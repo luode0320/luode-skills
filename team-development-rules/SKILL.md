@@ -1,6 +1,6 @@
 ---
 name: team-development-rules
-description: Enforce the team's full development workflow for Chinese-first collaboration, requirement clarification, minimal code changes, coding standards, AGENTS.md generation, Git history awareness, testing, delivery notes, method timestamp safety checks, and repeated-failure diagnosis. Use when Codex is asked to generate, modify, debug, review, test, or explain code under the team's engineering rules, or when producing AGENTS.md and other engineering documentation in Chinese.
+description: 按团队完整研发流程执行任务，涵盖中文优先协作、需求澄清、最小代码改动、编码规范、AGENTS.md 生成、Git 历史感知、测试、交付说明、方法时间戳安全检查和重复失败诊断。用于 Codex 在团队工程规则下生成、修改、调试、评审、测试或解释代码，或产出中文 AGENTS.md 及其他工程文档时触发。
 ---
 
 # 团队研发规则

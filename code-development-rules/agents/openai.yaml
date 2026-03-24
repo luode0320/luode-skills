@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code Development Rules"
-  short_description: "Clarify requirements first and enforce team coding rules."
-  default_prompt: "Use $code-development-rules to clarify requirements first and then implement the smallest safe code change."
