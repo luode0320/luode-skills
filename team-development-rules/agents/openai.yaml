@@ -1,0 +1,4 @@
+interface:
+  display_name: "团队研发规则"
+  short_description: "让代理按团队规则完成沟通、编码、测试与交付说明。"
+  default_prompt: "Use $team-development-rules to clarify the task first, then implement with the team coding, testing, and delivery rules."
