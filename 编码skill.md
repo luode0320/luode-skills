@@ -412,12 +412,148 @@ Bug 域采用两条互补路径：
 
 ## 十四、推荐的 references 组织方式
 
-建议每个 skill 都采用：
+建议每个 skill 都采用“精简 `SKILL.md` + 结构化 `references/`”的方式组织，不建议把全部规则堆在 `SKILL.md` 里。
 
-- 一个精简 `SKILL.md`
-- 多个按主题拆分的 `references/*.md`
+### 1. `SKILL.md` 保留内容
 
-不建议把全部规则堆在 `SKILL.md` 里。
+`SKILL.md` 只保留最核心的、必须第一时间被加载的内容，原则上只写：
+
+- 核心触发逻辑
+- 执行流程
+- 权责边界
+- 暂停 / 确认条件
+- 通过 / 驳回判定标准
+- references 读取入口与选择规则
+
+约束要求：
+
+- `SKILL.md` 必须保持精简，严禁堆砌大量细则
+- 不把语言细节、框架细节、场景枚举、长篇示例直接塞进 `SKILL.md`
+- 一切可拆分、可复用、可按需加载的细节，都应进入 `references/`
+
+### 2. `references/*.md` 拆分规则
+
+`references/` 用于承载细则，必须按可维护、可复用、可独立更新的原则拆分。
+
+拆分维度优先级建议如下：
+
+1. 按语言拆分
+
+- 例如：`java-*.md`、`python-*.md`、`typescript-*.md`
+
+2. 按框架或技术栈拆分
+
+- 例如：`mybatis-*.md`、`jpa-*.md`、`spring-*.md`
+- 例如：`vue-*.md`、`react-*.md`
+
+3. 按场景拆分
+
+- 例如：`bug-runtime-debug.md`
+- 例如：`api-response-envelope.md`
+- 例如：`test-regression-scope.md`
+
+4. 按代码位点拆分
+
+- 例如：`database-sql-rules.md`
+- 例如：`request-header-trace.md`
+- 例如：`common-util-placement.md`
+
+典型示例：
+
+- 数据库规则可拆成：
+  - `sql-rules.md`
+  - `mybatis-rules.md`
+  - `jpa-rules.md`
+- 前端规则可拆成：
+  - `vue-rules.md`
+  - `react-rules.md`
+- 安全规则可拆成：
+  - `fastapi-security.md`
+  - `django-security.md`
+  - `react-security.md`
+
+拆分原则：
+
+- 一份 reference 只负责一类相对稳定的主题
+- 同一份 reference 不要同时混合语言、框架、位点、流程四种维度
+- 只要某一部分会独立演进、独立增补、独立复用，就应该拆出去
+
+### 3. references 命名规范
+
+全体系统一使用小写字母 + 连字符命名，不使用空格，不使用中文文件名。
+
+推荐命名格式：
+
+- `主题-规则.md`
+- `语言-主题-规则.md`
+- `框架-主题-规则.md`
+- `位点-主题-规则.md`
+
+命名示例：
+
+- `sql-rules.md`
+- `mybatis-rules.md`
+- `jpa-rules.md`
+- `react-rules.md`
+- `vue-rules.md`
+- `error-response-rules.md`
+- `trace-header-rules.md`
+- `runtime-debug-rules.md`
+
+禁止情况：
+
+- `规则1.md`
+- `临时.md`
+- `最终版.md`
+- `各种规范汇总.md`
+- 含义不清、不能从文件名判断用途的命名
+
+### 4. references 目录层级规范
+
+默认建议每个 skill 只保留一层 `references/`，不要做过深目录嵌套。
+
+推荐结构：
+
+```text
+skill-name/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+└── references/
+    ├── general-rules.md
+    ├── java-xxx-rules.md
+    ├── python-xxx-rules.md
+    ├── react-xxx-rules.md
+    └── ...
+```
+
+目录层级控制原则：
+
+- 优先平铺，不优先深层级
+- 如果 references 文件数量较少，全部放在 `references/` 根下
+- 只有当某个 skill 的 references 数量明显变多且维度非常稳定时，才考虑再分一级目录
+- 即使分目录，也只建议一层，例如：
+  - `references/languages/`
+  - `references/frameworks/`
+  - `references/scenarios/`
+
+### 5. 全体系统一性要求
+
+所有 skill 的 references 组织方式要尽量统一，避免不同 skill 各写一套风格。
+
+统一要求包括：
+
+- 命名风格统一
+- 目录层级统一
+- 拆分维度统一
+- 文件职责边界统一
+- 不在一个 skill 平铺、另一个 skill 深层嵌套、第三个 skill 全堆进 `SKILL.md`
+
+目标是：
+
+- 后续任何人补规则时，都知道该把内容放在哪
+- 后续任何人审查 skill 时，都能快速找到对应 reference
+- 后续迁移、合并、拆分 skill 时，references 结构可以直接复用
 
 ## 十五、已准备好的种子内容
 
@@ -508,6 +644,7 @@ Bug 域采用两条互补路径：
 14. PR 评审和测试前自审是否已经区分清楚
 15. 语法检查、引用清理和格式化规则是否还要按语言继续拆细
 16. 统一归档目录约定是否合理，是否需要按领域再细化子目录
+17. references 的拆分维度、命名规范和目录层级是否足够统一，是否便于长期维护
 
 ## 十九、当前结论
 
