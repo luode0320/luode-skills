@@ -185,6 +185,7 @@ Bug 域采用两条互补路径：
 
 | Skill 名字                     | 自动触发 description                                                        | 核心职责                                     |
 | ------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------- |
+| `code-minimal-change-rules`    | 当新增或修改代码、调整功能、修复 Bug 时自动触发。                           | 严控代码变更范围，杜绝无关修改、冗余改动和过度优化，保证每次变更聚焦单一目标，降低回归风险和排查难度。 |
 | `code-readability-rules`       | 当新增或修改任意业务代码、工具代码、服务代码、脚本代码时自动触发。          | 保证函数结构清晰、逻辑顺序自然、复杂度可控。 |
 | `code-style-consistency-rules` | 当新增或修改任意代码文件时自动触发。                                        | 跟随项目现有风格，不引入风格跳变。           |
 | `naming-rules`                 | 当新增或修改类名、函数名、变量名、常量名、DTO、实体、字段映射名时自动触发。 | 保证命名语义化。                             |
@@ -198,6 +199,7 @@ Bug 域采用两条互补路径：
 | Skill 名字                  | 自动触发 description                                                                                                                                                                                                | 核心职责                             |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | `config-change-rules`       | 当新增或修改 `.env`、`.env.example`、`application.yml`、`application.yaml`、`settings.py`、`config.ts`、`appsettings.json`、`values.yaml`、环境变量读取、默认值、配置注入、配置分层、特性开关、密钥占位时自动触发。 | 统一配置、密钥和默认值策略。         |
+| `common-util-rules`         | 当新增或修改工具类、通用方法、公共组件、工具函数、通用常量、复用代码时自动触发。                                                                                                                         | 统一通用工具代码的编写规范、复用标准、存放位置和调用方式，避免重复造轮子，保证公共代码的通用性、稳定性和可维护性。 |
 | `database-schema-rules`     | 当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。                                                                                                                        | 统一表结构变更、迁移安全和回滚策略。 |
 | `database-query-rules`      | 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。                                                                                                                  | 统一数据库访问和查询性能规则。       |
 | `api-endpoint-rules`        | 当新增或修改 controller、router、handler、路由声明、HTTP 方法、接口 CRUD、路径命名、幂等接口、超时预算时自动触发。                                                                                                  | 统一接口入口设计。                   |
@@ -400,6 +402,7 @@ Bug 域采用两条互补路径：
 - `bug-debug-log-rules`
 - `bug-assertion-diagnostic-rules`
 - `bug-fix-proposal-rules`
+- `code-minimal-change-rules`
 - `code-readability-rules`
 - `code-style-consistency-rules`
 - `chinese-comment-rules`
@@ -409,6 +412,7 @@ Bug 域采用两条互补路径：
 - `cleanup-format-review-rules`
 - `code-placement-review-rules`
 - `config-change-rules`
+- `common-util-rules`
 - `database-schema-rules`
 - `database-query-rules`
 - `api-endpoint-rules`
