@@ -274,7 +274,7 @@ Bug 域采用两条互补路径：
 | `test-program-rules`          | 当新增测试程序、模拟程序、验证脚本、数据构造脚本时自动触发。                     | 统一测试程序和辅助脚本位置。 |
 | `test-doc-rules`              | 当新增或修改测试 `README.md`、验证说明、测试报告、覆盖说明时自动触发。           | 统一测试说明文档结构。       |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求与验收标准时自动触发。 | 负责当前需求对应的功能正确性验证。 |
-| `regression-validation-rules` | 当功能修改、Bug 修复、重构、依赖调整、配置调整后，需要确认旧能力未被破坏时自动触发。 | 负责回归范围识别和回归验证。 |
+| `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
 | `integration-debugging-rules` | 当联调、排查接口不通、字段不一致、环境差异、trace 断链、测试环境问题时自动触发。 | 统一联调和排障证据记录。     |
 
 ### 测试域内部边界判定
@@ -308,11 +308,12 @@ Bug 域采用两条互补路径：
 - 适用于“单点功能看起来没问题，但整个链路跑不通”的场景
 - 不替代功能验证，也不替代回归验证
 
-5. 回归验证
+5. 回归测试与回归验证
 
-- 由 `regression-validation-rules` 负责
+- 由 `test-regression-rules` 负责
 - 聚焦当前改动是否破坏旧逻辑、共享模块、公共接口、历史页面、已有流程和兼容行为
 - 重点回答“这次改动有没有带坏别的地方”
+- 明确回归范围、用例选取和验证要点
 - 不负责决定测试资产存放规范
 
 ### 测试域默认分流规则
@@ -321,7 +322,7 @@ Bug 域采用两条互补路径：
 - 讨论“测试目录建在哪、怎么命名、README 怎么写”时，进入测试资源管理相关 skill
 - 讨论“当前需求是否实现正确”时，进入 `functional-validation-rules`
 - 讨论“上下游系统是否打通、环境是否一致、链路是否闭环”时，进入 `integration-debugging-rules`
-- 讨论“旧功能有没有被这次改动带坏”时，进入 `regression-validation-rules`
+- 讨论“旧功能有没有被这次改动带坏、回归范围怎么定、回归用例怎么选”时，进入 `test-regression-rules`
 
 ### 测试域内部顺序
 
@@ -329,7 +330,7 @@ Bug 域采用两条互补路径：
 - 再由测试资源管理类 skill 规范测试资产位置、命名和文档
 - 然后执行 `functional-validation-rules`
 - 涉及跨系统或跨环境时，再进入 `integration-debugging-rules`
-- 最后执行 `regression-validation-rules`，确认改动没有破坏原有能力
+- 最后执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证
 
 ## 十一、交付域
 
@@ -426,7 +427,7 @@ Bug 域采用两条互补路径：
 - `test-program-rules`
 - `test-doc-rules`
 - `functional-validation-rules`
-- `regression-validation-rules`
+- `test-regression-rules`
 
 ## 十七、当前不执行的事项
 
