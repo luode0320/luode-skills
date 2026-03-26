@@ -1,0 +1,4 @@
+interface:
+  display_name: "包结构与分层"
+  short_description: "约束目录分层、包职责与依赖方向的代码结构规则与语言映射"
+  default_prompt: "使用 $package-structure-rules 判断当前新增或修改的代码应落在哪一层、哪个目录，以及是否允许跨层依赖。"
