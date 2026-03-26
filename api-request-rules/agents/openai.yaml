@@ -1,0 +1,4 @@
+interface:
+  display_name: "接口请求规则"
+  short_description: "约束 path、query、body、DTO 与参数校验边界的接口请求规则"
+  default_prompt: "使用 $api-request-rules 判断当前接口请求参数、DTO、path、query 与 body 结构应如何设计。"
