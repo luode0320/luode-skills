@@ -1765,6 +1765,262 @@ skill-name/
 - 如果 `team-development-rules` 和 `skill-evolution-rules` 仍有争议，不能提前进入 `code-minimal-change-rules`
 - `code-minimal-change-rules` 之所以作为第一个编码样板，是因为它对后续所有 skill 都有约束意义，适合作为编码主干模板的第一块
 
+### 6.1 第一波关键 Skill 的审查版正文骨架
+
+为了避免第一波真正开始落地时，仍然靠临时发挥去写正文，下面先固化 3 个关键 skill 的审查版正文骨架。
+
+这 3 个 skill 分工如下：
+
+- `team-development-rules`
+  负责阶段判断、分流、冲突裁决和流程阻断
+- `skill-evolution-rules`
+  负责未来 skill 的新增、拆分、迁移、合并和退休
+- `code-minimal-change-rules`
+  负责所有编码行为的最小改动约束，是后续编码主干的第一块基线
+
+#### 6.1.1 `team-development-rules` 审查版骨架
+
+建议 frontmatter 草案：
+
+```yaml
+---
+name: team-development-rules
+description: 当任务阶段不明确、领域边界不清、多个 skill 同时触发、流程需要暂停/重启/继续/终止，或用户明确要求按团队完整研发流程处理时自动触发。
+---
+```
+
+建议正文段落顺序：
+
+1. Skill 作用
+
+- 说明它是弱触发协调层
+- 明确只负责阶段分析、路由分流、冲突裁决、流程中断
+- 明确不承载数据库、接口、错误处理、日志、测试细则
+
+2. 自动触发信号
+
+- 新任务进入但阶段未明
+- 同时像需求又像 Bug
+- 同时命中多个位点或多个阶段
+- 当前流程出现暂停、重启、终止诉求
+
+3. 进入后先做什么
+
+- 先判阶段
+- 再判需求类或 Bug 类
+- 再判是否已经进入代码位点
+- 最后判是否已经进入编码审查、测试或交付
+
+4. 默认执行流程
+
+- 读取总控层默认分流决策表
+- 读取阶段阻断表
+- 给出当前应进入的域 / skill
+- 如果存在冲突，再给出裁决结果和原因
+
+5. 权责边界与不负责事项
+
+- 不替代小 skill 执行细则
+- 不因为“全流程”三个字就默认抢所有任务
+- 对单一明确位点任务只做让路，不做主执行
+
+6. 暂停并确认条件
+
+- 需求和 Bug 无法判定
+- 当前任务同时跨两个阶段且前一阶段未完成
+- 多个 skill 规则冲突且无法依据既定优先级裁断
+
+7. 通过 / 驳回标准
+
+- 通过：能明确给出阶段、所属域、建议命中 skill、是否阻断下一阶段
+- 驳回：仍然无法说明当前任务归属，或把明确小 skill 场景错误拦回总控层
+
+8. 归档要求
+
+- 需要时将分流结论、阻断原因、裁决结果记录到 `analysis/` 或 `review/`
+- 如果只是常规让路且没有冲突，可不强制单独归档
+
+9. references 读取规则
+
+- 优先读取：`references/routing-rules.md`
+- 涉及阻断时再读：`references/stage-blockers.md`
+- 涉及冲突时再读：`references/conflict-examples.md`
+
+建议首批 references：
+
+- `references/routing-rules.md`
+  存放分流逻辑、主次关系、优先级规则
+- `references/stage-blockers.md`
+  存放各阶段不可跳过条件
+- `references/conflict-examples.md`
+  存放多 skill 并行命中、重复命中、冲突命中的裁决样例
+
+#### 6.1.2 `skill-evolution-rules` 审查版骨架
+
+建议 frontmatter 草案：
+
+```yaml
+---
+name: skill-evolution-rules
+description: 当新增、修改、拆分、合并、迁移或退休团队内部 skill，或发现现有 skill 边界失衡、触发描述失真、references 结构失控时自动触发。
+---
+```
+
+建议正文段落顺序：
+
+1. Skill 作用
+
+- 说明它负责维护 skill 体系本身
+- 保证未来新增规则时不会把体系重新写乱
+
+2. 自动触发信号
+
+- 新增一个团队内部 skill
+- 发现某个 skill 过宽、过细、抢职责或漏职责
+- 需要把一部分 rules 从 A skill 迁到 B skill
+- 需要合并重复 skill 或退休失效 skill
+
+3. 进入后先做什么
+
+- 先识别当前问题属于新增、拆分、合并、迁移还是退休
+- 再识别影响的是 name、description、正文边界还是 references 结构
+
+4. 默认执行流程
+
+- 先看问题类型
+- 再判断是否需要拆 skill
+- 再判断 references 是否要拆分或迁移
+- 最后输出变更建议、受影响 skill 清单、迁移顺序
+
+5. 权责边界与不负责事项
+
+- 不直接替业务 skill 代写业务规则
+- 不因为发现一个 skill 有问题，就顺手重写整个体系
+- 不绕过总控层和已有波次计划大规模改结构
+
+6. 暂停并确认条件
+
+- 拆分后边界仍不清
+- 合并后 description 会明显过宽
+- 迁移 references 会影响多个已稳定 skill
+
+7. 通过 / 驳回标准
+
+- 通过：能明确给出本次演进属于哪种变更、影响哪些 skill、应如何迁移
+- 驳回：只有抽象建议，没有明确改动对象、边界和迁移顺序
+
+8. 归档要求
+
+- 将演进建议、影响范围、迁移决策和遗留问题记录到 `reports/` 或 `analysis/`
+
+9. references 读取规则
+
+- 优先读取：`references/evolution-patterns.md`
+- 涉及拆分 / 合并时再读：`references/split-merge-boundaries.md`
+- 涉及迁移时再读：`references/migration-checklist.md`
+
+建议首批 references：
+
+- `references/evolution-patterns.md`
+  存放新增、拆分、合并、迁移、退休的基本模式
+- `references/split-merge-boundaries.md`
+  存放“什么情况应该拆、什么情况不该拆”的边界判断
+- `references/migration-checklist.md`
+  存放 skill 调整时必须检查的命名、description、references、归档影响
+
+#### 6.1.3 `code-minimal-change-rules` 审查版骨架
+
+建议 frontmatter 草案：
+
+```yaml
+---
+name: code-minimal-change-rules
+description: 当新增或修改代码、调整功能、修复 Bug、补测试支撑代码或整理实现细节时自动触发，用于约束改动范围、删除无关修改并保持变更聚焦。
+---
+```
+
+建议正文段落顺序：
+
+1. Skill 作用
+
+- 说明它是所有编码行为的基础约束
+- 目标是控制范围、降低回归、降低审查成本
+
+2. 自动触发信号
+
+- 新增业务代码
+- 修改已有逻辑
+- 修复 Bug
+- 为测试补最小支撑代码
+- 为联调补最小必要适配
+
+3. 进入后先做什么
+
+- 先确认本次目标只是什么
+- 列出为了完成目标必须改动的文件和模块
+- 标出明显不属于当前目标的潜在顺手改动
+
+4. 默认执行流程
+
+- 先收缩改动范围
+- 再执行真实实现
+- 再检查是否混入无关重构、无关格式化、无关命名调整、无关清理
+- 最后把遗留问题留给后续独立任务，而不是在本次任务中顺手做掉
+
+5. 权责边界与不负责事项
+
+- 不替代 `code-readability-rules` 负责可读性细节
+- 不替代 `code-style-consistency-rules` 负责项目风格一致性
+- 不替代 `code-placement-review-rules` 负责落点审查
+- 它只关心“这次该不该改、需不需要改这么多”
+
+6. 暂停并确认条件
+
+- 当前需求想顺手改历史问题
+- 当前 Bug 修复想顺手重构整段模块
+- 本次改动已经扩大到多个不相干目标
+
+7. 通过 / 驳回标准
+
+- 通过：改动与目标直接相关，范围可解释，无明显无关修改
+- 驳回：出现顺手优化、顺手重构、顺手统一风格、顺手清理整片旧代码等越界行为
+
+8. 归档要求
+
+- 如存在被刻意排除的后续事项，应在 `analysis/` 或 `review/` 中记录“本次不处理项”
+
+9. references 读取规则
+
+- 优先读取：`references/minimal-change-general.md`
+- 涉及边界争议时再读：`references/minimal-change-boundaries.md`
+- 涉及是否误伤相邻规则时再读：`references/minimal-change-examples.md`
+
+建议首批 references：
+
+- `references/minimal-change-general.md`
+  存放最小改动原则、常见越界行为、允许改动范围
+- `references/minimal-change-boundaries.md`
+  存放与可读性、风格一致性、代码归位、测试补充之间的边界
+- `references/minimal-change-examples.md`
+  存放正反例样例，帮助审查时快速判断是否越界
+
+### 6.2 第一波真正开始落地时的固定顺序
+
+如果下一阶段从“审查稿”进入“初始化 skill”，建议固定顺序不要变：
+
+1. 先写 `team-development-rules` 的 `SKILL.md` 审查版
+2. 再写 `skill-evolution-rules` 的 `SKILL.md` 审查版
+3. 再写 `code-minimal-change-rules` 的 `SKILL.md` 审查版
+4. 每完成一个，都先做触发 / 不触发 / 易混淆场景审查
+5. 审查通过后，才补对应 `agents/openai.yaml`
+6. 最后再补第一版 `references/`
+
+这样安排的原因是：
+
+- 总控层先稳，后续所有 skill 才知道自己何时该接手
+- 体系维护层先稳，后续 skill 的拆分和迁移才不会失控
+- 最小改动基线先稳，后续编码类 skill 才不会一上来就失焦
+
 ### 7. 当前实施态度
 
 这套计划默认采用“慢工出细活”的策略：
@@ -1814,6 +2070,9 @@ skill-name/
 - `skill-evolution-rules` 是否已经形成规划草案
 - 首批 skill 的统一最小文件骨架是否已定稿
 - `SKILL.md` 的统一最小段落模板是否已定稿
+- `team-development-rules` 的审查版正文骨架是否已定稿
+- `skill-evolution-rules` 的审查版正文骨架是否已定稿
+- `code-minimal-change-rules` 的审查版正文骨架是否已定稿
 - 标准结构、归档规范、references 规范是否已成统一模板
 - 是否已经准备“总控层应触发 / 不应触发”样例
 
@@ -1911,6 +2170,9 @@ skill-name/
 25. 总控层的阶段阻断表是否足够严格，能否防止跳过需求澄清、Bug 定位、编码审查和测试
 26. 首批 skill 的统一最小文件骨架是否足够轻量，是否会导致模板过重
 27. `SKILL.md` 的统一段落模板是否既方便审查，又不会把技能正文写得过长
+28. `team-development-rules` 的审查版正文骨架是否已经足够明确，能否直接进入正式 `SKILL.md` 起草
+29. `skill-evolution-rules` 的审查版正文骨架是否已经足够明确，能否支撑未来体系持续演进
+30. `code-minimal-change-rules` 的审查版正文骨架是否已经足够明确，能否作为第一个编码样板 skill
 
 ## 二十、当前结论
 
