@@ -1,0 +1,4 @@
+interface:
+  display_name: "清理格式审查"
+  short_description: "进入测试前清理未使用导入、调试残留、死代码与格式噪音的规则"
+  default_prompt: "使用 $cleanup-format-review-rules 在进入测试前检查当前改动是否存在未使用导入、调试残留、死代码或格式噪音。"
