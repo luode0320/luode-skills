@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bug 运行时诊断"
+  short_description: "在静态证据不足时通过断点、日志与运行观察收敛 Bug 的诊断规则"
+  default_prompt: "使用 $bug-runtime-debug-rules 在静态定位不足时，通过断点、变量观察、debug 日志或运行时证据继续缩小 Bug 范围。"
