@@ -1,0 +1,4 @@
+interface:
+  display_name: "公共工具规则"
+  short_description: "区分通用工具与业务逻辑，并统一工具类、常量与公共组件落点的规则"
+  default_prompt: "使用 $common-util-rules 判断当前代码是否真的应抽成公共工具、常量或通用组件，以及应放在哪一层。"
