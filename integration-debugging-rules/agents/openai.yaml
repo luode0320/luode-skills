@@ -1,0 +1,4 @@
+interface:
+  display_name: "联调排障规则"
+  short_description: "统一跨系统环境差异字段断链联调证据与排障边界规则"
+  default_prompt: "使用 $integration-debugging-rules 判断当前跨系统联调、环境差异、字段不一致或 trace 断链问题应如何定位、留痕和分流。"
