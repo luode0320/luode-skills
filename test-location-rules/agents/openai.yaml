@@ -1,0 +1,4 @@
+interface:
+  display_name: "测试目录落点"
+  short_description: "统一测试资源根目录、任务目录与禁止散落规则的测试位置规范"
+  default_prompt: "使用 $test-location-rules 判断当前测试脚本、模拟数据、验证代码和说明文档应放在哪个测试目录。"
