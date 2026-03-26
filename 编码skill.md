@@ -199,6 +199,7 @@ Bug 域采用两条互补路径：
 | Skill 名字                  | 自动触发 description                                                                                                                                                                                                | 核心职责                             |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | `config-change-rules`       | 当新增或修改 `.env`、`.env.example`、`application.yml`、`application.yaml`、`settings.py`、`config.ts`、`appsettings.json`、`values.yaml`、环境变量读取、默认值、配置注入、配置分层、特性开关、密钥占位时自动触发。 | 统一配置、密钥和默认值策略。         |
+| `package-structure-rules`   | 当新增或修改包、目录、模块、分层结构、包名定义、文件归属、跨层引用关系时自动触发。 | 统一代码包定义、目录分层、包名职责、模块边界和依赖方向，尤其约束 Go 等语言中的 `routes`、`services`、`utils`、`models`、`repositories`、`middleware`、`constants`、`config`、`controller` 等包结构，避免目录失控和职责混乱。 |
 | `common-util-rules`         | 当新增或修改工具类、通用方法、公共组件、工具函数、通用常量、复用代码时自动触发。                                                                                                                         | 统一通用工具代码的编写规范、复用标准、存放位置和调用方式，避免重复造轮子，保证公共代码的通用性、稳定性和可维护性。 |
 | `database-schema-rules`     | 当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。                                                                                                                        | 统一表结构变更、迁移安全和回滚策略。 |
 | `database-query-rules`      | 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。                                                                                                                  | 统一数据库访问和查询性能规则。       |
@@ -467,6 +468,11 @@ Bug 域采用两条互补路径：
 - 前端规则可拆成：
   - `vue-rules.md`
   - `react-rules.md`
+- 包结构规则可拆成：
+  - `go-package-layout-rules.md`
+  - `go-dependency-boundary-rules.md`
+  - `java-package-layout-rules.md`
+  - `python-module-layout-rules.md`
 - 安全规则可拆成：
   - `fastapi-security.md`
   - `django-security.md`
@@ -598,6 +604,7 @@ skill-name/
 - `cleanup-format-review-rules`
 - `code-placement-review-rules`
 - `config-change-rules`
+- `package-structure-rules`
 - `common-util-rules`
 - `database-schema-rules`
 - `database-query-rules`
