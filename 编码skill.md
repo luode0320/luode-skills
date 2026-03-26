@@ -664,7 +664,281 @@ skill-name/
 - `functional-validation-rules`
 - `test-regression-rules`
 
-## 十七、当前不执行的事项
+## 十七、实施落地计划（串行安全版）
+
+整体落地原则不是“同时铺很多个 skill”，而是“一个一个做，做完一个、审完一个、验证一个，再开始下一个”。
+
+### 1. 实施总原则
+
+- 严格串行，不并行落地多个 skill
+- 每个 skill 必须完成定义、结构、样例、校验、审查、回归后，才能进入下一个
+- 先做模板和样板，再批量扩展
+- 先做高频、高价值、边界清晰的 skill，再做复杂或依赖更多上下文的 skill
+- 每次落地只解决一个明确目标，不在同一轮里顺手做额外扩展
+
+### 2. 单个 Skill 的标准落地步骤
+
+每个 skill 一律按以下顺序落地：
+
+1. 固化目标
+
+- 明确这个 skill 解决什么问题
+- 明确它和相邻 skill 的边界
+- 明确自动触发 description
+
+2. 固化结构
+
+- 创建 skill 目录骨架
+- 写精简版 `SKILL.md`
+- 规划 `references/` 文件清单
+- 明确通过 / 驳回标准
+- 明确归档要求
+
+3. 写第一版内容
+
+- 只写当前 skill 自己必须有的规则
+- 不提前把未来规则塞进来
+- 不跨 skill 抢职责
+
+4. 做本地静态校验
+
+- 检查 `SKILL.md` frontmatter
+- 检查命名、目录、references 结构
+- 检查 description 是否过宽或过窄
+
+5. 做场景验证
+
+- 至少准备 3 类真实场景：
+  - 应该触发的场景
+  - 不该触发的场景
+  - 容易混淆边界的场景
+- 验证 skill 是否真的符合预期边界
+
+6. 做审查修订
+
+- 记录本轮发现的问题
+- 只修这个 skill 自身的问题
+- 不连带开启下一个 skill
+
+7. 冻结当前版本
+
+- 在文档中记录当前 skill 已审查通过
+- 记录遗留问题和后续优化项
+
+8. 再进入下一个 skill
+
+### 3. 单个 Skill 的完成判定
+
+一个 skill 只有同时满足下面条件，才算“完成”，否则不能进入下一个：
+
+- 目标和边界明确
+- 自动触发 description 定稿
+- `SKILL.md` 已完成精简化
+- `references/` 结构已完成第一版
+- 通过 / 驳回标准已写清
+- 归档要求已写清
+- 至少经过一轮场景验证
+- 至少经过一轮人工审查修订
+
+### 4. 推荐实施波次
+
+为了降低风险，建议按“先模板、再样板、再扩展”的顺序落地。
+
+#### 第一波：基础模板与协调层
+
+目标：先把整套体系的模板、约定和总控层收稳。
+
+- `team-development-rules`
+- `skill-evolution-rules`
+
+完成标准：
+
+- 总控层定位稳定为弱触发协调层
+- 标准结构、归档规范、references 规范全部定稿
+- 后续 skill 可以直接复用模板
+
+第一波详细实施步骤：
+
+1. 固化总控层最终定义
+
+- 只处理 `team-development-rules`
+- 不同时处理其他业务 skill
+- 最终确认总控层的定位、触发边界、冲突裁决规则、流程中断规则
+- 输出物：
+  - 总控层最终定义审查稿
+  - 总控层触发 / 不触发场景清单
+
+2. 固化公共模板规范
+
+- 只处理所有 skill 的公共模板，不开始写具体业务细则
+- 最终确认：
+  - skill 标准结构
+  - references 拆分规则
+  - references 命名与层级规范
+  - 归档目录约定
+  - 通过 / 驳回标准写法
+- 输出物：
+  - 公共模板规范稿
+  - 公共 references 结构规范稿
+
+3. 落地 `skill-evolution-rules` 规划
+
+- 先不急着扩其他 skill
+- 优先把“后续 skill 怎么拆、怎么改、怎么迁移”的元规则稳定下来
+- 输出物：
+  - `skill-evolution-rules` 的目标、边界、触发定义草案
+
+4. 做第一波场景验证
+
+- 至少验证 3 类场景：
+  - 只有小 skill 应该触发，总控层不应抢占
+  - 阶段不明确，总控层应介入分流
+  - 多个 skill 同时命中，总控层应负责裁决
+- 输出物：
+  - 第一波验证样例列表
+  - 每个样例的预期路由结果
+
+5. 做第一波复盘
+
+- 审核第一波里是否仍存在：
+  - 总控层过宽
+  - 模板过重
+  - references 结构不统一
+  - 归档要求不可执行
+- 输出物：
+  - 第一波复盘记录
+  - 第一波遗留问题清单
+
+第一波退出条件：
+
+- `team-development-rules` 已被确认是弱触发协调层，而不是总规则 skill
+- `skill-evolution-rules` 的规划已成型
+- 所有 skill 都有统一标准结构模板
+- `references/` 组织规范已稳定
+- 归档规范已稳定
+- 总控层与小 skill 的主次关系已经在样例验证中跑通
+
+只有第一波退出条件全部满足，才能进入第二波。
+
+#### 第二波：编码主干样板
+
+目标：选最核心、最常用、边界最清晰的编码 skill 做样板。
+
+- `code-minimal-change-rules`
+- `code-readability-rules`
+- `code-style-consistency-rules`
+- `package-structure-rules`
+
+完成标准：
+
+- 编码基线类 skill 的写法稳定
+- 代码位点类 skill 的触发描述写法稳定
+- “基线域”和“位点域”的边界基本跑通
+
+#### 第三波：需求与 Bug 样板
+
+目标：把需求流和 Bug 流跑通，验证阶段分流是否成立。
+
+- `requirement-gap-rules`
+- `requirement-boundary-rules`
+- `bug-intake-rules`
+- `bug-root-cause-rules`
+- `bug-runtime-debug-rules`
+- `bug-fix-proposal-rules`
+
+完成标准：
+
+- 需求域与 Bug 域边界稳定
+- Bug 的静态定位与运行时诊断双路径可执行
+- 总控层的分流价值被验证
+
+#### 第四波：接口与公共逻辑样板
+
+目标：覆盖最常见业务开发位点。
+
+- `api-endpoint-rules`
+- `api-request-rules`
+- `api-response-rules`
+- `common-util-rules`
+- `error-handling-rules`
+- `logging-trace-rules`
+
+完成标准：
+
+- 后端高频开发位点基本覆盖
+- 公共逻辑、错误处理、日志链路开始形成统一规范
+
+#### 第五波：测试样板
+
+目标：把“写完代码 -> 编码审查 -> 测试 -> 回归”链路打通。
+
+- `implementation-review-rules`
+- `syntax-check-review-rules`
+- `cleanup-format-review-rules`
+- `code-placement-review-rules`
+- `test-location-rules`
+- `test-naming-rules`
+- `test-program-rules`
+- `test-doc-rules`
+- `functional-validation-rules`
+- `test-regression-rules`
+
+完成标准：
+
+- 编码审查域与测试域边界稳定
+- 测试资源管理和功能验证、回归验证分离清楚
+
+#### 第六波：剩余位点与增强项
+
+目标：在前五波稳定后，再补剩余位点和增强能力。
+
+- `config-change-rules`
+- `database-schema-rules`
+- `database-query-rules`
+- `request-header-rules`
+- `auth-security-rules`
+- `performance-caching-rules`
+- `integration-debugging-rules`
+- 其他后续新增 skill
+
+### 5. 落地节奏建议
+
+建议采用保守节奏：
+
+- 每次只处理 1 个 skill
+- 一个 skill 至少经过“初稿 -> 审查 -> 修订 -> 再审”两轮
+- 每一波完成后，不立刻进入下一波，先复盘共性问题
+- 如果某一波中发现模板本身有问题，先回修模板，再继续后续 skill
+- 如果当前 skill 的边界仍不稳定，不允许以“先做下一个再回头修”的方式推进
+- 如果当前波次的退出条件未满足，不允许提前进入下一波
+
+### 6. 当前建议的第一步
+
+如果正式开始落地，不建议一上来就建很多目录。
+
+最稳的开始方式是：
+
+1. 先把 `team-development-rules` 改造成正式的弱触发协调层
+2. 同时把 `skill-evolution-rules` 做出来，作为后续体系维护规则
+3. 然后只落地一个编码样板 skill：
+   `code-minimal-change-rules`
+4. 等这一套模板验证稳定后，再进入第二个 skill
+
+补充说明：
+
+- 这里的“做出来”优先指完成规划、结构、场景验证和审查，不默认等于立刻批量建目录
+- 如果 `team-development-rules` 和 `skill-evolution-rules` 仍有争议，不能提前进入 `code-minimal-change-rules`
+- `code-minimal-change-rules` 之所以作为第一个编码样板，是因为它对后续所有 skill 都有约束意义，适合作为编码主干模板的第一块
+
+### 7. 当前实施态度
+
+这套计划默认采用“慢工出细活”的策略：
+
+- 不追求短时间铺满全部 skill
+- 追求每个 skill 都能独立成立、独立维护、独立复用
+- 追求每完成一个，就真的能成为后续 skill 的模板和参照物
+
+## 十八、当前不执行的事项
 
 在审查通过前，暂不执行以下动作：
 
@@ -674,7 +948,7 @@ skill-name/
 - 不写正式 `references/` 细则
 - 不做自动触发描述的最终定稿
 
-## 十八、后续审查重点
+## 十九、后续审查重点
 
 后续审查建议重点看这几件事：
 
@@ -696,8 +970,10 @@ skill-name/
 16. 语法检查、引用清理和格式化规则是否还要按语言继续拆细
 17. 统一归档目录约定是否合理，是否需要按领域再细化子目录
 18. references 的拆分维度、命名规范和目录层级是否足够统一，是否便于长期维护
+19. 串行实施计划是否合理，是否需要调整各波次顺序
+20. 每个 skill 的完成判定是否足够严格，能否防止半成品进入下一阶段
 
-## 十九、当前结论
+## 二十、当前结论
 
 当前整体方向已经确定为：
 
@@ -709,6 +985,7 @@ skill-name/
 - 总控层负责多 skill 冲突裁决与流程中断管控，但不替代小 skill 执行
 - Bug 域采用“静态定位 + 运行时诊断”的双路径设计
 - 明确引入“编码完成后、测试前”的编码审查阶段
+- 正式落地采用“串行、安全、单 skill 完整验收后再进入下一个”的实施策略
 - 允许长期演进和持续拆分
 
 本文件作为后续多轮审查的基础版本。
