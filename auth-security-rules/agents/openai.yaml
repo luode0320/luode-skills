@@ -1,0 +1,4 @@
+interface:
+  display_name: "认证安全规则"
+  short_description: "统一认证鉴权输入校验敏感信息与高风险入口安全边界规范"
+  default_prompt: "使用 $auth-security-rules 判断当前认证、鉴权、输入校验、敏感信息处理、上传下载和外部请求实现是否符合安全基线。"
