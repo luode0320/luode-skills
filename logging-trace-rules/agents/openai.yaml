@@ -1,0 +1,4 @@
+interface:
+  display_name: "日志与追踪规则"
+  short_description: "统一业务日志、调试日志、审计日志与 trace span 透传边界的规则"
+  default_prompt: "使用 $logging-trace-rules 设计当前日志字段、trace 或 span 透传方式，以及业务日志、调试日志和审计日志的边界。"
