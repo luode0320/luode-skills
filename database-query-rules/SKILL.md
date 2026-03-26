@@ -1,0 +1,70 @@
+---
+name: database-query-rules
+description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界，避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、performance-caching-rules 或业务规则本身。
+---
+
+# 数据库访问规则
+
+只在“SQL 怎么写、查询逻辑落在哪层、事务和锁怎么用、批量操作怎么控风险”这个问题上使用这个 skill。
+如果当前问题是表结构、字段、索引和迁移脚本，请转交 `database-schema-rules`。
+
+## Skill 作用与适用场景
+
+- 统一 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、分页和批量操作的访问规则。
+- 区分数据访问层、schema 结构层、缓存层和业务规则层的职责边界。
+- 约束查询性能、事务范围、锁使用时机和批量操作风险控制。
+- 防止把跨层业务编排、缓存策略或结构设计问题误塞进数据访问实现。
+
+## 自动触发信号
+
+- 新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询。
+- 需要判断某段逻辑该落在数据访问层还是业务层。
+- 需要确认事务边界、锁粒度、批量写入方式或分页策略是否合理。
+- 发现查询慢、事务过大、锁范围过宽或访问层混入业务判断时。
+
+## 进入后先做什么
+
+1. 先确认 schema 结构已经稳定，不在当前 skill 内回头改字段和索引设计。
+2. 识别当前变更属于读查询、写操作、事务编排、锁控制还是批量任务。
+3. 判断当前逻辑属于数据访问职责，还是已经越界进入业务编排。
+4. 确认当前性能问题是访问实现问题，而不是 schema 或缓存策略问题。
+
+## 默认执行流程
+
+1. 默认先读 `references/access-layer-boundaries.md`，判断 SQL、Repository、DAO、Mapper 和业务层的分工。
+2. 如果涉及事务、锁和批量操作，再读 `references/transactions-locks-and-batch.md`。
+3. 如果需要对照分页、查询性能和正反例，再读 `references/query-performance-examples.md`。
+4. 输出访问层落点、事务范围、锁策略、分页方式和性能风险说明。
+5. 如果问题本质落回 schema 结构或缓存策略，停止停留在 query 层并转给相邻 skill。
+
+## 权责边界与不负责事项
+
+- 只负责数据访问实现，不负责表结构、索引、DDL 和迁移，那属于 `database-schema-rules`。
+- 不负责缓存读取写入、缓存 key 和失效策略，那属于 `performance-caching-rules`。
+- 不负责把复杂业务判断写成查询技巧或数据层副作用；业务编排仍属于业务层。
+- 不负责配置来源、连接池参数和环境变量，那属于 `config-change-rules`。
+- 不默认所有慢查询都靠 SQL 技巧解决，也不默认所有一致性问题都要靠大事务解决。
+
+## 需要暂停并确认的条件
+
+- 当前查询性能问题更像索引或表结构问题，而不是访问实现问题。
+- 当前事务横跨过多步骤、外部调用或跨服务行为，已经超出合理事务边界。
+- 当前锁策略可能导致长时间阻塞、死锁风险或明显并发退化。
+- 当前批量操作会影响大量数据，但缺少分批、重试、幂等或失败回收策略。
+
+## 执行通过 / 驳回标准
+
+- 通过：数据访问层职责清楚，SQL / Repository / DAO / Mapper 落点合理，事务和锁使用可解释，分页与批量策略没有明显风险。
+- 驳回：访问层混入业务逻辑、事务边界失控、锁范围过宽、分页和批量策略不稳定，或把 schema / 缓存问题伪装成 query 问题。
+
+## 执行结果归档要求
+
+- 将数据访问结论记录到任务记录、评审记录、性能说明或设计说明中。
+- 归档内容至少包含访问对象、访问层落点、事务范围、锁策略、批量策略和性能风险。
+- 如果调整了关键查询、事务或锁行为，必须记录兼容影响、失败模式和观察点。
+
+## references 读取规则
+
+- 默认先读 `references/access-layer-boundaries.md`。
+- 只有在涉及事务、锁和批量操作时，再读 `references/transactions-locks-and-batch.md`。
+- 只有在需要对照性能和正反例时，再读 `references/query-performance-examples.md`。
