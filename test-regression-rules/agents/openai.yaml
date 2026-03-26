@@ -1,0 +1,4 @@
+interface:
+  display_name: "回归验证规则"
+  short_description: "统一回归范围判定、用例选取、验证要点与结论留痕规范"
+  default_prompt: "使用 $test-regression-rules 判断当前改动需要回归哪些旧能力、应选择哪些回归用例、如何记录回归结论。"
