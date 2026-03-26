@@ -1,0 +1,4 @@
+interface:
+  display_name: "最小改动编码"
+  short_description: "约束代码改动范围并拦截无关修改、顺手重构与过度优化"
+  default_prompt: "使用 $code-minimal-change-rules 先收缩本次改动范围，再实现与目标直接相关的最小必要修改。"
