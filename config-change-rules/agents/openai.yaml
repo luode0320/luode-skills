@@ -1,0 +1,4 @@
+interface:
+  display_name: "配置变更规则"
+  short_description: "统一配置分层、环境变量、默认值策略与密钥占位边界规范"
+  default_prompt: "使用 $config-change-rules 判断当前配置文件、环境变量、默认值和密钥占位修改是否符合配置分层与安全基线。"
