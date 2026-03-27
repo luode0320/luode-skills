@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skill 字典</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <p class="eyebrow">Luode Skills</p>
+          <h1>Skill 字典</h1>
+          <p class="sidebar-copy">
+            面向仓库内 skill 的静态索引页。按《编码 Skill 体系整体计划》顺序组织，便于快速定位、比对和提出改进建议。
+          </p>
+        </div>
+
+        <section class="sidebar-section">
+          <h2>分类索引</h2>
+          <nav id="domain-nav" class="domain-nav"></nav>
+        </section>
+
+        <section class="sidebar-section quick-links">
+          <h2>快捷入口</h2>
+          <a href="../字典.md">打开字典.md</a>
+          <a href="../编码skill.md">打开总规划</a>
+          <a href="../team-development-rules/SKILL.md">查看总控规则</a>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Project Scan</p>
+            <h2>按域、状态与文档脉络查看整个项目</h2>
+            <p class="hero-copy">
+              页面支持本地直接打开，不依赖构建和服务端。左侧是域索引，中间是条目清单，右侧是结构化详情和后续优化切入点。
+            </p>
+          </div>
+          <div id="summary-cards" class="summary-cards"></div>
+        </header>
+
+        <section class="toolbar">
+          <label class="search-field">
+            <span>检索</span>
+            <input id="search-input" type="search" placeholder="搜索 skill 名、域、职责、触发词" />
+          </label>
+          <div id="status-filters" class="status-filters"></div>
+        </section>
+
+        <section class="content-grid">
+          <section class="list-panel">
+            <div class="panel-header">
+              <h3>Skill 清单</h3>
+              <p id="result-hint"></p>
+            </div>
+            <div id="skill-list" class="skill-list"></div>
+            <div class="panel-header docs-header">
+              <h3>项目文档</h3>
+              <p>根目录规划、复盘、验证与遗留问题文档。</p>
+            </div>
+            <div id="doc-list" class="doc-list"></div>
+          </section>
+
+          <aside class="detail-panel">
+            <div id="detail-view" class="detail-view"></div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
