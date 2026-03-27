@@ -1,4 +1,4 @@
 interface:
   display_name: "包结构与分层"
-  short_description: "判断 main.go、internal、utils/common/global/middleware/crontask 与 router/controller/service/repository/model 的落点、职责和依赖方向"
-  default_prompt: "使用 $package-structure-rules 判断当前新增或修改的代码应落在 `main.go`、`internal`、`utils`、`common`、`global`、`middleware`、`crontask`，还是 `router`、`controller`、`service`、`repository`、`model` 等目录，并说明允许的依赖方向与不应新增的泛化目录。"
+  short_description: "判断 main.go、internal、根级入口层与业务分层目录的落点和依赖方向"
+  default_prompt: "使用 $package-structure-rules 判断当前代码应落在 `main.go`、`internal`、根级 `global/middleware/crontask`，还是 `router`、`controller`、`service`、`repository`、`model` 等目录，并说明允许的依赖方向。"

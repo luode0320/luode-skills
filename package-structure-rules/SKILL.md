@@ -1,6 +1,6 @@
 ---
 name: package-structure-rules
-description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策；不要用它代替工具实现、接口设计或代码审查类 skill。
+description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策，尤其适合判断单二进制 Go 服务中哪些代码必须留在 `internal/`，以及哪些入口层目录必须保持根级；不要用它代替工具实现、接口设计或代码审查类 skill。
 ---
 
 # 包结构与分层规则
@@ -21,12 +21,14 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 - 新增文件时不确定应该放在哪一层。
 - 修改包名定义、模块归属或跨层依赖关系。
 - 新建 `utils`、`common`、`global`、`middleware`、`crontask` 等公共或入口目录。
+- 需要判断单二进制 Go 服务里，哪些代码默认应放进 `internal/`，哪些目录必须保持根级。
+- 需要判断 `internal/chain`、`internal/wss` 这类项目私有适配层是否合规。
 - 需要判断 `router`、`controller`、`service`、`repository`、`model` 等目录职责。
 
 ## 进入后先做什么
 
 1. 先识别当前项目语言或技术栈。
-2. 再判断当前改动是入口层、业务层、数据访问层、横切层、全局实例层，还是公共支撑层。
+2. 再判断当前改动是入口层、业务层、数据访问层、横切层、全局实例层、定时任务入口层，还是公共支撑层或私有适配层。
 3. 先复用现有稳定目录，不要为了单个文件默认新建目录。
 4. 最后确认该层允许依赖谁，不允许依赖谁。
 

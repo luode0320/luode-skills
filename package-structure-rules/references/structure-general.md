@@ -25,6 +25,12 @@
 - `crontask`
   只放定时任务入口、任务注册、调度装配和触发逻辑，不承载核心业务实现。
 
+## 私有层与根级层边界
+
+- 私有业务代码默认优先进入项目私有层，例如 Go 单二进制服务中的 `internal/`。
+- `global`、`middleware`、`crontask` 这类根级入口或全局目录，一旦确定存在，就不要再派生 `internal/global`、`internal/middleware`、`internal/crontask` 这类内部变体。
+- 项目私有的协议适配层、基础设施适配层或运行时接入层，可以放在私有层中按职责命名，例如 `internal/chain`、`internal/wss`；这类目录不强制统一成单一固定名称，但职责必须清晰稳定。
+
 ## 命名建议
 
 - 优先使用清晰、职责稳定的目录名，不要在同一项目里混用 `router/routes`、`controller/handler`、`model/domain` 这类近义命名。
@@ -35,6 +41,7 @@
 
 - 入口层如 `router`、`controller`、`middleware`、`crontask` 可以依赖业务层或稳定公共支撑层。
 - 业务层可以依赖数据访问层和稳定的公共支撑层。
+- 私有适配层可以依赖稳定公共支撑层或必要的业务接口，但不要反向控制入口层命名和目录结构。
 - 数据访问层不应反向依赖入口层。
 - `utils`、`common`、`global` 不应反向依赖具体业务目录。
 - 如果框架已把某两层天然合一，不要机械拆成两层再强行套用模板。

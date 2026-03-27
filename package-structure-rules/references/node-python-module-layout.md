@@ -41,6 +41,7 @@
 
 ## 特别提醒
 
-- 同一项目不要同时混用多套近义命名，如一部分叫 `router`，另一部分叫 `routes`；一部分叫 `controller`，另一部分叫 `handlers`。
+- 同一项目中不要同时混用多套近义命名，如一部分叫 `router`，另一部分叫 `routes`；一部分叫 `controller`，另一部分叫 `handlers`。
 - 如果框架或团队已有稳定的复数命名基线，可以继续沿用，但不要半路切换成另一套。
+- Node / Python 不要机械照搬 Go 的根级私有层约束。像 `internal/`、根级 `global` / `middleware` / `crontask` 以及“禁止 `internal/middleware`”这类规则，只有项目本身已经明确采用同类私有层基线时才适用。
 - Python 模块文件不要因为临时方便而散落在根目录，优先归入职责清晰的目录。
