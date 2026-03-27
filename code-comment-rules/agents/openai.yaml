@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码注释"
+  short_description: "判断注释必要性、位置和颗粒度的规则"
+  default_prompt: "使用 $code-comment-rules 判断当前代码哪些地方需要注释、应写成什么类型，并指出多余或过期注释。"

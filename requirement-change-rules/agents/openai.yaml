@@ -1,0 +1,4 @@
+interface:
+  display_name: "需求变更"
+  short_description: "识别需求中途变化并重算影响范围的规则"
+  default_prompt: "使用 $requirement-change-rules 判断当前新增条件属于什么类型的需求变更，并给出影响范围和处理建议。"

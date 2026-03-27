@@ -1,0 +1,4 @@
+interface:
+  display_name: "命名规则"
+  short_description: "统一业务术语和代码命名口径的规则"
+  default_prompt: "使用 $naming-rules 审查当前新增或修改的命名，给出统一术语和具体命名建议。"

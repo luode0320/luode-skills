@@ -1,0 +1,4 @@
+interface:
+  display_name: "交付总结"
+  short_description: "整理交付摘要、验证结论和遗留风险的规则"
+  default_prompt: "使用 $delivery-summary-rules 为当前任务整理交付总结，说明主要改动、验证结论、风险和遗留事项。"

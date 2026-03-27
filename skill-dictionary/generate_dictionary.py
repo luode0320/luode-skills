@@ -55,10 +55,11 @@ STATUS_META = {
 DOC_KIND_ORDER = {
     "总规划": 1,
     "实施记录": 2,
-    "验证样例": 3,
-    "复盘记录": 4,
-    "遗留问题": 5,
-    "其他文档": 6,
+    "巡检记录": 3,
+    "验证样例": 4,
+    "复盘记录": 5,
+    "遗留问题": 6,
+    "其他文档": 7,
 }
 
 CHINESE_NUMERAL_MAP = {
@@ -214,6 +215,8 @@ def classify_doc(name: str) -> str:
         return "总规划"
     if "实施计划闭环记录" in name:
         return "实施记录"
+    if "巡检" in name:
+        return "巡检记录"
     if "验证样例" in name:
         return "验证样例"
     if "复盘记录" in name:
@@ -390,11 +393,20 @@ def build_recommendations(domain_summary: list[dict]) -> list[str]:
     bug_missing = summary_by_label["Bug 域"]["planned_count"]
     test_missing = summary_by_label["测试域"]["planned_count"]
     delivery_missing = summary_by_label["交付域"]["planned_count"]
+    total_missing = sum(
+        item["planned_count"] for item in domain_summary if item["label"] != "扩展种子"
+    )
+    seed_items = {item["name"] for item in summary_by_label["扩展种子"]["items"]}
 
-    if requirement_missing:
+    if total_missing == 0:
+        recommendations.append(
+            "55 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。"
+        )
+    elif requirement_missing:
         recommendations.append(
             f"优先补齐需求域缺口，目前仍缺 {requirement_missing} 个规划 skill，后续需求澄清和验收会继续压在总控层。"
         )
+
     if bug_missing:
         recommendations.append(
             f"Bug 域还缺 {bug_missing} 个环节，尤其是复现、范围界定、诊断日志和修复后验证，建议补完整闭环。"
@@ -404,8 +416,18 @@ def build_recommendations(domain_summary: list[dict]) -> list[str]:
             f"测试域缺 {test_missing} 个、交付域缺 {delivery_missing} 个，建议先补 `test-strategy-rules` 和交付域三件套。"
         )
 
-    recommendations.append("把 `frontend-skill` 明确映射到规划中的 `frontend-component-rules`，避免前端规则长期处于体系外。")
-    recommendations.append("评估 `security-best-practices` 与 `auth-security-rules` 的关系，决定保留为独立种子还是拆分吸收。")
+    if {"frontend-skill", "frontend-component-rules"} & seed_items or "frontend-skill" in seed_items:
+        recommendations.append(
+            "当前同时存在 `frontend-component-rules` 与 `frontend-skill`，建议明确前者负责组件工程规则、后者保留页面设计种子，避免触发歧义。"
+        )
+    if "security-best-practices" in seed_items:
+        recommendations.append(
+            "评估 `security-best-practices` 与 `auth-security-rules` 的关系，决定继续保留为体系外种子，还是拆分吸收到主规划。"
+        )
+    if total_missing == 0:
+        recommendations.append(
+            "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
+        )
 
     return recommendations[:5]
 
@@ -473,7 +495,7 @@ def render_markdown(payload: dict) -> str:
     lines.append("## 概览")
     lines.append("")
     lines.append(f"- 生成时间：{payload['generated_at']}")
-    lines.append(f"- 静态页面：[`skill-dictionary/index.html`](skill-dictionary/index.html)")
+    lines.append(f"- 静态页面：[`index.html`](index.html)")
     lines.append("- 刷新命令：`python skill-dictionary/generate_dictionary.py`")
     lines.append(f"- 主规划文档：[`{payload['plan_doc_name']}`]({payload['plan_doc']})")
     lines.append(f"- 已落地规划 skill：{summary['implemented_total']} / {summary['planned_total']}")

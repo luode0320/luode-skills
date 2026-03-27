@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bug 缺口"
+  short_description: "识别 Bug 入口缺失信息并阻止盲目定位的规则"
+  default_prompt: "使用 $bug-gap-rules 判断当前 Bug 入口还缺哪些关键信息，并说明哪些缺口会阻断复现或定位。"

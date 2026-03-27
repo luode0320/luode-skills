@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-27 11:37:04",
+  "generated_at": "2026-03-27 13:42:37",
   "repo_root": "D:\\code\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
     "planned_total": 55,
-    "implemented_total": 35,
-    "planned_missing": 20,
+    "implemented_total": 55,
+    "planned_missing": 0,
     "seed_total": 2,
-    "doc_total": 1,
-    "references_total": 117,
-    "agents_total": 37
+    "doc_total": 3,
+    "references_total": 177,
+    "agents_total": 57
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -79,34 +79,50 @@ window.SKILL_DICTIONARY = {
       "label": "需求域",
       "description": "需求澄清、缺口识别、边界确认、验收前置",
       "order": 2,
-      "implemented_count": 2,
-      "planned_count": 4,
+      "implemented_count": 6,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 6,
       "items": [
         {
           "id": "requirement-intake-rules",
           "name": "requirement-intake-rules",
-          "title": "requirement-intake-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "需求接入规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "requirement",
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 2,
           "item_order": 1,
-          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段时自动触发。",
+          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。负责梳理目标、背景、上下游、输入输出和约束前提；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
           "core_responsibility": "先理解目标、背景、上下游和输入输出。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "requirement-intake-rules/SKILL.md",
+          "directory_path": "requirement-intake-rules",
+          "directory": "requirement-intake-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "requirement-intake-rules/references/intake-boundaries-and-examples.md",
+            "requirement-intake-rules/references/intake-checklist.md",
+            "requirement-intake-rules/references/requirement-structure-template.md"
+          ],
+          "agents": [
+            "requirement-intake-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
           ]
         },
@@ -197,78 +213,126 @@ window.SKILL_DICTIONARY = {
         {
           "id": "requirement-splitting-rules",
           "name": "requirement-splitting-rules",
-          "title": "requirement-splitting-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "需求拆分规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "requirement",
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 2,
           "item_order": 4,
-          "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤时自动触发。",
+          "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤或多个角色协作，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环；不要用它代替需求接入、边界确认或项目排期管理。",
           "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "requirement-splitting-rules/SKILL.md",
+          "directory_path": "requirement-splitting-rules",
+          "directory": "requirement-splitting-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "requirement-splitting-rules/references/splitting-dimensions.md",
+            "requirement-splitting-rules/references/splitting-examples.md",
+            "requirement-splitting-rules/references/splitting-sequence.md"
+          ],
+          "agents": [
+            "requirement-splitting-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
           ]
         },
         {
           "id": "requirement-change-rules",
           "name": "requirement-change-rules",
-          "title": "requirement-change-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "需求变更确认规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "requirement",
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 2,
           "item_order": 5,
-          "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级时自动触发。",
+          "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论；不要把历史缺陷误当成需求变更。",
           "core_responsibility": "重新确认变更范围和影响。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "requirement-change-rules/SKILL.md",
+          "directory_path": "requirement-change-rules",
+          "directory": "requirement-change-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "requirement-change-rules/references/change-classification.md",
+            "requirement-change-rules/references/change-decision-examples.md",
+            "requirement-change-rules/references/impact-recheck.md"
+          ],
+          "agents": [
+            "requirement-change-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
           ]
         },
         {
           "id": "acceptance-criteria-rules",
           "name": "acceptance-criteria-rules",
-          "title": "acceptance-criteria-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "验收标准细化规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "requirement",
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 2,
           "item_order": 6,
-          "auto_trigger": "当任务准备进入实现前确认，或交付前需要验收标准时自动触发。",
+          "auto_trigger": "当任务准备进入实现前确认，或交付前需要把“做到什么算完成”写成可验证、可测试、可复核的标准时触发。负责细化成功条件、异常条件、边界条件和不在范围项；不要用它代替功能验证或回归验证。",
           "core_responsibility": "补齐可验证、可测试的验收标准。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "acceptance-criteria-rules/SKILL.md",
+          "directory_path": "acceptance-criteria-rules",
+          "directory": "acceptance-criteria-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "acceptance-criteria-rules/references/acceptance-boundaries.md",
+            "acceptance-criteria-rules/references/acceptance-template.md",
+            "acceptance-criteria-rules/references/testable-criteria-checklist.md"
+          ],
+          "agents": [
+            "acceptance-criteria-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
           ]
         }
@@ -279,8 +343,8 @@ window.SKILL_DICTIONARY = {
       "label": "Bug 域",
       "description": "问题录入、定位、运行时诊断、修复建议",
       "order": 3,
-      "implemented_count": 4,
-      "planned_count": 7,
+      "implemented_count": 11,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 11,
       "items": [
@@ -329,78 +393,126 @@ window.SKILL_DICTIONARY = {
         {
           "id": "bug-gap-rules",
           "name": "bug-gap-rules",
-          "title": "bug-gap-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 缺口识别规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 2,
-          "auto_trigger": "当 bug 描述缺少复现条件、环境信息、输入数据、报错日志、影响范围时自动触发。",
+          "auto_trigger": "当 Bug 描述缺少复现条件、环境信息、输入数据、报错日志、影响范围或关键时间线，导致后续复现与定位无法可靠推进时触发。负责识别缺失项、区分阻断级与非阻断级缺口，并阻止盲目进入定位。",
           "core_responsibility": "补齐定位所需基础信息。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-gap-rules/SKILL.md",
+          "directory_path": "bug-gap-rules",
+          "directory": "bug-gap-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-gap-rules/references/blocking-signals.md",
+            "bug-gap-rules/references/gap-checklist.md",
+            "bug-gap-rules/references/gap-examples.md"
+          ],
+          "agents": [
+            "bug-gap-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
         {
           "id": "bug-reproduction-rules",
           "name": "bug-reproduction-rules",
-          "title": "bug-reproduction-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 复现规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 3,
-          "auto_trigger": "当问题需要复现、构造步骤、确定触发条件、判断是否稳定发生时自动触发。",
+          "auto_trigger": "当问题需要构造步骤、确定触发条件、判断是否稳定发生、确认出现频率或复现环境时触发。负责输出复现路径、稳定性判断和无法复现时的结论处理；不要用它代替根因分析。",
           "core_responsibility": "输出复现步骤和复现结论。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-reproduction-rules/SKILL.md",
+          "directory_path": "bug-reproduction-rules",
+          "directory": "bug-reproduction-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-reproduction-rules/references/reproduction-examples.md",
+            "bug-reproduction-rules/references/reproduction-template.md",
+            "bug-reproduction-rules/references/stability-checks.md"
+          ],
+          "agents": [
+            "bug-reproduction-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
         {
           "id": "bug-scoping-rules",
           "name": "bug-scoping-rules",
-          "title": "bug-scoping-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 范围界定规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 4,
-          "auto_trigger": "当需要判断问题属于哪个模块、哪个业务链路、哪个服务、哪个页面、哪个接口、哪个数据流时自动触发。",
+          "auto_trigger": "当需要判断问题属于哪个模块、哪个服务、哪个页面、哪个接口、哪个数据流、哪个团队边界，以及影响到了哪些业务链路时触发。负责界定归属、影响面和优先定位入口；不要把它当成根因结论。",
           "core_responsibility": "明确问题归属和影响范围。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-scoping-rules/SKILL.md",
+          "directory_path": "bug-scoping-rules",
+          "directory": "bug-scoping-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-scoping-rules/references/ownership-boundaries.md",
+            "bug-scoping-rules/references/scoping-dimensions.md",
+            "bug-scoping-rules/references/scoping-examples.md"
+          ],
+          "agents": [
+            "bug-scoping-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
@@ -491,52 +603,84 @@ window.SKILL_DICTIONARY = {
         {
           "id": "bug-debug-log-rules",
           "name": "bug-debug-log-rules",
-          "title": "bug-debug-log-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 调试日志规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 7,
-          "auto_trigger": "当定位 bug 需要临时增加 debug 日志、关键变量输出、关键分支日志、上下游输入输出日志时自动触发。",
+          "auto_trigger": "当定位 Bug 需要临时增加 debug 日志、关键变量输出、关键分支日志、上下游输入输出日志或时间线日志来补充运行时证据时触发。负责日志落点、日志粒度、可回收性和清理要求；不要把临时诊断日志混成正式日志策略。",
           "core_responsibility": "通过可回收的临时日志补充运行期证据。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-debug-log-rules/SKILL.md",
+          "directory_path": "bug-debug-log-rules",
+          "directory": "bug-debug-log-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-debug-log-rules/references/debug-log-cleanup.md",
+            "bug-debug-log-rules/references/debug-log-examples.md",
+            "bug-debug-log-rules/references/debug-log-placement.md"
+          ],
+          "agents": [
+            "bug-debug-log-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
         {
           "id": "bug-assertion-diagnostic-rules",
           "name": "bug-assertion-diagnostic-rules",
-          "title": "bug-assertion-diagnostic-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 断言诊断规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 8,
-          "auto_trigger": "当怀疑状态异常、顺序错误、数据污染、不变量被破坏，且需要通过程序断言或诊断性检查快速暴露问题位置时自动触发。",
+          "auto_trigger": "当怀疑状态异常、顺序错误、数据污染、不变量被破坏，且需要通过程序断言、诊断性检查、快速失败或区间收缩来暴露问题位置时触发。负责断言进入条件、放置位置和后续去留决策；不要把诊断断言长期留作正式业务逻辑。",
           "core_responsibility": "用断言和诊断检查缩小 bug 发生区间。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-assertion-diagnostic-rules/SKILL.md",
+          "directory_path": "bug-assertion-diagnostic-rules",
+          "directory": "bug-assertion-diagnostic-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-assertion-diagnostic-rules/references/assertion-entry-conditions.md",
+            "bug-assertion-diagnostic-rules/references/assertion-examples.md",
+            "bug-assertion-diagnostic-rules/references/assertion-placement.md"
+          ],
+          "agents": [
+            "bug-assertion-diagnostic-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
@@ -585,52 +729,84 @@ window.SKILL_DICTIONARY = {
         {
           "id": "bug-regression-risk-rules",
           "name": "bug-regression-risk-rules",
-          "title": "bug-regression-risk-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 回归风险规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 10,
-          "auto_trigger": "当修复可能影响公共方法、共享模块、已有接口、数据库行为或兼容性时自动触发。",
+          "auto_trigger": "当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。负责识别回归风险点、风险等级和验证优先级；不要把它代替实际回归测试。",
           "core_responsibility": "识别回归风险。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-regression-risk-rules/SKILL.md",
+          "directory_path": "bug-regression-risk-rules",
+          "directory": "bug-regression-risk-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-regression-risk-rules/references/risk-dimensions.md",
+            "bug-regression-risk-rules/references/risk-examples.md",
+            "bug-regression-risk-rules/references/risk-ranking-and-scope.md"
+          ],
+          "agents": [
+            "bug-regression-risk-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
         {
           "id": "bug-validation-rules",
           "name": "bug-validation-rules",
-          "title": "bug-validation-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Bug 修复验证规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 3,
           "item_order": 11,
-          "auto_trigger": "当 bug 修复后需要验证是否修好、是否引入副作用、是否需要补回归测试时自动触发。",
+          "auto_trigger": "当 Bug 修复后需要验证是否真的修好、是否引入副作用、是否需要补测试样例、是否已经满足关闭条件时触发。负责修复后验证闭环、结论记录和未覆盖说明；不要把它代替功能实现验证或全量回归策略。",
           "core_responsibility": "负责修复后的验证闭环。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "bug-validation-rules/SKILL.md",
+          "directory_path": "bug-validation-rules",
+          "directory": "bug-validation-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "bug-validation-rules/references/validation-boundaries.md",
+            "bug-validation-rules/references/validation-checklist.md",
+            "bug-validation-rules/references/validation-template.md"
+          ],
+          "agents": [
+            "bug-validation-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         }
@@ -641,8 +817,8 @@ window.SKILL_DICTIONARY = {
       "label": "编码基线域",
       "description": "开始编码即并行生效的基础质量规则",
       "order": 4,
-      "implemented_count": 3,
-      "planned_count": 3,
+      "implemented_count": 6,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 6,
       "items": [
@@ -775,78 +951,126 @@ window.SKILL_DICTIONARY = {
         {
           "id": "naming-rules",
           "name": "naming-rules",
-          "title": "naming-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "命名规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "baseline",
           "domain_label": "编码基线域",
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 4,
           "item_order": 4,
-          "auto_trigger": "当新增或修改类名、函数名、变量名、常量名、DTO、实体、字段映射名时自动触发。",
+          "auto_trigger": "当新增或修改变量、函数、类、模块、接口、字段、事件、任务名、测试名或配置项命名时触发。负责统一业务术语、语义粒度、缩写边界和命名一致性；不要把它代替代码可读性或风格格式规则。",
           "core_responsibility": "保证命名语义化。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "naming-rules/SKILL.md",
+          "directory_path": "naming-rules",
+          "directory": "naming-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "naming-rules/references/domain-term-alignment.md",
+            "naming-rules/references/naming-examples.md",
+            "naming-rules/references/naming-principles.md"
+          ],
+          "agents": [
+            "naming-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
           ]
         },
         {
           "id": "chinese-comment-rules",
           "name": "chinese-comment-rules",
-          "title": "chinese-comment-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "中文注释规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "baseline",
           "domain_label": "编码基线域",
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 4,
           "item_order": 5,
-          "auto_trigger": "当新增或修改中文注释、业务说明、中文文档注释时自动触发。",
+          "auto_trigger": "当新增或修改代码注释、步骤说明、复杂逻辑解释、临时诊断说明或测试说明，且团队要求默认使用中文表述时触发。负责中文注释的语言选择、表达方式和禁忌；不要把它代替注释位置与颗粒度规则。",
           "core_responsibility": "统一中文表达习惯和注释语气。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "chinese-comment-rules/SKILL.md",
+          "directory_path": "chinese-comment-rules",
+          "directory": "chinese-comment-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "chinese-comment-rules/references/chinese-comment-patterns.md",
+            "chinese-comment-rules/references/comment-examples.md",
+            "chinese-comment-rules/references/comment-language-boundary.md"
+          ],
+          "agents": [
+            "chinese-comment-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
           ]
         },
         {
           "id": "code-comment-rules",
           "name": "code-comment-rules",
-          "title": "code-comment-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "代码注释规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "baseline",
           "domain_label": "编码基线域",
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 4,
           "item_order": 6,
-          "auto_trigger": "当新增或修改函数注释、类注释、模块注释、步骤注释、代码块注释时自动触发。",
+          "auto_trigger": "当需要判断代码是否应该加注释、注释放在哪里、写到什么颗粒度、如何与实现同步维护时触发。负责注释必要性、位置选择、颗粒度控制和过期注释治理；不要把它代替中文语言表达规则。",
           "core_responsibility": "统一注释层级和颗粒度。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "code-comment-rules/SKILL.md",
+          "directory_path": "code-comment-rules",
+          "directory": "code-comment-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "code-comment-rules/references/comment-examples.md",
+            "code-comment-rules/references/comment-granularity.md",
+            "code-comment-rules/references/comment-placement.md"
+          ],
+          "agents": [
+            "code-comment-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
           ]
         }
@@ -857,8 +1081,8 @@ window.SKILL_DICTIONARY = {
       "label": "代码位点域",
       "description": "按改动位置叠加触发的实现规则",
       "order": 5,
-      "implemented_count": 13,
-      "planned_count": 1,
+      "implemented_count": 14,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 14,
       "items": [
@@ -1370,26 +1594,42 @@ window.SKILL_DICTIONARY = {
         {
           "id": "frontend-component-rules",
           "name": "frontend-component-rules",
-          "title": "frontend-component-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "前端组件规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "location",
           "domain_label": "代码位点域",
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 5,
           "item_order": 13,
-          "auto_trigger": "当新增或修改 React、Vue、前端组件、页面、表单、状态流、客户端数据展示逻辑时自动触发。",
+          "auto_trigger": "当新增或修改前端组件、组件拆分、props 设计、状态归属、事件上抛、组合方式、复用边界或样式承载层次时触发。负责组件边界、状态边界和可维护性约束；不要用它代替页面视觉设计种子 `frontend-skill`。",
           "core_responsibility": "统一前端组件和页面工程规则。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "frontend-component-rules/SKILL.md",
+          "directory_path": "frontend-component-rules",
+          "directory": "frontend-component-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "frontend-component-rules/references/component-examples.md",
+            "frontend-component-rules/references/component-splitting.md",
+            "frontend-component-rules/references/component-state-boundaries.md"
+          ],
+          "agents": [
+            "frontend-component-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。"
           ]
         },
@@ -1622,34 +1862,50 @@ window.SKILL_DICTIONARY = {
       "label": "测试域",
       "description": "策略、资源、功能验证、联调、回归",
       "order": 7,
-      "implemented_count": 7,
-      "planned_count": 1,
+      "implemented_count": 8,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 8,
       "items": [
         {
           "id": "test-strategy-rules",
           "name": "test-strategy-rules",
-          "title": "test-strategy-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "测试策略规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "test",
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、联调、回归",
           "domain_order": 7,
           "item_order": 1,
-          "auto_trigger": "当功能实现和编码审查完成后，开始补测试、写验证脚本、做回归检查时自动触发。",
+          "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；不要用它代替具体测试资源管理或验证执行 skill。",
           "core_responsibility": "决定测试层级和覆盖重点。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "test-strategy-rules/SKILL.md",
+          "directory_path": "test-strategy-rules",
+          "directory": "test-strategy-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "test-strategy-rules/references/priority-model.md",
+            "test-strategy-rules/references/strategy-dimensions.md",
+            "test-strategy-rules/references/strategy-template.md"
+          ],
+          "agents": [
+            "test-strategy-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
           ]
         },
@@ -1954,112 +2210,176 @@ window.SKILL_DICTIONARY = {
       "label": "交付域",
       "description": "Git 协作、评审、发布与交付说明",
       "order": 8,
-      "implemented_count": 0,
-      "planned_count": 4,
+      "implemented_count": 4,
+      "planned_count": 0,
       "seed_count": 0,
       "total_count": 4,
       "items": [
         {
           "id": "release-rollout-rules",
           "name": "release-rollout-rules",
-          "title": "release-rollout-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "发布上线规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "delivery",
           "domain_label": "交付域",
           "domain_description": "Git 协作、评审、发布与交付说明",
           "domain_order": 8,
           "item_order": 1,
-          "auto_trigger": "当新增或修改发布脚本、发布检查、灰度策略、观察窗口、上线 checklist、回滚条件时自动触发。",
+          "auto_trigger": "当任务已经通过实现自审与测试，准备进入发布、灰度、分批投放、开关控制、上线检查或回滚预案确认时触发。负责上线前检查、发布节奏、灰度控制和回滚门槛；不要用它代替测试验证或交付总结。",
           "core_responsibility": "管理上线和回滚规则。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "release-rollout-rules/SKILL.md",
+          "directory_path": "release-rollout-rules",
+          "directory": "release-rollout-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "release-rollout-rules/references/release-checklist.md",
+            "release-rollout-rules/references/rollback-gates.md",
+            "release-rollout-rules/references/rollout-risk-controls.md"
+          ],
+          "agents": [
+            "release-rollout-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
           ]
         },
         {
           "id": "code-review-rules",
           "name": "code-review-rules",
-          "title": "code-review-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "代码评审规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "delivery",
           "domain_label": "交付域",
           "domain_description": "Git 协作、评审、发布与交付说明",
           "domain_order": 8,
           "item_order": 2,
-          "auto_trigger": "当任务是 PR 评审、他人代码评审、检查 diff、风险扫描、测试遗漏检查或交付前复查时自动触发。",
+          "auto_trigger": "当代码已完成实现自审，准备进入正式代码评审、PR 评审或他人复核时触发。负责评审关注点、阻断问题、评论写法和评审结论；不要把它代替开发者自己的实现自审。",
           "core_responsibility": "统一评审重点和输出方式，不替代编码完成后的自审。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "code-review-rules/SKILL.md",
+          "directory_path": "code-review-rules",
+          "directory": "code-review-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "code-review-rules/references/review-comments.md",
+            "code-review-rules/references/review-examples.md",
+            "code-review-rules/references/review-focus.md"
+          ],
+          "agents": [
+            "code-review-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
           ]
         },
         {
           "id": "git-collaboration-rules",
           "name": "git-collaboration-rules",
-          "title": "git-collaboration-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "Git 协作规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "delivery",
           "domain_label": "交付域",
           "domain_description": "Git 协作、评审、发布与交付说明",
           "domain_order": 8,
           "item_order": 3,
-          "auto_trigger": "当创建提交、整理提交说明、准备 PR、合并前检查时自动触发。",
+          "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；不要把它代替代码评审或发布上线规则。",
           "core_responsibility": "统一 Git 协作规则。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "git-collaboration-rules/SKILL.md",
+          "directory_path": "git-collaboration-rules",
+          "directory": "git-collaboration-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "git-collaboration-rules/references/branch-and-commit.md",
+            "git-collaboration-rules/references/collaboration-examples.md",
+            "git-collaboration-rules/references/sync-and-pr-scope.md"
+          ],
+          "agents": [
+            "git-collaboration-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
           ]
         },
         {
           "id": "delivery-summary-rules",
           "name": "delivery-summary-rules",
-          "title": "delivery-summary-rules",
-          "status": "planned",
-          "status_label": "规划中",
+          "title": "交付总结规则",
+          "status": "implemented",
+          "status_label": "已实现",
           "domain_id": "delivery",
           "domain_label": "交付域",
           "domain_description": "Git 协作、评审、发布与交付说明",
           "domain_order": 8,
           "item_order": 4,
-          "auto_trigger": "当准备交付说明、变更说明、影响范围说明、风险说明时自动触发。",
+          "auto_trigger": "当任务准备交付给需求方、测试方、评审方、发布方或后续维护者，需要说明本次改了什么、验证了什么、还有什么风险和遗留事项时触发。负责交付说明结构、验证摘要、风险说明和后续建议；不要把它代替发布动作或代码评审。",
           "core_responsibility": "统一交付文档结构。",
-          "skill_path": "",
-          "directory_path": "",
-          "directory": "",
-          "sections": [],
-          "references": [],
-          "agents": [],
+          "skill_path": "delivery-summary-rules/SKILL.md",
+          "directory_path": "delivery-summary-rules",
+          "directory": "delivery-summary-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "delivery-summary-rules/references/delivery-examples.md",
+            "delivery-summary-rules/references/delivery-risk-and-debt.md",
+            "delivery-summary-rules/references/delivery-template.md"
+          ],
+          "agents": [
+            "delivery-summary-rules/agents/openai.yaml"
+          ],
           "has_license": false,
           "focus_points": [
-            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
           ]
         }
@@ -2264,6 +2584,48 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "requirement-intake-rules",
+      "name": "requirement-intake-rules",
+      "title": "需求接入规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "requirement",
+      "domain_label": "需求域",
+      "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
+      "domain_order": 2,
+      "item_order": 1,
+      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。负责梳理目标、背景、上下游、输入输出和约束前提；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
+      "core_responsibility": "先理解目标、背景、上下游和输入输出。",
+      "skill_path": "requirement-intake-rules/SKILL.md",
+      "directory_path": "requirement-intake-rules",
+      "directory": "requirement-intake-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "requirement-intake-rules/references/intake-boundaries-and-examples.md",
+        "requirement-intake-rules/references/intake-checklist.md",
+        "requirement-intake-rules/references/requirement-structure-template.md"
+      ],
+      "agents": [
+        "requirement-intake-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
+      ]
+    },
+    {
       "id": "requirement-gap-rules",
       "name": "requirement-gap-rules",
       "title": "需求缺口识别规则",
@@ -2348,106 +2710,128 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "requirement-intake-rules",
-      "name": "requirement-intake-rules",
-      "title": "requirement-intake-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "requirement",
-      "domain_label": "需求域",
-      "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
-      "domain_order": 2,
-      "item_order": 1,
-      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段时自动触发。",
-      "core_responsibility": "先理解目标、背景、上下游和输入输出。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
-      ]
-    },
-    {
       "id": "requirement-splitting-rules",
       "name": "requirement-splitting-rules",
-      "title": "requirement-splitting-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "需求拆分规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "requirement",
       "domain_label": "需求域",
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 2,
       "item_order": 4,
-      "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤时自动触发。",
+      "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤或多个角色协作，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环；不要用它代替需求接入、边界确认或项目排期管理。",
       "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "requirement-splitting-rules/SKILL.md",
+      "directory_path": "requirement-splitting-rules",
+      "directory": "requirement-splitting-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "requirement-splitting-rules/references/splitting-dimensions.md",
+        "requirement-splitting-rules/references/splitting-examples.md",
+        "requirement-splitting-rules/references/splitting-sequence.md"
+      ],
+      "agents": [
+        "requirement-splitting-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
       ]
     },
     {
       "id": "requirement-change-rules",
       "name": "requirement-change-rules",
-      "title": "requirement-change-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "需求变更确认规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "requirement",
       "domain_label": "需求域",
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 2,
       "item_order": 5,
-      "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级时自动触发。",
+      "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论；不要把历史缺陷误当成需求变更。",
       "core_responsibility": "重新确认变更范围和影响。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "requirement-change-rules/SKILL.md",
+      "directory_path": "requirement-change-rules",
+      "directory": "requirement-change-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "requirement-change-rules/references/change-classification.md",
+        "requirement-change-rules/references/change-decision-examples.md",
+        "requirement-change-rules/references/impact-recheck.md"
+      ],
+      "agents": [
+        "requirement-change-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
       ]
     },
     {
       "id": "acceptance-criteria-rules",
       "name": "acceptance-criteria-rules",
-      "title": "acceptance-criteria-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "验收标准细化规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "requirement",
       "domain_label": "需求域",
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 2,
       "item_order": 6,
-      "auto_trigger": "当任务准备进入实现前确认，或交付前需要验收标准时自动触发。",
+      "auto_trigger": "当任务准备进入实现前确认，或交付前需要把“做到什么算完成”写成可验证、可测试、可复核的标准时触发。负责细化成功条件、异常条件、边界条件和不在范围项；不要用它代替功能验证或回归验证。",
       "core_responsibility": "补齐可验证、可测试的验收标准。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "acceptance-criteria-rules/SKILL.md",
+      "directory_path": "acceptance-criteria-rules",
+      "directory": "acceptance-criteria-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "acceptance-criteria-rules/references/acceptance-boundaries.md",
+        "acceptance-criteria-rules/references/acceptance-template.md",
+        "acceptance-criteria-rules/references/testable-criteria-checklist.md"
+      ],
+      "agents": [
+        "acceptance-criteria-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
       ]
     },
@@ -2485,6 +2869,132 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "bug-intake-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
+      "id": "bug-gap-rules",
+      "name": "bug-gap-rules",
+      "title": "Bug 缺口识别规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 3,
+      "item_order": 2,
+      "auto_trigger": "当 Bug 描述缺少复现条件、环境信息、输入数据、报错日志、影响范围或关键时间线，导致后续复现与定位无法可靠推进时触发。负责识别缺失项、区分阻断级与非阻断级缺口，并阻止盲目进入定位。",
+      "core_responsibility": "补齐定位所需基础信息。",
+      "skill_path": "bug-gap-rules/SKILL.md",
+      "directory_path": "bug-gap-rules",
+      "directory": "bug-gap-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-gap-rules/references/blocking-signals.md",
+        "bug-gap-rules/references/gap-checklist.md",
+        "bug-gap-rules/references/gap-examples.md"
+      ],
+      "agents": [
+        "bug-gap-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
+      "id": "bug-reproduction-rules",
+      "name": "bug-reproduction-rules",
+      "title": "Bug 复现规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 3,
+      "item_order": 3,
+      "auto_trigger": "当问题需要构造步骤、确定触发条件、判断是否稳定发生、确认出现频率或复现环境时触发。负责输出复现路径、稳定性判断和无法复现时的结论处理；不要用它代替根因分析。",
+      "core_responsibility": "输出复现步骤和复现结论。",
+      "skill_path": "bug-reproduction-rules/SKILL.md",
+      "directory_path": "bug-reproduction-rules",
+      "directory": "bug-reproduction-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-reproduction-rules/references/reproduction-examples.md",
+        "bug-reproduction-rules/references/reproduction-template.md",
+        "bug-reproduction-rules/references/stability-checks.md"
+      ],
+      "agents": [
+        "bug-reproduction-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
+      "id": "bug-scoping-rules",
+      "name": "bug-scoping-rules",
+      "title": "Bug 范围界定规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 3,
+      "item_order": 4,
+      "auto_trigger": "当需要判断问题属于哪个模块、哪个服务、哪个页面、哪个接口、哪个数据流、哪个团队边界，以及影响到了哪些业务链路时触发。负责界定归属、影响面和优先定位入口；不要把它当成根因结论。",
+      "core_responsibility": "明确问题归属和影响范围。",
+      "skill_path": "bug-scoping-rules/SKILL.md",
+      "directory_path": "bug-scoping-rules",
+      "directory": "bug-scoping-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-scoping-rules/references/ownership-boundaries.md",
+        "bug-scoping-rules/references/scoping-dimensions.md",
+        "bug-scoping-rules/references/scoping-examples.md"
+      ],
+      "agents": [
+        "bug-scoping-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -2578,6 +3088,90 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "bug-debug-log-rules",
+      "name": "bug-debug-log-rules",
+      "title": "Bug 调试日志规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 3,
+      "item_order": 7,
+      "auto_trigger": "当定位 Bug 需要临时增加 debug 日志、关键变量输出、关键分支日志、上下游输入输出日志或时间线日志来补充运行时证据时触发。负责日志落点、日志粒度、可回收性和清理要求；不要把临时诊断日志混成正式日志策略。",
+      "core_responsibility": "通过可回收的临时日志补充运行期证据。",
+      "skill_path": "bug-debug-log-rules/SKILL.md",
+      "directory_path": "bug-debug-log-rules",
+      "directory": "bug-debug-log-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-debug-log-rules/references/debug-log-cleanup.md",
+        "bug-debug-log-rules/references/debug-log-examples.md",
+        "bug-debug-log-rules/references/debug-log-placement.md"
+      ],
+      "agents": [
+        "bug-debug-log-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
+      "id": "bug-assertion-diagnostic-rules",
+      "name": "bug-assertion-diagnostic-rules",
+      "title": "Bug 断言诊断规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 3,
+      "item_order": 8,
+      "auto_trigger": "当怀疑状态异常、顺序错误、数据污染、不变量被破坏，且需要通过程序断言、诊断性检查、快速失败或区间收缩来暴露问题位置时触发。负责断言进入条件、放置位置和后续去留决策；不要把诊断断言长期留作正式业务逻辑。",
+      "core_responsibility": "用断言和诊断检查缩小 bug 发生区间。",
+      "skill_path": "bug-assertion-diagnostic-rules/SKILL.md",
+      "directory_path": "bug-assertion-diagnostic-rules",
+      "directory": "bug-assertion-diagnostic-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-assertion-diagnostic-rules/references/assertion-entry-conditions.md",
+        "bug-assertion-diagnostic-rules/references/assertion-examples.md",
+        "bug-assertion-diagnostic-rules/references/assertion-placement.md"
+      ],
+      "agents": [
+        "bug-assertion-diagnostic-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
       "id": "bug-fix-proposal-rules",
       "name": "bug-fix-proposal-rules",
       "title": "Bug 修复建议规则",
@@ -2620,184 +3214,86 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "bug-gap-rules",
-      "name": "bug-gap-rules",
-      "title": "bug-gap-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 3,
-      "item_order": 2,
-      "auto_trigger": "当 bug 描述缺少复现条件、环境信息、输入数据、报错日志、影响范围时自动触发。",
-      "core_responsibility": "补齐定位所需基础信息。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
-      "id": "bug-reproduction-rules",
-      "name": "bug-reproduction-rules",
-      "title": "bug-reproduction-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 3,
-      "item_order": 3,
-      "auto_trigger": "当问题需要复现、构造步骤、确定触发条件、判断是否稳定发生时自动触发。",
-      "core_responsibility": "输出复现步骤和复现结论。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
-      "id": "bug-scoping-rules",
-      "name": "bug-scoping-rules",
-      "title": "bug-scoping-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 3,
-      "item_order": 4,
-      "auto_trigger": "当需要判断问题属于哪个模块、哪个业务链路、哪个服务、哪个页面、哪个接口、哪个数据流时自动触发。",
-      "core_responsibility": "明确问题归属和影响范围。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
-      "id": "bug-debug-log-rules",
-      "name": "bug-debug-log-rules",
-      "title": "bug-debug-log-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 3,
-      "item_order": 7,
-      "auto_trigger": "当定位 bug 需要临时增加 debug 日志、关键变量输出、关键分支日志、上下游输入输出日志时自动触发。",
-      "core_responsibility": "通过可回收的临时日志补充运行期证据。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
-      "id": "bug-assertion-diagnostic-rules",
-      "name": "bug-assertion-diagnostic-rules",
-      "title": "bug-assertion-diagnostic-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 3,
-      "item_order": 8,
-      "auto_trigger": "当怀疑状态异常、顺序错误、数据污染、不变量被破坏，且需要通过程序断言或诊断性检查快速暴露问题位置时自动触发。",
-      "core_responsibility": "用断言和诊断检查缩小 bug 发生区间。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
       "id": "bug-regression-risk-rules",
       "name": "bug-regression-risk-rules",
-      "title": "bug-regression-risk-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "Bug 回归风险规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "bug",
       "domain_label": "Bug 域",
       "domain_description": "问题录入、定位、运行时诊断、修复建议",
       "domain_order": 3,
       "item_order": 10,
-      "auto_trigger": "当修复可能影响公共方法、共享模块、已有接口、数据库行为或兼容性时自动触发。",
+      "auto_trigger": "当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。负责识别回归风险点、风险等级和验证优先级；不要把它代替实际回归测试。",
       "core_responsibility": "识别回归风险。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "bug-regression-risk-rules/SKILL.md",
+      "directory_path": "bug-regression-risk-rules",
+      "directory": "bug-regression-risk-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-regression-risk-rules/references/risk-dimensions.md",
+        "bug-regression-risk-rules/references/risk-examples.md",
+        "bug-regression-risk-rules/references/risk-ranking-and-scope.md"
+      ],
+      "agents": [
+        "bug-regression-risk-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看静态定位与运行时诊断的切换条件是否清楚。"
       ]
     },
     {
       "id": "bug-validation-rules",
       "name": "bug-validation-rules",
-      "title": "bug-validation-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "Bug 修复验证规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "bug",
       "domain_label": "Bug 域",
       "domain_description": "问题录入、定位、运行时诊断、修复建议",
       "domain_order": 3,
       "item_order": 11,
-      "auto_trigger": "当 bug 修复后需要验证是否修好、是否引入副作用、是否需要补回归测试时自动触发。",
+      "auto_trigger": "当 Bug 修复后需要验证是否真的修好、是否引入副作用、是否需要补测试样例、是否已经满足关闭条件时触发。负责修复后验证闭环、结论记录和未覆盖说明；不要把它代替功能实现验证或全量回归策略。",
       "core_responsibility": "负责修复后的验证闭环。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "bug-validation-rules/SKILL.md",
+      "directory_path": "bug-validation-rules",
+      "directory": "bug-validation-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "bug-validation-rules/references/validation-boundaries.md",
+        "bug-validation-rules/references/validation-checklist.md",
+        "bug-validation-rules/references/validation-template.md"
+      ],
+      "agents": [
+        "bug-validation-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看静态定位与运行时诊断的切换条件是否清楚。"
       ]
     },
@@ -2930,78 +3426,126 @@ window.SKILL_DICTIONARY = {
     {
       "id": "naming-rules",
       "name": "naming-rules",
-      "title": "naming-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "命名规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "baseline",
       "domain_label": "编码基线域",
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 4,
       "item_order": 4,
-      "auto_trigger": "当新增或修改类名、函数名、变量名、常量名、DTO、实体、字段映射名时自动触发。",
+      "auto_trigger": "当新增或修改变量、函数、类、模块、接口、字段、事件、任务名、测试名或配置项命名时触发。负责统一业务术语、语义粒度、缩写边界和命名一致性；不要把它代替代码可读性或风格格式规则。",
       "core_responsibility": "保证命名语义化。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "naming-rules/SKILL.md",
+      "directory_path": "naming-rules",
+      "directory": "naming-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "naming-rules/references/domain-term-alignment.md",
+        "naming-rules/references/naming-examples.md",
+        "naming-rules/references/naming-principles.md"
+      ],
+      "agents": [
+        "naming-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
       ]
     },
     {
       "id": "chinese-comment-rules",
       "name": "chinese-comment-rules",
-      "title": "chinese-comment-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "中文注释规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "baseline",
       "domain_label": "编码基线域",
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 4,
       "item_order": 5,
-      "auto_trigger": "当新增或修改中文注释、业务说明、中文文档注释时自动触发。",
+      "auto_trigger": "当新增或修改代码注释、步骤说明、复杂逻辑解释、临时诊断说明或测试说明，且团队要求默认使用中文表述时触发。负责中文注释的语言选择、表达方式和禁忌；不要把它代替注释位置与颗粒度规则。",
       "core_responsibility": "统一中文表达习惯和注释语气。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "chinese-comment-rules/SKILL.md",
+      "directory_path": "chinese-comment-rules",
+      "directory": "chinese-comment-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "chinese-comment-rules/references/chinese-comment-patterns.md",
+        "chinese-comment-rules/references/comment-examples.md",
+        "chinese-comment-rules/references/comment-language-boundary.md"
+      ],
+      "agents": [
+        "chinese-comment-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
       ]
     },
     {
       "id": "code-comment-rules",
       "name": "code-comment-rules",
-      "title": "code-comment-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "代码注释规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "baseline",
       "domain_label": "编码基线域",
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 4,
       "item_order": 6,
-      "auto_trigger": "当新增或修改函数注释、类注释、模块注释、步骤注释、代码块注释时自动触发。",
+      "auto_trigger": "当需要判断代码是否应该加注释、注释放在哪里、写到什么颗粒度、如何与实现同步维护时触发。负责注释必要性、位置选择、颗粒度控制和过期注释治理；不要把它代替中文语言表达规则。",
       "core_responsibility": "统一注释层级和颗粒度。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "code-comment-rules/SKILL.md",
+      "directory_path": "code-comment-rules",
+      "directory": "code-comment-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "code-comment-rules/references/comment-examples.md",
+        "code-comment-rules/references/comment-granularity.md",
+        "code-comment-rules/references/comment-placement.md"
+      ],
+      "agents": [
+        "code-comment-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
       ]
     },
@@ -3511,6 +4055,48 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "frontend-component-rules",
+      "name": "frontend-component-rules",
+      "title": "前端组件规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "location",
+      "domain_label": "代码位点域",
+      "domain_description": "按改动位置叠加触发的实现规则",
+      "domain_order": 5,
+      "item_order": 13,
+      "auto_trigger": "当新增或修改前端组件、组件拆分、props 设计、状态归属、事件上抛、组合方式、复用边界或样式承载层次时触发。负责组件边界、状态边界和可维护性约束；不要用它代替页面视觉设计种子 `frontend-skill`。",
+      "core_responsibility": "统一前端组件和页面工程规则。",
+      "skill_path": "frontend-component-rules/SKILL.md",
+      "directory_path": "frontend-component-rules",
+      "directory": "frontend-component-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "frontend-component-rules/references/component-examples.md",
+        "frontend-component-rules/references/component-splitting.md",
+        "frontend-component-rules/references/component-state-boundaries.md"
+      ],
+      "agents": [
+        "frontend-component-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。"
+      ]
+    },
+    {
       "id": "performance-caching-rules",
       "name": "performance-caching-rules",
       "title": "性能与缓存规则",
@@ -3549,32 +4135,6 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。"
-      ]
-    },
-    {
-      "id": "frontend-component-rules",
-      "name": "frontend-component-rules",
-      "title": "frontend-component-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "location",
-      "domain_label": "代码位点域",
-      "domain_description": "按改动位置叠加触发的实现规则",
-      "domain_order": 5,
-      "item_order": 13,
-      "auto_trigger": "当新增或修改 React、Vue、前端组件、页面、表单、状态流、客户端数据展示逻辑时自动触发。",
-      "core_responsibility": "统一前端组件和页面工程规则。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
         "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。"
       ]
     },
@@ -3744,6 +4304,48 @@ window.SKILL_DICTIONARY = {
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否只处理静态质量问题，不越界替代测试。"
+      ]
+    },
+    {
+      "id": "test-strategy-rules",
+      "name": "test-strategy-rules",
+      "title": "测试策略规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "test",
+      "domain_label": "测试域",
+      "domain_description": "策略、资源、功能验证、联调、回归",
+      "domain_order": 7,
+      "item_order": 1,
+      "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；不要用它代替具体测试资源管理或验证执行 skill。",
+      "core_responsibility": "决定测试层级和覆盖重点。",
+      "skill_path": "test-strategy-rules/SKILL.md",
+      "directory_path": "test-strategy-rules",
+      "directory": "test-strategy-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "test-strategy-rules/references/priority-model.md",
+        "test-strategy-rules/references/strategy-dimensions.md",
+        "test-strategy-rules/references/strategy-template.md"
+      ],
+      "agents": [
+        "test-strategy-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
       ]
     },
     {
@@ -4041,132 +4643,170 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "test-strategy-rules",
-      "name": "test-strategy-rules",
-      "title": "test-strategy-rules",
-      "status": "planned",
-      "status_label": "规划中",
-      "domain_id": "test",
-      "domain_label": "测试域",
-      "domain_description": "策略、资源、功能验证、联调、回归",
-      "domain_order": 7,
-      "item_order": 1,
-      "auto_trigger": "当功能实现和编码审查完成后，开始补测试、写验证脚本、做回归检查时自动触发。",
-      "core_responsibility": "决定测试层级和覆盖重点。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
-      "has_license": false,
-      "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
-        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
-      ]
-    },
-    {
       "id": "release-rollout-rules",
       "name": "release-rollout-rules",
-      "title": "release-rollout-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "发布上线规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "delivery",
       "domain_label": "交付域",
       "domain_description": "Git 协作、评审、发布与交付说明",
       "domain_order": 8,
       "item_order": 1,
-      "auto_trigger": "当新增或修改发布脚本、发布检查、灰度策略、观察窗口、上线 checklist、回滚条件时自动触发。",
+      "auto_trigger": "当任务已经通过实现自审与测试，准备进入发布、灰度、分批投放、开关控制、上线检查或回滚预案确认时触发。负责上线前检查、发布节奏、灰度控制和回滚门槛；不要用它代替测试验证或交付总结。",
       "core_responsibility": "管理上线和回滚规则。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "release-rollout-rules/SKILL.md",
+      "directory_path": "release-rollout-rules",
+      "directory": "release-rollout-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "release-rollout-rules/references/release-checklist.md",
+        "release-rollout-rules/references/rollback-gates.md",
+        "release-rollout-rules/references/rollout-risk-controls.md"
+      ],
+      "agents": [
+        "release-rollout-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
       ]
     },
     {
       "id": "code-review-rules",
       "name": "code-review-rules",
-      "title": "code-review-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "代码评审规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "delivery",
       "domain_label": "交付域",
       "domain_description": "Git 协作、评审、发布与交付说明",
       "domain_order": 8,
       "item_order": 2,
-      "auto_trigger": "当任务是 PR 评审、他人代码评审、检查 diff、风险扫描、测试遗漏检查或交付前复查时自动触发。",
+      "auto_trigger": "当代码已完成实现自审，准备进入正式代码评审、PR 评审或他人复核时触发。负责评审关注点、阻断问题、评论写法和评审结论；不要把它代替开发者自己的实现自审。",
       "core_responsibility": "统一评审重点和输出方式，不替代编码完成后的自审。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "code-review-rules/SKILL.md",
+      "directory_path": "code-review-rules",
+      "directory": "code-review-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "code-review-rules/references/review-comments.md",
+        "code-review-rules/references/review-examples.md",
+        "code-review-rules/references/review-focus.md"
+      ],
+      "agents": [
+        "code-review-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
       ]
     },
     {
       "id": "git-collaboration-rules",
       "name": "git-collaboration-rules",
-      "title": "git-collaboration-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "Git 协作规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "delivery",
       "domain_label": "交付域",
       "domain_description": "Git 协作、评审、发布与交付说明",
       "domain_order": 8,
       "item_order": 3,
-      "auto_trigger": "当创建提交、整理提交说明、准备 PR、合并前检查时自动触发。",
+      "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；不要把它代替代码评审或发布上线规则。",
       "core_responsibility": "统一 Git 协作规则。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "git-collaboration-rules/SKILL.md",
+      "directory_path": "git-collaboration-rules",
+      "directory": "git-collaboration-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "git-collaboration-rules/references/branch-and-commit.md",
+        "git-collaboration-rules/references/collaboration-examples.md",
+        "git-collaboration-rules/references/sync-and-pr-scope.md"
+      ],
+      "agents": [
+        "git-collaboration-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
       ]
     },
     {
       "id": "delivery-summary-rules",
       "name": "delivery-summary-rules",
-      "title": "delivery-summary-rules",
-      "status": "planned",
-      "status_label": "规划中",
+      "title": "交付总结规则",
+      "status": "implemented",
+      "status_label": "已实现",
       "domain_id": "delivery",
       "domain_label": "交付域",
       "domain_description": "Git 协作、评审、发布与交付说明",
       "domain_order": 8,
       "item_order": 4,
-      "auto_trigger": "当准备交付说明、变更说明、影响范围说明、风险说明时自动触发。",
+      "auto_trigger": "当任务准备交付给需求方、测试方、评审方、发布方或后续维护者，需要说明本次改了什么、验证了什么、还有什么风险和遗留事项时触发。负责交付说明结构、验证摘要、风险说明和后续建议；不要把它代替发布动作或代码评审。",
       "core_responsibility": "统一交付文档结构。",
-      "skill_path": "",
-      "directory_path": "",
-      "directory": "",
-      "sections": [],
-      "references": [],
-      "agents": [],
+      "skill_path": "delivery-summary-rules/SKILL.md",
+      "directory_path": "delivery-summary-rules",
+      "directory": "delivery-summary-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "delivery-summary-rules/references/delivery-examples.md",
+        "delivery-summary-rules/references/delivery-risk-and-debt.md",
+        "delivery-summary-rules/references/delivery-template.md"
+      ],
+      "agents": [
+        "delivery-summary-rules/agents/openai.yaml"
+      ],
       "has_license": false,
       "focus_points": [
-        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
-        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看 Git 协作、评审、发布、交付说明是否已分层收口。"
       ]
     },
@@ -4309,13 +4949,30 @@ window.SKILL_DICTIONARY = {
       "kind": "总规划",
       "path": "编码skill.md",
       "is_plan_doc": true
+    },
+    {
+      "id": "doc:第二轮巡检",
+      "name": "第二轮巡检",
+      "file_name": "第二轮巡检.md",
+      "title": "第二轮巡检",
+      "kind": "巡检记录",
+      "path": "第二轮巡检.md",
+      "is_plan_doc": false
+    },
+    {
+      "id": "doc:规划实现对账",
+      "name": "规划实现对账",
+      "file_name": "规划实现对账.md",
+      "title": "规划实现对账",
+      "kind": "其他文档",
+      "path": "规划实现对账.md",
+      "is_plan_doc": false
     }
   ],
   "recommendations": [
-    "优先补齐需求域缺口，目前仍缺 4 个规划 skill，后续需求澄清和验收会继续压在总控层。",
-    "Bug 域还缺 7 个环节，尤其是复现、范围界定、诊断日志和修复后验证，建议补完整闭环。",
-    "测试域缺 1 个、交付域缺 4 个，建议先补 `test-strategy-rules` 和交付域三件套。",
-    "把 `frontend-skill` 明确映射到规划中的 `frontend-component-rules`，避免前端规则长期处于体系外。",
-    "评估 `security-best-practices` 与 `auth-security-rules` 的关系，决定保留为独立种子还是拆分吸收。"
+    "55 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "当前同时存在 `frontend-component-rules` 与 `frontend-skill`，建议明确前者负责组件工程规则、后者保留页面设计种子，避免触发歧义。",
+    "评估 `security-best-practices` 与 `auth-security-rules` 的关系，决定继续保留为体系外种子，还是拆分吸收到主规划。",
+    "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
 };

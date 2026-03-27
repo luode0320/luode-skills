@@ -17,12 +17,26 @@
 | --- | --- | --- |
 | 用户提出新功能、新页面、新接口、新模块，尚未开始写代码 | 需求域 / `requirement-intake-rules` | 先理解目标、背景、输入输出和上下游 |
 | 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现 |
+| 需求过大，涉及多个模块、多个页面、多个接口或多个实施波次 | 需求域 / `requirement-splitting-rules` | 先拆成可独立推进的子项，再决定实施顺序 |
+| 编码过程中出现新条件、优先级变化、默认值变化或交付物变化 | 需求域 / `requirement-change-rules` | 先重算影响范围，不直接把变更偷偷塞进当前实现 |
 | 用户描述报错、异常、结果不符、线上故障、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现和定位 |
+| Bug 描述缺少复现条件、环境信息、日志样本或影响范围 | Bug 域 / `bug-gap-rules` | 先补齐定位所需最小信息，不盲目进入根因分析 |
+| 需要先构造稳定步骤、确认触发条件和复现频率 | Bug 域 / `bug-reproduction-rules` | 先回答“怎么复现、是否稳定发生” |
+| 需要判断问题归属模块、服务、页面、接口、数据流或责任边界 | Bug 域 / `bug-scoping-rules` | 先划清归属和影响面，再决定优先定位入口 |
 | 静态阅读代码不足以定位 Bug | Bug 域 / `bug-runtime-debug-rules`、`bug-debug-log-rules`、`bug-assertion-diagnostic-rules` | 改走运行时诊断路径 |
+| Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`、`bug-regression-risk-rules` | 先给修复建议和回归风险，再决定是否实施 |
 | 需求或 Bug 已澄清，开始新增或修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再叠加位点 skill |
+| 当前任务是前端页面视觉表达、落地页气质或界面叙事 | 扩展种子 / `frontend-skill` | 这是页面视觉设计种子，不代替前端组件工程规则 |
+| 当前任务是前端组件拆分、props 设计、状态归属或复用边界 | 代码位点域 / `frontend-component-rules` | 这是组件工程规则，不代替页面视觉设计种子 |
 | 代码已经完成，准备进入测试，但还没做静态自审 | 编码审查域 | 先完成实现自审、语法检查、清理格式和代码归位 |
-| 编码审查通过，准备补测试、做功能验证或联调 | 测试域 | 先定测试策略，再进入功能验证、联调和回归 |
-| 测试已基本完成，准备提交、评审、上线或写交付说明 | 交付域 | 进入 Git 协作、评审、发布和交付说明 |
+| 编码审查通过，但还没明确先测什么、测到什么程度 | 测试域 / `test-strategy-rules` | 先定测试策略和优先级，再分流执行验证 |
+| 需要确认当前需求或当前改动本身是否做对 | 测试域 / `functional-validation-rules` | 聚焦当前功能正确性，不扩张成回归或联调问题 |
+| 当前看起来不是单点功能错误，而是跨系统、跨环境、跨链路联调失败 | 测试域 / `integration-debugging-rules` | 聚焦联调证据、环境差异和链路分流 |
+| 需要确认修复或改动有没有把旧能力带坏 | 测试域 / `test-regression-rules`、`bug-validation-rules` | 聚焦兼容性、影响面和修复闭环，不混入功能验证 |
+| 测试已基本完成，准备整理提交与协作边界 | 交付域 / `git-collaboration-rules` | 先整理 commit、分支和 PR 范围 |
+| 代码准备进入正式评审或 PR 复核 | 交付域 / `code-review-rules` | 正式评审与作者自审分开 |
+| 准备发布、灰度、放量或确认回滚预案 | 交付域 / `release-rollout-rules` | 先确认发布检查项、放量节奏和回滚门槛 |
+| 需要形成交付摘要、验证结论、风险和遗留事项 | 交付域 / `delivery-summary-rules` | 用统一交付说明结构收口，而不是散落在口头说明里 |
 | 任务同时像需求又像 Bug，或同时跨多个阶段 | 继续由 `team-development-rules` 分流 | 先裁决，不允许任何小 skill 抢占 |
 
 ## 让路规则
@@ -30,3 +44,5 @@
 - 如果当前任务已经是明确的 SQL、API、配置、日志、错误处理、测试、评审或交付任务，不要停留在总控层。
 - 如果目标小 skill 已经明确，总控层给出分流结论后立即退出。
 - 总控层只在阶段不清、域不清、顺序不清或 skill 冲突时保留控制权。
+- `frontend-skill` 只负责页面视觉设计种子；`frontend-component-rules` 才是主规划里的组件工程规则。
+- `security-best-practices` 只在用户明确要求安全最佳实践建议、安全评审或安全报告时使用；普通安全实现仍优先走 `auth-security-rules`。

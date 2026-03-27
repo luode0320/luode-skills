@@ -1,0 +1,4 @@
+interface:
+  display_name: "修复验证"
+  short_description: "确认 Bug 是否修好并形成关闭结论的规则"
+  default_prompt: "使用 $bug-validation-rules 对当前 Bug 修复结果做闭环验证，说明是否已修好、还有哪些未覆盖项。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文注释"
+  short_description: "规范代码注释中文表达方式的规则"
+  default_prompt: "使用 $chinese-comment-rules 审查当前代码注释的中文表达，给出更准确、更可维护的写法。"

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skill 字典</title>
+    <link rel="stylesheet" href="./skill-dictionary/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-head">
+        <p class="eyebrow">Skill Dictionary</p>
+        <h1>Skill 字典</h1>
+        <p class="page-copy">查询一个 skill，切换类别，然后直接看规则说明。</p>
+      </header>
+
+      <section class="toolbar">
+        <label class="search-field">
+          <span>查询</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="例如：需求、回归、前端、测试、security"
+            autocomplete="off"
+          />
+        </label>
+        <p class="result-hint" id="result-hint"></p>
+      </section>
+
+      <nav class="domain-tabs" id="domain-tabs" aria-label="类别切换"></nav>
+
+      <section class="skill-section">
+        <div class="section-head">
+          <h2>规则条目</h2>
+          <p class="section-copy" id="skill-hint"></p>
+        </div>
+        <div class="skill-strip" id="skill-strip"></div>
+      </section>
+
+      <section class="detail-panel" id="detail-panel"></section>
+    </main>
+
+    <script src="./skill-dictionary/data.js"></script>
+    <script src="./skill-dictionary/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "验收标准"
+  short_description: "把需求目标细化成可验证完成标准的规则"
+  default_prompt: "使用 $acceptance-criteria-rules 为当前需求补齐可验证的验收标准，覆盖主路径、异常路径和边界条件。"
