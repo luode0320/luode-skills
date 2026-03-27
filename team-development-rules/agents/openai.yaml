@@ -1,4 +1,4 @@
 interface:
-  display_name: "团队研发规则"
-  short_description: "让代理按团队规则完成沟通、编码、测试与交付说明。"
-  default_prompt: "Use $team-development-rules to clarify the task first, then implement with the team coding, testing, and delivery rules."
+  display_name: "团队研发总控"
+  short_description: "按研发阶段分流、裁决冲突并阻断越级推进的总控协调 skill"
+  default_prompt: "使用 $team-development-rules 先判断当前任务所处阶段、应接手的 skill，以及是否需要暂停或阻断流程。"

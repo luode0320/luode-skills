@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码可读性"
+  short_description: "约束函数结构、逻辑顺序、复杂度与可维护性的编码规则"
+  default_prompt: "使用 $code-readability-rules 检查当前实现是否足够清晰、顺序自然且便于维护。"

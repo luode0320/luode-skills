@@ -1,0 +1,4 @@
+interface:
+  display_name: "测试文档规则"
+  short_description: "统一测试说明、测试报告、覆盖说明与验证记录文档规范"
+  default_prompt: "使用 $test-doc-rules 判断当前测试 README、验证说明、测试报告和覆盖说明应如何组织。"

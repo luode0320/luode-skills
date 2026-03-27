@@ -1,0 +1,4 @@
+interface:
+  display_name: "需求边界判定"
+  short_description: "区分当前需求范围、历史问题、需求变更与兼容影响面的判定规则"
+  default_prompt: "使用 $requirement-boundary-rules 判断当前问题属于需求范围、需求变更、历史缺陷还是兼容影响。"

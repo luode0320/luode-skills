@@ -1,0 +1,4 @@
+interface:
+  display_name: "风格一致编码"
+  short_description: "跟随项目现有写法，避免局部风格跳变与个人偏好入侵的编码规则"
+  default_prompt: "使用 $code-style-consistency-rules 让当前改动严格跟随项目已有写法，不引入新的局部风格。"

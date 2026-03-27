@@ -1,0 +1,4 @@
+interface:
+  display_name: "语法校验规则"
+  short_description: "进入测试前检查语法、类型、依赖引用与明显构建失败风险的规则"
+  default_prompt: "使用 $syntax-check-review-rules 在进入测试前检查当前改动是否存在语法、类型、引用或明显构建失败风险。"

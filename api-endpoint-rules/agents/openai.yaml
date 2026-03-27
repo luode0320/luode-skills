@@ -1,0 +1,4 @@
+interface:
+  display_name: "接口入口规则"
+  short_description: "约束 controller、router、handler 职责与路径命名、HTTP 方法语义"
+  default_prompt: "使用 $api-endpoint-rules 判断当前接口应如何定义入口职责、路径命名与 HTTP 方法语义。"

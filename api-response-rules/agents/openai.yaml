@@ -1,0 +1,4 @@
+interface:
+  display_name: "接口响应规则"
+  short_description: "统一成功、错误、分页响应结构与兼容字段放置方式的接口规则"
+  default_prompt: "使用 $api-response-rules 设计当前接口的成功响应、错误响应、分页结构和兼容字段放置方式。"

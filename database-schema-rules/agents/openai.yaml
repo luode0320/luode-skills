@@ -1,0 +1,4 @@
+interface:
+  display_name: "数据库结构规则"
+  short_description: "统一表字段索引约束迁移回滚与结构兼容边界规则"
+  default_prompt: "使用 $database-schema-rules 判断当前表结构、字段、索引、约束和迁移脚本修改是否符合结构变更与回滚基线。"
