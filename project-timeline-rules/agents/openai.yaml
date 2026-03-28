@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目时间线"
+  short_description: "项目开发历程、关键决策和技术演进报告的自动触发规则"
+  default_prompt: "使用 $project-timeline-rules 为当前项目生成按时间顺序组织的开发历程、关键阶段和技术演进报告；如果没有真实记忆后端，则降级为基于本地文档和 Git 历史的时间线分析，并明确标注来源。"

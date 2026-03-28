@@ -60,3 +60,17 @@
 - 应命中：`test-strategy-rules`、`functional-validation-rules`、`test-regression-rules`。
 - 裁决：先进入 `test-strategy-rules` 确定优先级；当前变更正确性由 `functional-validation-rules` 先收口；确认当前功能没问题后，再由 `test-regression-rules` 处理旧能力兼容性。
 - 原因：先定策略，再验当前功能，最后做回归；否则容易把三层职责混成一轮模糊测试。
+
+### 样例 8：用户一边提新需求，一边问“之前是不是做过类似功能”
+
+- 当前信号：用户提出一个新需求，同时要求先回忆以前有没有做过类似页面、接口或流程。
+- 应命中：`history-recall-rules` + 需求域 skill。
+- 裁决：先由 `history-recall-rules` 补回历史方案和历史结论；历史补齐后回到 `requirement-intake-rules` / `requirement-gap-rules` 继续做当前需求澄清。
+- 原因：历史回忆只是辅助信息，不代替当前需求分析；先补上下文，再继续需求主流程。
+
+### 样例 9：用户要求“写项目历程报告”，但当前也需要交付说明
+
+- 当前信号：用户既想看整个项目演进历史，又想知道这次交付做了什么。
+- 应命中：`project-timeline-rules` + `delivery-summary-rules`。
+- 裁决：如果问题重点是长期历史、关键决策、阶段演进，先由 `project-timeline-rules` 主导；如果问题重点是当前这一轮改动、验证和风险，再由 `delivery-summary-rules` 输出本次交付摘要。
+- 原因：时间尺度不同；项目时间线报告不应替代当前交付说明，当前交付说明也不能冒充完整项目史。

@@ -23,6 +23,7 @@ class DomainConfig:
 
 DOMAIN_ORDER = [
     DomainConfig("orchestration", "总控层", "流程分流、冲突裁决、阶段阻断"),
+    DomainConfig("memory", "记忆域", "跨会话历史检索、项目演进回顾、长期上下文补全"),
     DomainConfig("requirement", "需求域", "需求澄清、缺口识别、边界确认、验收前置"),
     DomainConfig("bug", "Bug 域", "问题录入、定位、运行时诊断、修复建议"),
     DomainConfig("baseline", "编码基线域", "开始编码即并行生效的基础质量规则"),
@@ -36,6 +37,7 @@ DOMAIN_ORDER = [
 
 DOMAIN_SECTION_MATCH = {
     "总控层": "总控层",
+    "记忆域": "记忆域",
     "需求域": "需求域",
     "Bug 域": "Bug 域",
     "编码基线域": "编码基线域",
@@ -174,14 +176,29 @@ def parse_plan_document() -> tuple[Path, dict[str, list[dict[str, str]]]]:
     return plan_path, plan_domains
 
 
+def iter_skill_directories() -> list[Path]:
+    directories: list[Path] = []
+    parents = [ROOT, ROOT / "downloaded-seeds"]
+
+    for parent in parents:
+        if not parent.exists():
+            continue
+        for directory in sorted(parent.iterdir()):
+            if directory.is_dir() and (directory / "SKILL.md").exists():
+                directories.append(directory)
+
+    return directories
+
+
+def has_license_file(directory: Path) -> bool:
+    return any(path.is_file() for path in directory.glob("LICENSE*"))
+
+
 def parse_actual_skills() -> dict[str, dict]:
     skills: dict[str, dict] = {}
 
-    for directory in sorted(ROOT.iterdir()):
+    for directory in iter_skill_directories():
         skill_path = directory / "SKILL.md"
-        if not directory.is_dir() or not skill_path.exists():
-            continue
-
         text = read_text(skill_path)
         frontmatter = parse_frontmatter(text)
         name = frontmatter.get("name", directory.name)
@@ -195,7 +212,7 @@ def parse_actual_skills() -> dict[str, dict]:
             "sections": second_level_headings(text),
             "references": collect_relative_files(directory / "references"),
             "agents": collect_relative_files(directory / "agents"),
-            "has_license": (directory / "LICENSE.txt").exists(),
+            "has_license": has_license_file(directory),
         }
 
     return skills
@@ -281,6 +298,7 @@ def build_focus_points(item: dict) -> list[str]:
 
     domain_points = {
         "总控层": "重点看是否只做分流和阻断，没有越权覆盖单域 skill。",
+        "记忆域": "重点看它是否只补历史上下文，不越权代替当前需求、Bug、编码或交付判断。",
         "需求域": "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。",
         "Bug 域": "重点看静态定位与运行时诊断的切换条件是否清楚。",
         "编码基线域": "重点看它是否能并行生效，并且不抢位点域或审查域职责。",
