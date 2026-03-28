@@ -1,4 +1,0 @@
-interface:
-  display_name: "前端组件"
-  short_description: "规范前端组件拆分和状态边界的规则"
-  default_prompt: "使用 $frontend-component-rules 审查当前前端组件的拆分、props 与状态边界，并给出具体调整建议。"
