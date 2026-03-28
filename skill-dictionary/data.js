@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-29 00:14:06",
+  "generated_at": "2026-03-29 00:24:41",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 9,
     "seed_total": 0,
     "doc_total": 3,
-    "references_total": 166,
+    "references_total": 167,
     "agents_total": 50
   },
   "downloaded_seeds": {
@@ -1726,7 +1726,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
           "item_order": 14,
-          "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
+          "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发，尤其适用于首页、营销页、品牌展示页、数据面板和需要明确设计方向的前端界面。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
           "core_responsibility": "统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。",
           "skill_path": "frontend-ui-visual-rules/SKILL.md",
           "directory_path": "frontend-ui-visual-rules",
@@ -1743,6 +1743,7 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "frontend-ui-visual-rules/references/aesthetic-direction-rules.md",
             "frontend-ui-visual-rules/references/color-typography-icon-rules.md",
             "frontend-ui-visual-rules/references/design-search-workflow.md",
             "frontend-ui-visual-rules/references/forms-nav-data-display-rules.md",
@@ -4064,7 +4065,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
       "item_order": 14,
-      "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
+      "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发，尤其适用于首页、营销页、品牌展示页、数据面板和需要明确设计方向的前端界面。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
       "core_responsibility": "统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。",
       "skill_path": "frontend-ui-visual-rules/SKILL.md",
       "directory_path": "frontend-ui-visual-rules",
@@ -4081,6 +4082,7 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "frontend-ui-visual-rules/references/aesthetic-direction-rules.md",
         "frontend-ui-visual-rules/references/color-typography-icon-rules.md",
         "frontend-ui-visual-rules/references/design-search-workflow.md",
         "frontend-ui-visual-rules/references/forms-nav-data-display-rules.md",
