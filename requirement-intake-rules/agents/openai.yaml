@@ -1,4 +1,4 @@
 interface:
   display_name: "需求接入"
-  short_description: "梳理需求目标、背景、上下游和输入输出的入口规则"
-  default_prompt: "使用 $requirement-intake-rules 把当前新需求整理成结构化接入摘要，并判断下一步该进入哪个需求域 skill。"
+  short_description: "从需求链接与零散资料补齐需求并落 ment 文档的入口规则"
+  default_prompt: "使用 $requirement-intake-rules 根据需求 URL、零散资料和物料整理需求，补齐到可进入开发的程度，并生成 ment 文档与分流建议。"
