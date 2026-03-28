@@ -1,4 +1,4 @@
 interface:
   display_name: "调试日志"
-  short_description: "用可回收临时日志补充 Bug 运行期证据的规则"
-  default_prompt: "使用 $bug-debug-log-rules 设计当前 Bug 所需的临时调试日志，说明落点、观察目标和清理要求。"
+  short_description: "用可删除临时日志补充 Bug 证据并统一归档的规则"
+  default_prompt: "使用 $bug-debug-log-rules 设计当前 Bug 所需的临时调试日志，说明落点、观察目标、`bug/` 根目录记录方式，以及定位完成后的删除要求。"
