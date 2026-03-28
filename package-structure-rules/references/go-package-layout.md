@@ -4,6 +4,36 @@
 
 用于 Go 项目中判断 `main.go`、`internal`、`utils`、`common`、`global`、`middleware`、`crontask` 以及常见业务目录的职责边界。
 
+## 项目根目录规则
+
+### 场景一：前后端在一个根目录的项目
+
+如果前后端代码在同一个根目录下，例如：
+- `admin-go/` - 后端 Go 项目
+- `admin-vue/` - 前端 Vue 项目
+
+则 Go 包结构规则应用于后端子目录（如 `admin-go/`），即：
+- `admin-go/main.go`
+- `admin-go/internal/`
+- `admin-go/common/`
+- `admin-go/global/`
+- `admin-go/middleware/`
+- `admin-go/crontask/`
+- `admin-go/async/`
+- `admin-go/utils/`
+
+### 场景二：单纯的 Go 项目
+
+如果是单纯的 Go 项目（没有前端代码在同一根目录），则直接在项目根目录下应用本规则，即：
+- 项目根目录/main.go
+- 项目根目录/internal/
+- 项目根目录/common/
+- 项目根目录/global/
+- 项目根目录/middleware/
+- 项目根目录/crontask/
+- 项目根目录/async/
+- 项目根目录/utils/
+
 ## 推荐层次
 
 - 项目根目录 `main.go`
