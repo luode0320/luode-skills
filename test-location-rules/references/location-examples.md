@@ -10,19 +10,26 @@
 │   ├── services/         # 业务代码，无测试资产
 │   └── utils/            # 业务代码，无测试资产
 ├── test/
-│   ├── 2026-03-28_143022_用户登录功能验证/
-│   │   ├── README.md     # 必须包含
-│   │   ├── test-login.js
-│   │   ├── fixtures/
-│   │   │   └── user-data.json
-│   │   └── cases/
-│   │       └── login-cases.md
-│   ├── 2026-03-28_154511_订单创建接口测试/
-│   │   ├── README.md
-│   │   └── test-order-api.js
-│   ├── 2026-03-28_162033_数据导出功能验证/
-│   │   ├── README.md
-│   │   └── test-export.js
+│   ├── 2026-03-28_143022/
+│   │   ├── 用户登录功能验证/
+│   │   │   └── README.md
+│   │   └── src/
+│   │       └── service/
+│   │           ├── user_login_test.go
+│   │           └── fixtures/
+│   │               └── user_data.json
+│   ├── 2026-03-28_154511/
+│   │   ├── 订单创建接口测试/
+│   │   │   └── README.md
+│   │   └── internal/
+│   │       └── service/
+│   │           └── create_order_test.go
+│   ├── 2026-03-28_162033/
+│   │   ├── 数据导出功能验证/
+│   │   │   └── README.md
+│   │   └── app/
+│   │       └── export/
+│   │           └── export_test.js
 │   └── archive/
 │       └── 2026-W12/
 │           └── ...
@@ -37,11 +44,11 @@
 
 ## 执行方式
 ```bash
-node test-login.js
+go test ./test/2026-03-28_143022/src/service
 ```
 
 ## 依赖数据
-- fixtures/user-data.json - 测试用户数据
+- `test/2026-03-28_143022/src/service/fixtures/user_data.json`
 - 使用测试环境数据库
 
 ## 覆盖范围
@@ -57,12 +64,15 @@ node test-login.js
 ### 同一会话多次测试的正确做法
 ```
 test/
-├── 2026-03-28_143022_用户登录功能验证/
-│   └── README.md
-├── 2026-03-28_144511_用户注册功能验证/
-│   └── README.md
-└── 2026-03-28_150033_用户信息修改功能验证/
-    └── README.md
+├── 2026-03-28_143022/
+│   └── 用户登录功能验证/
+│       └── README.md
+├── 2026-03-28_144511/
+│   └── 用户注册功能验证/
+│       └── README.md
+└── 2026-03-28_150033/
+    └── 用户信息修改功能验证/
+        └── README.md
 ```
 
 ## 反例
@@ -72,6 +82,7 @@ test/
 - 把接口返回样例 JSON 放进 `src/controllers/`、`app/services/` 之类的生产目录。
 - 把验证脚本命名成临时文件后长期留在 `scripts/` 或 `tmp/` 中。
 - 把测试说明写到 `docs/`，但目录里没有对应测试代码和测试数据，导致说明与资产脱节。
+- 把 Go 测试包直接放进中文目录，例如 `test/2026-03-28_143022/用户登录功能验证/service/login_test.go`。
 
 ### 错误的目录结构
 ```
@@ -83,6 +94,10 @@ test/
 │   │   └── mock-order.json    # ❌ Mock 数据放在业务代码目录
 │   └── utils/
 ├── test-login.js               # ❌ 测试脚本放在根目录
+├── test/
+│   └── 2026-03-28_143022_用户登录功能验证/  # ❌ 时间戳根目录混入中文
+│       └── service/
+│           └── login_test.go
 ├── tmp-test/                   # ❌ 使用了错误的目录名
 │   └── ...
 └── tests/                      # ❌ 应该是 test/（单数）
@@ -92,25 +107,30 @@ test/
 ### 缺少 README.md
 ```
 test/
-└── 2026-03-28_143022_用户登录功能验证/
-    ├── test-login.js
-    └── fixtures/               # ❌ 缺少 README.md
+└── 2026-03-28_143022/
+    └── internal/
+        └── service/
+            └── history_client_test.go   # ❌ 缺少中文说明目录和 README.md
 ```
 
 ### 多个测试混在一个目录
 ```
 test/
-└── 2026-03-28_143022_用户功能测试/
-    ├── test-login.js
-    ├── test-register.js        # ❌ 应该分开创建独立目录
-    ├── test-profile.js
-    └── README.md
+└── 2026-03-28_143022/
+    ├── 用户功能测试/
+    │   └── README.md
+    ├── internal/
+    │   └── service/
+    │       ├── login_test.go
+    │       ├── register_test.go        # ❌ 不同独立测试混在一个时间戳根目录
+    │       └── profile_test.go
 ```
 
 ## 判定示例
 
 - 如果当前仓库没有 `test/` 目录，必须创建并使用它。
 - 如果已有 `tests/`（复数）目录，建议逐步迁移到 `test/`（单数）。
-- 如果当前测试资产只服务一个需求任务，应优先在该任务测试目录聚合，不要拆散到多个无关公共目录。
-- 同一需求的多个独立测试验证，必须分别创建独立的任务目录。
-- 每个任务目录必须包含 README.md，否则视为不完整。
+- 如果当前测试资产只服务一个需求任务，应优先在该时间戳根目录内聚合，不要拆散到多个无关公共目录。
+- 同一需求的多个独立测试验证，必须分别创建独立的时间戳根目录。
+- 每个时间戳根目录都必须包含中文说明目录和 `README.md`，否则视为不完整。
+- 对 Go 项目，任何会被 `go test ./...` 扫描到的测试包路径都必须保持 ASCII。

@@ -1,4 +1,4 @@
 interface:
   display_name: "测试目录落点"
-  short_description: "统一测试资源根目录、任务目录与禁止散落规则的测试位置规范"
-  default_prompt: "使用 $test-location-rules 判断当前测试脚本、模拟数据、验证代码和说明文档应放在哪个测试目录。"
+  short_description: "统一时间戳测试根目录、中文说明目录与真实代码镜像路径的规则"
+  default_prompt: "使用 $test-location-rules 判断当前测试脚本、模拟数据、验证代码和说明文档应放到哪个 `test/yyyy-MM-DD_HHmmss/` 根目录下，并如何拆分中文说明目录与真实代码路径镜像目录。"
