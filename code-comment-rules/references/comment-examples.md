@@ -2,6 +2,17 @@
 
 ## 更好
 
+- 每个函数、方法都必须标注最近修改时间（北京时间：yyyy-MM-DD HH:mm:ss），例如：
+
+```go
+// CreateOrder 创建订单
+// 最近修改时间：2026-03-28 14:30:22
+func CreateOrder(ctx context.Context, req *OrderRequest) (*OrderResponse, error) {
+    // 1. 校验请求参数
+    // ...
+}
+```
+
 - 在多步骤代码块中使用中文编号步骤注释，例如：
 
 ```go
