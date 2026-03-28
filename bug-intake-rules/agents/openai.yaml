@@ -1,4 +1,4 @@
 interface:
   display_name: "Bug 问题录入"
-  short_description: "标准化记录异常现象、影响范围、环境条件与期望结果的 Bug 入口规则"
-  default_prompt: "使用 $bug-intake-rules 先把当前 Bug 的现象、影响范围、环境条件、期望结果和实际结果整理清楚。"
+  short_description: "标准化录入 Bug 入口并建立 `bug/` 根目录记录的规则"
+  default_prompt: "使用 $bug-intake-rules 先把当前 Bug 的现象、影响范围、环境条件、期望结果和实际结果整理清楚，并建立当前 `bug/` 根目录记录。"

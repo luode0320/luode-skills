@@ -1,4 +1,4 @@
 interface:
   display_name: "回归风险"
-  short_description: "识别 Bug 修复潜在副作用与回归重点的规则"
-  default_prompt: "使用 $bug-regression-risk-rules 评估当前修复方案的回归风险，并给出风险等级和验证优先级。"
+  short_description: "识别 Bug 回归风险并统一写回 `bug/` 根目录的规则"
+  default_prompt: "使用 $bug-regression-risk-rules 评估当前修复方案的回归风险，给出风险等级和验证优先级，并写回当前 `bug/` 根目录。"

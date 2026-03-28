@@ -1,4 +1,4 @@
 interface:
   display_name: "Bug 根因定位"
-  short_description: "通过代码、日志、trace 与调用链静态收敛 Bug 根因的定位规则"
-  default_prompt: "使用 $bug-root-cause-rules 先通过代码、日志、trace 和调用链静态定位当前 Bug 的根因。"
+  short_description: "通过代码与证据链静态定位 Bug 根因并统一归档的规则"
+  default_prompt: "使用 $bug-root-cause-rules 先通过代码、日志、trace 和调用链静态定位当前 Bug 的根因，并写回当前 `bug/` 根目录。"

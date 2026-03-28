@@ -1,4 +1,4 @@
 interface:
   display_name: "Bug 修复建议"
-  short_description: "在根因已定位后输出修改建议、风险评估与确认条件的 Bug 交接规则"
-  default_prompt: "使用 $bug-fix-proposal-rules 在 Bug 已定位后先整理修改建议、影响范围、风险点和是否需要用户确认。"
+  short_description: "在根因已定位后输出修复建议并统一写回 `bug/` 根目录的规则"
+  default_prompt: "使用 $bug-fix-proposal-rules 在 Bug 已定位后整理修改建议、影响范围、风险点和确认条件，并写回当前 `bug/` 根目录。"

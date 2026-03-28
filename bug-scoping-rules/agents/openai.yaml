@@ -1,4 +1,4 @@
 interface:
   display_name: "Bug 范围"
-  short_description: "界定 Bug 归属模块、影响面和优先定位入口的规则"
-  default_prompt: "使用 $bug-scoping-rules 判断当前问题属于哪条链路和哪些模块，并给出优先定位入口。"
+  short_description: "界定 Bug 范围并将结论写回 `bug/` 根目录的规则"
+  default_prompt: "使用 $bug-scoping-rules 判断当前问题属于哪条链路和哪些模块，给出优先定位入口，并写回当前 `bug/` 根目录。"
