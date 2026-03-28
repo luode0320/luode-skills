@@ -1,4 +1,4 @@
 interface:
   display_name: "需求缺口识别"
-  short_description: "识别需求描述缺失项并在信息不足时阻断盲目编码推进的规则"
-  default_prompt: "使用 $requirement-gap-rules 判断当前需求是否缺少关键前提、字段、流程、规则或验收信息。"
+  short_description: "识别需求缺口并回写同一份 ment 需求文档的规则"
+  default_prompt: "使用 $requirement-gap-rules 判断当前需求是否缺少关键前提、字段、流程、规则或验收信息，并把缺口结论更新到同一份 ment 需求文档。"
