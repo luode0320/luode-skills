@@ -1,4 +1,0 @@
-interface:
-  display_name: "安全最佳实践种子"
-  short_description: "用于安全评审和安全默认代码生成"
-  default_prompt: "使用 $security-best-practices 结合当前语言和框架的参考规则，对代码进行安全评审或生成更安全的实现。"

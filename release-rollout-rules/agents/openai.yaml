@@ -1,4 +1,0 @@
-interface:
-  display_name: "发布上线"
-  short_description: "规范发布检查、灰度放量和回滚门槛的规则"
-  default_prompt: "使用 $release-rollout-rules 为当前变更制定发布上线方案，说明检查项、放量策略和回滚条件。"

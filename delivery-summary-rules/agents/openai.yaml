@@ -1,4 +1,4 @@
 interface:
   display_name: "交付总结"
-  short_description: "整理交付摘要、验证结论和遗留风险的规则"
-  default_prompt: "使用 $delivery-summary-rules 为当前任务整理交付总结，说明主要改动、验证结论、风险和遗留事项。"
+  short_description: "按确认后的 Git 提交范围生成并保存交付总结的规则"
+  default_prompt: "使用 $delivery-summary-rules 在我确认开始发布总结并给出 Git 起始提交后，整理本次交付总结，说明主要改动、验证结论、风险和遗留事项，并保存到根目录 `doc/`。"

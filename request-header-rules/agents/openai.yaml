@@ -1,4 +1,0 @@
-interface:
-  display_name: "请求头规则"
-  short_description: "统一认证 trace 租户 幂等 上下文请求头分类透传与边界规范"
-  default_prompt: "使用 $request-header-rules 判断当前认证头、trace 头、租户头、幂等键和上下文头的分类与透传规则是否合理。"
