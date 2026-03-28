@@ -1,4 +1,0 @@
-interface:
-  display_name: "Skill 体系演进"
-  short_description: "维护 skill 新增、拆分、迁移、合并与退休边界的体系规则"
-  default_prompt: "使用 $skill-evolution-rules 评估当前 skill 体系是否需要新增、拆分、迁移、合并或退休。"
