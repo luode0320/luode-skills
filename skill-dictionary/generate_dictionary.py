@@ -393,14 +393,18 @@ def build_recommendations(domain_summary: list[dict]) -> list[str]:
     bug_missing = summary_by_label["Bug 域"]["planned_count"]
     test_missing = summary_by_label["测试域"]["planned_count"]
     delivery_missing = summary_by_label["交付域"]["planned_count"]
+    total_planned = sum(
+        item["implemented_count"] + item["planned_count"] for item in domain_summary if item["label"] != "扩展种子"
+    )
     total_missing = sum(
         item["planned_count"] for item in domain_summary if item["label"] != "扩展种子"
     )
     seed_items = {item["name"] for item in summary_by_label["扩展种子"]["items"]}
+    all_items = {item["name"] for domain in domain_summary for item in domain["items"]}
 
     if total_missing == 0:
         recommendations.append(
-            "55 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。"
+            f"{total_planned} 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。"
         )
     elif requirement_missing:
         recommendations.append(
@@ -416,9 +420,9 @@ def build_recommendations(domain_summary: list[dict]) -> list[str]:
             f"测试域缺 {test_missing} 个、交付域缺 {delivery_missing} 个，建议先补 `test-strategy-rules` 和交付域三件套。"
         )
 
-    if {"frontend-skill", "frontend-component-rules"} & seed_items or "frontend-skill" in seed_items:
+    if {"frontend-ui-visual-rules", "frontend-component-rules"} <= all_items:
         recommendations.append(
-            "当前同时存在 `frontend-component-rules` 与 `frontend-skill`，建议明确前者负责组件工程规则、后者保留页面设计种子，避免触发歧义。"
+            "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。"
         )
     if "security-best-practices" in seed_items:
         recommendations.append(

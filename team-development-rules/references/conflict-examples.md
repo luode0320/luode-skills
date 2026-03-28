@@ -43,9 +43,9 @@
 ### 样例 5：前端页面任务同时像视觉设计又像组件拆分
 
 - 当前信号：用户要做一个新页面，同时既强调首屏视觉表达，又要求把组件拆干净、状态边界清晰。
-- 应命中：`frontend-skill` + `frontend-component-rules`。
-- 裁决：如果当前先解决的是页面视觉方向、信息层级和构图节奏，先由 `frontend-skill` 主导；一旦进入组件拆分、props 设计、状态归属和复用边界，再由 `frontend-component-rules` 接手工程细节。
-- 原因：两者可以串行配合，但不能互相替代；视觉设计种子不应抢组件工程规则的职责。
+- 应命中：`frontend-ui-visual-rules` + `frontend-component-rules`。
+- 裁决：如果当前先解决的是页面视觉方向、信息层级和构图节奏，先由 `frontend-ui-visual-rules` 主导；一旦进入组件拆分、props 设计、状态归属和复用边界，再由 `frontend-component-rules` 接手工程细节。
+- 原因：两者可以串行配合，但不能互相替代；页面视觉规则不应抢组件工程规则的职责。
 
 ### 样例 6：运行时诊断同时命中 debug 日志和断言诊断
 

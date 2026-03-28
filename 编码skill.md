@@ -299,7 +299,8 @@ Bug 域采用两条互补路径：
 | `error-handling-rules`      | 当新增或修改异常类、全局异常处理、错误中间件、`try/catch`、错误映射、重试、超时、降级、fallback 时自动触发。                                                                                                        | 统一错误处理模型。                   |
 | `logging-trace-rules`       | 当新增或修改日志、logger、trace、span、审计日志、脱敏、排障字段、链路透传时自动触发。                                                                                                                               | 统一日志和链路追踪规则。             |
 | `auth-security-rules`       | 当新增或修改认证、鉴权、登录、登出、会话、JWT、对象级授权、输入校验、敏感信息处理、上传下载安全、外部请求安全时自动触发。                                                                                           | 统一安全实现的默认基线。             |
-| `frontend-component-rules`  | 当新增或修改 React、Vue、前端组件、页面、表单、状态流、客户端数据展示逻辑时自动触发。                                                                                                                               | 统一前端组件和页面工程规则。         |
+| `frontend-component-rules`  | 当新增或修改 React、Vue、前端组件拆分、props 设计、状态归属、事件上抛、组合方式、复用边界、前端状态流和客户端数据展示逻辑时自动触发。                                                                                 | 统一前端组件工程、状态边界和页面内组合规则。         |
+| `frontend-ui-visual-rules`  | 当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发。 | 统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。 |
 | `performance-caching-rules` | 当新增或修改 SQL 性能、接口耗时、缓存读取写入、缓存 key、缓存失效、前端渲染热点、大列表、图表、虚拟滚动时自动触发。                                                                                                 | 统一性能和缓存规则。                 |
 
 ### 代码位点域的多 Skill 并行触发规则
@@ -780,21 +781,19 @@ skill-name/
 
 ## 十五、已准备好的种子内容
 
-当前已下载并中文化的种子目录：
+当前不再保留独立的前端视觉 downloaded seed 目录。
 
-- `downloaded-seeds/frontend-skill`
-- `downloaded-seeds/security-best-practices`
+已完成的种子吸收情况：
 
-已中文化范围：
+- GitHub 外部种子 `ui-ux-pro-max-skill` 已下载、中文化整理并合并吸收到 `frontend-ui-visual-rules`
+- 合并保留内容包括：搜索脚本 `scripts/search.py`、设计系统聚合脚本、`data/*.csv` 数据集和原始许可文本
+- `frontend-ui-visual-rules` 现已同时承担正式项目规则和内置设计搜索能力，不再额外保留第二个前端视觉种子 skill
 
-- 种子 skill 的 `SKILL.md`
-- 种子 skill 的 `agents/openai.yaml`
-- 安全种子的框架参考 `references/*.md`
+后续种子处理原则：
 
-后续计划：
-
-- `security-best-practices` 的中文内容作为 `auth-security-rules` 的重要来源
-- `frontend-skill` 的中文内容作为 `frontend-component-rules` 的重要来源
+- 如果后续继续下载外部种子，优先评估是否直接吸收到现有正式 skill
+- 只有在确实需要保留“原始参考源”且短期内不会并入主规则时，才单独保留 `downloaded-seeds/` 目录
+- 安全类外部种子如后续引入，优先评估是否直接吸收到 `auth-security-rules`
 
 ## 十六、推荐的落地顺序
 

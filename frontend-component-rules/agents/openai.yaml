@@ -1,0 +1,4 @@
+interface:
+  display_name: "前端组件工程"
+  short_description: "前端组件拆分、状态边界、props 契约和组合复用的自动触发规则"
+  default_prompt: "使用 $frontend-component-rules 为当前前端组件改动补齐组件边界、状态归属、props 契约、组合复用和副作用约束。"
