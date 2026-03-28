@@ -1,4 +1,0 @@
-interface:
-  display_name: "性能缓存规则"
-  short_description: "统一 SQL 接口缓存前端渲染性能边界与过度优化判定规范"
-  default_prompt: "使用 $performance-caching-rules 判断当前 SQL 性能、接口耗时、缓存策略或前端渲染优化是否符合性能与缓存基线。"
