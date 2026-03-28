@@ -1,4 +1,4 @@
 interface:
   display_name: "测试策略"
-  short_description: "确定测试优先级、类型组合和覆盖范围的规则"
-  default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略，说明应优先做哪些验证、哪些路径可后补。"
+  short_description: "以 `test-location-rules` 为基准制定测试策略并统一留痕的规则"
+  default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略，说明应优先做哪些验证、哪些路径可后补，并写回当前 `test/` 任务目录。"

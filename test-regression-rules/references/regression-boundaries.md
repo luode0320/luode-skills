@@ -23,3 +23,4 @@
 - 现象更像环境或链路异常，转交 `integration-debugging-rules`。
 - 回归范围过大、资源不足、优先级存在争议，升级到 `test-strategy-rules`。
 - 发现明确回归失败项，回流编码域或 Bug 域修复。
+- 回归说明文档和结论留痕统一遵循 `test-location-rules`，放在 `test/` 根目录下的当前任务目录中。
