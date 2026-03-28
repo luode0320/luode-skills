@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-28 22:50:47",
+  "generated_at": "2026-03-29 00:14:06",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 58,
-    "implemented_total": 49,
+    "planned_total": 59,
+    "implemented_total": 50,
     "planned_missing": 9,
     "seed_total": 0,
     "doc_total": 3,
-    "references_total": 160,
-    "agents_total": 49
+    "references_total": 166,
+    "agents_total": 50
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -177,10 +177,10 @@ window.SKILL_DICTIONARY = {
       "label": "需求域",
       "description": "需求澄清、缺口识别、边界确认、验收前置",
       "order": 3,
-      "implemented_count": 6,
+      "implemented_count": 7,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 6,
+      "total_count": 7,
       "items": [
         {
           "id": "requirement-intake-rules",
@@ -193,7 +193,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 1,
-          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。支持从需求 URL、零散资料、物料和补充说明中整理需求，补齐到可进入后续代码开发的程度，并将结果沉淀到 `ment/` 目录；它同时定义需求域统一文档入口，同一需求后续只能持续更新这一份文档；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
+          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。支持从需求 URL、零散资料、物料和补充说明中整理需求，先结合当前项目上下文逐步澄清目标、约束和成功标准，对存在多个合理方向的需求先收敛方案，再补齐到可进入后续代码开发的程度，并将结果沉淀到 `ment/` 目录；它同时定义需求域统一文档入口，同一需求后续只能持续更新这一份文档；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
           "core_responsibility": "先理解目标、背景、上下游和输入输出。",
           "skill_path": "requirement-intake-rules/SKILL.md",
           "directory_path": "requirement-intake-rules",
@@ -235,7 +235,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 2,
-          "auto_trigger": "当需求描述不完整、缺少前提、缺少字段、缺少流程、缺少业务规则、缺少依赖条件或缺少验收信息时触发。负责识别需求缺口并在信息不足时阻断盲目编码推进，同时将缺口分析结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求边界判断、需求变更判断或验收标准细化 skill。",
+          "auto_trigger": "当需求描述不完整、缺少前提、缺少字段、缺少流程、缺少业务规则、缺少依赖条件、缺少成功标准、存在多种合理解释或关键方案尚未收敛时触发。负责识别需求缺口并在信息不足时阻断盲目编码推进，同时将缺口分析结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求边界判断、需求变更判断或验收标准细化 skill。",
           "core_responsibility": "识别缺失信息并暂停盲目实现。",
           "skill_path": "requirement-gap-rules/SKILL.md",
           "directory_path": "requirement-gap-rules",
@@ -319,7 +319,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 4,
-          "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤或多个角色协作，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求接入、边界确认或项目排期管理。",
+          "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤、多个角色协作，或一次性覆盖多个独立子系统、多个产品子域、多个相对独立主线，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求接入、边界确认或项目排期管理。",
           "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
           "skill_path": "requirement-splitting-rules/SKILL.md",
           "directory_path": "requirement-splitting-rules",
@@ -351,6 +351,51 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "implementation-plan-rules",
+          "name": "implementation-plan-rules",
+          "title": "实施计划拆解规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "requirement",
+          "domain_label": "需求域",
+          "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
+          "domain_order": 3,
+          "item_order": 5,
+          "auto_trigger": "当需求、边界和验收标准已基本稳定，且正式编码前仍需要先把当前优先闭环的文件落点、模块职责、任务顺序、验证步骤和阶段收口拆清时触发。负责把已确认需求或已拆分出的当前优先子项转成可执行实施计划，并将计划单独保存到 `ment/` 下的实施计划文档中；不要用它代替需求拆分、验收标准编写、实际编码或测试执行。",
+          "core_responsibility": "把已确认需求转成可执行实施计划。",
+          "skill_path": "implementation-plan-rules/SKILL.md",
+          "directory_path": "implementation-plan-rules",
+          "directory": "implementation-plan-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "implementation-plan-rules/references/plan-boundaries-and-examples.md",
+            "implementation-plan-rules/references/plan-entry-checklist.md",
+            "implementation-plan-rules/references/plan-review-checklist.md",
+            "implementation-plan-rules/references/plan-structure-template.md",
+            "implementation-plan-rules/references/source-notes.md",
+            "implementation-plan-rules/references/task-granularity-and-order.md"
+          ],
+          "agents": [
+            "implementation-plan-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
+          ]
+        },
+        {
           "id": "requirement-change-rules",
           "name": "requirement-change-rules",
           "title": "需求变更确认规则",
@@ -360,7 +405,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 3,
-          "item_order": 5,
+          "item_order": 6,
           "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论，并将变更结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要把历史缺陷误当成需求变更。",
           "core_responsibility": "重新确认变更范围和影响。",
           "skill_path": "requirement-change-rules/SKILL.md",
@@ -402,7 +447,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "需求域",
           "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
           "domain_order": 3,
-          "item_order": 6,
+          "item_order": 7,
           "auto_trigger": "当任务准备进入实现前确认，或交付前需要把“做到什么算完成”写成可验证、可测试、可复核的标准时触发。负责细化成功条件、异常条件、边界条件和不在范围项，并将验收标准单独保存到 `ment/` 下的验收文档中；不要用它代替功能验证或回归验证。",
           "core_responsibility": "补齐可验证、可测试的验收标准。",
           "skill_path": "acceptance-criteria-rules/SKILL.md",
@@ -2600,7 +2645,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 1,
-      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。支持从需求 URL、零散资料、物料和补充说明中整理需求，补齐到可进入后续代码开发的程度，并将结果沉淀到 `ment/` 目录；它同时定义需求域统一文档入口，同一需求后续只能持续更新这一份文档；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
+      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发。支持从需求 URL、零散资料、物料和补充说明中整理需求，先结合当前项目上下文逐步澄清目标、约束和成功标准，对存在多个合理方向的需求先收敛方案，再补齐到可进入后续代码开发的程度，并将结果沉淀到 `ment/` 目录；它同时定义需求域统一文档入口，同一需求后续只能持续更新这一份文档；不要用它代替需求缺口、边界、拆分、变更或验收标准类 skill。",
       "core_responsibility": "先理解目标、背景、上下游和输入输出。",
       "skill_path": "requirement-intake-rules/SKILL.md",
       "directory_path": "requirement-intake-rules",
@@ -2642,7 +2687,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 2,
-      "auto_trigger": "当需求描述不完整、缺少前提、缺少字段、缺少流程、缺少业务规则、缺少依赖条件或缺少验收信息时触发。负责识别需求缺口并在信息不足时阻断盲目编码推进，同时将缺口分析结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求边界判断、需求变更判断或验收标准细化 skill。",
+      "auto_trigger": "当需求描述不完整、缺少前提、缺少字段、缺少流程、缺少业务规则、缺少依赖条件、缺少成功标准、存在多种合理解释或关键方案尚未收敛时触发。负责识别需求缺口并在信息不足时阻断盲目编码推进，同时将缺口分析结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求边界判断、需求变更判断或验收标准细化 skill。",
       "core_responsibility": "识别缺失信息并暂停盲目实现。",
       "skill_path": "requirement-gap-rules/SKILL.md",
       "directory_path": "requirement-gap-rules",
@@ -2726,7 +2771,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 4,
-      "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤或多个角色协作，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求接入、边界确认或项目排期管理。",
+      "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤、多个角色协作，或一次性覆盖多个独立子系统、多个产品子域、多个相对独立主线，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要用它代替需求接入、边界确认或项目排期管理。",
       "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
       "skill_path": "requirement-splitting-rules/SKILL.md",
       "directory_path": "requirement-splitting-rules",
@@ -2758,6 +2803,51 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "implementation-plan-rules",
+      "name": "implementation-plan-rules",
+      "title": "实施计划拆解规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "requirement",
+      "domain_label": "需求域",
+      "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
+      "domain_order": 3,
+      "item_order": 5,
+      "auto_trigger": "当需求、边界和验收标准已基本稳定，且正式编码前仍需要先把当前优先闭环的文件落点、模块职责、任务顺序、验证步骤和阶段收口拆清时触发。负责把已确认需求或已拆分出的当前优先子项转成可执行实施计划，并将计划单独保存到 `ment/` 下的实施计划文档中；不要用它代替需求拆分、验收标准编写、实际编码或测试执行。",
+      "core_responsibility": "把已确认需求转成可执行实施计划。",
+      "skill_path": "implementation-plan-rules/SKILL.md",
+      "directory_path": "implementation-plan-rules",
+      "directory": "implementation-plan-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "implementation-plan-rules/references/plan-boundaries-and-examples.md",
+        "implementation-plan-rules/references/plan-entry-checklist.md",
+        "implementation-plan-rules/references/plan-review-checklist.md",
+        "implementation-plan-rules/references/plan-structure-template.md",
+        "implementation-plan-rules/references/source-notes.md",
+        "implementation-plan-rules/references/task-granularity-and-order.md"
+      ],
+      "agents": [
+        "implementation-plan-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。"
+      ]
+    },
+    {
       "id": "requirement-change-rules",
       "name": "requirement-change-rules",
       "title": "需求变更确认规则",
@@ -2767,7 +2857,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "需求域",
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 3,
-      "item_order": 5,
+      "item_order": 6,
       "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论，并将变更结果持续更新到 `requirement-intake-rules` 约定的同一个 `ment/` 需求文档中；不要把历史缺陷误当成需求变更。",
       "core_responsibility": "重新确认变更范围和影响。",
       "skill_path": "requirement-change-rules/SKILL.md",
@@ -2809,7 +2899,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "需求域",
       "domain_description": "需求澄清、缺口识别、边界确认、验收前置",
       "domain_order": 3,
-      "item_order": 6,
+      "item_order": 7,
       "auto_trigger": "当任务准备进入实现前确认，或交付前需要把“做到什么算完成”写成可验证、可测试、可复核的标准时触发。负责细化成功条件、异常条件、边界条件和不在范围项，并将验收标准单独保存到 `ment/` 下的验收文档中；不要用它代替功能验证或回归验证。",
       "core_responsibility": "补齐可验证、可测试的验收标准。",
       "skill_path": "acceptance-criteria-rules/SKILL.md",

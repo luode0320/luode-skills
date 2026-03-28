@@ -21,6 +21,7 @@
 | 用户提出新功能、新页面、新接口、新模块，尚未开始写代码 | 需求域 / `requirement-intake-rules` | 先理解目标、背景、输入输出和上下游 |
 | 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现 |
 | 需求过大，涉及多个模块、多个页面、多个接口或多个实施波次 | 需求域 / `requirement-splitting-rules` | 先拆成可独立推进的子项，再决定实施顺序 |
+| 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施计划、明确文件落点、任务顺序和验证闭环 | 需求域 / `implementation-plan-rules` | 先把已确认需求转成可执行实施计划，再进入编码 |
 | 编码过程中出现新条件、优先级变化、默认值变化或交付物变化 | 需求域 / `requirement-change-rules` | 先重算影响范围，不直接把变更偷偷塞进当前实现 |
 | 用户描述报错、异常、结果不符、线上故障、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现和定位 |
 | Bug 描述缺少复现条件、环境信息、日志样本或影响范围 | Bug 域 / `bug-gap-rules` | 先补齐定位所需最小信息，不盲目进入根因分析 |
