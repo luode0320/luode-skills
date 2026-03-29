@@ -1,6 +1,6 @@
 ---
 name: package-structure-rules
-description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` / `async` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策，尤其适合判断单二进制 Go 服务中哪些代码必须留在 `internal/`，以及哪些入口层目录必须保持根级；不要用它代替工具实现、接口设计或代码审查类 skill。
+description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` / `async` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策，尤其适合判断单二进制 Go 服务中哪些代码必须留在 `internal/`，以及哪些入口层目录必须保持根级；`utils` / `common` / `global` / `middleware` 根目录默认只放子包子目录，具体实现文件落在子目录中；不要用它代替工具实现、接口设计或代码审查类 skill。
 ---
 
 # 包结构与分层规则
@@ -13,6 +13,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 - 判断新增代码应进入哪个包、目录或模块。
 - 约束分层职责，避免目录失控和职责混杂。
 - 限制跨层依赖方向，防止反向依赖和循环依赖。
+- 约束 `utils` / `common` / `global` / `middleware` 采用二级子包结构，避免根目录堆实现文件。
 - 在不同语言栈下，给出可落地的目录命名与依赖建议。
 
 ## 自动触发信号
@@ -21,6 +22,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 - 新增文件时不确定应该放在哪一层。
 - 修改包名定义、模块归属或跨层依赖关系。
 - 新建 `utils`、`common`、`global`、`middleware`、`crontask`、`async` 等公共或入口目录。
+- 打算在 `utils`、`common`、`global`、`middleware` 根目录直接新增实现文件。
 - 需要判断单二进制 Go 服务里，哪些代码默认应放进 `internal/`，哪些目录必须保持根级。
 - 需要判断 `internal/chain`、`internal/wss` 这类项目私有适配层是否合规。
 - 需要判断 `router`、`controller`、`service`、`repository`、`model` 等目录职责。
@@ -33,7 +35,8 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
    - 如果是单纯的 Go 项目，则直接在项目根目录下应用本规则
 3. 再判断当前改动是入口层、业务层、数据访问层、横切层、全局实例层、定时任务入口层，还是公共支撑层或私有适配层。
 4. 先复用现有稳定目录，不要为了单个文件默认新建目录。
-5. 最后确认该层允许依赖谁，不允许依赖谁。
+5. 对 `utils`、`common`、`global`、`middleware` 先确定子目录职责，再落实现文件。
+6. 最后确认该层允许依赖谁，不允许依赖谁。
 
 ## 默认执行流程
 
@@ -41,7 +44,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 2. 如果项目是 Go，再读 `references/go-package-layout.md`。
 3. 如果项目是 Java，再读 `references/java-layer-layout.md`。
 4. 如果项目是 Node 或 Python，再读 `references/node-python-module-layout.md`。
-5. 输出目录归属、目录职责、依赖方向和是否允许新增目录的结论。
+5. 输出目录归属、目录职责、依赖方向、二级子目录方案和是否允许新增目录的结论。
 
 ## 权责边界与不负责事项
 
@@ -60,7 +63,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 ## 执行通过 / 驳回标准
 
 - 通过：能明确给出代码落点、目录职责、允许依赖方向和不允许跨层访问的边界。
-- 驳回：目录命名含糊、职责交叉、依赖方向混乱，或把本应归属现有层的代码随意塞进新目录。
+- 驳回：目录命名含糊、职责交叉、依赖方向混乱，把本应归属现有层的代码随意塞进新目录，或在 `utils`、`common`、`global`、`middleware` 根目录直接放实现文件。
 
 ## 执行结果归档要求
 
