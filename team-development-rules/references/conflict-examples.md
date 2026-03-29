@@ -88,3 +88,10 @@
 - 应命中：`requirement-splitting-rules` + `implementation-plan-rules`。
 - 裁决：先由 `requirement-splitting-rules` 拆出子系统 / 子项边界，只保留当前优先闭环；边界稳定后，再由 `implementation-plan-rules` 继续细化该优先子项的文件落点和执行步骤。
 - 原因：拆分先回答“先做哪一块”；实施计划再回答“这块具体怎么落地”，两者不能倒置。
+
+### 样例 12：当前功能验证需要真实浏览器操作
+
+- 当前信号：用户要求验证一个前端页面是否能正常打开、点击、输入、提交并截图留证。
+- 应命中：`functional-validation-rules` + `agent-browser`。
+- 裁决：由 `agent-browser` 负责真实浏览器执行、页面交互和截图取证；由 `functional-validation-rules` 负责判断当前需求是否通过、结论如何归档。
+- 原因：一个负责执行手段，一个负责验证结论，二者并行配合但不能互相替代。
