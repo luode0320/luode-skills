@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-29 15:24:49",
+  "generated_at": "2026-03-29 15:52:56",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 52,
-    "implemented_total": 52,
+    "planned_total": 53,
+    "implemented_total": 53,
     "planned_missing": 0,
     "seed_total": 1,
     "doc_total": 2,
-    "references_total": 174,
-    "agents_total": 50
+    "references_total": 177,
+    "agents_total": 51
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -77,13 +77,55 @@ window.SKILL_DICTIONARY = {
     {
       "id": "memory",
       "label": "记忆域",
-      "description": "跨会话历史检索、项目演进回顾、长期上下文补全",
+      "description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "order": 2,
-      "implemented_count": 2,
+      "implemented_count": 3,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 2,
+      "total_count": 3,
       "items": [
+        {
+          "id": "recent-context-bootstrap-rules",
+          "name": "recent-context-bootstrap-rules",
+          "title": "新会话上下文预热规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "memory",
+          "domain_label": "记忆域",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_order": 2,
+          "item_order": 1,
+          "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发。负责优先从近 3 天的 ment、test、bug、doc 和 git 提交中提取最近活动，并压缩成可继续工作的前置上下文；如果部分目录不存在，则只使用存在的目录和 git 信息；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线，或当前主域本身的分析执行。",
+          "core_responsibility": "负责优先从最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 提交中压缩前置上下文，再把任务转交真正主域。",
+          "skill_path": "recent-context-bootstrap-rules/SKILL.md",
+          "directory_path": "recent-context-bootstrap-rules",
+          "directory": "recent-context-bootstrap-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "recent-context-bootstrap-rules/references/bootstrap-sources.md",
+            "recent-context-bootstrap-rules/references/boundary-rules.md",
+            "recent-context-bootstrap-rules/references/output-format.md"
+          ],
+          "agents": [
+            "recent-context-bootstrap-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+          ]
+        },
         {
           "id": "history-recall-rules",
           "name": "history-recall-rules",
@@ -92,10 +134,10 @@ window.SKILL_DICTIONARY = {
           "status_label": "已实现",
           "domain_id": "memory",
           "domain_label": "记忆域",
-          "domain_description": "跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 1,
-          "auto_trigger": "当用户明确询问“上次怎么做的”“之前有没有修过/做过/讨论过”“以前类似需求/类似 Bug/类似接口/类似表结构是怎么处理的”，或当前任务明显依赖过去会话结论时自动触发。负责优先从持久记忆后端检索历史方案、历史修复和历史决策；如果没有真实记忆后端，则降级为基于 ment、Git 和本地文档的历史回溯；不要用它代替当前需求澄清、当前 Bug 定位或当前实现验证。",
+          "item_order": 2,
+          "auto_trigger": "当用户明确询问“上次怎么做的”“之前有没有修过/做过/讨论过”“以前类似需求/类似 Bug/类似接口/类似表结构是怎么处理的”，或当前任务明显依赖过去会话结论时自动触发。负责优先从持久记忆后端检索历史方案、历史修复和历史决策；如果没有真实记忆后端，则降级为基于 ment、Git 和本地文档的历史回溯；不要把它代替 recent-context-bootstrap-rules 的新会话最近 3 天上下文预热，也不要用它代替当前需求澄清、当前 Bug 定位或当前实现验证。",
           "core_responsibility": "负责检索跨会话历史、历史方案和历史修复记录，补回长期上下文。",
           "skill_path": "history-recall-rules/SKILL.md",
           "directory_path": "history-recall-rules",
@@ -124,7 +166,7 @@ window.SKILL_DICTIONARY = {
           "focus_points": [
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看它是否只补历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
           ]
         },
         {
@@ -135,9 +177,9 @@ window.SKILL_DICTIONARY = {
           "status_label": "已实现",
           "domain_id": "memory",
           "domain_label": "记忆域",
-          "domain_description": "跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 2,
+          "item_order": 3,
           "auto_trigger": "当用户要求生成项目开发历程、阶段总结、技术演进、关键决策回顾、项目时间线报告、完整历史分析或“这个项目一路是怎么走过来的”时自动触发。负责基于持久记忆后端或本地历史材料，按时间顺序组织项目演进、关键阶段、重大问题和技术决策；不要用它代替当前一次交付摘要、当前需求验收或当前 Bug 修复说明。",
           "core_responsibility": "负责按项目维度组织长期历史、输出时间线和演进报告。",
           "skill_path": "project-timeline-rules/SKILL.md",
@@ -167,7 +209,7 @@ window.SKILL_DICTIONARY = {
           "focus_points": [
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看它是否只补历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
           ]
         }
       ]
@@ -2258,7 +2300,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "Git 协作与交付说明",
           "domain_order": 9,
           "item_order": 1,
-          "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；git 提交消息必须遵循 feat/fix 等格式；不要把它代替代码评审或发布上线规则。",
+          "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；git 提交消息必须遵循 feat/fix 等格式；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题；不要把它代替代码评审或发布上线规则。",
           "core_responsibility": "统一 Git 协作规则。",
           "skill_path": "git-collaboration-rules/SKILL.md",
           "directory_path": "git-collaboration-rules",
@@ -2424,6 +2466,48 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "recent-context-bootstrap-rules",
+      "name": "recent-context-bootstrap-rules",
+      "title": "新会话上下文预热规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "memory",
+      "domain_label": "记忆域",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_order": 2,
+      "item_order": 1,
+      "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发。负责优先从近 3 天的 ment、test、bug、doc 和 git 提交中提取最近活动，并压缩成可继续工作的前置上下文；如果部分目录不存在，则只使用存在的目录和 git 信息；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线，或当前主域本身的分析执行。",
+      "core_responsibility": "负责优先从最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 提交中压缩前置上下文，再把任务转交真正主域。",
+      "skill_path": "recent-context-bootstrap-rules/SKILL.md",
+      "directory_path": "recent-context-bootstrap-rules",
+      "directory": "recent-context-bootstrap-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "recent-context-bootstrap-rules/references/bootstrap-sources.md",
+        "recent-context-bootstrap-rules/references/boundary-rules.md",
+        "recent-context-bootstrap-rules/references/output-format.md"
+      ],
+      "agents": [
+        "recent-context-bootstrap-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+      ]
+    },
+    {
       "id": "history-recall-rules",
       "name": "history-recall-rules",
       "title": "历史回忆规则",
@@ -2431,10 +2515,10 @@ window.SKILL_DICTIONARY = {
       "status_label": "已实现",
       "domain_id": "memory",
       "domain_label": "记忆域",
-      "domain_description": "跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 1,
-      "auto_trigger": "当用户明确询问“上次怎么做的”“之前有没有修过/做过/讨论过”“以前类似需求/类似 Bug/类似接口/类似表结构是怎么处理的”，或当前任务明显依赖过去会话结论时自动触发。负责优先从持久记忆后端检索历史方案、历史修复和历史决策；如果没有真实记忆后端，则降级为基于 ment、Git 和本地文档的历史回溯；不要用它代替当前需求澄清、当前 Bug 定位或当前实现验证。",
+      "item_order": 2,
+      "auto_trigger": "当用户明确询问“上次怎么做的”“之前有没有修过/做过/讨论过”“以前类似需求/类似 Bug/类似接口/类似表结构是怎么处理的”，或当前任务明显依赖过去会话结论时自动触发。负责优先从持久记忆后端检索历史方案、历史修复和历史决策；如果没有真实记忆后端，则降级为基于 ment、Git 和本地文档的历史回溯；不要把它代替 recent-context-bootstrap-rules 的新会话最近 3 天上下文预热，也不要用它代替当前需求澄清、当前 Bug 定位或当前实现验证。",
       "core_responsibility": "负责检索跨会话历史、历史方案和历史修复记录，补回长期上下文。",
       "skill_path": "history-recall-rules/SKILL.md",
       "directory_path": "history-recall-rules",
@@ -2463,7 +2547,7 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看它是否只补历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
       ]
     },
     {
@@ -2474,9 +2558,9 @@ window.SKILL_DICTIONARY = {
       "status_label": "已实现",
       "domain_id": "memory",
       "domain_label": "记忆域",
-      "domain_description": "跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 2,
+      "item_order": 3,
       "auto_trigger": "当用户要求生成项目开发历程、阶段总结、技术演进、关键决策回顾、项目时间线报告、完整历史分析或“这个项目一路是怎么走过来的”时自动触发。负责基于持久记忆后端或本地历史材料，按时间顺序组织项目演进、关键阶段、重大问题和技术决策；不要用它代替当前一次交付摘要、当前需求验收或当前 Bug 修复说明。",
       "core_responsibility": "负责按项目维度组织长期历史、输出时间线和演进报告。",
       "skill_path": "project-timeline-rules/SKILL.md",
@@ -2506,7 +2590,7 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看它是否只补历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
       ]
     },
     {
@@ -4513,7 +4597,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "Git 协作与交付说明",
       "domain_order": 9,
       "item_order": 1,
-      "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；git 提交消息必须遵循 feat/fix 等格式；不要把它代替代码评审或发布上线规则。",
+      "auto_trigger": "当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；git 提交消息必须遵循 feat/fix 等格式；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题；不要把它代替代码评审或发布上线规则。",
       "core_responsibility": "统一 Git 协作规则。",
       "skill_path": "git-collaboration-rules/SKILL.md",
       "directory_path": "git-collaboration-rules",
@@ -4641,7 +4725,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "52 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "53 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
