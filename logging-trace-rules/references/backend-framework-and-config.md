@@ -7,6 +7,53 @@
 - Go 服务默认使用 `go.uber.org/zap`（通过项目 `utils/log/` 封装统一调用）。
 - Go 日志框架实现目录统一为 `utils/log/`，禁止在其他目录重复实现一套 logger。
 - 日志必须配置化管理，禁止在业务代码里硬编码日志级别、文件路径和轮转参数。
+- 日志初始化必须在 `LoadConfig` 之后执行，禁止在配置加载前初始化。
+- 日志初始化只能执行一次，禁止多处重复初始化。
+- 禁止使用空配置做预初始化（例如 `Init(config.LogConfig{})`）。
+
+## 初始化顺序要求（强制）
+
+推荐顺序：
+
+1. `LoadConfig` 读取配置文件。
+2. 从配置对象中取 `LogConfig`。
+3. 执行一次 `InitLogger(logConfig)`。
+4. 业务代码统一调用 logger，不再初始化。
+
+## Go 初始化示例
+
+```go
+package main
+
+import (
+    "finance-go/config"
+    "finance-go/utils/log"
+)
+
+func main() {
+    cfg, err := config.LoadConfig()
+    if err != nil {
+        panic(err)
+    }
+
+    if err := log.Init(cfg.LogConfig); err != nil {
+        panic(err)
+    }
+
+    // 之后统一使用 log.Infof / log.Errorf，不再重复 Init
+}
+```
+
+## 禁止示例
+
+```go
+// ❌ 禁止：配置加载前用空配置预初始化
+log.Init(config.LogConfig{})
+
+cfg, _ := config.LoadConfig()
+// ❌ 禁止：重复初始化
+log.Init(cfg.LogConfig)
+```
 
 ## Go 推荐调用方式
 
@@ -68,3 +115,6 @@ logConfig:
 - 是否统一走 `utils/log/` 封装。
 - 是否有配置文件驱动日志参数。
 - 是否区分了文件日志与标准输出开关。
+- 是否先执行 `LoadConfig` 再执行日志初始化。
+- 是否保证日志只初始化一次。
+- 是否不存在 `Init(config.LogConfig{})` 这类空配置预初始化。
