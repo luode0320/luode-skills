@@ -83,6 +83,7 @@ test/
 - 把验证脚本命名成临时文件后长期留在 `scripts/` 或 `tmp/` 中。
 - 把测试说明写到 `docs/`，但目录里没有对应测试代码和测试数据，导致说明与资产脱节。
 - 把 Go 测试包直接放进中文目录，例如 `test/2026-03-28_143022/用户登录功能验证/service/login_test.go`。
+- 在源码目录落地同包白盒测试文件，例如 `internal/service/order_service_test.go`。
 
 ### 错误的目录结构
 ```
@@ -125,6 +126,12 @@ test/
     │       ├── register_test.go        # ❌ 不同独立测试混在一个时间戳根目录
     │       └── profile_test.go
 ```
+
+### 白盒诉求的正确处理
+
+- 诉求：需要访问 `internal/service/order_service.go` 中未导出逻辑。
+- 错误做法：在 `internal/service/order_service_test.go` 同包落地白盒测试。
+- 正确做法：先补 seam（导出接口/测试钩子/依赖注入点），再将测试文件放在 `test/<时间戳>/internal/service/order_service_test.go`。
 
 ## 判定示例
 
