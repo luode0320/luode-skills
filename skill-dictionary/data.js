@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-29 14:31:28",
+  "generated_at": "2026-03-29 14:46:40",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -7,7 +7,7 @@ window.SKILL_DICTIONARY = {
     "planned_total": 61,
     "implemented_total": 52,
     "planned_missing": 9,
-    "seed_total": 0,
+    "seed_total": 1,
     "doc_total": 1,
     "references_total": 174,
     "agents_total": 50
@@ -2586,9 +2586,43 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 0,
-      "total_count": 0,
-      "items": []
+      "seed_count": 1,
+      "total_count": 1,
+      "items": [
+        {
+          "id": "find-skills",
+          "name": "find-skills",
+          "title": "查找 Skills",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 11,
+          "item_order": 1,
+          "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "find-skills/SKILL.md",
+          "directory_path": "find-skills",
+          "directory": "find-skills",
+          "sections": [
+            "何时使用本 Skill",
+            "什么是 Skills CLI？",
+            "如何帮助用户查找 Skills",
+            "常见 Skill 分类",
+            "高效搜索建议",
+            "当没有找到合适的 Skill 时"
+          ],
+          "references": [],
+          "agents": [],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        }
+      ]
     }
   ],
   "items": [
@@ -5030,6 +5064,39 @@ window.SKILL_DICTIONARY = {
         "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
         "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
         "重点看新增、合并、迁移和退休 skill 的门槛是否足够明确。"
+      ]
+    },
+    {
+      "id": "find-skills",
+      "name": "find-skills",
+      "title": "查找 Skills",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 11,
+      "item_order": 1,
+      "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "find-skills/SKILL.md",
+      "directory_path": "find-skills",
+      "directory": "find-skills",
+      "sections": [
+        "何时使用本 Skill",
+        "什么是 Skills CLI？",
+        "如何帮助用户查找 Skills",
+        "常见 Skill 分类",
+        "高效搜索建议",
+        "当没有找到合适的 Skill 时"
+      ],
+      "references": [],
+      "agents": [],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
       ]
     }
   ],
