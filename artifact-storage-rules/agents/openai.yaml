@@ -1,0 +1,4 @@
+interface:
+  display_name: "产物存储"
+  short_description: "统一研发产物目录、命名模板与复用策略的全局规则"
+  default_prompt: "使用 $artifact-storage-rules 确认当前需求文档、Bug 记录、测试资产或项目文档的统一根目录、命名模板、主入口文件和复用策略，并让相关 skill 以这里作为单一真相源。"

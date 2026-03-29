@@ -22,7 +22,7 @@ class DomainConfig:
 
 
 DOMAIN_ORDER = [
-    DomainConfig("orchestration", "总控层", "流程分流、冲突裁决、阶段阻断"),
+    DomainConfig("orchestration", "总控层", "流程分流、冲突裁决、阶段阻断与全局基础约定"),
     DomainConfig("memory", "记忆域", "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全"),
     DomainConfig("requirement", "需求域", "需求澄清、缺口识别、边界确认、验收前置"),
     DomainConfig("bug", "Bug 域", "问题录入、定位、运行时诊断、修复建议"),
@@ -295,7 +295,7 @@ def build_focus_points(item: dict) -> list[str]:
         points.append("检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。")
 
     domain_points = {
-        "总控层": "重点看是否只做分流和阻断，没有越权覆盖单域 skill。",
+        "总控层": "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。",
         "记忆域": "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。",
         "需求域": "重点看是否能区分需求缺口、边界变化、验收偏差和历史 Bug。",
         "Bug 域": "重点看静态定位与运行时诊断的切换条件是否清楚。",

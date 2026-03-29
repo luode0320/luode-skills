@@ -8,7 +8,7 @@
 
 ## 默认扫描来源
 
-按下面顺序扫描：
+默认扫描顺序遵循 `artifact-storage-rules/references/path-map.yaml`，当前顺序为：
 
 1. `ment/`
 2. `test/`

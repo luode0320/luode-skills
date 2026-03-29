@@ -1,0 +1,34 @@
+version: 1
+
+roots:
+  requirement_docs: "ment"
+  bug_records: "bug"
+  test_assets: "test"
+  project_docs: "doc"
+
+entry_files:
+  requirement_doc: "{date}_需求中文说明.md"
+  acceptance_doc: "{date}_验收中文说明.md"
+  implementation_plan_doc: "{date}_实施计划中文说明.md"
+  bug_root_readme: "README.md"
+  test_task_readme: "README.md"
+
+directories:
+  bug_root: "{datetime}_问题中文简介"
+  test_task_root: "{datetime}"
+  test_task_doc_dir: "测试任务中文简介"
+
+bootstrap:
+  recent_context_scan_roots:
+    - "ment"
+    - "test"
+    - "bug"
+    - "doc"
+
+policies:
+  same_requirement_updates_same_doc: true
+  same_requirement_acceptance_updates_same_doc: true
+  same_requirement_plan_updates_same_doc: true
+  same_bug_updates_same_root: true
+  same_test_round_updates_same_root: true
+  new_independent_test_round_creates_new_root: true

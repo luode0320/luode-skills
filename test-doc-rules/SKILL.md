@@ -1,6 +1,6 @@
 ---
 name: test-doc-rules
-description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `test-location-rules` 为基准，使用 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
+description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
 ---
 
 # 测试文档规则
@@ -28,20 +28,21 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 
 ## 进入后先做什么
 
-1. 先确认测试目录已经遵循 `test-location-rules`，即存在独立的 `test/yyyy-MM-DD_HHmmss/` 时间戳根目录。
-2. 确认 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md` 作为当前任务唯一的中文主说明入口。
+1. 先确认测试目录已经遵循 `test-location-rules`，即存在独立的中央约定时间戳根目录。
+2. 确认中央约定的测试任务主说明 `README.md` 作为当前任务唯一的中文主说明入口。
 3. 区分当前文档属于主 README、详细验证说明、覆盖补充、执行记录还是报告摘要。
 4. 如果需要额外 markdown、图片说明或附件，先确定它们对应的真实代码路径镜像目录，再放入 ASCII 路径中。
 5. 确认 README 是否已经能说明测试目标、运行入口、依赖条件、覆盖范围和最终结论。
 
 ## 默认执行流程
 
-1. 默认先确认遵循 `test-location-rules`：所有测试文档都属于 `test/yyyy-MM-DD_HHmmss/` 这个时间戳根目录。
-2. 默认先读 `references/doc-minimums.md`，确认 README 和补充文档的最小字段。
-3. 如果当前文档与测试程序、功能结论或回归结论职责混淆，再读 `references/doc-boundaries.md`。
-4. 如果需要判断当前文档是否达标，再读 `references/doc-examples.md` 对照正反例。
-5. 输出缺失章节、补充建议、应放入 README 的内容，以及应转移到 ASCII 镜像路径的详细文档。
-6. 测试文档未稳定前，不进入正式交付总结或发布留痕阶段。
+1. 默认先确认遵循 `test-location-rules`：所有测试文档都属于中央约定的测试时间戳根目录。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径和同一轮测试是否继续复用同一根目录。
+3. 默认先读 `references/doc-minimums.md`，确认 README 和补充文档的最小字段。
+4. 如果当前文档与测试程序、功能结论或回归结论职责混淆，再读 `references/doc-boundaries.md`。
+5. 如果需要判断当前文档是否达标，再读 `references/doc-examples.md` 对照正反例。
+6. 输出缺失章节、补充建议、应放入 README 的内容，以及应转移到 ASCII 镜像路径的详细文档。
+7. 测试文档未稳定前，不进入正式交付总结或发布留痕阶段。
 
 ## 权责边界与不负责事项
 
@@ -56,23 +57,25 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 - 中文说明目录之外没有找到明确的 ASCII 真实代码路径镜像目录，导致详细文档无处安放。
 - 当前 README 既想承载中文总览，又想堆放大量原始日志、截图和明细，结构已经失控。
 - 为了补齐文档，需要先补录大量缺失的执行事实、环境信息或测试结果。
-- 当前文档准备脱离 `test/yyyy-MM-DD_HHmmss/` 单独放到 `testing/`、`analysis/` 或其他目录。
+- 当前文档准备脱离中央约定的测试时间戳根目录单独放到 `testing/`、`analysis/` 或其他目录。
 
 ## 执行通过 / 驳回标准
 
-- 通过：`test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md` 已经清楚说明测试对象、执行方式、依赖条件、真实资产入口、覆盖范围和最终结论；如有额外文档，也已落在同一时间戳根目录下的 ASCII 镜像路径中，并被 README 正确引用。
+- 通过：中央约定的测试任务主说明 `README.md` 已经清楚说明测试对象、执行方式、依赖条件、真实资产入口、覆盖范围和最终结论；如有额外文档，也已落在同一时间戳根目录下的 ASCII 镜像路径中，并被 README 正确引用。
 - 驳回：README 只剩口头式结论，缺少运行入口和结果依据；或补充文档继续散落到 `testing/`、`analysis/`、仓库根目录、业务目录或中文说明目录中，无法支持复现、交接和追溯。
 
 ## 执行结果归档要求
 
-- 主文档固定归档到 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`。
+- 主文档固定归档到 `artifact-storage-rules` 约定的测试任务主说明 `README.md`。
 - 主 README 至少包含测试目的、测试对象、执行方式、依赖数据与环境、覆盖范围、真实资产路径和验证结论。
-- 额外 markdown、截图说明、执行明细、案例表和附录文档，统一归档到 `test/yyyy-MM-DD_HHmmss/<ASCII 真实代码路径镜像>/` 下。
+- 额外 markdown、截图说明、执行明细、案例表和附录文档，统一归档到中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中。
+- 测试任务主说明位置、目录命名模板和同一轮测试的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 主 README 必须显式写出这些详细文档或证据文件所在的 ASCII 路径，避免只留一堆孤立附件。
 - 如果同一需求拆成多轮独立验证，应分别维护各自时间戳根目录的 README，而不是在一个 README 中持续堆叠历史轮次。
 
 ## references 读取规则
 
 - 默认先读 `references/doc-minimums.md`。
+- 在定位测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径或判断是否继续沿用同一轮测试根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在职责边界混淆时，再读 `references/doc-boundaries.md`。
 - 只有在需要正反例或模板参考时，再读 `references/doc-examples.md`。

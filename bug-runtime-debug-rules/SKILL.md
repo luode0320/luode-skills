@@ -32,10 +32,11 @@ description: 当仅靠静态分析不能稳定定位 Bug，且需要在运行过
 ## 默认执行流程
 
 1. 默认先读 `references/runtime-entry-conditions.md`，确认当前是否真的需要进入运行时诊断。
-2. 再读 `references/runtime-observation-methods.md`，选择断点、变量观察、debug 日志、断言等合适手段。
-3. 如果需要判断何时结束或如何回流，再读 `references/runtime-exit-and-handoff.md`。
-4. 输出本轮诊断目标、观察点、得到的运行时证据和下一步结论。
-5. 结束后要么回流到 `bug-root-cause-rules` 固化结论，要么直接进入 `bug-fix-proposal-rules`。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 根目录、入口 `README.md` 和同一 Bug 持续复用同一根目录的策略。
+3. 再读 `references/runtime-observation-methods.md`，选择断点、变量观察、debug 日志、断言等合适手段。
+4. 如果需要判断何时结束或如何回流，再读 `references/runtime-exit-and-handoff.md`。
+5. 输出本轮诊断目标、观察点、得到的运行时证据和下一步结论，并更新到当前 Bug 根目录下的 `README.md`。
+6. 结束后要么回流到 `bug-root-cause-rules` 固化结论，要么直接进入 `bug-fix-proposal-rules`。
 
 ## 权责边界与不负责事项
 
@@ -58,12 +59,14 @@ description: 当仅靠静态分析不能稳定定位 Bug，且需要在运行过
 
 ## 执行结果归档要求
 
-- 将运行时诊断目标、观察点、关键变量或日志证据、结束结论统一记录到项目根目录 `bug/` 下的当前 Bug 根目录中。
+- 将运行时诊断目标、观察点、关键变量或日志证据、结束结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 根目录中。
 - 归档内容至少包含进入原因、采用手段、观察结果、收缩结论、后续流转，以及临时 debug 日志或断言代码是否已删除。
+- Bug 根目录、入口 `README.md` 和同一 Bug 根目录复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果本轮诊断同时使用了调试日志和断言，相关记录统一落在同一个 Bug 根目录中，不再分散到 `analysis/` 或其他目录。
 
 ## references 读取规则
 
 - 默认先读 `references/runtime-entry-conditions.md`。
+- 在定位当前 Bug 根目录、入口 `README.md` 或判断是否继续复用同一根目录时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在选择诊断手段时，再读 `references/runtime-observation-methods.md`。
 - 只有在判断结束条件和交接方式时，再读 `references/runtime-exit-and-handoff.md`。

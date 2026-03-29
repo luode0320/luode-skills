@@ -34,6 +34,7 @@
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
+- `artifact-storage-rules` 负责统一 `ment/`、`bug/`、`test/`、`doc/` 等跨域共享目录、命名模板和复用策略
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
 
@@ -44,6 +45,7 @@
 例如：
 
 - 新会话刚开始且没有上下文时，先压缩最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 活动
+- 需要决定需求文档、Bug 记录、测试任务目录和项目说明文档的统一落点与命名时，先进入 `artifact-storage-rules`
 - 用户给出需求链接、资料、原型、物料时，进入需求域
 - 用户描述线上问题、异常现象、复现路径时，进入 Bug 域
 - 开始新增或修改代码时，进入编码基线域
@@ -80,7 +82,7 @@
 
 截至当前版本：
 
-- 已落地 Skill：`53`
+- 已落地 Skill：`54`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`1`
 
@@ -105,6 +107,7 @@ python skill-dictionary/generate_dictionary.py
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
+| `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 等研发产物根目录、命名模板、主入口文件和复用策略。 |
 
 ### 2. 记忆域
 
@@ -118,13 +121,13 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                         | 功能                                                                                                      |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `requirement-intake-rules`    | 作为需求总入口，接收需求 URL、资料、物料、上下文，补齐目标、前提、输入输出，并在 `ment/` 下沉淀需求文档。 |
+| `requirement-intake-rules`    | 作为需求总入口，接收需求 URL、资料、物料、上下文，补齐目标、前提、输入输出，并按 `artifact-storage-rules` 沉淀需求文档。 |
 | `requirement-gap-rules`       | 判断需求描述是否缺少前提、字段、流程、业务规则等，并统一更新到需求文档。                                  |
 | `requirement-boundary-rules`  | 判断需求边界、影响范围、上下游、非目标范围，防止越界实现。                                                |
 | `requirement-splitting-rules` | 把大需求拆成可执行的小任务项，明确模块拆分和实施顺序。                                                    |
 | `implementation-plan-rules`   | 把确认后的需求转成实施计划，帮助进入编码阶段。                                                            |
 | `requirement-change-rules`    | 处理需求变更，重新确认变更点、影响面、文档同步和后续实施路径。                                            |
-| `acceptance-criteria-rules`   | 生成独立的验收标准文档，沉淀到 `ment/` 中，保证验收标准可验证、可测试、可回溯。                           |
+| `acceptance-criteria-rules`   | 生成独立的验收标准文档，并按 `artifact-storage-rules` 落到统一验收文档位置，保证验收标准可验证、可测试、可回溯。 |
 
 ### 4. Bug 域
 
