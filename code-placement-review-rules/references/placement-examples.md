@@ -14,7 +14,13 @@
 - 根目录只承担命名空间，不直接堆实现文件。
 - 结论：通过。
 
-### 正例 3：Go 测试文件不落源码目录
+### 正例 3：Go 服务层按业务子目录分层
+
+- `internal/service/order/create.go`、`internal/service/user/profile.go`。
+- `internal/service/` 根目录不直接堆业务实现文件。
+- 结论：通过。
+
+### 正例 4：Go 测试文件不落源码目录
 
 - `test/2026-03-29_201500/internal/service/order_service_test.go`。
 - `internal/service/` 下没有同包 `*_test.go`。
@@ -43,3 +49,9 @@
 - 在 `internal/service/order_service_test.go` 直接新增同包白盒测试文件。
 - 命中 `test/` 外 `*_test.go` 禁放规则。
 - 结论：驳回。
+
+### 反例 5：Go 服务层大平层堆叠
+
+- `internal/service/create_order.go`、`internal/service/cancel_order.go`、`internal/service/refund_order.go` 等大量业务实现都放在根目录。
+- 目录职责边界越来越模糊，后续易引发命名冲突和循环依赖。
+- 结论：驳回，先按业务域拆子目录。

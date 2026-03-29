@@ -109,3 +109,16 @@ rg --files -g "*_test.go" | rg -v "^test/"
 
 - 命中为空：通过，可继续提交。
 - 命中非空：阻断提交，先改 seam 并迁移到 `test/<时间戳>/` 后再提交。
+
+## Go 服务层提交前扫描
+
+Go 项目在执行 `git commit` 前，还必须检查 staged 文件中是否出现服务层根目录直落实现：
+
+```powershell
+git diff --cached --name-only | rg "^internal/service/[^/]+\.go$"
+```
+
+判定规则：
+
+- 命中为空：通过，可继续提交。
+- 命中非空：阻断提交，先迁移到 `internal/service/<domain>/` 后再提交。

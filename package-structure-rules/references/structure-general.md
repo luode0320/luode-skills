@@ -11,6 +11,7 @@
 - 默认优先使用职责型命名，如 `router`、`controller`、`service`、`repository`、`model`、`middleware`、`utils`。
 - 同一目录内的文件应处在相近职责层，不要混入口层、业务层和数据层。
 - `utils`、`common`、`global`、`middleware` 这类通用或横切目录，根目录默认先拆子目录，具体实现文件放子目录。
+- 业务主目录（如 `service`）规模增长时，也应优先按业务域拆子目录，避免根目录大平层。
 - 分层应尽量单向依赖，避免反向依赖和循环依赖。
 
 ## 公共与入口目录边界

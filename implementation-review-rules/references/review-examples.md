@@ -31,6 +31,12 @@
 - 本轮 Go 测试文件均位于 `test/<时间戳>/` ASCII 镜像路径。
 - 结论：可进入后续审查和测试。
 
+### 正例 5：Go 服务实现按业务子目录落位
+
+- 执行 `git diff --name-only HEAD -- | rg "^internal/service/[^/]+\\.go$"` 无命中。
+- 本轮服务实现落在 `internal/service/order/`、`internal/service/user/` 等子目录。
+- 结论：可进入后续审查和测试。
+
 ## 反例
 
 ### 反例 1：功能写完但顺手改太多
@@ -70,3 +76,9 @@
 - 扫描命中 `internal/service/order_service_test.go`（位于 `test/` 之外）。
 - 试图以白盒同包为由保留源码目录 `*_test.go`。
 - 结论：驳回，先改 seam 并迁移测试落点。
+
+### 反例 7：Go 服务层根目录直落实现
+
+- 扫描命中 `internal/service/create_order.go`。
+- 本轮业务实现直接落在 `internal/service/` 根目录，未按业务域拆分子目录。
+- 结论：驳回，先迁移到 `internal/service/<domain>/`。

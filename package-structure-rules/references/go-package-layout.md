@@ -49,7 +49,7 @@
 - `internal/controller/`
   负责 HTTP 输入输出、参数转换和响应映射。默认使用 `controller`，不要使用 `handler`。
 - `internal/service/`
-  负责业务流程、领域规则和跨仓储编排。
+  负责业务流程、领域规则和跨仓储编排。`internal/service/` 根目录默认先拆业务子目录（如 `internal/service/order/`、`internal/service/user/`），具体实现文件放在子目录中，避免大平层。
 - `internal/entity/`
   存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑。
 - `internal/<adapter>/`
@@ -84,7 +84,7 @@
 - `internal/controller`
   负责 HTTP 输入输出、参数转换和响应映射。默认使用 `controller`，不要使用 `handler`。
 - `internal/service`
-  负责业务流程、领域规则和跨仓储编排。
+  负责业务流程、领域规则和跨仓储编排。根目录默认先拆 `internal/service/<domain>/`，再放实现文件，避免把多个业务需求堆在 `internal/service/` 根目录。
 - `internal/entity`
   存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑。
 - `utils`
@@ -125,8 +125,9 @@
 ## 特别提醒
 
 - `internal/router` 和 `internal/controller` 不一定必须同时存在；如果框架已经把两者合一，不要机械复制两层。
-- `utils` 不是垃圾桶。最外层可以有稳定可移植的 `utils`，`internal` 里也可以有项目内适配型 `utils` 子包，`internal/service` 目录下也可以存在局部的 `utils.go` 文件，但每一种都要有清晰边界。
+- `utils` 不是垃圾桶。最外层可以有稳定可移植的 `utils`，`internal` 里也可以有项目内适配型 `utils` 子包；若服务层需要局部工具，放在对应业务子目录（如 `internal/service/order/utils.go`），不要直接放在 `internal/service/` 根目录。
 - `utils`、`common`、`global`、`middleware` 根目录默认只放子目录，不直接放实现文件，避免循环依赖与命名冲突。
+- `internal/service` 根目录默认只放业务子目录，不直接堆业务实现文件；规模增长时必须继续按域拆分子目录。
 - `global`、`middleware`、`crontask` 是根级入口或根级全局目录；在单二进制 Go 服务里，`internal/global`、`internal/middleware`、`internal/crontask` 视为不合规。
 - 不要为了放一个文件就新建一个目录；只有当职责会稳定扩展、边界明确时，才值得单独建目录。
 - 如果某段代码已经明显带有业务语义，就应优先落到 `internal/service`、`internal/controller` 或其他明确业务目录，而不是继续留在 `utils` 或 `common`。

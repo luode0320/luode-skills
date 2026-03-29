@@ -126,6 +126,16 @@ rg --files -g "*_test.go" | rg -v "^test/"
 
 结果为空，再继续提交。
 
+### 正例 7：Go 提交前检查 staged 服务层落点
+
+提交前执行：
+
+```powershell
+git diff --cached --name-only | rg "^internal/service/[^/]+\.go$"
+```
+
+结果为空，再继续提交。
+
 ## 较差
 
 ### 反例 1：一个提交里同时包含功能、重构、格式化和调试残留
@@ -203,3 +213,15 @@ internal/service/order_service_test.go
 仍然执行提交。
 
 ❌ 问题：违反测试落点基线，应先改 seam 并迁移到 `test/` 根目录体系后再提交。
+
+### 反例 7：Go 项目命中服务层根目录直落仍继续提交
+
+扫描结果命中：
+
+```text
+internal/service/create_order.go
+```
+
+仍然执行提交。
+
+❌ 问题：违反服务层子目录化规则，应先迁移到 `internal/service/<domain>/` 后再提交。

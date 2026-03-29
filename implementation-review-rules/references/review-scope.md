@@ -24,6 +24,7 @@
 - 实现风格是否与项目现有写法明显冲突。
 - 实现结构是否存在显著可维护性问题。
 - Go 项目是否存在 `test/` 外 `*_test.go` 落点违规（命令示例：`rg --files -g "*_test.go" | rg -v "^test/"`）。
+- Go 项目本轮改动是否命中 `internal/service/[^/]+.go` 根目录落点（命令示例：`git diff --name-only HEAD -- | rg "^internal/service/[^/]+\\.go$"`）。
 
 ## 不在本轮主检查范围
 
@@ -36,3 +37,4 @@
 ## 输出补充
 
 - Go 场景下，输出中应包含 `*_test.go` 禁放扫描结果（命中路径或“未命中”）。
+- Go 场景下，输出中应包含 `internal/service` 根目录落点扫描结果（命中路径或“未命中”）。
