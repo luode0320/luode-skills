@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill演进"
+  short_description: "发现现有研发skill缺口并推动最小化回补的流程规则"
+  default_prompt: "使用 $skill-evolution-rules 判断当前研发任务卡住是否是因为某个现有 skill 不完善，明确应该补哪个 skill、补什么内容、是否先暂停当前任务，并在完善后继续原主流程。"

@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-29 16:52:27",
+  "generated_at": "2026-03-29 17:35:55",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 54,
-    "implemented_total": 54,
+    "planned_total": 55,
+    "implemented_total": 55,
     "planned_missing": 0,
     "seed_total": 1,
     "doc_total": 2,
-    "references_total": 182,
-    "agents_total": 52
+    "references_total": 186,
+    "agents_total": 53
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 2,
+      "implemented_count": 3,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 2,
+      "total_count": 3,
       "items": [
         {
           "id": "team-development-rules",
@@ -108,6 +108,49 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "artifact-storage-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
+          "id": "skill-evolution-rules",
+          "name": "skill-evolution-rules",
+          "title": "Skill 演进规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 3,
+          "auto_trigger": "当研发任务已经进入需求、Bug、编码、审查、测试或交付主流程，且当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充时触发。负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务；待 skill 更新并重新加载后，再回到原任务继续执行。不要用它代替需求补齐、Bug 定位或具体代码实现。",
+          "core_responsibility": "负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。",
+          "skill_path": "skill-evolution-rules/SKILL.md",
+          "directory_path": "skill-evolution-rules",
+          "directory": "skill-evolution-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "skill-evolution-rules/references/evolution-decision-matrix.md",
+            "skill-evolution-rules/references/gap-signals.md",
+            "skill-evolution-rules/references/improvement-output-template.md",
+            "skill-evolution-rules/references/resume-workflow.md"
+          ],
+          "agents": [
+            "skill-evolution-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -2554,6 +2597,49 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "skill-evolution-rules",
+      "name": "skill-evolution-rules",
+      "title": "Skill 演进规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 3,
+      "auto_trigger": "当研发任务已经进入需求、Bug、编码、审查、测试或交付主流程，且当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充时触发。负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务；待 skill 更新并重新加载后，再回到原任务继续执行。不要用它代替需求补齐、Bug 定位或具体代码实现。",
+      "core_responsibility": "负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。",
+      "skill_path": "skill-evolution-rules/SKILL.md",
+      "directory_path": "skill-evolution-rules",
+      "directory": "skill-evolution-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "skill-evolution-rules/references/evolution-decision-matrix.md",
+        "skill-evolution-rules/references/gap-signals.md",
+        "skill-evolution-rules/references/improvement-output-template.md",
+        "skill-evolution-rules/references/resume-workflow.md"
+      ],
+      "agents": [
+        "skill-evolution-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
       "id": "recent-context-bootstrap-rules",
       "name": "recent-context-bootstrap-rules",
       "title": "新会话上下文预热规则",
@@ -4813,7 +4899,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "54 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "55 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
