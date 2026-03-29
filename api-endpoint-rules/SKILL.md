@@ -18,6 +18,15 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 - 防止把请求结构、响应格式和错误处理混进入口定义规则。
 - 确保接口路径名称语义清晰、类型清楚，通过路径区分操作类型（如 /orders/get、/orders/del、/orders/add）。
 
+## 强制规则：Go 路由注册写法（internal/router）
+
+- 路由注册必须显式声明，不使用通用路由包装器（如 `registerPostRoutes`、route 列表驱动）隐藏具体接口声明。
+- 路由 path 必须在注册处直接硬编码，不使用路径常量引用（除全局根前缀如 `/api/walletPay` 外）。
+- 每个接口使用 `group.POST("/path", controller.Method)` 直接注册。
+- 接口注释放在注册语句上一行，不在参数行内写注释，避免 `gofmt` 自动拆行影响可读性。
+- 禁止使用 `GET/PATCH/PUT/DELETE`；所有接口统一 `POST + JSON body`。
+- 禁止在 path 中使用 `:id` 或 `{id}` 风格参数；查询类接口也通过 `POST body` 传参。
+
 ## 自动触发信号
 
 - 新增接口或路由。
