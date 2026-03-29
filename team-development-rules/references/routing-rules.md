@@ -26,7 +26,7 @@
 | 用户描述报错、异常、结果不符、线上故障、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现和定位 |
 | Bug 描述缺少复现条件、环境信息、日志样本或影响范围 | Bug 域 / `bug-gap-rules` | 先补齐定位所需最小信息，不盲目进入根因分析 |
 | 需要先构造稳定步骤、确认触发条件和复现频率 | Bug 域 / `bug-reproduction-rules` | 先回答“怎么复现、是否稳定发生” |
-| 需要判断问题归属模块、服务、页面、接口、数据流或责任边界 | Bug 域 / `bug-scoping-rules` | 先划清归属和影响面，再决定优先定位入口 |
+| 需要判断问题归属模块、服务、页面、接口、数据流或责任边界 | Bug 域 / `bug-root-cause-rules` | 在根因定位时一并划清归属和影响面，再决定优先定位入口 |
 | 静态阅读代码不足以定位 Bug | Bug 域 / `bug-runtime-debug-rules`、`bug-debug-log-rules`、`bug-assertion-diagnostic-rules` | 改走运行时诊断路径 |
 | Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`、`bug-regression-risk-rules` | 先给修复建议和回归风险，再决定是否实施 |
 | 需求或 Bug 已澄清，开始新增或修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再叠加位点 skill |
@@ -37,11 +37,11 @@
 | 编码审查通过，但还没明确先测什么、测到什么程度 | 测试域 / `test-strategy-rules` | 先定测试策略和优先级，再分流执行验证 |
 | 需要用真实浏览器打开本地页面、测试环境页面或网站，执行点击、输入、登录、截图、抓取页面数据、查看网络请求或验证前端交互 | 测试域 / `agent-browser` | 这是浏览器联动执行能力，不代替功能验证、回归验证或联调归因 |
 | 需要确认当前需求或当前改动本身是否做对 | 测试域 / `functional-validation-rules` | 聚焦当前功能正确性，不扩张成回归或联调问题 |
-| 当前看起来不是单点功能错误，而是跨系统、跨环境、跨链路联调失败 | 测试域 / `integration-debugging-rules` | 聚焦联调证据、环境差异和链路分流 |
+| 当前看起来不是单点功能错误，而是跨系统、跨环境、跨链路联调失败 | 测试域 / `test-strategy-rules` | 先重新拆分验证路径与证据收集方式，再决定落到功能验证、回归或浏览器联动 |
 | 需要确认修复或改动有没有把旧能力带坏 | 测试域 / `test-regression-rules`、`bug-validation-rules` | 聚焦兼容性、影响面和修复闭环，不混入功能验证 |
 | 测试已基本完成，准备整理提交与协作边界 | 交付域 / `git-collaboration-rules` | 先整理 commit、分支和 PR 范围 |
-| 代码准备进入正式评审或 PR 复核 | 交付域 / `code-review-rules` | 正式评审与作者自审分开 |
-| 准备发布、灰度、放量或确认回滚预案 | 交付域 / `release-rollout-rules` | 先确认发布检查项、放量节奏和回滚门槛 |
+| 代码准备进入正式评审或 PR 复核 | 交付域 / `git-collaboration-rules`、`delivery-summary-rules` | 先整理提交流程与交付说明，再交给团队既有评审流程 |
+| 准备发布、灰度、放量或确认回滚预案 | 总控层 / `team-development-rules` | 当前没有独立发布 skill，由总控层提醒回到团队发布流程 |
 | 需要形成交付摘要、验证结论、风险和遗留事项 | 交付域 / `delivery-summary-rules` | 用统一交付说明结构收口，而不是散落在口头说明里 |
 | 任务同时像需求又像 Bug，或同时跨多个阶段 | 继续由 `team-development-rules` 分流 | 先裁决，不允许任何小 skill 抢占 |
 
@@ -52,4 +52,4 @@
 - 总控层只在阶段不清、域不清、顺序不清或 skill 冲突时保留控制权。
 - `frontend-design` 与内部前端规则冲突时，默认由 `frontend-design` 优先主导；`frontend-ui-visual-rules` 和 `frontend-component-rules` 只作为补充约束。
 - `frontend-ui-visual-rules` 负责页面视觉设计与交互体验；`frontend-component-rules` 负责组件工程、状态边界和复用规则。
-- `security-best-practices` 只在用户明确要求安全最佳实践建议、安全评审或安全报告时使用；普通安全实现仍优先走 `auth-security-rules`。
+- `security-best-practices` 只在用户明确要求安全最佳实践建议、安全评审或安全报告时使用；普通实现仍优先走现有接口、错误处理、日志和实现自审规则。

@@ -22,7 +22,7 @@
 ### 样例 2：新增接口同时命中多个位点 skill
 
 - 当前信号：新增接口，同时涉及请求参数、响应结构、认证头、日志和异常映射。
-- 应命中：`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`request-header-rules`、`logging-trace-rules`、`error-handling-rules`。
+- 应命中：`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`logging-trace-rules`、`error-handling-rules`。
 - 裁决：总控层只确认主位点是接口主干，小 skill 并行生效；总控层随后退出。
 - 原因：不存在阶段争议，也不存在互斥冲突。
 

@@ -21,7 +21,7 @@
 ## 回流规则
 
 - 当前功能本身未验证通过，先回流 `functional-validation-rules`。
-- 现象更像环境或链路异常，转交 `integration-debugging-rules`。
+- 现象更像环境或链路异常，先回到 `test-strategy-rules` 重新分流。
 - 回归范围过大、资源不足、优先级存在争议，升级到 `test-strategy-rules`。
 - 发现明确回归失败项，回流编码域或 Bug 域修复。
 - 如果回归说明和证据落点不符合新结构，回流 `test-location-rules` 或 `test-doc-rules` 调整。

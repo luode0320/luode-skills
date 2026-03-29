@@ -29,9 +29,8 @@ DOMAIN_ORDER = [
     DomainConfig("baseline", "编码基线域", "开始编码即并行生效的基础质量规则"),
     DomainConfig("location", "代码位点域", "按改动位置叠加触发的实现规则"),
     DomainConfig("review", "编码审查域", "测试前的静态自审、语法检查、清理归位"),
-    DomainConfig("test", "测试域", "策略、资源、功能验证、联调、回归"),
-    DomainConfig("delivery", "交付域", "Git 协作、评审、发布与交付说明"),
-    DomainConfig("evolution", "体系维护域", "维护 skill 体系自身的拆分、迁移与演进"),
+    DomainConfig("test", "测试域", "策略、资源、功能验证、浏览器联动与回归"),
+    DomainConfig("delivery", "交付域", "Git 协作与交付说明"),
     DomainConfig("seed", "扩展种子", "已入库但未并入主规划的参考 skill"),
 ]
 
@@ -45,7 +44,6 @@ DOMAIN_SECTION_MATCH = {
     "编码审查域": "编码审查域",
     "测试域": "测试域",
     "交付域": "交付域",
-    "体系维护域": "体系维护域",
 }
 
 STATUS_META = {
@@ -305,8 +303,7 @@ def build_focus_points(item: dict) -> list[str]:
         "代码位点域": "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。",
         "编码审查域": "重点看它是否只处理静态质量问题，不越界替代测试。",
         "测试域": "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。",
-        "交付域": "重点看 Git 协作、评审、发布、交付说明是否已分层收口。",
-        "体系维护域": "重点看新增、合并、迁移和退休 skill 的门槛是否足够明确。",
+        "交付域": "重点看 Git 协作与交付说明是否已分层收口，并且不越界替代测试或发布流程。",
         "扩展种子": "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。",
     }
     points.append(domain_points[domain])
@@ -444,7 +441,7 @@ def build_recommendations(domain_summary: list[dict]) -> list[str]:
         )
     if "security-best-practices" in seed_items:
         recommendations.append(
-            "评估 `security-best-practices` 与 `auth-security-rules` 的关系，决定继续保留为体系外种子，还是拆分吸收到主规划。"
+            "评估 `security-best-practices` 是否保持为体系外种子，还是拆分吸收到现有位点类规则。"
         )
     if total_missing == 0:
         recommendations.append(
