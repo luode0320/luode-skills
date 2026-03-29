@@ -4,4 +4,5 @@
 - 一条日志至少要回答一个明确问题。
 - 避免同一层同时打重复日志。
 - 输出字段优先选择能区分假设的最小集合。
+- 临时调试日志也必须通过项目 `utils/log/` 封装输出，禁止 `fmt.Println`、`println`、`console.log`。
 - 当前 Bug 的日志记录统一归档到项目根目录 `bug/` 下对应的 Bug 根目录中，命名格式参考 `test-location-rules`，使用 `yyyy-MM-DD_HHmmss_问题中文简介`。
