@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Compliance Gate"
+  short_description: "Gate skill compliance and merge prioritized next steps."
+  default_prompt: "Use this skill at the end of execution to check triggered skill rules, merge task-level and skill-gap suggestions, prioritize task-level actions, and output concise next-step suggestions."
