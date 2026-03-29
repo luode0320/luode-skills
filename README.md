@@ -261,8 +261,9 @@ python skill-dictionary/generate_dictionary.py
 如果你想让 AI 帮你引入一个新的外部 Skill，可以直接使用下面这段话术：
 
 ```text
-claude-mem(记忆) 好像也可以下载过来, 结合到我们的skill。完整的复制过来作为我们的一个独立的skill, 但是SKILL.md说明要翻译为中文, 英文我们看不懂, 然后其他的实现内容都不用改, 避免skill的功能出现异常。
-要注意我们也有冲突的前端skill, 如果有冲突, 以claude-mem优先被使用的前提。
+claude-mem(记忆) :
+可以下载过来, 结合到我们的skill。完整的复制过来作为我们的一个独立的skill, 但是SKILL.md说明要翻译为中文, 英文我们看不懂, 然后其他的实现内容都不用改, 避免skill的功能出现异常。
+要注意我们也有冲突的skill, 如果有冲突, 优先使用现在新独立的skill。
 ```
 
 把这段话术直接提交给 AI，就可以让 AI 继续补充一个新的 Skill。
