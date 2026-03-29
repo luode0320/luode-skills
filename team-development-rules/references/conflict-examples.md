@@ -95,3 +95,10 @@
 - 应命中：`functional-validation-rules` + `agent-browser`。
 - 裁决：由 `agent-browser` 负责真实浏览器执行、页面交互和截图取证；由 `functional-validation-rules` 负责判断当前需求是否通过、结论如何归档。
 - 原因：一个负责执行手段，一个负责验证结论，二者并行配合但不能互相替代。
+
+### 样例 13：`frontend-design` 与内部前端 skill 同时命中
+
+- 当前信号：用户要求直接构建一个前端页面或前端应用，同时任务天然会命中 `frontend-design`、`frontend-ui-visual-rules` 甚至 `frontend-component-rules`。
+- 应命中：`frontend-design` + 内部前端 skill。
+- 裁决：默认由 `frontend-design` 主导整体界面设计与代码落地；`frontend-ui-visual-rules` 只补团队内部视觉规范，`frontend-component-rules` 只补组件工程边界。
+- 原因：用户已明确要求使用外部专业前端设计 skill，且你们已设定“冲突时 `frontend-design` 优先”，因此内部规则不能反向抢主导权。

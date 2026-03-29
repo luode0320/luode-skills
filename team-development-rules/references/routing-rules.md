@@ -30,6 +30,7 @@
 | 静态阅读代码不足以定位 Bug | Bug 域 / `bug-runtime-debug-rules`、`bug-debug-log-rules`、`bug-assertion-diagnostic-rules` | 改走运行时诊断路径 |
 | Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`、`bug-regression-risk-rules` | 先给修复建议和回归风险，再决定是否实施 |
 | 需求或 Bug 已澄清，开始新增或修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再叠加位点 skill |
+| 当前任务是构建前端页面、Web 组件或前端应用，并且重点在整体界面落地质量、设计方向、成品效果或避免模板化 AI 审美 | 代码位点域 / `frontend-design` | 当与内部前端规则重叠时，优先由 `frontend-design` 主导 |
 | 当前任务是前端页面视觉表达、落地页气质、配色排版或界面叙事 | 代码位点域 / `frontend-ui-visual-rules` | 这是页面视觉与交互体验规则，不代替前端组件工程规则 |
 | 当前任务是前端组件拆分、props 设计、状态归属或复用边界 | 代码位点域 / `frontend-component-rules` | 这是组件工程规则，不代替页面视觉与交互体验规则 |
 | 代码已经完成，准备进入测试，但还没做静态自审 | 编码审查域 | 先完成实现自审、语法检查、清理格式和代码归位 |
@@ -49,5 +50,6 @@
 - 如果当前任务已经是明确的 SQL、API、配置、日志、错误处理、测试、评审或交付任务，不要停留在总控层。
 - 如果目标小 skill 已经明确，总控层给出分流结论后立即退出。
 - 总控层只在阶段不清、域不清、顺序不清或 skill 冲突时保留控制权。
+- `frontend-design` 与内部前端规则冲突时，默认由 `frontend-design` 优先主导；`frontend-ui-visual-rules` 和 `frontend-component-rules` 只作为补充约束。
 - `frontend-ui-visual-rules` 负责页面视觉设计与交互体验；`frontend-component-rules` 负责组件工程、状态边界和复用规则。
 - `security-best-practices` 只在用户明确要求安全最佳实践建议、安全评审或安全报告时使用；普通安全实现仍优先走 `auth-security-rules`。

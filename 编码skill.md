@@ -354,6 +354,7 @@ Bug 域采用两条互补路径：
 | `error-handling-rules`      | 当新增或修改异常类、全局异常处理、错误中间件、`try/catch`、错误映射、重试、超时、降级、fallback 时自动触发。                                                                                                        | 统一错误处理模型。                   |
 | `logging-trace-rules`       | 当新增或修改日志、logger、trace、span、审计日志、脱敏、排障字段、链路透传时自动触发。                                                                                                                               | 统一日志和链路追踪规则。             |
 | `auth-security-rules`       | 当新增或修改认证、鉴权、登录、登出、会话、JWT、对象级授权、输入校验、敏感信息处理、上传下载安全、外部请求安全时自动触发。                                                                                           | 统一安全实现的默认基线。             |
+| `frontend-design`           | 当用户要求构建 Web 组件、页面或前端应用，尤其强调整体界面成品质感、设计方向、前端落地效果或避免模板化 AI 审美时自动触发。                                                                                           | 生成具有鲜明风格、生产级质量的前端界面，并在与内部前端规则冲突时优先作为主导 skill。 |
 | `frontend-component-rules`  | 当新增或修改 React、Vue、前端组件拆分、props 设计、状态归属、事件上抛、组合方式、复用边界、前端状态流和客户端数据展示逻辑时自动触发。                                                                                 | 统一前端组件工程、状态边界和页面内组合规则。         |
 | `frontend-ui-visual-rules`  | 当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发。 | 统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。 |
 | `performance-caching-rules` | 当新增或修改 SQL 性能、接口耗时、缓存读取写入、缓存 key、缓存失效、前端渲染热点、大列表、图表、虚拟滚动时自动触发。                                                                                                 | 统一性能和缓存规则。                 |
@@ -402,7 +403,13 @@ Bug 域采用两条互补路径：
 - 主位点决定主要参考哪一组 references
 - 横切位点补充额外的限制和检查项
 
-7. 发生重复约束时由总控层裁决
+7. 前端冲突时 `frontend-design` 优先
+
+- 当 `frontend-design` 与 `frontend-ui-visual-rules`、`frontend-component-rules` 同时命中时，由 `frontend-design` 先主导整体前端落地。
+- `frontend-ui-visual-rules` 退为团队内部视觉约束补充，`frontend-component-rules` 退为组件工程边界补充。
+- 也就是说，`frontend-design` 负责“整体成品怎么设计并落地”，内部前端 skill 负责“按团队习惯补约束”，不能反过来抢主导权。
+
+8. 发生重复约束时由总控层裁决
 
 - 如果两个位点类 skill 对同一问题给出重复要求，总控层负责去重
 - 如果两个位点类 skill 的要求明显冲突，按“结构优先、主位点优先、横切位点补充”的原则裁决

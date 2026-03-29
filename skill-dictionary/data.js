@@ -1,14 +1,14 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-03-29 14:06:40",
+  "generated_at": "2026-03-29 14:31:28",
   "repo_root": "E:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 60,
-    "implemented_total": 51,
+    "planned_total": 61,
+    "implemented_total": 52,
     "planned_missing": 9,
     "seed_total": 0,
-    "doc_total": 3,
+    "doc_total": 1,
     "references_total": 174,
     "agents_total": 50
   },
@@ -1208,10 +1208,10 @@ window.SKILL_DICTIONARY = {
       "label": "代码位点域",
       "description": "按改动位置叠加触发的实现规则",
       "order": 6,
-      "implemented_count": 11,
+      "implemented_count": 12,
       "planned_count": 4,
       "seed_count": 0,
-      "total_count": 15,
+      "total_count": 16,
       "items": [
         {
           "id": "config-change-rules",
@@ -1671,6 +1671,36 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "frontend-design",
+          "name": "frontend-design",
+          "title": "frontend-design",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "location",
+          "domain_label": "代码位点域",
+          "domain_description": "按改动位置叠加触发的实现规则",
+          "domain_order": 6,
+          "item_order": 13,
+          "auto_trigger": "创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面或前端应用时使用这个 skill。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。",
+          "core_responsibility": "生成具有鲜明风格、生产级质量的前端界面，并在与内部前端规则冲突时优先作为主导 skill。",
+          "skill_path": "frontend-design/SKILL.md",
+          "directory_path": "frontend-design",
+          "directory": "frontend-design",
+          "sections": [
+            "设计思考",
+            "前端审美指导"
+          ],
+          "references": [],
+          "agents": [],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。",
+            "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
+          ]
+        },
+        {
           "id": "frontend-component-rules",
           "name": "frontend-component-rules",
           "title": "前端组件工程规则",
@@ -1680,7 +1710,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "代码位点域",
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
-          "item_order": 13,
+          "item_order": 14,
           "auto_trigger": "当新增或修改 React、Vue、前端组件拆分、组件目录归属、props 设计、emits 设计、slots 设计、状态归属、事件上抛、组合方式、hooks、composables、复用边界、受控/非受控切换、渲染副作用或客户端展示逻辑时自动触发。负责组件边界、状态边界、接口契约、组合复用和渲染可维护性；不要用它代替页面视觉、配色、排版、响应式和 UI 风格规则。",
           "core_responsibility": "统一前端组件工程、状态边界和页面内组合规则。",
           "skill_path": "frontend-component-rules/SKILL.md",
@@ -1725,7 +1755,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "代码位点域",
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
-          "item_order": 14,
+          "item_order": 15,
           "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发，尤其适用于首页、营销页、品牌展示页、数据面板和需要明确设计方向的前端界面。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
           "core_responsibility": "统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。",
           "skill_path": "frontend-ui-visual-rules/SKILL.md",
@@ -1774,7 +1804,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "代码位点域",
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
-          "item_order": 15,
+          "item_order": 16,
           "auto_trigger": "当新增或修改 SQL 性能、接口耗时、缓存读取写入、缓存 key、缓存失效、前端渲染热点、大列表、图表、虚拟滚动时自动触发。",
           "core_responsibility": "统一性能和缓存规则。",
           "skill_path": "",
@@ -4066,6 +4096,36 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "frontend-design",
+      "name": "frontend-design",
+      "title": "frontend-design",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "location",
+      "domain_label": "代码位点域",
+      "domain_description": "按改动位置叠加触发的实现规则",
+      "domain_order": 6,
+      "item_order": 13,
+      "auto_trigger": "创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面或前端应用时使用这个 skill。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。",
+      "core_responsibility": "生成具有鲜明风格、生产级质量的前端界面，并在与内部前端规则冲突时优先作为主导 skill。",
+      "skill_path": "frontend-design/SKILL.md",
+      "directory_path": "frontend-design",
+      "directory": "frontend-design",
+      "sections": [
+        "设计思考",
+        "前端审美指导"
+      ],
+      "references": [],
+      "agents": [],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看主位点与横切位点是否可并行叠加，而不是互相覆盖。",
+        "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
+      ]
+    },
+    {
       "id": "frontend-component-rules",
       "name": "frontend-component-rules",
       "title": "前端组件工程规则",
@@ -4075,7 +4135,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "代码位点域",
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
-      "item_order": 13,
+      "item_order": 14,
       "auto_trigger": "当新增或修改 React、Vue、前端组件拆分、组件目录归属、props 设计、emits 设计、slots 设计、状态归属、事件上抛、组合方式、hooks、composables、复用边界、受控/非受控切换、渲染副作用或客户端展示逻辑时自动触发。负责组件边界、状态边界、接口契约、组合复用和渲染可维护性；不要用它代替页面视觉、配色、排版、响应式和 UI 风格规则。",
       "core_responsibility": "统一前端组件工程、状态边界和页面内组合规则。",
       "skill_path": "frontend-component-rules/SKILL.md",
@@ -4120,7 +4180,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "代码位点域",
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
-      "item_order": 14,
+      "item_order": 15,
       "auto_trigger": "当新增或修改前端页面、页面布局、主题样式、配色、字体、图标、卡片、弹窗、表单、表格、图表、导航、空状态、动画、响应式样式、暗黑模式、设计 token、Tailwind 类名、CSS/SCSS/LESS、`.tsx`/`.jsx`/`.vue`/`.html` 中影响界面视觉和交互体验的代码时自动触发，尤其适用于首页、营销页、品牌展示页、数据面板和需要明确设计方向的前端界面。负责页面视觉方向、信息层级、交互反馈、可访问性、响应式适配和交付前 UI 自审；内置合并后的 UI/UX 设计种子数据与搜索脚本，可在风格不明时辅助定方向；不要用它代替纯组件工程拆分、状态管理、接口接线或后端规则。",
       "core_responsibility": "统一页面视觉方向、信息层级、交互反馈、响应式适配、可访问性和交付前 UI 自审。",
       "skill_path": "frontend-ui-visual-rules/SKILL.md",
@@ -4247,7 +4307,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "代码位点域",
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
-      "item_order": 15,
+      "item_order": 16,
       "auto_trigger": "当新增或修改 SQL 性能、接口耗时、缓存读取写入、缓存 key、缓存失效、前端渲染热点、大列表、图表、虚拟滚动时自动触发。",
       "core_responsibility": "统一性能和缓存规则。",
       "skill_path": "",
@@ -4982,24 +5042,6 @@ window.SKILL_DICTIONARY = {
       "kind": "总规划",
       "path": "编码skill.md",
       "is_plan_doc": true
-    },
-    {
-      "id": "doc:完成习惯调整",
-      "name": "完成习惯调整",
-      "file_name": "完成习惯调整.md",
-      "title": "package-structure-rules [√]",
-      "kind": "其他文档",
-      "path": "完成习惯调整.md",
-      "is_plan_doc": false
-    },
-    {
-      "id": "doc:未调整",
-      "name": "未调整",
-      "file_name": "未调整.md",
-      "title": "未调整的 Skill 列表",
-      "kind": "其他文档",
-      "path": "未调整.md",
-      "is_plan_doc": false
     }
   ],
   "recommendations": [
