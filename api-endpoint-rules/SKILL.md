@@ -1,12 +1,12 @@
 ---
 name: api-endpoint-rules
-description: 当新增或修改 controller、router、路由声明、HTTP 方法、接口路径命名、接口入口职责或超时入口边界时触发。负责统一接口入口设计、路径命名和强制使用 POST 方法；必须以 package-structure-rules 为基准，不使用 handler 包名；不要用它代替请求参数、响应结构或错误处理规则。
+description: 当新增或修改 controller、router、路由声明、HTTP 方法、接口路径命名、接口入口职责或超时入口边界时触发。负责统一接口入口设计、路径命名和强制使用 POST 方法；必须以 package-structure-rules 为基准，不使用 handler 包名；若本次改动影响 Swagger/OpenAPI 的路径、tag、摘要或文档分组，应与 api-swagger-rules 同步生效；不要用它代替请求参数、响应结构或错误处理规则。
 ---
 
 # 接口入口规则
 
 只在判断"接口入口该怎么定义、落在哪层、路径怎么命名、HTTP 方法怎么选"时使用这个 skill。
-如果当前问题是请求字段、响应包装、错误响应或鉴权细节，请转交相邻接口类 skill。
+如果当前问题是请求字段、响应包装、错误响应、Swagger/OpenAPI 文档同步或鉴权细节，请转交相邻接口类 skill。
 
 **重要：本 skill 必须以 `package-structure-rules` 为基准，不使用 handler 包名；所有 API 接口强制使用 POST 请求，JSON 作为 body；不允许使用 GET、PATCH、PUT、DELETE 等其他请求类型。**
 
@@ -15,6 +15,7 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 - 明确 controller / router 的入口职责边界（不使用 handler）。
 - 统一路径命名、强制使用 POST 方法和 JSON body。
 - 约束接口入口只做入口层工作，不直接吞掉业务层职责。
+- 要求接口路径、分组和摘要稳定后，同步交给 `api-swagger-rules` 收口接口文档与调试入口。
 - 防止把请求结构、响应格式和错误处理混进入口定义规则。
 - 确保接口路径名称语义清晰、类型清楚，通过路径区分操作类型（如 /orders/get、/orders/del、/orders/add）。
 
@@ -52,12 +53,14 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 3. 如果涉及路径命名和方法语义，再读 `references/path-and-method-semantics.md`。
 4. 如果涉及接口或典型反例，再读 `references/endpoint-examples.md`。
 5. 输出入口落点、路径命名、强制使用 POST 方法和不应放在入口层的逻辑结论。
-6. 入口定义稳定后，再交给 `api-request-rules`、`api-response-rules` 等后续 skill 细化。
+6. 如果当前接口需要 Swagger/OpenAPI 文档或调试入口，入口定义稳定后同步交给 `api-swagger-rules`。
+7. 入口定义稳定后，再交给 `api-request-rules`、`api-response-rules` 等后续 skill 细化。
 
 ## 权责边界与不负责事项
 
 - 只负责接口入口设计，不代替 `api-request-rules` 设计参数结构。
 - 不代替 `api-response-rules` 设计成功 / 错误 / 分页返回结构。
+- 不代替 `api-swagger-rules` 设计 Swagger/OpenAPI 接口文档、调试入口和暴露策略。
 - 不代替 `error-handling-rules` 设计异常分类和重试降级路径。
 - 不把复杂业务编排、领域判断或数据访问直接塞进 controller。
 - 必须遵循 `package-structure-rules` 的约定，不使用 handler 包名。

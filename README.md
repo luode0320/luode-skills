@@ -54,6 +54,7 @@
 - 开始新增或修改代码时，进入编码基线域
 - 改到数据库表结构、SQL、Repository 时，进入数据库相关 Skill
 - 改到 API 接口、请求模型、响应结构、请求头时，进入 API 相关 Skill
+- 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-swagger-rules`
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
 - 写完代码后，先进入编码审查域，再进入测试域
 - 准备提交、整理交付说明或进入团队发布流程前收口时，进入交付域
@@ -85,7 +86,7 @@
 
 截至当前版本：
 
-- 已落地 Skill：`56`
+- 已落地 Skill：`57`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`2`
 
@@ -171,6 +172,7 @@ python skill-dictionary/generate_dictionary.py
 | `api-endpoint-rules`       | 统一 API 接口入口、路由设计、职责边界和接口组织方式。                                           |
 | `api-request-rules`        | 统一请求体、入参模型、输入校验、字段约束和请求约定。                                            |
 | `api-response-rules`       | 统一 API 响应结构、状态表达、兼容策略和返回规范。                                               |
+| `api-swagger-rules`        | 统一后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。                    |
 | `error-handling-rules`     | 统一错误模型、错误传播、错误码和异常处理方式。                                                  |
 | `logging-trace-rules`      | 统一日志、trace、链路透传、关键节点记录和定位证据。                                             |
 | `frontend-design`          | 用于生成具有鲜明风格、达到生产级质量的前端界面；当它与内部前端视觉类 Skill 冲突时，以它为优先。 |
@@ -328,3 +330,4 @@ claude-mem(记忆) :
 2026-03-30 10:13:52 fix: 更新
 2026-03-30 10:19:30 fix: 更新
 2026-03-30 10:23:57 fix: 规范 README 改动日志时间顺序
+2026-03-30 11:12:56 feat: 新增 Swagger/OpenAPI 接口规则

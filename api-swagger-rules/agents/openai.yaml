@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swagger / OpenAPI 规则"
+  short_description: "统一后端 HTTP API 的 Swagger/OpenAPI 接入、文档同步和调试入口暴露规则"
+  default_prompt: "使用 $api-swagger-rules 判断当前后端 HTTP API 是否需要 Swagger/OpenAPI、如何保持接口文档同步以及如何开放调试入口。"

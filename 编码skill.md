@@ -186,6 +186,7 @@
 | 用户描述报错、异常、结果不符、线上故障、偶发问题、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现、定位和根因分析 |
 | Bug 仅靠读代码无法定位，需要运行中观察 | Bug 域 / `bug-runtime-debug-rules`、`bug-debug-log-rules`、`bug-assertion-diagnostic-rules` | 进入运行时诊断路径，不应继续停留在纯静态分析 |
 | 需求或 Bug 已澄清，开始真正新增 / 修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再按改动位点附加对应 skill |
+| 当前任务是后端 HTTP API 的 Swagger/OpenAPI 框架接入、接口文档同步、Swagger 调试入口、文档暴露路径或环境开关策略 | 代码位点域 / `api-swagger-rules` | 这是接口契约文档和调试入口规则，不代替接口入口、请求、响应或功能验证 |
 | 代码已经完成，准备进入测试，但还没做静态自审 | 编码审查域 | 先做实现自审、语法检查、清理格式和代码归位 |
 | 编码审查通过，准备写测试、补测试、做功能验证或联调 | 测试域 | 先定测试策略，再看资源位置、功能验证、环境差异处理和回归 |
 | 测试已基本完成，开始准备提交、交付说明或进入团队发布流程 | 交付域 | 进入 Git 协作与交付说明收口流程 |
@@ -367,6 +368,7 @@ Bug 域采用两条互补路径：
 | `api-endpoint-rules`        | 当新增或修改 controller、router、handler、路由声明、HTTP 方法、接口 CRUD、路径命名、幂等接口、超时预算时自动触发。                                                                                                  | 统一接口入口设计。                   |
 | `api-request-rules`         | 当新增或修改请求参数、DTO、query 参数、path 参数、body 结构、参数校验、请求模型时自动触发。                                                                                                                         | 统一请求模型和校验规则。             |
 | `api-response-rules`        | 当新增或修改返回体、响应包装器、分页结构、错误码结构、兼容字段、版本字段时自动触发。                                                                                                                                | 统一响应格式和兼容策略。             |
+| `api-swagger-rules`         | 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时自动触发。                                                                  | 统一 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。 |
 | `error-handling-rules`      | 当新增或修改异常类、全局异常处理、错误中间件、`try/catch`、错误映射、重试、超时、降级、fallback 时自动触发。                                                                                                        | 统一错误处理模型。                   |
 | `logging-trace-rules`       | 当新增或修改日志、logger、trace、span、审计日志、脱敏、排障字段、链路透传时自动触发。                                                                                                                               | 统一日志和链路追踪规则。             |
 | `frontend-design`           | 当用户要求构建 Web 组件、页面或前端应用，尤其强调整体界面成品质感、设计方向、前端落地效果或避免模板化 AI 审美时自动触发。                                                                                           | 生成具有鲜明风格、生产级质量的前端界面，并在与内部前端规则冲突时优先作为主导 skill。 |
@@ -382,7 +384,7 @@ Bug 域采用两条互补路径：
 1. 位点类 skill 允许并行命中
 
 - 同一次改动可以同时触发多个位点类 skill
-- 例如新增一个接口时，往往会同时命中 `api-endpoint-rules`、`api-request-rules`、`api-response-rules`
+- 例如新增一个接口时，往往会同时命中 `api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`api-swagger-rules`
 - 如果该接口还涉及日志记录或异常映射，则还会继续命中 `logging-trace-rules`、`error-handling-rules`
 
 2. 基线域默认并行生效
@@ -406,7 +408,7 @@ Bug 域采用两条互补路径：
 
 5. 接口入口位点与横切位点并行叠加
 
-- `api-endpoint-rules`、`api-request-rules`、`api-response-rules` 负责接口主干
+- `api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`api-swagger-rules` 负责接口主干与接口文档同步
 - `error-handling-rules`、`logging-trace-rules` 负责当前保留的横切约束
 - 横切类 skill 不替代主干 skill，只在主干上叠加要求
 
@@ -458,7 +460,7 @@ Bug 域采用两条互补路径：
 
 | Skill 名字                    | 自动触发 description                                                                                                                                             | 核心职责                                                 |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `implementation-review-rules` | 当功能代码已经完成、准备进入测试前验证时自动触发，检查是否符合编码规范、命名规范、注释规范、风格一致性和最小改动原则。                                           | 对刚完成的实现做一次测试前规范自审。                     |
+| `implementation-review-rules` | 当功能代码已经完成、准备进入测试前验证时自动触发，检查是否符合编码规范、命名规范、注释规范、风格一致性和最小改动原则；若本轮涉及后端 HTTP API，还要检查 Swagger/OpenAPI 是否同步。 | 对刚完成的实现做一次测试前规范自审。                     |
 | `syntax-check-review-rules`   | 当新增或修改代码后准备进入测试前验证，且需要确认语法、类型、依赖引用、构建基础正确性时自动触发。                                                                 | 检查语法错误、引用缺失、类型问题和明显构建失败风险。     |
 | `cleanup-format-review-rules` | 当新增或修改代码后准备进入测试前验证，且存在未使用导入、未使用变量、未使用方法引用、调试残留、临时代码、多余换行或格式不一致风险时自动触发。                     | 清理代码噪音并统一基础格式。                             |
 | `code-placement-review-rules` | 当新增文件、移动文件、扩展模块、跨层调用、工具类落点或目录归属可能不合理时，在进入测试前自动触发。                                                               | 检查代码存放位置、模块归属、层级边界和依赖方向是否合理。 |

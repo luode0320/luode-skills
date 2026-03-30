@@ -34,6 +34,7 @@
 | 静态阅读代码不足以定位 Bug | Bug 域 / `bug-runtime-debug-rules`、`bug-debug-log-rules`、`bug-assertion-diagnostic-rules` | 改走运行时诊断路径 |
 | Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`、`bug-regression-risk-rules` | 先给修复建议和回归风险，再决定是否实施 |
 | 需求或 Bug 已澄清，开始新增或修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再叠加位点 skill |
+| 当前任务是后端 HTTP API 的 Swagger/OpenAPI 框架接入、接口文档同步、Swagger 调试入口、文档暴露路径或环境开关策略 | 代码位点域 / `api-swagger-rules` | 这是接口契约文档和调试入口规则，不代替接口入口、请求、响应或功能验证 |
 | 当前任务是构建前端页面、Web 组件或前端应用，并且重点在整体界面落地质量、设计方向、成品效果或避免模板化 AI 审美 | 代码位点域 / `frontend-design` | 当与内部前端规则重叠时，优先由 `frontend-design` 主导 |
 | 当前任务是前端页面视觉表达、落地页气质、配色排版或界面叙事 | 代码位点域 / `frontend-ui-visual-rules` | 这是页面视觉与交互体验规则，不代替前端组件工程规则 |
 | 当前任务是前端组件拆分、props 设计、状态归属或复用边界 | 代码位点域 / `frontend-component-rules` | 这是组件工程规则，不代替页面视觉与交互体验规则 |
