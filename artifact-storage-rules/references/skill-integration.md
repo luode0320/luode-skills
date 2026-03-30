@@ -8,11 +8,13 @@
 - 需要知道各根目录职责时，读取 `../artifact-storage-rules/references/root-directories.md`
 - 需要知道命名模板时，读取 `../artifact-storage-rules/references/naming-templates.md`
 - 需要知道“更新原记录还是新建新记录”时，读取 `../artifact-storage-rules/references/update-policy.md`
+- 需要知道根目录 `项目设计.md` 的主入口、别名兼容和复用策略时，仍优先读取本 skill 的 `path-map.yaml` 与 `update-policy.md`
 
 ## 其他 skill 的写法建议
 
 - 可以写“路径、命名和复用策略统一遵循 `artifact-storage-rules`”。
 - 可以写“如需具体模板，读取 `../artifact-storage-rules/references/path-map.yaml`”。
+- 可以写“根目录项目设计文档主入口统一遵循 `artifact-storage-rules` 中的 `项目设计.md` 规则”。
 - 不建议在各自 `SKILL.md` 中重复维护完整的 `ment/`、`bug/`、`test/`、`doc/` 模板说明。
 
 ## 变更优先级

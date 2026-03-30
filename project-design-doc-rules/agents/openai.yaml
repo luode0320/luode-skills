@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目设计文档"
+  short_description: "分析整项目时读取、同步或补建根目录项目设计文档的规则"
+  default_prompt: "使用 $project-design-doc-rules 判断当前项目根目录是否存在 `项目设计.md` 或同类设计文档，按弱参考原则校验其与真实代码是否偏移，并在需要时同步或补建根目录 `项目设计.md`。"

@@ -12,6 +12,15 @@ entry_files:
   implementation_plan_doc: "{date}_实施计划中文说明.md"
   bug_root_readme: "README.md"
   test_task_readme: "README.md"
+  project_design_doc: "项目设计.md"
+
+root_files:
+  project_design_primary: "项目设计.md"
+  project_design_aliases:
+    - "架构设计.md"
+    - "项目大纲.md"
+    - "系统设计.md"
+    - "项目说明.md"
 
 directories:
   bug_root: "{datetime}_问题中文简介"
@@ -24,6 +33,12 @@ bootstrap:
     - "test"
     - "bug"
     - "doc"
+  weak_reference_root_files:
+    - "项目设计.md"
+    - "架构设计.md"
+    - "项目大纲.md"
+    - "系统设计.md"
+    - "项目说明.md"
 
 policies:
   same_requirement_updates_same_doc: true
@@ -32,3 +47,6 @@ policies:
   same_bug_updates_same_root: true
   same_test_round_updates_same_root: true
   new_independent_test_round_creates_new_root: true
+  same_project_design_updates_same_doc: true
+  project_design_doc_is_weak_reference: true
+  missing_project_design_doc_can_be_created_after_full_analysis: true

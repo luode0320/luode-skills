@@ -34,7 +34,7 @@
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
-- `artifact-storage-rules` 负责统一 `ment/`、`bug/`、`test/`、`doc/` 等跨域共享目录、命名模板和复用策略
+- `artifact-storage-rules` 负责统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
@@ -46,7 +46,8 @@
 例如：
 
 - 新会话刚开始且没有上下文时，先压缩最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 活动
-- 需要决定需求文档、Bug 记录、测试任务目录和项目说明文档的统一落点与命名时，先进入 `artifact-storage-rules`
+- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`
+- 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
 - 用户给出需求链接、资料、原型、物料时，进入需求域
 - 用户描述线上问题、异常现象、复现路径时，进入 Bug 域
@@ -84,9 +85,9 @@
 
 截至当前版本：
 
-- 已落地 Skill：`55`
+- 已落地 Skill：`56`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`1`
+- 扩展种子 Skill：`2`
 
 主规划文档：
 
@@ -109,7 +110,8 @@ python skill-dictionary/generate_dictionary.py
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
-| `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 等研发产物根目录、命名模板、主入口文件和复用策略。 |
+| `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
+| `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 
 ### 2. 记忆域
@@ -206,9 +208,10 @@ python skill-dictionary/generate_dictionary.py
 
 ### 10. 扩展种子
 
-| Skill         | 功能                                                                     |
-| ------------- | ------------------------------------------------------------------------ |
+| Skill | 功能 |
+| ----- | ---- |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
+| `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出合并后的下一步建议。 |
 
 ## 当前规划状态
 
