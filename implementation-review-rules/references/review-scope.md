@@ -27,6 +27,9 @@
 - Go 项目是否存在 `test/` 外 `*_test.go` 落点违规（命令示例：`rg --files -g "*_test.go" | rg -v "^test/"`）。
 - Go 项目本轮改动是否命中 `internal/service/[^/]+.go` 根目录落点（命令示例：`git diff --name-only HEAD -- | rg "^internal/service/[^/]+\\.go$"`）。
 - Go 项目 `internal/service` 是否散落请求/响应/第三方结果结构体（命令示例：`rg -n "^\\s*type\\s+[A-Za-z_][A-Za-z0-9_]*\\s+struct\\s*{" internal/service`，并人工复核结构体语义）。
+- Go 项目是否在函数/方法内部使用 `var (...)` 分组声明局部变量（命令示例：`rg -n "^\\s+var\\s*\\($" --glob "*.go"`，并人工复核作用域）。
+- Go 项目多参数函数是否直接使用多行参数列表（命令示例：`rg -n "^\\s*func .*\\($|^\\s*func .*,\\s*$" --glob "*.go"`，并人工复核是否应改为单行签名或参数结构体）。
+- Go 项目第三方 API 响应解析是否长期使用 `map[string]any` + key 硬编码（命令示例：`rg -n "map\\[string\\](any|interface\\{\\})" --glob "*.go"`，并人工复核用途）。
 
 ## 不在本轮主检查范围
 
@@ -41,3 +44,6 @@
 - Go 场景下，输出中应包含 `*_test.go` 禁放扫描结果（命中路径或“未命中”）。
 - Go 场景下，输出中应包含 `internal/service` 根目录落点扫描结果（命中路径或“未命中”）。
 - Go 场景下，输出中应包含 `internal/service` 结构体散落扫描结果（可疑路径 + 复核结论）。
+- Go 场景下，输出中应包含局部变量 `var (...)` 分组声明扫描结果（可疑路径 + 复核结论）。
+- Go 场景下，输出中应包含多参数函数签名换行扫描结果（可疑路径 + 复核结论）。
+- Go 场景下，输出中应包含第三方响应 map 解析扫描结果（可疑路径 + 复核结论）。

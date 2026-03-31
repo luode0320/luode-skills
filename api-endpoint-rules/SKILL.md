@@ -1,6 +1,6 @@
 ---
 name: api-endpoint-rules
-description: 当新增或修改 controller、router、路由声明、HTTP 方法、接口路径命名、接口入口职责或超时入口边界时触发。负责统一接口入口设计、路径命名和强制使用 POST 方法；必须以 package-structure-rules 为基准，不使用 handler 包名；若本次改动影响 Swagger/OpenAPI 的路径、tag、摘要或文档分组，应与 api-swagger-rules 同步生效；不要用它代替请求参数、响应结构或错误处理规则。
+description: 当新增或修改 controller、router、路由声明、HTTP 方法、接口路径命名、接口入口职责或超时入口边界时触发。负责统一接口入口设计、路径命名和强制使用 POST 方法，并约束 Go 路由注册代码块写法；必须以 package-structure-rules 为基准，不使用 handler 包名；若本次改动影响 Swagger/OpenAPI 的路径、tag、摘要或文档分组，应与 api-swagger-rules 同步生效；不要用它代替请求参数、响应结构或错误处理规则。
 ---
 
 # 接口入口规则
@@ -25,6 +25,8 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 - 路由 path 必须在注册处直接硬编码，不使用路径常量引用（除全局根前缀如 `/api/walletPay` 外）。
 - 每个接口使用 `group.POST("/path", controller.Method)` 直接注册。
 - 接口注释放在注册语句上一行，不在参数行内写注释，避免 `gofmt` 自动拆行影响可读性。
+- 在同一函数步骤中批量注册业务路由时，必须使用代码块包裹路由注册区段，示例：`{ group.POST(...); group.POST(...) }`。
+- 路由注册代码块内只放注册语句和路由说明注释，不在块内混入鉴权、分组创建或其他装配逻辑。
 - 禁止使用 `GET/PATCH/PUT/DELETE`；所有接口统一 `POST + JSON body`。
 - 禁止在 path 中使用 `:id` 或 `{id}` 风格参数；查询类接口也通过 `POST body` 传参。
 
@@ -33,6 +35,7 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 - 新增接口或路由。
 - 修改 controller、router 入口代码（不使用 handler）。
 - 调整路径命名、HTTP 方法或接口设计。
+- Go 路由函数出现多条连续 `POST` 注册语句，但未按代码块收口。
 - 不确定某段逻辑该放在接口入口还是业务层。
 - 使用了非 POST 请求类型（GET、PATCH、PUT、DELETE 等）。
 - 路径命名没有明确区分操作类型。
@@ -45,6 +48,7 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 4. 明确路径命名对象、资源语义和操作类型（通过路径区分 get/add/del/update 等）。
 5. 确认入口层只承担接入职责，不直接下沉复杂业务。
 6. 确认使用 `internal/controller`、`internal/router`，不使用 handler 包名。
+7. 若同一阶段存在多条路由注册，确认使用代码块 `{ ... }` 包裹注册区段，保证结构直观。
 
 ## 默认执行流程
 
@@ -75,8 +79,8 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 
 ## 执行通过 / 驳回标准
 
-- 通过：能明确接口入口职责、路径命名语义清晰且包含操作类型、强制使用 POST 方法 + JSON body、使用 internal/controller/internal/router 而不使用 handler、明确不应放入入口层的逻辑边界。
-- 驳回：路径命名含糊、使用了非 POST 请求类型、controller 承担过多业务逻辑、使用了 handler 包名、或把请求 / 响应规则混作入口问题。
+- 通过：能明确接口入口职责、路径命名语义清晰且包含操作类型、强制使用 POST 方法 + JSON body、使用 internal/controller/internal/router 而不使用 handler、明确不应放入入口层的逻辑边界；Go 路由函数中的批量路由注册已使用代码块 `{ ... }` 收口。
+- 驳回：路径命名含糊、使用了非 POST 请求类型、controller 承担过多业务逻辑、使用了 handler 包名、把请求 / 响应规则混作入口问题，或 Go 批量路由注册未使用代码块 `{ ... }`。
 
 ## 执行结果归档要求
 

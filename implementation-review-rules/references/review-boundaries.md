@@ -22,6 +22,9 @@
 - Go 场景下，当前 skill 需要提前识别 `test/` 外 `*_test.go` 的明显违规并拦截；完整归位纠偏仍由 `code-placement-review-rules` 收口。
 - Go 场景下，当前 skill 也需要提前识别本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录；更系统的目录整理仍由 `code-placement-review-rules` 收口。
 - Go 场景下，当前 skill 还需要提前识别 `internal/service` 是否散落请求/响应/第三方结果结构体；统一归位到 `internal/entity/<domain>/` 的系统化迁移仍由 `code-placement-review-rules` 收口。
+- Go 场景下，当前 skill 还需要提前识别函数/方法内 `var (...)` 分组声明局部变量问题；更完整的风格规则仍由 `code-style-consistency-rules` 收口。
+- Go 场景下，当前 skill 还需要提前识别多参数函数签名是否直接换行；更完整的函数签名风格规则仍由 `code-style-consistency-rules` 与 `code-readability-rules` 收口。
+- Go 场景下，当前 skill 还需要提前识别第三方 API 响应 map 硬编码解析问题；探测脚本的产出与留痕流程由 `test-program-rules` 收口。
 
 ## 与注释规范的边界
 

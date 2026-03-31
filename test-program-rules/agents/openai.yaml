@@ -1,4 +1,4 @@
 interface:
   display_name: "测试程序规则"
   short_description: "统一测试程序职责拆分、ASCII 镜像归档与控制台过程日志输出"
-  default_prompt: "使用 $test-program-rules 判断当前测试程序、模拟程序、验证脚本和数据构造脚本应如何划分职责；真实测试资产统一落在 `test/yyyy-MM-DD_HHmmss/<ASCII 真实代码路径镜像>/` 下，中文说明目录只保留 `README.md`，且测试脚本执行时需输出关键过程日志到控制台。"
+  default_prompt: "使用 $test-program-rules 判断当前测试程序、模拟程序、验证脚本和数据构造脚本应如何划分职责；真实测试资产统一落在 `test/yyyy-MM-DD_HHmmss/<ASCII 真实代码路径镜像>/` 下，中文说明目录只保留 `README.md`，且测试脚本执行时需输出关键过程日志到控制台；第三方 API 响应结构不明时先用探测脚本获取样例，再回流结构体建模。"

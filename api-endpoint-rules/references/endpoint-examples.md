@@ -31,6 +31,18 @@
 └── ...
 ```
 
+### 正例 4：Go 路由批量注册使用代码块收口
+
+```go
+// 4. 最后注册订单业务路由。
+{
+	// /orders/add 建单接口。
+	serviceGroup.POST("/orders/add", controllers.orderController.CreateOrder)
+	// /orders/get 查单接口。
+	serviceGroup.POST("/orders/get", controllers.orderController.GetOrder)
+}
+```
+
 ## 反例
 
 ### 反例 1：使用了非 POST 请求类型
@@ -63,3 +75,15 @@
 - `/doCreateOrder`
 - `/handleUserAction`
 - 结论：不利于资源语义稳定，应使用 `/orders/add`、`/users/update` 等格式。
+
+### 反例 6：Go 路由批量注册未用代码块
+
+```go
+// 4. 最后注册订单业务路由。
+// /orders/add 建单接口。
+serviceGroup.POST("/orders/add", controllers.orderController.CreateOrder)
+// /orders/get 查单接口。
+serviceGroup.POST("/orders/get", controllers.orderController.GetOrder)
+```
+
+- 结论：批量路由注册应使用代码块 `{ ... }` 收口，避免步骤边界不清。

@@ -1,4 +1,4 @@
 interface:
   display_name: "代码可读性"
   short_description: "约束函数结构、逻辑顺序、复杂度与可维护性的编码规则"
-  default_prompt: "使用 $code-readability-rules 检查当前实现是否足够清晰、顺序自然且便于维护。"
+  default_prompt: "使用 $code-readability-rules 检查当前实现是否足够清晰、顺序自然且便于维护；Go 函数签名参数默认单行，参数过多时优先提炼参数结构体；接入第三方 API 时优先结构体解析响应，避免 map + key 硬编码。"

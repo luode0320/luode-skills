@@ -1,4 +1,4 @@
 interface:
   display_name: "风格一致编码"
   short_description: "跟随项目现有写法，避免局部风格跳变与个人偏好入侵的编码规则"
-  default_prompt: "使用 $code-style-consistency-rules 让当前改动严格跟随项目已有写法，不引入新的局部风格。"
+  default_prompt: "使用 $code-style-consistency-rules 让当前改动严格跟随项目已有写法，不引入新的局部风格；Go 路由函数中同一步骤的批量注册语句统一使用代码块 `{ ... }`，函数内局部变量预声明禁止 `var (...)` 分组写法，函数签名参数默认单行，参数过多时优先提炼参数结构体。"
