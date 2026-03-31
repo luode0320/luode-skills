@@ -1,6 +1,6 @@
 ---
 name: package-structure-rules
-description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` / `async` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策，尤其适合判断单二进制 Go 服务中哪些代码必须留在 `internal/`，以及哪些入口层目录必须保持根级；`utils` / `common` / `global` / `middleware` 根目录默认只放子包子目录，`internal/service` 也默认先拆业务子目录再落实现文件；不要用它代替工具实现、接口设计或代码审查类 skill。
+description: 用于判断新增或修改包、目录、模块、`main.go` 启动入口、`internal` 私有代码、`utils` / `common` / `global` / `middleware` / `crontask` / `async` 等支撑目录，以及 `router` / `controller` / `service` / `repository` / `model` 等业务目录的落点、职责和依赖方向。适用于 Go、Java、Node/Python 项目的结构决策，尤其适合判断单二进制 Go 服务中哪些代码必须留在 `internal/`，以及哪些入口层目录必须保持根级；`utils` / `common` / `global` / `middleware` 根目录默认只放子包子目录，`internal/service` 也默认先拆业务子目录再落实现文件；当单文件达到 500 行及以上且仍在扩展时，需评估按功能拆文件并在必要时拆子目录/子包；不要用它代替工具实现、接口设计或代码审查类 skill。
 ---
 
 # 包结构与分层规则
@@ -16,6 +16,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 - 约束 `utils` / `common` / `global` / `middleware` 采用二级子包结构，避免根目录堆实现文件。
 - 约束 Go `internal/service` 采用业务子目录结构，避免在 `internal/service` 根目录堆实现文件。
 - 在不同语言栈下，给出可落地的目录命名与依赖建议。
+- 当单文件超过 500 行且功能持续增加时，指导按职责拆文件；业务流程足够多时，指导拆子目录/子包。
 
 ## 自动触发信号
 
@@ -25,6 +26,7 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 - 新建 `utils`、`common`、`global`、`middleware`、`crontask`、`async` 等公共或入口目录。
 - 打算在 `utils`、`common`、`global`、`middleware` 根目录直接新增实现文件。
 - 打算在 Go `internal/service` 根目录直接新增多个业务实现文件。
+- 同一文件超过 500 行且还在持续新增方法或流程分支，不确定应如何拆分落位。
 - 需要判断单二进制 Go 服务里，哪些代码默认应放进 `internal/`，哪些目录必须保持根级。
 - 需要判断 `internal/chain`、`internal/wss` 这类项目私有适配层是否合规。
 - 需要判断 `router`、`controller`、`service`、`repository`、`model` 等目录职责。
@@ -39,7 +41,8 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 4. 先复用现有稳定目录，不要为了单个文件默认新建目录。
 5. 对 `utils`、`common`、`global`、`middleware` 先确定子目录职责，再落实现文件。
 6. 对 Go `internal/service` 先确定业务子目录（按域或能力）再落实现文件。
-7. 最后确认该层允许依赖谁，不允许依赖谁。
+7. 若目标文件已达 500 行及以上，先按功能域、流程阶段和上下游边界制定拆分方案（拆文件优先，必要时拆子目录/子包）。
+8. 最后确认该层允许依赖谁，不允许依赖谁。
 
 ## 默认执行流程
 
@@ -65,8 +68,8 @@ description: 用于判断新增或修改包、目录、模块、`main.go` 启动
 
 ## 执行通过 / 驳回标准
 
-- 通过：能明确给出代码落点、目录职责、允许依赖方向和不允许跨层访问的边界。
-- 驳回：目录命名含糊、职责交叉、依赖方向混乱，把本应归属现有层的代码随意塞进新目录，在 `utils`、`common`、`global`、`middleware` 根目录直接放实现文件，或在 Go `internal/service` 根目录直接堆业务实现文件。
+- 通过：能明确给出代码落点、目录职责、允许依赖方向和不允许跨层访问的边界；对 500 行及以上且持续增长的文件已给出可执行拆分落位方案。
+- 驳回：目录命名含糊、职责交叉、依赖方向混乱，把本应归属现有层的代码随意塞进新目录，在 `utils`、`common`、`global`、`middleware` 根目录直接放实现文件，或在 Go `internal/service` 根目录直接堆业务实现文件；或 500 行及以上文件持续堆功能却没有拆分落位方案。
 
 ## 执行结果归档要求
 

@@ -26,6 +26,12 @@
 - `internal/service/` 下没有同包 `*_test.go`。
 - 结论：通过。
 
+### 正例 5：500+ 行文件按职责拆分
+
+- 原 `internal/service/order/process.go` 已超过 500 行。
+- 本轮将“校验”“编排”“回写”拆为 `validate.go`、`workflow.go`、`persist.go`，并保持同一业务子目录。
+- 结论：通过。
+
 ## 反例
 
 ### 反例 1：repository 里写业务编排
@@ -55,3 +61,9 @@
 - `internal/service/create_order.go`、`internal/service/cancel_order.go`、`internal/service/refund_order.go` 等大量业务实现都放在根目录。
 - 目录职责边界越来越模糊，后续易引发命名冲突和循环依赖。
 - 结论：驳回，先按业务域拆子目录。
+
+### 反例 6：500+ 行文件继续堆功能
+
+- 单文件已经超过 500 行，本轮仍继续新增多个方法和流程分支。
+- 未执行拆分，也未给出本轮可落地拆分方案。
+- 结论：驳回，先按功能职责拆分文件，必要时拆子目录。
