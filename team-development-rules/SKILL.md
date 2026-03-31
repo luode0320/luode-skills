@@ -15,6 +15,7 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 - 再判断应该交给哪个域或哪个小 skill 接手。
 - 在多个 skill 同时命中时做去重、裁决和让路。
 - 在前置条件未满足时阻断流程，防止跳阶段推进。
+- 进入编码阶段时，默认提醒联动 `code-comment-rules`，避免改动位点注释漏触发。
 
 ## 自动触发信号
 
@@ -30,7 +31,7 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 1. 先判断当前阶段。
 2. 如果问题明显是在查历史，优先判断是否应进入记忆域。
 3. 再判断这是需求类、Bug 类还是交付收口类问题。
-4. 如果已经进入写代码阶段，再判断是否已有明确的代码位点 skill 可直接接手。
+4. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 与 `code-comment-rules`，再判断代码位点 skill。
 5. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
 
 ## 默认执行流程
