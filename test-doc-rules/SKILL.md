@@ -1,6 +1,6 @@
 ---
 name: test-doc-rules
-description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
+description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
 ---
 
 # 测试文档规则
@@ -9,6 +9,12 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 如果当前争议是测试程序怎么写，请转交 `test-program-rules`；如果是功能到底算不算通过，请转交 `functional-validation-rules`；如果是旧能力有没有被带坏，请转交 `test-regression-rules`。
 
 **重要：本 skill 必须服从 `test-location-rules`。中文说明目录只允许存放 `README.md`；如果需要详细说明、案例表、补充报告、截图说明或执行清单，这些文档必须放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中。**
+
+## 测试隔离红线（强制）
+
+- 严禁为了测试目的改动生产代码语义，包括但不限于新增测试专用方法、测试专用数据、测试专用结构体字段。
+- 测试文档中若出现“为测试方便新增生产字段/方法”的做法，必须标记为违规并阻断，不得作为可接受方案沉淀。
+- 测试说明只记录测试资产与结论，不为生产代码污染行为背书。
 
 ## Skill 作用与适用场景
 
@@ -62,7 +68,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 ## 执行通过 / 驳回标准
 
 - 通过：中央约定的测试任务主说明 `README.md` 已经清楚说明测试对象、执行方式、依赖条件、真实资产入口、覆盖范围和最终结论；如有额外文档，也已落在同一时间戳根目录下的 ASCII 镜像路径中，并被 README 正确引用。
-- 驳回：README 只剩口头式结论，缺少运行入口和结果依据；或补充文档继续散落到 `testing/`、`analysis/`、仓库根目录、业务目录或中文说明目录中，无法支持复现、交接和追溯。
+- 驳回：README 只剩口头式结论，缺少运行入口和结果依据；补充文档继续散落到 `testing/`、`analysis/`、仓库根目录、业务目录或中文说明目录中，无法支持复现、交接和追溯；或文档把“新增测试专用方法/数据/结构体字段”作为可接受做法记录到生产代码方案中。
 
 ## 执行结果归档要求
 
