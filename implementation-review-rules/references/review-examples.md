@@ -37,6 +37,12 @@
 - 本轮服务实现落在 `internal/service/order/`、`internal/service/user/` 等子目录。
 - 结论：可进入后续审查和测试。
 
+### 正例 6：Go 服务结构体归位到 entity
+
+- 执行 `rg -n "^\\s*type\\s+[A-Za-z_][A-Za-z0-9_]*\\s+struct\\s*{" internal/service` 后人工复核，无请求/响应/第三方结果结构体散落在 `internal/service`。
+- 本轮新增请求/响应结构体放在 `internal/entity/order/`、`internal/entity/user/` 等业务子目录。
+- 结论：可进入后续审查和测试。
+
 ## 反例
 
 ### 反例 1：功能写完但顺手改太多
@@ -82,3 +88,9 @@
 - 扫描命中 `internal/service/create_order.go`。
 - 本轮业务实现直接落在 `internal/service/` 根目录，未按业务域拆分子目录。
 - 结论：驳回，先迁移到 `internal/service/<domain>/`。
+
+### 反例 8：Go 服务实现散落请求/响应结构体
+
+- 扫描命中 `internal/service/order/create_service.go` 中新增 `CreateOrderRequest`、`CreateOrderResponse`。
+- 这些结构体属于数据定义，不应混在服务行为实现文件。
+- 结论：驳回，先迁移到 `internal/entity/order/` 后再进入测试。

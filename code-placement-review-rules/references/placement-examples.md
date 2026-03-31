@@ -32,6 +32,12 @@
 - 本轮将“校验”“编排”“回写”拆为 `validate.go`、`workflow.go`、`persist.go`，并保持同一业务子目录。
 - 结论：通过。
 
+### 正例 6：Go 结构体归位到 internal/entity
+
+- `internal/service/order/create.go` 仅保留服务编排与方法逻辑。
+- 请求/响应结构体迁移到 `internal/entity/order/create_entity.go`。
+- 结论：通过。
+
 ## 反例
 
 ### 反例 1：repository 里写业务编排
@@ -67,3 +73,9 @@
 - 单文件已经超过 500 行，本轮仍继续新增多个方法和流程分支。
 - 未执行拆分，也未给出本轮可落地拆分方案。
 - 结论：驳回，先按功能职责拆分文件，必要时拆子目录。
+
+### 反例 7：service 文件散落结构体定义
+
+- 在 `internal/service/order/create.go` 中定义请求/响应/第三方结果 `type Xxx struct`。
+- 与 `internal/entity` 职责混放，导致结构体定义分散、阅读跳转成本升高。
+- 结论：驳回，迁移到 `internal/entity/<domain>/` 后再继续。

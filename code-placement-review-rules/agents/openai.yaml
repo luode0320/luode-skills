@@ -1,4 +1,4 @@
 interface:
   display_name: "代码归位审查"
   short_description: "进入测试前审查文件归属、模块归属、目录落点与跨层依赖方向的规则"
-  default_prompt: "使用 $code-placement-review-rules 在进入测试前检查当前文件、模块和目录归属是否合理，以及是否存在越层依赖。"
+  default_prompt: "使用 $code-placement-review-rules 在进入测试前检查当前文件、模块和目录归属是否合理，以及是否存在越层依赖；Go 场景下需额外检查 `internal/service` 是否散落请求/响应/第三方结果结构体，并归位到 `internal/entity/<domain>/`。"

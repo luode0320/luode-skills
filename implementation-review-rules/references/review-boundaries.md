@@ -21,6 +21,7 @@
 - 但如果实现为了追求“方便”把常量、配置、错误、枚举、日志助手乱塞位置，当前 skill 仍应指出这是实现质量问题。
 - Go 场景下，当前 skill 需要提前识别 `test/` 外 `*_test.go` 的明显违规并拦截；完整归位纠偏仍由 `code-placement-review-rules` 收口。
 - Go 场景下，当前 skill 也需要提前识别本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录；更系统的目录整理仍由 `code-placement-review-rules` 收口。
+- Go 场景下，当前 skill 还需要提前识别 `internal/service` 是否散落请求/响应/第三方结果结构体；统一归位到 `internal/entity/<domain>/` 的系统化迁移仍由 `code-placement-review-rules` 收口。
 
 ## 与注释规范的边界
 

@@ -51,7 +51,7 @@
 - `internal/service/`
   负责业务流程、领域规则和跨仓储编排。`internal/service/` 根目录默认先拆业务子目录（如 `internal/service/order/`、`internal/service/user/`），具体实现文件放在子目录中，避免大平层。
 - `internal/entity/`
-  存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑。
+  存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑。建议按业务域拆分为 `internal/entity/<domain>/`。
 - `internal/<adapter>/`
   放项目私有的协议适配层或基础设施适配层，例如 `internal/chain`、`internal/wss`。这类目录可以存在，不强制要求统一固定名称，但必须表达清晰职责，不能退化成新的杂项目录。
 - `utils/`
@@ -85,8 +85,9 @@
   负责 HTTP 输入输出、参数转换和响应映射。默认使用 `controller`，不要使用 `handler`。
 - `internal/service`
   负责业务流程、领域规则和跨仓储编排。根目录默认先拆 `internal/service/<domain>/`，再放实现文件，避免把多个业务需求堆在 `internal/service/` 根目录。
+  服务实现文件默认不定义请求/响应/第三方结果结构体；该类结构体统一归位到 `internal/entity/<domain>/`，避免跨文件跳转与重复定义。
 - `internal/entity`
-  存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑。
+  存放 API 结构体，包括请求结构体、响应结构体、第三方 API 结果结构体等。这里只存放数据结构定义，不包含业务逻辑，建议按域拆到 `internal/entity/<domain>/`。
 - `utils`
   只放稳定、职责清晰、没有明显业务状态的小工具。它不是兜底目录，也不是"暂时不知道放哪"的落点。根目录默认先拆 `utils/<name>/`，再放实现文件。
 - `common`
@@ -128,6 +129,8 @@
 - `utils` 不是垃圾桶。最外层可以有稳定可移植的 `utils`，`internal` 里也可以有项目内适配型 `utils` 子包；若服务层需要局部工具，放在对应业务子目录（如 `internal/service/order/utils.go`），不要直接放在 `internal/service/` 根目录。
 - `utils`、`common`、`global`、`middleware` 根目录默认只放子目录，不直接放实现文件，避免循环依赖与命名冲突。
 - `internal/service` 根目录默认只放业务子目录，不直接堆业务实现文件；规模增长时必须继续按域拆分子目录。
+- `internal/service` 实现文件默认只保留服务行为代码和必要的服务接收器结构体，不要在这里新增请求/响应/第三方结果结构体。
+- 请求/响应/第三方结果结构体默认统一落到 `internal/entity/<domain>/`，避免在多个 service 文件重复定义同类结构体。
 - `global`、`middleware`、`crontask` 是根级入口或根级全局目录；在单二进制 Go 服务里，`internal/global`、`internal/middleware`、`internal/crontask` 视为不合规。
 - 不要为了放一个文件就新建一个目录；只有当职责会稳定扩展、边界明确时，才值得单独建目录。
 - 如果某段代码已经明显带有业务语义，就应优先落到 `internal/service`、`internal/controller` 或其他明确业务目录，而不是继续留在 `utils` 或 `common`。
