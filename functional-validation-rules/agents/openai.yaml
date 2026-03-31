@@ -1,4 +1,4 @@
 interface:
   display_name: "功能验证规则"
   short_description: "统一当前需求功能正确性的验证范围、判定方式以及 README 结论与 ASCII 证据留痕"
-  default_prompt: "使用 $functional-validation-rules 判断当前需求或当前修改的功能应如何验证、如何判定是否满足验收标准；结论写回 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`，详细执行证据归档到同一时间戳根目录下的 ASCII 真实代码路径镜像目录。"
+  default_prompt: "使用 $functional-validation-rules 判断当前需求或当前修改的功能应如何验证、如何判定是否满足验收标准；结论写回 `test/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`（中文目录名按功能验证主题动态命名），详细执行证据归档到同一时间戳根目录下的 ASCII 真实代码路径镜像目录。"

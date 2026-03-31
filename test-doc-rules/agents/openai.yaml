@@ -1,4 +1,4 @@
 interface:
   display_name: "测试文档规则"
   short_description: "以 test-location-rules 为基准，统一中文 README 与 ASCII 镜像文档的组织方式"
-  default_prompt: "使用 $test-doc-rules 判断当前测试 README、验证说明、测试报告和覆盖说明应如何组织；中文说明统一写入 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`，额外文档统一落在同一时间戳根目录下的 ASCII 真实代码路径镜像目录中。"
+  default_prompt: "使用 $test-doc-rules 判断当前测试 README、验证说明、测试报告和覆盖说明应如何组织；中文说明统一写入 `test/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`（该中文目录名按 README 主题动态命名，不是固定字面值），额外文档统一落在同一时间戳根目录下的 ASCII 真实代码路径镜像目录中。"

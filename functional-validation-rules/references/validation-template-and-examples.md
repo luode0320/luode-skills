@@ -2,7 +2,7 @@
 
 ## 结论模板
 
-主结论写入 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`，至少包含：
+主结论写入 `test/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`，至少包含：
 
 - 验证对象：
 - 关联需求 / 变更：

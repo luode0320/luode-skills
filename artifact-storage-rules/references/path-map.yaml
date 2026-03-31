@@ -25,7 +25,8 @@ root_files:
 directories:
   bug_root: "{datetime}_问题中文简介"
   test_task_root: "{datetime}"
-  test_task_doc_dir: "测试任务中文简介"
+  test_task_doc_dir: "{test_task_cn_title}"
+  test_task_doc_dir_note: "根据 README 将要描述的测试任务主题动态命名；禁止使用字面量“测试任务中文简介”"
 
 bootstrap:
   recent_context_scan_roots:

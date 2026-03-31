@@ -13,7 +13,7 @@
   - `history_client_mock.json`
   - `history_client_cases.json`
   - `history_client_run.ps1`
-- 中文只允许出现在 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`，不能进入 Go 可编译路径。
+- 中文只允许出现在 `test/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`，不能进入 Go 可编译路径。
 
 ## 常见程序类型
 

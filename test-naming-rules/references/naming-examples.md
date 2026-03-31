@@ -28,7 +28,7 @@
 ## 正例
 
 - 时间戳根目录使用 `yyyy-MM-DD_HHmmss` 格式，如 `2026-03-28_143022`、`2026-03-28_154511`。
-- 中文说明目录使用测试任务中文简介，如 `用户登录功能验证/`、`订单创建接口测试/`。
+- 中文说明目录使用本次测试任务中文主题（动态命名），如 `用户登录功能验证/`、`订单创建接口测试/`。
 - 测试文件名称与测试对象和层级一致，如 `user-login.api.test.ts`、`cart-service.integration_test.go`。
 - 测试数据目录直接表达场景用途，如 `fixtures/order-create/`、`mock/payment-callback/`。
 - 共享资源目录突出公共属性，如 `shared-fixtures/`、`common-mocks/`。

@@ -1,4 +1,4 @@
 interface:
   display_name: "回归验证规则"
   short_description: "以 test-location-rules 为基准，统一回归范围判定、README 结论与 ASCII 证据留痕"
-  default_prompt: "使用 $test-regression-rules 判断当前改动需要回归哪些旧能力、应选择哪些回归用例；回归结论写回 `test/yyyy-MM-DD_HHmmss/测试任务中文简介/README.md`，详细案例和证据归档到同一时间戳根目录下的 ASCII 真实代码路径镜像目录。"
+  default_prompt: "使用 $test-regression-rules 判断当前改动需要回归哪些旧能力、应选择哪些回归用例；回归结论写回 `test/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`（中文目录名按回归主题动态命名），详细案例和证据归档到同一时间戳根目录下的 ASCII 真实代码路径镜像目录。"
