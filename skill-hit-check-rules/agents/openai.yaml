@@ -1,4 +1,4 @@
 interface:
   display_name: "命中检查"
   short_description: "每轮提问先检查 skill 命中，并显式回报命中列表，避免漏触发"
-  default_prompt: "使用 $skill-hit-check-rules 在每轮用户提问后先检查 skill 命中，先输出命中结果，再进入对应主域 skill 执行。"
+  default_prompt: "使用 $skill-hit-check-rules 在每轮用户提问后先检查 skill 命中，先输出命中结果，再进入对应主域 skill 执行；若请求属于“补充注释/只改注释”，命中列表必须至少包含 `code-comment-rules` 与 `skill-compliance-gate-rules`。"

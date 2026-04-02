@@ -59,6 +59,32 @@ if err != nil {
 }
 ```
 
+- 方法头注释完整时，方法体仍需编号步骤注释，例如：
+
+```go
+// OrderInitStateTrackerTask 追踪仅创建订单状态任务
+// [参数] 无
+// [返回] 无
+// 最近修改时间: 2026-04-02 17:44:24 增加批量订单状态回填为用户已发起转账
+func (p *BuyProviderBase) OrderInitStateTrackerTask() {
+    // 1. 防止任务并发堆积并设置运行标记
+    if p.queryOrderInitStateTaskRunning {
+        return
+    }
+
+    // 2. 查询仅创建订单并构造 providerOrderID 缓存
+    orders, err := repository.NewBuySellOrderRepo().FindBuyInitOrdersByProvider(p.GetProviderName())
+    if err != nil {
+        return
+    }
+
+    // 3. 分批查询服务商状态并回填订单状态
+    for start := 0; start < len(providerOrderIDs); start += batchSize {
+        // ...
+    }
+}
+```
+
 - 在字段定义和初始化位置同时补字段注释，例如：
 
 ```go
@@ -90,6 +116,7 @@ result := map[string]any{
 - `i++ // i 加 1`
 - 给每一行链式调用都补一条重复注释。
 - 一个三段式流程没有 `1.`、`2.`、`3.` 步骤注释，只靠读者自己推断顺序。
+- 函数头注释已经补齐 `[参数]`、`[返回]` 和 `最近修改时间`，但方法体仍使用未编号普通注释（如“查询订单”“分批处理”“更新状态”）替代 `1.`、`2.`、`3.`。
 - 结构体字段定义有注释，但初始化对象时字段列表完全没有重复注释。
 - 结构体字段定义有注释，但字段组装和字段使用位置完全没有重复注释。
 - 新增或修改函数时没有 `[参数]` / `[返回]` 注释，或参数返回语义写得过于含糊。
