@@ -1,13 +1,13 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-02 15:40:03",
+  "generated_at": "2026-04-02 17:33:33",
   "repo_root": "/home/luode/.codex/skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 57,
-    "implemented_total": 57,
+    "planned_total": 59,
+    "implemented_total": 59,
     "planned_missing": 0,
-    "seed_total": 7,
+    "seed_total": 5,
     "doc_total": 3,
     "references_total": 204,
     "agents_total": 61
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 4,
+      "implemented_count": 6,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 4,
+      "total_count": 6,
       "items": [
         {
           "id": "team-development-rules",
@@ -194,6 +194,89 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "skill-evolution-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
+          "id": "skill-hit-check-rules",
+          "name": "skill-hit-check-rules",
+          "title": "Skill 命中检查规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 5,
+          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+          "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
+          "skill_path": "skill-hit-check-rules/SKILL.md",
+          "directory_path": "skill-hit-check-rules",
+          "directory": "skill-hit-check-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "输出要求",
+            "权责边界与不负责事项",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "skill-hit-check-rules/references/hit-checklist.md",
+            "skill-hit-check-rules/references/output-format.md"
+          ],
+          "agents": [
+            "skill-hit-check-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
+          "id": "skill-compliance-gate-rules",
+          "name": "skill-compliance-gate-rules",
+          "title": "Skill 执行完整性闸门规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 6,
+          "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+          "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
+          "skill_path": "skill-compliance-gate-rules/SKILL.md",
+          "directory_path": "skill-compliance-gate-rules",
+          "directory": "skill-compliance-gate-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "提交前闸门检查（internal/router）",
+            "输出要求（简化版）",
+            "阻断判定与处理",
+            "权责边界与不负责事项",
+            "执行通过 / 驳回标准",
+            "references 读取规则",
+            "回到主流程的重启点"
+          ],
+          "references": [
+            "skill-compliance-gate-rules/references/applicability-and-gap-check.md",
+            "skill-compliance-gate-rules/references/next-step-suggestion-template.md"
+          ],
+          "agents": [
+            "skill-compliance-gate-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -2575,8 +2658,8 @@ window.SKILL_DICTIONARY = {
       "order": 10,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 7,
-      "total_count": 7,
+      "seed_count": 5,
+      "total_count": 5,
       "items": [
         {
           "id": "\"doc\"",
@@ -2776,89 +2859,6 @@ window.SKILL_DICTIONARY = {
             "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
             "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
           ]
-        },
-        {
-          "id": "skill-compliance-gate-rules",
-          "name": "skill-compliance-gate-rules",
-          "title": "Skill 执行完整性闸门规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 6,
-          "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "skill-compliance-gate-rules/SKILL.md",
-          "directory_path": "skill-compliance-gate-rules",
-          "directory": "skill-compliance-gate-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "提交前闸门检查（internal/router）",
-            "输出要求（简化版）",
-            "阻断判定与处理",
-            "权责边界与不负责事项",
-            "执行通过 / 驳回标准",
-            "references 读取规则",
-            "回到主流程的重启点"
-          ],
-          "references": [
-            "skill-compliance-gate-rules/references/applicability-and-gap-check.md",
-            "skill-compliance-gate-rules/references/next-step-suggestion-template.md"
-          ],
-          "agents": [
-            "skill-compliance-gate-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "skill-hit-check-rules",
-          "name": "skill-hit-check-rules",
-          "title": "Skill 命中检查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 7,
-          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "skill-hit-check-rules/SKILL.md",
-          "directory_path": "skill-hit-check-rules",
-          "directory": "skill-hit-check-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "输出要求",
-            "权责边界与不负责事项",
-            "执行通过 / 驳回标准",
-            "references 读取规则"
-          ],
-          "references": [
-            "skill-hit-check-rules/references/hit-checklist.md",
-            "skill-hit-check-rules/references/output-format.md"
-          ],
-          "agents": [
-            "skill-hit-check-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
         }
       ]
     }
@@ -3029,6 +3029,89 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "skill-evolution-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
+      "id": "skill-hit-check-rules",
+      "name": "skill-hit-check-rules",
+      "title": "Skill 命中检查规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 5,
+      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+      "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
+      "skill_path": "skill-hit-check-rules/SKILL.md",
+      "directory_path": "skill-hit-check-rules",
+      "directory": "skill-hit-check-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "输出要求",
+        "权责边界与不负责事项",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "skill-hit-check-rules/references/hit-checklist.md",
+        "skill-hit-check-rules/references/output-format.md"
+      ],
+      "agents": [
+        "skill-hit-check-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
+      "id": "skill-compliance-gate-rules",
+      "name": "skill-compliance-gate-rules",
+      "title": "Skill 执行完整性闸门规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 6,
+      "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+      "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
+      "skill_path": "skill-compliance-gate-rules/SKILL.md",
+      "directory_path": "skill-compliance-gate-rules",
+      "directory": "skill-compliance-gate-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "提交前闸门检查（internal/router）",
+        "输出要求（简化版）",
+        "阻断判定与处理",
+        "权责边界与不负责事项",
+        "执行通过 / 驳回标准",
+        "references 读取规则",
+        "回到主流程的重启点"
+      ],
+      "references": [
+        "skill-compliance-gate-rules/references/applicability-and-gap-check.md",
+        "skill-compliance-gate-rules/references/next-step-suggestion-template.md"
+      ],
+      "agents": [
+        "skill-compliance-gate-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -5503,89 +5586,6 @@ window.SKILL_DICTIONARY = {
         "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
         "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
       ]
-    },
-    {
-      "id": "skill-compliance-gate-rules",
-      "name": "skill-compliance-gate-rules",
-      "title": "Skill 执行完整性闸门规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 6,
-      "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "skill-compliance-gate-rules/SKILL.md",
-      "directory_path": "skill-compliance-gate-rules",
-      "directory": "skill-compliance-gate-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "提交前闸门检查（internal/router）",
-        "输出要求（简化版）",
-        "阻断判定与处理",
-        "权责边界与不负责事项",
-        "执行通过 / 驳回标准",
-        "references 读取规则",
-        "回到主流程的重启点"
-      ],
-      "references": [
-        "skill-compliance-gate-rules/references/applicability-and-gap-check.md",
-        "skill-compliance-gate-rules/references/next-step-suggestion-template.md"
-      ],
-      "agents": [
-        "skill-compliance-gate-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "skill-hit-check-rules",
-      "name": "skill-hit-check-rules",
-      "title": "Skill 命中检查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 7,
-      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "skill-hit-check-rules/SKILL.md",
-      "directory_path": "skill-hit-check-rules",
-      "directory": "skill-hit-check-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "输出要求",
-        "权责边界与不负责事项",
-        "执行通过 / 驳回标准",
-        "references 读取规则"
-      ],
-      "references": [
-        "skill-hit-check-rules/references/hit-checklist.md",
-        "skill-hit-check-rules/references/output-format.md"
-      ],
-      "agents": [
-        "skill-hit-check-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
     }
   ],
   "docs": [
@@ -5618,7 +5618,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "57 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "59 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

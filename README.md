@@ -86,9 +86,9 @@
 
 截至当前版本：
 
-- 已落地 Skill：`57`
+- 已落地 Skill：`59`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`2`
+- 扩展种子 Skill：`5`
 
 主规划文档：
 
@@ -114,6 +114,8 @@ python skill-dictionary/generate_dictionary.py
 | `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
+| `skill-hit-check-rules` | 每轮用户提问先做 Skill 命中检查并显式回报命中列表，避免漏触发。 |
+| `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出主任务优先的下一步建议。 |
 
 ### 2. 记忆域
 
@@ -212,8 +214,11 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill | 功能 |
 | ----- | ---- |
+| `"doc"` | 用于读取、创建、编辑 `.docx` 文档并进行版式核验。 |
+| `"pdf"` | 用于读取、创建、审阅 PDF 文档并进行渲染检查。 |
+| `"spreadsheet"` | 用于处理 `.xlsx` / `.csv` / `.tsv` 表格并支持公式与样式工作流。 |
+| `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
-| `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出合并后的下一步建议。 |
 
 ## 当前规划状态
 
@@ -342,3 +347,4 @@ claude-mem(记忆) :
 2026-04-02 14:53:23 feat: 新增提问轮次技能命中检查规则
 2026-04-02 15:34:33 fix: 强化提交消息换行与字面量校验规则
 2026-04-02 15:41:17 docs: 刷新 skill 字典数据与统计
+2026-04-02 17:41:56 fix: 并入命中检查与合规闸门主规划
