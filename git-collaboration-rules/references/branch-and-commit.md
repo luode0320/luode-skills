@@ -109,6 +109,45 @@ fix: 修复订单创建时金额计算错误
 - `test:` - 测试相关
 - `chore:` - 构建/工具相关
 
+## 多行说明写法（跨 shell 统一）
+
+推荐优先使用以下两种方式，避免把 `\n` 写进提交消息正文：
+
+### 写法一：多 `-m`（跨 shell 稳定）
+
+```bash
+git commit \
+  -m "fix: 适配 financeConfig 新字段与动态开关规则" \
+  -m "1. 新增 financeConfig 的 version/limit/enable 字段映射。
+2. 根据 gVersion 与 ipCountry 动态计算 enable。
+3. 补充关键结构与函数中文注释。"
+```
+
+### 写法二：`-F -`（长正文推荐）
+
+```bash
+cat <<'MSG' | git commit -F -
+fix: 适配 financeConfig 新字段与动态开关规则
+
+1. 新增 financeConfig 的 version/limit/enable 字段映射。
+2. 根据 gVersion 与 ipCountry 动态计算 enable。
+3. 补充关键结构与函数中文注释。
+MSG
+```
+
+## 提交后强制校验（新增硬规则）
+
+提交完成后必须执行一次：
+
+```bash
+git log -1 --pretty=%B | rg '\\n'
+```
+
+判定规则：
+
+- 命中为空：通过。
+- 命中非空：说明提交正文含字面量 `\n`，必须立即 `git commit --amend` 修正为真实换行。
+
 ## Windows/PowerShell 提交说明格式（重点：换行）
 
 Windows/PowerShell 场景下，提交消息格式必须满足：
@@ -126,6 +165,7 @@ Windows/PowerShell 场景下，提交消息格式必须满足：
 - 标题行和说明正文之间必须有且仅有一空行。
 - 说明正文必须是“真实换行”，不允许出现字面量 `\n`。
 - 正文建议使用短句或列表，避免一整段大长句。
+- 提交后仍需执行 `git log -1 --pretty=%B | rg '\\n'` 校验，确保没有字面量 `\n` 遗留。
 
 推荐写法一（`-m` + here-string，适合常规提交）：
 
