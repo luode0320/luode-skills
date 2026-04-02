@@ -4,7 +4,7 @@
 
 用于统一测试目录、测试文件、测试脚本和测试数据目录的命名维度与表达顺序。
 
-**重要：本规则必须以 `test-location-rules` 为基础，所有测试资产必须统一放在 `test/` 根目录下。**
+**重要：本规则必须以 `test-task-root-layout-rules` 为基础，所有测试资产必须统一放在 `test/` 根目录下；若存在 Go 可编译路径，还必须同步遵循 `go-test-compile-path-rules`。**
 
 ## 铁律：test/ 根目录与三层命名分工
 

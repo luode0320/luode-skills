@@ -4,4 +4,4 @@
 - 功能验证聚焦当前需求是否实现正确。
 - 回归验证聚焦旧能力是否被带坏。
 - 三者可能连续出现，但职责不能混写。
-- Bug 结论记录统一沉淀到 `bug/` 根目录；实际测试脚本、测试数据和测试报告仍按 `test-location-rules` 放在 `test/` 目录。
+- Bug 结论记录统一沉淀到 `bug/` 根目录；实际测试脚本、测试数据和测试报告仍按 `test-task-root-layout-rules` 放在 `test/` 时间戳根目录中；若原本散落在错误位置，还需按 `test-scattered-asset-location-rules` 收拢。

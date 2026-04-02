@@ -1,0 +1,3 @@
+dynamic sample
+purpose: verify that a newly created test task can place executable assets in an ASCII mirror path under the current timestamp root.
+expected owner skill: test-task-root-layout-rules

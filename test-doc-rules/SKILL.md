@@ -1,6 +1,6 @@
 ---
 name: test-doc-rules
-description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
+description: 当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。
 ---
 
 # 测试文档规则
@@ -8,7 +8,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 只在“测试说明文档应该怎么写、怎么组织、怎么留痕”这个问题上使用这个 skill。
 如果当前争议是测试程序怎么写，请转交 `test-program-rules`；如果是功能到底算不算通过，请转交 `functional-validation-rules`；如果是旧能力有没有被带坏，请转交 `test-regression-rules`。
 
-**重要：本 skill 必须服从 `test-location-rules`。中文说明目录只允许存放 `README.md`；如果需要详细说明、案例表、补充报告、截图说明或执行清单，这些文档必须放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中。**
+**重要：本 skill 必须服从 `test-task-root-layout-rules`。中文说明目录只允许存放 `README.md`；如果需要详细说明、案例表、补充报告、截图说明或执行清单，这些文档必须放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中。**
 
 ## 测试隔离红线（强制）
 
@@ -34,7 +34,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 
 ## 进入后先做什么
 
-1. 先确认测试目录已经遵循 `test-location-rules`，即存在独立的中央约定时间戳根目录。
+1. 先确认测试目录已经遵循 `test-task-root-layout-rules`，即存在独立的中央约定时间戳根目录。
 2. 确认中央约定的测试任务主说明 `README.md` 作为当前任务唯一的中文主说明入口。
 3. 区分当前文档属于主 README、详细验证说明、覆盖补充、执行记录还是报告摘要。
 4. 如果需要额外 markdown、图片说明或附件，先确定它们对应的真实代码路径镜像目录，再放入 ASCII 路径中。
@@ -42,7 +42,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 
 ## 默认执行流程
 
-1. 默认先确认遵循 `test-location-rules`：所有测试文档都属于中央约定的测试时间戳根目录。
+1. 默认先确认遵循 `test-task-root-layout-rules`：所有测试文档都属于中央约定的测试时间戳根目录。
 2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径和同一轮测试是否继续复用同一根目录。
 3. 默认先读 `references/doc-minimums.md`，确认 README 和补充文档的最小字段。
 4. 如果当前文档与测试程序、功能结论或回归结论职责混淆，再读 `references/doc-boundaries.md`。
@@ -52,7 +52,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 
 ## 权责边界与不负责事项
 
-- 只负责测试文档结构、字段和归档方式，不负责决定测试资产落点，那属于 `test-location-rules`。
+- 只负责测试文档结构、字段和归档方式，不负责决定测试资产落点，那属于 `test-task-root-layout-rules`。
 - 只负责把结论记录清楚，不负责判定功能是否通过，那属于 `functional-validation-rules`。
 - 只负责把回归范围和结论留痕清楚，不负责决定回归是否充分，那属于 `test-regression-rules`。
 - 不负责测试程序实现、断言设计、mock 组织和脚本拆分，那属于 `test-program-rules`。

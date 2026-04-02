@@ -507,9 +507,11 @@ Bug 域采用两条互补路径：
 | Skill 名字                    | 自动触发 description                                                             | 核心职责                     |
 | ----------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
 | `test-strategy-rules`         | 当功能实现和编码审查完成后，开始补测试、写验证脚本、做回归检查时自动触发。       | 决定测试层级和覆盖重点。     |
-| `test-location-rules`         | 当新增测试目录、测试脚本、测试程序、模拟数据、验证代码时自动触发。               | 统一测试资源位置。           |
+| `test-task-root-layout-rules` | 当需要新建测试任务目录，或决定当天时间戳根目录、中文说明目录和 ASCII 镜像布局时自动触发。 | 统一测试任务根布局。         |
+| `test-scattered-asset-location-rules` | 当发现测试脚本、测试数据、mock、fixture、日志或说明散落在 `test/` 根目录之外时自动触发。 | 收拢散落测试资产。           |
+| `go-test-compile-path-rules`  | 当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包诉求时自动触发。 | 统一 Go 测试可编译路径。     |
 | `test-naming-rules`           | 当创建新的测试任务目录、测试文件、测试脚本、测试数据目录时自动触发。             | 统一测试目录和文件命名。     |
-| `test-program-rules`          | 当新增测试程序、模拟程序、验证脚本、数据构造脚本时自动触发。                     | 统一测试程序和辅助脚本位置。 |
+| `test-program-rules`          | 当新增测试程序、模拟程序、验证脚本、数据构造脚本时自动触发。                     | 统一测试程序职责和辅助脚本边界。 |
 | `test-doc-rules`              | 当新增或修改测试 `README.md`、验证说明、测试报告、覆盖说明时自动触发。           | 统一测试说明文档结构。       |
 | `agent-browser`               | 当需要打开本地或远程 Web 页面、点击按钮、填写表单、登录站点、截图、提取页面数据、查看网络请求或通过真实浏览器验证前端交互时自动触发。 | 统一浏览器自动化测试与页面交互执行。 |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求与验收标准时自动触发。 | 负责当前需求对应的功能正确性验证。 |
@@ -527,7 +529,7 @@ Bug 域采用两条互补路径：
 
 2. 测试资源管理
 
-- 由 `test-location-rules`、`test-naming-rules`、`test-program-rules`、`test-doc-rules` 共同负责
+- 由 `test-task-root-layout-rules`、`test-scattered-asset-location-rules`、`go-test-compile-path-rules`、`test-naming-rules`、`test-program-rules`、`test-doc-rules` 共同负责
 - 重点解决测试目录、命名、测试程序落点、测试说明文档等组织问题
 - 只管理测试资产如何存放、如何命名、如何描述
 - 不负责判断功能是否正确

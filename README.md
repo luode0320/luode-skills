@@ -195,9 +195,11 @@ python skill-dictionary/generate_dictionary.py
 | Skill                         | 功能                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------ |
 | `test-strategy-rules`         | 先决定测试层级、测试重点和覆盖策略。                                           |
-| `test-location-rules`         | 统一测试资源、测试文件、测试目录的位置。                                       |
+| `test-task-root-layout-rules` | 统一测试任务根目录、时间戳根目录和中文/ASCII 镜像布局。                        |
+| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `test/` 根目录外的测试资产。                     |
+| `go-test-compile-path-rules`  | 统一 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。                |
 | `test-naming-rules`           | 统一测试目录和测试文件命名。                                                   |
-| `test-program-rules`          | 统一测试程序、测试脚本和辅助测试工具的存放位置。                               |
+| `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分。                               |
 | `test-doc-rules`              | 统一测试说明文档的结构和描述方式。                                             |
 | `agent-browser`               | 提供浏览器自动化能力，用于页面交互测试、自动化验证、页面截图和浏览器联动操作。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
@@ -355,3 +357,4 @@ claude-mem(记忆) :
 2026-04-02 20:28:36 fix: 强化skill拆分分类二分与零丢失约束
 2026-04-02 20:33:50 fix: 强化补注释优先未提交改动与方法注释闸门
 2026-04-02 21:58:51 docs: 补充项目设计文档与模块关系图
+2026-04-03 00:18:15 feat: 拆分并下线 test-location-rules

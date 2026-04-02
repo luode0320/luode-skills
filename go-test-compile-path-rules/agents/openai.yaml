@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go 测试编译路径"
+  short_description: "统一 Go 测试 ASCII 编译路径、源码禁放 *_test.go 与 seam 方案"
+  default_prompt: "使用 $go-test-compile-path-rules 处理 Go 测试目录的 ASCII 编译路径、源码目录禁放 *_test.go 和白盒 seam 替代方案。"

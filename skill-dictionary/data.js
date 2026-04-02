@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-02 18:02:30",
-  "repo_root": "/home/luode/.codex/skills",
+  "generated_at": "2026-04-02 23:57:22",
+  "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 59,
-    "implemented_total": 59,
+    "planned_total": 61,
+    "implemented_total": 61,
     "planned_missing": 0,
-    "seed_total": 5,
-    "doc_total": 3,
-    "references_total": 204,
-    "agents_total": 61
+    "seed_total": 6,
+    "doc_total": 4,
+    "references_total": 207,
+    "agents_total": 64
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -213,7 +213,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 5,
-          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `code-comment-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `code-comment-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -253,7 +253,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 6,
-          "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+          "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
           "directory_path": "skill-compliance-gate-rules",
@@ -1411,6 +1411,7 @@ window.SKILL_DICTIONARY = {
           "directory": "code-comment-rules",
           "sections": [
             "Skill 作用与适用场景",
+            "强制规则：补注释优先范围",
             "强制门禁：改动位点注释补齐",
             "强制规则：步骤注释位置",
             "强制规则：步骤编号不能被普通注释替代",
@@ -2188,10 +2189,10 @@ window.SKILL_DICTIONARY = {
       "label": "测试域",
       "description": "策略、资源、功能验证、浏览器联动与回归",
       "order": 8,
-      "implemented_count": 8,
+      "implemented_count": 10,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 8,
+      "total_count": 10,
       "items": [
         {
           "id": "test-strategy-rules",
@@ -2204,7 +2205,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
           "item_order": 1,
-          "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把策略摘要统一记录到中央约定的测试任务主说明 `README.md` 中，并在需要拆成多轮独立测试时给出多个时间戳根目录方案；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替具体测试资源管理或验证执行 skill。",
+          "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把策略摘要统一记录到中央约定的测试任务主说明 `README.md` 中，并在需要拆成多轮独立测试时给出多个时间戳根目录方案；若策略涉及 Go 可编译测试路径，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替具体测试资源管理或验证执行 skill。",
           "core_responsibility": "决定测试层级和覆盖重点。",
           "skill_path": "test-strategy-rules/SKILL.md",
           "directory_path": "test-strategy-rules",
@@ -2237,9 +2238,9 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "test-location-rules",
-          "name": "test-location-rules",
-          "title": "测试目录落点规则",
+          "id": "test-task-root-layout-rules",
+          "name": "test-task-root-layout-rules",
+          "title": "测试任务根布局规则",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "test",
@@ -2247,34 +2248,101 @@ window.SKILL_DICTIONARY = {
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
           "item_order": 2,
-          "auto_trigger": "当新增或修改测试目录、测试文件、测试脚本、验证程序、fixture、mock 数据、测试说明文档落点时触发。负责在 `artifact-storage-rules` 的统一约定下管理测试资源根目录、时间戳任务根目录、中文说明目录、真实代码路径镜像目录和禁止散落规则；尤其要避免把中文路径放进会被 Go 工具链编译的测试包目录，并强制 Go 源码目录禁止落地 `*_test.go`（白盒诉求必须通过可外部测试 seam 解决）；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-naming-rules、test-program-rules、test-doc-rules、code-placement-review-rules 或功能验证规则。",
-          "core_responsibility": "统一测试资源位置。",
-          "skill_path": "test-location-rules/SKILL.md",
-          "directory_path": "test-location-rules",
-          "directory": "test-location-rules",
+          "auto_trigger": "当为当前需求、当前 Bug 或当前验证任务新增测试任务目录，或需要决定 `test/` 根目录下的当天时间戳根目录、中文说明目录和 ASCII 真实代码路径镜像布局时触发。负责统一测试任务根目录创建、当天时间戳校验、中文 README 说明目录和真实测试资产镜像布局；不要用它代替散落测试资产迁移、Go 编译路径冲突处理、测试命名规则或测试程序实现规则。",
+          "core_responsibility": "统一测试任务根布局。",
+          "skill_path": "test-task-root-layout-rules/SKILL.md",
+          "directory_path": "test-task-root-layout-rules",
+          "directory": "test-task-root-layout-rules",
           "sections": [
-            "测试隔离红线（强制）",
-            "铁律：所有测试资产必须统一在 `artifact-storage-rules` 定义的测试根目录下",
-            "Go 冲突决策分支：白盒同包诉求与禁放规则",
-            "新基线：时间戳根目录 + 中文说明目录 + 真实代码路径镜像",
-            "硬阻断规则：新测试任务必须使用当天时间戳目录",
             "Skill 作用与适用场景",
             "自动触发信号",
-            "进入后先做什么",
+            "强制规则",
             "默认执行流程",
             "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
+            "通过 / 驳回标准",
             "references 读取规则"
           ],
           "references": [
-            "test-location-rules/references/forbidden-scattered-assets.md",
-            "test-location-rules/references/location-examples.md",
-            "test-location-rules/references/test-root-and-task-folders.md"
+            "test-task-root-layout-rules/references/task-root-layout.md"
           ],
           "agents": [
-            "test-location-rules/agents/openai.yaml"
+            "test-task-root-layout-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+          ]
+        },
+        {
+          "id": "test-scattered-asset-location-rules",
+          "name": "test-scattered-asset-location-rules",
+          "title": "测试资产禁散落规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "test",
+          "domain_label": "测试域",
+          "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+          "domain_order": 8,
+          "item_order": 3,
+          "auto_trigger": "当发现测试脚本、测试数据、mock、fixture、测试说明、日志或临时验证资产散落在 `test/` 根目录之外，或混放进业务目录、仓库根目录、文档目录和非测试目录时触发。负责识别、阻断并迁移散落测试资产，统一收拢到中央测试根目录下的正确任务目录；不要用它代替测试任务根目录创建、Go 编译路径禁放处理、测试命名规则或测试程序实现规则。",
+          "core_responsibility": "收拢散落测试资产。",
+          "skill_path": "test-scattered-asset-location-rules/SKILL.md",
+          "directory_path": "test-scattered-asset-location-rules",
+          "directory": "test-scattered-asset-location-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "强制规则",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "test-scattered-asset-location-rules/references/scattered-asset-migration.md"
+          ],
+          "agents": [
+            "test-scattered-asset-location-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+          ]
+        },
+        {
+          "id": "go-test-compile-path-rules",
+          "name": "go-test-compile-path-rules",
+          "title": "Go 测试编译路径规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "test",
+          "domain_label": "测试域",
+          "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+          "domain_order": 8,
+          "item_order": 4,
+          "auto_trigger": "当 Go 项目中的测试路径会进入编译链路、出现源码目录 `*_test.go`、中文可编译路径，或存在白盒同包测试诉求时触发。负责统一 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改用 seam 方案，并把测试资产收回中央测试根目录；不要用它代替测试任务根目录创建、散落测试资产迁移、测试命名规则或测试程序实现规则。",
+          "core_responsibility": "统一 Go 测试可编译路径。",
+          "skill_path": "go-test-compile-path-rules/SKILL.md",
+          "directory_path": "go-test-compile-path-rules",
+          "directory": "go-test-compile-path-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "强制规则",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "go-test-compile-path-rules/references/go-compile-path.md"
+          ],
+          "agents": [
+            "go-test-compile-path-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -2293,8 +2361,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 3,
-          "auto_trigger": "当创建或修改测试时间戳根目录、中文说明目录、测试文件、测试脚本、测试数据目录、fixture 目录、mock 目录时触发。负责统一测试目录与文件命名规范，保证名称可读、可检索、与业务目标一致；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基础，遵循中央约定的时间戳根目录、中文说明目录和真实代码路径镜像目录命名规则；尤其要避免中文进入会被 Go 工具链编译的路径；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、test-doc-rules 或功能验证规则。",
+          "item_order": 5,
+          "auto_trigger": "当创建或修改测试时间戳根目录、中文说明目录、测试文件、测试脚本、测试数据目录、fixture 目录、mock 目录时触发。负责统一测试目录与文件命名规范，保证名称可读、可检索、与业务目标一致；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基础，遵循中央约定的时间戳根目录、中文说明目录和真实代码路径镜像目录命名规则；涉及 Go 可编译路径时，还必须服从 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-program-rules、test-doc-rules 或功能验证规则。",
           "core_responsibility": "统一测试目录和文件命名。",
           "skill_path": "test-naming-rules/SKILL.md",
           "directory_path": "test-naming-rules",
@@ -2337,9 +2405,9 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 4,
-          "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中，并避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-naming-rules、test-doc-rules、bug-runtime-debug-rules 或功能验证规则。",
-          "core_responsibility": "统一测试程序和辅助脚本位置。",
+          "item_order": 6,
+          "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中；若发现资产散落在 `test/` 根目录之外，应先按 `test-scattered-asset-location-rules` 收拢；Go 场景下还必须遵循 `go-test-compile-path-rules`，避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-naming-rules、test-doc-rules、bug-runtime-debug-rules 或功能验证规则。",
+          "core_responsibility": "统一测试程序职责和辅助脚本边界。",
           "skill_path": "test-program-rules/SKILL.md",
           "directory_path": "test-program-rules",
           "directory": "test-program-rules",
@@ -2380,8 +2448,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 5,
-          "auto_trigger": "当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。",
+          "item_order": 7,
+          "auto_trigger": "当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。",
           "core_responsibility": "统一测试说明文档结构。",
           "skill_path": "test-doc-rules/SKILL.md",
           "directory_path": "test-doc-rules",
@@ -2423,7 +2491,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 6,
+          "item_order": 8,
           "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当用户需要与网站交互时使用，包括打开页面、填写表单、点击按钮、截图、提取数据、测试 Web 应用，或执行任何浏览器自动化任务。典型触发语句包括“打开一个网站”“填写表单”“点击按钮”“截个图”“抓取页面数据”“测试这个 Web 应用”“登录某个网站”“自动化浏览器操作”，以及任何需要通过程序控制浏览器完成的任务。",
           "core_responsibility": "统一浏览器自动化测试与页面交互执行。",
           "skill_path": "agent-browser/SKILL.md",
@@ -2479,8 +2547,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 7,
-          "auto_trigger": "当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和验收标准时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把功能验证结论写回中央约定的测试任务主说明 `README.md`，并把详细执行证据放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules、test-location-rules 或 test-regression-rules。",
+          "item_order": 9,
+          "auto_trigger": "当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和验收标准时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把功能验证结论写回中央约定的测试任务主说明 `README.md`，并把详细执行证据放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；若该镜像路径会进入 Go 编译链路，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules、test-task-root-layout-rules 或 test-regression-rules。",
           "core_responsibility": "负责当前需求对应的功能正确性验证。",
           "skill_path": "functional-validation-rules/SKILL.md",
           "directory_path": "functional-validation-rules",
@@ -2522,8 +2590,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "测试域",
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
-          "item_order": 8,
-          "auto_trigger": "当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把回归结论统一写回中央约定的测试任务主说明 `README.md`，并把详细回归案例、执行证据和补充说明放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。",
+          "item_order": 10,
+          "auto_trigger": "当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把回归结论统一写回中央约定的测试任务主说明 `README.md`，并把详细回归案例、执行证据和补充说明放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；若该镜像路径会进入 Go 编译链路，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。",
           "core_responsibility": "明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。",
           "skill_path": "test-regression-rules/SKILL.md",
           "directory_path": "test-regression-rules",
@@ -2660,8 +2728,8 @@ window.SKILL_DICTIONARY = {
       "order": 10,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 5,
-      "total_count": 5,
+      "seed_count": 6,
+      "total_count": 6,
       "items": [
         {
           "id": "\"doc\"",
@@ -2861,6 +2929,45 @@ window.SKILL_DICTIONARY = {
             "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
             "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
           ]
+        },
+        {
+          "id": "skill-split-preserve-rules",
+          "name": "skill-split-preserve-rules",
+          "title": "Skill 拆分保护规则",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 10,
+          "item_order": 6,
+          "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "skill-split-preserve-rules/SKILL.md",
+          "directory_path": "skill-split-preserve-rules",
+          "directory": "skill-split-preserve-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "默认执行流程",
+            "强制约束",
+            "输出要求",
+            "阻断条件",
+            "references 读取规则"
+          ],
+          "references": [
+            "skill-split-preserve-rules/references/entry-and-splitting.md",
+            "skill-split-preserve-rules/references/mapping-and-deletion.md",
+            "skill-split-preserve-rules/references/naming-and-output.md"
+          ],
+          "agents": [
+            "skill-split-preserve-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
         }
       ]
     }
@@ -3050,7 +3157,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 5,
-      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `code-comment-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `code-comment-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -3090,7 +3197,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 6,
-      "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+      "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
       "directory_path": "skill-compliance-gate-rules",
@@ -4200,6 +4307,7 @@ window.SKILL_DICTIONARY = {
       "directory": "code-comment-rules",
       "sections": [
         "Skill 作用与适用场景",
+        "强制规则：补注释优先范围",
         "强制门禁：改动位点注释补齐",
         "强制规则：步骤注释位置",
         "强制规则：步骤编号不能被普通注释替代",
@@ -4957,7 +5065,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
       "item_order": 1,
-      "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把策略摘要统一记录到中央约定的测试任务主说明 `README.md` 中，并在需要拆成多轮独立测试时给出多个时间戳根目录方案；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替具体测试资源管理或验证执行 skill。",
+      "auto_trigger": "当准备进入测试阶段，需要确定测什么、先测什么、测到什么程度、哪些路径必须覆盖、哪些风险只能记录待补测时触发。负责测试优先级、测试类型组合、覆盖范围和资源收口；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把策略摘要统一记录到中央约定的测试任务主说明 `README.md` 中，并在需要拆成多轮独立测试时给出多个时间戳根目录方案；若策略涉及 Go 可编译测试路径，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替具体测试资源管理或验证执行 skill。",
       "core_responsibility": "决定测试层级和覆盖重点。",
       "skill_path": "test-strategy-rules/SKILL.md",
       "directory_path": "test-strategy-rules",
@@ -4990,9 +5098,9 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "test-location-rules",
-      "name": "test-location-rules",
-      "title": "测试目录落点规则",
+      "id": "test-task-root-layout-rules",
+      "name": "test-task-root-layout-rules",
+      "title": "测试任务根布局规则",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "test",
@@ -5000,34 +5108,101 @@ window.SKILL_DICTIONARY = {
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
       "item_order": 2,
-      "auto_trigger": "当新增或修改测试目录、测试文件、测试脚本、验证程序、fixture、mock 数据、测试说明文档落点时触发。负责在 `artifact-storage-rules` 的统一约定下管理测试资源根目录、时间戳任务根目录、中文说明目录、真实代码路径镜像目录和禁止散落规则；尤其要避免把中文路径放进会被 Go 工具链编译的测试包目录，并强制 Go 源码目录禁止落地 `*_test.go`（白盒诉求必须通过可外部测试 seam 解决）；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-naming-rules、test-program-rules、test-doc-rules、code-placement-review-rules 或功能验证规则。",
-      "core_responsibility": "统一测试资源位置。",
-      "skill_path": "test-location-rules/SKILL.md",
-      "directory_path": "test-location-rules",
-      "directory": "test-location-rules",
+      "auto_trigger": "当为当前需求、当前 Bug 或当前验证任务新增测试任务目录，或需要决定 `test/` 根目录下的当天时间戳根目录、中文说明目录和 ASCII 真实代码路径镜像布局时触发。负责统一测试任务根目录创建、当天时间戳校验、中文 README 说明目录和真实测试资产镜像布局；不要用它代替散落测试资产迁移、Go 编译路径冲突处理、测试命名规则或测试程序实现规则。",
+      "core_responsibility": "统一测试任务根布局。",
+      "skill_path": "test-task-root-layout-rules/SKILL.md",
+      "directory_path": "test-task-root-layout-rules",
+      "directory": "test-task-root-layout-rules",
       "sections": [
-        "测试隔离红线（强制）",
-        "铁律：所有测试资产必须统一在 `artifact-storage-rules` 定义的测试根目录下",
-        "Go 冲突决策分支：白盒同包诉求与禁放规则",
-        "新基线：时间戳根目录 + 中文说明目录 + 真实代码路径镜像",
-        "硬阻断规则：新测试任务必须使用当天时间戳目录",
         "Skill 作用与适用场景",
         "自动触发信号",
-        "进入后先做什么",
+        "强制规则",
         "默认执行流程",
         "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
+        "通过 / 驳回标准",
         "references 读取规则"
       ],
       "references": [
-        "test-location-rules/references/forbidden-scattered-assets.md",
-        "test-location-rules/references/location-examples.md",
-        "test-location-rules/references/test-root-and-task-folders.md"
+        "test-task-root-layout-rules/references/task-root-layout.md"
       ],
       "agents": [
-        "test-location-rules/agents/openai.yaml"
+        "test-task-root-layout-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+      ]
+    },
+    {
+      "id": "test-scattered-asset-location-rules",
+      "name": "test-scattered-asset-location-rules",
+      "title": "测试资产禁散落规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "test",
+      "domain_label": "测试域",
+      "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+      "domain_order": 8,
+      "item_order": 3,
+      "auto_trigger": "当发现测试脚本、测试数据、mock、fixture、测试说明、日志或临时验证资产散落在 `test/` 根目录之外，或混放进业务目录、仓库根目录、文档目录和非测试目录时触发。负责识别、阻断并迁移散落测试资产，统一收拢到中央测试根目录下的正确任务目录；不要用它代替测试任务根目录创建、Go 编译路径禁放处理、测试命名规则或测试程序实现规则。",
+      "core_responsibility": "收拢散落测试资产。",
+      "skill_path": "test-scattered-asset-location-rules/SKILL.md",
+      "directory_path": "test-scattered-asset-location-rules",
+      "directory": "test-scattered-asset-location-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "强制规则",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "test-scattered-asset-location-rules/references/scattered-asset-migration.md"
+      ],
+      "agents": [
+        "test-scattered-asset-location-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+      ]
+    },
+    {
+      "id": "go-test-compile-path-rules",
+      "name": "go-test-compile-path-rules",
+      "title": "Go 测试编译路径规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "test",
+      "domain_label": "测试域",
+      "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+      "domain_order": 8,
+      "item_order": 4,
+      "auto_trigger": "当 Go 项目中的测试路径会进入编译链路、出现源码目录 `*_test.go`、中文可编译路径，或存在白盒同包测试诉求时触发。负责统一 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改用 seam 方案，并把测试资产收回中央测试根目录；不要用它代替测试任务根目录创建、散落测试资产迁移、测试命名规则或测试程序实现规则。",
+      "core_responsibility": "统一 Go 测试可编译路径。",
+      "skill_path": "go-test-compile-path-rules/SKILL.md",
+      "directory_path": "go-test-compile-path-rules",
+      "directory": "go-test-compile-path-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "强制规则",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "go-test-compile-path-rules/references/go-compile-path.md"
+      ],
+      "agents": [
+        "go-test-compile-path-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -5046,8 +5221,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 3,
-      "auto_trigger": "当创建或修改测试时间戳根目录、中文说明目录、测试文件、测试脚本、测试数据目录、fixture 目录、mock 目录时触发。负责统一测试目录与文件命名规范，保证名称可读、可检索、与业务目标一致；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基础，遵循中央约定的时间戳根目录、中文说明目录和真实代码路径镜像目录命名规则；尤其要避免中文进入会被 Go 工具链编译的路径；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、test-doc-rules 或功能验证规则。",
+      "item_order": 5,
+      "auto_trigger": "当创建或修改测试时间戳根目录、中文说明目录、测试文件、测试脚本、测试数据目录、fixture 目录、mock 目录时触发。负责统一测试目录与文件命名规范，保证名称可读、可检索、与业务目标一致；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基础，遵循中央约定的时间戳根目录、中文说明目录和真实代码路径镜像目录命名规则；涉及 Go 可编译路径时，还必须服从 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-program-rules、test-doc-rules 或功能验证规则。",
       "core_responsibility": "统一测试目录和文件命名。",
       "skill_path": "test-naming-rules/SKILL.md",
       "directory_path": "test-naming-rules",
@@ -5090,9 +5265,9 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 4,
-      "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中，并避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-naming-rules、test-doc-rules、bug-runtime-debug-rules 或功能验证规则。",
-      "core_responsibility": "统一测试程序和辅助脚本位置。",
+      "item_order": 6,
+      "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中；若发现资产散落在 `test/` 根目录之外，应先按 `test-scattered-asset-location-rules` 收拢；Go 场景下还必须遵循 `go-test-compile-path-rules`，避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-naming-rules、test-doc-rules、bug-runtime-debug-rules 或功能验证规则。",
+      "core_responsibility": "统一测试程序职责和辅助脚本边界。",
       "skill_path": "test-program-rules/SKILL.md",
       "directory_path": "test-program-rules",
       "directory": "test-program-rules",
@@ -5133,8 +5308,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 5,
-      "auto_trigger": "当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-location-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。",
+      "item_order": 7,
+      "auto_trigger": "当新增或修改测试 README、验证说明、测试报告、覆盖说明、测试执行记录时触发。负责统一测试文档的最小结构、记录字段、主文档入口和归档方式；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，使用中央约定的测试任务主说明 `README.md` 作为中文主说明入口，并把额外文档放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-task-root-layout-rules、test-program-rules、functional-validation-rules 或 test-regression-rules。",
       "core_responsibility": "统一测试说明文档结构。",
       "skill_path": "test-doc-rules/SKILL.md",
       "directory_path": "test-doc-rules",
@@ -5176,7 +5351,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 6,
+      "item_order": 8,
       "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当用户需要与网站交互时使用，包括打开页面、填写表单、点击按钮、截图、提取数据、测试 Web 应用，或执行任何浏览器自动化任务。典型触发语句包括“打开一个网站”“填写表单”“点击按钮”“截个图”“抓取页面数据”“测试这个 Web 应用”“登录某个网站”“自动化浏览器操作”，以及任何需要通过程序控制浏览器完成的任务。",
       "core_responsibility": "统一浏览器自动化测试与页面交互执行。",
       "skill_path": "agent-browser/SKILL.md",
@@ -5232,8 +5407,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 7,
-      "auto_trigger": "当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和验收标准时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把功能验证结论写回中央约定的测试任务主说明 `README.md`，并把详细执行证据放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules、test-location-rules 或 test-regression-rules。",
+      "item_order": 9,
+      "auto_trigger": "当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和验收标准时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把功能验证结论写回中央约定的测试任务主说明 `README.md`，并把详细执行证据放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；若该镜像路径会进入 Go 编译链路，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules、test-task-root-layout-rules 或 test-regression-rules。",
       "core_responsibility": "负责当前需求对应的功能正确性验证。",
       "skill_path": "functional-validation-rules/SKILL.md",
       "directory_path": "functional-validation-rules",
@@ -5275,8 +5450,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "测试域",
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
-      "item_order": 8,
-      "auto_trigger": "当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-location-rules` 为基准，把回归结论统一写回中央约定的测试任务主说明 `README.md`，并把详细回归案例、执行证据和补充说明放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。",
+      "item_order": 10,
+      "auto_trigger": "当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-task-root-layout-rules` 为基准，把回归结论统一写回中央约定的测试任务主说明 `README.md`，并把详细回归案例、执行证据和补充说明放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；若该镜像路径会进入 Go 编译链路，还必须同步遵循 `go-test-compile-path-rules`；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。",
       "core_responsibility": "明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。",
       "skill_path": "test-regression-rules/SKILL.md",
       "directory_path": "test-regression-rules",
@@ -5590,6 +5765,45 @@ window.SKILL_DICTIONARY = {
         "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
         "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
       ]
+    },
+    {
+      "id": "skill-split-preserve-rules",
+      "name": "skill-split-preserve-rules",
+      "title": "Skill 拆分保护规则",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 10,
+      "item_order": 6,
+      "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "skill-split-preserve-rules/SKILL.md",
+      "directory_path": "skill-split-preserve-rules",
+      "directory": "skill-split-preserve-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "默认执行流程",
+        "强制约束",
+        "输出要求",
+        "阻断条件",
+        "references 读取规则"
+      ],
+      "references": [
+        "skill-split-preserve-rules/references/entry-and-splitting.md",
+        "skill-split-preserve-rules/references/mapping-and-deletion.md",
+        "skill-split-preserve-rules/references/naming-and-output.md"
+      ],
+      "agents": [
+        "skill-split-preserve-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
     }
   ],
   "docs": [
@@ -5615,14 +5829,23 @@ window.SKILL_DICTIONARY = {
       "id": "doc:skills拆分",
       "name": "skills拆分",
       "file_name": "skills拆分.md",
-      "title": "Skills 拆分方案（按触发时机细分）",
+      "title": "Skill 拆分 Skill 设计（功能不删减版）",
       "kind": "其他文档",
       "path": "skills拆分.md",
+      "is_plan_doc": false
+    },
+    {
+      "id": "doc:项目设计",
+      "name": "项目设计",
+      "file_name": "项目设计.md",
+      "title": "项目设计",
+      "kind": "其他文档",
+      "path": "项目设计.md",
       "is_plan_doc": false
     }
   ],
   "recommendations": [
-    "59 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "61 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

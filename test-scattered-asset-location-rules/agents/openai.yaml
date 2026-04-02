@@ -1,0 +1,4 @@
+interface:
+  display_name: "测试资产禁散落"
+  short_description: "识别并迁移散落在 test 根目录之外的脚本、数据与说明资产"
+  default_prompt: "使用 $test-scattered-asset-location-rules 识别并收拢散落在 test 根目录之外的测试脚本、数据、mock 和说明资产。"

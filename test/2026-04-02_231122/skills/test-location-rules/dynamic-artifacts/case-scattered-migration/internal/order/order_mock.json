@@ -1,0 +1,5 @@
+{
+  "dynamicSample": true,
+  "purpose": "simulate the corrected destination of a previously scattered mock asset",
+  "expectedOwnerSkill": "test-scattered-asset-location-rules"
+}

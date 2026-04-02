@@ -1,0 +1,4 @@
+interface:
+  display_name: "测试任务根布局"
+  short_description: "统一测试任务根目录、当天时间戳目录与 README 镜像布局规则"
+  default_prompt: "使用 $test-task-root-layout-rules 为当前测试任务确定 test 根目录、当天时间戳目录、中文说明目录和 ASCII 镜像目录布局。"

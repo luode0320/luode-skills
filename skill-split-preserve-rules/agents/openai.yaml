@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill拆分保护"
+  short_description: "功能零丢失地拆分过载 skill 并在完成后删除旧 skill"
+  default_prompt: "使用 $skill-split-preserve-rules 对目标 skill 做功能零丢失的分类二分拆分，先完成覆盖映射和删除前承接检查，再删除旧 skill。"

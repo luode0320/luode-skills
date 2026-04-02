@@ -1,0 +1,63 @@
+---
+name: skill-split-preserve-rules
+description: 当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。
+---
+
+# Skill 拆分保护规则
+
+只在“旧 skill 已经过载，必须拆成多个独立 skill”时使用本 skill。
+目标不是把文档简单拆薄，而是在原功能、原特例、原资源零丢失的前提下，把职责重新归位，并在新 skill 全量承接后删除旧 skill。
+
+## Skill 作用与适用场景
+
+- 判断当前是否真的该拆，而不是把普通补规则误判成拆分任务。
+- 先把旧 skill 的规则、resources、边界声明完整采集出来，再开始拆分。
+- 强制优先使用“分类二分拆分”，避免一上来过细碎片化。
+- 用映射表证明原规则 100% 被承接，而不是凭经验判断“应该差不多”。
+- 在旧 skill 删除前写清主承接关系、次承接关系和阻断条件。
+- 要求新 skill 名称从各自 `description` 反推，不机械沿用旧 skill 名称。
+
+## 默认执行流程
+
+1. 先读 `references/entry-and-splitting.md`，确认是否满足拆分门槛，并完成分类识别。
+2. 为旧 skill 建立基线：读取 `SKILL.md`、`agents/openai.yaml`、`references/`、`scripts/`、`assets/`，抽出完整规则和资源清单。
+3. 按 `references/mapping-and-deletion.md` 做规则原子化，并为每条原规则分配唯一规则 ID。
+4. 先按并列类别做一次二分；只有当前组已无法再按类别拆分时，才允许降级到更细维度。
+5. 为每个新 skill 生成独立 `description`，再按 `references/naming-and-output.md` 从 `description` 反推 skill 名称与交付结构。
+6. 生成覆盖映射表、特例迁移说明和删除前承接检查；任一原规则无落点时立即阻断删除。
+7. 只有在覆盖率 100%、特例已承接、删除后入口关系清晰时，才删除旧 skill。
+
+## 强制约束
+
+- 原 skill 的“必须 / 默认 / 先做 / 阻断 / 通过标准 / 不得”语句不得丢失。
+- 历史兼容规则、低频特例、看起来奇怪的规则默认都保留，除非有明确废弃决议。
+- `references/`、`scripts/`、`assets/` 和 `agents/openai.yaml` 都属于迁移范围，不得只迁正文。
+- 仍可按分类集合二分时，不得直接跳到更细的拆分维度。
+- 旧 skill 不进入长期兼容期；本 skill 的目标是“新 skill 完整承接后删除旧 skill”。
+- 若用户明确要求先做首轮对照验证，可临时保留旧 skill 作为冻结基线，但该状态只能用于比对遗漏，不得继续向旧 skill 混入新规则。
+- 如果当前场景不允许删除旧 skill，不要继续套用本 skill，改用其他迁移方案。
+
+## 输出要求
+
+必须至少产出：
+
+1. 新 skill 列表，以及每个新 skill 的 `description`、命名理由和职责边界。
+2. 原规则到新 skill 的覆盖映射表，含主落点、等价性说明和组合覆盖说明。
+3. 特例规则迁移说明，以及 resources 迁移结果。
+4. 旧 skill 删除前承接检查结论和最终删除动作。
+5. 若拆分被阻断，写清阻断原因、缺口位置和回到哪一步补齐。
+6. 若当前是首轮对照验证，额外产出“旧 skill 与新 skill 集合”的比对结论，并明确旧 skill 仍处于临时保留状态。
+
+## 阻断条件
+
+- 无法证明存在两个以上可独立命中的并列职责组。
+- 任一原规则、特例规则或资源没有明确承接落点。
+- 新 skill 命名仍依赖旧 skill 前缀，无法从 `description` 自圆其说。
+- 删除前仍说不清“删除后由谁承接”。
+- 拆分后平均需要命中过多 skill，或新 skill 已不能独立理解职责。
+
+## references 读取规则
+
+- 默认先读 `references/entry-and-splitting.md`。
+- 需要规则原子化、覆盖映射和删除收口时，再读 `references/mapping-and-deletion.md`。
+- 需要为新 skill 命名或组织最终产物时，再读 `references/naming-and-output.md`。
