@@ -1,0 +1,4 @@
+Skill 命中检查：
+- 命中 skill：`comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`
+
+理由：当前请求明确是在问方法补注释时 `[参数]`、`[返回]`、`最近修改时间` 的补法，属于“补充注释/注释完善”场景，且涉及注释放置、函数头元信息、中文表达与最终收口检查。

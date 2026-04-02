@@ -1,0 +1,3 @@
+- `api-swagger-rules`
+
+理由：你的问题是在询问 Swagger 接口注释/注解怎么写，直接命中 Swagger/OpenAPI 接口文档注解规则。

@@ -25,6 +25,6 @@ Skill 命中检查：
 
 ```text
 Skill 命中检查：
-- 命中 skill：`skill-hit-check-rules`、`code-comment-rules`、`skill-compliance-gate-rules`
+- 命中 skill：`skill-hit-check-rules`、`comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`
 - 原因：本轮存在代码改动，且即将进入最终回复前收口，需执行注释补齐与完整性闸门检查
 ```

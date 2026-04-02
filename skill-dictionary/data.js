@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-02 23:57:22",
+  "generated_at": "2026-04-03 02:08:41",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 61,
-    "implemented_total": 61,
+    "planned_total": 62,
+    "implemented_total": 62,
     "planned_missing": 0,
     "seed_total": 6,
     "doc_total": 4,
-    "references_total": 207,
-    "agents_total": 64
+    "references_total": 212,
+    "agents_total": 65
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -213,7 +213,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 5,
-          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `code-comment-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `code-comment-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -1173,10 +1173,10 @@ window.SKILL_DICTIONARY = {
       "label": "编码基线域",
       "description": "开始编码即并行生效的基础质量规则",
       "order": 5,
-      "implemented_count": 6,
+      "implemented_count": 7,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 6,
+      "total_count": 7,
       "items": [
         {
           "id": "code-minimal-change-rules",
@@ -1231,7 +1231,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 5,
           "item_order": 2,
-          "auto_trigger": "当新增或修改业务代码、工具代码、服务代码、脚本代码或 Bug 修复逻辑时触发。负责约束函数结构、逻辑顺序、复杂度和可维护性，并在功能不变前提下优先让最近改动代码表达更清楚、更直接；当单文件达到 500 行及以上且仍持续新增功能时，必须触发拆分评估；结构调整落地后必须联动 `code-comment-rules` 完成改动位点注释补齐；Go 接入第三方 API 时默认使用结构体解析响应，禁止长期使用 map + key 硬编码解析；同时要求已有公共工具优先复用，禁止同语义重复封装；不要用它代替最小改动、风格一致性、注释规则或代码归位规则。",
+          "auto_trigger": "当新增或修改业务代码、工具代码、服务代码、脚本代码或 Bug 修复逻辑时触发。负责约束函数结构、逻辑顺序、复杂度和可维护性，并在功能不变前提下优先让最近改动代码表达更清楚、更直接；当单文件达到 500 行及以上且仍持续新增功能时，必须触发拆分评估；结构调整落地后必须联动 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 完成改动位点注释检查与补齐；Go 接入第三方 API 时默认使用结构体解析响应，禁止长期使用 map + key 硬编码解析；同时要求已有公共工具优先复用，禁止同语义重复封装；不要用它代替最小改动、风格一致性、注释规则或代码归位规则。",
           "core_responsibility": "保证函数结构清晰、逻辑顺序自然、复杂度可控。",
           "skill_path": "code-readability-rules/SKILL.md",
           "directory_path": "code-readability-rules",
@@ -1394,9 +1394,9 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "code-comment-rules",
-          "name": "code-comment-rules",
-          "title": "代码注释规则",
+          "id": "comment-placement-granularity-rules",
+          "name": "comment-placement-granularity-rules",
+          "title": "注释放置与颗粒度规则",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "baseline",
@@ -1404,35 +1404,74 @@ window.SKILL_DICTIONARY = {
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 5,
           "item_order": 6,
-          "auto_trigger": "当新增或修改任意代码，或需要判断代码是否应该加注释、注释放在哪里、写到什么颗粒度、如何与实现同步维护时触发。负责注释必要性、位置选择、颗粒度控制、步骤注释、字段注释、函数方法参数返回注释、函数方法修改时间标注和过期注释治理；必须对本轮改动位点执行注释补齐检查；每个函数方法的修改都必须补充最近修改时间（北京时间：yyyy-MM-DD HH:mm:ss），并补充 `[参数]` / `[返回]` 简单注释；Swagger/OpenAPI 接口文档注解/注释不由本 skill 兜底，应转交 api-swagger-rules；不要把它代替中文语言表达规则。",
-          "core_responsibility": "统一注释层级和颗粒度，并拦截改动位点漏注释。",
-          "skill_path": "code-comment-rules/SKILL.md",
-          "directory_path": "code-comment-rules",
-          "directory": "code-comment-rules",
+          "auto_trigger": "当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时触发。负责统一注释位置、颗粒度、字段相关注释和过期注释治理；不要用它代替注释语言表达、改动位点补齐闸门或 Swagger/OpenAPI 注解规则。",
+          "core_responsibility": "统一注释位置、颗粒度、字段相关注释和过期注释治理。",
+          "skill_path": "comment-placement-granularity-rules/SKILL.md",
+          "directory_path": "comment-placement-granularity-rules",
+          "directory": "comment-placement-granularity-rules",
           "sections": [
             "Skill 作用与适用场景",
-            "强制规则：补注释优先范围",
-            "强制门禁：改动位点注释补齐",
-            "强制规则：步骤注释位置",
-            "强制规则：步骤编号不能被普通注释替代",
-            "强制规则：函数方法注释顺序",
-            "强制规则：注释语言",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
-            "执行结果归档要求",
             "references 读取规则"
           ],
           "references": [
-            "code-comment-rules/references/comment-examples.md",
-            "code-comment-rules/references/comment-granularity.md",
-            "code-comment-rules/references/comment-placement.md"
+            "comment-placement-granularity-rules/references/comment-examples.md",
+            "comment-placement-granularity-rules/references/comment-granularity.md",
+            "comment-placement-granularity-rules/references/comment-placement.md"
           ],
           "agents": [
-            "code-comment-rules/agents/openai.yaml"
+            "comment-placement-granularity-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
+          ]
+        },
+        {
+          "id": "comment-completion-gate-rules",
+          "name": "comment-completion-gate-rules",
+          "title": "注释补齐闸门规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "baseline",
+          "domain_label": "编码基线域",
+          "domain_description": "开始编码即并行生效的基础质量规则",
+          "domain_order": 5,
+          "item_order": 7,
+          "auto_trigger": "当本轮代码新增或修改，或用户请求补充注释、只补注释、注释完善，或需要判断函数头 `[参数]` / `[返回]` / `最近修改时间` 如何补、方法体步骤编号是否必须、普通流程注释是否必须改写为编号步骤注释时触发。负责统一补注释优先范围、函数头元信息、方法块步骤编号和注释缺失阻断闸门；不要用它代替注释语言表达、一般性的注释位置判断或 Swagger/OpenAPI 注解规则。",
+          "core_responsibility": "统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。",
+          "skill_path": "comment-completion-gate-rules/SKILL.md",
+          "directory_path": "comment-completion-gate-rules",
+          "directory": "comment-completion-gate-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "强制规则：补注释优先范围",
+            "强制门禁：改动位点注释补齐",
+            "强制规则：步骤编号",
+            "强制规则：函数头元信息",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "comment-completion-gate-rules/references/comment-completion-priority.md",
+            "comment-completion-gate-rules/references/comment-examples.md",
+            "comment-completion-gate-rules/references/comment-function-metadata.md",
+            "comment-completion-gate-rules/references/comment-step-numbering-gate.md"
+          ],
+          "agents": [
+            "comment-completion-gate-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -2024,7 +2063,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "测试前的静态自审、语法检查、清理归位",
           "domain_order": 7,
           "item_order": 1,
-          "auto_trigger": "当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `code-comment-rules` 的改动位点注释补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；Go 场景下还需在实现自审阶段扫描 `test/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
+          "auto_trigger": "当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；Go 场景下还需在实现自审阶段扫描 `test/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
           "core_responsibility": "对刚完成的实现做一次测试前规范自审。",
           "skill_path": "implementation-review-rules/SKILL.md",
           "directory_path": "implementation-review-rules",
@@ -2941,7 +2980,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
           "item_order": 6,
-          "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
+          "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
           "directory_path": "skill-split-preserve-rules",
@@ -2957,7 +2996,8 @@ window.SKILL_DICTIONARY = {
           "references": [
             "skill-split-preserve-rules/references/entry-and-splitting.md",
             "skill-split-preserve-rules/references/mapping-and-deletion.md",
-            "skill-split-preserve-rules/references/naming-and-output.md"
+            "skill-split-preserve-rules/references/naming-and-output.md",
+            "skill-split-preserve-rules/references/validation-and-testing.md"
           ],
           "agents": [
             "skill-split-preserve-rules/agents/openai.yaml"
@@ -3157,7 +3197,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 5,
-      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `code-comment-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `code-comment-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改且进入最终回复前收口，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -4127,7 +4167,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 5,
       "item_order": 2,
-      "auto_trigger": "当新增或修改业务代码、工具代码、服务代码、脚本代码或 Bug 修复逻辑时触发。负责约束函数结构、逻辑顺序、复杂度和可维护性，并在功能不变前提下优先让最近改动代码表达更清楚、更直接；当单文件达到 500 行及以上且仍持续新增功能时，必须触发拆分评估；结构调整落地后必须联动 `code-comment-rules` 完成改动位点注释补齐；Go 接入第三方 API 时默认使用结构体解析响应，禁止长期使用 map + key 硬编码解析；同时要求已有公共工具优先复用，禁止同语义重复封装；不要用它代替最小改动、风格一致性、注释规则或代码归位规则。",
+      "auto_trigger": "当新增或修改业务代码、工具代码、服务代码、脚本代码或 Bug 修复逻辑时触发。负责约束函数结构、逻辑顺序、复杂度和可维护性，并在功能不变前提下优先让最近改动代码表达更清楚、更直接；当单文件达到 500 行及以上且仍持续新增功能时，必须触发拆分评估；结构调整落地后必须联动 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 完成改动位点注释检查与补齐；Go 接入第三方 API 时默认使用结构体解析响应，禁止长期使用 map + key 硬编码解析；同时要求已有公共工具优先复用，禁止同语义重复封装；不要用它代替最小改动、风格一致性、注释规则或代码归位规则。",
       "core_responsibility": "保证函数结构清晰、逻辑顺序自然、复杂度可控。",
       "skill_path": "code-readability-rules/SKILL.md",
       "directory_path": "code-readability-rules",
@@ -4290,9 +4330,9 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "code-comment-rules",
-      "name": "code-comment-rules",
-      "title": "代码注释规则",
+      "id": "comment-placement-granularity-rules",
+      "name": "comment-placement-granularity-rules",
+      "title": "注释放置与颗粒度规则",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "baseline",
@@ -4300,35 +4340,74 @@ window.SKILL_DICTIONARY = {
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 5,
       "item_order": 6,
-      "auto_trigger": "当新增或修改任意代码，或需要判断代码是否应该加注释、注释放在哪里、写到什么颗粒度、如何与实现同步维护时触发。负责注释必要性、位置选择、颗粒度控制、步骤注释、字段注释、函数方法参数返回注释、函数方法修改时间标注和过期注释治理；必须对本轮改动位点执行注释补齐检查；每个函数方法的修改都必须补充最近修改时间（北京时间：yyyy-MM-DD HH:mm:ss），并补充 `[参数]` / `[返回]` 简单注释；Swagger/OpenAPI 接口文档注解/注释不由本 skill 兜底，应转交 api-swagger-rules；不要把它代替中文语言表达规则。",
-      "core_responsibility": "统一注释层级和颗粒度，并拦截改动位点漏注释。",
-      "skill_path": "code-comment-rules/SKILL.md",
-      "directory_path": "code-comment-rules",
-      "directory": "code-comment-rules",
+      "auto_trigger": "当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时触发。负责统一注释位置、颗粒度、字段相关注释和过期注释治理；不要用它代替注释语言表达、改动位点补齐闸门或 Swagger/OpenAPI 注解规则。",
+      "core_responsibility": "统一注释位置、颗粒度、字段相关注释和过期注释治理。",
+      "skill_path": "comment-placement-granularity-rules/SKILL.md",
+      "directory_path": "comment-placement-granularity-rules",
+      "directory": "comment-placement-granularity-rules",
       "sections": [
         "Skill 作用与适用场景",
-        "强制规则：补注释优先范围",
-        "强制门禁：改动位点注释补齐",
-        "强制规则：步骤注释位置",
-        "强制规则：步骤编号不能被普通注释替代",
-        "强制规则：函数方法注释顺序",
-        "强制规则：注释语言",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
-        "执行结果归档要求",
         "references 读取规则"
       ],
       "references": [
-        "code-comment-rules/references/comment-examples.md",
-        "code-comment-rules/references/comment-granularity.md",
-        "code-comment-rules/references/comment-placement.md"
+        "comment-placement-granularity-rules/references/comment-examples.md",
+        "comment-placement-granularity-rules/references/comment-granularity.md",
+        "comment-placement-granularity-rules/references/comment-placement.md"
       ],
       "agents": [
-        "code-comment-rules/agents/openai.yaml"
+        "comment-placement-granularity-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
+      ]
+    },
+    {
+      "id": "comment-completion-gate-rules",
+      "name": "comment-completion-gate-rules",
+      "title": "注释补齐闸门规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "baseline",
+      "domain_label": "编码基线域",
+      "domain_description": "开始编码即并行生效的基础质量规则",
+      "domain_order": 5,
+      "item_order": 7,
+      "auto_trigger": "当本轮代码新增或修改，或用户请求补充注释、只补注释、注释完善，或需要判断函数头 `[参数]` / `[返回]` / `最近修改时间` 如何补、方法体步骤编号是否必须、普通流程注释是否必须改写为编号步骤注释时触发。负责统一补注释优先范围、函数头元信息、方法块步骤编号和注释缺失阻断闸门；不要用它代替注释语言表达、一般性的注释位置判断或 Swagger/OpenAPI 注解规则。",
+      "core_responsibility": "统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。",
+      "skill_path": "comment-completion-gate-rules/SKILL.md",
+      "directory_path": "comment-completion-gate-rules",
+      "directory": "comment-completion-gate-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "强制规则：补注释优先范围",
+        "强制门禁：改动位点注释补齐",
+        "强制规则：步骤编号",
+        "强制规则：函数头元信息",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "comment-completion-gate-rules/references/comment-completion-priority.md",
+        "comment-completion-gate-rules/references/comment-examples.md",
+        "comment-completion-gate-rules/references/comment-function-metadata.md",
+        "comment-completion-gate-rules/references/comment-step-numbering-gate.md"
+      ],
+      "agents": [
+        "comment-completion-gate-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -4896,7 +4975,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "测试前的静态自审、语法检查、清理归位",
       "domain_order": 7,
       "item_order": 1,
-      "auto_trigger": "当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `code-comment-rules` 的改动位点注释补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；Go 场景下还需在实现自审阶段扫描 `test/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
+      "auto_trigger": "当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；Go 场景下还需在实现自审阶段扫描 `test/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
       "core_responsibility": "对刚完成的实现做一次测试前规范自审。",
       "skill_path": "implementation-review-rules/SKILL.md",
       "directory_path": "implementation-review-rules",
@@ -5777,7 +5856,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
       "item_order": 6,
-      "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
+      "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
       "directory_path": "skill-split-preserve-rules",
@@ -5793,7 +5872,8 @@ window.SKILL_DICTIONARY = {
       "references": [
         "skill-split-preserve-rules/references/entry-and-splitting.md",
         "skill-split-preserve-rules/references/mapping-and-deletion.md",
-        "skill-split-preserve-rules/references/naming-and-output.md"
+        "skill-split-preserve-rules/references/naming-and-output.md",
+        "skill-split-preserve-rules/references/validation-and-testing.md"
       ],
       "agents": [
         "skill-split-preserve-rules/agents/openai.yaml"
@@ -5845,7 +5925,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "61 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "62 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

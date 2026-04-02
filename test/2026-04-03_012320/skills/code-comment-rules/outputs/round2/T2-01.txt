@@ -1,0 +1,5 @@
+命中的 skill 列表：
+- `skill-hit-check-rules`
+- `comment-placement-granularity-rules`
+
+理由：本轮用户先要求执行 Skill 命中检查，且问题核心是在判断“这个注释是否有必要、应该放在哪段代码上方”，与注释命中检查和注释位置/颗粒度判断直接对应。

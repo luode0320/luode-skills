@@ -1,0 +1,4 @@
+interface:
+  display_name: "注释放置与颗粒度"
+  short_description: "判断代码注释该不该写、写在哪、写多细，并治理过期注释"
+  default_prompt: "使用 $comment-placement-granularity-rules 判断当前代码注释是否真的有必要、应该放在哪一段代码上方、写到什么颗粒度；同时检查结构体字段在定义、初始化、映射和使用位置是否需要重复补字段含义注释，并指出需要清理的过期或误导性旧注释。"

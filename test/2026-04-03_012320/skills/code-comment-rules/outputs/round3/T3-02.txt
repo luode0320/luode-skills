@@ -1,0 +1,5 @@
+- `code-comment-rules`
+- `chinese-comment-rules`
+- `skill-compliance-gate-rules`
+
+理由：这轮是在处理“补充注释 + 第三方固定错误原文是否保留 + 中文注释如何写得更自然”，按规则属于补注释请求，必须同时命中这 3 个 skill。

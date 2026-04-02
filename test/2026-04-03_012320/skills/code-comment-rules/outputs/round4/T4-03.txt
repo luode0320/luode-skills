@@ -1,0 +1,19 @@
+Skill 命中检查：
+- 命中 skill：`code-comment-rules`、`chinese-comment-rules`
+- 原因：本轮是在判断代码注释该不该保留原文、中文说明该怎么写，属于注释规则与中文表达规则的直接命中；`skill-hit-check-rules` 已执行，但按规则不计入业务命中列表。
+
+针对 [sample_comment_target.go:21](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L21) 这一行，我的判断是：不能把整句 `third-party fixed error message: resource not found` 都当作“可保留原文”。
+
+能保留原文的，只有真正的第三方固定错误原文，也就是 `resource not found` 这部分。前面的 `third-party fixed error message:` 只是说明性注释，不属于第三方返回原文，按规则应改成中文表达。中文处理上，推荐用“中文解释 + 原文点名”的方式，不要把错误原文硬翻译掉，也不要整句都写成英文注释。
+
+更稳妥的处理思路是：
+- 保留原文：`resource not found`
+- 中文说明写清两件事：这是一条第三方固定错误原文；它表示什么、当前代码如何处理
+
+如果要落成注释风格，方向应类似：
+```go
+// 第三方固定错误原文：resource not found
+// 表示第三方返回资源不存在，此处直接透传错误信息
+```
+
+如果 `resource not found` 并不是第三方稳定返回的固定文案，只是开发者自己的概括，那就不应该保留英文，应该直接改成中文注释。

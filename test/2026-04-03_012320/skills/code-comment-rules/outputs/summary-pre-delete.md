@@ -1,0 +1,16 @@
+# Codex 触发验证汇总（pre-delete）
+
+| Round | Case | Required | Forbidden | Actual Hits | Status | Missing Required | Hit Forbidden | Output |
+|---|---|---|---|---|---|---|---|---|
+| round2 | T2-01 | comment-placement-granularity-rules | comment-completion-gate-rules | skill-hit-check-rules、comment-placement-granularity-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-01.txt |
+| round2 | T2-02 | comment-completion-gate-rules | comment-placement-granularity-rules | code-comment-rules、chinese-comment-rules、skill-compliance-gate-rules | FAIL | comment-completion-gate-rules |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-02.txt |
+| round2 | T2-03 | comment-completion-gate-rules | comment-placement-granularity-rules | code-comment-rules | FAIL | comment-completion-gate-rules |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-03.txt |
+| round2 | T2-04 | chinese-comment-rules | comment-placement-granularity-rules, comment-completion-gate-rules | chinese-comment-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-04.txt |
+| round2 | T2-05 | api-swagger-rules | comment-placement-granularity-rules, comment-completion-gate-rules, chinese-comment-rules | api-swagger-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-05.txt |
+| round2 | T2-06 | comment-completion-gate-rules, comment-placement-granularity-rules |  | code-comment-rules、comment-completion-gate-rules、comment-placement-granularity-rules、chinese-comment-rules、skill-compliance-gate-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round2\T2-06.txt |
+| round3 | T3-01 | comment-completion-gate-rules, comment-placement-granularity-rules |  | code-comment-rules、comment-completion-gate-rules、chinese-comment-rules、skill-compliance-gate-rules | FAIL | comment-placement-granularity-rules |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round3\T3-01.txt |
+| round3 | T3-02 | comment-completion-gate-rules, chinese-comment-rules |  | code-comment-rules、chinese-comment-rules、skill-compliance-gate-rules | FAIL | comment-completion-gate-rules |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round3\T3-02.txt |
+| round3 | T3-03 | comment-placement-granularity-rules, chinese-comment-rules |  | comment-placement-granularity-rules、chinese-comment-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round3\T3-03.txt |
+| round4 | T4-01 | code-comment-rules |  | code-comment-rules、skill-hit-check-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round4\T4-01.txt |
+| round4 | T4-02 | comment-completion-gate-rules, comment-placement-granularity-rules |  | code-comment-rules、comment-completion-gate-rules、comment-placement-granularity-rules、chinese-comment-rules、skill-compliance-gate-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round4\T4-02.txt |
+| round4 | T4-03 | chinese-comment-rules | comment-placement-granularity-rules, comment-completion-gate-rules | code-comment-rules、chinese-comment-rules、skill-hit-check-rules | PASS |  |  | test\2026-04-03_012320\skills\code-comment-rules\outputs\round4\T4-03.txt |

@@ -1,0 +1,6 @@
+Skill 命中检查：
+- `code-comment-rules`
+- `chinese-comment-rules`
+- `skill-compliance-gate-rules`
+
+理由：本轮是在问“方法补注释时 `[参数]`、`[返回]`、最近修改时间怎么补”的注释完善规范，按 `skill-hit-check-rules` 对“补充注释/注释完善”请求必须同时命中这 3 个 skill。

@@ -1,0 +1,12 @@
+Skill 命中检查：
+- 命中 skill：`code-comment-rules`
+- 说明：已先按 `skill-hit-check-rules` 做命中检查；本轮是注释规则完整性核对，不涉及代码修改。
+
+结论：这份示例文件未完整承接 `code-comment-rules`，关键还缺下面 4 类规则。
+
+- [sample_comment_target.go#L11](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L11) 、[sample_comment_target.go#L37](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L37) 的两个函数都缺函数头注释，未按固定顺序补齐 `[参数]`、`[返回]`、`最近修改时间`，且最后一行也没有“北京时间 + 本次改动原因”。
+- [sample_comment_target.go#L18](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L18) 、[sample_comment_target.go#L27](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L27) 只写了普通流程注释，没有改成就近落位的中文编号步骤注释 `1.`、`2.`；而 [sample_comment_target.go#L37](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L37) 这个函数本体也缺少方法块注释。
+- [sample_comment_target.go#L21](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L21) 的注释主句是英文，不符合“注释必须中文”的规则；即便要保留第三方固定原文，也应补一行中文解释，不能直接用英文注释充当主说明。
+- [sample_comment_target.go#L47](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L47) 、[sample_comment_target.go#L43](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go#L43) 的字段注释承接不完整：`Order.Status` 定义处没有字段注释，结构体初始化 `Status: "paid"` 处也没有重复字段说明，未满足字段定义/初始化位置都要可读的要求。
+
+本次仅做检查，未修改文件。

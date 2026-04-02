@@ -1,0 +1,38 @@
+[
+  {
+    "phase": "post-delete",
+    "round": "round5",
+    "id": "T5-01",
+    "required": "comment-placement-granularity-rules",
+    "forbidden": "code-comment-rules",
+    "actual_hits": "skill-hit-check-rules、comment-placement-granularity-rules",
+    "status": "PASS",
+    "missing_required": "",
+    "hit_forbidden": "",
+    "output_file": "test\\2026-04-03_012320\\skills\\code-comment-rules\\outputs\\round5\\T5-01.txt"
+  },
+  {
+    "phase": "post-delete",
+    "round": "round5",
+    "id": "T5-02",
+    "required": "comment-completion-gate-rules",
+    "forbidden": "code-comment-rules",
+    "actual_hits": "comment-placement-granularity-rules、comment-completion-gate-rules、chinese-comment-rules、skill-compliance-gate-rules",
+    "status": "PASS",
+    "missing_required": "",
+    "hit_forbidden": "",
+    "output_file": "test\\2026-04-03_012320\\skills\\code-comment-rules\\outputs\\round5\\T5-02.txt"
+  },
+  {
+    "phase": "post-delete",
+    "round": "round5",
+    "id": "T5-03",
+    "required": "chinese-comment-rules",
+    "forbidden": "comment-placement-granularity-rules, comment-completion-gate-rules, code-comment-rules",
+    "actual_hits": "chinese-comment-rules",
+    "status": "PASS",
+    "missing_required": "",
+    "hit_forbidden": "",
+    "output_file": "test\\2026-04-03_012320\\skills\\code-comment-rules\\outputs\\round5\\T5-03.txt"
+  }
+]

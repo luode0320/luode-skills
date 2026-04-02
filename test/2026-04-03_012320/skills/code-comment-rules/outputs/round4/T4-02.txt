@@ -1,0 +1,12 @@
+Skill 命中检查：
+- 命中 skill：`code-comment-rules`、`comment-completion-gate-rules`、`comment-placement-granularity-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`
+- 依据：当前请求属于“补注释前检查”，且目标文件是未提交的新文件，整份 [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go) 都属于优先关注的改动位点。
+
+- [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):11 和 [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):37 这两个函数如果现在补注释，先过函数头闸门：都要补齐 `[参数]`、`[返回]`、`最近修改时间`，而且顺序固定，现有行内注释不能替代函数头注释。
+- [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):18 和 [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):27 现在只是普通流程注释；`BuildRefundPayload` 实际已经是“组装 payload、查订单并处理错误、更新状态”三个连续步骤，补注释时必须改成就近放置的 `1.` `2.` `3.` 编号注释，分别贴在对应步骤第一行上方，不能集中堆到函数开头。
+- 字段注释放置要优先守住定义处和非直观映射处：[sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):6、[sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):7、[sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):8 已有字段注释，但映射到 payload 的位置若继续扩展，应补块级意图说明；相对地，[sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):48 的 `Order.Status` 作为新字段目前缺字段注释，是明确缺口。
+- [sample_comment_target.go](C:/Users/Administrator/.codex/skills/test/2026-04-03_012320/skills/code-comment-rules/sample_comment_target.go):21 的英文注释属于第三方固定错误原文，可以保留，但按中文注释规则，真要补时应在附近补一条中文解释这个错误分支的含义或处理动作，而不是只留下英文主句。
+
+下一步建议：
+1. 如果要开始补注释，优先按“函数头元信息 -> `BuildRefundPayload` 步骤编号 -> `Order.Status` 字段注释 -> 英文错误分支中文解释”这个顺序收口。  
+2. 文件未修改。

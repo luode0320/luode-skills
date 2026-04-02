@@ -86,9 +86,9 @@
 
 截至当前版本：
 
-- 已落地 Skill：`59`
+- 已落地 Skill：`62`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`5`
+- 扩展种子 Skill：`6`
 
 主规划文档：
 
@@ -161,7 +161,8 @@ python skill-dictionary/generate_dictionary.py
 | `code-style-consistency-rules` | 保持项目原有风格一致，不引入风格跳变。                       |
 | `naming-rules`                 | 统一命名语义与可理解性。                                     |
 | `chinese-comment-rules`        | 统一中文注释语言风格、语气和表述方式。                       |
-| `code-comment-rules`           | 统一代码注释层级、颗粒度和注释位置。                         |
+| `comment-placement-granularity-rules` | 统一代码注释是否必要、放置位置、颗粒度、字段注释和过期注释治理。 |
+| `comment-completion-gate-rules` | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
 
 ### 6. 代码位点域
 
@@ -358,3 +359,4 @@ claude-mem(记忆) :
 2026-04-02 20:33:50 fix: 强化补注释优先未提交改动与方法注释闸门
 2026-04-02 21:58:51 docs: 补充项目设计文档与模块关系图
 2026-04-03 00:18:15 feat: 拆分并下线 test-location-rules
+2026-04-03 02:07:46 feat: 拆分并下线 code-comment-rules

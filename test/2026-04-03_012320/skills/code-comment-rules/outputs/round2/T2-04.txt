@@ -1,0 +1,4 @@
+Skill 命中检查：
+- 命中 skill：`chinese-comment-rules`
+
+理由：这轮是在判断英文错误原文是否保留、中文注释该怎么表达，属于注释语言边界与中文写法问题，直接命中 `chinese-comment-rules`。

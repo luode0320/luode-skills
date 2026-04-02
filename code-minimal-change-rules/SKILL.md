@@ -15,7 +15,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 - 约束新增代码、修复 Bug、补测试支撑代码时只做最小必要改动。
 - 降低回归风险、审查成本和问题排查难度。
 - 即使要做表达层简化，也只限最近改动和当前必要位置，不扩散到历史代码。
-- 明确“最小改动”不等于“跳过注释”：本轮改动位点仍需联动 `code-comment-rules` 补齐注释。
+- 明确“最小改动”不等于“跳过注释”：本轮改动位点仍需联动 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 补齐注释。
 
 ## 自动触发信号
 
@@ -32,7 +32,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 3. 标出不属于当前目标的潜在顺手改动。
 4. 如果包含“顺手简化代码”，先限定只能处理最近改动中真正影响理解的部分。
 5. 如果发现改动目标已经扩散，先暂停并收缩范围。
-6. 标记本轮改动位点，预留 `code-comment-rules` 注释补齐动作，不把“未改动周边”误解为“改动位点可不注释”。
+6. 标记本轮改动位点，预留 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 注释补齐动作，不把“未改动周边”误解为“改动位点可不注释”。
 
 ## 默认执行流程
 
@@ -41,7 +41,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 3. 如果需要判断某个改动是否越界，再读取 `references/minimal-change-examples.md` 对照正反例。
 4. 先收缩范围，再实现最小必要改动。
 5. 完成后复查是否混入无关重构、无关格式化、无关命名调整、无关清理。
-6. 最后联动 `code-comment-rules`：仅补本轮改动位点注释，不扩散到无关历史代码。
+6. 最后联动注释双 skill：用 `comment-placement-granularity-rules` 判断必要性 / 位置 / 颗粒度，再用 `comment-completion-gate-rules` 完成改动位点补齐闸门，不扩散到无关历史代码。
 
 ## 权责边界与不负责事项
 
