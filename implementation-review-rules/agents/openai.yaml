@@ -1,4 +1,4 @@
 interface:
   display_name: "实现自审规则"
   short_description: "编码完成后对可读性、结构、命名、依赖、错误处理、日志和注释质量做第一道自审"
-  default_prompt: "使用 $implementation-review-rules 在进入测试前检查当前实现是否符合可读性优先、单一职责、常量抽离、依赖治理、命名语义化、错误处理、日志可追溯、方法注释最近修改时间、UTF-8 与中文注释等实现质量要求；Go 场景下还需确认 `internal/service` 没有散落请求/响应/第三方结果结构体并归位到 `internal/entity/<domain>/`，函数内局部变量未使用 `var (...)` 分组声明，多参数函数签名未直接使用多行参数列表，且第三方 API 响应未长期使用 map + key 硬编码解析。"
+  default_prompt: "使用 $implementation-review-rules 在进入测试前检查当前实现是否符合可读性优先、单一职责、常量抽离、依赖治理、命名语义化、错误处理、日志可追溯、方法注释最近修改时间（含本次改动原因）、方法注释顺序（参数/返回在前，最近修改时间最后一行）、UTF-8 与中文注释等实现质量要求；Go 场景下还需确认 `internal/service` 没有散落请求/响应/第三方结果结构体并归位到 `internal/entity/<domain>/`，函数内局部变量未使用 `var (...)` 分组声明，多参数函数签名未直接使用多行参数列表，且第三方 API 响应未长期使用 map + key 硬编码解析。"
