@@ -1,181 +1,171 @@
-# Skills 拆分方案（按触发时机细分）
+# Skill 拆分 Skill 设计（功能不删减版）
 
-更新时间：2026-04-01
+更新时间：2026-04-02
 
 ## 1. 目标
 
-- 把“长 description + 多职责混合”的 skill 拆成单一触发类型的子 skill。
-- 每个子 skill 只负责一种主要触发时机，降低命中歧义。
-- 拆分后不丢规则细节：细节留在子 skill 的 `SKILL.md` 与 `references/`。
+定义一个独立 skill（建议名：`skill-split-preserve-rules`）：
 
-## 2. 拆分原则（执行版）
+- 当任意已有 skill 被更新、优化、补充时自动触发。
+- 在“原有功能不删减”的前提下，把目标 skill 拆分为多个独立 skill。
+- 让拆分结果可验证、可回滚、可追溯，避免“拆完更轻但能力丢失”。
 
-- 一个子 skill 的 `description` 建议只包含：
-  - `当...时触发`
-  - `负责...`
-  - `不要用它代替...`
-- 子 skill 的触发对象必须单一：
-  - 例如“测试程序”与“模拟程序”分开，不混写。
-- 如果一个改动经常同时命中 4 个以上子 skill，说明拆分过细，需回并。
-- 每个子 skill 必须是“完整 skill”，不是仅有触发描述的壳子：
-  - 必须有完整的 `SKILL.md`（frontmatter + 可执行流程）
-  - 建议有 `agents/openai.yaml`，确保 UI 元信息与触发提示一致
-  - 需要补齐配套资源目录（按需）：`references/`、`scripts/`、`assets/`
-  - 如果父 skill 原本有参考资料，拆分后必须把对应资料迁入子 skill 的 `references/`，并在子 skill `SKILL.md` 中明确何时读取
+## 2. 触发条件
 
-## 2.1 命名与目录排序规则（新增）
+满足任一条件即触发本 skill：
 
-- 为了让目录按名称排序时呈现“入口 skill -> 子 skill”的视觉顺序，子 skill 名必须复用父 skill 全前缀。
-- 命名格式：
-  - 父 skill：`<parent>-rules`
-  - 子 skill：`<parent>-rules-<序号>-<主题>`
-- 序号建议使用两位且按 `10/20/30...` 递增，给后续插入预留空间。
-- 示例：
-  - `test-program-rules`
-  - `test-program-rules-10-case`
-  - `test-program-rules-20-mock`
-  - `test-program-rules-30-verify-script`
-- 禁止同级出现“无父前缀”的子 skill 名，否则排序后会打散分组。
+- 对某个现有 skill 做“新增规则/补充规则/优化规则”。
+- 发现某个 skill 的职责混合、触发歧义、正文过长，准备拆分。
+- 需要把一个 skill 的多类职责拆成多个平级独立 skill。
 
-## 2.2 子 skill 完整性规则（新增）
+不触发场景：
 
-- 子 skill 必须可独立被触发并独立完成本职责，不依赖“先读父 skill 才能执行”。
-- 子 skill 的 `SKILL.md` 至少应包含：
-  - 清晰触发边界（当...时触发）
-  - 执行流程（步骤化）
-  - 资源导航（引用本 skill 下 `references/`、`scripts/`、`assets/` 的读取/使用时机）
-  - 边界声明（不要用它代替...）
-- `references/` 不应空挂目录：
-  - 有领域细节就下沉到 `references/`，避免把细节堆回父 skill
-  - 无需参考资料时，应在 `SKILL.md` 明确“当前子 skill 无额外 references，直接按主流程执行”
-- 父 skill 只做分流与索引，不再充当子 skill 的隐式知识仓库。
+- 仅修正错别字、排版、链接等非功能编辑。
+- 仅调整语句表达但不改变触发、流程、边界、验收标准。
 
-## 3. 第一批拆分（建议先落地）
+## 3. 核心约束（必须）
 
-## 3.1 拆分 `test-program-rules`
+本 skill 的第一原则：**功能不删减**。
+第二原则：**原规则零丢失**。
+拆分策略第一优先级：**按分类二分拆分（每次拆一半类别）**。
 
-保留 `test-program-rules` 作为“测试程序总入口分流”。
+拆分过程中必须满足：
 
-新增子 skill：
+- 原 skill 的每一条可执行规则，都必须在新 skill 集合中找到落点。
+- 原 skill 的每一个“必须/默认/先做/阻断/通过标准”语句，不得丢失。
+- 原 skill 中任何看似奇怪、低频、历史兼容、特殊路径规则，默认都按“特例规则”处理并强制保留，绝对不能丢弃。
+- 原 skill 的 references/scripts/assets 中有用内容，不得静默丢弃。
+- 原 skill 的边界声明（不要用它代替...）必须被继承或显式重写。
+- 不允许用“由经验补齐”替代显式规则迁移。
+- 新 skill 可以补充和增强规则，但不得删除、弱化或覆盖原规则约束强度。
+- 只要当前规则仍可按“分类集合”拆成两组，就必须优先按分类二分，不得直接跳到其它维度拆分。
 
-1. `test-program-rules-10-case`
-   description: 当新增或修改正式测试程序（承载断言与场景编排）时触发。负责正式测试程序的职责边界、程序结构与长期保留策略；不要用它代替测试目录落点或测试文档规则。
+## 3.1 分类二分拆分策略（强优先级）
 
-2. `test-program-rules-20-mock`
-   description: 当新增或修改模拟程序（mock/stub/fake/假服务）时触发。负责模拟程序与正式测试程序的边界、复用策略与隔离要求；不要用它代替 fixture 命名或测试报告规则。
+- 拆分时优先识别“并列类别集合”（如目录/文件/脚本/验证程序/fixture/mock/文档落点）。
+- 每次拆分只做一次二分：把类别集合拆成 A/B 两组，尽量接近一半。
+- 若某一组后续仍过长或职责仍混合，继续对该组递归执行“分类二分”。
+- 只有在“单类触发已无法再按分类二分”时，才允许降级到更细维度（如新增 vs 修改、前置条件、路径层级）。
+- 禁止在仍可分类二分时直接做过细拆分，避免一次性碎片化。
 
-3. `test-program-rules-30-verify-script`
-   description: 当新增或修改验证脚本、探测脚本、调用脚本时触发。负责脚本执行步骤、控制台过程日志与证据留痕；第三方 API 响应结构不明时优先由本 skill 驱动探测流程；不要用它代替功能验收结论规则。
+### 3.1.1 分类二分示例（test-location 场景）
 
-4. `test-program-rules-40-fixture-data`
-   description: 当新增或修改测试数据构造脚本、样例数据、fixture 生成逻辑时触发。负责数据构造职责、输入输出稳定性与复用边界；不要用它代替 mock 程序或正式测试程序规则。
+原触发：
+- 当新增或修改测试目录、测试文件、测试脚本、验证程序、fixture、mock 数据、测试说明文档落点时触发。
 
-5. `test-program-rules-50-helper`
-   description: 当新增或修改测试辅助代码（公共断言、构造器、客户端封装）时触发。负责辅助代码抽象边界与复用约束；不要用它代替业务代码抽象或正式测试程序编排规则。
+第一次拆分（按分类二分）：
+1. 当新增或修改测试目录、测试文件、测试脚本时触发。
+2. 当新增或修改验证程序、fixture、mock 数据、测试说明文档落点时触发。
 
-## 3.2 拆分 `implementation-review-rules`
+第二次拆分（仍按分类优先；若分类不可再拆，再降级维度）：
+- 对“当新增或修改测试目录、测试文件、测试脚本时触发”继续拆分，可得到：
+1. 当新增测试目录、测试文件、测试脚本时触发。
+2. 当修改测试目录、测试文件、测试脚本时触发。
 
-保留 `implementation-review-rules` 作为“实现自审总闸门 + 汇总结论”。
+## 3.2 特例规则保护（强制）
 
-新增子 skill：
+- 任何“不符合直觉”的原规则，在未获得明确废弃指令前，一律视为有效特例。
+- 特例规则必须在映射表标记 `特例=是`，并给出落点。
+- 若确需移除某条原规则，必须有明确的“废弃决议来源”；无决议时禁止删除。
 
-1. `implementation-review-rules-10-core`
-   description: 当代码实现完成准备进入测试前自审时触发。负责可读性、单一职责、命名、错误处理、日志与注释补齐的通用实现质量检查；不要用它代替目录归位或功能验证规则。
+## 4. 输入与输出
 
-2. `implementation-review-rules-20-go-placement`
-   description: 当 Go 改动涉及 `internal/service` 落点或 `internal/entity` 结构体归位时触发。负责 service 根目录落点与请求/响应结构体归位检查；不要用它代替包结构设计决策规则。
+输入：
 
-3. `implementation-review-rules-30-go-style`
-   description: 当 Go 改动涉及函数签名或局部变量声明风格时触发。负责多参数签名、局部变量声明等编码风格闸门检查；不要用它代替格式化或命名策略规则。
+- 被拆分 skill 目录（例如 `xxx-rules/`）。
+- 本次更新/优化/补充需求说明。
 
-4. `implementation-review-rules-40-go-thirdparty-response`
-   description: 当 Go 接入第三方 API 并涉及响应解析时触发。负责“探测样例 -> 结构体建模 -> 禁止长期 map 硬编码解析”的自审闸门；若结构无法确认需暂停并反馈用户；不要用它代替测试脚本落点管理规则。
+输出：
 
-5. `implementation-review-rules-50-api-doc-sync`
-   description: 当改动涉及后端 HTTP API 契约（路径、请求、响应、错误）时触发。负责测试前 Swagger/OpenAPI 同步检查；不要用它代替接口设计或请求响应模型定义规则。
+1. 拆分后的独立 skill 列表（平级命名，不走父子链）。
+2. 每个新 skill 的职责边界与触发描述。
+3. 功能覆盖映射表（原规则 -> 新 skill 落点）。
+4. 特例规则保护说明（包含所有“看似奇怪规则”的迁移去向）。
+5. 迁移结果与兼容策略（旧 skill 是否保留、保留多久、何时下线）。
 
-## 3.3 拆分 `package-structure-rules`
+## 5. 标准流程
 
-保留 `package-structure-rules` 作为“结构总入口分流 + 最终裁决”。
+1. 基线采集
+- 读取目标 skill 的 `SKILL.md`、`description`、`references/`、`scripts/`、`assets/`、`agents/openai.yaml`。
+- 抽取“完整规则清单”和“资源清单”，包含必须、建议、示例、注释性约束与历史兼容说明。
+- 为每条原规则分配唯一规则 ID，避免迁移时漏项。
 
-新增子 skill：
+2. 规则原子化
+- 把原规则按触发对象拆成最小职责单元。
+- 标记每条规则的优先级（必须/建议/说明）。
 
-1. `package-structure-rules-10-core`
-   description: 当新增或修改包、目录、模块归属且需要判断基础分层职责时触发。负责通用目录职责、依赖方向与边界判定；不要用它代替语言专项规则。
+3. 拆分设计
+- 按“单一触发对象”把原子规则分组。
+- 优先按“分类集合二分”生成两组候选，单次只拆一半类别。
+- 对仍过长的候选组递归执行分类二分；无法再二分时再切换更细维度。
+- 形成多个独立 skill 候选，保证职责不重叠、边界可判定。
 
-2. `package-structure-rules-20-go-entry`
-   description: 当 Go 项目涉及 `main.go` 启动入口、根级入口层目录（global/middleware/crontask/async）时触发。负责 Go 入口层落点与依赖方向约束；不要用它代替业务实现层风格规则。
+4. 独立化落地
+- 为每个新 skill 生成完整结构：`SKILL.md` + 按需 `references/` + 按需 `scripts/`/`assets/`。
+- description 统一写法：`当...时触发` + `负责...` + `不要用它代替...`。
 
-3. `package-structure-rules-30-go-service-layout`
-   description: 当 Go 改动涉及 `internal/service` 目录组织时触发。负责 service 子目录分层与根目录禁堆实现规则；不要用它代替实现质量自审规则。
+5. 覆盖校验
+- 生成“功能覆盖映射表”，逐条核对原规则是否 100% 覆盖。
+- 任一原规则无落点，则判定拆分失败并阻断提交。
+- 若某条规则被改写，必须给出“等价或增强证明”；不能证明则回退为原规则表达。
 
-4. `package-structure-rules-40-go-entity-placement`
-   description: 当 Go 改动涉及请求/响应/第三方结果结构体定义时触发。负责 `internal/entity/<domain>` 归位规则与 service 行为层职责分离；不要用它代替请求响应字段设计规则。
+6. 兼容收口
+- 旧 skill 进入兼容期时，只保留迁移说明，不再新增规则。
+- 兼容期结束后下线旧 skill，避免重复命中。
 
-5. `package-structure-rules-50-large-file-split`
-   description: 当单文件达到 500 行及以上且持续扩展时触发。负责按功能拆文件与必要子目录/子包拆分落位；不要用它代替具体业务重构方案设计。
+## 6. 功能覆盖映射表（强制）
 
-## 4. 第二批拆分（第一批稳定后）
+每次拆分必须产出映射表，建议格式：
 
-## 4.1 拆分 `git-collaboration-rules`
+| 原 skill 规则ID | 原规则摘要 | 特例标记 | 新 skill 名称 | 新规则落点（文件/章节） | 迁移动作 | 状态 |
+|---|---|---|---|---|---|---|
+| R-001 | ... | 否/是 | ... | ... | 原样迁移/等价改写/增强补充 | 已覆盖 |
 
-1. `git-collaboration-rules-10-commit-granularity`
-   description: 当准备提交且存在多业务改动时触发。负责提交粒度拆分策略与提交顺序；不要用它代替分支同步规则。
+强制要求：
 
-2. `git-collaboration-rules-20-commit-message`
-   description: 当准备编写提交说明时触发。负责 `feat/fix` 提交规范、Windows 换行规范与消息结构；不要用它代替代码评审规则。
+- 覆盖率必须为 100%。
+- 状态不得出现“待补充”进入提交阶段。
+- 若规则被重写，必须给出“等价性说明”。
+- 映射统计口径以“原规则条目总数”为准，不允许合并条目来虚增覆盖率。
+- 每条标记为特例的规则都必须有落点，不允许“按常规合并省略”。
 
-3. `git-collaboration-rules-30-readme-changelog`
-   description: 当提交前需要更新根目录 `README.md` 改动日志时触发。负责时间格式、正序校验与日志条目规范；不要用它代替业务文档编写规则。
+## 7. 命名规则（独立 skill）
 
-4. `git-collaboration-rules-40-go-precommit-guard`
-   description: 当 Go 项目准备提交时触发。负责提交前阻断项（`test/` 外 `*_test.go`、`internal/service/*.go` 根目录直落等）扫描；不要用它代替实现自审规则。
+- 禁止父子序号命名（例如 `xxx-rules-10-yyy`）。
+- 使用平级命名：`<domain>-<focus>-rules`。
+- 名称应可直接体现职责，无需依赖“父 skill 上下文”。
 
-## 4.2 拆分 `database-schema-rules`
+## 8. 验收标准
 
-1. `database-schema-rules-10-base`
-   description: 当新增或修改表、字段、索引、约束、DDL 时触发。负责基础 schema 变更安全与兼容边界；不要用它代替查询实现规则。
+拆分完成判定必须同时满足：
 
-2. `database-schema-rules-20-required-fields`
-   description: 当设计或变更通用字段（如 created_at/updated_at/逻辑删除/毫秒时间戳）时触发。负责必备字段完整性与默认值要求；不要用它代替业务字段定义规则。
+- 新增 skill 全部可独立触发、独立执行。
+- 原 skill 可执行规则覆盖率 100%。
+- 原 skill 完整规则（含特例）覆盖率 100%。
+- 拆分路径符合“分类二分优先”，且每轮拆分都有分组依据记录。
+- 原资源迁移完成，无悬空引用。
+- 新 skill 边界清晰，互不替代。
+- 同类任务平均命中 skill 数稳定在 2~3（防止过度拆分）。
 
-3. `database-schema-rules-30-money`
-   description: 当新增或修改金额字段时触发。负责金额字段类型与精度约束（字符串存储）规则；不要用它代替业务换算逻辑规则。
+## 9. 阻断条件
 
-4. `database-schema-rules-40-engine-charset`
-   description: 当新增或修改表级参数时触发。负责 ENGINE/CHARSET/注释等表级标准约束；不要用它代替迁移发布流程规则。
+出现以下任一情况，禁止收口：
 
-## 5. 拆分后的命中顺序建议
+- 发现原规则无新落点（覆盖率 < 100%）。
+- 发现任何特例规则缺失、被弱化或被“常规化吞并”。
+- 在仍可按分类二分时，直接跳过分类拆分进入过细维度拆分。
+- 发现关键 references/scripts 被遗漏。
+- 新 skill 之间职责冲突，无法判定触发边界。
+- 旧 skill 与新 skill 长期并存且无下线计划。
 
-以一次 Go 第三方 API 接入为例：
+## 10. 回滚策略
 
-1. `package-structure-rules`（总入口分流）
-2. `package-structure-rules-40-go-entity-placement`（结构体落点）
-3. `test-program-rules-30-verify-script`（先探测响应）
-4. `code-readability-rules`（实现清晰度）
-5. `implementation-review-rules`（总闸门汇总）
-6. `implementation-review-rules-40-go-thirdparty-response`（专项阻断）
+- 若覆盖校验不通过，回滚到“拆分前基线版本”。
+- 先补齐映射缺口，再重新执行拆分流程。
+- 回滚后保留问题清单，避免重复遗漏。
 
-## 6. 迁移执行建议
+## 11. 推荐的 Skill 描述草案（可直接用于新 skill）
 
-1. 先创建“完整子 skill 骨架”而非最小壳子：`SKILL.md` + `agents/openai.yaml` + 按需资源目录（`references/`、`scripts/`、`assets/`）。
-2. 把父 skill 的对应章节与参考材料同时迁移到子 skill（优先下沉到 `references/`），父 skill 只保留“分流索引”。
-3. 在每个子 skill `SKILL.md` 中显式声明资源读取路径与时机，避免隐式依赖父 skill 说明。
-4. 更新 `agents/openai.yaml` 默认 prompt，避免仍命中过于宽泛的父 skill。
-5. 每次只拆 1 个父 skill，避免一次性全仓震荡。
-6. 每轮拆分后观察 1 周：
-   - 误触发率是否下降
-   - 漏触发是否上升
-   - 平均命中 skill 数是否维持在 2~3
-   - 子 skill 是否可独立执行（不回读父 skill 细节）
-
-## 7. 验收标准
-
-- 每个新子 skill 的 description 长度建议控制在 80~220 字。
-- 每个子 skill 至少有 1 条明确“不要用它代替...”边界。
-- 每个子 skill 必须具备完整功能结构：
-  - `SKILL.md`（含执行流程与边界）
-  - `agents/openai.yaml`（建议，且与 `SKILL.md` 一致）
-  - 有细节资料时必须提供 `references/` 并在 `SKILL.md` 可导航
-- 父 skill 不再承载过多执行细则，只保留分流与汇总职责。
-- 拆分后同类任务的命中路径更短、更稳定、可复核。
+```text
+当新增、优化或补充任意现有 skill 内容，且该 skill 存在多职责混合或触发歧义、需要拆分为多个独立 skill 时触发。负责在原有功能不删减前提下优先执行“分类二分拆分（每次拆一半类别）”、递归拆分、资源迁移与覆盖校验，并输出原规则到新 skill 的 100% 映射关系；任何看似奇怪的原规则默认按特例保留且必须有落点，不得删除；不要用它代替业务需求分析、Bug 定位或具体功能实现。
+```
