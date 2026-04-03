@@ -381,3 +381,4 @@ claude-mem(记忆) :
 2026-04-03 23:47:55 fix: 前端界面调整场景优先使用 frontend-design
 2026-04-03 23:50:08 chore: 删除 ui-ux-pro-max-skill
 2026-04-04 00:56:15 feat: 新增前端排版先审查后修复路由并引入 Vercel 前端技能
+2026-04-04 01:10:56 docs: 中文化 Vercel 前端技能说明
