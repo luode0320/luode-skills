@@ -24,6 +24,12 @@ REPORT_NAME_MAP = {
     "monthly": "月报",
     "yearly": "年报",
 }
+PERIOD_SCOPE_TEXT = {
+    "daily": "今日",
+    "weekly": "本周",
+    "monthly": "本月",
+    "yearly": "本年",
+}
 TYPE_LABELS = {
     "feat": "功能",
     "fix": "修复",
@@ -348,26 +354,81 @@ def summarize_project(
     )
 
 
+def extract_item_summary(report_item: str) -> str:
+    match = re.match(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}:\s*(.+)$", report_item)
+    if not match:
+        return report_item.strip()
+    return match.group(1).strip()
+
+
+def normalize_outline_detail(summary: str) -> str:
+    text = summary.strip()
+    match = re.match(r"^[^:：]+[:：]\s*(.+)$", text)
+    if match:
+        return match.group(1).strip()
+    return text
+
+
+def build_project_outline(period: str, result: ProjectResult) -> str:
+    scope = PERIOD_SCOPE_TEXT[period]
+    if result.warning:
+        return f"{result.name}: {scope}统计异常（{result.warning}）"
+    if not result.report_items:
+        return f"{result.name}: {scope}无提交记录"
+
+    details: list[str] = []
+    seen: set[str] = set()
+    for item in result.report_items:
+        raw_summary = extract_item_summary(item)
+        detail = normalize_outline_detail(raw_summary)
+        normalized = detail.lower()
+        if not detail or normalized in seen:
+            continue
+        seen.add(normalized)
+        details.append(detail)
+
+    if not details:
+        return f"{result.name}: {scope}主要完成本周期相关开发与修复任务。"
+
+    top_details = details[:3]
+    if len(details) > 3:
+        return f"{result.name}: {scope}主要完成{'、'.join(top_details)}等任务。"
+    return f"{result.name}: {scope}主要完成{'、'.join(top_details)}。"
+
+
 def render_report(period: str, period_label: str, results: list[ProjectResult]) -> str:
     period_name = REPORT_NAME_MAP[period]
+    displayed_results = [item for item in results if item.warning or item.report_items]
 
     lines: list[str] = [f"{period_name}（{period_label}）"]
-    for result in results:
+    if period != "daily":
+        lines.append("")
+        lines.append("总体归纳统计:")
+        if displayed_results:
+            for result in displayed_results:
+                lines.append(build_project_outline(period, result))
+        else:
+            lines.append("本周期无提交记录")
+
+    lines.append("")
+    lines.append("各项目明细:")
+    if not displayed_results:
+        lines.append("")
+        lines.append("本周期无提交记录")
+        return "\n".join(lines)
+
+    for result in displayed_results:
         lines.append("")
         lines.append(f"{result.name}:")
+        lines.append("1. 报告内容点:")
         if result.warning:
-            lines.append("1. 报告内容点:")
             lines.append(f"- {result.warning}")
             continue
 
-        lines.append("1. 报告内容点:")
-        if result.report_items:
-            for item in result.report_items:
-                lines.append(f"- {item}")
-        else:
-            lines.append("- 本周期无提交记录")
+        for item in result.report_items:
+            lines.append(f"- {item}")
 
-    return "\n".join(lines)
+    return "\n".join(lines).rstrip()
 
 
 def resolve_report_output_dir(cfg: dict) -> Path:
