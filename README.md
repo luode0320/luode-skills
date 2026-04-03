@@ -361,3 +361,4 @@ claude-mem(记忆) :
 2026-04-03 00:18:15 feat: 拆分并下线 test-location-rules
 2026-04-03 02:07:46 feat: 拆分并下线 code-comment-rules
 2026-04-03 10:26:22 feat: 新增工作报告汇总规则 skill
+2026-04-03 10:27:30 fix: 清理工作报告规则 skill 的编译产物
