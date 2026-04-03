@@ -378,3 +378,4 @@ claude-mem(记忆) :
 2026-04-03 22:09:16 fix: 放宽前端视觉规则的组件库默认外观绑定
 2026-04-03 22:09:51 feat: 新增 ui-ux-pro-max-skill 并补充中文触发词
 2026-04-03 23:47:55 fix: 前端界面调整场景优先使用 frontend-design
+2026-04-03 23:50:08 chore: 删除 ui-ux-pro-max-skill
