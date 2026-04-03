@@ -75,6 +75,8 @@ class ProjectResult:
     path: str
     report_items: list[str]
     warning: str | None = None
+    release_pending_summary: str | None = None
+    release_progress_percent: int | None = None
 
 
 def parse_args() -> argparse.Namespace:
@@ -295,6 +297,27 @@ def normalize_str_list(values: object) -> list[str]:
     return [str(item).strip() for item in values if str(item).strip()]
 
 
+def normalize_optional_text(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def normalize_optional_percent(value: object) -> int | None:
+    if value is None:
+        return None
+    try:
+        percent = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    if percent < 0:
+        return 0
+    if percent > 100:
+        return 100
+    return percent
+
+
 def resolve_excluded_types(cfg: dict) -> set[str]:
     configured = normalize_str_list(cfg.get("excluded_types"))
     if configured:
@@ -354,49 +377,47 @@ def summarize_project(
     )
 
 
-def extract_item_summary(report_item: str) -> str:
-    match = re.match(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}:\s*(.+)$", report_item)
-    if not match:
-        return report_item.strip()
-    return match.group(1).strip()
-
-
-def normalize_outline_detail(summary: str) -> str:
-    text = summary.strip()
-    match = re.match(r"^[^:：]+[:：]\s*(.+)$", text)
-    if match:
-        return match.group(1).strip()
-    return text
-
-
-def build_project_outline(period: str, result: ProjectResult) -> str:
+def build_release_progress_summary_lines(period: str, cfg: dict, results: list[ProjectResult]) -> list[str]:
     scope = PERIOD_SCOPE_TEXT[period]
-    if result.warning:
-        return f"{result.name}: {scope}统计异常（{result.warning}）"
-    if not result.report_items:
-        return f"{result.name}: {scope}无提交记录"
+    summary_results = [
+        item
+        for item in results
+        if item.warning
+        or item.report_items
+        or item.release_pending_summary
+        or item.release_progress_percent is not None
+    ]
+    if not summary_results:
+        return ["当前开发待发布版本总体进度:", "本周期无提交记录"]
 
-    details: list[str] = []
-    seen: set[str] = set()
-    for item in result.report_items:
-        raw_summary = extract_item_summary(item)
-        detail = normalize_outline_detail(raw_summary)
-        normalized = detail.lower()
-        if not detail or normalized in seen:
+    overall_percent = normalize_optional_percent(cfg.get("release_overall_progress_percent"))
+    if overall_percent is None:
+        percents = [item.release_progress_percent for item in summary_results if item.release_progress_percent is not None]
+        if percents:
+            overall_percent = round(sum(percents) / len(percents))
+
+    if overall_percent is None:
+        lines: list[str] = ["当前开发待发布版本总体进度:"]
+    else:
+        lines = [f"当前开发待发布版本总体进度({overall_percent}%):"]
+
+    for item in summary_results:
+        if item.release_pending_summary:
+            pending = item.release_pending_summary
+        elif item.warning:
+            pending = f"{scope}统计异常（{item.warning}）"
+        else:
+            pending = "待补充未完成事项"
+
+        if item.release_progress_percent is None:
+            lines.append(f"{item.name}: {pending} -> 项目完成度: 未配置")
             continue
-        seen.add(normalized)
-        details.append(detail)
+        lines.append(f"{item.name}: {pending} -> 项目完成度: {item.release_progress_percent}%")
 
-    if not details:
-        return f"{result.name}: {scope}主要完成本周期相关开发与修复任务。"
-
-    top_details = details[:3]
-    if len(details) > 3:
-        return f"{result.name}: {scope}主要完成{'、'.join(top_details)}等任务。"
-    return f"{result.name}: {scope}主要完成{'、'.join(top_details)}。"
+    return lines
 
 
-def render_report(period: str, period_label: str, results: list[ProjectResult]) -> str:
+def render_report(period: str, period_label: str, results: list[ProjectResult], cfg: dict) -> str:
     period_name = REPORT_NAME_MAP[period]
     displayed_results = [item for item in results if item.warning or item.report_items]
 
@@ -404,11 +425,7 @@ def render_report(period: str, period_label: str, results: list[ProjectResult]) 
     if period != "daily":
         lines.append("")
         lines.append("总体归纳统计:")
-        if displayed_results:
-            for result in displayed_results:
-                lines.append(build_project_outline(period, result))
-        else:
-            lines.append("本周期无提交记录")
+        lines.extend(build_release_progress_summary_lines(period, cfg, results))
 
     lines.append("")
     lines.append("各项目明细:")
@@ -483,6 +500,8 @@ def main() -> int:
         project_name = str(project.get("name", "未命名项目")).strip() or "未命名项目"
         project_path_raw = str(project.get("path", "")).strip()
         project_path = Path(project_path_raw).expanduser()
+        project_release_pending_summary = normalize_optional_text(project.get("release_pending_summary"))
+        project_release_progress_percent = normalize_optional_percent(project.get("release_progress_percent"))
 
         if not project_path_raw:
             results.append(
@@ -491,6 +510,8 @@ def main() -> int:
                     path=project_path_raw,
                     report_items=[],
                     warning="项目路径为空，无法统计",
+                    release_pending_summary=project_release_pending_summary,
+                    release_progress_percent=project_release_progress_percent,
                 )
             )
             continue
@@ -502,6 +523,8 @@ def main() -> int:
                     path=project_path_raw,
                     report_items=[],
                     warning=f"项目路径不存在: {project_path_raw}",
+                    release_pending_summary=project_release_pending_summary,
+                    release_progress_percent=project_release_progress_percent,
                 )
             )
             continue
@@ -513,6 +536,8 @@ def main() -> int:
                     path=project_path_raw,
                     report_items=[],
                     warning=f"不是 Git 仓库: {project_path_raw}",
+                    release_pending_summary=project_release_pending_summary,
+                    release_progress_percent=project_release_progress_percent,
                 )
             )
             continue
@@ -521,7 +546,10 @@ def main() -> int:
             commits = run_git_log(project_path, start, end)
             commits = filter_commits_by_author(commits, author_filters)
             commits = filter_commits_by_importance(commits, excluded_types, excluded_keywords)
-            results.append(summarize_project(project_name, project_path_raw, commits, report_timezone))
+            summary_result = summarize_project(project_name, project_path_raw, commits, report_timezone)
+            summary_result.release_pending_summary = project_release_pending_summary
+            summary_result.release_progress_percent = project_release_progress_percent
+            results.append(summary_result)
         except Exception as exc:  # noqa: BLE001
             results.append(
                 ProjectResult(
@@ -529,10 +557,12 @@ def main() -> int:
                     path=project_path_raw,
                     report_items=[],
                     warning=f"统计失败: {exc}",
+                    release_pending_summary=project_release_pending_summary,
+                    release_progress_percent=project_release_progress_percent,
                 )
             )
 
-    report_text = render_report(args.period, period_label, results)
+    report_text = render_report(args.period, period_label, results, cfg)
     output_dir = resolve_report_output_dir(cfg)
     try:
         saved_path = save_report_file(report_text, output_dir, args.period)
