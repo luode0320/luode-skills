@@ -225,6 +225,7 @@ python skill-dictionary/generate_dictionary.py
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
 | `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
 | `work-report-summary-rules` | 用于按项目配置统计本人 Git 提交并生成日报/周报/月报/年报。 |
+| `golang-patterns` | 外部 Go 通用开发模式与最佳实践补充规则（作为内置 Go 规则补充，不覆盖内置强制约束）。 |
 
 ## 当前规划状态
 
@@ -259,6 +260,7 @@ python skill-dictionary/generate_dictionary.py
 - 前端样式“排版/对齐/歪斜”问题，默认先命中 `web-design-guidelines` 做审查，再命中 `frontend-design` 实施修复
 - 前端 UI、组件、样式的调整/改进/界面 Bug 修复（非排版审查类），默认优先命中 `frontend-design`
 - 当 `frontend-design` 与 `frontend-component-rules`、`frontend-ui-visual-rules` 同时命中或冲突时，以 `frontend-design` 为主，其他 skill 作为补充约束
+- Go 场景中，默认先遵循本仓库内置自适应规则；外部 skill（`golang-patterns`）仅作补充约束，冲突时以内置规则为准
 
 ## 为什么推荐先 fork 再个性化
 
@@ -384,3 +386,4 @@ claude-mem(记忆) :
 2026-04-04 01:10:56 docs: 中文化 Vercel 前端技能说明
 2026-04-04 01:11:36 feat: 新增并中文化 Vue 前端技能
 2026-04-04 01:12:11 fix: 强化技能命中检查开头输出规范
+2026-04-04 01:54:30 fix: 清理Go外部技能引用并保留golang-patterns补充规范

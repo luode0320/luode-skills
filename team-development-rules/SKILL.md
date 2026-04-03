@@ -17,6 +17,7 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 - 在前置条件未满足时阻断流程，防止跳阶段推进。
 - 进入编码阶段时，默认提醒联动 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，避免改动位点注释漏触发。
 - 前端样式排版异常（如对不齐、歪斜、间距错乱）默认先命中 `web-design-guidelines` 做审查，再由 `frontend-design` 实施修复。
+- Go 场景命中外部 skill 时，默认以本仓库内置自适应规则为主，外部 skill 仅作补充约束，不得覆盖内置强制规则。
 
 ## 自动触发信号
 
@@ -34,8 +35,9 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 3. 再判断这是需求类、Bug 类还是交付收口类问题。
 4. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
 5. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
-6. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
-7. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
+6. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
+7. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
+8. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
 
 ## 默认执行流程
 
