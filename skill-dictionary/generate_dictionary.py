@@ -524,38 +524,39 @@ def render_markdown(payload: dict) -> str:
     lines.append(f"- references 文件总数：{summary['references_total']}")
     lines.append(f"- agents 文件总数：{summary['agents_total']}")
     lines.append("")
-    lines.append("## 分类总览")
+    lines.append("## 技能目录树")
     lines.append("")
-    lines.append("| 顺序 | 分类 | 已实现 | 规划中 | 种子 | 总数 | 说明 |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
     for domain in payload["domains"]:
         lines.append(
-            f"| {domain['order']} | {domain['label']} | {domain['implemented_count']} | {domain['planned_count']} | {domain['seed_count']} | {domain['total_count']} | {domain['description']} |"
+            f"* **{domain['order']}.{domain['label']}**（已实现 {domain['implemented_count']} / 规划中 {domain['planned_count']} / 种子 {domain['seed_count']}）"
         )
-    lines.append("")
+        lines.append(f"  * 说明：{domain['description']}")
+        if not domain["items"]:
+            lines.append("  * 本分类暂无技能。")
+            continue
 
-    for domain in payload["domains"]:
-        lines.append(f"## {domain['order']:02d} {domain['label']}")
-        lines.append("")
-        lines.append(f"- 说明：{domain['description']}")
-        lines.append(f"- 进度：已实现 {domain['implemented_count']}，规划中 {domain['planned_count']}，扩展种子 {domain['seed_count']}")
-        lines.append("")
-        lines.append("| 顺序 | Skill | 状态 | 路径 | 核心职责 |")
-        lines.append("| --- | --- | --- | --- | --- |")
         for item in domain["items"]:
-            path_cell = f"[`{item['skill_path']}`]({item['skill_path']})" if item["skill_path"] else "待创建"
-            lines.append(
-                f"| {item['item_order']} | `{item['name']}` | {item['status_label']} | {path_cell} | {item['core_responsibility']} |"
-            )
+            node_number = f"{domain['order']}.{item['item_order']}"
+            lines.append(f"  * **{node_number} `{item['name']}`（{item['status_label']}）**")
+            if item["skill_path"]:
+                lines.append(f"    * [`{item['skill_path']}`]({item['skill_path']})")
+            else:
+                lines.append("    * 路径：待创建")
+            lines.append(f"    * 核心职责：{item['core_responsibility']}")
         lines.append("")
 
-    lines.append("## 项目文档")
+    lines.append("## 项目文档目录")
     lines.append("")
-    lines.append("| 文档 | 类型 | 路径 |")
-    lines.append("| --- | --- | --- |")
+    docs_by_kind: dict[str, list[dict]] = defaultdict(list)
     for doc in payload["docs"]:
-        lines.append(f"| {doc['title']} | {doc['kind']} | [`{doc['path']}`]({doc['path']}) |")
-    lines.append("")
+        docs_by_kind[doc["kind"]].append(doc)
+
+    for kind, docs in sorted(docs_by_kind.items(), key=lambda item: DOC_KIND_ORDER.get(item[0], 999)):
+        lines.append(f"* **{kind}**")
+        for index, doc in enumerate(docs, start=1):
+            lines.append(f"  * **{index}.{doc['title']}**")
+            lines.append(f"    * [`{doc['path']}`]({doc['path']})")
+        lines.append("")
 
     lines.append("## 当前建议")
     lines.append("")

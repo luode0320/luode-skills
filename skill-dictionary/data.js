@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-03 02:08:41",
-  "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
+  "generated_at": "2026-04-03 17:30:47",
+  "repo_root": "/home/luode/.codex/skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
     "planned_total": 62,
     "implemented_total": 62,
     "planned_missing": 0,
-    "seed_total": 6,
+    "seed_total": 8,
     "doc_total": 4,
-    "references_total": 212,
-    "agents_total": 65
+    "references_total": 217,
+    "agents_total": 67
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -2767,8 +2767,8 @@ window.SKILL_DICTIONARY = {
       "order": 10,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 6,
-      "total_count": 6,
+      "seed_count": 8,
+      "total_count": 8,
       "items": [
         {
           "id": "\"doc\"",
@@ -2895,6 +2895,47 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "code-review-automation-rules",
+          "name": "code-review-automation-rules",
+          "title": "提交级代码审核规则",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 10,
+          "item_order": 4,
+          "auto_trigger": "当用户主动提出“审核代码”“review 当前分支提交”“审查最近提交”时触发。负责读取项目 `main` 分支最近一条提交时间，并仅审查当前分支在该时间之后且尚未并入 `main` 的提交，逐条输出中文结构化结果（致命/严重/中等/建议），再将汇总报告保存到被审核项目根目录固定文件名（同名覆盖）；禁止跨提交混审，禁止把非当前 commit 引入的问题混入结论。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "code-review-automation-rules/SKILL.md",
+          "directory_path": "code-review-automation-rules",
+          "directory": "code-review-automation-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "强制规则",
+            "权责边界与不负责事项",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "code-review-automation-rules/references/report-and-wecom.md",
+            "code-review-automation-rules/references/review-prompt-template.md",
+            "code-review-automation-rules/references/review-workflow.md"
+          ],
+          "agents": [
+            "code-review-automation-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        },
+        {
           "id": "context-compression-rules",
           "name": "context-compression-rules",
           "title": "上下文压缩规则",
@@ -2904,7 +2945,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 4,
+          "item_order": 5,
           "auto_trigger": "当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./.skills`），避免压缩后丢失 skill 记忆，再输出可直接续做的最小上下文包；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "context-compression-rules/SKILL.md",
@@ -2946,7 +2987,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 5,
+          "item_order": 6,
           "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "find-skills/SKILL.md",
@@ -2979,7 +3020,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 6,
+          "item_order": 7,
           "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -3001,6 +3042,47 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "skill-split-preserve-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        },
+        {
+          "id": "work-report-summary-rules",
+          "name": "work-report-summary-rules",
+          "title": "工作报告汇总规则",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 10,
+          "item_order": 8,
+          "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点、提交时间精确到秒）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "work-report-summary-rules/SKILL.md",
+          "directory_path": "work-report-summary-rules",
+          "directory": "work-report-summary-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "报告输出要求",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "work-report-summary-rules/references/projects.json",
+            "work-report-summary-rules/references/report-format.md"
+          ],
+          "agents": [
+            "work-report-summary-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -5771,6 +5853,47 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "code-review-automation-rules",
+      "name": "code-review-automation-rules",
+      "title": "提交级代码审核规则",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 10,
+      "item_order": 4,
+      "auto_trigger": "当用户主动提出“审核代码”“review 当前分支提交”“审查最近提交”时触发。负责读取项目 `main` 分支最近一条提交时间，并仅审查当前分支在该时间之后且尚未并入 `main` 的提交，逐条输出中文结构化结果（致命/严重/中等/建议），再将汇总报告保存到被审核项目根目录固定文件名（同名覆盖）；禁止跨提交混审，禁止把非当前 commit 引入的问题混入结论。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "code-review-automation-rules/SKILL.md",
+      "directory_path": "code-review-automation-rules",
+      "directory": "code-review-automation-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "强制规则",
+        "权责边界与不负责事项",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "code-review-automation-rules/references/report-and-wecom.md",
+        "code-review-automation-rules/references/review-prompt-template.md",
+        "code-review-automation-rules/references/review-workflow.md"
+      ],
+      "agents": [
+        "code-review-automation-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
+    },
+    {
       "id": "context-compression-rules",
       "name": "context-compression-rules",
       "title": "上下文压缩规则",
@@ -5780,7 +5903,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 4,
+      "item_order": 5,
       "auto_trigger": "当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./.skills`），避免压缩后丢失 skill 记忆，再输出可直接续做的最小上下文包；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "context-compression-rules/SKILL.md",
@@ -5822,7 +5945,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 5,
+      "item_order": 6,
       "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "find-skills/SKILL.md",
@@ -5855,7 +5978,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 6,
+      "item_order": 7,
       "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -5877,6 +6000,47 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "skill-split-preserve-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
+    },
+    {
+      "id": "work-report-summary-rules",
+      "name": "work-report-summary-rules",
+      "title": "工作报告汇总规则",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 10,
+      "item_order": 8,
+      "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点、提交时间精确到秒）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "work-report-summary-rules/SKILL.md",
+      "directory_path": "work-report-summary-rules",
+      "directory": "work-report-summary-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "报告输出要求",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "work-report-summary-rules/references/projects.json",
+        "work-report-summary-rules/references/report-format.md"
+      ],
+      "agents": [
+        "work-report-summary-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [

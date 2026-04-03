@@ -88,7 +88,7 @@
 
 - 已落地 Skill：`62`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`6`
+- 扩展种子 Skill：`8`
 
 主规划文档：
 
@@ -220,8 +220,11 @@ python skill-dictionary/generate_dictionary.py
 | `"doc"` | 用于读取、创建、编辑 `.docx` 文档并进行版式核验。 |
 | `"pdf"` | 用于读取、创建、审阅 PDF 文档并进行渲染检查。 |
 | `"spreadsheet"` | 用于处理 `.xlsx` / `.csv` / `.tsv` 表格并支持公式与样式工作流。 |
+| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告。 |
 | `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
+| `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
+| `work-report-summary-rules` | 用于按项目配置统计本人 Git 提交并生成日报/周报/月报/年报。 |
 
 ## 当前规划状态
 
@@ -365,3 +368,4 @@ claude-mem(记忆) :
 2026-04-03 11:49:07 feat: 工作报告支持自动保存到 code 目录
 2026-04-03 14:18:14 fix: 统一需求文档命名为时间戳加中文简介标题
 2026-04-03 17:07:57 feat: 新增提交级代码审核自动化规则 skill
+2026-04-03 17:31:56 feat: 优化 skill 字典树形目录展示
