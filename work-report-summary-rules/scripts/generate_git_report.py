@@ -17,6 +17,13 @@ from zoneinfo import ZoneInfo
 WEEKDAY_CN = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
 BEIJING_TZ_NAME = "Asia/Shanghai"
 BEIJING_TZ = ZoneInfo(BEIJING_TZ_NAME)
+DEFAULT_REPORT_OUTPUT_DIR = "/home/luode/code"
+REPORT_NAME_MAP = {
+    "daily": "日报",
+    "weekly": "周报",
+    "monthly": "月报",
+    "yearly": "年报",
+}
 TYPE_LABELS = {
     "feat": "功能",
     "fix": "修复",
@@ -342,12 +349,7 @@ def summarize_project(
 
 
 def render_report(period: str, period_label: str, results: list[ProjectResult]) -> str:
-    period_name = {
-        "daily": "日报",
-        "weekly": "周报",
-        "monthly": "月报",
-        "yearly": "年报",
-    }[period]
+    period_name = REPORT_NAME_MAP[period]
 
     lines: list[str] = [f"{period_name}（{period_label}）"]
     for result in results:
@@ -366,6 +368,23 @@ def render_report(period: str, period_label: str, results: list[ProjectResult]) 
             lines.append("- 本周期无提交记录")
 
     return "\n".join(lines)
+
+
+def resolve_report_output_dir(cfg: dict) -> Path:
+    raw = str(cfg.get("report_output_dir") or DEFAULT_REPORT_OUTPUT_DIR).strip()
+    return Path(raw).expanduser()
+
+
+def build_report_filename(period: str) -> str:
+    timestamp = dt.datetime.now(BEIJING_TZ).strftime("%Y%m%d%H%M%S")
+    return f"{REPORT_NAME_MAP[period]}-{timestamp}"
+
+
+def save_report_file(report_text: str, output_dir: Path, period: str) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    file_path = output_dir / build_report_filename(period)
+    file_path.write_text(report_text, encoding="utf-8")
+    return file_path
 
 
 def main() -> int:
@@ -452,7 +471,16 @@ def main() -> int:
                 )
             )
 
-    print(render_report(args.period, period_label, results))
+    report_text = render_report(args.period, period_label, results)
+    output_dir = resolve_report_output_dir(cfg)
+    try:
+        saved_path = save_report_file(report_text, output_dir, args.period)
+    except Exception as exc:  # noqa: BLE001
+        print(f"保存报告失败：{exc}", file=sys.stderr)
+        return 1
+
+    print(report_text)
+    print(f"\n报告已保存：{saved_path}", file=sys.stderr)
     return 0
 
 

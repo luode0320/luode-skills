@@ -1,5 +1,6 @@
 {
   "timezone": "Asia/Shanghai",
+  "report_output_dir": "/home/luode/code",
   "authors": [
     "luode",
     "luode@ellipalwallet.com"
