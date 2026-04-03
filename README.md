@@ -178,7 +178,7 @@ python skill-dictionary/generate_dictionary.py
 | `api-swagger-rules`        | 统一后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。                    |
 | `error-handling-rules`     | 统一错误模型、错误传播、错误码和异常处理方式。                                                  |
 | `logging-trace-rules`      | 统一日志、trace、链路透传、关键节点记录和定位证据。                                             |
-| `frontend-design`          | 用于生成具有鲜明风格、达到生产级质量的前端界面；对前端 UI、组件、样式的调整/改进/界面 Bug 修复优先使用，且与内部前端同域 Skill 冲突时以它为优先。 |
+| `frontend-design`          | 用于生成具有鲜明风格、达到生产级质量的前端界面；对前端 UI、组件、样式的调整/改进/界面 Bug 修复优先使用；若属于排版/对齐/歪斜问题，先由 `web-design-guidelines` 审查再由本 skill 修复。 |
 | `frontend-component-rules` | 统一前端组件工程、状态边界、组合方式和组件职责。                                                |
 | `frontend-ui-visual-rules` | 统一页面视觉、交互、信息层级、响应式适配、可访问性和 UI 自审规范。                              |
 
@@ -256,7 +256,8 @@ python skill-dictionary/generate_dictionary.py
 
 当前已明确的一条优先级：
 
-- 前端 UI、组件、样式的调整/改进/界面 Bug 修复，默认优先命中 `frontend-design`
+- 前端样式“排版/对齐/歪斜”问题，默认先命中 `web-design-guidelines` 做审查，再命中 `frontend-design` 实施修复
+- 前端 UI、组件、样式的调整/改进/界面 Bug 修复（非排版审查类），默认优先命中 `frontend-design`
 - 当 `frontend-design` 与 `frontend-component-rules`、`frontend-ui-visual-rules` 同时命中或冲突时，以 `frontend-design` 为主，其他 skill 作为补充约束
 
 ## 为什么推荐先 fork 再个性化
@@ -379,3 +380,4 @@ claude-mem(记忆) :
 2026-04-03 22:09:51 feat: 新增 ui-ux-pro-max-skill 并补充中文触发词
 2026-04-03 23:47:55 fix: 前端界面调整场景优先使用 frontend-design
 2026-04-03 23:50:08 chore: 删除 ui-ux-pro-max-skill
+2026-04-04 00:56:15 feat: 新增前端排版先审查后修复路由并引入 Vercel 前端技能
