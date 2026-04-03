@@ -1,0 +1,4 @@
+interface:
+  display_name: "提交代码审核"
+  short_description: "Review current-branch commits after main latest commit in Chinese"
+  default_prompt: "Use $code-review-automation-rules to review commits on the current branch after the latest commit time on main, then overwrite code_review_result.md in the project root."
