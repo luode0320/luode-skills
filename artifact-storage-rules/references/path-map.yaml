@@ -7,7 +7,8 @@ roots:
   project_docs: "doc"
 
 entry_files:
-  requirement_doc: "{date}_需求中文说明.md"
+  requirement_doc: "{datetime}_{requirement_cn_title}.md"
+  requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   acceptance_doc: "{date}_验收中文说明.md"
   implementation_plan_doc: "{date}_实施计划中文说明.md"
   bug_root_readme: "README.md"
