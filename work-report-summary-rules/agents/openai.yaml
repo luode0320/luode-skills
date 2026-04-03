@@ -1,0 +1,4 @@
+interface:
+  display_name: "工作报告汇总"
+  short_description: "Aggregate git commits into daily weekly monthly yearly reports"
+  default_prompt: "Use $work-report-summary-rules to summarize my git commits across configured projects into a weekly report."
