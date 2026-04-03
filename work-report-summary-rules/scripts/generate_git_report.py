@@ -437,7 +437,7 @@ def render_report(period: str, period_label: str, results: list[ProjectResult], 
     for result in displayed_results:
         lines.append("")
         lines.append(f"{result.name}:")
-        lines.append("1. 报告内容点:")
+        lines.append("报告内容点:")
         if result.warning:
             lines.append(f"- {result.warning}")
             continue
