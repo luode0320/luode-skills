@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: 创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面或前端应用时使用这个 skill。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。
+description: 创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面或前端应用，或进行前端 UI、组件、样式的调整/改进/界面 Bug 修复时优先使用这个 skill。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。
 license: Complete terms in LICENSE.txt
 ---
 

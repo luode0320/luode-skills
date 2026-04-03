@@ -31,8 +31,9 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 1. 先判断当前阶段。
 2. 如果问题明显是在查历史，优先判断是否应进入记忆域。
 3. 再判断这是需求类、Bug 类还是交付收口类问题。
-4. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
-5. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
+4. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复，优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
+5. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
+6. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
 
 ## 默认执行流程
 
