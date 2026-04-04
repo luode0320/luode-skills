@@ -11,6 +11,11 @@
 
 - 当用户请求“补充注释”或“只改注释”时，命中列表至少包含：`comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`。
 
+## 图片输入场景补充
+
+- 当检测到消息包含图片输入（例如 `<image ...>`）时，必须强制检查并命中 `image-redbox-focus-rules`。
+- 在图片输入场景下，不得跳过该命中检查直接进入主任务执行。
+
 ## 代码改动收口场景补充
 
 - 当本轮发生代码新增或修改，且准备输出最终回复时，命中列表必须包含：`comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`。
