@@ -141,7 +141,7 @@
 | R-CC-005 | 补注释请求优先处理未提交改动位点 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：补注释优先范围` | 原样迁移 | 测试版草案 | `comment-completion-gate-rules` | 无 | 无 |
 | R-CC-006 | 未提交改动中若存在函数、方法改动，必须优先补函数头注释与方法块注释 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：补注释优先范围` | 原样迁移 | 测试版草案 | `comment-completion-gate-rules` | 无 | 无 |
 | R-CC-007 | 所有改动位点必须补齐注释，缺失则不得进入通过/可提交结论 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制门禁：改动位点注释补齐` | 原样迁移 | 测试版草案 | `comment-completion-gate-rules` | 无 | 无 |
-| R-CC-008 | 方法体存在 2 个及以上连续步骤时，必须补顶层 `1.` `2.` `3.` 编号，必要时可用 `1.1` 等细分 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：步骤编号` | 等价改写 | 测试版草案 | `comment-completion-gate-rules` | 合并“步骤注释位置”与“分层编号”两组规则统一表述 | 无 |
+| R-CC-008 | 方法体存在 1 个及以上步骤时，必须至少补顶层 `1.` 编号；若存在多个连续步骤，再补 `2.` `3.`，必要时可用 `1.1` 等细分 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：步骤编号` | 等价改写 | 测试版草案 | `comment-completion-gate-rules` | 合并“步骤注释位置”与“分层编号”两组规则统一表述 | 无 |
 | R-CC-009 | 编号步骤注释必须就近落位，不得集中写在函数开头，也不得用普通流程注释替代 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：步骤编号` | 等价改写 | 测试版草案 | `comment-completion-gate-rules` | 旧 skill 的两组相邻规则合并为同一约束组 | 无 |
 | R-CC-010 | 函数、方法必须补 `[参数]` / `[返回]` / `最近修改时间`，且顺序固定 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：函数头元信息` | 原样迁移 | 测试版草案 | `comment-completion-gate-rules` | 无 | 无 |
 | R-CC-011 | 最近修改时间必须包含本次改动原因，且最后一行写入 | 否 | `comment-completion-gate-rules` | 新 `SKILL.md / 强制规则：函数头元信息` | 原样迁移 | 测试版草案 | `comment-completion-gate-rules` | 无 | 无 |
