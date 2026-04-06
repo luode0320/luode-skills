@@ -1,4 +1,4 @@
 interface:
   display_name: "Git 协作"
   short_description: "规范提交粒度、分支同步和 PR 整理的规则"
-  default_prompt: "使用 $git-collaboration-rules 整理当前变更的提交与 PR 边界，给出提交粒度和协作建议。"
+  default_prompt: "使用 $git-collaboration-rules 处理当前 Git 提交流程：分析全部未提交改动并按业务拆分为多次提交；若用户请求“提交git”，必须持续提交直到 `git status --short` 为空（除阻断级规则外不得提前结束）；每次提交前同步更新项目根 README 改动日志，并保证提交消息格式与换行合规。"
