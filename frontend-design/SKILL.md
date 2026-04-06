@@ -8,6 +8,15 @@ license: Complete terms in LICENSE.txt
 
 用户会提供前端需求，例如要构建一个组件、页面、应用或界面。用户也可能同时提供用途、受众或技术约束等上下文。
 
+## 触发后强制联动
+
+- 凡本轮新增或修改 `.vue`、`.tsx`、`.jsx`、`.css`、`.scss` 文件，必须同时命中：
+  - `comment-placement-granularity-rules`
+  - `comment-completion-gate-rules`
+  - `chinese-comment-rules`
+  - `skill-compliance-gate-rules`
+- 上述任一 skill 未命中，不得给出“已完成前端改动”或“可提交”结论。
+
 ## 设计思考
 
 在开始编码之前，先理解上下文，并明确选择一个**大胆且清晰**的审美方向：
