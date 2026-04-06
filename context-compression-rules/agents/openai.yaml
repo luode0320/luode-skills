@@ -1,4 +1,4 @@
 interface:
   display_name: "上下文压缩"
   short_description: "上下文压缩完成后自动补载 skills 和记忆，输出可继续执行的最小上下文包"
-  default_prompt: "使用 $context-compression-rules，在压缩完成后联动 $recent-context-bootstrap-rules 加载最近上下文和 skill 索引（系统的所有 skills 与 `./.skills`），再整理成可继续执行的最小摘要。"
+  default_prompt: "使用 $context-compression-rules，在压缩完成后联动 $recent-context-bootstrap-rules 加载最近上下文和 skill 索引（系统的所有 skills 与 `./.skills`），再整理成可继续执行的最小摘要；必须输出编码许可状态（confirmed/not-confirmed/unknown），若非 confirmed 则不得直接进入编码。"

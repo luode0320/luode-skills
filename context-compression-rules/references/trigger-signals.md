@@ -21,3 +21,7 @@
 - 先联动 `recent-context-bootstrap-rules`，补齐最近 3 天前情和 skill 索引来源：
   - 系统的所有 skills
   - 当前项目根目录下 `./.skills`
+- 恢复并声明“编码许可状态”：
+  - `confirmed`：已明确允许开始/继续实现代码
+  - `not-confirmed`：明确未允许开始/继续实现代码
+  - `unknown`：无法确认，默认不得直接进入编码，需先走关键节点确认
