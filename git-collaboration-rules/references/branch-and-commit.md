@@ -80,9 +80,18 @@ yyyy-MM-DD HH:mm:ss 提交标题
 
 - `<type>` 使用 `feat`、`fix`、`refactor`、`style`、`docs`、`test`、`chore` 等规范类型。
 - `中文简要说明` 直接描述本次改动对象，例如“用户登录”“订单结算”“订单创建接口”。
+- 禁止使用 `type(scope): 标题` 的括号 scope 写法（例如 `feat(reqsend): 转账详细统计支持多Sheet导出错误明细`）。
+- 遇到 scope 场景必须改写为 `type: [scope] 标题`（例如 `feat: [reqsend] 转账详细统计支持多Sheet导出错误明细`）。
 - `中文简要说明` 不允许加“功能/”“业务/”“接口/”等分类前缀。
 - `中文简要说明` 不允许直接写 API URL（如 `POST /api/order/create`）。
 - `标题说明` 用动宾短句说明动作，例如“新增短信验证码登录能力”“修复优惠券重复抵扣”。
+
+正误对照（必须遵循）：
+
+```text
+错误：feat(reqsend): 转账详细统计支持多Sheet导出错误明细
+正确：feat: [reqsend] 转账详细统计支持多Sheet导出错误明细
+```
 
 ### 格式一：feat（新增功能）
 

@@ -201,6 +201,20 @@ fix: 修复 bug
 
 ❌ 问题：没有说明，不知道修复了什么 bug、原因是什么、影响范围是什么。
 
+### 反例 2.1：错误使用 `type(scope):` 括号 scope 格式
+
+```text
+feat(reqsend): 转账详细统计支持多Sheet导出错误明细
+```
+
+❌ 问题：标题格式不符合本规则。禁止 `type(scope): ...` 写法，必须改成 `type: [scope] ...`。
+
+正确写法：
+
+```text
+feat: [reqsend] 转账详细统计支持多Sheet导出错误明细
+```
+
 ### 反例 3：PR 只写"fix bug"或"update code"
 
 ```
