@@ -1,0 +1,3 @@
+interface:
+  display_name: "代码上下文重同步规则"
+  short_description: "代码记忆与现状不一致时先重读再增量合并，避免覆盖用户手动改动"
