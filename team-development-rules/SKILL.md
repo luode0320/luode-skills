@@ -28,18 +28,20 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 - 多个 skill 同时命中，可能重复、冲突或顺序错位。
 - 需要决定流程是暂停、重启、继续还是终止。
 - 用户明确要求按团队完整研发流程处理。
+- 用户直接给出“提交git / 提交 git / commit一下 / 帮我提交”这类执行型 Git 短指令，但当前上下文又混有阶段信息，可能被误分流。
 
 ## 进入后先做什么
 
 1. 先判断当前阶段。
-2. 如果问题明显是在查历史，优先判断是否应进入记忆域。
-3. 再判断这是需求类、Bug 类还是交付收口类问题。
-4. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
-5. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
-6. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
-7. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
-8. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
-9. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
+2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号。
+3. 如果问题明显是在查历史，优先判断是否应进入记忆域。
+4. 再判断这是需求类、Bug 类还是交付收口类问题。
+5. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
+6. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
+7. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
+8. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
+9. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
+10. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
 
 ## 默认执行流程
 

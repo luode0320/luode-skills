@@ -34,6 +34,14 @@
 - 可以多 skill 同时命中。
 - 本 skill 不计入“业务命中 skill 列表”。
 
+## Git 短指令场景补充
+
+- 当用户输入执行型 Git 指令（如“提交git”“提交 git”“git提交”“commit一下”“帮我提交代码”）时，必须优先命中 `git-collaboration-rules`。
+- 对“执行提交”和“审查提交”做意图区分：
+  - 执行提交：命中 `git-collaboration-rules`。
+  - 审查提交（如“review commit”“审核最近提交”）：命中 `code-review-automation-rules`。
+- 不允许要求用户额外补充“测试已完成”“准备交付”这类描述后才触发 Git 提交流程。
+
 ## 自主执行场景补充
 
 - 当任务是多步骤链路，且当前阶段完成后存在可直接执行的下一步（非关键决策/高风险节点），必须检查并命中 `autonomous-execution-rules`。
