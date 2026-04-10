@@ -19,7 +19,8 @@
 ## 代码改动收口场景补充
 
 - 当本轮发生代码新增或修改，且准备输出最终回复时，命中列表必须包含：`comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`。
-- 即使用户没有显式提到“注释”，也不能跳过上述三个 skill。
+- 当本轮发生代码新增或修改，且准备输出最终回复时，命中列表还必须包含：`cleanup-format-review-rules`、`syntax-check-review-rules`。
+- 即使用户没有显式提到“注释”或“格式”，也不能跳过上述收口 skill。
 - 若缺少任一 skill，先补命中并完成收口检查，再输出最终回复。
 
 ## 代码改动中段场景补充
