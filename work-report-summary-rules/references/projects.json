@@ -28,11 +28,11 @@
   "projects": [
     {
       "path": "/home/luode/code/ellipal_buysell_go",
-      "name": "买卖币项目"
+      "name": "买卖币"
     },
     {
       "path": "/home/luode/code/ellipal_market_activity",
-      "name": "市场活动项目"
+      "name": "市场活动"
     },
     {
       "path": "/home/luode/code/ellipal_wallet_pay",
@@ -40,23 +40,19 @@
     },
     {
       "path": "/home/luode/code/EllipalFinance-go",
-      "name": "兑换项目"
+      "name": "兑换"
     },
     {
       "path": "/home/luode/code/EllipalNodeSync",
-      "name": "go-api服务项目"
+      "name": "go-api服务"
     },
     {
       "path": "/home/luode/code/ellipal-swap-java",
-      "name": "自有兑换项目"
+      "name": "自有兑换"
     },
     {
-      "path": "/home/luode/code/go-admin",
-      "name": "管理系统后端项目"
-    },
-    {
-      "path": "/home/luode/code/go-admin-vue3",
-      "name": "管理系统前端项目"
+      "path": "/home/luode/code/ellipal_admin",
+      "name": "管理系统"
     },
     {
       "path": "/home/luode/code/hedgeswapSignManager",
