@@ -1,4 +1,4 @@
 interface:
   display_name: "自主连续执行规则"
   short_description: "Auto-continue tasks and pause only at key decision points"
-  default_prompt: "使用 $autonomous-execution-rules 自动推进多步骤任务：当任务尚未闭环且准备输出“下一步建议/是否继续”时，默认直接执行下一步，不停顿询问；仅在关键决策或高风险节点暂停并给出结构化确认选项。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须先暂停确认，不得直接进入编码。"
+  default_prompt: "使用 $autonomous-execution-rules 自动推进多步骤任务：当任务尚未闭环且准备输出“下一步建议/是否继续”时，默认直接执行下一步，不停顿询问；当用户已明确“开始执行/按文档实现”时，默认连续推进到实现与测试闭环，仅在阻断级或高风险节点暂停。若刚发生上下文压缩且编码许可状态不是 confirmed（如 unknown/revoked），必须先暂停确认，不得直接进入编码。"
