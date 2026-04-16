@@ -1,4 +1,4 @@
 interface:
   display_name: "需求接入"
   short_description: "从需求链接与零散资料补齐需求，并定义需求域同一份 ment 文档入口的规则"
-  default_prompt: "使用 $requirement-intake-rules 根据需求 URL、零散资料和物料整理需求，补齐到可进入开发的程度，生成或更新 ment 文档，并同步产出 `.flow.svg` 与 `.sequence.svg`；若涉及新增文件必须写明目录+文件名，若涉及数据库新表/字段变更必须附 SQL。"
+  default_prompt: "使用 $requirement-intake-rules 根据需求 URL、零散资料和物料整理需求，补齐到可进入开发的程度，生成或更新 ment 文档，并同步产出 `.flow.svg` 与 `.sequence.svg`；若涉及新增文件必须使用目录树代码块记录，若涉及数据库新表/字段变更必须附 SQL。"
