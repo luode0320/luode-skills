@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-16 23:39:25",
+  "generated_at": "2026-04-17 01:25:44",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 63,
-    "implemented_total": 63,
+    "planned_total": 64,
+    "implemented_total": 64,
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
-    "references_total": 241,
-    "agents_total": 69
+    "references_total": 244,
+    "agents_total": 70
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 6,
+      "implemented_count": 7,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 6,
+      "total_count": 7,
       "items": [
         {
           "id": "team-development-rules",
@@ -243,6 +243,50 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "subagent-dispatch-rules",
+          "name": "subagent-dispatch-rules",
+          "title": "子代理分发规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 6,
+          "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先判断当前任务是否满足 subagent 委派条件（默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控或写集冲突时回退本地执行）；满足时优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
+          "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
+          "skill_path": "subagent-dispatch-rules/SKILL.md",
+          "directory_path": "subagent-dispatch-rules",
+          "directory": "subagent-dispatch-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "主 agent 可见公告（强制）",
+            "子任务优先委派清单",
+            "必须主 agent 本地执行的场景",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
+            "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+            "subagent-dispatch-rules/references/subagent-task-templates.md"
+          ],
+          "agents": [
+            "subagent-dispatch-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
           "id": "skill-compliance-gate-rules",
           "name": "skill-compliance-gate-rules",
           "title": "Skill 执行完整性闸门规则",
@@ -252,7 +296,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 6,
+          "item_order": 7,
           "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
@@ -3608,6 +3652,50 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "subagent-dispatch-rules",
+      "name": "subagent-dispatch-rules",
+      "title": "子代理分发规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 6,
+      "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先判断当前任务是否满足 subagent 委派条件（默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控或写集冲突时回退本地执行）；满足时优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
+      "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
+      "skill_path": "subagent-dispatch-rules/SKILL.md",
+      "directory_path": "subagent-dispatch-rules",
+      "directory": "subagent-dispatch-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "主 agent 可见公告（强制）",
+        "子任务优先委派清单",
+        "必须主 agent 本地执行的场景",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
+        "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+        "subagent-dispatch-rules/references/subagent-task-templates.md"
+      ],
+      "agents": [
+        "subagent-dispatch-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
       "id": "skill-compliance-gate-rules",
       "name": "skill-compliance-gate-rules",
       "title": "Skill 执行完整性闸门规则",
@@ -3617,7 +3705,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 6,
+      "item_order": 7,
       "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
@@ -6687,7 +6775,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "63 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "64 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
