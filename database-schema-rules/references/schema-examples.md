@@ -266,3 +266,20 @@ CREATE INDEX `idx_everything` ON `orders` (`user_id`, `status`, `amount`, `creat
 ```
 
 ❌ 问题：没有分析查询瓶颈，盲目加索引可能导致写入性能下降。
+
+### 反例 12：SQL 标识符裸写，未统一反引号
+
+```sql
+CREATE TABLE orders (
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  PRIMARY KEY (id),
+  KEY idx_enabled (enabled)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='示例表';
+```
+
+❌ 问题：
+
+- 表名、字段名、索引名均未按规范使用反引号包裹。
+- `enabled` 这类名称在不同方言或演进阶段容易产生兼容与可读性问题。
+- 风格不统一会增加迁移脚本 diff 噪音与 review 成本。

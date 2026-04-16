@@ -1,4 +1,4 @@
 interface:
   display_name: "数据库访问规则"
   short_description: "统一 SQL Repository 事务锁分页批量操作与查询性能边界规范"
-  default_prompt: "使用 $database-query-rules 判断当前 SQL、Repository、DAO、事务、锁和批量 CRUD 修改是否符合数据访问与查询性能基线。"
+  default_prompt: "使用 $database-query-rules 判断当前 SQL、Repository、DAO、事务、锁和批量 CRUD 修改是否符合数据访问与查询性能基线，并确保 SQL 标识符统一使用反引号（如 `enabled`）。"
