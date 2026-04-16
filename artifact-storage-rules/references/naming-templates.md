@@ -5,6 +5,8 @@
 ## 需求域
 
 - 需求文档：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.md`
+- 需求流程图（SVG）：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.flow.svg`
+- 需求时序图（SVG）：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.sequence.svg`
 - 验收文档：`ment/YYYY-MM-DD_验收中文说明.md`
 - 实施计划：`ment/YYYY-MM-DD_实施计划中文说明.md`
 
@@ -13,16 +15,20 @@
 - `<需求中文简介标题>` 必须使用本次需求的中文简介标题，禁止固定写成“需求中文说明”。
 - 同一天存在多个近似标题时，在不改变中文语义前提下补充更具体描述，避免重名。
 - 同一需求的补齐、边界、拆分、变更应持续更新同一份需求文档，不新建平行入口。
+- 需求文档落地时必须同步产出两张 SVG：流程图（`.flow.svg`）与时序图（`.sequence.svg`）。
 
 ## Bug 域
 
 - Bug 根目录：`bug/YYYY-MM-DD_HHmmss_问题中文简介/`
 - Bug 主入口文件：`bug/YYYY-MM-DD_HHmmss_问题中文简介/README.md`
+- Bug 流程图（SVG）：`bug/YYYY-MM-DD_HHmmss_问题中文简介/flow.svg`
+- Bug 时序图（SVG）：`bug/YYYY-MM-DD_HHmmss_问题中文简介/sequence.svg`
 
 补充要求：
 
 - 同一个 Bug 的后续复现、定位、诊断、方案和验证都沿用同一根目录。
 - `README.md` 作为主入口文件，其他附件和细节记录围绕该根目录组织。
+- Bug 根目录落地时必须同步产出两张 SVG：流程图（`flow.svg`）与时序图（`sequence.svg`）。
 
 ## 测试域
 

@@ -8,10 +8,14 @@ roots:
 
 entry_files:
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
+  requirement_flow_svg: "{datetime}_{requirement_cn_title}.flow.svg"
+  requirement_sequence_svg: "{datetime}_{requirement_cn_title}.sequence.svg"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   acceptance_doc: "{date}_验收中文说明.md"
   implementation_plan_doc: "{date}_实施计划中文说明.md"
   bug_root_readme: "README.md"
+  bug_flow_svg: "flow.svg"
+  bug_sequence_svg: "sequence.svg"
   test_task_readme: "README.md"
   project_design_doc: "项目设计.md"
 
@@ -46,7 +50,9 @@ policies:
   same_requirement_updates_same_doc: true
   same_requirement_acceptance_updates_same_doc: true
   same_requirement_plan_updates_same_doc: true
+  requirement_requires_svg_diagrams: true
   same_bug_updates_same_root: true
+  bug_requires_svg_diagrams: true
   same_test_round_updates_same_root: true
   new_independent_test_round_creates_new_root: true
   same_project_design_updates_same_doc: true
