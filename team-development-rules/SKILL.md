@@ -28,12 +28,12 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 - 多个 skill 同时命中，可能重复、冲突或顺序错位。
 - 需要决定流程是暂停、重启、继续还是终止。
 - 用户明确要求按团队完整研发流程处理。
-- 用户直接给出“提交git / 提交 git / commit一下 / 帮我提交”这类执行型 Git 短指令，但当前上下文又混有阶段信息，可能被误分流。
+- 用户直接给出“提交git / 提交 git / commit一下 / 帮我提交”这类执行型 Git 短指令，但当前上下文又混有阶段信息，可能被误分流；这类指令必须优先转交 `git-collaboration-rules`，不得先进入记忆、需求、Bug、编码或交付分流。
 
 ## 进入后先做什么
 
 1. 先判断当前阶段。
-2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号。
+2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号，也不得先路由到 `autonomous-execution-rules` 或 `delivery-summary-rules`。
 3. 如果问题明显是在查历史，优先判断是否应进入记忆域。
 4. 再判断这是需求类、Bug 类还是交付收口类问题。
 5. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
