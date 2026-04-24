@@ -114,7 +114,7 @@ python skill-dictionary/generate_dictionary.py
 | `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
-| `skill-hit-check-rules` | 每轮用户提问先做 Skill 命中检查并显式回报命中列表，避免漏触发。 |
+| `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `subagent-dispatch-rules` | 任一 skill 命中后默认先判断并优先尝试委派 subagent；仅在用户明确禁止、不可切分或高风险冲突时回退本地执行，并由主 agent 输出可见启动/完成状态。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出主任务优先的下一步建议。 |
 
@@ -422,3 +422,4 @@ claude-mem(记忆) :
 2026-04-17 11:23:42 fix: [注释闸门核对] 强制输出函数与补丁注释清单
 2026-04-21 15:58:58 docs: [Git协作路由修正] 统一提交说明中文格式
 2026-04-21 18:44:50 fix: [格式化日志约定] 统一格式化日志排版
+2026-04-24 13:46:07 fix: [命中检查路由] 修正skill自举依赖并转入总控路由

@@ -36,12 +36,13 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号，也不得先路由到 `autonomous-execution-rules` 或 `delivery-summary-rules`。
 3. 如果问题明显是在查历史，优先判断是否应进入记忆域。
 4. 再判断这是需求类、Bug 类还是交付收口类问题。
-5. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
-6. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
-7. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
-8. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
-9. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
-10. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
+5. 每轮开局先路由到 `skill-hit-check-rules` 做命中检查，再进入具体主域；不要把它当成业务 skill，而要把它当成总控入口的一部分。
+6. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
+7. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
+8. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
+9. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
+10. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
+11. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
 
 ## 默认执行流程
 
