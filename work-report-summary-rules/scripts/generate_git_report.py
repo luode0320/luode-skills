@@ -353,11 +353,6 @@ def filter_commits_by_importance(
     return filtered
 
 
-def format_timestamp(ts: int, timezone: ZoneInfo) -> str:
-    local_dt = dt.datetime.fromtimestamp(ts, tz=dt.timezone.utc).astimezone(timezone)
-    return local_dt.strftime("%Y-%m-%d %H:%M:%S")
-
-
 def summarize_project(
     project_name: str,
     project_path: str,
@@ -367,8 +362,7 @@ def summarize_project(
     report_items: list[str] = []
 
     for item in commits:
-        summary = f"{format_timestamp(item.commit_ts, timezone)}: {summarize_commit_subject(item.subject)}"
-        report_items.append(summary)
+        report_items.append(summarize_commit_subject(item.subject))
 
     return ProjectResult(
         name=project_name,
