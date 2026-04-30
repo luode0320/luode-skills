@@ -15,6 +15,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 - 如果没有命中，明确说明未命中原因，避免“未命中但没解释”。
 - 把 skill 检查作为前置动作，不代替后续主域执行。
 - 当用户给出执行型 Git 短指令（如“提交git”“提交 git”“commit 一下”）时，必须优先命中 `git-collaboration-rules`，且其优先级高于 `autonomous-execution-rules`、`delivery-summary-rules` 和其他阶段判断，避免被误分流。
+- 当用户给出执行型 Git 短指令（如“提交git”“提交 git”“commit 一下”）时，除命中 `git-collaboration-rules` 外，还必须在首条中间进度与最终回复输出“Skill 执行证据”区块，防止出现“只命中未执行”。
 
 ## 自动触发信号
 
@@ -40,6 +41,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 8. 当多步骤任务存在可直接继续的下一步时，必须补做 `autonomous-execution-rules` 命中检查，并默认继续推进。
 9. 当用户请求补注释时，先定位“未提交且已有改动”的代码范围，再执行注释补齐，不得优先处理未改动历史代码。
 10. 当用户请求是“执行提交”而不是“审查提交”时，必须优先命中 `git-collaboration-rules`，不得先进入其他阶段 skill；若是“review commit/审核提交”，则命中 `code-review-automation-rules`。
+11. 当命中 `git-collaboration-rules` 时，必须在首条中间进度附带执行证据最小集：`已读取的 skill 文件路径`、`当前 git 盘点命令`、`下一步命令`；最终回复必须附带结果证据最小集：`git status --short`、`git diff --cached --stat`、`git commit`、`git log -1 --pretty=%B` 的执行结论。
 
 ## 默认执行流程
 
@@ -58,6 +60,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 10.2 当本轮在原有方法中存在补丁位点时，最终回复必须包含“补丁注释核对清单”；若无补丁位点，必须声明“补丁位点 0 个”。
 11. 若本轮是补注释请求，强制校验是否已命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并确认注释范围优先覆盖未提交改动代码。
 12. 若用户输入“提交git / 提交 git / commit一下 / 帮我提交”这类执行型短指令，必须先命中 `git-collaboration-rules` 再进入其他域判断，不得等待“测试已完成”等附加描述才触发，也不得先命中 `autonomous-execution-rules` 或 `delivery-summary-rules`。
+13. 若命中 `git-collaboration-rules` 但缺失“Skill 执行证据”区块，判定为命中失败并要求立即补齐证据后再继续。
 
 ## 输出要求
 
@@ -76,6 +79,7 @@ Skill 命中检查：
 - 本轮长链路执行的中间阶段总结消息必须再次输出该区块。
 - 本轮最终回复也必须先输出该区块。
 - 禁止仅在最终回复输出，导致执行过程不可见。
+- 若本轮命中 `git-collaboration-rules`，该区块必须追加“Skill 执行证据”小节；缺失即视为不合规。
 
 未命中时：
 
@@ -93,8 +97,8 @@ Skill 命中检查：
 
 ## 执行通过 / 驳回标准
 
-- 通过：首条中间消息、首次代码改动后的中间消息、以及最终回复都给出命中检查结果，且命中 skill 列表与本轮任务一致；涉及函数/方法改动时最终回复包含函数注释核对清单（或明确函数位点 0 个）；涉及补丁位点时最终回复包含补丁注释核对清单（或明确补丁位点 0 个）。
-- 驳回：用户提问后未执行命中检查，或命中了 skill 但未告知清单，或已改代码但拖到最终回复才补注释相关命中，或“提交git”类执行指令未命中 `git-collaboration-rules`，或函数/方法改动场景未输出函数注释核对清单，或补丁位点场景未输出补丁注释核对清单。
+- 通过：首条中间消息、首次代码改动后的中间消息、以及最终回复都给出命中检查结果，且命中 skill 列表与本轮任务一致；涉及函数/方法改动时最终回复包含函数注释核对清单（或明确函数位点 0 个）；涉及补丁位点时最终回复包含补丁注释核对清单（或明确补丁位点 0 个）；若命中 `git-collaboration-rules`，首条中间进度与最终回复均包含可核验的 Skill 执行证据。
+- 驳回：用户提问后未执行命中检查，或命中了 skill 但未告知清单，或已改代码但拖到最终回复才补注释相关命中，或“提交git”类执行指令未命中 `git-collaboration-rules`，或命中后未输出 Skill 执行证据，或函数/方法改动场景未输出函数注释核对清单，或补丁位点场景未输出补丁注释核对清单。
 
 ## references 读取规则
 
