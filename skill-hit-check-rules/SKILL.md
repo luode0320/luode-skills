@@ -1,6 +1,6 @@
 ---
 name: skill-hit-check-rules
-description: 作为总控层的轮次命中检查入口 skill，在每轮用户提问开始时负责检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。该 skill 应由 `team-development-rules` 或平台侧总控在每轮开局优先路由调用，而不是依赖自身先被业务命中。若本轮发生代码新增或修改，不仅在最终回复前收口必须命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`，还必须在首次代码改动后的中间阶段立即补做一次注释相关命中检查；涉及代码改动收口时，需补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 的命中检查，避免只做构建不做基础格式和语法收口；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。
+description: 【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善”时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。
 ---
 
 # Skill 命中检查规则
