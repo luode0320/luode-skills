@@ -1,6 +1,6 @@
 ---
 name: skill-hit-check-rules
-description: 【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善”时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。
+description: 【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。
 ---
 
 # Skill 命中检查规则
@@ -33,7 +33,8 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 2. 命中判断时，优先依据各 skill 的 `description` 触发条件。
 3. 必须在回复最开始先输出命中检查结果，再进入主域执行。
 4. 输出命中列表时，不把本 skill 自己计入“业务命中 skill 列表”。
-5. 当请求包含“补充注释 / 只补注释 / 注释规范检查 / 注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，不得缺任一项。
+5. 当请求包含“补充注释 / 只补注释 / 注释规范检查 / 注释完善 / 补下注释 / 加注释”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，不得缺任一项。
+5.1 即使用户消息仅有“补充注释”四个字，也必须立即执行上述四个 skill 命中，不得等待补充上下文。
 6. 当本轮首次发生代码新增或修改时，即使用户未显式提“注释”，也必须在中间进度阶段立即补命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`。
 7. 当本轮发生代码新增或修改且进入最终回复前收口时，必须再次复核上述三个注释相关 skill 仍处于命中状态。
 7.1 当本轮发生代码新增或修改且进入最终回复前收口时，必须补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 命中检查；若未执行，不能给出“已完成”结论。
@@ -59,6 +60,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 10.1 当命中 `comment-completion-gate-rules` 且本轮存在函数/方法改动时，最终回复必须包含“函数注释核对清单”；若无函数/方法改动，必须声明“函数位点 0 个”。
 10.2 当本轮在原有方法中存在补丁位点时，最终回复必须包含“补丁注释核对清单”；若无补丁位点，必须声明“补丁位点 0 个”。
 11. 若本轮是补注释请求，强制校验是否已命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并确认注释范围优先覆盖未提交改动代码。
+11.1 补注释请求的最终回复必须附“函数注释核对清单 + 补丁注释核对清单（或 0 个声明）”，缺失任一项视为不合规。
 12. 若用户输入“提交git / 提交 git / commit一下 / 帮我提交”这类执行型短指令，必须先命中 `git-collaboration-rules` 再进入其他域判断，不得等待“测试已完成”等附加描述才触发，也不得先命中 `autonomous-execution-rules` 或 `delivery-summary-rules`。
 13. 若命中 `git-collaboration-rules` 但缺失“Skill 执行证据”区块，判定为命中失败并要求立即补齐证据后再继续。
 
