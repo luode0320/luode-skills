@@ -59,6 +59,11 @@ agent-browser snapshot -i  # 检查结果
    - 建议最多 2-3 次重试
    - 每次重试都要说明：触发原因、调整动作、结果
 
+7. **测试截图只临时保留，收口前必须清理**
+   - 过程截图允许保留用于定位问题与中间汇报
+   - 测试完成后默认删除临时截图，避免在仓库与测试目录遗留垃圾截图
+   - 只有用户明确要求“保留截图作为交付物”时才允许保留，并应集中放到约定目录
+
 完整经验与命令模板见：
 - [references/browser-operation-lessons.md](references/browser-operation-lessons.md)
 - [references/tapd-workflow-automation.md](references/tapd-workflow-automation.md)
@@ -616,6 +621,29 @@ agent-browser close --all              # 关闭所有活动 session
 
 如果之前某个 session 没有正确关闭，守护进程可能还在。可执行 `agent-browser close` 清理，或用 `agent-browser close --all` 一次关闭全部。
 
+## 测试截图清理（强制）
+
+截图可以在执行过程中用于排障与汇报，但默认视为临时产物。
+当测试完成并进入收口阶段时，必须执行截图清理，避免遗留垃圾文件。
+
+默认规则：
+
+- 允许过程截图：用于中间定位、异常证据、阶段性汇报。
+- 强制收口清理：测试完成后删除临时截图。
+- 保留例外：只有用户明确要求保留截图时，才保留并集中归档。
+
+推荐做法：
+
+```bash
+# 示例：清理项目内临时截图目录
+Remove-Item -LiteralPath .\\screenshots\\* -Force -ErrorAction SilentlyContinue
+
+# 示例：清理 /tmp 下本次测试截图（按前缀）
+Remove-Item -LiteralPath /tmp/ab-test-*.png -Force -ErrorAction SilentlyContinue
+```
+
+补充：若截图属于失败用例证据且用户要求保留，需在最终总结中说明“保留原因 + 保存位置”。
+
 若想在空闲一段时间后自动关闭守护进程（适合 CI 或一次性环境）：
 
 ```bash
@@ -720,6 +748,7 @@ agent-browser eval -b "$(echo -n 'Array.from(document.querySelectorAll("a")).map
 | [references/browser-operation-lessons.md](references/browser-operation-lessons.md) | 浏览器自动化实战经验、失败分流与稳定执行清单 |
 | [references/snapshot-refs.md](references/snapshot-refs.md)           | Ref 生命周期、失效规则与排障 |
 | [references/session-management.md](references/session-management.md) | 并行 session、状态持久化、并发抓取 |
+| [references/screenshot-cleanup.md](references/screenshot-cleanup.md) | 测试截图生命周期、清理时机与保留例外 |
 | [references/authentication.md](references/authentication.md)         | 登录流程、OAuth、2FA、状态复用 |
 | [references/tapd-workflow-automation.md](references/tapd-workflow-automation.md) | TAPD 场景自动化流程、暂停点复盘与无交互收敛 |
 | [references/video-recording.md](references/video-recording.md)       | 调试和留档时的视频录制 |

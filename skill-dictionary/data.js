@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-05-12 00:45:30",
+  "generated_at": "2026-05-12 01:27:56",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
-    "references_total": 247,
+    "references_total": 248,
     "agents_total": 72
   },
   "downloaded_seeds": {
@@ -2719,6 +2719,7 @@ window.SKILL_DICTIONARY = {
             "超时与慢页面",
             "JavaScript 对话框（alert / confirm / prompt）",
             "Session 管理与清理",
+            "测试截图清理（强制）",
             "Ref 生命周期（重要）",
             "带标注的截图（Vision 模式）",
             "语义定位器（Refs 的替代方案）",
@@ -2736,6 +2737,7 @@ window.SKILL_DICTIONARY = {
             "agent-browser/references/commands.md",
             "agent-browser/references/profiling.md",
             "agent-browser/references/proxy-support.md",
+            "agent-browser/references/screenshot-cleanup.md",
             "agent-browser/references/session-management.md",
             "agent-browser/references/snapshot-refs.md",
             "agent-browser/references/tapd-workflow-automation.md",
@@ -6132,6 +6134,7 @@ window.SKILL_DICTIONARY = {
         "超时与慢页面",
         "JavaScript 对话框（alert / confirm / prompt）",
         "Session 管理与清理",
+        "测试截图清理（强制）",
         "Ref 生命周期（重要）",
         "带标注的截图（Vision 模式）",
         "语义定位器（Refs 的替代方案）",
@@ -6149,6 +6152,7 @@ window.SKILL_DICTIONARY = {
         "agent-browser/references/commands.md",
         "agent-browser/references/profiling.md",
         "agent-browser/references/proxy-support.md",
+        "agent-browser/references/screenshot-cleanup.md",
         "agent-browser/references/session-management.md",
         "agent-browser/references/snapshot-refs.md",
         "agent-browser/references/tapd-workflow-automation.md",
