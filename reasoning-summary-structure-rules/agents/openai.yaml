@@ -1,0 +1,4 @@
+interface:
+  display_name: "总结结构闸门"
+  short_description: "在最终推理总结时强制检查输出结构完整性与条件字段"
+  default_prompt: "使用 $reasoning-summary-structure-rules 在最终回复前执行总结结构闸门检查。按固定顺序输出：Skill 命中检查、Skill 执行证据、当前问题、解决方案与根因、结果与结论、条件字段（改动点/验证结果/函数注释核对）、下一步建议。若必填项缺失，先补信息再收口。"

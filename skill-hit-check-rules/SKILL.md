@@ -1,6 +1,6 @@
 ---
 name: skill-hit-check-rules
-description: 【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。
+description: 【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当进入最终推理总结或结束输出阶段时，必须同步命中 `reasoning-summary-structure-rules` 并按其结构收口。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。
 ---
 
 # Skill 命中检查规则
@@ -38,6 +38,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 6. 当本轮首次发生代码新增或修改时，即使用户未显式提“注释”，也必须在中间进度阶段立即补命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`。
 7. 当本轮发生代码新增或修改且进入最终回复前收口时，必须再次复核上述三个注释相关 skill 仍处于命中状态。
 7.1 当本轮发生代码新增或修改且进入最终回复前收口时，必须补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 命中检查；若未执行，不能给出“已完成”结论。
+7.3 当进入最终推理总结或结束输出阶段时，必须补命中 `reasoning-summary-structure-rules`，并按其固定结构完成收口。
 7.2 当本轮已命中任一业务 skill 时，默认同步补命中 `subagent-dispatch-rules`，先做“是否委派”判定再进入主执行；仅在用户明确禁止委派或环境不支持时回退本地执行。
 8. 当多步骤任务存在可直接继续的下一步时，必须补做 `autonomous-execution-rules` 命中检查，并默认继续推进。
 9. 当用户请求补注释时，先定位“未提交且已有改动”的代码范围，再执行注释补齐，不得优先处理未改动历史代码。
@@ -57,6 +58,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 9. 若本轮是多步骤任务且当前阶段完成后可继续，先命中 `autonomous-execution-rules` 并直接推进下一步，不在中段停顿征求确认。
 9.1 若本轮已命中业务 skill，默认先补命中 `subagent-dispatch-rules`，完成委派判定后再继续后续技能执行；若用户明确禁止委派，则保留命中但回退本地执行。
 10. 若本轮存在代码改动且准备最终回复，强制补命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`cleanup-format-review-rules`、`syntax-check-review-rules` 与 `skill-compliance-gate-rules` 后再收口。
+10.3 若准备输出最终总结或结束输出，强制补命中 `reasoning-summary-structure-rules` 后再收口。
 10.1 当命中 `comment-completion-gate-rules` 且本轮存在函数/方法改动时，最终回复必须包含“函数注释核对清单”；若无函数/方法改动，必须声明“函数位点 0 个”。
 10.2 当本轮在原有方法中存在补丁位点时，最终回复必须包含“补丁注释核对清单”；若无补丁位点，必须声明“补丁位点 0 个”。
 11. 若本轮是补注释请求，强制校验是否已命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并确认注释范围优先覆盖未提交改动代码。

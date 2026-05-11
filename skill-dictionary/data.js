@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-05-11 22:47:34",
+  "generated_at": "2026-05-12 00:45:30",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 65,
-    "implemented_total": 65,
+    "planned_total": 66,
+    "implemented_total": 66,
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
-    "references_total": 244,
-    "agents_total": 71
+    "references_total": 247,
+    "agents_total": 72
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 7,
+      "implemented_count": 8,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 7,
+      "total_count": 8,
       "items": [
         {
           "id": "team-development-rules",
@@ -213,7 +213,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 5,
-          "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
+          "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当进入最终推理总结或结束输出阶段时，必须同步命中 `reasoning-summary-structure-rules` 并按其结构收口。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -321,6 +321,47 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "skill-compliance-gate-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
+          "id": "reasoning-summary-structure-rules",
+          "name": "reasoning-summary-structure-rules",
+          "title": "推理总结结构闸门规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 8,
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题、问题的解决方案与根因、当前结果与结论、下一步建议；若本轮有改动必须包含本次改动点与函数注释核对；若本轮有验证必须包含验证结果。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
+          "skill_path": "reasoning-summary-structure-rules/SKILL.md",
+          "directory_path": "reasoning-summary-structure-rules",
+          "directory": "reasoning-summary-structure-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "输出要求（固定顺序）",
+            "权责边界与不负责事项",
+            "执行通过 / 驳回标准",
+            "references 读取规则"
+          ],
+          "references": [
+            "reasoning-summary-structure-rules/references/conditional-sections-rules.md",
+            "reasoning-summary-structure-rules/references/output-examples.md",
+            "reasoning-summary-structure-rules/references/summary-structure-template.md"
+          ],
+          "agents": [
+            "reasoning-summary-structure-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -3669,7 +3710,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 5,
-      "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
+      "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当进入最终推理总结或结束输出阶段时，必须同步命中 `reasoning-summary-structure-rules` 并按其结构收口。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -3777,6 +3818,47 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "skill-compliance-gate-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
+      "id": "reasoning-summary-structure-rules",
+      "name": "reasoning-summary-structure-rules",
+      "title": "推理总结结构闸门规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 8,
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题、问题的解决方案与根因、当前结果与结论、下一步建议；若本轮有改动必须包含本次改动点与函数注释核对；若本轮有验证必须包含验证结果。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
+      "skill_path": "reasoning-summary-structure-rules/SKILL.md",
+      "directory_path": "reasoning-summary-structure-rules",
+      "directory": "reasoning-summary-structure-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "输出要求（固定顺序）",
+        "权责边界与不负责事项",
+        "执行通过 / 驳回标准",
+        "references 读取规则"
+      ],
+      "references": [
+        "reasoning-summary-structure-rules/references/conditional-sections-rules.md",
+        "reasoning-summary-structure-rules/references/output-examples.md",
+        "reasoning-summary-structure-rules/references/summary-structure-template.md"
+      ],
+      "agents": [
+        "reasoning-summary-structure-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -6869,7 +6951,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "65 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "66 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
