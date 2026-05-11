@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-04-17 01:25:44",
+  "generated_at": "2026-05-11 22:47:34",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 64,
-    "implemented_total": 64,
+    "planned_total": 65,
+    "implemented_total": 65,
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
     "references_total": 244,
-    "agents_total": 70
+    "agents_total": 71
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -213,7 +213,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 5,
-          "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改，不仅在最终回复前收口必须命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`，还必须在首次代码改动后的中间阶段立即补做一次注释相关命中检查；涉及代码改动收口时，需补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 的命中检查，避免只做构建不做基础格式和语法收口；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+          "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -297,7 +297,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 7,
-          "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
           "directory_path": "skill-compliance-gate-rules",
@@ -1217,10 +1217,10 @@ window.SKILL_DICTIONARY = {
       "label": "编码基线域",
       "description": "开始编码即并行生效的基础质量规则",
       "order": 5,
-      "implemented_count": 8,
+      "implemented_count": 9,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 8,
+      "total_count": 9,
       "items": [
         {
           "id": "code-minimal-change-rules",
@@ -1366,6 +1366,7 @@ window.SKILL_DICTIONARY = {
             "Go 路由风格约定",
             "Go 局部变量声明风格约定",
             "Go 函数签名风格约定",
+            "Go 代码排版补充约定",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -1486,7 +1487,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 5,
           "item_order": 7,
-          "auto_trigger": "当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时触发。负责统一注释位置、颗粒度、字段相关注释和过期注释治理；不要用它代替注释语言表达、改动位点补齐闸门或 Swagger/OpenAPI 注解规则。",
+          "auto_trigger": "【联动自动触发】本轮发生代码新增/修改时，默认与 `comment-completion-gate-rules` 联动命中；当需要判断注释该不该写、写在哪里、写多细时必须命中。若用户提“补充注释/加注释”但未指定细节，也要默认命中本 skill 做注释落点判定。负责注释放置与颗粒度（含字段注释、边界注释、过期注释治理），不代替中文表达、补齐闸门或 Swagger 规则。",
           "core_responsibility": "统一注释位置、颗粒度、字段相关注释和过期注释治理。",
           "skill_path": "comment-placement-granularity-rules/SKILL.md",
           "directory_path": "comment-placement-granularity-rules",
@@ -1527,7 +1528,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 5,
           "item_order": 8,
-          "auto_trigger": "当本轮代码新增或修改，或用户请求补充注释、只补注释、注释完善，或需要判断函数头 `[参数]` / `[返回]` / `最近修改时间` 如何补、方法体步骤编号是否必须、普通流程注释是否必须改写为编号步骤注释时触发。负责统一补注释优先范围、函数头元信息、方法块步骤编号和注释缺失阻断闸门；不要用它代替注释语言表达、一般性的注释位置判断或 Swagger/OpenAPI 注解规则。",
+          "auto_trigger": "【强制自动触发】只要本轮发生任意代码新增/修改，或用户提到“补充注释/只补注释/注释完善/补下注释/加注释”，必须命中本 skill。即使用户只发一句“补充注释”，也必须立即触发并输出注释补齐核对结果。负责改动位点注释补齐闸门：函数头 `[参数]`/`[返回]`/`最近修改时间`、方法体步骤编号、补丁原因注释、函数/补丁核对清单。缺任一项不得收口。仅负责补齐闸门，不代替中文表达、注释放置颗粒度或 Swagger 注解规则。",
           "core_responsibility": "统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。",
           "skill_path": "comment-completion-gate-rules/SKILL.md",
           "directory_path": "comment-completion-gate-rules",
@@ -1539,6 +1540,8 @@ window.SKILL_DICTIONARY = {
             "强制门禁：前端必注释位点",
             "强制规则：步骤编号",
             "强制规则：函数头元信息",
+            "强制规则：函数注释核对清单（可执行闸门）",
+            "强制规则：补丁逻辑注释（做了什么 + 为什么）",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -1561,6 +1564,43 @@ window.SKILL_DICTIONARY = {
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
+          ]
+        },
+        {
+          "id": "windows-encoding-rules",
+          "name": "windows-encoding-rules",
+          "title": "Windows 中文编码防护规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "baseline",
+          "domain_label": "编码基线域",
+          "domain_description": "开始编码即并行生效的基础质量规则",
+          "domain_order": 5,
+          "item_order": 9,
+          "auto_trigger": "当任务运行在 Windows（PowerShell 或 CMD）且涉及中文读写、日志追加、README/Markdown 修改、脚本输出重定向、Git 提交信息或终端显示时触发。用于预防与修复中文乱码（mojibake）、统一 UTF-8 写入策略，并在落盘前做编码自检；尤其适用于“看到乱码”“中文变成问号/锟斤拷/Ãxx”“同文件中英正常但中文异常”“追加写入后部分行乱码”等场景。",
+          "core_responsibility": "统一 Windows 终端与文件中文编码防护，避免中文乱码落盘。",
+          "skill_path": "windows-encoding-rules/SKILL.md",
+          "directory_path": "windows-encoding-rules",
+          "directory": "windows-encoding-rules",
+          "sections": [
+            "自动触发信号",
+            "进入后先做什么",
+            "Windows 防错基线",
+            "推荐执行流程",
+            "落盘命令模板",
+            "通过 / 驳回标准",
+            "边界"
+          ],
+          "references": [],
+          "agents": [
+            "windows-encoding-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否能并行生效，并且不抢位点域或审查域职责。",
+            "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
           ]
         }
       ]
@@ -1812,6 +1852,7 @@ window.SKILL_DICTIONARY = {
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
+            "结构体解析示例（Go）",
             "执行结果归档要求",
             "references 读取规则"
           ],
@@ -1854,6 +1895,7 @@ window.SKILL_DICTIONARY = {
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
+            "结构体解析示例（Go）",
             "执行结果归档要求",
             "references 读取规则"
           ],
@@ -1967,7 +2009,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
           "item_order": 10,
-          "auto_trigger": "当新增或修改日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑时触发。负责统一日志与链路追踪规则，后端日志必须使用项目日志框架且不得使用控制台打印，并通过配置文件管理日志参数；日志初始化必须在 LoadConfig 之后且仅初始化一次，禁止空配置预初始化；不要用它代替错误处理、响应结构或长期监控告警策略。",
+          "auto_trigger": "当新增或修改日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑时触发。负责统一日志与链路追踪规则，后端日志必须使用项目日志框架且不得使用控制台打印，并通过配置文件管理日志参数；业务日志默认必须使用中文表达，只有协议字段、固定 key、第三方固定原文等少数例外可以保留原文；日志初始化必须在 LoadConfig 之后且仅初始化一次，禁止空配置预初始化；不要用它代替错误处理、响应结构或长期监控告警策略。",
           "core_responsibility": "统一日志和链路追踪规则。",
           "skill_path": "logging-trace-rules/SKILL.md",
           "directory_path": "logging-trace-rules",
@@ -1980,6 +2022,7 @@ window.SKILL_DICTIONARY = {
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
+            "日志排版规范（新增）",
             "执行结果归档要求",
             "references 读取规则"
           ],
@@ -2343,7 +2386,8 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
-            "references 读取规则"
+            "references 读取规则",
+            "项目联调强制规则（新增）"
           ],
           "references": [
             "test-strategy-rules/references/priority-model.md",
@@ -2642,7 +2686,8 @@ window.SKILL_DICTIONARY = {
             "深入文档",
             "浏览器引擎选择",
             "观测面板（Observability Dashboard）",
-            "可直接使用的模板"
+            "可直接使用的模板",
+            "项目联调强制规则（新增）"
           ],
           "references": [
             "agent-browser/references/authentication.md",
@@ -2689,7 +2734,8 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
-            "references 读取规则"
+            "references 读取规则",
+            "项目联调强制规则（新增）"
           ],
           "references": [
             "functional-validation-rules/references/validation-boundaries.md",
@@ -2772,7 +2818,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "Git 协作与交付说明",
           "domain_order": 9,
           "item_order": 1,
-          "auto_trigger": "'当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；当用户明确请求“提交git”时，默认目标是提交当前全部未提交改动（含 staged、unstaged、untracked），允许按业务拆成多次提交，并持续提交直到 `git status --short` 为空；git 提交消息必须遵循 feat/fix 等格式，标题统一使用 `<type>: [中文简要说明] 标题说明`（直接描述，不加功能/业务/接口等前缀，且不得直接写 API URL，且禁止 `feat(scope):` 这类括号 scope 写法）；提交说明必须使用真实换行（禁止在任意 shell 把 `\\n` 当文本写入）；若用户提供的提交文案包含字面量 `\\n`，必须先反转义为真实换行再提交；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题，且 README.md 改动日志必须保持按时间正序排列；Go 项目提交前还必须扫描 `test/` 外 `*_test.go` 并阻断违规提交，同时阻断本次提交中直接落在 `internal/service/*.go` 根目录的业务实现文件；不要把它代替代码评审或发布上线规则。'",
+          "auto_trigger": "'当出现 Git 协作与提交流程需求时触发；若用户输入执行型提交指令（如“提交git”“提交 git”“git提交”“commit一下”“帮我提交代码”“帮我 commit”），必须无条件自动触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；当用户明确请求“提交git”时，默认目标是提交当前全部未提交改动（含 staged、unstaged、untracked），允许按业务拆成多次提交，并持续提交直到 `git status --short` 为空；git 提交消息必须遵循 feat/fix 等格式，标题统一使用 `<type>: [中文简要说明] 标题说明`（直接描述，不加功能/业务/接口等前缀，且不得直接写 API URL，且禁止 `feat(scope):` 这类括号 scope 写法）；提交前必须执行标题闸门校验（`git log -1 --pretty=%s` 或待提交标题）并满足“类型合法 + `[]` 内含中文 + 方括号后有标题说明”，任一不满足必须阻断或 `git commit --amend` 修正；提交说明必须使用真实换行（禁止在任意 shell 把 `\\n` 当文本写入）；若用户提供的提交文案包含字面量 `\\n`，必须先反转义为真实换行再提交；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题，且 README.md 改动日志必须保持按时间正序排列；Go 项目提交前还必须扫描 `test/` 外 `*_test.go` 并阻断违规提交，同时阻断本次提交中直接落在 `internal/service/*.go` 根目录的业务实现文件；命中本 skill 后必须先读取本文件并在首条中间进度输出“已读取 skill + 将执行步骤”，否则视为未执行本 skill；不要把它代替代码评审或发布上线规则。'",
           "core_responsibility": "统一 Git 协作规则。",
           "skill_path": "git-collaboration-rules/SKILL.md",
           "directory_path": "git-collaboration-rules",
@@ -3159,6 +3205,7 @@ window.SKILL_DICTIONARY = {
             "并发模式",
             "接口设计",
             "包结构与命名",
+            "常量与枚举",
             "结构体与 API 设计",
             "性能与内存",
             "工具链与质量门禁",
@@ -3404,7 +3451,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
           "item_order": 15,
-          "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点、提交时间精确到秒）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
+          "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
           "directory_path": "work-report-summary-rules",
@@ -3622,7 +3669,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 5,
-      "auto_trigger": "当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。若本轮发生代码新增或修改，不仅在最终回复前收口必须命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`，还必须在首次代码改动后的中间阶段立即补做一次注释相关命中检查；涉及代码改动收口时，需补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 的命中检查，避免只做构建不做基础格式和语法收口；当用户请求“补充注释/只补注释/注释完善”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，并优先处理未提交且已有改动的代码位点。不要用它代替需求、Bug、编码、测试或交付等主域 skill 的实际执行。",
+      "auto_trigger": "【强制自动触发】每轮用户新消息都必须先命中本 skill（不依赖业务关键词）；首条中间进度与最终回复都必须先输出“Skill 命中检查”。只要本轮发生任意代码新增/修改，必须同步命中并复核 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`skill-compliance-gate-rules`，收口前补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules`。当用户提到“补充注释/只补注释/注释完善/补下注释/加注释”（包括仅一句“补充注释”）时，强制同时命中 `chinese-comment-rules`。本 skill 仅做命中检查，不代替需求、Bug、实现与测试本身。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -3706,7 +3753,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 7,
-      "auto_trigger": "当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。负责在最终回复前进行一次 skill 执行完整性闸门检查，并在固定格式中输出合并后的下一步建议：主任务建议优先，skill 补齐建议次优先。代码生成或修改对话在最终回复前收口时也必须触发本 skill。不要用它代替需求澄清、Bug 定位、功能实现或测试执行本身。",
+      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
       "directory_path": "skill-compliance-gate-rules",
@@ -4727,6 +4774,7 @@ window.SKILL_DICTIONARY = {
         "Go 路由风格约定",
         "Go 局部变量声明风格约定",
         "Go 函数签名风格约定",
+        "Go 代码排版补充约定",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -4847,7 +4895,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 5,
       "item_order": 7,
-      "auto_trigger": "当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时触发。负责统一注释位置、颗粒度、字段相关注释和过期注释治理；不要用它代替注释语言表达、改动位点补齐闸门或 Swagger/OpenAPI 注解规则。",
+      "auto_trigger": "【联动自动触发】本轮发生代码新增/修改时，默认与 `comment-completion-gate-rules` 联动命中；当需要判断注释该不该写、写在哪里、写多细时必须命中。若用户提“补充注释/加注释”但未指定细节，也要默认命中本 skill 做注释落点判定。负责注释放置与颗粒度（含字段注释、边界注释、过期注释治理），不代替中文表达、补齐闸门或 Swagger 规则。",
       "core_responsibility": "统一注释位置、颗粒度、字段相关注释和过期注释治理。",
       "skill_path": "comment-placement-granularity-rules/SKILL.md",
       "directory_path": "comment-placement-granularity-rules",
@@ -4888,7 +4936,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 5,
       "item_order": 8,
-      "auto_trigger": "当本轮代码新增或修改，或用户请求补充注释、只补注释、注释完善，或需要判断函数头 `[参数]` / `[返回]` / `最近修改时间` 如何补、方法体步骤编号是否必须、普通流程注释是否必须改写为编号步骤注释时触发。负责统一补注释优先范围、函数头元信息、方法块步骤编号和注释缺失阻断闸门；不要用它代替注释语言表达、一般性的注释位置判断或 Swagger/OpenAPI 注解规则。",
+      "auto_trigger": "【强制自动触发】只要本轮发生任意代码新增/修改，或用户提到“补充注释/只补注释/注释完善/补下注释/加注释”，必须命中本 skill。即使用户只发一句“补充注释”，也必须立即触发并输出注释补齐核对结果。负责改动位点注释补齐闸门：函数头 `[参数]`/`[返回]`/`最近修改时间`、方法体步骤编号、补丁原因注释、函数/补丁核对清单。缺任一项不得收口。仅负责补齐闸门，不代替中文表达、注释放置颗粒度或 Swagger 注解规则。",
       "core_responsibility": "统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。",
       "skill_path": "comment-completion-gate-rules/SKILL.md",
       "directory_path": "comment-completion-gate-rules",
@@ -4900,6 +4948,8 @@ window.SKILL_DICTIONARY = {
         "强制门禁：前端必注释位点",
         "强制规则：步骤编号",
         "强制规则：函数头元信息",
+        "强制规则：函数注释核对清单（可执行闸门）",
+        "强制规则：补丁逻辑注释（做了什么 + 为什么）",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -4922,6 +4972,43 @@ window.SKILL_DICTIONARY = {
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否能并行生效，并且不抢位点域或审查域职责。"
+      ]
+    },
+    {
+      "id": "windows-encoding-rules",
+      "name": "windows-encoding-rules",
+      "title": "Windows 中文编码防护规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "baseline",
+      "domain_label": "编码基线域",
+      "domain_description": "开始编码即并行生效的基础质量规则",
+      "domain_order": 5,
+      "item_order": 9,
+      "auto_trigger": "当任务运行在 Windows（PowerShell 或 CMD）且涉及中文读写、日志追加、README/Markdown 修改、脚本输出重定向、Git 提交信息或终端显示时触发。用于预防与修复中文乱码（mojibake）、统一 UTF-8 写入策略，并在落盘前做编码自检；尤其适用于“看到乱码”“中文变成问号/锟斤拷/Ãxx”“同文件中英正常但中文异常”“追加写入后部分行乱码”等场景。",
+      "core_responsibility": "统一 Windows 终端与文件中文编码防护，避免中文乱码落盘。",
+      "skill_path": "windows-encoding-rules/SKILL.md",
+      "directory_path": "windows-encoding-rules",
+      "directory": "windows-encoding-rules",
+      "sections": [
+        "自动触发信号",
+        "进入后先做什么",
+        "Windows 防错基线",
+        "推荐执行流程",
+        "落盘命令模板",
+        "通过 / 驳回标准",
+        "边界"
+      ],
+      "references": [],
+      "agents": [
+        "windows-encoding-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否能并行生效，并且不抢位点域或审查域职责。",
+        "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
       ]
     },
     {
@@ -5161,6 +5248,7 @@ window.SKILL_DICTIONARY = {
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
+        "结构体解析示例（Go）",
         "执行结果归档要求",
         "references 读取规则"
       ],
@@ -5203,6 +5291,7 @@ window.SKILL_DICTIONARY = {
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
+        "结构体解析示例（Go）",
         "执行结果归档要求",
         "references 读取规则"
       ],
@@ -5316,7 +5405,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
       "item_order": 10,
-      "auto_trigger": "当新增或修改日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑时触发。负责统一日志与链路追踪规则，后端日志必须使用项目日志框架且不得使用控制台打印，并通过配置文件管理日志参数；日志初始化必须在 LoadConfig 之后且仅初始化一次，禁止空配置预初始化；不要用它代替错误处理、响应结构或长期监控告警策略。",
+      "auto_trigger": "当新增或修改日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑时触发。负责统一日志与链路追踪规则，后端日志必须使用项目日志框架且不得使用控制台打印，并通过配置文件管理日志参数；业务日志默认必须使用中文表达，只有协议字段、固定 key、第三方固定原文等少数例外可以保留原文；日志初始化必须在 LoadConfig 之后且仅初始化一次，禁止空配置预初始化；不要用它代替错误处理、响应结构或长期监控告警策略。",
       "core_responsibility": "统一日志和链路追踪规则。",
       "skill_path": "logging-trace-rules/SKILL.md",
       "directory_path": "logging-trace-rules",
@@ -5329,6 +5418,7 @@ window.SKILL_DICTIONARY = {
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
+        "日志排版规范（新增）",
         "执行结果归档要求",
         "references 读取规则"
       ],
@@ -5668,7 +5758,8 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
-        "references 读取规则"
+        "references 读取规则",
+        "项目联调强制规则（新增）"
       ],
       "references": [
         "test-strategy-rules/references/priority-model.md",
@@ -5967,7 +6058,8 @@ window.SKILL_DICTIONARY = {
         "深入文档",
         "浏览器引擎选择",
         "观测面板（Observability Dashboard）",
-        "可直接使用的模板"
+        "可直接使用的模板",
+        "项目联调强制规则（新增）"
       ],
       "references": [
         "agent-browser/references/authentication.md",
@@ -6014,7 +6106,8 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
-        "references 读取规则"
+        "references 读取规则",
+        "项目联调强制规则（新增）"
       ],
       "references": [
         "functional-validation-rules/references/validation-boundaries.md",
@@ -6085,7 +6178,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "Git 协作与交付说明",
       "domain_order": 9,
       "item_order": 1,
-      "auto_trigger": "'当准备整理提交、拆提交粒度、同步分支、处理协作变更、准备 PR 或合并前收口时触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；当用户明确请求“提交git”时，默认目标是提交当前全部未提交改动（含 staged、unstaged、untracked），允许按业务拆成多次提交，并持续提交直到 `git status --short` 为空；git 提交消息必须遵循 feat/fix 等格式，标题统一使用 `<type>: [中文简要说明] 标题说明`（直接描述，不加功能/业务/接口等前缀，且不得直接写 API URL，且禁止 `feat(scope):` 这类括号 scope 写法）；提交说明必须使用真实换行（禁止在任意 shell 把 `\\n` 当文本写入）；若用户提供的提交文案包含字面量 `\\n`，必须先反转义为真实换行再提交；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题，且 README.md 改动日志必须保持按时间正序排列；Go 项目提交前还必须扫描 `test/` 外 `*_test.go` 并阻断违规提交，同时阻断本次提交中直接落在 `internal/service/*.go` 根目录的业务实现文件；不要把它代替代码评审或发布上线规则。'",
+      "auto_trigger": "'当出现 Git 协作与提交流程需求时触发；若用户输入执行型提交指令（如“提交git”“提交 git”“git提交”“commit一下”“帮我提交代码”“帮我 commit”），必须无条件自动触发。负责提交粒度、提交说明、分支同步、协作边界和 PR 整理；提交代码时必须分析未提交的代码，如果可以分成不同的业务修改，就用多次不同的 git 提交；当用户明确请求“提交git”时，默认目标是提交当前全部未提交改动（含 staged、unstaged、untracked），允许按业务拆成多次提交，并持续提交直到 `git status --short` 为空；git 提交消息必须遵循 feat/fix 等格式，标题统一使用 `<type>: [中文简要说明] 标题说明`（直接描述，不加功能/业务/接口等前缀，且不得直接写 API URL，且禁止 `feat(scope):` 这类括号 scope 写法）；提交前必须执行标题闸门校验（`git log -1 --pretty=%s` 或待提交标题）并满足“类型合法 + `[]` 内含中文 + 方括号后有标题说明”，任一不满足必须阻断或 `git commit --amend` 修正；提交说明必须使用真实换行（禁止在任意 shell 把 `\\n` 当文本写入）；若用户提供的提交文案包含字面量 `\\n`，必须先反转义为真实换行再提交；git 提交前必须先在项目根目录 README.md 追加本次改动日志，格式为时间 + 提交标题，且 README.md 改动日志必须保持按时间正序排列；Go 项目提交前还必须扫描 `test/` 外 `*_test.go` 并阻断违规提交，同时阻断本次提交中直接落在 `internal/service/*.go` 根目录的业务实现文件；命中本 skill 后必须先读取本文件并在首条中间进度输出“已读取 skill + 将执行步骤”，否则视为未执行本 skill；不要把它代替代码评审或发布上线规则。'",
       "core_responsibility": "统一 Git 协作规则。",
       "skill_path": "git-collaboration-rules/SKILL.md",
       "directory_path": "git-collaboration-rules",
@@ -6460,6 +6553,7 @@ window.SKILL_DICTIONARY = {
         "并发模式",
         "接口设计",
         "包结构与命名",
+        "常量与枚举",
         "结构体与 API 设计",
         "性能与内存",
         "工具链与质量门禁",
@@ -6705,7 +6799,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
       "item_order": 15,
-      "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点、提交时间精确到秒）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
+      "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",
       "directory_path": "work-report-summary-rules",
@@ -6775,7 +6869,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "64 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "65 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

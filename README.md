@@ -86,7 +86,7 @@
 
 截至当前版本：
 
-- 已落地 Skill：`64`
+- 已落地 Skill：`65`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`15`
 
@@ -164,6 +164,7 @@ python skill-dictionary/generate_dictionary.py
 | `chinese-comment-rules`        | 统一中文注释语言风格、语气和表述方式。                       |
 | `comment-placement-granularity-rules` | 统一代码注释是否必要、放置位置、颗粒度、字段注释和过期注释治理。 |
 | `comment-completion-gate-rules` | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
+| `windows-encoding-rules` | 统一 Windows 终端与文件中文读写编码防护，预防 README、日志和提交说明乱码。 |
 
 ### 6. 代码位点域
 
@@ -435,3 +436,4 @@ claude-mem(记忆) :
 2026-05-07 00:05:22 fix: [注释命中规则] 补充补注释触发词与执行证据要求
 2026-05-11 18:29:04 fix: [请求参数规则] 禁止弱类型请求体解析
 2026-05-11 18:45:07 docs: [响应规则] 补充结构化解析要求
+2026-05-11 23:08:00 docs: [联调与编码防护] 补充联调强制触发与中文编码防护规则

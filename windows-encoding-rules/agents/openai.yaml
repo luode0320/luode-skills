@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Windows Encoding Guardrails"
+  short_description: "Guardrails against Chinese text mojibake on Windows terminals"
+  default_prompt: "Use $windows-encoding-rules to prevent or fix Chinese encoding issues on Windows."
