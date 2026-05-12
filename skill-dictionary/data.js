@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-05-12 01:27:56",
-  "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
+  "generated_at": "2026-05-12 18:14:31",
+  "repo_root": "/home/luode/.codex/skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
-    "references_total": 248,
+    "references_total": 249,
     "agents_total": 72
   },
   "downloaded_seeds": {
@@ -1408,6 +1408,7 @@ window.SKILL_DICTIONARY = {
             "Go 局部变量声明风格约定",
             "Go 函数签名风格约定",
             "Go 代码排版补充约定",
+            "Go 编码规则清单",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -1419,6 +1420,7 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "code-style-consistency-rules/references/consistency-examples.md",
+            "code-style-consistency-rules/references/go-coding-rules.md",
             "code-style-consistency-rules/references/local-convention-detection.md",
             "code-style-consistency-rules/references/style-baseline.md"
           ],
@@ -4859,6 +4861,7 @@ window.SKILL_DICTIONARY = {
         "Go 局部变量声明风格约定",
         "Go 函数签名风格约定",
         "Go 代码排版补充约定",
+        "Go 编码规则清单",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -4870,6 +4873,7 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "code-style-consistency-rules/references/consistency-examples.md",
+        "code-style-consistency-rules/references/go-coding-rules.md",
         "code-style-consistency-rules/references/local-convention-detection.md",
         "code-style-consistency-rules/references/style-baseline.md"
       ],
