@@ -1,4 +1,4 @@
 interface:
   display_name: "子代理分发"
   short_description: "任一 skill 命中后默认优先尝试 subagent 委派，并输出主 agent 可见状态"
-  default_prompt: "使用 $subagent-dispatch-rules 在任一 skill 命中并进入执行前先做 subagent 委派判定；默认允许并优先委派 sidecar 子任务，仅在用户明确禁止、任务不可切分、风险不可控或写集冲突时回退本地执行；启动与完成都要由主 agent 输出可见状态。"
+  default_prompt: "使用 $subagent-dispatch-rules 在任一 skill 命中并进入执行前自动做 subagent 委派判定；不需要用户明确要求才委派，默认允许并优先委派 sidecar 子任务；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行；启动与完成都要由主 agent 输出可见状态。"

@@ -115,7 +115,7 @@ python skill-dictionary/generate_dictionary.py
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
-| `subagent-dispatch-rules` | 任一 skill 命中后默认先判断并优先尝试委派 subagent；仅在用户明确禁止、不可切分或高风险冲突时回退本地执行，并由主 agent 输出可见启动/完成状态。 |
+| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件，满足可委派条件即自动委派；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行，并由主 agent 输出可见启动/完成状态。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出主任务优先的下一步建议。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性：Skill 命中检查、Skill 执行证据、当前问题、解决方案与根因、结果结论、条件字段（改动点/验证结果/函数注释核对）和下一步建议。 |
 
@@ -441,3 +441,4 @@ claude-mem(记忆) :
 2026-05-12 00:54:06 feat: [总结结构闸门] 新增推理总结收口规则并接入命中检查
 2026-05-12 01:29:47 fix: [测试截图清理] 强制收口删除agent-browser临时截图
 2026-05-12 18:17:00 docs: [Go编码规则] 补充TrimSpace使用约束
+2026-05-13 10:15:34 fix: [子代理分发] 自动委派判定不依赖用户要求
