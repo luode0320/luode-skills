@@ -10,12 +10,16 @@ license: Complete terms in LICENSE.txt
 
 ## 触发后强制联动
 
-- 凡本轮新增或修改 `.vue`、`.tsx`、`.jsx`、`.css`、`.scss` 文件，必须同时命中：
+- 凡本轮新增或修改 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js`、`.html`、`.css`、`.scss`、`.less` 前端代码文件，必须同时命中：
   - `comment-placement-granularity-rules`
   - `comment-completion-gate-rules`
   - `chinese-comment-rules`
+  - `cleanup-format-review-rules`
+  - `syntax-check-review-rules`
   - `skill-compliance-gate-rules`
 - 上述任一 skill 未命中，不得给出“已完成前端改动”或“可提交”结论。
+- 前端格式收口必须至少检查 import 排序/分组、重复或未使用 import、缩进、连续空行、模板 / script / style 区块排版；若项目存在 Prettier、ESLint、vue-tsc、tsc、npm/yarn/pnpm lint 等本地命令，优先执行对应命令并记录结果。
+- 前端注释收口必须覆盖新增或修改的函数、事件处理、异步数据加载、条件渲染、复杂样式和兼容/兜底逻辑；前端代码和后端代码一样属于代码改动，不能以“这是前端”作为跳过注释双 skill 的理由。
 
 ## 设计思考
 

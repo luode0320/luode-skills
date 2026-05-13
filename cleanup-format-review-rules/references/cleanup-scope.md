@@ -12,11 +12,15 @@
 - 死代码
 - 多余空行
 - 明显格式不一致
+- 前端 import 排序/分组混乱、重复或未使用 import
+- `.vue` 模板/script/style 区块排版、缩进和连续空行问题
+- `.tsx`、`.jsx`、`.ts`、`.js`、`.html`、`.css`、`.scss`、`.less` 中可由 Prettier/ESLint/stylelint 或人工稳定判断的格式问题
 
 ## 需要谨慎
 
 - 临时代码删除是否会影响当前验证
 - 调试日志是否已被转成正式日志
+- 前端 formatter/linter 是否会带来大面积历史格式化；若会，只格式化本轮改动文件
 
 ## 禁止借机处理
 
