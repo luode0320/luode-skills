@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-05-14 23:41:25",
+  "generated_at": "2026-05-16 20:06:55",
   "repo_root": "C:\\Users\\Administrator\\.codex\\skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 66,
-    "implemented_total": 66,
+    "planned_total": 67,
+    "implemented_total": 67,
     "planned_missing": 0,
     "seed_total": 15,
     "doc_total": 4,
-    "references_total": 249,
-    "agents_total": 72
+    "references_total": 250,
+    "agents_total": 73
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 8,
+      "implemented_count": 9,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 8,
+      "total_count": 9,
       "items": [
         {
           "id": "team-development-rules",
@@ -243,6 +243,46 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "code-snippet-location-rules",
+          "name": "code-snippet-location-rules",
+          "title": "代码片段位置定位规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "orchestration",
+          "domain_label": "总控层",
+          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+          "domain_order": 1,
+          "item_order": 6,
+          "auto_trigger": "当用户只粘贴一段代码、报错片段、函数片段或截图转写代码，并说“这里改一下/这段需要修改/这里有问题”等，但没有明确给出文件路径、符号全名、模块位置或可唯一定位的代码位点时触发。负责先按“用户明确路径、当前活动编辑器/当前打开文件/当前选区、代码片段精确匹配、仓库搜索候选、询问确认”的优先级定位真实目标文件，避免把相似代码误判到仓库其他位置；不要用它代替 code-context-resync-rules 的已知文件重读，也不要代替具体业务实现、Bug 定位或代码修改规则。",
+          "core_responsibility": "负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。",
+          "skill_path": "code-snippet-location-rules/SKILL.md",
+          "directory_path": "code-snippet-location-rules",
+          "directory": "code-snippet-location-rules",
+          "sections": [
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "code-snippet-location-rules/references/source-priority.md"
+          ],
+          "agents": [
+            "code-snippet-location-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+          ]
+        },
+        {
           "id": "subagent-dispatch-rules",
           "name": "subagent-dispatch-rules",
           "title": "子代理分发规则",
@@ -252,7 +292,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 6,
+          "item_order": 7,
           "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
           "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
           "skill_path": "subagent-dispatch-rules/SKILL.md",
@@ -296,7 +336,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 7,
+          "item_order": 8,
           "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
@@ -339,7 +379,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 8,
+          "item_order": 9,
           "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题、问题的解决方案与根因、当前结果与结论、下一步建议；若本轮有改动必须包含本次改动点与函数注释核对；若本轮有验证必须包含验证结果。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
           "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
@@ -1584,6 +1624,7 @@ window.SKILL_DICTIONARY = {
             "强制规则：步骤编号",
             "强制规则：函数头元信息",
             "强制规则：函数注释核对清单（可执行闸门）",
+            "强制规则：字段/结构体字面量注释核对清单",
             "强制规则：补丁逻辑注释（做了什么 + 为什么）",
             "自动触发信号",
             "进入后先做什么",
@@ -1755,7 +1796,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
           "item_order": 3,
-          "auto_trigger": "当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。负责统一数据库结构变更、迁移安全、兼容性和回滚边界；数据库的字段必须要定义数据类型、默认值、是否需要索引、字段 CHARSET=utf8mb4、ENGINE=InnoDB、注释说明等写清楚，不要遗漏；所有金额相关的要强制使用字符串，避免任何出现精度问题的情况；所有表必须包含 created_at 和 updated_at 字段，由数据库自动管理；必须冗余一个毫秒级时间戳的创建时间，避免数据库的时区问题影响不同的时间格式；所有表必须包含逻辑删除字段，1 的状态标识删除，不是 1 代表正常非删除状态，默认 0=非删除；否则会导致自动创建表出现不可控的因素；避免把查询实现、事务控制和业务逻辑混进结构变更；不要用它代替 database-query-rules、项目配置约束或发布回滚流程。",
+          "auto_trigger": "当新增或修改数据库、表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义或自动建库/建表/建索引启动逻辑时自动触发。负责统一数据库结构变更、迁移安全、兼容性和回滚边界；自动初始化必须覆盖库、表、索引三类对象，启动时若支持自动建库和自动建表，也必须同步具备自动检查并创建缺失索引的流程；数据库表模型必须每张表单独一个文件，自动建表/迁移逻辑、自动建索引逻辑也必须分别放在独立文件中；数据库的字段必须要定义数据类型、默认值、是否需要索引、字段 CHARSET=utf8mb4、ENGINE=InnoDB、注释说明等写清楚，不要遗漏；所有金额相关的要强制使用字符串，避免任何出现精度问题的情况；所有表必须包含 created_at 和 updated_at 字段，由数据库自动管理；必须冗余一个毫秒级时间戳的创建时间，避免数据库的时区问题影响不同的时间格式；所有表必须包含逻辑删除字段，1 的状态标识删除，不是 1 代表正常非删除状态，默认 0=非删除；否则会导致自动创建表出现不可控的因素；避免把查询实现、事务控制和业务逻辑混进结构变更；不要用它代替 database-query-rules、项目配置约束或发布回滚流程。",
           "core_responsibility": "统一表结构变更、迁移安全和回滚策略。",
           "skill_path": "database-schema-rules/SKILL.md",
           "directory_path": "database-schema-rules",
@@ -1797,7 +1838,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
           "item_order": 4,
-          "auto_trigger": "当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界，避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。",
+          "auto_trigger": "当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界；GORM 查询、统计、更新、创建、保存必须显式使用 `Model(&models.X{})` 或等价方式声明目标表模型，禁止依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导；避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。",
           "core_responsibility": "统一数据库访问和查询性能规则。",
           "skill_path": "database-query-rules/SKILL.md",
           "directory_path": "database-query-rules",
@@ -3744,6 +3785,46 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "code-snippet-location-rules",
+      "name": "code-snippet-location-rules",
+      "title": "代码片段位置定位规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "orchestration",
+      "domain_label": "总控层",
+      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
+      "domain_order": 1,
+      "item_order": 6,
+      "auto_trigger": "当用户只粘贴一段代码、报错片段、函数片段或截图转写代码，并说“这里改一下/这段需要修改/这里有问题”等，但没有明确给出文件路径、符号全名、模块位置或可唯一定位的代码位点时触发。负责先按“用户明确路径、当前活动编辑器/当前打开文件/当前选区、代码片段精确匹配、仓库搜索候选、询问确认”的优先级定位真实目标文件，避免把相似代码误判到仓库其他位置；不要用它代替 code-context-resync-rules 的已知文件重读，也不要代替具体业务实现、Bug 定位或代码修改规则。",
+      "core_responsibility": "负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。",
+      "skill_path": "code-snippet-location-rules/SKILL.md",
+      "directory_path": "code-snippet-location-rules",
+      "directory": "code-snippet-location-rules",
+      "sections": [
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "code-snippet-location-rules/references/source-priority.md"
+      ],
+      "agents": [
+        "code-snippet-location-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+      ]
+    },
+    {
       "id": "subagent-dispatch-rules",
       "name": "subagent-dispatch-rules",
       "title": "子代理分发规则",
@@ -3753,7 +3834,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 6,
+      "item_order": 7,
       "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
       "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
       "skill_path": "subagent-dispatch-rules/SKILL.md",
@@ -3797,7 +3878,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 7,
+      "item_order": 8,
       "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
@@ -3840,7 +3921,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 8,
+      "item_order": 9,
       "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题、问题的解决方案与根因、当前结果与结论、下一步建议；若本轮有改动必须包含本次改动点与函数注释核对；若本轮有验证必须包含验证结果。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
       "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
@@ -5037,6 +5118,7 @@ window.SKILL_DICTIONARY = {
         "强制规则：步骤编号",
         "强制规则：函数头元信息",
         "强制规则：函数注释核对清单（可执行闸门）",
+        "强制规则：字段/结构体字面量注释核对清单",
         "强制规则：补丁逻辑注释（做了什么 + 为什么）",
         "自动触发信号",
         "进入后先做什么",
@@ -5196,7 +5278,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
       "item_order": 3,
-      "auto_trigger": "当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。负责统一数据库结构变更、迁移安全、兼容性和回滚边界；数据库的字段必须要定义数据类型、默认值、是否需要索引、字段 CHARSET=utf8mb4、ENGINE=InnoDB、注释说明等写清楚，不要遗漏；所有金额相关的要强制使用字符串，避免任何出现精度问题的情况；所有表必须包含 created_at 和 updated_at 字段，由数据库自动管理；必须冗余一个毫秒级时间戳的创建时间，避免数据库的时区问题影响不同的时间格式；所有表必须包含逻辑删除字段，1 的状态标识删除，不是 1 代表正常非删除状态，默认 0=非删除；否则会导致自动创建表出现不可控的因素；避免把查询实现、事务控制和业务逻辑混进结构变更；不要用它代替 database-query-rules、项目配置约束或发布回滚流程。",
+      "auto_trigger": "当新增或修改数据库、表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义或自动建库/建表/建索引启动逻辑时自动触发。负责统一数据库结构变更、迁移安全、兼容性和回滚边界；自动初始化必须覆盖库、表、索引三类对象，启动时若支持自动建库和自动建表，也必须同步具备自动检查并创建缺失索引的流程；数据库表模型必须每张表单独一个文件，自动建表/迁移逻辑、自动建索引逻辑也必须分别放在独立文件中；数据库的字段必须要定义数据类型、默认值、是否需要索引、字段 CHARSET=utf8mb4、ENGINE=InnoDB、注释说明等写清楚，不要遗漏；所有金额相关的要强制使用字符串，避免任何出现精度问题的情况；所有表必须包含 created_at 和 updated_at 字段，由数据库自动管理；必须冗余一个毫秒级时间戳的创建时间，避免数据库的时区问题影响不同的时间格式；所有表必须包含逻辑删除字段，1 的状态标识删除，不是 1 代表正常非删除状态，默认 0=非删除；否则会导致自动创建表出现不可控的因素；避免把查询实现、事务控制和业务逻辑混进结构变更；不要用它代替 database-query-rules、项目配置约束或发布回滚流程。",
       "core_responsibility": "统一表结构变更、迁移安全和回滚策略。",
       "skill_path": "database-schema-rules/SKILL.md",
       "directory_path": "database-schema-rules",
@@ -5238,7 +5320,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
       "item_order": 4,
-      "auto_trigger": "当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界，避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。",
+      "auto_trigger": "当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界；GORM 查询、统计、更新、创建、保存必须显式使用 `Model(&models.X{})` 或等价方式声明目标表模型，禁止依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导；避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。",
       "core_responsibility": "统一数据库访问和查询性能规则。",
       "skill_path": "database-query-rules/SKILL.md",
       "directory_path": "database-query-rules",
@@ -6959,7 +7041,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "66 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "67 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

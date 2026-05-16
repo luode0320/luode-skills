@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "代码片段定位"
+  short_description: "用户只贴代码片段未给路径时，优先依据活动编辑器定位目标文件"
+  default_prompt: "使用 $code-snippet-location-rules 判断用户粘贴代码片段对应的真实文件位置，优先使用明确路径和当前活动编辑器上下文。"
