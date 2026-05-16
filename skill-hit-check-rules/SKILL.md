@@ -36,6 +36,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 5. 当请求包含“补充注释 / 只补注释 / 注释规范检查 / 注释完善 / 补下注释 / 加注释”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，不得缺任一项。
 5.1 即使用户消息仅有“补充注释”四个字，也必须立即执行上述四个 skill 命中，不得等待补充上下文。
 6. 当本轮首次发生代码新增或修改时，即使用户未显式提“注释”，也必须在中间进度阶段立即补命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`。
+6.1 当本轮准备新增、修改或移动任意 `*_test.go`、测试脚本、mock、fixture、测试数据或测试说明时，必须同时命中 `test-task-root-layout-rules`、`test-scattered-asset-location-rules`、`test-program-rules` 与 `skill-compliance-gate-rules`；若是 Go 项目或文件名为 `*_test.go`，还必须命中 `go-test-compile-path-rules`，并在写入前确认源码目录禁放、`test/` 当天时间戳根目录和 ASCII 镜像路径。
 7. 当本轮发生代码新增或修改且进入最终回复前收口时，必须再次复核上述三个注释相关 skill 仍处于命中状态。
 7.1 当本轮发生代码新增或修改且进入最终回复前收口时，必须补做 `cleanup-format-review-rules` 与 `syntax-check-review-rules` 命中检查；若未执行，不能给出“已完成”结论。
 7.3 当进入最终推理总结或结束输出阶段时，必须补命中 `reasoning-summary-structure-rules`，并按其固定结构完成收口。
