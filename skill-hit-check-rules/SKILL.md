@@ -33,7 +33,7 @@ description: 【强制自动触发】每轮用户新消息都必须先命中本 
 2. 命中判断时，优先依据各 skill 的 `description` 触发条件。
 3. 必须在回复最开始先输出命中检查结果，再进入主域执行。
 4. 输出命中列表时，不把本 skill 自己计入“业务命中 skill 列表”。
-5. 当请求包含“补充注释 / 只补注释 / 注释规范检查 / 注释完善 / 补下注释 / 加注释”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，不得缺任一项。
+5. 当请求包含“补充注释 / 只补注释 / 注释规范检查 / 注释完善 / 补下注释 / 加注释”时，必须同时命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`skill-compliance-gate-rules`，不得缺任一项；若本轮涉及前端文件，还必须把前端文件本身纳入注释检查范围，不得只看后端。
 5.1 即使用户消息仅有“补充注释”四个字，也必须立即执行上述四个 skill 命中，不得等待补充上下文。
 6. 当本轮首次发生代码新增或修改时，即使用户未显式提“注释”，也必须在中间进度阶段立即补命中 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `skill-compliance-gate-rules`。
 6.1 当本轮准备新增、修改或移动任意 `*_test.go`、测试脚本、mock、fixture、测试数据或测试说明时，必须同时命中 `test-task-root-layout-rules`、`test-scattered-asset-location-rules`、`test-program-rules` 与 `skill-compliance-gate-rules`；若是 Go 项目或文件名为 `*_test.go`，还必须命中 `go-test-compile-path-rules`，并在写入前确认源码目录禁放、`test/` 当天时间戳根目录和 ASCII 镜像路径。
