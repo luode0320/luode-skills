@@ -91,6 +91,7 @@ func LoadConfig(path string) (*Config, error) {
 
 - channel 写入用 `select` + `ctx.Done()` 兜底
 - 必要时使用带缓冲 channel
+- 写 `go func()` 前先检查项目是否已有统一协程封装；有则优先复用项目既有风格，避免在同一工程里出现多套并发启动写法
 
 ### goroutine 必须做 panic 保护
 
