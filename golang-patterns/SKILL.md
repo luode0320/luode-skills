@@ -91,6 +91,13 @@ func LoadConfig(path string) (*Config, error) {
 
 - channel 写入用 `select` + `ctx.Done()` 兜底
 - 必要时使用带缓冲 channel
+- 写 `go func()` 前先检查项目是否已有统一协程封装；有则优先复用项目既有风格，避免在同一工程里出现多套并发启动写法
+
+### goroutine 必须做 panic 保护
+
+- 所有 `go func()` / 后台 goroutine 都必须在入口处加 `defer func(){ if r := recover(); r != nil { ... } }()`
+- 不允许让 panic 直接从 goroutine 向外逃逸；必须在 goroutine 边界转成日志、错误回传或告警
+- 公共异步封装也必须内部 recover，不能默认调用方自己兜底
 
 ## 接口设计
 
@@ -177,6 +184,7 @@ goimports -w .
 
 - 长函数中使用裸返回（`return`）
 - 用 panic 做业务分支控制
+- `go func()` 里不加 recover 就直接执行复杂逻辑
 - 把 `context.Context` 放进 struct 字段
 - 同一类型混用值接收者和指针接收者但无明确规则
 
