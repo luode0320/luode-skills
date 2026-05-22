@@ -1,6 +1,6 @@
 ---
 name: context-compression-rules
-description: 当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./.skills`），避免压缩后丢失 skill 记忆，再输出可直接续做的最小上下文包；压缩包必须显式携带“是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。
+description: 当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），避免压缩后丢失 skill 记忆，再输出可直接续做的最小上下文包；压缩包必须显式携带“是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。
 ---
 
 # 上下文压缩规则
@@ -37,7 +37,7 @@ description: 当当前会话已发生“压缩上下文 / 自动压缩上下文 
 1. 默认先读 `references/trigger-signals.md`，确认是否满足“压缩后自动触发”条件。
 2. 再读 `references/compression-playbook.md`，确认保留/折叠/剔除规则和压缩模板。
 3. 再读 `references/boundary-rules.md`，确认与 `recent-context-bootstrap-rules`、`history-recall-rules`、主域 skill 的让路关系。
-4. 强制联动 `recent-context-bootstrap-rules`，并按其规则加载系统的所有 skills 与当前项目根目录下 `./.skills` 的最小 skill 索引。
+4. 强制联动 `recent-context-bootstrap-rules`，并按其规则加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的最小 skill 索引。
 5. 输出压缩后的上下文包，至少包含：当前目标、已确认事实、关键约束、关键路径、待确认项、下一步动作、编码许可状态（`confirmed` / `not-confirmed` / `unknown`）。
 6. 压缩完成后立即退出，交还主执行权，不在本 skill 内停留。
 

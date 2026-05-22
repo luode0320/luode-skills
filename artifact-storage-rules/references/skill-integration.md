@@ -15,7 +15,7 @@
 - 可以写“路径、命名和复用策略统一遵循 `artifact-storage-rules`”。
 - 可以写“如需具体模板，读取 `../artifact-storage-rules/references/path-map.yaml`”。
 - 可以写“根目录项目设计文档主入口统一遵循 `artifact-storage-rules` 中的 `项目设计.md` 规则”。
-- 不建议在各自 `SKILL.md` 中重复维护完整的 `ment/`、`bug/`、`test/`、`doc/` 模板说明。
+- 不建议在各自 `SKILL.md` 中重复维护完整的 `ment/`、`bug/`、`test/`、`doc/`、`skill/` 模板说明。
 
 ## 变更优先级
 

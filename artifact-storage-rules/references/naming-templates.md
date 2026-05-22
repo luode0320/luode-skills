@@ -52,6 +52,12 @@
 - 通用项目文档默认放在 `doc/` 下。
 - 具体文件名按文档主题命名，但应避免使用 `temp.md`、`result.txt` 这类无意义名称。
 
+## skill 域
+
+- 项目专属 skill 默认放在 `skill/` 下。
+- 子 skill 建议目录：`skill/<topic>/SKILL.md`。
+- `<topic>` 建议使用 ASCII 主题名并统一 `-rules` 后缀，便于跨平台和工具扫描。
+
 ## 根目录项目设计主入口
 
 - 项目设计主入口：`项目设计.md`

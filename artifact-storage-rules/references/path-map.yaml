@@ -5,6 +5,7 @@ roots:
   bug_records: "bug"
   test_assets: "test"
   project_docs: "doc"
+  project_local_skills: "skill"
 
 entry_files:
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
@@ -40,6 +41,7 @@ bootstrap:
     - "test"
     - "bug"
     - "doc"
+    - "skill"
   weak_reference_root_files:
     - "项目设计.md"
     - "架构设计.md"

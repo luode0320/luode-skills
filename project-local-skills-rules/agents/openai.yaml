@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目专属Skill沉淀"
+  short_description: "分析项目并将项目专属编码规则拆分沉淀到根目录 skill/ 的规则"
+  default_prompt: "使用 $project-local-skills-rules 分析当前项目并把项目专属编码规则拆分为多个独立 skill，统一落到项目根目录 `skill/`，并给出每个 skill 的触发条件和核心职责。"

@@ -19,6 +19,7 @@
 ## 触发后第一动作
 
 - 先联动 `recent-context-bootstrap-rules`，补齐最近 3 天前情和 skill 索引来源：
+  - 当前项目根目录下 `./skill`
   - 系统的所有 skills
   - 当前项目根目录下 `./.skills`
 - 恢复并声明“编码许可状态”：
