@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-05-22 12:08:36",
+  "generated_at": "2026-05-25 15:41:27",
   "repo_root": "/home/luode/.codex/skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",

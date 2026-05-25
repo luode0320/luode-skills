@@ -7,6 +7,8 @@
 - 需求文档：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.md`
 - 需求流程图（SVG）：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.flow.svg`
 - 需求时序图（SVG）：`ment/YYYY-MM-DD_HHmmss_<需求中文简介标题>.sequence.svg`
+- 需求图片素材（截图/外部图片）：`ment/data/<需求文档同名主干>.<素材标识>.<扩展名>`
+  - 示例：`ment/data/2026-05-25_103000_支付路由改造.req-shot-login.png`
 - 验收文档：`ment/YYYY-MM-DD_验收中文说明.md`
 - 实施计划：`ment/<需求文档同名主干>实施计划.md`
   - 示例：需求文档 `ment/2026-04-16_141518_多业务复用Swap适配控制需求.md`
@@ -20,6 +22,8 @@
 - 同一需求的补齐、边界、拆分、变更应持续更新同一份需求文档，不新建平行入口。
 - 需求文档落地时必须同步产出两张 SVG：流程图（`.flow.svg`）与时序图（`.sequence.svg`）。
 - 需求域 SVG 图默认视觉规范为白底，需显式绘制全画布白色背景层（`fill=\"#FFFFFF\"`），禁止透明底。
+- 用户提供的需求截图与外部生成图片统一存放到 `ment/data/`，并在需求主文档内使用 Markdown 图片语法直接引用展示。
+- 素材标识建议使用 ASCII：如 `req-shot-login`、`state-diagram-v2`，避免空格和中文标点。
 
 ## Bug 域
 
