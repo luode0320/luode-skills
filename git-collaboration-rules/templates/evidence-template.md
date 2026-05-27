@@ -12,3 +12,7 @@ Skill 执行证据清单：
 - `scripts/post_commit_gate.sh`：<PASS/BLOCK 或 FALLBACK + 摘要>
 - `git log -1 --pretty=%B`：<结果摘要>
 - `git log -1 --pretty=%s`：<结果摘要>
+
+固定校验行（强制）：
+- `HIT-CHECK:PASS`
+- `GIT-RULE:PASS`

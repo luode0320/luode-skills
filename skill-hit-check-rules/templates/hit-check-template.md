@@ -1,3 +1,7 @@
+HIT-CHECK:<PASS/BLOCK>; GIT-RULE:<PASS/NA/BLOCK>
+SKILLS:<skill1,skill2,...>
+GIT-LINK:<YES/NO>
+
 Skill 命中检查：
 - 命中 skill：
 `<skill-a>`: <命中原因>
