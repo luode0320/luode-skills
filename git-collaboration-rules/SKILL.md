@@ -1,12 +1,24 @@
 ---
 name: git-collaboration-rules
-description: 当出现 git/commit/提交/push/pull/status/diff/log 等协作动作时触发。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，但必须循环到 `git status --short` 为空（除阻断项外）。
+description: 【强制触发】凡出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，但必须循环到 `git status --short` 为空（除阻断项外）。
 ---
 
 # Git 协作规则（最小闭环版）
 
 ## -1. 触发确认（强制）
 当用户请求包含 `git/commit/提交/push/pull/status/diff/log` 任一关键词时，必须命中本 skill；未命中不得执行 git 命令。
+
+## -1.1 语义触发扩展（强制）
+以下表达即使不出现关键词，也必须命中本 skill：
+- `提交git`、`帮我提交`、`commit一下`、`把改动提交到分支`
+- `推送代码`、`给我推上去`、`同步到远端`
+- `看下git状态`、`看下改动`、`看看最近提交`
+
+判定原则：只要用户意图是让代理执行或检查 Git 协作动作，即视为命中，不得以“缺少明确 git 关键词”回避。
+
+## -1.2 联动前置（强制）
+- 本 skill 一旦命中，必须同时命中 `skill-hit-check-rules`。
+- 若首条中间进度缺少“Skill 命中检查”或缺少 Git 三要素证据，则 `BLOCK`，除盘点命令外禁止继续执行 Git 命令。
 
 ## 0. 首条中间进度（强制）
 必须先输出并填写模板：
