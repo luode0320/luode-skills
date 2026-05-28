@@ -1,6 +1,7 @@
 HIT-CHECK:<PASS/BLOCK>; GIT-RULE:<PASS/NA/BLOCK>
 SKILLS:<skill1,skill2,...>
 GIT-LINK:<YES/NO>
+PRECHECK:READY
 
 Skill 命中检查：
 - 命中 skill：
@@ -14,3 +15,6 @@ Skill 执行证据：
 - 当前盘点命令：`git status --short`、`git diff --cached --stat`
 - 下一步命令：`scripts/pre_commit_gate.sh "<title>"`
 - 脚本可用性：`pre=<FOUND/MISSING>`、`post=<FOUND/MISSING>`
+
+# 若发生违规顺序（先执行命令后命中检查），必须追加：
+RECOVERY:RESTART_REQUIRED
