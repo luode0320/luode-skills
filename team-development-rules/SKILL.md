@@ -33,6 +33,7 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 ## 进入后先做什么
 
 1. 先判断当前阶段。
+1.1 若发现本轮尚未执行 `skill-hit-check-rules`，立即中断当前流程并回到命中检查步骤；在命中检查完成前不得继续任何领域动作或工具调用。
 2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号，也不得先路由到 `autonomous-execution-rules` 或 `delivery-summary-rules`。
 3. 如果问题明显是在查历史，优先判断是否应进入记忆域。
 4. 再判断这是需求类、Bug 类还是交付收口类问题。
