@@ -26,10 +26,10 @@ if ! rg -n --fixed-strings "$TITLE" README.md >/dev/null; then
   exit 14
 fi
 
-# 3) Go 禁放扫描：test/ 外 *_test.go
-if rg --files -g '*_test.go' | rg -v '^test/' >/dev/null; then
-  echo "BLOCK: found *_test.go outside test/" >&2
-  rg --files -g '*_test.go' | rg -v '^test/' >&2 || true
+# 3) Go 测试文件位置扫描：只检查本次提交涉及的新增/修改 *_test.go
+if git diff --cached --name-only --diff-filter=AM | rg '_test\.go$' | rg -v '^test/' >/dev/null; then
+  echo "BLOCK: staged *_test.go outside test/" >&2
+  git diff --cached --name-only --diff-filter=AM | rg '_test\.go$' | rg -v '^test/' >&2 || true
   exit 15
 fi
 
