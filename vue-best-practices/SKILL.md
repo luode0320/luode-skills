@@ -47,6 +47,23 @@ metadata:
 
 这些是必须掌握并在每个 Vue 任务中落实的基础能力，请结合 `1.1` 中已加载资料执行。
 
+### 前端格式化与保存规则
+
+- 处理 Vue 项目时，若仓库内存在 `prettier.config.js` / `.prettierrc*`，默认将其视为前端格式化真相源。
+- 若项目存在 Prettier 配置但未安装本地 `prettier` 依赖，且当前任务已经涉及格式化、保存后样式漂移、缩进不一致或需要统一排版，优先补齐本地 `prettier` 依赖，再处理文件格式。
+- 若项目缺少编辑器接线，优先补齐：
+  - `.editorconfig`
+  - `.vscode/settings.json`
+- VS Code 场景下，默认将 `esbenp.prettier-vscode` 设为前端文件的 `editor.defaultFormatter`，避免依赖编辑器内建格式化器、Volar 或其他插件猜测缩进。
+- 处理单文件格式问题时，优先使用项目本地 Prettier 按项目配置真实写回，例如：
+  - `npx prettier --config ./prettier.config.js --write src/views/xxx.vue`
+- 若项目格式化配置明确要求 `useTabs: true`、`vueIndentScriptAndStyle: true` 或其他非默认选项，不要以个人偏好改成另一套风格；必须跟随项目真相源。
+- 不要把 ESLint 当作 Vue 项目的主要排版工具，除非项目明确把格式化规则写进 ESLint 并实际启用。
+- 若本轮改动包含格式化配置文件或格式化落地，完成前应至少执行一次最小验证：
+  - `npm run build`
+  - 或项目中等价的前端构建命令
+- 若只是局部“看起来不顺眼”，但项目已有明确格式化真相源，不要引入第二套配置或手工维持例外格式。
+
 ### 响应式
 
 - 必读资料： [reactivity](references/reactivity.md)
