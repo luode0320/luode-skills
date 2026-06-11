@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP 安装判定"
+  short_description: "分析项目是否需要安装浏览器或 Godot MCP，并确定后续工具优先级"
+  default_prompt: "使用 $mcp-installation-rules 分析当前项目是否需要安装 Chrome DevTools MCP 或 Godot AI MCP，并明确后续浏览器与 Godot 编辑器应由哪个工具优先接管。"

@@ -89,9 +89,9 @@
 
 截至当前版本：
 
-- 已落地 Skill：`68`
+- 已落地 Skill：`69`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`15`
+- 扩展种子 Skill：`17`
 
 主规划文档：
 
@@ -117,6 +117,7 @@ python skill-dictionary/generate_dictionary.py
 | `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
+| `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、优先级与后续工具让路规则。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
@@ -482,3 +483,4 @@ claude-mem(记忆) :
 2026-06-02 17:54:41 docs: [命中检查规则] 移除本地提交脚本硬编码
 2026-06-03 18:34:08 docs: [Git协作规则] 优先使用skill自带提交闸门
 2026-06-04 18:02:04 docs: [Go编码规则] 禁用iota常量枚举
+2026-06-11 11:35:00 feat: [MCP安装判定] 新增项目MCP安装与优先级规则
