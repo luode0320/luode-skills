@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodeGraph 分析"
+  short_description: "分析代码库结构、调用链、符号关系与影响面时优先提醒使用 CodeGraph"
+  default_prompt: "使用 $codegraph-analysis-rules 在分析项目、调用链、符号关系和影响面时优先提醒使用 CodeGraph，并在不可用时回退到本地搜索。"
