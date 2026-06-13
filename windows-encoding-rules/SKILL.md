@@ -41,6 +41,13 @@ Out-File -Encoding utf8 <path>
 ```powershell
 $env:PYTHONUTF8 = "1"
 ```
+- Windows PowerShell 5.1 中，若需要用 `Invoke-WebRequest`、`Invoke-RestMethod`、`iwr`、`irm` 下载文件、拉取远端文本、请求 API 或执行远端安装脚本，默认先执行：
+```powershell
+$PSDefaultParameterValues['Invoke-WebRequest:UseBasicParsing'] = $true
+$PSDefaultParameterValues['Invoke-RestMethod:UseBasicParsing'] = $true
+```
+- 单次命令也可显式附带 `-UseBasicParsing`；凡是无人值守脚本，默认必须启用，避免弹出“是否继续执行 / 使用 IE 解析”的人工确认框。
+- 若只是下载文件到本地，优先使用 `curl.exe` 替代 PowerShell Web Cmdlet，以减少交互提示。
 - 禁止直接使用 `>`、`>>` 追加中文关键内容（除非已明确编码策略并验证）。
 - 对关键文档（如 `README.md`）优先“整段替换/精确替换”，少用盲目追加。
 - 每次中文写入后都执行“回读核对 + Git diff 核对”。
