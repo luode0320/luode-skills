@@ -1,0 +1,4 @@
+interface:
+  display_name: "2D 素材设计"
+  short_description: "为生产级游戏设计、生成并后处理原创 2D 游戏素材"
+  default_prompt: "当任务需要设计、生成、补齐、替换或整理 2D 游戏素材时，使用此 skill 构建原创 2D 资产，并把外部免费素材仅作为参考。"
