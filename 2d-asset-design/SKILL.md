@@ -179,6 +179,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 玩法可读性：敌我区分、威胁等级、拾取物和 UI 图标识别方式。
 
 如果已有素材风格本身还不稳定，先输出“临时项目风格基线”，并在本轮所有素材里保持一致；不得每个素材各自找一个新画风。
+需要把设计结果交给实现层时，必须先形成 image spec，再进入生成提示词或实现步骤。
 
 ### 第 2 步：先写素材 brief
 
@@ -224,10 +225,12 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 参考差距拆解：和目标参考相比，当前最容易掉分的 3-5 个点
 - 回炉条件：哪些情况出现就必须重做，而不是继续微调
 - 风格一致性风险：哪些设计选择可能让它不像当前项目
+- image spec 交接字段：资产类型、用途、主要诉求、项目视觉基线、参考来源、参考差距、允许差异、风格约束、构图、材质、光照、质量阶梯、输出格式、通过条件、禁止项
 
 设计工作流参考：
 
 - [references/image-generation-workflow.md](references/image-generation-workflow.md)
+- [references/image-spec-contract.md](references/image-spec-contract.md)
 
 ### 第 3 步：处理外部参考
 
@@ -286,6 +289,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 完成初稿后，必须按 [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md) 做一次自审。未达到目标质量阶梯时，默认回炉一次，不要直接交付。
 还必须按 [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md) 做一次风格一致性自审。素材质量达标但风格不一致时，仍然必须回炉。
+还必须按 [references/image-spec-contract.md](references/image-spec-contract.md) 检查设计到实现的交接字段是否齐全，缺字段不得进入实现。
 
 ### 第 5 步：执行后处理
 
@@ -430,6 +434,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 提示词规则： [references/prompt-rules.md](references/prompt-rules.md)
 - 商业级审稿闸门： [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md)
 - 项目风格一致性合同： [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md)
+- 图像设计交接合同： [references/image-spec-contract.md](references/image-spec-contract.md)
 - 参考与原创边界规则： [references/reference-only-policy.md](references/reference-only-policy.md)
 - 图像设计工作流： [references/image-generation-workflow.md](references/image-generation-workflow.md)
 - 地图模式选择： [references/map-strategies.md](references/map-strategies.md)

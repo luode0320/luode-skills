@@ -44,6 +44,8 @@
 - Same shadow and glow logic / 相同阴影和发光规则
 - Same detail density / 相同细节密度
 
+如果已经写了 image spec，提示词必须直接继承 image spec 里的项目视觉基线、允许差异、参考差距和通过条件，不要重新发明一套更松的说明。
+
 必须避免：
 
 - different asset pack style
@@ -69,6 +71,21 @@
 - layered material planes / 材质层级
 - grounded contact shadow / 对应主体落点的接地影
 - 1-3 focal details / 1-3 个视觉焦点
+
+如果是从 image spec 生成提示词，提示词必须保留以下字段语义：
+
+- asset type
+- use case
+- project visual baseline
+- reference gap
+- allowed differences
+- style constraints
+- composition / framing
+- materials / textures
+- lighting / mood
+- quality tier
+- pass criteria
+- avoid
 
 禁止出现或必须规避：
 
@@ -133,15 +150,29 @@
 
 ```text
 为一款 2D 游戏创建一个原创 <资产类型>。
+资产类型：<asset type>。
+用途：<use case>。
+主要诉求：<primary request>。
+项目视觉基线：<project visual baseline>。
+参考来源：<reference sources>。
+参考差距：<reference gap>。
+允许差异：<allowed differences>。
+风格约束：<style constraints>。
 用途：<玩法职责>。
 视角：<俯视 / 侧视 / 3/4>。
 风格：<clean_hd / pixel_inspired / project-native>。
+构图：<composition / framing>。
+材质：<materials / textures>。
+光照：<lighting / mood>。
+质量阶梯：<quality tier>。
+通过条件：<pass criteria>。
 项目风格基线：<镜头、描边、配色、材质、阴影、发光、细节密度>。
 风格一致性：必须匹配项目已有素材，不能像来自另一个素材包；只允许为玩法识别做受控差异。
 轮廓：<轮廓语言>。
 配色：<配色方向>。
 质量：目标 <Tier 2 / Tier 3>，必须具备好看的外轮廓、手绘线稿节奏、非均匀描边、清晰负形、材质层级、接地阴影和 1-3 个视觉焦点。
 输出：准确的 <rows>x<cols> 网格。
+禁止项：<avoid>。
 背景：纯平 #FF00FF。
 不要文字、标签、UI、水印、边框、格线。
 不要简单几何图标、均匀描边贴纸、随机发光点、占位图或 prop pack 小装饰感。
