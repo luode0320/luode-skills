@@ -16,6 +16,8 @@ description: 用于设计、生成和后处理原创 2D 游戏素材。当用户
 
 它的默认质量目标不是“先交付一个能用的占位图”，而是“按商业游戏成品标准生产可直接进入正式美术链路的原创 2D 资产”。
 
+在进入实现前，设计阶段默认先用 `Image Generation Skill` 做图像设计收口，再由 `2d-asset-design` 按设计结果实现。
+
 ## 自动触发范围
 
 出现以下任一意图时，自动使用本 skill：
@@ -33,14 +35,25 @@ description: 用于设计、生成和后处理原创 2D 游戏素材。当用户
 
 ## 核心原则
 
-### 1. 免费素材只做参考，不直接入库
+### 1. 先设计，再实现
+
+设计阶段默认先走 `Image Generation Skill` 的图像设计工作流：
+
+- 先把资产目标写成清晰的 image spec
+- 再判断是 `generate` 还是 `edit`
+- 再明确是否需要透明背景、变体、合成或局部修改
+- 再把设计结果交给 `2d-asset-design` 进行实现和后处理
+
+需要设计工作流细节时，读取 [references/image-generation-workflow.md](references/image-generation-workflow.md)。
+
+### 2. 免费素材只做参考，不直接入库
 
 Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许做参考板、比例参考、层次参考、风格拆解与制作约束参考。
 不要把下载素材直接作为最终游戏资产，也不要只做轻微换色、裁切、描边后冒充原创成品。
 
 需要参考规则时，读取 [references/reference-only-policy.md](references/reference-only-policy.md)。
 
-### 2. 先满足玩法可读性，再追求装饰细节
+### 3. 先满足玩法可读性，再追求装饰细节
 
 任何素材先回答这几个问题：
 
@@ -53,11 +66,11 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 但“删细节”不等于“删结构”。对于树、建筑、掩体、场景机关、门、桥、路障、遗迹、残骸、雕像等场景物件，默认必须保留足以让单体物件成立的结构信息、材质层次、接地感和体块关系，不能把“更扁平、更少颜色”误做成“轻装饰符号”。
 
-### 3. 只构建项目原创 2D 素材
+### 4. 只构建项目原创 2D 素材
 
 目标不是“找到能用的现成包”，而是“借鉴参考后，为当前项目构建新的原创 2D 视觉资产”。
 
-### 4. 面向 Godot 交付
+### 5. 面向 Godot 交付
 
 默认考虑：
 
@@ -69,7 +82,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 可拆层的地图/道具资源
 - Godot 导入后的继续编辑空间
 
-### 5. 商业级场景物件优先于轻装饰交付
+### 6. 商业级场景物件优先于轻装饰交付
 
 除非用户明确要求“临时 demo 占位”“只做极简符号”“只做噪点/小装饰 pack”，否则：
 
@@ -78,6 +91,35 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 默认把场景物件当成独立 hero prop 设计，再决定是否需要补充少量 micro props。
 
 本项目默认拒绝“只是为了填空而存在的小装饰包”。轻装饰、噪点、符号化草簇只能作为明确说明的 demo 资产，不能作为正式生产方案。
+
+### 7. 商业级审稿闸门优先于“结构齐全”
+
+“有轮廓、有体积、有结构、有阴影”只是最低级 hero prop 门槛，不等于商业级完成度。
+当用户要求高质量、正式资产、接近成品游戏观感、类《土豆兄弟》俯视自动射击质感，或已经指出“距离参考差很多”时，必须进入商业级审稿闸门。
+
+需要审稿细则时，读取 [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md)。
+
+默认结论规则：
+
+- 只达到“能看出是什么”的结果，判为 `Tier 1: low hero prop`，不得当正式最终资产交付。
+- 只有同时具备好看的外轮廓、线稿节奏、姿态/生长势、负形、材质层级、局部焦点、接地影和地图融合度，才允许进入正式候选。
+- 程序几何图形、简单椭圆堆叠、规则多边形拼接、重复 stamp、均匀描边、没有手绘线条节奏的结果，只能作为构图草稿或 demo，默认不能作为正式 hero prop。
+- 对树木、怪物、建筑、地标、Boss、主角等高价值资产，必须先做参考差距拆解，再生成或制作原创资产。
+
+### 8. 项目风格一致性是强制前置条件
+
+任何正式素材都必须像来自同一个游戏，而不是像多个素材包拼在一起。
+质量高但风格不一致，仍然判定为失败结果。
+
+需要风格一致性规则时，读取 [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md)。
+
+默认强规则：
+
+- 设计新素材前，必须先锁定项目视觉基线，包括镜头角度、描边逻辑、色相范围、明度/饱和度、材质语言、发光方式、阴影方向、细节密度、UI/战斗可读性优先级。
+- 新素材必须继承项目主视觉 DNA，只允许在玩法职责需要时做受控差异。
+- 不允许因为单个素材“更好看”就引入完全不同画风、不同描边、不同渲染方式、不同光照方向或不同材质语言。
+- 如果参考图风格强于项目现有风格，必须先提炼可融入项目的部分，再重设计；不能把参考风格整包搬进项目导致风格割裂。
+- 交付前必须做风格一致性自审；不通过时优先回炉，而不是继续堆细节。
 
 ## 执行流程
 
@@ -104,6 +146,40 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 如果请求涉及树木、建筑、掩体、场景机关、门、桥、地标、建筑残骸、祭坛、雕像、车辆残骸、大型植被、可交互地图物件或任何“用户会盯着看并判断质感”的场景对象，默认直接判定为 `Hero Prop`，而不是 `Prop Pack`。
 
+### 第 1.5 步：判定质量阶梯
+
+生成前必须先判定当前资产应该达到哪个质量阶梯：
+
+- `Tier 0: Blockout`：只验证尺寸、位置和碰撞，不允许当正式美术。
+- `Tier 1: Low Hero Prop`：有基本结构和体积，但造型、线稿和材质仍像低级草稿；只能作为迭代中间态。
+- `Tier 2: Production Candidate`：具备明确造型语言、手绘线条节奏、材质分层和可用接地感，可以进入项目候选。
+- `Tier 3: Shippable`：缩小后仍好看，单体成立，放进地图也融合，能承受用户对照商业游戏截图审视。
+
+除非用户明确说“占位 / demo / 临时”，本项目正式素材默认目标至少是 `Tier 2`，重要角色、怪物、树木、建筑、Boss、地图主视觉默认目标是 `Tier 3`。
+
+### 第 1.6 步：锁定项目视觉基线
+
+写素材 brief 前，必须先建立或读取当前项目的视觉基线。
+
+优先来源：
+
+- 项目已有正式素材：角色、怪物、地图、UI、特效、图标。
+- 项目素材记录文档，例如 `game/assets/README.md`。
+- 项目设计文档或 AGENTS.md 中的美术方向。
+- 用户本轮明确指定的风格方向。
+
+视觉基线至少包含：
+
+- 镜头与透视：俯视、3/4、侧视、角色朝向规则。
+- 轮廓与描边：描边粗细、是否非均匀、外轮廓压重方式。
+- 色彩：主色族、焦点色、饱和度、明度范围、是否低噪点。
+- 材质：金属、木头、树冠、皮肤、晶体、布料、能量的表达方式。
+- 光照与阴影：主光方向、接地影形状、发光是否影响周边。
+- 细节密度：小尺寸下保留多少纹理、裂缝、晶体、颗粒。
+- 玩法可读性：敌我区分、威胁等级、拾取物和 UI 图标识别方式。
+
+如果已有素材风格本身还不稳定，先输出“临时项目风格基线”，并在本轮所有素材里保持一致；不得每个素材各自找一个新画风。
+
 ### 第 2 步：先写素材 brief
 
 在生成素材前，先输出简短素材 brief，至少包含：
@@ -112,11 +188,16 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 玩法用途
 - 观看视角：俯视 / 侧视 / 3/4
 - 风格方向
+- 项目视觉基线继承点
+- 允许的受控差异
 - 轮廓语言
 - 配色方向
 - 材质提示
 - 体积与结构要求
 - 接地感 / 阴影策略
+- 线稿与边缘质量要求
+- 局部焦点和视觉重心
+- 质量阶梯目标
 - 动画需求
 - 交付格式
 
@@ -140,6 +221,13 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 是否需要明显的接地阴影
 - 是否需要材质分层（树冠/树干/绑带/苔藓/发光点缀/金属件等）
 - 是否允许只作为背景噪点：默认不允许
+- 参考差距拆解：和目标参考相比，当前最容易掉分的 3-5 个点
+- 回炉条件：哪些情况出现就必须重做，而不是继续微调
+- 风格一致性风险：哪些设计选择可能让它不像当前项目
+
+设计工作流参考：
+
+- [references/image-generation-workflow.md](references/image-generation-workflow.md)
 
 ### 第 3 步：处理外部参考
 
@@ -148,6 +236,21 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 1. 提炼可复用信息：轮廓、色块、层次、材质、节奏、构图密度、镜头角度。
 2. 丢弃直接复用风险高的部分：独特造型、完整构图、原包专属排列、可直接辨认的角色或道具设计。
 3. 重新组合成当前项目自己的风格 brief。
+
+参考图只能用于提升项目风格内的质量，不允许让项目突然变成另一个游戏。
+提炼参考时必须分成两类：
+
+- 可吸收：轮廓节奏、线稿层次、材质组织、焦点细节、阴影/发光方法。
+- 不直接吸收：原作独特造型、世界观符号、专属配色比例、可识别角色或物件身份、与项目现有视觉基线冲突的渲染方式。
+
+当存在参考图时，必须额外做“差距拆解”，至少比较：
+
+- 外轮廓是否好看，不只是清楚。
+- 线条是否有粗细、断续、压重和手绘节奏，而不是均匀描边。
+- 姿态/生长势是否有方向性、偏心和生命力，而不是上下左右规整摆放。
+- 负形是否丰富，枝条、空洞、缝隙和外延是否创造可读形状。
+- 材质层次是否能看出前后、软硬、亮暗、发光和遮挡关系。
+- 局部焦点是否明确，是否有 1-3 个高完成度细节撑起资产记忆点。
 
 不要输出“就直接用这个包”作为结论。
 
@@ -173,6 +276,16 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 有材质分层，而不是整块纯色
 - 如风格允许，可有少量发光点缀，但不能喧宾夺主
 - 单体物件即使脱离地图，也应像一个完整资产，而不是地图噪点
+
+生成方式约束：
+
+- 程序绘制、Pillow、SVG 几何拼接可以用于布局草图、碰撞草图、分层验证、风格探索和临时 blockout。
+- 对 `Tier 2` / `Tier 3` 正式素材，默认不得只靠简单几何脚本直接交付最终资产。
+- 如果只能使用程序绘制，也必须模拟手绘质量：非均匀轮廓、非对称结构、局部断线、压重线、复杂负形、材质遮挡、局部焦点和二次细节；做不到则必须声明为草稿。
+- 如果当前工具无法生成足够质量的原始图，不要把低级结果包装成正式资产，应输出回炉 brief、参考差距和下一轮生成策略。
+
+完成初稿后，必须按 [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md) 做一次自审。未达到目标质量阶梯时，默认回炉一次，不要直接交付。
+还必须按 [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md) 做一次风格一致性自审。素材质量达标但风格不一致时，仍然必须回炉。
 
 ### 第 5 步：执行后处理
 
@@ -258,8 +371,15 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 有材质分层
 - 可有发光点缀
 - 单体物件本身成立
+- 有好看的外轮廓和负形，而不是规则几何轮廓
+- 有手绘线稿节奏：粗细变化、关键压重、适当断线和局部轮廓强调
+- 有姿态或生长势：树枝、残骸、建筑结构不能完全对称、均匀或僵硬
+- 有 1-3 个局部焦点细节，例如发光晶体、挂件、破损边、苔藓、符文、绑带或机械核心
+- 有地图融合度：颜色、明度、阴影方向和画面噪点不能像贴纸
 
 如果结果只是轻装饰符号、噪点、草簇暗示、几何图形拼接、没有主体结构的平面涂抹，默认判定为失败结果，必须回炉。
+如果结果只满足“结构齐全”但看起来仍像低级几何拼图、低龄简笔画、贴纸、玩具块或程序生成图，默认也判定为 `Tier 1`，不得作为正式素材收口。
+如果结果单体质量还可以，但描边、色彩、明度、材质、发光、阴影或细节密度明显不像项目已有素材，默认判定为风格一致性失败，不得作为正式素材收口。
 
 地图相关约束分别读取：
 
@@ -308,7 +428,10 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 - 资产模式判定： [references/asset-modes.md](references/asset-modes.md)
 - 提示词规则： [references/prompt-rules.md](references/prompt-rules.md)
+- 商业级审稿闸门： [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md)
+- 项目风格一致性合同： [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md)
 - 参考与原创边界规则： [references/reference-only-policy.md](references/reference-only-policy.md)
+- 图像设计工作流： [references/image-generation-workflow.md](references/image-generation-workflow.md)
 - 地图模式选择： [references/map-strategies.md](references/map-strategies.md)
 - 分层地图合同： [references/layered-map-contract.md](references/layered-map-contract.md)
 - prop pack 合同： [references/prop-pack-contract.md](references/prop-pack-contract.md)
