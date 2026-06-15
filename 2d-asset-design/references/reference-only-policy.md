@@ -1,10 +1,11 @@
 # Reference-Only Policy
 
-Use this file when the request mentions free/public asset packs, screenshots, downloaded art, or external game visuals.
+Use this file when the request mentions asset packs, store pages, screenshots, downloaded art, paid marketplaces, or external game visuals.
 
 ## Goal
 
 Convert references into a new production direction instead of directly shipping the referenced art.
+This applies equally to free packs, paid packs, marketplace previews, store screenshots, and user-provided reference screenshots.
 
 ## Allowed Uses Of References
 
@@ -15,10 +16,12 @@ Convert references into a new production direction instead of directly shipping 
 - study material breakup
 - study timing and pose count for animation
 - study how maps separate walkable ground, blockers, props, and points of interest
+- study what makes a marketplace preview feel commercial-grade
 
 ## Disallowed Uses
 
 - shipping a downloaded asset unchanged
+- shipping a marketplace screenshot or edited crop as final art
 - shipping a lightly recolored or resized copy
 - tracing a distinctive asset too closely
 - preserving a unique composition or shape arrangement from one source pack
@@ -59,3 +62,4 @@ Before finalizing, confirm:
 - the asset reads correctly during motion
 - the asset is original enough to stand on its own
 - the asset can be imported cleanly into Godot
+- the chosen reference was explicitly confirmed by the user before design production began

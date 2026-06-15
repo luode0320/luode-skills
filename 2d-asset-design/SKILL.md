@@ -1,6 +1,6 @@
 ---
 name: 2d-asset-design
-description: 用于设计、生成和后处理原创 2D 游戏素材。当用户想要新建、重做、补齐、替换、迭代或统一 2D 游戏素材时自动使用；当角色、怪物、Boss、地图、瓦片、场景道具、UI、图标、特效、投射物、掉落物、Sprite Sheet、逐帧动画、Godot 可导入贴图或分层 2D 资源在需求实现过程中成为阻塞项时也自动使用。也用于把 Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等免费素材站资源当作参考板进行风格提炼，再重新设计和生成原创素材，而不是直接复用下载素材作为最终游戏资产。
+description: 用于设计、生成和后处理原创 2D 游戏素材。当用户想要新建、重做、补齐、替换、迭代或统一 2D 游戏素材时自动使用；当角色、怪物、Boss、地图、瓦片、场景道具、UI、图标、特效、投射物、掉落物、Sprite Sheet、逐帧动画、Godot 可导入贴图或分层 2D 资源在需求实现过程中成为阻塞项时也自动使用。也用于先从外部素材网站检索候选参考，再把用户选定的截图当作参考板进行风格提炼，重新设计和生成原创素材，而不是直接复用第三方素材作为最终游戏资产。正式素材任务默认先联动共享根目录设计 skill `agent-sprite-forge-design`：先检索参考候选，再出设计图给用户确认，满意后才进入生产和后处理；当进入角色/怪物/Boss 动画或 sprite sheet 生产时，再自动联动共享根目录 `character-sprite-animation-production`。
 ---
 
 # 2D 素材设计
@@ -16,7 +16,7 @@ description: 用于设计、生成和后处理原创 2D 游戏素材。当用户
 
 它的默认质量目标不是“先交付一个能用的占位图”，而是“按商业游戏成品标准生产可直接进入正式美术链路的原创 2D 资产”。
 
-在进入实现前，设计阶段默认先用 `Image Generation Skill` 做图像设计收口，再由 `2d-asset-design` 按设计结果实现。
+在进入实现前，设计阶段默认先用共享根目录 skill `agent-sprite-forge-design` 做美术设计收口：先检索外部参考候选给用户，再基于用户选定截图配合 `Image Generation Skill` 产出设计图预览；只有用户确认设计方向后，`2d-asset-design` 才进入正式生产、后处理和 Godot 交付。若生产对象包含角色、怪物或 Boss 动作，再自动联动共享根目录 `character-sprite-animation-production` 负责动作生产与 QA。
 
 ## 自动触发范围
 
@@ -24,7 +24,8 @@ description: 用于设计、生成和后处理原创 2D 游戏素材。当用户
 
 - 用户明确要求“做素材”“设计素材”“生成素材”“换美术”“补 2D 资源”“重做角色/怪物/UI/地图素材”。
 - 当前任务推进到某一步，发现缺少角色、怪物、子弹、道具、图标、地图、瓦片、场景道具、特效、HUD 等 2D 素材。
-- 需要把免费素材站资源当成参考，再重新设计项目自己的原创素材。
+- 需要把第三方素材站、商店页、作品页或用户提供截图当成参考，再重新设计项目自己的原创素材。
+- 需要先去素材网站检索候选、给用户看截图、再根据用户选中的参考做原创设计。
 - 需要把 2D 素材整理为 Godot 可导入的透明图、分帧图、Sprite Sheet、可预览动画。
 - 需要统一 2D 资产风格，避免不同来源素材混用导致画面割裂。
 
@@ -37,19 +38,28 @@ description: 用于设计、生成和后处理原创 2D 游戏素材。当用户
 
 ### 1. 先设计，再实现
 
-设计阶段默认先走 `Image Generation Skill` 的图像设计工作流：
+设计阶段默认先走共享根目录 `agent-sprite-forge-design`，并结合 `Image Generation Skill` 的图像设计工作流：
 
+- 先检索外部参考候选并给用户看
+- 先让用户选定要推进的参考截图或参考方向
 - 先把资产目标写成清晰的 image spec
+- 先明确 sprite / map / layered map / FX / engine handoff 属于哪条设计链路
 - 再判断是 `generate` 还是 `edit`
 - 再明确是否需要透明背景、变体、合成或局部修改
-- 再把设计结果交给 `2d-asset-design` 进行实现和后处理
+- 先给用户看设计图预览并等待确认
+- 再把已确认的设计结果交给 `2d-asset-design` 进行实现和后处理
+
+如果用户继续通过对话调整设计，默认继续留在设计阶段，不得抢跑进入最终生产。
 
 需要设计工作流细节时，读取 [references/image-generation-workflow.md](references/image-generation-workflow.md)。
+还必须读取 [references/design-preview-confirmation-gate.md](references/design-preview-confirmation-gate.md)。
 
-### 2. 免费素材只做参考，不直接入库
+### 2. 第三方素材默认只做参考，不直接入库
 
-Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许做参考板、比例参考、层次参考、风格拆解与制作约束参考。
-不要把下载素材直接作为最终游戏资产，也不要只做轻微换色、裁切、描边后冒充原创成品。
+Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo、itch.io、CraftPix、Fab、ArtStation Marketplace、Gumroad 等来源默认都只允许做参考板、比例参考、层次参考、风格拆解与制作约束参考。
+不要把第三方素材直接作为最终游戏资产，也不要只做轻微换色、裁切、描边后冒充原创成品。
+
+如果当前阶段只是做参考检索与方向筛选，不要因为素材站点付费、需要登录、需要购买或只能看商店页，就把它从候选池排除；这类限制只在“需要实际下载或直接接入第三方素材”时再考虑。
 
 需要参考规则时，读取 [references/reference-only-policy.md](references/reference-only-policy.md)。
 
@@ -123,6 +133,27 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 ## 执行流程
 
+### 第 0 步：先走设计确认闭环
+
+正式 2D 素材任务默认必须先命中共享根目录 `agent-sprite-forge-design`，再进入本 skill 的生产部分。
+
+默认顺序：
+
+1. 检索外部参考候选
+2. 向用户展示候选素材截图、链接或候选清单
+3. 由用户选定要推进的参考截图，或补充新的参考截图
+4. 锁定项目视觉基线
+5. 形成 image spec / 素材 brief
+6. 生成设计图预览
+7. 向用户展示设计图并等待确认
+8. 如果用户不满意，继续通过对话迭代设计图
+9. 只有用户明确确认满意后，才进入本 skill 的正式生产、后处理和 Godot 交付
+
+没有用户确认时，不得把设计预览当最终素材交付。
+没有用户选定参考前，不得直接跳过候选筛选阶段假定风格。
+
+如果任务进入角色、怪物、Boss 的动作生产、direction set 或 sprite sheet 生产，还必须读取 [references/character-animation-production-gate.md](references/character-animation-production-gate.md)，并联动共享根目录 `character-sprite-animation-production`。
+
 ### 第 1 步：识别资产任务
 
 先把请求收敛成明确资产类别：
@@ -145,6 +176,23 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 当一句话可能对应多种素材生产方案时，读取 [references/asset-modes.md](references/asset-modes.md)。
 
 如果请求涉及树木、建筑、掩体、场景机关、门、桥、地标、建筑残骸、祭坛、雕像、车辆残骸、大型植被、可交互地图物件或任何“用户会盯着看并判断质感”的场景对象，默认直接判定为 `Hero Prop`，而不是 `Prop Pack`。
+
+### 第 1.2 步：先做参考候选筛选
+
+在写正式 brief 前，先做外部参考候选筛选。
+
+最少要整理出：
+
+- 候选来源网站
+- 候选链接或页面
+- 候选截图或可描述的预览图
+- 每个候选的风格标签
+- 每个候选适合借鉴的点
+- 每个候选与项目当前方向的风险点
+
+如果用户已经直接给了参考截图，可以跳过网站检索，但仍然要做参考拆解。
+
+若当前只能访问网站页面、商店页、作品页、宣传图或付费预览图，也可以纳入候选；只要当前任务不是“直接下载接入”，就不要把这类来源排除。
 
 ### 第 1.5 步：判定质量阶梯
 
@@ -183,7 +231,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 ### 第 2 步：先写素材 brief
 
-在生成素材前，先输出简短素材 brief，至少包含：
+在生成素材前，先输出简短素材 brief，并准备设计图预览。至少包含：
 
 - 资产类型
 - 玩法用途
@@ -231,6 +279,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 - [references/image-generation-workflow.md](references/image-generation-workflow.md)
 - [references/image-spec-contract.md](references/image-spec-contract.md)
+- [references/design-preview-confirmation-gate.md](references/design-preview-confirmation-gate.md)
 
 ### 第 3 步：处理外部参考
 
@@ -239,6 +288,8 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 1. 提炼可复用信息：轮廓、色块、层次、材质、节奏、构图密度、镜头角度。
 2. 丢弃直接复用风险高的部分：独特造型、完整构图、原包专属排列、可直接辨认的角色或道具设计。
 3. 重新组合成当前项目自己的风格 brief。
+
+如果用户还没有指定参考图，先由 agent 提供候选参考，不要默认把检索责任推回给用户。
 
 参考图只能用于提升项目风格内的质量，不允许让项目突然变成另一个游戏。
 提炼参考时必须分成两类：
@@ -259,10 +310,18 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 
 ### 第 4 步：生成原始素材
 
+先区分“设计预览图”和“最终生产素材”：
+
+- 设计预览图：用于给用户确认方向
+- 最终生产素材：用于后处理、导出和 Godot 接入
+
+默认必须先生成设计预览图，再根据用户确认进入最终生产。
+
 优先使用当前可用的图像生成能力产出新的原创素材。
 如果环境里没有图像生成能力，不要假装已经生成完成，而是输出：
 
 - 可执行的生成 brief
+- 用于向用户确认方向的设计预览说明
 - 建议的构图 / 帧数 / 行列结构
 - 后处理参数
 - 接入 Godot 所需交付格式
@@ -287,9 +346,12 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 如果只能使用程序绘制，也必须模拟手绘质量：非均匀轮廓、非对称结构、局部断线、压重线、复杂负形、材质遮挡、局部焦点和二次细节；做不到则必须声明为草稿。
 - 如果当前工具无法生成足够质量的原始图，不要把低级结果包装成正式资产，应输出回炉 brief、参考差距和下一轮生成策略。
 
+完成参考候选整理后，也必须先让用户选定参考方向；未选定前默认继续停留在候选筛选阶段。
+完成设计预览后，必须先向用户展示并等待确认；未确认时默认继续迭代。
 完成初稿后，必须按 [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md) 做一次自审。未达到目标质量阶梯时，默认回炉一次，不要直接交付。
 还必须按 [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md) 做一次风格一致性自审。素材质量达标但风格不一致时，仍然必须回炉。
 还必须按 [references/image-spec-contract.md](references/image-spec-contract.md) 检查设计到实现的交接字段是否齐全，缺字段不得进入实现。
+还必须按 [references/design-preview-confirmation-gate.md](references/design-preview-confirmation-gate.md) 检查是否已有用户确认；未确认不得进入生产阶段。
 
 ### 第 5 步：执行后处理
 
@@ -347,6 +409,7 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 动画帧之间角色体量不要漂移太大。
 - 需要固定脚底锚点时，优先用 `bottom` 对齐。
 - 不要把大范围脱离本体的攻击弧光、爆炸、远距离子弹直接塞进角色本体 sheet，优先拆成独立 FX。
+- 如果进入 idle / walk / run / attack / cast / hit / death / 4向 / 8向 / sprite sheet 生产，默认联动共享根目录 `character-sprite-animation-production`。
 
 ### 投射物、命中特效、法术效果
 
@@ -424,9 +487,11 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 1. 资产目标
 2. 参考提炼
 3. 原创 brief
-4. 生成方案
-5. 后处理方案
-6. Godot 交付物
+4. 设计预览方案
+5. 用户确认状态
+6. 生成方案
+7. 后处理方案
+8. Godot 交付物
 
 ## 资源
 
@@ -435,6 +500,8 @@ Kenney、OpenGameArt、Quaternius、KayKit、Godot Demo 等来源默认只允许
 - 商业级审稿闸门： [references/art-direction-quality-gate.md](references/art-direction-quality-gate.md)
 - 项目风格一致性合同： [references/project-style-consistency-contract.md](references/project-style-consistency-contract.md)
 - 图像设计交接合同： [references/image-spec-contract.md](references/image-spec-contract.md)
+- 设计预览确认闸门： [references/design-preview-confirmation-gate.md](references/design-preview-confirmation-gate.md)
+- 角色动画生产闸门： [references/character-animation-production-gate.md](references/character-animation-production-gate.md)
 - 参考与原创边界规则： [references/reference-only-policy.md](references/reference-only-policy.md)
 - 图像设计工作流： [references/image-generation-workflow.md](references/image-generation-workflow.md)
 - 地图模式选择： [references/map-strategies.md](references/map-strategies.md)
