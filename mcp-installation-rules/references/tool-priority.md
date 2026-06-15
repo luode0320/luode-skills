@@ -9,6 +9,11 @@
 - 查看 Network、Performance、Coverage 等 DevTools 能力
 - 验证前端页面行为、抓取运行时状态
 
+名称约定：
+
+- `Chrome DevTools MCP` 是本仓库统一使用的官方工具名。
+- 用户提到“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”时，默认都映射到 `Chrome DevTools MCP`，不要在规则里并列成多个不同工具。
+
 优先级固定为：
 
 1. `Chrome DevTools MCP`

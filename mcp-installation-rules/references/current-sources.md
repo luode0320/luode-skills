@@ -4,6 +4,7 @@
 
 ## Chrome DevTools MCP
 
+- 官方当前产品名会同时出现 `Chrome DevTools MCP` 与 `Chrome DevTools for agents`；本仓库在规则判定里统一记作 `Chrome DevTools MCP`。
 - Chrome 官方说明：
   - `https://developer.chrome.com/docs/devtools/agents`
   - `https://developer.chrome.com/docs/devtools/agents/get-started`
@@ -13,6 +14,7 @@
 使用原则：
 
 - 默认以 Chrome 官方文档和官方仓库的最新安装说明为准。
+- 若用户说“谷歌浏览器 MCP”或“Google Chrome MCP”，回答时先做一次名称归一，再引用官方来源。
 - 后续浏览器控制优先让位给该 MCP，而不是继续默认使用其他浏览器工具。
 
 ## Godot AI MCP

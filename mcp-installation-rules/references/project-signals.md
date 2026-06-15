@@ -4,6 +4,7 @@
 
 满足任一条即可视为“命中前端项目标记”，再结合仓库上下文判断是否为真实主项目：
 
+- 用户明确提到“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”，并希望当前项目后续由浏览器侧 MCP 接管
 - 存在 `package.json`、`pnpm-lock.yaml`、`yarn.lock`、`bun.lockb`
 - 存在 `vite.config.*`、`next.config.*`、`nuxt.config.*`
 - 存在 `src/`、`public/`、`pages/`、`app/` 等典型前端目录
@@ -25,3 +26,4 @@
 - 若仓库同时包含前端与 Godot 标记，不冲突，默认两个 MCP 都需要准备。
 - 若只有网页管理后台或游戏官网前端，不会削弱 Godot 标记；两者仍应分别接管各自工具面。
 - 若仓库只是包含文档示例或少量静态文件，不能直接判定为真实前端项目。
+- 若用户口头只说“谷歌浏览器 MCP”，但仓库内没有真实前端页面、浏览器验证或调试需求证据，不要仅凭名称机械判定必须安装。

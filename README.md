@@ -85,6 +85,8 @@
 
 ## 当前进度
 
+2026-06-15 11:56:59 docs: [MCP配置规则] 补充项目级config默认补齐约束
+
 2026-06-05 11:36:43 docs: [公共工具规则] 补充业务字面量复用约束
 
 截至当前版本：
@@ -117,7 +119,7 @@ python skill-dictionary/generate_dictionary.py
 | `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
-| `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、优先级与后续工具让路规则。 |
+| `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
