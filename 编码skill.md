@@ -162,7 +162,7 @@
 | `artifact-storage-rules` | 当需要定义、调整或解释 `ment/`、`bug/`、`test/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板或同任务复用策略时自动触发。 | 作为跨域统一约定 skill，提供目录、命名和复用策略的单一真相源，供需求、Bug、测试、记忆、项目设计和交付类 skill 统一引用。 |
 | `project-design-doc-rules` | 当用户要求分析整个项目、梳理架构 / 模块 / 主链路、同步根目录 `项目设计.md`，或在完成全项目分析后补建该文档时自动触发。 | 负责把根目录项目设计类文档当作弱参考源读取，按代码与当前文档优先原则判断偏移，并统一同步或补建根目录 `项目设计.md`。 |
 | `project-local-skills-rules` | 当用户要求“分析项目并总结项目专属 skill”，或要求把项目私有编码规则沉淀到项目目录时自动触发。 | 负责把项目专属规则拆成多个独立 skill，并统一落到项目根目录 `skill/`，供后续预热和编码阶段优先命中。 |
-| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。 |
+| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
 | `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
 | `skill-hit-check-rules` | 当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若未命中则明确告知未命中及原因。 | 在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。 |
