@@ -55,6 +55,11 @@ TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 
 ## 变更最小化
 - 注释补充不改变业务逻辑。
+
+## Windows / WSL 执行规则
+- Windows 下默认优先使用 Git Bash 或 WSL shell。
+- 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
+- 若确需在 Windows 侧执行命令，优先只读检查；写入前必须显式指定 UTF-8，并在落盘后立即 `git diff` 核对仅有预期改动。
 TEMPLATE
 )
 
@@ -94,5 +99,9 @@ append_section_if_missing "$AGENTS_FILE" "中文编码规则" "- 新增或修改
 - 文件编码保持 UTF-8，禁止乱码。"
 
 append_section_if_missing "$AGENTS_FILE" "变更最小化" "- 注释补充不改变业务逻辑。"
+
+append_section_if_missing "$AGENTS_FILE" "Windows / WSL 执行规则" "- Windows 下默认优先使用 Git Bash 或 WSL shell。
+- 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
+- 若确需在 Windows 侧执行命令，优先只读检查；写入前必须显式指定 UTF-8，并在落盘后立即 \`git diff\` 核对仅有预期改动。"
 
 echo "[OK] 已检查并补齐: $AGENTS_FILE"
