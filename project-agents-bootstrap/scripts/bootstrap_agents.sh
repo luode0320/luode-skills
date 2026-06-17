@@ -36,6 +36,8 @@ if [[ ! -d "$REPO_DIR" ]]; then
 fi
 
 AGENTS_FILE="$REPO_DIR/AGENTS.md"
+GITATTRIBUTES_FILE="$REPO_DIR/.gitattributes"
+EDITORCONFIG_FILE="$REPO_DIR/.editorconfig"
 
 TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 # AGENTS.md
@@ -60,6 +62,47 @@ TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 - Windows 下默认优先使用 Git Bash 或 WSL shell。
 - 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
 - 若确需在 Windows 侧执行命令，优先只读检查；写入前必须显式指定 UTF-8，并在落盘后立即 `git diff` 核对仅有预期改动。
+- 仓库应提交 `.gitattributes` 与 `.editorconfig`，显式固定 `LF`、`UTF-8`、末尾换行和基础编辑器行为。
+- Windows 下若仓库出现 `.sh` 仅 `100755 => 100644` 之类伪改动，应优先关闭 `core.filemode` 并清理 mode change。
+- Windows 下若仓库出现大量无关文件被带进改动，应优先检查 `core.autocrlf` 并通过 `.gitattributes` 固定换行策略。
+TEMPLATE
+)
+
+GITATTRIBUTES_CONTENT=$(cat <<'TEMPLATE'
+* text=auto
+
+*.sh text eol=lf
+*.bash text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+TEMPLATE
+)
+
+EDITORCONFIG_CONTENT=$(cat <<'TEMPLATE'
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
+[*.go]
+indent_style = tab
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
 TEMPLATE
 )
 
@@ -84,7 +127,16 @@ append_section_if_missing() {
 if [[ ! -f "$AGENTS_FILE" ]]; then
   printf "%s\n" "$TEMPLATE_CONTENT" > "$AGENTS_FILE"
   echo "[OK] 已创建: $AGENTS_FILE"
-  exit 0
+fi
+
+if [[ ! -f "$GITATTRIBUTES_FILE" ]]; then
+  printf "%s\n" "$GITATTRIBUTES_CONTENT" > "$GITATTRIBUTES_FILE"
+  echo "[OK] 已创建: $GITATTRIBUTES_FILE"
+fi
+
+if [[ ! -f "$EDITORCONFIG_FILE" ]]; then
+  printf "%s\n" "$EDITORCONFIG_CONTENT" > "$EDITORCONFIG_FILE"
+  echo "[OK] 已创建: $EDITORCONFIG_FILE"
 fi
 
 # 已存在则做增量补齐，不覆盖已有内容
@@ -102,6 +154,9 @@ append_section_if_missing "$AGENTS_FILE" "变更最小化" "- 注释补充不改
 
 append_section_if_missing "$AGENTS_FILE" "Windows / WSL 执行规则" "- Windows 下默认优先使用 Git Bash 或 WSL shell。
 - 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
-- 若确需在 Windows 侧执行命令，优先只读检查；写入前必须显式指定 UTF-8，并在落盘后立即 \`git diff\` 核对仅有预期改动。"
+- 若确需在 Windows 侧执行命令，优先只读检查；写入前必须显式指定 UTF-8，并在落盘后立即 \`git diff\` 核对仅有预期改动。
+- 仓库应提交 \`.gitattributes\` 与 \`.editorconfig\`，显式固定 \`LF\`、\`UTF-8\`、末尾换行和基础编辑器行为。
+- Windows 下若仓库出现 \`.sh\` 仅 \`100755 => 100644\` 之类伪改动，应优先关闭 \`core.filemode\` 并清理 mode change。
+- Windows 下若仓库出现大量无关文件被带进改动，应优先检查 \`core.autocrlf\` 并通过 \`.gitattributes\` 固定换行策略。"
 
 echo "[OK] 已检查并补齐: $AGENTS_FILE"
