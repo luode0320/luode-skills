@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Windows WSL Execution Rules"
+  short_description: "Windows 仓库默认通过 WSL 执行启动、调试与测试规则"
+  default_prompt: "Use $windows-wsl-execution-rules to run project start, debug, and test commands from Windows through WSL."
