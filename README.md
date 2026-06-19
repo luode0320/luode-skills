@@ -23,6 +23,24 @@
 2. 再根据你自己的项目结构、语言、框架、团队流程，把 Skill 做个性化调整。
 3. 将外部下载来的优秀 Skill 先本地化翻译，再决定是独立保留，还是吸收到现有 Skill 中。
 
+## 目录连接
+如果你想把这个仓库放在某个特定的盘符或路径下，可以使用 Windows 的目录连接功能，把它链接到你想放的位置。
+
+关闭agent, powershell管理员执行:
+
+codex:
+```sh
+Rename-Item 'C:\Users\luode\.codex\skills' 'skills.bak'
+cmd /c mklink /J "C:\Users\luode\.codex\skills" "F:\luode-skills"
+```
+
+claude:
+```sh
+Rename-Item 'C:\Users\luode\.claude\skills' 'skills.bak'
+cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
+```
+
+
 ## 体系原则
 
 这套 Skill 体系不是一个“大而全”的单体规则文件，而是：
