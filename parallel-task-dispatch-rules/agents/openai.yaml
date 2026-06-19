@@ -1,0 +1,4 @@
+interface:
+  display_name: "并行任务分发规则"
+  short_description: "为开发任务判定安全的并行拆分方式"
+  default_prompt: "使用 $parallel-task-dispatch-rules 先判断当前开发任务应并行、条件并行还是串行推进，再拆分线程。"

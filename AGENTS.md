@@ -4,10 +4,13 @@
 - 本文件适用于本仓库下所有代码与文档变更。
 
 ## Skill 命中强制规则
-- 处理本仓库任务时，必须先命中并加载至少一个项目内 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`。
+- 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
+- 若本轮涉及创建、补齐或更新仓库级 `AGENTS.md`，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
-- 若连 `skill-hit-check-rules` 都未命中，视为上下文丢失严重、当前一个 skill 都没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
+- 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
+- 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
+- 所有审查类 skill 统一按强制自动触发处理；只要是只读检查、规则核对、实现自审、归位审查或回归风险审查，默认优先并行。
 
 ## 注释任务强制流程
 - 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。

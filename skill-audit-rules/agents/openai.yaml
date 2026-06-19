@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill 审计规则"
+  short_description: "并发审计漏触发与规则未执行"
+  default_prompt: "使用 $skill-audit-rules 并发审计当前任务是否漏触发应有的 skill，或已触发 skill 是否还有未执行完的规则。"

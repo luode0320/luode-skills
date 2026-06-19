@@ -1,0 +1,4 @@
+interface:
+  display_name: "可读性检查规则"
+  short_description: "检查函数结构和局部可读性"
+  default_prompt: "使用 $code-readability-review-rules 只检查函数结构、表达顺序、条件层级、复杂度和局部可读性是否需要改进，并给出正反例与改进建议。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "实现自审镜像规则"
+  short_description: "只读检查实现自审的质量闸门与收口要求"
+  default_prompt: "使用 $implementation-review-mirror-rules 只读检查功能代码是否满足 implementation-review-rules 的实现自审要求，重点看结构、注释、Go 落点、回归风险和 500+ 行拆分，不直接改代码。"
