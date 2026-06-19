@@ -57,7 +57,7 @@ $PSDefaultParameterValues['Invoke-RestMethod:UseBasicParsing'] = $true
 - 每次中文写入后都执行“回读核对 + Git diff 核对”。
 - 对 Windows 下的仓库写入前，优先确认当前 shell 是否为 Git Bash/WSL；如果必须用 PowerShell，写入命令必须显式 UTF-8 且落盘后核对换行是否被转换。
 - 默认建议仓库提交 `.gitattributes` 与 `.editorconfig`，显式固定 `LF`、`UTF-8`、末尾换行和基础编辑器行为。
-- 对已有历史仓库，`.gitattributes` 默认先采用“最小约束”策略：先用 `* text=auto`，只对 `*.sh` / `*.bash` 等明确必须 `LF` 的脚本强制 `eol=lf`，不要一上来对 `*.go`、`*.vue`、`*.sql`、`*.md` 全量强制 `eol=lf`，否则容易触发整仓重规范化。
+- 对已有历史仓库，`.gitattributes` 默认先采用“最小约束”策略：先用 `* text=auto`，对 `*.sh` / `*.bash` 这类明确必须 `LF` 的脚本，以及 CI / 工作流 / 配置类文件 `*.yml` / `*.yaml` 显式强制 `eol=lf`；不要一上来对 `*.go`、`*.vue`、`*.sql`、`*.md` 全量强制 `eol=lf`，否则容易触发整仓重规范化。
 - Windows 下若 Git 出现 `.sh` 文件仅有 `100755 => 100644` 之类 mode change，优先检查并关闭仓库级与全局 `core.filemode`。
 - Windows 下若 Git 出现大量 `LF will be replaced by CRLF`，优先检查并关闭仓库级与全局 `core.autocrlf`，同时为仓库补齐 `.gitattributes`。
 
@@ -94,7 +94,7 @@ git diff -- README.md
 ## 通过 / 驳回标准
 
 - 通过：中文在终端可读、文件回读正常、`git diff` 无异常乱码片段。
-- 通过：仓库存在 `.gitattributes` / `.editorconfig`，Windows 下默认配置不会再把无关文件批量带进改动，`.sh` 不再因 mode change 反复脏掉。
+- 通过：仓库存在 `.gitattributes` / `.editorconfig`，Windows 下默认配置不会再把无关文件批量带进改动，`*.sh` / `*.bash` / `*.yml` / `*.yaml` 等需稳定 `LF` 的文件类型有明确换行约束，脚本文件也不再因 mode change 反复脏掉。
 - 驳回：依赖默认编码写入、写后未验证、发现乱码仍继续后续流程。
 
 ## 边界

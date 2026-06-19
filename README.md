@@ -103,6 +103,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-20 01:24:15 docs: [Windows编码规则] 补充yml与yaml换行约束
+
 2026-06-19 11:41:00 docs: [AGENTS命中规则] 强制至少触发skill-hit-check-rules
 
 2026-06-19 17:27:21 feat: [Windows与WSL执行规则] 新增 Windows 到 WSL 执行协作 skill
