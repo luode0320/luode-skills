@@ -85,6 +85,8 @@
 
 ## 当前进度
 
+2026-06-19 11:41:00 docs: [AGENTS命中规则] 强制至少触发skill-hit-check-rules
+
 2026-06-19 17:27:21 feat: [Windows与WSL执行规则] 新增 Windows 到 WSL 执行协作 skill
 
 2026-06-18 11:24:24 docs: [实施计划周期规则] 强化开发周期与单阶段步骤约束

@@ -45,6 +45,12 @@ TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 ## 适用范围
 - 本文件适用于本仓库下所有代码与文档变更。
 
+## Skill 命中强制规则
+- 处理本仓库任务时，必须先命中并加载至少一个项目内 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`。
+- 必须在首条中间进度明确输出当前命中的 skill 列表。
+- 若连 `skill-hit-check-rules` 都未命中，视为上下文丢失严重、当前一个 skill 都没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
+
 ## 注释任务强制流程
 - 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
 - 第一步：先声明命中的注释类 skill。
@@ -141,6 +147,11 @@ fi
 
 # 已存在则做增量补齐，不覆盖已有内容
 append_section_if_missing "$AGENTS_FILE" "适用范围" "- 本文件适用于本仓库下所有代码与文档变更。"
+
+append_section_if_missing "$AGENTS_FILE" "Skill 命中强制规则" "- 处理本仓库任务时，必须先命中并加载至少一个项目内 skill。
+- 最低要求：至少命中 \`skill-hit-check-rules\`。
+- 必须在首条中间进度明确输出当前命中的 skill 列表。
+- 若连 \`skill-hit-check-rules\` 都未命中，视为上下文丢失严重、当前一个 skill 都没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。"
 
 append_section_if_missing "$AGENTS_FILE" "注释任务强制流程" "- 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
 - 第一步：先声明命中的注释类 skill。
