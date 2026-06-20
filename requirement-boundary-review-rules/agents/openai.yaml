@@ -1,0 +1,4 @@
+interface:
+  display_name: "需求边界审查镜像规则"
+  short_description: "只读检查需求边界、归属、兼容性影响和回写一致性"
+  default_prompt: "使用 $requirement-boundary-review-rules 只读检查当前任务的需求边界、归属、排除项、兼容性影响面和需求主文档回写是否满足 requirement-boundary-rules 的要求，不直接改代码或写文档。"

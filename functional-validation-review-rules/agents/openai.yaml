@@ -1,0 +1,4 @@
+interface:
+  display_name: "功能验证审查镜像规则"
+  short_description: "只读检查功能验证范围、判定标准、联调要求和留痕"
+  default_prompt: "使用 $functional-validation-review-rules 只读检查功能验证是否满足 functional-validation-rules 的验证范围、验证步骤、通过驳回标准、联调要求、结果留痕和测试隔离要求，不直接执行验证或写测试结论。"

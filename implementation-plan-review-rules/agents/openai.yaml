@@ -1,0 +1,4 @@
+interface:
+  display_name: "实施计划审查镜像规则"
+  short_description: "只读检查开发周期、阶段拆分、文件落点和计划收口"
+  default_prompt: "使用 $implementation-plan-review-rules 只读检查当前实施计划是否满足 implementation-plan-rules 的开发周期、阶段拆分、文件落点、依赖顺序、验证闭环和计划收口要求，不直接写计划文档。"
