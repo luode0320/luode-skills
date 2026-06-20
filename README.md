@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-21 05:01:58 feat: [Imagegen自动联动] 强化真实生图链路与编辑入口
+
 2026-06-21 02:40:19 fix: [AGENTS全仓同步] 强化多文件自举与落盘校验
 
 2026-06-21 01:44:58 docs: [AGENTS自举规则] 强化Godot模板与受管章节同步

@@ -133,6 +133,15 @@ TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 - 若在 Windows PowerShell 5.1 下执行远端安装脚本、下载资源或请求 GitHub API，必须显式使用 `-UseBasicParsing`，或预先设置 `Invoke-WebRequest` / `Invoke-RestMethod` 的默认 `UseBasicParsing`，避免弹出人工确认框。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取，但不允许跳过记录。
+
+## 图像生成强制规则
+- 只要当前用户请求属于生图、改图、参考图出新图、sprite、动作帧、概念图、UI 位图、贴图、透明底抠图、2D 游戏素材预览或其他位图资产任务，必须自动命中 `imagegen`，不得等用户额外明确说“使用 imagegen”。
+- 命中 2D 游戏素材相关任务时，若涉及设计图、预览图、原始素材图、动作关键帧或 sprite 方向图，除命中领域 skill 外，还必须联动命中 `imagegen`。
+- 对于生图任务，允许的“原始图产生方式”只有真实图像生成/编辑链路：内置 `image_gen`，或经验证可用的 `imagegen` CLI/API 图像通道。
+- 严禁把 Pillow、SVG、HTML/CSS/canvas、脚本拼接、程序绘制、几何组合、占位图、自动排版图、后处理脚本输出伪装成“已完成生图结果”或“最终素材”。
+- CLI fallback 仅表示“改走 imagegen 的脚本入口去调用真实图像生成/编辑 API”，不表示允许退化成脚本合成图片；凡是不经过真实图像模型生成的结果，一律不得作为生图成品交付。
+- 如果内置 `image_gen` 不可用，必须先验证 `imagegen` CLI/API 链路；若也不可用，则明确阻断并只允许交付 prompt、brief、参考候选、动作规划等中间信息，不得交付脚本生成图冒充成品。
+- 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。
 TEMPLATE
 )
 
@@ -295,6 +304,14 @@ sync_agents_file() {
 - 若在 Windows PowerShell 5.1 下执行远端安装脚本、下载资源或请求 GitHub API，必须显式使用 \`-UseBasicParsing\`，或预先设置 \`Invoke-WebRequest\` / \`Invoke-RestMethod\` 的默认 \`UseBasicParsing\`，避免弹出人工确认框。
 - 安装完成后必须为当前项目执行 \`codegraph init\`，生成 \`.codegraph/\` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取，但不允许跳过记录。"
+
+  sync_section "$file" "图像生成强制规则" "- 只要当前用户请求属于生图、改图、参考图出新图、sprite、动作帧、概念图、UI 位图、贴图、透明底抠图、2D 游戏素材预览或其他位图资产任务，必须自动命中 \`imagegen\`，不得等用户额外明确说“使用 imagegen”。
+- 命中 2D 游戏素材相关任务时，若涉及设计图、预览图、原始素材图、动作关键帧或 sprite 方向图，除命中领域 skill 外，还必须联动命中 \`imagegen\`。
+- 对于生图任务，允许的“原始图产生方式”只有真实图像生成/编辑链路：内置 \`image_gen\`，或经验证可用的 \`imagegen\` CLI/API 图像通道。
+- 严禁把 Pillow、SVG、HTML/CSS/canvas、脚本拼接、程序绘制、几何组合、占位图、自动排版图、后处理脚本输出伪装成“已完成生图结果”或“最终素材”。
+- CLI fallback 仅表示“改走 imagegen 的脚本入口去调用真实图像生成/编辑 API”，不表示允许退化成脚本合成图片；凡是不经过真实图像模型生成的结果，一律不得作为生图成品交付。
+- 如果内置 \`image_gen\` 不可用，必须先验证 \`imagegen\` CLI/API 链路；若也不可用，则明确阻断并只允许交付 prompt、brief、参考候选、动作规划等中间信息，不得交付脚本生成图冒充成品。
+- 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。"
 
   if is_godot_project; then
     sync_section "$file" "Godot 项目工具配置" "$GODOT_TOOLING_SECTION"

@@ -1,146 +1,210 @@
 ---
 name: "imagegen"
-description: "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas."
+description: "用于生成或编辑位图图片，例如插画、照片、纹理、精灵图、UI 图、概念图、动作帧、透明底抠图等。当用户要“生图”“改图”“参考图出新图”“做 sprite / mockup / 位图素材”时使用。优先使用内置 `image_gen` 工具；如果当前 turn 没有内置工具，就在本地 imagegen 环境可验证时自动切换到捆绑的 CLI 流程，而不是默认阻断。不要用于更适合直接修改 SVG、矢量资源或代码原生图形的任务。"
 ---
 
 # Image Generation Skill
 
-Generates or edits images for the current project (for example website assets, game assets, UI mockups, product mockups, wireframes, logo design, photorealistic images, or infographics).
+用于为当前项目生成或编辑位图图像，例如网站素材、游戏素材、UI 预览图、产品图、线框图、Logo 探索图、照片风图像、信息图、角色动作帧等。
 
-## Top-level modes and rules
+## 顶层模式
 
-This skill has exactly two top-level modes:
+本 skill 只有两种顶层模式：
 
-- **Default built-in tool mode (preferred):** built-in `image_gen` tool for normal image generation, editing, and simple transparent-image requests. Does not require `OPENAI_API_KEY`.
-- **Fallback CLI mode:** `scripts/image_gen.py` CLI. Use when the user explicitly asks for the CLI/API/model path, or after the user explicitly confirms a true model-native transparency fallback with `gpt-image-1.5`. Requires `OPENAI_API_KEY`.
+- **默认内置模式（优先）**：使用内置 `image_gen` 工具做普通生图、改图和简单透明底需求。不依赖 `OPENAI_API_KEY`。
+- **CLI fallback 模式**：使用 `scripts/image_gen.py` 以及系统入口脚本 `scripts/run_imagegen.ps1` / `scripts/run_imagegen.sh`。当内置工具在当前 turn 不可用且本地 imagegen 环境验证通过时自动启用；用户显式要求 CLI/API/模型控制时也走这条路径。
 
-Within CLI fallback, the CLI exposes three subcommands:
+CLI fallback 暴露三个子命令：
 
 - `generate`
 - `edit`
 - `generate-batch`
 
-Rules:
-- Use the built-in `image_gen` tool by default for normal image generation and editing requests.
-- Do not switch to CLI fallback for ordinary quality, size, or file-path control.
-- If the user explicitly asks for a transparent image/background, stay on built-in `image_gen` first: prompt for a flat removable chroma-key background, then remove it locally with the installed helper at `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`.
-- Never silently switch from built-in `image_gen` or CLI `gpt-image-2` to CLI `gpt-image-1.5`. Treat this as a model/path downgrade and ask the user before doing it, unless the user has already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback.
-- If a transparent request appears too complex for clean chroma-key removal, asks for true/native transparency, or local removal fails validation, explain that true transparency requires CLI `gpt-image-1.5 --background transparent --output-format png` because `gpt-image-2` does not support `background=transparent`, then ask whether to proceed. Run the CLI fallback only after the user confirms.
-- The word `batch` by itself does not mean CLI fallback. If the user asks for many assets or says to batch-generate assets without explicitly asking for CLI/API/model controls, stay on the built-in path and issue one built-in call per requested asset or variant.
-- If the built-in tool fails or is unavailable, tell the user the CLI fallback exists and that it requires `OPENAI_API_KEY`. Proceed only if the user explicitly asks for that fallback.
-- If the user explicitly asks for CLI mode, use the bundled `scripts/image_gen.py` workflow. Do not create one-off SDK runners.
-- Never modify `scripts/image_gen.py`. If something is missing, ask the user before doing anything else.
-- When the user wants a reusable local image generation entrypoint for current and future projects, or asks how to configure image generation once and reuse it later, use the system-level bridge scripts in `scripts/` and the setup guidance in `references/local-entrypoints.md`.
+## 核心规则
 
-Built-in save-path policy:
-- In built-in tool mode, Codex saves generated images under `$CODEX_HOME/*` by default.
-- Do not describe or rely on OS temp as the default built-in destination.
-- Do not describe or rely on a destination-path argument (if any) on the built-in `image_gen` tool. If a specific location is needed, generate first and then move or copy the selected output from `$CODEX_HOME/generated_images/...`.
-- Save-path precedence in built-in mode:
-  1. If the user names a destination, move or copy the selected output there.
-  2. If the image is meant for the current project, move or copy the final selected image into the workspace before finishing.
-  3. If the image is only for preview or brainstorming, render it inline; the underlying file can remain at the default `$CODEX_HOME/*` path.
-- Never leave a project-referenced asset only at the default `$CODEX_HOME/*` path.
-- Do not overwrite an existing asset unless the user explicitly asked for replacement; otherwise create a sibling versioned filename such as `hero-v2.png` or `item-icon-edited.png`.
+- 普通生图和改图优先使用内置 `image_gen`。
+- 只要用户请求语义属于生图相关，对话中即使没有出现“请用 imagegen / 用 image_gen / 用 CLI”这类显式措辞，也必须自动触发本 skill。
+- 不要因为用户只是想改尺寸、质量、输出路径，就主动切到 CLI。
+- 如果当前 turn 没有可用的内置 `image_gen`，不要立刻阻断；先验证本地 CLI fallback。
+- 这里的 CLI fallback 仅指“通过 `imagegen` 自带脚本入口去调用真实图像生成/编辑 API”，绝不允许退化为程序绘制、脚本拼图、SVG/HTML/CSS/canvas/Pillow 几何合成、占位图生成或其他非真实模型出图方式。
+- CLI fallback 优先使用系统入口脚本，而不是自己现写一层 runner：
+  - Windows：`scripts/run_imagegen.ps1`
+  - Linux/macOS：`scripts/run_imagegen.sh`
+- CLI fallback 验证时，优先先跑 `check`，确认：
+  - auth 来源
+  - base URL 来源
+  - `openai` 导入是否正常
+  - `PIL` 导入是否正常
+  - dry-run 是否成功
+- 如果验证失败只是因为缺少 `openai` 或 `PIL`，在环境允许时先安装缺失依赖，再重跑验证。
+- 如果 CLI fallback 验证通过，直接继续出图，不需要再等用户额外提示“请用 imagegen”。
+- 只有在这两条路都不可用时才阻断：
+  - 内置 `image_gen`
+  - 已验证通过的 CLI fallback
+- 不允许因为“有脚本能画个差不多的图”就绕开本 skill 的真实图像生成链路。
+- 不要静默从 built-in `image_gen` 或 CLI `gpt-image-2` 降级到 `gpt-image-1.5`。这类路径变化默认要向用户确认，除非用户已经明确要求 `gpt-image-1.5`、`scripts/image_gen.py` 或 CLI fallback。
+- 如果用户要的是真透明、复杂透明对象，或本地抠图失败，再询问是否切到 `gpt-image-1.5 --background transparent --output-format png`。
+- 用户只是提到 “batch” 不代表必须走 CLI；只有确实需要 CLI 控制，或 built-in 不可用时，才切 CLI。
+- 用户显式要求 CLI 时，使用捆绑的 `scripts/image_gen.py` / 系统入口脚本，不要自建一次性 SDK 脚本。
+- **不要修改** `scripts/image_gen.py`。如果脚本能力不够，先和用户对齐。
+- 当用户希望把 imagegen 配成以后都能复用的本地入口时，读取 `references/local-entrypoints.md`。
 
-Shared prompt guidance for both modes lives in `references/prompting.md` and `references/sample-prompts.md`.
+## 强阻断规则
 
-Fallback-only docs/resources for CLI mode:
-- `references/cli.md`
-- `references/image-api.md`
-- `references/codex-network.md`
-- `scripts/image_gen.py`
+- 只要这是明确的位图图片任务，例如插画、照片、sprite、动作帧、纹理、概念图、UI 图、mockup、透明底抠图，就必须尝试真实的位图生成路径。
+- 如果 built-in 不可用，必须先尝试验证 CLI fallback，再决定是否阻断。
+- 只有满足以下全部条件时，才允许把任务判定为 blocked：
+  - built-in `image_gen` 不可用
+  - CLI fallback 验证失败，或无法鉴权
+  - 没有已确认可用的其他模型/路径 fallback
+- 在没有可用出图路径之前，不得：
+  - 假装图片已经生成
+  - 输出“最终 PNG / WebP / JPG”
+  - 用 SVG / HTML / CSS / canvas 占位图冒充位图成品
+  - 用 Pillow、脚本拼接、程序绘制、几何组合、布局导出、后处理合成结果冒充“imagegen 已生图”
+  - 把设计草图、文字方案、占位图说成已完成素材
+- 在 blocked 状态下，可以提供明确标注的中间产物，例如：
+  - prompt 草稿
+  - image brief
+  - 动作规划
+  - 布局规格
+  - 环境检查结果
+  - 依赖修复步骤
+  - fallback 说明
+- blocked 状态下给出的所有内容都必须明确标注为“尚未生成最终图片”。
 
-Local post-processing helper:
-- `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`: removes a flat chroma-key background from a generated image and writes a PNG/WebP with alpha. Prefer auto-key sampling, soft matte, and despill for antialiased edges.
+## 内置模式保存规则
 
-## When to use
-- Generate a new image (concept art, product shot, cover, website hero)
-- Generate a new image using one or more reference images for style, composition, or mood
-- Edit an existing image (inpainting, lighting or weather transformations, background replacement, object removal, compositing, transparent background)
-- Produce many assets or variants for one task
+- built-in 模式下，默认生成文件会落到 `$CODEX_HOME/*`。
+- 不要把 OS temp 当成默认 built-in 输出位置。
+- 不要依赖 built-in 工具的目标路径参数行为；需要特定位置时，先生成，再移动/复制。
+- 保存优先级：
+  1. 用户指定了目标路径：移动或复制到该路径
+  2. 图片是当前项目要用的：移动或复制进工作区
+  3. 图片只是预览：可以只在对话里展示，底层文件保留在默认位置
+- 不要把项目实际依赖的图片只留在 `$CODEX_HOME/*`。
+- 除非用户明确要替换原文件，否则默认输出到新的版本化文件名，例如 `hero-v2.png`。
 
-## When not to use
-- Extending or matching an existing SVG/vector icon set, logo system, or illustration library inside the repo
-- Creating simple shapes, diagrams, wireframes, or icons that are better produced directly in SVG, HTML/CSS, or canvas
-- Making a small project-local asset edit when the source file already exists in an editable native format
-- Any task where the user clearly wants deterministic code-native output instead of a generated bitmap
+## 什么时候用
 
-## Decision tree
+- 生成全新图片
+- 基于一张或多张参考图生成新图
+- 编辑现有图片
+- 生成一批位图素材
 
-Think about two separate questions:
+## 什么时候不要用
 
-1. **Intent:** is this a new image or an edit of an existing image?
-2. **Execution strategy:** is this one asset or many assets/variants?
+- 明显更适合直接改 SVG / 矢量图标系统
+- 更适合直接用 HTML / CSS / canvas 画出来的简单图形
+- 已有源文件是更合适的原生可编辑格式
+- 用户明确想要确定性的代码原生输出，而不是 AI 位图
 
-Intent:
-- If the user wants to modify an existing image while preserving parts of it, treat the request as **edit**.
-- If the user provides images only as references for style, composition, mood, or subject guidance, treat the request as **generate**.
-- If the user provides no images, treat the request as **generate**.
+## 判定思路
 
-Built-in edit semantics:
-- Built-in edit mode is for images already visible in the conversation context, such as attached images or images generated earlier in the thread.
-- If the user wants to edit a local image file with the built-in tool, first load it with built-in `view_image` tool so the image is visible in the conversation context, then proceed with the built-in edit flow.
-- Do not promise arbitrary filesystem-path editing through the built-in tool.
-- If a local file still needs direct file-path control, masks, or other explicit CLI-only parameters, use the explicit CLI fallback only when the user asks for it.
-- For edits, preserve invariants aggressively and save non-destructively by default.
+先判断两个维度：
 
-Execution strategy:
-- In the built-in default path, produce many assets or variants by issuing one `image_gen` call per requested asset or variant.
-- In the CLI fallback path, use the CLI `generate-batch` subcommand only when the user explicitly chose CLI mode and needs many prompts/assets.
-- For many distinct assets, do not use `n` as a substitute for separate prompts. `n` is for variants of one prompt; distinct assets need distinct built-in calls or distinct CLI `generate-batch` jobs.
+1. **意图**：这是 `generate` 还是 `edit`
+2. **执行方式**：这是单个资产，还是多个资产/变体
 
-Assume the user wants a new image unless they clearly ask to change an existing one.
+### 意图判定
 
-## Workflow
-1. Decide the top-level mode: built-in by default, including simple transparent-output requests; fallback CLI only if explicitly requested or after the user explicitly confirms a transparent-output fallback.
-2. Decide the intent: `generate` or `edit`.
-3. Decide whether the output is preview-only or meant to be consumed by the current project.
-4. Decide the execution strategy: single asset vs repeated built-in calls vs CLI `generate-batch`.
-5. Collect inputs up front: prompt(s), exact text (verbatim), constraints/avoid list, and any input images.
-6. For every input image, label its role explicitly:
+- 用户想保留原图主体、修改局部：按 `edit`
+- 用户给图只是做风格/构图/角色参考：按 `generate`
+- 用户没有给图：按 `generate`
+
+### built-in edit 语义
+
+- built-in edit 只适合编辑当前对话上下文里可见的图片
+- 如果用户要编辑的是本地文件，且仍打算走 built-in，先用 `view_image` 把图读入上下文
+- 如果任务明确需要文件路径控制、mask 或其他 CLI 专属参数，再走 CLI
+
+### 批量策略
+
+- built-in 路径：一个资产/一种变体，对应一次 built-in 调用
+- CLI 路径：只有明确走 CLI 且需要很多不同 prompt 时，才用 `generate-batch`
+- `n` 只适合同一 prompt 的多个变体，不适合多个不同资产
+
+## 工作流
+
+1. 判定顶层模式：
+   - built-in 可用：优先 built-in
+   - built-in 不可用：立刻尝试 CLI fallback
+   - 只有当需要 `gpt-image-1.5` 真透明或其他明显降级/换路时，才询问用户确认
+2. 判定是 `generate` 还是 `edit`
+3. 判定结果是预览图还是项目正式资产
+4. 判定是单图、多次调用，还是 CLI `generate-batch`
+5. 一次性收集输入：prompt、文字要求、约束、禁止项、输入图
+6. 明确每张输入图的角色：
    - reference image
    - edit target
-   - supporting insert/style/compositing input
-7. If the edit target is only on the local filesystem and you are staying on the built-in path, inspect it with `view_image` first so the image is available in conversation context.
-8. If the user asked for a photo, illustration, sprite, product image, banner, or other explicitly raster-style asset, use `image_gen` rather than substituting SVG/HTML/CSS placeholders. If the request is for an icon, logo, or UI graphic that should match existing repo-native SVG/vector/code assets, prefer editing those directly instead.
-9. Augment the prompt based on specificity:
-   - If the user's prompt is already specific and detailed, normalize it into a clear spec without adding creative requirements.
-   - If the user's prompt is generic, add tasteful augmentation only when it materially improves output quality.
-10. Use the built-in `image_gen` tool by default.
-11. For transparent-output requests, follow the transparent image guidance below: generate with built-in `image_gen` on a flat chroma-key background, copy the selected output into the workspace or `tmp/imagegen/`, run the installed `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py` helper, and validate the alpha result before using it. If this path looks unsuitable or fails, ask before switching to CLI `gpt-image-1.5`.
-12. Inspect outputs and validate: subject, style, composition, text accuracy, and invariants/avoid items.
-13. Iterate with a single targeted change, then re-check.
-14. For preview-only work, render the image inline; the underlying file may remain at the default `$CODEX_HOME/generated_images/...` path.
-15. For project-bound work, move or copy the selected artifact into the workspace and update any consuming code or references. Never leave a project-referenced asset only at the default `$CODEX_HOME/generated_images/...` path.
-16. For batches or multi-asset requests, persist every requested deliverable final in the workspace unless the user explicitly asked to keep outputs preview-only. Discarded variants do not need to be kept unless requested.
-17. If the user explicitly chooses or confirms the CLI fallback, then use the fallback-only docs for model, quality, size, `input_fidelity`, masks, output format, output paths, and network setup.
-18. Always report the final saved path(s) for any workspace-bound asset(s), plus the final prompt or prompt set and whether the built-in tool or fallback CLI mode was used.
-19. If the user wants a reusable local CLI setup, read `references/local-entrypoints.md`, prefer bridging from Codex local auth/config, and use the system-level PowerShell/bash wrappers instead of rewriting project-local wrappers from scratch.
+   - supporting input
+7. 如果 edit target 是本地文件且你还打算走 built-in，先 `view_image`
+8. 如果用户要的是照片、插画、sprite、banner、动作帧或其他位图产物，必须走真实图像路径，不要用代码占位
+9. 按用户 prompt 具体程度做轻量增强：
+   - 已经很具体：只规范化，不乱加创意
+   - 比较泛：只补能明显提升质量的必要细节
+10. built-in 可用时，先用 built-in `image_gen`
+11. built-in 不可用时，先验证 CLI fallback
+12. CLI fallback 验证命令：
+    - Windows：`powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\imagegen\scripts\run_imagegen.ps1" -Action check`
+    - Linux/macOS：`bash "$HOME/.codex/skills/imagegen/scripts/run_imagegen.sh" check`
+13. 如果只缺 `openai` / `PIL`，在环境允许时补依赖后重试验证
+14. CLI 验证通过后，用系统入口脚本继续生成/编辑，不要另写 wrapper
+15. 透明底需求：
+    - built-in 可用：先用 built-in + 纯色抠图背景，再本地去底
+    - built-in 不可用但 CLI 已验证：用 CLI `gpt-image-2` + 纯色抠图背景，再本地去底
+    - 只有切 `gpt-image-1.5 --background transparent` 时才问用户
+16. 检查结果：主体、风格、构图、文本准确性、约束是否满足
+17. 需要迭代时，一次只改一个重点
+18. 预览图可以直接在对话里展示
+19. 项目正式资产必须存进工作区
+20. 多资产任务默认把每个正式结果都落盘
+21. 用户显式要求 CLI/API/模型控制时，再细读 `references/cli.md` 和 `references/image-api.md`
+22. 最终必须汇报：
+    - 最终保存路径
+    - 最终 prompt 或 prompt 集
+    - 执行路径：
+      - `Image generation path: built-in image_gen`
+      - `Image generation path: CLI fallback`
+      - `Image generation blocked: no usable built-in or validated CLI path`
+23. 用户要长期复用的本地入口时，读取 `references/local-entrypoints.md`
 
-## Transparent image requests
+## 透明底规则
 
-Transparent-image requests still use built-in `image_gen` first. Because the built-in tool does not expose a true transparent-background control, create a removable chroma-key source image and then convert the key color to alpha locally.
+透明底请求优先仍然是“纯色背景 + 本地抠图”，不是默认直接上 `gpt-image-1.5`。
 
-Default sequence:
-1. Use built-in `image_gen` to generate the requested subject on a perfectly flat solid chroma-key background.
-2. Choose a key color that is unlikely to appear in the subject: default `#00ff00`, use `#ff00ff` for green subjects, and avoid `#0000ff` for blue subjects.
-3. After generation, move or copy the selected source image from `$CODEX_HOME/generated_images/...` into the workspace or `tmp/imagegen/`.
-4. Run the installed helper path, not a project-relative script path:
-   ```bash
-   python "${CODEX_HOME:-$HOME/.codex}/skills/imagegen/scripts/remove_chroma_key.py" \
-     --input <source> \
-     --out <final.png> \
-     --auto-key border \
-     --soft-matte \
-     --transparent-threshold 12 \
-     --opaque-threshold 220 \
-     --despill
-   ```
-5. Validate that the output has an alpha channel, transparent corners, plausible subject coverage, and no obvious key-color fringe. If a thin fringe remains, retry once with `--edge-contract 1`; use `--edge-feather 0.25` only when the edge is visibly stair-stepped and the subject is not shiny or reflective.
-6. Save the final alpha PNG/WebP in the project if the asset is project-bound. Never leave a project-referenced transparent asset only under `$CODEX_HOME/*`.
+如果 built-in 可用，优先 built-in。  
+如果 built-in 不可用但 CLI 已验证通过，就用 CLI `gpt-image-2` 走同样的纯色抠图流程。
 
-Prompt transparent requests like this:
+### 默认步骤
+
+1. 生成纯色抠图背景的图片：
+   - built-in 可用：用 built-in
+   - built-in 不可用：用已验证的 CLI `gpt-image-2`
+2. 选择不容易和主体撞色的 key color：
+   - 默认 `#00ff00`
+   - 绿色主体用 `#ff00ff`
+   - 蓝色主体避免 `#0000ff`
+3. 把生成结果放到工作区或 `tmp/imagegen/`
+   - built-in 路径：从 `$CODEX_HOME/generated_images/...` 挪出来
+   - CLI 路径：直接输出到工作区目标文件
+4. 用本地脚本去背景：
+
+```bash
+python "${CODEX_HOME:-$HOME/.codex}/skills/imagegen/scripts/remove_chroma_key.py" \
+  --input <source> \
+  --out <final.png> \
+  --auto-key border \
+  --soft-matte \
+  --transparent-threshold 12 \
+  --opaque-threshold 220 \
+  --despill
+```
+
+5. 校验 alpha 是否正常、边缘是否有明显绿边/紫边
+6. 如果是项目正式资产，把透明图存进项目目录
+
+### 透明底 prompt 规范
 
 ```text
 Create the requested subject on a perfectly flat solid #00ff00 chroma-key background for background removal.
@@ -150,68 +214,79 @@ Do not use #00ff00 anywhere in the subject.
 No cast shadow, no contact shadow, no reflection, no watermark, and no text unless explicitly requested.
 ```
 
-Do not automatically use CLI `gpt-image-1.5 --background transparent --output-format png` instead of chroma keying. Ask the user first when the user asks for true/native transparency, when local removal fails validation, or when the requested image is complex: hair, fur, feathers, smoke, glass, liquids, translucent materials, reflective objects, soft shadows, realistic product grounding, or subject colors that conflict with all practical key colors.
+### 什么时候要询问是否切 `gpt-image-1.5`
 
-Use a concise confirmation like:
+- 用户明确要 true/native transparency
+- 本地抠图校验失败
+- 主体太复杂，不适合纯色抠图，例如：
+  - hair
+  - fur
+  - feathers
+  - smoke
+  - glass
+  - liquids
+  - translucent materials
+  - reflective objects
+  - soft shadows
+
+确认文案可用：
 
 ```text
-This likely needs true native transparency. The default built-in path uses a chroma-key background plus local removal, but true transparency requires the CLI fallback with gpt-image-1.5 because gpt-image-2 does not support background=transparent. It also requires OPENAI_API_KEY. Should I proceed with that CLI fallback?
+This likely needs true native transparency. The default path uses a chroma-key background plus local removal, but true transparency requires the CLI fallback with gpt-image-1.5 because gpt-image-2 does not support background=transparent. Should I proceed with that CLI fallback?
 ```
 
-## Prompt augmentation
+## Prompt 增强
 
-Reformat user prompts into a structured, production-oriented spec. Make the user's goal clearer and more actionable, but do not blindly add detail.
+把用户输入整理成更稳定的生产型 prompt，但不要无脑加戏。
 
-Treat this as prompt-shaping guidance, not a closed schema. Use only the lines that help, and add a short extra labeled line when it materially improves clarity.
+### 具体程度策略
 
-### Specificity policy
+- 用户已经很具体：只做结构化整理
+- 用户比较泛：只补能明显提升结果的必要信息
 
-Use the user's prompt specificity to decide how much augmentation is appropriate:
+允许补充：
 
-- If the prompt is already specific and detailed, preserve that specificity and only normalize/structure it.
-- If the prompt is generic, you may add tasteful augmentation when it will materially improve the result.
+- 构图提示
+- 预期用途
+- 必要的布局约束
+- 合理的场景具体化
 
-Allowed augmentations:
-- composition or framing hints
-- polish level or intended-use hints
-- practical layout guidance
-- reasonable scene concreteness that supports the stated request
+不要补充：
 
-Not allowed augmentations:
-- extra characters or objects that are not implied by the request
-- brand names, slogans, palettes, or narrative beats that are not implied
-- arbitrary side-specific placement unless the surrounding layout supports it
+- 用户没提过的额外角色/物体
+- 用户没要求的品牌、文案、故事设定
+- 没依据的左右位置要求
 
-## Use-case taxonomy (exact slugs)
+## Use-case taxonomy
 
-Classify each request into one of these buckets and keep the slug consistent across prompts and references.
+下面这些 slug 保持英文，不要擅自翻译或改名：
 
-Generate:
-- photorealistic-natural — candid/editorial lifestyle scenes with real texture and natural lighting.
-- product-mockup — product/packaging shots, catalog imagery, merch concepts.
-- ui-mockup — app/web interface mockups and wireframes; specify the desired fidelity.
-- infographic-diagram — diagrams/infographics with structured layout and text.
-- scientific-educational — classroom explainers, scientific diagrams, and learning visuals with required labels and accuracy constraints.
-- ads-marketing — campaign concepts and ad creatives with audience, brand position, scene, and exact tagline/copy.
-- productivity-visual — slide, chart, workflow, and data-heavy business visuals.
-- logo-brand — logo/mark exploration, vector-friendly.
-- illustration-story — comics, children’s book art, narrative scenes.
-- stylized-concept — style-driven concept art, 3D/stylized renders.
-- historical-scene — period-accurate/world-knowledge scenes.
+### Generate
 
-Edit:
-- text-localization — translate/replace in-image text, preserve layout.
-- identity-preserve — try-on, person-in-scene; lock face/body/pose.
-- precise-object-edit — remove/replace a specific element (including interior swaps).
-- lighting-weather — time-of-day/season/atmosphere changes only.
-- background-extraction — transparent background / clean cutout. Use built-in `image_gen` with chroma-key removal first for simple opaque subjects; ask before using CLI true transparency for complex subjects.
-- style-transfer — apply reference style while changing subject/scene.
-- compositing — multi-image insert/merge with matched lighting/perspective.
-- sketch-to-render — drawing/line art to photoreal render.
+- `photorealistic-natural`
+- `product-mockup`
+- `ui-mockup`
+- `infographic-diagram`
+- `scientific-educational`
+- `ads-marketing`
+- `productivity-visual`
+- `logo-brand`
+- `illustration-story`
+- `stylized-concept`
+- `historical-scene`
 
-## Shared prompt schema
+### Edit
 
-Use the following labeled spec as shared prompt scaffolding for both top-level modes:
+- `text-localization`
+- `identity-preserve`
+- `precise-object-edit`
+- `lighting-weather`
+- `background-extraction`
+- `style-transfer`
+- `compositing`
+- `sketch-to-render`
+
+## 共享 prompt 模板
 
 ```text
 Use case: <taxonomy slug>
@@ -230,155 +305,104 @@ Constraints: <must keep/must avoid>
 Avoid: <negative constraints>
 ```
 
-Notes:
-- `Asset type` and `Input images` are prompt scaffolding, not dedicated CLI flags.
-- `Scene/backdrop` refers to the visual setting. It is not the same as the fallback CLI `background` parameter, which controls output transparency behavior.
-- Fallback-only execution notes such as `Quality:`, `Input fidelity:`, masks, output format, and output paths belong in the CLI path only. Do not treat them as built-in `image_gen` tool arguments.
+说明：
 
-Augmentation rules:
-- Keep it short.
-- Add only the details needed to improve the prompt materially.
-- For edits, explicitly list invariants (`change only X; keep Y unchanged`).
-- If any critical detail is missing and blocks success, ask a question; otherwise proceed.
+- `Asset type` 和 `Input images` 是 prompt 结构，不是 CLI 独立参数
+- `Scene/backdrop` 指画面背景，不等于 CLI 的 `background` 参数
+- `Quality`、`input_fidelity`、mask、输出格式、输出路径这类是 CLI 执行参数，不要混进 built-in 工具参数语义里
 
-## Examples
+## Prompt 最佳实践
 
-### Generation example (hero image)
-```text
-Use case: product-mockup
-Asset type: landing page hero
-Primary request: a minimal hero image of a ceramic coffee mug
-Style/medium: clean product photography
-Composition/framing: wide composition with usable negative space for page copy if needed
-Lighting/mood: soft studio lighting
-Constraints: no logos, no text, no watermark
-```
+- prompt 顺序优先按：场景 -> 主体 -> 细节 -> 约束
+- 写清楚用途，帮助模型进入正确质量模式
+- 文本内容要逐字明确
+- 多图输入时，按图片编号说明各自用途
+- edit 任务要反复强调 invariants
+- 每轮迭代只改一个重点
+- prompt 已经很具体时，不要过度扩写
 
-### Edit example (invariants)
-```text
-Use case: precise-object-edit
-Asset type: product photo background replacement
-Primary request: replace only the background with a warm sunset gradient
-Constraints: change only the background; keep the product and its edges unchanged; no text; no watermark
-```
+更多共享原则看：
 
-## Prompting best practices
-- Structure prompt as scene/backdrop -> subject -> details -> constraints.
-- Include intended use (ad, UI mock, infographic) to set the mode and polish level.
-- Use camera/composition language for photorealism.
-- Only use SVG/vector stand-ins when the user explicitly asked for vector output or a non-image placeholder.
-- Quote exact text and specify typography + placement.
-- For tricky words, spell them letter-by-letter and require verbatim rendering.
-- For multi-image inputs, reference images by index and describe how they should be used.
-- For edits, repeat invariants every iteration to reduce drift.
-- Iterate with single-change follow-ups.
-- If the prompt is generic, add only the extra detail that will materially help.
-- If the prompt is already detailed, normalize it instead of expanding it.
-- For CLI fallback only, see `references/cli.md` and `references/image-api.md` for model, `quality`, `input_fidelity`, masks, output format, and output-path guidance.
-- For transparent images, use the built-in-first chroma-key workflow unless the request is complex enough to need true CLI transparency; ask before switching to CLI `gpt-image-1.5`.
+- `references/prompting.md`
+- `references/sample-prompts.md`
 
-More principles shared by both modes: `references/prompting.md`.
-Copy/paste specs shared by both modes: `references/sample-prompts.md`.
+## `gpt-image-2` 指南
 
-## Guidance by asset type
-Asset-type templates (website assets, game assets, wireframes, logo) are consolidated in `references/sample-prompts.md`.
+CLI fallback 默认模型是 `gpt-image-2`。
 
-## gpt-image-2 guidance for CLI fallback
+- 新的 CLI 工作流默认优先 `gpt-image-2`
+- 只有 true transparency 等特殊需求才考虑 `gpt-image-1.5`
+- `gpt-image-2` 不支持 `background=transparent`
+- `gpt-image-2` 不需要设置 `input_fidelity`
+- `quality` 可用：
+  - `low`
+  - `medium`
+  - `high`
+  - `auto`
+- 草稿优先：
+  - `1024x1024`
+  - `quality low`
+- 正式图按需求提升尺寸和质量
 
-The fallback CLI defaults to `gpt-image-2`.
+常用尺寸：
 
-- Use `gpt-image-2` for new CLI/API workflows unless the request needs true model-native transparent output.
-- If a transparent request may need CLI fallback, ask before using `gpt-image-1.5` unless the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback. Explain that the built-in chroma-key path is the default, but true transparency requires `gpt-image-1.5` because `gpt-image-2` does not support `background=transparent`.
-- `gpt-image-2` always uses high fidelity for image inputs; do not set `input_fidelity` with this model.
-- `gpt-image-2` supports `quality` values `low`, `medium`, `high`, and `auto`.
-- Use `quality low` for fast drafts, thumbnails, and quick iterations. Use `medium`, `high`, or `auto` for final assets, dense text, diagrams, identity-sensitive edits, or high-resolution outputs.
-- Square images are typically fastest to generate. Use `1024x1024` for fast square drafts.
-- If the user asks for 4K-style output, use `3840x2160` for landscape or `2160x3840` for portrait.
-- `gpt-image-2` size may be `auto` or `WIDTHxHEIGHT` if all constraints hold: max edge `<= 3840px`, both edges multiples of `16px`, long-to-short ratio `<= 3:1`, total pixels between `655,360` and `8,294,400`.
-
-Popular `gpt-image-2` sizes:
-- `1024x1024` square
-- `1536x1024` landscape
-- `1024x1536` portrait
-- `2048x2048` 2K square
-- `2048x1152` 2K landscape
-- `3840x2160` 4K landscape
-- `2160x3840` 4K portrait
+- `1024x1024`
+- `1536x1024`
+- `1024x1536`
+- `2048x2048`
+- `2048x1152`
+- `3840x2160`
+- `2160x3840`
 - `auto`
 
-## Fallback CLI mode only
+## CLI fallback 专属约定
 
-### Temp and output conventions
-These conventions apply only to the CLI fallback. They do not describe built-in `image_gen` output behavior.
-- Use `tmp/imagegen/` for intermediate files (for example JSONL batches); delete them when done.
-- Write final artifacts under `output/imagegen/`.
-- Use `--out` or `--out-dir` to control output paths; keep filenames stable and descriptive.
+### 临时与输出目录
 
-### Dependencies
-Prefer `uv` for dependency management in this repo.
+- 临时文件放 `tmp/imagegen/`
+- 正式输出放 `output/imagegen/`
+- 文件名尽量稳定、可读
 
-Required Python package:
+### 依赖
+
+优先使用 `uv`，但当前环境没有 `uv` 时，也可以使用当前 Python 环境的包管理器。
+
 ```bash
 uv pip install openai
-```
-
-Required for local chroma-key removal and optional downscaling:
-```bash
 uv pip install pillow
 ```
 
-Portability note:
-- If you are using the installed skill outside this repo, install dependencies into that environment with its package manager.
-- In uv-managed environments, `uv pip install ...` remains the preferred path.
+### 环境
 
-### Environment
-- `OPENAI_API_KEY` must be set for live API calls.
-- Do not ask the user for `OPENAI_API_KEY` when using the built-in `image_gen` tool.
-- Never ask the user to paste the full key in chat. Ask them to set it locally and confirm when ready.
-- When the user already uses Codex with local auth/config, prefer bridging from `~/.codex/auth.json` and `~/.codex/config.toml` before asking them to create a second parallel environment-variable setup.
-- If the shared Codex config path does not expose usable image models such as `gpt-image-2`, `gpt-image-1.5`, or `gpt-image-1`, or the image endpoint returns errors like `model_not_found` or `No available channel`, the CLI bridge may automatically fall back to a project-level image channel declared in the current repo `AGENTS.md`.
-- The fallback precedence for CLI mode is:
-  1. current process environment variables
-  2. project `AGENTS.md` image config
+- 真实 API 调用需要可用的图像通道
+- built-in 路径不需要向用户索要 `OPENAI_API_KEY`
+- CLI fallback 优先桥接：
+  1. 当前进程环境变量
+  2. 项目 `AGENTS.md` 图像配置
   3. `~/.codex/auth.json` + `~/.codex/config.toml`
-- If the primary channel cannot use the latest `gpt-image` model, return to the project `AGENTS.md` fallback config before any other repair path.
-- If the project `AGENTS.md` fallback config is also unavailable, treat the image channel as missing instead of inventing a different provider.
-- The project `AGENTS.md` fallback is only for image generation traffic. It must not be described or implemented as a general text-model override.
-- `AGENTS.md` 里允许写读取位置、`baseurl`、模型名、优先级和回退规则，但不得明文写真实 `OPENAI_API_KEY`。
-- `api` 和 `baseurl` 推荐写成读取约定，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_BASE_URL`、`codex-auth:OPENAI_API_KEY`、`codex-config:base_url`；运行脚本会在项目级 `AGENTS.md` 中解析这些约定。
-- If the current project `AGENTS.md` does not yet contain an imagegen config block, the system skill may initialize a template block there so the user has a clear place to fill in image-only `api`/`baseurl` read locations and an optional default `model`.
-- The initialized `AGENTS.md` template may contain unresolved env-based placeholders such as `env:PROJECT_IMAGE_OPENAI_API_KEY`; unresolved placeholders must be treated as missing config until the user fills the corresponding local runtime config.
-- Recommended project-level template shape:
-  - primary channel: `baseurl=https://api.openai.com/v1`, model `gpt-image-1`
-  - read locations: current process environment variables, `~/.codex/auth.json`, `~/.codex/config.toml`
-  - fallback config:
-    - `api: ''`
-    - `baseurl: ''`
-  - fallback rule: if the primary channel cannot use the latest `gpt-image` models, return to the project `AGENTS.md` fallback config first; if that also fails, degrade to manual placeholder handling only.
-- When the CLI bridge falls back to the project `AGENTS.md`, surface that clearly in validation output so the user knows a project-specific temporary image channel is in use.
-- If neither shared Codex config nor project `AGENTS.md` provides a usable image channel, say so explicitly and ask the user to provide a new image-capable channel instead of pretending generation succeeded.
+- 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
+  1. 跑系统 `check`
+  2. 如果 `openai` 或 `PIL` 缺失，先补依赖
+  3. 再跑一次 `check`
+  4. 如果 env / project `AGENTS.md` / Codex local config 都无法提供图像通道，再明确报 unavailable
+  5. 验证成功后立刻继续出图，不要再等用户额外提示
 
-If the key is missing, give the user these steps:
-1. Create an API key in the OpenAI platform UI: https://platform.openai.com/api-keys
-2. Set `OPENAI_API_KEY` as an environment variable in their system.
-3. Offer to guide them through setting the environment variable for their OS/shell if needed.
+如果缺少 key，提示用户：
 
-If installation is not possible in this environment, tell the user which dependency is missing and how to install it into their active environment.
+1. 去 OpenAI 平台创建 API key
+2. 在本地系统环境变量中设置 `OPENAI_API_KEY`
+3. 如有需要，继续指导用户按系统/终端配置
 
-### Script-mode notes
-- CLI commands + examples: `references/cli.md`
-- API parameter quick reference: `references/image-api.md`
-- Network approvals / sandbox settings for CLI mode: `references/codex-network.md`
+## 参考文件
 
-## Reference map
-- `references/prompting.md`: shared prompting principles for both modes.
-- `references/sample-prompts.md`: shared copy/paste prompt recipes for both modes.
-- `references/cli.md`: fallback-only CLI usage via `scripts/image_gen.py`.
-- `references/image-api.md`: fallback-only API/CLI parameter reference.
-- `references/codex-network.md`: fallback-only network/sandbox troubleshooting for CLI mode.
-- `references/local-entrypoints.md`: reusable local setup, Codex auth bridge, project `AGENTS.md` fallback, and Windows/Linux wrappers.
-- `scripts/image_gen.py`: fallback-only CLI implementation. Do not load or use it unless the user explicitly chooses CLI mode or explicitly confirms a transparent request's true CLI transparency fallback.
-- `scripts/bootstrap_imagegen_env.py`: bridges Codex local auth/config into runtime env vars for CLI usage.
-- `scripts/run_imagegen.ps1`: Windows PowerShell wrapper for environment check and generation.
-- `scripts/run_imagegen.sh`: Linux/macOS bash wrapper for environment check and generation.
-- `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`: local post-processing helper for built-in transparent-image requests.
+- `references/prompting.md`
+- `references/sample-prompts.md`
+- `references/cli.md`
+- `references/image-api.md`
+- `references/codex-network.md`
+- `references/local-entrypoints.md`
+- `scripts/image_gen.py`
+- `scripts/bootstrap_imagegen_env.py`
+- `scripts/run_imagegen.ps1`
+- `scripts/run_imagegen.sh`
+- `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`

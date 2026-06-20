@@ -1,12 +1,15 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("check", "generate", "init-project-agents")]
+    [ValidateSet("check", "generate", "edit", "init-project-agents")]
     [string]$Action,
     [string]$Prompt = "",
     [string]$Out = "output/imagegen/output.png",
     [string]$Size = "1024x1024",
     [string]$Quality = "medium",
     [string]$Model = "",
+    [string[]]$Image = @(),
+    [string]$Mask = "",
+    [string]$InputFidelity = "",
     [switch]$DryRun
 )
 
@@ -76,19 +79,55 @@ for mod in mods:
 }
 
 if (-not $Prompt) {
-    throw "Prompt is required when Action=generate"
+    throw "Prompt is required when Action=generate or Action=edit"
+}
+
+if ($Action -eq "generate") {
+    $Command = @(
+        "python",
+        $ImageGenScript,
+        "generate",
+        "--prompt", $Prompt,
+        "--model", $ResolvedModel,
+        "--quality", $Quality,
+        "--size", $Size,
+        "--out", $Out
+    )
+
+    if ($DryRun) {
+        $Command += "--dry-run"
+    }
+
+    & $Command[0] $Command[1..($Command.Length - 1)]
+    exit $LASTEXITCODE
+}
+
+if ($Image.Count -lt 1) {
+    throw "At least one -Image path is required when Action=edit"
 }
 
 $Command = @(
     "python",
     $ImageGenScript,
-    "generate",
+    "edit",
     "--prompt", $Prompt,
     "--model", $ResolvedModel,
     "--quality", $Quality,
     "--size", $Size,
     "--out", $Out
 )
+
+foreach ($ImagePath in $Image) {
+    $Command += @("--image", $ImagePath)
+}
+
+if ($Mask) {
+    $Command += @("--mask", $Mask)
+}
+
+if ($InputFidelity) {
+    $Command += @("--input-fidelity", $InputFidelity)
+}
 
 if ($DryRun) {
     $Command += "--dry-run"

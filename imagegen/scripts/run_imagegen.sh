@@ -8,6 +8,9 @@ SIZE="${4:-1024x1024}"
 QUALITY="${5:-medium}"
 MODEL="${6:-}"
 DRY_RUN="${7:-}"
+IMAGE="${8:-}"
+MASK="${9:-}"
+INPUT_FIDELITY="${10:-}"
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_CODEX_HOME="${HOME}/.codex"
@@ -61,20 +64,41 @@ if [[ "$ACTION" == "init-project-agents" ]]; then
   exit 0
 fi
 
-if [[ "$ACTION" != "generate" ]]; then
+if [[ "$ACTION" != "generate" && "$ACTION" != "edit" ]]; then
   echo "Usage:"
   echo "  run_imagegen.sh check"
   echo "  run_imagegen.sh init-project-agents"
   echo "  run_imagegen.sh generate <prompt> [out] [size] [quality] [model] [--dry-run]"
+  echo "  run_imagegen.sh edit <prompt> [out] [size] [quality] [model] [--dry-run] [image] [mask] [input_fidelity]"
   exit 1
 fi
 
 if [[ -z "$PROMPT" ]]; then
-  echo "Prompt is required for generate"
+  echo "Prompt is required for generate/edit"
   exit 1
 fi
 
-CMD=(python "$SCRIPT_ROOT/image_gen.py" generate --prompt "$PROMPT" --model "$MODEL" --quality "$QUALITY" --size "$SIZE" --out "$OUT")
+if [[ "$ACTION" == "generate" ]]; then
+  CMD=(python "$SCRIPT_ROOT/image_gen.py" generate --prompt "$PROMPT" --model "$MODEL" --quality "$QUALITY" --size "$SIZE" --out "$OUT")
+  if [[ "$DRY_RUN" == "--dry-run" ]]; then
+    CMD+=(--dry-run)
+  fi
+  "${CMD[@]}"
+  exit $?
+fi
+
+if [[ -z "$IMAGE" ]]; then
+  echo "At least one image path is required for edit"
+  exit 1
+fi
+
+CMD=(python "$SCRIPT_ROOT/image_gen.py" edit --prompt "$PROMPT" --model "$MODEL" --quality "$QUALITY" --size "$SIZE" --out "$OUT" --image "$IMAGE")
+if [[ -n "$MASK" ]]; then
+  CMD+=(--mask "$MASK")
+fi
+if [[ -n "$INPUT_FIDELITY" ]]; then
+  CMD+=(--input-fidelity "$INPUT_FIDELITY")
+fi
 if [[ "$DRY_RUN" == "--dry-run" ]]; then
   CMD+=(--dry-run)
 fi
