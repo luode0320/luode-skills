@@ -342,8 +342,10 @@ Portability note:
   2. project `AGENTS.md` image config
   3. `~/.codex/auth.json` + `~/.codex/config.toml`
 - The project `AGENTS.md` fallback is only for image generation traffic. It must not be described or implemented as a general text-model override.
-- If the current project `AGENTS.md` does not yet contain an imagegen config block, the system skill may initialize a template block there so the user has a clear place to fill in image-only `api` and `baseurl`.
-- The initialized `AGENTS.md` template must use placeholders such as `???`; placeholders are not valid credentials and must be treated as missing config until the user replaces them.
+- `AGENTS.md` 里允许写读取位置、`baseurl`、模型名、优先级和回退规则，但不得明文写真实 `OPENAI_API_KEY`。
+- `api` 和 `baseurl` 推荐写成读取约定，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_BASE_URL`、`codex-auth:OPENAI_API_KEY`、`codex-config:base_url`；运行脚本会在项目级 `AGENTS.md` 中解析这些约定。
+- If the current project `AGENTS.md` does not yet contain an imagegen config block, the system skill may initialize a template block there so the user has a clear place to fill in image-only `api`/`baseurl` read locations and an optional default `model`.
+- The initialized `AGENTS.md` template may contain unresolved env-based placeholders such as `env:PROJECT_IMAGE_OPENAI_API_KEY`; unresolved placeholders must be treated as missing config until the user fills the corresponding local runtime config.
 - When the CLI bridge falls back to the project `AGENTS.md`, surface that clearly in validation output so the user knows a project-specific temporary image channel is in use.
 - If neither shared Codex config nor project `AGENTS.md` provides a usable image channel, say so explicitly and ask the user to provide a new image-capable channel instead of pretending generation succeeded.
 

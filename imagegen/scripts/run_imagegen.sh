@@ -6,7 +6,7 @@ PROMPT="${2:-}"
 OUT="${3:-output/imagegen/output.png}"
 SIZE="${4:-1024x1024}"
 QUALITY="${5:-medium}"
-MODEL="${6:-gpt-image-2}"
+MODEL="${6:-}"
 DRY_RUN="${7:-}"
 
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,6 +24,10 @@ fi
 
 eval "$(python "$SCRIPT_ROOT/bootstrap_imagegen_env.py" --shell bash --codex-home "$CODEX_HOME_DIR" --project-root "$PROJECT_ROOT")"
 
+if [[ -z "$MODEL" ]]; then
+  MODEL="${IMAGEGEN_MODEL:-gpt-image-2}"
+fi
+
 if [[ "$ACTION" == "check" ]]; then
   echo "CODEX_HOME: $CODEX_HOME_DIR"
   echo "IMAGEGEN_PROJECT_ROOT: $PROJECT_ROOT"
@@ -32,6 +36,9 @@ if [[ "$ACTION" == "check" ]]; then
   [[ -n "${OPENAI_BASE_URL:-}" ]] && echo "OPENAI_BASE_URL: SET" || echo "OPENAI_BASE_URL: MISSING"
   echo "OPENAI_API_KEY source: ${IMAGEGEN_OPENAI_API_KEY_SOURCE:-unknown}"
   echo "OPENAI_BASE_URL source: ${IMAGEGEN_OPENAI_BASE_URL_SOURCE:-unknown}"
+  echo "IMAGEGEN_MODEL: ${MODEL}"
+  echo "IMAGEGEN_FALLBACK_MODEL: ${IMAGEGEN_FALLBACK_MODEL:-unset}"
+  echo "IMAGEGEN_PRIORITY_RULE: ${IMAGEGEN_PRIORITY_RULE:-unset}"
   [[ -n "${IMAGEGEN_PROJECT_AGENTS_MD:-}" ]] && echo "Project AGENTS.md: ${IMAGEGEN_PROJECT_AGENTS_MD}"
   python - <<'PY'
 import importlib.util

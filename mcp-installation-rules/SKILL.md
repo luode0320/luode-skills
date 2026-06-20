@@ -108,6 +108,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 ## 与相邻 skill 的边界
 
 - 不代替 `project-design-doc-rules` 做整项目总览同步。
+- 不代替 `godot-project-bootstrap-rules` 做 Godot 项目的 `AGENTS.md` 模板补齐、图像配置模板补齐或环境就绪收口；本 skill 只负责 MCP 判定与项目级 Codex 配置补齐。
 - 不代替 `agent-browser` 做实际浏览器自动化执行；它只负责在需要时让位给更高优先级的 Chrome DevTools MCP。
 - 不代替 `find-skills` 做开放生态技能搜索；这里只判断当前项目应安装什么 MCP。
 - 不代替具体的前端 skill 或 Godot 项目实现规则。

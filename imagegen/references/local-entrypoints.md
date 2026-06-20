@@ -34,6 +34,10 @@ Recommended project `AGENTS.md` format:
 ```text
 ## 图像生成配置
 
+- `AGENTS.md` 里只允许写图像通道的读取位置、`baseurl`、模型名、优先级和回退规则；不得明文写真实 `OPENAI_API_KEY`。
+- `api` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_API_KEY`、`codex-auth:OPENAI_API_KEY` 这类读取约定，而不是明文密钥。
+- `baseurl` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_BASE_URL`、`env:OPENAI_BASE_URL`、`codex-config:base_url` 这类读取约定。
+- `model` 字段用于声明当前项目默认图像模型；如果调用时没有显式传 `--model`，脚本会优先使用这里的模型。
 - 当共享 `~/.codex/config.toml + auth.json` 对接的默认图像通道不可用、缺少 `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1`，或返回 `model_not_found`、`No available channel` 时，允许 `imagegen` skill 优先读取本项目 `AGENTS.md` 中声明的项目级图像通道，作为当前项目的临时/专用图像生成配置。
 - `imagegen` 的配置优先级默认是：当前进程环境变量 > 本项目 `AGENTS.md` 图像配置 > `~/.codex/auth.json` + `~/.codex/config.toml`。
 - 该项目级图像配置只用于图像生成相关流程，不用于覆盖普通文本模型配置。
@@ -41,12 +45,21 @@ Recommended project `AGENTS.md` format:
 - 图像配置格式固定如下，供 `imagegen` skill 自动读取：
 
 图像配置:
-api: ???
-baseurl: ???
+api: env:PROJECT_IMAGE_OPENAI_API_KEY
+baseurl: env:PROJECT_IMAGE_OPENAI_BASE_URL
+model: gpt-image-2
+fallback_model: gpt-image-1.5
+priority: env > project-agents > codex-local
 ```
 
 This project-level fallback is only for image generation. It should not be treated as a generic text-model override.
-The `???` placeholders are intentionally invalid. Treat them as missing config until the user fills real values locally.
+Recommended safe fill methods:
+
+- Use `env:YOUR_ENV_NAME` when the real key or base URL lives in local/project runtime env vars.
+- Use `codex-auth:OPENAI_API_KEY` to bridge the shared local `~/.codex/auth.json` key.
+- Use `codex-config:base_url` to bridge the shared local `~/.codex/config.toml` base URL.
+
+Do not store real secrets in `AGENTS.md`.
 
 Initialize the project template when it is missing:
 

@@ -103,6 +103,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-20 17:41:48 feat: [Godot自举] 新增 Godot 项目 bootstrap skill
+
 2026-06-20 15:37:55 feat: [需求测试审查] 新增条件并行审查镜像 skill
 
 2026-06-20 13:42:41 feat: [接口与命名审查] 新增更多只读审查镜像 skill
@@ -127,9 +129,9 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`70`
+- 已落地 Skill：`71`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`17`
+- 扩展种子 Skill：`43`
 
 主规划文档：
 
@@ -156,6 +158,7 @@ python skill-dictionary/generate_dictionary.py
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
+| `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级 `AGENTS.md`、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
@@ -533,3 +536,4 @@ claude-mem(记忆) :
 2026-06-14 14:32:53 docs: [ImageGen设计接入] 让2D素材先走图像设计工作流
 2026-06-14 14:44:00 docs: [2D美术管线] 接入风格一致性与审稿闸门
 2026-06-14 14:58:11 docs: [ImageSpec交接] 让设计和实现通过结构化spec对接
+

@@ -6,7 +6,7 @@ param(
     [string]$Out = "output/imagegen/output.png",
     [string]$Size = "1024x1024",
     [string]$Quality = "medium",
-    [string]$Model = "gpt-image-2",
+    [string]$Model = "",
     [switch]$DryRun
 )
 
@@ -36,6 +36,14 @@ foreach ($Line in $BootstrapLines) {
     }
 }
 
+$ResolvedModel = if ($Model) {
+    $Model
+} elseif ($env:IMAGEGEN_MODEL) {
+    $env:IMAGEGEN_MODEL
+} else {
+    "gpt-image-2"
+}
+
 if ($Action -eq "init-project-agents") {
     python $BootstrapScript --shell powershell --codex-home $CodexHome --project-root $ProjectRoot --init-project-agents-image-config | Out-Null
     Write-Host "Initialized AGENTS.md imagegen template at project root if it was missing."
@@ -50,6 +58,9 @@ if ($Action -eq "check") {
     Write-Host ("OPENAI_BASE_URL: " + $(if ($env:OPENAI_BASE_URL) { "SET" } else { "MISSING" }))
     Write-Host ("OPENAI_API_KEY source: " + $(if ($env:IMAGEGEN_OPENAI_API_KEY_SOURCE) { $env:IMAGEGEN_OPENAI_API_KEY_SOURCE } else { "unknown" }))
     Write-Host ("OPENAI_BASE_URL source: " + $(if ($env:IMAGEGEN_OPENAI_BASE_URL_SOURCE) { $env:IMAGEGEN_OPENAI_BASE_URL_SOURCE } else { "unknown" }))
+    Write-Host ("IMAGEGEN_MODEL: " + $ResolvedModel)
+    Write-Host ("IMAGEGEN_FALLBACK_MODEL: " + $(if ($env:IMAGEGEN_FALLBACK_MODEL) { $env:IMAGEGEN_FALLBACK_MODEL } else { "unset" }))
+    Write-Host ("IMAGEGEN_PRIORITY_RULE: " + $(if ($env:IMAGEGEN_PRIORITY_RULE) { $env:IMAGEGEN_PRIORITY_RULE } else { "unset" }))
     if ($env:IMAGEGEN_PROJECT_AGENTS_MD) {
         Write-Host "Project AGENTS.md: $env:IMAGEGEN_PROJECT_AGENTS_MD"
     }
@@ -73,7 +84,7 @@ $Command = @(
     $ImageGenScript,
     "generate",
     "--prompt", $Prompt,
-    "--model", $Model,
+    "--model", $ResolvedModel,
     "--quality", $Quality,
     "--size", $Size,
     "--out", $Out

@@ -39,6 +39,24 @@ AGENTS_FILE="$REPO_DIR/AGENTS.md"
 GITATTRIBUTES_FILE="$REPO_DIR/.gitattributes"
 EDITORCONFIG_FILE="$REPO_DIR/.editorconfig"
 
+is_godot_project() {
+  if [[ -f "$REPO_DIR/project.godot" ]]; then
+    return 0
+  fi
+
+  if find "$REPO_DIR" -maxdepth 3 -type f \
+    \( -name "*.gd" -o -name "*.tscn" -o -name "*.scn" -o -name "*.tres" -o -name "*.res" -o -name "export_presets.cfg" \) \
+    | grep -q .; then
+    return 0
+  fi
+
+  if [[ -d "$REPO_DIR/addons" ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
 TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 # AGENTS.md
 
@@ -121,6 +139,31 @@ trim_trailing_whitespace = false
 TEMPLATE
 )
 
+GODOT_TOOLING_SECTION=$(cat <<'TEMPLATE'
+- 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 标记时，默认额外命中 `godot-project-bootstrap-rules`、`mcp-installation-rules` 与 `imagegen`，用于补齐项目级 Godot 开发配置。
+- Godot 编辑器相关工作默认优先由 `Godot AI MCP` 接管；项目级 Codex 配置检查路径固定为 `./codex/config.toml` > `./.codex/config.toml`。
+- 若项目级 MCP 配置缺失，允许相关 skill 默认补齐；无需等待额外确认。
+- 本节只记录约定、优先级和读取位置，不记录任何真实密钥或访问令牌。
+TEMPLATE
+)
+
+GODOT_IMAGEGEN_SECTION=$(cat <<'TEMPLATE'
+- `AGENTS.md` 里只允许写图像通道的读取位置、`baseurl`、模型名、优先级和回退规则；不得明文写真实 `OPENAI_API_KEY`。
+- `api` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_API_KEY`、`codex-auth:OPENAI_API_KEY` 这类读取约定，而不是明文密钥。
+- `baseurl` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_BASE_URL`、`env:OPENAI_BASE_URL`、`codex-config:base_url` 这类读取约定。
+- `model` 字段用于声明当前项目默认图像模型；若调用方没有显式传 `--model`，运行脚本会优先读取这里的模型。
+- 若当前项目需要独立图像通道，优先让项目维护者把真实 key 放进本机环境变量或项目既有运行时配置，再在这里写读取位置。
+- 当前 `imagegen` 的读取优先级默认是：当前进程环境变量 > 本项目 `AGENTS.md` 图像配置 > `~/.codex/auth.json` + `~/.codex/config.toml`。
+
+图像配置:
+api: env:PROJECT_IMAGE_OPENAI_API_KEY
+baseurl: env:PROJECT_IMAGE_OPENAI_BASE_URL
+model: gpt-image-2
+fallback_model: gpt-image-1.5
+priority: env > project-agents > codex-local
+TEMPLATE
+)
+
 append_section_if_missing() {
   local file="$1"
   local header="$2"
@@ -186,5 +229,10 @@ append_section_if_missing "$AGENTS_FILE" "Windows / WSL 执行规则" "- Windows
 - 仓库应提交 \`.gitattributes\` 与 \`.editorconfig\`，显式固定 \`LF\`、\`UTF-8\`、末尾换行和基础编辑器行为。
 - Windows 下若仓库出现 \`.sh\` 仅 \`100755 => 100644\` 之类伪改动，应优先关闭 \`core.filemode\` 并清理 mode change。
 - Windows 下若仓库出现大量无关文件被带进改动，应优先检查 \`core.autocrlf\` 并通过 \`.gitattributes\` 固定换行策略。"
+
+if is_godot_project; then
+  append_section_if_missing "$AGENTS_FILE" "Godot 项目工具配置" "$GODOT_TOOLING_SECTION"
+  append_section_if_missing "$AGENTS_FILE" "图像生成配置" "$GODOT_IMAGEGEN_SECTION"
+fi
 
 echo "[OK] 已检查并补齐: $AGENTS_FILE"
