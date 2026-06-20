@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-20 23:43:56 docs: [首轮自举硬闸门] 强化AGENTS与基础仓库文件阻断规则
+
 2026-06-20 23:23:05 fix: [AGENTS增量同步] 支持受管章节幂等upsert
 
 2026-06-20 21:53:58 docs: [并行技能显式输出] 命中并行规则时强制输出并行技能
