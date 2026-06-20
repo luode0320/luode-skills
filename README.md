@@ -103,6 +103,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-20 13:42:41 feat: [接口与命名审查] 新增更多只读审查镜像 skill
+
 2026-06-20 03:22:42 feat: [审查规则拆分] 新增只读审查、并行分发与自举联动 skill
 
 2026-06-20 01:24:15 docs: [Windows编码规则] 补充yml与yaml换行约束

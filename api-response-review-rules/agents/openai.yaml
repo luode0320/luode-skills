@@ -1,0 +1,4 @@
+interface:
+  display_name: "接口响应检查镜像规则"
+  short_description: "只读检查响应包装、分页结构和兼容字段"
+  default_prompt: "使用 $api-response-review-rules 只读检查当前返回体、响应包装器、分页结构、兼容字段或统一响应模型是否满足 api-response-rules 的要求，不直接改代码。"

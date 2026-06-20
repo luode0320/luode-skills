@@ -14,6 +14,24 @@
 - `code-readability-review-rules`
   - 做什么：检查函数结构、表达顺序和局部可读性是否需要改进。
   - 建议：可并行，属于只读审查镜像；可和 `code-readability-rules` 的执行线程并发预审。
+- `naming-review-rules`
+  - 做什么：检查变量、函数、类、模块、接口、字段、事件、任务名、测试名和配置项命名是否一致。
+  - 建议：可并行，属于只读审查镜像；可和 `naming-rules` 的执行线程并发预审。
+- `common-util-review-rules`
+  - 做什么：检查当前逻辑是否应抽成公共工具、是否存在重复封装和 7 天冻结风险。
+  - 建议：可并行，属于只读审查镜像；可和 `common-util-rules` 的执行线程并发预审。
+- `logging-trace-review-rules`
+  - 做什么：检查日志、trace、span、审计日志和初始化顺序是否合规。
+  - 建议：可并行，属于只读审查镜像；可和 `logging-trace-rules` 的执行线程并发预审。
+- `api-request-review-rules`
+  - 做什么：检查请求 DTO、body 结构、参数校验和 `ShouldBindJSON` 使用是否合规。
+  - 建议：可并行，属于只读审查镜像；可和 `api-request-rules` 的执行线程并发预审。
+- `api-response-review-rules`
+  - 做什么：检查响应包装、分页结构、兼容字段和弱类型解析风险。
+  - 建议：可并行，属于只读审查镜像；可和 `api-response-rules` 的执行线程并发预审。
+- `api-swagger-review-rules`
+  - 做什么：检查 Swagger/OpenAPI 接入、文档同步和调试入口暴露策略。
+  - 建议：可并行，属于只读审查镜像；可和 `api-swagger-rules` 的执行线程并发预审。
 - `cleanup-format-review-rules`
   - 做什么：清理格式噪音、对齐缩进、统一空行和基础排版。
   - 建议：可并行，只要每个线程拥有不重叠的文件集。

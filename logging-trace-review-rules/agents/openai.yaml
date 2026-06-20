@@ -1,0 +1,4 @@
+interface:
+  display_name: "日志追踪检查镜像规则"
+  short_description: "只读检查日志、trace、span 与初始化顺序"
+  default_prompt: "使用 $logging-trace-review-rules 只读检查当前日志与链路追踪是否满足 logging-trace-rules 的标准，不直接改代码。"
