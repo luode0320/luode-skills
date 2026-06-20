@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-21 01:44:58 docs: [AGENTS自举规则] 强化Godot模板与受管章节同步
+
 2026-06-21 00:52:51 docs: [AGENTS模板排版] 统一项目自举规则与图像模型说明
 
 2026-06-20 23:55:37 docs: [图像回退配置] 强化主通道与项目回退规则
