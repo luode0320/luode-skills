@@ -61,6 +61,12 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 这套体系希望做到的是“改哪类代码，就触发哪类 Skill”。
 
+并且，命中检查与并行分发的可见输出也要求固定化：
+
+- 首条中间进度至少输出 `命中检查`、`命中技能`
+- 若本轮命中 `parallel-task-dispatch-rules`，还必须额外输出 `并行技能`
+- 若最终没有真正启动任何并行 skill，也必须明确写 `并行技能:无`
+
 例如：
 
 - 新会话刚开始且没有上下文时，先压缩最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 活动
@@ -102,6 +108,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `downloaded-seeds/` 只作为外部 Skill 下载后的临时中转目录，不建议长期保留与顶层重复的同名 Skill
 
 ## 当前进度
+
+2026-06-20 20:56:52 feat: [并行输出规则] 强制显示并行技能列表
 
 2026-06-20 17:41:48 feat: [Godot自举] 新增 Godot 项目 bootstrap skill
 
