@@ -51,6 +51,13 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
   - `~/.codex/config.toml`
   - 项目已经接好的运行时环境变量或运行时配置
 - 项目如需专用图像通道，优先让项目维护者在本机环境里配置真实密钥，再在 `AGENTS.md` 中声明读取位置，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`。
+- 图像生成配置必须同时声明主通道与回退配置。
+- 主通道优先使用 `baseurl=https://api.openai.com/v1` 和最新可用的 `gpt-image` 模型，例如 `gpt-image-1`。
+- 若主通道无法使用最新 `gpt-image` 模型，必须回退到项目 `AGENTS.md` 中声明的回退配置。
+- 回退配置至少应包含：
+  - `api: ''`
+  - `baseurl: ''`
+- 若主通道和项目回退配置都不可用，必须明确标记为缺失配置，不得伪造生成结果或静默切换到未声明的服务商。
 
 ## 输出要求
 

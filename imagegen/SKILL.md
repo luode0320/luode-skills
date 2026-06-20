@@ -341,11 +341,20 @@ Portability note:
   1. current process environment variables
   2. project `AGENTS.md` image config
   3. `~/.codex/auth.json` + `~/.codex/config.toml`
+- If the primary channel cannot use the latest `gpt-image` model, return to the project `AGENTS.md` fallback config before any other repair path.
+- If the project `AGENTS.md` fallback config is also unavailable, treat the image channel as missing instead of inventing a different provider.
 - The project `AGENTS.md` fallback is only for image generation traffic. It must not be described or implemented as a general text-model override.
 - `AGENTS.md` 里允许写读取位置、`baseurl`、模型名、优先级和回退规则，但不得明文写真实 `OPENAI_API_KEY`。
 - `api` 和 `baseurl` 推荐写成读取约定，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_BASE_URL`、`codex-auth:OPENAI_API_KEY`、`codex-config:base_url`；运行脚本会在项目级 `AGENTS.md` 中解析这些约定。
 - If the current project `AGENTS.md` does not yet contain an imagegen config block, the system skill may initialize a template block there so the user has a clear place to fill in image-only `api`/`baseurl` read locations and an optional default `model`.
 - The initialized `AGENTS.md` template may contain unresolved env-based placeholders such as `env:PROJECT_IMAGE_OPENAI_API_KEY`; unresolved placeholders must be treated as missing config until the user fills the corresponding local runtime config.
+- Recommended project-level template shape:
+  - primary channel: `baseurl=https://api.openai.com/v1`, model `gpt-image-1`
+  - read locations: current process environment variables, `~/.codex/auth.json`, `~/.codex/config.toml`
+  - fallback config:
+    - `api: ''`
+    - `baseurl: ''`
+  - fallback rule: if the primary channel cannot use the latest `gpt-image` models, return to the project `AGENTS.md` fallback config first; if that also fails, degrade to manual placeholder handling only.
 - When the CLI bridge falls back to the project `AGENTS.md`, surface that clearly in validation output so the user knows a project-specific temporary image channel is in use.
 - If neither shared Codex config nor project `AGENTS.md` provides a usable image channel, say so explicitly and ask the user to provide a new image-capable channel instead of pretending generation succeeded.
 
