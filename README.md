@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-20 21:53:58 docs: [并行技能显式输出] 命中并行规则时强制输出并行技能
+
 2026-06-20 20:56:52 feat: [并行输出规则] 强制显示并行技能列表
 
 2026-06-20 17:41:48 feat: [Godot自举] 新增 Godot 项目 bootstrap skill
