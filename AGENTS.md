@@ -7,6 +7,7 @@
 - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
 - 若本轮涉及创建、补齐或更新仓库级 `AGENTS.md`，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
+- 对已经存在的 `AGENTS.md`，也必须继续做增量同步与受管章节 upsert，而不是只初始化一次。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
