@@ -54,6 +54,12 @@ TEMPLATE_CONTENT=$(cat <<'TEMPLATE'
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 所有审查类 skill 统一按强制自动触发处理；只要是只读检查、规则核对、实现自审、归位审查或回归风险审查，默认优先并行。
 
+## 上下文压缩续做规则
+- 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
+- 压缩后继续执行前，必须重新读取当前项目根目录 `AGENTS.md`，恢复仓库级硬规则、必命中 skill 和阻断条件。
+- 若压缩后未重新读取 `AGENTS.md`，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
+- 若压缩后发现 `AGENTS.md` 缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
+
 ## 注释任务强制流程
 - 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
 - 第一步：先声明命中的注释类 skill。
@@ -158,6 +164,11 @@ append_section_if_missing "$AGENTS_FILE" "Skill 命中强制规则" "- 处理本
 - 若连 \`skill-hit-check-rules\` 或 \`parallel-task-dispatch-rules\` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 \`skill-audit-rules\` 进行只读审计。
 - 所有审查类 skill 统一按强制自动触发处理；只要是只读检查、规则核对、实现自审、归位审查或回归风险审查，默认优先并行。"
+
+append_section_if_missing "$AGENTS_FILE" "上下文压缩续做规则" "- 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 \`context-compression-rules\`。
+- 压缩后继续执行前，必须重新读取当前项目根目录 \`AGENTS.md\`，恢复仓库级硬规则、必命中 skill 和阻断条件。
+- 若压缩后未重新读取 \`AGENTS.md\`，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
+- 若压缩后发现 \`AGENTS.md\` 缺失、损坏或规则不完整，必须先触发 \`project-agents-bootstrap\` 补齐，再继续主任务。"
 
 append_section_if_missing "$AGENTS_FILE" "注释任务强制流程" "- 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
 - 第一步：先声明命中的注释类 skill。
