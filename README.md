@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-21 14:00:10 docs: [生图回报格式] 补全路径与模型回报要求
+
 2026-06-21 13:02:23 fix: [Imagegen回退优先级] 强化项目配置解析与落盘约束
 
 2026-06-21 05:01:58 feat: [Imagegen自动联动] 强化真实生图链路与编辑入口

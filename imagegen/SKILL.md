@@ -168,9 +168,13 @@ CLI fallback 暴露三个子命令：
     - 最终保存路径
     - 最终 prompt 或 prompt 集
     - 执行路径：
-      - `Image generation path: built-in image_gen`
-      - `Image generation path: CLI fallback`
-      - `Image generation blocked: no usable built-in or validated CLI path`
+      - `生图路径: built-in image_gen`
+      - `生图路径: CLI fallback`
+      - `生图状态: 无可用的 built-in 或已验证 CLI 生图链路，本次未完成最终生图`
+    - 本次实际使用的模型或通道：
+      - `生图模型: gpt-image-2`
+      - `生图模型: gpt-image-1.5`
+      - 若走 built-in 且当前环境拿不到精确底层模型名，也必须明确写出 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`
 23. 用户要长期复用的本地入口时，读取 `references/local-entrypoints.md`
 
 ## 透明底规则
