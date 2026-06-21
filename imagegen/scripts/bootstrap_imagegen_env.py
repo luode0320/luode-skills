@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""Bootstrap OpenAI image generation env vars from Codex local or project config.
+"""Bootstrap OpenAI image generation env vars from project or Codex config.
 
-Reads:
-- current process env vars first
-- project AGENTS.md image config if present
-- ~/.codex/auth.json for OPENAI_API_KEY
-- ~/.codex/config.toml for base_url
-
-Prints shell-ready exports for either bash or powershell.
+Resolution order:
+1. current process env vars
+2. project AGENTS.md fallback config
+3. project AGENTS.md primary image config
+4. ~/.codex/auth.json and ~/.codex/config.toml
 """
 
 from __future__ import annotations
@@ -41,8 +39,9 @@ AGENTS_IMAGE_CONFIG_TEMPLATE = """
 - `api` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_API_KEY`、`env:OPENAI_API_KEY`、`codex-auth:OPENAI_API_KEY` 这类读取约定，而不是明文密钥。
 - `baseurl` 字段推荐写成 `env:PROJECT_IMAGE_OPENAI_BASE_URL`、`env:OPENAI_BASE_URL`、`codex-config:base_url` 这类读取约定；如确需项目专用地址，也允许写明确的 `https://...`。
 - `model` 字段用于声明当前项目默认图像模型；若调用方没有显式传 `--model`，运行脚本会优先读取这里的模型。
-- 当共享 `~/.codex/config.toml + auth.json` 对接的默认图像通道不可用、缺少 `gpt-image-2` / `gpt-image-1.5` / `gpt-image-1`，或返回 `model_not_found`、`No available channel` 时，允许 `imagegen` skill 优先读取本项目 `AGENTS.md` 中声明的项目级图像通道读取约定，作为当前项目的临时/专用图像生成配置。
-- `imagegen` 的配置优先级默认是：当前进程环境变量 > 本项目 `AGENTS.md` 图像配置 > `~/.codex/auth.json` + `~/.codex/config.toml`。
+- 如果用户在 `AGENTS.md` 里明确配置了 `回退规则：回退配置` 下的 `api` / `baseurl`，则在当前进程环境变量之后优先使用这组回退配置；这是用户主动声明的项目图像通道，应先于共享 Codex local 配置。
+- 当项目未声明回退配置，或回退配置解析不出有效值时，再使用本项目 `AGENTS.md` 中声明的常规项目级图像通道。
+- `imagegen` 的配置优先级默认是：当前进程环境变量 > 本项目 `AGENTS.md` 回退配置 > 本项目 `AGENTS.md` 图像配置 > `~/.codex/auth.json` + `~/.codex/config.toml`。
 - 该项目级图像配置只用于图像生成相关流程，不用于覆盖普通文本模型配置。
 - 如果项目级图像通道也不可用，必须明确告知当前图像入口仍不可用，并提示继续补充新的图像通道读取位置，而不是假装已生成成功。
 - 图像配置格式固定如下，供 `imagegen` skill 自动读取：
@@ -52,7 +51,11 @@ api: env:PROJECT_IMAGE_OPENAI_API_KEY
 baseurl: env:PROJECT_IMAGE_OPENAI_BASE_URL
 model: gpt-image-2
 fallback_model: gpt-image-1.5
-priority: env > project-agents > codex-local
+priority: env > project-fallback > project-agents > codex-local
+
+回退规则：回退配置
+api: env:PROJECT_IMAGE_FALLBACK_OPENAI_API_KEY
+baseurl: env:PROJECT_IMAGE_FALLBACK_OPENAI_BASE_URL
 """.strip()
 
 
@@ -95,7 +98,7 @@ def ensure_agents_image_config_block(project_root: Path | None) -> tuple[Path | 
     except Exception:
         return agents_path, False
 
-    if "## 图像生成配置" in text and "图像配置:" in text:
+    if "## 图像生成配置" in text and "图像配置:" in text and "回退规则：回退配置" in text:
         return agents_path, False
 
     new_text = text.rstrip() + "\n\n" + AGENTS_IMAGE_CONFIG_TEMPLATE + "\n"
@@ -103,11 +106,11 @@ def ensure_agents_image_config_block(project_root: Path | None) -> tuple[Path | 
     return agents_path, True
 
 
-def _read_config_block_map(text: str) -> dict[str, str]:
+def _read_named_block_map(text: str, heading_pattern: str) -> dict[str, str]:
     lines = text.splitlines()
     start_index = None
     for index, line in enumerate(lines):
-        if re.match(r"^\s*图像配置\s*[:：]\s*$", line):
+        if re.match(heading_pattern, line):
             start_index = index + 1
             break
 
@@ -125,6 +128,9 @@ def _read_config_block_map(text: str) -> dict[str, str]:
             if config:
                 break
             continue
+        if re.match(r"^(##\s+|[-*]\s+)", stripped):
+            if config:
+                break
         match = re.match(r"^(?P<key>[A-Za-z0-9_-]+)\s*[:：]\s*(?P<value>.+?)\s*$", stripped)
         if match:
             config[match.group("key").lower()] = match.group("value").strip()
@@ -176,33 +182,36 @@ def _resolve_project_config_value(
 def read_agents_image_config(
     project_root: Path | None,
     codex_home: Path,
-) -> tuple[str | None, str | None, str | None, str | None, str | None, Path | None]:
+) -> tuple[str | None, str | None, str | None, str | None, str | None, str | None, str | None, Path | None]:
     if project_root is None:
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
     agents_path = find_agents_md(project_root)
     if agents_path is None:
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
     try:
         text = agents_path.read_text(encoding="utf-8")
     except Exception:
-        return None, None, None, None, None, agents_path
+        return None, None, None, None, None, None, None, agents_path
 
-    config_map = _read_config_block_map(text)
-    if not config_map:
-        return None, None, None, None, None, agents_path
+    primary_map = _read_named_block_map(text, r"^\s*图像配置\s*[:：]\s*$")
+    fallback_map = _read_named_block_map(text, r"^\s*回退规则\s*[:：]\s*回退配置\s*$")
+    if not primary_map and not fallback_map:
+        return None, None, None, None, None, None, None, agents_path
 
-    api = _resolve_project_config_value(config_map.get("api"), codex_home=codex_home, value_kind="api")
-    base_url = _resolve_project_config_value(
-        config_map.get("baseurl"),
+    api = _resolve_project_config_value(primary_map.get("api"), codex_home=codex_home, value_kind="api")
+    base_url = _resolve_project_config_value(primary_map.get("baseurl"), codex_home=codex_home, value_kind="baseurl")
+    model = normalize_config_value(primary_map.get("model"))
+    fallback_model = normalize_config_value(primary_map.get("fallback_model"))
+    priority = normalize_config_value(primary_map.get("priority"))
+    fallback_api = _resolve_project_config_value(fallback_map.get("api"), codex_home=codex_home, value_kind="api")
+    fallback_base_url = _resolve_project_config_value(
+        fallback_map.get("baseurl"),
         codex_home=codex_home,
         value_kind="baseurl",
     )
-    model = normalize_config_value(config_map.get("model"))
-    fallback_model = normalize_config_value(config_map.get("fallback_model"))
-    priority = normalize_config_value(config_map.get("priority"))
-    return api, base_url, model, fallback_model, priority, agents_path
+    return api, base_url, model, fallback_model, priority, fallback_api, fallback_base_url, agents_path
 
 
 def read_auth_key(codex_home: Path) -> str | None:
@@ -270,10 +279,17 @@ def main() -> int:
     project_root = Path(project_root_arg)
     if args.init_project_agents_image_config:
         ensure_agents_image_config_block(project_root)
-    agents_key, agents_base_url, agents_model, agents_fallback_model, agents_priority, agents_path = read_agents_image_config(
-        project_root,
-        codex_home,
-    )
+
+    (
+        agents_key,
+        agents_base_url,
+        agents_model,
+        agents_fallback_model,
+        agents_priority,
+        fallback_key,
+        fallback_base_url,
+        agents_path,
+    ) = read_agents_image_config(project_root, codex_home)
 
     env_key = os.environ.get("OPENAI_API_KEY")
     env_base_url = os.environ.get("OPENAI_BASE_URL")
@@ -283,6 +299,9 @@ def main() -> int:
     if env_key:
         key = env_key
         key_source = "env"
+    elif fallback_key:
+        key = fallback_key
+        key_source = "project-fallback"
     elif agents_key:
         key = agents_key
         key_source = "project-agents"
@@ -293,6 +312,9 @@ def main() -> int:
     if env_base_url:
         base_url = env_base_url
         base_url_source = "env"
+    elif fallback_base_url:
+        base_url = fallback_base_url
+        base_url_source = "project-fallback"
     elif agents_base_url:
         base_url = agents_base_url
         base_url_source = "project-agents"

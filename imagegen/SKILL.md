@@ -78,12 +78,15 @@ CLI fallback 暴露三个子命令：
 - built-in 模式下，默认生成文件会落到 `$CODEX_HOME/*`。
 - 不要把 OS temp 当成默认 built-in 输出位置。
 - 不要依赖 built-in 工具的目标路径参数行为；需要特定位置时，先生成，再移动/复制。
+- 只要图片是当前项目的正式资产，默认统一存到项目根目录下的 `images/<YYYYMMDDHHMMSS>/` 子目录。
+- `<YYYYMMDDHHMMSS>` 目录表示本次生成批次时间；同一批次的相关正式资产应放在同一个时间戳目录里。
 - 保存优先级：
   1. 用户指定了目标路径：移动或复制到该路径
-  2. 图片是当前项目要用的：移动或复制进工作区
+  2. 图片是当前项目要用的：移动或复制进项目 `images/<YYYYMMDDHHMMSS>/`
   3. 图片只是预览：可以只在对话里展示，底层文件保留在默认位置
 - 不要把项目实际依赖的图片只留在 `$CODEX_HOME/*`。
-- 除非用户明确要替换原文件，否则默认输出到新的版本化文件名，例如 `hero-v2.png`。
+- 同一张图的多轮优化、微调、返修，默认沿用同一基础名并做版本号递增，例如 `hero-v1.png`、`hero-v2.png`、`hero-v3.png`。
+- 除非用户明确要替换原文件，否则不要覆盖旧版本；从无版本文件起步时，第一版也直接用 `v1`。
 
 ## 什么时候用
 
@@ -157,10 +160,11 @@ CLI fallback 暴露三个子命令：
 16. 检查结果：主体、风格、构图、文本准确性、约束是否满足
 17. 需要迭代时，一次只改一个重点
 18. 预览图可以直接在对话里展示
-19. 项目正式资产必须存进工作区
+19. 项目正式资产必须存进项目 `images/<YYYYMMDDHHMMSS>/`
 20. 多资产任务默认把每个正式结果都落盘
-21. 用户显式要求 CLI/API/模型控制时，再细读 `references/cli.md` 和 `references/image-api.md`
-22. 最终必须汇报：
+21. 同一张图的连续优化结果必须做 `v1`、`v2`、`v3` 递增，不要覆盖前一版
+22. 用户显式要求 CLI/API/模型控制时，再细读 `references/cli.md` 和 `references/image-api.md`
+23. 最终必须汇报：
     - 最终保存路径
     - 最终 prompt 或 prompt 集
     - 执行路径：
@@ -360,7 +364,9 @@ CLI fallback 默认模型是 `gpt-image-2`。
 ### 临时与输出目录
 
 - 临时文件放 `tmp/imagegen/`
-- 正式输出放 `output/imagegen/`
+- 正式输出放项目根目录 `images/<YYYYMMDDHHMMSS>/`
+- 同一批次共用同一个时间戳目录；不要把同批正式结果散落到多个目录
+- 同一张图的版本文件名用稳定基础名加 `-v<number>`，例如 `landing-hero-v1.png`
 - 文件名尽量稳定、可读
 
 ### 依赖
@@ -378,8 +384,9 @@ uv pip install pillow
 - built-in 路径不需要向用户索要 `OPENAI_API_KEY`
 - CLI fallback 优先桥接：
   1. 当前进程环境变量
-  2. 项目 `AGENTS.md` 图像配置
-  3. `~/.codex/auth.json` + `~/.codex/config.toml`
+  2. 项目 `AGENTS.md` 回退配置
+  3. 项目 `AGENTS.md` 图像配置
+  4. `~/.codex/auth.json` + `~/.codex/config.toml`
 - 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
   1. 跑系统 `check`
   2. 如果 `openai` 或 `PIL` 缺失，先补依赖

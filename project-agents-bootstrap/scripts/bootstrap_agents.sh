@@ -199,8 +199,8 @@ GODOT_IMAGEGEN_SECTION=$(cat <<'TEMPLATE'
 - 图像配置示例：
   - 主通道：`baseurl=https://api.openai.com/v1`，模型 `gpt-image-1`
   - 读取位置：当前进程环境变量、`~/.codex/auth.json`、`~/.codex/config.toml`
-  - 优先级：当前进程环境变量 > `~/.codex/auth.json` > `~/.codex/config.toml`
-  - 回退规则：主通道不可用时先切换到回退配置；若回退配置也不可用，则允许降级到人工补图或占位图，不得伪造已生成结果
+  - 优先级：当前进程环境变量 > 用户项目声明的回退配置 > 用户项目声明的主配置 > `~/.codex/auth.json` > `~/.codex/config.toml`
+  - 回退规则：如果用户项目已声明回退配置里的 `api` / `baseurl`，则在当前进程环境变量之后优先使用该回退配置；若未声明或不可用，再继续使用项目主配置与 Codex local 默认配置；若这些也都不可用，则允许降级到人工补图或占位图，不得伪造已生成结果
 - 回退规则：回退配置
   - `api: ''`
   - `baseurl: ''`
