@@ -1,6 +1,6 @@
 ---
 name: godot-project-bootstrap-rules
-description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级 `AGENTS.md`、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。
+description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。
 ---
 
 # Godot 项目自举规则
@@ -8,7 +8,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 目标
 
 - 识别当前仓库是否为真实 Godot 项目。
-- 自动补齐仓库级 `AGENTS.md` 中的 Godot 开发约定与图像生成配置模板。
+- 自动补齐仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）中的 Godot 开发约定与图像生成配置模板。
 - 自动补齐项目级 Codex MCP 配置中的 `Godot AI MCP`。
 - 明确哪些部分已经自动就绪，哪些部分仍需要项目维护者手工补配置。
 
@@ -22,8 +22,8 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 进入后先做什么
 
 1. 先按 `mcp-installation-rules` 的项目识别规则确认是否为 Godot 项目。
-2. 强制联动 `project-agents-bootstrap`，确保仓库根目录 `AGENTS.md` 存在。
-3. 检查 `AGENTS.md` 是否已包含：
+2. 强制联动 `project-agents-bootstrap`，确保仓库根目录规则文件（`AGENTS.md` / `CLAUDE.md`）存在。
+3. 检查规则文件（`AGENTS.md` / `CLAUDE.md`）是否已包含：
    - `## Godot 项目工具配置`
    - `## 图像生成配置`
 4. 若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少 `Godot AI MCP`，按 `mcp-installation-rules` 默认补齐。
@@ -31,7 +31,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 默认执行流程
 
 1. 识别 Godot 项目标记。
-2. 补齐仓库级 `AGENTS.md`。
+2. 补齐仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）。
 3. 若为 Godot 项目，强制补齐：
    - Godot 工具接管约定
    - 图像生成配置模板
@@ -43,17 +43,17 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 
 ## 图像配置硬规则
 
-- `AGENTS.md` 里只允许写图像通道的读取约定、`baseurl`、模型名、优先级和回退规则。
-- `AGENTS.md` 里不得明文写真实 `OPENAI_API_KEY`。
+- 规则文件（`AGENTS.md` / `CLAUDE.md`）里只允许写图像通道的读取约定、`baseurl`、模型名、优先级和回退规则。
+- 规则文件（`AGENTS.md` / `CLAUDE.md`）里不得明文写真实 `OPENAI_API_KEY`。
 - 真实密钥必须来自：
   - 当前进程环境变量
   - `~/.codex/auth.json`
   - `~/.codex/config.toml`
   - 项目已经接好的运行时环境变量或运行时配置
-- 项目如需专用图像通道，优先让项目维护者在本机环境里配置真实密钥，再在 `AGENTS.md` 中声明读取位置，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`。
+- 项目如需专用图像通道，优先让项目维护者在本机环境里配置真实密钥，再在规则文件（`AGENTS.md` / `CLAUDE.md`）中声明读取位置，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`。
 - 图像生成配置必须同时声明主通道与回退规则。
 - 主通道优先使用 `baseurl=https://api.openai.com/v1` 和最新可用的 `gpt-image` 模型，例如 `gpt-image-1`。
-- 若主通道无法使用最新 `gpt-image` 模型，必须回退到项目 `AGENTS.md` 中声明的回退配置。
+- 若主通道无法使用最新 `gpt-image` 模型，必须回退到项目规则文件（`AGENTS.md` / `CLAUDE.md`）中声明的回退配置。
 - 回退规则必须写成 `回退规则：回退配置` 的层级结构，并至少包含：
   - `api: ''`
   - `baseurl: ''`
@@ -64,7 +64,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 最终必须明确写出：
 
 - 是否命中 Godot 项目标记
-- `AGENTS.md` 是否已补齐 Godot 与图像配置模板
+- 规则文件（`AGENTS.md` / `CLAUDE.md`）是否已补齐 Godot 与图像配置模板
 - `Godot AI MCP` 是否已补齐到项目级 Codex 配置
 - 当前图像生成模板是否只剩人工填写
 - 剩余人工步骤是什么
@@ -78,6 +78,6 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 通过标准
 
 - Godot 项目已被识别。
-- `AGENTS.md` 中已有 Godot 项目工具配置与图像生成配置模板。
+- 规则文件（`AGENTS.md` / `CLAUDE.md`）中已有 Godot 项目工具配置与图像生成配置模板。
 - 项目级 Codex 配置中已有 `Godot AI MCP`，或已明确记录无法安全补齐的原因。
 - 最终输出中已明确区分自动完成项与人工待办项。

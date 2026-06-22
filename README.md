@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-22 18:11:40 feat: [规则文件兼容性] 全面适配 AGENTS.md / CLAUDE.md 双 AI 环境
+
 2026-06-21 14:00:10 docs: [生图回报格式] 补全路径与模型回报要求
 
 2026-06-21 13:02:23 fix: [Imagegen回退优先级] 强化项目配置解析与落盘约束

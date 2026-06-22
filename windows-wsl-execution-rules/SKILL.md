@@ -267,7 +267,7 @@ Go 调试配置必须使用远程附加模式，通过端口连接 WSL 内运行
 
 ## 与其他规则的协作
 
-- 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把”Windows 编辑、WSL 执行”的约束写入仓库 `AGENTS.md`
+- 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把”Windows 编辑、WSL 执行”的约束写入仓库规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）
 - 涉及测试覆盖和回归策略时，让路给 `test-strategy-rules`、`test-regression-rules`
 - 涉及语言或框架本身的命令选择时，让路给对应语言/框架 skill（Go 项目联动 `golang-patterns`）
 - 涉及 Windows 中文编码、日志重定向或 PowerShell 落盘时，可联动 `windows-encoding-rules`

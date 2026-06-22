@@ -388,14 +388,14 @@ uv pip install pillow
 - built-in 路径不需要向用户索要 `OPENAI_API_KEY`
 - CLI fallback 优先桥接：
   1. 当前进程环境变量
-  2. 项目 `AGENTS.md` 回退配置
-  3. 项目 `AGENTS.md` 图像配置
+  2. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）回退配置
+  3. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）图像配置
   4. `~/.codex/auth.json` + `~/.codex/config.toml`
 - 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
   1. 跑系统 `check`
   2. 如果 `openai` 或 `PIL` 缺失，先补依赖
   3. 再跑一次 `check`
-  4. 如果 env / project `AGENTS.md` / Codex local config 都无法提供图像通道，再明确报 unavailable
+  4. 如果 env / 项目规则文件（`AGENTS.md` / `CLAUDE.md`）/ AI local config 都无法提供图像通道，再明确报 unavailable
   5. 验证成功后立刻继续出图，不要再等用户额外提示
 
 如果缺少 key，提示用户：
