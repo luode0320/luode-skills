@@ -57,24 +57,31 @@
 
 > 详细规则见 `windows-wsl-execution-rules` skill。
 
-**强制执行原则（两条硬约束）：**
-- Windows 无法运行项目二进制文件，所有编译产物只能在 WSL 内执行
-- 只有 WSL 进程才能正常进行网络通信，PowerShell / Git Bash 受网络策略限制
+**操作类型分工：**
 
-**执行要求：**
-- 所有项目命令必须通过 WSL 执行，禁止在 PowerShell 或 Git Bash 中直接运行
-- 命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
-- VSCode 调试走 WSL：`tasks.json` 使用 `wsl.exe` 执行器，`launch.json` 通过 `dlv dap` 远程协议连接
+| 操作类型 | 执行环境 |
+|---------|---------|
+| 读文件、改文件、搜索、列目录 | Git Bash 或 Windows 工具直接执行 |
+| git status/diff/log/add/commit | Git Bash 直接执行 |
+| 启动程序、运行测试、构建二进制 | **必须 WSL** |
+| 调试（dlv）、安装依赖 | **必须 WSL** |
+| 任何需要网络通信的进程 | **必须 WSL** |
 
-**路径三层结构：**
-- Windows 源码：`D:\luode\<project>`（编辑）
-- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁，不直接使用）
-- WSL 用户工作路径：`/home/luode/d/luode/<project>`（**所有命令在此执行**）
+**WSL 执行两条硬约束：**
+- Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
+- 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
 
-**执行前必须检查 bind mount：**
+**WSL 执行命令格式：**`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
+
+**启动/调试前必须检查 bind mount：**
 - 检查：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
-- 未挂载则执行：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
-- sudo 需要 root 密码时停止自动执行，通知用户手动完成后回复再继续
+- 未挂载：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
+- sudo 需要 root 密码时停止，通知用户手动完成后回复再继续
+
+**路径三层结构（执行时使用）：**
+- Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
+- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
+- WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
 
 **编码约束：**
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略
