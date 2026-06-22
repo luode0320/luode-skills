@@ -140,27 +140,41 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 以下模板适用于 `AGENTS.md`（Codex）和 `CLAUDE.md`（Claude Code），文件名按当前 AI 环境选择，内容结构相同。
 
 ```md
-# AGENTS.md
+# AGENTS.md / CLAUDE.md
+
+> Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
 
 ## 适用范围
 
 - 本文件适用于本仓库下所有代码与文档变更。
 
+## Skill 强制自动触发规则（最高优先级）
+
+- **所有 skill 的触发不依赖用户主动通知**，AI 必须基于任务内容、工作目录、用户意图主动检测并触发
+- 每轮处理用户消息时，必须主动扫描所有可用 skill 的触发条件，符合条件的 skill 必须被调用
+- `skill-hit-check-rules` 每轮必须作为第一个 tool call 被调用，无例外
+- 禁止以下理由跳过应触发的 skill：
+  - “用户没有明确说需要这个 skill”
+  - “任务看起来简单，不需要 skill”
+  - “我已经知道怎么做了”
+  - “这不是核心 skill”
+- 违反本规则视为流程违规，必须立即停止当前执行，回到命中检查重走
+
 ## Skill 命中强制规则
 
 - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
-- 若本轮涉及创建、补齐或更新仓库级 `AGENTS.md`，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
+- 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 所有审查类 skill 统一按强制自动触发处理；只要是只读检查、规则核对、实现自审、归位审查或回归风险审查，默认优先并行。
 - 上下文压缩续做规则：
-  - 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
-  - 压缩后继续执行前，必须重新读取当前项目根目录 `AGENTS.md`，恢复仓库级硬规则、必命中 skill 和阻断条件。
-  - 若压缩后未重新读取 `AGENTS.md`，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
-  - 若压缩后发现 `AGENTS.md` 缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
+  - 若当前会话刚发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
+  - 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
+  - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
+  - 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
 
 ## 注释任务强制流程
 
@@ -171,10 +185,10 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## 上下文压缩续做规则
 
-- 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
-- 压缩后继续执行前，必须重新读取当前项目根目录 `AGENTS.md`，恢复仓库级硬规则、必命中 skill 和阻断条件。
-- 若压缩后未重新读取 `AGENTS.md`，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
-- 若压缩后发现 `AGENTS.md` 缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
+- 若当前会话刚发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
+- 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
+- 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
+- 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
 
 ## 中文编码规则
 
