@@ -201,13 +201,52 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-- Windows 下默认优先使用 Git Bash 或 WSL shell。
-- 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
-- 若确需在 Windows 侧执行写入，必须显式指定 UTF-8，并在落盘后立即 `git diff` 核对仅有预期改动。
-- 仓库应提交 `.gitattributes` 与 `.editorconfig`，显式固定 `UTF-8`、基础编辑器行为，并对换行采用最小约束策略。
-- 对已有历史仓库，`.gitattributes` 默认先用 `* text=auto`，对 `*.sh` / `*.bash` 这类明确必须 `LF` 的脚本，以及 `*.yml` / `*.yaml` 这类工作流或配置文件显式强制 `eol=lf`，不要直接对 `*.go`、`*.vue`、`*.sql`、`*.md` 等全量强制 `eol=lf`。
-- Windows 下若仓库出现 `.sh` 仅 `100755 => 100644` 之类伪改动，应优先关闭 `core.filemode` 并清理 mode change。
-- Windows 下若仓库出现大量无关文件被带进改动，应优先检查 `core.autocrlf` 并通过 `.gitattributes` 固定换行策略。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。
+
+**强制执行原则（两条硬约束）：**
+- Windows 无法运行项目二进制文件，所有编译产物只能在 WSL 内执行
+- 只有 WSL 进程才能正常进行网络通信，PowerShell / Git Bash 受网络策略限制
+
+**执行环境强制要求：**
+- 所有项目命令（启动、调试、测试、构建、安装依赖）必须通过 WSL 执行，禁止在 PowerShell 或 Git Bash 中直接运行
+- 命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
+- VSCode 调试同样走 WSL：`tasks.json` 使用 `wsl.exe` 执行器，`launch.json` 通过 `dlv dap` 远程协议连接 WSL 调试器
+
+**路径约定（三层结构）：**
+- Windows 源码：`D:\luode\<project>`（编辑）
+- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁，不直接使用）
+- WSL 用户工作路径：`/home/luode/d/luode/<project>`（**所有命令在此执行**）
+
+**执行前必须检查 bind mount：**
+
+```bash
+# 第一步：检查是否已挂载
+wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"
+```
+
+- 输出 `mounted`：直接执行项目命令
+- 输出 `not_mounted`：执行 bind mount
+
+```bash
+# 第二步：执行 bind mount（需要 root 密码时停止并通知用户）
+wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"
+```
+
+⚠️ 若 sudo 需要交互式 root 密码，必须立即停止自动执行，提示用户在 WSL 终端手动完成挂载后回复，再继续。
+
+**禁止行为：**
+- 禁止在 PowerShell 或 Git Bash 中直接运行 `go build`、`go test`、`go run`、`dlv`、`pnpm`、`npm` 等项目命令
+- 禁止假设"Git Bash 已够用"——Git Bash 不是 WSL，网络限制同样存在
+- 禁止跳过 bind mount 检查直接执行命令
+
+**Git 操作例外：**
+- 纯文件搜索、读文件、列目录、Git 状态查看、差异查看可在 Windows 侧执行
+
+**编码约束：**
+- 仓库应提交 `.gitattributes` 与 `.editorconfig`，固定 `UTF-8` 和换行策略
+- `.gitattributes` 默认 `* text=auto`，`*.sh` / `*.yaml` 显式强制 `eol=lf`
+- 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
+- Windows 下出现大量无关文件改动，优先检查 `core.autocrlf`
 
 ## CodeGraph 强制准备规则
 
