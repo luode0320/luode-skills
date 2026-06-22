@@ -163,8 +163,8 @@
 | `artifact-storage-rules` | 当需要定义、调整或解释 `ment/`、`bug/`、`test/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板或同任务复用策略时自动触发。 | 作为跨域统一约定 skill，提供目录、命名和复用策略的单一真相源，供需求、Bug、测试、记忆、项目设计和交付类 skill 统一引用。 |
 | `project-design-doc-rules` | 当用户要求分析整个项目、梳理架构 / 模块 / 主链路、同步根目录 `项目设计.md`，或在完成全项目分析后补建该文档时自动触发。 | 负责把根目录项目设计类文档当作弱参考源读取，按代码与当前文档优先原则判断偏移，并统一同步或补建根目录 `项目设计.md`。 |
 | `project-local-skills-rules` | 当用户要求“分析项目并总结项目专属 skill”，或要求把项目私有编码规则沉淀到项目目录时自动触发。 | 负责把项目专属规则拆成多个独立 skill，并统一落到项目根目录 `skill/`，供后续预热和编码阶段优先命中。 |
-| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否还需要保留 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定使用哪条本地 CLI 路径时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 CLI 接管结论、优先级和旧 MCP 名称兼容说明；默认收口为浏览器使用 `agent-browser`、Godot 使用本地 `godot4` / `godot` 或项目自带启动脚本，不再默认补齐 MCP 配置。 |
-| `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级 `AGENTS.md`、Godot CLI 工具约定、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-agents-bootstrap`、`mcp-installation-rules` 与 `imagegen`。 |
+| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。 |
+| `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-agents-bootstrap`、`mcp-installation-rules` 与 `imagegen`。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
 | `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
 | `skill-hit-check-rules` | 当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若本轮同时命中 `parallel-task-dispatch-rules`，还要额外输出并行触发的 skill 列表；若未命中则明确告知未命中及原因。 | 在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。 |
@@ -190,7 +190,7 @@
 | -------- | -------------------- | ---- |
 | 当前争议是研发文档、Bug 记录、测试任务目录、项目通用文档或根目录项目设计主文档应该放到哪里、叫什么、是否复用原记录 | 总控层 / `artifact-storage-rules` | 先确定全局目录和命名约定，再回到对应主域继续执行 |
 | 用户要求分析当前项目并整理项目专属编码规则，或要求把规则沉淀成多个项目私有 skill | 总控层 / `project-local-skills-rules` | 先按主题拆分项目专属 skill，再统一写入项目根目录 `skill/`，避免规则只停留在口头总结 |
-| 用户要求检查当前项目浏览器或 Godot 工具现在该怎么接管，或任务即将涉及前端页面验证 / Godot 编辑器操控，需要先判断应走哪条 CLI 路径 | 总控层 / `mcp-installation-rules` | 先按项目结构识别前端与 Godot 标记，明确 CLI 接管结论，再把浏览器或编辑器控制权让给对应本地工具 |
+| 用户要求检查当前项目是否需要安装 MCP，或任务即将涉及前端页面验证 / Godot 编辑器操控，需要先判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP | 总控层 / `mcp-installation-rules` | 先按项目结构识别前端与 Godot 标记，明确需要安装的 MCP，再把浏览器或编辑器控制权让给对应工具 |
 | 用户要求分析代码库结构、调用链、符号关系、影响面或重构范围，需要先缩小跨文件搜索 | 总控层 / `codegraph-analysis-rules` | 先用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到本地搜索与阅读 |
 | 当前主流程已经明确，但执行中发现已命中的某个 skill 触发不准、规则缺失、边界不清、references 不足，继续推进只能靠临时口头规则兜底 | 总控辅助 / `skill-evolution-rules` | 先判断这是不是 skill gap，再决定补旧 skill、补相邻 skill 还是新增独立 skill；阻断级 gap 应先暂停当前任务 |
 | 用户只粘贴一段代码、函数或报错片段并说“这里改”，但没有提供文件路径或可唯一定位的代码位置 | 总控层 / `code-snippet-location-rules` | 先依据明确路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件，再进入代码重读或具体修改 |

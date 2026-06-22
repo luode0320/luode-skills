@@ -1,6 +1,6 @@
 ---
 name: godot-project-bootstrap-rules
-description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot CLI 工具约定、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。
+description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。
 ---
 
 # Godot 项目自举规则
@@ -9,7 +9,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 
 - 识别当前仓库是否为真实 Godot 项目。
 - 自动补齐仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）中的 Godot 开发约定与图像生成配置模板。
-- 自动补齐 Godot CLI / 编辑器命令行接管约定。
+- 自动补齐项目级 Codex MCP 配置中的 `Godot AI MCP`。
 - 明确哪些部分已经自动就绪，哪些部分仍需要项目维护者手工补配置。
 
 ## 自动触发信号
@@ -17,7 +17,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 - 命中 `project.godot`
 - 命中 `.gd`、`.tscn`、`.scn`、`.tres`、`.res`
 - 命中 `addons/`、`export_presets.cfg`
-- 用户明确说“这是 Godot 游戏项目”“帮我把 Godot 项目的环境和图像生成配置补齐”“检查 Godot 工具 / gpt-image 配置”
+- 用户明确说“这是 Godot 游戏项目”“帮我把 Godot 项目的环境和图像生成配置补齐”“检查 Godot MCP / gpt-image 配置”
 
 ## 进入后先做什么
 
@@ -26,16 +26,17 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 3. 检查规则文件（`AGENTS.md` / `CLAUDE.md`）是否已包含：
    - `## Godot 项目工具配置`
    - `## 图像生成配置`
-4. 若缺失对应章节，补齐 Godot CLI 接管约定和图像生成配置模板。
+4. 若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少 `Godot AI MCP`，按 `mcp-installation-rules` 默认补齐。
 
 ## 默认执行流程
 
 1. 识别 Godot 项目标记。
 2. 补齐仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）。
 3. 若为 Godot 项目，强制补齐：
-   - Godot CLI / 编辑器命令行接管约定
+   - Godot 工具接管约定
    - 图像生成配置模板
-4. 输出环境就绪结论，区分：
+4. 检查并补齐项目级 Codex MCP 配置。
+5. 输出环境就绪结论，区分：
    - 已自动补齐
    - 已存在可直接复用
    - 仍需人工配置
@@ -58,26 +59,19 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
   - `baseurl: ''`
 - 若主通道和项目回退配置都不可用，必须明确标记为缺失配置，不得伪造生成结果或静默切换到未声明的服务商。
 
-## Godot 工具约定硬规则
-
-- `AGENTS.md` 中默认应把 Godot 任务收口到本地 `godot4` / `godot` 或项目自带启动脚本。
-- 不再默认补齐、扩写或优先推荐 Godot MCP。
-- 如果项目已有固定启动命令，应优先把该命令写入约定，而不是让后续任务临时猜测。
-- 若当前环境暂无可用 Godot 可执行入口，可以先继续静态代码或文档工作，但必须把“运行态未验证”显式列入最终说明。
-
 ## 输出要求
 
 最终必须明确写出：
 
 - 是否命中 Godot 项目标记
 - 规则文件（`AGENTS.md` / `CLAUDE.md`）是否已补齐 Godot 与图像配置模板
-- 当前本机是否已有明确的 Godot 启动入口，或仍需人工补充
+- `Godot AI MCP` 是否已补齐到项目级 Codex 配置
 - 当前图像生成模板是否只剩人工填写
 - 剩余人工步骤是什么
 
 ## 与相邻 skill 的边界
 
-- 不替代 `mcp-installation-rules` 做旧 MCP 命名兼容与工具接管判定；这里只负责把 Godot 项目的完整准备流串起来。
+- 不替代 `mcp-installation-rules` 做 MCP 安装来源分析；这里只负责把 Godot 项目的完整准备流串起来。
 - 不替代 `imagegen` 做实际图片生成；这里只保证项目的图像配置入口存在且格式可读。
 - 不替代 `project-agents-bootstrap` 做通用仓库规则补齐；这里只追加 Godot 项目的专项模板。
 
@@ -85,5 +79,5 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 
 - Godot 项目已被识别。
 - 规则文件（`AGENTS.md` / `CLAUDE.md`）中已有 Godot 项目工具配置与图像生成配置模板。
-- 当前默认路线已明确为 Godot CLI / 编辑器命令行，或已明确记录本机暂缺可执行入口。
+- 项目级 Codex 配置中已有 `Godot AI MCP`，或已明确记录无法安全补齐的原因。
 - 最终输出中已明确区分自动完成项与人工待办项。

@@ -2,45 +2,46 @@
 
 ## 浏览器相关
 
-当项目命中前端标记，并且任务涉及以下任一场景时，优先使用 `agent-browser`：
+当项目命中前端标记，并且任务涉及以下任一场景时，优先使用 `Chrome DevTools MCP`：
 
 - 打开真实页面并交互
-- 验证前端页面行为
-- 截图、抓取页面文本、查看网络请求
-- 做真实浏览器路径验证
+- 调试 DOM、样式、控制台错误
+- 查看 Network、Performance、Coverage 等 DevTools 能力
+- 验证前端页面行为、抓取运行时状态
 
-旧名称兼容：
+名称约定：
 
-- 用户提到“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”时，默认都视为旧称呼。
-- 当前默认路线统一收口为 `agent-browser`，不要再把这些旧称呼当成首选工具名。
+- `Chrome DevTools MCP` 是本仓库统一使用的官方工具名。
+- 用户提到“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”时，默认都映射到 `Chrome DevTools MCP`，不要在规则里并列成多个不同工具。
 
 优先级固定为：
 
-1. `agent-browser`
-2. 其他本地浏览器兜底方式
+1. `Chrome DevTools MCP`
+2. `agent-browser`
+3. 其他本地浏览器兜底方式
 
 回退条件：
 
-- 当前环境暂时没有可用的 `agent-browser`
-- 任务只需要一次性截图或极轻量页面查看，可临时用其他本地方式兜底
-- 用户明确要求不要做真实浏览器自动化
+- 当前环境未安装或未接通 Chrome DevTools MCP
+- 任务只需要最基础的浏览器自动化，且暂时无法安装 MCP
+- 需要的只是一次性截图或简单表单操作，可临时回退 `agent-browser`
 
 ## Godot 编辑器相关
 
-当项目命中 Godot 标记，并且任务涉及以下任一场景时，优先使用本地 Godot CLI / 编辑器命令行：
+当项目命中 Godot 标记，并且任务涉及以下任一场景时，优先使用 `Godot AI MCP`：
 
 - 创建或编辑场景
 - 操作节点、资源、脚本挂载
-- 运行项目并读取运行态反馈
-- 抓取启动日志、截图或最小运行态上下文
+- 运行项目并读取编辑器或运行态反馈
+- 从编辑器抓取当前状态、错误或可视化上下文
 
 优先级固定为：
 
-1. `godot4` / `godot` / 项目自带启动脚本
-2. 其他静态读取或人工兜底方式
+1. `Godot AI MCP`
+2. 其他 Godot 本地兜底方式
 
 回退条件：
 
-- 当前环境暂无可用的 Godot 可执行入口
-- 任务只需要静态阅读项目文件，不需要控制编辑器或运行项目
+- 当前环境未安装或未接通 Godot AI MCP
+- 任务只需要静态阅读项目文件，不需要控制编辑器
 - 当前只是做代码级修改，尚未进入编辑器联动阶段

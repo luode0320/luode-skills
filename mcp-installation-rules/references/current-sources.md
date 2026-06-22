@@ -1,35 +1,30 @@
-# 当前推荐入口
+# 当前推荐来源
 
-以下入口用于“确认当前浏览器或 Godot 任务应走哪条本地工具链”，不是要把旧 MCP 路线重新设回默认值。
+以下来源用于“确认当前该装什么、去哪里看最新安装说明”，不是要把某一条命令硬编码到所有环境里。
 
-## 浏览器 CLI
+## Chrome DevTools MCP
 
-- 本仓库统一浏览器控制入口：`agent-browser`
-- 参考入口：
-  - `../../agent-browser/SKILL.md`
-  - `../../agent-browser/references/commands.md`
-
-使用原则：
-
-- 默认以后两份本地 skill 文档为准。
-- 若当前环境未全局安装 `agent-browser`，优先使用 `npx -y agent-browser ...` 方式运行。
-- 若用户说“谷歌浏览器 MCP”或“Chrome DevTools for agents”，回答时先说明这属于历史命名，再收口到 `agent-browser`。
-- 不再默认推荐重新引入浏览器 MCP。
-
-## Godot CLI
-
-- 本地可执行入口优先级：
-  - `godot4`
-  - `godot`
-  - 项目自带启动脚本或封装命令
-
-建议检查方式：
-
-- `godot4 --version`
-- `godot --version`
-- 项目已有脚本时，优先读取项目内约定
+- 官方当前产品名会同时出现 `Chrome DevTools MCP` 与 `Chrome DevTools for agents`；本仓库在规则判定里统一记作 `Chrome DevTools MCP`。
+- Chrome 官方说明：
+  - `https://developer.chrome.com/docs/devtools/agents`
+  - `https://developer.chrome.com/docs/devtools/agents/get-started`
+- 官方仓库：
+  - `https://github.com/ChromeDevTools/chrome-devtools-mcp`
 
 使用原则：
 
-- 只要任务涉及 Godot 编辑器操控、运行验证、截图或读取运行态，优先走本地 Godot CLI / 编辑器命令行。
-- 不再默认推荐重新引入旧 Godot MCP 路线。
+- 默认以 Chrome 官方文档和官方仓库的最新安装说明为准。
+- 若用户说“谷歌浏览器 MCP”或“Google Chrome MCP”，回答时先做一次名称归一，再引用官方来源。
+- 后续浏览器控制优先让位给该 MCP，而不是继续默认使用其他浏览器工具。
+
+## Godot AI MCP
+
+- Godot Asset Library 中的 `Godot AI` 条目：
+  - `https://godotengine.org/asset-library/asset/5050`
+- 活跃项目主页：
+  - `https://github.com/hi-godot/godot-ai`
+
+使用原则：
+
+- Godot 生态变化较快，默认以项目主页或资产库中的当前安装说明为准。
+- 后续只要任务涉及 Godot 编辑器操控，就优先让位给该 MCP。
