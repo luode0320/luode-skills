@@ -94,13 +94,15 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
 - Windows / WSL 执行规则：
-  - Windows 下默认优先使用 Git Bash 或 WSL shell。
-  - 尽量不要用 Windows PowerShell 直接写入、格式化或批量修改仓库文件，避免换行和编码漂移。
-  - 若确需在 Windows 侧执行写入，必须显式指定 UTF-8，并在落盘后立即 `git diff` 核对仅有预期改动。
-  - 仓库应提交 `.gitattributes` 与 `.editorconfig`，显式固定 `UTF-8`、基础编辑器行为，并对换行采用最小约束策略。
-  - 对已有历史仓库，`.gitattributes` 默认先用 `* text=auto`，对 `*.sh` / `*.bash` 这类明确必须 `LF` 的脚本，以及 `*.yml` / `*.yaml` 这类工作流或配置文件显式强制 `eol=lf`，不要直接对 `*.go`、`*.vue`、`*.sql`、`*.md` 等全量强制 `eol=lf`。
-  - Windows 下若仓库出现 `.sh` 仅 `100755 => 100644` 之类伪改动，应优先关闭 `core.filemode` 并清理 mode change。
-  - Windows 下若仓库出现大量无关文件被带进改动，应优先检查 `core.autocrlf` 并通过 `.gitattributes` 固定换行策略。
+  - **强制 WSL 执行**：所有项目命令（启动、调试、测试、构建、安装依赖）必须通过 WSL 执行，禁止在 PowerShell 或 Git Bash 中直接运行
+  - 两条硬约束：Windows 无法运行项目二进制；只有 WSL 进程可正常进行网络通信
+  - 命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
+  - 执行前必须检查 bind mount：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
+  - 未挂载则执行：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
+  - sudo 需要 root 密码时停止自动执行，通知用户手动完成后回复再继续
+  - 路径三层：`D:\luode\<project>` → `/mnt/d/luode/<project>`（桥梁）→ `/home/luode/d/luode/<project>`（执行）
+  - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
+  - Windows 下出现大量无关文件改动，优先检查 `core.autocrlf`；`.sh` 出现 filemode 伪改动优先关闭 `core.filemode`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
 - 若仓库命中 Godot 项目标记，还必须补齐：
   - `## Godot 项目工具配置`
