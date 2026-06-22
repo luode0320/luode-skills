@@ -1,4 +1,4 @@
 interface:
   display_name: "MCP 安装判定"
-  short_description: "分析项目是否需要安装浏览器或 Godot MCP，并在项目级 Codex config.toml 缺失时默认补齐配置"
-  default_prompt: "使用 $mcp-installation-rules 分析当前项目是否需要安装 Chrome DevTools MCP 或 Godot AI MCP；若用户提到谷歌浏览器 MCP、Google Chrome MCP 或 Chrome DevTools for agents，也统一收口为 Chrome DevTools MCP。若项目级 ./codex/config.toml 或 ./.codex/config.toml 缺少目标 MCP 配置，则默认补齐，并明确后续浏览器与 Godot 编辑器应由哪个工具优先接管。"
+  short_description: "分析项目是否还需要保留浏览器或 Godot MCP，并收口到 CLI 优先的接管结论"
+  default_prompt: "使用 $mcp-installation-rules 分析当前项目后续浏览器与 Godot 编辑器应由哪条本地工具链接管。若用户提到谷歌浏览器 MCP、Google Chrome MCP、Chrome DevTools for agents 或 Godot MCP，也统一识别为历史称呼，并默认收口为浏览器使用 `agent-browser`、Godot 使用本地 `godot4` / `godot` 或项目自带启动脚本；除非用户明确要求保留旧 MCP 方案，否则不要再推荐安装或补齐 MCP 配置。"

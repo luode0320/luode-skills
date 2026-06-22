@@ -8,10 +8,12 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 ## AI 环境检测与规则文件约定
 
 本 skill 统一用"规则文件"指代与当前 AI 对应的仓库级配置文件：
+
 - **Codex 环境**：规则文件 = `AGENTS.md`
 - **Claude Code 环境**：规则文件 = `CLAUDE.md`
 
 检测方式（按优先级）：
+
 1. 若仓库根目录已存在 `AGENTS.md` 或 `CLAUDE.md` 其中一个，使用已存在的那个
 2. 若两者都不存在，根据当前运行 AI 创建对应文件（Claude → `CLAUDE.md`，Codex → `AGENTS.md`）
 3. 若两者都存在，使用与当前 AI 对应的文件，并在输出中标注另一个文件的存在
@@ -63,11 +65,13 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 8. 若仓库根目录缺失 `.gitattributes` 或 `.editorconfig`，必须一并补齐最小可用版本，用于固定 `LF`、`UTF-8`、末尾换行和基础编辑器行为。
 9. 若首轮尚未完成规则文件（`AGENTS.md` / `CLAUDE.md`）、`.gitattributes`、`.editorconfig` 任一项的创建、补齐或受管章节同步，必须立即停止后续主任务；此时唯一允许继续的工作是完成这些仓库级文件更新，不得先做项目分析再回补。
 10. 执行脚本后必须立刻核对结果，至少包含：
-   - 受管章节是否真的写入最新内容
-   - 是否同步到了所有已存在的规则文件（`AGENTS.md` / `CLAUDE.md`）
-   - `git diff -- AGENTS.md CLAUDE.md .gitattributes .editorconfig */AGENTS.md` 或等价检查中是否只出现预期改动
+
+- 受管章节是否真的写入最新内容
+- 是否同步到了所有已存在的规则文件（`AGENTS.md` / `CLAUDE.md`）
+- `git diff -- AGENTS.md CLAUDE.md .gitattributes .editorconfig */AGENTS.md` 或等价检查中是否只出现预期改动
+
 11. 若脚本未执行、执行失败、只同步了部分规则文件、或执行后未核对结果，判定为阻断，禁止宣称已完成自举。
-8. 必须确保文档包含以下最低规则：
+12. 必须确保文档包含以下最低规则：
 
 - Skill 命中强制规则：
   - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
@@ -141,7 +145,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 以下模板适用于 `AGENTS.md`（Codex）和 `CLAUDE.md`（Claude Code），文件名按当前 AI 环境选择，内容结构相同。
 
-```md
+````md
 # AGENTS.md / CLAUDE.md
 
 > Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
@@ -207,24 +211,28 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 **操作类型分工：**
 
-| 操作类型 | 执行环境 |
-|---------|---------|
-| 读文件、改文件、搜索、列目录 | Git Bash 或 Windows 工具直接执行 |
-| git status/diff/log/add/commit | Git Bash 直接执行 |
-| 启动程序、运行测试、构建二进制 | **必须 WSL** |
-| 调试（dlv）、安装依赖 | **必须 WSL** |
-| 任何需要网络通信的进程 | **必须 WSL** |
+| 操作类型                       | 执行环境                         |
+| ------------------------------ | -------------------------------- |
+| 读文件、改文件、搜索、列目录   | Git Bash 或 Windows 工具直接执行 |
+| git status/diff/log/add/commit | Git Bash 直接执行                |
+| 启动程序、运行测试、构建二进制 | **必须 WSL**                     |
+| 调试（dlv）、安装依赖          | **必须 WSL**                     |
+| 任何需要网络通信的进程         | **必须 WSL**                     |
 
 **WSL 执行两条硬约束：**
+
 - Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
 - 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
 
 **WSL 执行命令格式：**
+
 ```bash
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
 ```
+````
 
 **启动/调试前必须检查 bind mount：**
+
 ```bash
 # 检查挂载状态
 wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"
@@ -235,11 +243,13 @@ wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind
 **VSCode 调试走 WSL：** `tasks.json` 使用 `wsl.exe` 执行器，`launch.json` 通过 `dlv dap` 远程协议连接
 
 **路径三层结构（仅执行时使用）：**
+
 - Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
 - WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
 - WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
 
 **编码约束：**
+
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略
 - `.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
 - 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
@@ -251,6 +261,7 @@ wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind
 - 若在 Windows PowerShell 5.1 下执行安装，必须默认启用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing`，不得把人工点击确认当作标准流程。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取。
+
 ```
 
 ## 边界
@@ -264,3 +275,4 @@ wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind
 - 若首轮发现 `.gitattributes` 或 `.editorconfig` 缺失，也不允许降级为”先分析项目后补文件”；必须先补齐这两个文件，再继续主任务。
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
 - 若仓库位于 Windows 环境，默认应把 Git Bash / WSL shell 优先级一并补入仓库规则，而不是只在单次会话里临时提醒。
+```
