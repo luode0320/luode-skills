@@ -98,8 +98,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
 - Windows / WSL 执行规则：
-  - **读文件、改文件、git 操作、文件搜索**：优先使用 Git Bash 或 Windows 工具直接执行，无需经过 WSL
-  - **启动程序、调试、测试、构建、安装依赖、网络通信**：必须通过 WSL 执行（两条硬约束：Windows 无法运行项目二进制；只有 WSL 进程可正常进行网络通信）
+  - **看代码、改代码、git 操作（提交、拉取、status/diff/log）**：优先用 Git Bash 直接执行，无需挂载 WSL
+  - **编译、运行、测试、调试、依赖等一切执行类命令（`go build`、`go run`、`go test`、`dlv`、`go mod`）**：必须通过 WSL 执行（两条硬约束：项目二进制只能在 Linux 编译和运行；Windows 对项目二进制进程做了网络管控不能出网）
   - WSL 执行命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
   - **WSL 执行前必须检查 bind mount**（仅在需要执行程序时）：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
   - 未挂载则执行：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
@@ -211,13 +211,15 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 **操作类型分工：**
 
-| 操作类型                       | 执行环境                         |
-| ------------------------------ | -------------------------------- |
-| 读文件、改文件、搜索、列目录   | Git Bash 或 Windows 工具直接执行 |
-| git status/diff/log/add/commit | Git Bash 直接执行                |
-| 启动程序、运行测试、构建二进制 | **必须 WSL**                     |
-| 调试（dlv）、安装依赖          | **必须 WSL**                     |
-| 任何需要网络通信的进程         | **必须 WSL**                     |
+| 操作类型                                 | 执行环境     |
+| ---------------------------------------- | ------------ |
+| 看代码、改代码（读写文件、搜索、列目录） | Git Bash     |
+| git 提交、拉取、status / diff / log      | Git Bash     |
+| 编译 `go build`                          | **必须 WSL** |
+| 运行 `go run` / 启动服务                 | **必须 WSL** |
+| 测试 `go test`                           | **必须 WSL** |
+| 调试 `dlv`                               | **必须 WSL** |
+| 依赖 `go mod download` / `tidy`          | **必须 WSL** |
 
 **WSL 执行两条硬约束：**
 

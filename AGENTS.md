@@ -61,11 +61,13 @@
 
 | 操作类型 | 执行环境 |
 |---------|---------|
-| 读文件、改文件、搜索、列目录 | Git Bash 或 Windows 工具直接执行 |
-| git status/diff/log/add/commit | Git Bash 直接执行 |
-| 启动程序、运行测试、构建二进制 | **必须 WSL** |
-| 调试（dlv）、安装依赖 | **必须 WSL** |
-| 任何需要网络通信的进程 | **必须 WSL** |
+| 看代码、改代码（读写文件、搜索、列目录） | Git Bash |
+| git 提交、拉取、status / diff / log | Git Bash |
+| 编译 `go build` | **必须 WSL** |
+| 运行 `go run` / 启动服务 | **必须 WSL** |
+| 测试 `go test` | **必须 WSL** |
+| 调试 `dlv` | **必须 WSL** |
+| 依赖 `go mod download` / `tidy` | **必须 WSL** |
 
 **WSL 执行两条硬约束：**
 - Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行

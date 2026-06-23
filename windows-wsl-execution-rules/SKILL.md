@@ -1,38 +1,51 @@
 ---
 name: windows-wsl-execution-rules
-description: 当当前工作目录位于 Windows 盘符路径（如 C:\、D:\、E:\、F:\）时强制生效，无需用户主动提及 WSL。所有项目的启动、调试、测试、构建、安装依赖、运行脚本均必须通过 WSL 执行，禁止在 PowerShell 或 Git Bash 中直接运行项目命令。代码在 Windows 侧编辑，执行环境强制为 WSL，因为 Windows 无法运行项目二进制文件且存在网络限制，只有 WSL 进程才能正常进行网络通信。VSCode 的 launch.json 和 tasks.json 也必须通过 WSL 管道或 dlv 远程调试协议完成调试。不要用它代替具体语言/框架的实现、测试策略、编码规则或 WSL 安装说明。
+description: 当当前工作目录位于 Windows 盘符路径（如 C:\、D:\、E:\、F:\）时强制生效，无需用户主动提及 WSL。核心原则：只有看代码、改代码、git 操作（提交、拉取、status/diff/log）在 Windows 侧用 Git Bash；编译、运行、测试、调试、依赖等一切执行类命令（go build、go run、go test、dlv、go mod）都必须在 WSL 中执行。根本原因是 Windows 对项目二进制进程做了网络管控、不能出网，且二进制只能在 Linux 环境编译和运行，只有 WSL 进程才能正常联网。WSL 执行前需检查 bind mount 是否就绪，未挂载则先挂载。VSCode 的 launch.json 和 tasks.json 通过 WSL 管道或 dlv 远程调试协议完成调试。不要用它代替具体语言/框架的实现、测试策略、编码规则或 WSL 安装说明。
 ---
 
-# Windows -> WSL 强制执行规则
+# Windows / WSL 执行规则
 
 本规则在以下环境中**强制生效**，无需用户手动触发：
 
 - 仓库位于 Windows 目录，例如 `D:\luode\project`、`F:\code\app`
 - 代码编辑发生在 Windows 侧（Codex 桌面端、VSCode、资源管理器）
-- Windows 目录已挂载到 WSL 路径，例如 `D:\luode\project` → `/mnt/d/luode/project`
 
-**强制 WSL 执行的根本原因（两条硬约束）：**
+## 执行环境分工（核心）
 
-1. **二进制无法在 Windows 运行**：项目编译产物（Go 二进制等）只能在 Linux 环境执行，直接在 PowerShell 中运行会失败
-2. **网络限制**：只有 WSL 进程才能正常进行网络通信，PowerShell / Git Bash 中运行的进程受网络策略限制，无法访问内外网资源
+| 操作类型 | 执行环境 |
+|---------|---------|
+| 看代码、改代码（读写文件、搜索、列目录） | **Git Bash** |
+| git 提交、拉取、status / diff / log | **Git Bash** |
+| 编译 `go build` | **WSL** |
+| 运行 `go run` / 启动服务 | **WSL** |
+| 测试 `go test` | **WSL** |
+| 调试 `dlv` | **WSL** |
+| 依赖 `go mod download` / `tidy` | **WSL** |
+
+**判定口诀：只有看代码、改代码、git 操作用 Git Bash；编译、运行、测试、调试、依赖等一切执行类命令都在 WSL。**
+
+**为什么执行类必须走 WSL（两条硬约束）：**
+
+1. **二进制无法在 Windows 运行**：项目编译产物（Go 二进制等）面向 Linux 环境，编译和运行都只能在 WSL 内执行
+2. **网络管控**：Windows 对项目二进制进程做了网络管控、不能出网；只有 WSL 进程才能正常访问内外网资源
 
 ## 自动触发信号
 
-满足以下任一条件，本规则**无条件强制介入**：
+满足以下任一条件，本规则**无条件强制介入**（并据分工表判断走 Git Bash 还是 WSL）：
 
 - 当前工作目录路径含有 Windows 盘符，例如 `C:\`、`D:\`、`E:\`、`F:\`
 - 用户提到 `Windows`、`WSL`、`Git Bash`、`Ubuntu`、`Linux 环境`
 - 用户说明项目代码位于 Windows 盘符目录
-- 当前任务包含：启动、调试、测试、构建、安装依赖、运行脚本、查看运行时错误
+- 当前任务包含：编译、启动、调试、测试、运行脚本、依赖拉取、查看运行时错误（这些走 WSL）
 - 项目根目录含有 `go.mod`、`package.json`、`Cargo.toml`、`requirements.txt`、`Makefile` 等项目入口文件
 
 ## 进入后先做什么
 
-1. 确认当前项目根目录位于 Windows 盘符路径（如 `D:\luode\project`）。
-2. 将路径转换为对应的 WSL 挂载路径（如 `/mnt/d/luode/project`）。
-3. 所有项目命令**必须**通过 `wsl.exe -e bash -lc "cd '<WSL_PATH>' && <COMMAND>"` 执行。
-4. VSCode 调试任务（`tasks.json`）同样通过 `wsl.exe` shell 执行；调试配置（`launch.json`）通过 `dlv` 远程协议连接 WSL 内的调试器。
-5. 不存在"先试 PowerShell，失败再换 WSL"的回退逻辑——直接走 WSL，不走回退。
+1. 先按分工表判断当前命令属于 Git Bash 还是 WSL。
+2. **Git Bash 类**（看代码、改代码、git 操作）：直接在 Windows 侧用 Git Bash 执行，使用 Windows 路径，无需挂载 WSL。
+3. **WSL 类**（编译、运行、测试、调试、依赖）：先把路径转换为 WSL 用户工作路径，检查 bind mount 就绪后，通过 `wsl.exe -e bash -lc "cd '<WSL_PATH>' && <COMMAND>"` 执行。
+4. VSCode 调试任务（`tasks.json`）通过 `wsl.exe` shell 执行；调试配置（`launch.json`）通过 `dlv` 远程协议连接 WSL 内的调试器。
+5. WSL 类命令不存在"先试 Git Bash，失败再换 WSL"的回退——直接走 WSL。
 
 ## 团队默认路径约定
 
@@ -48,7 +61,9 @@ description: 当当前工作目录位于 Windows 盘符路径（如 C:\、D:\、
 
 ## WSL 挂载检查与挂载流程
 
-**在执行任何 WSL 命令之前，必须先检查用户工作路径是否已 bind mount**，流程如下：
+> 仅 **WSL 类命令**（编译、运行、测试、调试、依赖）执行前需要本流程；看代码、改代码、git 操作直接用 Windows 路径，无需挂载。
+
+**在执行 WSL 类命令之前，必须先检查用户工作路径是否已 bind mount**，流程如下：
 
 ### 第一步：检查 bind mount 是否就绪
 
@@ -110,25 +125,23 @@ bind mount 目标路径规则（第二步）：
 
 如果项目本身已经位于 WSL 内部路径，例如 `\\wsl$\Ubuntu\home\user\repo`，优先确认是否可直接通过对应发行版中的 Linux 路径执行；不要再强行走 bind mount 规则。
 
-## 强制执行策略
+## 执行环境职责
 
-**Windows 侧只负责**（不执行任何项目命令）：
-- 编辑源代码文件
-- 浏览仓库目录结构
-- 读取日志、产物文件
-- 调用 `wsl.exe` 向 WSL 发起命令
+**Git Bash 负责**（看代码、改代码、git，Windows 侧直接执行，无需挂载）：
+- 编辑、读写源代码文件
+- 浏览目录、搜索、列目录、读取日志与产物
+- git 提交、拉取、status / diff / log
 
-**WSL 侧强制承担所有执行任务**：
-- 安装依赖（`go mod download`、`pnpm install` 等）
-- 启动开发服务
-- 构建二进制（`go build`）
-- 运行测试（`go test ./...`）
-- 格式化、lint、typecheck
-- 运行项目脚本
-- 启动调试器（`dlv`）
-- 所有需要网络通信的进程
+**WSL 负责**（一切执行类命令）：
+- 编译 `go build`
+- 启动开发服务、`go run`
+- 运行测试 `go test ./...`
+- 启动调试器 `dlv`
+- 依赖拉取 `go mod download` / `go mod tidy`
+- lint、typecheck 等需要运行工具链或出网的命令
+- 所有需要出网的进程
 
-**原因**：Windows 无法运行项目二进制，且只有 WSL 进程可以正常使用网络。
+**原因**：项目二进制只能在 Linux 环境编译和运行，且 Windows 对项目二进制进程做了网络管控不能出网，只有 WSL 进程才能正常联网。
 
 ## 团队目录与工作流
 
@@ -142,12 +155,12 @@ bind mount 目标路径规则（第二步）：
 
 ### 工作流分工
 
-1. **Windows 侧负责编辑**
+1. **Windows 侧负责看代码、改代码、git**
    - VSCode 直接打开 `D:\luode\<project>`
-   - 资源管理器、编辑器操作 Windows 真实文件
-2. **WSL 侧负责所有执行**
-   - 启动项目、调试、测试、构建、安装依赖
-   - 所有需要网络的进程均在 WSL 内运行
+   - Git Bash 执行读写文件、git 提交与拉取
+2. **WSL 侧负责一切执行**
+   - 编译、启动、调试、测试、依赖拉取
+   - 所有执行类命令均在 WSL 内运行
 
 ### bind mount 挂载步骤
 
@@ -183,14 +196,17 @@ sudo mount -a
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
 ```
 
-Go 项目示例（团队主要技术栈）：
+Go 项目示例（一切执行类都走 WSL，团队主要技术栈）：
 
 ```powershell
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go build ./..."
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go test ./..."
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go run ./cmd/server"
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && dlv dap --listen=:2345 --headless=true --log"
+wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go mod download"
 ```
+
+看代码、改代码、git 提交与拉取直接在 Git Bash 用 Windows 路径执行，无需走 WSL。
 
 如果需要加载 shell 环境、nvm、asdf、pyenv 或其他 profile 逻辑，可改用：
 
@@ -202,24 +218,24 @@ wsl.exe -e bash -lic "cd '/home/luode/d/luode/<project>' && <COMMAND>"
 
 ## 命令选择规则
 
-- 用户说“启动项目”“跑测试”“调试一下”“验证构建”时，先推断真实项目命令，再通过 WSL 执行。
+- 用户说“启动项目”“跑测试”“调试一下”“编译验证”时，先推断真实项目命令，再通过 WSL 执行。
 - 如果项目已有 `package.json`、`Makefile`、`justfile`、`pytest.ini`、`go.mod`、`Cargo.toml`、`manage.py` 等入口，优先复用项目已有命令。
 - 如果项目已有仓库级脚本或 README 说明，遵循项目已有执行入口，不要额外发明 Windows 侧替代命令。
 
-## 允许直接在 Windows 执行的情况
+## 用 Git Bash 直接在 Windows 执行的情况
 
-以下情况可以继续在 Windows 侧执行，而不强制切 WSL：
+以下情况优先用 Git Bash，不切 WSL、不需要挂载：
 
-- 纯文件搜索、读文件、列目录
-- Git 状态查看、差异查看、日志查看
+- 看代码、改代码（读文件、改文件、文件搜索、列目录）
+- git 全部操作（提交、拉取、status / diff / log）
 - 明确属于 Windows 系统管理的命令
 - 仅操作 Windows 本地产物，且与 Linux 运行环境无关
 
 ## 不要这样做
 
-- 不要在 Windows PowerShell 或 Git Bash 中直接执行 `go build`、`go test`、`go run`、`dlv`、`pnpm`、`npm`、`yarn`、`pytest` 等项目命令
-- 不要假设”Git Bash 已经够用”——Git Bash 不是 WSL，网络限制同样存在
-- 不要只切到 Windows 工作目录就假设命令环境已经正确
+- 不要在 Git Bash 或 PowerShell 中直接运行**任何执行类命令**（`go build`、`go run`、`go test`、`dlv`、`go mod download`、`pnpm dev` 等）——这些必须走 WSL
+- 不要把看代码、改代码、git 操作强行塞进 WSL——这些用 Git Bash 即可，无需挂载
+- 不要因为命令"看起来简单"（如 `go build`）就在 Git Bash 跑——编译产物面向 Linux，必须 WSL
 - 不要忽略路径换算，直接把 `D:\...` 原样塞进 `bash -lc`
 - 不要在 `tasks.json` 或 `launch.json` 中使用 `cmd`、`powershell` 作为 shell 运行项目命令
 - 不要试图在 Windows 侧直接运行 `dlv`——调试器必须在 WSL 内启动

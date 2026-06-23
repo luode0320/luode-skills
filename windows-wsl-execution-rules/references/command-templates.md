@@ -28,8 +28,10 @@ wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
 
 ## Go 项目（团队主要技术栈）
 
+> 一切执行类命令（编译、测试、运行、调试、依赖）都走 WSL；看代码、改代码、git 操作用 Git Bash。
+
 ```powershell
-# 构建
+# 编译
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go build ./..."
 
 # 测试（全量）
@@ -44,11 +46,11 @@ wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go run ./cmd/serv
 # 启动 dlv 调试器（供 VSCode 远程 attach）
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && dlv dap --listen=:2345 --headless=true --log"
 
+# 依赖拉取
+wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go mod download"
+
 # 格式化
 wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && gofmt -w . && goimports -w ."
-
-# 依赖下载
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go mod download"
 ```
 
 ---
