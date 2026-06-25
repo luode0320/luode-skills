@@ -1,306 +1,101 @@
 ---
 name: windows-wsl-execution-rules
-description: 当当前工作目录位于 Windows 盘符路径（如 C:\、D:\、E:\、F:\）时强制生效，无需用户主动提及 WSL。核心原则：只有看代码、改代码、git 操作（提交、拉取、status/diff/log）在 Windows 侧用 Git Bash；编译、运行、测试、调试、依赖等一切执行类命令（go build、go run、go test、dlv、go mod）都必须在 WSL 中执行。根本原因是 Windows 对项目二进制进程做了网络管控、不能出网，且二进制只能在 Linux 环境编译和运行，只有 WSL 进程才能正常联网。WSL 执行前需检查 bind mount 是否就绪，未挂载则先挂载。VSCode 的 launch.json 和 tasks.json 通过 WSL 管道或 dlv 远程调试协议完成调试。不要用它代替具体语言/框架的实现、测试策略、编码规则或 WSL 安装说明。
+description: 当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\wsl.localhost\<distro>\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。
 ---
 
-# Windows / WSL 执行规则
+# Windows / WSL 执行规范（代码在 WSL）
 
-本规则在以下环境中**强制生效**，无需用户手动触发：
+## 适用场景
 
-- 仓库位于 Windows 目录，例如 `D:\luode\project`、`F:\code\app`
-- 代码编辑发生在 Windows 侧（Codex 桌面端、VSCode、资源管理器）
+项目代码放在 WSL 文件系统内（如 `/home/<user>/<project>`），开发在 Windows 环境进行。
 
-## 执行环境分工（核心）
+## 核心架构：先看 agent 在哪运行
 
-| 操作类型 | 执行环境 |
+### 情况一：agent 在 WSL（推荐，最简单）
+
+- 代码在 WSL、agent 在 WSL，本地直接访问
+- 直接执行 `go build` / `go test` / `go run` / `dlv`，**无需任何包裹**
+- 进程天然在 WSL，联网正常
+
+### 情况二：agent 在 Windows（如 Claude Desktop GUI）
+
+- **shell 默认用 Git Bash**
+- **看代码、改代码**：通过 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+- **编译、运行、测试、调试**：通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
+
+## 为什么执行/调试必须在 WSL
+
+- 只有 WSL 进程才能正常联网（Windows 上启动的进程受网络管控）
+- 二进制面向 Linux，只能在 WSL 编译和运行
+
+## 路径约定
+
+代码在 WSL 内，两种访问方式：
+
+| 用途 | 路径形式 |
+|------|---------|
+| WSL 内执行（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` |
+| Windows 侧看代码/改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` |
+
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
+- **不再使用 `/mnt/<drive>`**——代码不在 Windows 盘。
+
+## 执行环境分工（agent 在 Windows 时）
+
+| 操作类型 | 执行方式 |
 |---------|---------|
-| 看代码、改代码（读写文件、搜索、列目录） | **Git Bash** |
-| git 提交、拉取、status / diff / log | **Git Bash** |
-| 编译 `go build` | **WSL** |
-| 运行 `go run` / 启动服务 | **WSL** |
-| 测试 `go test` | **WSL** |
-| 调试 `dlv` | **WSL** |
-| 依赖 `go mod download` / `tidy` | **WSL** |
+| 看代码、改代码（读写文件、搜索） | Git Bash，经 `\\wsl.localhost\...` 访问 |
+| git 提交、拉取、status / diff / log | Git Bash（经 `\\wsl.localhost\...`）或 WSL 内 |
+| 编译 / 运行 / 测试 / 调试 / 依赖 | `wsl.exe --cd /home/<user>/<project> <command>` |
 
-**判定口诀：只有看代码、改代码、git 操作用 Git Bash；编译、运行、测试、调试、依赖等一切执行类命令都在 WSL。**
+## 命令模板（agent 在 Windows 时）
 
-**为什么执行类必须走 WSL（两条硬约束）：**
-
-1. **二进制无法在 Windows 运行**：项目编译产物（Go 二进制等）面向 Linux 环境，编译和运行都只能在 WSL 内执行
-2. **网络管控**：Windows 对项目二进制进程做了网络管控、不能出网；只有 WSL 进程才能正常访问内外网资源
-
-## 自动触发信号
-
-满足以下任一条件，本规则**无条件强制介入**（并据分工表判断走 Git Bash 还是 WSL）：
-
-- 当前工作目录路径含有 Windows 盘符，例如 `C:\`、`D:\`、`E:\`、`F:\`
-- 用户提到 `Windows`、`WSL`、`Git Bash`、`Ubuntu`、`Linux 环境`
-- 用户说明项目代码位于 Windows 盘符目录
-- 当前任务包含：编译、启动、调试、测试、运行脚本、依赖拉取、查看运行时错误（这些走 WSL）
-- 项目根目录含有 `go.mod`、`package.json`、`Cargo.toml`、`requirements.txt`、`Makefile` 等项目入口文件
-
-## 进入后先做什么
-
-1. 先按分工表判断当前命令属于 Git Bash 还是 WSL。
-2. **Git Bash 类**（看代码、改代码、git 操作）：直接在 Windows 侧用 Git Bash 执行，使用 Windows 路径，无需挂载 WSL。
-3. **WSL 类**（编译、运行、测试、调试、依赖）：先把路径转换为 WSL 用户工作路径，检查 bind mount 就绪后，通过 `wsl.exe -e bash -lc "cd '<WSL_PATH>' && <COMMAND>"` 执行。
-4. VSCode 调试任务（`tasks.json`）通过 `wsl.exe` shell 执行；调试配置（`launch.json`）通过 `dlv` 远程协议连接 WSL 内的调试器。
-5. WSL 类命令不存在"先试 Git Bash，失败再换 WSL"的回退——直接走 WSL。
-
-## 团队默认路径约定
-
-团队项目统一放在 `D:\luode\` 下，路径分三层：
-
-| 层级 | 路径 | 说明 |
-|------|------|------|
-| Windows 源码路径 | `D:\luode\ellipal_admin` | 代码实际存放位置，VSCode 编辑 |
-| WSL 自动挂载路径 | `/mnt/d/luode/ellipal_admin` | WSL 启动时自动挂载，作为 bind 的源 |
-| WSL 用户工作路径 | `/home/luode/d/luode/ellipal_admin` | bind mount 目标，**所有项目命令在此执行** |
-
-**项目命令统一使用用户工作路径 `/home/luode/d/luode/<project>`，不使用 `/mnt/d/...`。**
-
-## WSL 挂载检查与挂载流程
-
-> 仅 **WSL 类命令**（编译、运行、测试、调试、依赖）执行前需要本流程；看代码、改代码、git 操作直接用 Windows 路径，无需挂载。
-
-**在执行 WSL 类命令之前，必须先检查用户工作路径是否已 bind mount**，流程如下：
-
-### 第一步：检查 bind mount 是否就绪
+默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`：
 
 ```powershell
-wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/ellipal_admin && echo 'mounted' || echo 'not_mounted'"
+# 测试
+wsl.exe --cd /home/<user>/<project> go test ./...
+# 运行
+wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
+# 调试
+wsl.exe --cd /home/<user>/<project> dlv debug ./cmd/<app>
+# 依赖
+wsl.exe --cd /home/<user>/<project> go mod download
 ```
 
-- 输出 `mounted`：直接进入第三步执行项目命令
-- 输出 `not_mounted`：进入第二步执行 bind mount
-
-### 第二步：执行 bind mount
-
-```powershell
-wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount --bind /mnt/d/luode/ellipal_admin /home/luode/d/luode/ellipal_admin"
-```
-
-若需要持久化（WSL 重启后自动挂载），追加 fstab：
-
-```powershell
-wsl.exe -e bash -lc "grep -v '/mnt/d/luode/ellipal_admin' /etc/fstab | sudo tee /etc/fstab && echo '/mnt/d/luode/ellipal_admin    /home/luode/d/luode/ellipal_admin    none    bind    0 0' | sudo tee -a /etc/fstab && mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount -a"
-```
-
-**⚠️ 如果 sudo 要求交互式输入 root 密码，必须立即停止自动执行，通知用户：**
-
-> "WSL bind mount 需要 root 密码，请在 WSL 终端中手动执行以下命令，完成后告知我：
-> ```bash
-> mkdir -p /home/luode/d/luode/ellipal_admin
-> sudo mount --bind /mnt/d/luode/ellipal_admin /home/luode/d/luode/ellipal_admin
-> ```
-> 完成后请回复，我将继续执行后续步骤。"
-
-等待用户确认后，重新执行第一步验证挂载成功，再继续。
-
-### 第三步：执行项目命令
-
-挂载确认后，使用用户工作路径执行命令：
-
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-
-## 路径换算规则
-
-Windows 路径经过两步转换，最终得到 WSL 用户工作路径：
-
-```
-D:\luode\ellipal_admin
-  → /mnt/d/luode/ellipal_admin      (WSL 自动挂载，第一步)
-  → /home/luode/d/luode/ellipal_admin  (bind mount，第二步，实际使用路径)
-```
-
-通用换算（第一步，Windows → WSL 自动挂载路径）：
-- 盘符转小写，去掉 `:`，`\` 改为 `/`，前缀 `/mnt/`
-- `D:\luode\project` → `/mnt/d/luode/project`
-
-bind mount 目标路径规则（第二步）：
-- 格式：`/home/<user>/d/<win-path-without-drive>`
-- `D:\luode\ellipal_admin` → `/home/luode/d/luode/ellipal_admin`
-
-如果项目本身已经位于 WSL 内部路径，例如 `\\wsl$\Ubuntu\home\user\repo`，优先确认是否可直接通过对应发行版中的 Linux 路径执行；不要再强行走 bind mount 规则。
-
-## 执行环境职责
-
-**Git Bash 负责**（看代码、改代码、git，Windows 侧直接执行，无需挂载）：
-- 编辑、读写源代码文件
-- 浏览目录、搜索、列目录、读取日志与产物
-- git 提交、拉取、status / diff / log
-
-**WSL 负责**（一切执行类命令）：
-- 编译 `go build`
-- 启动开发服务、`go run`
-- 运行测试 `go test ./...`
-- 启动调试器 `dlv`
-- 依赖拉取 `go mod download` / `go mod tidy`
-- lint、typecheck 等需要运行工具链或出网的命令
-- 所有需要出网的进程
-
-**原因**：项目二进制只能在 Linux 环境编译和运行，且 Windows 对项目二进制进程做了网络管控不能出网，只有 WSL 进程才能正常联网。
-
-## 团队目录与工作流
-
-### 目录约定
-
-项目真实文件放在 `D:\luode\` 下，WSL 通过 bind mount 映射到用户目录：
-
-- Windows：`D:\luode\ellipal_admin`
-- WSL 自动挂载：`/mnt/d/luode/ellipal_admin`（桥梁，不直接使用）
-- WSL 用户工作路径：`/home/luode/d/luode/ellipal_admin`（**实际执行路径**）
-
-### 工作流分工
-
-1. **Windows 侧负责看代码、改代码、git**
-   - VSCode 直接打开 `D:\luode\<project>`
-   - Git Bash 执行读写文件、git 提交与拉取
-2. **WSL 侧负责一切执行**
-   - 编译、启动、调试、测试、依赖拉取
-   - 所有执行类命令均在 WSL 内运行
-
-### bind mount 挂载步骤
-
-首次使用或 WSL 重启后需要挂载：
+agent 在 WSL 时直接执行，无需 `wsl.exe`：
 
 ```bash
-# 临时挂载（WSL 重启后失效）
-mkdir -p /home/luode/d/luode/ellipal_admin
-sudo mount --bind /mnt/d/luode/ellipal_admin /home/luode/d/luode/ellipal_admin
+cd /home/<user>/<project> && go test ./...
 ```
 
-持久化（写入 fstab，WSL 重启后自动生效）：
+## WSL 内缓存目录建议
+
+代码在 WSL 原生文件系统，I/O 性能好。Go 缓存默认即可，如需显式设置：
 
 ```bash
-grep -v '/mnt/d/luode/ellipal_admin' /etc/fstab | sudo tee /etc/fstab
-echo '/mnt/d/luode/ellipal_admin    /home/luode/d/luode/ellipal_admin    none    bind    0 0' | sudo tee -a /etc/fstab
-mkdir -p /home/luode/d/luode/ellipal_admin
-sudo mount -a
+export GOCACHE=$HOME/.cache/go-build
+export GOMODCACHE=$HOME/go/pkg/mod
 ```
 
-### 推荐边界
+## 不推荐做法
 
-- Windows 打开文件用真实盘符路径 `D:\luode\...`
-- WSL 命令执行用 bind mount 后的用户工作路径 `/home/luode/d/luode/...`
-- 不把 `\\wsl.localhost\...` 当成 Windows 访问 Windows 挂载盘的稳定入口
-- 若代码真实放在 WSL 内部目录，则 Windows 打开和 Codex 协作方式应重新单独规划
+- 不要在 Windows 原生 Go 环境跑需联网的项目。
+- 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
+- agent 在 Windows 时，不要用 PowerShell 作默认 shell——用 Git Bash。
+- 不要再用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`。
 
-## 固定命令模板
+## 约束总结
 
-默认模板（使用用户 bind mount 路径）：
-
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-
-Go 项目示例（一切执行类都走 WSL，团队主要技术栈）：
-
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go build ./..."
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go test ./..."
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go run ./cmd/server"
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && dlv dap --listen=:2345 --headless=true --log"
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go mod download"
-```
-
-看代码、改代码、git 提交与拉取直接在 Git Bash 用 Windows 路径执行，无需走 WSL。
-
-如果需要加载 shell 环境、nvm、asdf、pyenv 或其他 profile 逻辑，可改用：
-
-```powershell
-wsl.exe -e bash -lic "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-
-仅当项目明确依赖交互式登录 shell 初始化时才使用 `-lic`；默认优先 `-lc`。
-
-## 命令选择规则
-
-- 用户说“启动项目”“跑测试”“调试一下”“编译验证”时，先推断真实项目命令，再通过 WSL 执行。
-- 如果项目已有 `package.json`、`Makefile`、`justfile`、`pytest.ini`、`go.mod`、`Cargo.toml`、`manage.py` 等入口，优先复用项目已有命令。
-- 如果项目已有仓库级脚本或 README 说明，遵循项目已有执行入口，不要额外发明 Windows 侧替代命令。
-
-## 用 Git Bash 直接在 Windows 执行的情况
-
-以下情况优先用 Git Bash，不切 WSL、不需要挂载：
-
-- 看代码、改代码（读文件、改文件、文件搜索、列目录）
-- git 全部操作（提交、拉取、status / diff / log）
-- 明确属于 Windows 系统管理的命令
-- 仅操作 Windows 本地产物，且与 Linux 运行环境无关
-
-## 不要这样做
-
-- 不要在 Git Bash 或 PowerShell 中直接运行**任何执行类命令**（`go build`、`go run`、`go test`、`dlv`、`go mod download`、`pnpm dev` 等）——这些必须走 WSL
-- 不要把看代码、改代码、git 操作强行塞进 WSL——这些用 Git Bash 即可，无需挂载
-- 不要因为命令"看起来简单"（如 `go build`）就在 Git Bash 跑——编译产物面向 Linux，必须 WSL
-- 不要忽略路径换算，直接把 `D:\...` 原样塞进 `bash -lc`
-- 不要在 `tasks.json` 或 `launch.json` 中使用 `cmd`、`powershell` 作为 shell 运行项目命令
-- 不要试图在 Windows 侧直接运行 `dlv`——调试器必须在 WSL 内启动
-
-## VSCode 调试配置规范（Go 项目）
-
-项目必须维护 `.vscode/launch.json` 和 `.vscode/tasks.json`，用于在 VSCode 中通过 WSL 完成调试。
-
-**调试架构**：
-
-```
-VSCode (Windows) ──DAP协议──► dlv dap (WSL 内)
-                                    │
-                              /mnt/d/luode/project (WSL 挂载的 Windows 目录)
-```
-
-### tasks.json 规范
-
-`tasks.json` 中所有 shell 命令必须使用 `wsl.exe` 作为执行器：
-
-- `”type”: “shell”`
-- `”command”: “wsl.exe”`
-- args 格式：`[“-e”, “bash”, “-lc”, “cd '<WSL_PATH>' && <COMMAND>”]`
-
-常见任务类型：`go build`、`go test`、启动 `dlv dap` 监听端口。
-
-### launch.json 规范
-
-Go 调试配置必须使用远程附加模式，通过端口连接 WSL 内运行的 `dlv`：
-
-- `”type”: “go”`
-- `”request”: “attach”`
-- `”mode”: “remote”`
-- `”port”: 2345`（与 `dlv dap --listen=:2345` 对应）
-- `”substitutePath”`：映射 Windows 工作目录与 WSL 挂载路径，用于断点对齐
-
-详细模板见 `references/vscode-debug-config.md`。
-
-### VSCode 调试流程
-
-1. 在 VSCode 中运行 `tasks.json` 中的”WSL: Start dlv”任务，在 WSL 内启动 `dlv dap`
-2. VSCode 的 Go 调试器通过 `localhost:2345` 连接 WSL 内的 `dlv`
-3. `substitutePath` 确保 Windows 侧的断点与 WSL 侧的源码路径正确对齐
-4. 所有运行时网络请求均由 WSL 内的进程发出，不受 Windows 网络限制
+**代码在 WSL；agent 在 WSL 直接干，agent 在 Windows 则 Git Bash 默认 shell + `\\wsl.localhost` 看代码、`wsl.exe --cd` 进 WSL 执行与调试。**
 
 ## 与其他规则的协作
 
-- 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把”Windows 编辑、WSL 执行”的约束写入仓库规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）
-- 涉及测试覆盖和回归策略时，让路给 `test-strategy-rules`、`test-regression-rules`
-- 涉及语言或框架本身的命令选择时，让路给对应语言/框架 skill（Go 项目联动 `golang-patterns`）
-- 涉及 Windows 中文编码、日志重定向或 PowerShell 落盘时，可联动 `windows-encoding-rules`
-
-## 默认输出要求
-
-当本 skill 被命中且实际执行了项目命令时，结果说明至少应包含：
-
-- Windows 原始项目路径
-- 换算后的 WSL 项目路径
-- 实际执行的 WSL 命令
-- 是否成功进入 WSL 并执行
-- 若失败，失败发生在”路径换算 / 进入目录 / 命令执行”哪一层
+- 涉及 Windows 中文编码、Git Bash 落盘细节时，联动 `windows-encoding-rules`。
+- 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
 
 ## 参考资料读取规则
 
 - 默认先读 `references/command-templates.md`
-- 需要 VSCode `launch.json` / `tasks.json` 模板时，读 `references/vscode-debug-config.md`
-- 只有在需要确认路径转换细节或边界场景时，再读 `references/path-mapping.md`
-- 需要团队推荐目录、协作方式或挂载命令时，再读 `references/recommended-workflow.md`
+- 需要路径访问细节时读 `references/path-mapping.md`
+- 需要团队工作流时读 `references/recommended-workflow.md`

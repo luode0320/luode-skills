@@ -65,35 +65,19 @@
 
 ## Windows / WSL 执行规则
 
-> 详细规则见 `windows-wsl-execution-rules` skill。
+> 详细规则见 `windows-wsl-execution-rules` skill。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
 
-**操作类型分工：**
+**先看 agent 在哪运行：**
 
-| 操作类型 | 执行环境 |
-|---------|---------|
-| 看代码、改代码（读写文件、搜索、列目录） | Git Bash |
-| git 提交、拉取、status / diff / log | Git Bash |
-| 编译 `go build` | **必须 WSL** |
-| 运行 `go run` / 启动服务 | **必须 WSL** |
-| 测试 `go test` | **必须 WSL** |
-| 调试 `dlv` | **必须 WSL** |
-| 依赖 `go mod download` / `tidy` | **必须 WSL** |
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 Windows（如 Claude Desktop GUI）**：
+  - shell 默认用 Git Bash
+  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**WSL 执行两条硬约束：**
-- Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
-- 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
+**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
 
-**WSL 执行命令格式：**`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
-
-**启动/调试前必须检查 bind mount：**
-- 检查：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
-- 未挂载：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
-- sudo 需要 root 密码时停止，通知用户手动完成后回复再继续
-
-**路径三层结构（执行时使用）：**
-- Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
-- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
-- WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
+**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
 
 **编码约束：**
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略

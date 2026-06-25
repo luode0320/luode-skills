@@ -73,6 +73,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 11. 若脚本未执行、执行失败、只同步了部分规则文件、或执行后未核对结果，判定为阻断，禁止宣称已完成自举。
 12. 必须确保文档包含以下最低规则：
 
+- 严禁脑补工具调用与结果（最高优先级）：任何文件/命令/搜索/网络的读取与执行必须经真实工具调用完成，严禁在正文编写 `<invoke>`/`<result>`/伪 function_calls 假装调用或凭记忆想象文件内容当结果；引用代码/行号/函数名前必须来自本轮真实工具返回；发现大段重复行、错乱行号、源码异常以代码块结束符收尾等迹象立即停止并重发真实工具调用、用 `md5sum`/`wc -c` 交叉校验。
 - Skill 命中强制规则：
   - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
   - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
@@ -97,16 +98,13 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
-- Windows / WSL 执行规则：
-  - **看代码、改代码、git 操作（提交、拉取、status/diff/log）**：优先用 Git Bash 直接执行，无需挂载 WSL
-  - **编译、运行、测试、调试、依赖等一切执行类命令（`go build`、`go run`、`go test`、`dlv`、`go mod`）**：必须通过 WSL 执行（两条硬约束：项目二进制只能在 Linux 编译和运行；Windows 对项目二进制进程做了网络管控不能出网）
-  - WSL 执行命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
-  - **WSL 执行前必须检查 bind mount**（仅在需要执行程序时）：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
-  - 未挂载则执行：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
-  - sudo 需要 root 密码时停止自动执行，通知用户手动完成后回复再继续
-  - 路径三层（仅执行时用）：`D:\luode\<project>` → `/mnt/d/luode/<project>`（桥梁）→ `/home/luode/d/luode/<project>`（执行）
+- Windows / WSL 执行规则（代码在 WSL 文件系统内 `/home/<user>/<project>`）：
+  - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹
+  - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；看代码/改代码/git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问；编译/运行/测试/调试通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
+  - 为什么执行/调试在 WSL：只有 WSL 进程能正常联网，且二进制面向 Linux
+  - 命令格式：`wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+  - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
-  - Windows 下出现大量无关文件改动，优先检查 `core.autocrlf`；`.sh` 出现 filemode 伪改动优先关闭 `core.filemode`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
 - 若仓库命中 Godot 项目标记，还必须补齐：
   - `## Godot 项目工具配置`
@@ -166,6 +164,14 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - “这不是核心 skill”
 - 违反本规则视为流程违规，必须立即停止当前执行，回到命中检查重走
 
+## 严禁脑补工具调用与结果（最高优先级，强制）
+
+- 任何对文件、命令、搜索、网络的读取与执行，必须通过真实工具调用（独立 tool call）完成；严禁在回复正文里编写 `<invoke>` / `<result>` / 伪 function_calls 文本假装调用工具，也禁止凭记忆“想象”文件内容当作已读取结果。
+- 引用任何文件内容、行号、函数名、配置值前，必须来自本轮真实工具返回；未真实读取不得断言具体代码或数据。
+- 若发现输出出现大段重复行、错乱或重复行号、源码文件莫名以 Markdown 代码块结束符收尾、import 与实际用法矛盾等异常，立即判定为生成异常：停止后重新发起真实工具调用，并用 `md5sum` / `wc -c` 等独立命令交叉校验再继续。
+- 关键文件读取建议附带指纹校验（`md5sum` + `wc -c`），确保所读即磁盘真实内容。
+- 违反本条视为最高级别流程违规。
+
 ## 严禁自动提交 Git（最高优先级，强制）
 
 - 绝对禁止在用户未于「当前这轮消息」显式提出提交的前提下，执行任何写入仓库历史的 Git 动作（`git commit`、`git commit --amend`、`git push`、`git rebase`、`git merge --no-ff` 等）。
@@ -217,48 +223,19 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
 
-**操作类型分工：**
+**先看 agent 在哪运行：**
 
-| 操作类型                                 | 执行环境     |
-| ---------------------------------------- | ------------ |
-| 看代码、改代码（读写文件、搜索、列目录） | Git Bash     |
-| git 提交、拉取、status / diff / log      | Git Bash     |
-| 编译 `go build`                          | **必须 WSL** |
-| 运行 `go run` / 启动服务                 | **必须 WSL** |
-| 测试 `go test`                           | **必须 WSL** |
-| 调试 `dlv`                               | **必须 WSL** |
-| 依赖 `go mod download` / `tidy`          | **必须 WSL** |
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 Windows（如 Claude Desktop GUI）**：
+  - shell 默认用 Git Bash
+  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**WSL 执行两条硬约束：**
+**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
 
-- Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
-- 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
-
-**WSL 执行命令格式：**
-
-```bash
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-````
-
-**启动/调试前必须检查 bind mount：**
-
-```bash
-# 检查挂载状态
-wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"
-# 未挂载时执行（sudo 需要密码则停止并通知用户手动完成）
-wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"
-```
-
-**VSCode 调试走 WSL：** `tasks.json` 使用 `wsl.exe` 执行器，`launch.json` 通过 `dlv dap` 远程协议连接
-
-**路径三层结构（仅执行时使用）：**
-
-- Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
-- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
-- WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
+**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
 
 **编码约束：**
 

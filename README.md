@@ -117,6 +117,12 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-22 23:42:06 docs: [MCP安装收口] 统一浏览器与Godot工具安装判定
 
+2026-06-25 15:32:07 fix: [WSL执行路径二次收敛] 代码已在 WSL 文件系统 废弃 /mnt 统一用 /home 路径
+
+2026-06-25 10:37:18 fix: [WSL执行路径收敛] 废弃 bind mount 统一改用 wsl.exe --cd /mnt 直接挂载
+
+2026-06-23 14:56:40 feat: [严禁脑补工具调用] 新增最高优先级强制规则到自举 Skill 与脚本
+
 2026-06-22 18:33:02 chore: [仓库基础配置] 新增 .editorconfig 与 .gitattributes 并统一 yaml 换行
 
 2026-06-22 18:11:40 feat: [规则文件兼容性] 全面适配 AGENTS.md / CLAUDE.md 双 AI 环境

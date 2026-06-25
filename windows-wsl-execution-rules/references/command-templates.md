@@ -1,85 +1,53 @@
 # 命令模板
 
-## 执行前：挂载检查三步流程
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。编译、运行、测试、调试、依赖都在 WSL 中执行。
 
-```powershell
-# 第一步：检查 bind mount 是否就绪
-wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/ellipal_admin && echo 'mounted' || echo 'not_mounted'"
+## agent 在 WSL（推荐）
 
-# 第二步（未挂载时）：执行 bind mount
-# 需要 root 密码时，停止自动执行，通知用户手动完成
-wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount --bind /mnt/d/luode/ellipal_admin /home/luode/d/luode/ellipal_admin"
+直接执行，无需包裹：
 
-# 若需要持久化（写入 fstab）
-wsl.exe -e bash -lc "grep -v '/mnt/d/luode/ellipal_admin' /etc/fstab | sudo tee /etc/fstab && echo '/mnt/d/luode/ellipal_admin    /home/luode/d/luode/ellipal_admin    none    bind    0 0' | sudo tee -a /etc/fstab && mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount -a"
+```bash
+cd /home/<user>/<project>
 
-# 第三步：挂载成功后执行项目命令（使用用户工作路径）
+go build ./...
+go test ./...
+go run ./cmd/<app>
+dlv debug ./cmd/<app>
+go mod download
 ```
 
----
+## agent 在 Windows（如 Claude Desktop GUI）
 
-## 通用模板
-
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-
----
-
-## Go 项目（团队主要技术栈）
-
-> 一切执行类命令（编译、测试、运行、调试、依赖）都走 WSL；看代码、改代码、git 操作用 Git Bash。
+shell 默认用 Git Bash；执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。
 
 ```powershell
 # 编译
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go build ./..."
+wsl.exe --cd /home/<user>/<project> go build ./...
 
-# 测试（全量）
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go test ./..."
+# 测试
+wsl.exe --cd /home/<user>/<project> go test ./...
 
-# 测试（指定包）
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go test ./internal/..."
+# 运行 / 启动服务
+wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
 
-# 启动服务
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go run ./cmd/server"
+# 调试
+wsl.exe --cd /home/<user>/<project> dlv debug ./cmd/<app>
 
-# 启动 dlv 调试器（供 VSCode 远程 attach）
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && dlv dap --listen=:2345 --headless=true --log"
-
-# 依赖拉取
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && go mod download"
-
-# 格式化
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/ellipal_admin' && gofmt -w . && goimports -w ."
+# 依赖下载
+wsl.exe --cd /home/<user>/<project> go mod download
 ```
 
----
+看代码、改代码、git 操作用 Git Bash，经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件。
 
-## Node / pnpm / npm
+## WSL 内缓存目录建议
 
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && pnpm install"
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && pnpm test"
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && pnpm dev"
+```bash
+export GOCACHE=$HOME/.cache/go-build
+export GOMODCACHE=$HOME/go/pkg/mod
 ```
 
----
+## 说明
 
-## Python
-
-```powershell
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && pytest"
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && python manage.py runserver"
-```
-
----
-
-## 需要登录 shell 的模板
-
-当命令依赖 `nvm`、`asdf`、`pyenv` 或 `.bashrc` 初始化时使用 `-lic`：
-
-```powershell
-wsl.exe -e bash -lic "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-
-仅在确认需要时使用，默认优先 `-lc`。
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
+- 代码已在 WSL，不再使用 `/mnt/<drive>` 路径。
+- 若命令依赖 `nvm`、`asdf`、`pyenv` 等 shell 初始化，可改用 `wsl.exe --cd /home/<user>/<project> bash -lic "<command>"`。

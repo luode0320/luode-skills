@@ -1,54 +1,23 @@
-# 路径映射规则
+# 路径访问规则
 
-## 团队路径三层结构
+代码放在 WSL 文件系统内。根据 agent 运行位置，用不同路径形式访问。
 
-```
-Windows 源码路径        D:\luode\ellipal_admin
-      ↓ WSL 自动挂载
-WSL 自动挂载路径        /mnt/d/luode/ellipal_admin
-      ↓ bind mount
-WSL 用户工作路径        /home/luode/d/luode/ellipal_admin   ← 所有命令在此执行
-```
+## 路径形式
 
-| Windows 路径 | WSL 自动挂载路径 | WSL 用户工作路径（实际使用） |
-|-------------|----------------|--------------------------|
-| `D:\luode\ellipal_admin` | `/mnt/d/luode/ellipal_admin` | `/home/luode/d/luode/ellipal_admin` |
-| `D:\luode\<project>` | `/mnt/d/luode/<project>` | `/home/luode/d/luode/<project>` |
+| 用途 | 路径形式 | 示例 |
+|------|---------|------|
+| WSL 内执行（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` | `/home/luode/myapp` |
+| Windows 侧看代码/改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` | `\\wsl.localhost\Ubuntu\home\luode\myapp` |
 
-**项目命令统一使用用户工作路径，不直接使用 `/mnt/d/...`。**
+## 说明
 
-## 路径换算步骤
-
-### 第一步：Windows → WSL 自动挂载路径
-1. 取出盘符并转小写（`D` → `d`）
-2. 去掉 `:`
-3. 将 `\` 替换为 `/`
-4. 前缀 `/mnt/`
-- 示例：`D:\luode\project` → `/mnt/d/luode/project`
-
-### 第二步：WSL 自动挂载路径 → 用户工作路径（bind mount）
-- 格式：`/home/<user>/d/<path-after-drive>`
-- 示例：`/mnt/d/luode/project` → `/home/luode/d/luode/project`
-
-## 挂载检查（执行命令前必须先确认）
-
-```powershell
-# 检查 bind mount 是否就绪
-wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/ellipal_admin && echo 'mounted' || echo 'not_mounted'"
-```
-
-未挂载时，执行 bind mount（需要 root 密码时暂停通知用户）：
-
-```powershell
-# 临时挂载（重启 WSL 后失效）
-wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount --bind /mnt/d/luode/ellipal_admin /home/luode/d/luode/ellipal_admin"
-
-# 持久化挂载（写入 fstab，重启后自动生效）
-wsl.exe -e bash -lc "grep -v '/mnt/d/luode/ellipal_admin' /etc/fstab | sudo tee /etc/fstab && echo '/mnt/d/luode/ellipal_admin    /home/luode/d/luode/ellipal_admin    none    bind    0 0' | sudo tee -a /etc/fstab && mkdir -p /home/luode/d/luode/ellipal_admin && sudo mount -a"
-```
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看（如 `Ubuntu`、`Ubuntu-24.04`）。
+- **执行类命令始终用 WSL 内路径 `/home/<user>/<project>`**（agent 在 Windows 时配合 `wsl.exe --cd`）。
+- **Windows 侧编辑器/文件访问用 `\\wsl.localhost\<distro>\...`** —— 这是 Windows 访问 WSL 原生文件的官方稳定方式。
+- 代码已在 WSL 内，**不再使用 `/mnt/<drive>`**（那是访问 Windows 盘的路径）。
 
 ## 注意事项
 
-- 如果路径中包含空格，进入 `bash -lc` 时要整体放进单引号。
-- 如果路径位于 `\\wsl$\<distro>\...`，不要再按三层结构转换，直接使用对应 Linux 原生路径。
-- WSL 自动挂载路径 `/mnt/d` 在 WSL 启动时由系统自动创建，通常不需要手动挂载；bind mount 到用户目录才需要手动操作。
+- 不要把 WSL 路径（`/home/...`）和 Windows UNC 路径（`\\wsl.localhost\...`）混用在同一命令上下文。
+- `wsl.exe --cd` 后必须是 WSL 内路径 `/home/<user>/<project>`，不是 UNC 路径。
+- 路径含空格时整体放进引号。
