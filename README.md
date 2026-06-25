@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-25 00:46:00 docs: [总结正反例] 增加需求对照示例
+
 2026-06-25 00:34:00 docs: [总结需求对照] 在收尾总结中补充模型理解的需求
 
 2026-06-25 00:17:00 docs: [总结结构强制] 让收尾总结必须命中 reasoning-summary-structure-rules
