@@ -1,45 +1,35 @@
 # 团队推荐目录与工作流
 
-为"Windows 编辑、WSL 运行 Go 项目"的团队提供一套简单流程。代码留在 Windows 目录，Go 进程通过 `wsl.exe` 在 WSL 中启动，路径直接用 `/mnt/<drive>/...`，无需 bind mount。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。编译、运行、测试、调试都在 WSL 中完成。
 
 ## 推荐目录
 
-项目真实文件放在 Windows 盘符目录，例如：
+- WSL 内：`/home/<user>/<project>`
+- Windows 侧访问（看代码/改代码）：`\\wsl.localhost\<distro>\home\<user>\<project>`
 
-- `D:\luode\<project>` → WSL 路径 `/mnt/d/luode/<project>`
+## 两种 agent 运行位置
 
-## 协作分工
+### agent 在 WSL（推荐）
 
-- **Windows 侧（Git Bash / 编辑器）**：
-  - Codex 桌面端 / VSCode 编辑真实文件
-  - 看代码、改代码、文件搜索
-  - git 提交、拉取、status / diff / log
-- **WSL 侧**：
-  - 编译、测试、运行、调试
-  - 依赖下载（`go mod download` / `go get`）
-  - 所有需要联网的 Go 进程
+- 直接 `cd /home/<user>/<project>` 后执行 `go test` / `go run` / `dlv`，无需任何包裹
+- 进程天然在 WSL，联网正常
 
-## VS Code 用法
+### agent 在 Windows（如 Claude Desktop GUI）
 
-二选一即可：
+- shell 默认用 Git Bash
+- 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问
+- 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 
-1. 直接打开 Windows 目录 `D:\luode\<project>`
-2. 用 WSL Remote 打开 `/mnt/d/luode/<project>`
+## 命令入口（agent 在 Windows 时）
 
-两者都可行，但 Go 命令执行仍落在 WSL 中。
-
-## 命令入口
-
-从 Windows 侧通过 `wsl.exe --cd` 进入 WSL 执行（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）：
+默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`：
 
 ```powershell
-wsl.exe --cd /mnt/d/luode/<project> go test ./...
-wsl.exe --cd /mnt/d/luode/<project> go run ./cmd/<app>
+wsl.exe --cd /home/<user>/<project> go test ./...
+wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
 ```
 
 ## 缓存目录建议
-
-为减少 Windows 盘缓存问题，在 WSL 中设置（写入 shell 配置持久生效）：
 
 ```bash
 export GOCACHE=$HOME/.cache/go-build
@@ -48,6 +38,6 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 ## 注意事项
 
-- 代码留在 Windows 目录，不要为了运行而迁移到 WSL 文件系统。
-- 不要把 Windows 路径直接传给 WSL 内部命令；`--cd` 后用 `/mnt/<drive>/...`。
-- 如需固定化操作，可在 Windows 侧封装统一入口脚本：统一工作目录、统一 Go 缓存目录、统一 WSL 发行版名。
+- 代码在 WSL 原生文件系统，I/O 性能好，无需 bind mount 或 `/mnt` 换算。
+- `wsl.exe --cd` 后用 WSL 内路径 `/home/<user>/<project>`；Windows 编辑器访问用 `\\wsl.localhost\...`。
+- 如需固定化操作，可在 Windows 侧封装统一入口脚本：统一工作目录、统一 WSL 发行版名。

@@ -1,114 +1,101 @@
 ---
 name: windows-wsl-execution-rules
-description: 当仓库代码位于 Windows 目录（C:\、D:\ 等盘符路径），但 Go 进程需要在 WSL 中运行时触发。核心约束：代码留在 Windows 目录不迁移；看代码/改代码/git 操作用 Git Bash；go build/run/test/dlv/mod 等一切 Go 运行行为必须通过 wsl.exe 进入 WSL 执行（Windows 上启动的 Go 进程无法联网，且二进制面向 Linux）。执行方式直接用 WSL 自动挂载路径 /mnt/<drive>/...，无需 bind mount 或手动挂载；命令格式 wsl.exe -d <distro> --cd <wsl_path> <command>。不要用它代替具体语言/框架实现、测试策略或编码规则。
+description: 当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\wsl.localhost\<distro>\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。
 ---
 
-# Windows 目录 + WSL 运行项目规范
+# Windows / WSL 执行规范（代码在 WSL）
 
 ## 适用场景
 
-仓库代码保留在 Windows 文件系统中，但 Go 进程必须在 WSL 中启动时使用本规范。典型情况：
+项目代码放在 WSL 文件系统内（如 `/home/<user>/<project>`），开发在 Windows 环境进行。
 
-- Codex Desktop / VSCode 运行在 Windows 上
-- 项目代码位于 `D:\luode\...` 或 `C:\Users\...`
-- Windows 上启动的 Go 进程无法联网
-- 需要在 WSL 中执行 `go test`、`go run`、`dlv` 等命令
+## 核心架构：先看 agent 在哪运行
 
-## 核心原则
+### 情况一：agent 在 WSL（推荐，最简单）
 
-1. 代码文件保留在 Windows 目录，不要求迁移到 WSL 文件系统。
-2. 看代码、改代码、git 操作（提交、拉取、status/diff/log）用 Git Bash 直接在 Windows 侧完成。
-3. 所有 Go 运行行为（build/run/test/dlv/mod）都通过 `wsl.exe` 进入 WSL 执行。
-4. 进入 WSL 后路径使用 WSL 自动挂载格式 `/mnt/<drive>/...`，**不需要 bind mount 或手动挂载**。
-5. 依赖下载、测试、构建、调试统一在 WSL 中完成。
+- 代码在 WSL、agent 在 WSL，本地直接访问
+- 直接执行 `go build` / `go test` / `go run` / `dlv`，**无需任何包裹**
+- 进程天然在 WSL，联网正常
 
-## 执行环境分工
+### 情况二：agent 在 Windows（如 Claude Desktop GUI）
 
-| 操作类型 | 执行环境 |
-|---------|---------|
-| 看代码、改代码（读写文件、搜索、列目录） | Git Bash |
-| git 提交、拉取、status / diff / log | Git Bash |
-| 编译 `go build` | **WSL** |
-| 运行 `go run` / 启动服务 | **WSL** |
-| 测试 `go test` | **WSL** |
-| 调试 `dlv` | **WSL** |
-| 依赖 `go mod download` / `go get` | **WSL** |
+- **shell 默认用 Git Bash**
+- **看代码、改代码**：通过 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+- **编译、运行、测试、调试**：通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
 
-**为什么 Go 进程必须走 WSL：** Windows 上启动的 Go 进程无法联网，且编译产物面向 Linux；只有 WSL 进程才能正常运行和联网。
+## 为什么执行/调试必须在 WSL
+
+- 只有 WSL 进程才能正常联网（Windows 上启动的进程受网络管控）
+- 二进制面向 Linux，只能在 WSL 编译和运行
 
 ## 路径约定
 
-代码留在 Windows 目录，执行时换算为 WSL 自动挂载路径：
+代码在 WSL 内，两种访问方式：
 
-| Windows 路径 | WSL 路径 |
-|-------------|---------|
-| `D:\luode\<project>` | `/mnt/d/luode/<project>` |
-| `C:\Users\luode\...\w-m` | `/mnt/c/Users/luode/.../w-m` |
+| 用途 | 路径形式 |
+|------|---------|
+| WSL 内执行（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` |
+| Windows 侧看代码/改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` |
 
-换算规则：盘符转小写 → 去掉 `:` → `\` 改为 `/` → 前缀 `/mnt/`。
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
+- **不再使用 `/mnt/<drive>`**——代码不在 Windows 盘。
 
-- 不要把 Windows 路径（`D:\...`）直接传给 WSL 内部命令。
-- 从 PowerShell / Git Bash 启动 WSL 时，用 `wsl.exe --cd <wsl_path>` 指定工作目录。
+## 执行环境分工（agent 在 Windows 时）
 
-## 命令模板
+| 操作类型 | 执行方式 |
+|---------|---------|
+| 看代码、改代码（读写文件、搜索） | Git Bash，经 `\\wsl.localhost\...` 访问 |
+| git 提交、拉取、status / diff / log | Git Bash（经 `\\wsl.localhost\...`）或 WSL 内 |
+| 编译 / 运行 / 测试 / 调试 / 依赖 | `wsl.exe --cd /home/<user>/<project> <command>` |
 
-默认使用 WSL 默认发行版（命令省略 `-d`）；如有多个发行版需指定，先用 `wsl.exe -l -v` 查看实际名称，再加 `-d <发行版名>`：
+## 命令模板（agent 在 Windows 时）
+
+默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`：
 
 ```powershell
 # 测试
-wsl.exe --cd /mnt/d/luode/<project> go test ./...
-
+wsl.exe --cd /home/<user>/<project> go test ./...
 # 运行
-wsl.exe --cd /mnt/d/luode/<project> go run ./cmd/<app>
-
+wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
 # 调试
-wsl.exe --cd /mnt/d/luode/<project> dlv debug ./cmd/<app>
+wsl.exe --cd /home/<user>/<project> dlv debug ./cmd/<app>
+# 依赖
+wsl.exe --cd /home/<user>/<project> go mod download
+```
 
-# 依赖下载
-wsl.exe --cd /mnt/d/luode/<project> go mod download
+agent 在 WSL 时直接执行，无需 `wsl.exe`：
+
+```bash
+cd /home/<user>/<project> && go test ./...
 ```
 
 ## WSL 内缓存目录建议
 
-为减少 Windows 盘带来的缓存问题，建议在 WSL 中设置（可写入 shell 配置持久生效）：
+代码在 WSL 原生文件系统，I/O 性能好。Go 缓存默认即可，如需显式设置：
 
 ```bash
 export GOCACHE=$HOME/.cache/go-build
 export GOMODCACHE=$HOME/go/pkg/mod
 ```
 
-## 依赖管理规则
-
-`go mod download` / `go get` / `go test` / `go run` / `dlv` 都应在 WSL 内执行，不要在 Windows 本地 Go 环境中执行。
-
-## 排障
-
-出现以下问题，优先按 WSL 运行链路排查：
-
-- Windows 侧 Go 无法联网
-- 依赖下载失败
-- `go test` 行为和 WSL 不一致
-- 进程启动后无法访问外部网络
-
 ## 不推荐做法
 
-- 不要直接在 Windows 原生 Go 环境中跑需要联网的项目。
-- 不要混用 Windows 路径和 WSL 命令上下文。
-- 不要为了运行而来回迁移仓库存放位置。
-- 不要把"代码在 Windows"误解为"只能用 Windows 进程运行"。
+- 不要在 Windows 原生 Go 环境跑需联网的项目。
+- 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
+- agent 在 Windows 时，不要用 PowerShell 作默认 shell——用 Git Bash。
+- 不要再用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`。
 
 ## 约束总结
 
-**代码可以留在 Windows 目录，但 Go 进程必须通过 `wsl.exe` 在 WSL 中启动。**
+**代码在 WSL；agent 在 WSL 直接干，agent 在 Windows 则 Git Bash 默认 shell + `\\wsl.localhost` 看代码、`wsl.exe --cd` 进 WSL 执行与调试。**
 
 ## 与其他规则的协作
 
-- 涉及 Windows 中文编码、PowerShell 落盘细节时，联动 `windows-encoding-rules`。
+- 涉及 Windows 中文编码、Git Bash 落盘细节时，联动 `windows-encoding-rules`。
 - 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
 
 ## 参考资料读取规则
 
 - 默认先读 `references/command-templates.md`
-- 需要路径换算细节时读 `references/path-mapping.md`
-- 需要 VSCode 调试配置时读 `references/vscode-debug-config.md`
+- 需要路径访问细节时读 `references/path-mapping.md`
 - 需要团队工作流时读 `references/recommended-workflow.md`

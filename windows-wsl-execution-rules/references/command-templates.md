@@ -1,50 +1,45 @@
 # 命令模板
 
-代码留在 Windows 目录，Go 运行行为通过 `wsl.exe` 进入 WSL，路径直接用 WSL 自动挂载 `/mnt/<drive>/...`，无需 bind mount 或手动挂载。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。编译、运行、测试、调试、依赖都在 WSL 中执行。
 
-默认使用 WSL 默认发行版（命令省略 `-d`）；如有多个发行版需指定，先用 `wsl.exe -l -v` 查看实际名称，再加 `-d <发行版名>`。
+## agent 在 WSL（推荐）
 
-## 通用模板
+直接执行，无需包裹：
 
-```powershell
-wsl.exe --cd <wsl_path> <command>
+```bash
+cd /home/<user>/<project>
+
+go build ./...
+go test ./...
+go run ./cmd/<app>
+dlv debug ./cmd/<app>
+go mod download
 ```
 
-## Go 项目（团队主要技术栈）
+## agent 在 Windows（如 Claude Desktop GUI）
 
-> 看代码、改代码、git 操作用 Git Bash；编译、测试、运行、调试、依赖都走 WSL。
+shell 默认用 Git Bash；执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。
 
 ```powershell
 # 编译
-wsl.exe --cd /mnt/d/luode/<project> go build ./...
+wsl.exe --cd /home/<user>/<project> go build ./...
 
-# 测试（全量）
-wsl.exe --cd /mnt/d/luode/<project> go test ./...
-
-# 测试（指定包）
-wsl.exe --cd /mnt/d/luode/<project> go test ./internal/...
+# 测试
+wsl.exe --cd /home/<user>/<project> go test ./...
 
 # 运行 / 启动服务
-wsl.exe --cd /mnt/d/luode/<project> go run ./cmd/<app>
+wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
 
 # 调试
-wsl.exe --cd /mnt/d/luode/<project> dlv debug ./cmd/<app>
+wsl.exe --cd /home/<user>/<project> dlv debug ./cmd/<app>
 
 # 依赖下载
-wsl.exe --cd /mnt/d/luode/<project> go mod download
+wsl.exe --cd /home/<user>/<project> go mod download
 ```
 
-## Node / pnpm / npm
-
-```powershell
-wsl.exe --cd /mnt/d/luode/<project> pnpm install
-wsl.exe --cd /mnt/d/luode/<project> pnpm test
-wsl.exe --cd /mnt/d/luode/<project> pnpm dev
-```
+看代码、改代码、git 操作用 Git Bash，经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件。
 
 ## WSL 内缓存目录建议
-
-为减少 Windows 盘缓存问题，在 WSL 中设置（可写入 shell 配置持久生效）：
 
 ```bash
 export GOCACHE=$HOME/.cache/go-build
@@ -53,6 +48,6 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 ## 说明
 
-- 看代码、改代码、git 提交与拉取直接在 Git Bash 用 Windows 路径执行，无需走 WSL。
-- 不要把 Windows 路径（`D:\...`）直接传给 WSL 内部命令；`--cd` 后必须是 `/mnt/<drive>/...` 格式。
-- 若命令依赖 `nvm`、`asdf`、`pyenv` 等 shell 初始化，可改用 `wsl.exe --cd <wsl_path> bash -lic "<command>"`。
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
+- 代码已在 WSL，不再使用 `/mnt/<drive>` 路径。
+- 若命令依赖 `nvm`、`asdf`、`pyenv` 等 shell 初始化，可改用 `wsl.exe --cd /home/<user>/<project> bash -lic "<command>"`。

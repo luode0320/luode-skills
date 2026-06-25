@@ -65,27 +65,19 @@
 
 ## Windows / WSL 执行规则
 
-> 详细规则见 `windows-wsl-execution-rules` skill。代码留在 Windows 目录，Go 进程必须通过 `wsl.exe` 在 WSL 中启动。
+> 详细规则见 `windows-wsl-execution-rules` skill。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
 
-**操作类型分工：**
+**先看 agent 在哪运行：**
 
-| 操作类型 | 执行环境 |
-|---------|---------|
-| 看代码、改代码（读写文件、搜索、列目录） | Git Bash |
-| git 提交、拉取、status / diff / log | Git Bash |
-| 编译 `go build` | **必须 WSL** |
-| 运行 `go run` / 启动服务 | **必须 WSL** |
-| 测试 `go test` | **必须 WSL** |
-| 调试 `dlv` | **必须 WSL** |
-| 依赖 `go mod download` / `go get` | **必须 WSL** |
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 Windows（如 Claude Desktop GUI）**：
+  - shell 默认用 Git Bash
+  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**为什么 Go 进程走 WSL：** Windows 上启动的 Go 进程无法联网，且二进制面向 Linux；只有 WSL 进程能正常运行和联网。
+**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
 
-**执行方式（直接用 WSL 自动挂载路径 `/mnt`，无需 bind mount 或手动挂载）：**
-- 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`）
-- 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
-- 示例：`wsl.exe --cd /mnt/d/luode/<project> go test ./...`
-- WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
+**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
 
 **编码约束：**
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略

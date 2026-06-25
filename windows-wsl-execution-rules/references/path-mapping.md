@@ -1,27 +1,23 @@
-# 路径映射规则
+# 路径访问规则
 
-代码留在 Windows 目录，执行 Go 命令时换算为 WSL 自动挂载路径 `/mnt/<drive>/...`。WSL 启动时自动挂载 Windows 盘符，**无需 bind mount 或手动挂载**。
+代码放在 WSL 文件系统内。根据 agent 运行位置，用不同路径形式访问。
 
-## 映射表
+## 路径形式
 
-| Windows 路径 | WSL 路径（执行时使用） |
-|-------------|----------------------|
-| `D:\luode\<project>` | `/mnt/d/luode/<project>` |
-| `D:\luode\ellipal_admin` | `/mnt/d/luode/ellipal_admin` |
-| `C:\Users\luode\Documents\...\w-m` | `/mnt/c/Users/luode/Documents/.../w-m` |
+| 用途 | 路径形式 | 示例 |
+|------|---------|------|
+| WSL 内执行（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` | `/home/luode/myapp` |
+| Windows 侧看代码/改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` | `\\wsl.localhost\Ubuntu\home\luode\myapp` |
 
-## 换算步骤
+## 说明
 
-1. 取出盘符并转小写（`D` → `d`）
-2. 去掉 `:`
-3. 将 `\` 替换为 `/`
-4. 前缀 `/mnt/`
-
-示例：`D:\luode\project` → `/mnt/d/luode/project`
+- `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看（如 `Ubuntu`、`Ubuntu-24.04`）。
+- **执行类命令始终用 WSL 内路径 `/home/<user>/<project>`**（agent 在 Windows 时配合 `wsl.exe --cd`）。
+- **Windows 侧编辑器/文件访问用 `\\wsl.localhost\<distro>\...`** —— 这是 Windows 访问 WSL 原生文件的官方稳定方式。
+- 代码已在 WSL 内，**不再使用 `/mnt/<drive>`**（那是访问 Windows 盘的路径）。
 
 ## 注意事项
 
-- 不要把 Windows 路径（`D:\...`）直接传给 WSL 内部命令；`wsl.exe --cd` 后必须是 `/mnt/<drive>/...` 格式。
-- 如果路径中包含空格，整体放进引号。
-- 如果路径位于 `\\wsl$\<distro>\...`（代码本身在 WSL 内部），直接使用对应 Linux 原生路径，不走 `/mnt` 换算。
-- `/mnt/<drive>` 由 WSL 启动时自动挂载，通常无需任何手动操作。
+- 不要把 WSL 路径（`/home/...`）和 Windows UNC 路径（`\\wsl.localhost\...`）混用在同一命令上下文。
+- `wsl.exe --cd` 后必须是 WSL 内路径 `/home/<user>/<project>`，不是 UNC 路径。
+- 路径含空格时整体放进引号。

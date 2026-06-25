@@ -98,14 +98,13 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
-- Windows / WSL 执行规则（代码留 Windows，Go 进程在 WSL 跑）：
-  - **看代码、改代码、git 操作（提交、拉取、status/diff/log）**：用 Git Bash 直接执行
-  - **编译、运行、测试、调试、依赖等一切 Go 运行行为（`go build`、`go run`、`go test`、`dlv`、`go mod`）**：必须通过 `wsl.exe` 进入 WSL 执行（Windows 上启动的 Go 进程无法联网，且二进制面向 Linux）
-  - 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`），直接用 WSL 自动挂载路径，**无需 bind mount 或手动挂载**
-  - 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
-  - WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
+- Windows / WSL 执行规则（代码在 WSL 文件系统内 `/home/<user>/<project>`）：
+  - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹
+  - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；看代码/改代码/git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问；编译/运行/测试/调试通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
+  - 为什么执行/调试在 WSL：只有 WSL 进程能正常联网，且二进制面向 Linux
+  - 命令格式：`wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+  - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
-  - Windows 下出现大量无关文件改动，优先检查 `core.autocrlf`；`.sh` 出现 filemode 伪改动优先关闭 `core.filemode`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
 - 若仓库命中 Godot 项目标记，还必须补齐：
   - `## Godot 项目工具配置`
@@ -224,28 +223,19 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码留在 Windows 目录，Go 进程必须通过 `wsl.exe` 在 WSL 中启动。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
 
-**操作类型分工：**
+**先看 agent 在哪运行：**
 
-| 操作类型                                 | 执行环境     |
-| ---------------------------------------- | ------------ |
-| 看代码、改代码（读写文件、搜索、列目录） | Git Bash     |
-| git 提交、拉取、status / diff / log      | Git Bash     |
-| 编译 `go build`                          | **必须 WSL** |
-| 运行 `go run` / 启动服务                 | **必须 WSL** |
-| 测试 `go test`                           | **必须 WSL** |
-| 调试 `dlv`                               | **必须 WSL** |
-| 依赖 `go mod download` / `go get`        | **必须 WSL** |
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 Windows（如 Claude Desktop GUI）**：
+  - shell 默认用 Git Bash
+  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**为什么 Go 进程走 WSL：** Windows 上启动的 Go 进程无法联网，且二进制面向 Linux；只有 WSL 进程能正常运行和联网。
+**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
 
-**执行方式（直接用 WSL 自动挂载路径 `/mnt`，无需 bind mount 或手动挂载）：**
-
-- 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`）
-- 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
-- 示例：`wsl.exe --cd /mnt/d/luode/<project> go test ./...`
-- WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
+**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
 
 **编码约束：**
 
