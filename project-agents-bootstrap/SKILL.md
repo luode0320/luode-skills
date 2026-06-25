@@ -26,8 +26,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## 仓库级总控规则
 
-- 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
+- 处理本仓库任务时，必须先命中并加载至少三个基础 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件（`AGENTS.md` 对应 Codex，`CLAUDE.md` 对应 Claude Code），默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。对已经存在的规则文件，也必须继续做增量同步与受管章节 upsert，而不是只初始化一次。
 - 首轮规则文件、`.gitattributes`、`.editorconfig` 自举是硬闸门：若其中任一缺失、未创建、未补齐或未完成受管章节同步，判定为阻断，禁止进入任何项目分析、读码、需求、Bug、编码、测试或交付主任务，必须先更新补充完成后再继续。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
@@ -178,8 +178,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Skill 命中强制规则
 
-- 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
+- 处理本仓库任务时，必须先命中并加载至少三个基础 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。

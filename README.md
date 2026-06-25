@@ -109,6 +109,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-25 00:17:00 docs: [总结结构强制] 让收尾总结必须命中 reasoning-summary-structure-rules
+
 2026-06-22 23:42:06 docs: [MCP安装收口] 统一浏览器与Godot工具安装判定
 
 2026-06-22 18:33:02 chore: [仓库基础配置] 新增 .editorconfig 与 .gitattributes 并统一 yaml 换行
