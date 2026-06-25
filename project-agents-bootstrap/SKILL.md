@@ -98,14 +98,12 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
-- Windows / WSL 执行规则：
-  - **看代码、改代码、git 操作（提交、拉取、status/diff/log）**：优先用 Git Bash 直接执行，无需挂载 WSL
-  - **编译、运行、测试、调试、依赖等一切执行类命令（`go build`、`go run`、`go test`、`dlv`、`go mod`）**：必须通过 WSL 执行（两条硬约束：项目二进制只能在 Linux 编译和运行；Windows 对项目二进制进程做了网络管控不能出网）
-  - WSL 执行命令格式：`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
-  - **WSL 执行前必须检查 bind mount**（仅在需要执行程序时）：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
-  - 未挂载则执行：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
-  - sudo 需要 root 密码时停止自动执行，通知用户手动完成后回复再继续
-  - 路径三层（仅执行时用）：`D:\luode\<project>` → `/mnt/d/luode/<project>`（桥梁）→ `/home/luode/d/luode/<project>`（执行）
+- Windows / WSL 执行规则（代码留 Windows，Go 进程在 WSL 跑）：
+  - **看代码、改代码、git 操作（提交、拉取、status/diff/log）**：用 Git Bash 直接执行
+  - **编译、运行、测试、调试、依赖等一切 Go 运行行为（`go build`、`go run`、`go test`、`dlv`、`go mod`）**：必须通过 `wsl.exe` 进入 WSL 执行（Windows 上启动的 Go 进程无法联网，且二进制面向 Linux）
+  - 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`），直接用 WSL 自动挂载路径，**无需 bind mount 或手动挂载**
+  - 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+  - WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
   - Windows 下出现大量无关文件改动，优先检查 `core.autocrlf`；`.sh` 出现 filemode 伪改动优先关闭 `core.filemode`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
@@ -226,7 +224,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码留在 Windows 目录，Go 进程必须通过 `wsl.exe` 在 WSL 中启动。
 
 **操作类型分工：**
 
@@ -238,36 +236,16 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 | 运行 `go run` / 启动服务                 | **必须 WSL** |
 | 测试 `go test`                           | **必须 WSL** |
 | 调试 `dlv`                               | **必须 WSL** |
-| 依赖 `go mod download` / `tidy`          | **必须 WSL** |
+| 依赖 `go mod download` / `go get`        | **必须 WSL** |
 
-**WSL 执行两条硬约束：**
+**为什么 Go 进程走 WSL：** Windows 上启动的 Go 进程无法联网，且二进制面向 Linux；只有 WSL 进程能正常运行和联网。
 
-- Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
-- 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
+**执行方式（直接用 WSL 自动挂载路径 `/mnt`，无需 bind mount 或手动挂载）：**
 
-**WSL 执行命令格式：**
-
-```bash
-wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"
-```
-````
-
-**启动/调试前必须检查 bind mount：**
-
-```bash
-# 检查挂载状态
-wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"
-# 未挂载时执行（sudo 需要密码则停止并通知用户手动完成）
-wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"
-```
-
-**VSCode 调试走 WSL：** `tasks.json` 使用 `wsl.exe` 执行器，`launch.json` 通过 `dlv dap` 远程协议连接
-
-**路径三层结构（仅执行时使用）：**
-
-- Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
-- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
-- WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
+- 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`）
+- 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+- 示例：`wsl.exe --cd /mnt/d/luode/<project> go test ./...`
+- WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
 
 **编码约束：**
 

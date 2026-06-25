@@ -65,7 +65,7 @@
 
 ## Windows / WSL 执行规则
 
-> 详细规则见 `windows-wsl-execution-rules` skill。
+> 详细规则见 `windows-wsl-execution-rules` skill。代码留在 Windows 目录，Go 进程必须通过 `wsl.exe` 在 WSL 中启动。
 
 **操作类型分工：**
 
@@ -77,23 +77,15 @@
 | 运行 `go run` / 启动服务 | **必须 WSL** |
 | 测试 `go test` | **必须 WSL** |
 | 调试 `dlv` | **必须 WSL** |
-| 依赖 `go mod download` / `tidy` | **必须 WSL** |
+| 依赖 `go mod download` / `go get` | **必须 WSL** |
 
-**WSL 执行两条硬约束：**
-- Windows 无法运行项目二进制文件，编译产物只能在 WSL 内执行
-- 只有 WSL 进程可正常进行网络通信，PowerShell / Git Bash 受网络策略限制
+**为什么 Go 进程走 WSL：** Windows 上启动的 Go 进程无法联网，且二进制面向 Linux；只有 WSL 进程能正常运行和联网。
 
-**WSL 执行命令格式：**`wsl.exe -e bash -lc "cd '/home/luode/d/luode/<project>' && <COMMAND>"`
-
-**启动/调试前必须检查 bind mount：**
-- 检查：`wsl.exe -e bash -lc "mountpoint -q /home/luode/d/luode/<project> && echo 'mounted' || echo 'not_mounted'"`
-- 未挂载：`wsl.exe -e bash -lc "mkdir -p /home/luode/d/luode/<project> && sudo mount --bind /mnt/d/luode/<project> /home/luode/d/luode/<project>"`
-- sudo 需要 root 密码时停止，通知用户手动完成后回复再继续
-
-**路径三层结构（执行时使用）：**
-- Windows 源码：`D:\luode\<project>`（编辑，Git Bash 直接访问）
-- WSL 自动挂载：`/mnt/d/luode/<project>`（桥梁）
-- WSL 用户工作路径：`/home/luode/d/luode/<project>`（执行命令）
+**执行方式（直接用 WSL 自动挂载路径 `/mnt`，无需 bind mount 或手动挂载）：**
+- 路径换算：`D:\luode\<project>` → `/mnt/d/luode/<project>`（盘符转小写，`\`→`/`，前缀 `/mnt/`）
+- 命令格式：`wsl.exe --cd /mnt/d/luode/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+- 示例：`wsl.exe --cd /mnt/d/luode/<project> go test ./...`
+- WSL 内建议设缓存目录：`export GOCACHE=$HOME/.cache/go-build`、`export GOMODCACHE=$HOME/go/pkg/mod`
 
 **编码约束：**
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略
