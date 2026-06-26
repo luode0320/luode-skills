@@ -1,4 +1,4 @@
 interface:
   display_name: "项目风格规则"
   short_description: "自动归纳项目代码风格示例，维护 PROJECT_STYLE.md 作为唯一风格记忆源"
-  default_prompt: "Use $project-style-rules to extract, merge, and read project style examples from code and conversation."
+  default_prompt: "使用 $project-style-rules 从代码和对话中抽取、合并并读取项目风格示例；写入 PROJECT_STYLE.md 时标题、章节名、条目标题和字段名必须使用中文。"
