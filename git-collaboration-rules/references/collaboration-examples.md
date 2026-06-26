@@ -137,7 +137,7 @@ fix: [订单结算] 修复订单创建时金额计算错误
 提交前执行：
 
 ```powershell
-rg --files -g "*_test.go" | rg -v "^test/"
+rg --files -g "*_test.go" | rg -v "^doc/tests/"
 ```
 
 结果为空，再继续提交。
@@ -274,7 +274,7 @@ internal/service/order_service_test.go
 
 仍然执行提交。
 
-❌ 问题：违反测试落点基线，应先改 seam 并迁移到 `test/` 根目录体系后再提交。
+❌ 问题：违反测试落点基线，应先改 seam 并迁移到 `doc/tests/` 根目录体系后再提交。
 
 ### 反例 7：Go 项目命中服务层根目录直落仍继续提交
 

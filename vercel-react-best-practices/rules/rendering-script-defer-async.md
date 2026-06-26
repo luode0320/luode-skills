@@ -65,4 +65,4 @@ export default function Page() {
 }
 ```
 
-Reference: [MDN - Script element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer)
+Reference: [MDN - Script element](https://developer.mozilla.org/en-US/docs/Web/HTML/Eledoc/requirements/script#defer)

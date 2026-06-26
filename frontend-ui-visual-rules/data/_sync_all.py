@@ -74,7 +74,7 @@ UI_RENAMES = {
     "Developer Tool/IDE": "Developer Tool / IDE",
     "Education": "Educational App",
     "Fintech (Banking)": "Fintech/Crypto",
-    "Government/Public": "Government/Public Service",
+    "Governdoc/requirements/Public": "Governdoc/requirements/Public Service",
     "Home Services": "Home Services (Plumber/Electrician)",
     "Micro-Credentials/Badges": "Micro-Credentials/Badges Platform",
     "Music/Entertainment": "Music Streaming",

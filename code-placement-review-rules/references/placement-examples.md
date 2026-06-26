@@ -22,7 +22,7 @@
 
 ### 正例 4：Go 测试文件不落源码目录
 
-- `test/2026-03-29_201500/internal/service/order_service_test.go`。
+- `doc/tests/2026-03-29_201500/internal/service/order_service_test.go`。
 - `internal/service/` 下没有同包 `*_test.go`。
 - 结论：通过。
 
@@ -59,7 +59,7 @@
 ### 反例 4：Go 测试文件落在禁放目录
 
 - 在 `internal/service/order_service_test.go` 直接新增同包白盒测试文件。
-- 命中 `test/` 外 `*_test.go` 禁放规则。
+- 命中 `doc/tests/` 外 `*_test.go` 禁放规则。
 - 结论：驳回。
 
 ### 反例 5：Go 服务层大平层堆叠

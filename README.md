@@ -52,7 +52,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
-- `artifact-storage-rules` 负责统一 `ment/`、`bug/`、`test/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略
+- `artifact-storage-rules` 负责统一 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
@@ -69,8 +69,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 例如：
 
-- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `ment/`、`test/`、`bug/`、`doc/` 和 Git 活动
-- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`
+- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/requirements/`、`doc/tests/`、`doc/bugs/`、`doc/` 和 Git 活动
+- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`，并统一收口到 `doc/requirements/`、`doc/bugs/`、`doc/tests/`
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
@@ -202,7 +202,7 @@ python skill-dictionary/generate_dictionary.py
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
-| `artifact-storage-rules` | 统一 `ment/`、`bug/`、`test/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略。 |
+| `artifact-storage-rules` | 统一 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，需求、Bug、测试主文档统一收口到 `doc/` 子目录。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
@@ -298,7 +298,7 @@ python skill-dictionary/generate_dictionary.py
 | ----------------------------- | ------------------------------------------------------------------------------ |
 | `test-strategy-rules`         | 先决定测试层级、测试重点和覆盖策略。                                           |
 | `test-task-root-layout-rules` | 统一测试任务根目录、时间戳根目录和中文/ASCII 镜像布局。                        |
-| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `test/` 根目录外的测试资产。                     |
+| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `doc/tests/` 根目录外的测试资产。                     |
 | `go-test-compile-path-rules`  | 统一 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。                |
 | `test-naming-rules`           | 统一测试目录和测试文件命名。                                                   |
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分。                               |

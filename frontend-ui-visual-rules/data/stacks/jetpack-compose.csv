@@ -49,5 +49,5 @@ No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
 48,Lifecycle,RememberCoroutineScope usage,Only for UI jobs,UI coroutine,Long jobs,Scoped job,Leak,Medium,https://developer.android.com/jetpack/compose/side-effects#remembercoroutinescope
 49,Interop,Interop View carefully,Use AndroidView,Isolated usage,Mix everywhere,Safe interop,Messy UI,Low,https://developer.android.com/jetpack/compose/interop
 50,Interop,Avoid legacy patterns,No LiveData in UI,StateFlow,LiveData,Modern stack,Legacy debt,Medium,
-51,Debug,Use layout inspector,Inspect recomposition,Tools,Blind debug,Fast debug,Guessing,Low,https://developer.android.com/studio/debug/layout-inspector
+51,Debug,Use layout inspector,Inspect recomposition,Tools,Blind debug,Fast debug,Guessing,Low,https://developer.android.com/studio/dedoc/bugs/layout-inspector
 52,Debug,Enable recomposition counts,Track recomposition,Debug flags,Ignore,Performance aware,Hidden jank,Low,

@@ -24,7 +24,7 @@
 - 注释、文档与新增代码文件是否默认使用 UTF-8；注释是否使用中文。
 - 实现风格是否与项目现有写法明显冲突。
 - 实现结构是否存在显著可维护性问题。
-- Go 项目是否存在 `test/` 外 `*_test.go` 落点违规（命令示例：`rg --files -g "*_test.go" | rg -v "^test/"`）。
+- Go 项目是否存在 `doc/tests/` 外 `*_test.go` 落点违规（命令示例：`rg --files -g "*_test.go" | rg -v "^doc/tests/"`）。
 - Go 项目本轮改动是否命中 `internal/service/[^/]+.go` 根目录落点（命令示例：`git diff --name-only HEAD -- | rg "^internal/service/[^/]+\\.go$"`）。
 - Go 项目 `internal/service` 是否散落请求/响应/第三方结果结构体（命令示例：`rg -n "^\\s*type\\s+[A-Za-z_][A-Za-z0-9_]*\\s+struct\\s*{" internal/service`，并人工复核结构体语义）。
 - Go 项目是否在函数/方法内部使用 `var (...)` 分组声明局部变量（命令示例：`rg -n "^\\s+var\\s*\\($" --glob "*.go"`，并人工复核作用域）。

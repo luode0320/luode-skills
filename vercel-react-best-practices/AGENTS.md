@@ -2588,7 +2588,7 @@ export default function Page() {
 
 **Note:** In Next.js, prefer the `next/script` component with `strategy` prop instead of raw script tags:
 
-Reference: [https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer)
+Reference: [https://developer.mozilla.org/en-US/docs/Web/HTML/Eledoc/requirements/script#defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Eledoc/requirements/script#defer)
 
 ### 6.9 Use Explicit Conditional Rendering
 

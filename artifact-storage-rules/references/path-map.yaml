@@ -1,20 +1,18 @@
 version: 1
-
 roots:
-  requirement_docs: "ment"
-  requirement_assets: "ment/data"
-  bug_records: "bug"
-  test_assets: "test"
+  requirement_docs: "doc/requirements"
+  requirement_assets: "doc/requirements/data"
+  bug_records: "doc/bugs"
+  test_assets: "doc/tests"
   project_docs: "doc"
   project_local_skills: "skill"
-
 entry_files:
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
   requirement_flow_svg: "{datetime}_{requirement_cn_title}.flow.svg"
   requirement_sequence_svg: "{datetime}_{requirement_cn_title}.sequence.svg"
   requirement_asset_image: "{requirement_doc_stem}.{asset_slug}.{ext}"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
-  requirement_asset_image_note: "需求截图与外部图片素材统一放在 ment/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
+  requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/requirements/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
   acceptance_doc: "{date}_验收中文说明.md"
   implementation_plan_doc: "{requirement_doc_stem}实施计划.md"
   implementation_plan_doc_note: "实施计划命名必须复用对应需求文档同前缀（yyyy-MM-DD_HHmmss_中文简介标题），并在末尾追加“实施计划”；例如：2026-04-16_141518_多业务复用Swap适配控制需求实施计划.md"
@@ -23,7 +21,6 @@ entry_files:
   bug_sequence_svg: "sequence.svg"
   test_task_readme: "README.md"
   project_design_doc: "项目设计.md"
-
 root_files:
   project_design_primary: "项目设计.md"
   project_design_aliases:
@@ -31,18 +28,16 @@ root_files:
     - "项目大纲.md"
     - "系统设计.md"
     - "项目说明.md"
-
 directories:
   bug_root: "{datetime}_问题中文简介"
   test_task_root: "{datetime}"
   test_task_doc_dir: "{test_task_cn_title}"
   test_task_doc_dir_note: "根据 README 将要描述的测试任务主题动态命名；禁止使用字面量“测试任务中文简介”"
-
 bootstrap:
   recent_context_scan_roots:
-    - "ment"
-    - "test"
-    - "bug"
+    - "doc/requirements"
+    - "doc/tests"
+    - "doc/bugs"
     - "doc"
     - "skill"
   weak_reference_root_files:
@@ -51,13 +46,12 @@ bootstrap:
     - "项目大纲.md"
     - "系统设计.md"
     - "项目说明.md"
-
 policies:
   same_requirement_updates_same_doc: true
   same_requirement_acceptance_updates_same_doc: true
   same_requirement_plan_updates_same_doc: true
   requirement_requires_svg_diagrams: true
-  requirement_assets_under_ment_data: true
+  requirement_assets_under_doc_requirements_data: true
   requirement_doc_embeds_assets_in_markdown: true
   same_bug_updates_same_root: true
   bug_requires_svg_diagrams: true

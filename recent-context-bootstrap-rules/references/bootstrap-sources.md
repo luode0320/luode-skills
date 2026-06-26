@@ -10,9 +10,9 @@
 
 默认扫描顺序遵循 `artifact-storage-rules/references/path-map.yaml`，当前顺序为：
 
-1. `ment/`
-2. `test/`
-3. `bug/`
+1. `doc/requirements/`
+2. `doc/tests/`
+3. `doc/bugs/`
 4. `doc/`
 5. 最近 3 天的 git 提交
 
