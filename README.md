@@ -117,6 +117,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-22 23:42:06 docs: [MCP安装收口] 统一浏览器与Godot工具安装判定
 
+2026-06-26 11:28:23 docs: [根因修复强制] 新增反打补丁规则并统一最小改动与根因修复的边界
+
 2026-06-25 15:32:07 fix: [WSL执行路径二次收敛] 代码已在 WSL 文件系统 废弃 /mnt 统一用 /home 路径
 
 2026-06-25 10:37:18 fix: [WSL执行路径收敛] 废弃 bind mount 统一改用 wsl.exe --cd /mnt 直接挂载
