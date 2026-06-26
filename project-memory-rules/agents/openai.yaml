@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目记忆规则"
+  short_description: "自动抽取、归并并维护项目知识主文档，供对话与代码阅读优先命中"
+  default_prompt: "Use $project-memory-rules to extract, merge, and read project memory from conversation and code."
