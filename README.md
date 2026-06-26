@@ -223,6 +223,7 @@ python skill-dictionary/generate_dictionary.py
 | `history-recall-rules`   | 检索跨会话历史、历史方案、历史修复记录，补回长期上下文。   |
 | `project-timeline-rules` | 按项目维度整理历史演进时间线，输出项目阶段变化与决策轨迹。 |
 | `project-memory-rules` | 自动抽取对话与代码中的项目事实，持续维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源。 |
+| `project-style-rules` | 自动抽取对话与代码中的项目代码风格示例，持续维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。 |
 
 ### 3. 需求域
 

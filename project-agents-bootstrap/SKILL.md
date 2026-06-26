@@ -1,6 +1,6 @@
 ---
 name: project-agents-bootstrap
-description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、UTF-8 中文编码约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要项目长期记忆，还要同步引入 `project-memory-rules` 并确保其最低命中要求写入仓库级规则。
+description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、UTF-8 中文编码约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。
 ---
 
 # 项目 AGENTS.md 自举与补齐 Skill
@@ -26,8 +26,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## 仓库级总控规则
 
-- 处理本仓库任务时，必须先命中并加载至少四个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`。
+- 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件（`AGENTS.md` 对应 Codex，`CLAUDE.md` 对应 Claude Code），默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。对已经存在的规则文件，也必须继续做增量同步与受管章节 upsert，而不是只初始化一次。
 - 首轮规则文件、`.gitattributes`、`.editorconfig` 自举是硬闸门：若其中任一缺失、未创建、未补齐或未完成受管章节同步，判定为阻断，禁止进入任何项目分析、读码、需求、Bug、编码、测试或交付主任务，必须先更新补充完成后再继续。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
@@ -76,7 +76,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 严禁脑补工具调用与结果（最高优先级）：任何文件/命令/搜索/网络的读取与执行必须经真实工具调用完成，严禁在正文编写 `<invoke>`/`<result>`/伪 function_calls 假装调用或凭记忆想象文件内容当结果；引用代码/行号/函数名前必须来自本轮真实工具返回；发现大段重复行、错乱行号、源码异常以代码块结束符收尾等迹象立即停止并重发真实工具调用、用 `md5sum`/`wc -c` 交叉校验。
 - Skill 命中强制规则：
   - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
-  - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`。
+  - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`。
   - 若本轮涉及创建、补齐或更新仓库级规则文件（`AGENTS.md` / `CLAUDE.md`），默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
   - 必须在首条中间进度明确输出当前命中的 skill 列表。
   - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -186,8 +186,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Skill 命中强制规则
 
-- 处理本仓库任务时，必须先命中并加载至少四个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`。
+- 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
