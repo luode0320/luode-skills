@@ -76,7 +76,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 严禁脑补工具调用与结果（最高优先级）：任何文件/命令/搜索/网络的读取与执行必须经真实工具调用完成，严禁在正文编写 `<invoke>`/`<result>`/伪 function_calls 假装调用或凭记忆想象文件内容当结果；引用代码/行号/函数名前必须来自本轮真实工具返回；发现大段重复行、错乱行号、源码异常以代码块结束符收尾等迹象立即停止并重发真实工具调用、用 `md5sum`/`wc -c` 交叉校验。
 - Skill 命中强制规则：
   - 处理本仓库任务时，必须先命中并加载至少两个基础 skill。
-  - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`。
+  - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`。
   - 若本轮涉及创建、补齐或更新仓库级规则文件（`AGENTS.md` / `CLAUDE.md`），默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
   - 必须在首条中间进度明确输出当前命中的 skill 列表。
   - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -265,3 +265,4 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
 - 若仓库位于 Windows 环境，默认应把 Git Bash / WSL shell 优先级一并补入仓库规则，而不是只在单次会话里临时提醒。
 ```
+````
