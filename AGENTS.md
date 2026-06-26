@@ -91,3 +91,18 @@
 - 若在 Windows PowerShell 5.1 下执行安装，必须默认启用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing`，不得把人工点击确认当作标准流程。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取。
+
+## 代码库探索规则
+
+1. 日常理解代码、定位实现、追踪调用链、分析改动影响时，优先使用 CodeGraph。
+2. 修改代码前，先用 CodeGraph 获取相关源码和影响范围。
+3. 不要在 CodeGraph 已经返回足够上下文时重复全仓库 grep。
+4. 项目架构分析、跨模块依赖、函数调用频率、ADR 记录等架构层任务，用 codebase-memory-mcp 作补充。
+5. CodeGraph 作默认入口，codebase-memory-mcp 作高级图分析工具；两者结果与当前代码不一致时，以当前代码为准并重新同步索引。
+
+## 插件检测安装规则
+
+- 涉及 AI 编码插件（如 Ponytail）的安装、启用、配置时，联动 `plugin-installation-rules`。
+- Ponytail 为默认必装插件：会话 / 项目准备时默认安装并启用（详见 `plugin-installation-rules`）。
+- 安装命令与配置一律以插件官方仓库为准，不沿用第三方博客 / 公众号转述的旧命名、旧参数。
+- 通用支持 Claude Code / Codex 等环境，按当前 AI 选对应安装方式；安装或启用失败时回退到常规流程。

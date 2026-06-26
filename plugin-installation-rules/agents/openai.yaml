@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Installation Rules"
+  short_description: "通用 AI 编码插件的检测、安装、使用与回退规则（claude / codex 通用）"
+  default_prompt: "Use $plugin-installation-rules to detect, install, configure and use AI coding plugins like Ponytail, always following the official repository."

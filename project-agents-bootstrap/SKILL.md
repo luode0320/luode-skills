@@ -106,6 +106,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
+- 代码图谱 MCP 配套：架构层分析可补充安装 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制、失败不阻塞）；安装判定与配合规则详见 `mcp-installation-rules`。
+- 插件检测安装：涉及 AI 编码插件（如 Ponytail）的安装、启用、配置时，联动 `plugin-installation-rules`，以官方仓库为准、claude/codex 通用。Ponytail 为默认必装插件，会话/项目准备时默认安装并启用。
 - 若仓库命中 Godot 项目标记，还必须补齐：
   - `## Godot 项目工具配置`
   - `## 图像生成配置`
@@ -250,6 +252,22 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若在 Windows PowerShell 5.1 下执行安装，必须默认启用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing`，不得把人工点击确认当作标准流程。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取。
+- 架构层分析可配套 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制）作为 CodeGraph 的补充。
+
+## 代码库探索规则
+
+1. 日常理解代码、定位实现、追踪调用链、分析改动影响时，优先使用 CodeGraph。
+2. 修改代码前，先用 CodeGraph 获取相关源码和影响范围。
+3. 不要在 CodeGraph 已经返回足够上下文时重复全仓库 grep。
+4. 项目架构分析、跨模块依赖、函数调用频率、ADR 记录等架构层任务，用 codebase-memory-mcp 作补充。
+5. CodeGraph 作默认入口，codebase-memory-mcp 作高级图分析工具；两者结果与当前代码不一致时，以当前代码为准并重新同步索引。
+
+## 插件检测安装规则
+
+- 涉及 AI 编码插件（如 Ponytail）的安装、启用、配置时，联动 `plugin-installation-rules`。
+- Ponytail 为默认必装插件：会话 / 项目准备时默认安装并启用（详见 `plugin-installation-rules`）。
+- 安装命令与配置一律以插件官方仓库为准，不沿用第三方博客 / 公众号转述的旧命名、旧参数。
+- 通用支持 Claude Code / Codex 等环境，按当前 AI 选对应安装方式；安装或启用失败时回退到常规流程。
 
 ```
 
