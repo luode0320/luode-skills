@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Change Review"
+  short_description: "Review current project changes before handoff"
+  default_prompt: "Use $project-change-review-rules to review the current project changes."

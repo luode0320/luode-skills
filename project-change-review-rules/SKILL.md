@@ -1,0 +1,115 @@
+---
+name: project-change-review-rules
+description: 显式调用型项目当前改动总审查 skill。仅当用户明确点名 `$project-change-review-rules`、`project-change-review-rules`，或明确要求“用这个/该审查项目当前改动的 skill 审查当前 diff/当前改动”时触发。负责只读审查当前项目未提交改动、已暂存改动和可见新增文件，覆盖需求边界、缺陷、遗漏、安全风险、重复逻辑、未按已命中 skill 规则实现、注释缺失或乱码、日志打印不合规、工具包/公共方法复用不足、代码可读性差、补丁式修补、测试与验证缺口；输出按严重级别排序的问题清单和应补触发的专门 review skill，不直接改代码、不格式化、不提交。
+---
+
+# 项目当前改动总审查规则
+
+## 目标
+
+把“审查当前项目改动”收口成一个显式调用入口。进入后先界定当前 diff，再用代码审查视角找问题：边界是否跑偏、实现是否有缺陷、是否漏测漏改、是否有安全和日志风险、是否重复造轮子、是否违反项目已启用的 skill 规则，以及代码是否像临时补丁。
+
+本 skill 是总审查闸门，只读、不修复、不提交。发现问题后输出可执行回改建议，并指出应交给哪个专门 skill 继续处理。
+
+## 快速流程
+
+1. 读取项目规则文件：优先 `AGENTS.md`，不存在再读 `CLAUDE.md`。
+2. 盘点当前改动：
+   - `git status --short`
+   - `git diff --stat`
+   - `git diff --name-only`
+   - `git diff --cached --stat`
+   - `git diff --cached --name-only`
+   - 对未跟踪文本文件，按风险和相关性抽样读取。
+3. 确定审查边界：本轮只审查当前可见改动，不顺手审历史遗留；若改动依赖历史上下文，只读必要调用方、被调用方和配置。
+4. 按审查矩阵逐项检查，并联动适用的专门 review skill。
+5. 输出发现优先的审查报告。若无问题，明确写“未发现阻断项”，并说明剩余风险和未执行验证。
+
+## 审查矩阵
+
+必须覆盖以下维度：
+
+- 需求边界：是否扩大范围、改了无关文件、引入新行为但没有需求依据、修改公共行为却没有兼容路径。
+- 缺陷风险：空值、边界条件、错误处理、状态顺序、并发、缓存、事务、幂等、时区、分页、排序、权限、异常分支。
+- 遗漏风险：只改上游未改下游，只改请求未改响应，只改实现未改文档/Swagger/配置/迁移/测试，只改主路径未改失败路径。
+- 安全风险：鉴权绕过、权限粒度变宽、敏感信息日志、SQL/命令/路径注入、XSS、CSRF、SSRF、反序列化、密钥落盘、调试入口暴露。
+- 重复逻辑：同语义工具函数重复封装、业务文件内复制已有 util、同一判断/映射/转换在多个位置复制。
+- skill 合规：当前改动是否漏触发或漏执行相关 skill，尤其是注释、日志、可读性、目录归位、接口请求/响应、Swagger、数据库、测试、格式和语法检查。
+- 注释质量：新增/修改函数是否按项目注释规则补齐；中文注释是否 UTF-8；是否存在过期注释、解释显而易见行为的废注释、补丁逻辑无“为什么”。
+- 日志与追踪：是否用正式 logger；是否存在 console/print 临时输出；日志是否有业务上下文、脱敏、trace/span、错误对象和排障字段。
+- 工具包使用：是否优先复用项目已有公共方法、成熟依赖和框架能力；是否绕过封装直接拼低层实现。
+- 可读性与补丁感：是否控制流跳跃、嵌套过深、硬编码、魔法值、临时分支堆叠、函数过长、文件持续膨胀、命名含糊、局部修补破坏整体结构。
+- 测试与验证：是否有必要测试；测试目录、命名、fixture、执行方式是否符合项目规则；验证结果是否能覆盖改动风险。
+
+## 专门 Skill 联动
+
+根据 diff 类型主动声明应联动的只读 review skill：
+
+- 需求边界不清或范围跑偏：`requirement-boundary-review-rules`
+- 实现质量和补丁感：`implementation-review-rules`
+- 可读性、复杂度、重复封装：`code-readability-review-rules`、`common-util-review-rules`
+- 目录归位、跨层调用、包结构：`code-placement-review-rules`
+- 命名、风格、格式、语法：`naming-review-rules`、`code-style-review-rules`、`format-review-rules`、`cleanup-format-review-rules`、`syntax-check-review-rules`
+- 注释缺口：`comment-review-rules`
+- 日志、trace、审计、脱敏：`logging-trace-review-rules`
+- API 请求/响应/Swagger：`api-request-review-rules`、`api-response-review-rules`、`api-swagger-review-rules`
+- 数据库、SQL、事务、schema：`database-query-rules`、`database-schema-rules`
+- 回归风险和验证缺口：`test-regression-review-rules`、`test-strategy-review-rules`、`functional-validation-review-rules`
+- 已命中 skill 是否执行完整：`skill-audit-rules`、`skill-compliance-gate-rules`
+
+如果某个专门 skill 的 `SKILL.md` 尚未读取，不得声称已按该 skill 逐条完成审查；只能写“建议联动”。若已经读取并执行其检查，必须在报告中给出对应证据。
+
+## 读取与证据规则
+
+- 引用文件、行号、函数名、配置值前必须真实读取当前文件内容。
+- 优先使用 `git diff`、`git diff --cached`、`rg`、CodeGraph 或项目规定的代码图谱工具定位上下文。
+- 对二进制、生成文件、锁文件和大体积文件只做边界判断；除非改动本身可疑，不展开逐行审查。
+- 未跟踪文件必须纳入边界判断；如果太多，按入口文件、配置、迁移、脚本、测试、文档优先抽样，并说明未完全展开的范围。
+- 发现疑似用户手改或上下文冲突时，先重读磁盘文件，不得用旧记忆下结论。
+
+## 输出格式
+
+审查报告必须“发现优先”，按严重级别排序：
+
+```text
+发现:
+- [P0/P1/P2/P3] 文件:行 - 问题标题
+  证据: 当前 diff 或源码中的具体行为。
+  风险: 为什么会出错、泄露、回归或违反规则。
+  建议: 最小可执行修复方向。
+  关联 skill: xxx-review-rules
+
+未发现阻断项:
+- 若没有 P0/P1，明确说明。
+
+已覆盖:
+- 当前 diff 范围、已读规则、已联动 skill、已执行命令。
+
+未覆盖/剩余风险:
+- 未运行的测试、未展开的大文件、缺失上下文。
+
+下一步建议:
+1. ...
+```
+
+严重级别：
+
+- `P0`：会导致数据破坏、严重安全问题、主流程不可用、提交/发布必须阻断。
+- `P1`：高概率缺陷、权限/兼容/回归风险、重要规则未执行，合并前必须修。
+- `P2`：可维护性、遗漏验证、局部可读性或日志注释问题，应在本轮修。
+- `P3`：非阻断建议、后续优化或轻微一致性问题。
+
+## 驳回标准
+
+命中任一条件时，不得给“当前改动可通过审查”的结论：
+
+- 存在 P0/P1 未处理问题。
+- 当前 diff 边界不清，且无法确认改动是否完整。
+- 涉及安全、权限、数据库、接口契约、公共工具旧行为，但缺少必要验证或兼容说明。
+- 改动明显违反项目 AGENTS/CLAUDE 规则或已命中 skill 的阻断条件。
+- 只看了 `git status`，没有读取实际 diff 或关键文件。
+
+## References
+
+- 需要快速执行时读取 `references/checklist.md`。
+- 需要组织报告时读取 `references/report-template.md`。
