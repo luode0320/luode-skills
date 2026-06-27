@@ -177,7 +177,11 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-19 17:27:21 feat: [Windows与WSL执行规则] 新增 Windows 到 WSL 执行协作 skill
 
+2026-06-27 23:47:58 feat: [实施与验收域] 拆分实施域并补齐双层验收链路
+
 2026-06-18 11:24:24 docs: [实施计划周期规则] 强化开发周期与单阶段步骤约束
+
+2026-06-27 docs: [实施与验收域重构] 实施独立到 `doc/实施/`，验收统一到 `doc/验收/` 并拆为前置验收标准 + 后置最终验收
 
 2026-06-17 14:58:19 docs: [MCP安装与计划规则] 补充安装流程与增量计划约束
 
@@ -250,9 +254,10 @@ python skill-dictionary/generate_dictionary.py
 | `requirement-gap-rules`       | 只处理主动侦察后仍缺少的关键前提、字段、流程、业务规则等内容；先生成临时缺口文档，用户确认后回填主需求文档并删除临时缺口文档。 |
 | `requirement-boundary-rules`  | 判断需求边界、影响范围、上下游、非目标范围，防止越界实现。                                                |
 | `requirement-splitting-rules` | 把大需求拆成可执行的小任务项，明确模块拆分和实施顺序。                                                    |
-| `implementation-plan-rules`   | 把确认后的需求转成实施计划，帮助进入编码阶段。                                                            |
+| `implementation-planning-rules` | 把确认后的需求转成实施总览与实施周期，作为独立实施域进入编码前的正式入口。                              |
 | `requirement-change-rules`    | 处理需求变更，重新确认变更点、影响面、文档同步和后续实施路径。                                            |
-| `acceptance-criteria-rules`   | 生成独立的验收标准文档，并按 `artifact-storage-rules` 落到统一验收文档位置，保证验收标准可验证、可测试、可回溯。 |
+| `acceptance-criteria-rules`   | 生成独立的前置验收标准文档，并按 `artifact-storage-rules` 落到 `doc/验收/`，保证实施前口径可验证、可测试、可回溯。 |
+| `final-acceptance-rules`      | 在测试和审核完成后生成独立的最终验收文档，基于验收标准逐条给出放行结论。                                 |
 
 ### 4. Bug 域
 
@@ -359,8 +364,8 @@ python skill-dictionary/generate_dictionary.py
 一个典型研发任务，建议按下面的节奏理解这套 Skill：
 
 1. 如果是新会话且当前任务明显依赖近期项目动态，先进入 `recent-context-bootstrap-rules` 补最近 3 天前置上下文。
-2. 再进入需求域，优先按“4 主步 + 4 条件步”理解：主流程为 `Idea/Discovery -> Intake -> Acceptance -> Implementation Plan`，条件步骤为 `Gap / Boundary / Splitting / Change`。
-3. 其中 `Gap / Boundary / Splitting / Change` 只按条件插入；如果任何一个条件步骤未完成，必须阻断进入 `Acceptance` 与 `Implementation Plan`。
+2. 再进入需求链路，优先按“4 主步 + 4 条件步 + 双层验收”理解：主流程为 `Idea/Discovery -> Intake -> Acceptance Criteria -> Implementation`，条件步骤为 `Gap / Boundary / Splitting / Change`，后置收口为 `Test -> Review -> Final Acceptance`。
+3. 其中 `Gap / Boundary / Splitting / Change` 只按条件插入；如果任何一个条件步骤未完成，必须阻断进入 `Acceptance Criteria` 与 `Implementation`。
 4. 如果是 Bug，转入 Bug 域，而不是混入普通需求流程。
 5. 进入编码时，同时受到编码基线域和代码位点域约束。
 6. 编码完成后，先过编码审查域，再进入测试域。

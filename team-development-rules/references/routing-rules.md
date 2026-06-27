@@ -24,9 +24,9 @@
 | 用户明确问“上次怎么做的”“之前有没有修过 / 做过 / 讨论过”“以前类似问题怎么处理” | 记忆域 / `history-recall-rules` | 先补回历史上下文，再回到需求、Bug、编码或交付主流程 |
 | 用户要求输出项目开发历程、关键决策回顾、项目时间线报告 | 记忆域 / `project-timeline-rules` | 这是长期历史分析，不等于当前一次交付摘要 |
 | 用户提出新功能、新页面、新接口、新模块，尚未开始写代码 | 需求域 / `requirement-intake-rules` | 先理解目标、背景、输入输出和上下游 |
-| 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现 |
+| 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现；若仍可继续侦察，优先回流 `requirement-discovery-rules` |
 | 需求过大，涉及多个模块、多个页面、多个接口或多个实施波次 | 需求域 / `requirement-splitting-rules` | 先拆成可独立推进的子项，再决定实施顺序 |
-| 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施计划、明确文件落点、任务顺序和验证闭环 | 需求域 / `implementation-plan-rules` | 先把已确认需求转成可执行实施计划，再进入编码 |
+| 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施方案、明确文件落点、任务顺序和验证闭环 | 实施域 / `implementation-planning-rules` | 先把已确认需求转成可执行实施总览/实施周期，再进入编码 |
 | 需求文档已确认且用户已明确“开始执行/按文档实现” | 连续执行链路 / `autonomous-execution-rules` + 需求/编码/测试域 | 默认连续推进到“实现 + 审查 + 测试闭环”，除阻断级节点外不在中间重复确认 |
 | 编码过程中出现新条件、优先级变化、默认值变化或交付物变化 | 需求域 / `requirement-change-rules` | 先重算影响范围，不直接把变更偷偷塞进当前实现 |
 | 用户描述报错、异常、结果不符、线上故障、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现和定位 |
@@ -46,6 +46,7 @@
 | 需要确认当前需求或当前改动本身是否做对 | 测试域 / `functional-validation-rules` | 聚焦当前功能正确性，不扩张成回归或联调问题 |
 | 当前看起来不是单点功能错误，而是跨系统、跨环境、跨链路联调失败 | 测试域 / `test-strategy-rules` | 先重新拆分验证路径与证据收集方式，再决定落到功能验证、回归或浏览器联动 |
 | 需要确认修复或改动有没有把旧能力带坏 | 测试域 / `test-regression-rules`、`bug-validation-rules` | 聚焦兼容性、影响面和修复闭环，不混入功能验证 |
+| 测试和审核都已完成，需要确认是否最终放行 | 验收域 / `final-acceptance-rules` | 按验收标准逐条收口最终放行；若测试或审核任一未完成则阻断 |
 | 测试已基本完成，准备整理提交与协作边界 | 交付域 / `git-collaboration-rules` | 先整理 commit、分支和 PR 范围 |
 | 代码准备进入正式评审或 PR 复核 | 交付域 / `git-collaboration-rules`、`delivery-summary-rules` | 先整理提交流程与交付说明，再交给团队既有评审流程 |
 | 准备发布、灰度、放量或确认回滚预案 | 总控层 / `team-development-rules` | 当前没有独立发布 skill，由总控层提醒回到团队发布流程 |

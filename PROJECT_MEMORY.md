@@ -23,7 +23,7 @@
 ### 研发产物目录正式口径
 - 别名: doc 顶层目录规则
 - 类型: 目录规则
-- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前正式顶层子目录为 `doc/需求/`、`doc/架构/`、`doc/阶段/`、`doc/审查/`、`doc/bugs/`、`doc/tests/`。
+- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前正式顶层子目录为 `doc/需求/`、`doc/架构/`、`doc/实施/`、`doc/验收/`、`doc/审查/`、`doc/bugs/`、`doc/tests/`。
 - 来源: `artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 文档归档与规则引用
 - 更新时间: 2026-06-27
@@ -41,7 +41,7 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 需求域对外统一采用“4 主步 + 4 条件步”：主流程为 `Idea/Discovery -> Intake -> Acceptance -> Implementation Plan`，条件步骤为 `Gap / Boundary / Splitting / Change`。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。当前不把需求域 skill 合并成一个大 skill，而是通过 `requirement-discovery-rules/references/requirement-domain-routing.md` 维护相邻 skill 的顺序、让路和重叠边界。
+- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审核 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。
 - 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
 - 适用范围: 需求域
 - 更新时间: 2026-06-27
@@ -50,7 +50,16 @@
 ### 需求临时缺口文档规则
 - 别名: gap 临时文档, 缺口阻断文档
 - 类型: 流程规则
-- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收和实施计划。
+- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
+
+### 双层验收规则
+- 别名: 前置验收 + 最终验收, 验收双层机制
+- 类型: 流程规则
+- 定义: 验收统一归入“验收”大类，分为前置 `验收标准` 与后置 `最终验收` 两层。前置验收标准由 `acceptance-criteria-rules` 生成并落到 `doc/验收/<需求文档同名主干>验收标准.md`；后置最终验收由 `final-acceptance-rules` 生成并落到 `doc/验收/<需求文档同名主干>最终验收.md`。测试和审核未完成时，最终验收必须阻断。
+- 来源: `artifact-storage-rules/references/path-map.yaml`、`acceptance-criteria-rules`、`final-acceptance-rules`
+- 适用范围: 验收域
+- 更新时间: 2026-06-27
+- 状态: 启用
 - 来源: `requirement-gap-rules`、`artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 需求域
 - 更新时间: 2026-06-27

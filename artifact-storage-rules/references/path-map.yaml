@@ -3,7 +3,8 @@ roots:
   requirement_docs: "doc/需求"
   requirement_assets: "doc/需求/data"
   architecture_docs: "doc/架构"
-  stage_docs: "doc/阶段"
+  implementation_docs: "doc/实施"
+  acceptance_docs: "doc/验收"
   bug_records: "doc/bugs"
   test_assets: "doc/tests"
   review_records: "doc/审查"
@@ -18,9 +19,14 @@ entry_files:
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/需求/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
   requirement_gap_doc_note: "临时缺口文档必须复用对应需求文档同前缀，并在末尾追加“.gap.md”；例如：2026-04-16_141518_多业务复用Swap适配控制需求.gap.md。该文档仅在 gap 未关闭时存在，用户确认并回填主需求文档后必须删除。"
-  acceptance_doc: "{date}_验收中文说明.md"
-  implementation_plan_doc: "{requirement_doc_stem}实施计划.md"
-  implementation_plan_doc_note: "实施计划命名必须复用对应需求文档同前缀（yyyy-MM-DD_HHmmss_中文简介标题），并在末尾追加“实施计划”；例如：2026-04-16_141518_多业务复用Swap适配控制需求实施计划.md"
+  acceptance_criteria_doc: "{requirement_doc_stem}验收标准.md"
+  acceptance_criteria_doc_note: "前置验收标准文档必须复用对应需求文档同前缀，并在末尾追加“验收标准”；例如：2026-04-16_141518_多业务复用Swap适配控制需求验收标准.md"
+  final_acceptance_doc: "{requirement_doc_stem}最终验收.md"
+  final_acceptance_doc_note: "最终验收文档必须复用对应需求文档同前缀，并在末尾追加“最终验收”；例如：2026-04-16_141518_多业务复用Swap适配控制需求最终验收.md"
+  implementation_overview_doc: "{requirement_doc_stem}实施总览.md"
+  implementation_overview_doc_note: "实施总览文档必须复用对应需求文档同前缀，并在末尾追加“实施总览”；例如：2026-04-16_141518_多业务复用Swap适配控制需求实施总览.md"
+  implementation_cycle_doc: "{requirement_doc_stem}实施周期{cycle_no}_{cycle_cn_title}.md"
+  implementation_cycle_doc_note: "实施周期文档必须复用对应需求文档同前缀，并在末尾追加“实施周期NN_中文主题”；例如：2026-04-16_141518_多业务复用Swap适配控制需求实施周期01_接口与配置落点.md"
   bug_root_readme: "README.md"
   bug_flow_svg: "flow.svg"
   bug_sequence_svg: "sequence.svg"
@@ -44,7 +50,8 @@ bootstrap:
   recent_context_scan_roots:
     - "doc/需求"
     - "doc/架构"
-    - "doc/阶段"
+    - "doc/实施"
+    - "doc/验收"
     - "doc/tests"
     - "doc/bugs"
     - "doc/审查"
@@ -61,6 +68,9 @@ policies:
   requirement_gap_doc_is_temporary: true
   same_requirement_acceptance_updates_same_doc: true
   same_requirement_plan_updates_same_doc: true
+  implementation_plan_separated_from_requirement_domain: true
+  implementation_cycle_docs_allowed: true
+  final_acceptance_requires_test_and_review: true
   requirement_requires_svg_diagrams: true
   requirement_assets_under_doc_requirement_data: true
   requirement_doc_embeds_assets_in_markdown: true

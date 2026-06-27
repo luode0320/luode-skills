@@ -15,7 +15,7 @@
 ### doc 顶层混合命名
 - 别名: 文档目录混合命名
 - 类型: 目录风格
-- 示例: `doc/需求/`、`doc/架构/`、`doc/阶段/`、`doc/审查/`、`doc/bugs/`、`doc/tests/`
+- 示例: `doc/需求/`、`doc/架构/`、`doc/实施/`、`doc/验收/`、`doc/审查/`、`doc/bugs/`、`doc/tests/`
 - 说明: `doc/` 根目录保持英文，顶层子目录采用中文语义优先，但 `bugs`、`tests` 这类工程高频词保留英文，避免脚本和协作摩擦。
 - 来源: 对话确认、`artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 文档目录命名

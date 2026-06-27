@@ -230,7 +230,7 @@ def to_wave_number(value: str) -> int:
 def classify_doc(name: str) -> str:
     if name.endswith("编码skill.md"):
         return "总规划"
-    if "实施计划闭环记录" in name:
+    if "实施计划闭环记录" in name or "实施总览" in name or "实施周期" in name:
         return "实施记录"
     if "巡检" in name:
         return "巡检记录"

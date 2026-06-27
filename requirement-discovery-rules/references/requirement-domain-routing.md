@@ -2,16 +2,17 @@
 
 ## 对外心智模型
 
-对外统一使用“4 主步 + 4 条件步”：
+对外统一使用“需求接入前半段 + 条件闸门 + 下游移交”：
 
-- 主流程：`Idea / Discovery -> Intake -> Acceptance -> Implementation Plan`
+- 需求域主流程：`Idea / Discovery -> Intake`
 - 条件步骤：`Gap / Boundary / Splitting / Change`
+- 下游移交：`Acceptance Criteria -> Implementation -> Test -> Review -> Final Acceptance`
 
 其中：
 
 - `discovery` 负责主动侦察和找资料。
 - `intake` 负责把 discovery 结果接成唯一主需求文档。
-- `acceptance` 和 `implementation-plan` 只在需求稳定后进入。
+- `acceptance criteria` 和 `implementation` 已不再属于需求域主流程；需求稳定后由需求域移交到验收域与实施域。
 - `gap / boundary / splitting / change` 都是按条件插入的闸门，不是每次都默认完整走一遍的长链路。
 
 ## 内部默认顺序
@@ -24,8 +25,8 @@
 4. `requirement-boundary-rules`：在范围、兼容、历史问题归属不清时裁决当前需求与影响范围。
 5. `requirement-splitting-rules`：在需求体量过大或跨多个子系统时，拆出可独立闭环的子项。
 6. `requirement-change-rules`：当已澄清或已实现需求发生新增条件、优先级或交付物变化时，重算影响。
-7. `acceptance-criteria-rules`：把稳定后的需求目标转成可验证、可测试、可复核的验收标准。
-8. `implementation-plan-rules`：把当前优先闭环转成编码前计划、文件落点、阶段和验证点。
+7. `acceptance-criteria-rules`：把稳定后的需求目标转成可验证、可测试、可复核的前置验收标准。
+8. `implementation-planning-rules`：把当前优先闭环转成编码前实施总览、实施周期、文件落点和验证点。
 
 ## 合并判断
 
@@ -39,7 +40,7 @@
 - `boundary` 是范围裁决，不能被接入或缺口规则顺手处理。
 - `splitting` 是体量和闭环拆分，不是需求补全。
 - `change` 是已进入流程后的变更重算，不是初始 idea 接入。
-- `acceptance` 和 `implementation-plan` 是下游产物，不能提前吃掉前置不确定性。
+- `acceptance criteria`、`implementation` 和 `final acceptance` 都是下游产物，不能提前吃掉前置不确定性。
 
 ## 允许吸收的重叠
 
@@ -56,5 +57,5 @@
 - discovery 输出后仍缺关键业务取舍：提出最多 3 个拍板问题。
 - discovery 输出后已能形成需求：转 intake。
 - intake 文档中仍有关键事实缺失：先判断能否 discovery，不能再 gap。
-- gap 未关闭、boundary 未裁清、splitting 未完成或 change 未重算时，阻断进入 acceptance 和 implementation-plan。
-- 需求稳定后才进入 acceptance 和 implementation-plan。
+- gap 未关闭、boundary 未裁清、splitting 未完成或 change 未重算时，阻断进入 `acceptance-criteria-rules` 与 `implementation-planning-rules`。
+- 需求稳定后才移交前置验收标准与实施域；测试和审核完成后才允许进入最终验收。
