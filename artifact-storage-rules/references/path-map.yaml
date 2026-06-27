@@ -57,7 +57,7 @@ policies:
   same_requirement_acceptance_updates_same_doc: true
   same_requirement_plan_updates_same_doc: true
   requirement_requires_svg_diagrams: true
-  requirement_assets_under_doc_requirements_data: true
+  requirement_assets_under_doc_requirement_data: true
   requirement_doc_embeds_assets_in_markdown: true
   same_bug_updates_same_root: true
   bug_requires_svg_diagrams: true

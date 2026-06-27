@@ -31,6 +31,7 @@ DOMAIN_ORDER = [
     DomainConfig("review", "编码审查域", "测试前的静态自审、语法检查、清理归位"),
     DomainConfig("test", "测试域", "策略、资源、功能验证、浏览器联动与回归"),
     DomainConfig("delivery", "交付域", "Git 协作与交付说明"),
+    DomainConfig("submission_review", "提交级专项审查", "相对 `main` 的当前分支提交级代码审查，不纳入默认自动审查链"),
     DomainConfig("seed", "扩展种子", "已入库但未并入主规划的参考 skill"),
 ]
 
@@ -44,6 +45,7 @@ DOMAIN_SECTION_MATCH = {
     "编码审查域": "编码审查域",
     "测试域": "测试域",
     "交付域": "交付域",
+    "提交级专项审查": "提交级专项审查",
 }
 
 STATUS_META = {
@@ -304,6 +306,7 @@ def build_focus_points(item: dict) -> list[str]:
         "编码审查域": "重点看它是否只处理静态质量问题，不越界替代测试。",
         "测试域": "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。",
         "交付域": "重点看 Git 协作与交付说明是否已分层收口，并且不越界替代测试或发布流程。",
+        "提交级专项审查": "重点看它是否只处理相对 `main` 的提交级审查，不回退成当前 diff 总审查或默认自动审查链的一部分。",
         "扩展种子": "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。",
     }
     points.append(domain_points[domain])

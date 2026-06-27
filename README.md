@@ -91,6 +91,9 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 ```text
 .
 ├── README.md
+├── PROJECT_MEMORY.md
+├── PROJECT_STYLE.md
+├── 项目设计.md
 ├── 编码skill.md
 ├── 字典.md
 ├── skill-dictionary/
@@ -177,9 +180,9 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`71`
+- 已落地 Skill：`75`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`43`
+- 扩展种子 Skill：`21`
 
 主规划文档：
 
@@ -208,10 +211,13 @@ python skill-dictionary/generate_dictionary.py
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
+| `project-agents-bootstrap` | 新会话首轮或仓库级规则文件缺失时，负责补齐和同步 `AGENTS.md` / `CLAUDE.md` 及其关键受管章节。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
+| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进，并强制输出并行技能列表或“并行技能:无”。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
 | `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件，满足可委派条件即自动委派；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行，并由主 agent 输出可见启动/完成状态。 |
+| `skill-audit-rules` | 当本轮存在多 skill 组合、并行拆分或规则收口风险时，负责只读审计是否漏触发应有 skill 或漏执行关键规则。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查，并输出主任务优先的下一步建议。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性：Skill 命中检查、Skill 执行证据、当前问题、解决方案与根因、结果结论、条件字段（改动点/验证结果/函数注释核对）和下一步建议。 |
 
@@ -312,14 +318,19 @@ python skill-dictionary/generate_dictionary.py
 | `git-collaboration-rules` | 统一分支协作、提交规范、协作边界和 Git 操作要求。 |
 | `delivery-summary-rules`  | 统一交付说明、变更说明、验证说明和最终输出结构。  |
 
-### 10. 扩展种子
+### 10. 提交级专项审查
+
+| Skill | 功能 |
+| ----- | ---- |
+| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，和“当前 diff 总审查”不是同一问题，不纳入默认自动审查链。 |
+
+### 11. 扩展种子
 
 | Skill | 功能 |
 | ----- | ---- |
 | `"doc"` | 用于读取、创建、编辑 `.docx` 文档并进行版式核验。 |
 | `"pdf"` | 用于读取、创建、审阅 PDF 文档并进行渲染检查。 |
 | `"spreadsheet"` | 用于处理 `.xlsx` / `.csv` / `.tsv` 表格并支持公式与样式工作流。 |
-| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，不纳入默认自动审查链。 |
 | `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
 | `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
@@ -422,6 +433,7 @@ claude-mem(记忆) :
 ## 维护建议
 
 - 修改或新增 Skill 后，及时刷新字典
+- 调整长期规则、目录口径、命名偏好或审查链时，同步回写根目录 `PROJECT_MEMORY.md` 与 `PROJECT_STYLE.md`，直接更新原条目，不保留并行旧口径
 - 规则变复杂时，优先把细则下沉到 `references/`
 - `SKILL.md` 只保留触发逻辑、执行流程、权责边界、判定标准和必要说明
 - 不要把所有规则都堆进总控层
@@ -592,4 +604,4 @@ claude-mem(记忆) :
 2026-06-27 13:57:29 docs: [项目记忆风格] 强化增量更新与词条回写
 2026-06-27 14:19:48 docs: [产物归档规则] 强化迁移同步与旧入口清理
 2026-06-27 16:31:47 docs: [审查链与目录归档] 收敛默认审查规则并迁移文档入口
-
+2026-06-27 17:12:38 docs: [审查规划与风格记忆] 收敛提交级专项审查并强化风格示例片段要求
