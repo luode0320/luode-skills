@@ -63,6 +63,7 @@ description: 当仅靠静态分析不能稳定定位 Bug，且需要在运行过
 - 归档内容至少包含进入原因、采用手段、观察结果、收缩结论、后续流转，以及临时 debug 日志或断言代码是否已删除。
 - Bug 根目录、入口 `README.md` 和同一 Bug 根目录复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果本轮诊断同时使用了调试日志和断言，相关记录统一落在同一个 Bug 根目录中，不再分散到 `analysis/` 或其他目录。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对运行时诊断目标、证据和结束结论是否已经真实写入当前 Bug 根目录；未落盘不得判定运行时诊断完成。
 
 ## references 读取规则
 

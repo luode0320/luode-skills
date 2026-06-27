@@ -55,6 +55,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `artifact-storage-rules` 负责统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - `artifact-delivery-gate-rules` 负责在需求、Bug、测试、审查收口前核对正式文档是否已经真实落盘，阻断“只在回复里说、不写文档”的假完成
+- 文档落盘闸门不只约束需求入口、Bug 入口、测试总结和总审查入口；需求补齐/边界/拆分/变更、Bug 复现/根因/运行时诊断/修复建议/回归风险、测试策略/命名/程序/目录/散落资产治理等中间链路，只要本轮已经形成应持久化结论，最终收口前同样必须联动 `artifact-delivery-gate-rules`
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
 
@@ -84,6 +85,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
 - 写完代码后，先进入编码审查域；默认先过 `implementation-review-rules`，再进入测试域，最终收口前再由 `project-change-review-rules` 做当前 diff 总审查
 - 需求、Bug、测试、审查任一链路准备最终收口前，进入 `artifact-delivery-gate-rules`，确认正式文档已经真实写入 `doc/需求/`、`doc/bugs/`、`doc/tests/` 或 `doc/审查/`
+- 即使当前只是在处理中间环节而不是主入口 skill，只要已经产出需求分析结论、Bug 诊断结论、测试资源整理结论或提交级审查报告，也必须先落盘再允许最终回复
 - 准备提交、整理交付说明或进入团队发布流程前收口时，进入交付域
 
 ## 仓库结构
@@ -218,7 +220,7 @@ python skill-dictionary/generate_dictionary.py
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `project-agents-bootstrap` | 新会话首轮或仓库级规则文件缺失时，负责补齐和同步 `AGENTS.md` / `CLAUDE.md` 及其关键受管章节。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
-| `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，缺文档时直接阻断收口。 |
+| `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，主入口与中间链路结论一视同仁；缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进，并强制输出并行技能列表或“并行技能:无”。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
@@ -329,7 +331,7 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill | 功能 |
 | ----- | ---- |
-| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，和“当前 diff 总审查”不是同一问题，不纳入默认自动审查链。 |
+| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，和“当前 diff 总审查”不是同一问题，不纳入默认自动审查链；正式报告统一归档到 `doc/审查/`，不再写项目根目录固定文件名。 |
 
 ### 11. 扩展种子
 
@@ -441,6 +443,7 @@ claude-mem(记忆) :
 
 - 修改或新增 Skill 后，及时刷新字典
 - 调整长期规则、目录口径、命名偏好或审查链时，同步回写根目录 `PROJECT_MEMORY.md` 与 `PROJECT_STYLE.md`，直接更新原条目，不保留并行旧口径
+- 当文档落盘规则扩展到新的中间链路或新的审查出口时，同步检查 README、`PROJECT_MEMORY.md`、相关 skill 的 `references/` 与 agent prompt，避免只改主 skill 不改配套口径
 - 规则变复杂时，优先把细则下沉到 `references/`
 - `SKILL.md` 只保留触发逻辑、执行流程、权责边界、判定标准和必要说明
 - 不要把所有规则都堆进总控层
@@ -613,3 +616,5 @@ claude-mem(记忆) :
 2026-06-27 16:31:47 docs: [审查链与目录归档] 收敛默认审查规则并迁移文档入口
 2026-06-27 17:12:38 docs: [审查规划与风格记忆] 收敛提交级专项审查并强化风格示例片段要求
 2026-06-27 20:06:11 feat: [文档落盘闸门] 新增统一收口前文档落盘检查并强制审查域归档
+2026-06-27 21:23:30 docs: [中间链路落盘] 扩展需求Bug测试中间环节落盘闸门并统一提交级审查归档到 doc/审查
+2026-06-27 21:38:00 fix: [Skill格式与归档] 修复异常SKILL结构并补齐中间链路落盘

@@ -23,6 +23,8 @@ entry_files:
   bug_flow_svg: "flow.svg"
   bug_sequence_svg: "sequence.svg"
   test_task_readme: "README.md"
+  review_doc: "{date}_{review_cn_title}.md"
+  review_index_readme: "README.md"
   project_design_doc: "项目设计.md"
 root_files:
   project_design_primary: "项目设计.md"
