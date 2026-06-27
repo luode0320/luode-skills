@@ -41,7 +41,7 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审核 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。
+- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审核 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。需求、验收标准和实施计划完成后不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
 - 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
 - 适用范围: 需求域
 - 更新时间: 2026-06-27
@@ -59,6 +59,15 @@
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`acceptance-criteria-rules`、`final-acceptance-rules`
 - 适用范围: 验收域
 - 更新时间: 2026-06-27
+- 状态: 启用
+
+### 实施开工授权与自动推进
+- 别名: 开始实施确认, 开工授权, 实施周期自动推进
+- 类型: 流程规则
+- 定义: 需求主文档、前置验收标准和实施总览/实施周期即使都已完成，也不构成自动开工授权；必须由用户在当前任务中明确说“开始实施”“开始执行”或“按实施计划执行”，才允许从实施文档切入正式编码。开工后按 `autonomous-execution-rules` 默认遵循“当前实施周期实现 -> 当前周期编码审查 -> 当前周期测试 -> 当前周期审核/验收收口 -> 下一实施周期”的自动串行闭环，除阻断级事件外不再等待用户逐步下达“进入测试/进入审核/继续下一个周期”指令。
+- 来源: `autonomous-execution-rules`、`implementation-planning-rules`、`team-development-rules/references/routing-rules.md`
+- 适用范围: 实施域、测试域、审核域、验收域
+- 更新时间: 2026-06-28
 - 状态: 启用
 - 来源: `requirement-gap-rules`、`artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 需求域
@@ -139,3 +148,4 @@
 - 2026-06-27：明确 `requirement-discovery-rules` 是需求域第一入口，现有需求 skill 暂不合并为大 skill，改为通过路由 reference 收敛职责重叠。
 - 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
 - 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/审查/`，不再写项目根目录固定文件名。
+- 2026-06-28：明确“需求/验收标准/实施计划完成不等于自动开工”，必须等用户明确“开始实施/开始执行”后才能进入编码；一旦开工，后续按实施周期自动串行推进实现、测试、审核与验收闭环。
