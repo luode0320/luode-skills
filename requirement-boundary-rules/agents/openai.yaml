@@ -1,4 +1,4 @@
 interface:
   display_name: "需求边界判定"
-  short_description: "判定需求边界并更新同一份 ment 需求文档的规则"
-  default_prompt: "使用 $requirement-boundary-rules 判断当前问题属于需求范围、需求变更、历史缺陷还是兼容影响，并把边界结论更新到同一份 ment 需求文档。"
+  short_description: "判定需求边界，并更新同一份 doc/需求/ 主文档。"
+  default_prompt: "使用 $requirement-boundary-rules 判断当前问题属于需求范围、需求变更、历史缺陷还是兼容影响，并把边界结论更新到同一份 doc/需求/ 主文档。"

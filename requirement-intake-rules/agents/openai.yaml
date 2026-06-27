@@ -1,1 +1,4 @@
-interface:   display_name: "需求接入"   short_description: "从需求链接与零散资料补齐需求，并定义需求域同一份 doc/需求/ 文档入口的规则"   default_prompt: "使用 $requirement-intake-rules 根据需求 URL、零散资料和物料整理需求，补齐到可进入开发的程度，生成或更新 doc/需求/ 文档，并同步产出 `.flow.svg` 与 `.sequence.svg`；两张 SVG 必须显式白底（全画布白色背景层）。若涉及新增文件必须使用目录树代码块记录，若涉及数据库新表/字段变更必须附 SQL。"
+interface:
+  display_name: "需求接入"
+  short_description: "接收 discovery 或资料，收口为同一份需求主文档。"
+  default_prompt: "使用 $requirement-intake-rules 根据 discovery 结果、需求 URL 和零散资料整理需求，补齐到可开发程度并更新 doc/需求/ 主文档。"

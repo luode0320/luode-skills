@@ -29,6 +29,24 @@
 - 更新时间: 2026-06-27
 - 状态: 启用
 
+### 需求主动侦察链路
+- 别名: 老板式 idea 转需求, idea 侦察, 需求 discovery
+- 类型: 流程规则
+- 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-discovery-rules` 主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、用户补充路径或 URL，形成有证据来源的需求设计；已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
+- 来源: 对话确认、`requirement-discovery-rules`
+- 适用范围: 需求域
+- 更新时间: 2026-06-27
+- 状态: 启用
+
+### 需求域第一入口
+- 别名: 需求 skill 顺序, 需求前置入口
+- 类型: 流程规则
+- 定义: 需求域默认以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责把 discovery 或用户资料收口为需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。当前不把需求域 skill 合并成一个大 skill，而是通过 `requirement-discovery-rules/references/requirement-domain-routing.md` 维护相邻 skill 的顺序、让路和重叠边界。
+- 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
+- 适用范围: 需求域
+- 更新时间: 2026-06-27
+- 状态: 启用
+
 ### 审查体系收口
 - 别名: 审查链路
 - 类型: 流程规则
@@ -72,3 +90,5 @@
 ## 变更记录
 
 - 2026-06-27：初始化根目录长期记忆文档，补齐 doc 顶层目录口径、审查链收口和长期规则回写约束。
+- 2026-06-27：新增需求主动侦察链路，明确老板式 idea 先由 agent 查项目、数据、代码、上下游和补充路径，再形成需求设计并回写可复用侦察线索。
+- 2026-06-27：明确 `requirement-discovery-rules` 是需求域第一入口，现有需求 skill 暂不合并为大 skill，改为通过路由 reference 收敛职责重叠。

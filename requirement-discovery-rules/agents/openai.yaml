@@ -1,0 +1,4 @@
+interface:
+  display_name: "需求主动侦察"
+  short_description: "从一句话想法主动查项目、数据、代码和资料，形成需求设计证据。"
+  default_prompt: "使用 $requirement-discovery-rules 从一个粗略 idea 开始，主动侦察项目、数据库、代码、上下游和用户补充线索，整理可行方案并沉淀可复用记忆。"

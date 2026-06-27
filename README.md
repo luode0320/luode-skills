@@ -74,7 +74,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
-- 用户给出需求链接、资料、原型、物料时，进入需求域
+- 用户只给一句话 idea 或老板式方向时，先进入 `requirement-discovery-rules` 主动侦察项目、数据、代码和上下游；用户给出需求链接、资料、原型、物料时，进入需求域继续接入
 - 用户描述线上问题、异常现象、复现路径时，进入 Bug 域
 - 开始新增或修改代码时，进入编码基线域
 - 改到数据库表结构、SQL、Repository 时，进入数据库相关 Skill
@@ -98,6 +98,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 ├── 字典.md
 ├── skill-dictionary/
 ├── team-development-rules/
+├── requirement-discovery-rules/
 ├── requirement-intake-rules/
 ├── bug-intake-rules/
 ├── ...
@@ -111,6 +112,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `downloaded-seeds/` 只作为外部 Skill 下载后的临时中转目录，不建议长期保留与顶层重复的同名 Skill
 
 ## 当前进度
+
+2026-06-27 19:45:50 docs: [需求主动侦察] 新增需求前置侦察并收敛需求域路由
 
 2026-06-25 00:46:00 docs: [总结正反例] 增加需求对照示例
 
@@ -180,7 +183,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`75`
+- 已落地 Skill：`76`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`21`
 
@@ -235,8 +238,9 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                         | 功能                                                                                                      |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `requirement-intake-rules`    | 作为需求总入口，接收需求 URL、资料、物料、上下文，补齐目标、前提、输入输出，并按 `artifact-storage-rules` 沉淀需求文档。 |
-| `requirement-gap-rules`       | 判断需求描述是否缺少前提、字段、流程、业务规则等，并统一更新到需求文档。                                  |
+| `requirement-discovery-rules` | 从一句话 idea 或粗略方向出发，主动侦察项目代码、数据库线索、历史资料、上下游、用户补充路径和 URL，形成有证据来源的需求设计，并把可复用线索回写长期记忆。 |
+| `requirement-intake-rules`    | 作为需求主文档入口，接收 discovery 结果、需求 URL、资料、物料和上下文，收口目标、前提、输入输出，并按 `artifact-storage-rules` 沉淀需求文档。 |
+| `requirement-gap-rules`       | 判断主动侦察后是否仍缺少前提、字段、流程、业务规则等关键内容，并统一更新到需求文档。                                  |
 | `requirement-boundary-rules`  | 判断需求边界、影响范围、上下游、非目标范围，防止越界实现。                                                |
 | `requirement-splitting-rules` | 把大需求拆成可执行的小任务项，明确模块拆分和实施顺序。                                                    |
 | `implementation-plan-rules`   | 把确认后的需求转成实施计划，帮助进入编码阶段。                                                            |

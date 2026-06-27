@@ -24,7 +24,7 @@ class DomainConfig:
 DOMAIN_ORDER = [
     DomainConfig("orchestration", "总控层", "流程分流、冲突裁决、阶段阻断与全局基础约定"),
     DomainConfig("memory", "记忆域", "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全"),
-    DomainConfig("requirement", "需求域", "需求澄清、缺口识别、边界确认、验收前置"),
+    DomainConfig("requirement", "需求域", "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置"),
     DomainConfig("bug", "Bug 域", "问题录入、定位、运行时诊断、修复建议"),
     DomainConfig("baseline", "编码基线域", "开始编码即并行生效的基础质量规则"),
     DomainConfig("location", "代码位点域", "按改动位置叠加触发的实现规则"),
