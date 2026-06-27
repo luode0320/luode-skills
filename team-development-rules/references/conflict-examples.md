@@ -30,7 +30,7 @@
 
 - 当前信号：实现已完成，但还没有做语法检查、清理未使用引用和调试残留。
 - 应命中：`team-development-rules` + 编码审查域。
-- 裁决：阻断进入测试域，先进入 `implementation-review-rules`、`syntax-check-review-rules`、`cleanup-format-review-rules`。
+- 裁决：阻断进入测试域，先进入 `implementation-review-rules`。
 - 原因：编码审查阶段未完成，不能跳测试前自审。
 
 ### 样例 4：验收不通过，但原因可能是需求理解偏差也可能是代码缺陷

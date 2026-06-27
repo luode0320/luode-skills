@@ -52,7 +52,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
-- `artifact-storage-rules` 负责统一 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
+- `artifact-storage-rules` 负责统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
@@ -69,8 +69,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 例如：
 
-- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/requirements/`、`doc/tests/`、`doc/bugs/`、`doc/` 和 Git 活动
-- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`，并统一收口到 `doc/requirements/`、`doc/bugs/`、`doc/tests/`
+- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/需求/`、`doc/tests/`、`doc/bugs/`、`doc/` 和 Git 活动
+- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`，并统一收口到 `doc/需求/`、`doc/bugs/`、`doc/tests/`
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
@@ -81,7 +81,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 改到 API 接口、请求模型、响应结构、请求头时，进入 API 相关 Skill
 - 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-swagger-rules`
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
-- 写完代码后，先进入编码审查域，再进入测试域
+- 写完代码后，先进入编码审查域；默认先过 `implementation-review-rules`，再进入测试域，最终收口前再由 `project-change-review-rules` 做当前 diff 总审查
 - 准备提交、整理交付说明或进入团队发布流程前收口时，进入交付域
 
 ## 仓库结构
@@ -202,7 +202,7 @@ python skill-dictionary/generate_dictionary.py
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
-| `artifact-storage-rules` | 统一 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，需求、Bug、测试主文档统一收口到 `doc/` 子目录。 |
+| `artifact-storage-rules` | 统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，需求、Bug、测试主文档统一收口到 `doc/` 子目录。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
@@ -287,10 +287,8 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                         | 功能                                                     |
 | ----------------------------- | -------------------------------------------------------- |
-| `implementation-review-rules` | 在进入测试前，对本次实现做一次静态规范自审。             |
-| `syntax-check-review-rules`   | 检查语法错误、类型问题、导入引用问题、构建失败风险。     |
-| `cleanup-format-review-rules` | 清理未使用导入、冗余代码、多余换行，统一基础格式。       |
-| `code-placement-review-rules` | 检查代码存放位置、模块归属、层级边界和依赖方向是否合理。 |
+| `implementation-review-rules` | 唯一自动测试前实现闸门，统一检查实现质量、基础格式、语法/类型/引用、目录归位/依赖方向。 |
+| `project-change-review-rules` | 当前改动总审查；支持用户显式审查当前 diff，也支持最终收口前自动总审查。 |
 
 ### 8. 测试域
 
@@ -321,7 +319,7 @@ python skill-dictionary/generate_dictionary.py
 | `"doc"` | 用于读取、创建、编辑 `.docx` 文档并进行版式核验。 |
 | `"pdf"` | 用于读取、创建、审阅 PDF 文档并进行渲染检查。 |
 | `"spreadsheet"` | 用于处理 `.xlsx` / `.csv` / `.tsv` 表格并支持公式与样式工作流。 |
-| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告。 |
+| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，不纳入默认自动审查链。 |
 | `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
 | `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
@@ -593,4 +591,5 @@ claude-mem(记忆) :
 2026-06-27 01:44:29 docs: [当前改动审查] 扩展审核当前改动触发词
 2026-06-27 13:57:29 docs: [项目记忆风格] 强化增量更新与词条回写
 2026-06-27 14:19:48 docs: [产物归档规则] 强化迁移同步与旧入口清理
+2026-06-27 16:31:47 docs: [审查链与目录归档] 收敛默认审查规则并迁移文档入口
 

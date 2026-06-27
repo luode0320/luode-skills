@@ -1,4 +1,4 @@
-# `test-location-rules` 拆分对照样本
+﻿# `test-location-rules` 拆分对照样本
 
 更新时间：`2026-04-03 00:35`
 
@@ -102,5 +102,6 @@
 
 - 上表中的规则项继续保持 100% 已覆盖。
 - 现行文档、字典索引与技能入口已经全部迁移到 `test-task-root-layout-rules`、`test-scattered-asset-location-rules` 与 `go-test-compile-path-rules`。
-- 历史证据仅保留在 `doc/requirements/` 与 `doc/tests/2026-04-02_231122/` 这类审计材料中，不再作为运行中的依赖入口。
+- 历史证据仅保留在 `doc/需求/` 与 `doc/tests/2026-04-02_231122/` 这类审计材料中，不再作为运行中的依赖入口。
 - `test-location-rules/` 目录及其 `references/`、`agents/`、`SKILL.md` 已从仓库中移除。
+

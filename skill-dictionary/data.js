@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-27 14:16:48",
+  "generated_at": "2026-06-27 16:23:36",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 71,
-    "implemented_total": 71,
+    "planned_total": 69,
+    "implemented_total": 69,
     "planned_missing": 0,
-    "seed_total": 47,
+    "seed_total": 27,
     "doc_total": 5,
-    "references_total": 287,
-    "agents_total": 105
+    "references_total": 281,
+    "agents_total": 83
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -83,7 +83,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 2,
-          "auto_trigger": "当需要定义、调整或解释项目中 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物根目录、主入口文件、命名模板、同任务复用策略或跨域文档引用关系时自动触发。负责提供全局唯一的目录与命名单一真相源，并为需求、Bug、测试、记忆、项目设计和交付类 skill 提供统一引用基准；不要用它代替需求分析、Bug 定位、测试执行、生产代码存放决策或流程分流。",
+          "auto_trigger": "当需要定义、调整或解释项目中 `doc/需求/`、`doc/架构/`、`doc/阶段/`、`doc/bugs/`、`doc/tests/`、`doc/审查/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物根目录、主入口文件、命名模板、同任务复用策略或跨域文档引用关系时自动触发。负责提供全局唯一的目录与命名单一真相源，并为需求、Bug、测试、审查、记忆、项目设计和交付类 skill 提供统一引用基准；不要用它代替需求分析、Bug 定位、测试执行、生产代码存放决策或流程分流。",
           "core_responsibility": "作为跨域统一约定 skill，提供目录、命名和复用策略的单一真相源，供需求、Bug、测试、记忆、项目设计和交付类 skill 统一引用。",
           "skill_path": "artifact-storage-rules/SKILL.md",
           "directory_path": "artifact-storage-rules",
@@ -128,7 +128,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 3,
-          "auto_trigger": "当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / code-placement-review-rules 的代码归位判断。",
+          "auto_trigger": "当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / implementation-review-rules 的测试前归位判断。",
           "core_responsibility": "负责把根目录项目设计类文档当作弱参考源读取，按代码与当前文档优先原则判断偏移，并统一同步或补建根目录 `项目设计.md`。",
           "skill_path": "project-design-doc-rules/SKILL.md",
           "directory_path": "project-design-doc-rules",
@@ -507,7 +507,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 12,
-          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
+          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill 与 `implementation-review-rules` 的测试前收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
           "directory_path": "skill-compliance-gate-rules",
@@ -2400,10 +2400,10 @@ window.SKILL_DICTIONARY = {
       "label": "编码审查域",
       "description": "测试前的静态自审、语法检查、清理归位",
       "order": 7,
-      "implemented_count": 4,
+      "implemented_count": 2,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 4,
+      "total_count": 2,
       "items": [
         {
           "id": "implementation-review-rules",
@@ -2416,8 +2416,8 @@ window.SKILL_DICTIONARY = {
           "domain_description": "测试前的静态自审、语法检查、清理归位",
           "domain_order": 7,
           "item_order": 1,
-          "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；必须检查“最近修改超过7天的高复用通用代码是否被直接修改旧行为”，命中时要求改为新增兼容路径；Go 场景下还需在实现自审阶段扫描 `doc/tests/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；默认优先并行；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
-          "core_responsibility": "对刚完成的实现做一次测试前规范自审。",
+          "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。作为唯一自动测试前实现闸门，统一检查 4 组内容：实现质量、格式清理、语法/类型/引用、目录归位/分层边界。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须完成基础格式、语法/类型/引用、目录归位与依赖方向的测试前收口；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；必须检查“最近修改超过7天的高复用通用代码是否被直接修改旧行为”，命中时要求改为新增兼容路径；Go 场景下还需在实现自审阶段扫描 `doc/tests/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；默认优先并行；不要用它代替功能验证规则。",
+          "core_responsibility": "对刚完成的实现做一次测试前静态自审与收口。",
           "skill_path": "implementation-review-rules/SKILL.md",
           "directory_path": "implementation-review-rules",
           "directory": "implementation-review-rules",
@@ -2434,9 +2434,12 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "implementation-review-rules/references/format-cleanup-checks.md",
+            "implementation-review-rules/references/placement-and-dependency-checks.md",
             "implementation-review-rules/references/review-boundaries.md",
             "implementation-review-rules/references/review-examples.md",
-            "implementation-review-rules/references/review-scope.md"
+            "implementation-review-rules/references/review-scope.md",
+            "implementation-review-rules/references/syntax-and-reference-checks.md"
           ],
           "agents": [
             "implementation-review-rules/agents/openai.yaml"
@@ -2449,9 +2452,9 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "syntax-check-review-rules",
-          "name": "syntax-check-review-rules",
-          "title": "语法校验规则",
+          "id": "project-change-review-rules",
+          "name": "project-change-review-rules",
+          "title": "项目当前改动总审查规则",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "review",
@@ -2459,113 +2462,28 @@ window.SKILL_DICTIONARY = {
           "domain_description": "测试前的静态自审、语法检查、清理归位",
           "domain_order": 7,
           "item_order": 2,
-          "auto_trigger": "【强制自动触发】当新增或修改代码后准备进入测试前验证，且需要确认语法、类型、依赖引用、构建基础是否正确时触发。负责检查语法错误、引用缺失、类型问题和明显构建失败风险；默认优先并行；不要用它代替实现自审、格式清理或功能测试规则。",
-          "core_responsibility": "检查语法错误、引用缺失、类型问题和明显构建失败风险。",
-          "skill_path": "syntax-check-review-rules/SKILL.md",
-          "directory_path": "syntax-check-review-rules",
-          "directory": "syntax-check-review-rules",
+          "auto_trigger": "当前改动总审查 skill。两类场景自动成立：用户明确点名 `$project-change-review-rules`、`project-change-review-rules`、说出“审核当前改动/当前 diff”，或本轮存在代码改动且准备最终收口。负责只读审查当前项目未提交改动、已暂存改动和可见新增文件，覆盖需求边界、缺陷、遗漏、安全风险、重复逻辑、未按已命中 skill 规则实现、注释缺失或乱码、日志打印不合规、工具包/公共方法复用不足、代码可读性差、补丁式修补、测试与验证缺口；输出按严重级别排序的问题清单，不直接改代码、不格式化、不提交。",
+          "core_responsibility": "对当前工作区 diff 做总审查，补抓边界、风险、遗漏和阻断项。",
+          "skill_path": "project-change-review-rules/SKILL.md",
+          "directory_path": "project-change-review-rules",
+          "directory": "project-change-review-rules",
           "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
+            "目标",
+            "快速流程",
+            "审查矩阵",
+            "专门 Skill 联动",
+            "读取与证据规则",
+            "输出格式",
+            "驳回标准",
             "执行结果归档要求",
-            "references 读取规则"
+            "References"
           ],
           "references": [
-            "syntax-check-review-rules/references/check-examples.md",
-            "syntax-check-review-rules/references/check-scope.md",
-            "syntax-check-review-rules/references/type-and-reference-risks.md"
+            "project-change-review-rules/references/checklist.md",
+            "project-change-review-rules/references/report-template.md"
           ],
           "agents": [
-            "syntax-check-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看它是否只处理静态质量问题，不越界替代测试。"
-          ]
-        },
-        {
-          "id": "cleanup-format-review-rules",
-          "name": "cleanup-format-review-rules",
-          "title": "清理格式审查规则",
-          "status": "implemented",
-          "status_label": "已实现",
-          "domain_id": "review",
-          "domain_label": "编码审查域",
-          "domain_description": "测试前的静态自审、语法检查、清理归位",
-          "domain_order": 7,
-          "item_order": 3,
-          "auto_trigger": "【强制自动触发】当新增或修改代码后准备进入测试前验证，且存在未使用导入、未使用变量、未使用方法引用、调试残留、临时代码、死代码、多余换行或格式不一致风险时触发。负责清理代码噪音并统一基础格式；默认优先并行；不要用它代替功能性修改或实现重构。",
-          "core_responsibility": "清理代码噪音并统一基础格式。",
-          "skill_path": "cleanup-format-review-rules/SKILL.md",
-          "directory_path": "cleanup-format-review-rules",
-          "directory": "cleanup-format-review-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
-          ],
-          "references": [
-            "cleanup-format-review-rules/references/cleanup-examples.md",
-            "cleanup-format-review-rules/references/cleanup-scope.md",
-            "cleanup-format-review-rules/references/debug-artifact-rules.md"
-          ],
-          "agents": [
-            "cleanup-format-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看它是否只处理静态质量问题，不越界替代测试。"
-          ]
-        },
-        {
-          "id": "code-placement-review-rules",
-          "name": "code-placement-review-rules",
-          "title": "代码归位审查规则",
-          "status": "implemented",
-          "status_label": "已实现",
-          "domain_id": "review",
-          "domain_label": "编码审查域",
-          "domain_description": "测试前的静态自审、语法检查、清理归位",
-          "domain_order": 7,
-          "item_order": 4,
-          "auto_trigger": "【强制自动触发】当新增文件、移动文件、扩展模块、跨层调用、工具类落点或目录归属可能不合理时，在进入测试前触发。负责检查代码存放位置、模块归属、层级边界和依赖方向是否合理；Go 项目中还需检查 `*_test.go` 是否误落在 `doc/tests/` 之外，并检查 `internal/service` 是否散落请求/响应等结构体定义；对 500 行及以上且持续膨胀的文件需追加拆分审查；默认优先并行；不要用它代替编码前的包结构决策规则。",
-          "core_responsibility": "检查代码存放位置、模块归属、层级边界和依赖方向是否合理。",
-          "skill_path": "code-placement-review-rules/SKILL.md",
-          "directory_path": "code-placement-review-rules",
-          "directory": "code-placement-review-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
-          ],
-          "references": [
-            "code-placement-review-rules/references/dependency-direction.md",
-            "code-placement-review-rules/references/placement-checklist.md",
-            "code-placement-review-rules/references/placement-examples.md"
-          ],
-          "agents": [
-            "code-placement-review-rules/agents/openai.yaml"
+            "project-change-review-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -3101,8 +3019,8 @@ window.SKILL_DICTIONARY = {
       "order": 10,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 47,
-      "total_count": 47,
+      "seed_count": 27,
+      "total_count": 27,
       "items": [
         {
           "id": "\"doc\"",
@@ -3368,123 +3286,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "api-request-review-rules",
-          "name": "api-request-review-rules",
-          "title": "接口请求检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 7,
-          "auto_trigger": "【强制自动触发】当需要只检查请求参数、DTO、body 结构、参数校验或请求模型是否符合接口请求规范时触发。只读镜像版本，严格沿用 `api-request-rules` 的请求结构标准，不新增请求规范，不直接改代码；默认优先并行；适合在请求结构收口前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "api-request-review-rules/SKILL.md",
-          "directory_path": "api-request-review-rules",
-          "directory": "api-request-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "api-request-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "api-response-review-rules",
-          "name": "api-response-review-rules",
-          "title": "接口响应检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 8,
-          "auto_trigger": "【强制自动触发】当需要只检查返回体、响应包装器、分页结构、错误响应结构、兼容字段、版本字段或统一响应模型是否符合响应规范时触发。只读镜像版本，严格沿用 `api-response-rules` 的响应结构标准，不新增响应规范，不直接改代码；默认优先并行；适合在响应收口前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "api-response-review-rules/SKILL.md",
-          "directory_path": "api-response-review-rules",
-          "directory": "api-response-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "api-response-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "api-swagger-review-rules",
-          "name": "api-swagger-review-rules",
-          "title": "Swagger/OpenAPI 检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 9,
-          "auto_trigger": "【强制自动触发】当需要只检查后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步、调试入口暴露、文档分组标签、路径或环境开关是否合规时触发。只读镜像版本，严格沿用 `api-swagger-rules` 的 Swagger/OpenAPI 标准，不新增文档规范，不直接改代码；默认优先并行；适合在文档收口前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "api-swagger-review-rules/SKILL.md",
-          "directory_path": "api-swagger-review-rules",
-          "directory": "api-swagger-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "api-swagger-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "autonomous-execution-rules",
           "name": "autonomous-execution-rules",
           "title": "自主连续执行规则",
@@ -3494,7 +3295,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 10,
+          "item_order": 7,
           "auto_trigger": "当多步骤任务尚未闭环且存在可直接执行的下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行下一步，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "autonomous-execution-rules/SKILL.md",
@@ -3524,45 +3325,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "bug-regression-risk-mirror-rules",
-          "name": "bug-regression-risk-mirror-rules",
-          "title": "Bug 回归风险镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 11,
-          "auto_trigger": "【强制自动触发】当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。只读镜像版本，严格沿用 `bug-regression-risk-rules` 的回归风险标准，不新增风险规范，不直接改代码；默认优先并行；适合在修复实施前并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "bug-regression-risk-mirror-rules/SKILL.md",
-          "directory_path": "bug-regression-risk-mirror-rules",
-          "directory": "bug-regression-risk-mirror-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "bug-regression-risk-mirror-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "character-sprite-animation-production",
           "name": "character-sprite-animation-production",
           "title": "Character Sprite Animation Production",
@@ -3572,7 +3334,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 12,
+          "item_order": 8,
           "auto_trigger": "用于在 2D 游戏角色、怪物、Boss 或类角色单位需要动作生产时，负责角色动画的生产、分方向拆分、fixed-cell sheet 布局、动作 QA 与预览验证。吸收 character-animation-creator-skill 的核心思路：先锁定角色 identity，再做 base pose，再按动作和方向逐项扩展，并在生成后做 contact sheet、方向一致性、体量漂移和动画可读性审查。适用于 idle、walk、run、attack、cast、hit、death、4向/8向、fixed-cell sprite sheet 等角色动画任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "character-sprite-animation-production/SKILL.md",
@@ -3597,88 +3359,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "code-placement-mirror-rules",
-          "name": "code-placement-mirror-rules",
-          "title": "代码归位镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 13,
-          "auto_trigger": "【强制自动触发】当新增文件、移动文件、扩展模块、跨层调用、工具类落点或目录归属可能不合理时触发。只读镜像版本，严格沿用 `code-placement-review-rules` 的归位审查标准，不新增结构规范，不直接改代码；默认优先并行；适合和执行线程并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "code-placement-mirror-rules/SKILL.md",
-          "directory_path": "code-placement-mirror-rules",
-          "directory": "code-placement-mirror-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "code-placement-mirror-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "code-readability-review-rules",
-          "name": "code-readability-review-rules",
-          "title": "可读性检查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 14,
-          "auto_trigger": "【强制自动触发】当需要只检查函数结构、表达顺序、条件层级、复杂度、JSON key 直取、第三方响应解析、接口抽象和局部可读性是否需要改进时触发。只读审查版，判定标准严格沿用 `code-readability-rules`，不新增可读性规范，不直接改代码；默认优先并行；适合在进入可读性改写前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "code-readability-review-rules/SKILL.md",
-          "directory_path": "code-readability-review-rules",
-          "directory": "code-readability-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "审查原则",
-            "输入",
-            "输出",
-            "边界",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "code-readability-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "code-review-automation-rules",
           "name": "code-review-automation-rules",
           "title": "提交级代码审核规则",
@@ -3688,7 +3368,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 15,
+          "item_order": 9,
           "auto_trigger": "【强制自动触发】当用户主动提出“审核代码”“review 当前分支提交”“审查最近提交”时触发。负责读取项目 `main` 分支最近一条提交时间，并仅审查当前分支在该时间之后且尚未并入 `main` 的提交，逐条输出中文结构化结果（致命/严重/中等/建议），再将汇总报告保存到被审核项目根目录固定文件名（同名覆盖）；禁止跨提交混审，禁止把非当前 commit 引入的问题混入结论。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "code-review-automation-rules/SKILL.md",
@@ -3720,131 +3400,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "code-style-review-rules",
-          "name": "code-style-review-rules",
-          "title": "代码风格检查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 16,
-          "auto_trigger": "【强制自动触发】当需要只检查局部代码风格、写法一致性、命名习惯、错误处理写法、路由写法、局部排版和团队约定是否偏离时触发。只读审查版，判定标准严格沿用 `code-style-consistency-rules`，不新增风格规范，不直接改代码；默认优先并行；适合在进入风格一致性修正前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "code-style-review-rules/SKILL.md",
-          "directory_path": "code-style-review-rules",
-          "directory": "code-style-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "审查原则",
-            "输入",
-            "输出",
-            "边界",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "code-style-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "comment-review-rules",
-          "name": "comment-review-rules",
-          "title": "注释检查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 17,
-          "auto_trigger": "【强制自动触发】当需要只检查函数、方法、字段、结构体字面量、补丁位点和前端改动位点注释是否缺失或不合格时触发。只读审查版，判定标准严格沿用 `comment-completion-gate-rules` 与 `comment-placement-granularity-rules`，不新增注释规范，不直接补写注释；默认优先并行；适合在进入注释补齐闸门前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "comment-review-rules/SKILL.md",
-          "directory_path": "comment-review-rules",
-          "directory": "comment-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "审查原则",
-            "输入",
-            "输出",
-            "边界",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "comment-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "common-util-review-rules",
-          "name": "common-util-review-rules",
-          "title": "公共工具检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 18,
-          "auto_trigger": "【强制自动触发】当需要只检查工具类、通用方法、公共组件、工具函数、通用常量或复用代码是否应该抽成公共层时触发。只读镜像版本，严格沿用 `common-util-rules` 的公共工具判定标准，不新增工具规范，不直接改代码；默认优先并行；适合在抽公共工具前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "common-util-review-rules/SKILL.md",
-          "directory_path": "common-util-review-rules",
-          "directory": "common-util-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "common-util-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "context-compression-rules",
           "name": "context-compression-rules",
           "title": "上下文压缩规则",
@@ -3854,7 +3409,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 19,
+          "item_order": 10,
           "auto_trigger": "当当前会话已发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），并强制重新读取当前项目根目录 `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code），避免压缩后丢失 skill 记忆或仓库级硬规则，再输出可直接续做的最小上下文包；压缩包必须显式携带”是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "context-compression-rules/SKILL.md",
@@ -3896,7 +3451,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 20,
+          "item_order": 11,
           "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "find-skills/SKILL.md",
@@ -3920,88 +3475,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "format-review-rules",
-          "name": "format-review-rules",
-          "title": "格式检查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 21,
-          "auto_trigger": "【强制自动触发】当需要只检查代码格式、缩进、空行、对齐、换行、基础排版以及未使用导入/变量/方法引用/死代码/调试残留是否需要处理时触发。只读审查版，判定标准严格沿用 `cleanup-format-review-rules`，不新增格式规范，不直接改代码；默认优先并行；适合在进入 cleanup-format-review-rules 之前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "format-review-rules/SKILL.md",
-          "directory_path": "format-review-rules",
-          "directory": "format-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "审查原则",
-            "输入",
-            "输出",
-            "边界",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "format-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "functional-validation-review-rules",
-          "name": "functional-validation-review-rules",
-          "title": "功能验证审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 22,
-          "auto_trigger": "【强制自动触发】当需要只检查功能验证是否满足 `functional-validation-rules` 的验证范围、验证步骤、通过驳回标准、联调要求、结果留痕和测试隔离要求时触发。只读镜像版本，严格沿用 `functional-validation-rules` 的功能验证标准，不新增验证规则，不直接执行验证、不直接写测试结论；默认优先并行；适合在功能验证执行前或执行后做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "functional-validation-review-rules/SKILL.md",
-          "directory_path": "functional-validation-review-rules",
-          "directory": "functional-validation-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "functional-validation-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "golang-patterns",
           "name": "golang-patterns",
           "title": "Go 开发模式",
@@ -4011,7 +3484,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 23,
+          "item_order": 12,
           "auto_trigger": "Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "golang-patterns/SKILL.md",
@@ -4051,7 +3524,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 24,
+          "item_order": 13,
           "auto_trigger": "当用户提交图片、截图、设计稿并希望分析/修改/排查时触发。硬条件：当消息包含 `<image ...>` 时必须命中本 skill。默认将红框（含红色方框、红圈、红线标注）区域视为本轮重点关注信息，优先围绕该区域给出结论与建议；若无红框，再回退到全图分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "image-redbox-focus-rules/SKILL.md",
@@ -4076,162 +3549,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "implementation-plan-review-rules",
-          "name": "implementation-plan-review-rules",
-          "title": "实施计划审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 25,
-          "auto_trigger": "【强制自动触发】当需要只检查实施计划是否满足 `implementation-plan-rules` 的开发周期、阶段拆分、文件落点、依赖顺序、验证闭环和计划收口要求时触发。只读镜像版本，严格沿用 `implementation-plan-rules` 的计划标准，不新增计划规范，不直接写计划文档；默认优先并行；适合在实施计划收口前做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "implementation-plan-review-rules/SKILL.md",
-          "directory_path": "implementation-plan-review-rules",
-          "directory": "implementation-plan-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "implementation-plan-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "implementation-review-mirror-rules",
-          "name": "implementation-review-mirror-rules",
-          "title": "实现自审镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 26,
-          "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。只读镜像版本，严格沿用 `implementation-review-rules` 的实现自审标准，不新增实现规范，不直接改代码；默认优先并行；适合和执行线程并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "implementation-review-mirror-rules/SKILL.md",
-          "directory_path": "implementation-review-mirror-rules",
-          "directory": "implementation-review-mirror-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "输出格式",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "implementation-review-mirror-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "logging-trace-review-rules",
-          "name": "logging-trace-review-rules",
-          "title": "日志追踪检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 27,
-          "auto_trigger": "【强制自动触发】当需要只检查日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑是否合规时触发。只读镜像版本，严格沿用 `logging-trace-rules` 的日志与链路追踪标准，不新增日志规范，不直接改代码；默认优先并行；适合在日志收口前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "logging-trace-review-rules/SKILL.md",
-          "directory_path": "logging-trace-review-rules",
-          "directory": "logging-trace-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "logging-trace-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "naming-review-rules",
-          "name": "naming-review-rules",
-          "title": "命名检查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 28,
-          "auto_trigger": "【强制自动触发】当需要只检查变量、函数、类、模块、接口、字段、事件、任务名、测试名或配置项命名是否准确一致时触发。只读镜像版本，严格沿用 `naming-rules` 的命名标准，不新增命名规范，不直接改代码；默认优先并行；适合在命名重命名或实现前做并行预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "naming-review-rules/SKILL.md",
-          "directory_path": "naming-review-rules",
-          "directory": "naming-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "naming-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "parallel-task-dispatch-rules",
           "name": "parallel-task-dispatch-rules",
           "title": "并行任务分发规则",
@@ -4241,7 +3558,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 29,
+          "item_order": 14,
           "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "parallel-task-dispatch-rules/SKILL.md",
@@ -4280,7 +3597,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 30,
+          "item_order": 15,
           "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "plugin-installation-rules/SKILL.md",
@@ -4320,7 +3637,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 31,
+          "item_order": 16,
           "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、UTF-8 中文编码约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "project-agents-bootstrap/SKILL.md",
@@ -4359,85 +3676,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "project-change-review-rules",
-          "name": "project-change-review-rules",
-          "title": "项目当前改动总审查规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 32,
-          "auto_trigger": "显式调用型项目当前改动总审查 skill。仅当用户明确点名 `$project-change-review-rules`、`project-change-review-rules`，说出“审核当前改动”，或明确要求“用这个/该审查项目当前改动的 skill 审查当前 diff/当前改动”时触发。负责只读审查当前项目未提交改动、已暂存改动和可见新增文件，覆盖需求边界、缺陷、遗漏、安全风险、重复逻辑、未按已命中 skill 规则实现、注释缺失或乱码、日志打印不合规、工具包/公共方法复用不足、代码可读性差、补丁式修补、测试与验证缺口；输出按严重级别排序的问题清单和应补触发的专门 review skill，不直接改代码、不格式化、不提交。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "project-change-review-rules/SKILL.md",
-          "directory_path": "project-change-review-rules",
-          "directory": "project-change-review-rules",
-          "sections": [
-            "目标",
-            "快速流程",
-            "审查矩阵",
-            "专门 Skill 联动",
-            "读取与证据规则",
-            "输出格式",
-            "驳回标准",
-            "References"
-          ],
-          "references": [
-            "project-change-review-rules/references/checklist.md",
-            "project-change-review-rules/references/report-template.md"
-          ],
-          "agents": [
-            "project-change-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "project-design-doc-review-rules",
-          "name": "project-design-doc-review-rules",
-          "title": "项目设计文档审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 33,
-          "auto_trigger": "【强制自动触发】当需要只检查项目设计文档是否满足 `project-design-doc-rules` 的文档发现、偏移判断、同步时机、主入口收口和弱参考源使用要求时触发。只读镜像版本，严格沿用 `project-design-doc-rules` 的设计文档规则，不新增设计文档标准，不直接写设计文档；默认优先并行；适合在项目设计文档更新前做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "project-design-doc-review-rules/SKILL.md",
-          "directory_path": "project-design-doc-review-rules",
-          "directory": "project-design-doc-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "project-design-doc-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "project-memory-rules",
           "name": "project-memory-rules",
           "title": "项目记忆规则",
@@ -4447,7 +3685,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 34,
+          "item_order": 17,
           "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目事实，写入根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源。用于项目需要长期记住指标、参数、表字段、缓存键、变量、公式、方法映射或其他反复出现的信息，并且后续对话应优先读取和更新这份记忆的场景。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "project-memory-rules/SKILL.md",
@@ -4484,7 +3722,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 35,
+          "item_order": 18,
           "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例，并且后续写代码应优先参考和更新这份风格记忆的场景。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "project-style-rules/SKILL.md",
@@ -4512,45 +3750,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "requirement-boundary-review-rules",
-          "name": "requirement-boundary-review-rules",
-          "title": "需求边界审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 36,
-          "auto_trigger": "【强制自动触发】当需要只检查当前任务的需求边界、归属、排除项、兼容性影响面和需求主文档回写是否满足 `requirement-boundary-rules` 的要求时触发。只读镜像版本，严格沿用 `requirement-boundary-rules` 的边界判定标准，不新增边界规则，不直接改代码、不写文档；默认优先并行；适合在边界收口前做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "requirement-boundary-review-rules/SKILL.md",
-          "directory_path": "requirement-boundary-review-rules",
-          "directory": "requirement-boundary-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "requirement-boundary-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "skill-audit-rules",
           "name": "skill-audit-rules",
           "title": "Skill 审计规则",
@@ -4560,7 +3759,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 37,
+          "item_order": 19,
           "auto_trigger": "【强制自动触发】当主任务存在多 skill 组合、并行拆分或规则收口风险时触发。负责只读审计当前任务是否漏触发应有的 skill，以及已触发 skill 是否还有未执行完的规则；默认优先并行；输出补漏提醒、遗漏清单和下一步建议，但不改代码、不写文件、不做最终收口。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-audit-rules/SKILL.md",
@@ -4595,7 +3794,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 38,
+          "item_order": 20,
           "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -4626,84 +3825,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "test-regression-review-rules",
-          "name": "test-regression-review-rules",
-          "title": "回归验证审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 39,
-          "auto_trigger": "【强制自动触发】当需要只检查回归验证是否满足 `test-regression-rules` 的回归范围、用例选取、兼容性影响、结果留痕和测试隔离要求时触发。只读镜像版本，严格沿用 `test-regression-rules` 的回归验证标准，不新增回归规则，不直接执行回归、不直接写回归结论；默认优先并行；适合在回归验证执行前或执行后做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "test-regression-review-rules/SKILL.md",
-          "directory_path": "test-regression-review-rules",
-          "directory": "test-regression-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "test-regression-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
-          "id": "test-strategy-review-rules",
-          "name": "test-strategy-review-rules",
-          "title": "测试策略审查镜像规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 10,
-          "item_order": 40,
-          "auto_trigger": "【强制自动触发】当需要只检查测试策略是否满足 `test-strategy-rules` 的覆盖范围、优先级、资源收口、测试根目录落点和测试隔离要求时触发。只读镜像版本，严格沿用 `test-strategy-rules` 的策略标准，不新增测试策略规范，不直接写测试文档、不执行验证；默认优先并行；适合在测试策略收口前做并发预审。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "test-strategy-review-rules/SKILL.md",
-          "directory_path": "test-strategy-review-rules",
-          "directory": "test-strategy-review-rules",
-          "sections": [
-            "目标",
-            "源规则",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "读取规则"
-          ],
-          "references": [],
-          "agents": [
-            "test-strategy-review-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "time-util-rules",
           "name": "time-util-rules",
           "title": "时间处理规则",
@@ -4713,7 +3834,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 41,
+          "item_order": 21,
           "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "time-util-rules/SKILL.md",
@@ -4746,7 +3867,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 42,
+          "item_order": 22,
           "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -4778,7 +3899,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 43,
+          "item_order": 23,
           "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-best-practices/SKILL.md",
@@ -4834,7 +3955,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 44,
+          "item_order": 24,
           "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-router-best-practices/SKILL.md",
@@ -4860,7 +3981,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 45,
+          "item_order": 25,
           "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "web-design-guidelines/SKILL.md",
@@ -4890,7 +4011,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 46,
+          "item_order": 26,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\\\wsl.localhost\\<distro>\\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4934,7 +4055,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
-          "item_order": 47,
+          "item_order": 27,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -5023,7 +4144,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 2,
-      "auto_trigger": "当需要定义、调整或解释项目中 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物根目录、主入口文件、命名模板、同任务复用策略或跨域文档引用关系时自动触发。负责提供全局唯一的目录与命名单一真相源，并为需求、Bug、测试、记忆、项目设计和交付类 skill 提供统一引用基准；不要用它代替需求分析、Bug 定位、测试执行、生产代码存放决策或流程分流。",
+      "auto_trigger": "当需要定义、调整或解释项目中 `doc/需求/`、`doc/架构/`、`doc/阶段/`、`doc/bugs/`、`doc/tests/`、`doc/审查/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等研发产物根目录、主入口文件、命名模板、同任务复用策略或跨域文档引用关系时自动触发。负责提供全局唯一的目录与命名单一真相源，并为需求、Bug、测试、审查、记忆、项目设计和交付类 skill 提供统一引用基准；不要用它代替需求分析、Bug 定位、测试执行、生产代码存放决策或流程分流。",
       "core_responsibility": "作为跨域统一约定 skill，提供目录、命名和复用策略的单一真相源，供需求、Bug、测试、记忆、项目设计和交付类 skill 统一引用。",
       "skill_path": "artifact-storage-rules/SKILL.md",
       "directory_path": "artifact-storage-rules",
@@ -5068,7 +4189,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 3,
-      "auto_trigger": "当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / code-placement-review-rules 的代码归位判断。",
+      "auto_trigger": "当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / implementation-review-rules 的测试前归位判断。",
       "core_responsibility": "负责把根目录项目设计类文档当作弱参考源读取，按代码与当前文档优先原则判断偏移，并统一同步或补建根目录 `项目设计.md`。",
       "skill_path": "project-design-doc-rules/SKILL.md",
       "directory_path": "project-design-doc-rules",
@@ -5447,7 +4568,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 12,
-      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、语法/格式收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
+      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill 与 `implementation-review-rules` 的测试前收口），并输出可执行下一步建议。若存在可执行但未执行规则，禁止给“已完成”结论。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
       "directory_path": "skill-compliance-gate-rules",
@@ -7284,8 +6405,8 @@ window.SKILL_DICTIONARY = {
       "domain_description": "测试前的静态自审、语法检查、清理归位",
       "domain_order": 7,
       "item_order": 1,
-      "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；必须检查“最近修改超过7天的高复用通用代码是否被直接修改旧行为”，命中时要求改为新增兼容路径；Go 场景下还需在实现自审阶段扫描 `doc/tests/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；默认优先并行；不要用它代替语法检查、格式化执行、目录归位审查或功能验证规则。",
-      "core_responsibility": "对刚完成的实现做一次测试前规范自审。",
+      "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。作为唯一自动测试前实现闸门，统一检查 4 组内容：实现质量、格式清理、语法/类型/引用、目录归位/分层边界。负责检查实现是否符合可读性优先、单一职责、命名语义化、注释完整、错误处理明确、日志可追溯、依赖使用审慎、魔法值治理、冗余逻辑清理和编码规范等实现质量要求，并在功能不变前提下检查最近改动代码是否还存在可直接收口的表达层冗余；必须核验本轮改动是否完成 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的改动位点注释检查与补齐；必须完成基础格式、语法/类型/引用、目录归位与依赖方向的测试前收口；必须识别 500 行及以上且持续膨胀的文件并要求拆分或给出拆分方案；必须检查“可复用公共工具是否被重复封装”并拦截重复造轮子；必须检查“最近修改超过7天的高复用通用代码是否被直接修改旧行为”，命中时要求改为新增兼容路径；Go 场景下还需在实现自审阶段扫描 `doc/tests/` 外 `*_test.go` 禁放问题，以及本轮改动是否把业务实现直接落在 `internal/service/*.go` 根目录文件，是否把请求/响应/第三方结果结构体散落在 `internal/service` 实现文件，是否在函数/方法内使用 `var (...)` 分组声明局部变量，是否把多参数函数签名直接写成多行参数列表，是否把第三方 API 响应长期用 `map[string]any` + key 硬编码解析；若本轮改动涉及后端 HTTP API，还必须检查 Swagger/OpenAPI 是否同步更新；默认优先并行；不要用它代替功能验证规则。",
+      "core_responsibility": "对刚完成的实现做一次测试前静态自审与收口。",
       "skill_path": "implementation-review-rules/SKILL.md",
       "directory_path": "implementation-review-rules",
       "directory": "implementation-review-rules",
@@ -7302,9 +6423,12 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "implementation-review-rules/references/format-cleanup-checks.md",
+        "implementation-review-rules/references/placement-and-dependency-checks.md",
         "implementation-review-rules/references/review-boundaries.md",
         "implementation-review-rules/references/review-examples.md",
-        "implementation-review-rules/references/review-scope.md"
+        "implementation-review-rules/references/review-scope.md",
+        "implementation-review-rules/references/syntax-and-reference-checks.md"
       ],
       "agents": [
         "implementation-review-rules/agents/openai.yaml"
@@ -7317,9 +6441,9 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "syntax-check-review-rules",
-      "name": "syntax-check-review-rules",
-      "title": "语法校验规则",
+      "id": "project-change-review-rules",
+      "name": "project-change-review-rules",
+      "title": "项目当前改动总审查规则",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "review",
@@ -7327,113 +6451,28 @@ window.SKILL_DICTIONARY = {
       "domain_description": "测试前的静态自审、语法检查、清理归位",
       "domain_order": 7,
       "item_order": 2,
-      "auto_trigger": "【强制自动触发】当新增或修改代码后准备进入测试前验证，且需要确认语法、类型、依赖引用、构建基础是否正确时触发。负责检查语法错误、引用缺失、类型问题和明显构建失败风险；默认优先并行；不要用它代替实现自审、格式清理或功能测试规则。",
-      "core_responsibility": "检查语法错误、引用缺失、类型问题和明显构建失败风险。",
-      "skill_path": "syntax-check-review-rules/SKILL.md",
-      "directory_path": "syntax-check-review-rules",
-      "directory": "syntax-check-review-rules",
+      "auto_trigger": "当前改动总审查 skill。两类场景自动成立：用户明确点名 `$project-change-review-rules`、`project-change-review-rules`、说出“审核当前改动/当前 diff”，或本轮存在代码改动且准备最终收口。负责只读审查当前项目未提交改动、已暂存改动和可见新增文件，覆盖需求边界、缺陷、遗漏、安全风险、重复逻辑、未按已命中 skill 规则实现、注释缺失或乱码、日志打印不合规、工具包/公共方法复用不足、代码可读性差、补丁式修补、测试与验证缺口；输出按严重级别排序的问题清单，不直接改代码、不格式化、不提交。",
+      "core_responsibility": "对当前工作区 diff 做总审查，补抓边界、风险、遗漏和阻断项。",
+      "skill_path": "project-change-review-rules/SKILL.md",
+      "directory_path": "project-change-review-rules",
+      "directory": "project-change-review-rules",
       "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
+        "目标",
+        "快速流程",
+        "审查矩阵",
+        "专门 Skill 联动",
+        "读取与证据规则",
+        "输出格式",
+        "驳回标准",
         "执行结果归档要求",
-        "references 读取规则"
+        "References"
       ],
       "references": [
-        "syntax-check-review-rules/references/check-examples.md",
-        "syntax-check-review-rules/references/check-scope.md",
-        "syntax-check-review-rules/references/type-and-reference-risks.md"
+        "project-change-review-rules/references/checklist.md",
+        "project-change-review-rules/references/report-template.md"
       ],
       "agents": [
-        "syntax-check-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看它是否只处理静态质量问题，不越界替代测试。"
-      ]
-    },
-    {
-      "id": "cleanup-format-review-rules",
-      "name": "cleanup-format-review-rules",
-      "title": "清理格式审查规则",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "review",
-      "domain_label": "编码审查域",
-      "domain_description": "测试前的静态自审、语法检查、清理归位",
-      "domain_order": 7,
-      "item_order": 3,
-      "auto_trigger": "【强制自动触发】当新增或修改代码后准备进入测试前验证，且存在未使用导入、未使用变量、未使用方法引用、调试残留、临时代码、死代码、多余换行或格式不一致风险时触发。负责清理代码噪音并统一基础格式；默认优先并行；不要用它代替功能性修改或实现重构。",
-      "core_responsibility": "清理代码噪音并统一基础格式。",
-      "skill_path": "cleanup-format-review-rules/SKILL.md",
-      "directory_path": "cleanup-format-review-rules",
-      "directory": "cleanup-format-review-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
-      ],
-      "references": [
-        "cleanup-format-review-rules/references/cleanup-examples.md",
-        "cleanup-format-review-rules/references/cleanup-scope.md",
-        "cleanup-format-review-rules/references/debug-artifact-rules.md"
-      ],
-      "agents": [
-        "cleanup-format-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看它是否只处理静态质量问题，不越界替代测试。"
-      ]
-    },
-    {
-      "id": "code-placement-review-rules",
-      "name": "code-placement-review-rules",
-      "title": "代码归位审查规则",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "review",
-      "domain_label": "编码审查域",
-      "domain_description": "测试前的静态自审、语法检查、清理归位",
-      "domain_order": 7,
-      "item_order": 4,
-      "auto_trigger": "【强制自动触发】当新增文件、移动文件、扩展模块、跨层调用、工具类落点或目录归属可能不合理时，在进入测试前触发。负责检查代码存放位置、模块归属、层级边界和依赖方向是否合理；Go 项目中还需检查 `*_test.go` 是否误落在 `doc/tests/` 之外，并检查 `internal/service` 是否散落请求/响应等结构体定义；对 500 行及以上且持续膨胀的文件需追加拆分审查；默认优先并行；不要用它代替编码前的包结构决策规则。",
-      "core_responsibility": "检查代码存放位置、模块归属、层级边界和依赖方向是否合理。",
-      "skill_path": "code-placement-review-rules/SKILL.md",
-      "directory_path": "code-placement-review-rules",
-      "directory": "code-placement-review-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
-      ],
-      "references": [
-        "code-placement-review-rules/references/dependency-direction.md",
-        "code-placement-review-rules/references/placement-checklist.md",
-        "code-placement-review-rules/references/placement-examples.md"
-      ],
-      "agents": [
-        "code-placement-review-rules/agents/openai.yaml"
+        "project-change-review-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -8200,123 +7239,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "api-request-review-rules",
-      "name": "api-request-review-rules",
-      "title": "接口请求检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 7,
-      "auto_trigger": "【强制自动触发】当需要只检查请求参数、DTO、body 结构、参数校验或请求模型是否符合接口请求规范时触发。只读镜像版本，严格沿用 `api-request-rules` 的请求结构标准，不新增请求规范，不直接改代码；默认优先并行；适合在请求结构收口前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "api-request-review-rules/SKILL.md",
-      "directory_path": "api-request-review-rules",
-      "directory": "api-request-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "api-request-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "api-response-review-rules",
-      "name": "api-response-review-rules",
-      "title": "接口响应检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 8,
-      "auto_trigger": "【强制自动触发】当需要只检查返回体、响应包装器、分页结构、错误响应结构、兼容字段、版本字段或统一响应模型是否符合响应规范时触发。只读镜像版本，严格沿用 `api-response-rules` 的响应结构标准，不新增响应规范，不直接改代码；默认优先并行；适合在响应收口前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "api-response-review-rules/SKILL.md",
-      "directory_path": "api-response-review-rules",
-      "directory": "api-response-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "api-response-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "api-swagger-review-rules",
-      "name": "api-swagger-review-rules",
-      "title": "Swagger/OpenAPI 检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 9,
-      "auto_trigger": "【强制自动触发】当需要只检查后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步、调试入口暴露、文档分组标签、路径或环境开关是否合规时触发。只读镜像版本，严格沿用 `api-swagger-rules` 的 Swagger/OpenAPI 标准，不新增文档规范，不直接改代码；默认优先并行；适合在文档收口前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "api-swagger-review-rules/SKILL.md",
-      "directory_path": "api-swagger-review-rules",
-      "directory": "api-swagger-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "api-swagger-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "autonomous-execution-rules",
       "name": "autonomous-execution-rules",
       "title": "自主连续执行规则",
@@ -8326,7 +7248,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 10,
+      "item_order": 7,
       "auto_trigger": "当多步骤任务尚未闭环且存在可直接执行的下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行下一步，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "autonomous-execution-rules/SKILL.md",
@@ -8356,45 +7278,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "bug-regression-risk-mirror-rules",
-      "name": "bug-regression-risk-mirror-rules",
-      "title": "Bug 回归风险镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 11,
-      "auto_trigger": "【强制自动触发】当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。只读镜像版本，严格沿用 `bug-regression-risk-rules` 的回归风险标准，不新增风险规范，不直接改代码；默认优先并行；适合在修复实施前并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "bug-regression-risk-mirror-rules/SKILL.md",
-      "directory_path": "bug-regression-risk-mirror-rules",
-      "directory": "bug-regression-risk-mirror-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "bug-regression-risk-mirror-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "character-sprite-animation-production",
       "name": "character-sprite-animation-production",
       "title": "Character Sprite Animation Production",
@@ -8404,7 +7287,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 12,
+      "item_order": 8,
       "auto_trigger": "用于在 2D 游戏角色、怪物、Boss 或类角色单位需要动作生产时，负责角色动画的生产、分方向拆分、fixed-cell sheet 布局、动作 QA 与预览验证。吸收 character-animation-creator-skill 的核心思路：先锁定角色 identity，再做 base pose，再按动作和方向逐项扩展，并在生成后做 contact sheet、方向一致性、体量漂移和动画可读性审查。适用于 idle、walk、run、attack、cast、hit、death、4向/8向、fixed-cell sprite sheet 等角色动画任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "character-sprite-animation-production/SKILL.md",
@@ -8429,88 +7312,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "code-placement-mirror-rules",
-      "name": "code-placement-mirror-rules",
-      "title": "代码归位镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 13,
-      "auto_trigger": "【强制自动触发】当新增文件、移动文件、扩展模块、跨层调用、工具类落点或目录归属可能不合理时触发。只读镜像版本，严格沿用 `code-placement-review-rules` 的归位审查标准，不新增结构规范，不直接改代码；默认优先并行；适合和执行线程并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "code-placement-mirror-rules/SKILL.md",
-      "directory_path": "code-placement-mirror-rules",
-      "directory": "code-placement-mirror-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "code-placement-mirror-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "code-readability-review-rules",
-      "name": "code-readability-review-rules",
-      "title": "可读性检查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 14,
-      "auto_trigger": "【强制自动触发】当需要只检查函数结构、表达顺序、条件层级、复杂度、JSON key 直取、第三方响应解析、接口抽象和局部可读性是否需要改进时触发。只读审查版，判定标准严格沿用 `code-readability-rules`，不新增可读性规范，不直接改代码；默认优先并行；适合在进入可读性改写前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "code-readability-review-rules/SKILL.md",
-      "directory_path": "code-readability-review-rules",
-      "directory": "code-readability-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "审查原则",
-        "输入",
-        "输出",
-        "边界",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "code-readability-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "code-review-automation-rules",
       "name": "code-review-automation-rules",
       "title": "提交级代码审核规则",
@@ -8520,7 +7321,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 15,
+      "item_order": 9,
       "auto_trigger": "【强制自动触发】当用户主动提出“审核代码”“review 当前分支提交”“审查最近提交”时触发。负责读取项目 `main` 分支最近一条提交时间，并仅审查当前分支在该时间之后且尚未并入 `main` 的提交，逐条输出中文结构化结果（致命/严重/中等/建议），再将汇总报告保存到被审核项目根目录固定文件名（同名覆盖）；禁止跨提交混审，禁止把非当前 commit 引入的问题混入结论。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "code-review-automation-rules/SKILL.md",
@@ -8552,131 +7353,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "code-style-review-rules",
-      "name": "code-style-review-rules",
-      "title": "代码风格检查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 16,
-      "auto_trigger": "【强制自动触发】当需要只检查局部代码风格、写法一致性、命名习惯、错误处理写法、路由写法、局部排版和团队约定是否偏离时触发。只读审查版，判定标准严格沿用 `code-style-consistency-rules`，不新增风格规范，不直接改代码；默认优先并行；适合在进入风格一致性修正前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "code-style-review-rules/SKILL.md",
-      "directory_path": "code-style-review-rules",
-      "directory": "code-style-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "审查原则",
-        "输入",
-        "输出",
-        "边界",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "code-style-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "comment-review-rules",
-      "name": "comment-review-rules",
-      "title": "注释检查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 17,
-      "auto_trigger": "【强制自动触发】当需要只检查函数、方法、字段、结构体字面量、补丁位点和前端改动位点注释是否缺失或不合格时触发。只读审查版，判定标准严格沿用 `comment-completion-gate-rules` 与 `comment-placement-granularity-rules`，不新增注释规范，不直接补写注释；默认优先并行；适合在进入注释补齐闸门前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "comment-review-rules/SKILL.md",
-      "directory_path": "comment-review-rules",
-      "directory": "comment-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "审查原则",
-        "输入",
-        "输出",
-        "边界",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "comment-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "common-util-review-rules",
-      "name": "common-util-review-rules",
-      "title": "公共工具检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 18,
-      "auto_trigger": "【强制自动触发】当需要只检查工具类、通用方法、公共组件、工具函数、通用常量或复用代码是否应该抽成公共层时触发。只读镜像版本，严格沿用 `common-util-rules` 的公共工具判定标准，不新增工具规范，不直接改代码；默认优先并行；适合在抽公共工具前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "common-util-review-rules/SKILL.md",
-      "directory_path": "common-util-review-rules",
-      "directory": "common-util-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "common-util-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "context-compression-rules",
       "name": "context-compression-rules",
       "title": "上下文压缩规则",
@@ -8686,7 +7362,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 19,
+      "item_order": 10,
       "auto_trigger": "当当前会话已发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），并强制重新读取当前项目根目录 `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code），避免压缩后丢失 skill 记忆或仓库级硬规则，再输出可直接续做的最小上下文包；压缩包必须显式携带”是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "context-compression-rules/SKILL.md",
@@ -8728,7 +7404,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 20,
+      "item_order": 11,
       "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "find-skills/SKILL.md",
@@ -8752,88 +7428,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "format-review-rules",
-      "name": "format-review-rules",
-      "title": "格式检查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 21,
-      "auto_trigger": "【强制自动触发】当需要只检查代码格式、缩进、空行、对齐、换行、基础排版以及未使用导入/变量/方法引用/死代码/调试残留是否需要处理时触发。只读审查版，判定标准严格沿用 `cleanup-format-review-rules`，不新增格式规范，不直接改代码；默认优先并行；适合在进入 cleanup-format-review-rules 之前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "format-review-rules/SKILL.md",
-      "directory_path": "format-review-rules",
-      "directory": "format-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "审查原则",
-        "输入",
-        "输出",
-        "边界",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "format-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "functional-validation-review-rules",
-      "name": "functional-validation-review-rules",
-      "title": "功能验证审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 22,
-      "auto_trigger": "【强制自动触发】当需要只检查功能验证是否满足 `functional-validation-rules` 的验证范围、验证步骤、通过驳回标准、联调要求、结果留痕和测试隔离要求时触发。只读镜像版本，严格沿用 `functional-validation-rules` 的功能验证标准，不新增验证规则，不直接执行验证、不直接写测试结论；默认优先并行；适合在功能验证执行前或执行后做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "functional-validation-review-rules/SKILL.md",
-      "directory_path": "functional-validation-review-rules",
-      "directory": "functional-validation-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "functional-validation-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "golang-patterns",
       "name": "golang-patterns",
       "title": "Go 开发模式",
@@ -8843,7 +7437,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 23,
+      "item_order": 12,
       "auto_trigger": "Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "golang-patterns/SKILL.md",
@@ -8883,7 +7477,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 24,
+      "item_order": 13,
       "auto_trigger": "当用户提交图片、截图、设计稿并希望分析/修改/排查时触发。硬条件：当消息包含 `<image ...>` 时必须命中本 skill。默认将红框（含红色方框、红圈、红线标注）区域视为本轮重点关注信息，优先围绕该区域给出结论与建议；若无红框，再回退到全图分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "image-redbox-focus-rules/SKILL.md",
@@ -8908,162 +7502,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "implementation-plan-review-rules",
-      "name": "implementation-plan-review-rules",
-      "title": "实施计划审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 25,
-      "auto_trigger": "【强制自动触发】当需要只检查实施计划是否满足 `implementation-plan-rules` 的开发周期、阶段拆分、文件落点、依赖顺序、验证闭环和计划收口要求时触发。只读镜像版本，严格沿用 `implementation-plan-rules` 的计划标准，不新增计划规范，不直接写计划文档；默认优先并行；适合在实施计划收口前做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "implementation-plan-review-rules/SKILL.md",
-      "directory_path": "implementation-plan-review-rules",
-      "directory": "implementation-plan-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "implementation-plan-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "implementation-review-mirror-rules",
-      "name": "implementation-review-mirror-rules",
-      "title": "实现自审镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 26,
-      "auto_trigger": "【强制自动触发】当功能代码已经完成、准备进入测试前验证时触发。只读镜像版本，严格沿用 `implementation-review-rules` 的实现自审标准，不新增实现规范，不直接改代码；默认优先并行；适合和执行线程并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "implementation-review-mirror-rules/SKILL.md",
-      "directory_path": "implementation-review-mirror-rules",
-      "directory": "implementation-review-mirror-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "输出格式",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "implementation-review-mirror-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "logging-trace-review-rules",
-      "name": "logging-trace-review-rules",
-      "title": "日志追踪检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 27,
-      "auto_trigger": "【强制自动触发】当需要只检查日志、logger、trace、span、审计日志、脱敏字段、排障字段、日志配置文件或链路透传逻辑是否合规时触发。只读镜像版本，严格沿用 `logging-trace-rules` 的日志与链路追踪标准，不新增日志规范，不直接改代码；默认优先并行；适合在日志收口前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "logging-trace-review-rules/SKILL.md",
-      "directory_path": "logging-trace-review-rules",
-      "directory": "logging-trace-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "logging-trace-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "naming-review-rules",
-      "name": "naming-review-rules",
-      "title": "命名检查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 28,
-      "auto_trigger": "【强制自动触发】当需要只检查变量、函数、类、模块、接口、字段、事件、任务名、测试名或配置项命名是否准确一致时触发。只读镜像版本，严格沿用 `naming-rules` 的命名标准，不新增命名规范，不直接改代码；默认优先并行；适合在命名重命名或实现前做并行预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "naming-review-rules/SKILL.md",
-      "directory_path": "naming-review-rules",
-      "directory": "naming-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "naming-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "parallel-task-dispatch-rules",
       "name": "parallel-task-dispatch-rules",
       "title": "并行任务分发规则",
@@ -9073,7 +7511,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 29,
+      "item_order": 14,
       "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "parallel-task-dispatch-rules/SKILL.md",
@@ -9112,7 +7550,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 30,
+      "item_order": 15,
       "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "plugin-installation-rules/SKILL.md",
@@ -9152,7 +7590,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 31,
+      "item_order": 16,
       "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、UTF-8 中文编码约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "project-agents-bootstrap/SKILL.md",
@@ -9191,85 +7629,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "project-change-review-rules",
-      "name": "project-change-review-rules",
-      "title": "项目当前改动总审查规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 32,
-      "auto_trigger": "显式调用型项目当前改动总审查 skill。仅当用户明确点名 `$project-change-review-rules`、`project-change-review-rules`，说出“审核当前改动”，或明确要求“用这个/该审查项目当前改动的 skill 审查当前 diff/当前改动”时触发。负责只读审查当前项目未提交改动、已暂存改动和可见新增文件，覆盖需求边界、缺陷、遗漏、安全风险、重复逻辑、未按已命中 skill 规则实现、注释缺失或乱码、日志打印不合规、工具包/公共方法复用不足、代码可读性差、补丁式修补、测试与验证缺口；输出按严重级别排序的问题清单和应补触发的专门 review skill，不直接改代码、不格式化、不提交。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "project-change-review-rules/SKILL.md",
-      "directory_path": "project-change-review-rules",
-      "directory": "project-change-review-rules",
-      "sections": [
-        "目标",
-        "快速流程",
-        "审查矩阵",
-        "专门 Skill 联动",
-        "读取与证据规则",
-        "输出格式",
-        "驳回标准",
-        "References"
-      ],
-      "references": [
-        "project-change-review-rules/references/checklist.md",
-        "project-change-review-rules/references/report-template.md"
-      ],
-      "agents": [
-        "project-change-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "project-design-doc-review-rules",
-      "name": "project-design-doc-review-rules",
-      "title": "项目设计文档审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 33,
-      "auto_trigger": "【强制自动触发】当需要只检查项目设计文档是否满足 `project-design-doc-rules` 的文档发现、偏移判断、同步时机、主入口收口和弱参考源使用要求时触发。只读镜像版本，严格沿用 `project-design-doc-rules` 的设计文档规则，不新增设计文档标准，不直接写设计文档；默认优先并行；适合在项目设计文档更新前做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "project-design-doc-review-rules/SKILL.md",
-      "directory_path": "project-design-doc-review-rules",
-      "directory": "project-design-doc-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "project-design-doc-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "project-memory-rules",
       "name": "project-memory-rules",
       "title": "项目记忆规则",
@@ -9279,7 +7638,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 34,
+      "item_order": 17,
       "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目事实，写入根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源。用于项目需要长期记住指标、参数、表字段、缓存键、变量、公式、方法映射或其他反复出现的信息，并且后续对话应优先读取和更新这份记忆的场景。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "project-memory-rules/SKILL.md",
@@ -9316,7 +7675,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 35,
+      "item_order": 18,
       "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例，并且后续写代码应优先参考和更新这份风格记忆的场景。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "project-style-rules/SKILL.md",
@@ -9344,45 +7703,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "requirement-boundary-review-rules",
-      "name": "requirement-boundary-review-rules",
-      "title": "需求边界审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 36,
-      "auto_trigger": "【强制自动触发】当需要只检查当前任务的需求边界、归属、排除项、兼容性影响面和需求主文档回写是否满足 `requirement-boundary-rules` 的要求时触发。只读镜像版本，严格沿用 `requirement-boundary-rules` 的边界判定标准，不新增边界规则，不直接改代码、不写文档；默认优先并行；适合在边界收口前做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "requirement-boundary-review-rules/SKILL.md",
-      "directory_path": "requirement-boundary-review-rules",
-      "directory": "requirement-boundary-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "requirement-boundary-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "skill-audit-rules",
       "name": "skill-audit-rules",
       "title": "Skill 审计规则",
@@ -9392,7 +7712,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 37,
+      "item_order": 19,
       "auto_trigger": "【强制自动触发】当主任务存在多 skill 组合、并行拆分或规则收口风险时触发。负责只读审计当前任务是否漏触发应有的 skill，以及已触发 skill 是否还有未执行完的规则；默认优先并行；输出补漏提醒、遗漏清单和下一步建议，但不改代码、不写文件、不做最终收口。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-audit-rules/SKILL.md",
@@ -9427,7 +7747,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 38,
+      "item_order": 20,
       "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -9458,84 +7778,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "test-regression-review-rules",
-      "name": "test-regression-review-rules",
-      "title": "回归验证审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 39,
-      "auto_trigger": "【强制自动触发】当需要只检查回归验证是否满足 `test-regression-rules` 的回归范围、用例选取、兼容性影响、结果留痕和测试隔离要求时触发。只读镜像版本，严格沿用 `test-regression-rules` 的回归验证标准，不新增回归规则，不直接执行回归、不直接写回归结论；默认优先并行；适合在回归验证执行前或执行后做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "test-regression-review-rules/SKILL.md",
-      "directory_path": "test-regression-review-rules",
-      "directory": "test-regression-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "test-regression-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
-      "id": "test-strategy-review-rules",
-      "name": "test-strategy-review-rules",
-      "title": "测试策略审查镜像规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 10,
-      "item_order": 40,
-      "auto_trigger": "【强制自动触发】当需要只检查测试策略是否满足 `test-strategy-rules` 的覆盖范围、优先级、资源收口、测试根目录落点和测试隔离要求时触发。只读镜像版本，严格沿用 `test-strategy-rules` 的策略标准，不新增测试策略规范，不直接写测试文档、不执行验证；默认优先并行；适合在测试策略收口前做并发预审。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "test-strategy-review-rules/SKILL.md",
-      "directory_path": "test-strategy-review-rules",
-      "directory": "test-strategy-review-rules",
-      "sections": [
-        "目标",
-        "源规则",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "读取规则"
-      ],
-      "references": [],
-      "agents": [
-        "test-strategy-review-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "time-util-rules",
       "name": "time-util-rules",
       "title": "时间处理规则",
@@ -9545,7 +7787,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 41,
+      "item_order": 21,
       "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "time-util-rules/SKILL.md",
@@ -9578,7 +7820,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 42,
+      "item_order": 22,
       "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -9610,7 +7852,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 43,
+      "item_order": 23,
       "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-best-practices/SKILL.md",
@@ -9666,7 +7908,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 44,
+      "item_order": 24,
       "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-router-best-practices/SKILL.md",
@@ -9692,7 +7934,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 45,
+      "item_order": 25,
       "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "web-design-guidelines/SKILL.md",
@@ -9722,7 +7964,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 46,
+      "item_order": 26,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\\\wsl.localhost\\<distro>\\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -9766,7 +8008,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
-      "item_order": 47,
+      "item_order": 27,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",
@@ -9846,7 +8088,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "71 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "69 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

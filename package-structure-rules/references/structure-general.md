@@ -54,4 +54,4 @@
 
 - 目录结构规则只决定“放在哪里”和“能依赖谁”。
 - 工具函数写法交给 `common-util-rules`。
-- 编码完成后的代码落点复查交给 `code-placement-review-rules`。
+- 编码完成后的代码落点复查交给 `implementation-review-rules`。

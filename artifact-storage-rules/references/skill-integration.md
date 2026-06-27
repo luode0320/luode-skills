@@ -15,9 +15,10 @@
 - 可以写“路径、命名和复用策略统一遵循 `artifact-storage-rules`”。
 - 可以写“如需具体模板，读取 `../artifact-storage-rules/references/path-map.yaml`”。
 - 可以写“根目录项目设计文档主入口统一遵循 `artifact-storage-rules` 中的 `项目设计.md` 规则”。
-- 不建议在各自 `SKILL.md` 中重复维护完整的 `doc/requirements/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 模板说明。
+- 不建议在各自 `SKILL.md` 中重复维护完整的 `doc/需求/`、`doc/架构/`、`doc/阶段/`、`doc/bugs/`、`doc/tests/`、`doc/审查/`、`doc/`、`skill/` 模板说明。
 - 若本轮执行的是仓库内目录迁移，必须同步检查并更新仓库级 `AGENTS.md`、`README.md`、根目录 `项目设计.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`；不要只移动文件。
 - 若用户没有明确要求保留兼容层，迁移完成后应删除旧目录与旧跳转文档，不保留新旧并行入口。
+- 若当前结论属于实现自审、目录归位、格式清理、语法检查或注释核对，默认归档到 `doc/审查/`；根级 `review/` 不再作为正式入口，`analysis/` 只有在项目明确声明该目录时才允许作为正式入口。
 
 ## 变更优先级
 

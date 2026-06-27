@@ -6,7 +6,7 @@
 
 ## 执行方式
 
-1. 对照 [2026-04-03_code-comment-rules拆分预案.md](C:/Users/Administrator/.codex/skills/doc/requirements/2026-04-03_code-comment-rules拆分预案.md) 第 7 节映射表逐条检查原规则落点。
+1. 对照 [2026-04-03_code-comment-rules拆分预案.md](C:/Users/Administrator/.codex/skills/doc/需求/2026-04-03_code-comment-rules拆分预案.md) 第 7 节映射表逐条检查原规则落点。
 2. 校验新 skill 目录结构与 `agents/openai.yaml`、`references/` 是否齐全。
 3. 运行结构校验：
    - `python -X utf8 .system\skill-creator\scripts\quick_validate.py C:\Users\Administrator\.codex\skills\comment-placement-granularity-rules`

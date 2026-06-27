@@ -1,9 +1,12 @@
-version: 1
+version: 2
 roots:
-  requirement_docs: "doc/requirements"
-  requirement_assets: "doc/requirements/data"
+  requirement_docs: "doc/需求"
+  requirement_assets: "doc/需求/data"
+  architecture_docs: "doc/架构"
+  stage_docs: "doc/阶段"
   bug_records: "doc/bugs"
   test_assets: "doc/tests"
+  review_records: "doc/审查"
   project_docs: "doc"
   project_local_skills: "skill"
 entry_files:
@@ -12,7 +15,7 @@ entry_files:
   requirement_sequence_svg: "{datetime}_{requirement_cn_title}.sequence.svg"
   requirement_asset_image: "{requirement_doc_stem}.{asset_slug}.{ext}"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
-  requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/requirements/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
+  requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/需求/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
   acceptance_doc: "{date}_验收中文说明.md"
   implementation_plan_doc: "{requirement_doc_stem}实施计划.md"
   implementation_plan_doc_note: "实施计划命名必须复用对应需求文档同前缀（yyyy-MM-DD_HHmmss_中文简介标题），并在末尾追加“实施计划”；例如：2026-04-16_141518_多业务复用Swap适配控制需求实施计划.md"
@@ -35,9 +38,12 @@ directories:
   test_task_doc_dir_note: "根据 README 将要描述的测试任务主题动态命名；禁止使用字面量“测试任务中文简介”"
 bootstrap:
   recent_context_scan_roots:
-    - "doc/requirements"
+    - "doc/需求"
+    - "doc/架构"
+    - "doc/阶段"
     - "doc/tests"
     - "doc/bugs"
+    - "doc/审查"
     - "doc"
     - "skill"
   weak_reference_root_files:
@@ -57,6 +63,7 @@ policies:
   bug_requires_svg_diagrams: true
   same_test_round_updates_same_root: true
   new_independent_test_round_creates_new_root: true
+  review_outputs_under_doc_review_root: true
   same_project_design_updates_same_doc: true
   project_design_doc_is_weak_reference: true
   missing_project_design_doc_can_be_created_after_full_analysis: true

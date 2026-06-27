@@ -1,4 +1,0 @@
-interface:
-  display_name: "格式检查规则"
-  short_description: "检查代码格式、缩进和基础排版问题"
-  default_prompt: "使用 $format-review-rules 只检查代码格式、缩进、空行、对齐、换行和基础排版是否需要修正，并给出问题清单与修正建议。"

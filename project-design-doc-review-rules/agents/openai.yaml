@@ -1,4 +1,0 @@
-interface:
-  display_name: "项目设计文档审查镜像规则"
-  short_description: "只读检查设计文档偏移、同步时机和主入口收口"
-  default_prompt: "使用 $project-design-doc-review-rules 只读检查项目设计文档是否满足 project-design-doc-rules 的文档发现、偏移判断、同步时机、主入口收口和弱参考源使用要求，不直接写设计文档。"

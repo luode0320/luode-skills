@@ -2,57 +2,18 @@
 
 ## 可并行
 
-- `format-review-rules`
-  - 做什么：检查代码格式、缩进、空行和基础排版是否需要修正。
-  - 建议：可并行，属于只读审查镜像；可和 `cleanup-format-review-rules` 的执行线程并发预审，再由主线程统一收口。
-- `comment-review-rules`
-  - 做什么：检查函数、方法、字段和补丁位点注释是否缺失或不合格。
-  - 建议：可并行，属于只读审查镜像；可和 `comment-completion-gate-rules` / `comment-placement-granularity-rules` 的执行线程并发预审。
-- `code-style-review-rules`
-  - 做什么：检查局部代码风格、写法一致性和团队约定是否偏离。
-  - 建议：可并行，属于只读审查镜像；可和 `code-style-consistency-rules` 的执行线程并发预审。
-- `code-readability-review-rules`
-  - 做什么：检查函数结构、表达顺序和局部可读性是否需要改进。
-  - 建议：可并行，属于只读审查镜像；可和 `code-readability-rules` 的执行线程并发预审。
-- `naming-review-rules`
-  - 做什么：检查变量、函数、类、模块、接口、字段、事件、任务名、测试名和配置项命名是否一致。
-  - 建议：可并行，属于只读审查镜像；可和 `naming-rules` 的执行线程并发预审。
-- `common-util-review-rules`
-  - 做什么：检查当前逻辑是否应抽成公共工具、是否存在重复封装和 7 天冻结风险。
-  - 建议：可并行，属于只读审查镜像；可和 `common-util-rules` 的执行线程并发预审。
-- `logging-trace-review-rules`
-  - 做什么：检查日志、trace、span、审计日志和初始化顺序是否合规。
-  - 建议：可并行，属于只读审查镜像；可和 `logging-trace-rules` 的执行线程并发预审。
-- `api-request-review-rules`
-  - 做什么：检查请求 DTO、body 结构、参数校验和 `ShouldBindJSON` 使用是否合规。
-  - 建议：可并行，属于只读审查镜像；可和 `api-request-rules` 的执行线程并发预审。
-- `api-response-review-rules`
-  - 做什么：检查响应包装、分页结构、兼容字段和弱类型解析风险。
-  - 建议：可并行，属于只读审查镜像；可和 `api-response-rules` 的执行线程并发预审。
-- `api-swagger-review-rules`
-  - 做什么：检查 Swagger/OpenAPI 接入、文档同步和调试入口暴露策略。
-  - 建议：可并行，属于只读审查镜像；可和 `api-swagger-rules` 的执行线程并发预审。
-- `cleanup-format-review-rules`
-  - 做什么：清理格式噪音、对齐缩进、统一空行和基础排版。
-  - 建议：可并行，只要每个线程拥有不重叠的文件集。
 - `comment-completion-gate-rules`
   - 做什么：补齐函数、方法、字段、补丁位点相关注释。
   - 建议：可并行，只要每个线程拥有不重叠的文件集。
 - `comment-placement-granularity-rules`
   - 做什么：判断注释该补在哪里、补多细、哪些位点必须补。
   - 建议：可并行，当注释补充发生在不同文件或不同模块时。
-- `syntax-check-review-rules`
-  - 做什么：检查语法、类型、引用、基础编译是否正确。
-  - 建议：可并行，当检查范围能按 package、模块或目录拆开时。
 - `functional-validation-rules`
   - 做什么：验证功能行为、交互结果和输出是否满足需求。
   - 建议：可并行，当验证目标是独立模块或独立场景时。
 - `implementation-review-rules`
-  - 做什么：检查实现是否符合可读性、命名、结构、收口质量要求。
+  - 做什么：检查实现是否符合可读性、命名、结构、格式、语法/类型/引用和归位收口要求。
   - 建议：可并行，只要 review 范围不重叠且已指定统一收口线程。
-- `implementation-review-mirror-rules`
-  - 做什么：只读镜像检查实现自审是否满足实现收口要求。
-  - 建议：可并行，属于只读审查镜像；可和 `implementation-review-rules` 的执行线程并发预审。
 - `code-style-consistency-rules`
   - 做什么：统一代码风格、局部写法和团队约定。
   - 建议：可并行，只要每个线程处理的文件集不重叠。
@@ -62,42 +23,18 @@
 - `skill-audit-rules`
   - 做什么：并发审计主任务是否漏触发 skill，以及已触发 skill 是否还有未执行完的规则。
   - 建议：可并行，只读审计，不改代码、不写文件，适合和主线程同时跑；只看当前轮次和主线程已声明 skill，不靠历史记忆。
-- `code-placement-review-rules`
-  - 做什么：审查代码落点、目录归属、层级边界和依赖方向是否合理。
-  - 建议：可并行，只要每个线程检查的文件集不重叠。
-- `code-placement-mirror-rules`
-  - 做什么：只读镜像检查代码落点、目录归属和依赖方向是否满足归位要求。
-  - 建议：可并行，属于只读审查镜像；可和 `code-placement-review-rules` 的执行线程并发预审。
 - `code-review-automation-rules`
   - 做什么：自动审查当前分支提交，输出致命/严重/中等/建议问题。
   - 建议：可并行，只读审查，适合和实现线程同时跑。
+- `project-change-review-rules`
+  - 做什么：对当前工作区 diff 做总审查，补抓边界、风险、遗漏和阻断项。
+  - 建议：可并行，只读审查；若与主线程同时跑，必须指定单一收口线程统一汇总结论。
 - `bug-regression-risk-rules`
   - 做什么：审查 Bug 修复可能带来的回归风险、兼容性风险和验证优先级。
   - 建议：可并行，只读审查，适合和修复线程并发跑。
-- `bug-regression-risk-mirror-rules`
-  - 做什么：只读镜像检查 Bug 修复的回归风险和验证优先级是否满足风险识别要求。
-  - 建议：可并行，属于只读审查镜像；可和 `bug-regression-risk-rules` 的执行线程并发预审。
 
 ## 条件并行
 
-- `requirement-boundary-review-rules`
-  - 做什么：只读审查边界、归属、排除项、兼容性和回写一致性是否满足需求边界收口要求。
-  - 建议：条件并行，适合在边界已基本稳定后并发核对历史偏差、兼容性影响和文档收口一致性。
-- `test-strategy-review-rules`
-  - 做什么：只读审查测试策略是否覆盖关键路径、优先级、资源约束和待补测风险。
-  - 建议：条件并行，适合在策略接近收口时并发核对覆盖面和优先级排序。
-- `implementation-plan-review-rules`
-  - 做什么：只读审查开发周期开拆、依赖顺序、阶段目标、验收门槛和计划可执行性。
-  - 建议：条件并行，适合在计划复杂且准备进入实施前并发核对顺序和收口风险。
-- `project-design-doc-review-rules`
-  - 做什么：只读审查项目设计文档是否偏离真实结构、主链路、模块归属和同步时机。
-  - 建议：条件并行，适合在设计文档较大或核对维度较多时并发审查偏移点。
-- `functional-validation-review-rules`
-  - 做什么：只读审查功能验证范围、通过/驳回标准和结果留痕是否清楚且可执行。
-  - 建议：条件并行，适合在验证对象稳定后并发核对验证范围和判定标准。
-- `test-regression-review-rules`
-  - 做什么：只读审查回归覆盖范围、风险路径、必测优先级和回归收口是否合理。
-  - 建议：条件并行，适合在回归面较大时并发筛查高风险路径和必测集。
 - `test-regression-rules`
   - 做什么：判断修复或改动后需要补哪些回归测试。
   - 建议：条件并行，仅在回归覆盖范围能按模块或服务稳定拆分时。
@@ -137,8 +74,8 @@
 
 ## 分发建议
 
-- review、cleanup、注释补充这类工作，只有在文件归属明确后才并行。
-- 只读 review skill 可以并行检查同一批文件；真正的代码修改、注释补写、格式修正仍要按文件写入串行。
+- 注释补充、实现自审和当前 diff 总审查这类工作，只有在文件归属明确后才并行。
+- 只读审查可以并行检查同一批文件；真正的代码修改、注释补写和格式修正仍要按文件写入串行。
 - 同一文件内的代码修改和注释修改必须串行，不能拆成多个线程同时写。
 - 先做根因、契约定义、schema 决策，再分发下游任务。
 - 如果两个候选 skill 都要修改同一个文件，直接收回为一个串行线程。

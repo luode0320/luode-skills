@@ -68,7 +68,7 @@ Subagent 状态：
 ## 子任务优先委派清单
 
 - 代码注释补齐与注释位点核查（如 `comment-placement-granularity-rules`、`comment-completion-gate-rules`）。
-- 编码审查类检查（如 `implementation-review-rules`、`cleanup-format-review-rules`、`syntax-check-review-rules`）。
+- 编码审查类检查（如 `implementation-review-rules`、`project-change-review-rules`）。
 - 规则核对与文档同步类任务（不阻塞主路径时）。
 - 多模块独立改造且写集可天然分离的任务。
 

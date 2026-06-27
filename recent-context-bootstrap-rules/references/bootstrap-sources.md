@@ -10,7 +10,7 @@
 
 默认扫描顺序遵循 `artifact-storage-rules/references/path-map.yaml`，当前顺序为：
 
-1. `doc/requirements/`
+1. `doc/需求/`
 2. `doc/tests/`
 3. `doc/bugs/`
 4. `doc/`

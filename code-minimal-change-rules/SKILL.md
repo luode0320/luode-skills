@@ -55,7 +55,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 
 - 只负责约束改动范围，不替代 `code-readability-rules` 处理可读性细节。
 - 不替代 `code-style-consistency-rules` 处理项目风格一致性。
-- 不替代 `code-placement-review-rules` 处理代码归位和目录落点问题。
+- 不替代 `implementation-review-rules` 处理测试前的代码归位和目录落点问题。
 - 不替代测试类 skill 决定如何组织测试资源和验证范围。
 
 ## 需要暂停并确认的条件
@@ -74,7 +74,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 
 ## 执行结果归档要求
 
-- 如果明确排除了某些不应在本次处理的事项，将结论记录到 `analysis/` 或 `review/`。
+- 如果明确排除了某些不应在本次处理的事项，将结论记录到 `analysis/` 或 `doc/审查/`。
 - 归档内容至少包含本次目标、刻意不处理项、排除原因和建议后续动作。
 - 如果本次范围没有争议且无额外排除项，可以不单独归档。
 

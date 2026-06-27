@@ -1,4 +1,0 @@
-interface:
-  display_name: "公共工具检查镜像规则"
-  short_description: "只读检查公共工具抽取边界、重复封装与7天冻结"
-  default_prompt: "使用 $common-util-review-rules 只读检查当前逻辑是否满足 common-util-rules 的公共工具判定标准，不直接改代码。"
