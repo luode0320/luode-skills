@@ -52,7 +52,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
-- `artifact-storage-rules` 负责统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
+- `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - `artifact-delivery-gate-rules` 负责在需求、Bug、测试、审查收口前核对正式文档是否已经真实落盘，阻断“只在回复里说、不写文档”的假完成
 - 文档落盘闸门不只约束需求入口、Bug 入口、测试总结和总审查入口；需求补齐/边界/拆分/变更、Bug 复现/根因/运行时诊断/修复建议/回归风险、测试策略/命名/程序/目录/散落资产治理等中间链路，只要本轮已经形成应持久化结论，最终收口前同样必须联动 `artifact-delivery-gate-rules`
@@ -72,8 +72,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 例如：
 
-- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/需求/`、`doc/tests/`、`doc/bugs/`、`doc/` 和 Git 活动
-- 需要决定需求文档、Bug 记录、测试任务目录、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`，并统一收口到 `doc/需求/`、`doc/bugs/`、`doc/tests/`
+- 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`、`doc/` 和 Git 活动
+- 需要决定需求文档、架构文档、实施文档、Bug 记录、测试任务目录、审查记录、验收文档、项目说明文档和根目录 `项目设计.md` 的统一落点与命名时，先进入 `artifact-storage-rules`，并统一收口到 `doc/1-架构/` 到 `doc/7-验收/`
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
@@ -87,7 +87,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-swagger-rules`
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
 - 写完代码后，先进入编码审查域；默认先过 `implementation-review-rules`，再进入测试域，最终收口前再由 `project-change-review-rules` 做当前 diff 总审查
-- 需求、Bug、测试、审查任一链路准备最终收口前，进入 `artifact-delivery-gate-rules`，确认正式文档已经真实写入 `doc/需求/`、`doc/bugs/`、`doc/tests/` 或 `doc/审查/`
+- 需求、Bug、测试、审查任一链路准备最终收口前，进入 `artifact-delivery-gate-rules`，确认正式文档已经真实写入 `doc/2-需求/`、`doc/4-bugs/`、`doc/5-tests/` 或 `doc/6-审查/`
 - 即使当前只是在处理中间环节而不是主入口 skill，只要已经产出需求分析结论、Bug 诊断结论、测试资源整理结论或提交级审查报告，也必须先落盘再允许最终回复
 - 准备提交、整理交付说明或进入团队发布流程前收口时，进入交付域
 
@@ -119,6 +119,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `downloaded-seeds/` 只作为外部 Skill 下载后的临时中转目录，不建议长期保留与顶层重复的同名 Skill
 
 ## 当前进度
+
+2026-06-28 01:12:00 docs: [架构文档规则] 新增 architecture-doc-rules 并迁移 doc 编号目录口径
 
 2026-06-27 22:43:42 docs: [需求流程优化] 收敛4主步4条件步并补齐临时缺口文档规则
 
@@ -184,7 +186,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-18 11:24:24 docs: [实施计划周期规则] 强化开发周期与单阶段步骤约束
 
-2026-06-27 docs: [实施与验收域重构] 实施独立到 `doc/实施/`，验收统一到 `doc/验收/` 并拆为前置验收标准 + 后置最终验收
+2026-06-27 docs: [实施与验收域重构] 实施独立到 `doc/3-实施/`，验收统一到 `doc/7-验收/` 并拆为前置验收标准 + 后置最终验收
 
 2026-06-17 14:58:19 docs: [MCP安装与计划规则] 补充安装流程与增量计划约束
 
@@ -196,9 +198,9 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`77`
+- 已落地 Skill：`78`
 - 规划中待补 Skill：`0`
-- 扩展种子 Skill：`21`
+- 扩展种子 Skill：`22`
 
 主规划文档：
 
@@ -221,8 +223,9 @@ python skill-dictionary/generate_dictionary.py
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
-| `artifact-storage-rules` | 统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，需求、Bug、测试主文档统一收口到 `doc/` 子目录。 |
+| `artifact-storage-rules` | 统一 `doc/1-架构/` 到 `doc/7-验收/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，所有活动研发产物统一收口到编号目录。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
+| `architecture-doc-rules` | 统一 `doc/1-架构/` 下长期架构专题文档的创建、更新、职责边界和与根目录 `项目设计.md` 的分层关系。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
@@ -259,7 +262,7 @@ python skill-dictionary/generate_dictionary.py
 | `requirement-splitting-rules` | 把大需求拆成可执行的小任务项，明确模块拆分和实施顺序。                                                    |
 | `implementation-planning-rules` | 把确认后的需求转成实施总览与实施周期，作为独立实施域进入编码前的正式入口。                              |
 | `requirement-change-rules`    | 处理需求变更，重新确认变更点、影响面、文档同步和后续实施路径。                                            |
-| `acceptance-criteria-rules`   | 生成独立的前置验收标准文档，并按 `artifact-storage-rules` 落到 `doc/验收/`，保证实施前口径可验证、可测试、可回溯。 |
+| `acceptance-criteria-rules`   | 生成独立的前置验收标准文档，并按 `artifact-storage-rules` 落到 `doc/7-验收/`，保证实施前口径可验证、可测试、可回溯。 |
 | `final-acceptance-rules`      | 在测试和审核完成后生成独立的最终验收文档，基于验收标准逐条给出放行结论。                                 |
 
 ### 4. Bug 域
@@ -321,7 +324,7 @@ python skill-dictionary/generate_dictionary.py
 | ----------------------------- | ------------------------------------------------------------------------------ |
 | `test-strategy-rules`         | 先决定测试层级、测试重点和覆盖策略。                                           |
 | `test-task-root-layout-rules` | 统一测试任务根目录、时间戳根目录和中文/ASCII 镜像布局。                        |
-| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `doc/tests/` 根目录外的测试资产。                     |
+| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `doc/5-tests/` 根目录外的测试资产。                     |
 | `go-test-compile-path-rules`  | 统一 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。                |
 | `test-naming-rules`           | 统一测试目录和测试文件命名。                                                   |
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分。                               |
@@ -341,7 +344,7 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill | 功能 |
 | ----- | ---- |
-| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，和“当前 diff 总审查”不是同一问题，不纳入默认自动审查链；正式报告统一归档到 `doc/审查/`，不再写项目根目录固定文件名。 |
+| `code-review-automation-rules` | 用于按当前分支未并入 `main` 的提交范围执行逐条代码审查并生成结构化中文报告；它是提交级专项审查，和“当前 diff 总审查”不是同一问题，不纳入默认自动审查链；正式报告统一归档到 `doc/6-审查/`，不再写项目根目录固定文件名。 |
 
 ### 11. 扩展种子
 
@@ -627,7 +630,7 @@ claude-mem(记忆) :
 2026-06-27 16:31:47 docs: [审查链与目录归档] 收敛默认审查规则并迁移文档入口
 2026-06-27 17:12:38 docs: [审查规划与风格记忆] 收敛提交级专项审查并强化风格示例片段要求
 2026-06-27 20:06:11 feat: [文档落盘闸门] 新增统一收口前文档落盘检查并强制审查域归档
-2026-06-27 21:23:30 docs: [中间链路落盘] 扩展需求Bug测试中间环节落盘闸门并统一提交级审查归档到 doc/审查
+2026-06-27 21:23:30 docs: [中间链路落盘] 扩展需求Bug测试中间环节落盘闸门并统一提交级审查归档到 doc/6-审查
 2026-06-27 21:38:00 fix: [Skill格式与归档] 修复异常SKILL结构并补齐中间链路落盘
 2026-06-27 22:43:42 docs: [需求流程优化] 收敛4主步4条件步并补齐临时缺口文档规则
 2026-06-28 00:29:05 docs: [实施开工与自动推进] 明确开始实施需用户确认并按实施周期自动串行闭环

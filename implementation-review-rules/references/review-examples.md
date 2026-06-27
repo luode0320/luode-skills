@@ -27,8 +27,8 @@
 
 ### 正例 4：Go 测试落点自审通过
 
-- 执行 `rg --files -g "*_test.go" | rg -v "^doc/tests/"` 无命中。
-- 本轮 Go 测试文件均位于 `doc/tests/<时间戳>/` ASCII 镜像路径。
+- 执行 `rg --files -g "*_test.go" | rg -v "^doc/5-tests/"` 无命中。
+- 本轮 Go 测试文件均位于 `doc/5-tests/<时间戳>/` ASCII 镜像路径。
 - 结论：可进入后续审查和测试。
 
 ### 正例 5：Go 服务实现按业务子目录落位
@@ -97,7 +97,7 @@
 
 ### 反例 6：Go 测试落点违规
 
-- 扫描命中 `internal/service/order_service_test.go`（位于 `doc/tests/` 之外）。
+- 扫描命中 `internal/service/order_service_test.go`（位于 `doc/5-tests/` 之外）。
 - 试图以白盒同包为由保留源码目录 `*_test.go`。
 - 结论：驳回，先改 seam 并迁移测试落点。
 

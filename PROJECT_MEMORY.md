@@ -23,10 +23,19 @@
 ### 研发产物目录正式口径
 - 别名: doc 顶层目录规则
 - 类型: 目录规则
-- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前正式顶层子目录为 `doc/需求/`、`doc/架构/`、`doc/实施/`、`doc/验收/`、`doc/审查/`、`doc/bugs/`、`doc/tests/`。
+- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前正式活动子目录按流程顺序编号为 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`。
 - 来源: `artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 文档归档与规则引用
-- 更新时间: 2026-06-27
+- 更新时间: 2026-06-28
+- 状态: 启用
+
+### 架构专题文档规则
+- 别名: architecture-doc-rules, 架构文档目录
+- 类型: 文档规则
+- 定义: `architecture-doc-rules` 专门负责 `doc/1-架构/` 下的长期架构专题文档，包括项目架构、目录树、目录职责、主要业务或功能设计架构、模块关系和关键链路；根目录 `项目设计.md` 保持项目级总览入口，专题细节进入 `doc/1-架构/`。
+- 来源: `architecture-doc-rules/SKILL.md`
+- 适用范围: 架构域、项目设计域
+- 更新时间: 2026-06-28
 - 状态: 启用
 
 ### 需求主动侦察链路
@@ -35,7 +44,7 @@
 - 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-discovery-rules` 主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径或 URL，形成有证据来源的需求设计；外部资料默认遵循“官方文档/官网/自有仓库与站点优先，公共 GitHub 与社区资料只作补充”的优先级。已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
 - 来源: 对话确认、`requirement-discovery-rules`
 - 适用范围: 需求域
-- 更新时间: 2026-06-27
+- 更新时间: 2026-06-28
 - 状态: 启用
 
 ### 需求域第一入口
@@ -44,18 +53,18 @@
 - 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审核 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。需求、验收标准和实施计划完成后不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
 - 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
 - 适用范围: 需求域
-- 更新时间: 2026-06-27
+- 更新时间: 2026-06-28
 - 状态: 启用
 
 ### 需求临时缺口文档规则
 - 别名: gap 临时文档, 缺口阻断文档
 - 类型: 流程规则
-- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
+- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/2-需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
 
 ### 双层验收规则
 - 别名: 前置验收 + 最终验收, 验收双层机制
 - 类型: 流程规则
-- 定义: 验收统一归入“验收”大类，分为前置 `验收标准` 与后置 `最终验收` 两层。前置验收标准由 `acceptance-criteria-rules` 生成并落到 `doc/验收/<需求文档同名主干>验收标准.md`；后置最终验收由 `final-acceptance-rules` 生成并落到 `doc/验收/<需求文档同名主干>最终验收.md`。测试和审核未完成时，最终验收必须阻断。
+- 定义: 验收统一归入“验收”大类，分为前置 `验收标准` 与后置 `最终验收` 两层。前置验收标准由 `acceptance-criteria-rules` 生成并落到 `doc/7-验收/<需求文档同名主干>验收标准.md`；后置最终验收由 `final-acceptance-rules` 生成并落到 `doc/7-验收/<需求文档同名主干>最终验收.md`。测试和审核未完成时，最终验收必须阻断。
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`acceptance-criteria-rules`、`final-acceptance-rules`
 - 适用范围: 验收域
 - 更新时间: 2026-06-27
@@ -77,7 +86,7 @@
 ### 审查体系收口
 - 别名: 审查链路
 - 类型: 流程规则
-- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-compliance-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/审查/`，不再允许仅在最终回复中口头保留通过结论。
+- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-compliance-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/6-审查/`，不再允许仅在最终回复中口头保留通过结论。
 - 来源: `README.md`、`项目设计.md`
 - 适用范围: 审查域
 - 更新时间: 2026-06-27
@@ -86,7 +95,7 @@
 ### 文档落盘闸门
 - 别名: 归档闸门, 收口前落盘检查
 - 类型: 流程规则
-- 定义: 需求、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、配套 SVG、README 和证据路径是否已经真实落盘到 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/审查/`；未落盘不得判定任务完成。
+- 定义: 需求、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、配套 SVG、README 和证据路径是否已经真实落盘到 `doc/2-需求/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`；未落盘不得判定任务完成。
 - 来源: `artifact-delivery-gate-rules`、`README.md`
 - 适用范围: 需求域、Bug 域、测试域、审查域
 - 更新时间: 2026-06-27
@@ -104,7 +113,7 @@
 ### 提交级审查正式归档位置
 - 别名: commit review 归档口径, 提交级专项审查出口
 - 类型: 审查规则
-- 定义: `code-review-automation-rules` 的正式长期输出已统一收口到 `doc/审查/`，文件名遵循 `artifact-storage-rules` 中央模板；不再写入项目根目录固定文件名 `code_review_result.md` 一类平行入口。
+- 定义: `code-review-automation-rules` 的正式长期输出已统一收口到 `doc/6-审查/`，文件名遵循 `artifact-storage-rules` 中央模板；不再写入项目根目录固定文件名 `code_review_result.md` 一类平行入口。
 - 来源: `code-review-automation-rules`、`artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 审查域
 - 更新时间: 2026-06-27
@@ -124,10 +133,10 @@
 ### doc 顶层混合命名
 - 别名: 中文语义优先命名
 - 类型: 术语
-- 定义: `doc/` 根目录保留英文，顶层子目录采用“中文语义优先 + 工程通用域保留英文”的混合方案：`需求`、`架构`、`阶段`、`审查`、`bugs`、`tests`。
+- 定义: `doc/` 根目录保留英文，活动子目录采用“编号顺序 + 中文语义优先 + 工程通用域保留英文”的混合方案：`1-架构`、`2-需求`、`3-实施`、`4-bugs`、`5-tests`、`6-审查`、`7-验收`。
 - 来源: 对话确认、`artifact-storage-rules`
 - 适用范围: 文档目录命名
-- 更新时间: 2026-06-27
+- 更新时间: 2026-06-28
 - 状态: 启用
 
 ## 业务约束
@@ -147,5 +156,6 @@
 - 2026-06-27：新增需求主动侦察链路，明确老板式 idea 先由 agent 查项目、数据、代码、上下游和补充路径，再形成需求设计并回写可复用侦察线索。
 - 2026-06-27：明确 `requirement-discovery-rules` 是需求域第一入口，现有需求 skill 暂不合并为大 skill，改为通过路由 reference 收敛职责重叠。
 - 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
-- 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/审查/`，不再写项目根目录固定文件名。
+- 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/6-审查/`，不再写项目根目录固定文件名。
 - 2026-06-28：明确“需求/验收标准/实施计划完成不等于自动开工”，必须等用户明确“开始实施/开始执行”后才能进入编码；一旦开工，后续按实施周期自动串行推进实现、测试、审核与验收闭环。
+- 2026-06-28：将正式活动文档目录迁移为 `doc/1-架构/` 到 `doc/7-验收/` 的编号顺序，并新增 `architecture-doc-rules` 承接长期架构专题文档。

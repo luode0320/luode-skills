@@ -42,7 +42,7 @@
 优先示例形式：
 
 - 单行代码片段：`return nil, nil`
-- 配置片段：`doc/需求/`
+- 配置片段：`doc/2-需求/`
 - 命令片段：`python skill-dictionary/generate_dictionary.py`
 - 多行代码片段：
 

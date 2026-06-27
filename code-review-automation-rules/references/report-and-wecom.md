@@ -2,7 +2,7 @@
 
 ## 报告文件
 
-- 目录：`<project_path>/doc/审查/`。
+- 目录：`<project_path>/doc/6-审查/`。
 - 文件名：`YYYY-MM-DD_<审查中文主题>.md`（遵循 `artifact-storage-rules` 中央模板；同主题复用或覆盖）。
 - 编码：UTF-8。
 
@@ -23,8 +23,8 @@
 
 ## 输出建议
 
-- 发现问题：`发现问题。结果已保存到 <project_path>/doc/审查/<report_file>`
-- 未发现问题：`Review 完成，未发现阻断项。结果已保存到 <project_path>/doc/审查/<report_file>`
+- 发现问题：`发现问题。结果已保存到 <project_path>/doc/6-审查/<report_file>`
+- 未发现问题：`Review 完成，未发现阻断项。结果已保存到 <project_path>/doc/6-审查/<report_file>`
 
 ## 明确不做
 

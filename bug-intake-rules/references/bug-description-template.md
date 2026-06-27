@@ -6,7 +6,7 @@
 
 ## 标准模板
 
-> 当前 Bug 根目录应落在 `doc/bugs/YYYY-MM-DD_HHmmss_问题中文简介/` 下，主入口文件为该目录中的 `README.md`。
+> 当前 Bug 根目录应落在 `doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/` 下，主入口文件为该目录中的 `README.md`。
 
 ```text
 问题现象

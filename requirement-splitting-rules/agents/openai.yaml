@@ -1,4 +1,4 @@
 interface:
   display_name: "需求拆分"
-  short_description: "将大需求拆分，并更新同一份 doc/需求/ 主文档。"
-  default_prompt: "使用 $requirement-splitting-rules 把当前大需求拆成可执行的子项，给出依赖关系和实施顺序，并更新到同一份 doc/需求/ 主文档。"
+  short_description: "将大需求拆分，并更新同一份 doc/2-需求/ 主文档。"
+  default_prompt: "使用 $requirement-splitting-rules 把当前大需求拆成可执行的子项，给出依赖关系和实施顺序，并更新到同一份 doc/2-需求/ 主文档。"

@@ -1,4 +1,4 @@
 interface:
   display_name: "需求接入"
   short_description: "接收 discovery 或资料，收口为同一份需求主文档。"
-  default_prompt: "使用 $requirement-intake-rules 根据 discovery 结果、需求 URL 和零散资料整理需求，补齐到可开发程度并更新 doc/需求/ 主文档。"
+  default_prompt: "使用 $requirement-intake-rules 根据 discovery 结果、需求 URL 和零散资料整理需求，补齐到可开发程度并更新 doc/2-需求/ 主文档。"

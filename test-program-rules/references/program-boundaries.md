@@ -26,7 +26,7 @@
 
 - 临时排障代码不直接升级为正式测试程序，除非已经补齐职责、命名和归档。
 - 测试辅助逻辑不得直接塞进生产 `utils`、`common`、`service` 目录。
-- 正式测试程序、模拟程序和验证脚本必须跟随 `test-task-root-layout-rules`，统一落在 `doc/tests/yyyy-MM-DD_HHmmss/<ASCII 真实代码路径镜像>/` 下；若涉及 Go 可编译路径，还必须同步遵循 `go-test-compile-path-rules`。
+- 正式测试程序、模拟程序和验证脚本必须跟随 `test-task-root-layout-rules`，统一落在 `doc/5-tests/yyyy-MM-DD_HHmmss/<ASCII 真实代码路径镜像>/` 下；若涉及 Go 可编译路径，还必须同步遵循 `go-test-compile-path-rules`。
 - Go 白盒诉求也必须遵循同一落点规则；不得通过源码目录同包 `*_test.go` 绕开。
 - 中文说明目录只保留 `README.md`，不承载任何真实测试代码。
 - 如果本质是目录归属错误，应回流 `test-task-root-layout-rules`、`test-scattered-asset-location-rules` 或 `implementation-review-rules`。

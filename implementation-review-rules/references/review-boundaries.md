@@ -19,7 +19,7 @@
 
 - 当前 skill 直接负责测试前的目录归位、模块落点和依赖方向复查。
 - 但如果问题已经上升为“编码前结构设计”或“跨模块架构重排”，仍应回到 `package-structure-rules` 或更上层设计讨论。
-- Go 场景下，当前 skill 需要直接收口 `doc/tests/` 外 `*_test.go`、`internal/service/*.go` 根目录落点、`internal/service` 结构体散落、局部变量 `var (...)`、多参数签名直换行与第三方 API 响应 map 硬编码解析等问题。
+- Go 场景下，当前 skill 需要直接收口 `doc/5-tests/` 外 `*_test.go`、`internal/service/*.go` 根目录落点、`internal/service` 结构体散落、局部变量 `var (...)`、多参数签名直换行与第三方 API 响应 map 硬编码解析等问题。
 
 ## 与注释规范的边界
 

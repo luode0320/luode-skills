@@ -13,7 +13,7 @@
 - `utils`、`common`、`global`、`middleware` 根目录是否直接出现实现文件。
 - Go `internal/service` 根目录是否直接堆业务实现文件，而未拆业务子目录。
 - Go `internal/service` 实现文件是否散落请求 / 响应 / 第三方结果结构体。
-- Go 项目中，`doc/tests/` 外是否出现 `*_test.go`。
+- Go 项目中，`doc/5-tests/` 外是否出现 `*_test.go`。
 - 本轮重点业务文件是否达到 500 行及以上且仍在持续新增功能。
 
 ## 依赖方向常见问题
@@ -30,12 +30,12 @@
 - 公共根目录优先承担命名空间职责，具体实现优先放子目录。
 - Go `internal/service` 默认先按业务域拆子目录，再放实现文件。
 - Go 请求 / 响应 / 第三方结果结构体默认放 `internal/entity`，`internal/service` 只保留行为实现。
-- Go 测试文件默认只允许落在 `doc/tests/` 根目录体系内。
+- Go 测试文件默认只允许落在 `doc/5-tests/` 根目录体系内。
 - 500+ 行持续膨胀文件不应继续就地堆方法，应按功能职责拆到多文件，必要时拆子目录。
 
 ## 扫描示例
 
-- Go 禁放测试扫描：`rg --files -g "*_test.go" | rg -v "^doc/tests/"`
+- Go 禁放测试扫描：`rg --files -g "*_test.go" | rg -v "^doc/5-tests/"`
 - Go 服务层结构体扫描：`rg -n "^\\s*type\\s+[A-Za-z_][A-Za-z0-9_]*\\s+struct\\s*{" internal/service`
 
 ## 正反例
@@ -60,7 +60,7 @@
 
 ### 正例 4：Go 测试文件不落源码目录
 
-- `doc/tests/2026-03-29_201500/internal/service/order_service_test.go`。
+- `doc/5-tests/2026-03-29_201500/internal/service/order_service_test.go`。
 - `internal/service/` 下没有同包 `*_test.go`。
 - 结论：通过。
 
@@ -95,7 +95,7 @@
 ### 反例 4：Go 测试文件落在禁放目录
 
 - 在 `internal/service/order_service_test.go` 直接新增同包白盒测试文件。
-- 命中 `doc/tests/` 外 `*_test.go` 禁放规则。
+- 命中 `doc/5-tests/` 外 `*_test.go` 禁放规则。
 - 结论：驳回。
 
 ### 反例 5：Go 服务层大平层堆叠

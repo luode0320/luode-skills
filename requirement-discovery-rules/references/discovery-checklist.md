@@ -4,8 +4,8 @@
 
 - 当前项目长期记忆：`PROJECT_MEMORY.md`
 - 当前项目风格记忆：`PROJECT_STYLE.md`
-- 需求与阶段材料：`doc/需求/`、`doc/实施/`、`doc/验收/`、`doc/架构/`
-- 近期记录：`doc/bugs/`、`doc/tests/`、`doc/审查/`
+- 需求与阶段材料：`doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/7-验收/`
+- 近期记录：`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`
 - 根目录说明：`README.md`、`项目设计.md`、同类项目说明文档
 - 代码入口：路由、controller、service、repository、model、frontend 页面、任务脚本、配置文件
 - 数据入口：数据库连接配置、迁移脚本、模型定义、SQL、ORM schema、表名和字段名
