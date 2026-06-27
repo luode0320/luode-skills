@@ -54,6 +54,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
 - `artifact-storage-rules` 负责统一 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
+- `artifact-delivery-gate-rules` 负责在需求、Bug、测试、审查收口前核对正式文档是否已经真实落盘，阻断“只在回复里说、不写文档”的假完成
 - 具体的编码、数据库、API、错误处理、日志、测试等规则，尽量交给各自独立的小 Skill 执行
 - 当多个 Skill 同时命中时，由总控层负责裁决优先级，避免重复触发或相互冲突
 
@@ -82,6 +83,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-swagger-rules`
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
 - 写完代码后，先进入编码审查域；默认先过 `implementation-review-rules`，再进入测试域，最终收口前再由 `project-change-review-rules` 做当前 diff 总审查
+- 需求、Bug、测试、审查任一链路准备最终收口前，进入 `artifact-delivery-gate-rules`，确认正式文档已经真实写入 `doc/需求/`、`doc/bugs/`、`doc/tests/` 或 `doc/审查/`
 - 准备提交、整理交付说明或进入团队发布流程前收口时，进入交付域
 
 ## 仓库结构
@@ -183,7 +185,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`76`
+- 已落地 Skill：`77`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`21`
 
@@ -216,6 +218,7 @@ python skill-dictionary/generate_dictionary.py
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `project-agents-bootstrap` | 新会话首轮或仓库级规则文件缺失时，负责补齐和同步 `AGENTS.md` / `CLAUDE.md` 及其关键受管章节。 |
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
+| `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进，并强制输出并行技能列表或“并行技能:无”。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
@@ -609,3 +612,4 @@ claude-mem(记忆) :
 2026-06-27 14:19:48 docs: [产物归档规则] 强化迁移同步与旧入口清理
 2026-06-27 16:31:47 docs: [审查链与目录归档] 收敛默认审查规则并迁移文档入口
 2026-06-27 17:12:38 docs: [审查规划与风格记忆] 收敛提交级专项审查并强化风格示例片段要求
+2026-06-27 20:06:11 feat: [文档落盘闸门] 新增统一收口前文档落盘检查并强制审查域归档

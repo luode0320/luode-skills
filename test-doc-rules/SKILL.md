@@ -78,6 +78,7 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 - 测试任务主说明位置、目录命名模板和同一轮测试的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 主 README 必须显式写出这些详细文档或证据文件所在的 ASCII 路径，避免只留一堆孤立附件。
 - 如果同一需求拆成多轮独立验证，应分别维护各自时间戳根目录的 README，而不是在一个 README 中持续堆叠历史轮次。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对测试任务 `README.md` 与引用的 ASCII 证据路径是否已经真实落盘；未落盘不得判定测试文档完成。
 
 ## references 读取规则
 

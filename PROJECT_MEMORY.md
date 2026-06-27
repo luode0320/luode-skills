@@ -50,9 +50,18 @@
 ### 审查体系收口
 - 别名: 审查链路
 - 类型: 流程规则
-- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`skill-compliance-gate-rules`；其中 `code-review-automation-rules` 仅用于按当前分支提交范围做专项审查，不纳入默认自动审查链。
+- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-compliance-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/审查/`，不再允许仅在最终回复中口头保留通过结论。
 - 来源: `README.md`、`项目设计.md`
 - 适用范围: 审查域
+- 更新时间: 2026-06-27
+- 状态: 启用
+
+### 文档落盘闸门
+- 别名: 归档闸门, 收口前落盘检查
+- 类型: 流程规则
+- 定义: 需求、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、配套 SVG、README 和证据路径是否已经真实落盘到 `doc/需求/`、`doc/bugs/`、`doc/tests/`、`doc/审查/`；未落盘不得判定任务完成。
+- 来源: `artifact-delivery-gate-rules`、`README.md`
+- 适用范围: 需求域、Bug 域、测试域、审查域
 - 更新时间: 2026-06-27
 - 状态: 启用
 
@@ -92,3 +101,4 @@
 - 2026-06-27：初始化根目录长期记忆文档，补齐 doc 顶层目录口径、审查链收口和长期规则回写约束。
 - 2026-06-27：新增需求主动侦察链路，明确老板式 idea 先由 agent 查项目、数据、代码、上下游和补充路径，再形成需求设计并回写可复用侦察线索。
 - 2026-06-27：明确 `requirement-discovery-rules` 是需求域第一入口，现有需求 skill 暂不合并为大 skill，改为通过路由 reference 收敛职责重叠。
+- 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
