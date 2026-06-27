@@ -1,4 +1,4 @@
 interface:
   display_name: "需求缺口识别"
-  short_description: "识别侦察后仍缺的关键信息，并回写需求主文档。"
-  default_prompt: "使用 $requirement-gap-rules 判断当前需求是否仍缺关键前提、字段、流程、规则或验收信息，并把缺口结论更新到同一份 doc/需求/ 主文档。"
+  short_description: "识别侦察后仍缺的关键信息，先写临时缺口文档，再回填主需求文档。"
+  default_prompt: "使用 $requirement-gap-rules 判断当前需求是否仍缺关键前提、字段、流程、规则或验收信息；先排除可继续 discovery 解决的问题，再把仍未补齐的关键缺口写入 doc/需求/ 下的临时缺口文档，待用户确认后回填主需求文档并删除临时缺口文档。"

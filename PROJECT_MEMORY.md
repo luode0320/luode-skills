@@ -32,7 +32,7 @@
 ### 需求主动侦察链路
 - 别名: 老板式 idea 转需求, idea 侦察, 需求 discovery
 - 类型: 流程规则
-- 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-discovery-rules` 主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、用户补充路径或 URL，形成有证据来源的需求设计；已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
+- 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-discovery-rules` 主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径或 URL，形成有证据来源的需求设计；外部资料默认遵循“官方文档/官网/自有仓库与站点优先，公共 GitHub 与社区资料只作补充”的优先级。已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
 - 来源: 对话确认、`requirement-discovery-rules`
 - 适用范围: 需求域
 - 更新时间: 2026-06-27
@@ -41,8 +41,17 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 需求域默认以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责把 discovery 或用户资料收口为需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。当前不把需求域 skill 合并成一个大 skill，而是通过 `requirement-discovery-rules/references/requirement-domain-routing.md` 维护相邻 skill 的顺序、让路和重叠边界。
+- 定义: 需求域对外统一采用“4 主步 + 4 条件步”：主流程为 `Idea/Discovery -> Intake -> Acceptance -> Implementation Plan`，条件步骤为 `Gap / Boundary / Splitting / Change`。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。当前不把需求域 skill 合并成一个大 skill，而是通过 `requirement-discovery-rules/references/requirement-domain-routing.md` 维护相邻 skill 的顺序、让路和重叠边界。
 - 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
+- 适用范围: 需求域
+- 更新时间: 2026-06-27
+- 状态: 启用
+
+### 需求临时缺口文档规则
+- 别名: gap 临时文档, 缺口阻断文档
+- 类型: 流程规则
+- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收和实施计划。
+- 来源: `requirement-gap-rules`、`artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 需求域
 - 更新时间: 2026-06-27
 - 状态: 启用

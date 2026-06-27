@@ -3,8 +3,11 @@
 ## 需求域
 
 - 同一个需求只保留一份需求入口文档。
-- `requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 默认继续更新这同一份需求文档。
+- `requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 默认围绕这同一份需求文档推进。
+- `requirement-gap-rules` 在关键缺口阻断时允许创建一份临时缺口文档，命名复用对应需求文档主干并追加 `.gap.md`；该文档仅用于 gap 未关闭阶段，用户确认并回填主需求文档后必须删除。
+- `requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 的稳定结论仍直接更新主需求文档，不额外新建平行长期入口。
 - 验收文档和实施计划文档可以与需求文档分开，但各自同一需求只保留一份主文档。
+- 需求未稳定前，不进入验收文档和实施计划文档；若 gap 未关闭、边界未裁清、拆分未完成或变更未重算，必须阻断进入这两类下游文档。
 
 ## Bug 域
 
