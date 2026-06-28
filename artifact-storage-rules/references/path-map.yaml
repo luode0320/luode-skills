@@ -1,4 +1,4 @@
-version: 2
+version: 4
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
@@ -11,6 +11,14 @@ roots:
   project_docs: "doc"
   project_local_skills: "skill"
 entry_files:
+  architecture_overview_doc: "1-总架构.md"
+  architecture_directory_tree_doc: "2-目录树.md"
+  architecture_module_responsibilities_doc: "3-模块职责.md"
+  architecture_business_flow_index_doc: "4-主要业务链路.md"
+  architecture_business_flow_doc: "{business_flow_sequence}-业务链路-{business_flow_cn_title}.md"
+  architecture_appendix_doc: "附录-{architecture_cn_title}.md"
+  architecture_core_docs_note: "doc/1-架构/ 的四个稳定中文主入口固定为 1-总架构.md、2-目录树.md、3-模块职责.md、4-主要业务链路.md"
+  architecture_business_flow_doc_note: "业务链路从序号 5 开始；同一链路持续更新原编号文档，新增独立链路使用当前最大业务链路编号加 1，并同步更新 4-主要业务链路.md 索引；历史编号不复用、不重排"
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
   requirement_gap_doc: "{requirement_doc_stem}.gap.md"
   requirement_flow_svg: "{datetime}_{requirement_cn_title}.flow.svg"
@@ -64,6 +72,13 @@ bootstrap:
     - "系统设计.md"
     - "项目说明.md"
 policies:
+  architecture_core_docs_use_stable_ordered_chinese_names: true
+  same_architecture_topic_updates_same_doc: true
+  same_business_flow_updates_same_doc: true
+  new_business_flow_creates_new_doc: true
+  architecture_business_flow_index_required: true
+  architecture_business_flow_sequence_starts_at_five: true
+  architecture_business_flow_sequence_is_append_only: true
   same_requirement_updates_same_doc: true
   requirement_gap_doc_is_temporary: true
   same_requirement_acceptance_updates_same_doc: true

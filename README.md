@@ -120,6 +120,10 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-06-28 13:14:21 docs: [架构文档规则] 架构文档改为固定序号并让业务链路从5依次下推
+
+2026-06-28 04:17:15 docs: [架构文档规则] 固定四个中文架构主入口并补齐业务链路增量模板
+
 2026-06-28 01:12:00 docs: [架构文档规则] 新增 architecture-doc-rules 并迁移 doc 编号目录口径
 
 2026-06-27 22:43:42 docs: [需求流程优化] 收敛4主步4条件步并补齐临时缺口文档规则
@@ -225,7 +229,7 @@ python skill-dictionary/generate_dictionary.py
 | `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
 | `artifact-storage-rules` | 统一 `doc/1-架构/` 到 `doc/7-验收/`、`doc/` 以及根目录 `项目设计.md` 等研发产物主入口、命名模板和复用策略，所有活动研发产物统一收口到编号目录。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
-| `architecture-doc-rules` | 统一 `doc/1-架构/` 下长期架构专题文档的创建、更新、职责边界和与根目录 `项目设计.md` 的分层关系。 |
+| `architecture-doc-rules` | 统一 `doc/1-架构/` 下 `1-总架构.md` 到 `4-主要业务链路.md` 四个有序中文主入口；业务链路从序号 `5` 开始按最大编号加一，支持更新原编号链路或追加新链路，并维护与根目录 `项目设计.md` 的分层关系。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |

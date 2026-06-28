@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-28 02:57:57",
+  "generated_at": "2026-06-28 13:19:32",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 22,
     "doc_total": 7,
-    "references_total": 291,
+    "references_total": 292,
     "agents_total": 86
   },
   "downloaded_seeds": {
@@ -170,8 +170,8 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 4,
-          "auto_trigger": "当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档时自动触发，适用于项目架构、目录树、目录职责、主要业务/功能设计架构、模块关系、关键链路、运行时设计和架构专题说明；负责区分专题架构文档与根目录 `项目设计.md` 的分层关系，并确保路径、命名和复用策略服从 `artifact-storage-rules`。不要用它代替 project-design-doc-rules 的根目录项目总览同步、implementation-planning-rules 的当前需求实施计划、package-structure-rules 的生产代码目录归位或 codegraph-analysis-rules 的源码图谱探索。",
-          "core_responsibility": "负责维护 `doc/1-架构/` 下的长期架构专题，并区分它与根目录 `项目设计.md` 的总览分层关系。",
+          "auto_trigger": "当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档时自动触发，适用于总架构、目录树、目录职责、模块职责、主要业务/功能设计架构、模块关系、关键链路、运行时设计和架构专题说明；负责维护 `1-总架构.md`、`2-目录树.md`、`3-模块职责.md`、`4-主要业务链路.md` 四个有序中文主入口，并支持从序号 5 开始更新或追加“序号-业务链路-中文业务名称.md”文档。同时区分专题架构文档与根目录 `项目设计.md` 的分层关系，并确保路径、命名和复用策略服从 `artifact-storage-rules`。不要用它代替 project-design-doc-rules 的根目录项目总览同步、implementation-planning-rules 的当前需求实施计划、package-structure-rules 的生产代码目录归位或 codegraph-analysis-rules 的源码图谱探索。",
+          "core_responsibility": "负责维护 `1-4` 四个有序中文主入口；业务链路从 `5` 开始依次下推，同一链路保留编号更新，新链路使用最大编号加一，并区分它与根目录 `项目设计.md` 的总览分层关系。",
           "skill_path": "architecture-doc-rules/SKILL.md",
           "directory_path": "architecture-doc-rules",
           "directory": "architecture-doc-rules",
@@ -188,6 +188,7 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "architecture-doc-rules/references/architecture-doc-template.md",
+            "architecture-doc-rules/references/architecture-topic-examples.md",
             "architecture-doc-rules/references/layering-with-project-design.md",
             "architecture-doc-rules/references/update-policy.md"
           ],
@@ -4476,8 +4477,8 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 4,
-      "auto_trigger": "当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档时自动触发，适用于项目架构、目录树、目录职责、主要业务/功能设计架构、模块关系、关键链路、运行时设计和架构专题说明；负责区分专题架构文档与根目录 `项目设计.md` 的分层关系，并确保路径、命名和复用策略服从 `artifact-storage-rules`。不要用它代替 project-design-doc-rules 的根目录项目总览同步、implementation-planning-rules 的当前需求实施计划、package-structure-rules 的生产代码目录归位或 codegraph-analysis-rules 的源码图谱探索。",
-      "core_responsibility": "负责维护 `doc/1-架构/` 下的长期架构专题，并区分它与根目录 `项目设计.md` 的总览分层关系。",
+      "auto_trigger": "当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档时自动触发，适用于总架构、目录树、目录职责、模块职责、主要业务/功能设计架构、模块关系、关键链路、运行时设计和架构专题说明；负责维护 `1-总架构.md`、`2-目录树.md`、`3-模块职责.md`、`4-主要业务链路.md` 四个有序中文主入口，并支持从序号 5 开始更新或追加“序号-业务链路-中文业务名称.md”文档。同时区分专题架构文档与根目录 `项目设计.md` 的分层关系，并确保路径、命名和复用策略服从 `artifact-storage-rules`。不要用它代替 project-design-doc-rules 的根目录项目总览同步、implementation-planning-rules 的当前需求实施计划、package-structure-rules 的生产代码目录归位或 codegraph-analysis-rules 的源码图谱探索。",
+      "core_responsibility": "负责维护 `1-4` 四个有序中文主入口；业务链路从 `5` 开始依次下推，同一链路保留编号更新，新链路使用最大编号加一，并区分它与根目录 `项目设计.md` 的总览分层关系。",
       "skill_path": "architecture-doc-rules/SKILL.md",
       "directory_path": "architecture-doc-rules",
       "directory": "architecture-doc-rules",
@@ -4494,6 +4495,7 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "architecture-doc-rules/references/architecture-doc-template.md",
+        "architecture-doc-rules/references/architecture-topic-examples.md",
         "architecture-doc-rules/references/layering-with-project-design.md",
         "architecture-doc-rules/references/update-policy.md"
       ],
