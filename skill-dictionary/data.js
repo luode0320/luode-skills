@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-29 22:55:20",
+  "generated_at": "2026-06-30 01:10:32",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 22,
     "doc_total": 7,
-    "references_total": 299,
+    "references_total": 300,
     "agents_total": 86
   },
   "downloaded_seeds": {
@@ -724,7 +724,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 17,
-          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）；若本轮有验证必须包含验证结果；最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
           "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
           "directory_path": "reasoning-summary-structure-rules",
@@ -1220,6 +1220,7 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
             "implementation-planning-rules/references/plan-boundaries-and-examples.md",
             "implementation-planning-rules/references/plan-entry-checklist.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
@@ -5084,7 +5085,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 17,
-      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）；若本轮有验证必须包含验证结果；最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
       "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
       "directory_path": "reasoning-summary-structure-rules",
@@ -5556,6 +5557,7 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
         "implementation-planning-rules/references/plan-boundaries-and-examples.md",
         "implementation-planning-rules/references/plan-entry-checklist.md",
         "implementation-planning-rules/references/plan-review-checklist.md",

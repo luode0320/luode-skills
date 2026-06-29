@@ -28,13 +28,13 @@
 - 方案：新建 `bug-discovery-rules` 作为 Bug 域侦察前置，相邻 skill 让路 / 回流。
 - 根因：原 Bug 域缺一个“追问前先主动取证”的角色。
 
-## 📌 结果与结论
-
-> 已落地并接入链路 `intake → discovery → gap → reproduction → root-cause`。
-
 ## ✅ 验证
 
 - 字典 `implemented_total 78→79`、`planned_missing 0`，bug-discovery 归 Bug 域非种子。
+
+## 📌 结果与结论
+
+> 已落地并接入链路 `intake → discovery → gap → reproduction → root-cause`。
 
 ## 📦 改动点
 
