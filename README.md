@@ -144,6 +144,12 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-22 23:42:06 docs: [MCP安装收口] 统一浏览器与Godot工具安装判定
 
+2026-06-29 15:35:09 feat: [Bug主动侦察] 新增 bug-discovery-rules skill 并联动 Bug 链路回流
+2026-06-29 15:36:30 feat: [本地环境配置发现] test-strategy-rules 新增本地真实环境连接章节并全链路联动
+2026-06-29 15:37:45 feat: [Skill资产闸门] skill-hit-check-rules 新增资产改动联动闸门并同步 AGENTS.md
+2026-06-29 15:39:00 docs: [总结排版规范] reasoning-summary-structure-rules 重刷排版结构规范
+2026-06-29 15:40:15 chore: [字典刷新] 刷新字典产物并同步 project-agents-bootstrap 描述
+
 2026-06-29 11:18:14 feat: [统一MD补齐编排] project-agents-bootstrap 新增四核心 md 聚合更新入口
 
 2026-06-26 11:28:23 docs: [根因修复强制] 新增反打补丁规则并统一最小改动与根因修复的边界
