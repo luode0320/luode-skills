@@ -5,6 +5,8 @@
 ```text
 Subagent 状态：
 - 已启动：<subagent-id 或昵称>
+- 逻辑名：<任务简要中文-线程标识>
+- 平台昵称：<spawn 返回昵称；没有则写未提供>
 - 执行 skill：<skill-name>
 - 任务：<一句话任务摘要>
 ```
@@ -14,8 +16,11 @@ Subagent 状态：
 ```text
 Subagent 状态：
 - 已完成：<subagent-id 或昵称>
+- 逻辑名：<任务简要中文-线程标识>
+- 平台昵称：<spawn 返回昵称；没有则写未提供>
 - 执行 skill：<skill-name>
 - 结果：<一句话结果摘要>
+- 回收：<已调用 close_agent / 回收失败原因>
 ```
 
 ## 模板 1：只读核查任务
@@ -73,3 +78,12 @@ Subagent 状态：
 - 是否提供了可验证证据（命令输出/文件 diff/测试结论）。
 - 是否存在需要主 agent 决策的冲突项。
 - 主 agent 是否已输出启动公告与完成公告。
+- 主 agent 是否已记录逻辑名、平台昵称和 agent_id 的映射。
+- 主 agent 是否已调用 `close_agent` / 等价关闭工具完成回收。
+
+## 启动计划脚本约定
+
+- 批量委派前，优先运行 `scripts/generate_subagent_plan.py` 生成启动计划。
+- `agent_name` / `logical_agent_name` 默认使用“任务简要中文 + 线程标识”，用于主 agent 侧的中文逻辑命名。
+- 平台 UI 昵称以真实启动工具返回值为准；若工具未提供命名参数，不能强制改成中文。
+- 主 agent 使用脚本输出的 `message` 作为真实子 agent 委派消息草案，再调用真实 subagent / multi-agent / thread 工具。

@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-29 15:09:48",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-06-29 22:55:20",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 22,
     "doc_total": 7,
-    "references_total": 296,
+    "references_total": 299,
     "agents_total": 86
   },
   "downloaded_seeds": {
@@ -426,8 +426,8 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 10,
-          "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
-          "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进，并输出并行技能与文件归属。",
+          "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件；若判定为可并行或条件并行且无阻断，必须立即联动 `subagent-dispatch-rules` 发起真实子线程 / 子代理并行执行，不能只停留在文本分发。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
+          "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。",
           "skill_path": "parallel-task-dispatch-rules/SKILL.md",
           "directory_path": "parallel-task-dispatch-rules",
           "directory": "parallel-task-dispatch-rules",
@@ -437,6 +437,8 @@ window.SKILL_DICTIONARY = {
             "典型分类",
             "分发流程",
             "输出要求",
+            "与 subagent-dispatch-rules 的联动闸门",
+            "执行通过 / 驳回标准",
             "references 读取规则"
           ],
           "references": [
@@ -595,8 +597,8 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 14,
-          "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
-          "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
+          "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并产出真实启动证据，不能只停留在文本分析或口头宣告，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
+          "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。",
           "skill_path": "subagent-dispatch-rules/SKILL.md",
           "directory_path": "subagent-dispatch-rules",
           "directory": "subagent-dispatch-rules",
@@ -606,6 +608,7 @@ window.SKILL_DICTIONARY = {
             "进入后先做什么",
             "默认执行流程",
             "主 agent 可见公告（强制）",
+            "真实启动证据（强制）",
             "子任务优先委派清单",
             "必须主 agent 本地执行的场景",
             "权责边界与不负责事项",
@@ -616,6 +619,9 @@ window.SKILL_DICTIONARY = {
           "references": [
             "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
             "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+            "subagent-dispatch-rules/references/examples/launch-plan-input.json",
+            "subagent-dispatch-rules/references/examples/launch-plan-output.json",
+            "subagent-dispatch-rules/references/launch-plan-schema.md",
             "subagent-dispatch-rules/references/subagent-task-templates.md"
           ],
           "agents": [
@@ -4780,8 +4786,8 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 10,
-      "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
-      "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进，并输出并行技能与文件归属。",
+      "auto_trigger": "【强制自动触发】当研发任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时触发。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件；若判定为可并行或条件并行且无阻断，必须立即联动 `subagent-dispatch-rules` 发起真实子线程 / 子代理并行执行，不能只停留在文本分发。适用于代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的开发任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；不用于根因定位、接口边界冻结、数据库 schema 变更等必须先串行定边界的任务。",
+      "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。",
       "skill_path": "parallel-task-dispatch-rules/SKILL.md",
       "directory_path": "parallel-task-dispatch-rules",
       "directory": "parallel-task-dispatch-rules",
@@ -4791,6 +4797,8 @@ window.SKILL_DICTIONARY = {
         "典型分类",
         "分发流程",
         "输出要求",
+        "与 subagent-dispatch-rules 的联动闸门",
+        "执行通过 / 驳回标准",
         "references 读取规则"
       ],
       "references": [
@@ -4949,8 +4957,8 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 14,
-      "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
-      "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态。",
+      "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件（不需要用户明确要求；默认允许委派并推荐优先使用；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行）；满足时必须优先将可并行子任务委派给 subagent 执行，并产出真实启动证据，不能只停留在文本分析或口头宣告，并在主 agent 过程消息中显式输出“已启动 subagent + 正在执行的 skill + 当前任务摘要”。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
+      "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。",
       "skill_path": "subagent-dispatch-rules/SKILL.md",
       "directory_path": "subagent-dispatch-rules",
       "directory": "subagent-dispatch-rules",
@@ -4960,6 +4968,7 @@ window.SKILL_DICTIONARY = {
         "进入后先做什么",
         "默认执行流程",
         "主 agent 可见公告（强制）",
+        "真实启动证据（强制）",
         "子任务优先委派清单",
         "必须主 agent 本地执行的场景",
         "权责边界与不负责事项",
@@ -4970,6 +4979,9 @@ window.SKILL_DICTIONARY = {
       "references": [
         "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
         "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+        "subagent-dispatch-rules/references/examples/launch-plan-input.json",
+        "subagent-dispatch-rules/references/examples/launch-plan-output.json",
+        "subagent-dispatch-rules/references/launch-plan-schema.md",
         "subagent-dispatch-rules/references/subagent-task-templates.md"
       ],
       "agents": [

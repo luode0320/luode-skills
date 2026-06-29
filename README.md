@@ -70,6 +70,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 首条中间进度至少输出 `命中检查`、`命中技能`
 - 若本轮命中 `parallel-task-dispatch-rules`，还必须额外输出 `并行技能`
 - 若最终没有真正启动任何并行 skill，也必须明确写 `并行技能:无`
+- 若 `parallel-task-dispatch-rules` 判定允许并行且无阻断，必须继续联动 `subagent-dispatch-rules` 发起真实子线程；只输出线程分配或并行技能列表，不算真正并行
 
 例如：
 
@@ -149,6 +150,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 2026-06-29 15:37:45 feat: [Skill资产闸门] skill-hit-check-rules 新增资产改动联动闸门并同步 AGENTS.md
 2026-06-29 15:39:00 docs: [总结排版规范] reasoning-summary-structure-rules 重刷排版结构规范
 2026-06-29 15:40:15 chore: [字典刷新] 刷新字典产物并同步 project-agents-bootstrap 描述
+2026-06-29 23:36:37 feat: [子代理真实并行闭环] 强化并行启动计划与回收规范
 
 2026-06-29 11:18:14 feat: [统一MD补齐编排] project-agents-bootstrap 新增四核心 md 聚合更新入口
 
@@ -252,9 +254,9 @@ python skill-dictionary/generate_dictionary.py
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，主入口与中间链路结论一视同仁；缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
-| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进，并强制输出并行技能列表或“并行技能:无”。 |
+| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，必须联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能列表或回退为“并行技能:无”。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
-| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件，满足可委派条件即自动委派；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行，并由主 agent 输出可见启动/完成状态。 |
+| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件，满足可委派条件即自动委派并产出真实启动证据；批量委派时优先使用 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行，并由主 agent 输出可见启动/完成状态，且在结果回收后继续调用 `close_agent` 完成子 agent 回收。 |
 | `skill-audit-rules` | 当本轮存在多 skill 组合、并行拆分或规则收口风险时，负责只读审计是否漏触发应有 skill 或漏执行关键规则。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查；只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出后续内容。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性；默认不输出后续内容，只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出。 |

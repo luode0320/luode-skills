@@ -1,0 +1,52 @@
+{
+  "task_name": "补充子代理启动计划",
+  "task_summary": "补充子代理启动计划脚本并测试",
+  "execution_skill": "subagent-dispatch-rules",
+  "planned_thread_count": 2,
+  "generated_at": "2026-06-29 22:20:00",
+  "threads": [
+    {
+      "thread": "A",
+      "agent_name": "补充子代理启动计划-A",
+      "logical_agent_name": "补充子代理启动计划-A",
+      "agent_type": "worker",
+      "goal": "编写子 agent 启动计划脚本",
+      "expected_output": "输出脚本变更摘要与自测结果",
+      "write_scope": [
+        "subagent-dispatch-rules/scripts/generate_subagent_plan.py"
+      ],
+      "read_scope": [
+        "subagent-dispatch-rules/SKILL.md"
+      ],
+      "shared_constraints": [
+        "不要回退他人改动",
+        "不要修改写集外文件"
+      ],
+      "extra_constraints": [
+        "保持 UTF-8 编码"
+      ],
+      "message": "逻辑子任务名：补充子代理启动计划-A\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 编写子 agent 启动计划脚本\n写集边界：\n- 仅允许修改：subagent-dispatch-rules/scripts/generate_subagent_plan.py\n- 你不是独自在代码库里，不要回退他人改动。\n补充读取范围：\n- subagent-dispatch-rules/SKILL.md\n约束：\n- 不要回退他人改动\n- 不要修改写集外文件\n- 保持 UTF-8 编码\n输出要求：\n- 输出脚本变更摘要与自测结果\n- 最终回复请列出你实际改动或核查的文件路径。"
+    },
+    {
+      "thread": "B",
+      "agent_name": "补充子代理启动计划-B",
+      "logical_agent_name": "补充子代理启动计划-B",
+      "agent_type": "worker",
+      "goal": "补充 schema 文档与规则接入说明",
+      "expected_output": "输出文档改动摘要",
+      "write_scope": [
+        "subagent-dispatch-rules/references/launch-plan-schema.md",
+        "subagent-dispatch-rules/SKILL.md"
+      ],
+      "read_scope": [
+        "subagent-dispatch-rules/references/subagent-task-templates.md"
+      ],
+      "shared_constraints": [
+        "不要回退他人改动",
+        "不要修改写集外文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：补充子代理启动计划-B\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 补充 schema 文档与规则接入说明\n写集边界：\n- 仅允许修改：subagent-dispatch-rules/references/launch-plan-schema.md, subagent-dispatch-rules/SKILL.md\n- 你不是独自在代码库里，不要回退他人改动。\n补充读取范围：\n- subagent-dispatch-rules/references/subagent-task-templates.md\n约束：\n- 不要回退他人改动\n- 不要修改写集外文件\n输出要求：\n- 输出文档改动摘要\n- 最终回复请列出你实际改动或核查的文件路径。"
+    }
+  ]
+}
