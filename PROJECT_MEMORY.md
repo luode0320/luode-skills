@@ -100,10 +100,10 @@
 ### 并行执行闭环规则
 - 别名: 并行识别必须真启动, 规划器加执行器, 子线程启动证据
 - 类型: 流程规则
-- 定义: `parallel-task-dispatch-rules` 只负责并行判定与线程拆分，不再允许单独停留在“识别出可并行”。当其判定为可并行或条件并行且无阻断时，必须继续联动 `subagent-dispatch-rules` 发起真实子线程 / 子代理执行，并核对计划线程数与实际启动线程数；仅输出线程分配文案、`并行技能` 列表或口头启动说明，不视为真正并行已生效。
-- 来源: `parallel-task-dispatch-rules`、`subagent-dispatch-rules`
-- 适用范围: 并行开发、并发审查、sidecar 子任务分发
-- 更新时间: 2026-06-29
+- 定义: `parallel-task-dispatch-rules` 只负责并行判定与线程拆分，不再允许单独停留在“识别出可并行”。当其判定为可并行或条件并行且无阻断时，必须继续联动 `subagent-dispatch-rules` 发起真实子线程 / 子代理执行，并核对计划线程数、实际启动线程数与关闭/回收线程数；仅输出线程分配文案、`并行技能` 列表或口头启动说明，不视为真正并行已生效。并行识别不以固定 skill 映射为白名单；项目分析、找 Bug、需求完善侦察、资料/日志/调用链证据收集等任务，只要能拆成独立问题、独立证据来源、独立目录、独立模块或独立文件集，主 agent 必须优先尝试委派只读 sidecar 子 agent。单一根因、需求边界、接口契约、schema 或架构方向等最终裁决仍由主 agent 串行负责。
+- 来源: `parallel-task-dispatch-rules`、`parallel-task-dispatch-rules/references/task-classification.md`、`subagent-dispatch-rules`、`subagent-dispatch-rules/references/delegation-decision-matrix.md`
+- 适用范围: 并行开发、并发审查、项目分析、需求侦察、Bug 分诊、sidecar 子任务分发
+- 更新时间: 2026-06-30
 - 状态: 启用
 
 ### 子 agent 启动计划脚本
@@ -205,6 +205,7 @@
 - 2026-06-29：新增并行执行闭环口径，明确 `parallel-task-dispatch-rules` 判定可并行后必须继续联动 `subagent-dispatch-rules` 发起真实子线程，不能只停留在文本规划。
 - 2026-06-29：新增 `generate_subagent_plan.py` 启动计划脚本，明确批量委派先生成计划 JSON，再由主 agent 读取计划并真实启动；子 agent 名称默认使用任务简要中文。
 - 2026-06-29：补充子 agent 生命周期口径，明确中文任务名属于主 agent 逻辑名，平台 UI 昵称由启动工具返回；结果收回后仍必须调用 `close_agent` 完成回收。
+- 2026-06-30：扩展并行识别口径，明确并行不再依赖固定 skill 映射白名单；主 agent 在项目分析、找 Bug、需求完善侦察、证据收集等任务中必须自主识别可委派的只读 sidecar 子任务并优先尝试真实 subagent 并行。
 - 2026-06-28：将正式活动文档目录迁移为 `doc/1-架构/` 到 `doc/7-验收/` 的编号顺序，并新增 `architecture-doc-rules` 承接长期架构专题文档。
 - 2026-06-28：固定架构域四个中文主入口，补齐目录树、模块职责、主要业务链路示例，并明确单条业务链路的新增与更新策略。
 - 2026-06-28：架构域文件改为固定顺序编号，基础入口占用 `1-4`，业务链路从 `5` 开始按最大编号加一，历史编号不复用、不重排。

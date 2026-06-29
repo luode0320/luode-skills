@@ -98,10 +98,11 @@ def second_level_headings(text: str) -> list[str]:
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
-    if not text.startswith("---\n"):
+    normalized = text.lstrip("\ufeff").replace("\r\n", "\n")
+    if not normalized.startswith("---\n"):
         return {}
 
-    match = re.match(r"^---\n(.*?)\n---\n?", text, re.S)
+    match = re.match(r"^---\n(.*?)\n---\n?", normalized, re.S)
     if not match:
         return {}
 
