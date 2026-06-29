@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-29 14:51:17",
+  "generated_at": "2026-06-29 15:09:48",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -398,6 +398,7 @@ window.SKILL_DICTIONARY = {
             "上下文压缩续做规则",
             "中文编码规则",
             "变更最小化",
+            "输出格式规则",
             "Windows / WSL 执行规则",
             "CodeGraph 强制准备规则",
             "代码库探索规则",
@@ -4751,6 +4752,7 @@ window.SKILL_DICTIONARY = {
         "上下文压缩续做规则",
         "中文编码规则",
         "变更最小化",
+        "输出格式规则",
         "Windows / WSL 执行规则",
         "CodeGraph 强制准备规则",
         "代码库探索规则",
