@@ -1,15 +1,15 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-06-30 17:21:12",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-06-30 22:30:23",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 79,
-    "implemented_total": 79,
+    "planned_total": 80,
+    "implemented_total": 80,
     "planned_missing": 0,
-    "seed_total": 23,
+    "seed_total": 22,
     "doc_total": 7,
-    "references_total": 306,
+    "references_total": 309,
     "agents_total": 87
   },
   "downloaded_seeds": {
@@ -2906,10 +2906,10 @@ window.SKILL_DICTIONARY = {
       "label": "测试域",
       "description": "策略、资源、功能验证、浏览器联动与回归",
       "order": 8,
-      "implemented_count": 10,
+      "implemented_count": 11,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 10,
+      "total_count": 11,
       "items": [
         {
           "id": "test-strategy-rules",
@@ -3350,6 +3350,58 @@ window.SKILL_DICTIONARY = {
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
           ]
+        },
+        {
+          "id": "project-release-test-rules",
+          "name": "project-release-test-rules",
+          "title": "项目上线接口测试门禁规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "test",
+          "domain_label": "测试域",
+          "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+          "domain_order": 8,
+          "item_order": 11,
+          "auto_trigger": "当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时触发。负责在每次执行前扫描并更新项目接口基线、规划测试范围、执行接口验证、给出 agent 判定的接口级结果和上线放行结论；所有测试资产落地到 `doc/5-tests/` 对应时间戳根目录，强制要求请求参数和简要响应为 JSON 字符串，禁止接口明细输出为 Markdown 表格。",
+          "core_responsibility": "负责每次执行前扫描并更新接口基线，完成项目级核心接口门禁测试、结论归档与最终放行输入。",
+          "skill_path": "project-release-test-rules/SKILL.md",
+          "directory_path": "project-release-test-rules",
+          "directory": "project-release-test-rules",
+          "sections": [
+            "测试隔离红线（强制，和现有测试域规则一致）",
+            "Skill 作用与适用场景",
+            "自动触发信号",
+            "首次触发冷启动规则（强制）",
+            "接口基线扫描规则（强制）",
+            "基线漂移处理规则（强制）",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "project-release-test-rules/references/agent-response-judgement.md",
+            "project-release-test-rules/references/bootstrap-workflow.md",
+            "project-release-test-rules/references/execution-gate.md",
+            "project-release-test-rules/references/existing-test-skill-integration.md",
+            "project-release-test-rules/references/interface-inventory-schema.md",
+            "project-release-test-rules/references/inventory-reconcile-rules.md",
+            "project-release-test-rules/references/output-artifacts.md",
+            "project-release-test-rules/references/report-format.md",
+            "project-release-test-rules/references/test-selection-policy.md"
+          ],
+          "agents": [
+            "project-release-test-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+          ]
         }
       ]
     },
@@ -3518,8 +3570,8 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 23,
-      "total_count": 23,
+      "seed_count": 22,
+      "total_count": 22,
       "items": [
         {
           "id": "\"doc\"",
@@ -4085,52 +4137,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "project-release-test-rules",
-          "name": "project-release-test-rules",
-          "title": "项目上线接口测试门禁规则",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 11,
-          "item_order": 15,
-          "auto_trigger": "当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时触发。负责维护项目接口基线、规划测试范围、执行接口验证、给出agent判定的接口级结果和上线放行结论，所有测试资产落地到doc/5-tests/对应时间戳根目录，强制要求请求参数和简要响应为JSON字符串，禁止接口明细输出为Markdown表格，agent负责判定接口是否通过，无需人工参与响应判断。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "project-release-test-rules/SKILL.md",
-          "directory_path": "project-release-test-rules",
-          "directory": "project-release-test-rules",
-          "sections": [
-            "测试隔离红线（强制，和现有测试域规则一致）",
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过/驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
-          ],
-          "references": [
-            "project-release-test-rules/references/agent-response-judgement.md",
-            "project-release-test-rules/references/execution-gate.md",
-            "project-release-test-rules/references/existing-test-skill-integration.md",
-            "project-release-test-rules/references/interface-inventory-schema.md",
-            "project-release-test-rules/references/report-format.md",
-            "project-release-test-rules/references/test-selection-policy.md"
-          ],
-          "agents": [
-            "project-release-test-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "skill-split-preserve-rules",
           "name": "skill-split-preserve-rules",
           "title": "Skill 拆分保护规则",
@@ -4140,7 +4146,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 16,
+          "item_order": 15,
           "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -4180,7 +4186,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 17,
+          "item_order": 16,
           "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "time-util-rules/SKILL.md",
@@ -4213,7 +4219,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 18,
+          "item_order": 17,
           "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -4245,7 +4251,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 19,
+          "item_order": 18,
           "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-best-practices/SKILL.md",
@@ -4301,7 +4307,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 20,
+          "item_order": 19,
           "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-router-best-practices/SKILL.md",
@@ -4327,7 +4333,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 21,
+          "item_order": 20,
           "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "web-design-guidelines/SKILL.md",
@@ -4357,7 +4363,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 22,
+          "item_order": 21,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\\\wsl.localhost\\<distro>\\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4401,7 +4407,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 23,
+          "item_order": 22,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -7675,6 +7681,58 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "project-release-test-rules",
+      "name": "project-release-test-rules",
+      "title": "项目上线接口测试门禁规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "test",
+      "domain_label": "测试域",
+      "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+      "domain_order": 8,
+      "item_order": 11,
+      "auto_trigger": "当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时触发。负责在每次执行前扫描并更新项目接口基线、规划测试范围、执行接口验证、给出 agent 判定的接口级结果和上线放行结论；所有测试资产落地到 `doc/5-tests/` 对应时间戳根目录，强制要求请求参数和简要响应为 JSON 字符串，禁止接口明细输出为 Markdown 表格。",
+      "core_responsibility": "负责每次执行前扫描并更新接口基线，完成项目级核心接口门禁测试、结论归档与最终放行输入。",
+      "skill_path": "project-release-test-rules/SKILL.md",
+      "directory_path": "project-release-test-rules",
+      "directory": "project-release-test-rules",
+      "sections": [
+        "测试隔离红线（强制，和现有测试域规则一致）",
+        "Skill 作用与适用场景",
+        "自动触发信号",
+        "首次触发冷启动规则（强制）",
+        "接口基线扫描规则（强制）",
+        "基线漂移处理规则（强制）",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "project-release-test-rules/references/agent-response-judgement.md",
+        "project-release-test-rules/references/bootstrap-workflow.md",
+        "project-release-test-rules/references/execution-gate.md",
+        "project-release-test-rules/references/existing-test-skill-integration.md",
+        "project-release-test-rules/references/interface-inventory-schema.md",
+        "project-release-test-rules/references/inventory-reconcile-rules.md",
+        "project-release-test-rules/references/output-artifacts.md",
+        "project-release-test-rules/references/report-format.md",
+        "project-release-test-rules/references/test-selection-policy.md"
+      ],
+      "agents": [
+        "project-release-test-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+      ]
+    },
+    {
       "id": "git-collaboration-rules",
       "name": "git-collaboration-rules",
       "title": "Git 协作规则（最小闭环版）",
@@ -8372,52 +8430,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "project-release-test-rules",
-      "name": "project-release-test-rules",
-      "title": "项目上线接口测试门禁规则",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 11,
-      "item_order": 15,
-      "auto_trigger": "当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时触发。负责维护项目接口基线、规划测试范围、执行接口验证、给出agent判定的接口级结果和上线放行结论，所有测试资产落地到doc/5-tests/对应时间戳根目录，强制要求请求参数和简要响应为JSON字符串，禁止接口明细输出为Markdown表格，agent负责判定接口是否通过，无需人工参与响应判断。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "project-release-test-rules/SKILL.md",
-      "directory_path": "project-release-test-rules",
-      "directory": "project-release-test-rules",
-      "sections": [
-        "测试隔离红线（强制，和现有测试域规则一致）",
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过/驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
-      ],
-      "references": [
-        "project-release-test-rules/references/agent-response-judgement.md",
-        "project-release-test-rules/references/execution-gate.md",
-        "project-release-test-rules/references/existing-test-skill-integration.md",
-        "project-release-test-rules/references/interface-inventory-schema.md",
-        "project-release-test-rules/references/report-format.md",
-        "project-release-test-rules/references/test-selection-policy.md"
-      ],
-      "agents": [
-        "project-release-test-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "skill-split-preserve-rules",
       "name": "skill-split-preserve-rules",
       "title": "Skill 拆分保护规则",
@@ -8427,7 +8439,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 16,
+      "item_order": 15,
       "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -8467,7 +8479,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 17,
+      "item_order": 16,
       "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "time-util-rules/SKILL.md",
@@ -8500,7 +8512,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 18,
+      "item_order": 17,
       "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -8532,7 +8544,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 19,
+      "item_order": 18,
       "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-best-practices/SKILL.md",
@@ -8588,7 +8600,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 20,
+      "item_order": 19,
       "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-router-best-practices/SKILL.md",
@@ -8614,7 +8626,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 21,
+      "item_order": 20,
       "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "web-design-guidelines/SKILL.md",
@@ -8644,7 +8656,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 22,
+      "item_order": 21,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 /home/<user>/<project>）、在 Windows 环境下开发时触发。两种 agent 运行位置：agent 在 WSL 时直接访问代码、执行、调试，无需包裹；agent 在 Windows 时（如 Claude Desktop GUI），shell 默认用 Git Bash，看代码/改代码通过 \\\\wsl.localhost\\<distro>\\... 访问 WSL 文件，编译/运行/测试/调试通过 wsl.exe --cd /home/<user>/<project> <command> 进 WSL 执行（只有 WSL 进程能联网，二进制面向 Linux）。不再使用 /mnt 盘符路径。不要用它代替具体语言/框架实现、测试策略或编码规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -8688,7 +8700,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 23,
+      "item_order": 22,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交并输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试）；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",
@@ -8786,7 +8798,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "79 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "80 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

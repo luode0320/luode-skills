@@ -127,6 +127,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 2026-06-30 15:48:00 docs: [输出格式与授权同步] 收敛普通Markdown输出规则并同步子代理完全授权
 
+2026-06-30 23:21:11 feat: [上线测试门禁] 补齐冷启动扫描与测试产物骨架
+
 2026-06-30 15:20:50 fix: [子代理授权] 启用完全授权模式支持自动启动
 
 2026-06-30 15:09:17 fix: [子代理授权] 尊重工具元数据并补充授权回退边界
@@ -227,7 +229,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`78`
+- 已落地 Skill：`80`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`22`
 
@@ -361,6 +363,7 @@ python skill-dictionary/generate_dictionary.py
 | `agent-browser`               | 提供浏览器自动化能力，用于页面交互测试、自动化验证、页面截图和浏览器联动操作。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
 | `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响。  |
+| `project-release-test-rules`  | 作为上线前项目级接口测试门禁，强制每次执行前先扫描并更新接口基线，再完成必测接口筛选、门禁测试、结果归档与最终放行结论。 |
 
 ### 9. 交付域
 
