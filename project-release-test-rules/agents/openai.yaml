@@ -1,0 +1,14 @@
+﻿display_name: 上线接口测试门禁
+short_description: 项目级上线前全接口测试门禁，自动判定接口是否通过，输出上线准入结论
+default_prompt: |
+  你现在需要使用project-release-test-rules完成上线前接口测试门禁工作，步骤如下：
+  1. 读取项目接口基线，基线文件默认位置为doc/5-tests/基线/interface-inventory.yaml
+  2. 根据本次上线改动的模块列表，按照test-selection-policy筛选必测接口
+  3. 调用generate_release_test_plan.py生成本次上线测试计划
+  4. 执行每个接口的测试，记录请求参数（JSON）和响应结果（JSON）
+  5. 按照agent-response-judgement规则自动判定每个接口是否通过，给出判定理由
+  6. 按照report-format要求生成测试报告，禁止使用Markdown表格，接口明细用块状格式
+  7. 按照execution-gate规则给出最终门禁结论：PASS/FAIL/PARTIAL
+  8. 所有测试资产归档到doc/5-tests/下的时间戳根目录，中文说明放README，测试脚本和完整响应放ASCII镜像目录
+  9. 将测试结论同步给final-acceptance-rules作为最终验收输入
+  10. 如果接口基线不存在，先扫描项目路由、controller、Swagger文档生成初始基线

@@ -1,0 +1,67 @@
+summary:
+  总接口数: 3
+  必测P0接口数: 1
+  必测P1接口数: 1
+  必测P2接口数: 0
+  跳过接口数: 1
+  本次改动模块:
+  - 订单模块
+p0_interfaces:
+- 接口标识: order_create_POST
+  接口名称: 创建订单接口
+  HTTP方法: POST
+  接口路径: /api/order/v2/create
+  所属模块: 订单模块
+  鉴权要求: 需要Bearer Token
+  请求参数schema:
+    userId: string (必填，用户ID)
+    amount: number (必填，订单金额)
+    currency: string (必填，币种)
+    remark: string (可选，备注)
+  响应结构摘要:
+    httpStatus: number
+    code: number (业务返回码)
+    message: string
+    data:
+      orderId: string
+      status: string
+      amount: number
+  业务成功判定: code == 0 && data.status == "pending" && data.orderId != ""
+  业务失败判定: code != 0 || (data.status != "pending" && data.status != "fail")
+  依赖数据: 需要已认证用户token、有效币种配置
+  数据副作用: 创建新订单记录、扣减用户可用额度
+  清理方式: 删除测试创建的orderId对应订单、回滚用户额度扣减
+  风险等级: P0
+  是否上线必测: 是
+  最近测试时间: 2026-06-30 17:00:00
+  最近测试结论: 通过
+p1_interfaces:
+- 接口标识: order_detail_GET
+  接口名称: 订单详情查询接口
+  HTTP方法: GET
+  接口路径: /api/order/v2/detail/{id}
+  所属模块: 订单模块
+  鉴权要求: 需要Bearer Token
+  请求参数schema:
+    id: string (必填，订单ID，路径参数)
+  响应结构摘要:
+    httpStatus: number
+    code: number
+    data:
+      orderId: string
+      status: string
+      amount: number
+      userId: string
+  业务成功判定: code == 0 && data.orderId == request.params.id
+  业务失败判定: code != 0 || data.userId != request.user.id
+  依赖数据: 存在有效的测试订单ID
+  数据副作用: 无
+  清理方式: 无
+  风险等级: P1
+  是否上线必测: 是
+  最近测试时间: 2026-06-30 17:00:00
+  最近测试结论: 通过
+p2_interfaces: []
+skipped_interfaces:
+- 接口: user_info_GET
+  理由: 非改动模块P2接口，本次跳过
