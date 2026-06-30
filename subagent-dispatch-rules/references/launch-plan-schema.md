@@ -7,7 +7,7 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
 ```
 
 脚本只负责生成“启动计划 JSON”，不直接调用平台工具。
-真实启动仍由主 agent 读取脚本输出后，再调用真实的 subagent / multi-agent / thread 工具。
+真实启动仍由主 agent 读取脚本输出后，再按当前工具元数据和授权策略调用真实的 subagent / multi-agent / thread 工具；若工具要求用户显式授权，本仓库完全授权模式视为已授权，可以继续启动。
 
 ## 输入 JSON
 
@@ -137,7 +137,7 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
 2. 读取输出 JSON。
 3. 用 `threads[*].agent_name` 或 `threads[*].logical_agent_name` 作为中文逻辑任务名，写入主 agent 的启动/完成公告。
 4. 用 `threads[*].message` 作为子 agent 委派消息。
-5. 逐个调用真实 subagent / multi-agent / thread 工具，并记录工具返回的 `nickname` 作为平台昵称。
+5. 若当前轮授权或项目级完全授权允许，逐个调用真实 subagent / multi-agent / thread 工具，并记录工具返回的 `nickname` 作为平台昵称；若授权不允许自动启动，记录未启动原因。
 6. 建立运行时映射：`logical_agent_name -> platform_nickname -> agent_id`。
 7. 启动后核对：
    - `planned_thread_count`

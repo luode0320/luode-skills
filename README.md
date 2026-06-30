@@ -70,7 +70,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 首条中间进度至少输出 `命中检查`、`命中技能`
 - 若本轮命中 `parallel-task-dispatch-rules`，还必须额外输出 `并行技能`
 - 若最终没有真正启动任何并行 skill，也必须明确写 `并行技能:无`
-- 若 `parallel-task-dispatch-rules` 判定允许并行且无阻断，必须继续联动 `subagent-dispatch-rules` 发起真实子线程；只输出线程分配或并行技能列表，不算真正并行
+- 本仓库默认处于 subagent 完全授权模式，用户已允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work
+- 若 `parallel-task-dispatch-rules` 判定允许并行且无阻断，必须继续联动 `subagent-dispatch-rules` 做真实启动判定；完全授权模式满足工具显式授权条件，只输出线程分配或并行技能列表不算真正并行
 
 例如：
 
@@ -123,6 +124,10 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `downloaded-seeds/` 只作为外部 Skill 下载后的临时中转目录，不建议长期保留与顶层重复的同名 Skill
 
 ## 当前进度
+
+2026-06-30 15:20:50 fix: [子代理授权] 启用完全授权模式支持自动启动
+
+2026-06-30 15:09:17 fix: [子代理授权] 尊重工具元数据并补充授权回退边界
 
 2026-06-30 14:53:35 fix: [命中检查输出] 修正首条可见格式
 
@@ -256,9 +261,9 @@ python skill-dictionary/generate_dictionary.py
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，主入口与中间链路结论一视同仁；缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
-| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，必须联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能列表或回退为“并行技能:无”。 |
+| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，必须联动 `subagent-dispatch-rules` 做真实启动判定。本仓库完全授权模式满足工具显式授权条件，应输出并行技能列表并真实启动，或在环境/风险/写集阻断时回退为“并行技能:无”。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
-| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件，满足可委派条件即自动委派并产出真实启动证据；批量委派时优先使用 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行，并由主 agent 输出可见启动/完成状态，且在结果回收后继续调用 `close_agent` 完成子 agent 回收。 |
+| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件；本仓库完全授权模式视为用户已给出项目级 standing authorization，允许在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent。批量委派时优先使用 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准。 |
 | `skill-audit-rules` | 当本轮存在多 skill 组合、并行拆分或规则收口风险时，负责只读审计是否漏触发应有 skill 或漏执行关键规则。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查；只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出后续内容。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性；默认不输出后续内容，只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出。 |

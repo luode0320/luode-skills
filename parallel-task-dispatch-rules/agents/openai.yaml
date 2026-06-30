@@ -1,4 +1,4 @@
 interface:
   display_name: "并行任务分发规则"
   short_description: "为研发、分析、侦察、审查、测试或文档任务判定安全的并行拆分方式"
-  default_prompt: "使用 $parallel-task-dispatch-rules 先判断当前任务应并行、条件并行还是串行推进；不要只依赖固定 skill 映射，需按独立问题、证据来源、文件集、模块边界或职责边界自主识别可并行子任务；若判定允许并行且无阻断，立即联动 $subagent-dispatch-rules 发起真实子线程执行。"
+  default_prompt: "使用 $parallel-task-dispatch-rules 先判断当前任务应并行、条件并行还是串行推进；不要只依赖固定 skill 映射，需按独立问题、证据来源、文件集、模块边界或职责边界自主识别可并行子任务；若判定允许并行且无阻断，立即联动 $subagent-dispatch-rules 做真实启动判定。本仓库完全授权模式视为满足工具显式授权条件，任务可切分且环境支持时应发起真实子线程执行。"

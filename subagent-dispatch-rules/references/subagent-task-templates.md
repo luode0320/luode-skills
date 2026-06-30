@@ -86,4 +86,4 @@ Subagent 状态：
 - 批量委派前，优先运行 `scripts/generate_subagent_plan.py` 生成启动计划。
 - `agent_name` / `logical_agent_name` 默认使用“任务简要中文 + 线程标识”，用于主 agent 侧的中文逻辑命名。
 - 平台 UI 昵称以真实启动工具返回值为准；若工具未提供命名参数，不能强制改成中文。
-- 主 agent 使用脚本输出的 `message` 作为真实子 agent 委派消息草案，再调用真实 subagent / multi-agent / thread 工具。
+- 主 agent 使用脚本输出的 `message` 作为真实子 agent 委派消息草案；当前轮授权或项目级完全授权允许时，调用真实 subagent / multi-agent / thread 工具。
