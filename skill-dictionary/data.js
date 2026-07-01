@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-01 15:48:44",
-  "repo_root": "/mnt/d/luode/luode-skills",
+  "generated_at": "2026-07-01 18:11:35",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -398,6 +398,7 @@ window.SKILL_DICTIONARY = {
             "上下文压缩续做规则",
             "中文编码规则",
             "变更最小化",
+            "本地连接调试测试红线（最高优先级，强制）",
             "依赖与工具复用优先规则",
             "输出格式规则",
             "Windows / WSL 执行规则",
@@ -4817,6 +4818,7 @@ window.SKILL_DICTIONARY = {
         "上下文压缩续做规则",
         "中文编码规则",
         "变更最小化",
+        "本地连接调试测试红线（最高优先级，强制）",
         "依赖与工具复用优先规则",
         "输出格式规则",
         "Windows / WSL 执行规则",

@@ -28,6 +28,7 @@ description: 当项目代码位于 WSL 文件系统内（如 /home/<user>/<proje
 
 - 会产出或启动可执行程序的命令：如 `go build`、`go run`、`npm start`、`pnpm dev`、`python app.py`
 - 会真实跑测试或调试器的命令：如 `go test`、`pytest`、`dlv debug`
+- 启动程序、测试、调试和联调命令必须使用 local 本地配置、本地数据库和本地服务；不得通过 WSL 启动连接 `test` / `prod` / `staging` 数据库、缓存、消息队列、HTTP/RPC 上游或其他非 local 服务。
 - 会依赖 WSL 运行时环境才能正确完成的安装/准备动作：如 `go mod download`、需要 Linux 环境的 `npm install`
 - 不启动程序的普通仓库操作 **不算** 执行类命令：如 `rg`、`ls`、`cat`、规则文件检查、文档修改、普通 git 盘点
 
@@ -90,6 +91,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 ## 不推荐做法
 
 - 不要在 Windows 原生 Go 环境跑需联网的项目。
+- 不要为了调试或测试方便，把启动参数、环境变量或配置文件切到 `test` / `prod` / `staging` 等非 local 环境；local 不可用时记录为本地环境阻断。
 - 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
 - 不要把普通搜索、读文件、规则检查这类非执行动作一律切进 WSL。
 - agent 在 Windows 时，不要用 PowerShell 作默认 shell——优先 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`。

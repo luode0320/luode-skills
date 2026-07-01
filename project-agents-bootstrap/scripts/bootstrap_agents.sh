@@ -198,6 +198,15 @@ BODY_MIN_CHANGE=$(cat <<'EOF'
 EOF
 )
 
+BODY_LOCAL_ONLY_CONNECTION=$(cat <<'EOF'
+- 需求侦察、Bug 复现 / 定位 / 运行时调试、功能验证、回归测试、上线接口测试、浏览器联调、启动前后端服务或执行任何测试脚本时，所有数据库、缓存、消息队列、HTTP/RPC 上游、前端 / 后端服务连接都只能使用 `local` 本地环境。
+- 本地环境只允许来自 `config_local*`、`.env.local`、`.env.development`、本机开发容器、`localhost` / `127.0.0.1` / 本机端口等本地开发配置；`test`、`prod`、`production`、`staging`、`pre`、`release` 等非 local 环境一律禁止连接。
+- 即使用户提供了 test / prod 连接串、账号、接口地址或临时授权，也不得由 agent 直接连接或调用；必须记录为环境阻断，并要求改用 local 本地数据库和本地服务。
+- 若 local 配置缺失、local 数据不足或本地服务未启动，只能初始化 / 启动 / 查询 local 环境；不得回退到 test / prod 数据库、缓存、消息队列、外部服务或线上接口补证据。
+- 需要写入数据时仅允许写入 local 环境，并且必须有清理或回滚方案；Bug 侦察类只读链路仍保持只读，禁止自行增删改数据。
+EOF
+)
+
 BODY_REUSE_FIRST=$(cat <<'EOF'
 - 编写代码前，必须先检索是否已有可复用的开源库、npm 包或项目内工具类，优先复用而非从零实现。
 - 优先级：项目内已有工具类 / 公共方法 > 成熟开源库（npm / GitHub）> 自行实现。
@@ -434,6 +443,7 @@ sync_agents_file() {
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
   sync_section "$file" "中文编码规则" "$BODY_CHINESE_ENC"
   sync_section "$file" "变更最小化" "$BODY_MIN_CHANGE"
+  sync_section "$file" "本地连接调试测试红线（最高优先级，强制）" "$BODY_LOCAL_ONLY_CONNECTION"
   sync_section "$file" "依赖与工具复用优先规则" "$BODY_REUSE_FIRST"
   sync_section "$file" "最小实现优先级阶梯" "$BODY_MINIMAL_LADDER"
   sync_section "$file" "输出格式规则" "$BODY_OUTPUT_FORMAT"

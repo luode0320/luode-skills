@@ -205,6 +205,15 @@
 - 更新时间: 2026-07-01
 - 状态: 启用
 
+### 本地连接调试测试红线
+- 别名: 只连 local, 禁连 test/prod, 本地服务联调, local 数据库
+- 类型: 环境安全规则
+- 定义: 需求侦察、Bug 复现 / 定位 / 运行时调试、功能验证、回归测试、上线接口测试、浏览器联调、启动前后端服务或执行测试脚本时，所有数据库、缓存、消息队列、HTTP/RPC 上游、前端 / 后端服务连接都只能使用 local 本地环境。`test`、`prod`、`production`、`staging`、`pre`、`release` 等非 local 环境一律禁止连接；即使用户提供临时连接信息或授权，agent 也不得直接连接，只能记录为环境阻断并要求改用 local。本地配置缺失、local 数据不足或本地服务未启动时，只能补齐 local 环境或阻断，不得回退到 test / prod。
+- 来源: 用户本轮确认、`AGENTS.md`、`test-strategy-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`、`project-agents-bootstrap/scripts/bootstrap_agents.sh`
+- 适用范围: 需求域、Bug 域、测试域、运行时调试、浏览器联调、Windows / WSL 执行命令
+- 更新时间: 2026-07-01
+- 状态: 启用
+
 ## 术语表
 
 ### doc 顶层混合命名
@@ -255,6 +264,7 @@
 - 2026-06-30：收紧实施规划口径，明确计划阶段只读、最小任务优先按依赖图与垂直切片组织、单任务默认控制在约 5 个文件以内，且每个最小任务都必须先完成测试、审查、验收闭环后再进入下一个任务。
 - 2026-07-01：修正 Windows + WSL 执行边界，明确普通命令默认留在 Git Bash / bash，只有执行类动作才进入 WSL；纯 Windows 项目或不执行程序的任务不应误切 WSL。
 - 2026-07-01：恢复 README 改动日志时间戳格式为 yyyy-MM-dd HH:mm:ss 提交标题；新增提交前审查闸门，pre_commit_gate.sh 校验 doc/6-审查/ 下审查文档的审查结论、是否允许提交、阻断问题；两个审查 skill 归档时统一写入判定字段。
+- 2026-07-01：新增本地连接调试测试红线，明确需求、Bug、测试、运行时调试、启动联调和浏览器验证只能连接 local 本地数据库与本地服务，禁止连接 test / prod / staging 等非 local 环境。
 
 
 ### 上线接口测试门禁规则
