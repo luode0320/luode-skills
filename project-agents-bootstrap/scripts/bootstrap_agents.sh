@@ -207,6 +207,26 @@ BODY_REUSE_FIRST=$(cat <<'EOF'
 EOF
 )
 
+BODY_MINIMAL_LADDER=$(cat <<'EOF'
+- 写代码前按以下顺序逐级判断,停在前一级能成立的就停,不往下跳级:
+  1. 需要存在吗?纯推测性需求 → 不写,用一行说明为何跳过(YAGNI)
+  2. 代码库已有?已有的 helper / util / 类型 / 模式 → 复用,不重写;改前先搜 `utils` / `common` / `helpers` 及依赖声明文件
+  3. 标准库能做?→ 用标准库,不引入第三方
+  4. 平台原生特性能覆盖?→ 用原生(如浏览器 `<input type="date">`、CSS 原生能力、DB 约束替代应用层校验),不装库
+  5. 已装依赖能解?→ 用它,不加新依赖
+  6. 能写成一行?→ 写一行
+  7. 都不行: 才写最小可工作代码
+- 阶梯在理解问题后才运行,不替代阅读:先读任务和涉及的代码、追完真实流程,再爬阶梯;两级行得通就取更高一级,第一个能用的解就是对的
+- Bug 修复走根因不走症状:改前 grep 所有调用方,在共享函数加一处 guard 比每调用方加一处 guard 更小 diff,且不留下兄弟调用方仍然坏掉
+- 不写未请求的抽象:没有第二实现的接口、单一产品的工厂、永不改的配置值,都不提前建
+- 故意简化处标记 `deferral:` 注释,写明天花板和升级路径,例如 `// deferral: 全局锁, 吞吐量不够时改每账户锁`; 没有升级路径的标记为会被静默忽略的风险
+- 与「变更最小化」「依赖与工具复用优先规则」的边界:本阶梯管写什么(方案选择),「变更最小化」管改多少(diff 范围),「依赖与工具复用优先规则」是本阶梯第 2、5 级的具体执行细节;三者互补不冲突
+- 不可砍的红线:信任边界的输入校验、防数据丢失的错误处理、安全措施、无障碍基础、硬件校准旋钮、用户显式要求的内容;简化只针对冗余抽象和重复造轮,不针对安全检查
+- 非平凡逻辑(分支 / 循环 / 解析 / 金额或安全路径)落地时留一个最小可运行自检(assert 或一个测试文件),平凡一行不需要
+- 用户坚持要完整版 → 照建,不再争论
+EOF
+)
+
 BODY_OUTPUT_FORMAT=$(cat <<'EOF'
 - AI 输出统一使用 markdown，不依赖 HTML 渲染：HTML 标签在 Claude Desktop、纯 CLI、Codex 等大量 agent 环境不渲染，会退化成原文噪声，并破坏对输出的机器解析。
 - 视觉层级与区分靠 markdown 语义结构（`#` / `##` 标题、`---` 分隔线、表格、`>` 引用块、徽章 emoji），不靠绝对字号。
@@ -415,6 +435,7 @@ sync_agents_file() {
   sync_section "$file" "中文编码规则" "$BODY_CHINESE_ENC"
   sync_section "$file" "变更最小化" "$BODY_MIN_CHANGE"
   sync_section "$file" "依赖与工具复用优先规则" "$BODY_REUSE_FIRST"
+  sync_section "$file" "最小实现优先级阶梯" "$BODY_MINIMAL_LADDER"
   sync_section "$file" "输出格式规则" "$BODY_OUTPUT_FORMAT"
   sync_section "$file" "Windows / WSL 执行规则" "$BODY_WINDOWS_WSL"
   sync_section "$file" "CodeGraph 强制准备规则" "$BODY_CODEGRAPH"

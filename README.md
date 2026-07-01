@@ -128,6 +128,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-07-01 14:10:26 docs: [最小实现阶梯] 吸收Ponytail最小实现规则
+
 2026-06-30 15:48:00 docs: [输出格式与授权同步] 收敛普通Markdown输出规则并同步子代理完全授权
 
 2026-06-30 23:21:11 feat: [上线测试门禁] 补齐冷启动扫描与测试产物骨架
