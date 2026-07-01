@@ -107,10 +107,10 @@
 - 状态: 启用
 
 ### Windows 命令分层写法
-- 别名: Git Bash 优先, 执行类再 wsl.exe, 普通命令别硬套 WSL
+- 别名: 先固化 PowerShell UTF-8, 普通命令默认 PowerShell, 执行类再 wsl.exe
 - 类型: 工具风格
-- 示例: `普通命令: 在 Git Bash / bash 下经 \\wsl.localhost\\<distro>\\home\\<user>\\<project> 执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...`
-- 说明: Windows + WSL 规则文案要把“普通命令”和“执行类命令”分层写清。搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL。
+- 示例: `前提: 先执行 powershell -ExecutionPolicy Bypass -File .\\windows-encoding-rules\\scripts\\enable_powershell_utf8.ps1；普通命令: 在 PowerShell 下经 \\\\wsl.localhost\\<distro>\\home\\<user>\\<project> 执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...`
+- 说明: Windows + WSL 规则文案要先写清 PowerShell UTF-8 永久化前提，再写“普通命令”和“执行类命令”的分层。满足前提后，搜索、读写文件、规则检查、普通 git 盘点默认留在 PowerShell；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL。
 - 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: `AGENTS.md`、环境规则 skill、命令模板、推荐工作流文档
 - 更新时间: 2026-07-01
@@ -159,7 +159,7 @@
 - 2026-06-30：补充子 agent 完全授权写法，明确项目级 standing authorization 满足工具显式授权条件。
 - 2026-06-30：补充命中检查可见输出样式，明确使用普通 Markdown 标题和行内代码字段行，禁止代码块包裹。
 - 2026-06-30：补充普通说明不用代码围栏风格，明确自然语言结构化输出改用 Markdown 列表、表格或引用块，` ```text ` 不再作为普通回复模板。
-- 2026-07-01：新增 Windows 命令分层写法，明确规则文案必须写清“普通命令优先 Git Bash / bash、执行类命令再进 WSL”，避免把所有命令都误导到 WSL。
+- 2026-07-01：收紧 Windows 命令分层写法，明确规则文案必须先写 PowerShell UTF-8 永久化前提，再写“普通命令默认 PowerShell、执行类命令再进 WSL”，避免旧的 Git Bash 默认口径继续扩散。
 - 2026-06-30：新增实施计划书写风格，明确依赖图 + 垂直切片优先、单任务约 5 文件、每任务闭环后再进入下一任务。
 - 2026-07-01：新增受限计划文风要求，明确受限计划正文必须显式声明“不得作为实施授权”，避免被误读为可直接开工的正式执行计划。
 - 2026-06-30：新增需求提问风格，明确一次一个关键问题只允许围绕真实缺口，不允许夹带 agent 猜测。

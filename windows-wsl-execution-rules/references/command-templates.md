@@ -1,6 +1,6 @@
 # 命令模板
 
-代码放在 WSL 文件系统内（`/home/<user>/<project>`）。只有执行类命令进入 WSL；普通命令仍优先 Git Bash / bash。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。只有执行类命令进入 WSL；普通命令留在 Windows 默认 shell。前提是 PowerShell 已按 `windows-encoding-rules` 完成 UTF-8 永久化。
 
 ## agent 在 WSL（推荐）
 
@@ -18,12 +18,12 @@ go mod download
 
 ## agent 在 Windows（如 Claude Desktop GUI）
 
-shell 默认用 Git Bash；执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。
+先确认 PowerShell 已按 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 完成 UTF-8 永久化；满足前提后默认 shell 用 PowerShell。执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。
 
-普通命令示例（留在 Git Bash / bash）：
+普通命令示例（留在 PowerShell）：
 
-```bash
-cd //wsl.localhost/<distro>/home/<user>/<project>
+```powershell
+Set-Location \\wsl.localhost\<distro>\home\<user>\<project>
 rg "TODO"
 git status
 ```
@@ -45,7 +45,7 @@ wsl.exe --cd /home/<user>/<project> dlv debug ./cmd/<app>
 wsl.exe --cd /home/<user>/<project> go mod download
 ```
 
-看代码、改代码、搜索、规则检查和多数 git 操作用 Git Bash / bash，经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件。
+看代码、改代码、搜索、规则检查和多数 git 操作都留在 PowerShell，经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件；若 PowerShell 尚未完成 UTF-8 永久化，先补前提再继续。
 
 ## WSL 内缓存目录建议
 

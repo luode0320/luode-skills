@@ -153,7 +153,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - Windows / WSL 执行规则（代码在 WSL 文件系统内 `/home/<user>/<project>`）：
   - 只有执行类动作才优先进入 WSL：编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装
   - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行执行类命令；普通命令也可直接在当前 shell 完成，无需包裹
-  - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`
+  - **agent 在 Windows（如 Claude Desktop GUI）**：只有当 PowerShell 已通过 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 永久固定为 UTF-8 时，shell 默认才用 PowerShell；此前提未满足时必须先补初始化
   - 看代码、改代码、搜索、规则检查、普通 git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问
   - 执行类动作通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
   - 为什么只有执行类动作在 WSL：只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时
@@ -328,13 +328,13 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。只有当代码位于 WSL 文件系统内，且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认仍优先 Git Bash / bash。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。只有当 PowerShell 已通过用户级配置永久固定为 UTF-8 时，Windows 默认 shell 才允许取 PowerShell；若此前提未满足，必须先执行 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 完成永久化初始化。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Windows 默认 shell。
 
 **先看 agent 在哪运行：**
 
 - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行执行类命令，普通命令也可直接在当前 shell 完成，无需任何包裹。
 - **agent 在 Windows（如 Claude Desktop GUI）**：
-  - shell 默认用 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`
+  - 先检查 PowerShell 是否已通过 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 永久固定为 UTF-8；满足前提后，shell 默认用 PowerShell
   - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
   - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
 
@@ -384,6 +384,6 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若仓库内存在多个规则文件（`AGENTS.md` / `CLAUDE.md`），本 skill 不允许只同步根目录后结束；必须同步所有已存在规则文件的受管章节，除非用户明确要求排除某些子工程。
 - 若首轮发现 `.gitattributes` 或 `.editorconfig` 缺失，也不允许降级为”先分析项目后补文件”；必须先补齐这两个文件，再继续主任务。
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
-- 若仓库位于 Windows 环境，默认应把“普通命令优先 Git Bash / bash、执行类命令再进 WSL”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
+- 若仓库位于 Windows 环境，默认应把“先完成 PowerShell UTF-8 永久化，再由 PowerShell 承接普通命令、执行类命令再进 WSL”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
 ```
 ````
