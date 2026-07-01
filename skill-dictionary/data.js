@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-01 14:26:45",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-07-01 15:48:44",
+  "repo_root": "/mnt/d/luode/luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -2940,7 +2940,8 @@ window.SKILL_DICTIONARY = {
             "执行结果归档要求",
             "references 读取规则",
             "项目联调强制规则（新增）",
-            "本地环境配置发现与连接（强制）"
+            "本地环境配置发现与连接（强制）",
+            "测试样本分布优先（强制）"
           ],
           "references": [
             "test-strategy-rules/references/priority-model.md",
@@ -3143,7 +3144,8 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
-            "references 读取规则"
+            "references 读取规则",
+            "写接口测试脚本的过程日志约定（强制）"
           ],
           "references": [
             "test-program-rules/references/program-boundaries.md",
@@ -3292,7 +3294,8 @@ window.SKILL_DICTIONARY = {
             "执行通过 / 驳回标准",
             "执行结果归档要求",
             "references 读取规则",
-            "项目联调强制规则（新增）"
+            "项目联调强制规则（新增）",
+            "功能验证样本分布（强制）"
           ],
           "references": [
             "functional-validation-rules/references/validation-boundaries.md",
@@ -7272,7 +7275,8 @@ window.SKILL_DICTIONARY = {
         "执行结果归档要求",
         "references 读取规则",
         "项目联调强制规则（新增）",
-        "本地环境配置发现与连接（强制）"
+        "本地环境配置发现与连接（强制）",
+        "测试样本分布优先（强制）"
       ],
       "references": [
         "test-strategy-rules/references/priority-model.md",
@@ -7475,7 +7479,8 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
-        "references 读取规则"
+        "references 读取规则",
+        "写接口测试脚本的过程日志约定（强制）"
       ],
       "references": [
         "test-program-rules/references/program-boundaries.md",
@@ -7624,7 +7629,8 @@ window.SKILL_DICTIONARY = {
         "执行通过 / 驳回标准",
         "执行结果归档要求",
         "references 读取规则",
-        "项目联调强制规则（新增）"
+        "项目联调强制规则（新增）",
+        "功能验证样本分布（强制）"
       ],
       "references": [
         "functional-validation-rules/references/validation-boundaries.md",
@@ -8779,7 +8785,7 @@ window.SKILL_DICTIONARY = {
       "id": "doc:README",
       "name": "README",
       "file_name": "README.md",
-      "title": "README",
+      "title": "luode-skills",
       "kind": "其他文档",
       "path": "README.md",
       "is_plan_doc": false

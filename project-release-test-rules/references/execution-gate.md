@@ -64,3 +64,43 @@
 2. FAIL结论必须修复问题后重新测试，重新生成报告，直到得到PASS或经过特批的PARTIAL。
 3. PARTIAL结论必须经过相关负责人确认风险可接受后，才能作为允许上线的依据，不能直接自动放行。
 4. 最终结论必须写入测试报告主README.md，作为上线审批的附件留存。
+
+## 写接口场景下 EXPECTED_FAIL 的门禁准入（与 `agent-response-judgement.md` 联动）
+
+> 本节是写接口（createTransaction、createOrder、cancelOrder、refund 等）专用门禁准入规则，是对上文 PASS/FAIL/PARTIAL 三级判定的强化补充，不取代既有规则。
+
+### 一、为什么需要写接口专用准入
+
+- 写接口受链上手续费、币对维护、地址风控、上游业务级拒绝等外部环境影响，历史成功参数在当前时点大概率会触发 EXPECTED_FAIL。
+- 既有规则中 P0 接口存在 UNEXPECTED_FAIL 即判 FAIL，会把所有写接口一刀切到 FAIL，导致上线测试无法推进。
+- 用写接口专用准入后：矩阵样本齐 + 4 类样本齐 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 时可走 PARTIAL。
+
+### 二、PARTIAL 准入条件（写接口专用）
+
+同时满足以下所有条件，P0 写接口可走 PARTIAL 结论：
+
+1. `test-data-construction-rules.md` 中 4 级样本（`historical_succeeded` / `historical_failed_lifecycle` / `historical_inflight` / `current_listing_available`）全部出现；缺失任一类视为矩阵缺失，直接判 PENDING。
+2. `UNEXPECTED_FAIL` 数量为 0（5xx、空 msg、堆栈、字段缺失、状态不符、敏感信息泄露等真异常不允许出现）。
+3. `EXPECTED_FAIL` 比例 ≥60%（即 `EXPECTED_FAIL` 数量 / 总样本数 ≥ 0.6）。
+4. 同一 `EXPECTED_FAIL` 子类（手续费不足 / 维护中 / 黑名单 / 超范围 / 上游业务级拒绝）连续 3 轮占比 ≥80% 时，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL。
+5. 至少 2 个通道/链/币种的样本都有结果（覆盖度），不能单一通道假阳性。
+
+### 三、PARTIAL 升级与降级
+
+- 满足第二节所有条件 → PARTIAL 准入；剩余的 `EXPECTED_FAIL` 子类需在 PARTIAL 风险项列表中逐项说明影响范围与缓解措施。
+- 不满足第二节任一条件 → 维持既有规则（P0 不通过即 FAIL，或按既有 PARTIAL 条件判定）。
+- `UNEXPECTED_FAIL > 0` → 直接 FAIL（不因 EXPECTED_FAIL 比例高而豁免）。
+
+### 四、人工阻断条件
+
+满足以下任一条件，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL：
+
+- 同一 `EXPECTED_FAIL` 子类连续 3 轮占比 ≥80%（业务已经形成稳定失败模式，需要人工评估是否调整参数策略或确认业务预期）。
+- 4 类样本中任意一类缺失（矩阵不完整，无法证明接口在所有业务态下都按预期工作）。
+- 代理配置错误或上游服务不可用（外部环境阻断，不是接口代码问题，但仍需人工确认环境后重测）。
+
+### 五、与既有 PARTIAL 条件的关系
+
+- 本节不取代既有 PARTIAL 条件（"无 P0 接口不通过、待确认、跳过的情况"）。
+- 本节只在写接口场景下，放宽 `EXPECTED_FAIL` 计入 PARTIAL 准入；其他类型接口仍按既有规则。
+- 既有 PARTIAL 风险项列表要求（风险等级、影响范围、严重程度、修复计划、补测计划、回滚方案）仍然适用。

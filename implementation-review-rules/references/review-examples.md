@@ -1,5 +1,32 @@
 # 实现自审正反例
 
+## 统一判定字段（所有审查文档必须包含）
+
+审查文档落盘时必须包含以下 4 个字段，用于提交闸门校验：
+
+- 审查结论: 通过/阻断
+- 审查范围: <文件列表或等价范围说明>
+- 是否允许提交: 是/否
+- 阻断问题: <P0/P1 摘要，没有则写无>
+
+通过示例：
+
+```text
+审查结论: 通过
+审查范围: internal/service/order/create_service.go, internal/entity/order/request.go
+是否允许提交: 是
+阻断问题: 无
+```
+
+阻断示例：
+
+```text
+审查结论: 阻断
+审查范围: internal/service/order/create_service.go
+是否允许提交: 否
+阻断问题: [P1] create_service.go:45 - 请求结构体散落在 service 层
+```
+
 ## 正例
 
 ### 正例 1：实现完成且可读性优先
