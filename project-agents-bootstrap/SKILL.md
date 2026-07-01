@@ -148,11 +148,14 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 最小改动原则：注释补充不改变业务逻辑。
 - 依赖与工具复用优先规则：编写代码前先检索项目工具类 / npm / GitHub 开源库，优先复用，禁止重复造轮子；引入新依赖须确认许可证兼容与维护活跃；确需自行实现须在注释或 PR 说明中写明原因。
 - Windows / WSL 执行规则（代码在 WSL 文件系统内 `/home/<user>/<project>`）：
-  - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹
-  - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；看代码/改代码/git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问；编译/运行/测试/调试通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
-  - 为什么执行/调试在 WSL：只有 WSL 进程能正常联网，且二进制面向 Linux
-  - 命令格式：`wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
-  - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`
+  - 只有执行类动作才优先进入 WSL：编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装
+  - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行执行类命令；普通命令也可直接在当前 shell 完成，无需包裹
+  - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`
+  - 看代码、改代码、搜索、规则检查、普通 git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问
+  - 执行类动作通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
+  - 为什么只有执行类动作在 WSL：只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时
+  - 命令格式：执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+  - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`；纯 Windows 项目或本轮不执行程序时不要误切 WSL
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
 - 代码图谱 MCP 配套：架构层分析可补充安装 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制、失败不阻塞）；安装判定与配合规则详见 `mcp-installation-rules`。
@@ -314,19 +317,19 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。只有当代码位于 WSL 文件系统内，且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认仍优先 Git Bash / bash。
 
 **先看 agent 在哪运行：**
 
-- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行执行类命令，普通命令也可直接在当前 shell 完成，无需任何包裹。
 - **agent 在 Windows（如 Claude Desktop GUI）**：
-  - shell 默认用 Git Bash
-  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
-  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
+  - shell 默认用 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`
+  - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
+**为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
-**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
+**命令格式：** 执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。普通命令不要为了统一口径强制套这层。代码在 WSL 时不再使用 `/mnt/<drive>`；纯 Windows 项目或本轮不执行程序时，不要误触发本规则。
 
 **编码约束：**
 
@@ -370,6 +373,6 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若仓库内存在多个规则文件（`AGENTS.md` / `CLAUDE.md`），本 skill 不允许只同步根目录后结束；必须同步所有已存在规则文件的受管章节，除非用户明确要求排除某些子工程。
 - 若首轮发现 `.gitattributes` 或 `.editorconfig` 缺失，也不允许降级为”先分析项目后补文件”；必须先补齐这两个文件，再继续主任务。
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
-- 若仓库位于 Windows 环境，默认应把 Git Bash / WSL shell 优先级一并补入仓库规则，而不是只在单次会话里临时提醒。
+- 若仓库位于 Windows 环境，默认应把“普通命令优先 Git Bash / bash、执行类命令再进 WSL”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
 ```
 ````

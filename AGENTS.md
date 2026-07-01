@@ -99,19 +99,19 @@
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。代码在 WSL 文件系统内（`/home/<user>/<project>`），编译/运行/测试/调试都在 WSL 完成。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` skill。本节为写入规则文件的最小约束摘要。只有当代码位于 WSL 文件系统内，且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认仍优先 Git Bash / bash。
 
 **先看 agent 在哪运行：**
 
-- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹。
+- **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行执行类命令，普通命令也可直接在当前 shell 完成，无需任何包裹。
 - **agent 在 Windows（如 Claude Desktop GUI）**：
-  - shell 默认用 Git Bash
-  - 看代码、改代码、git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
-  - 编译、运行、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
+  - shell 默认用 Git Bash；若当前环境已有稳定 `bash` 也可直接用 `bash`
+  - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
+  - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
 
-**为什么执行/调试在 WSL：** 只有 WSL 进程能正常联网，且二进制面向 Linux。
+**为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
-**命令格式：** `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。不再使用 `/mnt/<drive>`。
+**命令格式：** 执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。普通命令不要为了统一口径强制套这层。代码在 WSL 时不再使用 `/mnt/<drive>`；纯 Windows 项目或本轮不执行程序时，不要误触发本规则。
 
 **编码约束：**
 

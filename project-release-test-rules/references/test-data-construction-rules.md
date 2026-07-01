@@ -1,6 +1,6 @@
 # 测试数据构造规则
 
-本文件定义 `project-release-test-rules` 在准备接口测试请求参数时，如何从本地数据库获取真实数据构造合理的请求参数，避免用不存在的数据测试并接受失败为"符合预期"。
+本文件定义 `project-release-test-rules` 在准备接口测试请求参数时，如何从本地 `local` 环境数据库获取真实数据构造合理的请求参数，避免用不存在的数据测试并接受失败为"符合预期"。
 
 ## 核心原则
 
@@ -30,7 +30,7 @@
 
 ### MySQL 查询
 
-- 使用测试环境配置的数据库连接（从 `global/config/config_<env>_yaml.go` 获取地址、用户名、密码、库名）。
+- 只能使用本地 `local` 配置中的数据库连接（从 `global/config/config_local*`、`.env.local` 或等价本地配置获取地址、用户名、密码、库名）。
 - 通过命令行 `mysql -h <host> -P <port> -u <user> -p<password> <dbname> -e "SQL"` 或 Python 脚本查询。
 - 查询最近记录示例：`SELECT * FROM <table> ORDER BY <time_column> DESC LIMIT 5`
 - 从记录中提取请求参数字段，如 `from_cType`、`from_shortName`、`to_cType`、`to_shortName`、`fromAddress`、`toAddress`、`fromAmount` 等。
@@ -87,7 +87,7 @@
 
 ### 代理配置位置
 
-- 查看项目的环境配置文件（如 Go 项目的 `global/config/config_<env>_yaml.go`）中的 `httpConfig` 段。
+- 查看项目的本地配置文件（如 Go 项目的 `global/config/config_local*`、`.env.local`）中的 `httpConfig` 段。
 - 配置示例：
 
 ```yaml
@@ -109,7 +109,7 @@ httpConfig:
 
 1. 读取当前环境配置中的 `httpConfig.proxy` 字段。
 2. 若代理被注释或为空，评估该环境是否需要代理访问外网服务。
-3. 若需要代理，取消注释并填入可用代理地址，重启服务后重测。
+3. 若需要代理，只能调整本地 `local` 配置并重启本地服务后重测；不得改动 `test` 环境配置来完成本地自动化测试。
 4. 若代理地址本身不可达，标记为环境问题，不得判定为接口代码缺陷。
 
 ### 禁止行为
@@ -117,6 +117,7 @@ httpConfig:
 - 看到外部服务超时就直接判定接口不通过，不检查代理配置。
 - 明明是代理未配置导致的网络问题，却判定为代码 bug 或接口逻辑错误。
 - 代理配置存在但未验证代理可达性，直接重启服务后测试。
+- 为了让本地自动化测试跑通，去修改 `config_test*` 或改用 `test` 环境数据库 / 服务。
 
 ## 例外条件
 

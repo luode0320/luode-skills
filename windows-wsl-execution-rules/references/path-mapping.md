@@ -12,7 +12,7 @@
 ## 说明
 
 - `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看（如 `Ubuntu`、`Ubuntu-24.04`）。
-- **执行类命令始终用 WSL 内路径 `/home/<user>/<project>`**（agent 在 Windows 时配合 `wsl.exe --cd`）。
+- **只有执行类命令才用 WSL 内路径 `/home/<user>/<project>`**（agent 在 Windows 时配合 `wsl.exe --cd`）。
 - **Windows 侧编辑器/文件访问用 `\\wsl.localhost\<distro>\...`** —— 这是 Windows 访问 WSL 原生文件的官方稳定方式。
 - 代码已在 WSL 内，**不再使用 `/mnt/<drive>`**（那是访问 Windows 盘的路径）。
 
@@ -21,3 +21,4 @@
 - 不要把 WSL 路径（`/home/...`）和 Windows UNC 路径（`\\wsl.localhost\...`）混用在同一命令上下文。
 - `wsl.exe --cd` 后必须是 WSL 内路径 `/home/<user>/<project>`，不是 UNC 路径。
 - 路径含空格时整体放进引号。
+- 搜索、读文件、改规则、普通 git 盘点等非执行动作，不要为了统一格式强行改成 `/home/...` 上下文。
