@@ -64,6 +64,7 @@
 ```text
 【接口 1】
 接口            POST /api/order/create
+接口名称        创建订单
 接口标识        order_create_POST
 请求参数        {"userId":"***","amount":"100","currency":"USDT","remark":"测试订单"}
 简要响应        {"httpStatus":200,"code":0,"message":"success","data":{"orderId":"ord_123456***","status":"pending","amount":"100"}}
@@ -75,6 +76,7 @@ Agent 判定      通过
 
 【接口 2】
 接口            GET /api/order/detail/{id}
+接口名称        查询订单详情
 接口标识        order_detail_GET
 请求参数        {"id":"ord_123456***","Authorization":"***"}
 简要响应        {"httpStatus":200,"code":0,"data":{"orderId":"ord_123456***","status":"pending","amount":"100","userId":"***"}}
@@ -88,7 +90,7 @@ Agent 判定      通过
 ### 接口明细格式强制规则
 
 1. 每个接口必须以 `【接口 N】` 开头，`N` 为数字，从 1 开始递增。
-2. 字段顺序固定：接口、接口标识、请求参数、简要响应、Agent 判定、判定理由、风险等级、发现来源、是否阻断上线。
+2. 字段顺序固定：接口、接口名称、接口标识、请求参数、简要响应、Agent 判定、判定理由、风险等级、发现来源、是否阻断上线。
 3. 请求参数和简要响应必须是合法的 JSON 字符串，可包含必要的转义和脱敏。
 4. Agent 判定只能是 `通过`、`不通过`、`待确认` 三种值。
 5. 是否阻断上线只能是 `是` 或 `否`。

@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-01 00:23:16",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-01 11:20:45",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 22,
     "doc_total": 7,
-    "references_total": 309,
+    "references_total": 310,
     "agents_total": 87
   },
   "downloaded_seeds": {
@@ -398,6 +398,7 @@ window.SKILL_DICTIONARY = {
             "上下文压缩续做规则",
             "中文编码规则",
             "变更最小化",
+            "依赖与工具复用优先规则",
             "输出格式规则",
             "Windows / WSL 执行规则",
             "CodeGraph 强制准备规则",
@@ -3391,6 +3392,7 @@ window.SKILL_DICTIONARY = {
             "project-release-test-rules/references/inventory-reconcile-rules.md",
             "project-release-test-rules/references/output-artifacts.md",
             "project-release-test-rules/references/report-format.md",
+            "project-release-test-rules/references/test-data-construction-rules.md",
             "project-release-test-rules/references/test-selection-policy.md"
           ],
           "agents": [
@@ -4811,6 +4813,7 @@ window.SKILL_DICTIONARY = {
         "上下文压缩续做规则",
         "中文编码规则",
         "变更最小化",
+        "依赖与工具复用优先规则",
         "输出格式规则",
         "Windows / WSL 执行规则",
         "CodeGraph 强制准备规则",
@@ -7720,6 +7723,7 @@ window.SKILL_DICTIONARY = {
         "project-release-test-rules/references/inventory-reconcile-rules.md",
         "project-release-test-rules/references/output-artifacts.md",
         "project-release-test-rules/references/report-format.md",
+        "project-release-test-rules/references/test-data-construction-rules.md",
         "project-release-test-rules/references/test-selection-policy.md"
       ],
       "agents": [

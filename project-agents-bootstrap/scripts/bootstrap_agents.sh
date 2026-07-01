@@ -198,6 +198,15 @@ BODY_MIN_CHANGE=$(cat <<'EOF'
 EOF
 )
 
+BODY_REUSE_FIRST=$(cat <<'EOF'
+- 编写代码前，必须先检索是否已有可复用的开源库、npm 包或项目内工具类，优先复用而非从零实现。
+- 优先级：项目内已有工具类 / 公共方法 > 成熟开源库（npm / GitHub）> 自行实现。
+- 禁止在已有成熟第三方库覆盖该能力时重复造轮子；引入新依赖前须确认许可证兼容、维护活跃且无已知安全问题。
+- 若确实需要自行实现，必须在代码注释或 PR 说明中写明为何不使用现有库 / 工具类。
+- 检索范围应覆盖项目 `utils`、`common`、`helpers` 等公共目录，以及 `package.json` / `go.mod` 等依赖声明文件。
+EOF
+)
+
 BODY_OUTPUT_FORMAT=$(cat <<'EOF'
 - AI 输出统一使用 markdown，不依赖 HTML 渲染：HTML 标签在 Claude Desktop、纯 CLI、Codex 等大量 agent 环境不渲染，会退化成原文噪声，并破坏对输出的机器解析。
 - 视觉层级与区分靠 markdown 语义结构（`#` / `##` 标题、`---` 分隔线、表格、`>` 引用块、徽章 emoji），不靠绝对字号。
@@ -405,6 +414,7 @@ sync_agents_file() {
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
   sync_section "$file" "中文编码规则" "$BODY_CHINESE_ENC"
   sync_section "$file" "变更最小化" "$BODY_MIN_CHANGE"
+  sync_section "$file" "依赖与工具复用优先规则" "$BODY_REUSE_FIRST"
   sync_section "$file" "输出格式规则" "$BODY_OUTPUT_FORMAT"
   sync_section "$file" "Windows / WSL 执行规则" "$BODY_WINDOWS_WSL"
   sync_section "$file" "CodeGraph 强制准备规则" "$BODY_CODEGRAPH"

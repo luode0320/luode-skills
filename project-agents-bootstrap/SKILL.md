@@ -146,6 +146,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 后处理脚本只允许在“真实生成出的原始图”基础上做去背、切帧、对齐、拼表、预览整理；不得替代 imagegen 负责原始创作出图。
 - 只要本轮实际发生了 imagegen 生图或改图，最终回复必须向用户明确汇报本次生图路径与本次实际使用的模型名；例如 `生图路径: CLI fallback` 与 `生图模型: gpt-image-2`。若走 built-in 且拿不到精确模型名，也必须明确写成 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`，不得省略。
 - 最小改动原则：注释补充不改变业务逻辑。
+- 依赖与工具复用优先规则：编写代码前先检索项目工具类 / npm / GitHub 开源库，优先复用，禁止重复造轮子；引入新依赖须确认许可证兼容与维护活跃；确需自行实现须在注释或 PR 说明中写明原因。
 - Windows / WSL 执行规则（代码在 WSL 文件系统内 `/home/<user>/<project>`）：
   - **agent 在 WSL（推荐）**：直接 `cd /home/<user>/<project>` 执行 `go build`/`test`/`run`/`dlv`，无需任何包裹
   - **agent 在 Windows（如 Claude Desktop GUI）**：shell 默认用 Git Bash；看代码/改代码/git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问；编译/运行/测试/调试通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
@@ -294,6 +295,14 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 ## 变更最小化
 
 - 注释补充不改变业务逻辑。
+
+## 依赖与工具复用优先规则
+
+- 编写代码前，必须先检索是否已有可复用的开源库、npm 包或项目内工具类，优先复用而非从零实现。
+- 优先级：项目内已有工具类 / 公共方法 > 成熟开源库（npm / GitHub）> 自行实现。
+- 禁止在已有成熟第三方库覆盖该能力时重复造轮子；引入新依赖前须确认许可证兼容、维护活跃且无已知安全问题。
+- 若确实需要自行实现，必须在代码注释或 PR 说明中写明为何不使用现有库 / 工具类。
+- 检索范围应覆盖项目 `utils`、`common`、`helpers` 等公共目录，以及 `package.json` / `go.mod` 等依赖声明文件。
 
 ## 输出格式规则
 
