@@ -107,11 +107,11 @@
 - 状态: 启用
 
 ### Windows 命令分层写法
-- 别名: 先固化 PowerShell UTF-8, 普通命令默认 PowerShell, 执行类再 wsl.exe
+- 别名: Windows 普通命令优先 bash, Git Bash 优先, 执行类再 wsl.exe
 - 类型: 工具风格
-- 示例: `前提: 先执行 powershell -ExecutionPolicy Bypass -File .\\windows-encoding-rules\\scripts\\enable_powershell_utf8.ps1；普通命令: 在 PowerShell 下经 \\\\wsl.localhost\\<distro>\\home\\<user>\\<project> 执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...`
-- 说明: Windows + WSL 规则文案要先写清 PowerShell UTF-8 永久化前提，再写“普通命令”和“执行类命令”的分层。满足前提后，搜索、读写文件、规则检查、普通 git 盘点默认留在 PowerShell；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL；面向用户展示的项目内文件引用必须另按用户访问环境输出，不沿用执行命令里的 `/home/...`。
-- 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`AGENTS.md`
+- 示例: `普通命令: 在 Git Bash / bash 下经 //wsl.localhost/<distro>/home/<user>/<project> 或等价 Windows 可访问路径执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...；PowerShell: 仅用于 .ps1、Windows 专用 cmdlet、profile / 编码初始化或用户明确要求`
+- 说明: Windows + WSL 规则文案要先写清“普通命令”和“执行类命令”的分层。Windows 下搜索、读写文件、规则检查、普通 git 盘点默认优先使用 Git Bash / bash；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`；PowerShell 只作为 Windows 专项入口保留。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL；面向用户展示的项目内文件引用必须另按用户访问环境输出，不沿用执行命令里的 `/home/...`。
+- 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`windows-encoding-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: `AGENTS.md`、环境规则 skill、命令模板、推荐工作流文档
 - 更新时间: 2026-07-02
 - 状态: 启用
@@ -179,7 +179,7 @@
 - 2026-06-30：补充子 agent 完全授权写法，明确项目级 standing authorization 满足工具显式授权条件。
 - 2026-06-30：补充命中检查可见输出样式，明确使用普通 Markdown 标题和行内代码字段行，禁止代码块包裹。
 - 2026-06-30：补充普通说明不用代码围栏风格，明确自然语言结构化输出改用 Markdown 列表、表格或引用块，` ```text ` 不再作为普通回复模板。
-- 2026-07-01：收紧 Windows 命令分层写法，明确规则文案必须先写 PowerShell UTF-8 永久化前提，再写“普通命令默认 PowerShell、执行类命令再进 WSL”，避免旧的 Git Bash 默认口径继续扩散。
+- 2026-07-01：历史上曾收紧为 PowerShell UTF-8 后承接普通命令；2026-07-02 已按新确认口径替换为 Windows 下普通仓库命令优先 Git Bash / bash，PowerShell 仅用于专项场景，执行类命令再进 WSL。
 - 2026-07-02：新增文件写入显式 UTF-8 风格，明确 PowerShell、Python、Node 等写文件命令必须显式 UTF-8，禁止 GBK / ANSI / 默认编码落盘。
 - 2026-07-02：补充项目内文件引用路径写法，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用使用 `\\wsl.localhost\...`，不把 `/home/...` 当作用户可打开路径。
 - 2026-06-30：新增实施计划书写风格，明确依赖图 + 垂直切片优先、单任务约 5 文件、每任务闭环后再进入下一任务。

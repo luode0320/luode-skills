@@ -1,6 +1,6 @@
 # 团队推荐目录与工作流
 
-代码放在 WSL 文件系统内（`/home/<user>/<project>`）。执行类动作在 WSL 中完成，普通命令默认留在 PowerShell，但前提是已按 `windows-encoding-rules` 完成 UTF-8 永久化。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。执行类动作在 WSL 中完成，Windows 下普通仓库命令默认优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景。
 
 ## 推荐目录
 
@@ -17,7 +17,7 @@
 
 ### agent 在 Windows（如 Claude Desktop GUI）
 
-- shell 默认用 PowerShell；若尚未完成 UTF-8 永久化，先执行 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1`
+- shell 默认用 Git Bash / bash；PowerShell 只作 Windows 专项入口
 - 看代码、改代码、搜索、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问
 - 编译、运行、启动程序、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 - 回复中的项目内文件路径、审查证据路径和总结路径：使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，不要把 `/home/...` 当成用户可打开路径输出
@@ -26,7 +26,7 @@
 
 默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`：
 
-```powershell
+```bash
 wsl.exe --cd /home/<user>/<project> go test ./...
 wsl.exe --cd /home/<user>/<project> go run ./cmd/<app>
 ```

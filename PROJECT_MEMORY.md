@@ -197,10 +197,10 @@
 - 状态: 启用
 
 ### Windows / WSL 执行边界
-- 别名: 先固化 PowerShell UTF-8, 普通命令默认 PowerShell, 执行类动作才进 WSL
+- 别名: Windows 普通命令优先 bash, Git Bash 优先, 执行类动作才进 WSL
 - 类型: 环境规则
-- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，必须先通过 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 把 PowerShell 用户级配置永久固定为 UTF-8；只有此前提满足后，默认 shell 才取 PowerShell。搜索、读写文件、规则检查、普通 git 盘点等非执行动作留在 PowerShell；只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。面向用户输出的项目内文件引用按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。
-- 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`AGENTS.md`
+- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，搜索、读写文件、规则检查、普通 git 盘点等非执行动作默认优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。面向用户输出的项目内文件引用按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。
+- 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`windows-encoding-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: Windows + WSL 协作开发、仓库级执行规则、命令模板
 - 更新时间: 2026-07-02
 - 状态: 启用
@@ -289,7 +289,7 @@
 - 2026-06-30：新增普通 Markdown 输出规则，明确自然语言结构化输出不得包进 ` ```text ` 等代码围栏，应使用 Markdown 段落、列表、表格或引用块。
 - 2026-06-30：收紧需求阶段口径，明确“一次只推进一个关键问题”只允许基于真实缺口，不允许夹带 agent 猜测；需求主文档未真实落盘前，禁止进入实施规划与正式编码。
 - 2026-06-30：收紧实施规划口径，明确计划阶段只读、最小任务优先按依赖图与垂直切片组织、单任务默认控制在约 5 个文件以内，且每个最小任务都必须先完成真实测试、审查、验收闭环后再进入下一个任务。
-- 2026-07-01：收紧 Windows 默认 shell 前提，明确必须先把 PowerShell 用户级配置永久固定为 UTF-8，满足前提后普通命令默认留在 PowerShell，只有执行类动作才进入 WSL。
+- 2026-07-01：历史上曾收紧为 PowerShell UTF-8 后承接普通命令；2026-07-02 已按新确认口径替换为 Windows 下普通仓库命令优先 Git Bash / bash，PowerShell 仅用于专项场景，执行类动作才进入 WSL。
 - 2026-07-01：恢复 README 改动日志时间戳格式为 yyyy-MM-dd HH:mm:ss 提交标题；新增提交前审查闸门，pre_commit_gate.sh 校验 doc/6-审查/ 下审查文档的审查结论、是否允许提交、阻断问题；两个审查 skill 归档时统一写入判定字段。
 - 2026-07-01：新增本地连接调试测试红线，明确需求、Bug、测试、运行时调试、启动联调和浏览器验证只能连接 local 本地数据库与本地服务，禁止连接 test / prod / staging 等非 local 环境。
 - 2026-07-01：补充计划型提问入口，明确用户只要显式索要“怎么做/先给计划/先出方案/先列步骤”，就必须先命中实施规划规则；若前置条件未齐，也要输出受限计划 / 阻断计划，而不是表现成计划规则未触发。

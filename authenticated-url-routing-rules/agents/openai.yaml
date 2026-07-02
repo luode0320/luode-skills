@@ -1,0 +1,4 @@
+interface:
+  display_name: "认证 URL 路由"
+  short_description: "URL 分析默认优先复用已登录 Chrome 会话"
+  default_prompt: "Use $authenticated-url-routing-rules to open and analyze this URL through the signed-in Chrome session."
