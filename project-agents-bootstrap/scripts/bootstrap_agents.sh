@@ -96,6 +96,7 @@ is_godot_project() {
 
 BODY_SCOPE=$(cat <<'EOF'
 - 本文件适用于本仓库下所有代码与文档变更。
+- 把 `Plan Mode` 的默认计划外壳沉到仓库级规则里，保证所有计划型提问都会先触发 `implementation-planning-rules` 再回流前置域。
 EOF
 )
 
@@ -109,6 +110,7 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
   - “我已经知道怎么做了”
   - “这不是核心 skill”
 - 违反本规则视为流程违规，必须立即停止当前执行，回到命中检查重走
+- 当前上下文处于 `Plan Mode` 时，必须把 `implementation-planning-rules` 作为第一层计划外壳先命中，再按需回流需求侦察、需求接入、缺口、边界、拆分或其他域；这条路由优先级高于普通计划型提问
 
 ### 项目长期上下文文档自动加载（强制）
 
