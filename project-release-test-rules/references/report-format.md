@@ -7,7 +7,7 @@
 测试报告分为四部分：
 
 1. 测试概览（主 `README.md` 中展示）
-2. 基线扫描与对账摘要（主 `README.md` 中展示）
+2. 基线扫描、双索引同步与对账摘要（主 `README.md` 中展示）
 3. 接口测试明细（ASCII 镜像目录的 `interface-test-results.md` 中展示）
 4. 门禁结论（主 `README.md` 中展示）
 
@@ -21,7 +21,7 @@
 ## 基本信息
 - 测试时间：YYYY-MM-DD HH:MM:SS
 - 测试范围：本次上线改动模块
-- 测试环境：测试环境 / 预发环境
+- 测试环境：local 本地环境
 - 接口总数：N
 - 必测接口数：N
 - 通过接口数：N
@@ -53,6 +53,17 @@
 1. 新增接口：POST /api/order/create，来源 backend/router/order.go:42
 2. 变更接口：GET /api/order/detail/{id}，变更项：鉴权要求、响应结构摘要
 3. 待确认接口：POST /api/pay，待确认项：业务成功判定
+
+## 接口契约双索引同步摘要
+- 当前代码扫描接口数：N
+- swag manifest 接口数：N
+- interface inventory 接口数：N
+- 缺失 manifest：是 / 否
+- 缺失 inventory：是 / 否
+- 是否需要双刷新：是 / 否
+- schema 漂移接口数：N
+- 受影响可复用参数数：N
+- 同步报告：ascii-artifacts/interface-sync-report.yaml
 ```
 
 ---
@@ -67,8 +78,11 @@
 接口名称        创建订单
 接口标识        order_create_POST
 请求参数        {"userId":"***","amount":"100","currency":"USDT","remark":"测试订单"}
+参数来源        reusable_param:order_create_candidate_20260702
+依赖追踪        artifacts/dependency-trace/order_create_POST.json
 简要响应        {"httpStatus":200,"code":0,"message":"success","data":{"orderId":"ord_123456***","status":"pending","amount":"100"}}
 Agent 判定      通过
+阻断分类        无
 判定理由        HTTP 状态码 200，业务 code=0，返回有效 orderId，订单状态为 pending，符合创建订单预期
 风险等级        P0
 发现来源        route,swagger
@@ -79,8 +93,11 @@ Agent 判定      通过
 接口名称        查询订单详情
 接口标识        order_detail_GET
 请求参数        {"id":"ord_123456***","Authorization":"***"}
+参数来源        upstream_api:order_create_POST -> $.data.orderId
+依赖追踪        artifacts/dependency-trace/order_detail_GET.json
 简要响应        {"httpStatus":200,"code":0,"data":{"orderId":"ord_123456***","status":"pending","amount":"100","userId":"***"}}
 Agent 判定      通过
+阻断分类        无
 判定理由        HTTP 状态码 200，业务 code=0，返回订单信息和创建接口一致，符合预期
 风险等级        P0
 发现来源        controller,test
@@ -90,13 +107,15 @@ Agent 判定      通过
 ### 接口明细格式强制规则
 
 1. 每个接口必须以 `【接口 N】` 开头，`N` 为数字，从 1 开始递增。
-2. 字段顺序固定：接口、接口名称、接口标识、请求参数、简要响应、Agent 判定、判定理由、风险等级、发现来源、是否阻断上线。
+2. 字段顺序固定：接口、接口名称、接口标识、请求参数、参数来源、依赖追踪、简要响应、Agent 判定、阻断分类、判定理由、风险等级、发现来源、是否阻断上线。
 3. 请求参数和简要响应必须是合法的 JSON 字符串，可包含必要的转义和脱敏。
-4. Agent 判定只能是 `通过`、`不通过`、`待确认` 三种值。
-5. 是否阻断上线只能是 `是` 或 `否`。
-6. 禁止使用任何形式的 Markdown 表格、HTML 表格输出接口明细。
-7. 禁止合并多个接口到同一个块中，每个接口独立成块。
-8. 超过 3 个字段的 JSON 可以适当换行，保持可读性。
+4. Agent 判定只能是 `通过`、`不通过`、`待确认` 三种值；写接口可使用 `PASS`、`EXPECTED_FAIL`、`UNEXPECTED_FAIL`、`PENDING`。
+5. 阻断分类只能是 `无`、`BLOCKED_BY_DEPENDENCY`、`PARAM_UNRESOLVED`、`ENV_BLOCKED`、`BASELINE_STALE`。
+6. 是否阻断上线只能是 `是` 或 `否`。
+7. 禁止使用任何形式的 Markdown 表格、HTML 表格输出接口明细。
+8. 禁止合并多个接口到同一个块中，每个接口独立成块。
+9. 超过 3 个字段的 JSON 可以适当换行，保持可读性。
+10. 依赖追踪必须指向真实落盘文件；没有依赖时写 `无`。
 
 ### 简要响应内容强制规则
 
@@ -152,7 +171,23 @@ Agent 判定      通过
 4. 所有 P0 接口都有测试结果，无遗漏。
 5. 门禁结论明确，理由充分。
 6. 所有接口的判定理由都明确具体，无模糊描述。
-7. README 中必须包含基线扫描与对账摘要，不能只保留测试结果。
+7. README 中必须包含基线扫描、双索引同步与对账摘要，不能只保留测试结果。
+8. 每个依赖接口或参数解析失败必须有阻断分类，不能混入目标接口“不通过”。
+
+## 参数复用与失效摘要（主 README.md）
+
+每次上线测试主 README 必须包含参数基线变更摘要：
+
+```text
+## 参数复用与失效摘要
+- 本轮复用参数数：N
+- 复验成功参数数：N
+- 新增 candidate 参数数：N
+- 标记 stale 参数数：N
+- 标记 invalid 参数数：N
+- 标记 quarantined 参数数：N
+- 主要失效类型：expired / schema_changed / state_changed / ...
+```
 
 ## 写接口样本分布块（强制）
 

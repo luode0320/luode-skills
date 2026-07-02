@@ -25,6 +25,19 @@
 | 最近测试时间 | 上次测试该接口的时间 | 2026-06-30 21:10:00 |
 | 最近测试结论 | 上次测试的结论 | 通过 / 不通过 / 待确认 |
 
+## 参数依赖字段（必填）
+
+以下字段用于支撑通用参数构造，解决“目标接口参数来自另一个接口结果”的依赖问题。冷启动时允许写入空结构，但字段必须存在，不能让 agent 在测试阶段临时猜测参数。
+
+| 字段名 | 说明 | 示例 |
+| --- | --- | --- |
+| 接口角色 | 当前接口在依赖图中的角色，可同时具备多个角色 | ["provider","consumer"] |
+| 可提供字段 | 当前接口成功响应中可供其他接口复用的字段与提取规则 | `{"orderId":{"response_path":"$.data.items[*].id","selector":"first where status == 'paid'"}}` |
+| 参数来源 | 当前接口请求参数的来源规则，字段名到来源 key 的映射 | `{"orderId":"parameter-sources.yaml#parameters.orderId"}` |
+| 依赖接口 | 当前接口执行前必须先执行或可选执行的 provider 接口 | ["order_list_GET"] |
+| 依赖失败策略 | provider 失败或参数无法提取时的结果分类 | BLOCKED_BY_DEPENDENCY / PARAM_UNRESOLVED / PENDING |
+| 可复用参数影响字段 | 哪些请求参数变化会影响 `reusable-params.yaml` 中历史样本是否仍可复用 | ["orderId","userId","currency"] |
+
 ## 扫描与对账字段（必填）
 
 以下字段用于支撑冷启动、每次执行前的增量扫描和基线对账：
@@ -36,6 +49,28 @@
 | 完整度 | 当前基线信息完整程度 | 完整 / 部分 / 待确认 |
 | 待确认项 | 当前仍缺失或冲突的关键字段列表 | ["鉴权要求","业务成功判定"] |
 | 最近扫描提交 | 本次扫描对应的提交或工作区标识 | 86e52d2 |
+
+## Swagger/OpenAPI 双索引字段（必填）
+
+以下字段用于将上线测试接口基线与 `swag/.swag-manifest.yaml` 绑定，保证接口文档索引和测试索引来自同一份当前代码事实。冷启动时允许空值，但字段必须存在。
+
+| 字段名 | 说明 | 示例 |
+| --- | --- | --- |
+| openapi_operation_id | OpenAPI operationId，来自 `swag/.swag-manifest.yaml` | supported_onramps_all_get |
+| openapi_file | 当前接口对应的单接口 OpenAPI YAML 文件 | supported_onramps_all.yaml |
+| openapi_manifest_updated_at | manifest 最近刷新时间 | 2026-07-02 18:30:00 |
+| request_schema_hash | 请求 schema 的稳定 hash，用于判断请求契约漂移 | 6d12... |
+| response_schema_hash | 响应 schema 的稳定 hash，用于判断响应契约漂移 | 91ac... |
+| schema_sync_status | 当前接口在双索引中的同步状态 | synced / missing_in_swag / missing_in_inventory / schema_changed / deprecated / blocked |
+
+`schema_sync_status` 含义：
+
+- `synced`：当前代码、swag manifest、interface inventory 三方一致。
+- `missing_in_swag`：当前代码或 inventory 存在，但 swag manifest 缺失。
+- `missing_in_inventory`：当前代码或 manifest 存在，但 inventory 缺失。
+- `schema_changed`：请求或响应 schema hash 变化，需要重测并标记相关可复用参数 stale。
+- `deprecated`：当前代码已无法找到该接口。
+- `blocked`：缺少关键同步证据，不能自动判断。
 
 ## 推荐扩展字段
 
@@ -49,6 +84,8 @@
 - 第三方依赖：接口依赖的外部服务名称
 - 鉴权获取方式：测试时如何拿到 token、cookie 或签名
 - 调用顺序依赖：是否依赖前置接口先调用
+- 参数复验策略：是否每次复用前都需要轻量复验
+- 参数失效条件：哪些响应、状态或业务规则变化会让历史参数失效
 - 成功后关键副作用：成功后必须额外核验的写入、副作用或状态流转
 - 失败后预期语义：失败响应在业务上应如何解释
 - 回滚/清理步骤：测试结束后如何清理脏数据、恢复环境
@@ -58,6 +95,7 @@
 - 每个项目统一存放在 `doc/5-tests/基线/interface-inventory.yaml`，YAML 格式，可被脚本直接读取。
 - 新增、修改、删除接口必须更新基线。
 - 每次上线测试前必须先扫描当前接口事实，并与基线对账。
+- 每次上线测试前必须同步检查 `swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 的接口集合；任一缺失或不一致时先刷新两边。
 - 每次上线测试后必须更新对应接口的最近扫描时间、最近测试时间和结论。
 - 基线禁止随意删除；废弃接口应标记废弃状态，而不是静默移除。
 - 冷启动生成的初版基线允许包含 `待确认项`，但不得缺少 `发现来源`、`发现证据` 和 `完整度`。

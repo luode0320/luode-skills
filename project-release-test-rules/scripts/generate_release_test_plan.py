@@ -7,6 +7,12 @@
 2. reconcile-inventory: 扫描当前接口事实并与已有基线对账
 3. generate-plan: 基于更新后的接口基线生成测试计划
 4. init-release-test-task: 初始化上线前接口测试任务目录骨架
+5. init-baseline-assets: 初始化项目长期基线资产库
+6. build-dependency-graph: 根据接口清单和参数来源生成依赖图
+7. validate-reusable-params: 校验可复用参数生命周期结构
+8. resolve-test-data: 解析可复用 / fixture / rule 参数并生成依赖追踪
+9. update-baseline-assets: 按事件持续回写基线资产
+10. sync-interface-contract-assets: 对账当前代码、swag manifest 与接口测试基线
 """
 
 from __future__ import annotations
@@ -18,7 +24,7 @@ import re
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Set, Tuple
 
 import yaml
 
@@ -79,6 +85,54 @@ DEFAULT_RISK_BY_KEYWORD = {
     "order": "P0",
 }
 
+ALLOWED_REUSABLE_PARAM_STATUSES = {
+    "candidate",
+    "reusable",
+    "stale",
+    "invalid",
+    "quarantined",
+    "retired",
+}
+
+ALLOWED_REUSABLE_PARAM_FAILURE_TYPES = {
+    "",
+    None,
+    "not_found",
+    "expired",
+    "state_changed",
+    "permission_denied",
+    "schema_changed",
+    "business_rule_changed",
+    "environment_blocked",
+    "unknown",
+}
+
+DEFAULT_SCRIPT_ADAPTER = {
+    "base_url_source": "local_config",
+    "auth": {
+        "provider": "",
+        "token_path": "",
+        "credential_ref": "",
+    },
+    "response_wrapper": {
+        "code_path": "$.code",
+        "success_values": [0, "0", True],
+        "message_path": "$.message",
+        "data_path": "$.data",
+    },
+    "masking": {
+        "sensitive_keys": [
+            "token",
+            "password",
+            "secret",
+            "phone",
+            "idCard",
+            "bankCard",
+            "authorization",
+        ],
+    },
+}
+
 
 def utc_now_str() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -96,6 +150,21 @@ def write_yaml(path: Path, data) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as file:
         yaml.safe_dump(data, file, allow_unicode=True, sort_keys=False)
+
+
+def write_text_if_missing(path: Path, content: str) -> bool:
+    if path.exists():
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    return True
+
+
+def write_yaml_if_missing(path: Path, data) -> bool:
+    if path.exists():
+        return False
+    write_yaml(path, data)
+    return True
 
 
 def load_interface_inventory(inventory_path: Path) -> List[Dict]:
@@ -171,6 +240,12 @@ def inventory_record(method: str, path: str, source: str, evidence: str, file_pa
         "最近扫描时间": utc_now_str(),
         "最近测试时间": "",
         "最近测试结论": "待确认",
+        "接口角色": ["consumer"],
+        "可提供字段": {},
+        "参数来源": {},
+        "依赖接口": [],
+        "依赖失败策略": "PARAM_UNRESOLVED",
+        "可复用参数影响字段": [],
         "发现来源": source,
         "发现证据": evidence,
         "完整度": "部分",
@@ -183,6 +258,7 @@ def inventory_record(method: str, path: str, source: str, evidence: str, file_pa
             "依赖数据",
             "数据副作用",
             "清理方式",
+            "参数来源",
         ],
         "最近扫描提交": "",
     }
@@ -264,6 +340,258 @@ def scan_project_interfaces(project_root: Path) -> List[Dict]:
 
 def key_by_identity(interface: Dict) -> Tuple[str, str]:
     return interface["HTTP 方法"].upper(), normalize_path(interface["接口路径"])
+
+
+def key_from_method_path(method: str, path: str) -> Tuple[str, str]:
+    return method.upper(), normalize_path(path)
+
+
+def stable_hash(value: Any) -> str:
+    if value in (None, "", {}, []):
+        return ""
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    import hashlib
+
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def load_swag_manifest(manifest_path: Path) -> Dict[str, Any]:
+    manifest = read_yaml(manifest_path, {})
+    if not isinstance(manifest, dict):
+        raise ValueError(f"swag manifest 格式非法，应为对象：{manifest_path}")
+    return manifest
+
+
+def manifest_interface_records(manifest: Dict[str, Any]) -> List[Dict[str, Any]]:
+    interfaces = manifest.get("interfaces", [])
+    if not isinstance(interfaces, list):
+        return []
+    return [
+        item
+        for item in interfaces
+        if isinstance(item, dict) and item.get("method") and item.get("path") and item.get("generated", True)
+    ]
+
+
+def manifest_identity_map(manifest: Dict[str, Any]) -> Dict[Tuple[str, str], Dict[str, Any]]:
+    result: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    for item in manifest_interface_records(manifest):
+        result[key_from_method_path(str(item["method"]), str(item["path"]))] = item
+    return result
+
+
+def schema_hash_from_manifest(item: Dict[str, Any], prefix: str) -> str:
+    explicit = item.get(f"{prefix}_schema_hash")
+    if explicit:
+        return str(explicit)
+    for field in (f"{prefix}_schema", f"{prefix}Schema", f"{prefix}_body", f"{prefix}Body"):
+        if field in item:
+            return stable_hash(item.get(field))
+    return ""
+
+
+def ensure_openapi_sync_fields(interface: Dict[str, Any]) -> None:
+    interface.setdefault("openapi_operation_id", "")
+    interface.setdefault("openapi_file", "")
+    interface.setdefault("openapi_manifest_updated_at", "")
+    interface.setdefault("request_schema_hash", "")
+    interface.setdefault("response_schema_hash", "")
+    interface.setdefault("schema_sync_status", "blocked")
+
+
+def manifest_to_inventory_record(
+    key: Tuple[str, str],
+    manifest_item: Dict[str, Any],
+    scanned_item: Dict[str, Any] | None,
+    manifest_updated_at: str,
+    project_root: Path,
+) -> Dict[str, Any]:
+    if scanned_item:
+        record = dict(scanned_item)
+    else:
+        method, path = key
+        evidence = manifest_item.get("source_router_file") or manifest_item.get("source_controller_file") or "swag/.swag-manifest.yaml"
+        record = inventory_record(
+            method,
+            path,
+            "swagger",
+            str(evidence),
+            project_root / str(evidence).split(":", 1)[0],
+        )
+    ensure_openapi_sync_fields(record)
+    record["openapi_operation_id"] = manifest_item.get("operationId", "")
+    record["openapi_file"] = manifest_item.get("file", "")
+    record["openapi_manifest_updated_at"] = manifest_updated_at
+    record["request_schema_hash"] = schema_hash_from_manifest(manifest_item, "request")
+    record["response_schema_hash"] = schema_hash_from_manifest(manifest_item, "response")
+    return record
+
+
+def affected_reusable_param_keys(interface: Dict[str, Any]) -> List[str]:
+    values = interface.get("可复用参数影响字段") or []
+    if isinstance(values, str):
+        return [values]
+    if isinstance(values, list):
+        return [str(value) for value in values if value]
+    return []
+
+
+def mark_reusable_params_stale(reusable_params_path: Path, affected_keys: Set[str], reason: str) -> int:
+    if not reusable_params_path.exists() or not affected_keys:
+        return 0
+    payload = read_yaml(reusable_params_path, {"params": {}})
+    params = payload.get("params", {})
+    if not isinstance(params, dict):
+        return 0
+
+    changed = 0
+    for key in affected_keys:
+        samples = params.get(key, [])
+        if not isinstance(samples, list):
+            continue
+        for sample in samples:
+            if not isinstance(sample, dict):
+                continue
+            if sample.get("status") in {"candidate", "reusable"}:
+                sample["status"] = "stale"
+                sample["failure_type"] = "schema_changed"
+                sample["invalidation_reason"] = reason
+                sample["last_failed_at"] = utc_now_str()
+                changed += 1
+
+    if changed:
+        write_yaml(reusable_params_path, payload)
+    return changed
+
+
+def sync_inventory_with_openapi_assets(
+    project_root: Path,
+    manifest_path: Path,
+    inventory_path: Path,
+    reusable_params_path: Path | None = None,
+) -> Dict[str, Any]:
+    scanned_inventory = scan_project_interfaces(project_root)
+    scanned_map = {key_by_identity(item): item for item in scanned_inventory}
+    inventory_exists = inventory_path.exists()
+    existing_inventory = load_interface_inventory(inventory_path) if inventory_exists else []
+    inventory_map = {key_by_identity(item): item for item in existing_inventory}
+    manifest_exists = manifest_path.exists()
+    manifest = load_swag_manifest(manifest_path) if manifest_exists else {}
+    manifest_map = manifest_identity_map(manifest) if manifest_exists else {}
+    manifest_updated_at = str(manifest.get("updated_at", "")) if manifest_exists else ""
+
+    updated_inventory: List[Dict[str, Any]] = []
+    missing_in_swag: List[Dict[str, Any]] = []
+    missing_in_inventory: List[Dict[str, Any]] = []
+    missing_in_code: List[Dict[str, Any]] = []
+    schema_changed: List[Dict[str, Any]] = []
+    synced: List[Dict[str, Any]] = []
+    affected_param_keys: Set[str] = set()
+
+    all_keys = sorted(set(scanned_map) | set(manifest_map) | set(inventory_map))
+    for key in all_keys:
+        scanned = scanned_map.get(key)
+        manifest_item = manifest_map.get(key)
+        existing = inventory_map.get(key)
+        method, path = key
+
+        if manifest_item is None:
+            record = dict(existing or scanned or {})
+            if not record:
+                continue
+            ensure_openapi_sync_fields(record)
+            record["schema_sync_status"] = "missing_in_swag" if scanned else "deprecated"
+            record["最近扫描时间"] = utc_now_str()
+            if scanned is None:
+                missing_in_code.append({"method": method, "path": path, "source": "inventory"})
+            else:
+                missing_in_swag.append({"method": method, "path": path})
+            updated_inventory.append(record)
+            continue
+
+        record = manifest_to_inventory_record(key, manifest_item, scanned, manifest_updated_at, project_root)
+        if existing:
+            merged = dict(existing)
+            merged.update(
+                {
+                    "HTTP 方法": method,
+                    "接口路径": path,
+                    "openapi_operation_id": record.get("openapi_operation_id", ""),
+                    "openapi_file": record.get("openapi_file", ""),
+                    "openapi_manifest_updated_at": record.get("openapi_manifest_updated_at", ""),
+                    "最近扫描时间": utc_now_str(),
+                }
+            )
+            for field in ("发现来源", "发现证据", "最近扫描提交"):
+                if scanned and scanned.get(field):
+                    merged[field] = scanned[field]
+            request_hash = record.get("request_schema_hash", "")
+            response_hash = record.get("response_schema_hash", "")
+            old_request_hash = existing.get("request_schema_hash", "")
+            old_response_hash = existing.get("response_schema_hash", "")
+            merged["request_schema_hash"] = request_hash
+            merged["response_schema_hash"] = response_hash
+            if (old_request_hash and old_request_hash != request_hash) or (old_response_hash and old_response_hash != response_hash):
+                merged["schema_sync_status"] = "schema_changed"
+                changed_item = {"method": method, "path": path, "interface_id": merged.get("接口标识", "")}
+                schema_changed.append(changed_item)
+                affected_param_keys.update(affected_reusable_param_keys(merged))
+                merged["最近测试结论"] = "待重测"
+            elif scanned is None:
+                merged["schema_sync_status"] = "deprecated"
+                merged["完整度"] = "待确认"
+                merged["待确认项"] = sorted(set(merged.get("待确认项", [])) | {"当前代码缺少接口"})
+                missing_in_code.append({"method": method, "path": path, "source": "manifest"})
+            else:
+                merged["schema_sync_status"] = "synced"
+                synced.append({"method": method, "path": path, "interface_id": merged.get("接口标识", "")})
+            updated_inventory.append(merged)
+        else:
+            record["schema_sync_status"] = "missing_in_inventory"
+            record["完整度"] = "待确认"
+            record["待确认项"] = sorted(set(record.get("待确认项", [])) | {"接口基线缺少 OpenAPI 同步记录"})
+            missing_in_inventory.append({"method": method, "path": path, "operationId": record.get("openapi_operation_id", "")})
+            updated_inventory.append(record)
+
+    updated_inventory.sort(key=lambda item: (item.get("所属模块", ""), item.get("接口路径", ""), item.get("HTTP 方法", "")))
+    write_yaml(inventory_path, updated_inventory)
+
+    stale_param_count = 0
+    if reusable_params_path is not None:
+        stale_param_count = mark_reusable_params_stale(
+            reusable_params_path,
+            affected_param_keys,
+            "OpenAPI schema changed during interface contract sync",
+        )
+
+    requires_dual_refresh = (
+        not manifest_exists
+        or not inventory_exists
+        or bool(missing_in_swag)
+        or bool(missing_in_inventory)
+        or bool(missing_in_code)
+    )
+    return {
+        "summary": {
+            "scanned_interface_count": len(scanned_map),
+            "manifest_interface_count": len(manifest_map),
+            "inventory_interface_count": len(inventory_map),
+            "updated_inventory_count": len(updated_inventory),
+            "missing_manifest": not manifest_exists,
+            "missing_inventory": not inventory_exists,
+            "requires_dual_refresh": requires_dual_refresh,
+            "schema_changed_count": len(schema_changed),
+            "affected_reusable_param_count": stale_param_count,
+            "synced_count": len(synced),
+            "updated_at": utc_now_str(),
+        },
+        "missing_in_swag": missing_in_swag,
+        "missing_in_inventory": missing_in_inventory,
+        "missing_in_code": missing_in_code,
+        "schema_changed": schema_changed,
+        "affected_reusable_params": sorted(affected_param_keys),
+        "synced": synced,
+    }
 
 
 def reconcile_inventory(existing_inventory: List[Dict], scanned_inventory: List[Dict], current_revision: str) -> Dict:
@@ -456,13 +784,27 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
     raw_request_dir = artifacts_dir / "raw-request"
     raw_response_dir = artifacts_dir / "raw-response"
     masked_response_dir = artifacts_dir / "masked-response"
+    dependency_trace_dir = artifacts_dir / "dependency-trace"
+    resolved_params_dir = artifacts_dir / "resolved-params"
     scripts_dir = ascii_dir / "scripts"
     plan_path = ascii_dir / "release-test-plan.yaml"
+    sync_report_path = ascii_dir / "interface-sync-report.yaml"
     reconcile_path = ascii_dir / "inventory-reconcile.yaml"
     results_path = ascii_dir / "interface-test-results.md"
     execute_log_path = logs_dir / "execute.log"
 
-    for directory in (chinese_dir, ascii_dir, artifacts_dir, logs_dir, raw_request_dir, raw_response_dir, masked_response_dir, scripts_dir):
+    for directory in (
+        chinese_dir,
+        ascii_dir,
+        artifacts_dir,
+        logs_dir,
+        raw_request_dir,
+        raw_response_dir,
+        masked_response_dir,
+        dependency_trace_dir,
+        resolved_params_dir,
+        scripts_dir,
+    ):
         directory.mkdir(parents=True, exist_ok=True)
 
     readme_path = chinese_dir / "README.md"
@@ -521,6 +863,33 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
             encoding="utf-8",
         )
 
+    if not sync_report_path.exists():
+        sync_report_path.write_text(
+            "\n".join(
+                [
+                    "summary:",
+                    "  scanned_interface_count: 0",
+                    "  manifest_interface_count: 0",
+                    "  inventory_interface_count: 0",
+                    "  updated_inventory_count: 0",
+                    "  missing_manifest: false",
+                    "  missing_inventory: false",
+                    "  requires_dual_refresh: false",
+                    "  schema_changed_count: 0",
+                    "  affected_reusable_param_count: 0",
+                    "  synced_count: 0",
+                    "  updated_at: ''",
+                    "missing_in_swag: []",
+                    "missing_in_inventory: []",
+                    "missing_in_code: []",
+                    "schema_changed: []",
+                    "affected_reusable_params: []",
+                    "synced: []",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
     if not results_path.exists():
         results_path.write_text(
             "\n".join(
@@ -543,10 +912,228 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
         "readme": str(readme_path),
         "ascii_dir": str(ascii_dir),
         "logs_dir": str(logs_dir),
+        "dependency_trace_dir": str(dependency_trace_dir),
+        "resolved_params_dir": str(resolved_params_dir),
         "plan": str(plan_path),
+        "sync_report": str(sync_report_path),
         "reconcile": str(reconcile_path),
         "results": str(results_path),
     }
+
+
+def ensure_baseline_assets(baseline_root: Path) -> Dict[str, Any]:
+    created: List[str] = []
+    existing: List[str] = []
+
+    defaults = {
+        "interface-inventory.yaml": [],
+        "dependency-graph.yaml": {"interfaces": {}, "scenarios": []},
+        "parameter-sources.yaml": {"parameters": {}},
+        "reusable-params.yaml": {"params": {}},
+        "scenario-catalog.yaml": {"scenarios": {}},
+        "script-adapter.yaml": DEFAULT_SCRIPT_ADAPTER,
+        "execution-history.yaml": {"history": []},
+    }
+
+    for filename, payload in defaults.items():
+        path = baseline_root / filename
+        if write_yaml_if_missing(path, payload):
+            created.append(filename)
+        else:
+            existing.append(filename)
+
+    readme = "\n".join(
+        [
+            "# 上线测试基线资产库",
+            "",
+            "本目录用于长期维护项目级上线接口测试资产。",
+            "",
+            "## 文件说明",
+            "- `interface-inventory.yaml`：接口清单与契约。",
+            "- `dependency-graph.yaml`：provider / consumer 依赖图。",
+            "- `parameter-sources.yaml`：请求参数来源规则。",
+            "- `reusable-params.yaml`：已验证可复用参数及生命周期。",
+            "- `scenario-catalog.yaml`：可复用接口场景。",
+            "- `script-adapter.yaml`：项目对通用脚本的适配。",
+            "- `execution-history.yaml`：历次上线测试摘要。",
+            "- `baseline-change-log.md`：人可读变更记录。",
+            "",
+            "## 安全约束",
+            "- 禁止保存明文 token、密码、手机号、身份证号、银行卡号、密钥。",
+            "- 禁止保存 test / prod / staging 等非 local 环境连接信息。",
+        ]
+    )
+    if write_text_if_missing(baseline_root / "README.md", readme):
+        created.append("README.md")
+    else:
+        existing.append("README.md")
+
+    change_log = "\n".join(
+        [
+            "# 基线变更记录",
+            "",
+            f"- {utc_now_str()} 初始化基线资产目录。",
+        ]
+    )
+    if write_text_if_missing(baseline_root / "baseline-change-log.md", change_log):
+        created.append("baseline-change-log.md")
+    else:
+        existing.append("baseline-change-log.md")
+
+    return {
+        "baseline_root": str(baseline_root),
+        "created": created,
+        "existing": existing,
+    }
+
+
+def interface_roles(interface: Dict) -> List[str]:
+    roles = interface.get("接口角色", [])
+    if isinstance(roles, str):
+        return [roles]
+    if isinstance(roles, list):
+        return [str(role) for role in roles]
+    return []
+
+
+def build_dependency_graph(inventory: List[Dict], parameter_sources: Dict) -> Dict[str, Any]:
+    graph: Dict[str, Any] = {"interfaces": {}, "scenarios": []}
+
+    for interface in inventory:
+        interface_id = interface.get("接口标识")
+        if not interface_id:
+            continue
+        depends_on = interface.get("依赖接口") or []
+        if isinstance(depends_on, str):
+            depends_on = [depends_on]
+
+        consumes: Dict[str, Any] = {}
+        param_sources = interface.get("参数来源") or {}
+        if isinstance(param_sources, dict):
+            for param_name, source_key in param_sources.items():
+                consumes[param_name] = {
+                    "from": source_key,
+                    "param_key": param_name,
+                }
+
+        node: Dict[str, Any] = {
+            "role": interface_roles(interface) or ["consumer"],
+            "depends_on": depends_on,
+            "consumes": consumes,
+            "provides": interface.get("可提供字段") or {},
+            "blocked_policy": interface.get("依赖失败策略") or "PARAM_UNRESOLVED",
+        }
+        graph["interfaces"][interface_id] = node
+
+    for param_name, config in (parameter_sources.get("parameters") or {}).items():
+        if not isinstance(config, dict):
+            continue
+        for provider in config.get("providers", []) or []:
+            if not isinstance(provider, dict) or provider.get("type") != "upstream_api":
+                continue
+            provider_interface = provider.get("interface")
+            if not provider_interface:
+                continue
+            graph["interfaces"].setdefault(
+                provider_interface,
+                {
+                    "role": ["provider"],
+                    "depends_on": [],
+                    "consumes": {},
+                    "provides": {},
+                    "blocked_policy": "BLOCKED_BY_DEPENDENCY",
+                },
+            )
+            graph["interfaces"][provider_interface]["provides"][param_name] = {
+                "response_path": provider.get("response_path", ""),
+                "selector": provider.get("selector", ""),
+                "extract": provider.get("extract", ""),
+            }
+
+    return graph
+
+
+def validate_dependency_graph(graph: Dict[str, Any]) -> List[str]:
+    errors: List[str] = []
+    interfaces = graph.get("interfaces", {})
+    if not isinstance(interfaces, dict):
+        return ["dependency graph 的 interfaces 必须是对象"]
+
+    for interface_id, node in interfaces.items():
+        if not isinstance(node, dict):
+            errors.append(f"{interface_id}: 节点必须是对象")
+            continue
+        for dependency in node.get("depends_on", []) or []:
+            if dependency not in interfaces:
+                errors.append(f"{interface_id}: 依赖接口不存在 {dependency}")
+        if node.get("blocked_policy") not in {"BLOCKED_BY_DEPENDENCY", "PARAM_UNRESOLVED", "PENDING", "FAIL"}:
+            errors.append(f"{interface_id}: 依赖失败策略非法 {node.get('blocked_policy')}")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(interface_id: str, path: List[str]) -> None:
+        if interface_id in visited:
+            return
+        if interface_id in visiting:
+            errors.append(f"存在循环依赖: {' -> '.join(path + [interface_id])}")
+            return
+        visiting.add(interface_id)
+        node = interfaces.get(interface_id, {})
+        for dependency in node.get("depends_on", []) or []:
+            visit(dependency, path + [interface_id])
+        visiting.remove(interface_id)
+        visited.add(interface_id)
+
+    for interface_id in interfaces:
+        visit(interface_id, [])
+    return errors
+
+
+def validate_reusable_params_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    errors: List[str] = []
+    warnings: List[str] = []
+    params = payload.get("params", {})
+    if not isinstance(params, dict):
+        return {"valid": False, "errors": ["reusable-params.yaml 的 params 必须是对象"], "warnings": []}
+
+    checked = 0
+    for param_name, samples in params.items():
+        if not isinstance(samples, list):
+            errors.append(f"{param_name}: 参数样本必须是列表")
+            continue
+        for index, sample in enumerate(samples):
+            checked += 1
+            prefix = f"{param_name}[{index}]"
+            if not isinstance(sample, dict):
+                errors.append(f"{prefix}: 样本必须是对象")
+                continue
+            status = sample.get("status")
+            if status not in ALLOWED_REUSABLE_PARAM_STATUSES:
+                errors.append(f"{prefix}: status 非法 {status}")
+            failure_type = sample.get("failure_type", "")
+            if failure_type not in ALLOWED_REUSABLE_PARAM_FAILURE_TYPES:
+                errors.append(f"{prefix}: failure_type 非法 {failure_type}")
+            if status in {"reusable", "stale"} and not sample.get("last_verified_at"):
+                warnings.append(f"{prefix}: {status} 缺少 last_verified_at")
+            if status in {"invalid", "quarantined"} and not sample.get("invalidation_reason"):
+                warnings.append(f"{prefix}: {status} 缺少 invalidation_reason")
+            if sample.get("value") and not sample.get("value_ref"):
+                warnings.append(f"{prefix}: 建议不要保存明文 value，改用 value_masked + value_ref")
+            for count_field in ("success_count", "fail_count"):
+                value = sample.get(count_field, 0)
+                if not isinstance(value, int) or value < 0:
+                    errors.append(f"{prefix}: {count_field} 必须是非负整数")
+
+    return {"valid": not errors, "checked": checked, "errors": errors, "warnings": warnings}
+
+
+def append_change_log(baseline_root: Path, message: str) -> None:
+    path = baseline_root / "baseline-change-log.md"
+    if not path.exists():
+        path.write_text("# 基线变更记录\n", encoding="utf-8")
+    with path.open("a", encoding="utf-8") as file:
+        file.write(f"\n- {utc_now_str()} {message}\n")
 
 
 def current_revision(project_root: Path) -> str:
@@ -619,6 +1206,251 @@ def command_init_release_test_task(args: argparse.Namespace) -> None:
     print_json({"mode": "init-release-test-task", **result})
 
 
+def command_init_baseline_assets(args: argparse.Namespace) -> None:
+    baseline_root = Path(args.baseline_root).resolve()
+    result = ensure_baseline_assets(baseline_root)
+    print_json({"mode": "init-baseline-assets", **result})
+
+
+def command_build_dependency_graph(args: argparse.Namespace) -> None:
+    inventory = load_interface_inventory(Path(args.inventory).resolve())
+    parameter_sources = read_yaml(Path(args.parameter_sources).resolve(), {"parameters": {}})
+    graph = build_dependency_graph(inventory, parameter_sources)
+    errors = validate_dependency_graph(graph)
+    if errors and args.validate:
+        print_json({"mode": "build-dependency-graph", "valid": False, "errors": errors})
+        raise SystemExit(1)
+    output_path = Path(args.output).resolve()
+    write_yaml(output_path, graph)
+    print_json(
+        {
+            "mode": "build-dependency-graph",
+            "output_path": str(output_path),
+            "interface_count": len(graph.get("interfaces", {})),
+            "valid": not errors,
+            "errors": errors,
+        }
+    )
+
+
+def command_validate_reusable_params(args: argparse.Namespace) -> None:
+    reusable_path = Path(args.reusable_params).resolve()
+    payload = read_yaml(reusable_path, {"params": {}})
+    result = validate_reusable_params_payload(payload)
+    print_json({"mode": "validate-reusable-params", "reusable_params": str(reusable_path), **result})
+    if not result["valid"]:
+        raise SystemExit(1)
+
+
+def sorted_providers(param_config: Dict[str, Any]) -> List[Dict[str, Any]]:
+    priority = param_config.get("priority") or []
+    providers = [provider for provider in param_config.get("providers", []) or [] if isinstance(provider, dict)]
+    if not priority:
+        return providers
+    priority_index = {name: index for index, name in enumerate(priority)}
+    return sorted(providers, key=lambda item: priority_index.get(item.get("type"), len(priority_index)))
+
+
+def find_reusable_sample(reusable_params: Dict[str, Any], key: str) -> Dict[str, Any] | None:
+    for sample in reusable_params.get("params", {}).get(key, []) or []:
+        if not isinstance(sample, dict):
+            continue
+        if sample.get("status") == "reusable":
+            return sample
+    return None
+
+
+def resolve_parameters(parameter_sources: Dict[str, Any], reusable_params: Dict[str, Any], interface_id: str) -> Dict[str, Any]:
+    resolved: Dict[str, Any] = {}
+    traces: List[Dict[str, Any]] = []
+
+    for param_name, param_config in (parameter_sources.get("parameters") or {}).items():
+        if not isinstance(param_config, dict):
+            continue
+        trace_base = {
+            "target_interface": interface_id,
+            "param": param_name,
+            "resolved": False,
+            "failure_type": "PARAM_UNRESOLVED",
+        }
+        for provider in sorted_providers(param_config):
+            source_type = provider.get("type", "")
+            trace = dict(trace_base)
+            trace["source_type"] = source_type
+
+            if source_type == "reusable_param":
+                key = provider.get("key") or param_name
+                sample = find_reusable_sample(reusable_params, key)
+                trace["source_key"] = key
+                if sample:
+                    resolved[param_name] = {
+                        "source_type": "reusable_param",
+                        "value_masked": sample.get("value_masked", ""),
+                        "value_ref": sample.get("value_ref", ""),
+                        "last_verified_at": sample.get("last_verified_at", ""),
+                    }
+                    trace.update({"resolved": True, "failure_type": "", "value_ref": sample.get("value_ref", "")})
+                    traces.append(trace)
+                    break
+                trace["reason"] = "no reusable sample"
+                traces.append(trace)
+                continue
+
+            if source_type in {"openapi_example", "fixture", "rule"}:
+                value_ref = provider.get("value_ref", "")
+                value = provider.get("value", provider.get("example", ""))
+                if value_ref or value != "":
+                    resolved[param_name] = {
+                        "source_type": source_type,
+                        "value_masked": provider.get("value_masked", "***" if value != "" else ""),
+                        "value_ref": value_ref,
+                    }
+                    trace.update({"resolved": True, "failure_type": "", "value_ref": value_ref})
+                    traces.append(trace)
+                    break
+                trace["reason"] = f"{source_type} missing value or value_ref"
+                traces.append(trace)
+                continue
+
+            trace.update(
+                {
+                    "source_interface": provider.get("interface", ""),
+                    "source_table": provider.get("table", ""),
+                    "response_path": provider.get("response_path", ""),
+                    "selector": provider.get("selector", ""),
+                    "extract": provider.get("extract", ""),
+                    "reason": "requires runtime execution or local data query",
+                }
+            )
+            traces.append(trace)
+
+    return {"interface_id": interface_id, "resolved_params": resolved, "dependency_trace": traces}
+
+
+def command_resolve_test_data(args: argparse.Namespace) -> None:
+    parameter_sources = read_yaml(Path(args.parameter_sources).resolve(), {"parameters": {}})
+    reusable_params = read_yaml(Path(args.reusable_params).resolve(), {"params": {}})
+    output_dir = Path(args.output_dir).resolve()
+    resolved_dir = output_dir / "resolved-params"
+    trace_dir = output_dir / "dependency-trace"
+    resolved_dir.mkdir(parents=True, exist_ok=True)
+    trace_dir.mkdir(parents=True, exist_ok=True)
+
+    result = resolve_parameters(parameter_sources, reusable_params, args.interface_id)
+    resolved_path = resolved_dir / f"{args.interface_id}.json"
+    trace_path = trace_dir / f"{args.interface_id}.json"
+    resolved_path.write_text(json.dumps(result["resolved_params"], ensure_ascii=False, indent=2), encoding="utf-8")
+    trace_path.write_text(json.dumps(result["dependency_trace"], ensure_ascii=False, indent=2), encoding="utf-8")
+    print_json(
+        {
+            "mode": "resolve-test-data",
+            "interface_id": args.interface_id,
+            "resolved_count": len(result["resolved_params"]),
+            "trace_count": len(result["dependency_trace"]),
+            "resolved_path": str(resolved_path),
+            "trace_path": str(trace_path),
+        }
+    )
+
+
+def apply_reusable_param_events(reusable_params: Dict[str, Any], events: List[Dict[str, Any]]) -> int:
+    params = reusable_params.setdefault("params", {})
+    applied = 0
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        param_name = event.get("param")
+        if not param_name:
+            continue
+        sample = event.get("sample") or {}
+        if not isinstance(sample, dict):
+            continue
+        status = sample.get("status", event.get("status", "candidate"))
+        if status not in ALLOWED_REUSABLE_PARAM_STATUSES:
+            status = "quarantined"
+            sample["invalidation_reason"] = "invalid status from event"
+        sample["status"] = status
+        sample.setdefault("first_verified_at", utc_now_str())
+        sample.setdefault("last_verified_at", "" if status != "reusable" else utc_now_str())
+        sample.setdefault("success_count", 0)
+        sample.setdefault("fail_count", 0)
+        sample.setdefault("failure_type", "")
+        sample.setdefault("invalidation_reason", "")
+
+        existing_samples = params.setdefault(param_name, [])
+        value_ref = sample.get("value_ref")
+        replaced = False
+        if value_ref:
+            for index, existing in enumerate(existing_samples):
+                if isinstance(existing, dict) and existing.get("value_ref") == value_ref:
+                    existing_samples[index] = {**existing, **sample}
+                    replaced = True
+                    break
+        if not replaced:
+            existing_samples.append(sample)
+        applied += 1
+    return applied
+
+
+def command_update_baseline_assets(args: argparse.Namespace) -> None:
+    baseline_root = Path(args.baseline_root).resolve()
+    event_path = Path(args.event_file).resolve()
+    output_path = Path(args.output).resolve()
+    events_payload = read_yaml(event_path, {})
+    ensure_baseline_assets(baseline_root)
+
+    reusable_path = baseline_root / "reusable-params.yaml"
+    reusable_params = read_yaml(reusable_path, {"params": {}})
+    reusable_events = events_payload.get("reusable_param_events", []) or []
+    applied_reusable_events = apply_reusable_param_events(reusable_params, reusable_events)
+    write_yaml(reusable_path, reusable_params)
+
+    history_path = baseline_root / "execution-history.yaml"
+    history = read_yaml(history_path, {"history": []})
+    execution_summary = events_payload.get("execution_summary")
+    if execution_summary:
+        history.setdefault("history", []).append(execution_summary)
+        write_yaml(history_path, history)
+
+    change_message = events_payload.get("change_message") or f"应用基线更新事件 {event_path.name}"
+    append_change_log(baseline_root, change_message)
+
+    summary = {
+        "mode": "update-baseline-assets",
+        "baseline_root": str(baseline_root),
+        "event_file": str(event_path),
+        "applied_reusable_param_events": applied_reusable_events,
+        "history_appended": bool(execution_summary),
+        "updated_at": utc_now_str(),
+    }
+    write_yaml(output_path, summary)
+    print_json({**summary, "output": str(output_path)})
+
+
+def command_sync_interface_contract_assets(args: argparse.Namespace) -> None:
+    project_root = Path(args.project_root).resolve()
+    manifest_path = Path(args.manifest).resolve()
+    inventory_path = Path(args.inventory).resolve()
+    output_path = Path(args.output).resolve()
+    reusable_params_path = Path(args.reusable_params).resolve() if args.reusable_params else None
+    result = sync_inventory_with_openapi_assets(
+        project_root,
+        manifest_path,
+        inventory_path,
+        reusable_params_path,
+    )
+    write_yaml(output_path, result)
+    print_json(
+        {
+            "mode": "sync-interface-contract-assets",
+            "manifest": str(manifest_path),
+            "inventory": str(inventory_path),
+            "output": str(output_path),
+            **result["summary"],
+        }
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="上线前接口测试资产初始化与计划生成工具")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -645,6 +1477,45 @@ def build_parser() -> argparse.ArgumentParser:
     init_parser.add_argument("--task-root", required=True, help="测试任务时间戳根目录路径")
     init_parser.add_argument("--title", default="上线前项目接口测试", help="中文说明目录名")
     init_parser.set_defaults(func=command_init_release_test_task)
+
+    baseline_parser = subparsers.add_parser("init-baseline-assets", help="初始化项目上线测试长期基线资产库")
+    baseline_parser.add_argument("--baseline-root", required=True, help="基线目录路径，例如 doc/5-tests/基线")
+    baseline_parser.set_defaults(func=command_init_baseline_assets)
+
+    graph_parser = subparsers.add_parser("build-dependency-graph", help="根据接口清单和参数来源生成依赖图")
+    graph_parser.add_argument("--inventory", required=True, help="接口基线文件路径")
+    graph_parser.add_argument("--parameter-sources", required=True, help="参数来源文件路径")
+    graph_parser.add_argument("--output", required=True, help="依赖图输出路径")
+    graph_parser.add_argument("--validate", action="store_true", help="存在依赖图错误时返回非零退出码")
+    graph_parser.set_defaults(func=command_build_dependency_graph)
+
+    reusable_parser = subparsers.add_parser("validate-reusable-params", help="校验可复用参数生命周期结构")
+    reusable_parser.add_argument("--reusable-params", required=True, help="reusable-params.yaml 路径")
+    reusable_parser.set_defaults(func=command_validate_reusable_params)
+
+    resolve_parser = subparsers.add_parser("resolve-test-data", help="按参数来源规则解析可复用/OpenAPI示例/fixture/rule 参数并写依赖追踪")
+    resolve_parser.add_argument("--parameter-sources", required=True, help="parameter-sources.yaml 路径")
+    resolve_parser.add_argument("--reusable-params", required=True, help="reusable-params.yaml 路径")
+    resolve_parser.add_argument("--interface-id", required=True, help="目标接口标识")
+    resolve_parser.add_argument("--output-dir", required=True, help="输出目录，通常为当轮 ASCII artifacts 目录")
+    resolve_parser.set_defaults(func=command_resolve_test_data)
+
+    update_parser = subparsers.add_parser("update-baseline-assets", help="按事件文件持续回写基线资产")
+    update_parser.add_argument("--baseline-root", required=True, help="基线目录路径")
+    update_parser.add_argument("--event-file", required=True, help="基线更新事件 YAML")
+    update_parser.add_argument("--output", default="baseline-update-summary.yaml", help="更新摘要输出路径")
+    update_parser.set_defaults(func=command_update_baseline_assets)
+
+    sync_parser = subparsers.add_parser(
+        "sync-interface-contract-assets",
+        help="对账当前代码、swag manifest 与接口测试基线，输出接口契约同步报告",
+    )
+    sync_parser.add_argument("--project-root", required=True, help="项目根目录")
+    sync_parser.add_argument("--manifest", required=True, help="swag/.swag-manifest.yaml 路径")
+    sync_parser.add_argument("--inventory", required=True, help="doc/5-tests/基线/interface-inventory.yaml 路径")
+    sync_parser.add_argument("--output", required=True, help="interface-sync-report.yaml 输出路径")
+    sync_parser.add_argument("--reusable-params", default="", help="可选：reusable-params.yaml 路径，用于 schema 漂移时标记 stale")
+    sync_parser.set_defaults(func=command_sync_interface_contract_assets)
 
     return parser
 

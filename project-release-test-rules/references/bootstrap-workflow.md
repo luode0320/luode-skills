@@ -9,6 +9,7 @@
 
 ## 冷启动目标
 - 自动生成第一版接口基线。
+- 自动初始化 `doc/5-tests/基线/` 长期资产库。
 - 自动创建测试任务根目录与主 `README.md`。
 - 自动生成测试计划骨架与测试产物骨架。
 - 允许存在待确认项，但必须留痕，不允许空白中止。
@@ -27,9 +28,11 @@
 2. 为每个接口补齐最小字段：接口标识、接口名称、HTTP 方法、接口路径、所属模块、发现来源、发现证据、完整度。
 3. 对缺失鉴权、请求参数 schema、响应结构摘要、成功判定、清理方式的接口，写入 `待确认项`。
 4. 创建 `doc/5-tests/基线/interface-inventory.yaml`。
-5. 调用 `test-task-root-layout-rules` 创建新的时间戳根目录。
-6. 在中文说明目录创建主 `README.md`，说明本次是冷启动建立基线。
-7. 在 ASCII 镜像目录创建计划骨架、结果骨架和证据目录。
+5. 同步创建 `dependency-graph.yaml`、`parameter-sources.yaml`、`reusable-params.yaml`、`scenario-catalog.yaml`、`script-adapter.yaml`、`execution-history.yaml`、`baseline-change-log.md` 和 `README.md`。
+6. 根据接口角色、参数来源和可提供字段生成第一版空依赖图；无法识别的依赖写入待确认，不得猜测。
+7. 调用 `test-task-root-layout-rules` 创建新的时间戳根目录。
+8. 在中文说明目录创建主 `README.md`，说明本次是冷启动建立基线。
+9. 在 ASCII 镜像目录创建计划骨架、结果骨架、依赖追踪、已解析参数和证据目录。
 
 ## 冷启动允许的暂停条件
 - 代码和文档都无法识别接口入口。
@@ -38,4 +41,5 @@
 
 ## 冷启动输出要求
 - 初版基线必须带上 `完整度` 和 `待确认项`。
+- 初版基线资产库必须包含完整文件骨架，不能只创建 `interface-inventory.yaml`。
 - 中文说明目录的 `README.md` 必须明确说明：本轮为冷启动、扫描来源、已生成资产、待确认缺口。

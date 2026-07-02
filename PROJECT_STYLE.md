@@ -166,6 +166,26 @@
 - 更新时间: 2026-06-30
 - 状态: 启用
 
+### 上线测试脚本工具箱写法
+- 别名: release test scripts, 基线资产脚本, 可复用参数脚本, 双索引同步脚本
+- 类型: 工具风格
+- 示例: `python project-release-test-rules/scripts/generate_release_test_plan.py sync-interface-contract-assets --project-root . --manifest swag/.swag-manifest.yaml --inventory doc/5-tests/基线/interface-inventory.yaml --output doc/5-tests/<时间戳>_上线前项目接口测试/ascii-artifacts/interface-sync-report.yaml`
+- 说明: 上线测试通用脚本优先沉淀为 `project-release-test-rules/scripts/generate_release_test_plan.py` 的子命令；项目差异写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试目录，不写死进通用脚本。连续复用且变复杂的能力再拆成独立脚本，但必须保持总入口可发现、可复用、`--help` 可验证。`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 的双索引同步也走同一总入口子命令，并固定输出 `interface-sync-report.yaml`。
+- 来源: `project-release-test-rules/references/reusable-script-toolbox.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
+- 适用范围: 上线接口测试脚本、基线初始化、依赖图、参数解析、基线回写
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### Swag OpenAPI 资产写法
+- 别名: swag 目录, OpenAPI YAML, Apifox 导入文件, swag manifest
+- 类型: 文档资产风格
+- 示例: `swag/openapi.yaml`、`swag/api_buySell_sell_getHistory.yaml`、`swag/.swag-manifest.yaml`
+- 说明: OpenAPI / Swagger 正式产物固定写入项目根目录 `swag/`；单接口文件按 path 去掉开头 `/`、`/` 替换 `_`、保留原 path 大小写命名。同一路径多 method 时追加小写 method。校验脚本放在对应 skill 的 `scripts/validate_openapi_yaml.py`，生成逻辑第一版可由 agent 读代码生成，但收口必须脚本校验。刷新 `swag/.swag-manifest.yaml` 后，若项目存在上线测试基线，还要同步或提示同步 `doc/5-tests/基线/interface-inventory.yaml`。
+- 来源: `swag-openapi-maintainer-rules/SKILL.md`、`swag-openapi-maintainer-rules/references/naming-rules.md`
+- 适用范围: Swagger/OpenAPI 导出、Apifox YAML、swag 资产维护
+- 更新时间: 2026-07-02
+- 状态: 启用
+
 ## 废弃写法
 
 ### 并行旧目录口径
@@ -196,3 +216,6 @@
 - 2026-06-30：新增实施计划书写风格，明确依赖图 + 垂直切片优先、单任务约 5 文件、每任务闭环后再进入下一任务。
 - 2026-07-01：新增受限计划文风要求，明确受限计划正文必须显式声明“不得作为实施授权”，避免被误读为可直接开工的正式执行计划。
 - 2026-06-30：新增需求提问风格，明确一次一个关键问题只允许围绕真实缺口，不允许夹带 agent 猜测。
+- 2026-07-02：新增上线测试脚本工具箱写法，明确通用能力优先沉淀为总入口子命令，项目差异通过基线适配文件承接。
+- 2026-07-02：新增 Swag OpenAPI 资产写法，明确 `swag/` 唯一输出目录、path 下划线命名和校验脚本收口方式。
+- 2026-07-02：补充上线测试与 Swag OpenAPI 双索引同步写法，明确同步入口为 `sync-interface-contract-assets`，固定输出 `interface-sync-report.yaml`。

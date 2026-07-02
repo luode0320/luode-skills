@@ -307,13 +307,25 @@
 - 2026-07-02：新增会话自动重命名规则，明确任务主题稳定且标题泛化、过时或不匹配时自动命中 `thread-title-rules`，调用真实线程重命名工具改为 8-24 字中文简要；标题已准确、工具不可用或用户禁止时跳过。
 - 2026-07-02：新增 URL 认证浏览器默认路由，明确用户提供 URL 时默认优先通过 Chrome Plugin 复用用户真实 Chrome 登录态，避免隔离浏览器或 `web` 丢失权限；补充 Chrome 安全策略拒绝正文读取时只报告阻断事实并 handoff，不做绕过；执行中已确认解决的问题必须继续回灌到 skill。
 - 2026-07-02：补充项目内文件引用路径规则，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用都用 `\\wsl.localhost\...`，`/home/...` 仅保留给 WSL 命令与日志上下文。
+- 2026-07-02：更新上线接口测试门禁规则，新增项目基线资产库、参数依赖解析、可复用参数生命周期、失效持续更新和通用脚本复用优先口径。
+- 2026-07-02：新增 Swag OpenAPI 全量维护规则，明确 `swag/` 为唯一正式输出目录，单接口完整 YAML、总 YAML 与 `.swag-manifest.yaml` 持续维护。
+- 2026-07-02：补充上线测试与 Swag OpenAPI 双索引同步规则，明确 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 理论上都不应缺失；任一缺失或三方接口集合不一致时，从当前代码刷新 swag 与测试基线两边。
 
 
 ### 上线接口测试门禁规则
 - 别名: project-release-test-rules, 上线测试门禁
 - 类型: 测试域核心规则
-- 定义: 上线前项目级全接口测试门禁，替代人工接口回归验证，输出上线准入结论。若项目尚无接口基线，首次触发时必须冷启动扫描路由、controller、Swagger、现有测试和接口文档，生成初版 interface-inventory.yaml 与测试任务骨架；其后每次执行前仍必须先做增量扫描和基线对账，发现新增接口、删除接口或接口信息漂移时先更新基线，再筛选必测接口并执行门禁测试。所有测试资产落地到doc/5-tests/对应时间戳根目录，接口明细用块状格式、请求响应为JSON字符串，Agent自动判定接口是否通过。
-- 来源: skill/project-release-test-rules/SKILL.md
+- 定义: 上线前项目级全接口测试门禁，替代人工接口回归验证，输出上线准入结论。每个业务项目必须在 `doc/5-tests/基线/` 长期维护接口清单、参数来源、依赖图、可复用参数、场景目录、脚本适配、执行历史和变更日志；同时将 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 作为当前代码接口事实的双索引，任一缺失、陈旧或接口集合不一致时，先刷新 swag 与测试基线两边。若目标接口参数无法直接确定，agent 必须按 `reusable_param -> upstream_api -> local_database -> local_cache -> openapi_example -> fixture -> rule` 解析，并把来源写入依赖追踪；已测试通过的参数可持续复用，但必须有 `candidate/reusable/stale/invalid/quarantined/retired` 生命周期、复验、失效归因和持续回写机制。已有通用脚本能力优先复用，缺能力时扩展 `project-release-test-rules/scripts/generate_release_test_plan.py` 的通用子命令，不为每次上线重复生成一次性脚本。
+- 来源: `project-release-test-rules/SKILL.md`、`project-release-test-rules/references/baseline-asset-rules.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
 - 适用范围: 全项目上线前接口测试、回归验证、上线准入判定
-- 更新时间: 2026-06-30 21:05:00
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### Swag OpenAPI 全量维护规则
+- 别名: swag-openapi-maintainer-rules, 更新 swag, OpenAPI YAML 资产
+- 类型: API 文档资产规则
+- 定义: 当用户要求生成、补齐、刷新、维护项目 swag，或导出 Apifox / OpenAPI / Swagger YAML 时，触发 `swag-openapi-maintainer-rules`。该 skill 负责从当前代码真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，维护项目根目录 `swag/` 作为唯一正式输出目录；每个接口一个可独立导入 Apifox 的完整 YAML，同时维护 `swag/openapi.yaml` 全量总文件和 `swag/.swag-manifest.yaml` 路由到文件映射。当前代码是唯一真相源，禁止凭历史记忆或旧文档补字段；若项目存在上线测试基线，刷新 swag 后必须同步或提示同步 `doc/5-tests/基线/interface-inventory.yaml`。
+- 来源: `swag-openapi-maintainer-rules/SKILL.md`
+- 适用范围: HTTP API 文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
+- 更新时间: 2026-07-02
 - 状态: 启用
