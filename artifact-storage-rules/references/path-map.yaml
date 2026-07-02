@@ -21,8 +21,6 @@ entry_files:
   architecture_business_flow_doc_note: "业务链路从序号 5 开始；同一链路持续更新原编号文档，新增独立链路使用当前最大业务链路编号加 1，并同步更新 4-主要业务链路.md 索引；历史编号不复用、不重排"
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
   requirement_gap_doc: "{requirement_doc_stem}.gap.md"
-  requirement_flow_svg: "{datetime}_{requirement_cn_title}.flow.svg"
-  requirement_sequence_svg: "{datetime}_{requirement_cn_title}.sequence.svg"
   requirement_asset_image: "{requirement_doc_stem}.{asset_slug}.{ext}"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/2-需求/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
@@ -94,7 +92,7 @@ policies:
   implementation_plan_separated_from_requirement_domain: true
   implementation_cycle_docs_allowed: true
   final_acceptance_requires_test_and_review: true
-  requirement_requires_svg_diagrams: true
+  requirement_doc_embeds_mermaid_diagrams: true
   requirement_assets_under_doc_requirement_data: true
   requirement_doc_embeds_assets_in_markdown: true
   same_bug_updates_same_root: true

@@ -12,7 +12,7 @@
 
 ## 需求域
 
-- 同一个需求只保留一份需求入口文档。
+- 同一个需求只保留一份需求入口文档，流程和时序表达随主文档正文一并维护，不再拆分独立图文件。
 - `requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 默认围绕这同一份需求文档推进。
 - `requirement-gap-rules` 在关键缺口阻断时允许创建一份临时缺口文档，命名复用对应需求文档主干并追加 `.gap.md`；该文档仅用于 gap 未关闭阶段，用户确认并回填主需求文档后必须删除。
 - `requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 的稳定结论仍直接更新主需求文档，不额外新建平行长期入口。
