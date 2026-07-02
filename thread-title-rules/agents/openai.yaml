@@ -1,0 +1,6 @@
+interface:
+  display_name: "会话标题规则"
+  short_description: "按当前任务主题自动重命名会话标题"
+  default_prompt: "Use $thread-title-rules to keep this thread title aligned with the current task."
+policy:
+  allow_implicit_invocation: true

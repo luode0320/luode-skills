@@ -173,6 +173,15 @@ BODY_SKILL_HIT=$(cat <<'EOF'
 EOF
 )
 
+BODY_THREAD_TITLE=$(cat <<'EOF'
+- 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交或其他可命名任务，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
+- `thread-title-rules` 负责生成 8-24 字中文简要标题，并调用当前环境真实线程重命名工具更新当前会话标题；Codex 环境优先使用真实 `set_thread_title` 工具。
+- 会话重命名不等待用户显式要求；但任务主题尚未稳定、标题已准确、工具不可用、无法可靠确定当前会话 ID 或用户明确禁止时必须跳过，并说明原因。
+- 标题采用“任务对象 + 动作 / 症状 / 阶段”的中文简要写法，避免只写“提交 git”“开始实施”“继续做”“修复 bug”“更新文档”等泛化动作标题。
+- 禁止用正文伪造工具调用、raw directive 或猜测结果来宣称已经改名；所有标题变更必须来自真实工具返回。
+EOF
+)
+
 BODY_COMMENT_TASK=$(cat <<'EOF'
 - 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
 - 第一步：先声明命中的注释类 skill。
@@ -448,6 +457,7 @@ sync_agents_file() {
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
+  sync_section "$file" "会话动态重命名规则" "$BODY_THREAD_TITLE"
   sync_section "$file" "注释任务强制流程" "$BODY_COMMENT_TASK"
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
   sync_section "$file" "文件编码与写入规则" "$BODY_CHINESE_ENC"

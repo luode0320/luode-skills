@@ -3951,3 +3951,11 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 禁止用未确认编码的 `>`、`>>`、默认 `Out-File`、默认 `Set-Content` 或其他依赖 shell 默认编码的方式写入中文、代码、Markdown、JSON、YAML、脚本和规则文件。
 - 写入后必须回读关键文件并检查 `git diff`，确认中文未乱码、编码未漂移、换行未被意外批量转换。
 - 仓库应提交 `.editorconfig` 与 `.gitattributes` 固定 `charset = utf-8`、基础换行和二进制文件规则；若发现文件被 GBK / ANSI 写入，必须先转回 UTF-8 再继续后续改动。
+
+## 会话动态重命名规则
+
+- 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交或其他可命名任务，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
+- `thread-title-rules` 负责生成 8-24 字中文简要标题，并调用当前环境真实线程重命名工具更新当前会话标题；Codex 环境优先使用真实 `set_thread_title` 工具。
+- 会话重命名不等待用户显式要求；但任务主题尚未稳定、标题已准确、工具不可用、无法可靠确定当前会话 ID 或用户明确禁止时必须跳过，并说明原因。
+- 标题采用“任务对象 + 动作 / 症状 / 阶段”的中文简要写法，避免只写“提交 git”“开始实施”“继续做”“修复 bug”“更新文档”等泛化动作标题。
+- 禁止用正文伪造工具调用、raw directive 或猜测结果来宣称已经改名；所有标题变更必须来自真实工具返回。
