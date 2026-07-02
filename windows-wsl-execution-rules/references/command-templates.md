@@ -47,6 +47,8 @@ wsl.exe --cd /home/<user>/<project> go mod download
 
 看代码、改代码、搜索、规则检查和多数 git 操作都留在 PowerShell，经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件；若 PowerShell 尚未完成 UTF-8 永久化，先补前提再继续。
 
+回复用户时同样按用户可访问路径引用项目内文件：项目在 WSL 且用户从 Windows 桌面访问时，普通文本路径、Markdown 链接、审查证据路径和总结路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有 `wsl.exe --cd` 参数、WSL shell 命令和日志原文保留 `/home/<user>/<project>`。
+
 ## WSL 内缓存目录建议
 
 ```bash

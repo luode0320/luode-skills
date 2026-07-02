@@ -110,10 +110,30 @@
 - 别名: 先固化 PowerShell UTF-8, 普通命令默认 PowerShell, 执行类再 wsl.exe
 - 类型: 工具风格
 - 示例: `前提: 先执行 powershell -ExecutionPolicy Bypass -File .\\windows-encoding-rules\\scripts\\enable_powershell_utf8.ps1；普通命令: 在 PowerShell 下经 \\\\wsl.localhost\\<distro>\\home\\<user>\\<project> 执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...`
-- 说明: Windows + WSL 规则文案要先写清 PowerShell UTF-8 永久化前提，再写“普通命令”和“执行类命令”的分层。满足前提后，搜索、读写文件、规则检查、普通 git 盘点默认留在 PowerShell；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL。
+- 说明: Windows + WSL 规则文案要先写清 PowerShell UTF-8 永久化前提，再写“普通命令”和“执行类命令”的分层。满足前提后，搜索、读写文件、规则检查、普通 git 盘点默认留在 PowerShell；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL；面向用户展示的项目内文件引用必须另按用户访问环境输出，不沿用执行命令里的 `/home/...`。
 - 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: `AGENTS.md`、环境规则 skill、命令模板、推荐工作流文档
-- 更新时间: 2026-07-01
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### 项目内文件引用路径写法
+- 别名: WSL 文件引用展示, 用户可打开路径, UNC 路径输出
+- 类型: 输出风格
+- 示例: `推荐: \\wsl.localhost\Ubuntu-24.04\home\luode\code\ellipal_admin\doc\6-审查\a.md；禁止: /home/luode/code/ellipal_admin/doc/6-审查/a.md`
+- 说明: 凡回复中引用项目内文件，都按用户当前客户端可打开的路径输出。项目在 Windows 本地盘就输出 Windows 本地路径；项目在 WSL 且用户从 Windows / Codex Desktop / Claude Desktop 访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`。`/home/<user>/<project>` 只用于命令参数、WSL shell 上下文和日志原文。
+- 来源: 用户本轮确认、`windows-wsl-execution-rules/references/path-mapping.md`
+- 适用范围: 最终回复、中间进度、审查报告、证据路径、截图说明、Markdown 链接和普通文本文件路径
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### 文件写入显式 UTF-8
+- 别名: UTF-8 写文件, 禁止默认编码, 跨平台编码写法
+- 类型: 工具风格
+- 示例: `PowerShell: Set-Content -Encoding UTF8 <path> <content>`、`Python: open(path, "w", encoding="utf-8")`、`Node: fs.writeFileSync(path, content, "utf8")`
+- 说明: 写代码、文档、配置、脚本、测试资产和生成文本时，优先选择能显式声明 UTF-8 的命令或 API；禁止依赖 GBK、ANSI、系统默认编码、编辑器默认编码或 shell 默认编码。写入后回读关键文件并检查 `git diff`，确认中文、编码和换行都符合预期。
+- 来源: 用户本轮确认、`AGENTS.md`、`windows-encoding-rules/SKILL.md`
+- 适用范围: 文件写入命令、脚本生成文档、规则文件维护、Windows / WSL / Linux 协作开发
+- 更新时间: 2026-07-02
 - 状态: 启用
 
 ### 实施计划按垂直切片书写
@@ -160,6 +180,8 @@
 - 2026-06-30：补充命中检查可见输出样式，明确使用普通 Markdown 标题和行内代码字段行，禁止代码块包裹。
 - 2026-06-30：补充普通说明不用代码围栏风格，明确自然语言结构化输出改用 Markdown 列表、表格或引用块，` ```text ` 不再作为普通回复模板。
 - 2026-07-01：收紧 Windows 命令分层写法，明确规则文案必须先写 PowerShell UTF-8 永久化前提，再写“普通命令默认 PowerShell、执行类命令再进 WSL”，避免旧的 Git Bash 默认口径继续扩散。
+- 2026-07-02：新增文件写入显式 UTF-8 风格，明确 PowerShell、Python、Node 等写文件命令必须显式 UTF-8，禁止 GBK / ANSI / 默认编码落盘。
+- 2026-07-02：补充项目内文件引用路径写法，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用使用 `\\wsl.localhost\...`，不把 `/home/...` 当作用户可打开路径。
 - 2026-06-30：新增实施计划书写风格，明确依赖图 + 垂直切片优先、单任务约 5 文件、每任务闭环后再进入下一任务。
 - 2026-07-01：新增受限计划文风要求，明确受限计划正文必须显式声明“不得作为实施授权”，避免被误读为可直接开工的正式执行计划。
 - 2026-06-30：新增需求提问风格，明确一次一个关键问题只允许围绕真实缺口，不允许夹带 agent 猜测。

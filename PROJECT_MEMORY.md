@@ -199,10 +199,28 @@
 ### Windows / WSL 执行边界
 - 别名: 先固化 PowerShell UTF-8, 普通命令默认 PowerShell, 执行类动作才进 WSL
 - 类型: 环境规则
-- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，必须先通过 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 把 PowerShell 用户级配置永久固定为 UTF-8；只有此前提满足后，默认 shell 才取 PowerShell。搜索、读写文件、规则检查、普通 git 盘点等非执行动作留在 PowerShell；只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。
+- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，必须先通过 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1` 把 PowerShell 用户级配置永久固定为 UTF-8；只有此前提满足后，默认 shell 才取 PowerShell。搜索、读写文件、规则检查、普通 git 盘点等非执行动作留在 PowerShell；只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。面向用户输出的项目内文件引用按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。
 - 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: Windows + WSL 协作开发、仓库级执行规则、命令模板
-- 更新时间: 2026-07-01
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### 项目内文件引用路径
+- 别名: 用户可访问路径, WSL 文件引用, UNC 路径展示
+- 类型: 输出规则
+- 定义: agent 回复中凡引用项目内文件，都必须使用用户当前客户端可打开的项目访问路径，而不是机械沿用执行环境路径。项目在 Windows 本地盘时使用 Windows 本地路径；项目在 WSL 文件系统且用户通过 Windows / Codex Desktop / Claude Desktop 访问时，项目内文件引用统一使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；`/home/<user>/<project>` 只用于 WSL 内命令、`wsl.exe --cd` 参数、WSL shell 日志或必须保留原文的执行上下文。
+- 来源: 用户确认、`windows-wsl-execution-rules/references/path-mapping.md`
+- 适用范围: 最终回复、中间进度、审查报告、证据路径、截图说明、Markdown 链接和普通文本文件路径
+- 更新时间: 2026-07-02
+- 状态: 启用
+
+### 文件写入统一 UTF-8
+- 别名: 跨平台 UTF-8 写入, 禁止 GBK/ANSI 落盘, 文件编码规则
+- 类型: 环境规则
+- 定义: 仓库所有代码、文档、配置、脚本、测试资产和生成类文本文件，新增或修改时默认使用 UTF-8 编码；Windows、Linux、WSL、容器和远程服务器上都必须保持同一口径，禁止用 GBK、ANSI、系统默认编码、编辑器默认编码或 shell 默认编码落盘。命令行写文件必须显式指定 UTF-8，写后回读关键文件并检查 `git diff`，确认中文未乱码、编码未漂移、换行未被意外批量转换。
+- 来源: 用户本轮确认、`AGENTS.md`、`windows-encoding-rules/SKILL.md`、`windows-wsl-execution-rules/SKILL.md`
+- 适用范围: 全仓库文件写入、规则文件自举、Windows / WSL / Linux 协作开发
+- 更新时间: 2026-07-02
 - 状态: 启用
 
 ### 本地连接调试测试红线
@@ -212,6 +230,15 @@
 - 来源: 用户本轮确认、`AGENTS.md`、`test-strategy-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`、`project-agents-bootstrap/scripts/bootstrap_agents.sh`
 - 适用范围: 需求域、Bug 域、测试域、运行时调试、浏览器联调、Windows / WSL 执行命令
 - 更新时间: 2026-07-01
+- 状态: 启用
+
+### URL 认证浏览器默认路由
+- 别名: authenticated-url-routing-rules, 已登录 Chrome 路由, URL 默认 Chrome Plugin
+- 类型: 浏览器路由规则
+- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页；只有 Chrome Plugin 不可用时，才回退到 `agent-browser --auto-connect`、state、profile 或 session。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
+- 来源: 用户确认、`authenticated-url-routing-rules/SKILL.md`
+- 适用范围: URL 分析、在线文档读取、浏览器权限页面、企业系统资料访问
+- 更新时间: 2026-07-02
 - 状态: 启用
 
 ## 术语表
@@ -267,6 +294,9 @@
 - 2026-07-01：新增本地连接调试测试红线，明确需求、Bug、测试、运行时调试、启动联调和浏览器验证只能连接 local 本地数据库与本地服务，禁止连接 test / prod / staging 等非 local 环境。
 - 2026-07-01：补充计划型提问入口，明确用户只要显式索要“怎么做/先给计划/先出方案/先列步骤”，就必须先命中实施规划规则；若前置条件未齐，也要输出受限计划 / 阻断计划，而不是表现成计划规则未触发。
 - 2026-07-01：补充受限计划授权边界，明确受限计划不得作为实施授权；即使用户明确采纳，也必须先补齐前置条件并升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
+- 2026-07-02：新增文件写入统一 UTF-8 口径，明确代码、文档、配置、脚本、测试资产和生成文本跨 Windows / WSL / Linux 默认 UTF-8，禁止 GBK / ANSI / 默认编码落盘，命令行写入后必须回读并检查 diff。
+- 2026-07-02：新增 URL 认证浏览器默认路由，明确用户提供 URL 时默认优先通过 Chrome Plugin 复用用户真实 Chrome 登录态，避免隔离浏览器或 `web` 丢失权限；补充 Chrome 安全策略拒绝正文读取时只报告阻断事实并 handoff，不做绕过；执行中已确认解决的问题必须继续回灌到 skill。
+- 2026-07-02：补充项目内文件引用路径规则，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用都用 `\\wsl.localhost\...`，`/home/...` 仅保留给 WSL 命令与日志上下文。
 
 
 ### 上线接口测试门禁规则

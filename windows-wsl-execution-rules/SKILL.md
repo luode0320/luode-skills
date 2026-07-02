@@ -1,6 +1,6 @@
 ---
 name: windows-wsl-execution-rules
-description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Windows 默认 shell。若已按 `windows-encoding-rules` 完成 PowerShell UTF-8 永久化，则 Windows 默认 shell 取 PowerShell；否则应先完成 UTF-8 永久化，未满足前提前不要把 PowerShell 当默认 shell。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 `\\wsl.localhost\distro\...` 访问 WSL 文件，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。
+description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Windows 默认 shell。若已按 `windows-encoding-rules` 完成 PowerShell UTF-8 永久化，则 Windows 默认 shell 取 PowerShell；否则应先完成 UTF-8 永久化，未满足前提前不要把 PowerShell 当默认 shell。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 `\\wsl.localhost\distro\...` 访问 WSL 文件，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。
 ---
 
 # Windows / WSL 执行规范（代码在 WSL）
@@ -22,6 +22,7 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - **默认先校验 Windows 默认 shell 前提**：若已按 `windows-encoding-rules` 完成 PowerShell UTF-8 永久化，则默认 shell 用 PowerShell；否则先执行 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1`，未完成前不要把 PowerShell 当默认 shell
 - **看代码、改代码**：通过 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
 - **普通命令默认不切 WSL**：搜索、读文件、改文件、规则检查、普通 `git status` / `git diff` / `git log` 等，默认留在 Windows 默认 shell
+- **文件写入仍按 UTF-8**：普通读写留在 Windows 默认 shell 时，必须继续使用 `windows-encoding-rules` 的显式 UTF-8 写入方式；不得因为路径在 WSL 或命令未进 WSL 就依赖 GBK / ANSI / shell 默认编码
 - **执行类命令再进 WSL**：编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，通过 `wsl.exe --cd /home/<user>/<project> <command>` 执行
 
 ## 什么算执行类命令
@@ -46,8 +47,11 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 |------|---------|
 | WSL 内执行类动作（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` |
 | Windows 侧普通命令、看代码、改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` |
+| 面向用户输出的项目内文件引用（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>\<relative-path>` |
 
 - `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
+- 回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\...`。
+- 只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。
 - **不再使用 `/mnt/<drive>`**——代码不在 Windows 盘。
 
 ## 执行环境分工（agent 在 Windows 时）
@@ -57,6 +61,8 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 | 看代码、改代码、读写文件、搜索、规则检查 | Windows 默认 shell，经 `\\wsl.localhost\...` 访问 |
 | 普通 git 盘点、提交、拉取 | Windows 默认 shell（经 `\\wsl.localhost\...`），仅在仓库本身要求时再切 WSL |
 | 编译 / 运行 / 启动程序 / 测试 / 调试 / 执行类依赖安装 | `wsl.exe --cd /home/<user>/<project> <command>` |
+
+读写文件无论落在哪一层执行，都必须保持 UTF-8；PowerShell 写文件显式带 `-Encoding UTF8`，脚本读写显式声明 UTF-8，WSL / Linux 侧不把仓库文本转换为 GBK、ANSI 或其他本地编码。
 
 ## 命令模板（agent 在 Windows 时）
 
@@ -93,6 +99,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - 不要在 Windows 原生 Go 环境跑需联网的项目。
 - 不要为了调试或测试方便，把启动参数、环境变量或配置文件切到 `test` / `prod` / `staging` 等非 local 环境；local 不可用时记录为本地环境阻断。
 - 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
+- 不要在面向 Windows 桌面用户的项目内文件引用里输出 `/home/...` 作为可打开路径；这类路径应转换成 `\\wsl.localhost\...`。
 - 不要把普通搜索、读文件、规则检查这类非执行动作一律切进 WSL。
 - agent 在 Windows 时，不要在未完成 UTF-8 永久化前直接把 PowerShell 当默认 shell；若未满足前提，先执行 `windows-encoding-rules/scripts/enable_powershell_utf8.ps1`。
 - 纯 Windows 项目，或本轮根本不会启动/执行程序的任务，不要为了“统一口径”硬套 WSL。
@@ -102,9 +109,11 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 **代码在 WSL 时：agent 在 WSL 直接干；agent 在 Windows 时先确保 PowerShell 已永久固定为 UTF-8，满足前提后由 PowerShell 处理普通命令，仅在编译、运行、启动程序、测试、调试等执行类动作时再用 `wsl.exe --cd` 进 WSL。**
 
+**所有代码、文档、配置、脚本、测试资产和生成类文本写入都必须保持 UTF-8；执行环境分层只决定命令在哪一侧运行，不改变文件编码规则。**
+
 ## 与其他规则的协作
 
-- 涉及 Windows 中文编码、PowerShell UTF-8 永久化与落盘细节时，联动 `windows-encoding-rules`。
+- 涉及文件写入编码、Windows 中文编码、PowerShell UTF-8 永久化与落盘细节时，联动 `windows-encoding-rules`。
 - 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
 
 ## 参考资料读取规则

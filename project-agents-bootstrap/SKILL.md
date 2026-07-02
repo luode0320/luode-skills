@@ -1,6 +1,6 @@
 ---
 name: project-agents-bootstrap
-description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、UTF-8 中文编码约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”，其中 `PROJECT_MEMORY.md` 联动 `project-memory-rules`、`PROJECT_STYLE.md` 联动 `project-style-rules`。
+description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、跨平台 UTF-8 文件写入约束，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”，其中 `PROJECT_MEMORY.md` 联动 `project-memory-rules`、`PROJECT_STYLE.md` 联动 `project-style-rules`。
 ---
 
 # 项目 AGENTS.md 自举与补齐 Skill
@@ -137,7 +137,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 先声明命中的注释类 skill。
   - 读取对应 `SKILL.md` 后再改代码。
   - 最终回复给执行证据（改动点、UTF-8、格式化/编译/测试结果）。
-- 中文编码规则：注释默认中文、文件保持 UTF-8、避免乱码。
+- 文件编码与写入规则：注释默认中文；所有代码、文档、配置、脚本、测试资产和生成类文本文件新增或修改时默认使用 UTF-8；禁止 GBK、ANSI、系统默认编码或编辑器默认编码落盘；命令行写文件必须显式指定 UTF-8，写后回读并检查 `git diff`。
 - 图像生成强制规则：
   - 只要当前用户请求属于生图、改图、参考图出新图、sprite、动作帧、概念图、UI 位图、贴图、透明底抠图、2D 游戏素材预览或其他位图资产任务，必须自动命中 `imagegen`，不得等用户额外明确说“使用 imagegen”。
   - 命中 2D 游戏素材相关任务时，若涉及设计图、预览图、原始素材图、动作关键帧或 sprite 方向图，除命中领域 skill 外，还必须联动命中 `imagegen`。
@@ -158,6 +158,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 执行类动作通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
   - 为什么只有执行类动作在 WSL：只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时
   - 命令格式：执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
+  - 用户可访问文件引用：回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`
   - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`；纯 Windows 项目或本轮不执行程序时不要误切 WSL
   - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
@@ -293,10 +294,15 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
 - 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
 
-## 中文编码规则
+## 文件编码与写入规则
 
 - 新增或修改注释默认使用中文。
-- 文件编码保持 UTF-8，禁止乱码。
+- 所有代码、文档、配置、脚本、测试资产和生成类文本文件，新增或修改时默认使用 UTF-8 编码；禁止使用 GBK、ANSI、系统默认编码或编辑器默认编码落盘。
+- 在 Windows、Linux、WSL、容器和远程服务器上写文件时都必须保持 UTF-8 口径一致；不得因为当前终端、区域设置或系统语言不同而切换编码。
+- 通过命令行写文件时必须显式指定 UTF-8：PowerShell 使用 `Set-Content -Encoding UTF8`、`Add-Content -Encoding UTF8`、`Out-File -Encoding utf8`，Python / Node / Go 等脚本必须显式声明 UTF-8 读写参数或确保运行时强制 UTF-8。
+- 禁止用未确认编码的 `>`、`>>`、默认 `Out-File`、默认 `Set-Content` 或其他依赖 shell 默认编码的方式写入中文、代码、Markdown、JSON、YAML、脚本和规则文件。
+- 写入后必须回读关键文件并检查 `git diff`，确认中文未乱码、编码未漂移、换行未被意外批量转换。
+- 仓库应提交 `.editorconfig` 与 `.gitattributes` 固定 `charset = utf-8`、基础换行和二进制文件规则；若发现文件被 GBK / ANSI 写入，必须先转回 UTF-8 再继续后续改动。
 
 ## 变更最小化
 
@@ -342,9 +348,11 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 **命令格式：** 执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。普通命令不要为了统一口径强制套这层。代码在 WSL 时不再使用 `/mnt/<drive>`；纯 Windows 项目或本轮不执行程序时，不要误触发本规则。
 
+**用户可访问文件引用：** 回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出。项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。
+
 **编码约束：**
 
-- 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略
+- 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略；任何读写文件操作都继续遵守“文件编码与写入规则”
 - `.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
 - 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
 - Windows 下出现大量无关改动优先检查 `core.autocrlf`
@@ -385,5 +393,6 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若首轮发现 `.gitattributes` 或 `.editorconfig` 缺失，也不允许降级为”先分析项目后补文件”；必须先补齐这两个文件，再继续主任务。
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
 - 若仓库位于 Windows 环境，默认应把“先完成 PowerShell UTF-8 永久化，再由 PowerShell 承接普通命令、执行类命令再进 WSL”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
+- 若仓库位于 WSL 文件系统且用户从 Windows 桌面访问，默认应把“命令用 `/home/...`、面向用户的项目内文件引用用 `\\wsl.localhost\...`”的边界一并补入仓库规则，避免输出用户无法打开的项目文件路径。
 ```
 ````
