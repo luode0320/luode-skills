@@ -1,6 +1,8 @@
 {
   "timezone": "Asia/Shanghai",
   "report_output_dir": "/home/luode/code",
+  "include_uncommitted_changes": true,
+  "uncommitted_max_paths": 5,
   "authors": [
     "luode",
     "luode@ellipalwallet.com"
@@ -24,6 +26,26 @@
     "test",
     "构建",
     "build"
+  ],
+  "uncommitted_excluded_keywords": [
+    "rename",
+    "renaming",
+    "重命名",
+    "rollback",
+    "roll back",
+    "回滚",
+    "文档",
+    "docs",
+    "测试",
+    "test",
+    "构建",
+    "build"
+  ],
+  "uncommitted_excluded_paths": [
+    "dist/",
+    "build/",
+    "coverage/",
+    "node_modules/"
   ],
   "projects": [
     {

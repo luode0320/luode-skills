@@ -58,6 +58,40 @@ DEFAULT_EXCLUDED_KEYWORDS = {
     "build",
     "构建",
 }
+DEFAULT_UNCOMMITTED_EXCLUDED_PATHS = {
+    "dist/",
+    "build/",
+    "coverage/",
+    "node_modules/",
+}
+TASK_CANDIDATE_DOC_PREFIXES = (
+    "doc/2-需求/",
+    "doc/3-实施/",
+    "doc/4-bugs/",
+    "doc/5-tests/",
+    "doc/6-审查/",
+    "doc/7-验收/",
+)
+TASK_CANDIDATE_SUFFIXES = (
+    "_当前改动总审查",
+    "_当前改动代码审查",
+    "_当前改动审查",
+    "_当前总审查",
+    "_代码审查",
+    "_实施总览",
+    "_验收标准",
+    "_验收记录",
+    "_测试记录",
+    "_测试方案",
+    "_README",
+)
+GENERIC_TASK_CANDIDATES = {
+    "当前改动",
+    "当前改动代码审查",
+    "当前改动总审查",
+    "代码审查",
+    "总审查",
+}
 
 
 @dataclass
@@ -74,9 +108,16 @@ class ProjectResult:
     name: str
     path: str
     report_items: list[str]
+    ongoing_items: list[str]
     warning: str | None = None
     release_pending_summary: str | None = None
     release_progress_percent: int | None = None
+
+
+@dataclass
+class WorktreeEntry:
+    status: str
+    path: str
 
 
 def parse_args() -> argparse.Namespace:
@@ -109,9 +150,17 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_config(config_path: Path) -> dict:
+    """
+    [参数]
+    - config_path: 配置文件路径。
+    [返回]
+    - dict: 解析后的工作报告配置对象。
+    最近修改时间: 2026-07-03 19:20:00 兼容 Windows UTF-8 BOM 配置文件，避免本地生成的 JSON 读取失败。
+    """
+    # 1. 统一按 UTF-8-SIG 读取配置，兼容 Windows 下可能带 BOM 的 JSON 文件。
     if not config_path.exists():
         raise FileNotFoundError(f"配置文件不存在：{config_path}")
-    raw = config_path.read_text(encoding="utf-8")
+    raw = config_path.read_text(encoding="utf-8-sig")
     data = json.loads(raw)
     if not isinstance(data, dict):
         raise ValueError("配置根节点必须是对象。")
@@ -160,10 +209,22 @@ def format_period_label(period: str, start: dt.date, end: dt.date) -> str:
 
 
 def run_git_log(repo_path: Path, start: dt.date, end: dt.date) -> list[CommitEntry]:
+    """
+    [参数]
+    - repo_path: Git 仓库路径。
+    - start: 统计开始日期。
+    - end: 统计结束日期（开区间）。
+    [返回]
+    - list[CommitEntry]: 指定时间范围内的提交列表。
+    最近修改时间: 2026-07-03 19:20:00 统一 Git 子进程为 UTF-8 输出，避免 Windows 中文路径和中文提交解码失败。
+    """
+    # 1. 读取指定时间范围内的 Git 提交，并关闭路径转义保证中文内容可直接进入报告。
     since = f"{start.isoformat()} 00:00:00"
     until = f"{(end - dt.timedelta(days=1)).isoformat()} 23:59:59"
     cmd = [
         "git",
+        "-c",
+        "core.quotepath=false",
         "-C",
         str(repo_path),
         "log",
@@ -173,7 +234,7 @@ def run_git_log(repo_path: Path, start: dt.date, end: dt.date) -> list[CommitEnt
         f"--until={until}",
         "--pretty=format:%H%x09%ct%x09%s%x09%an%x09%ae",
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     if proc.returncode != 0:
         stderr = proc.stderr.strip()
         if "does not have any commits yet" in stderr:
@@ -223,10 +284,18 @@ def filter_commits_by_author(commits: list[CommitEntry], filters: list[str]) -> 
 
 
 def read_global_git_identity() -> list[str]:
+    """
+    [参数]
+    - 无。
+    [返回]
+    - list[str]: 全局 Git 用户名和邮箱列表。
+    最近修改时间: 2026-07-03 19:20:00 统一 Git 配置读取编码，避免 Windows 环境返回中文身份时解码异常。
+    """
+    # 1. 按 UTF-8 读取全局 Git 身份，作为作者过滤的最后兜底来源。
     values: list[str] = []
     for key in ("user.name", "user.email"):
         cmd = ["git", "config", "--global", key]
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
         if proc.returncode == 0:
             value = proc.stdout.strip()
             if value:
@@ -305,6 +374,14 @@ def normalize_optional_text(value: object) -> str | None:
 
 
 def normalize_optional_percent(value: object) -> int | None:
+    """
+    [参数]
+    - value: 待归一化的百分比配置值。
+    [返回]
+    - int | None: 合法百分比或空值。
+    最近修改时间: 2026-07-03 19:20:00 复用到未提交工作区配置解析，统一百分比边界处理。
+    """
+    # 1. 仅接受可转为整数的配置值，并统一裁剪到 0-100。
     if value is None:
         return None
     try:
@@ -318,6 +395,29 @@ def normalize_optional_percent(value: object) -> int | None:
     return percent
 
 
+def normalize_optional_bool(value: object, default: bool) -> bool:
+    """
+    [参数]
+    - value: 待归一化的布尔配置值。
+    - default: 配置为空时使用的默认值。
+    [返回]
+    - bool: 归一化后的布尔结果。
+    最近修改时间: 2026-07-03 19:20:00 新增布尔配置解析，支持是否统计未提交工作区事项。
+    """
+    # 1. 配置缺失时回退默认值，显式字符串或数字时按常见布尔语义解析。
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+
+    text = str(value).strip().lower()
+    if text in {"1", "true", "yes", "on"}:
+        return True
+    if text in {"0", "false", "no", "off"}:
+        return False
+    return default
+
+
 def resolve_excluded_types(cfg: dict) -> set[str]:
     configured = normalize_str_list(cfg.get("excluded_types"))
     if configured:
@@ -326,10 +426,81 @@ def resolve_excluded_types(cfg: dict) -> set[str]:
 
 
 def resolve_excluded_keywords(cfg: dict) -> list[str]:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - list[str]: 已提交事项过滤关键词列表。
+    最近修改时间: 2026-07-03 19:20:00 与未提交工作区过滤配置并行，保留提交过滤逻辑独立解析。
+    """
+    # 1. 已配置时优先使用配置；否则回退到默认低价值关键词。
     configured = normalize_str_list(cfg.get("excluded_keywords"))
     if configured:
         return [item.lower() for item in configured]
     return [item.lower() for item in DEFAULT_EXCLUDED_KEYWORDS]
+
+
+def resolve_include_uncommitted_changes(cfg: dict) -> bool:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - bool: 是否启用未提交工作区事项补充。
+    最近修改时间: 2026-07-03 19:20:00 新增工作区补充开关，支持按配置决定是否纳入进行中事项。
+    """
+    # 1. 默认开启工作区补充，只有配置明确关闭时才跳过。
+    return normalize_optional_bool(cfg.get("include_uncommitted_changes"), True)
+
+
+def resolve_uncommitted_excluded_keywords(cfg: dict) -> list[str]:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - list[str]: 未提交工作区事项过滤关键词列表。
+    最近修改时间: 2026-07-03 19:20:00 新增工作区过滤关键词，避免低价值改动进入周报进行中事项。
+    """
+    # 1. 已配置时优先使用工作区专用关键词；否则复用提交过滤关键词。
+    configured = normalize_str_list(cfg.get("uncommitted_excluded_keywords"))
+    if configured:
+        return [item.lower() for item in configured]
+    return resolve_excluded_keywords(cfg)
+
+
+def resolve_uncommitted_excluded_paths(cfg: dict) -> list[str]:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - list[str]: 未提交工作区路径过滤前缀列表。
+    最近修改时间: 2026-07-03 19:20:00 新增工作区路径过滤，默认排除构建产物和依赖目录。
+    """
+    # 1. 已配置时优先使用配置；否则回退到默认低价值路径前缀。
+    configured = normalize_str_list(cfg.get("uncommitted_excluded_paths"))
+    if configured:
+        return configured
+    return list(DEFAULT_UNCOMMITTED_EXCLUDED_PATHS)
+
+
+def resolve_uncommitted_max_paths(cfg: dict) -> int:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - int: 单个项目未提交事项中最多展示的路径数量。
+    最近修改时间: 2026-07-03 19:20:00 新增路径数量限制，避免进行中事项过长影响周报可读性。
+    """
+    # 1. 优先读取配置，并把异常值裁剪到合理范围。
+    raw_value = cfg.get("uncommitted_max_paths")
+    try:
+        value = int(str(raw_value).strip()) if raw_value is not None else 5
+    except (TypeError, ValueError):
+        value = 5
+    if value < 1:
+        return 1
+    if value > 20:
+        return 20
+    return value
 
 
 def filter_commits_by_importance(
@@ -337,6 +508,16 @@ def filter_commits_by_importance(
     excluded_types: set[str],
     excluded_keywords: list[str],
 ) -> list[CommitEntry]:
+    """
+    [参数]
+    - commits: 待过滤的提交列表。
+    - excluded_types: 需要排除的提交类型集合。
+    - excluded_keywords: 需要排除的关键词列表。
+    [返回]
+    - list[CommitEntry]: 过滤后的提交列表。
+    最近修改时间: 2026-07-03 19:20:00 继续保留已提交事项过滤，和未提交事项过滤形成并行入口。
+    """
+    # 1. 仅保留具有业务语义的提交，排除低价值提交噪音。
     if not commits:
         return commits
 
@@ -353,12 +534,325 @@ def filter_commits_by_importance(
     return filtered
 
 
+def run_git_status_porcelain(repo_path: Path) -> list[WorktreeEntry]:
+    """
+    [参数]
+    - repo_path: Git 仓库路径。
+    [返回]
+    - list[WorktreeEntry]: 当前工作区未提交改动列表。
+    最近修改时间: 2026-07-03 19:20:00 新增工作区扫描，支持从未提交改动补充进行中事项。
+    """
+    # 1. 使用 porcelain 输出稳定读取工作区状态，并统一提取状态与路径。
+    cmd = [
+        "git",
+        "-c",
+        "core.quotepath=false",
+        "-C",
+        str(repo_path),
+        "status",
+        "--short",
+        "--untracked-files=all",
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    if proc.returncode != 0:
+        stderr = proc.stderr.strip()
+        raise RuntimeError(stderr or "git 工作区状态读取失败")
+
+    entries: list[WorktreeEntry] = []
+    for raw_line in proc.stdout.splitlines():
+        line = raw_line.rstrip()
+        if not line:
+            continue
+
+        status_code = line[:2]
+        path_text = line[3:].strip()
+        if " -> " in path_text:
+            path_text = path_text.split(" -> ", 1)[1].strip()
+
+        normalized_path = path_text.replace("\\", "/")
+        if not normalized_path:
+            continue
+
+        entries.append(WorktreeEntry(status=status_code, path=normalized_path))
+    return entries
+
+
+def filter_worktree_entries_by_importance(
+    entries: list[WorktreeEntry],
+    excluded_keywords: list[str],
+    excluded_paths: list[str],
+) -> list[WorktreeEntry]:
+    """
+    [参数]
+    - entries: 待过滤的工作区改动列表。
+    - excluded_keywords: 需要排除的关键词列表。
+    - excluded_paths: 需要排除的路径前缀列表。
+    [返回]
+    - list[WorktreeEntry]: 过滤后的工作区改动列表。
+    最近修改时间: 2026-07-03 19:20:00 新增工作区低价值改动过滤，避免文档和构建噪音进入周报。
+    """
+    # 1. 同时按关键词和路径前缀过滤低价值工作区改动。
+    filtered: list[WorktreeEntry] = []
+    normalized_paths = [item.replace("\\", "/").lower() for item in excluded_paths]
+    for entry in entries:
+        path_text = entry.path.lower()
+        if any(path_text.startswith(prefix) for prefix in normalized_paths):
+            continue
+        if any(keyword in path_text for keyword in excluded_keywords):
+            continue
+        filtered.append(entry)
+    return filtered
+
+
+def contains_chinese(text: str) -> bool:
+    """
+    [参数]
+    - text: 待检查的文本。
+    [返回]
+    - bool: 是否包含中文字符。
+    最近修改时间: 2026-07-03 20:05:00 新增中文检测，支撑未提交事项优先提取中文任务简要。
+    """
+    # 1. 通过中文 Unicode 范围快速判断文本里是否存在中文语义片段。
+    return bool(re.search(r"[\u4e00-\u9fff]", text))
+
+
+def strip_task_timestamp_prefix(text: str) -> str:
+    """
+    [参数]
+    - text: 可能带时间戳前缀的任务文本。
+    [返回]
+    - str: 去掉常见时间戳前缀后的文本。
+    最近修改时间: 2026-07-03 20:05:00 新增时间戳清理，避免审查和实施文档文件名前缀污染任务摘要。
+    """
+    # 1. 统一清理 YYYY-MM-DD、YYYYMMDD、HHMMSS 等常见文件名前缀。
+    cleaned = re.sub(r"^\d{4}-\d{2}-\d{2}_\d{6}_", "", text)
+    cleaned = re.sub(r"^\d{8}_\d{6}_", "", cleaned)
+    cleaned = re.sub(r"^\d{4}-\d{2}-\d{2}_", "", cleaned)
+    return re.sub(r"^\d{8}_", "", cleaned)
+
+
+def normalize_task_candidate(text: str) -> str:
+    """
+    [参数]
+    - text: 原始任务候选文本。
+    [返回]
+    - str: 归一化后的任务候选文本。
+    最近修改时间: 2026-07-03 20:05:00 新增任务候选归一化，统一清理文件名噪音并保留中文任务语义。
+    """
+    # 1. 先去掉时间戳、通用尾缀和实施周期前缀，收敛到任务主体。
+    cleaned = strip_task_timestamp_prefix(text.strip())
+    cleaned = re.sub(r"^实施周期\d+_", "", cleaned)
+    while True:
+        matched_suffix = next((suffix for suffix in TASK_CANDIDATE_SUFFIXES if cleaned.endswith(suffix)), None)
+        if matched_suffix is None:
+            break
+        cleaned = cleaned[: -len(matched_suffix)]
+
+    # 2. 再统一分隔符和空白，避免输出里夹带文件系统痕迹。
+    cleaned = cleaned.strip(" _-")
+    cleaned = re.sub(r"[_]+", " ", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned.strip(" -")
+
+
+def format_task_candidate(text: str) -> str | None:
+    """
+    [参数]
+    - text: 已归一化的任务候选文本。
+    [返回]
+    - str | None: 可直接用于周报的中文任务简要；无法可靠表达时返回空值。
+    最近修改时间: 2026-07-03 20:05:00 新增任务短句格式化，优先把混合路径候选整理成中文简要描述。
+    """
+    # 1. 没有中文语义时直接放弃，避免把纯英文路径误当任务名。
+    cleaned = normalize_task_candidate(text)
+    if not cleaned or not contains_chinese(cleaned):
+        return None
+    if cleaned.replace(" ", "") in GENERIC_TASK_CANDIDATES:
+        return None
+
+    # 2. 若前缀是英文模块名、后缀是中文任务说明，则整理成“完善 X 的 Y”。
+    first_cn_match = re.search(r"[\u4e00-\u9fff]", cleaned)
+    if first_cn_match is None:
+        return None
+
+    first_cn_index = first_cn_match.start()
+    prefix = cleaned[:first_cn_index].strip(" -")
+    suffix = cleaned[first_cn_index:].strip(" -")
+    if prefix and suffix and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ./_-]*", prefix):
+        return f"完善 {prefix} 的{suffix}"
+    return cleaned
+
+
+def extract_task_module_hint(text: str) -> str | None:
+    """
+    [参数]
+    - text: 已格式化的任务候选文本。
+    [返回]
+    - str | None: 候选里隐含的模块提示；没有时返回空值。
+    最近修改时间: 2026-07-03 20:05:00 新增模块提示提取，用于让任务摘要更贴近当前主改动目录。
+    """
+    # 1. 从“完善 X 的Y”格式中提取模块名，供工作区候选排序加权。
+    match = re.match(r"^完善\s+(.+?)\s+的.+$", text)
+    if match is None:
+        return None
+    module = match.group(1).strip()
+    return module or None
+
+
+def extract_task_candidate_from_path(path: str) -> str | None:
+    """
+    [参数]
+    - path: 单个未提交改动路径。
+    [返回]
+    - str | None: 从路径中提取出的任务候选；无法提取时返回空值。
+    最近修改时间: 2026-07-03 20:05:00 新增路径任务提取，优先复用中文文档名里的任务语义。
+    """
+    # 1. 优先从文件名提取任务候选；若文件名无中文，再回退到路径中最后一个含中文的目录或文件名。
+    normalized_path = path.replace("\\", "/")
+    file_name = Path(normalized_path).stem
+    if contains_chinese(file_name):
+        return format_task_candidate(file_name)
+
+    for segment in reversed(normalized_path.split("/")):
+        candidate = Path(segment).stem
+        if contains_chinese(candidate):
+            return format_task_candidate(candidate)
+    return None
+
+
+def collect_worktree_task_candidates(entries: list[WorktreeEntry]) -> list[str]:
+    """
+    [参数]
+    - entries: 过滤后的工作区改动列表。
+    [返回]
+    - list[str]: 按优先级排序的任务候选列表。
+    最近修改时间: 2026-07-03 20:05:00 新增候选收集，优先从需求/实施/审查等中文文档改动中推断进行中任务。
+    """
+    # 1. 先按文档路径优先级收集候选，尽量让“进行中”更像任务名而不是路径列表。
+    scored_candidates: list[tuple[int, str]] = []
+    root_counts: dict[str, int] = {}
+    seen_candidates: set[str] = set()
+    for entry in entries:
+        path_parts = entry.path.split("/", 1)
+        if not path_parts or not path_parts[0] or path_parts[0] == "doc":
+            continue
+        root_counts[path_parts[0]] = root_counts.get(path_parts[0], 0) + 1
+
+    for entry in entries:
+        candidate = extract_task_candidate_from_path(entry.path)
+        if not candidate or candidate in seen_candidates:
+            continue
+
+        score = 10
+        if entry.path.startswith(TASK_CANDIDATE_DOC_PREFIXES):
+            score += 100
+        if contains_chinese(Path(entry.path).stem):
+            score += 20
+        module_hint = extract_task_module_hint(candidate)
+        if module_hint and root_counts.get(module_hint, 0) >= 2:
+            score += 50
+
+        seen_candidates.add(candidate)
+        scored_candidates.append((score, candidate))
+
+    scored_candidates.sort(key=lambda item: (-item[0], item[1]))
+    return [item[1] for item in scored_candidates]
+
+
+def build_worktree_path_summary(entries: list[WorktreeEntry], max_paths: int) -> str:
+    """
+    [参数]
+    - entries: 过滤后的工作区改动列表。
+    - max_paths: 最多展示的路径数量。
+    [返回]
+    - str: 基于路径和状态统计生成的兜底摘要。
+    最近修改时间: 2026-07-03 20:05:00 拆出路径兜底摘要，供任务名提取失败时回退使用。
+    """
+    # 1. 先按状态统计工作区改动数量，避免只给路径列表看不出当前进展形态。
+    modified_count = 0
+    added_count = 0
+    deleted_count = 0
+    renamed_count = 0
+    other_count = 0
+    unique_paths: list[str] = []
+    seen_paths: set[str] = set()
+
+    for entry in entries:
+        status_text = entry.status.replace(" ", "")
+        if "M" in status_text:
+            modified_count += 1
+        elif "A" in status_text or "?" in status_text:
+            added_count += 1
+        elif "D" in status_text:
+            deleted_count += 1
+        elif "R" in status_text or "C" in status_text:
+            renamed_count += 1
+        else:
+            other_count += 1
+
+        if entry.path not in seen_paths:
+            seen_paths.add(entry.path)
+            unique_paths.append(entry.path)
+
+    # 2. 再限制路径展示数量，保持周报可读性，同时保留总数提示。
+    displayed_paths = unique_paths[:max_paths]
+    path_suffix = "、".join(displayed_paths)
+    if len(unique_paths) > len(displayed_paths):
+        path_suffix = f"{path_suffix} 等 {len(unique_paths)} 处"
+
+    segments: list[str] = []
+    if modified_count:
+        segments.append(f"修改 {modified_count} 项")
+    if added_count:
+        segments.append(f"新增 {added_count} 项")
+    if deleted_count:
+        segments.append(f"删除 {deleted_count} 项")
+    if renamed_count:
+        segments.append(f"重命名 {renamed_count} 项")
+    if other_count:
+        segments.append(f"其他 {other_count} 项")
+
+    summary = " / ".join(segments) if segments else f"{len(unique_paths)} 项"
+    return f"工作区仍有未提交改动（{summary}），涉及 {path_suffix}"
+
+
+def summarize_worktree_changes(entries: list[WorktreeEntry], max_paths: int) -> list[str]:
+    """
+    [参数]
+    - entries: 过滤后的工作区改动列表。
+    - max_paths: 最多展示的路径数量。
+    [返回]
+    - list[str]: 可直接写入报告的进行中事项列表。
+    最近修改时间: 2026-07-03 20:05:00 进行中事项优先输出中文任务简要，提取失败时再回退到路径摘要。
+    """
+    # 1. 先尝试从未提交改动里提取中文任务简要，让周报直接说明“正在做什么”。
+    if not entries:
+        return []
+    task_candidates = collect_worktree_task_candidates(entries)
+    if task_candidates:
+        return [f"进行中: {task_candidates[0]}"]
+
+    # 2. 没有可靠任务名时，再回退到路径与状态摘要，避免误报任务主题。
+    return [f"进行中: {build_worktree_path_summary(entries, max_paths)}"]
+
+
 def summarize_project(
     project_name: str,
     project_path: str,
     commits: list[CommitEntry],
-    timezone: ZoneInfo,
+    ongoing_items: list[str],
 ) -> ProjectResult:
+    """
+    [参数]
+    - project_name: 项目中文名称。
+    - project_path: 项目路径。
+    - commits: 已过滤的提交列表。
+    - ongoing_items: 已整理的进行中事项列表。
+    [返回]
+    - ProjectResult: 单个项目的报告结果。
+    最近修改时间: 2026-07-03 19:20:00 项目汇总新增进行中事项字段，支持已提交与未提交并存输出。
+    """
+    # 1. 先把已提交事项转成报告条目，再合并工作区进行中事项。
     report_items: list[str] = []
 
     for item in commits:
@@ -368,16 +862,28 @@ def summarize_project(
         name=project_name,
         path=project_path,
         report_items=report_items,
+        ongoing_items=ongoing_items,
     )
 
 
 def build_release_progress_summary_lines(period: str, cfg: dict, results: list[ProjectResult]) -> list[str]:
+    """
+    [参数]
+    - period: 报告周期类型。
+    - cfg: 工作报告配置对象。
+    - results: 项目统计结果列表。
+    [返回]
+    - list[str]: 总体归纳统计区块行列表。
+    最近修改时间: 2026-07-03 19:20:00 总体归纳统计兼容进行中事项，避免无提交但有在做项目被遗漏。
+    """
+    # 1. 总体归纳统计同时考虑警告、已提交事项和进行中事项。
     scope = PERIOD_SCOPE_TEXT[period]
     summary_results = [
         item
         for item in results
         if item.warning
         or item.report_items
+        or item.ongoing_items
         or item.release_pending_summary
         or item.release_progress_percent is not None
     ]
@@ -412,8 +918,19 @@ def build_release_progress_summary_lines(period: str, cfg: dict, results: list[P
 
 
 def render_report(period: str, period_label: str, results: list[ProjectResult], cfg: dict) -> str:
+    """
+    [参数]
+    - period: 报告周期类型。
+    - period_label: 已格式化的日期范围标签。
+    - results: 项目统计结果列表。
+    - cfg: 工作报告配置对象。
+    [返回]
+    - str: 最终报告正文。
+    最近修改时间: 2026-07-03 19:20:00 渲染层新增进行中事项输出，并保持已提交与未提交来源可区分。
+    """
+    # 1. 只展示真正有警告、已提交事项或进行中事项的项目。
     period_name = REPORT_NAME_MAP[period]
-    displayed_results = [item for item in results if item.warning or item.report_items]
+    displayed_results = [item for item in results if item.warning or item.report_items or item.ongoing_items]
 
     lines: list[str] = [f"{period_name}（{period_label}）"]
     if period != "daily":
@@ -438,6 +955,8 @@ def render_report(period: str, period_label: str, results: list[ProjectResult], 
 
         for item in result.report_items:
             lines.append(f"- {item}")
+        for item in result.ongoing_items:
+            lines.append(f"- {item}")
 
     return "\n".join(lines).rstrip()
 
@@ -460,6 +979,14 @@ def save_report_file(report_text: str, output_dir: Path, period: str) -> Path:
 
 
 def main() -> int:
+    """
+    [参数]
+    - 无。
+    [返回]
+    - int: 进程退出码，0 表示成功。
+    最近修改时间: 2026-07-03 19:20:00 主流程新增未提交工作区扫描，并把进行中事项补进各项目周报。
+    """
+    # 1. 先解析参数、配置和统计周期，再准备作者与过滤配置。
     configure_utf8_streams()
     args = parse_args()
 
@@ -485,9 +1012,12 @@ def main() -> int:
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    report_timezone = resolve_report_timezone()
     excluded_types = resolve_excluded_types(cfg)
     excluded_keywords = resolve_excluded_keywords(cfg)
+    include_uncommitted_changes = resolve_include_uncommitted_changes(cfg)
+    uncommitted_excluded_keywords = resolve_uncommitted_excluded_keywords(cfg)
+    uncommitted_excluded_paths = resolve_uncommitted_excluded_paths(cfg)
+    uncommitted_max_paths = resolve_uncommitted_max_paths(cfg)
 
     results: list[ProjectResult] = []
     for project in cfg["projects"]:
@@ -503,6 +1033,7 @@ def main() -> int:
                     name=project_name,
                     path=project_path_raw,
                     report_items=[],
+                    ongoing_items=[],
                     warning="项目路径为空，无法统计",
                     release_pending_summary=project_release_pending_summary,
                     release_progress_percent=project_release_progress_percent,
@@ -516,6 +1047,7 @@ def main() -> int:
                     name=project_name,
                     path=project_path_raw,
                     report_items=[],
+                    ongoing_items=[],
                     warning=f"项目路径不存在: {project_path_raw}",
                     release_pending_summary=project_release_pending_summary,
                     release_progress_percent=project_release_progress_percent,
@@ -529,6 +1061,7 @@ def main() -> int:
                     name=project_name,
                     path=project_path_raw,
                     report_items=[],
+                    ongoing_items=[],
                     warning=f"不是 Git 仓库: {project_path_raw}",
                     release_pending_summary=project_release_pending_summary,
                     release_progress_percent=project_release_progress_percent,
@@ -536,11 +1069,22 @@ def main() -> int:
             )
             continue
 
+        # 2. 对每个项目先统计已提交事项，再按配置补充未提交进行中事项。
         try:
             commits = run_git_log(project_path, start, end)
             commits = filter_commits_by_author(commits, author_filters)
             commits = filter_commits_by_importance(commits, excluded_types, excluded_keywords)
-            summary_result = summarize_project(project_name, project_path_raw, commits, report_timezone)
+            ongoing_items: list[str] = []
+            if include_uncommitted_changes:
+                worktree_entries = run_git_status_porcelain(project_path)
+                worktree_entries = filter_worktree_entries_by_importance(
+                    worktree_entries,
+                    uncommitted_excluded_keywords,
+                    uncommitted_excluded_paths,
+                )
+                ongoing_items = summarize_worktree_changes(worktree_entries, uncommitted_max_paths)
+
+            summary_result = summarize_project(project_name, project_path_raw, commits, ongoing_items)
             summary_result.release_pending_summary = project_release_pending_summary
             summary_result.release_progress_percent = project_release_progress_percent
             results.append(summary_result)
@@ -550,12 +1094,14 @@ def main() -> int:
                     name=project_name,
                     path=project_path_raw,
                     report_items=[],
+                    ongoing_items=[],
                     warning=f"统计失败: {exc}",
                     release_pending_summary=project_release_pending_summary,
                     release_progress_percent=project_release_progress_percent,
                 )
             )
 
+    # 3. 生成报告正文并保存到目标目录，确保控制台输出与文件内容保持一致。
     report_text = render_report(args.period, period_label, results, cfg)
     output_dir = resolve_report_output_dir(cfg)
     try:

@@ -398,7 +398,7 @@ python skill-dictionary/generate_dictionary.py
 | `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
 | `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
-| `work-report-summary-rules` | 用于按项目配置统计本人 Git 提交并生成日报/周报/月报/年报。 |
+| `work-report-summary-rules` | 用于按项目配置统计本人 Git 提交，并补充各项目未提交改动对应的进行中事项，生成日报/周报/月报/年报。 |
 | `golang-patterns` | 外部 Go 通用开发模式与最佳实践补充规则（作为内置 Go 规则补充，不覆盖内置强制约束）。 |
 
 ## 当前规划状态
@@ -702,3 +702,4 @@ claude-mem(记忆) :
 2026-07-03 16:12:53 docs: [审查链注释门禁] 强化代码改动注释不合规阻断
 2026-07-03 17:45:14 feat: [项目记忆与需求附录] 合并提交双区知识库与需求文档附录规则
 2026-07-03 18:09:21 fix: [会话标题工具发现] 补齐Codex改名链路
+2026-07-03 20:12:00 feat: [计划联动与周报补强] 完善实施计划约束并增强未提交事项汇总
