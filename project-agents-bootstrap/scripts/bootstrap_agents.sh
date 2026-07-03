@@ -56,6 +56,7 @@ fi
 
 GITATTRIBUTES_FILE="$REPO_DIR/.gitattributes"
 EDITORCONFIG_FILE="$REPO_DIR/.editorconfig"
+PROJECT_MEMORY_FILE="$REPO_DIR/PROJECT_MEMORY.md"
 
 PYTHON_BIN=""
 
@@ -390,6 +391,34 @@ trim_trailing_whitespace = false
 EOF
 )
 
+PROJECT_MEMORY_MACHINE_SECTION=$(cat <<'EOF'
+## 机器索引区
+
+```yaml
+version: 1
+entities: []
+relations: []
+evidence: []
+contexts: []
+lifecycle:
+  active: []
+  deprecated: []
+  stale: []
+  conflicted: []
+  retired: []
+retrieval_hints:
+  aliases: {}
+  scopes: {}
+  sources: {}
+extensions:
+  external_refs: []
+  retrieval_provider: ""
+  vector_doc_id: ""
+  graph_node_id: ""
+```
+EOF
+)
+
 # 在文件中按 "## header" 定位并 upsert 章节正文
 sync_section() {
   local file="$1"
@@ -447,6 +476,118 @@ create_rule_file() {
 > Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
 EOF
   echo "[OK] 已创建: $file"
+}
+
+# 创建最小可用的 PROJECT_MEMORY.md 双区骨架；仅负责主文件与机器索引区占位，不写业务事实。
+create_project_memory_file() {
+  local file="$1"
+  cat > "$file" <<'EOF'
+# 项目记忆
+
+## 核心记忆
+
+- 待补充
+
+## 变更记录
+
+- 2026-07-03: 由 `project-agents-bootstrap` 初始化双区骨架
+
+## 机器索引区
+
+```yaml
+version: 1
+entities: []
+relations: []
+evidence: []
+contexts: []
+lifecycle:
+  active: []
+  deprecated: []
+  stale: []
+  conflicted: []
+  retired: []
+retrieval_hints:
+  aliases: {}
+  scopes: {}
+  sources: {}
+extensions:
+  external_refs: []
+  retrieval_provider: ""
+  vector_doc_id: ""
+  graph_node_id: ""
+```
+EOF
+  echo "[OK] 已创建: $file"
+}
+
+# 同步 PROJECT_MEMORY.md 的结构骨架；若已有正文，只补底部受管机器索引区，不重写人工内容。
+sync_project_memory_file() {
+  local file="$1"
+
+  if [[ ! -f "$file" ]]; then
+    create_project_memory_file "$file"
+    return 0
+  fi
+
+  # 只补双区骨架，不重写人类正文区；事实抽取与正文归并仍交给 project-memory-rules。
+  $PYTHON_BIN - "$file" "$PROJECT_MEMORY_MACHINE_SECTION" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+machine_section = sys.argv[2].rstrip("\n")
+text = path.read_text(encoding="utf-8")
+
+if "## 机器索引区" not in text:
+    if not text.endswith("\n"):
+        text += "\n"
+    text += "\n" + machine_section + "\n"
+    path.write_text(text, encoding="utf-8")
+    print(f"[INFO] 已追加机器索引区: {path}")
+    raise SystemExit(0)
+
+marker = "## 机器索引区"
+start = text.index(marker)
+fence_start = text.find("```yaml", start)
+if fence_start == -1:
+    insert_at = start + len(marker)
+    text = text[:insert_at] + "\n\n```yaml\nversion: 1\nentities: []\nrelations: []\nevidence: []\ncontexts: []\nlifecycle:\n  active: []\n  deprecated: []\n  stale: []\n  conflicted: []\n  retired: []\nretrieval_hints:\n  aliases: {}\n  scopes: {}\n  sources: {}\nextensions:\n  external_refs: []\n  retrieval_provider: \"\"\n  vector_doc_id: \"\"\n  graph_node_id: \"\"\n```\n" + text[insert_at:]
+    path.write_text(text, encoding="utf-8")
+    print(f"[INFO] 已补齐机器索引区 yaml 骨架: {path}")
+    raise SystemExit(0)
+
+fence_end = text.find("```", fence_start + len("```yaml"))
+if fence_end == -1:
+    raise SystemExit("[ERROR] `## 机器索引区` 后缺少闭合 ```，无法安全补齐")
+
+block = text[fence_start:fence_end]
+required_blocks = [
+    ("version:", "version: 1\n"),
+    ("entities:", "entities: []\n"),
+    ("relations:", "relations: []\n"),
+    ("evidence:", "evidence: []\n"),
+    ("contexts:", "contexts: []\n"),
+    ("lifecycle:", "lifecycle:\n  active: []\n  deprecated: []\n  stale: []\n  conflicted: []\n  retired: []\n"),
+    ("retrieval_hints:", "retrieval_hints:\n  aliases: {}\n  scopes: {}\n  sources: {}\n"),
+    ("extensions:", "extensions:\n  external_refs: []\n  retrieval_provider: \"\"\n  vector_doc_id: \"\"\n  graph_node_id: \"\"\n"),
+]
+
+missing = []
+for needle, snippet in required_blocks:
+    if needle not in block:
+        missing.append(snippet)
+
+if missing:
+    insert_at = fence_end
+    prefix = ""
+    if not block.endswith("\n"):
+        prefix = "\n"
+    text = text[:insert_at] + prefix + "".join(missing) + text[insert_at:]
+    path.write_text(text, encoding="utf-8")
+    print(f"[INFO] 已补齐机器索引区最小 schema: {path}")
+else:
+    print(f"[INFO] 机器索引区已存在且满足最小骨架: {path}")
+PY
 }
 
 sync_agents_file() {
@@ -510,12 +651,15 @@ if [[ ! -f "$EDITORCONFIG_FILE" ]]; then
   echo "[OK] 已创建: $EDITORCONFIG_FILE"
 fi
 
-# 3) 同步根目录所有已存在的规则文件（AGENTS.md / CLAUDE.md）
+# 3) 确保 PROJECT_MEMORY.md 至少具备单文件双区骨架
+sync_project_memory_file "$PROJECT_MEMORY_FILE"
+
+# 4) 同步根目录所有已存在的规则文件（AGENTS.md / CLAUDE.md）
 for name in AGENTS.md CLAUDE.md; do
   sync_agents_file "$REPO_DIR/$name"
 done
 
-# 4) 同步子目录中所有已存在的 AGENTS.md / CLAUDE.md
+# 5) 同步子目录中所有已存在的 AGENTS.md / CLAUDE.md
 while IFS= read -r extra_file; do
   sync_agents_file "$extra_file"
 done < <(find "$REPO_DIR" -mindepth 2 \( -name AGENTS.md -o -name CLAUDE.md \) -type f | sort)

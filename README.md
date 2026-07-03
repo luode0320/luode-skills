@@ -289,7 +289,7 @@ python skill-dictionary/generate_dictionary.py
 | `recent-context-bootstrap-rules` | 新会话开始时压缩最近 3 天项目上下文，为后续主域补前置信息。 |
 | `history-recall-rules`   | 检索跨会话历史、历史方案、历史修复记录，补回长期上下文。   |
 | `project-timeline-rules` | 按项目维度整理历史演进时间线，输出项目阶段变化与决策轨迹。 |
-| `project-memory-rules` | 自动抽取对话与代码中的项目事实，持续维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源。 |
+| `project-memory-rules` | 自动抽取对话与代码中的项目事实，持续维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆主文件，并在文件内联动“人类阅读区 + 机器索引区”。 |
 | `project-style-rules` | 自动抽取对话与代码中的项目代码风格示例，持续维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。 |
 
 ### 3. 需求域
@@ -700,3 +700,4 @@ claude-mem(记忆) :
 2026-07-03 14:48:17 docs: [swag导入与计划格式] 收敛中文说明和Plan Mode约束
 2026-07-03 15:42:54 docs: [会话改名与Swag命名] 收敛平台改名矩阵和中文后缀清洗
 2026-07-03 16:12:53 docs: [审查链注释门禁] 强化代码改动注释不合规阻断
+2026-07-03 17:45:14 feat: [项目记忆与需求附录] 合并提交双区知识库与需求文档附录规则

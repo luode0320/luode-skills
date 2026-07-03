@@ -1,6 +1,6 @@
 ---
 name: project-agents-bootstrap
-description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”，其中 `PROJECT_MEMORY.md` 联动 `project-memory-rules`、`PROJECT_STYLE.md` 联动 `project-style-rules`。
+description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。
 ---
 
 # 项目 AGENTS.md 自举与补齐 Skill
@@ -94,16 +94,18 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 | 目标文件 | 负责 skill | 缺失时动作 | 已存在时动作 |
 |---------|-----------|-----------|-------------|
 | `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code） | `project-agents-bootstrap`（本 skill） | 按最小模板创建对应规则文件 | 受管章节增量同步与幂等 upsert |
-| `PROJECT_MEMORY.md` | `project-memory-rules` | 按记忆主文档模板创建 | 按记忆合并规则增量回写 |
+| `PROJECT_MEMORY.md` | `project-memory-rules` + `project-agents-bootstrap` | 按双区主文档模板创建，至少补齐人类阅读区与底部机器索引区骨架 | `project-agents-bootstrap` 只负责检测 / 创建 / 补齐双区骨架；事实抽取、实体关系更新仍由 `project-memory-rules` 负责 |
 | `PROJECT_STYLE.md` | `project-style-rules` | 按风格主文档模板创建 | 按风格合并规则增量回写 |
 
 编排要求：
 
 1. 四个文件都必须走一遍“检测 → 创建或补齐”，不得只更新其中一两个就收口。
-2. `AGENTS.md` / `CLAUDE.md` 按本 skill 受管章节规则处理；`PROJECT_MEMORY.md` 必须联动 `project-memory-rules`，`PROJECT_STYLE.md` 必须联动 `project-style-rules`，由各自 skill 决定具体写入与合并细节。
+2. `AGENTS.md` / `CLAUDE.md` 按本 skill 受管章节规则处理；`PROJECT_MEMORY.md` 必须联动 `project-memory-rules`，并继续保持“单文件双区”结构；`PROJECT_STYLE.md` 必须联动 `project-style-rules`，由各自 skill 决定具体写入与合并细节。
 3. 当前 AI 为 Claude Code 时规则文件取 `CLAUDE.md`，为 Codex 时取 `AGENTS.md`；两者都已存在时按本 skill 既有规则同步全部已存在规则文件。
 4. 四个 md 可按文件边界并行补齐（联动 `parallel-task-dispatch-rules`），但必须等全部落盘后统一核对，缺任一文件不得宣称完成。
 5. 最终回复必须逐文件给出结果：新建 / 更新 / 跳过原因，禁止只给整体一句“已更新”。
+6. `PROJECT_MEMORY.md` 缺失时创建双区骨架；已存在但缺少 `## 机器索引区` 时只补底部受管区；已存在且双区完整时只做最小同步，不重写已有正文区。
+7. `project-agents-bootstrap` 不负责从代码或对话抽取事实，不负责重建全部正文词条；它只负责双区骨架的检测、创建与幂等补齐。
 
 ## 执行步骤
 
@@ -115,15 +117,17 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 6. 若不存在：必须创建最小可用规则文件（`AGENTS.md` 或 `CLAUDE.md`）（禁止跳过）。
 7. 若存在：对受管章节做增量同步，缺失则追加，已存在则更新为最新规则，非受管内容保持不动；不能退化为”只初始化一次、后续不再同步”。
 8. 若仓库根目录缺失 `.gitattributes` 或 `.editorconfig`，必须一并补齐最小可用版本，用于固定 `LF`、`UTF-8`、末尾换行和基础编辑器行为。
-9. 若首轮尚未完成规则文件（`AGENTS.md` / `CLAUDE.md`）、`.gitattributes`、`.editorconfig` 任一项的创建、补齐或受管章节同步，必须立即停止后续主任务；此时唯一允许继续的工作是完成这些仓库级文件更新，不得先做项目分析再回补。
-10. 执行脚本后必须立刻核对结果，至少包含：
+9. 若仓库根目录缺失 `PROJECT_MEMORY.md`，或该文件缺少 `## 机器索引区`，必须通过脚本补齐最小双区骨架；不得改为创建 `PROJECT_MEMORY_INDEX.yaml`。
+10. 若首轮尚未完成规则文件（`AGENTS.md` / `CLAUDE.md`）、`.gitattributes`、`.editorconfig` 或 `PROJECT_MEMORY.md` 双区骨架中任一项的创建、补齐或受管章节同步，必须立即停止后续主任务；此时唯一允许继续的工作是完成这些仓库级文件更新，不得先做项目分析再回补。
+11. 执行脚本后必须立刻核对结果，至少包含：
 
 - 受管章节是否真的写入最新内容
 - 是否同步到了所有已存在的规则文件（`AGENTS.md` / `CLAUDE.md`）
+- `PROJECT_MEMORY.md` 是否存在且具备 `## 机器索引区`
 - `git diff -- AGENTS.md CLAUDE.md .gitattributes .editorconfig */AGENTS.md` 或等价检查中是否只出现预期改动
 
-11. 若脚本未执行、执行失败、只同步了部分规则文件、或执行后未核对结果，判定为阻断，禁止宣称已完成自举。
-12. 必须确保文档包含以下最低规则：
+12. 若脚本未执行、执行失败、只同步了部分规则文件、未补齐 `PROJECT_MEMORY.md` 双区骨架、或执行后未核对结果，判定为阻断，禁止宣称已完成自举。
+13. 必须确保文档包含以下最低规则：
 
 - 严禁脑补工具调用与结果（最高优先级）：任何文件/命令/搜索/网络的读取与执行必须经真实工具调用完成，严禁在正文编写 `<invoke>`/`<result>`/伪 function_calls 假装调用或凭记忆想象文件内容当结果；引用代码/行号/函数名前必须来自本轮真实工具返回；发现大段重复行、错乱行号、源码异常以代码块结束符收尾等迹象立即停止并重发真实工具调用、用 `md5sum`/`wc -c` 交叉校验。
 - Skill 命中强制规则：

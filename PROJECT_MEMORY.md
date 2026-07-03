@@ -335,3 +335,133 @@
 - 适用范围: HTTP API 文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
 - 更新时间: 2026-07-03
 - 状态: 启用
+
+## 机器索引区
+
+```yaml
+version: 1
+entities:
+  - entity_id: rule.authenticated-url-routing
+    name: "URL 认证浏览器默认路由"
+    type: "浏览器路由规则"
+    aliases:
+      - authenticated-url-routing-rules
+      - 已登录 Chrome 路由
+      - URL 默认 Chrome Plugin
+    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；Chrome Plugin 不可用时才允许回退到 `agent-browser` 路线。"
+    scope: "URL 分析、在线文档读取、浏览器权限页面"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.authenticated-url-routing
+    context_ids:
+      - context.url-analysis
+    updated_at: 2026-07-03
+  - entity_id: term.doc-top-level-mixed-naming
+    name: "doc 顶层混合命名"
+    type: "术语"
+    aliases:
+      - 中文语义优先命名
+    definition: "`doc/` 根目录保留英文，活动子目录采用“编号顺序 + 中文语义优先 + 工程通用域保留英文”的混合方案。"
+    scope: "文档目录命名"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.artifact-storage
+      - evidence.dialog.doc-layout
+    context_ids:
+      - context.doc-directory-naming
+    updated_at: 2026-07-03
+  - entity_id: rule.old-directory-cleanup
+    name: "旧目录处理规则"
+    type: "迁移约束"
+    aliases:
+      - 不保留兼容层
+    definition: "当目录迁移完成且用户未要求保留兼容入口时，应删除旧目录、旧占位文件和旧跳转文档，不保留并行旧包或兼容壳。"
+    scope: "目录迁移与收口"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.artifact-storage
+      - evidence.dialog.old-directory-cleanup
+    context_ids:
+      - context.directory-migration
+    updated_at: 2026-07-03
+relations:
+  - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
+    type: "depends_on"
+    from: "rule.old-directory-cleanup"
+    to: "term.doc-top-level-mixed-naming"
+    evidence_ids:
+      - evidence.skill.artifact-storage
+    status: "active"
+evidence:
+  - evidence_id: evidence.skill.authenticated-url-routing
+    type: "skill"
+    source: "authenticated-url-routing-rules/SKILL.md"
+    path: "authenticated-url-routing-rules/SKILL.md"
+    note: "URL 默认走真实 Chrome 登录态的技能定义来源"
+  - evidence_id: evidence.skill.artifact-storage
+    type: "skill"
+    source: "artifact-storage-rules/SKILL.md"
+    path: "artifact-storage-rules/SKILL.md"
+    note: "文档目录与迁移收口规则来源"
+  - evidence_id: evidence.dialog.doc-layout
+    type: "dialog"
+    source: "对话确认"
+    note: "doc 顶层混合命名为仓库长期口径"
+  - evidence_id: evidence.dialog.old-directory-cleanup
+    type: "dialog"
+    source: "对话确认"
+    note: "旧目录迁移完成后不保留兼容层"
+contexts:
+  - context_id: context.url-analysis
+    type: "task-scope"
+    name: "URL 分析与在线文档读取"
+    note: "适用于需要读取、分析或截图已登录页面的场景"
+  - context_id: context.doc-directory-naming
+    type: "repository-convention"
+    name: "文档目录命名"
+    note: "适用于 doc 顶层活动目录命名与归档"
+  - context_id: context.directory-migration
+    type: "repository-convention"
+    name: "目录迁移与收口"
+    note: "适用于目录迁移完成后的旧目录清理"
+lifecycle:
+  active:
+    - "rule.authenticated-url-routing"
+    - "term.doc-top-level-mixed-naming"
+    - "rule.old-directory-cleanup"
+    - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
+  deprecated: []
+  stale: []
+  conflicted: []
+  retired: []
+retrieval_hints:
+  aliases:
+    authenticated-url-routing-rules:
+      - "rule.authenticated-url-routing"
+    已登录 Chrome 路由:
+      - "rule.authenticated-url-routing"
+    中文语义优先命名:
+      - "term.doc-top-level-mixed-naming"
+    不保留兼容层:
+      - "rule.old-directory-cleanup"
+  scopes:
+    URL 分析:
+      - "rule.authenticated-url-routing"
+    文档目录命名:
+      - "term.doc-top-level-mixed-naming"
+    目录迁移与收口:
+      - "rule.old-directory-cleanup"
+  sources:
+    authenticated-url-routing-rules/SKILL.md:
+      - "rule.authenticated-url-routing"
+    artifact-storage-rules/SKILL.md:
+      - "term.doc-top-level-mixed-naming"
+      - "rule.old-directory-cleanup"
+extensions:
+  external_refs:
+    - type: migration-sample
+      note: "本轮仅迁移 3 条现有长期记忆作为单文件双区演练样本"
+  retrieval_provider: ""
+  vector_doc_id: ""
+  graph_node_id: ""
+```
