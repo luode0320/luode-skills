@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-03 18:48:53",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-07-04 02:40:44",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 8,
-    "references_total": 326,
+    "references_total": 327,
     "agents_total": 89
   },
   "downloaded_seeds": {
@@ -1275,6 +1275,7 @@ window.SKILL_DICTIONARY = {
             "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
             "implementation-planning-rules/references/plan-boundaries-and-examples.md",
             "implementation-planning-rules/references/plan-entry-checklist.md",
+            "implementation-planning-rules/references/plan-output-gate.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
             "implementation-planning-rules/references/plan-structure-template.md",
             "implementation-planning-rules/references/source-notes.md",
@@ -5811,6 +5812,7 @@ window.SKILL_DICTIONARY = {
         "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
         "implementation-planning-rules/references/plan-boundaries-and-examples.md",
         "implementation-planning-rules/references/plan-entry-checklist.md",
+        "implementation-planning-rules/references/plan-output-gate.md",
         "implementation-planning-rules/references/plan-review-checklist.md",
         "implementation-planning-rules/references/plan-structure-template.md",
         "implementation-planning-rules/references/source-notes.md",
