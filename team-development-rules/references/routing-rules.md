@@ -16,7 +16,7 @@
 
 | 当前信号 | 进入的域 / skill | 说明 |
 | --- | --- | --- |
-| 当前上下文处于 `Plan Mode` | 实施域 / `implementation-planning-rules` + 相邻计划前置 skill | 这是最高优先级计划路由；无论用户问什么，都先进入计划 skill 链路，再由它决定是否回流需求侦察、需求接入、缺口、边界、拆分或其他域；计划前置 skill 默认包括 `requirement-discovery-rules`、`requirement-intake-rules`、`requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`，但仅在它们确实承接当前缺口时才继续触发 |
+| 当前上下文处于 `Plan Mode` | 实施域 / `implementation-planning-rules` + 相邻计划前置 skill | 这是最高优先级计划路由；无论用户问什么，都先进入计划 skill 链路，再由它决定是否回流需求侦察、需求接入、缺口、边界、拆分或其他域；若运行环境要求用 `<proposed_plan>` 或其他专用计划包裹输出，包裹层不改变项目内计划格式，正文仍必须遵守 `implementation-planning-rules` 与模板约束；计划前置 skill 默认包括 `requirement-discovery-rules`、`requirement-intake-rules`、`requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`，但仅在它们确实承接当前缺口时才继续触发 |
 | 用户本轮核心问题是在问“这件事怎么做”“这个需求怎么落地”“先给个计划”“先出方案和步骤”“这个怎么改最合适” | 实施域 / `implementation-planning-rules` | 这是显式计划型提问；即使前置条件未齐，也要先命中计划规则并输出受限计划 / 阻断计划，而不是不触发 |
 | 用户直接输入“提交git”“提交 git”“git提交”“commit一下”“帮我提交代码”等执行型短指令 | 交付域 / `git-collaboration-rules` | 这是明确执行提交动作，直接进入 Git 提交流程；若命中阻断条件再回退补齐前置条件 |
 | 当前争议是需求文档、Bug 记录、测试任务目录、项目说明文档或根目录 `项目设计.md` 应该放到哪里、叫什么、是否复用原记录 | 总控层 / `artifact-storage-rules` | 先统一全局目录与命名约定，再回到对应主域继续执行 |

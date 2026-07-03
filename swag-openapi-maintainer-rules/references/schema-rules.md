@@ -24,6 +24,8 @@
 
 单接口 YAML 只包含一个接口 operation；如果同一 path 下同一单文件确实承载多个 method，必须能独立导入 Apifox。
 
+为避免 Apifox 导入时自动新增父目录，单接口 YAML 的 operation 默认不写 `tags`。总 YAML 可保留 `tags` 供全量文档分组使用。
+
 ## 总 YAML
 
 `swag/openapi.yaml` 必须包含当前扫描到的所有接口：
@@ -41,7 +43,8 @@
 - 必填来自 binding / validate / required tag、构造逻辑或 DTO 定义。
 - 类型来自语言类型、字段 tag、注释和 serializer。
 - 枚举来自常量、枚举类型、validator、代码分支。
-- description 可来自字段注释；没有注释时允许为空，不得编造业务含义。
+- 头部、请求参数、响应字段都必须有中文 `description`。
+- description 优先来自字段注释；源码注释不足时允许按 `description-rules.md` 做受控推导，但不得编造业务含义、默认值、校验规则或失败语义。
 
 ## 请求与响应
 
@@ -49,6 +52,7 @@
 - POST / PUT / PATCH body 必须按真实 request DTO 构造。
 - 统一响应包装必须按真实 response wrapper 展开或引用。
 - 错误响应至少覆盖项目统一错误结构；不能只写 200。
+- body 根对象、响应根对象和统一包装字段也必须有中文说明。
 
 ## 鉴权与 Header
 
@@ -59,6 +63,8 @@
 - API Key
 - Signature
 - Tenant / Locale / Trace Header
+
+以上方案无论通过参数还是安全方案表达，都必须带中文说明。
 
 无法确认时写入待确认并阻断通过验收，不要猜。
 

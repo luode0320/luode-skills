@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-03 02:39:41",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-03 14:39:23",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 7,
-    "references_total": 318,
+    "references_total": 319,
     "agents_total": 89
   },
   "downloaded_seeds": {
@@ -1244,7 +1244,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 6,
-          "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
+          "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
           "core_responsibility": "把已确认需求转成可执行实施总览与实施周期。",
           "skill_path": "implementation-planning-rules/SKILL.md",
           "directory_path": "implementation-planning-rules",
@@ -2599,7 +2599,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "按改动位置叠加触发的实现规则",
           "domain_order": 6,
           "item_order": 8,
-          "auto_trigger": "当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；不要用它代替 api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。",
+          "auto_trigger": "当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；本 skill 只负责后端代码中的 Swagger/OpenAPI 框架接入、注解与调试入口，当用户要求生成、更新、刷新、补齐 swag，或导出 OpenAPI/Swagger/Apifox YAML 到 swag/ 目录时，属于文档产物维护，必须转交 swag-openapi-maintainer-rules；不要用它代替 swag-openapi-maintainer-rules、api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。",
           "core_responsibility": "统一 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。",
           "skill_path": "api-swagger-rules/SKILL.md",
           "directory_path": "api-swagger-rules",
@@ -4280,7 +4280,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 17,
-          "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。不要用它代替业务接口实现、接口需求设计、功能测试或线上联调。",
+          "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
           "directory_path": "swag-openapi-maintainer-rules",
@@ -4296,6 +4296,7 @@ window.SKILL_DICTIONARY = {
             "scripts"
           ],
           "references": [
+            "swag-openapi-maintainer-rules/references/description-rules.md",
             "swag-openapi-maintainer-rules/references/discovery-rules.md",
             "swag-openapi-maintainer-rules/references/naming-rules.md",
             "swag-openapi-maintainer-rules/references/schema-rules.md",
@@ -5767,7 +5768,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 6,
-      "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
+      "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
       "core_responsibility": "把已确认需求转成可执行实施总览与实施周期。",
       "skill_path": "implementation-planning-rules/SKILL.md",
       "directory_path": "implementation-planning-rules",
@@ -7086,7 +7087,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "按改动位置叠加触发的实现规则",
       "domain_order": 6,
       "item_order": 8,
-      "auto_trigger": "当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；不要用它代替 api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。",
+      "auto_trigger": "当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；本 skill 只负责后端代码中的 Swagger/OpenAPI 框架接入、注解与调试入口，当用户要求生成、更新、刷新、补齐 swag，或导出 OpenAPI/Swagger/Apifox YAML 到 swag/ 目录时，属于文档产物维护，必须转交 swag-openapi-maintainer-rules；不要用它代替 swag-openapi-maintainer-rules、api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。",
       "core_responsibility": "统一 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。",
       "skill_path": "api-swagger-rules/SKILL.md",
       "directory_path": "api-swagger-rules",
@@ -8707,7 +8708,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 17,
-      "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。不要用它代替业务接口实现、接口需求设计、功能测试或线上联调。",
+      "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
       "directory_path": "swag-openapi-maintainer-rules",
@@ -8723,6 +8724,7 @@ window.SKILL_DICTIONARY = {
         "scripts"
       ],
       "references": [
+        "swag-openapi-maintainer-rules/references/description-rules.md",
         "swag-openapi-maintainer-rules/references/discovery-rules.md",
         "swag-openapi-maintainer-rules/references/naming-rules.md",
         "swag-openapi-maintainer-rules/references/schema-rules.md",

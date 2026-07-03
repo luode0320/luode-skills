@@ -1,12 +1,13 @@
 ---
 name: api-swagger-rules
-description: 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；不要用它代替 api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。
+description: 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时触发。负责统一 Swagger/OpenAPI 框架选型边界、接口文档最小必填项、请求/响应同步、调试可用性和暴露安全规则；对存在 HTTP API 且需要联调/调试的后端项目，默认要求使用统一的 Swagger/OpenAPI 方案；本 skill 只负责后端代码中的 Swagger/OpenAPI 框架接入、注解与调试入口，当用户要求生成、更新、刷新、补齐 swag，或导出 OpenAPI/Swagger/Apifox YAML 到 swag/ 目录时，属于文档产物维护，必须转交 swag-openapi-maintainer-rules；不要用它代替 swag-openapi-maintainer-rules、api-endpoint-rules、api-request-rules、api-response-rules、普通业务注释规则或功能验证。
 ---
 
 # Swagger / OpenAPI 规则
 
 只在判断“后端 HTTP API 是否需要 Swagger/OpenAPI、应该如何接入、如何保持接口文档同步、如何开放调试入口”时使用这个 skill。
 如果当前主要问题是接口入口职责、请求字段结构、响应包装或错误处理，请先转交相邻 API skill。
+如果当前主要诉求是维护 `swag/` 目录下的 OpenAPI/Swagger YAML 文档产物（生成/更新/刷新/补齐 swag、导出为 YAML），请转交 `swag-openapi-maintainer-rules`，本 skill 不产出 YAML 文档。
 
 **重要：只要项目存在需要开发/测试联调或接口调试的后端 HTTP API，就默认要求项目使用统一的 Swagger/OpenAPI 方案；同一项目只保留一套主方案。**
 
@@ -48,6 +49,7 @@ description: 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、
 ## 权责边界与不负责事项
 
 - 只负责 Swagger/OpenAPI 方案、接口文档同步和调试入口规则，不代替 `api-endpoint-rules` 设计接口入口职责。
+- 不负责生成或维护 `swag/` 目录下的全量 OpenAPI/Swagger YAML 文档产物；“生成/更新/刷新/补齐 swag、导出 YAML 到 swag/”属于文档域，交给 `swag-openapi-maintainer-rules`，本 skill 只管代码侧的 Swagger 契约、注解与调试入口。
 - 不代替 `api-request-rules` 设计请求 DTO 和字段校验。
 - 不代替 `api-response-rules` 设计统一响应结构、错误响应结构和分页返回。
 - 不把 Swagger/OpenAPI 注解/注释当成普通业务注释处理，那属于接口契约和调试入口规则。
