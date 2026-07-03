@@ -23,6 +23,10 @@ CJK_PATTERN = re.compile(r"[\u3400-\u9fff]")
 FILENAME_ILLEGAL_CHARS = re.compile(r'[\\/:*?"<>|]+')
 WHITESPACE_PATTERN = re.compile(r"\s+")
 MULTI_UNDERSCORE_PATTERN = re.compile(r"_+")
+LEADING_SUMMARY_ENUM_PATTERN = re.compile(
+    r"^\s*(?:[\(\[（【]?\s*\d+\s*[\)\]）】]?\s*[.、:：_\-]*\s*)+"
+)
+LEADING_SUMMARY_DECORATION_PATTERN = re.compile(r"^[\s._\-·、,:：;；\(\)（）【】\[\]]+")
 SUMMARY_SUFFIX_MAX_LEN = 24
 
 
@@ -70,12 +74,14 @@ def sanitize_summary_suffix(summary: Any) -> str:
     if not isinstance(summary, str):
         return ""
     value = summary.strip()
+    value = LEADING_SUMMARY_ENUM_PATTERN.sub("", value)
+    value = LEADING_SUMMARY_DECORATION_PATTERN.sub("", value)
     value = WHITESPACE_PATTERN.sub("_", value)
     value = FILENAME_ILLEGAL_CHARS.sub("_", value)
     value = MULTI_UNDERSCORE_PATTERN.sub("_", value)
-    value = value.strip(" _.")
+    value = value.strip(" _.-·、,:：;；")
     if len(value) > SUMMARY_SUFFIX_MAX_LEN:
-        value = value[:SUMMARY_SUFFIX_MAX_LEN].rstrip(" _.")
+        value = value[:SUMMARY_SUFFIX_MAX_LEN].rstrip(" _.-·、,:：;；")
     return value
 
 
