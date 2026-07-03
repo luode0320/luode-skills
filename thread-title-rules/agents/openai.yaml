@@ -1,6 +1,6 @@
 interface:
   display_name: "会话标题规则"
   short_description: "在支持改名的环境中按当前任务主题更新会话标题"
-  default_prompt: "Use $thread-title-rules to keep this thread title aligned with the current task when a real rename tool is available."
+  default_prompt: "Use $thread-title-rules to keep this thread title aligned with the current task. In Codex, if `set_thread_title` or `list_threads` are not already exposed, first discover the thread tools via tool search, then resolve the current thread and rename it. Only skip when the title is already accurate, the task is not stable, or the real tools remain unavailable after discovery."
 policy:
   allow_implicit_invocation: true
