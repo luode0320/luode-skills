@@ -88,6 +88,8 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
   "task_summary": "补充子代理启动计划脚本并测试",
   "execution_skill": "subagent-dispatch-rules",
   "planned_thread_count": 1,
+  "max_concurrent": 5,
+  "batch_count": 1,
   "generated_at": "2026-06-29 22:10:00",
   "threads": [
     {
@@ -110,7 +112,8 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
       "extra_constraints": [
         "保持 UTF-8 编码"
       ],
-      "message": "..."
+      "message": "...",
+      "batch_index": 1
     }
   ]
 }
@@ -130,6 +133,12 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
   - 当前脚本会同时输出 `agent_name` 与 `logical_agent_name`，两者值相同。
 - `message`
   - 直接用于真实 `spawn_agent` / 等价平台工具的委派消息草案。
+- `max_concurrent`
+  - 固定为 5，与 `SKILL.md`「并发上限与空闲回收（强制）」规定的并发上限一致；脚本不提供覆盖参数。
+- `batch_count`
+  - `= ceil(threads 总数 / max_concurrent)`，表示需要分几批启动。
+- `threads[*].batch_index`
+  - 从 1 开始；按输入 `threads` 数组顺序，每 `max_concurrent` 个线程分为一批，同一批内的线程 `batch_index` 相同。
 
 ## 主 agent 使用方式
 
@@ -137,13 +146,15 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
 2. 读取输出 JSON。
 3. 用 `threads[*].agent_name` 或 `threads[*].logical_agent_name` 作为中文逻辑任务名，写入主 agent 的启动/完成公告。
 4. 用 `threads[*].message` 作为子 agent 委派消息。
-5. 若当前轮授权或项目级完全授权允许，逐个调用真实 subagent / multi-agent / thread 工具，并记录工具返回的 `nickname` 作为平台昵称；若授权不允许自动启动，记录未启动原因。
-6. 建立运行时映射：`logical_agent_name -> platform_nickname -> agent_id`。
-7. 启动后核对：
+5. 按 `threads[*].batch_index` 分批启动：先启动 `batch_index=1` 的全部线程，且同一批次内线程数不得超过 `max_concurrent`；必须等这一批全部完成并 `close_agent` 回收后，才能启动 `batch_index=2` 及后续批次。
+6. 若当前轮授权或项目级完全授权允许，逐个调用真实 subagent / multi-agent / thread 工具，并记录工具返回的 `nickname` 作为平台昵称；若授权不允许自动启动，记录未启动原因。
+7. 建立运行时映射：`logical_agent_name -> platform_nickname -> agent_id`。
+8. 启动后核对：
    - `planned_thread_count`
+   - `batch_count` 与实际分批启动次数是否一致
    - 实际成功启动的线程数
    - 未启动线程及原因
-8. 结果收回后，立即调用 `close_agent` / 等价关闭工具，并核对“已关闭线程数”与“已完成线程数”一致。
+9. 结果收回后，立即调用 `close_agent` / 等价关闭工具，并核对“已关闭线程数”与“已完成线程数”一致，再启动下一批。
 
 ## 平台昵称说明
 

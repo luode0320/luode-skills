@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from datetime import datetime
@@ -15,6 +16,8 @@ from typing import Any
 DEFAULT_EXECUTION_SKILL = "subagent-dispatch-rules"
 DEFAULT_TASK_NAME = "并行子任务"
 MAX_TASK_NAME_LENGTH = 10
+# 与 SKILL.md「并发上限与空闲回收（强制）」规定的并发上限保持一致，脚本不提供覆盖参数
+MAX_CONCURRENT_AGENTS = 5
 TRAILING_NOISE_WORDS = (
     "并测试",
     "测试",
@@ -213,25 +216,43 @@ def build_agent_message(
 
 
 def build_plan(data: dict[str, Any]) -> dict[str, Any]:
+    """组装子 agent 启动计划，并按并发上限把线程标注为若干批次。
+
+    [参数] data: 输入 JSON 解析后的字典，须含 task_summary 与非空 threads 数组。
+    [返回] 结构化启动计划字典，含 max_concurrent、batch_count 与 threads[*].batch_index。
+    最近修改时间: 2026-07-04 16:52:00（新增并发上限批次拆分：为每个线程标注 batch_index，
+    并在返回值中补充 max_concurrent/batch_count，供主 agent 按批次启动、避免同时活跃数超过上限）
+    """
+    # 1. 校验并规范化任务摘要
     task_summary = compact_text(str(data.get("task_summary", "")))
     if not task_summary:
         raise ValueError("task_summary 不能为空。")
 
+    # 2. 校验 threads 为非空数组
     raw_threads = data.get("threads")
     if not isinstance(raw_threads, list) or not raw_threads:
         raise ValueError("threads 必须是非空数组。")
 
+    # 3. 规范化执行 skill、共享约束与任务简称
     execution_skill = compact_text(str(data.get("execution_skill", DEFAULT_EXECUTION_SKILL))) or DEFAULT_EXECUTION_SKILL
     shared_constraints = normalize_string_list(data.get("shared_constraints"), "shared_constraints")
     task_name = sanitize_task_name(task_summary)
 
+    # 4. 逐个规范化线程，生成子 agent 委派消息
     threads = [normalize_thread(item, task_name, shared_constraints) for item in raw_threads]
 
+    # 5. 按并发上限（MAX_CONCURRENT_AGENTS）为每个线程标注批次序号，供主 agent 分批启动
+    for index, thread in enumerate(threads):
+        thread["batch_index"] = index // MAX_CONCURRENT_AGENTS + 1
+
+    # 6. 组装并返回结构化启动计划
     return {
         "task_name": task_name,
         "task_summary": task_summary,
         "execution_skill": execution_skill,
         "planned_thread_count": len(threads),
+        "max_concurrent": MAX_CONCURRENT_AGENTS,
+        "batch_count": math.ceil(len(threads) / MAX_CONCURRENT_AGENTS),
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "threads": threads,
     }

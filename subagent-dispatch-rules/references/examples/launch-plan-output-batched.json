@@ -1,0 +1,137 @@
+{
+  "task_name": "七个模块只读侦察排查",
+  "task_summary": "七个模块只读侦察排查",
+  "execution_skill": "subagent-dispatch-rules",
+  "planned_thread_count": 7,
+  "max_concurrent": 5,
+  "batch_count": 2,
+  "generated_at": "2026-07-04 16:52:38",
+  "threads": [
+    {
+      "thread": "A",
+      "agent_name": "七个模块只读侦察排查-A",
+      "logical_agent_name": "七个模块只读侦察排查-A",
+      "agent_type": "explorer",
+      "goal": "侦察模块 A 的目录结构与入口",
+      "expected_output": "输出模块 A 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleA/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-A\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 A 的目录结构与入口\n读取范围：\n- moduleA/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 A 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 1
+    },
+    {
+      "thread": "B",
+      "agent_name": "七个模块只读侦察排查-B",
+      "logical_agent_name": "七个模块只读侦察排查-B",
+      "agent_type": "explorer",
+      "goal": "侦察模块 B 的目录结构与入口",
+      "expected_output": "输出模块 B 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleB/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-B\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 B 的目录结构与入口\n读取范围：\n- moduleB/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 B 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 1
+    },
+    {
+      "thread": "C",
+      "agent_name": "七个模块只读侦察排查-C",
+      "logical_agent_name": "七个模块只读侦察排查-C",
+      "agent_type": "explorer",
+      "goal": "侦察模块 C 的目录结构与入口",
+      "expected_output": "输出模块 C 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleC/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-C\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 C 的目录结构与入口\n读取范围：\n- moduleC/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 C 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 1
+    },
+    {
+      "thread": "D",
+      "agent_name": "七个模块只读侦察排查-D",
+      "logical_agent_name": "七个模块只读侦察排查-D",
+      "agent_type": "explorer",
+      "goal": "侦察模块 D 的目录结构与入口",
+      "expected_output": "输出模块 D 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleD/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-D\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 D 的目录结构与入口\n读取范围：\n- moduleD/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 D 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 1
+    },
+    {
+      "thread": "E",
+      "agent_name": "七个模块只读侦察排查-E",
+      "logical_agent_name": "七个模块只读侦察排查-E",
+      "agent_type": "explorer",
+      "goal": "侦察模块 E 的目录结构与入口",
+      "expected_output": "输出模块 E 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleE/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-E\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 E 的目录结构与入口\n读取范围：\n- moduleE/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 E 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 1
+    },
+    {
+      "thread": "F",
+      "agent_name": "七个模块只读侦察排查-F",
+      "logical_agent_name": "七个模块只读侦察排查-F",
+      "agent_type": "explorer",
+      "goal": "侦察模块 F 的目录结构与入口",
+      "expected_output": "输出模块 F 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleF/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-F\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 F 的目录结构与入口\n读取范围：\n- moduleF/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 F 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 2
+    },
+    {
+      "thread": "G",
+      "agent_name": "七个模块只读侦察排查-G",
+      "logical_agent_name": "七个模块只读侦察排查-G",
+      "agent_type": "explorer",
+      "goal": "侦察模块 G 的目录结构与入口",
+      "expected_output": "输出模块 G 结构摘要",
+      "write_scope": [],
+      "read_scope": [
+        "moduleG/"
+      ],
+      "shared_constraints": [
+        "只读侦察，不修改任何文件"
+      ],
+      "extra_constraints": [],
+      "message": "逻辑子任务名：七个模块只读侦察排查-G\n命名说明：\n- 该名称用于主 agent 跟踪，不等于平台显示昵称。\n任务目标：\n- 侦察模块 G 的目录结构与入口\n读取范围：\n- moduleG/\n约束：\n- 只读侦察，不修改任何文件\n输出要求：\n- 输出模块 G 结构摘要\n- 最终回复请列出你实际改动或核查的文件路径。",
+      "batch_index": 2
+    }
+  ]
+}

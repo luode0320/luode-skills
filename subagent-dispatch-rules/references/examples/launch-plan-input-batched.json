@@ -1,0 +1,51 @@
+{
+  "task_summary": "七个模块只读侦察排查",
+  "execution_skill": "subagent-dispatch-rules",
+  "shared_constraints": [
+    "只读侦察，不修改任何文件"
+  ],
+  "threads": [
+    {
+      "thread": "A",
+      "goal": "侦察模块 A 的目录结构与入口",
+      "read_scope": ["moduleA/"],
+      "expected_output": "输出模块 A 结构摘要"
+    },
+    {
+      "thread": "B",
+      "goal": "侦察模块 B 的目录结构与入口",
+      "read_scope": ["moduleB/"],
+      "expected_output": "输出模块 B 结构摘要"
+    },
+    {
+      "thread": "C",
+      "goal": "侦察模块 C 的目录结构与入口",
+      "read_scope": ["moduleC/"],
+      "expected_output": "输出模块 C 结构摘要"
+    },
+    {
+      "thread": "D",
+      "goal": "侦察模块 D 的目录结构与入口",
+      "read_scope": ["moduleD/"],
+      "expected_output": "输出模块 D 结构摘要"
+    },
+    {
+      "thread": "E",
+      "goal": "侦察模块 E 的目录结构与入口",
+      "read_scope": ["moduleE/"],
+      "expected_output": "输出模块 E 结构摘要"
+    },
+    {
+      "thread": "F",
+      "goal": "侦察模块 F 的目录结构与入口",
+      "read_scope": ["moduleF/"],
+      "expected_output": "输出模块 F 结构摘要"
+    },
+    {
+      "thread": "G",
+      "goal": "侦察模块 G 的目录结构与入口",
+      "read_scope": ["moduleG/"],
+      "expected_output": "输出模块 G 结构摘要"
+    }
+  ]
+}

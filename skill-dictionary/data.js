@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-04 02:40:44",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-04 16:54:59",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 8,
-    "references_total": 327,
+    "references_total": 329,
     "agents_total": 89
   },
   "downloaded_seeds": {
@@ -651,6 +651,7 @@ window.SKILL_DICTIONARY = {
             "默认执行流程",
             "主 agent 可见公告（强制）",
             "真实启动证据（强制）",
+            "并发上限与空闲回收（强制）",
             "子任务优先委派清单",
             "必须主 agent 本地执行的场景",
             "权责边界与不负责事项",
@@ -661,7 +662,9 @@ window.SKILL_DICTIONARY = {
           "references": [
             "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
             "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+            "subagent-dispatch-rules/references/examples/launch-plan-input-batched.json",
             "subagent-dispatch-rules/references/examples/launch-plan-input.json",
+            "subagent-dispatch-rules/references/examples/launch-plan-output-batched.json",
             "subagent-dispatch-rules/references/examples/launch-plan-output.json",
             "subagent-dispatch-rules/references/launch-plan-schema.md",
             "subagent-dispatch-rules/references/subagent-task-templates.md"
@@ -5212,6 +5215,7 @@ window.SKILL_DICTIONARY = {
         "默认执行流程",
         "主 agent 可见公告（强制）",
         "真实启动证据（强制）",
+        "并发上限与空闲回收（强制）",
         "子任务优先委派清单",
         "必须主 agent 本地执行的场景",
         "权责边界与不负责事项",
@@ -5222,7 +5226,9 @@ window.SKILL_DICTIONARY = {
       "references": [
         "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
         "subagent-dispatch-rules/references/delegation-decision-matrix.md",
+        "subagent-dispatch-rules/references/examples/launch-plan-input-batched.json",
         "subagent-dispatch-rules/references/examples/launch-plan-input.json",
+        "subagent-dispatch-rules/references/examples/launch-plan-output-batched.json",
         "subagent-dispatch-rules/references/examples/launch-plan-output.json",
         "subagent-dispatch-rules/references/launch-plan-schema.md",
         "subagent-dispatch-rules/references/subagent-task-templates.md"
