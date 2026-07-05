@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 当前上下文处于 `Plan Mode` | 实施域 / `implementation-planning-rules` + 相邻计划前置 skill | 这是最高优先级计划路由；无论用户问什么，都先进入计划 skill 链路，再由它决定是否回流需求侦察、需求接入、缺口、边界、拆分或其他域；若运行环境要求用 `<proposed_plan>` 或其他专用计划包裹输出，包裹层不改变项目内计划格式，正文仍必须遵守 `implementation-planning-rules` 与模板约束；计划前置 skill 默认包括 `requirement-discovery-rules`、`requirement-intake-rules`、`requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`，但仅在它们确实承接当前缺口时才继续触发 |
 | 用户本轮核心问题是在问“这件事怎么做”“这个需求怎么落地”“先给个计划”“先出方案和步骤”“这个怎么改最合适” | 实施域 / `implementation-planning-rules` | 这是显式计划型提问；即使前置条件未齐，也要先命中计划规则并输出受限计划 / 阻断计划，而不是不触发 |
+| 新项目开始、项目初期存在多份需求 / 多份实施总览 / 多个实施周期，或用户要求“实施顺序总表”“需求与实施计划全量顺序实施方案”“全量顺序实施方案” | 实施域 / `implementation-planning-rules` + `artifact-storage-rules` | 先在 `doc/3-实施/` 建立或更新项目级 / 集合级“需求与实施计划全量顺序实施方案”，把需求、验收标准、实施总览、实施周期、周期内最小任务按总顺序串起来，再进入单来源对象实施总览和周期执行 |
 | 用户直接输入“提交git”“提交 git”“git提交”“commit一下”“帮我提交代码”等执行型短指令 | 交付域 / `git-collaboration-rules` | 这是明确执行提交动作，直接进入 Git 提交流程；若命中阻断条件再回退补齐前置条件 |
 | 当前争议是需求文档、Bug 记录、测试任务目录、项目说明文档或根目录 `项目设计.md` 应该放到哪里、叫什么、是否复用原记录 | 总控层 / `artifact-storage-rules` | 先统一全局目录与命名约定，再回到对应主域继续执行 |
 | 当前主流程已经明确，但执行中发现已命中的某个 skill 触发不准、规则缺失、边界不清、references 不足，继续推进只能依赖临时口头规则 | 总控辅助 / `skill-evolution-rules` | 先判断这是不是 skill gap，再决定补旧 skill、补相邻 skill 还是新增独立 skill；阻断级 gap 应先暂停当前任务 |
@@ -28,7 +29,7 @@
 | 用户提出新功能、新页面、新接口、新模块，尚未开始写代码，且没有显式索要计划 | 需求域 / `requirement-intake-rules` | 先理解目标、背景、输入输出和上下游 |
 | 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现；若仍可继续侦察，优先回流 `requirement-discovery-rules` |
 | 需求过大，涉及多个模块、多个页面、多个接口或多个实施波次 | 需求域 / `requirement-splitting-rules` | 先拆成可独立推进的子项，再决定实施顺序 |
-| 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施方案、明确文件落点、任务顺序和验证闭环 | 实施域 / `implementation-planning-rules` | 先把已确认需求转成可执行实施总览/实施周期，再进入编码 |
+| 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施方案、明确文件落点、任务顺序和验证闭环 | 实施域 / `implementation-planning-rules` | 单来源对象先转成可执行实施总览/实施周期；多来源对象先补全量顺序实施方案，再进入各来源对象实施总览/实施周期 |
 | 需求、前置验收标准与实施文档都已确认，且用户已明确“开始实施”“开始执行”或“按实施计划执行” | 连续执行链路 / `autonomous-execution-rules` + 实施/编码/测试/验收域 | 默认先定位当前实施周期（第一期、第二期、第三期等大进度），再按周期内最小任务逐个推进“实现 -> 真实测试 -> 审查 -> 验收”；当前周期全部最小任务收口后再进入下一周期，除阻断级节点外不在中间重复确认 |
 | 需求、前置验收标准与实施文档已齐备，但用户还没有明确“开始实施/开始执行” | 保持在实施域 / `implementation-planning-rules` | 允许继续补计划、改周期、调验证点，但不允许直接进入编码 |
 | 编码过程中出现新条件、优先级变化、默认值变化或交付物变化 | 需求域 / `requirement-change-rules` | 先重算影响范围，不直接把变更偷偷塞进当前实现 |

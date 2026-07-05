@@ -8,6 +8,7 @@
 - 需要知道各根目录职责时，读取 `../artifact-storage-rules/references/root-directories.md`
 - 需要知道命名模板时，读取 `../artifact-storage-rules/references/naming-templates.md`
 - 需要知道“更新原记录还是新建新记录”时，读取 `../artifact-storage-rules/references/update-policy.md`
+- 需要判断新项目或多来源对象的实施顺序总表如何命名和复用时，读取 `../artifact-storage-rules/references/path-map.yaml`、`naming-templates.md` 与 `update-policy.md` 中的“需求与实施计划全量顺序实施方案”规则
 - 需要知道根目录 `项目设计.md` 的主入口、别名兼容和复用策略时，仍优先读取本 skill 的 `path-map.yaml` 与 `update-policy.md`
 
 ## 其他 skill 的写法建议
