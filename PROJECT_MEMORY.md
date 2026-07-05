@@ -82,10 +82,10 @@
 ### 实施开工授权与自动推进
 - 别名: 开始实施确认, 开工授权, 最小任务自动推进, 长文本执行边界
 - 类型: 流程规则
-- 定义: 来源对象文档（需求或 Bug）、前置验收标准和实施总览/实施周期即使都已完成，也不构成自动开工授权；必须由用户在当前任务中明确说“开始实施”“开始实现”“开始执行”“直接做”“继续做完”或“按文档实现”，且当前任务已有执行计划、任务完成条件、任务停止 / 结束条件、最大推进边界和验证点，才允许从实施文档切入正式编码。实施规划阶段默认采用只读计划模式：禁止写代码、禁止边计划边试做，只允许读仓库、定依赖、列风险、拆任务、写实施文档。计划正文开头必须先写“当前计划最终方案的简要说明”，用 1-3 句先交代推荐方案、主落点和为什么这么做；随后再写 agent 对当前问题的理解，至少交代问题 / 目标、本轮范围、非范围、当前优先闭环和关键假设 / 待确认点，再进入实施周期与最小任务拆分。实施周期是计划管理容器，不是默认执行粒度；真正执行单元必须先拆到最小任务，并优先按“依赖图 + 垂直切片”组织，避免按前端 / 后端 / 数据库水平分层堆计划。单任务尽量单次专注完成，默认控制在约 5 个文件以内；明显超过则继续拆分。凡是代码生成、修改或重构类任务，都必须显式计划真实测试，写清入口、环境、样本 / 数据来源和通过标准，`build`、`lint`、静态检查不算真实测试；只有纯文档、纯注释、纯排版、纯静态资源改名 / 搬运或不会影响运行结果的场景才允许免测；若计划涉及代码生成、修改或重构，“现状与落点”必须给出代码落点目录树，不能只写文件名或普通条目。若用户在当前轮显式提出“怎么做 / 先给计划 / 先出方案 / 先列步骤 / 这个怎么改”这类计划型问题，也必须先命中实施规划规则；若前置条件未齐，则输出受限计划 / 阻断计划，而不是不触发。若运行环境要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层只负责渲染 / 协议，不能覆盖项目内计划结构；正文仍必须遵守 `implementation-planning-rules` 与模板字段，并在输出前执行 `implementation-planning-rules/references/plan-output-gate.md` 的字段矩阵。Plan Mode 计划正文若以 `Summary`、`Key Changes`、`Public Interfaces`、`Test Plan`、`Assumptions` 等通用工程计划小节作为主结构，或缺少当前计划最终方案简要说明、agent 理解、范围、非范围、当前优先闭环、关键假设、实施周期、阶段计划、最小任务、真实测试、完成条件、停止 / 结束条件、最大推进边界等核心字段，直接判定为无效计划，必须按模板重写，不得解释为简化版计划。受限计划不得作为实施授权；用户即使明确采纳，agent 也只能先补齐缺失前置条件并将其升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。若用户给出开工类指令但没有计划或任务停止 / 结束条件，必须先补本轮受限计划并停在计划收口处，不得直接实现或进入长文本无限执行。开工后按 `autonomous-execution-rules` 默认遵循“当前实施周期内最小任务A实现 -> 最小任务A真实测试 -> 最小任务A审查 -> 最小任务A验收 -> 最小任务B…… -> 当前实施周期收口 -> 下一实施周期”的自动串行闭环；每个最小任务都必须先完成自己的真实测试、审查、验收，才允许进入下一个任务。
+- 定义: 来源对象文档（需求或 Bug）、前置验收标准和实施总览/实施周期即使都已完成，也不构成自动开工授权；必须由用户在当前任务中明确说“开始实施”“开始实现”“开始执行”“直接做”“继续做完”或“按文档实现”，且当前任务已有执行计划、任务完成条件、任务停止 / 结束条件、最大推进边界和验证点，才允许从实施文档切入正式编码。实施规划阶段默认采用只读计划模式：禁止写代码、禁止边计划边试做，只允许读仓库、定依赖、列风险、拆任务、写实施文档。计划正文开头必须先写“当前计划最终方案的简要说明”，用 1-3 句先交代推荐方案、主落点和为什么这么做；随后再写 agent 对当前问题的理解，至少交代问题 / 目标、本轮范围、非范围、当前优先闭环和关键假设 / 待确认点，再进入实施周期与最小任务拆分。实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界，必须写清周期顺序、期次定位、进入条件、收口条件和周期内最小任务顺序；真正执行单元是当前周期内的最小任务，并优先按“依赖图 + 垂直切片”组织，避免按前端 / 后端 / 数据库水平分层堆计划。单任务尽量单次专注完成，默认控制在约 5 个文件以内；明显超过则继续拆分。凡是代码生成、修改或重构类任务，都必须显式计划真实测试，写清入口、环境、样本 / 数据来源和通过标准，`build`、`lint`、静态检查不算真实测试；只有纯文档、纯注释、纯排版、纯静态资源改名 / 搬运或不会影响运行结果的场景才允许免测；若计划涉及代码生成、修改或重构，“现状与落点”必须给出代码落点目录树，不能只写文件名或普通条目。若用户在当前轮显式提出“怎么做 / 先给计划 / 先出方案 / 先列步骤 / 这个怎么改”这类计划型问题，也必须先命中实施规划规则；若前置条件未齐，则输出受限计划 / 阻断计划，而不是不触发。若运行环境要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层只负责渲染 / 协议，不能覆盖项目内计划结构；正文仍必须遵守 `implementation-planning-rules` 与模板字段，并在输出前执行 `implementation-planning-rules/references/plan-output-gate.md` 的字段矩阵。Plan Mode 计划正文若以 `Summary`、`Key Changes`、`Public Interfaces`、`Test Plan`、`Assumptions` 等通用工程计划小节作为主结构，或缺少当前计划最终方案简要说明、agent 理解、范围、非范围、当前优先闭环、关键假设、实施周期、阶段计划、最小任务、真实测试、完成条件、停止 / 结束条件、最大推进边界等核心字段，直接判定为无效计划，必须按模板重写，不得解释为简化版计划。受限计划不得作为实施授权；用户即使明确采纳，agent 也只能先补齐缺失前置条件并将其升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。若用户给出开工类指令但没有计划或任务停止 / 结束条件，必须先补本轮受限计划并停在计划收口处，不得直接实现或进入长文本无限执行。开工后按 `autonomous-execution-rules` 默认遵循“当前实施周期内最小任务A实现 -> 最小任务A真实测试 -> 最小任务A审查 -> 最小任务A验收 -> 最小任务B…… -> 当前实施周期收口 -> 下一实施周期”的自动串行闭环；每个最小任务都必须先完成自己的真实测试、审查、验收，才允许进入下一个任务；禁止先连续实现多个最小任务后统一测试、统一审查或统一验收。
 - 来源: `autonomous-execution-rules`、`implementation-planning-rules`、`team-development-rules/references/routing-rules.md`
 - 适用范围: 实施域、测试域、审查域、验收域
-- 更新时间: 2026-07-04
+- 更新时间: 2026-07-05
 - 状态: 启用
 
 ### 通用结束信号
@@ -163,10 +163,10 @@
 ### 文档落盘闸门
 - 别名: 归档闸门, 收口前落盘检查
 - 类型: 流程规则
-- 定义: 需求、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、配套 SVG、README 和证据路径是否已经真实落盘到 `doc/2-需求/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`；未落盘不得判定任务完成。
+- 定义: 需求、实施、验收、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、配套 SVG、README、实施总览/实施周期、验收文档和证据路径是否已经真实落盘到 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`；实施域还必须核对周期顺序、期次定位、周期内最小任务顺序和已执行最小任务的实现 / 真实测试 / 审查 / 验收状态，未落盘或缺闭环状态不得判定任务完成。
 - 来源: `artifact-delivery-gate-rules`、`README.md`
-- 适用范围: 需求域、Bug 域、测试域、审查域
-- 更新时间: 2026-06-27
+- 适用范围: 需求域、实施域、验收域、Bug 域、测试域、审查域
+- 更新时间: 2026-07-05
 - 状态: 启用
 
 ### 中间链路也受落盘闸门约束
@@ -305,6 +305,7 @@
 - 2026-07-01：补充受限计划授权边界，明确受限计划不得作为实施授权；即使用户明确采纳，也必须先补齐前置条件并升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
 - 2026-07-03：补充 Plan Mode 包裹口径，明确运行环境若要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与模板结构。
 - 2026-07-04：补充 Plan Mode 硬失败口径，明确 `Summary / Key Changes / Public Interfaces / Test Plan / Assumptions` 等通用工程计划壳不能作为实施规划主结构，且计划输出前必须执行 `implementation-planning-rules/references/plan-output-gate.md` 字段矩阵；缺核心字段时必须按模板重写。
+- 2026-07-05：明确实施周期是第一期 / 第二期 / 第三期等大进度与顺序边界，执行必须先按周期推进，周期内每个最小任务都完成“实现 -> 真实测试 -> 审查 -> 验收”后才进入下一任务 / 下一周期；文档落盘和最终验收需记录周期收口与最小任务闭环证据。
 - 2026-07-02：新增文件写入统一 UTF-8 口径，明确代码、文档、配置、脚本、测试资产和生成文本跨 Windows / WSL / Linux 默认 UTF-8，禁止 GBK / ANSI / 默认编码落盘，命令行写入后必须回读并检查 diff。
 - 2026-07-02：新增会话自动重命名规则，明确任务主题稳定且标题泛化、过时或不匹配时自动命中 `thread-title-rules`，调用真实线程重命名工具改为 8-24 字中文简要；标题已准确、工具不可用或用户禁止时跳过。
 - 2026-07-03：补充会话自动重命名平台能力矩阵，明确 Codex 优先用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过，`CLAUDE.md` 不等同于 Desktop 已具备自动改名能力。
@@ -386,6 +387,23 @@ entities:
     context_ids:
       - context.directory-migration
     updated_at: 2026-07-03
+  - entity_id: rule.implementation-cycle-minimum-task
+    name: "实施周期与最小任务闭环"
+    type: "流程规则"
+    aliases:
+      - 周期最小任务闭环
+      - 实施周期顺序
+      - 最小任务全流程收口
+    definition: "实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界；执行必须先按周期推进，当前周期内每个最小任务都完成实现、真实测试、审查、验收后，才允许进入下一最小任务或下一周期。"
+    scope: "实施规划、连续执行、文档落盘、最终验收"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.implementation-planning
+      - evidence.skill.autonomous-execution
+      - evidence.skill.final-acceptance
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-05
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -413,6 +431,21 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "旧目录迁移完成后不保留兼容层"
+  - evidence_id: evidence.skill.implementation-planning
+    type: "skill"
+    source: "implementation-planning-rules/SKILL.md"
+    path: "implementation-planning-rules/SKILL.md"
+    note: "实施周期、最小任务清单和计划闸门来源"
+  - evidence_id: evidence.skill.autonomous-execution
+    type: "skill"
+    source: "autonomous-execution-rules/SKILL.md"
+    path: "autonomous-execution-rules/SKILL.md"
+    note: "开始实施后的周期内最小任务连续执行来源"
+  - evidence_id: evidence.skill.final-acceptance
+    type: "skill"
+    source: "final-acceptance-rules/SKILL.md"
+    path: "final-acceptance-rules/SKILL.md"
+    note: "最终验收核对周期收口与最小任务闭环证据来源"
 contexts:
   - context_id: context.url-analysis
     type: "task-scope"
@@ -426,11 +459,16 @@ contexts:
     type: "repository-convention"
     name: "目录迁移与收口"
     note: "适用于目录迁移完成后的旧目录清理"
+  - context_id: context.implementation-flow
+    type: "task-scope"
+    name: "实施规划与执行"
+    note: "适用于实施周期、最小任务、连续执行、文档落盘和最终验收"
 lifecycle:
   active:
     - "rule.authenticated-url-routing"
     - "term.doc-top-level-mixed-naming"
     - "rule.old-directory-cleanup"
+    - "rule.implementation-cycle-minimum-task"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -446,6 +484,12 @@ retrieval_hints:
       - "term.doc-top-level-mixed-naming"
     不保留兼容层:
       - "rule.old-directory-cleanup"
+    周期最小任务闭环:
+      - "rule.implementation-cycle-minimum-task"
+    实施周期顺序:
+      - "rule.implementation-cycle-minimum-task"
+    最小任务全流程收口:
+      - "rule.implementation-cycle-minimum-task"
   scopes:
     URL 分析:
       - "rule.authenticated-url-routing"
@@ -453,12 +497,22 @@ retrieval_hints:
       - "term.doc-top-level-mixed-naming"
     目录迁移与收口:
       - "rule.old-directory-cleanup"
+    实施规划:
+      - "rule.implementation-cycle-minimum-task"
+    连续执行:
+      - "rule.implementation-cycle-minimum-task"
   sources:
     authenticated-url-routing-rules/SKILL.md:
       - "rule.authenticated-url-routing"
     artifact-storage-rules/SKILL.md:
       - "term.doc-top-level-mixed-naming"
       - "rule.old-directory-cleanup"
+    implementation-planning-rules/SKILL.md:
+      - "rule.implementation-cycle-minimum-task"
+    autonomous-execution-rules/SKILL.md:
+      - "rule.implementation-cycle-minimum-task"
+    final-acceptance-rules/SKILL.md:
+      - "rule.implementation-cycle-minimum-task"
 extensions:
   external_refs:
     - type: migration-sample
