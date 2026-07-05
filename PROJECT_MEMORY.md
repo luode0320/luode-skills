@@ -235,10 +235,10 @@
 ### 会话自动重命名规则
 - 别名: thread-title-rules, 会话标题自动更新, 任务中文简要
 - 类型: 工作台规则
-- 定义: 当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交或其他可命名任务，且标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`；由 agent 生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题。Codex 环境优先使用真实 `set_thread_title`；若当前工具列表尚未直接暴露 `set_thread_title` 或 `list_threads`，必须先通过 `tool_search` 发现线程工具，再按 `cwd`、最近更新时间和当前任务主题可靠识别当前会话后执行改名；只有完成工具发现后仍无真实工具时才可跳过。Claude Code 仅在存在真实改名工具时执行；Claude Desktop 默认视为无真实自动改名工具，必须显式跳过并说明原因。`CLAUDE.md` 仅用于 Claude Code 仓库规则自举，不等同于 Claude Desktop 已具备自动改名能力；禁止用正文伪造工具调用或猜测结果宣称已改名。
+- 定义: 当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，也必须在过程中尽早判定是否改名，不等待最终总结。由 agent 生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题。Codex 环境优先使用真实 `set_thread_title`；若当前工具列表尚未直接暴露 `set_thread_title` 或 `list_threads`，必须先通过 `tool_search` 发现线程工具，再按 `cwd`、最近更新时间和当前任务主题可靠识别当前会话后执行改名；只有完成工具发现后仍无真实工具时才可跳过。Claude Code 仅在存在真实改名工具时执行；Claude Desktop 默认视为无真实自动改名工具，必须显式跳过并说明原因。标题已准确、用户明确禁止或只是最小任务内部小步骤推进时跳过；禁止用正文伪造工具调用或猜测结果宣称已改名。
 - 来源: 用户本轮确认、`thread-title-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`
 - 适用范围: 会话管理、任务检索、总控层自动触发、仓库规则自举
-- 更新时间: 2026-07-03
+- 更新时间: 2026-07-05
 - 状态: 启用
 
 ### 本地连接调试测试红线
@@ -329,6 +329,7 @@
 - 2026-07-03：补充单接口 Swag 中文简介清洗规则，明确文件名后缀必须去掉 `1.`、`11.`、`（1）`、`【1】` 等数字前缀和无业务意义特殊符号，只保留接口中文简介本体。
 - 2026-07-03：收紧审查链注释门禁，明确只要本轮存在代码改动，`project-change-review-rules` 与 `implementation-review-rules` 都必须按注释双 skill 完整核验方法注释、字段/结构体字面量注释、步骤注释、`[参数]` / `[返回]`、最近修改时间和改动原因；任一缺失默认按审查失败处理，不得降级为建议项。
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
+- 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
 
 
@@ -449,6 +450,23 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-05
+  - entity_id: rule.thread-title-process-trigger
+    name: "会话标题过程触发"
+    type: "工作台规则"
+    aliases:
+      - thread-title-rules
+      - 会话自动重命名
+      - 阶段加提问改名
+      - goal 中途改名
+    definition: "当前会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点时，若能稳定归纳中文任务主题且当前标题为空泛、过时或不匹配，必须命中 `thread-title-rules` 并通过真实线程工具尽早改名；标题已准确、用户禁止或只是最小任务内部小步骤推进时跳过。"
+    scope: "会话管理、goal 长任务、上下文续做、任务检索"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.thread-title
+      - evidence.dialog.thread-title-process-trigger
+    context_ids:
+      - context.thread-title-management
+    updated_at: 2026-07-05
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -501,6 +519,15 @@ evidence:
     source: "project-agents-bootstrap/SKILL.md"
     path: "project-agents-bootstrap/SKILL.md"
     note: "仓库级规则自举同步代码生成风格入口来源"
+  - evidence_id: evidence.skill.thread-title
+    type: "skill"
+    source: "thread-title-rules/SKILL.md"
+    path: "thread-title-rules/SKILL.md"
+    note: "会话标题过程触发与真实改名工具约束来源"
+  - evidence_id: evidence.dialog.thread-title-process-trigger
+    type: "dialog"
+    source: "对话确认"
+    note: "用户确认采用“阶段+提问”策略，要求提问、goal 创建 / 恢复和长任务阶段切换时在过程中尝试改名"
 contexts:
   - context_id: context.url-analysis
     type: "task-scope"
@@ -522,6 +549,10 @@ contexts:
     type: "task-scope"
     name: "代码生成风格契约"
     note: "适用于新增、修改、重构代码前的风格来源收敛和契约检查"
+  - context_id: context.thread-title-management
+    type: "workspace-convention"
+    name: "会话标题管理"
+    note: "适用于用户提问、goal 长任务、上下文续做和阶段切换时的会话标题更新"
 lifecycle:
   active:
     - "rule.authenticated-url-routing"
@@ -530,6 +561,7 @@ lifecycle:
     - "rule.implementation-cycle-minimum-task"
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
+    - "rule.thread-title-process-trigger"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -563,6 +595,14 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     生成代码前风格总控:
       - "rule.code-generation-style-contract"
+    thread-title-rules:
+      - "rule.thread-title-process-trigger"
+    会话自动重命名:
+      - "rule.thread-title-process-trigger"
+    阶段加提问改名:
+      - "rule.thread-title-process-trigger"
+    goal 中途改名:
+      - "rule.thread-title-process-trigger"
   scopes:
     URL 分析:
       - "rule.authenticated-url-routing"
@@ -582,6 +622,10 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     风格契约:
       - "rule.code-generation-style-contract"
+    会话标题管理:
+      - "rule.thread-title-process-trigger"
+    goal 长任务:
+      - "rule.thread-title-process-trigger"
   sources:
     authenticated-url-routing-rules/SKILL.md:
       - "rule.authenticated-url-routing"
@@ -600,6 +644,9 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     project-agents-bootstrap/SKILL.md:
       - "rule.code-generation-style-contract"
+      - "rule.thread-title-process-trigger"
+    thread-title-rules/SKILL.md:
+      - "rule.thread-title-process-trigger"
 extensions:
   external_refs:
     - type: migration-sample

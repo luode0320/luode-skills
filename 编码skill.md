@@ -170,7 +170,7 @@
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-agents-bootstrap`、`mcp-installation-rules` 与 `imagegen`。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
 | `project-agents-bootstrap` | 当新会话首轮进入项目、仓库级规则文件缺失或需要同步补齐 `AGENTS.md` / `CLAUDE.md` 时自动触发。 | 负责为项目补齐或同步仓库级规则文件，并把基础硬规则、自举模板和关键白名单口径统一收口。 |
-| `thread-title-rules` | 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交或其他可命名任务，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。 |
+| `thread-title-rules` | 当当前 Codex / Claude / agent 会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。 |
 | `parallel-task-dispatch-rules` | 当任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时自动触发。 | 负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。 |
 | `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
 | `skill-hit-check-rules` | 当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若本轮同时命中 `parallel-task-dispatch-rules`，还要额外输出并行触发的 skill 列表；若未命中则明确告知未命中及原因。 | 在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。 |
