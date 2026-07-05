@@ -383,6 +383,7 @@ Bug 域采用两条互补路径：
 
 | Skill 名字                     | 自动触发 description                                                        | 核心职责                                     |
 | ------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------- |
+| `code-generation-style-rules`  | 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。       | 读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约，约束后续实现风格。 |
 | `code-minimal-change-rules`    | 当新增或修改代码、调整功能、修复 Bug 时自动触发。                           | 严控代码变更范围，杜绝无关修改、冗余改动和过度优化，保证每次变更聚焦单一目标，降低回归风险和排查难度；简单处理禁止顺手引入无收益接口抽象。 |
 | `code-context-resync-rules`    | 当继续修改已有代码且发现当前文件与 AI 记忆/上次读取内容不一致时自动触发。    | 先重读最新文件并以当前内容为基线增量合并，禁止按旧记忆覆盖用户手动改动。 |
 | `code-readability-rules`       | 当新增或修改任意业务代码、工具代码、服务代码、脚本代码时自动触发。          | 保证函数结构清晰、逻辑顺序自然、复杂度可控，并禁止在简单场景为“解耦”无脑抽象接口。 |
@@ -427,7 +428,7 @@ Bug 域采用两条互补路径：
 
 2. 基线域默认并行生效
 
-- 只要进入编码，`code-minimal-change-rules`、`code-context-resync-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill 默认一起生效
+- 只要进入编码，`code-generation-style-rules`、`code-minimal-change-rules`、`code-context-resync-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill 默认一起生效
 - 位点类 skill 只负责“改到哪里就约束哪里”
 - 基线域负责“无论改哪里都应保持一致的基础质量”
 - 两者关系是并行叠加，不是二选一

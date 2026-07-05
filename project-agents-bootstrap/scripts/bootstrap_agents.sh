@@ -60,19 +60,39 @@ PROJECT_MEMORY_FILE="$REPO_DIR/PROJECT_MEMORY.md"
 
 PYTHON_BIN=""
 
+# resolve_python
+# [参数] 无
+# [返回] 成功时设置 PYTHON_BIN；失败时退出脚本
+# 最近修改时间: 2026-07-05 15:38:58 跳过 WindowsApps Python shim，避免 Git Bash 下误用不可执行入口
 resolve_python() {
-  if command -v python3 >/dev/null 2>&1; then
-    PYTHON_BIN="$(command -v python3)"
-    return 0
-  fi
-  if command -v python >/dev/null 2>&1; then
-    PYTHON_BIN="$(command -v python)"
-    return 0
-  fi
-  if command -v py >/dev/null 2>&1; then
+  local candidate
+  local candidate_path
+
+  # 1. 逐个探测可真实执行的 Python 3，跳过只占位但不可运行的系统 shim。
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      candidate_path="$(command -v "$candidate")"
+      if "$candidate_path" - <<'PY' >/dev/null 2>&1
+import sys
+raise SystemExit(0 if sys.version_info.major == 3 else 1)
+PY
+      then
+        PYTHON_BIN="$candidate_path"
+        return 0
+      fi
+    fi
+  done
+
+  # 2. Windows 环境保留 py -3 作为最后兜底，兼容没有 python3 命令的机器。
+  if command -v py >/dev/null 2>&1 && py -3 - <<'PY' >/dev/null 2>&1
+import sys
+raise SystemExit(0 if sys.version_info.major == 3 else 1)
+PY
+  then
     PYTHON_BIN="$(command -v py) -3"
     return 0
   fi
+
   echo "[ERROR] 未找到可用 Python 解释器（python3 / python / py -3）" >&2
   exit 1
 }
@@ -161,6 +181,7 @@ BODY_SKILL_HIT=$(cat <<'EOF'
 - 需求阶段只允许围绕真实缺口一次推进一个关键问题；禁止把 agent 猜测写成待确认答案，禁止“先做了再补需求”，正式需求主文档未真实落盘前禁止进入实施规划与正式编码。
 - 用户若在当前轮显式提出计划型问题（如“怎么做”“先给计划”“先出方案和步骤”“这个怎么改”），必须先命中计划规则；即使前置条件尚未齐备，也要输出受限计划 / 阻断计划，而不是表现成计划规则未触发。
 - 当前运行环境若要求用 `<proposed_plan>` 或其他专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与 `plan-structure-template.md` 的结构、字段和约束，不得退化成通用摘要式计划。
+- Plan Mode 硬闸门：若计划正文以 `Summary`、`Key Changes`、`Public Interfaces`、`Test Plan`、`Assumptions` 等通用工程计划小节作为主结构，或缺少“当前计划最终方案的简要说明、agent 理解的问题 / 目标、本轮范围、非范围、当前优先闭环、关键假设 / 待确认点、实施周期、阶段计划、最小任务、真实测试、任务完成条件、任务停止 / 结束条件、最大推进边界”任一核心字段，直接判定为无效计划，必须立即按 `plan-structure-template.md` 重写；不得解释为“简化版计划”或继续进入实施。
 - 用户使用“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，不得视为无边界长文本执行授权；必须先确认已有执行计划，或当场给出本轮执行计划、任务完成条件、任务停止 / 结束条件和最大推进边界。缺少这些边界时，禁止直接进入实现 / 执行。
 - 受限计划不得作为实施授权；用户即使明确采纳，agent 也只能先补齐缺失前置条件并将其升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
 - 若当前轮只是采纳 agent 上一轮或更早轮次给出的建议、方案、修复路线或实施思路，也必须先把该建议收口成正式执行计划，才允许继续实现 / 执行；不得把聊天建议直接当成可执行计划。
@@ -175,6 +196,17 @@ BODY_SKILL_HIT=$(cat <<'EOF'
 - 若命中 `autonomous-execution-rules`，自动继续只允许用于“完成原始用户目标仍必需的动作”；不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
 - 当原始用户目标已经完成或用户已给出明确结束指令，且不存在完成原始目标仍必需的动作时，必须停止连续执行并直接结束；不得输出“下一步状态”“下一步建议”“等待用户新指令”“无需继续动作”等任何可能触发循环 loop 的占位区块或扩散性文案，除非用户明确要求后续建议。
 - 若当前运行环境存在 goal / plan / task 等显式状态收口机制，且原始用户目标已经完成或已满足该机制的阻断条件，必须在最终收口前真实执行对应收口动作；只写完成文案不算真正结束运行时状态。Codex goal 仅是其中一种特例。
+EOF
+)
+
+BODY_CODE_GENERATION_STYLE=$(cat <<'EOF'
+- 只要本轮新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码，必须在正式写代码前命中 `code-generation-style-rules`。
+- `code-generation-style-rules` 负责读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮“代码风格契约”。
+- 本轮代码风格契约至少覆盖命名、结构、注释、日志、错误处理、复用、排版和禁用写法；后续实现、补丁和测试代码都必须按契约落地。
+- 风格优先级固定为：用户本轮明确要求 > 当前文件稳定写法 > 同目录 / 模块写法 > `PROJECT_STYLE.md` 启用样例 > 通用 `code-*`、命名、注释、日志、错误处理等 skill。
+- 若 `PROJECT_STYLE.md` 与当前文件 / 同目录稳定写法冲突，优先跟随当前文件 / 同目录，并记录是否需要联动 `project-style-rules` 回写长期风格。
+- `project-style-rules` 只负责维护 `PROJECT_STYLE.md` 风格记忆，不作为代码生成总控入口；`code-style-consistency-rules` 负责基于本轮风格契约检查局部一致性。
+- 禁止借“统一风格”扩大无关 diff、批量格式化、重排无关代码或引入外部模板式个人偏好。
 EOF
 )
 
@@ -591,6 +623,10 @@ else:
 PY
 }
 
+# sync_agents_file
+# [参数] file: 需要同步受管章节的 AGENTS.md / CLAUDE.md 文件路径
+# [返回] 无
+# 最近修改时间: 2026-07-05 15:38:58 同步代码生成风格入口规则到所有受管规则文件
 sync_agents_file() {
   local file="$1"
 
@@ -603,6 +639,7 @@ sync_agents_file() {
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
+  sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"
   sync_section "$file" "会话动态重命名规则" "$BODY_THREAD_TITLE"
   sync_section "$file" "注释任务强制流程" "$BODY_COMMENT_TASK"
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"

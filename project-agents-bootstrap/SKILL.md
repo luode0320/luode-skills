@@ -1,6 +1,6 @@
 ---
 name: project-agents-bootstrap
-description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules` 和 `project-style-rules`，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。
+description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。
 ---
 
 # 项目 AGENTS.md 自举与补齐 Skill
@@ -23,12 +23,14 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 让仓库在新会话中也能稳定执行项目规则。
 - 把“会话记忆”转成“仓库常驻约束”。
 - 把 `Plan Mode` 的默认计划外壳沉到仓库级规则里，保证所有计划型提问都会先触发 `implementation-planning-rules` 再回流前置域。
+- 把代码生成风格入口规则沉到仓库级规则里，保证新增、修改或重构代码前都会先由 `code-generation-style-rules` 生成本轮代码风格契约。
 - 若仓库是 Godot 项目，自动补齐 Godot 工具接管和图像生成配置模板，并把图像通道的主配置与回退规则一起写全。
 
 ## 仓库级总控规则
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`。
+- 只要本轮新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码，必须先命中 `code-generation-style-rules`，把 `PROJECT_STYLE.md` 与局部既有写法收敛成本轮代码风格契约。
 - 若本轮涉及创建、补齐或更新仓库级规则文件（`AGENTS.md` 对应 Codex，`CLAUDE.md` 对应 Claude Code），默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。对已经存在的规则文件，也必须继续做增量同步与受管章节 upsert，而不是只初始化一次。
 - 首轮规则文件、`.gitattributes`、`.editorconfig` 自举是硬闸门：若其中任一缺失、未创建、未补齐或未完成受管章节同步，判定为阻断，禁止进入任何项目分析、读码、需求、Bug、编码、测试或交付主任务，必须先更新补充完成后再继续。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
@@ -124,6 +126,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 11. 执行脚本后必须立刻核对结果，至少包含：
 
 - 受管章节是否真的写入最新内容
+- `代码生成风格入口规则` 是否已写入所有目标规则文件
 - 是否同步到了所有已存在的规则文件（`AGENTS.md` / `CLAUDE.md`）
 - `PROJECT_MEMORY.md` 是否存在且具备 `## 机器索引区`
 - `git diff -- AGENTS.md CLAUDE.md .gitattributes .editorconfig */AGENTS.md` 或等价检查中是否只出现预期改动
@@ -155,6 +158,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 自动审查白名单只保留 `implementation-review-rules` 与最终收口前的 `project-change-review-rules`。
   - `project-change-review-rules` 同时支持两类触发：用户明确要求审查当前改动，或本轮存在代码改动且准备最终收口。
   - `code-review-automation-rules` 仅用于当前分支提交级审查，不纳入默认自动审查链。
+- 代码生成风格入口规则：新增、修改、重构代码 / 脚本 / 测试支撑代码 / 配置型代码前，必须命中 `code-generation-style-rules`，读取用户要求、目标文件 / 同目录样例、`PROJECT_STYLE.md` 和已命中编码类 skill，形成本轮代码风格契约；风格优先级为用户本轮明确要求 > 当前文件稳定写法 > 同目录 / 模块写法 > `PROJECT_STYLE.md` 启用样例 > 通用规则；`project-style-rules` 只维护长期风格记忆，`code-style-consistency-rules` 基于本轮契约检查局部一致性。
 - 注释任务强制流程：
   - 先声明命中的注释类 skill。
   - 读取对应 `SKILL.md` 后再改代码。
@@ -302,6 +306,16 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
   - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
   - 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-agents-bootstrap` 补齐，再继续主任务。
+
+## 代码生成风格入口规则
+
+- 只要本轮新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码，必须在正式写代码前命中 `code-generation-style-rules`。
+- `code-generation-style-rules` 负责读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮“代码风格契约”。
+- 本轮代码风格契约至少覆盖命名、结构、注释、日志、错误处理、复用、排版和禁用写法；后续实现、补丁和测试代码都必须按契约落地。
+- 风格优先级固定为：用户本轮明确要求 > 当前文件稳定写法 > 同目录 / 模块写法 > `PROJECT_STYLE.md` 启用样例 > 通用 `code-*`、命名、注释、日志、错误处理等 skill。
+- 若 `PROJECT_STYLE.md` 与当前文件 / 同目录稳定写法冲突，优先跟随当前文件 / 同目录，并记录是否需要联动 `project-style-rules` 回写长期风格。
+- `project-style-rules` 只负责维护 `PROJECT_STYLE.md` 风格记忆，不作为代码生成总控入口；`code-style-consistency-rules` 负责基于本轮风格契约检查局部一致性。
+- 禁止借“统一风格”扩大无关 diff、批量格式化、重排无关代码或引入外部模板式个人偏好。
 
 ## 会话动态重命名规则
 

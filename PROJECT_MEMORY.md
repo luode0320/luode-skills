@@ -88,6 +88,15 @@
 - 更新时间: 2026-07-05
 - 状态: 启用
 
+### 代码生成风格入口链路
+- 别名: 代码风格契约, 生成代码前风格总控, PROJECT_STYLE 应用入口
+- 类型: 流程规则
+- 定义: 新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；后续实现必须按契约落地。`project-style-rules` 继续只维护 `PROJECT_STYLE.md` 长期风格记忆，`code-style-consistency-rules` 基于本轮契约检查局部一致性。
+- 来源: 对话确认、`code-generation-style-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`
+- 适用范围: 编码基线域、仓库级规则自举、代码生成与修改
+- 更新时间: 2026-07-05
+- 状态: 启用
+
 ### 通用结束信号
 - 别名: 结束即停, 不扩散下一步, 停止建议, 三类合法后续
 - 类型: 流程规则
@@ -319,6 +328,7 @@
 - 2026-07-03：补充单接口 Swag 中文简介清洗规则，明确文件名后缀必须去掉 `1.`、`11.`、`（1）`、`【1】` 等数字前缀和无业务意义特殊符号，只保留接口中文简介本体。
 - 2026-07-03：收紧审查链注释门禁，明确只要本轮存在代码改动，`project-change-review-rules` 与 `implementation-review-rules` 都必须按注释双 skill 完整核验方法注释、字段/结构体字面量注释、步骤注释、`[参数]` / `[返回]`、最近修改时间和改动原因；任一缺失默认按审查失败处理，不得降级为建议项。
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
+- 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
 
 
 ### 上线接口测试门禁规则
@@ -404,6 +414,23 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-05
+  - entity_id: rule.code-generation-style-contract
+    name: "代码生成风格入口链路"
+    type: "流程规则"
+    aliases:
+      - code-generation-style-rules
+      - 代码风格契约
+      - 生成代码前风格总控
+      - PROJECT_STYLE 应用入口
+    definition: "新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；`project-style-rules` 只维护长期风格记忆，`code-style-consistency-rules` 基于契约检查局部一致性。"
+    scope: "编码基线域、仓库级规则自举、代码生成与修改"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.code-generation-style
+      - evidence.skill.project-agents-bootstrap
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-05
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -446,6 +473,16 @@ evidence:
     source: "final-acceptance-rules/SKILL.md"
     path: "final-acceptance-rules/SKILL.md"
     note: "最终验收核对周期收口与最小任务闭环证据来源"
+  - evidence_id: evidence.skill.code-generation-style
+    type: "skill"
+    source: "code-generation-style-rules/SKILL.md"
+    path: "code-generation-style-rules/SKILL.md"
+    note: "代码生成前风格契约入口来源"
+  - evidence_id: evidence.skill.project-agents-bootstrap
+    type: "skill"
+    source: "project-agents-bootstrap/SKILL.md"
+    path: "project-agents-bootstrap/SKILL.md"
+    note: "仓库级规则自举同步代码生成风格入口来源"
 contexts:
   - context_id: context.url-analysis
     type: "task-scope"
@@ -463,12 +500,17 @@ contexts:
     type: "task-scope"
     name: "实施规划与执行"
     note: "适用于实施周期、最小任务、连续执行、文档落盘和最终验收"
+  - context_id: context.code-generation-style
+    type: "task-scope"
+    name: "代码生成风格契约"
+    note: "适用于新增、修改、重构代码前的风格来源收敛和契约检查"
 lifecycle:
   active:
     - "rule.authenticated-url-routing"
     - "term.doc-top-level-mixed-naming"
     - "rule.old-directory-cleanup"
     - "rule.implementation-cycle-minimum-task"
+    - "rule.code-generation-style-contract"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -490,6 +532,12 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     最小任务全流程收口:
       - "rule.implementation-cycle-minimum-task"
+    code-generation-style-rules:
+      - "rule.code-generation-style-contract"
+    代码风格契约:
+      - "rule.code-generation-style-contract"
+    生成代码前风格总控:
+      - "rule.code-generation-style-contract"
   scopes:
     URL 分析:
       - "rule.authenticated-url-routing"
@@ -501,6 +549,12 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     连续执行:
       - "rule.implementation-cycle-minimum-task"
+    编码基线域:
+      - "rule.code-generation-style-contract"
+    代码生成:
+      - "rule.code-generation-style-contract"
+    风格契约:
+      - "rule.code-generation-style-contract"
   sources:
     authenticated-url-routing-rules/SKILL.md:
       - "rule.authenticated-url-routing"
@@ -513,6 +567,10 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     final-acceptance-rules/SKILL.md:
       - "rule.implementation-cycle-minimum-task"
+    code-generation-style-rules/SKILL.md:
+      - "rule.code-generation-style-contract"
+    project-agents-bootstrap/SKILL.md:
+      - "rule.code-generation-style-contract"
 extensions:
   external_refs:
     - type: migration-sample

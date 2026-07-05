@@ -325,6 +325,7 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                          | 功能                                                         |
 | ------------------------------ | ------------------------------------------------------------ |
+| `code-generation-style-rules`  | 编码前读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约。 |
 | `code-minimal-change-rules`    | 严控最小改动范围，避免无关修改、冗余调整和过度优化。         |
 | `code-readability-rules`       | 提升代码可读性，保证函数结构清晰、逻辑顺序自然、复杂度可控。 |
 | `code-style-consistency-rules` | 保持项目原有风格一致，不引入风格跳变。                       |
@@ -707,3 +708,4 @@ claude-mem(记忆) :
 2026-07-04 17:06:12 docs: [PlanMode计划开头简要方案] 计划正文新增当前计划最终方案简要说明前置字段
 2026-07-04 20:46:08 fix: [subagent token成本门槛] 收紧并行委派的上下文与启动条件
 2026-07-05 13:55:32 docs: [周期最小任务闭环] 强化实施周期顺序与最小任务全流程收口
+2026-07-05 16:14:26 feat: [代码生成风格] 新增生成风格契约入口
