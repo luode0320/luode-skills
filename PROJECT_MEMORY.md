@@ -223,6 +223,15 @@
 - 更新时间: 2026-07-06
 - 状态: 启用
 
+### WSL 工具 PATH interop 误用排查
+- 别名: rg permission denied, Windows 版工具误用, appendWindowsPath
+- 类型: 环境规则
+- 定义: WSL 默认在 `/etc/wsl.conf` 的 `[interop]` 段开启 `appendWindowsPath=true`，会把 Windows 的 `PATH` 追加到 WSL 的 `$PATH` 末尾；WSL 内未原生安装的命令行工具（如 `rg`）会 fallthrough 到 `/mnt/c/...` 下的 Windows 版 `.exe`，执行时可能因 DrvFs 挂载权限、只读标记或安全软件拦截报 `permission denied`。排查用 `command -v <tool>` 确认路径是否落在 `/mnt/` 下；修复优先在 WSL 内原生装该工具（如 `sudo apt install ripgrep`），不默认修改 `/etc/wsl.conf`。建议在新会话第一次于某 WSL 项目执行命令时，顺手做一次 `command -v` 一次性自检，提前发现缺失的原生包，而不是等报错再排查。
+- 来源: 对话确认、`windows-wsl-execution-rules/references/tool-path-interop.md`
+- 适用范围: WSL 执行环境、命令行工具排查
+- 更新时间: 2026-07-06
+- 状态: 启用
+
 ### 文件写入统一 UTF-8
 - 别名: 跨平台 UTF-8 写入, 禁止 GBK/ANSI 落盘, 文件编码规则
 - 类型: 环境规则
@@ -332,6 +341,7 @@
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
 - 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
+- 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
 
 ### 上线接口测试门禁规则
 - 别名: project-release-test-rules, 上线测试门禁

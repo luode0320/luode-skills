@@ -17,6 +17,7 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - 直接执行 `go build` / `go test` / `go run` / `dlv`，**无需任何包裹**
 - 进程天然在 WSL，联网正常
 - **但“面向用户输出的项目内文件引用”不因此改变**：这条规则只看用户查看环境，不看 agent 运行位置；agent 直接跑在 WSL 内不代表可以对着 Windows 桌面用户输出 `/home/...`，判定与格式见下方「路径约定」
+- 新会话第一次在这个 WSL 项目里执行命令时，建议顺手跑一次 `command -v rg fd fzf 2>/dev/null`（按项目实际常用工具调整）自检；输出路径落在 `/mnt/` 下说明该工具还是 Windows 版，按 `references/tool-path-interop.md` 提前原生装包，不必等真的报错再排查。这是一次性建议，不是每条命令前都要跑的强制检查
 
 ### 情况二：agent 在 Windows（如 Claude Desktop GUI）
 
@@ -103,6 +104,8 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
 - 不要在面向 Windows 桌面用户的项目内文件引用里输出 `/home/...` 作为可打开路径；这类路径应转换成 `\\wsl.localhost\...`。
 - 不要因为 agent 自身运行在 WSL 内（情况一，执行不需要包裹）就认为面向用户的文件引用也可以直接用 `/home/...` 输出；这条规则只看用户查看环境，不看 agent 运行位置。
+- 不要在 WSL 内命令（如 `rg`）报 `permission denied` 或行为异常时，直接当成 Linux 权限问题就 `chmod`/`sudo`；先用 `command -v <tool>` 确认路径是否落在 `/mnt/` 下——那意味着解析到了 Windows 版同名工具，详见 `references/tool-path-interop.md`。
+- 不要把修改 `/etc/wsl.conf`（如关闭 `appendWindowsPath`）当成默认排查手段；这是影响整个 WSL 发行版的重量级改动，只在用户明确要求时才做。
 - 不要把普通搜索、读文件、规则检查这类非执行动作一律切进 WSL。
 - agent 在 Windows 时，不要把 PowerShell 当普通仓库命令的默认 shell；只有 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才使用 PowerShell。
 - 纯 Windows 项目，或本轮根本不会启动/执行程序的任务，不要为了“统一口径”硬套 WSL。
@@ -124,3 +127,4 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - 默认先读 `references/command-templates.md`
 - 需要路径访问细节时读 `references/path-mapping.md`
 - 需要团队工作流时读 `references/recommended-workflow.md`
+- 首次进入 WSL 项目做一次性工具自检、或怀疑命令解析到 Windows 侧同名工具（如报 `permission denied`）时读 `references/tool-path-interop.md`

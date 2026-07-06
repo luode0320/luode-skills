@@ -18,6 +18,8 @@ go mod download
 
 执行不需要包裹，不代表回复里的文件引用也能直接用 `/home/...`：只要用户从 Windows 桌面访问，项目内文件路径仍要转换成 `\\wsl.localhost\<distro>\home\<user>\<project>\...`（判定依据是用户查看环境，不是 agent 运行位置，规则见下方）。
 
+这里的命令如果在 WSL 内报 `permission denied` 或行为跟预期的 Linux 版不一致，很可能是 PATH 里混进了 Windows 版同名工具（比如把 Windows 打包的 `rg.exe` 当成了 WSL 原生 `rg`）。新会话第一次执行这类命令时可顺手用 `command -v <tool>` 自检一次，排查方法见 `references/tool-path-interop.md`。
+
 ## agent 在 Windows（如 Claude Desktop GUI）
 
 普通命令默认用 Git Bash / bash；执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。
