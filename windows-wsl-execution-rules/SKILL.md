@@ -1,6 +1,6 @@
 ---
 name: windows-wsl-execution-rules
-description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。
+description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\wsl.localhost\<distro>\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。
 ---
 
 # Windows / WSL 执行规范（代码在 WSL）
@@ -16,6 +16,7 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - 代码在 WSL、agent 在 WSL，本地直接访问
 - 直接执行 `go build` / `go test` / `go run` / `dlv`，**无需任何包裹**
 - 进程天然在 WSL，联网正常
+- **但“面向用户输出的项目内文件引用”不因此改变**：这条规则只看用户查看环境，不看 agent 运行位置；agent 直接跑在 WSL 内不代表可以对着 Windows 桌面用户输出 `/home/...`，判定与格式见下方「路径约定」
 
 ### 情况二：agent 在 Windows（如 Claude Desktop GUI）
 
@@ -47,10 +48,11 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 |------|---------|
 | WSL 内执行类动作（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` |
 | Windows 侧普通命令、看代码、改代码（agent 在 Windows） | Git Bash / bash 使用 `//wsl.localhost/<distro>/home/<user>/<project>`；Windows 工具显示使用 `\\wsl.localhost\<distro>\home\<user>\<project>` |
-| 面向用户输出的项目内文件引用（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>\<relative-path>` |
+| 面向用户输出的项目内文件引用（与 agent 运行位置无关，只看用户查看环境） | `\\wsl.localhost\<distro>\home\<user>\<project>\<relative-path>` |
 
 - `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
 - 回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\...`。
+- **这条判定只看“用户查看环境”，不看“agent 运行位置”**：即使 agent 本身直接跑在 WSL 内（上面的情况一，执行不需要任何包裹），只要用户是从 Windows 桌面 / GUI 客户端查看回复，也必须输出 `\\wsl.localhost\...`；不要因为“我自己就在 WSL 里，直接用 `/home/...` 更省事”而跳过转换。
 - 只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。
 - **不再使用 `/mnt/<drive>`**——代码不在 Windows 盘。
 
@@ -100,6 +102,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - 不要为了调试或测试方便，把启动参数、环境变量或配置文件切到 `test` / `prod` / `staging` 等非 local 环境；local 不可用时记录为本地环境阻断。
 - 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
 - 不要在面向 Windows 桌面用户的项目内文件引用里输出 `/home/...` 作为可打开路径；这类路径应转换成 `\\wsl.localhost\...`。
+- 不要因为 agent 自身运行在 WSL 内（情况一，执行不需要包裹）就认为面向用户的文件引用也可以直接用 `/home/...` 输出；这条规则只看用户查看环境，不看 agent 运行位置。
 - 不要把普通搜索、读文件、规则检查这类非执行动作一律切进 WSL。
 - agent 在 Windows 时，不要把 PowerShell 当普通仓库命令的默认 shell；只有 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才使用 PowerShell。
 - 纯 Windows 项目，或本轮根本不会启动/执行程序的任务，不要为了“统一口径”硬套 WSL。

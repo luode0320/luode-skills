@@ -208,19 +208,19 @@
 ### Windows / WSL 执行边界
 - 别名: Windows 普通命令优先 bash, Git Bash 优先, 执行类动作才进 WSL
 - 类型: 环境规则
-- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，搜索、读写文件、规则检查、普通 git 盘点等非执行动作默认优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。面向用户输出的项目内文件引用按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。
+- 定义: 当项目代码位于 WSL 文件系统内且 agent 运行在 Windows 时，搜索、读写文件、规则检查、普通 git 盘点等非执行动作默认优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。只有编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，才通过 `wsl.exe --cd /home/<user>/<project> <command>` 进入 WSL。纯 Windows 项目，或当前任务本身不需要启动/执行程序时，不应误触发 WSL 执行规则。（另见 [[项目内文件引用路径]]：面向用户的文件路径格式判定与这里的“agent 运行位置”无关，即使 agent 直接跑在 WSL 内也要按用户查看环境转换路径，不要把这两条规则的适用条件混在一起读。）
 - 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`windows-encoding-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: Windows + WSL 协作开发、仓库级执行规则、命令模板
-- 更新时间: 2026-07-02
+- 更新时间: 2026-07-06
 - 状态: 启用
 
 ### 项目内文件引用路径
 - 别名: 用户可访问路径, WSL 文件引用, UNC 路径展示
 - 类型: 输出规则
-- 定义: agent 回复中凡引用项目内文件，都必须使用用户当前客户端可打开的项目访问路径，而不是机械沿用执行环境路径。项目在 Windows 本地盘时使用 Windows 本地路径；项目在 WSL 文件系统且用户通过 Windows / Codex Desktop / Claude Desktop 访问时，项目内文件引用统一使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；`/home/<user>/<project>` 只用于 WSL 内命令、`wsl.exe --cd` 参数、WSL shell 日志或必须保留原文的执行上下文。
+- 定义: agent 回复中凡引用项目内文件，都必须使用用户当前客户端可打开的项目访问路径，而不是机械沿用执行环境路径。项目在 Windows 本地盘时使用 Windows 本地路径；项目在 WSL 文件系统且用户通过 Windows / Codex Desktop / Claude Desktop 访问时，项目内文件引用统一使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；`/home/<user>/<project>` 只用于 WSL 内命令、`wsl.exe --cd` 参数、WSL shell 日志或必须保留原文的执行上下文。**判定依据只有“用户查看环境”，与 agent 自身运行在 WSL 还是 Windows 无关**：agent 直接跑在 WSL 内、执行不需要 `wsl.exe` 包裹时，这条规则依然生效，不能因为“自己就在 WSL 里”而顺手输出 `/home/...`。
 - 来源: 用户确认、`windows-wsl-execution-rules/references/path-mapping.md`
 - 适用范围: 最终回复、中间进度、审查报告、证据路径、截图说明、Markdown 链接和普通文本文件路径
-- 更新时间: 2026-07-02
+- 更新时间: 2026-07-06
 - 状态: 启用
 
 ### 文件写入统一 UTF-8
@@ -331,7 +331,7 @@
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
-
+- 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
 
 ### 上线接口测试门禁规则
 - 别名: project-release-test-rules, 上线测试门禁

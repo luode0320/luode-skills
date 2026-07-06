@@ -14,6 +14,7 @@
 
 - 直接 `cd /home/<user>/<project>` 后执行 `go test` / `go run` / `dlv`，无需任何包裹
 - 进程天然在 WSL，联网正常
+- 面向用户的文件引用格式与此无关：即使执行不需要包裹，只要用户从 Windows 桌面访问，回复里的项目内文件路径仍要用 `\\wsl.localhost\<distro>\...`（见上方「推荐目录」与下方「注意事项」）
 
 ### agent 在 Windows（如 Claude Desktop GUI）
 

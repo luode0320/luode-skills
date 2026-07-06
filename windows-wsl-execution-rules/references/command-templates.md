@@ -16,6 +16,8 @@ dlv debug ./cmd/<app>
 go mod download
 ```
 
+执行不需要包裹，不代表回复里的文件引用也能直接用 `/home/...`：只要用户从 Windows 桌面访问，项目内文件路径仍要转换成 `\\wsl.localhost\<distro>\home\<user>\<project>\...`（判定依据是用户查看环境，不是 agent 运行位置，规则见下方）。
+
 ## agent 在 Windows（如 Claude Desktop GUI）
 
 普通命令默认用 Git Bash / bash；执行类命令通过 `wsl.exe --cd` 进 WSL。默认发行版省略 `-d`，多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`。

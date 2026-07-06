@@ -8,7 +8,7 @@
 |------|---------|------|
 | WSL 内执行（agent 在 WSL，或 `wsl.exe --cd`） | `/home/<user>/<project>` | `/home/luode/myapp` |
 | Windows 侧看代码/改代码（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>` | `\\wsl.localhost\Ubuntu\home\luode\myapp` |
-| 面向用户输出的项目内文件引用（agent 在 Windows） | `\\wsl.localhost\<distro>\home\<user>\<project>\<relative-path>` | `\\wsl.localhost\Ubuntu-24.04\home\luode\code\ellipal_admin\doc\6-审查\a.md` |
+| 面向用户输出的项目内文件引用（与 agent 运行位置无关，只看用户查看环境） | `\\wsl.localhost\<distro>\home\<user>\<project>\<relative-path>` | `\\wsl.localhost\Ubuntu-24.04\home\luode\code\ellipal_admin\doc\6-审查\a.md` |
 
 ## 说明
 
@@ -16,6 +16,7 @@
 - **只有执行类命令才用 WSL 内路径 `/home/<user>/<project>`**（agent 在 Windows 时配合 `wsl.exe --cd`）。
 - **Windows 侧编辑器/文件访问用 `\\wsl.localhost\<distro>\...`** —— 这是 Windows 访问 WSL 原生文件的官方稳定方式。
 - **所有面向用户展示的项目内文件引用都用用户当前环境可打开的路径**：项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查报告证据路径、总结里的文件路径都使用 `\\wsl.localhost\<distro>\...`，不要把 `/home/...` 当成用户可打开路径输出。
+- **这条与 agent 运行位置无关**：判定依据只有“用户查看环境”，不是“agent 运行位置”；agent 直接跑在 WSL 内（执行不需要 `wsl.exe` 包裹）时，也不能顺手把 `/home/...` 当成给 Windows 桌面用户看的路径。
 - 代码已在 WSL 内，**不再使用 `/mnt/<drive>`**（那是访问 Windows 盘的路径）。
 
 ## 注意事项
