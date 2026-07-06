@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian 知识流"
+  short_description: "通过 Obsidian CLI 自动检索并沉淀会话知识"
+  default_prompt: "使用 $obsidian-knowledge-flow 在回答前检索历史笔记，并在总结阶段沉淀本次会话。"

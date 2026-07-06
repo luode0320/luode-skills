@@ -327,7 +327,7 @@ python skill-dictionary/generate_dictionary.py
 | ------------------------------ | ------------------------------------------------------------ |
 | `code-generation-style-rules`  | 编码前读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约。 |
 | `code-minimal-change-rules`    | 严控最小改动范围，避免无关修改、冗余调整和过度优化。         |
-| `code-readability-rules`       | 提升代码可读性，保证函数结构清晰、逻辑顺序自然、复杂度可控。 |
+| `code-readability-rules`       | 提升代码可读性，保证函数结构清晰、副作用显式，并用深模块口径拦截浅封装。 |
 | `code-style-consistency-rules` | 保持项目原有风格一致，不引入风格跳变。                       |
 | `naming-rules`                 | 统一命名语义与可理解性。                                     |
 | `chinese-comment-rules`        | 统一中文注释语言风格、语气和表述方式。                       |
@@ -716,3 +716,4 @@ claude-mem(记忆) :
 2026-07-06 13:39:23 docs: [WSL工具PATH误用排查] 补充command-v自检与一次性排查指引
 2026-07-06 13:56:08 docs: [Codex与ClaudeCode平台判定] 澄清多个skill的平台专属机制差异
 2026-07-06 13:57:09 docs: [Bug域图示规范] 流程图时序图改为正文内嵌Mermaid
+2026-07-07 00:14:00 feat: [知识流与代码规则] 新增Obsidian知识流并强化封装约束

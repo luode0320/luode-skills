@@ -27,6 +27,7 @@
 
 - 方案：新建 `bug-discovery-rules` 作为 Bug 域侦察前置，相邻 skill 让路 / 回流。
 - 根因：原 Bug 域缺一个“追问前先主动取证”的角色。
+- Obsidian 检索：已通过 `obsidian-knowledge-flow` 读取 `20-Knowledge/bug-domain/active-debug-flow.md` 作为历史规则证据。
 
 ## ✅ 验证
 
@@ -37,6 +38,7 @@
 > 本次解决的问题：补齐“Bug 也能先主动侦察再定位”的能力缺口。
 > 采用的方法：新建 `bug-discovery-rules` 并接入 Bug 域链路。
 > 结果确认：用户要的主动侦察能力已落地，并可继续向下游定位链路流转。
+> Obsidian 沉淀：已通过 `obsidian-knowledge-flow` 更新 `20-Knowledge/bug-domain/active-debug-flow.md`。
 
 ## 📦 改动点
 
