@@ -16,6 +16,7 @@
 
 1. `obsidian` 不在 PATH：
    - 预期：阻断，并说明需要安装/升级 Obsidian 1.12.7+ installer、启用 Command line interface、注册 CLI。
+   - 如果已定位到官方 installer 自带的 `Obsidian.com` 绝对路径，预期：允许把该路径作为 CLI 命令继续前置校验，并在证据中记录。
 2. `obsidian version` 失败：
    - 预期：阻断，不继续读写 vault。
 3. 默认根目录不存在：
@@ -25,6 +26,16 @@
    - 预期：阻断，不自动创建自定义目录。
 5. CLI active vault 与解析出的根目录不一致：
    - 预期：阻断，不使用 active vault 代替目标 vault。
+6. CLI 返回 `unable to find Obsidian` 或命令超时：
+   - 预期：有限等待或重启 Obsidian 后重试前置校验；仍失败则阻断，不进行目标 vault 写入。
+7. CLI 命令参数被误拼接，例如 `vault=知识库 vault info=path`：
+   - 预期：判定为非法命令模板，改用 `vaults verbose` 或明确的 `vault=<name>` 首参命令。
+8. 误用写入命令查帮助，例如 `create help`：
+   - 预期：判定为风险命令，改用只读 help 入口。
+9. 长 `content=` 参数、多行表格或 Mermaid append：
+   - 预期：拆成小块追加，并在最终读回校验中确认内容完整。
+10. 长任务后出现挂起的 Obsidian CLI 进程：
+   - 预期：记录并清理本轮挂起进程，重新执行 `version` 和 `vaults verbose` 证明 CLI 恢复。
 
 ## 样例 Vault 功能测试
 
@@ -48,6 +59,9 @@
 6. 可读组件：
    - 输入：一段长期流程或决策对比。
    - 预期：笔记正文可使用表格、列表、Obsidian callout 或 Mermaid；仍保持纯 Markdown 可读。
+7. 全量 vault 沉淀：
+   - 输入：一个已由 CLI 注册的源 vault 和一个已注册的目标 vault。
+   - 预期：先统计源 Markdown 总数；每个顶层分类生成逐篇沉淀笔记；全量总览汇总所有批次；逐篇表格数据行数等于来源 Markdown 数；总和等于源总数；敏感主题只保存脱敏后的通用线索。
 
 ## 仓库验证
 
