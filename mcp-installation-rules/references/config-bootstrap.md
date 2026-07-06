@@ -49,3 +49,16 @@
 - 配置原本是否缺失
 - 是否已默认补齐
 - 补齐后后续由哪个 MCP 优先接管
+
+## Claude Code 配置探测（待确认，新增）
+
+以上全部路径（`./codex/config.toml`、`./.codex/config.toml`）与 TOML `mcp_servers.*` schema 均为 Codex CLI 专属机制，不适用于 Claude Code。
+
+当前运行环境为 Claude Code 时：
+
+- 项目级 MCP 配置的具体机制（是否为根目录 `.mcp.json`、是否存在等价的补齐命令）**本次未实测验证**，不得直接照搬本文件描述的 `./codex/config.toml` 检查顺序或 TOML 字段结构。
+- 在核实具体机制前，遇到 Claude Code 环境下的 MCP 缺口判断，只能：
+  1. 明确告知用户"当前项目可能缺少 <MCP 名称> 配置，但 Claude Code 的具体配置文件/命令尚未核实"；
+  2. 引导用户查阅当前 Claude Code 版本的官方文档或帮助信息确认配置方式；
+  3. 待核实后再按"检测缺失 → 增量补齐 → 不覆盖已有配置"的思路（与 Codex 分支同一原则）执行，但具体文件路径与字段名称需以核实结果为准。
+- 不得在未核实的情况下默认创建任何猜测出的 Claude Code 配置文件，避免写入无效或错误位置。

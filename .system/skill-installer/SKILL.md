@@ -49,6 +49,13 @@ All of these scripts use network, so when running in the sandbox, request escala
 - Multiple `--path` values install multiple skills in one run, each named from the path basename unless `--name` is supplied.
 - Options: `--ref <ref>` (default `main`), `--dest <path>`, `--method auto|download|git`.
 
+## Platform Notes (added)
+
+The `--dest` option is a generic, platform-agnostic override — the script itself has no Codex-specific hardcoding; it only falls back to `$CODEX_HOME/skills` (`~/.codex/skills`) when `--dest` is not passed.
+
+- **Codex**: omit `--dest` to keep the existing default behavior (`$CODEX_HOME/skills`, i.e. `~/.codex/skills` when `CODEX_HOME` is unset).
+- **Claude Code**: pass an explicit `--dest <Claude Code skills directory>` so the skill is installed where Claude Code can discover it, instead of the Codex default. The exact Claude Code skills directory convention has not been verified in this session — confirm it with the user or current Claude Code documentation before relying on a specific path; do not guess a path and present it as confirmed.
+
 ## Notes
 
 - Curated listing is fetched from `https://github.com/openai/skills/tree/main/skills/.curated` via the GitHub API. If it is unavailable, explain the error and exit.

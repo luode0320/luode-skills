@@ -5,6 +5,8 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 
 # Image Generation Skill
 
+> 本目录是本仓库维护的 `imagegen` 权威版本；`.system/imagegen/` 是官方分发的只读参考快照，不应被当作生效版本重复触发。如两者同时出现在 skill 扫描结果中，以本目录（仓库根目录 `imagegen/`）为准。
+
 用于为当前项目生成或编辑位图图像，例如网站素材、游戏素材、UI 预览图、产品图、线框图、Logo 探索图、照片风图像、信息图、角色动作帧等。
 
 ## 顶层模式
@@ -19,6 +21,14 @@ CLI fallback 暴露三个子命令：
 - `generate`
 - `edit`
 - `generate-batch`
+
+## 脚本路径解析规则（新增）
+
+本 skill 引用的所有 `scripts/*` 路径均相对于**当前 SKILL.md 所在目录**（下称 `<skill-dir>`），不是固定的 `~/.codex/skills/imagegen/`：
+
+- 若当前运行环境是 Codex 且本 skill 是从 `$CODEX_HOME/skills/imagegen`（默认 `~/.codex/skills/imagegen`）加载的，`<skill-dir>` 就是该路径，与历史行为一致。
+- 若当前运行环境是 Claude Code，或本 skill 从其他位置（如本仓库路径、`.claude/skills/imagegen`）加载，`<skill-dir>` 必须解析为"本 SKILL.md 实际所在目录"，不得假设 `~/.codex/...`。
+- 判定方法：优先使用当前 agent 运行时暴露的"当前技能目录/当前文件路径"能力；若不可用，退化为在候选路径列表中按存在性探测（当前工作目录下的 `imagegen/`、仓库内 `skill/imagegen/`、`~/.codex/skills/imagegen/`、`~/.claude/skills/imagegen/` 等），第一个存在 `scripts/run_imagegen.*` 的目录即为 `<skill-dir>`。
 
 ## 核心规则
 
@@ -148,9 +158,9 @@ CLI fallback 暴露三个子命令：
    - 比较泛：只补能明显提升质量的必要细节
 10. built-in 可用时，先用 built-in `image_gen`
 11. built-in 不可用时，先验证 CLI fallback
-12. CLI fallback 验证命令：
-    - Windows：`powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\imagegen\scripts\run_imagegen.ps1" -Action check`
-    - Linux/macOS：`bash "$HOME/.codex/skills/imagegen/scripts/run_imagegen.sh" check`
+12. CLI fallback 验证命令（`<skill-dir>` 含义见"脚本路径解析规则"）：
+    - Windows：`powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\run_imagegen.ps1" -Action check`（Codex 默认安装下 `<skill-dir>` 通常是 `$env:USERPROFILE\.codex\skills\imagegen`）
+    - Linux/macOS：`bash "<skill-dir>/scripts/run_imagegen.sh" check`（Codex 默认安装下 `<skill-dir>` 通常是 `$HOME/.codex/skills/imagegen`）
 13. 如果只缺 `openai` / `PIL`，在环境允许时补依赖后重试验证
 14. CLI 验证通过后，用系统入口脚本继续生成/编辑，不要另写 wrapper
 15. 透明底需求：
@@ -196,10 +206,10 @@ CLI fallback 暴露三个子命令：
 3. 把生成结果放到工作区或 `tmp/imagegen/`
    - built-in 路径：从 `$CODEX_HOME/generated_images/...` 挪出来
    - CLI 路径：直接输出到工作区目标文件
-4. 用本地脚本去背景：
+4. 用本地脚本去背景（`<skill-dir>` 含义见"脚本路径解析规则"；Codex 默认安装下 `<skill-dir>` 通常是 `${CODEX_HOME:-$HOME/.codex}/skills/imagegen`）：
 
 ```bash
-python "${CODEX_HOME:-$HOME/.codex}/skills/imagegen/scripts/remove_chroma_key.py" \
+python "<skill-dir>/scripts/remove_chroma_key.py" \
   --input <source> \
   --out <final.png> \
   --auto-key border \
@@ -390,7 +400,8 @@ uv pip install pillow
   1. 当前进程环境变量
   2. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）回退配置
   3. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）图像配置
-  4. `~/.codex/auth.json` + `~/.codex/config.toml`
+  4. `~/.codex/auth.json` + `~/.codex/config.toml`（仅 Codex 环境存在该机制）
+  5. Claude Code 环境：当前版本暂无已确认的等价全局密钥配置文件（不假设存在 `~/.claude/auth.json` 等路径）；若前 3 级都未命中，必须明确提示用户在项目规则文件（`CLAUDE.md`）或本机环境变量中补充声明，不得静默尝试读取未经确认存在的 Claude Code 配置文件
 - 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
   1. 跑系统 `check`
   2. 如果 `openai` 或 `PIL` 缺失，先补依赖
@@ -410,10 +421,10 @@ uv pip install pillow
 - `references/sample-prompts.md`
 - `references/cli.md`
 - `references/image-api.md`
-- `references/codex-network.md`
+- `references/codex-network.md`（仅适用于 Codex CLI 的网络/沙箱审批配置；Claude Code 环境下没有等价的 `approval_policy`/`sandbox_mode` 概念，网络访问由宿主环境而非 skill 层配置控制，遇到网络受限问题应提示用户检查当前 Claude Code 会话的网络权限设置，不要尝试套用 Codex 的 TOML 配置项）
 - `references/local-entrypoints.md`
 - `scripts/image_gen.py`
 - `scripts/bootstrap_imagegen_env.py`
 - `scripts/run_imagegen.ps1`
 - `scripts/run_imagegen.sh`
-- `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`
+- `<skill-dir>/scripts/remove_chroma_key.py`（Codex 默认 `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`；`<skill-dir>` 含义见"脚本路径解析规则"）

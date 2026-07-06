@@ -15,7 +15,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 对“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”等浏览器 MCP 说法做统一收口，避免同一工具被误当成多个候选。
 - 识别 Godot 项目标记，并要求优先接入 Godot AI MCP。
 - 当一个项目同时包含前端与 Godot 子项目时，允许两个 MCP 同时成为推荐安装项。
-- 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。
+- 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。以上 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见下方"平台判定与 Claude Code MCP 配置分支"，两者不通用，不得混用同一份配置文件语义。
 - 为后续浏览器控制和 Godot 编辑器控制建立清晰的优先级，避免同类工具抢主导权。
 
 ## 自动触发信号
@@ -89,7 +89,20 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 两者均为 stdio 类 MCP，需要时把对应 server 配置补齐到项目级 MCP / Codex 配置（与本 skill 其他 MCP 的配置补齐策略一致）。
 - 安装或建立索引失败时，回退到 CodeGraph，再回退到本地搜索与文件读取，不阻塞主任务。
 
-## Chrome DevTools MCP 安装流程
+## 平台判定与 Claude Code MCP 配置分支（新增）
+
+以上"覆盖 Codex 本地配置缺口"及下方"Chrome DevTools MCP 安装流程"中出现的 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见本节，两者不通用，不得混用同一份配置文件语义。
+
+执行本 skill 任何配置补齐动作前，先判断当前运行环境是 Codex 还是 Claude Code：
+
+- **Codex 分支**：完全复用下方"Chrome DevTools MCP 安装流程"小节（该小节专属 Codex CLI 环境），逐字不变。
+- **Claude Code 分支（待确认）**：当前尚未实测确认 Claude Code 的项目级 MCP 配置具体机制（可能是项目根目录 `.mcp.json` 文件，也可能存在 `claude mcp add` 等命令，需在实际 Claude Code 版本中核实）。在核实之前，遇到 Claude Code 环境下的 MCP 安装/配置需求时：
+  - 不得照搬 Codex 分支的 `codex mcp add/list/get` 命令，这些命令在 Claude Code 环境不存在，执行会直接失败（`command not found`）；
+  - 应先向用户确认当前 Claude Code 版本支持的 MCP 配置方式（可查阅当前会话可用的官方文档/帮助，或询问用户），确认后再执行配置补齐动作；
+  - 若确认存在等价的项目级配置文件（如 `.mcp.json`），比照 Codex 分支的"检测缺失 → 默认补齐最小可用配置"思路执行，但具体 key/value schema 需以确认结果为准，不得照抄 Codex 的 TOML `command`/`args` 字段名假设它们同样适用于 Claude Code 的 JSON schema；
+  - 配置补齐后的可用性检查同理，需要用当前确认的 Claude Code 等价命令/机制替代 `codex mcp list` / `codex mcp get`，若没有等价查询手段，则通过让用户在下一次会话中确认新 MCP 是否出现在可用工具列表来间接验证。
+
+## Chrome DevTools MCP 安装流程（本节专属 Codex CLI 环境）
 
 当项目命中前端标记，且用户希望当前会话后续由浏览器侧 MCP 接管时，按下面流程执行：
 
@@ -112,10 +125,18 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 
 ## 适用安装结论模板
 
+Codex 环境：
+
 - `需要安装 Chrome DevTools MCP`
 - `项目级 ./.codex/config.toml 已默认补齐`
 - `后续浏览器控制优先级：Chrome DevTools MCP > agent-browser > 其他本地浏览器兜底方式`
 - `如当前会话未刷新到新 MCP，先重启 Codex 再验证`
+
+Claude Code 结论模板（待确认阶段使用，新增）：
+
+- `需要接入 Chrome DevTools MCP`
+- `当前 Claude Code 版本的具体 MCP 配置机制尚未核实，已提示用户确认`
+- `后续浏览器控制优先级：Chrome DevTools MCP > agent-browser > 其他本地浏览器兜底方式`（该优先级结论平台无关，可直接复用）
 
 ## 默认优先级
 
@@ -134,6 +155,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 不代替 `agent-browser` 做实际浏览器自动化执行；它只负责在需要时让位给更高优先级的 Chrome DevTools MCP。
 - 不代替 `find-skills` 做开放生态技能搜索；这里只判断当前项目应安装什么 MCP。
 - 不代替具体的前端 skill 或 Godot 项目实现规则。
+- 本 skill 的 Claude Code MCP 配置分支目前仅完成判定与提示义务，具体命令细节以实际核实结果为准，不作为最终结论。
 
 ## 需要暂停并确认的条件
 

@@ -18,6 +18,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 2. 若两者都不存在，根据当前运行 AI 创建对应文件（Claude → `CLAUDE.md`，Codex → `AGENTS.md`）
 3. 若两者都存在，使用与当前 AI 对应的文件，并在输出中标注另一个文件的存在
 
+脚本调用的平台传参映射（新增）：`scripts/bootstrap_agents.sh` 本身已支持 `--target codex|claude|both` 参数，但默认值是 `codex`（不传参时按 Codex 场景处理）。当前 AI 为 Claude Code 时，调用脚本必须显式追加 `--target claude`，否则会按默认值创建/同步 `AGENTS.md` 而非 `CLAUDE.md`；当前 AI 为 Codex 时可不传（脚本默认值即 `codex`，行为不变）；若两个规则文件都要同步，传 `--target both`。
+
 ## 目标
 
 - 让仓库在新会话中也能稳定执行项目规则。
@@ -114,7 +116,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## 执行步骤
 
-1. 优先执行脚本：`scripts/bootstrap_agents.sh`（默认当前目录，可通过 `--repo` 指定仓库）。
+1. 优先执行脚本：`scripts/bootstrap_agents.sh`（默认当前目录，可通过 `--repo` 指定仓库）。若当前 AI 为 Claude Code，必须显式追加 `--target claude`（不追加则脚本按默认值创建 `AGENTS.md`，与 Claude Code 场景不符）；Codex 环境可不传（脚本默认值即 `codex`）。
 2. 只要进入本 skill，就不能停留在“已读取规则但未落盘”的状态；必须真的执行脚本，而不是只阅读 `SKILL.md` 或口头说明。
 3. 若仓库内已存在多个规则文件（例如根目录与 `game/AGENTS.md` 或 `game/CLAUDE.md`），必须同步所有已存在规则文件的受管章节，不能只更新根目录后静默忽略子工程规则文件。
 4. 定位项目根目录（通常为当前工作目录）。
@@ -222,6 +224,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 - 默认当前目录：`scripts/bootstrap_agents.sh`
 - 指定仓库：`scripts/bootstrap_agents.sh --repo /path/to/repo`
+- Claude Code 环境：`scripts/bootstrap_agents.sh --target claude`
+- 两种规则文件都要：`scripts/bootstrap_agents.sh --target both`
 - 幂等执行：可重复运行，已有章节不会重复追加。
 
 ## 最小模板（缺失时使用）
