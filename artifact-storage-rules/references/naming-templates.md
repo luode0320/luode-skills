@@ -95,15 +95,12 @@
 
 - Bug 根目录：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/`
 - Bug 主入口文件：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/README.md`
-- Bug 流程图（SVG）：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/flow.svg`
-- Bug 时序图（SVG）：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/sequence.svg`
 
 补充要求：
 
 - 同一个 Bug 的后续复现、定位、诊断、方案和验证都沿用同一根目录。
-- `README.md` 作为主入口文件，其他附件和细节记录围绕该根目录组织。
-- Bug 根目录落地时必须同步产出两张 SVG：流程图（`flow.svg`）与时序图（`sequence.svg`）。
-- Bug 域 SVG 图默认视觉规范为白底，需显式绘制全画布白色背景层（`fill="#FFFFFF"`），禁止透明底。
+- `README.md` 作为唯一主入口文件，流程图与时序图统一用 Mermaid 语法直接写入正文，不另建独立 `flow.svg`/`sequence.svg` 等图文件，与需求域"正文内嵌 Mermaid 图示、不另建配套图文件"的约定保持一致。
+- 其他附件和细节记录围绕该根目录组织。
 
 ## 测试域
 

@@ -37,8 +37,6 @@ entry_files:
   implementation_cycle_doc: "{datetime}_{source_object_id}_实施周期{cycle_no}_{cycle_cn_title}.md"
   implementation_cycle_doc_note: "实施周期文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_实施周期NN_中文主题”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_实施周期01_接口与配置落点.md。不得只写“时间_阶段_说明”，必须保留来源对象标识。"
   bug_root_readme: "README.md"
-  bug_flow_svg: "flow.svg"
-  bug_sequence_svg: "sequence.svg"
   test_task_readme: "README.md"
   test_shared_readme: "README.md"
   test_shared_readme_note: "doc/5-tests/ 根级共享 README（doc/5-tests/README.md），记录跨轮复用的测试通用信息：鉴权/登录方式、配置文件位置、启动脚本用法、服务地址与端口等；与各时间戳目录中文说明目录内的 README.md 区分——后者只描述单轮测试任务，前者承载跨轮共享基建信息。"
@@ -100,7 +98,7 @@ policies:
   requirement_assets_under_doc_requirement_data: true
   requirement_doc_embeds_assets_in_markdown: true
   same_bug_updates_same_root: true
-  bug_requires_svg_diagrams: true
+  bug_doc_embeds_diagrams_in_markdown: true
   same_test_round_updates_same_root: true
   new_independent_test_round_creates_new_root: true
   test_shared_layer_reused_across_rounds: true

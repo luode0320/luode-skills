@@ -34,13 +34,13 @@
 当前缺失项
 - 还缺什么信息
 
-图示产物（必填）
-- 流程图：`flow.svg`
-- 时序图：`sequence.svg`
+图示产物（必填，直接写入本文档正文）
+- 流程图：Mermaid `flowchart` 代码块
+- 时序图：Mermaid `sequenceDiagram` 代码块
 ```
 
 ## 原则
 
 - 先写现象，再写猜测。
 - 猜测原因不能替代问题事实。
-- Bug 根目录记录必须包含 `README.md` + `flow.svg` + `sequence.svg` 三类主入口产物。
+- Bug 根目录记录只有 `README.md` 一个主入口文件，流程图与时序图以 Mermaid 语法直接嵌入正文，不另建独立 SVG 等图文件。
