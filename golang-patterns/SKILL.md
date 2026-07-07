@@ -134,6 +134,43 @@ func LoadConfig(path string) (*Config, error) {
 
 适用于可选参数较多的构造函数。
 
+### 避免转发式冗余封装
+
+导出函数体只有一行、只是把参数原样或做简单转换后转发给一个只有这一个调用方的私有函数（通常私有函数只是加了 `Match`/`Impl` 之类后缀），而这层拆分没有带来复用、独立测试或真实语义转换的价值时，只是"看起来分层"，只会让读者多跳一层才能看懂逻辑，应直接内联。
+
+```go
+// 反例：getEffectiveChannelByMatch 只有这一个调用方，拆出来没有独立价值
+func GetEffectiveChannel(channel, id string) string {
+	return getEffectiveChannelByMatch(channel, isMatched(id))
+}
+
+func getEffectiveChannelByMatch(channel string, matched bool) string {
+	if !matched {
+		return channel
+	}
+	return channel + suffix
+}
+```
+
+```go
+// 正例：直接内联，逻辑一目了然，少一层跳转
+func GetEffectiveChannel(channel, id string) string {
+	if !isMatched(id) {
+		return channel
+	}
+	return channel + suffix
+}
+```
+
+判断要不要拆出私有函数，看这次拆分本身是否有独立存在的理由，而不是看"看起来更分层"：
+
+- 私有函数被多处调用，值得拆分复用
+- 私有函数需要独立编写单元测试覆盖其行为，值得拆分
+- 私有函数做的是真实的语义/签名转换（如适配某个接口），不是简单转发，值得拆分
+- 以上都不满足，只是套一层同名转发，应直接内联到导出函数里
+
+本规则不是要求消灭所有私有 helper 函数：只要私有函数承担独立语义、有独立测试价值或被多处复用，就应该继续保留，不要为了"少一个函数"把不相关逻辑硬塞进一个大函数。
+
 ### 组合优于继承
 
 使用 embedding 复用能力，但要避免语义混乱。
@@ -187,6 +224,7 @@ goimports -w .
 - `go func()` 里不加 recover 就直接执行复杂逻辑
 - 把 `context.Context` 放进 struct 字段
 - 同一类型混用值接收者和指针接收者但无明确规则
+- 导出函数只做一行转发到近乎同名的私有函数（如 `GetX` → `getXMatch`），无复用、无独立测试、也无实质语义转换
 
 ## 最终要求
 
