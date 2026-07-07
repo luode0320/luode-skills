@@ -3798,7 +3798,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 ## Skill 命中强制规则
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`。
+- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -3867,8 +3867,9 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 **编码约束：**
 
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略；任何读写文件操作都继续遵守“文件编码与写入规则”
-- `.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
-- 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
+- `.gitattributes`/`.editorconfig` 首次创建时，行尾策略按仓库现有源码文件的主流换行风格自动适配：多数已跟踪源码为 CRLF（常见于长期用 Windows 提交的团队仓库）时用 `* text=auto eol=crlf`，否则用 `* text=auto`（对应 LF）；`*.sh`/`*.bash` 始终固定 `eol=lf`（shell 脚本在 Linux/WSL 下必须 LF 才能正确执行，不随主流风格摇摆）
+- 不对 `*.go`、`*.vue`、`*.md` 等全量强制统一 eol，尊重已有生态惯例
+- 已存在的 `.gitattributes`/`.editorconfig` 不会被本规则覆盖或反向调整；若发现仓库历史行尾风格与当前文件规则冲突（如某类文件在 `git status`/`git diff` 中出现和真实改动无关的整文件“伪变更”），应优先复核并修正 `.gitattributes` 的 `eol=` 声明，而不是强行修改大量既有文件的物理换行符
 - Windows 下出现大量无关改动优先检查 `core.autocrlf`
 
 ## CodeGraph 强制准备规则
@@ -3911,6 +3912,8 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 字号由各 agent 渲染端（客户端主题 / 字体 / 缩放）决定，内容层不强行控制；需要更大字号时调客户端，不在输出里塞 HTML。
 - 普通说明、方案、流程、总结、审查报告、线程拆分和状态回报必须使用普通 Markdown 段落、列表、表格或引用块；不得用 ` ```text `、无语言代码围栏、缩进代码块或 HTML 包裹整段自然语言输出。
 - 代码围栏只用于真实代码、命令、配置片段、日志片段、JSON/YAML 等需要等宽保真的内容；若只是为了展示可读结构，应改用 Markdown 列表或表格。
+- DO NOT send optional commentary.
+- 必要的命中检查、阻断说明、执行证据和用户明确要求的解释不属于 optional commentary。
 
 ## 依赖与工具复用优先规则
 

@@ -1,13 +1,13 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-07 00:12:32",
+  "generated_at": "2026-07-07 21:36:01",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 82,
-    "implemented_total": 82,
+    "planned_total": 83,
+    "implemented_total": 83,
     "planned_missing": 0,
-    "seed_total": 25,
+    "seed_total": 24,
     "doc_total": 8,
     "references_total": 341,
     "agents_total": 90
@@ -810,10 +810,10 @@ window.SKILL_DICTIONARY = {
       "label": "记忆域",
       "description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "order": 2,
-      "implemented_count": 5,
+      "implemented_count": 6,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 5,
+      "total_count": 6,
       "items": [
         {
           "id": "recent-context-bootstrap-rules",
@@ -1019,6 +1019,48 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "project-style-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+          ]
+        },
+        {
+          "id": "obsidian-knowledge-flow",
+          "name": "obsidian-knowledge-flow",
+          "title": "Obsidian 知识流",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "memory",
+          "domain_label": "记忆域",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_order": 2,
+          "item_order": 6,
+          "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复、回答前、阶段收口或最终回复前，可以先轻量命中本 skill 判断是否需要历史检索或知识沉淀；只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容，或出现“上次/之前/我们约定/当时怎么说/Obsidian/知识库”等信号时，才执行真实 Obsidian CLI retrieve/read；只有本轮存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才执行真实 CLI capture/distill。CLI 不可用、Obsidian 应用无法运行、目标 vault 未注册或目标不一致时必须阻断并记录证据，不得回退到文件系统读写。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+          "core_responsibility": "负责通过 Obsidian CLI 管理固定 vault 的历史检索、会话捕获和长期知识沉淀；CLI 不可用、vault 未注册或目标不一致时只记录阻断，不回退为文件系统读写。",
+          "skill_path": "obsidian-knowledge-flow/SKILL.md",
+          "directory_path": "obsidian-knowledge-flow",
+          "directory": "obsidian-knowledge-flow",
+          "sections": [
+            "目标",
+            "固定根目录",
+            "工作流程",
+            "捕获规则",
+            "检索规则",
+            "命令行约定"
+          ],
+          "references": [
+            "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+            "obsidian-knowledge-flow/references/cli-operations.md",
+            "obsidian-knowledge-flow/references/conflict-staleness.md",
+            "obsidian-knowledge-flow/references/note-schema.md",
+            "obsidian-knowledge-flow/references/validation-checklist.md",
+            "obsidian-knowledge-flow/references/vault-layout.md"
+          ],
+          "agents": [
+            "obsidian-knowledge-flow/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -3683,8 +3725,8 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 25,
-      "total_count": 25,
+      "seed_count": 24,
+      "total_count": 24,
       "items": [
         {
           "id": "\"doc\"",
@@ -4251,48 +4293,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "obsidian-knowledge-flow",
-          "name": "obsidian-knowledge-flow",
-          "title": "Obsidian 知识流",
-          "status": "seed",
-          "status_label": "扩展种子",
-          "domain_id": "seed",
-          "domain_label": "扩展种子",
-          "domain_description": "已入库但未并入主规划的参考 skill",
-          "domain_order": 11,
-          "item_order": 15,
-          "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复或回答前，只要问题可能依赖历史决策、项目事实、用户偏好、重复实体、知识库内容或“上次/之前/我们约定/当时怎么说”等历史信息，必须自动触发并先通过 Obsidian CLI 检索相关笔记；会话总结、阶段收口或最终回复前，必须自动判断是否存在可复用的事实、决策、流程、定义、偏好、来源或调试经验，并通过 Obsidian CLI 捕获/沉淀为 Markdown 笔记。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
-          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-          "skill_path": "obsidian-knowledge-flow/SKILL.md",
-          "directory_path": "obsidian-knowledge-flow",
-          "directory": "obsidian-knowledge-flow",
-          "sections": [
-            "目标",
-            "固定根目录",
-            "工作流程",
-            "捕获规则",
-            "检索规则",
-            "命令行约定"
-          ],
-          "references": [
-            "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-            "obsidian-knowledge-flow/references/cli-operations.md",
-            "obsidian-knowledge-flow/references/conflict-staleness.md",
-            "obsidian-knowledge-flow/references/note-schema.md",
-            "obsidian-knowledge-flow/references/validation-checklist.md",
-            "obsidian-knowledge-flow/references/vault-layout.md"
-          ],
-          "agents": [
-            "obsidian-knowledge-flow/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-          ]
-        },
-        {
           "id": "plugin-installation-rules",
           "name": "plugin-installation-rules",
           "title": "插件检测安装使用规则",
@@ -4302,7 +4302,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 16,
+          "item_order": 15,
           "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "plugin-installation-rules/SKILL.md",
@@ -4342,7 +4342,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 17,
+          "item_order": 16,
           "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -4382,7 +4382,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 18,
+          "item_order": 17,
           "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
@@ -4423,7 +4423,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 19,
+          "item_order": 18,
           "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "time-util-rules/SKILL.md",
@@ -4456,7 +4456,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 20,
+          "item_order": 19,
           "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -4488,7 +4488,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 21,
+          "item_order": 20,
           "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-best-practices/SKILL.md",
@@ -4544,7 +4544,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 22,
+          "item_order": 21,
           "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-router-best-practices/SKILL.md",
@@ -4570,7 +4570,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 23,
+          "item_order": 22,
           "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "web-design-guidelines/SKILL.md",
@@ -4600,7 +4600,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 24,
+          "item_order": 23,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\<distro>\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4646,7 +4646,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 25,
+          "item_order": 24,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -5660,6 +5660,48 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "project-style-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+      ]
+    },
+    {
+      "id": "obsidian-knowledge-flow",
+      "name": "obsidian-knowledge-flow",
+      "title": "Obsidian 知识流",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "memory",
+      "domain_label": "记忆域",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_order": 2,
+      "item_order": 6,
+      "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复、回答前、阶段收口或最终回复前，可以先轻量命中本 skill 判断是否需要历史检索或知识沉淀；只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容，或出现“上次/之前/我们约定/当时怎么说/Obsidian/知识库”等信号时，才执行真实 Obsidian CLI retrieve/read；只有本轮存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才执行真实 CLI capture/distill。CLI 不可用、Obsidian 应用无法运行、目标 vault 未注册或目标不一致时必须阻断并记录证据，不得回退到文件系统读写。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+      "core_responsibility": "负责通过 Obsidian CLI 管理固定 vault 的历史检索、会话捕获和长期知识沉淀；CLI 不可用、vault 未注册或目标不一致时只记录阻断，不回退为文件系统读写。",
+      "skill_path": "obsidian-knowledge-flow/SKILL.md",
+      "directory_path": "obsidian-knowledge-flow",
+      "directory": "obsidian-knowledge-flow",
+      "sections": [
+        "目标",
+        "固定根目录",
+        "工作流程",
+        "捕获规则",
+        "检索规则",
+        "命令行约定"
+      ],
+      "references": [
+        "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+        "obsidian-knowledge-flow/references/cli-operations.md",
+        "obsidian-knowledge-flow/references/conflict-staleness.md",
+        "obsidian-knowledge-flow/references/note-schema.md",
+        "obsidian-knowledge-flow/references/validation-checklist.md",
+        "obsidian-knowledge-flow/references/vault-layout.md"
+      ],
+      "agents": [
+        "obsidian-knowledge-flow/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -8784,48 +8826,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "obsidian-knowledge-flow",
-      "name": "obsidian-knowledge-flow",
-      "title": "Obsidian 知识流",
-      "status": "seed",
-      "status_label": "扩展种子",
-      "domain_id": "seed",
-      "domain_label": "扩展种子",
-      "domain_description": "已入库但未并入主规划的参考 skill",
-      "domain_order": 11,
-      "item_order": 15,
-      "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复或回答前，只要问题可能依赖历史决策、项目事实、用户偏好、重复实体、知识库内容或“上次/之前/我们约定/当时怎么说”等历史信息，必须自动触发并先通过 Obsidian CLI 检索相关笔记；会话总结、阶段收口或最终回复前，必须自动判断是否存在可复用的事实、决策、流程、定义、偏好、来源或调试经验，并通过 Obsidian CLI 捕获/沉淀为 Markdown 笔记。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
-      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
-      "skill_path": "obsidian-knowledge-flow/SKILL.md",
-      "directory_path": "obsidian-knowledge-flow",
-      "directory": "obsidian-knowledge-flow",
-      "sections": [
-        "目标",
-        "固定根目录",
-        "工作流程",
-        "捕获规则",
-        "检索规则",
-        "命令行约定"
-      ],
-      "references": [
-        "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-        "obsidian-knowledge-flow/references/cli-operations.md",
-        "obsidian-knowledge-flow/references/conflict-staleness.md",
-        "obsidian-knowledge-flow/references/note-schema.md",
-        "obsidian-knowledge-flow/references/validation-checklist.md",
-        "obsidian-knowledge-flow/references/vault-layout.md"
-      ],
-      "agents": [
-        "obsidian-knowledge-flow/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
-        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
-        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
-      ]
-    },
-    {
       "id": "plugin-installation-rules",
       "name": "plugin-installation-rules",
       "title": "插件检测安装使用规则",
@@ -8835,7 +8835,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 16,
+      "item_order": 15,
       "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "plugin-installation-rules/SKILL.md",
@@ -8875,7 +8875,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 17,
+      "item_order": 16,
       "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -8915,7 +8915,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 18,
+      "item_order": 17,
       "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
@@ -8956,7 +8956,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 19,
+      "item_order": 18,
       "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "time-util-rules/SKILL.md",
@@ -8989,7 +8989,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 20,
+      "item_order": 19,
       "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -9021,7 +9021,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 21,
+      "item_order": 20,
       "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-best-practices/SKILL.md",
@@ -9077,7 +9077,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 22,
+      "item_order": 21,
       "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-router-best-practices/SKILL.md",
@@ -9103,7 +9103,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 23,
+      "item_order": 22,
       "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "web-design-guidelines/SKILL.md",
@@ -9133,7 +9133,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 24,
+      "item_order": 23,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\<distro>\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -9179,7 +9179,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 25,
+      "item_order": 24,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",
@@ -9287,7 +9287,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "82 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "83 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]
