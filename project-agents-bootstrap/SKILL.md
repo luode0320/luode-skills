@@ -189,7 +189,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 命令格式：执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
   - 用户可访问文件引用：回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`
   - 不再使用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`；纯 Windows 项目或本轮不执行程序时不要误切 WSL
-  - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；`.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
+  - 编码约束：仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8；行尾策略首次创建时按仓库现有源码主流风格自动适配（多数已跟踪源码为 CRLF 时用 `* text=auto eol=crlf`，否则用 `* text=auto` 对应 LF），避免和长期用 CRLF 提交的既有仓库历史冲突导致大量文件出现无关“伪变更”；`*.sh`/`*.bash` 始终固定 `eol=lf`
 - CodeGraph 强制准备规则：未安装 `codegraph` 时，必须从 `colbymchenry/codegraph` 强制下载安装到当前服务器 / 电脑；安装后必须为当前项目初始化 CodeGraph；全程不需要用户确认。
 - 代码图谱 MCP 配套：架构层分析可补充安装 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制、失败不阻塞）；安装判定与配合规则详见 `mcp-installation-rules`。
 - 插件检测安装：涉及 AI 编码插件（如 Ponytail）的安装、启用、配置时，联动 `plugin-installation-rules`，以官方仓库为准、claude/codex 通用。Ponytail 为默认必装插件，会话/项目准备时默认安装并启用。
@@ -405,8 +405,9 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 **编码约束：**
 
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略；任何读写文件操作都继续遵守“文件编码与写入规则”
-- `.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
-- 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
+- `.gitattributes`/`.editorconfig` 首次创建时，行尾策略按仓库现有源码文件的主流换行风格自动适配：多数已跟踪源码为 CRLF（常见于长期用 Windows 提交的团队仓库）时用 `* text=auto eol=crlf`，否则用 `* text=auto`（对应 LF）；`*.sh`/`*.bash` 始终固定 `eol=lf`（shell 脚本在 Linux/WSL 下必须 LF 才能正确执行，不随主流风格摇摆）
+- 不对 `*.go`、`*.vue`、`*.md` 等全量强制统一 eol，尊重已有生态惯例
+- 已存在的 `.gitattributes`/`.editorconfig` 不会被本规则覆盖或反向调整；若发现仓库历史行尾风格与当前文件规则冲突（如某类文件在 `git status`/`git diff` 中出现和真实改动无关的整文件“伪变更”），应优先复核并修正 `.gitattributes` 的 `eol=` 声明，而不是强行修改大量既有文件的物理换行符
 - Windows 下出现大量无关改动优先检查 `core.autocrlf`
 
 ## CodeGraph 强制准备规则

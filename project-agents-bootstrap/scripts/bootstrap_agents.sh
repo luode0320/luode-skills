@@ -112,6 +112,44 @@ is_godot_project() {
   return 1
 }
 
+# detect_dominant_eol
+# [参数] 无（读取全局 REPO_DIR）
+# [返回] 通过 stdout 输出 "crlf" 或 "lf"；仓库为空或无匹配样本时默认 "lf"
+# 最近修改时间: 2026-07-07 15:15:24 新增：检测仓库现有源码的主流换行风格，避免 .gitattributes/.editorconfig
+# 首次创建时用固定 eol=lf 硬套一个和仓库历史约定不一致的策略（例如长期用 CRLF 提交的 Windows 团队仓库），
+# 造成大量文件在 git status/diff 中出现与真实改动无关的"伪变更"（本次由用户在真实项目中复现后定位到根因）
+detect_dominant_eol() {
+  # 1. 采样仓库内已跟踪的主流源码类型，最多取 50 个，避免大仓库全量扫描拖慢首次自举
+  local sample_files
+  sample_files=$(cd "$REPO_DIR" && git ls-files 2>/dev/null \
+    | grep -E '\.(java|go|py|js|ts|jsx|tsx|c|cpp|h|hpp|cs|rb|kt|swift|yml|yaml|json|xml)$' \
+    | head -50) || true
+  if [[ -z "$sample_files" ]]; then
+    echo "lf"
+    return
+  fi
+
+  # 2. 逐个样本文件统计 CRLF 占比
+  local total=0
+  local crlf_count=0
+  while IFS= read -r f; do
+    [[ -f "$REPO_DIR/$f" ]] || continue
+    total=$((total + 1))
+    # 用 `file` 判断行尾风格，不用 grep 直接匹配 $'\r'：部分 MSYS/Git Bash grep 在这里无法
+    # 匹配到裸 CR 字节（实测会稳定返回 0 个匹配，即使文件确实含 CRLF），`file` 的输出文本更可靠。
+    if file "$REPO_DIR/$f" 2>/dev/null | grep -q 'CRLF'; then
+      crlf_count=$((crlf_count + 1))
+    fi
+  done <<< "$sample_files"
+
+  # 3. CRLF 样本过半判定为 CRLF 主流仓库，否则默认 LF
+  if [[ "$total" -gt 0 && "$crlf_count" -gt $((total / 2)) ]]; then
+    echo "crlf"
+  else
+    echo "lf"
+  fi
+}
+
 # ---- 受管章节正文（单引号 heredoc，原样保留反引号等特殊字符）----
 # 章节内容以 project-agents-bootstrap 最小模板为权威源，创建与同步共用同一份正文，避免脱节。
 
@@ -320,8 +358,9 @@ BODY_WINDOWS_WSL=$(cat <<'EOF'
 **编码约束：**
 
 - 仓库提交 `.gitattributes` 与 `.editorconfig`，固定 UTF-8 和换行策略；任何读写文件操作都继续遵守“文件编码与写入规则”
-- `.gitattributes` 默认 `* text=auto`，`*.sh`/`*.yaml` 显式 `eol=lf`
-- 不对 `*.go`、`*.vue`、`*.md` 等全量强制 `eol=lf`
+- `.gitattributes`/`.editorconfig` 首次创建时，行尾策略按仓库现有源码文件的主流换行风格自动适配：多数已跟踪源码为 CRLF（常见于长期用 Windows 提交的团队仓库）时用 `* text=auto eol=crlf`，否则用 `* text=auto`（对应 LF）；`*.sh`/`*.bash` 始终固定 `eol=lf`（shell 脚本在 Linux/WSL 下必须 LF 才能正确执行，不随主流风格摇摆）
+- 不对 `*.go`、`*.vue`、`*.md` 等全量强制统一 eol，尊重已有生态惯例
+- 已存在的 `.gitattributes`/`.editorconfig` 不会被本规则覆盖或反向调整；若发现仓库历史行尾风格与当前文件规则冲突（如某类文件在 `git status`/`git diff` 中出现和真实改动无关的整文件“伪变更”），应优先复核并修正 `.gitattributes` 的 `eol=` 声明，而不是强行修改大量既有文件的物理换行符
 - Windows 下出现大量无关改动优先检查 `core.autocrlf`
 EOF
 )
@@ -385,13 +424,16 @@ GODOT_IMAGEGEN_SECTION=$(cat <<'EOF'
 EOF
 )
 
-GITATTRIBUTES_CONTENT=$(cat <<'EOF'
-* text=auto
+# 仓库现有源码的主流换行风格；只影响 .gitattributes/.editorconfig 首次创建的内容，
+# 已存在的文件仍按增量 upsert 规则处理，不会被这里覆盖。
+DOMINANT_EOL=$(detect_dominant_eol)
+
+if [[ "$DOMINANT_EOL" == "crlf" ]]; then
+  GITATTRIBUTES_CONTENT=$(cat <<'EOF'
+* text=auto eol=crlf
 
 *.sh text eol=lf
 *.bash text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
 
 *.png binary
 *.jpg binary
@@ -404,8 +446,47 @@ GITATTRIBUTES_CONTENT=$(cat <<'EOF'
 *.gz binary
 EOF
 )
+  EDITORCONFIG_CONTENT=$(cat <<'EOF'
+root = true
 
-EDITORCONFIG_CONTENT=$(cat <<'EOF'
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
+[*.go]
+indent_style = tab
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.sh]
+end_of_line = lf
+EOF
+)
+else
+  GITATTRIBUTES_CONTENT=$(cat <<'EOF'
+* text=auto
+
+*.sh text eol=lf
+*.bash text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+EOF
+)
+  EDITORCONFIG_CONTENT=$(cat <<'EOF'
 root = true
 
 [*]
@@ -424,6 +505,7 @@ indent_size = 4
 trim_trailing_whitespace = false
 EOF
 )
+fi
 
 PROJECT_MEMORY_MACHINE_SECTION=$(cat <<'EOF'
 ## 机器索引区
@@ -665,6 +747,10 @@ sync_agents_file() {
 }
 
 resolve_python
+# Windows 上 Python 的 stdout 默认编码常落到系统 ANSI 代码页（如中文系统的 GBK/cp936），
+# 而脚本内嵌 Python 块用 encoding="utf-8" 读写文件、却用默认编码 print() 状态信息，
+# 会导致中文 [INFO]/[ERROR] 提示在终端里乱码（实测复现）；强制 UTF-8 让文件与输出编码口径一致。
+export PYTHONIOENCODING=utf-8
 
 # 1) 按 --target 创建缺失的根目录规则文件
 declare -a TARGET_FILES=()
