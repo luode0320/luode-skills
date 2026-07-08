@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-07 21:36:01",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-08 11:00:54",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -554,7 +554,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 13,
-          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:<检索/沉淀/不适用/阻断>`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -901,6 +901,49 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "obsidian-knowledge-flow",
+          "name": "obsidian-knowledge-flow",
+          "title": "Obsidian 知识流",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "memory",
+          "domain_label": "记忆域",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_order": 2,
+          "item_order": 3,
+          "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理，并在仓库任务中采用“选择性默认”触发：每轮先轻量判断 `Obsidian:<检索/沉淀/不适用/阻断>`，只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容或“上次/之前/我们约定/当时怎么说”等历史信息时，才通过 Obsidian CLI 检索相关笔记；会话总结、阶段收口或最终回复前，只有存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才通过 Obsidian CLI 捕获/沉淀为 Markdown 笔记。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+          "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
+          "skill_path": "obsidian-knowledge-flow/SKILL.md",
+          "directory_path": "obsidian-knowledge-flow",
+          "directory": "obsidian-knowledge-flow",
+          "sections": [
+            "目标",
+            "选择性默认判定",
+            "固定根目录",
+            "工作流程",
+            "捕获规则",
+            "检索规则",
+            "命令行约定"
+          ],
+          "references": [
+            "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+            "obsidian-knowledge-flow/references/cli-operations.md",
+            "obsidian-knowledge-flow/references/conflict-staleness.md",
+            "obsidian-knowledge-flow/references/note-schema.md",
+            "obsidian-knowledge-flow/references/validation-checklist.md",
+            "obsidian-knowledge-flow/references/vault-layout.md"
+          ],
+          "agents": [
+            "obsidian-knowledge-flow/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+          ]
+        },
+        {
           "id": "project-timeline-rules",
           "name": "project-timeline-rules",
           "title": "项目时间线规则",
@@ -910,7 +953,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "记忆域",
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 3,
+          "item_order": 4,
           "auto_trigger": "当用户要求生成项目开发历程、阶段总结、技术演进、关键决策回顾、项目时间线报告、完整历史分析或“这个项目一路是怎么走过来的”时自动触发。负责基于持久记忆后端或本地历史材料，按时间顺序组织项目演进、关键阶段、重大问题和技术决策；不要用它代替当前一次交付摘要、当前需求验收或当前 Bug 修复说明。",
           "core_responsibility": "负责按项目维度组织长期历史、输出时间线和演进报告。",
           "skill_path": "project-timeline-rules/SKILL.md",
@@ -953,7 +996,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "记忆域",
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 4,
+          "item_order": 5,
           "auto_trigger": "从对话、代码与项目文档中抽取并维护长期项目记忆，统一写入根目录 `PROJECT_MEMORY.md`。该文件继续作为唯一长期记忆主文件，但内部升级为“人类阅读区 + 底部机器索引区”的单文件双区结构；默认先更新机器索引区，再同步人类阅读区，不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。",
           "core_responsibility": "负责维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源，并在规则调整时回写原词条。",
           "skill_path": "project-memory-rules/SKILL.md",
@@ -1000,7 +1043,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "记忆域",
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 5,
+          "item_order": 6,
           "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（通常由 `project-agents-bootstrap` 统一编排联动）。",
           "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
           "skill_path": "project-style-rules/SKILL.md",
@@ -1019,48 +1062,6 @@ window.SKILL_DICTIONARY = {
           ],
           "agents": [
             "project-style-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
-          ]
-        },
-        {
-          "id": "obsidian-knowledge-flow",
-          "name": "obsidian-knowledge-flow",
-          "title": "Obsidian 知识流",
-          "status": "implemented",
-          "status_label": "已实现",
-          "domain_id": "memory",
-          "domain_label": "记忆域",
-          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
-          "domain_order": 2,
-          "item_order": 6,
-          "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复、回答前、阶段收口或最终回复前，可以先轻量命中本 skill 判断是否需要历史检索或知识沉淀；只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容，或出现“上次/之前/我们约定/当时怎么说/Obsidian/知识库”等信号时，才执行真实 Obsidian CLI retrieve/read；只有本轮存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才执行真实 CLI capture/distill。CLI 不可用、Obsidian 应用无法运行、目标 vault 未注册或目标不一致时必须阻断并记录证据，不得回退到文件系统读写。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
-          "core_responsibility": "负责通过 Obsidian CLI 管理固定 vault 的历史检索、会话捕获和长期知识沉淀；CLI 不可用、vault 未注册或目标不一致时只记录阻断，不回退为文件系统读写。",
-          "skill_path": "obsidian-knowledge-flow/SKILL.md",
-          "directory_path": "obsidian-knowledge-flow",
-          "directory": "obsidian-knowledge-flow",
-          "sections": [
-            "目标",
-            "固定根目录",
-            "工作流程",
-            "捕获规则",
-            "检索规则",
-            "命令行约定"
-          ],
-          "references": [
-            "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-            "obsidian-knowledge-flow/references/cli-operations.md",
-            "obsidian-knowledge-flow/references/conflict-staleness.md",
-            "obsidian-knowledge-flow/references/note-schema.md",
-            "obsidian-knowledge-flow/references/validation-checklist.md",
-            "obsidian-knowledge-flow/references/vault-layout.md"
-          ],
-          "agents": [
-            "obsidian-knowledge-flow/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -5207,7 +5208,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 13,
-      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:<检索/沉淀/不适用/阻断>`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -5542,6 +5543,49 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "obsidian-knowledge-flow",
+      "name": "obsidian-knowledge-flow",
+      "title": "Obsidian 知识流",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "memory",
+      "domain_label": "记忆域",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_order": 2,
+      "item_order": 3,
+      "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理，并在仓库任务中采用“选择性默认”触发：每轮先轻量判断 `Obsidian:<检索/沉淀/不适用/阻断>`，只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容或“上次/之前/我们约定/当时怎么说”等历史信息时，才通过 Obsidian CLI 检索相关笔记；会话总结、阶段收口或最终回复前，只有存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才通过 Obsidian CLI 捕获/沉淀为 Markdown 笔记。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+      "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
+      "skill_path": "obsidian-knowledge-flow/SKILL.md",
+      "directory_path": "obsidian-knowledge-flow",
+      "directory": "obsidian-knowledge-flow",
+      "sections": [
+        "目标",
+        "选择性默认判定",
+        "固定根目录",
+        "工作流程",
+        "捕获规则",
+        "检索规则",
+        "命令行约定"
+      ],
+      "references": [
+        "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+        "obsidian-knowledge-flow/references/cli-operations.md",
+        "obsidian-knowledge-flow/references/conflict-staleness.md",
+        "obsidian-knowledge-flow/references/note-schema.md",
+        "obsidian-knowledge-flow/references/validation-checklist.md",
+        "obsidian-knowledge-flow/references/vault-layout.md"
+      ],
+      "agents": [
+        "obsidian-knowledge-flow/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+      ]
+    },
+    {
       "id": "project-timeline-rules",
       "name": "project-timeline-rules",
       "title": "项目时间线规则",
@@ -5551,7 +5595,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "记忆域",
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 3,
+      "item_order": 4,
       "auto_trigger": "当用户要求生成项目开发历程、阶段总结、技术演进、关键决策回顾、项目时间线报告、完整历史分析或“这个项目一路是怎么走过来的”时自动触发。负责基于持久记忆后端或本地历史材料，按时间顺序组织项目演进、关键阶段、重大问题和技术决策；不要用它代替当前一次交付摘要、当前需求验收或当前 Bug 修复说明。",
       "core_responsibility": "负责按项目维度组织长期历史、输出时间线和演进报告。",
       "skill_path": "project-timeline-rules/SKILL.md",
@@ -5594,7 +5638,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "记忆域",
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 4,
+      "item_order": 5,
       "auto_trigger": "从对话、代码与项目文档中抽取并维护长期项目记忆，统一写入根目录 `PROJECT_MEMORY.md`。该文件继续作为唯一长期记忆主文件，但内部升级为“人类阅读区 + 底部机器索引区”的单文件双区结构；默认先更新机器索引区，再同步人类阅读区，不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。",
       "core_responsibility": "负责维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆源，并在规则调整时回写原词条。",
       "skill_path": "project-memory-rules/SKILL.md",
@@ -5641,7 +5685,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "记忆域",
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 5,
+      "item_order": 6,
       "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（通常由 `project-agents-bootstrap` 统一编排联动）。",
       "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
       "skill_path": "project-style-rules/SKILL.md",
@@ -5660,48 +5704,6 @@ window.SKILL_DICTIONARY = {
       ],
       "agents": [
         "project-style-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
-      ]
-    },
-    {
-      "id": "obsidian-knowledge-flow",
-      "name": "obsidian-knowledge-flow",
-      "title": "Obsidian 知识流",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "memory",
-      "domain_label": "记忆域",
-      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
-      "domain_order": 2,
-      "item_order": 6,
-      "auto_trigger": "将固定根目录的 Obsidian vault 作为 Codex 会话知识库管理。会话开始、上下文恢复、回答前、阶段收口或最终回复前，可以先轻量命中本 skill 判断是否需要历史检索或知识沉淀；只有问题依赖历史决策、项目事实、用户偏好、重复实体、知识库内容，或出现“上次/之前/我们约定/当时怎么说/Obsidian/知识库”等信号时，才执行真实 Obsidian CLI retrieve/read；只有本轮存在可复用的事实、决策、流程、定义、偏好、来源或调试经验时，才执行真实 CLI capture/distill。CLI 不可用、Obsidian 应用无法运行、目标 vault 未注册或目标不一致时必须阻断并记录证据，不得回退到文件系统读写。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
-      "core_responsibility": "负责通过 Obsidian CLI 管理固定 vault 的历史检索、会话捕获和长期知识沉淀；CLI 不可用、vault 未注册或目标不一致时只记录阻断，不回退为文件系统读写。",
-      "skill_path": "obsidian-knowledge-flow/SKILL.md",
-      "directory_path": "obsidian-knowledge-flow",
-      "directory": "obsidian-knowledge-flow",
-      "sections": [
-        "目标",
-        "固定根目录",
-        "工作流程",
-        "捕获规则",
-        "检索规则",
-        "命令行约定"
-      ],
-      "references": [
-        "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-        "obsidian-knowledge-flow/references/cli-operations.md",
-        "obsidian-knowledge-flow/references/conflict-staleness.md",
-        "obsidian-knowledge-flow/references/note-schema.md",
-        "obsidian-knowledge-flow/references/validation-checklist.md",
-        "obsidian-knowledge-flow/references/vault-layout.md"
-      ],
-      "agents": [
-        "obsidian-knowledge-flow/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [

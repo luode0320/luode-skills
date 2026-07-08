@@ -30,6 +30,16 @@
 - 缺失则按各自 `references` 主文档模板创建；只写明确事实，合并去重，刷新「更新时间」，并在「变更记录」补写变更原因。
 - 单一主文档原则：每类长期上下文只维护一份根目录主文档，不产生衍生文件。
 
+### Obsidian 知识流选择性默认触发（强制）
+
+- 每轮仓库任务都必须先做一次轻量 Obsidian 判断，并在首条中间进度或等价命中检查证据中输出 `Obsidian:<检索/沉淀/不适用/阻断>`。
+- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / Obsidian / 知识库 / 当时怎么说”等信号时，判定为 `Obsidian:检索`，必须命中 `obsidian-knowledge-flow` 并通过 Obsidian CLI 检索 / 读取笔记。
+- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `Obsidian:沉淀`，必须命中 `obsidian-knowledge-flow` 并先通过 CLI 检索已有笔记，再决定捕获或沉淀。
+- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `Obsidian:不适用`，不得为了形式调用 Obsidian CLI。
+- Obsidian vault 的检索、读取、创建、追加和沉淀只能通过 `obsidian` CLI 完成；CLI 不可用、vault 未注册、目标根目录不一致或命令无法限定到目标 vault 时，判定为 `Obsidian:阻断`，不得用 `rg`、`Get-Content`、`Set-Content` 或直接文件读写冒充 vault 操作。
+- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `Obsidian:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
+- 本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区统一落在该 vault 下的 `知识库/` 目录；既然这个映射已经约定，就不要再通过环境变量、`.obsidian-kb-root` 或其它候选路径重复 probing。
+
 ## 严禁自动提交 Git（最高优先级，强制）
 
 - 绝对禁止在用户未于「当前这轮消息」显式提出提交的前提下，执行任何写入仓库历史的 Git 动作（`git commit`、`git commit --amend`、`git push`、`git rebase`、`git merge --no-ff` 等）。
@@ -38,6 +48,7 @@
 - 任何情况下都不得以「我以为你想提交」「按惯例提交」「顺手提交」为由自动提交。
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
+- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `obsidian-knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
 - 违反本条视为最高级别流程违规。
 
 ## Skill 命中强制规则
@@ -46,6 +57,7 @@
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
+- 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。
 - 进入分析、侦察、需求、Bug、审查、测试、文档或编码等实质执行前，主 agent 必须自主判断是否存在可由 subagent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界；不得只依赖固定 skill 映射表。
@@ -104,7 +116,7 @@
 ## 本地连接调试测试红线（最高优先级，强制）
 
 - 需求侦察、Bug 复现 / 定位 / 运行时调试、功能验证、回归测试、上线接口测试、浏览器联调、启动前后端服务或执行任何测试脚本时，所有数据库、缓存、消息队列、HTTP/RPC 上游、前端 / 后端服务连接都只能使用 `local` 本地环境。
-- 本地环境只允许来自 `config_local*`、`.env.local`、`.env.development`、本机开发容器、`localhost` / `127.0.0.1` / 本机端口等本地开发配置；`test`、`prod`、`production`、`staging`、`pre`、`release` 等非 local 环境一律禁止连接。
+- 「本地环境」的判定标准是**连接信息的配置归属**，不是连接地址是否指向本机：只要连接信息来自 `config_local*`、`.env.local`、`.env.development` 等 local 本地开发配置，即为允许使用的本地环境，即使其指向远程服务器、团队共享开发库或非 `localhost` 地址也属合法本地目标；`localhost` / `127.0.0.1` / 本机端口 / 本机开发容器只是 local 配置的常见形态，不是判定依据。`test`、`prod`、`production`、`staging`、`pre`、`release` 配置声明的连接信息一律禁止使用，即使其恰好指向本机也不例外。
 - 即使用户提供了 test / prod 连接串、账号、接口地址或临时授权，也不得由 agent 直接连接或调用；必须记录为环境阻断，并要求改用 local 本地数据库和本地服务。
 - 若 local 配置缺失、local 数据不足或本地服务未启动，只能初始化 / 启动 / 查询 local 环境；不得回退到 test / prod 数据库、缓存、消息队列、外部服务或线上接口补证据。
 - 需要写入数据时仅允许写入 local 环境，并且必须有清理或回滚方案；Bug 侦察类只读链路仍保持只读，禁止自行增删改数据。

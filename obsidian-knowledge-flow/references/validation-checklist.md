@@ -5,10 +5,25 @@
 ## Skill 资产验证
 
 - `SKILL.md` 的 YAML frontmatter 只包含 `name` 和 `description`。
-- `description` 覆盖会话开始检索、总结阶段捕获/沉淀、Obsidian、vault、Markdown 知识库、CLI、本地笔记库和知识库检索等触发场景。
+- `description` 覆盖选择性默认判断、固定根目录 `D:\obsidian_data`、`知识库/` 工作区、会话开始检索、总结阶段捕获/沉淀、Obsidian、vault、Markdown 知识库、CLI、本地笔记库和知识库检索等触发场景。
 - `SKILL.md` 直接链接所有 references，references 只保持一层深度。
 - `agents/openai.yaml` 字符串均已加引号，且 `default_prompt` 提到 `$obsidian-knowledge-flow`。
 - 不新增 README、安装指南、changelog 或无关辅助文档。
+
+## 选择性默认验证
+
+1. 普通仓库任务：
+   - 输入：一次不依赖历史知识、也没有可复用沉淀价值的普通文档或实现任务。
+   - 预期：输出 `Obsidian:不适用`，不调用 `obsidian` CLI，不读取 vault。
+2. 历史知识问题：
+   - 输入：用户询问“上次怎么定的”“之前 Obsidian 里有没有记录”。
+   - 预期：输出 `Obsidian:检索`，通过 `obsidian search` / `search:context` 检索，并用 `obsidian read` 读取匹配笔记。
+3. 收口沉淀：
+   - 输入：阶段收口时形成可复用规则、流程、事实或调试经验。
+   - 预期：输出 `Obsidian:沉淀`，先通过 CLI 检索已有承接笔记，再决定 `create` 或 `append`。
+4. CLI / vault 不可用：
+   - 输入：本应检索或沉淀，但 `obsidian version` 失败、vault 未注册或根目录不一致。
+   - 预期：输出 `Obsidian:阻断`，说明恢复动作，不用直接文件系统读写作为 fallback。
 
 ## CLI 前置验证
 
@@ -20,11 +35,11 @@
 2. `obsidian version` 失败：
    - 预期：阻断，不继续读写 vault。
 3. 默认根目录不存在：
-   - Windows 预期默认 `D:\obsidian_data`；WSL/Linux 预期默认 `/usr/local/src/obsidian_data`。
-   - 预期：自动创建默认目录；若 CLI 不认识该 vault，阻断并提示用户在 Obsidian 中打开/注册一次。
-4. 环境变量或 `.obsidian-kb-root` 指向的自定义目录不存在：
-   - 预期：阻断，不自动创建自定义目录。
-5. CLI active vault 与解析出的根目录不一致：
+   - Windows 预期固定 `D:\obsidian_data`。
+   - 预期：自动创建该固定目录；若 CLI 不认识该 vault，阻断并提示用户在 Obsidian 中打开/注册一次。
+4. `D:\obsidian_data` 下的 `知识库/` 目录不存在：
+   - 预期：只允许在固定根目录内补齐，不得改用其它路径。
+5. CLI active vault 与固定根目录不一致：
    - 预期：阻断，不使用 active vault 代替目标 vault。
 6. CLI 返回 `unable to find Obsidian` 或命令超时：
    - 预期：有限等待或重启 Obsidian 后重试前置校验；仍失败则阻断，不进行目标 vault 写入。
@@ -49,7 +64,7 @@
    - 预期：通过 CLI 创建或更新一篇会话笔记、一篇知识笔记、一篇来源笔记和一篇实体笔记，并补齐 backlinks。
 3. 沉淀：
    - 输入：一篇会话笔记同时包含稳定事实和不确定事实。
-   - 预期：稳定事实被提升；不确定事实留在会话笔记或 `00-Inbox/`。
+   - 预期：稳定事实被提升；不确定事实留在会话笔记或 `知识库/00-Inbox/`。
 4. 冲突：
    - 输入：一条新笔记与旧的活跃笔记矛盾，且没有权威证据。
    - 预期：笔记标记为 `conflicted`，同时保留两种说法。

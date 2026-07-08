@@ -7,6 +7,7 @@
 ## 建议
 
 - 小型无状态工具放 `utils` 或语言生态等价目录。
+- 与当前项目没有特征关联关系的可复用逻辑，优先放现有 `utils` / `common` 的职责子目录，不要散落在业务目录里。
 - `utils`、`common`、`global`、`middleware` 根目录先按职责拆子目录，再放实现文件。
 - 避免在上述根目录直接放 `xx.go`，例如应使用 `utils/log/logger.go`，而不是 `utils/logger.go`。
 - 稳定常量放 `constants`。

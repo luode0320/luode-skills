@@ -11,8 +11,8 @@
 1. `obsidian` 命令存在于当前 PATH；若 PATH 缺失但本机存在明确的官方 CLI 可执行文件（如 Windows installer 的 `Obsidian.com`），允许使用该绝对路径作为本轮 `obsidian` 命令来源，并在执行证据中写清路径。
 2. `obsidian version` 或上述绝对路径的 `version` 可执行并返回版本信息。
 3. Obsidian CLI 已在 Obsidian 设置中启用并注册。
-4. 目标 vault 根目录已解析并通过 [vault-layout.md](vault-layout.md) 的根目录校验。
-5. CLI 命令能限定到解析出的目标 vault。优先在 vault 根目录作为当前工作目录执行；如果 CLI 使用其他 active vault，必须阻断。
+4. 目标 vault 根目录固定为 `D:\obsidian_data`，并已通过 [vault-layout.md](vault-layout.md) 的固定根目录校验。
+5. CLI 命令能限定到这个固定 vault，且对 `知识库/` 下的相对路径生效。优先在 `D:\obsidian_data` 作为当前工作目录执行；如果 CLI 使用其他 active vault，必须阻断。
 
 任何一项失败都视为 CLI 硬依赖不满足。不要回退到 `rg`、`Get-Content`、`Set-Content`、Python 或 Node 直接读写 vault Markdown 文件。
 
@@ -33,10 +33,10 @@ obsidian version
 obsidian vaults verbose
 obsidian search query="关键词" limit=10 format=json
 obsidian search:context query="关键词" limit=10
-obsidian read path="20-Knowledge/topic/note.md"
-obsidian create path="10-Sessions/2026/07/session-title.md" content="# 标题\n\n正文"
-obsidian append path="20-Knowledge/topic/note.md" content="\n## 2026-07-06 更新\n\n- 新证据"
-obsidian open path="20-Knowledge/topic/note.md"
+obsidian read path="知识库/20-Knowledge/topic/note.md"
+obsidian create path="知识库/10-Sessions/2026/07/session-title.md" content="# 标题\n\n正文"
+obsidian append path="知识库/20-Knowledge/topic/note.md" content="\n## 2026-07-06 更新\n\n- 新证据"
+obsidian open path="知识库/20-Knowledge/topic/note.md"
 ```
 
 命令帮助只使用只读入口，例如 `obsidian help` 或 `obsidian <command> --help`。不要执行 `obsidian create help`、`obsidian append help` 这类会被解析为写入命令的伪帮助。

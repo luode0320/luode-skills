@@ -133,6 +133,8 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 ## 当前进度
 
+2026-07-07 19:15:55 docs: [Obsidian选择性触发] 接入知识流自动判断链
+
 2026-07-01 14:10:26 docs: [最小实现阶梯] 吸收Ponytail最小实现规则
 
 2026-06-30 15:48:00 docs: [输出格式与授权同步] 收敛普通Markdown输出规则并同步子代理完全授权
@@ -239,7 +241,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 截至当前版本：
 
-- 已落地 Skill：`82`
+- 已落地 Skill：`83`
 - 规划中待补 Skill：`0`
 - 扩展种子 Skill：`24`
 
@@ -288,6 +290,7 @@ python skill-dictionary/generate_dictionary.py
 | ------------------------ | ---------------------------------------------------------- |
 | `recent-context-bootstrap-rules` | 新会话开始时压缩最近 3 天项目上下文，为后续主域补前置信息。 |
 | `history-recall-rules`   | 检索跨会话历史、历史方案、历史修复记录，补回长期上下文。   |
+| `obsidian-knowledge-flow` | 仓库任务每轮先做 `Obsidian:<检索/沉淀/不适用/阻断>` 选择性默认判断；只有历史知识依赖或收口沉淀价值成立时，才通过 Obsidian CLI 检索、捕获或沉淀 vault 笔记。 |
 | `project-timeline-rules` | 按项目维度整理历史演进时间线，输出项目阶段变化与决策轨迹。 |
 | `project-memory-rules` | 自动抽取对话与代码中的项目事实，持续维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆主文件，并在文件内联动“人类阅读区 + 机器索引区”。 |
 | `project-style-rules` | 自动抽取对话与代码中的项目代码风格示例，持续维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。 |
@@ -723,4 +726,6 @@ claude-mem(记忆) :
 2026-07-07 09:56:25 docs: [可读性规则补充] 新增文件位置与防御性清洗两条约束
 2026-07-07 18:29:23 docs: [可读性规则补充] 新增线性流程单主线表达与拆分粒度约束
 2026-07-07 18:57:06 docs: [自举换行策略补充] 新增仓库主流换行风格自适配
-2026-07-07 21:42:53 docs: [Obsidian自动触发] 修复知识流命中链路
+2026-07-07 19:15:55 docs: [Obsidian选择性触发] 接入知识流自动判断链
+2026-07-08 17:30:02 docs: [审查归档] 归档本轮知识流提交域与本地判定四项改动审查报告
+2026-07-08 17:36:56 docs: [规则批量同步] 更新知识流提交域本地判定与静态复用四项规则

@@ -97,6 +97,15 @@
 - 更新时间: 2026-07-05
 - 状态: 启用
 
+### 工具落点分流规则
+- 别名: util 归位, common/util 归位, util 与 common/util 区分
+- 类型: 包结构/复用规则
+- 定义: `util` 仅存放与当前项目无关、脱离项目上下文仍成立的通用工具；`common/util` 仅存放可复用但依赖当前项目文件、路径、配置、命名约定或目录结构的工具。引用项目文件或项目约定的复用工具不要放进独立 `util`。
+- 来源: 对话确认、`common-util-rules`、`package-structure-rules`
+- 适用范围: 通用工具、公共函数、复用代码、包归位
+- 更新时间: 2026-07-08
+- 状态: 启用
+
 ### 通用结束信号
 - 别名: 结束即停, 不扩散下一步, 停止建议, 三类合法后续
 - 类型: 流程规则
@@ -167,6 +176,15 @@
 - 来源: `git-collaboration-rules/SKILL.md`、`branch-and-commit.md`
 - 适用范围: 提交流程、README 维护
 - 更新时间: 2026-07-01
+- 状态: 启用
+
+### Git 提交域隔离规则
+- 别名: 提交域隔离, 需求实施测试Bug审查验收单独提交, 代码实现单独提交
+- 类型: 流程规则
+- 定义: `提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 六类流程产物各自单独提交；测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。根目录 `README.md` 改动日志可以跟随对应 commit 一起更新，但不单独构成提交域。
+- 来源: 对话确认、`git-collaboration-rules/SKILL.md`、`git-collaboration-rules/scripts/pre_commit_gate.sh`
+- 适用范围: 提交流程、需求域、实施域、Bug 域、测试域、审查域、验收域
+- 更新时间: 2026-07-08
 - 状态: 启用
 
 ### 文档落盘闸门
@@ -248,6 +266,24 @@
 - 来源: 用户本轮确认、`thread-title-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`
 - 适用范围: 会话管理、任务检索、总控层自动触发、仓库规则自举
 - 更新时间: 2026-07-05
+- 状态: 启用
+
+### Obsidian 知识流选择性默认触发链
+- 别名: obsidian-knowledge-flow, Obsidian 知识流, 选择性默认触发, 知识库检索沉淀
+- 类型: 流程规则
+- 定义: 仓库任务每轮必须先做轻量 Obsidian 判断并输出 `Obsidian:<检索/沉淀/不适用/阻断>`；本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区为该 vault 下的 `知识库/`；后续操作不再通过环境变量、`.obsidian-kb-root` 或其它候选路径重新推导 vault。仅当问题依赖历史决策、知识库内容、用户偏好、重复实体或长期项目事实时判定为 `检索` 并通过 Obsidian CLI 检索 / 读取笔记；仅当阶段收口或最终回复前形成可复用事实、决策、流程、定义、偏好、来源或调试经验时判定为 `沉淀` 并先通过 CLI 检索已有笔记再捕获 / 沉淀。普通任务记录 `不适用`，不得为形式调用 CLI；CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback。
+- 来源: `AGENTS.md`、`CLAUDE.md`、`skill-hit-check-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`、`编码skill.md`
+- 适用范围: 记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀
+- 更新时间: 2026-07-08
+- 状态: 启用
+
+### Git 协作联动 Obsidian 沉淀
+- 别名: 提交前知识捕获, Git 收口沉淀, commit 联动 Obsidian
+- 类型: 流程规则
+- 定义: 当本仓库出现提交、推送、PR 收口或交付说明准备，且本轮形成可复用事实、决策、流程、定义、偏好、来源或调试经验时，优先命中 `obsidian-knowledge-flow` 做 `Obsidian:沉淀` 判定；沉淀只负责知识捕获，不构成 `git commit` / `git push` 授权。
+- 来源: 对话确认、`git-collaboration-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`
+- 适用范围: 提交流程、交付收口、Obsidian 记忆沉淀
+- 更新时间: 2026-07-08
 - 状态: 启用
 
 ### 本地连接调试测试红线
@@ -340,8 +376,10 @@
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
+- 2026-07-08：新增工具落点分流 util/common/util 规则，明确项目无关工具归 `util`，引用项目文件、路径、配置或约定的复用工具归 `common/util`。
 - 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
 - 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
+- 2026-07-08：新增 Git 协作联动 Obsidian 沉淀规则，明确提交 / 推送 / PR 收口形成可复用事实时先检索并沉淀，但沉淀不构成提交授权。
 
 ### 上线接口测试门禁规则
 - 别名: project-release-test-rules, 上线测试门禁
@@ -460,6 +498,23 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-05
+  - entity_id: rule.util-common-util-placement-split
+    name: "util 与 common/util 工具分流"
+    type: "包结构规则"
+    aliases:
+      - util 归位
+      - common/util 归位
+      - util 与 common/util 区分
+    definition: "util 仅存放与当前项目无关、脱离项目上下文仍成立的通用工具；common/util 仅存放可复用但依赖当前项目文件、路径、配置、命名约定或目录结构的工具。引用项目文件或项目约定的复用工具不要放进独立 util。"
+    scope: "通用工具、公共函数、复用代码、包归位"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.common-util-rules
+      - evidence.skill.package-structure-rules
+      - evidence.dialog.util-common-util-placement
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-08
   - entity_id: rule.thread-title-process-trigger
     name: "会话标题过程触发"
     type: "工作台规则"
@@ -477,6 +532,61 @@ entities:
     context_ids:
       - context.thread-title-management
     updated_at: 2026-07-05
+  - entity_id: rule.obsidian-knowledge-flow-selective-default
+    name: "Obsidian 知识流选择性默认触发链"
+    type: "流程规则"
+    aliases:
+      - obsidian-knowledge-flow
+      - Obsidian 知识流
+      - 选择性默认触发
+      - 知识库检索沉淀
+    definition: "仓库任务每轮先输出 `Obsidian:<检索/沉淀/不适用/阻断>` 轻量判断；本仓库固定使用 `D:\\obsidian_data` 作为 Obsidian 根目录，实际知识工作区为该 vault 下的 `知识库/`，后续操作不再通过环境变量、`.obsidian-kb-root` 或其它候选路径重新推导 vault；仅在历史知识依赖时通过 Obsidian CLI 检索 / 读取笔记，仅在收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时通过 CLI 捕获 / 沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。"
+    scope: "记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.skill-hit-check
+      - evidence.doc.repo-rules
+      - evidence.doc.skill-plan
+    context_ids:
+      - context.obsidian-knowledge-flow
+      - context.memory-domain
+    updated_at: 2026-07-08
+  - entity_id: rule.git-obsidian-capture-link
+    name: "Git 协作联动 Obsidian 沉淀"
+    type: "流程规则"
+    aliases:
+      - 提交前知识捕获
+      - Git 收口沉淀
+      - commit 联动 Obsidian
+    definition: "当本仓库出现提交、推送、PR 收口或交付说明准备，且本轮形成可复用事实、决策、流程、定义、偏好、来源或调试经验时，优先命中 `obsidian-knowledge-flow` 做 `Obsidian:沉淀` 判定；沉淀只负责知识捕获，不构成 `git commit` / `git push` 授权。"
+    scope: "提交流程、交付收口、Obsidian 记忆沉淀"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.git-collaboration
+      - evidence.dialog.git-obsidian-capture-link
+    context_ids:
+      - context.obsidian-knowledge-flow
+      - context.git-collaboration
+      - context.memory-domain
+    updated_at: 2026-07-08
+  - entity_id: rule.git-commit-domain-split
+    name: "Git 提交域隔离规则"
+    type: "流程规则"
+    aliases:
+      - 提交域隔离
+      - 需求实施测试Bug审查验收单独提交
+      - 代码实现单独提交
+    definition: "`提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 六类流程产物各自单独提交；测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。"
+    scope: "提交流程、需求/实施/Bug/测试/审查/验收归档"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.git-collaboration
+      - evidence.dialog.git-commit-domain-split
+    context_ids:
+      - context.git-collaboration
+    updated_at: 2026-07-08
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -484,6 +594,14 @@ relations:
     to: "term.doc-top-level-mixed-naming"
     evidence_ids:
       - evidence.skill.artifact-storage
+    status: "active"
+  - relation_id: rel.git-obsidian-capture-link.depends-on.obsidian-knowledge-flow
+    type: "depends_on"
+    from: "rule.git-obsidian-capture-link"
+    to: "rule.obsidian-knowledge-flow-selective-default"
+    evidence_ids:
+      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.git-collaboration
     status: "active"
 evidence:
   - evidence_id: evidence.skill.authenticated-url-routing
@@ -529,6 +647,20 @@ evidence:
     source: "project-agents-bootstrap/SKILL.md"
     path: "project-agents-bootstrap/SKILL.md"
     note: "仓库级规则自举同步代码生成风格入口来源"
+  - evidence_id: evidence.skill.common-util-rules
+    type: "skill"
+    source: "common-util-rules/SKILL.md"
+    path: "common-util-rules/SKILL.md"
+    note: "公共工具复用、存放位置和 util/common/util 分流规则来源"
+  - evidence_id: evidence.skill.package-structure-rules
+    type: "skill"
+    source: "package-structure-rules/SKILL.md"
+    path: "package-structure-rules/SKILL.md"
+    note: "包结构、目录分层和子包归位规则来源"
+  - evidence_id: evidence.dialog.util-common-util-placement
+    type: "dialog"
+    source: "对话确认"
+    note: "当前对话确认 util 与 common/util 的分流口径"
   - evidence_id: evidence.skill.thread-title
     type: "skill"
     source: "thread-title-rules/SKILL.md"
@@ -538,6 +670,39 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "用户确认采用“阶段+提问”策略，要求提问、goal 创建 / 恢复和长任务阶段切换时在过程中尝试改名"
+  - evidence_id: evidence.skill.obsidian-knowledge-flow
+    type: "skill"
+    source: "obsidian-knowledge-flow/SKILL.md"
+    path: "obsidian-knowledge-flow/SKILL.md"
+    note: "Obsidian 知识流选择性默认判断、CLI 检索、捕获和沉淀规则来源"
+  - evidence_id: evidence.skill.git-collaboration
+    type: "skill"
+    source: "git-collaboration-rules/SKILL.md"
+    path: "git-collaboration-rules/SKILL.md"
+    note: "Git 协作与提交授权规则来源"
+  - evidence_id: evidence.skill.skill-hit-check
+    type: "skill"
+    source: "skill-hit-check-rules/SKILL.md"
+    path: "skill-hit-check-rules/SKILL.md"
+    note: "首条命中检查输出 Obsidian 判断并联动 obsidian-knowledge-flow 的规则来源"
+  - evidence_id: evidence.doc.repo-rules
+    type: "doc"
+    source: "AGENTS.md / CLAUDE.md"
+    path: "AGENTS.md"
+    note: "仓库级 Obsidian 选择性默认触发硬规则来源"
+  - evidence_id: evidence.doc.skill-plan
+    type: "doc"
+    source: "编码skill.md"
+    path: "编码skill.md"
+    note: "主规划记忆域将 obsidian-knowledge-flow 纳入正式触发链的来源"
+  - evidence_id: evidence.dialog.git-obsidian-capture-link
+    type: "dialog"
+    source: "对话确认"
+    note: "用户要求将 Git 提交流程与 Obsidian 沉淀机制联动到项目规则中"
+  - evidence_id: evidence.dialog.git-commit-domain-split
+    type: "dialog"
+    source: "对话确认"
+    note: "用户要求需求、实施、测试、Bug、审查、验收与代码实现按提交域拆分，不再混在同一个 commit 里"
 contexts:
   - context_id: context.url-analysis
     type: "task-scope"
@@ -563,6 +728,18 @@ contexts:
     type: "workspace-convention"
     name: "会话标题管理"
     note: "适用于用户提问、goal 长任务、上下文续做和阶段切换时的会话标题更新"
+  - context_id: context.obsidian-knowledge-flow
+    type: "task-scope"
+    name: "Obsidian 知识流"
+    note: "适用于历史知识依赖、知识库检索、阶段收口沉淀和最终总结捕获判断"
+  - context_id: context.git-collaboration
+    type: "task-scope"
+    name: "Git 协作与知识沉淀"
+    note: "适用于提交、推送、PR 收口和交付说明准备时的知识捕获判断"
+  - context_id: context.memory-domain
+    type: "repository-convention"
+    name: "记忆域"
+    note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
 lifecycle:
   active:
     - "rule.authenticated-url-routing"
@@ -571,7 +748,11 @@ lifecycle:
     - "rule.implementation-cycle-minimum-task"
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
+    - "rule.util-common-util-placement-split"
     - "rule.thread-title-process-trigger"
+    - "rule.obsidian-knowledge-flow-selective-default"
+    - "rule.git-obsidian-capture-link"
+    - "rule.git-commit-domain-split"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -599,6 +780,16 @@ retrieval_hints:
       - "rule.implementation-sequence-master-plan"
     全量顺序实施方案:
       - "rule.implementation-sequence-master-plan"
+    util 归位:
+      - "rule.util-common-util-placement-split"
+    common/util 归位:
+      - "rule.util-common-util-placement-split"
+    util 与 common/util 区分:
+      - "rule.util-common-util-placement-split"
+    项目无关工具:
+      - "rule.util-common-util-placement-split"
+    项目相关工具:
+      - "rule.util-common-util-placement-split"
     code-generation-style-rules:
       - "rule.code-generation-style-contract"
     代码风格契约:
@@ -613,6 +804,28 @@ retrieval_hints:
       - "rule.thread-title-process-trigger"
     goal 中途改名:
       - "rule.thread-title-process-trigger"
+    obsidian-knowledge-flow:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    Obsidian 知识流:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    选择性默认触发:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    知识库检索沉淀:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    Git 协作联动 Obsidian 沉淀:
+      - "rule.git-obsidian-capture-link"
+    提交前知识捕获:
+      - "rule.git-obsidian-capture-link"
+    Git 收口沉淀:
+      - "rule.git-obsidian-capture-link"
+    commit 联动 Obsidian:
+      - "rule.git-obsidian-capture-link"
+    提交域隔离:
+      - "rule.git-commit-domain-split"
+    需求实施测试Bug审查验收单独提交:
+      - "rule.git-commit-domain-split"
+    代码实现单独提交:
+      - "rule.git-commit-domain-split"
   scopes:
     URL 分析:
       - "rule.authenticated-url-routing"
@@ -632,10 +845,33 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     风格契约:
       - "rule.code-generation-style-contract"
+    工具落点分流:
+      - "rule.util-common-util-placement-split"
+    util / common/util:
+      - "rule.util-common-util-placement-split"
+    公共工具归位:
+      - "rule.util-common-util-placement-split"
     会话标题管理:
       - "rule.thread-title-process-trigger"
     goal 长任务:
       - "rule.thread-title-process-trigger"
+    记忆域:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    Obsidian:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    知识库检索:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    阶段收口:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    提交流程:
+      - "rule.git-obsidian-capture-link"
+      - "rule.git-commit-domain-split"
+    交付收口:
+      - "rule.git-obsidian-capture-link"
+    Obsidian 记忆沉淀:
+      - "rule.git-obsidian-capture-link"
+    提交域隔离:
+      - "rule.git-commit-domain-split"
   sources:
     authenticated-url-routing-rules/SKILL.md:
       - "rule.authenticated-url-routing"
@@ -652,11 +888,35 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     code-generation-style-rules/SKILL.md:
       - "rule.code-generation-style-contract"
+    common-util-rules/SKILL.md:
+      - "rule.util-common-util-placement-split"
+    package-structure-rules/SKILL.md:
+      - "rule.util-common-util-placement-split"
+    编码skill.md:
+      - "rule.util-common-util-placement-split"
     project-agents-bootstrap/SKILL.md:
       - "rule.code-generation-style-contract"
       - "rule.thread-title-process-trigger"
     thread-title-rules/SKILL.md:
       - "rule.thread-title-process-trigger"
+    obsidian-knowledge-flow/SKILL.md:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    skill-hit-check-rules/SKILL.md:
+      - "rule.obsidian-knowledge-flow-selective-default"
+    AGENTS.md:
+      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.git-obsidian-capture-link"
+    CLAUDE.md:
+      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.git-obsidian-capture-link"
+    编码skill.md:
+      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.git-obsidian-capture-link"
+    git-collaboration-rules/SKILL.md:
+      - "rule.git-obsidian-capture-link"
+      - "rule.git-commit-domain-split"
+    git-collaboration-rules/scripts/pre_commit_gate.sh:
+      - "rule.git-commit-domain-split"
 extensions:
   external_refs:
     - type: migration-sample
