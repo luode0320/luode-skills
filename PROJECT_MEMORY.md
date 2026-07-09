@@ -97,6 +97,15 @@
 - 更新时间: 2026-07-05
 - 状态: 启用
 
+### 简单检查职责就地表达规则
+- 别名: 小函数内联, 避免过度职责拆分, 简单检查不强拆函数
+- 类型: 代码可读性规则
+- 定义: 职责清晰不等于每个职责都拆成独立函数。极短的局部检查、判空、匹配器取用、scope/flag 选择等逻辑，如果只有一个调用点、无副作用、无复杂分支、无独立测试价值，优先留在当前函数内，并用步骤注释或局部注释补清业务含义；只有复用、稳定业务术语、复杂规则、副作用或独立测试需求成立时才拆函数。
+- 来源: 对话确认、`code-readability-rules/SKILL.md`、`code-readability-rules/references/function-structure-rules.md`
+- 适用范围: 函数拆分、局部检查、guard 分支、简单匹配逻辑、注释补充
+- 更新时间: 2026-07-09
+- 状态: 启用
+
 ### 工具落点分流规则
 - 别名: util 归位, common/util 归位, util 与 common/util 区分
 - 类型: 包结构/复用规则
@@ -498,6 +507,22 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-05
+  - entity_id: rule.simple-check-inline-readability
+    name: "简单检查职责就地表达"
+    type: "代码可读性规则"
+    aliases:
+      - 小函数内联
+      - 避免过度职责拆分
+      - 简单检查不强拆函数
+    definition: "职责清晰不等于每个职责都拆成独立函数。极短的局部检查、判空、匹配器取用、scope/flag 选择等逻辑，如果只有一个调用点、无副作用、无复杂分支、无独立测试价值，优先留在当前函数内，并用步骤注释或局部注释补清业务含义；只有复用、稳定业务术语、复杂规则、副作用或独立测试需求成立时才拆函数。"
+    scope: "函数拆分、局部检查、guard 分支、简单匹配逻辑、注释补充"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.code-readability-rules
+      - evidence.dialog.simple-check-inline
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-09
   - entity_id: rule.util-common-util-placement-split
     name: "util 与 common/util 工具分流"
     type: "包结构规则"
@@ -647,6 +672,15 @@ evidence:
     source: "project-agents-bootstrap/SKILL.md"
     path: "project-agents-bootstrap/SKILL.md"
     note: "仓库级规则自举同步代码生成风格入口来源"
+  - evidence_id: evidence.skill.code-readability-rules
+    type: "skill"
+    source: "code-readability-rules/SKILL.md"
+    path: "code-readability-rules/SKILL.md"
+    note: "函数结构、职责拆分颗粒度和过度小函数内联规则来源"
+  - evidence_id: evidence.dialog.simple-check-inline
+    type: "dialog"
+    source: "对话确认"
+    note: "用户通过 DID matcher 示例确认极短检查职责可留在当前函数内，用注释补清业务语义"
   - evidence_id: evidence.skill.common-util-rules
     type: "skill"
     source: "common-util-rules/SKILL.md"
@@ -748,6 +782,7 @@ lifecycle:
     - "rule.implementation-cycle-minimum-task"
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
+    - "rule.simple-check-inline-readability"
     - "rule.util-common-util-placement-split"
     - "rule.thread-title-process-trigger"
     - "rule.obsidian-knowledge-flow-selective-default"
@@ -780,6 +815,14 @@ retrieval_hints:
       - "rule.implementation-sequence-master-plan"
     全量顺序实施方案:
       - "rule.implementation-sequence-master-plan"
+    小函数内联:
+      - "rule.simple-check-inline-readability"
+    避免过度职责拆分:
+      - "rule.simple-check-inline-readability"
+    简单检查不强拆函数:
+      - "rule.simple-check-inline-readability"
+    职责拆分颗粒度:
+      - "rule.simple-check-inline-readability"
     util 归位:
       - "rule.util-common-util-placement-split"
     common/util 归位:
@@ -845,6 +888,12 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     风格契约:
       - "rule.code-generation-style-contract"
+    函数拆分:
+      - "rule.simple-check-inline-readability"
+    局部检查:
+      - "rule.simple-check-inline-readability"
+    可读性:
+      - "rule.simple-check-inline-readability"
     工具落点分流:
       - "rule.util-common-util-placement-split"
     util / common/util:
@@ -888,6 +937,10 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     code-generation-style-rules/SKILL.md:
       - "rule.code-generation-style-contract"
+    code-readability-rules/SKILL.md:
+      - "rule.simple-check-inline-readability"
+    code-readability-rules/references/function-structure-rules.md:
+      - "rule.simple-check-inline-readability"
     common-util-rules/SKILL.md:
       - "rule.util-common-util-placement-split"
     package-structure-rules/SKILL.md:
