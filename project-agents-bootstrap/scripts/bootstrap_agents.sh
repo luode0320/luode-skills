@@ -248,6 +248,20 @@ BODY_CODE_GENERATION_STYLE=$(cat <<'EOF'
 EOF
 )
 
+BODY_KARPATHY_HARD_GATES=$(cat <<'EOF'
+- 本章节吸收 `multica-ai/andrej-karpathy-skills` 的四个核心原则，并翻译为本仓库自举规则：先想清楚再写、简单优先、手术式改动、目标驱动验证。
+- 该规则是全部任务硬闸门，不是软性建议；简单一行任务可以用更短表达完成检查，但不得跳过假设、最小方案、改动范围和验证目标四类判断。
+- 编码前必须显式收敛关键假设、成功标准和不确定项；存在多种合理解释时先澄清或给出取舍，不得静默选择一个方向直接实现。
+- 实现方案必须坚持简单优先：只做用户当前目标所需能力，不新增猜测性功能、未请求配置项、一次性抽象、单实现接口、无收益 helper / wrapper / manager / factory / adapter。
+- 修改既有文件必须保持手术式改动：只碰当前目标必需行，匹配现有风格；不顺手重构、统一格式、改注释、删历史死代码或清理无关变量。若本轮改动制造了新的未使用导入、变量、函数或孤儿文件，必须清理这些由本轮产生的残留。
+- 每一行主要改动都必须能追溯到用户目标、计划最小任务或验证闭环；无法追溯的改动视为越界，必须撤回或单独说明并等待授权。
+- 每个任务都必须转成可验证目标：Bug 修复优先有复现/回归验证，新增能力优先有行为验证，重构优先有改前/改后等价性验证；仅当纯文档、纯注释、纯排版或不会影响运行结果时，才允许写明免测理由。
+- 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
+- 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
+- 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
+EOF
+)
+
 BODY_THREAD_TITLE=$(cat <<'EOF'
 - 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
 - `thread-title-rules` 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 环境优先使用真实 `set_thread_title` 工具，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认视为无真实自动改名工具并显式跳过。
@@ -711,7 +725,7 @@ PY
 # sync_agents_file
 # [参数] file: 需要同步受管章节的 AGENTS.md / CLAUDE.md 文件路径
 # [返回] 无
-# 最近修改时间: 2026-07-05 15:38:58 同步代码生成风格入口规则到所有受管规则文件
+# 最近修改时间: 2026-07-09 22:09:47 同步 Karpathy 风格硬闸门到所有受管规则文件
 sync_agents_file() {
   local file="$1"
 
@@ -725,6 +739,7 @@ sync_agents_file() {
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
   sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"
+  sync_section "$file" "Karpathy 风格硬闸门" "$BODY_KARPATHY_HARD_GATES"
   sync_section "$file" "会话动态重命名规则" "$BODY_THREAD_TITLE"
   sync_section "$file" "注释任务强制流程" "$BODY_COMMENT_TASK"
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
