@@ -73,7 +73,13 @@ if ! printf '%s\n' "$TITLE" | rg -P "$TITLE_REGEX" >/dev/null; then
   exit 12
 fi
 
-# 2) README 必须在改动日志末尾追加本次标题日志
+# 2) 基础格式底线：只检查 staged diff 的空白错误；项目专用格式化检查由 skill 的基础代码核查执行
+if ! git diff --cached --check; then
+  echo "BLOCK: staged diff has whitespace errors" >&2
+  exit 18
+fi
+
+# 3) README 必须在改动日志末尾追加本次标题日志
 if [[ ! -f README.md ]]; then
   echo "BLOCK: README.md not found at repo root" >&2
   exit 13
@@ -106,21 +112,21 @@ if [[ "$LOG_TITLE" != "$TITLE" ]]; then
   exit 14
 fi
 
-# 3) Go 测试文件位置扫描：只检查本次提交涉及的新增/修改 *_test.go
+# 4) Go 测试文件位置扫描：只检查本次提交涉及的新增/修改 *_test.go
 if staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^doc/5-tests/' >/dev/null; then
   echo "BLOCK: staged *_test.go outside doc/5-tests/" >&2
   staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^doc/5-tests/' >&2 || true
   exit 15
 fi
 
-# 4) staged 禁放扫描：internal/service/*.go 根目录直落
+# 5) staged 禁放扫描：internal/service/*.go 根目录直落
 if staged_name_only | rg '^internal/service/[^/]+\.go$' >/dev/null; then
   echo "BLOCK: staged file in internal/service/*.go root" >&2
   staged_name_only | rg '^internal/service/[^/]+\.go$' >&2 || true
   exit 16
 fi
 
-# 5) staged 提交域隔离扫描：流程文档域、测试域与代码实现域分开提交
+# 6) staged 提交域隔离扫描：流程文档域、测试域与代码实现域分开提交
 declare -A DOMAIN_FILES=()
 declare -A DOMAIN_SEEN=()
 ARTIFACT_DOMAINS=()
@@ -151,35 +157,6 @@ if ((${#ARTIFACT_DOMAINS[@]} > 1)); then
   print_domain_details "${ARTIFACT_DOMAINS[@]}"
   exit 17
 fi
-
-# 6) 审查文档闸门：检查 doc/6-审查/ 下最近一份审查文档
-REVIEW_DIR="doc/6-审查"
-if [[ ! -d "$REVIEW_DIR" ]]; then
-  echo "BLOCK: review directory $REVIEW_DIR not found" >&2
-  exit 18
-fi
-LATEST_REVIEW=$(ls -1 "$REVIEW_DIR"/[0-9]*.md 2>/dev/null | sort -r | head -1)
-if [[ -z "$LATEST_REVIEW" ]]; then
-  echo "BLOCK: no review document found in $REVIEW_DIR" >&2
-  exit 18
-fi
-REVIEW_CONTENT=$(cat "$LATEST_REVIEW")
-if ! printf '%s\n' "$REVIEW_CONTENT" | rg -P '审查结论:\s*通过' >/dev/null; then
-  echo "BLOCK: review document conclusion is not 通过" >&2
-  echo "REVIEW_FILE: $LATEST_REVIEW" >&2
-  exit 18
-fi
-if ! printf '%s\n' "$REVIEW_CONTENT" | rg -P '是否允许提交:\s*是' >/dev/null; then
-  echo "BLOCK: review document does not allow commit" >&2
-  echo "REVIEW_FILE: $LATEST_REVIEW" >&2
-  exit 18
-fi
-if printf '%s\n' "$REVIEW_CONTENT" | rg -P '阻断问题:' | rg -iP '\[P[01]\]' >/dev/null; then
-  echo "BLOCK: review document has unresolved P0/P1" >&2
-  echo "REVIEW_FILE: $LATEST_REVIEW" >&2
-  exit 18
-fi
-echo "REVIEW_PASS: $LATEST_REVIEW"
 
 # 7) 盘点命令（供证据输出）
 git status --short

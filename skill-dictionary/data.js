@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-09 22:06:39",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-10 15:59:58",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -3583,7 +3583,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "Git 协作与交付说明",
           "domain_order": 9,
           "item_order": 1,
-          "auto_trigger": "【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。",
+          "auto_trigger": "【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。每次 `git commit` 前必须以当前 staged 改动为准完成基础代码核查：格式、注释、安全性、并发安全性、系统崩溃风险和边界条件；不得以最近审查文档替代或阻断该核查。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。",
           "core_responsibility": "统一 Git 协作规则。",
           "skill_path": "git-collaboration-rules/SKILL.md",
           "directory_path": "git-collaboration-rules",
@@ -8142,7 +8142,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "Git 协作与交付说明",
       "domain_order": 9,
       "item_order": 1,
-      "auto_trigger": "【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。",
+      "auto_trigger": "【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。每次 `git commit` 前必须以当前 staged 改动为准完成基础代码核查：格式、注释、安全性、并发安全性、系统崩溃风险和边界条件；不得以最近审查文档替代或阻断该核查。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。",
       "core_responsibility": "统一 Git 协作规则。",
       "skill_path": "git-collaboration-rules/SKILL.md",
       "directory_path": "git-collaboration-rules",

@@ -1,4 +1,4 @@
 interface:
   display_name: "Git 协作"
   short_description: "规范提交粒度、分支同步和 PR 整理的规则"
-  default_prompt: "使用 $git-collaboration-rules 处理当前 Git 提交流程：分析全部未提交改动并按业务与提交域拆分为多次提交；`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 默认各自单独提交，测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交，代码实现 / 运行配置单独提交；若用户请求“提交git”，必须持续提交直到 `git status --short` 为空（除阻断级规则外不得提前结束）；每次提交前同步更新项目根 README 改动日志，并保证提交消息格式与换行合规。"
+  default_prompt: "使用 $git-collaboration-rules 处理当前 Git 提交流程：分析全部未提交改动并按业务与提交域拆分为多次提交；`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 默认各自单独提交，测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交，代码实现 / 运行配置单独提交；每次提交前均基于当前 staged 改动完成基础代码核查：格式、注释、安全性、并发安全性、系统崩溃风险和边界条件；不以最近审查文档或完整项目审查作为前置条件，纯文档提交的无关联源码维度须记录为不适用；若用户请求“提交git”，必须持续提交直到 `git status --short` 为空（除阻断级规则外不得提前结束）；每次提交前同步更新项目根 README 改动日志，并保证提交消息格式与换行合规。"
