@@ -200,6 +200,16 @@
 - 更新时间: 2026-07-02
 - 状态: 启用
 
+### Windows 规则写法优先主路由再写 PowerShell 兜底
+- 别名: shell 路由优先, PowerShell fallback, windows skill merge style
+- 类型: 工具风格
+- 示例: `主路由: 普通仓库命令优先 Git Bash / bash；执行类命令优先 wsl.exe --cd；PowerShell: 仅在专项场景进入，进入后再遵守逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth`
+- 说明: 编写 Windows 环境规则时，先写清 shell 选择主路由，再补 PowerShell 专项兜底；不要把 PowerShell 语法细节直接写成默认入口，也不要把“能用 PowerShell 完成”误写成“推荐用 PowerShell 完成”。PowerShell 保底内容优先沉到 reference 或专项段落，避免主 skill 被 PowerShell 技巧淹没。
+- 来源: 本轮对话确认、`windows-wsl-execution-rules/SKILL.md`、社区 skill `powershell-windows`
+- 适用范围: Windows 环境 skill、references、命令模板、仓库级规则文案
+- 更新时间: 2026-07-10
+- 状态: 启用
+
 ### WSL 工具来源诊断命令
 - 别名: command -v 诊断, 工具路径校验, PATH interop 排查
 - 类型: 工具风格

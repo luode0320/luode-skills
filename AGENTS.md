@@ -133,7 +133,7 @@
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。若当前动作已经明确进入 PowerShell 专项场景，还必须同时写入 PowerShell 保底模式：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，以及 UTF-8 重定向防护。
 
 **先看 agent 在哪运行：**
 
@@ -142,6 +142,8 @@
   - 普通仓库命令优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景
   - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 或 Git Bash / bash 可访问的等价路径访问 WSL 文件
   - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
+
+**PowerShell 专项保底：** 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口；进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，带空格的可执行文件路径用引号并配合 `&`，日志或文件写入继续按 UTF-8 处理。
 
 **为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
@@ -244,3 +246,16 @@
 - 若 `PROJECT_STYLE.md` 与当前文件 / 同目录稳定写法冲突，优先跟随当前文件 / 同目录，并记录是否需要联动 `project-style-rules` 回写长期风格。
 - `project-style-rules` 只负责维护 `PROJECT_STYLE.md` 风格记忆，不作为代码生成总控入口；`code-style-consistency-rules` 负责基于本轮风格契约检查局部一致性。
 - 禁止借“统一风格”扩大无关 diff、批量格式化、重排无关代码或引入外部模板式个人偏好。
+
+## Karpathy 风格硬闸门
+
+- 本章节吸收 `multica-ai/andrej-karpathy-skills` 的四个核心原则，并翻译为本仓库自举规则：先想清楚再写、简单优先、手术式改动、目标驱动验证。
+- 该规则是全部任务硬闸门，不是软性建议；简单一行任务可以用更短表达完成检查，但不得跳过假设、最小方案、改动范围和验证目标四类判断。
+- 编码前必须显式收敛关键假设、成功标准和不确定项；存在多种合理解释时先澄清或给出取舍，不得静默选择一个方向直接实现。
+- 实现方案必须坚持简单优先：只做用户当前目标所需能力，不新增猜测性功能、未请求配置项、一次性抽象、单实现接口、无收益 helper / wrapper / manager / factory / adapter。
+- 修改既有文件必须保持手术式改动：只碰当前目标必需行，匹配现有风格；不顺手重构、统一格式、改注释、删历史死代码或清理无关变量。若本轮改动制造了新的未使用导入、变量、函数或孤儿文件，必须清理这些由本轮产生的残留。
+- 每一行主要改动都必须能追溯到用户目标、计划最小任务或验证闭环；无法追溯的改动视为越界，必须撤回或单独说明并等待授权。
+- 每个任务都必须转成可验证目标：Bug 修复优先有复现/回归验证，新增能力优先有行为验证，重构优先有改前/改后等价性验证；仅当纯文档、纯注释、纯排版或不会影响运行结果时，才允许写明免测理由。
+- 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
+- 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
+- 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。

@@ -53,6 +53,35 @@ wsl.exe --cd /home/<user>/<project> go mod download
 
 回复用户时同样按用户可访问路径引用项目内文件：项目在 WSL 且用户从 Windows 桌面访问时，普通文本路径、Markdown 链接、审查证据路径和总结路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有 `wsl.exe --cd` 参数、WSL shell 命令和日志原文保留 `/home/<user>/<project>`。
 
+## PowerShell 专项模板
+
+只有在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才用这部分模板。
+
+```powershell
+# 逻辑运算里的 cmdlet 单独加括号
+if ((Test-Path $configPath) -and ($env:APPDATA)) {
+    $json = Get-Content -Encoding UTF8 $configPath -Raw | ConvertFrom-Json
+}
+```
+
+```powershell
+# 路径优先 Join-Path，带空格的 exe 用 & 调用
+$tool = Join-Path $env:ProgramFiles "dotnet\\dotnet.exe"
+& $tool build
+```
+
+```powershell
+# JSON 输出显式带 Depth
+$payload | ConvertTo-Json -Depth 10 | Out-File -Encoding utf8 result.json
+```
+
+```powershell
+# 老版 Windows PowerShell 遇到日志乱码时显式转 UTF-8
+Get-Content app.log | Set-Content -Encoding utf8 app-utf8.log
+```
+
+PowerShell 专项模板解决的是“已经进入 PowerShell 后怎么写”，不改变主路由：普通仓库命令仍优先 Git Bash / bash，执行类动作仍优先 `wsl.exe --cd` 进入 WSL。
+
 ## WSL 内缓存目录建议
 
 ```bash
@@ -65,4 +94,5 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - `<distro>` 是 WSL 发行版名，用 `wsl.exe -l -v` 查看。
 - 代码已在 WSL，不再使用 `/mnt/<drive>` 路径。
 - 若命令依赖 `nvm`、`asdf`、`pyenv` 等 shell 初始化，可改用 `wsl.exe --cd /home/<user>/<project> bash -lic "<command>"`。
+- 进入 PowerShell 专项场景后，额外遵守 `references/powershell-fallback-patterns.md`。
 - 纯 Windows 项目，或当前任务不会真实启动程序时，不要因为模板存在就误切 WSL。

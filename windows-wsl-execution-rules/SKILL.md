@@ -1,6 +1,6 @@
 ---
 name: windows-wsl-execution-rules
-description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\wsl.localhost\<distro>\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。
+description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\wsl.localhost\distro\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。
 ---
 
 # Windows / WSL 执行规范（代码在 WSL）
@@ -26,6 +26,33 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - **普通命令默认不切 WSL**：搜索、读文件、改文件、规则检查、普通 `git status` / `git diff` / `git log` 等，默认留在 Git Bash / bash
 - **文件写入仍按 UTF-8**：普通读写留在 Git Bash / bash 时，脚本语言读写必须显式声明 UTF-8；不得因为路径在 WSL 或命令未进 WSL 就依赖 GBK / ANSI / shell 默认编码
 - **执行类命令再进 WSL**：编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装，通过 `wsl.exe --cd /home/<user>/<project> <command>` 执行
+
+## PowerShell 专项场景的保底模式
+
+这部分把社区热门 skill `powershell-windows` 的高价值规则吸收到本地，但定位是 **PowerShell 专项兜底**，不是把 PowerShell 重新升格成 Windows 默认仓库 shell。
+
+### 什么时候才进入 PowerShell
+
+- 运行 `.ps1` 脚本
+- 使用 Windows 专用 cmdlet（如 `Get-ItemProperty`、`Get-Service`、`Get-Clipboard`）
+- 做 PowerShell profile / 编码初始化
+- 用户明确要求 PowerShell
+
+### 进入 PowerShell 后必须遵守的规则
+
+1. 逻辑运算里，每个 cmdlet 调用都单独加括号，例如 `if ((Test-Path "a") -or (Test-Path "b"))`
+2. 脚本默认只用 ASCII 状态文本，不在 `.ps1` 和 inline PowerShell 里放 emoji 或花体符号
+3. 访问 `.Count`、`.Length`、属性链前先做 null check，不直接假设对象存在
+4. 复杂属性链不要直接塞进插值字符串，先落到变量，再输出
+5. 拼变量路径优先用 `Join-Path`；带空格的可执行文件路径要加引号，并配合 `&` 调用运算符
+6. `ConvertTo-Json` 默认显式带 `-Depth`
+7. PowerShell 专项写文件、导日志和重定向时继续遵守 UTF-8 防护，必要时联动 `windows-encoding-rules`
+
+### PowerShell 与主路由的关系
+
+- 如果任务本质只是 `rg` 搜索、读文件、普通 `git status` / `git diff`、规则检查或仓库盘点，**不要因为会写 PowerShell 就切到 PowerShell**
+- 如果任务本质是 Linux 运行链路里的编译、测试、调试或启动，**不要因为机器是 Windows 就放弃 WSL 执行**
+- PowerShell 在本 skill 里是专项入口，不是默认入口；默认入口仍然是 Git Bash / bash 和 `wsl.exe --cd`
 
 ## 什么算执行类命令
 
@@ -101,6 +128,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 - 不要在 Windows 原生 Go 环境跑需联网的项目。
 - 不要为了调试或测试方便，把启动参数、环境变量或配置文件切到 `test` / `prod` / `staging` 等非 local 环境；local 不可用时记录为本地环境阻断。
+- 不要把“普通仓库命令也能写成 PowerShell”误当成推荐路径；普通搜索、读文件、规则检查和多数 git 盘点仍优先 Git Bash / bash。
 - 不要把 WSL 路径（`/home/...`）和 Windows 路径混用在同一命令上下文。
 - 不要在面向 Windows 桌面用户的项目内文件引用里输出 `/home/...` 作为可打开路径；这类路径应转换成 `\\wsl.localhost\...`。
 - 不要因为 agent 自身运行在 WSL 内（情况一，执行不需要包裹）就认为面向用户的文件引用也可以直接用 `/home/...` 输出；这条规则只看用户查看环境，不看 agent 运行位置。
@@ -108,6 +136,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - 不要把修改 `/etc/wsl.conf`（如关闭 `appendWindowsPath`）当成默认排查手段；这是影响整个 WSL 发行版的重量级改动，只在用户明确要求时才做。
 - 不要把普通搜索、读文件、规则检查这类非执行动作一律切进 WSL。
 - agent 在 Windows 时，不要把 PowerShell 当普通仓库命令的默认 shell；只有 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才使用 PowerShell。
+- 不要在 PowerShell 脚本里直接复用 CMD 风格命令，或假设 PowerShell 与 CMD/Bash 重定向完全等价；进入 PowerShell 后按 `references/powershell-fallback-patterns.md` 的模式写。
 - 纯 Windows 项目，或本轮根本不会启动/执行程序的任务，不要为了“统一口径”硬套 WSL。
 - 不要再用 `/mnt/<drive>`——代码已在 WSL，用 `/home/<user>/...` 与 `\\wsl.localhost\...`。
 
@@ -121,10 +150,12 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 - 涉及文件写入编码、Windows 中文编码、Git Bash / bash UTF-8 基线、PowerShell 专项 UTF-8 初始化与落盘细节时，联动 `windows-encoding-rules`。
 - 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
+- 如果当前任务已经明确进入 PowerShell 专项场景，且出现逻辑运算括号、`Join-Path`、`ConvertTo-Json -Depth`、null check 或 ASCII-only 这类语法/风格坑，优先按本 skill 的 PowerShell 保底模式处理，不再临时口头补规则。
 
 ## 参考资料读取规则
 
 - 默认先读 `references/command-templates.md`
 - 需要路径访问细节时读 `references/path-mapping.md`
 - 需要团队工作流时读 `references/recommended-workflow.md`
+- 需要进入 PowerShell 专项场景时读 `references/powershell-fallback-patterns.md`
 - 首次进入 WSL 项目做一次性工具自检、或怀疑命令解析到 Windows 侧同名工具（如报 `permission denied`）时读 `references/tool-path-interop.md`

@@ -1,6 +1,6 @@
 ---
 name: project-agents-bootstrap
-description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。
+description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则、Windows 下“普通仓库命令优先 Git Bash / bash、执行类命令再进 WSL、PowerShell 仅作专项入口且进入后遵守保底模式”的主路由规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。
 ---
 
 # 项目 AGENTS.md 自举与补齐 Skill
@@ -185,6 +185,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - **agent 在 Windows（如 Claude Desktop GUI）**：普通仓库命令优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景
   - 看代码、改代码、搜索、规则检查、普通 git 经 `\\wsl.localhost\<distro>\home\<user>\<project>` 或 Git Bash / bash 可访问的等价路径访问
   - 执行类动作通过 `wsl.exe --cd /home/<user>/<project> <command>` 进 WSL 执行
+  - PowerShell 只作专项入口，不作默认入口；一旦进入 PowerShell，还必须同步写入“逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`、UTF-8 重定向防护”的保底模式
   - 为什么只有执行类动作在 WSL：只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时
   - 命令格式：执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）
   - 用户可访问文件引用：回复用户时，凡引用项目内文件都按用户当前环境可打开的路径输出；项目在 WSL 且用户从 Windows 桌面访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有命令参数、WSL shell 上下文和日志原文保留 `/home/<user>/<project>`
@@ -401,7 +402,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。若当前动作已经明确进入 PowerShell 专项场景，还必须同时写入 PowerShell 保底模式：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，以及 UTF-8 重定向防护。
 
 **先看 agent 在哪运行：**
 
@@ -410,6 +411,8 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
   - 普通仓库命令优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景
   - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 或 Git Bash / bash 可访问的等价路径访问 WSL 文件
   - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
+
+**PowerShell 专项保底：** 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口；进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，带空格的可执行文件路径用引号并配合 `&`，日志或文件写入继续按 UTF-8 处理。
 
 **为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
@@ -460,7 +463,7 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若仓库内存在多个规则文件（`AGENTS.md` / `CLAUDE.md`），本 skill 不允许只同步根目录后结束；必须同步所有已存在规则文件的受管章节，除非用户明确要求排除某些子工程。
 - 若首轮发现 `.gitattributes` 或 `.editorconfig` 缺失，也不允许降级为”先分析项目后补文件”；必须先补齐这两个文件，再继续主任务。
 - 若 CodeGraph 下载、安装或初始化失败，不应阻塞规则文件（`AGENTS.md` / `CLAUDE.md`）自举流程；按当前环境继续执行即可。
-- 若仓库位于 Windows 环境，默认应把“普通仓库命令优先 Git Bash / bash，PowerShell 仅用于 Windows 专项场景，执行类命令再进 WSL”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
+- 若仓库位于 Windows 环境，默认应把“普通仓库命令优先 Git Bash / bash，PowerShell 仅用于 Windows 专项场景，执行类命令再进 WSL；若进入 PowerShell 还要遵守保底模式”的边界一并补入仓库规则，而不是只在单次会话里临时提醒。
 - 若仓库位于 WSL 文件系统且用户从 Windows 桌面访问，默认应把“命令用 `/home/...`、面向用户的项目内文件引用用 `\\wsl.localhost\...`”的边界一并补入仓库规则，避免输出用户无法打开的项目文件路径。
 ```
 ````

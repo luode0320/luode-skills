@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-10 15:59:58",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-07-10 22:01:07",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 8,
-    "references_total": 341,
+    "references_total": 342,
     "agents_total": 90
   },
   "downloaded_seeds": {
@@ -376,7 +376,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 9,
-          "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。",
+          "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则、Windows 下“普通仓库命令优先 Git Bash / bash、执行类命令再进 WSL、PowerShell 仅作专项入口且进入后遵守保底模式”的主路由规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。",
           "core_responsibility": "负责为项目补齐或同步仓库级规则文件，并把基础硬规则、自举模板和关键白名单口径统一收口。",
           "skill_path": "project-agents-bootstrap/SKILL.md",
           "directory_path": "project-agents-bootstrap",
@@ -4603,7 +4603,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 23,
-          "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\<distro>\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。",
+          "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
           "directory_path": "windows-wsl-execution-rules",
@@ -4611,6 +4611,7 @@ window.SKILL_DICTIONARY = {
           "sections": [
             "适用场景",
             "核心架构：先看 agent 在哪运行",
+            "PowerShell 专项场景的保底模式",
             "什么算执行类命令",
             "为什么只有执行类动作优先在 WSL",
             "路径约定",
@@ -4625,6 +4626,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "windows-wsl-execution-rules/references/command-templates.md",
             "windows-wsl-execution-rules/references/path-mapping.md",
+            "windows-wsl-execution-rules/references/powershell-fallback-patterns.md",
             "windows-wsl-execution-rules/references/recommended-workflow.md",
             "windows-wsl-execution-rules/references/tool-path-interop.md"
           ],
@@ -5031,7 +5033,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 9,
-      "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。",
+      "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图）；也可被”创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录强制检测 AGENTS.md / CLAUDE.md：不存在则必须创建最小可用模板，存在则对受管章节执行增量补齐与幂等 upsert，既保留用户已有规则，也持续同步最新仓库规则；同时确保包含代码生成风格入口规则、注释类任务流程、跨平台 UTF-8 文件写入约束、按平台能力矩阵执行的会话动态重命名规则、Windows 下“普通仓库命令优先 Git Bash / bash、执行类命令再进 WSL、PowerShell 仅作专项入口且进入后遵守保底模式”的主路由规则，以及”上下文压缩后必须重新读取项目根目录规则文件再继续主任务”的硬规则。若仓库命中 Godot 项目标记，还必须额外补齐 Godot 工具接管与图像生成配置模板，并明确规则文件里不能存真实密钥；图像生成配置必须同步主通道与回退规则，且回退规则必须写成 `回退规则：回退配置` 的层级结构，并在其下声明 `api` / `baseurl`；若仓库需要长期记忆与长期风格，两者都要同步引入 `project-memory-rules`、`project-style-rules` 和 `code-generation-style-rules` 的仓库级入口口径，并确保其最低命中要求写入仓库级规则。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新这几个 md”等聚合指令时，本 skill 作为统一入口，一次性编排项目根目录 `AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md` 四个核心 md 的“检测→缺失则创建→已存在则增量补齐”；其中 `PROJECT_MEMORY.md` 必须继续保持为唯一长期记忆主文件，但内部补齐为“人类阅读区 + 底部机器索引区”的单文件双区结构，且不得新增 `PROJECT_MEMORY_INDEX.yaml`。",
       "core_responsibility": "负责为项目补齐或同步仓库级规则文件，并把基础硬规则、自举模板和关键白名单口径统一收口。",
       "skill_path": "project-agents-bootstrap/SKILL.md",
       "directory_path": "project-agents-bootstrap",
@@ -9138,7 +9140,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 23,
-      "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认优先使用 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\<distro>\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。不要用它代替具体语言/框架实现、测试策略或编码规则。",
+      "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
       "directory_path": "windows-wsl-execution-rules",
@@ -9146,6 +9148,7 @@ window.SKILL_DICTIONARY = {
       "sections": [
         "适用场景",
         "核心架构：先看 agent 在哪运行",
+        "PowerShell 专项场景的保底模式",
         "什么算执行类命令",
         "为什么只有执行类动作优先在 WSL",
         "路径约定",
@@ -9160,6 +9163,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "windows-wsl-execution-rules/references/command-templates.md",
         "windows-wsl-execution-rules/references/path-mapping.md",
+        "windows-wsl-execution-rules/references/powershell-fallback-patterns.md",
         "windows-wsl-execution-rules/references/recommended-workflow.md",
         "windows-wsl-execution-rules/references/tool-path-interop.md"
       ],

@@ -1,6 +1,6 @@
 # 团队推荐目录与工作流
 
-代码放在 WSL 文件系统内（`/home/<user>/<project>`）。执行类动作在 WSL 中完成，Windows 下普通仓库命令默认优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。执行类动作在 WSL 中完成，Windows 下普通仓库命令默认优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景。进入 PowerShell 后，再额外按本地吸收的 `powershell-windows` 保底模式处理语法、路径、JSON 和编码细节。
 
 ## 推荐目录
 
@@ -22,6 +22,13 @@
 - 看代码、改代码、搜索、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问
 - 编译、运行、启动程序、测试、调试：`wsl.exe --cd /home/<user>/<project> <command>`
 - 回复中的项目内文件路径、审查证据路径和总结路径：使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`，不要把 `/home/...` 当成用户可打开路径输出
+
+## PowerShell 专项保底
+
+- 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口
+- 进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`
+- 带空格的可执行文件路径用引号，并配合 `&`
+- 日志或文件写入继续按 UTF-8 处理；老版 Windows PowerShell 的重定向乱码按 `windows-encoding-rules` 和 `powershell-fallback-patterns.md` 补救
 
 ## 命令入口（agent 在 Windows 时）
 
@@ -45,4 +52,5 @@ export GOMODCACHE=$HOME/go/pkg/mod
 - `wsl.exe --cd` 后用 WSL 内路径 `/home/<user>/<project>`；Windows 编辑器访问用 `\\wsl.localhost\...`。
 - 命令用运行环境路径，文件引用用用户访问环境路径；项目在 WSL 且用户从 Windows 桌面访问时，所有项目内文件引用统一输出 `\\wsl.localhost\...`。
 - 如需固定化操作，可在 Windows 侧封装统一入口脚本：统一工作目录、统一 WSL 发行版名。
+- 进入 PowerShell 后的脚本细节，不再临时口头约定，统一回到 `references/powershell-fallback-patterns.md`。
 - 如果当前项目本身是纯 Windows 项目，或本轮不涉及启动/执行程序，就不应触发这套 WSL 执行规则。

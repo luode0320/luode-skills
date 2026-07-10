@@ -133,6 +133,15 @@
 - 更新时间: 2026-06-30
 - 状态: 启用
 
+### Windows 执行路由与 PowerShell 保底
+- 别名: Windows shell 主路由, PowerShell 专项兜底, windows-wsl-execution-rules 合并 powershell-windows
+- 类型: 流程规则
+- 定义: Windows 环境下的本地默认口径继续是“普通仓库命令优先 Git Bash / bash，执行类命令优先 `wsl.exe --cd` 进入 WSL，PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、profile / 编码初始化或用户明确要求”；同时 `windows-wsl-execution-rules` 已吸收热门社区 skill `powershell-windows` 的高价值保底规则，进入 PowerShell 专项场景后必须额外遵守逻辑运算括号、ASCII-only、null check、`Join-Path`、`ConvertTo-Json -Depth` 和 UTF-8 重定向防护。
+- 来源: 本轮对话确认、`windows-wsl-execution-rules/SKILL.md`、社区 skill `powershell-windows`
+- 适用范围: Windows 执行环境、仓库命令路由、PowerShell 专项场景
+- 更新时间: 2026-07-10
+- 状态: 启用
+
 ### 并行执行闭环规则
 - 别名: 并行识别必须真启动, 规划器加执行器, 子线程启动证据
 - 类型: 流程规则
