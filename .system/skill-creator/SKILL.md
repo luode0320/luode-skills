@@ -289,7 +289,7 @@ At this point, it is time to actually create the skill.
 
 Skip this step only if the skill being developed already exists. In this case, continue to the next step.
 
-Before running `init_skill.py`, ask where the user wants the skill created. If they do not specify a location, default to `$CODEX_HOME/skills`; when `CODEX_HOME` is unset, fall back to `~/.codex/skills` so the skill is auto-discovered. This default applies to Codex; see "Platform Notes" below for Claude Code.
+Before running `init_skill.py`, ask where the user wants the skill created. If they do not specify a location, default to `$CODEX_HOME/skills`; when `CODEX_HOME` is unset, fall back to `~/.codex/skills` so the skill is auto-discovered.
 
 When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
 
@@ -314,8 +314,6 @@ The script:
 - Creates `agents/openai.yaml` using agent-generated `display_name`, `short_description`, and `default_prompt` passed via `--interface key=value`
 - Optionally creates resource directories based on `--resources`
 - Optionally adds example files when `--examples` is set
-
-**Platform Notes (added):** `init_skill.py` takes `--path` as a required argument with no Codex-specific default baked into the script itself — the `$CODEX_HOME/skills` / `~/.codex/skills` default is a convention this doc recommends for Codex, not something the script enforces. When the current agent is Codex, keep asking for a location and defaulting to `${CODEX_HOME:-$HOME/.codex}/skills` as above. When the current agent is Claude Code, ask where the user wants the skill created and pass that location via `--path` so the skill lands where Claude Code can discover it (e.g. a project-local skills directory) instead of the Codex default; the exact Claude Code skills directory convention has not been verified in this session, so confirm it with the user or current Claude Code documentation rather than assuming a specific path. Also phrase the generated skill's guidance in product-neutral terms ("this AI agent" / "the current agent") rather than always saying "Codex" when the target platform is Claude Code.
 
 After initialization, customize the SKILL.md and add resources as needed. If you used `--examples`, replace or delete placeholder files.
 

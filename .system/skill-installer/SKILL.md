@@ -27,7 +27,7 @@ Skills from {repo}:
 Which ones would you like installed?
 """
 
-After installing a skill, tell the user: "Restart Codex to pick up new skills."
+After installing a skill, tell the user it will be available on their next turn.
 
 ## Scripts
 
@@ -48,13 +48,6 @@ All of these scripts use network, so when running in the sandbox, request escala
 - Installs into `$CODEX_HOME/skills/<skill-name>` (defaults to `~/.codex/skills`).
 - Multiple `--path` values install multiple skills in one run, each named from the path basename unless `--name` is supplied.
 - Options: `--ref <ref>` (default `main`), `--dest <path>`, `--method auto|download|git`.
-
-## Platform Notes (added)
-
-The `--dest` option is a generic, platform-agnostic override — the script itself has no Codex-specific hardcoding; it only falls back to `$CODEX_HOME/skills` (`~/.codex/skills`) when `--dest` is not passed.
-
-- **Codex**: omit `--dest` to keep the existing default behavior (`$CODEX_HOME/skills`, i.e. `~/.codex/skills` when `CODEX_HOME` is unset).
-- **Claude Code**: pass an explicit `--dest <Claude Code skills directory>` so the skill is installed where Claude Code can discover it, instead of the Codex default. The exact Claude Code skills directory convention has not been verified in this session — confirm it with the user or current Claude Code documentation before relying on a specific path; do not guess a path and present it as confirmed.
 
 ## Notes
 

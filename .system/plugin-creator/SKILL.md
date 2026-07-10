@@ -5,12 +5,6 @@ description: Create and scaffold plugin directories for Codex with a required `.
 
 # Plugin Creator
 
-## Platform Notes (added, unverified — see caveats below)
-
-This skill's manifest format (`.codex-plugin/plugin.json`) and marketplace commands (`codex plugin marketplace add`, `codex://plugins/...` deeplinks) are Codex-specific product mechanisms. If the current agent is Claude Code and it has an equivalent plugin/marketplace system, the plugin manifest directory name, field schema, and install/marketplace commands are almost certainly different and have **not been verified in this session** — do not reuse the `.codex-plugin/plugin.json` structure or `codex plugin marketplace add`/`codex://plugins/...` commands for Claude Code; confirm the actual mechanism with the user or current documentation before creating anything.
-
-One fact that *is* verified: `scripts/create_basic_plugin.py` already accepts a generic `--path` argument (default `~/plugins/<plugin-name>`, not Codex-specific) and `scripts/create_basic_plugin.py --with-marketplace` accepts `--marketplace-name`/writes to `~/.agents/plugins/marketplace.json` by default — output *location* is already parameterized regardless of platform. What still needs confirmation for Claude Code is the plugin *manifest format itself*, not just where it's written.
-
 ## Quick Start
 
 1. Run the scaffold script:
