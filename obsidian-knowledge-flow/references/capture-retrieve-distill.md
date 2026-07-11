@@ -1,6 +1,16 @@
 # 捕获、检索、沉淀
 
-本 skill 的默认节奏是“先做选择性判断，需要时检索，收口时按价值沉淀”。所有 vault 读写都走 Obsidian CLI；CLI 不可用时阻断。
+本 skill 的默认节奏是“先加载项目本地四件套，再做 Obsidian 选择性判断，需要时检索，收口时按价值沉淀”。项目本地 Markdown 与 vault 是两条独立链路：前者使用标准文件工具，后者所有读写都走 Obsidian CLI；CLI 不可用时阻断。
+
+## 项目本地四件套先行
+
+1. 读取项目目录父目录的当前平台规则文件。
+2. 在项目根目录检测 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md`；缺失时创建最小 UTF-8 模板。
+3. 按“`PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取当前状态与稳定规则。
+4. 普通启动不读 `PROJECT_HISTORY.md`；只有历史追问、当前状态不足或真实卡点时，按日期、关键词或事件类型窄读。
+5. 项目状态覆盖写入 `PROJECT_CURRENT.md` 前检查 UTF-8 字节数，不得超过 51,200；超限先压缩并阻断，不静默截断。稳定规则写入 `PROJECT_MEMORY.md`，历史事件写入 `PROJECT_HISTORY.md` 时只追加。
+
+项目四件套已经能回答当前项目问题时，保持 `Obsidian:不适用`，不为形式调用 CLI。只有跨项目历史、vault 笔记或长期知识依赖时才进入下面的检索流程。
 
 ## 选择性默认判定流程
 

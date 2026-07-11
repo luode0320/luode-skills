@@ -1,4 +1,8 @@
 interface:
   display_name: "Obsidian 知识流"
-  short_description: "通过 Obsidian CLI 自动检索并沉淀会话知识"
-  default_prompt: "使用 $obsidian-knowledge-flow 在回答前检索历史笔记，并在总结阶段沉淀本次会话。"
+  short_description: "分层管理项目四件套与 Obsidian 知识流"
+  default_prompt: >-
+    使用 $obsidian-knowledge-flow 时，先读取项目父目录规则、`PROJECT_CURRENT.md` 和
+    `PROJECT_MEMORY.md`；缺失项目记忆文件时先创建，`PROJECT_HISTORY.md` 只在历史追问、状态不足
+    或真实卡点时窄读。项目本地 Markdown 与 Obsidian vault 不混用；只有判定为 `Obsidian:检索`
+    或 `Obsidian:沉淀` 时，才通过固定 vault `D:\obsidian_data` 下的 Obsidian CLI 检索、读取、创建或追加笔记。

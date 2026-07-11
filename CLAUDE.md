@@ -22,13 +22,14 @@
 
 ### 项目长期上下文文档自动加载（强制）
 
-- 会话开始（含新会话首轮、上下文压缩续做后）必须检测项目根目录四个长期上下文文档：`AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`。
-- 存在即读取并加载为当前上下文；缺失即按各自主文档模板创建；其后随对话与代码变化持续维护，不是只建一次。
-- `PROJECT_MEMORY.md` 记忆对象：指标、参数、表字段、缓存键、变量、公式、方法映射、别名等反复出现且需长期复用的事实（联动 `project-memory-rules`）。
-- `PROJECT_STYLE.md` 记忆对象：方法、注释、错误处理、日志、接口等代码写法样例（联动 `project-style-rules`）。
+- 会话开始（含新会话首轮、上下文压缩续做后）必须先读取项目目录父目录的当前平台规则文件，再检测项目根目录 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
+- 缺失的三个项目记忆文件必须先创建最小 UTF-8 模板；固定读取顺序为 `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`。
+- `PROJECT_CURRENT.md` 保存当前目标、范围、状态、已完成、待办、阻断、验证和交接点，采用覆盖式维护，UTF-8 字节数不得超过 51,200。
+- `PROJECT_MEMORY.md` 只保存稳定项目规则、关键决策和少量长期事实，继续保留底部机器索引区（联动 `project-memory-rules`）。
+- `PROJECT_HISTORY.md` 只追加关键历史事件，普通启动默认不读，只有历史追问、当前状态不足或真实卡点时窄读。
+- `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
-- 缺失则按各自 `references` 主文档模板创建；只写明确事实，合并去重，刷新「更新时间」，并在「变更记录」补写变更原因。
-- 单一主文档原则：每类长期上下文只维护一份根目录主文档，不产生衍生文件。
+- 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
 
 ### Obsidian 知识流选择性默认触发（强制）
 

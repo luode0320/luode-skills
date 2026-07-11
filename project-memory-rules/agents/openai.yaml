@@ -1,11 +1,14 @@
 interface:
   display_name: "项目记忆规则"
-  short_description: "自动抽取、归并并维护单文件双区的项目长期记忆主文档"
+  short_description: "维护项目四件套与稳定长期记忆"
   default_prompt: >-
-    使用 $project-memory-rules 维护根目录 `PROJECT_MEMORY.md`。该文件继续作为唯一长期记忆主文件，
-    但内部固定为“人类阅读区 + 底部机器索引区”的单文件双区结构；不得新增
-    `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。执行时必须先完整读取
-    `PROJECT_MEMORY.md`，检查底部是否已有固定 `## 机器索引区`；若缺失，先补最小骨架。
+    使用 $project-memory-rules 维护项目根目录四件套：先读取 `PROJECT_CURRENT.md`，再读取
+    `PROJECT_MEMORY.md`；缺失的 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`
+    由 bootstrap 创建。`PROJECT_CURRENT.md` 覆盖式维护当前任务且不得超过 51,200 字节，
+    `PROJECT_HISTORY.md` 只追加关键事件并默认不读。`PROJECT_MEMORY.md` 只保存稳定规则、关键决策
+    和长期事实，继续保留“人类阅读区 + 底部机器索引区”的兼容结构；不得新增
+    `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。执行时必须完整读取 `PROJECT_MEMORY.md`，
+    检查底部是否已有固定 `## 机器索引区`；若缺失，先补最小骨架。
     随后基于代码、项目文档和当前对话证据，优先更新机器索引区中的 `entities`、
     `relations`、`evidence`、`contexts`、`lifecycle`、`retrieval_hints` 与必要的 `extensions`，
     再同步渲染或回写人类阅读区。若同一事实已存在，优先按 `entity_id + 类型 + 作用域 + 别名 + 来源`

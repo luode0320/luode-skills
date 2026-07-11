@@ -3769,13 +3769,24 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 ### 项目长期上下文文档自动加载（强制）
 
-- 会话开始（含新会话首轮、上下文压缩续做后）必须检测项目根目录四个长期上下文文档：`AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`。
-- 存在即读取并加载为当前上下文；缺失即按各自主文档模板创建；其后随对话与代码变化持续维护，不是只建一次。
-- `PROJECT_MEMORY.md` 记忆对象：指标、参数、表字段、缓存键、变量、公式、方法映射、别名等反复出现且需长期复用的事实（联动 `project-memory-rules`）。
-- `PROJECT_STYLE.md` 记忆对象：方法、注释、错误处理、日志、接口等代码写法样例（联动 `project-style-rules`）。
+- 会话开始（含新会话首轮、上下文压缩续做后）必须先读取项目目录父目录的当前平台规则文件，再检测项目根目录 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
+- 缺失的三个项目记忆文件必须先创建最小 UTF-8 模板；固定读取顺序为 `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`。
+- `PROJECT_CURRENT.md` 保存当前目标、范围、状态、已完成、待办、阻断、验证和交接点，采用覆盖式维护，UTF-8 字节数不得超过 51,200。
+- `PROJECT_MEMORY.md` 只保存稳定项目规则、关键决策和少量长期事实，继续保留底部机器索引区（联动 `project-memory-rules`）。
+- `PROJECT_HISTORY.md` 只追加关键历史事件，普通启动默认不读，只有历史追问、当前状态不足或真实卡点时窄读。
+- `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
-- 缺失则按各自 `references` 主文档模板创建；只写明确事实，合并去重，刷新「更新时间」，并在「变更记录」补写变更原因。
-- 单一主文档原则：每类长期上下文只维护一份根目录主文档，不产生衍生文件。
+- 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
+
+### Obsidian 知识流选择性默认触发（强制）
+
+- 每轮仓库任务都必须先做一次轻量 Obsidian 判断，并在首条中间进度或等价命中检查证据中输出 `Obsidian:<检索/沉淀/不适用/阻断>`。
+- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / Obsidian / 知识库 / 当时怎么说”等信号时，判定为 `Obsidian:检索`，必须命中 `obsidian-knowledge-flow` 并通过 Obsidian CLI 检索 / 读取笔记。
+- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `Obsidian:沉淀`，必须命中 `obsidian-knowledge-flow` 并先通过 CLI 检索已有笔记，再决定捕获或沉淀。
+- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `Obsidian:不适用`，不得为了形式调用 Obsidian CLI。
+- Obsidian vault 的检索、读取、创建、追加和沉淀只能通过 `obsidian` CLI 完成；CLI 不可用、vault 未注册、目标根目录不一致或命令无法限定到目标 vault 时，判定为 `Obsidian:阻断`，不得用 `rg`、`Get-Content`、`Set-Content` 或直接文件读写冒充 vault 操作。
+- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `Obsidian:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
+- 本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区统一落在该 vault 下的 `知识库/` 目录；既然这个映射已经约定，就不要再通过环境变量、`.obsidian-kb-root` 或其它候选路径重复 probing。
 
 ## 严禁脑补工具调用与结果（最高优先级，强制）
 
@@ -3793,6 +3804,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 任何情况下都不得以「我以为你想提交」「按惯例提交」「顺手提交」为由自动提交。
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
+- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `obsidian-knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
 - 违反本条视为最高级别流程违规。
 
 ## Skill 命中强制规则
@@ -3801,6 +3813,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-agents-bootstrap` 进行自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
+- 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。
 - 进入分析、侦察、需求、Bug、审查、测试、文档或编码等实质执行前，主 agent 必须自主判断是否存在可由 subagent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界；不得只依赖固定 skill 映射表。
@@ -3848,7 +3861,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 ## Windows / WSL 执行规则
 
-> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。
+> 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。若当前动作已经明确进入 PowerShell 专项场景，还必须同时写入 PowerShell 保底模式：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，以及 UTF-8 重定向防护。
 
 **先看 agent 在哪运行：**
 
@@ -3857,6 +3870,8 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
   - 普通仓库命令优先使用 Git Bash / bash；PowerShell 只用于 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求的场景
   - 看代码、改代码、搜索、规则检查、普通 git：经 `\\wsl.localhost\<distro>\home\<user>\<project>` 或 Git Bash / bash 可访问的等价路径访问 WSL 文件
   - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
+
+**PowerShell 专项保底：** 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口；进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，带空格的可执行文件路径用引号并配合 `&`，日志或文件写入继续按 UTF-8 处理。
 
 **为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
@@ -3945,7 +3960,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 ## 本地连接调试测试红线（最高优先级，强制）
 
 - 需求侦察、Bug 复现 / 定位 / 运行时调试、功能验证、回归测试、上线接口测试、浏览器联调、启动前后端服务或执行任何测试脚本时，所有数据库、缓存、消息队列、HTTP/RPC 上游、前端 / 后端服务连接都只能使用 `local` 本地环境。
-- 本地环境只允许来自 `config_local*`、`.env.local`、`.env.development`、本机开发容器、`localhost` / `127.0.0.1` / 本机端口等本地开发配置；`test`、`prod`、`production`、`staging`、`pre`、`release` 等非 local 环境一律禁止连接。
+- 「本地环境」的判定标准是**连接信息的配置归属**，不是连接地址是否指向本机：只要连接信息来自 `config_local*`、`.env.local`、`.env.development` 等 local 本地开发配置，即为允许使用的本地环境，即使其指向远程服务器、团队共享开发库或非 `localhost` 地址也属合法本地目标；`localhost` / `127.0.0.1` / 本机端口 / 本机开发容器只是 local 配置的常见形态，不是判定依据。`test`、`prod`、`production`、`staging`、`pre`、`release` 配置声明的连接信息一律禁止使用，即使其恰好指向本机也不例外。
 - 即使用户提供了 test / prod 连接串、账号、接口地址或临时授权，也不得由 agent 直接连接或调用；必须记录为环境阻断，并要求改用 local 本地数据库和本地服务。
 - 若 local 配置缺失、local 数据不足或本地服务未启动，只能初始化 / 启动 / 查询 local 环境；不得回退到 test / prod 数据库、缓存、消息队列、外部服务或线上接口补证据。
 - 需要写入数据时仅允许写入 local 环境，并且必须有清理或回滚方案；Bug 侦察类只读链路仍保持只读，禁止自行增删改数据。
@@ -3979,3 +3994,16 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 若 `PROJECT_STYLE.md` 与当前文件 / 同目录稳定写法冲突，优先跟随当前文件 / 同目录，并记录是否需要联动 `project-style-rules` 回写长期风格。
 - `project-style-rules` 只负责维护 `PROJECT_STYLE.md` 风格记忆，不作为代码生成总控入口；`code-style-consistency-rules` 负责基于本轮风格契约检查局部一致性。
 - 禁止借“统一风格”扩大无关 diff、批量格式化、重排无关代码或引入外部模板式个人偏好。
+
+## Karpathy 风格硬闸门
+
+- 本章节吸收 `multica-ai/andrej-karpathy-skills` 的四个核心原则，并翻译为本仓库自举规则：先想清楚再写、简单优先、手术式改动、目标驱动验证。
+- 该规则是全部任务硬闸门，不是软性建议；简单一行任务可以用更短表达完成检查，但不得跳过假设、最小方案、改动范围和验证目标四类判断。
+- 编码前必须显式收敛关键假设、成功标准和不确定项；存在多种合理解释时先澄清或给出取舍，不得静默选择一个方向直接实现。
+- 实现方案必须坚持简单优先：只做用户当前目标所需能力，不新增猜测性功能、未请求配置项、一次性抽象、单实现接口、无收益 helper / wrapper / manager / factory / adapter。
+- 修改既有文件必须保持手术式改动：只碰当前目标必需行，匹配现有风格；不顺手重构、统一格式、改注释、删历史死代码或清理无关变量。若本轮改动制造了新的未使用导入、变量、函数或孤儿文件，必须清理这些由本轮产生的残留。
+- 每一行主要改动都必须能追溯到用户目标、计划最小任务或验证闭环；无法追溯的改动视为越界，必须撤回或单独说明并等待授权。
+- 每个任务都必须转成可验证目标：Bug 修复优先有复现/回归验证，新增能力优先有行为验证，重构优先有改前/改后等价性验证；仅当纯文档、纯注释、纯排版或不会影响运行结果时，才允许写明免测理由。
+- 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
+- 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
+- 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。

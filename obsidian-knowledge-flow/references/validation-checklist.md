@@ -12,6 +12,11 @@
 
 ## 选择性默认验证
 
+0. 项目本地四件套启动：
+   - 输入：临时项目目录缺少 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
+   - 预期：先创建三个 UTF-8 文件，读取 current 后读取 memory；普通启动不读取 history。
+   - 追加场景：已有 history 内容时重复初始化不得覆盖；current 超过 51,200 字节时阻断。
+
 1. 普通仓库任务：
    - 输入：一次不依赖历史知识、也没有可复用沉淀价值的普通文档或实现任务。
    - 预期：输出 `Obsidian:不适用`，不调用 `obsidian` CLI，不读取 vault。
@@ -85,3 +90,4 @@
 - 对 skill 目录运行 skill creator 校验器。
 - 当 `description` 或 `##` 标题变化时，运行仓库 skill 字典生成脚本。
 - 检查 `git diff`，确认生成的字典文件由脚本刷新，不是手工修改。
+- 同时确认项目本地四件套与 vault 分层：项目 Markdown 使用标准文件工具，vault 检索和沉淀只能使用 Obsidian CLI。

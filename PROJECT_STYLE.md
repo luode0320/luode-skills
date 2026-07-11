@@ -150,6 +150,16 @@
 - 更新时间: 2026-07-07
 - 状态: 启用
 
+### 项目四件套与 Obsidian 分层写法
+- 别名: 项目本地四件套, current/memory/history 分层, vault 链路隔离
+- 类型: 文档与工具风格
+- 示例: `父目录规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md`、`PROJECT_HISTORY.md 仅按需窄读`、`项目 Markdown 用标准工具，vault 用 Obsidian CLI`
+- 说明: 项目启动上下文统一按父目录平台规则、当前状态、稳定记忆的顺序读取；当前状态覆盖维护，稳定规则合并维护，历史事件只追加。Obsidian vault 只承接跨项目知识检索与可复用知识沉淀，不把项目本地记忆文件当作 vault 笔记，也不为普通任务强制调用 CLI。
+- 来源: 用户本轮确认、`obsidian-knowledge-flow`、`project-memory-rules`
+- 适用范围: 项目规则、项目记忆文档、Obsidian 知识流
+- 更新时间: 2026-07-11
+- 状态: 启用
+
 ### Git 收口联动沉淀写法
 - 别名: 提交前知识沉淀, Git 联动 Obsidian
 - 类型: 流程风格

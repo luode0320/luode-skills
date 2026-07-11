@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# project-agents-bootstrap: 检查并补齐仓库内规则文件（AGENTS.md / CLAUDE.md）
+# project-agents-bootstrap: 检查并补齐仓库规则文件与项目记忆四件套
 # 用法:
 #   bootstrap_agents.sh
 #   bootstrap_agents.sh --repo /path/to/repo
@@ -57,6 +57,9 @@ fi
 GITATTRIBUTES_FILE="$REPO_DIR/.gitattributes"
 EDITORCONFIG_FILE="$REPO_DIR/.editorconfig"
 PROJECT_MEMORY_FILE="$REPO_DIR/PROJECT_MEMORY.md"
+PROJECT_CURRENT_FILE="$REPO_DIR/PROJECT_CURRENT.md"
+PROJECT_HISTORY_FILE="$REPO_DIR/PROJECT_HISTORY.md"
+PROJECT_CURRENT_MAX_BYTES=51200
 
 PYTHON_BIN=""
 
@@ -173,13 +176,14 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 
 ### 项目长期上下文文档自动加载（强制）
 
-- 会话开始（含新会话首轮、上下文压缩续做后）必须检测项目根目录四个长期上下文文档：`AGENTS.md`、`CLAUDE.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`。
-- 存在即读取并加载为当前上下文；缺失即按各自主文档模板创建；其后随对话与代码变化持续维护，不是只建一次。
-- `PROJECT_MEMORY.md` 记忆对象：指标、参数、表字段、缓存键、变量、公式、方法映射、别名等反复出现且需长期复用的事实（联动 `project-memory-rules`）。
-- `PROJECT_STYLE.md` 记忆对象：方法、注释、错误处理、日志、接口等代码写法样例（联动 `project-style-rules`）。
+- 会话开始（含新会话首轮、上下文压缩续做后）必须先读取项目目录父目录的当前平台规则文件，再检测项目根目录 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
+- 缺失的三个项目记忆文件必须先创建最小 UTF-8 模板；固定读取顺序为 `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`。
+- `PROJECT_CURRENT.md` 保存当前目标、范围、状态、已完成、待办、阻断、验证和交接点，采用覆盖式维护，UTF-8 字节数不得超过 51,200。
+- `PROJECT_MEMORY.md` 只保存稳定项目规则、关键决策和少量长期事实，继续保留底部机器索引区（联动 `project-memory-rules`）。
+- `PROJECT_HISTORY.md` 只追加关键历史事件，普通启动默认不读，只有历史追问、当前状态不足或真实卡点时窄读。
+- `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
-- 缺失则按各自 `references` 主文档模板创建；只写明确事实，合并去重，刷新「更新时间」，并在「变更记录」补写变更原因。
-- 单一主文档原则：每类长期上下文只维护一份根目录主文档，不产生衍生文件。
+- 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
 
 ### Obsidian 知识流选择性默认触发（强制）
 
@@ -565,6 +569,53 @@ extensions:
 EOF
 )
 
+PROJECT_CURRENT_TEMPLATE=$(cat <<'EOF'
+# 项目当前状态
+
+## 目标与范围
+
+- 目标：待补充
+- 范围：待补充
+- 非范围：待补充
+
+## 当前状态
+
+- 状态：初始化
+- 当前执行点：待补充
+- 更新时间：待补充
+
+## 已完成
+
+- 暂无
+
+## 待办
+
+- 待补充
+
+## 阻断
+
+- 无
+
+## 验证
+
+- 待补充
+
+## 下一执行点
+
+- 待补充
+EOF
+)
+
+PROJECT_HISTORY_TEMPLATE=$(cat <<'EOF'
+# 项目历史事件
+
+> 本文件只追加关键历史事件。普通新线程默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
+
+## 事件
+
+EOF
+)
+
 # 在文件中按 "## header" 定位并 upsert 章节正文
 sync_section() {
   local file="$1"
@@ -664,6 +715,70 @@ extensions:
 ```
 EOF
   echo "[OK] 已创建: $file"
+}
+
+# ensure_project_current_file
+# [参数] file: 项目根目录的 PROJECT_CURRENT.md 路径
+# [返回] 缺失时创建文件；已有文件通过 UTF-8 与 51,200 字节检查，否则返回非零并阻断
+# 最近修改时间: 2026-07-11 22:30:00 新增四件套当前状态文件的幂等创建与大小闸门，防止静默截断交接信息
+# 创建当前状态文件；已有文件只做大小和 UTF-8 检查，不覆盖用户内容。
+ensure_project_current_file() {
+  local file="$1"
+
+  # 1. 缺失时只创建最小模板，避免覆盖项目已有当前状态。
+  if [[ ! -f "$file" ]]; then
+    $PYTHON_BIN - "$file" "$PROJECT_CURRENT_TEMPLATE" <<'PY'
+from pathlib import Path
+import sys
+
+Path(sys.argv[1]).write_text(sys.argv[2].rstrip("\n") + "\n", encoding="utf-8")
+print(f"[OK] 已创建: {sys.argv[1]}")
+PY
+    return 0
+  fi
+
+  $PYTHON_BIN - "$file" "$PROJECT_CURRENT_MAX_BYTES" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+limit = int(sys.argv[2])
+data = path.read_bytes()
+data.decode("utf-8")
+if len(data) > limit:
+    raise SystemExit(f"[ERROR] PROJECT_CURRENT.md 超过 {limit} 字节，已阻断写入，请先压缩: {path}")
+print(f"[INFO] 当前状态文件已存在且未超限: {path} ({len(data)} bytes)")
+PY
+}
+
+# ensure_project_history_file
+# [参数] file: 项目根目录的 PROJECT_HISTORY.md 路径
+# [返回] 缺失时创建文件；已有文件通过 UTF-8 检查且保持原内容不变
+# 最近修改时间: 2026-07-11 22:30:00 新增四件套历史文件的幂等创建与追加保护，避免初始化覆盖事件流水
+# 创建历史文件；已有文件永远不覆盖，仅验证其可按 UTF-8 读取。
+ensure_project_history_file() {
+  local file="$1"
+
+  # 1. 缺失时创建追加式模板；已有历史只读校验，不做重排或覆盖。
+  if [[ ! -f "$file" ]]; then
+    $PYTHON_BIN - "$file" "$PROJECT_HISTORY_TEMPLATE" <<'PY'
+from pathlib import Path
+import sys
+
+Path(sys.argv[1]).write_text(sys.argv[2], encoding="utf-8")
+print(f"[OK] 已创建: {sys.argv[1]}")
+PY
+    return 0
+  fi
+
+  $PYTHON_BIN - "$file" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+path.read_bytes().decode("utf-8")
+print(f"[INFO] 历史文件已存在，保持原内容不变: {path}")
+PY
 }
 
 # 同步 PROJECT_MEMORY.md 的结构骨架；若已有正文，只补底部受管机器索引区，不重写人工内容。
@@ -807,7 +922,9 @@ if [[ ! -f "$EDITORCONFIG_FILE" ]]; then
   echo "[OK] 已创建: $EDITORCONFIG_FILE"
 fi
 
-# 3) 确保 PROJECT_MEMORY.md 至少具备单文件双区骨架
+# 3) 确保项目记忆四件套存在且职责边界可执行
+ensure_project_current_file "$PROJECT_CURRENT_FILE"
+ensure_project_history_file "$PROJECT_HISTORY_FILE"
 sync_project_memory_file "$PROJECT_MEMORY_FILE"
 
 # 4) 同步根目录所有已存在的规则文件（AGENTS.md / CLAUDE.md）

@@ -289,10 +289,19 @@
 ### Obsidian 知识流选择性默认触发链
 - 别名: obsidian-knowledge-flow, Obsidian 知识流, 选择性默认触发, 知识库检索沉淀
 - 类型: 流程规则
-- 定义: 仓库任务每轮必须先做轻量 Obsidian 判断并输出 `Obsidian:<检索/沉淀/不适用/阻断>`；本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区为该 vault 下的 `知识库/`；后续操作不再通过环境变量、`.obsidian-kb-root` 或其它候选路径重新推导 vault。仅当问题依赖历史决策、知识库内容、用户偏好、重复实体或长期项目事实时判定为 `检索` 并通过 Obsidian CLI 检索 / 读取笔记；仅当阶段收口或最终回复前形成可复用事实、决策、流程、定义、偏好、来源或调试经验时判定为 `沉淀` 并先通过 CLI 检索已有笔记再捕获 / 沉淀。普通任务记录 `不适用`，不得为形式调用 CLI；CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback。
+- 定义: 项目启动先按“父目录平台规则 -> `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取项目本地四件套；`PROJECT_CURRENT.md` 覆盖维护当前状态且不超过 51,200 字节，`PROJECT_MEMORY.md` 只承载稳定规则与关键决策，`PROJECT_HISTORY.md` 只追加且普通启动不读。Obsidian 仍固定使用 `D:\obsidian_data` 及其 `知识库/` 工作区，仅当问题依赖跨项目历史、vault 知识或既有笔记时判定为 `检索` 并通过 CLI 检索 / 读取；仅当收口形成可复用知识时判定为 `沉淀` 并先通过 CLI 检索已有承接笔记。普通任务记录 `不适用`，CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback；项目本地 Markdown 与 vault 链路不得混用。
 - 来源: `AGENTS.md`、`CLAUDE.md`、`skill-hit-check-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`、`编码skill.md`
 - 适用范围: 记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀
 - 更新时间: 2026-07-08
+- 状态: 启用
+
+### 项目四件套记忆闭环
+- 别名: PROJECT_CURRENT, PROJECT_MEMORY, PROJECT_HISTORY, 项目本地记忆四件套
+- 类型: 项目上下文规则
+- 定义: 父目录 `AGENTS.md` / `CLAUDE.md` 只保存跨项目通用规则；项目根目录 `PROJECT_CURRENT.md` 保存当前任务交接信息并覆盖维护，`PROJECT_MEMORY.md` 保存稳定项目规则、关键决策和少量长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。新项目、新任务、新会话或上下文压缩恢复时，固定先读取父目录当前平台规则，再读取 current 和 memory；history 只在历史追问、状态不足或真实卡点时窄读。项目本地文件使用标准工具，Obsidian vault 仍只通过 CLI 选择性检索和沉淀。
+- 来源: 用户本轮确认、`obsidian-knowledge-flow`、`project-memory-rules`、`project-agents-bootstrap`
+- 适用范围: 项目启动、上下文交接、记忆更新、Obsidian 边界
+- 更新时间: 2026-07-11
 - 状态: 启用
 
 ### Git 协作联动 Obsidian 沉淀
@@ -574,7 +583,7 @@ entities:
       - Obsidian 知识流
       - 选择性默认触发
       - 知识库检索沉淀
-    definition: "仓库任务每轮先输出 `Obsidian:<检索/沉淀/不适用/阻断>` 轻量判断；本仓库固定使用 `D:\\obsidian_data` 作为 Obsidian 根目录，实际知识工作区为该 vault 下的 `知识库/`，后续操作不再通过环境变量、`.obsidian-kb-root` 或其它候选路径重新推导 vault；仅在历史知识依赖时通过 Obsidian CLI 检索 / 读取笔记，仅在收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时通过 CLI 捕获 / 沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。"
+    definition: "项目启动先按父目录平台规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md 读取本地上下文；current 覆盖维护且不超过 51,200 字节，memory 只承载稳定规则与关键决策，history 只追加且普通启动不读。Obsidian 固定使用 D:\\obsidian_data 及其 知识库/ 工作区，仅在跨项目历史或既有 vault 知识依赖时通过 CLI 检索 / 读取，仅在收口形成可复用知识时先检索再沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。项目本地 Markdown 与 vault 链路不得混用。"
     scope: "记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀"
     status: "active"
     evidence_ids:
@@ -585,7 +594,7 @@ entities:
     context_ids:
       - context.obsidian-knowledge-flow
       - context.memory-domain
-    updated_at: 2026-07-08
+    updated_at: 2026-07-11
   - entity_id: rule.git-obsidian-capture-link
     name: "Git 协作联动 Obsidian 沉淀"
     type: "流程规则"
