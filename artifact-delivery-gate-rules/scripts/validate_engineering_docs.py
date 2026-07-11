@@ -39,7 +39,14 @@ def read_document(path: Path) -> Tuple[str, List[str]]:
 
 
 def headings(text: str) -> List[str]:
-    return [match.group(1).strip() for line in text.splitlines() if (match := HEADING_PATTERN.match(line))]
+    values: List[str] = []
+    for line in text.splitlines():
+        match = HEADING_PATTERN.match(line)
+        if not match:
+            continue
+        value = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
+        values.append(value)
+    return values
 
 
 def section_bodies(text: str) -> Dict[str, str]:
@@ -49,7 +56,7 @@ def section_bodies(text: str) -> Dict[str, str]:
     for line in lines:
         match = HEADING_PATTERN.match(line)
         if match:
-            current = match.group(1).strip()
+            current = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
             sections.setdefault(current, [])
         elif current:
             sections[current].append(line)
@@ -98,6 +105,13 @@ def check_frontmatter(text: str, errors: List[str]) -> None:
         value = metadata.get(field)
         if value in (None, "", []):
             errors.append(f"front matter missing non-empty field: {field}")
+    if metadata.get("source_ids") and not isinstance(metadata.get("source_ids"), list):
+        errors.append("front matter source_ids must be a list")
+    if metadata.get("status") not in {"draft", "confirmed", "in_progress", "blocked", "accepted", "pending"}:
+        errors.append("front matter status is outside the allowed lifecycle")
+    updated_at = str(metadata.get("updated_at", ""))
+    if updated_at and not re.match(r"^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2})?)?$", updated_at):
+        errors.append("front matter updated_at must use YYYY-MM-DD[ HH:mm[:ss]]")
 
 
 def check_fences(text: str, errors: List[str]) -> None:
@@ -114,17 +128,43 @@ def check_sections(text: str, profile: Dict[str, Any], errors: List[str]) -> Non
             errors.append(f"missing required section: {section}")
         elif not bodies.get(section):
             errors.append(f"required section is empty: {section}")
+    for alternatives in profile.get("required_any_sections", []):
+        names = [str(item) for item in alternatives]
+        matched = next((name for name in names if name in existing and bodies.get(name)), None)
+        if matched is None:
+            errors.append(f"missing one of required sections: {names}")
 
 
 def check_ids(text: str, profile: Dict[str, Any], errors: List[str]) -> List[str]:
     ids = ID_PATTERN.findall(text)
-    duplicates = sorted({item for item in ids if ids.count(item) > 1})
-    if duplicates:
-        errors.append(f"duplicate stable IDs: {duplicates}")
+    # 引用同一个 ID 是追踪矩阵的正常行为；重复定义应由文档自审和跨文档索引检查识别。
     prefixes = tuple(f"{prefix}-" for prefix in profile.get("id_prefixes", []))
     if prefixes and not any(item.startswith(prefixes) for item in ids):
         errors.append(f"no IDs found for profile prefixes: {list(prefixes)}")
     return sorted(set(ids))
+
+
+def markdown_table_count(text: str) -> int:
+    lines = text.splitlines()
+    return sum(1 for index, line in enumerate(lines[:-1]) if "|" in line and re.match(r"^\s*\|?\s*:?-{3,}", lines[index + 1]))
+
+
+def check_profile_content(text: str, profile: Dict[str, Any], errors: List[str]) -> None:
+    for phrase in profile.get("required_phrases", []):
+        if str(phrase).lower() not in text.lower():
+            errors.append(f"missing required content phrase: {phrase}")
+    minimum_tables = int(profile.get("min_tables", 0))
+    actual_tables = markdown_table_count(text)
+    if actual_tables < minimum_tables:
+        errors.append(f"insufficient Markdown tables: expected {minimum_tables}, got {actual_tables}")
+
+
+def check_diagram_annotations(text: str, errors: List[str]) -> None:
+    blocks = mermaid_blocks(text)
+    for index, block in enumerate(blocks, start=1):
+        first = next((line.strip() for line in block.splitlines() if line.strip()), "")
+        if not first:
+            errors.append(f"empty Mermaid block: {index}")
 
 
 def check_placeholders(text: str, payload: Dict[str, Any], errors: List[str]) -> None:
@@ -180,10 +220,12 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
         check_fences(text, errors)
         check_sections(text, profile, errors)
         ids = check_ids(text, profile, errors)
+        check_profile_content(text, profile, errors)
         check_placeholders(text, profile_payload, errors)
         check_na_reasons(text, errors)
         check_links(text, root, path, errors)
         diagrams = check_diagrams(text, profile, errors)
+        check_diagram_annotations(text, errors)
     else:
         ids = []
         diagrams = {}

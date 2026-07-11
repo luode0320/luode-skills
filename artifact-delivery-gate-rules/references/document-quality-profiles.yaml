@@ -12,57 +12,51 @@ placeholder_terms:
   - 正常
 profiles:
   requirement:
-    required_sections:
-      - 文档信息
-      - 当前计划最终方案简要说明
-      - 需求来源与证据台账
-      - 目标与非目标
-      - 功能需求
-      - 业务规则与优先级
-      - 数据与外部契约
-      - 风险、假设、依赖与阻断
-      - 追踪矩阵
+    required_sections: [文档信息, 决策冻结, 普通模型零决策执行契约]
+    required_any_sections:
+      - [需求来源与证据台账, 来源证据登记]
+      - [目标与非目标, 范围与边界]
+      - [功能需求, 功能需求与规则要求]
+      - [业务规则与优先级, 决策冻结]
+      - [数据与外部契约, 非功能要求、风险与阻断]
+      - [风险、假设、依赖与阻断, 非功能要求、风险与阻断]
+      - [追踪矩阵, 主追踪矩阵]
+      - [追踪契约, 垂直切片与追踪契约]
     id_prefixes: [SRC, DEC, REQ, RULE, BOUND, GAP, SLICE, AC]
     diagrams: {flowchart: 1, sequenceDiagram: 1}
     min_tables: 3
     required_phrases: [unresolved_decisions, 追踪矩阵, N/A]
   acceptance:
-    required_sections:
-      - 场景与前置条件
-      - 输入与预期结果
-      - 异常与边界条件
-      - 范围外说明
-      - REQ-AC 追踪矩阵
+    required_sections: [文档信息, 验收场景, 完成条件、停止条件与交付物]
+    required_any_sections:
+      - [场景与前置条件, 前置条件]
+      - [输入与预期结果, 验收目标与判定原则]
+      - [异常与边界条件, 异常分支场景]
+      - [范围外说明, 范围外场景]
+      - [REQ-AC 追踪矩阵, 验收对象与通过门槛]
     id_prefixes: [AC, REQ, RULE]
     diagrams: {flowchart: 1}
     min_tables: 2
     required_phrases: [通过标准, 失败标准, 范围外]
   implementation_overview:
-    required_sections:
-      - 当前计划最终方案简要说明
-      - Agent 对当前问题的理解
-      - 实施周期总览
-      - 阶段计划
-      - 最小任务清单
-      - 现状与落点
-      - 真实测试安排
-      - 风险与阻断项
-      - 任务完成、停止与最大推进边界
-      - 追踪矩阵
+    required_sections: [当前计划最终方案简要说明, 实施周期总览, 阶段计划, 最小任务清单, 现状与落点, 真实测试安排, 风险与阻断项, 自审结论]
+    required_any_sections:
+      - [Agent 对当前问题的理解, 基本信息]
+      - [任务完成、停止与最大推进边界, 总体任务停止/结束条件, 自审结论]
+      - [追踪矩阵, 最小任务清单]
     id_prefixes: [SRC, DEC, REQ, AC, CYCLE, TASK, TEST, ROLLBACK]
     diagrams: {flowchart: 2}
     min_tables: 4
     required_phrases: [unresolved_decisions, 文件/符号, 最大推进边界, 真实测试]
   implementation_cycle:
-    required_sections:
-      - 当前周期目标
-      - 进入条件与收口条件
-      - 当前代码基线
-      - 周期内最小任务执行顺序
-      - 文件与符号操作契约
-      - 真实测试与断言
-      - 回滚与停止条件
-      - 周期追踪矩阵
+    required_sections: [当前代码/文档基线, 周期内最小任务执行顺序, 最小任务闭环, 当前周期验证矩阵, 自审结论]
+    required_any_sections:
+      - [当前周期目标, 当前周期目标、边界与进入条件]
+      - [进入条件与收口条件, 当前周期目标、边界与进入条件]
+      - [文件与符号操作契约, 最小任务闭环]
+      - [真实测试与断言, 当前周期验证矩阵]
+      - [回滚与停止条件, 周期阻断、停止与回滚]
+      - [周期追踪矩阵, 当前周期验证矩阵]
     id_prefixes: [CYCLE, TASK, TEST, ROLLBACK, AC]
     diagrams: {flowchart: 1}
     min_tables: 4
