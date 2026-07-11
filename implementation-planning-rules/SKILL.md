@@ -174,11 +174,23 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - 如果后续发生的是已实现需求上的新增改动，应创建或增补一份新的实施周期文档记录本次改动的独立闭环，旧周期保留为历史记录。
 - 如果一个需求被拆成多个独立子任务周期，归档中必须明确每个周期只承载一个清晰目标，并标明周期之间的衔接关系。
 
+## 极致完整性与零决策执行硬闸门
+
+- 实施总览、实施周期和最小任务卡必须把强模型已经做出的业务/技术/测试决策冻结下来；普通模型只执行当前周期的当前 `TASK-*`，不得自行补默认值、异常处理、文件落点、回滚或测试断言。
+- 行为变更默认必须建立实施总览和至少一个实施周期；每个周期必须有完整周期模板，每个周期内必须有可独立闭环的最小任务。旧周期不能伪装承载已实现需求上的新改动。
+- 每个 `TASK-*` 必须明确唯一目标、前置条件、允许文件、目标符号/区段、操作类型、禁止触碰区、步骤、真实测试、断言、失败预期、清理、回滚、完成条件、停止条件和最大推进边界；预计触达文件超过 5 个时必须继续拆分或给出不可拆分证据。
+- 每个任务必须按“实现 -> 真实测试 -> 审查 -> 验收”逐个闭环；禁止先连续实现多个任务后统一测试、统一审查或统一验收。
+- 追踪必须覆盖 `REQ/RULE -> AC -> CYCLE -> TASK -> 文件/符号 -> TEST -> EVIDENCE`，并能从实施任务反向回到需求和验收；孤立 ID、重复 ID、单向映射或未决 P0/P1 均阻断。
+- 真实测试必须写精确命令、local 环境、样本/fixture、断言、失败预期、清理和证据路径；`build`、`lint`、静态检查、人工阅读和代码审查不能代替真实测试。免测只能用于纯文档/纯注释/纯排版/不改变运行结果的静态资源整理，并写 `N/A + 原因 + 证据`。
+- 总览至少包含边界图、周期依赖图和端到端流程/时序图；周期至少包含任务依赖图和一张领域匹配图。每张 Mermaid 图必须写目的和关联 ID，图文术语一致并通过语法校验。
+- 发现计划落点与代码基线不一致、符号不存在、命令失败、断言失败、依赖缺失或出现安全/数据损坏风险时，立即停止并记录 `GAP-*`，不得猜测替代实现路径。
+
 ## references 读取规则
 
 - 默认先读 `references/plan-entry-checklist.md`。
 - 在决定实施总览/实施周期文档的根目录、命名模板和同文档更新策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 输出或更新结构化实施文档 时，再读 `references/plan-structure-template.md`。
+- 只要实施文档需要交给普通模型继续执行，或用户要求“极致详细 / 极致完整 / 完善实施文档”，必须同时读取 `references/implementation-overview-template.md`、`references/implementation-cycle-template.md`、`references/minimum-task-execution-contract.md` 和 `references/visualization-standard.md`。
 - 只有在 判断或输出新项目 / 多来源对象 / 多实施文档的总执行顺序 时，再读 `references/full-sequence-master-plan.md`。
 - 只要当前处于 Plan Mode、最终回复使用 `<proposed_plan>`、或输出正式计划 / 受限计划 / 阻断计划，必须在最终输出前读 `references/plan-output-gate.md`。
 - 只有在 判断任务颗粒度、依赖顺序和最小闭环 时，再读 `references/task-granularity-and-order.md`。
