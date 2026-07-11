@@ -241,6 +241,15 @@
 - 更新时间: 2026-06-27
 - 状态: 启用
 
+### Imagegen 错误案例持续演进
+- 别名: imagegen, gpt-image-2 错误案例库, 生图失败经验回写
+- 类型: Skill 维护规则
+- 定义: 权威 `imagegen` skill 使用 `references/error-casebook.md` 保存已复现、已解决、已验证且已脱敏的生图错误；每次失败先分类并查找已有案例，解决后在获得 skill 维护授权时去重回写，未验证错误不得进入可执行案例，敏感凭据和用户私有内容不得落盘。
+- 来源: `imagegen/SKILL.md`、`imagegen/references/error-casebook.md`、本轮验证结果
+- 适用范围: gpt-image-2 CLI fallback、参数校验、透明背景、依赖/鉴权、限流与瞬态网络错误
+- 更新时间: 2026-07-12
+- 状态: 启用
+
 ### Windows / WSL 执行边界
 - 别名: Windows 普通命令优先 bash, Git Bash 优先, 执行类动作才进 WSL
 - 类型: 环境规则
@@ -432,6 +441,22 @@
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.imagegen-error-case-evolution
+    name: "Imagegen 错误案例持续演进"
+    type: "Skill 维护规则"
+    aliases:
+      - imagegen
+      - gpt-image-2 错误案例库
+      - 生图失败经验回写
+    definition: "权威 imagegen skill 使用 references/error-casebook.md 保存已复现、已解决、已验证且已脱敏的生图错误；每次失败先分类并查找已有案例，解决后在获得 skill 维护授权时去重回写，未验证错误不得进入可执行案例，敏感凭据和用户私有内容不得落盘。"
+    scope: "gpt-image-2 CLI fallback、参数校验、透明背景、依赖/鉴权、限流与瞬态网络错误"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.imagegen
+      - evidence.dialog.imagegen-error-case-evolution
+    context_ids:
+      - context.imagegen-maintenance
+    updated_at: 2026-07-12
   - entity_id: rule.authenticated-url-routing
     name: "URL 认证浏览器默认路由"
     type: "浏览器路由规则"
@@ -648,6 +673,15 @@ relations:
       - evidence.skill.git-collaboration
     status: "active"
 evidence:
+  - evidence_id: evidence.skill.imagegen
+    type: "skill"
+    source: "imagegen/SKILL.md"
+    path: "imagegen/SKILL.md"
+    note: "imagegen 错误案例分类、验证、授权回写、去重和敏感信息保护规则来源"
+  - evidence_id: evidence.dialog.imagegen-error-case-evolution
+    type: "dialog"
+    source: "用户需求与本轮验证"
+    note: "用户要求持续记录生图错误示例和解决方案，本轮以本地 dry-run/check 验证首批案例"
   - evidence_id: evidence.skill.authenticated-url-routing
     type: "skill"
     source: "authenticated-url-routing-rules/SKILL.md"
@@ -757,6 +791,10 @@ evidence:
     source: "对话确认"
     note: "用户要求需求、实施、测试、Bug、审查、验收与代码实现按提交域拆分，不再混在同一个 commit 里"
 contexts:
+  - context_id: context.imagegen-maintenance
+    type: "skill-maintenance"
+    name: "Imagegen Skill 维护"
+    note: "适用于生图调用错误的案例检索、排障验证、脱敏回写和版本演进"
   - context_id: context.url-analysis
     type: "task-scope"
     name: "URL 分析与在线文档读取"
@@ -795,6 +833,7 @@ contexts:
     note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
 lifecycle:
   active:
+    - "rule.imagegen-error-case-evolution"
     - "rule.authenticated-url-routing"
     - "term.doc-top-level-mixed-naming"
     - "rule.old-directory-cleanup"
@@ -814,6 +853,12 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    imagegen:
+      - "rule.imagegen-error-case-evolution"
+    gpt-image-2 错误案例库:
+      - "rule.imagegen-error-case-evolution"
+    生图失败经验回写:
+      - "rule.imagegen-error-case-evolution"
     authenticated-url-routing-rules:
       - "rule.authenticated-url-routing"
     已登录 Chrome 路由:
@@ -889,6 +934,12 @@ retrieval_hints:
     代码实现单独提交:
       - "rule.git-commit-domain-split"
   scopes:
+    Imagegen Skill 维护:
+      - "rule.imagegen-error-case-evolution"
+    gpt-image-2 CLI fallback:
+      - "rule.imagegen-error-case-evolution"
+    生图错误案例:
+      - "rule.imagegen-error-case-evolution"
     URL 分析:
       - "rule.authenticated-url-routing"
     文档目录命名:
@@ -941,6 +992,10 @@ retrieval_hints:
     提交域隔离:
       - "rule.git-commit-domain-split"
   sources:
+    imagegen/SKILL.md:
+      - "rule.imagegen-error-case-evolution"
+    imagegen/references/error-casebook.md:
+      - "rule.imagegen-error-case-evolution"
     authenticated-url-routing-rules/SKILL.md:
       - "rule.authenticated-url-routing"
     artifact-storage-rules/SKILL.md:

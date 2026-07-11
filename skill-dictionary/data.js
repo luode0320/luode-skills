@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-12 01:41:30",
+  "generated_at": "2026-07-12 02:04:48",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 10,
-    "references_total": 344,
+    "references_total": 345,
     "agents_total": 90
   },
   "downloaded_seeds": {
@@ -3789,6 +3789,7 @@ window.SKILL_DICTIONARY = {
             "顶层模式",
             "脚本路径解析规则（新增）",
             "核心规则",
+            "错误案例持续迭代",
             "强阻断规则",
             "内置模式保存规则",
             "什么时候用",
@@ -3807,6 +3808,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "imagegen/references/cli.md",
             "imagegen/references/codex-network.md",
+            "imagegen/references/error-casebook.md",
             "imagegen/references/image-api.md",
             "imagegen/references/local-entrypoints.md",
             "imagegen/references/prompting.md",
@@ -8330,6 +8332,7 @@ window.SKILL_DICTIONARY = {
         "顶层模式",
         "脚本路径解析规则（新增）",
         "核心规则",
+        "错误案例持续迭代",
         "强阻断规则",
         "内置模式保存规则",
         "什么时候用",
@@ -8348,6 +8351,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "imagegen/references/cli.md",
         "imagegen/references/codex-network.md",
+        "imagegen/references/error-casebook.md",
         "imagegen/references/image-api.md",
         "imagegen/references/local-entrypoints.md",
         "imagegen/references/prompting.md",

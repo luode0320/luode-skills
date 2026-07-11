@@ -748,3 +748,4 @@ claude-mem(记忆) :
 2026-07-11 22:59:00 docs: [项目四件套验收] 归档最终验收
 2026-07-12 00:26:04 feat: [命令失败恢复闭环] 完善Windows与WSL执行规则持续回写
 2026-07-12 01:44:09 feat: [浏览器工具路由收敛] 区分 Chrome Plugin、Chrome DevTools MCP 与 agent-browser
+2026-07-12 02:30:00 feat: [imagegen错误案例] 建立gpt-image-2错误迭代闭环

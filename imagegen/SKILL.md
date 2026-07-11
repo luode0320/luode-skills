@@ -59,6 +59,19 @@ CLI fallback 暴露三个子命令：
 - **不要修改** `scripts/image_gen.py`。如果脚本能力不够，先和用户对齐。
 - 当用户希望把 imagegen 配成以后都能复用的本地入口时，读取 `references/local-entrypoints.md`。
 
+## 错误案例持续迭代
+
+每次生图调用失败时，都要按以下顺序处理：
+
+1. 先按参数、环境、鉴权、网络/限流、模型能力和输出校验分类，再读取 `references/error-casebook.md` 查找匹配案例。
+2. 只执行案例中已经验证过的解决方案；涉及换模型、改变生图路径、真实透明回退或修改脚本时，继续遵守本 skill 的用户确认规则。
+3. 解决后必须用不依赖真实 API 的 `--dry-run`、`check` 或等价本地验证复核；验证失败时不得把本次尝试写成解决方案。
+4. 只有当前任务已获得 skill 维护授权时，才将已复现、已解决且已验证的错误脱敏后合并回案例库；未解决错误只能作为当轮诊断结果，不写入可执行案例。
+5. 回写前先按案例 ID、错误特征和适用模型去重；旧方案失效时更新原案例状态为“已替代”，不要新增冲突条目。
+6. 案例中禁止写入 API key、token、密码、完整鉴权响应、用户私有 prompt、输入图片内容和未经脱敏的本机路径；只保留足以复现问题的最小参数摘要。
+
+案例字段、状态和首批 `gpt-image-2` 错误示例统一见 `references/error-casebook.md`。该案例库是经验参考，不得覆盖当前代码、官方参数约束或用户当前明确要求。
+
 ## 强阻断规则
 
 - 只要这是明确的位图图片任务，例如插画、照片、sprite、动作帧、纹理、概念图、UI 图、mockup、透明底抠图，就必须尝试真实的位图生成路径。
@@ -423,6 +436,7 @@ uv pip install pillow
 - `references/image-api.md`
 - `references/codex-network.md`（仅适用于 Codex CLI 的网络/沙箱审批配置；Claude Code 环境下没有等价的 `approval_policy`/`sandbox_mode` 概念，网络访问由宿主环境而非 skill 层配置控制，遇到网络受限问题应提示用户检查当前 Claude Code 会话的网络权限设置，不要尝试套用 Codex 的 TOML 配置项）
 - `references/local-entrypoints.md`
+- `references/error-casebook.md`
 - `scripts/image_gen.py`
 - `scripts/bootstrap_imagegen_env.py`
 - `scripts/run_imagegen.ps1`
