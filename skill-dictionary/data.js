@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-12 03:24:43",
+  "generated_at": "2026-07-12 03:57:35",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 25,
     "doc_total": 10,
-    "references_total": 353,
+    "references_total": 360,
     "agents_total": 91
   },
   "downloaded_seeds": {
@@ -1157,9 +1157,11 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
-            "references 读取规则"
+            "references 读取规则",
+            "极致完整性交付硬闸门"
           ],
           "references": [
+            "requirement-intake-rules/references/extreme-completeness-standard.md",
             "requirement-intake-rules/references/intake-boundaries-and-examples.md",
             "requirement-intake-rules/references/intake-checklist.md",
             "requirement-intake-rules/references/requirement-structure-template.md"
@@ -1325,18 +1327,23 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
+            "极致完整性与零决策执行硬闸门",
             "references 读取规则"
           ],
           "references": [
             "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
             "implementation-planning-rules/references/full-sequence-master-plan.md",
+            "implementation-planning-rules/references/implementation-cycle-template.md",
+            "implementation-planning-rules/references/implementation-overview-template.md",
+            "implementation-planning-rules/references/minimum-task-execution-contract.md",
             "implementation-planning-rules/references/plan-boundaries-and-examples.md",
             "implementation-planning-rules/references/plan-entry-checklist.md",
             "implementation-planning-rules/references/plan-output-gate.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
             "implementation-planning-rules/references/plan-structure-template.md",
             "implementation-planning-rules/references/source-notes.md",
-            "implementation-planning-rules/references/task-granularity-and-order.md"
+            "implementation-planning-rules/references/task-granularity-and-order.md",
+            "implementation-planning-rules/references/visualization-standard.md"
           ],
           "agents": [
             "implementation-planning-rules/agents/openai.yaml"
@@ -1415,6 +1422,7 @@ window.SKILL_DICTIONARY = {
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
             "执行结果归档要求",
+            "极致完整性与可执行性硬闸门",
             "references 读取规则"
           ],
           "references": [
@@ -4023,6 +4031,7 @@ window.SKILL_DICTIONARY = {
             "Skill 作用与适用场景",
             "自动触发信号",
             "进入后先做什么",
+            "极致完整性机器门禁",
             "默认执行流程",
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
@@ -4030,7 +4039,10 @@ window.SKILL_DICTIONARY = {
             "执行结果归档要求",
             "references 读取规则"
           ],
-          "references": [],
+          "references": [
+            "artifact-delivery-gate-rules/references/document-handoff-contract.md",
+            "artifact-delivery-gate-rules/references/document-quality-profiles.yaml"
+          ],
           "agents": [
             "artifact-delivery-gate-rules/agents/openai.yaml"
           ],
@@ -5841,9 +5853,11 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
-        "references 读取规则"
+        "references 读取规则",
+        "极致完整性交付硬闸门"
       ],
       "references": [
+        "requirement-intake-rules/references/extreme-completeness-standard.md",
         "requirement-intake-rules/references/intake-boundaries-and-examples.md",
         "requirement-intake-rules/references/intake-checklist.md",
         "requirement-intake-rules/references/requirement-structure-template.md"
@@ -6009,18 +6023,23 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
+        "极致完整性与零决策执行硬闸门",
         "references 读取规则"
       ],
       "references": [
         "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
         "implementation-planning-rules/references/full-sequence-master-plan.md",
+        "implementation-planning-rules/references/implementation-cycle-template.md",
+        "implementation-planning-rules/references/implementation-overview-template.md",
+        "implementation-planning-rules/references/minimum-task-execution-contract.md",
         "implementation-planning-rules/references/plan-boundaries-and-examples.md",
         "implementation-planning-rules/references/plan-entry-checklist.md",
         "implementation-planning-rules/references/plan-output-gate.md",
         "implementation-planning-rules/references/plan-review-checklist.md",
         "implementation-planning-rules/references/plan-structure-template.md",
         "implementation-planning-rules/references/source-notes.md",
-        "implementation-planning-rules/references/task-granularity-and-order.md"
+        "implementation-planning-rules/references/task-granularity-and-order.md",
+        "implementation-planning-rules/references/visualization-standard.md"
       ],
       "agents": [
         "implementation-planning-rules/agents/openai.yaml"
@@ -6099,6 +6118,7 @@ window.SKILL_DICTIONARY = {
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
         "执行结果归档要求",
+        "极致完整性与可执行性硬闸门",
         "references 读取规则"
       ],
       "references": [
@@ -8611,6 +8631,7 @@ window.SKILL_DICTIONARY = {
         "Skill 作用与适用场景",
         "自动触发信号",
         "进入后先做什么",
+        "极致完整性机器门禁",
         "默认执行流程",
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
@@ -8618,7 +8639,10 @@ window.SKILL_DICTIONARY = {
         "执行结果归档要求",
         "references 读取规则"
       ],
-      "references": [],
+      "references": [
+        "artifact-delivery-gate-rules/references/document-handoff-contract.md",
+        "artifact-delivery-gate-rules/references/document-quality-profiles.yaml"
+      ],
       "agents": [
         "artifact-delivery-gate-rules/agents/openai.yaml"
       ],
