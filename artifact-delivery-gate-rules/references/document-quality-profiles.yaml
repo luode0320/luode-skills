@@ -45,7 +45,7 @@ profiles:
       - [任务完成、停止与最大推进边界, 总体任务停止/结束条件, 自审结论]
       - [追踪矩阵, 最小任务清单]
     id_prefixes: [SRC, DEC, REQ, AC, CYCLE, TASK, TEST, ROLLBACK]
-    diagrams: {flowchart: 2}
+    diagrams: {flowchart: 1, sequenceDiagram: 1}
     min_tables: 4
     required_phrases: [unresolved_decisions, 文件/符号, 最大推进边界, 真实测试]
   implementation_cycle:

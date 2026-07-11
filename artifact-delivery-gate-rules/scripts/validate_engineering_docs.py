@@ -123,14 +123,37 @@ def check_fences(text: str, errors: List[str]) -> None:
 def check_sections(text: str, profile: Dict[str, Any], errors: List[str]) -> None:
     existing = set(headings(text))
     bodies = section_bodies(text)
+    lines = text.splitlines()
+
+    def section_has_content(name: str) -> bool:
+        for index, line in enumerate(lines):
+            match = HEADING_PATTERN.match(line)
+            if not match:
+                continue
+            normalized = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
+            if normalized != name:
+                continue
+            level = len(line) - len(line.lstrip("#"))
+            for following in lines[index + 1 :]:
+                next_match = HEADING_PATTERN.match(following)
+                if next_match:
+                    next_level = len(following) - len(following.lstrip("#"))
+                    if next_level <= level:
+                        break
+                    return True
+                if following.strip():
+                    return True
+            return False
+        return False
+
     for section in profile.get("required_sections", []):
         if section not in existing:
             errors.append(f"missing required section: {section}")
-        elif not bodies.get(section):
+        elif not section_has_content(section):
             errors.append(f"required section is empty: {section}")
     for alternatives in profile.get("required_any_sections", []):
         names = [str(item) for item in alternatives]
-        matched = next((name for name in names if name in existing and bodies.get(name)), None)
+        matched = next((name for name in names if name in existing and section_has_content(name)), None)
         if matched is None:
             errors.append(f"missing one of required sections: {names}")
 
@@ -168,15 +191,28 @@ def check_diagram_annotations(text: str, errors: List[str]) -> None:
 
 
 def check_placeholders(text: str, payload: Dict[str, Any], errors: List[str]) -> None:
-    lowered = text.lower()
-    hits = [term for term in payload.get("placeholder_terms", []) if term.lower() in lowered]
+    terms = [str(term) for term in payload.get("placeholder_terms", [])]
+    hits: List[str] = []
+    in_code = False
+    for line in text.splitlines():
+        if line.strip().startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code:
+            continue
+        # 文档可以在规则条款中引用“禁止某词”；这种引用不是实际占位。
+        if re.search(r"禁止|不得|不允许|不能|不可|避免|禁止使用", line):
+            continue
+        lowered = line.lower()
+        hits.extend(term for term in terms if term.lower() in lowered)
     if hits:
         errors.append(f"placeholder or vague terms found: {sorted(set(hits))}")
 
 
 def check_na_reasons(text: str, errors: List[str]) -> None:
     for line_number, line in enumerate(text.splitlines(), start=1):
-        if re.search(r"\bN/A\b|不适用", line) and not re.search(r"原因|证据|依据", line):
+        searchable = re.sub(r"`[^`]*`", "", line)
+        if re.search(r"\bN/A\b|不适用", searchable) and not re.search(r"原因|理由|证据|依据|不涉及|本节", searchable):
             errors.append(f"N/A requires reason/evidence at line {line_number}")
 
 
