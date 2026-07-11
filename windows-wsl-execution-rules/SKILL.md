@@ -54,6 +54,26 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - 如果任务本质是 Linux 运行链路里的编译、测试、调试或启动，**不要因为机器是 Windows 就放弃 WSL 执行**
 - PowerShell 在本 skill 里是专项入口，不是默认入口；默认入口仍然是 Git Bash / bash 和 `wsl.exe --cd`
 
+## 跨环境命令失败恢复与经验沉淀
+
+命令失败后不能只换一条命令继续试。这里的命令包括普通仓库命令、执行类命令、JSON/编码处理、测试与验证脚本、`pre-commit` / `post-commit` gate 以及它们的回退检查。先保留失败证据，再根据实际错误分类、修复并验证；已经验证且具备复用价值的经验，必须在本轮收口前回写到 [命令失败恢复案例库](references/command-failure-recovery.md)。这是一条 agent 执行期的自动回写规则，不表示有后台监控进程；回写动作发生在当前任务的恢复成功之后。
+
+### 失败后的最小闭环
+
+1. 记录失败命令的 shell、agent 运行侧、工作目录、退出码、最小错误文本和是否触及 local 环境；先脱敏路径、用户名、token、连接串和业务数据。
+2. 只执行一个能区分根因的窄诊断：例如用 `command -v <tool>` / `type <tool>` 查工具来源，用 `pwd` / `Get-Location` 查工作目录，用 `$LASTEXITCODE` 查原生命令退出码，用原始文本回读定位 JSON 或编码问题。
+3. 按根因选择最小替代路径：shell 语法错误回到对应 shell，路径语境错误统一 Windows UNC 或 WSL `/home/...`，工具 interop 问题优先换 WSL 原生工具，JSON 解析问题先分离 stdout/stderr 并保存原文，编码问题改为显式 UTF-8。
+4. 修复后使用同一输入和同一成功标准重跑；除退出码外，还要验证输出可解析、产物/差异正确、运行配置仍为 local，避免“命令成功但环境错了”。
+5. 只有恢复成功且证据足够时才回写案例库；失败未定位、仅靠猜测、一次性网络抖动或包含敏感原文的案例不得直接写成规则。
+
+### 防止错误恢复失控
+
+- 同一失败假设最多无变化重试一次；第二次仍失败时必须改变 shell、路径、工具来源或输入处理方式之一，并重新诊断。
+- 不要把 PowerShell、Git Bash 和 WSL 的路径、重定向、变量语法混写在同一命令上下文；遇到嵌套引号或 JSON 解析异常，优先拆成脚本文件或分步变量，再做机器可读输出。
+- 不要因 `permission denied` 直接 `chmod` / `sudo`；先确认 `command -v <tool>` 是否命中 `/mnt/` 下的 Windows 版工具，再判断真实文件权限。
+- 不要为了修复当前命令关闭 WSL interop、修改 `/etc/wsl.conf`、切换到 test/prod 或放宽安全边界；这些只能在用户明确要求且风险已说明时处理。
+- 案例库写入采用“同根因合并、不同边界分条”；先检索已有案例，避免把同一错误追加成多个互相冲突的答案。
+
 ## 什么算执行类命令
 
 - 会产出或启动可执行程序的命令：如 `go build`、`go run`、`npm start`、`pnpm dev`、`python app.py`
@@ -150,6 +170,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 - 涉及文件写入编码、Windows 中文编码、Git Bash / bash UTF-8 基线、PowerShell 专项 UTF-8 初始化与落盘细节时，联动 `windows-encoding-rules`。
 - 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
+- 命令执行失败且已完成恢复时，先读并按 `references/command-failure-recovery.md` 回写已验证案例；涉及中文乱码、换行或重定向时同时联动 `windows-encoding-rules`。
 - 如果当前任务已经明确进入 PowerShell 专项场景，且出现逻辑运算括号、`Join-Path`、`ConvertTo-Json -Depth`、null check 或 ASCII-only 这类语法/风格坑，优先按本 skill 的 PowerShell 保底模式处理，不再临时口头补规则。
 
 ## 参考资料读取规则

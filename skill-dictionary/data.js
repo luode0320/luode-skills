@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-11 21:33:47",
+  "generated_at": "2026-07-12 00:14:44",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 24,
     "doc_total": 10,
-    "references_total": 343,
+    "references_total": 344,
     "agents_total": 90
   },
   "downloaded_seeds": {
@@ -4614,6 +4614,7 @@ window.SKILL_DICTIONARY = {
             "适用场景",
             "核心架构：先看 agent 在哪运行",
             "PowerShell 专项场景的保底模式",
+            "跨环境命令失败恢复与经验沉淀",
             "什么算执行类命令",
             "为什么只有执行类动作优先在 WSL",
             "路径约定",
@@ -4626,6 +4627,7 @@ window.SKILL_DICTIONARY = {
             "参考资料读取规则"
           ],
           "references": [
+            "windows-wsl-execution-rules/references/command-failure-recovery.md",
             "windows-wsl-execution-rules/references/command-templates.md",
             "windows-wsl-execution-rules/references/path-mapping.md",
             "windows-wsl-execution-rules/references/powershell-fallback-patterns.md",
@@ -9153,6 +9155,7 @@ window.SKILL_DICTIONARY = {
         "适用场景",
         "核心架构：先看 agent 在哪运行",
         "PowerShell 专项场景的保底模式",
+        "跨环境命令失败恢复与经验沉淀",
         "什么算执行类命令",
         "为什么只有执行类动作优先在 WSL",
         "路径约定",
@@ -9165,6 +9168,7 @@ window.SKILL_DICTIONARY = {
         "参考资料读取规则"
       ],
       "references": [
+        "windows-wsl-execution-rules/references/command-failure-recovery.md",
         "windows-wsl-execution-rules/references/command-templates.md",
         "windows-wsl-execution-rules/references/path-mapping.md",
         "windows-wsl-execution-rules/references/powershell-fallback-patterns.md",
