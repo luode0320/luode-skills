@@ -53,11 +53,22 @@ profiles:
     required_any_sections:
       - [当前周期目标, 当前周期目标、边界与进入条件]
       - [进入条件与收口条件, 当前周期目标、边界与进入条件]
-      - [文件与符号操作契约, 最小任务闭环]
+      - [文件与符号操作契约, 文件/符号操作契约, 最小任务闭环]
       - [真实测试与断言, 当前周期验证矩阵]
       - [回滚与停止条件, 周期阻断、停止与回滚]
       - [周期追踪矩阵, 当前周期验证矩阵]
     id_prefixes: [CYCLE, TASK, TEST, ROLLBACK, AC]
     diagrams: {flowchart: 1}
     min_tables: 4
-    required_phrases: [停止条件, 回滚, 文件与符号, 真实测试]
+    required_phrases: [停止条件, 回滚, 文件/符号, 真实测试]
+  implementation_master:
+    required_sections: [全量执行顺序, 自审结论]
+    required_any_sections:
+      - [文档信息, 文档定位与维护状态]
+      - [来源对象清单, 来源对象清单与回指关系, 项目与来源对象清单, 需求/验收/实施文档索引]
+      - [当前执行入口, 当前执行入口与下一步]
+      - [依赖与阻断, 依赖、进入、收口与阻断]
+    id_prefixes: [REQ, AC, CYCLE, TASK, TEST]
+    diagrams: {flowchart: 1}
+    min_tables: 3
+    required_phrases: [全量, 顺序, 阻断]

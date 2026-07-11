@@ -278,7 +278,7 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate engineering Markdown document completeness")
-    parser.add_argument("--profile", required=True, choices=("requirement", "acceptance", "implementation_overview", "implementation_cycle"))
+    parser.add_argument("--profile", required=True, choices=("requirement", "acceptance", "implementation_master", "implementation_overview", "implementation_cycle"))
     parser.add_argument("--doc", required=True, type=Path, help="Markdown document to validate")
     parser.add_argument("--root", type=Path, default=None, help="Root used for local link containment")
     parser.add_argument("--profile-file", type=Path, default=None, help="Quality profile YAML path")
