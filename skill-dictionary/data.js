@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-12 02:04:48",
+  "generated_at": "2026-07-12 03:24:43",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -7,10 +7,10 @@ window.SKILL_DICTIONARY = {
     "planned_total": 83,
     "implemented_total": 83,
     "planned_missing": 0,
-    "seed_total": 24,
+    "seed_total": 25,
     "doc_total": 10,
-    "references_total": 345,
-    "agents_total": 90
+    "references_total": 353,
+    "agents_total": 91
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -276,6 +276,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "mcp-installation-rules/references/config-bootstrap.md",
             "mcp-installation-rules/references/current-sources.md",
+            "mcp-installation-rules/references/execution-failure-casebook.md",
             "mcp-installation-rules/references/project-signals.md",
             "mcp-installation-rules/references/tool-priority.md"
           ],
@@ -522,6 +523,7 @@ window.SKILL_DICTIONARY = {
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
+            "执行失败候选交接",
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
             "执行通过 / 驳回标准",
@@ -555,7 +557,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 13,
-          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:<检索/沉淀/不适用/阻断>`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -572,6 +574,7 @@ window.SKILL_DICTIONARY = {
             "0. 首条消息格式（强制）",
             "1. 最小流程",
             "1.1 首条闸门（强制阻断）",
+            "1.2 执行期失败联动（强制）",
             "2. Git 联动闸门（强制）",
             "2.3 Skill 资产改动联动闸门（强制）",
             "3. 通过标准",
@@ -730,7 +733,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 17,
-          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill 与 `implementation-review-rules` 的测试前收口）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
+          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
           "directory_path": "skill-compliance-gate-rules",
@@ -929,6 +932,7 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+            "obsidian-knowledge-flow/references/cli-failure-casebook.md",
             "obsidian-knowledge-flow/references/cli-operations.md",
             "obsidian-knowledge-flow/references/conflict-staleness.md",
             "obsidian-knowledge-flow/references/note-schema.md",
@@ -3397,6 +3401,7 @@ window.SKILL_DICTIONARY = {
             "agent-browser/references/authentication.md",
             "agent-browser/references/browser-operation-lessons.md",
             "agent-browser/references/commands.md",
+            "agent-browser/references/execution-failure-casebook.md",
             "agent-browser/references/profiling.md",
             "agent-browser/references/proxy-support.md",
             "agent-browser/references/screenshot-cleanup.md",
@@ -3729,8 +3734,8 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 24,
-      "total_count": 24,
+      "seed_count": 25,
+      "total_count": 25,
       "items": [
         {
           "id": "\"doc\"",
@@ -4065,7 +4070,9 @@ window.SKILL_DICTIONARY = {
             "维护注意事项",
             "常见触发示例"
           ],
-          "references": [],
+          "references": [
+            "authenticated-url-routing-rules/references/execution-failure-casebook.md"
+          ],
           "agents": [
             "authenticated-url-routing-rules/agents/openai.yaml"
           ],
@@ -4192,6 +4199,43 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "execution-failure-learning-rules",
+          "name": "execution-failure-learning-rules",
+          "title": "Execution Failure Learning Rules",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 11,
+          "item_order": 12,
+          "auto_trigger": "当 Agent 执行 CLI、API、MCP、浏览器、安装器、生成器、测试入口或其他工具时出现非预期失败、错误产物、退出码为 0 但结果不可信、重复试错或已确认可复用的恢复方案时自动触发。负责执行前预防、失败后分类与快速恢复、同输入复验、脱敏去重、candidate 案例回写和 active 授权晋级；不代替业务 Bug、代码错误处理或 skill 缺口诊断。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "execution-failure-learning-rules/SKILL.md",
+          "directory_path": "execution-failure-learning-rules",
+          "directory": "execution-failure-learning-rules",
+          "sections": [
+            "三种模式",
+            "执行流程",
+            "强制边界",
+            "参考文件"
+          ],
+          "references": [
+            "execution-failure-learning-rules/references/case-template.md",
+            "execution-failure-learning-rules/references/classification-and-routing.md",
+            "execution-failure-learning-rules/references/lifecycle-and-gates.md"
+          ],
+          "agents": [
+            "execution-failure-learning-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        },
+        {
           "id": "find-skills",
           "name": "find-skills",
           "title": "查找 Skills",
@@ -4201,7 +4245,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 12,
+          "item_order": 13,
           "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "find-skills/SKILL.md",
@@ -4234,7 +4278,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 13,
+          "item_order": 14,
           "auto_trigger": "Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "golang-patterns/SKILL.md",
@@ -4274,7 +4318,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 14,
+          "item_order": 15,
           "auto_trigger": "当用户提交图片、截图、设计稿并希望分析/修改/排查时触发。硬条件：当消息包含 `<image ...>` 时必须命中本 skill。默认将红框（含红色方框、红圈、红线标注）区域视为本轮重点关注信息，优先围绕该区域给出结论与建议；若无红框，再回退到全图分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "image-redbox-focus-rules/SKILL.md",
@@ -4308,7 +4352,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 15,
+          "item_order": 16,
           "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "plugin-installation-rules/SKILL.md",
@@ -4326,6 +4370,7 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "plugin-installation-rules/references/execution-failure-casebook.md",
             "plugin-installation-rules/references/plugin-catalog.md"
           ],
           "agents": [
@@ -4348,7 +4393,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 16,
+          "item_order": 17,
           "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -4388,7 +4433,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 17,
+          "item_order": 18,
           "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
@@ -4429,7 +4474,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 18,
+          "item_order": 19,
           "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "time-util-rules/SKILL.md",
@@ -4462,7 +4507,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 19,
+          "item_order": 20,
           "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -4494,7 +4539,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 20,
+          "item_order": 21,
           "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-best-practices/SKILL.md",
@@ -4550,7 +4595,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 21,
+          "item_order": 22,
           "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-router-best-practices/SKILL.md",
@@ -4576,7 +4621,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 22,
+          "item_order": 23,
           "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "web-design-guidelines/SKILL.md",
@@ -4606,7 +4651,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 23,
+          "item_order": 24,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4656,7 +4701,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 24,
+          "item_order": 25,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -4939,6 +4984,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "mcp-installation-rules/references/config-bootstrap.md",
         "mcp-installation-rules/references/current-sources.md",
+        "mcp-installation-rules/references/execution-failure-casebook.md",
         "mcp-installation-rules/references/project-signals.md",
         "mcp-installation-rules/references/tool-priority.md"
       ],
@@ -5185,6 +5231,7 @@ window.SKILL_DICTIONARY = {
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
+        "执行失败候选交接",
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
         "执行通过 / 驳回标准",
@@ -5218,7 +5265,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 13,
-      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:<检索/沉淀/不适用/阻断>`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -5235,6 +5282,7 @@ window.SKILL_DICTIONARY = {
         "0. 首条消息格式（强制）",
         "1. 最小流程",
         "1.1 首条闸门（强制阻断）",
+        "1.2 执行期失败联动（强制）",
         "2. Git 联动闸门（强制）",
         "2.3 Skill 资产改动联动闸门（强制）",
         "3. 通过标准",
@@ -5393,7 +5441,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 17,
-      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill 与 `implementation-review-rules` 的测试前收口）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
+      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
       "directory_path": "skill-compliance-gate-rules",
@@ -5580,6 +5628,7 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
+        "obsidian-knowledge-flow/references/cli-failure-casebook.md",
         "obsidian-knowledge-flow/references/cli-operations.md",
         "obsidian-knowledge-flow/references/conflict-staleness.md",
         "obsidian-knowledge-flow/references/note-schema.md",
@@ -7976,6 +8025,7 @@ window.SKILL_DICTIONARY = {
         "agent-browser/references/authentication.md",
         "agent-browser/references/browser-operation-lessons.md",
         "agent-browser/references/commands.md",
+        "agent-browser/references/execution-failure-casebook.md",
         "agent-browser/references/profiling.md",
         "agent-browser/references/proxy-support.md",
         "agent-browser/references/screenshot-cleanup.md",
@@ -8608,7 +8658,9 @@ window.SKILL_DICTIONARY = {
         "维护注意事项",
         "常见触发示例"
       ],
-      "references": [],
+      "references": [
+        "authenticated-url-routing-rules/references/execution-failure-casebook.md"
+      ],
       "agents": [
         "authenticated-url-routing-rules/agents/openai.yaml"
       ],
@@ -8735,6 +8787,43 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "execution-failure-learning-rules",
+      "name": "execution-failure-learning-rules",
+      "title": "Execution Failure Learning Rules",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 11,
+      "item_order": 12,
+      "auto_trigger": "当 Agent 执行 CLI、API、MCP、浏览器、安装器、生成器、测试入口或其他工具时出现非预期失败、错误产物、退出码为 0 但结果不可信、重复试错或已确认可复用的恢复方案时自动触发。负责执行前预防、失败后分类与快速恢复、同输入复验、脱敏去重、candidate 案例回写和 active 授权晋级；不代替业务 Bug、代码错误处理或 skill 缺口诊断。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "execution-failure-learning-rules/SKILL.md",
+      "directory_path": "execution-failure-learning-rules",
+      "directory": "execution-failure-learning-rules",
+      "sections": [
+        "三种模式",
+        "执行流程",
+        "强制边界",
+        "参考文件"
+      ],
+      "references": [
+        "execution-failure-learning-rules/references/case-template.md",
+        "execution-failure-learning-rules/references/classification-and-routing.md",
+        "execution-failure-learning-rules/references/lifecycle-and-gates.md"
+      ],
+      "agents": [
+        "execution-failure-learning-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
+    },
+    {
       "id": "find-skills",
       "name": "find-skills",
       "title": "查找 Skills",
@@ -8744,7 +8833,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 12,
+      "item_order": 13,
       "auto_trigger": "当用户提出“我该怎么做 X”“帮我找一个做 X 的 skill”“有没有能做这个的 skill”这类问题，或表达想扩展能力的诉求时，帮助用户发现并安装可用的 agent skill。凡是用户在寻找可能以可安装 skill 形式存在的能力时，都应使用此 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "find-skills/SKILL.md",
@@ -8777,7 +8866,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 13,
+      "item_order": 14,
       "auto_trigger": "Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "golang-patterns/SKILL.md",
@@ -8817,7 +8906,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 14,
+      "item_order": 15,
       "auto_trigger": "当用户提交图片、截图、设计稿并希望分析/修改/排查时触发。硬条件：当消息包含 `<image ...>` 时必须命中本 skill。默认将红框（含红色方框、红圈、红线标注）区域视为本轮重点关注信息，优先围绕该区域给出结论与建议；若无红框，再回退到全图分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "image-redbox-focus-rules/SKILL.md",
@@ -8851,7 +8940,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 15,
+      "item_order": 16,
       "auto_trigger": "当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的\"插件检测 → 安装 → 验证 → 使用 → 回退\"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "plugin-installation-rules/SKILL.md",
@@ -8869,6 +8958,7 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "plugin-installation-rules/references/execution-failure-casebook.md",
         "plugin-installation-rules/references/plugin-catalog.md"
       ],
       "agents": [
@@ -8891,7 +8981,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 16,
+      "item_order": 17,
       "auto_trigger": "当某个现有 skill 已出现多个可独立命中的职责组、触发边界混合或内容膨胀到难以继续承接新增规则，且需要在功能零丢失前提下把它拆成多个独立 skill 并在承接完成后删除旧 skill 时触发。负责先做进入判定、规则原子化、按分类二分拆分、覆盖映射、多轮多模式测试验证、删除前承接检查、按新 skill description 命名并删除旧 skill；不要用它代替普通小修、纯文案润色或业务需求分析。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "skill-split-preserve-rules/SKILL.md",
@@ -8931,7 +9021,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 17,
+      "item_order": 18,
       "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
@@ -8972,7 +9062,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 18,
+      "item_order": 19,
       "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "time-util-rules/SKILL.md",
@@ -9005,7 +9095,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 19,
+      "item_order": 20,
       "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -9037,7 +9127,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 20,
+      "item_order": 21,
       "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-best-practices/SKILL.md",
@@ -9093,7 +9183,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 21,
+      "item_order": 22,
       "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-router-best-practices/SKILL.md",
@@ -9119,7 +9209,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 22,
+      "item_order": 23,
       "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "web-design-guidelines/SKILL.md",
@@ -9149,7 +9239,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 23,
+      "item_order": 24,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -9199,7 +9289,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 24,
+      "item_order": 25,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",

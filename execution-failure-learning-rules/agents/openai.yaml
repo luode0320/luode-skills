@@ -1,0 +1,4 @@
+interface:
+  display_name: "Execution Failure Learning"
+  short_description: "Prevent, recover, and learn from execution failures"
+  default_prompt: "Use $execution-failure-learning-rules to classify, recover, verify, and record a reusable execution failure."

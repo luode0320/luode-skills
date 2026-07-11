@@ -69,6 +69,8 @@ description: 将固定根目录的 Obsidian vault 作为跨项目知识库管理
 5. 保护用户手写内容。只做窄范围编辑，保持 frontmatter 合法，不批量重写无关段落。
 6. 写入长期笔记后，补齐必要的 backlinks、MOC 和 `知识库/INDEX.md` 入口，让 Obsidian 知识图谱和 CLI 检索都能找到新知识。
 
+Obsidian CLI、vault 注册、路径、超时或读写入口出现非预期失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/cli-failure-casebook.md](references/cli-failure-casebook.md)。CLI 阻断仍必须停止并报告，不得用文件系统 fallback；已验证的新经验只写入 candidate。
+
 ## 捕获规则
 
 - 只有未来检索确实有价值时，才把原始会话上下文写入 `知识库/10-Sessions/`。

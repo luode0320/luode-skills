@@ -63,6 +63,8 @@ description: 当用户要求分析项目、检查是否需要安装某个 AI 编
 
 ## 与相邻 skill 的边界
 
+插件安装、启用或可用性验证失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，保留官方来源、平台和版本边界；恢复成功后自动写 candidate，active 仍需授权。
+
 - 不代替 `mcp-installation-rules`：那个负责 MCP server 的判定与配置；本 skill 负责 AI 编码插件 / agent 增强。
 - 不代替具体的编码、测试、审查 skill 的领域工作。
 - 不代替 `find-skills` 的开放生态技能搜索。

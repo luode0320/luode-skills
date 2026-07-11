@@ -33,6 +33,8 @@ agent-browser snapshot -i  # 检查结果
 
 以下规则来自真实浏览器自动化执行复盘，默认优先于“理想流程”：
 
+执行前命中浏览器、session、snapshot 或 shell 高风险调用时，先触发 `execution-failure-learning-rules` 的 `prevent` 并查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)；执行失败后走 `recover`，修复并按同一成功标准复验后再写 candidate。
+
 1. **先判定页面状态，再做交互**
    - `open` 后立刻执行：`get title` + `get text body`
    - 按状态分流：

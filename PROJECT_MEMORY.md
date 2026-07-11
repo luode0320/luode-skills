@@ -250,6 +250,15 @@
 - 更新时间: 2026-07-12
 - 状态: 启用
 
+### 执行失败持续学习与主动预防
+- 别名: execution-failure-learning-rules, 执行失败案例演进, prevent recover learn
+- 类型: Skill 维护规则
+- 定义: 高风险工具调用前进入 `prevent` 预检，非预期失败进入 `recover` 分类、查库和同输入同成功标准复验，验证通过后才进入 `learn`。案例正文只归属于唯一 owner Skill；无维护授权保持 `candidate`，冲突标记 `conflicted`，业务 Bug、Skill 缺口和跨项目知识分别回流 `bug-*`、`skill-evolution-rules` 与 `obsidian-knowledge-flow`。
+- 来源: `execution-failure-learning-rules/SKILL.md`、`references/classification-and-routing.md`、`references/lifecycle-and-gates.md`、本轮前向行为测试
+- 适用范围: imagegen、Windows/WSL、浏览器、认证 URL、MCP/插件安装、Obsidian CLI 及后续注册的高风险执行域
+- 更新时间: 2026-07-12
+- 状态: 启用
+
 ### Windows / WSL 执行边界
 - 别名: Windows 普通命令优先 bash, Git Bash 优先, 执行类动作才进 WSL
 - 类型: 环境规则
@@ -456,6 +465,22 @@ entities:
       - evidence.dialog.imagegen-error-case-evolution
     context_ids:
       - context.imagegen-maintenance
+    updated_at: 2026-07-12
+  - entity_id: rule.execution-failure-learning
+    name: "执行失败持续学习与主动预防"
+    type: "Skill 维护规则"
+    aliases:
+      - execution-failure-learning-rules
+      - 执行失败案例演进
+      - prevent recover learn
+    definition: "高风险工具调用前进入 prevent 预检，非预期失败进入 recover 分类、查库和同输入同成功标准复验，验证通过后才进入 learn。案例正文只归属于唯一 owner Skill；无维护授权保持 candidate，冲突标记 conflicted，业务 Bug、Skill 缺口和跨项目知识分别回流 bug-*、skill-evolution-rules 与 obsidian-knowledge-flow。"
+    scope: "imagegen、Windows/WSL、浏览器、认证 URL、MCP/插件安装、Obsidian CLI 及后续注册的高风险执行域"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.execution-failure-learning
+      - evidence.test.execution-failure-learning
+    context_ids:
+      - context.execution-failure-learning
     updated_at: 2026-07-12
   - entity_id: rule.authenticated-url-routing
     name: "URL 认证浏览器默认路由"
@@ -682,6 +707,16 @@ evidence:
     type: "dialog"
     source: "用户需求与本轮验证"
     note: "用户要求持续记录生图错误示例和解决方案，本轮以本地 dry-run/check 验证首批案例"
+  - evidence_id: evidence.skill.execution-failure-learning
+    type: "skill"
+    source: "execution-failure-learning-rules/SKILL.md"
+    path: "execution-failure-learning-rules/SKILL.md"
+    note: "执行失败 prevent/recover/learn 路由、唯一 owner、脱敏、去重、冲突和授权门禁来源"
+  - evidence_id: evidence.test.execution-failure-learning
+    type: "test"
+    source: "doc/5-tests/2026-07-12_031353/execution_failure_learning_rules/forward_behavior_test.py"
+    path: "doc/5-tests/2026-07-12_031353/execution_failure_learning_rules/forward_behavior_test.py"
+    note: "AC-001 至 AC-008 前向行为验证，25 项断言全部通过"
   - evidence_id: evidence.skill.authenticated-url-routing
     type: "skill"
     source: "authenticated-url-routing-rules/SKILL.md"
@@ -795,6 +830,10 @@ contexts:
     type: "skill-maintenance"
     name: "Imagegen Skill 维护"
     note: "适用于生图调用错误的案例检索、排障验证、脱敏回写和版本演进"
+  - context_id: context.execution-failure-learning
+    type: "skill-maintenance"
+    name: "执行失败持续学习"
+    note: "适用于高风险调用的执行前预检、失败恢复、候选案例回写和 active 授权晋级"
   - context_id: context.url-analysis
     type: "task-scope"
     name: "URL 分析与在线文档读取"
@@ -834,6 +873,7 @@ contexts:
 lifecycle:
   active:
     - "rule.imagegen-error-case-evolution"
+    - "rule.execution-failure-learning"
     - "rule.authenticated-url-routing"
     - "term.doc-top-level-mixed-naming"
     - "rule.old-directory-cleanup"
@@ -855,6 +895,12 @@ retrieval_hints:
   aliases:
     imagegen:
       - "rule.imagegen-error-case-evolution"
+    execution-failure-learning-rules:
+      - "rule.execution-failure-learning"
+    执行失败案例演进:
+      - "rule.execution-failure-learning"
+    prevent recover learn:
+      - "rule.execution-failure-learning"
     gpt-image-2 错误案例库:
       - "rule.imagegen-error-case-evolution"
     生图失败经验回写:
@@ -936,6 +982,12 @@ retrieval_hints:
   scopes:
     Imagegen Skill 维护:
       - "rule.imagegen-error-case-evolution"
+    执行失败持续学习:
+      - "rule.execution-failure-learning"
+    高风险调用预检:
+      - "rule.execution-failure-learning"
+    candidate active 案例:
+      - "rule.execution-failure-learning"
     gpt-image-2 CLI fallback:
       - "rule.imagegen-error-case-evolution"
     生图错误案例:
@@ -992,6 +1044,16 @@ retrieval_hints:
     提交域隔离:
       - "rule.git-commit-domain-split"
   sources:
+    execution-failure-learning-rules/SKILL.md:
+      - "rule.execution-failure-learning"
+    execution-failure-learning-rules/references/classification-and-routing.md:
+      - "rule.execution-failure-learning"
+    execution-failure-learning-rules/references/lifecycle-and-gates.md:
+      - "rule.execution-failure-learning"
+    execution-failure-learning-rules/references/case-template.md:
+      - "rule.execution-failure-learning"
+    doc/5-tests/2026-07-12_031353/execution_failure_learning_rules/forward_behavior_test.py:
+      - "rule.execution-failure-learning"
     imagegen/SKILL.md:
       - "rule.imagegen-error-case-evolution"
     imagegen/references/error-casebook.md:

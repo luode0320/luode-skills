@@ -2,27 +2,29 @@
 
 ## 目标与范围
 
-- 目标：为权威 `imagegen` skill 建立 gpt-image-2 错误案例持续迭代、脱敏、验证和去重回写闭环。
-- 范围：`imagegen/SKILL.md`、`imagegen/references/error-casebook.md`、skill 字典索引与项目记忆。
-- 非范围：修改 `imagegen/scripts/image_gen.py`、真实图像 API 调用、自动静默切换模型、Git 提交或推送。
+- 目标：按已确认计划落地“执行失败持续学习与主动预防”元 Skill，使高风险调用可在执行前预防、失败后恢复，并把已验证经验沉淀为唯一 owner 的 candidate/active 案例。
+- 范围：新增 `execution-failure-learning-rules`；统一 `imagegen`、Windows/WSL、浏览器、URL、MCP、插件安装和 Obsidian owner 路由；刷新 Skill 字典；完成前向行为验证与知识收口。
+- 非范围：真实外部 API/浏览器/MCP/生产服务联调，自动静默切换模型，Git commit/push。
 
 ## 当前状态
 
-- 状态：已完成，imagegen 实现与审查文档已提交。
-- 当前执行点：错误案例规则、首批 gpt-image-2 案例、审查文档、字典刷新和本地验证已完成提交。
+- 状态：已完成最终验收；工作树改动尚未提交。
+- 当前执行点：本轮计划内动作已收口。
 - 更新时间：2026-07-12
 
 ## 已完成
 
-- 在 `imagegen/SKILL.md` 增加“错误案例持续迭代”规则：分类、查库、验证、授权回写、去重、替代状态和敏感信息保护。
-- 新增 `imagegen/references/error-casebook.md`，收录尺寸约束、透明背景、`input_fidelity`、CLI 依赖、鉴权通道和瞬态网络错误案例。
-- 刷新 `skill-dictionary/data.js` 与 `字典.md`，同步新章节和 references 文件。
-- 更新 `PROJECT_MEMORY.md`，记录 imagegen 案例库作为长期维护规则。
-- 新增 `doc/6-审查/2026-07-12_020035_imagegen错误案例演进_当前改动总审查.md`，审查结论为通过。
+- 新增元 Skill 及分类、生命周期、案例模板参考文件，覆盖 `prevent`、`recover`、`learn`、local-only、脱敏、去重、冲突和授权门禁。
+- 为 `imagegen`、Windows/WSL 统一成熟案例口径，并为 URL、浏览器、MCP、插件安装、Obsidian 建立首批 owner 案例库与路由。
+- 更新 `AGENTS.md`、`skill-hit-check-rules`、`skill-evolution-rules`、`skill-compliance-gate-rules` 的总控联动。
+- 修复 `skill-hit-check-rules` frontmatter 描述的 quick validator 不兼容尖括号问题。
+- 刷新 `skill-dictionary/data.js` 与 `字典.md`，生成器报告 `implemented_total=83`、`planned_missing=0`。
+- 新增 `doc/5-tests/2026-07-12_031353/` 前向行为测试资产，AC-001 至 AC-008 共 25 项断言全部通过。
 
 ## 待办
 
-- 无计划内待办。
+- 完成 Obsidian CLI 检索后沉淀本轮稳定决策与验证经验。
+- 完成 `skill-compliance-gate-rules`、`skill-audit-rules`、`project-change-review-rules` 和最终验收收口。
 
 ## 阻断
 
@@ -30,15 +32,10 @@
 
 ## 验证
 
-- 合法 `gpt-image-2` generate/edit dry-run 通过。
-- 尺寸、透明背景、`input_fidelity` 三个负向 dry-run 按预期退出并输出对应错误。
-- `imagegen/scripts/run_imagegen.ps1 -Action check` 通过，`openai` / `PIL` 可用，未输出密钥原值。
-- `python -X utf8 .system/skill-creator/scripts/quick_validate.py imagegen` 通过。
-- 字典生成器：`implemented_total=83`、`planned_missing=0`；`git diff --check` 通过。
-- 案例库敏感信息模式扫描未命中。
-- 重试伪客户端验证通过：限流错误按 3 次上限处理，非瞬态错误不重试。
-- `PROJECT_MEMORY.md` 机器索引解析和关键文件 UTF-8 回读通过。
+- 11 个受影响 Skill 的 `quick_validate.py` 全部通过。
+- 前向行为测试脚本通过，覆盖已知 active 预检、未知失败恢复、candidate 授权、业务 Bug 边界、预期负向排除、脱敏、无 owner 路由和冲突阻断。
+- `git diff --check` 通过；未执行 Git 提交或推送。
 
 ## 下一执行点
 
-- 本轮已收口。
+- 本轮已收口；Git 提交未执行。

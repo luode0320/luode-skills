@@ -147,6 +147,8 @@ Claude Code 结论模板（待确认阶段使用，新增）：
   - `agent-browser`：隔离 session、多 session、HAR / route、视觉 diff、录制 / trace、代理、多引擎；在不依赖用户 profile 的基础自动化中可作为条件后备
 - Godot 编辑器控制：
   - `Godot AI MCP`
+
+MCP 安装、配置、注册或连接失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，按当前 AI 平台和官方版本复验；未验证或无法脱敏的经验不得写入 active。
   - 其他 Godot 本地兜底方式（如仅运行命令、静态读文件、人工编辑）
 
 ## 与相邻 skill 的边界

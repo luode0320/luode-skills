@@ -56,6 +56,8 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 本 skill 必须持续吸收真实执行中已经确认有效的步骤和异常处理办法。只要某个 URL 访问问题已经通过本 skill、`chrome:control-chrome` 或授权浏览器链路解决，并且该问题未来可能重复出现，就要优先回写到本 skill，而不是只留在聊天记录里。
 
+执行失败、错误页面状态或退出成功但正文/产物不可信时，先触发 `execution-failure-learning-rules` 的 `recover`，并查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)。已确认的恢复方案按同一输入和同一成功标准复验后自动写入 candidate；未获授权不得晋级 active。
+
 ### 已确认可用步骤
 
 - 用户已经在默认 Chrome 打开并登录目标页面时，优先用 `openTabs()` 查找现有标签页，再用 `claimTab(tabInfo)` 认领；认领成功后不要重新打开同一 URL。

@@ -78,6 +78,7 @@
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 自动审查白名单只保留 `implementation-review-rules` 与最终收口前的 `project-change-review-rules`。
+- 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-evolution-rules` 或功能测试；未授权不得晋级 active。
 - `project-change-review-rules` 同时支持两类触发：用户明确要求审查当前改动，或本轮存在代码改动且准备最终收口。
 - `code-review-automation-rules` 仅用于当前分支提交级审查，不纳入默认自动审查链。
 - 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-evolution-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。

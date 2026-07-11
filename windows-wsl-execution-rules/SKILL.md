@@ -56,7 +56,13 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 
 ## 跨环境命令失败恢复与经验沉淀
 
-命令失败后不能只换一条命令继续试。这里的命令包括普通仓库命令、执行类命令、JSON/编码处理、测试与验证脚本、`pre-commit` / `post-commit` gate 以及它们的回退检查。先保留失败证据，再根据实际错误分类、修复并验证；已经验证且具备复用价值的经验，必须在本轮收口前回写到 [命令失败恢复案例库](references/command-failure-recovery.md)。这是一条 agent 执行期的自动回写规则，不表示有后台监控进程；回写动作发生在当前任务的恢复成功之后。
+命令执行前后由 `execution-failure-learning-rules` 路由本 skill 的 `prevent`、`recover`、`learn` 三种模式。这里的命令包括普通仓库命令、执行类命令、JSON/编码处理、测试与验证脚本、`pre-commit` / `post-commit` gate 以及它们的回退检查；这是一条 agent 执行期规则，不表示有后台监控进程。
+
+### 三种模式
+
+1. `prevent`：执行前按 shell、agent 运行侧、工作目录、工具来源和 local 配置匹配 `active` 案例；精确命中时先采用已验证路径。`candidate`、`conflicted`、`stale`、`superseded` 和 `rejected` 不能直接驱动命令。
+2. `recover`：失败后先保留脱敏证据并按实际根因分类；同一失败假设最多无变化重试一次，第二次仍失败必须改变 shell、路径、工具来源或输入处理方式之一，再重新诊断。
+3. `learn`：恢复成功且同一输入、同一成功标准复验通过后，自动将脱敏候选写入本 skill 案例库的 `candidate`；满足晋级门禁并取得当前任务 skill 维护授权后，才可转为 `active`。
 
 ### 失败后的最小闭环
 
@@ -65,6 +71,12 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 3. 按根因选择最小替代路径：shell 语法错误回到对应 shell，路径语境错误统一 Windows UNC 或 WSL `/home/...`，工具 interop 问题优先换 WSL 原生工具，JSON 解析问题先分离 stdout/stderr 并保存原文，编码问题改为显式 UTF-8。
 4. 修复后使用同一输入和同一成功标准重跑；除退出码外，还要验证输出可解析、产物/差异正确、运行配置仍为 local，避免“命令成功但环境错了”。
 5. 只有恢复成功且证据足够时才回写案例库；失败未定位、仅靠猜测、一次性网络抖动或包含敏感原文的案例不得直接写成规则。
+
+### 状态、冲突与授权
+
+- 案例状态统一为 `candidate`、`active`、`conflicted`、`stale`、`superseded`、`rejected`；只有 `active` 可在 `prevent` 中自动执行。
+- 新方案与现有 `active` 冲突时，先保留为 `candidate` 并标记 `conflicted`、记录替代关系；新方案完成同输入复验、去重、脱敏、唯一 owner 检查且获得授权后，旧方案才转 `superseded`。无法证明可复用或更优的候选转 `rejected`，历史上仍有价值但不应优先采用的方案转 `stale`。
+- `learn` 自动回写仅表示已验证候选，不等于允许改变 `active` 规则；Git 提交、推送和跨项目知识沉淀仍按各自授权边界执行。
 
 ### 防止错误恢复失控
 
@@ -170,7 +182,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 
 - 涉及文件写入编码、Windows 中文编码、Git Bash / bash UTF-8 基线、PowerShell 专项 UTF-8 初始化与落盘细节时，联动 `windows-encoding-rules`。
 - 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
-- 命令执行失败且已完成恢复时，先读并按 `references/command-failure-recovery.md` 回写已验证案例；涉及中文乱码、换行或重定向时同时联动 `windows-encoding-rules`。
+- 命令执行失败且已完成恢复时，先读并按 `references/command-failure-recovery.md` 回写已验证 `candidate`；只有满足晋级门禁并取得当前任务维护授权时才转 `active`。涉及中文乱码、换行或重定向时同时联动 `windows-encoding-rules`。
 - 如果当前任务已经明确进入 PowerShell 专项场景，且出现逻辑运算括号、`Join-Path`、`ConvertTo-Json -Depth`、null check 或 ASCII-only 这类语法/风格坑，优先按本 skill 的 PowerShell 保底模式处理，不再临时口头补规则。
 
 ## 参考资料读取规则

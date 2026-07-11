@@ -10,3 +10,5 @@
 - 2026-07-12：为权威 `imagegen` skill 增加错误案例持续迭代规则与脱敏案例库，收录 gpt-image-2 参数、透明背景、依赖/鉴权和瞬态网络错误，刷新字典并完成本地 dry-run/check、UTF-8 与敏感信息检查。
 - 2026-07-12：完成 imagegen 错误案例演进的当前改动总审查，收窄瞬态重试案例到 `generate-batch` 实际覆盖范围，并通过本地伪客户端重试验证；改动保持未提交。
 - 2026-07-12：按用户授权完成 imagegen 实现与审查文档提交，提交为 `26f763a` 与 `83e9576`；随后同步项目当前状态。
+- 2026-07-12：按用户确认计划新增 `execution-failure-learning-rules` 元 Skill，统一 prevent/recover/learn、唯一 owner、candidate/active 授权、脱敏去重和冲突门禁；接入首批高风险 owner，完成字典刷新与 AC-001 至 AC-008 前向行为验证，改动保持未提交。
+- 2026-07-12：完成执行失败持续学习与主动预防的当前改动总审查和最终验收，结论通过；Obsidian 知识笔记与 INDEX 已通过 CLI 沉淀，Git 提交仍未执行。
