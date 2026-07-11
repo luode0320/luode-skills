@@ -1,6 +1,6 @@
 ---
 name: authenticated-url-routing-rules
-description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；禁止优先使用 `web`、隔离浏览器、无登录态 Playwright 或普通抓取导致权限丢失。若 Chrome Plugin 不可用，再回退到 `agent-browser` 的 auto-connect、state、profile 或 session；若仍遇到登录页、权限页、验证码或人机验证，要求用户在真实 Chrome 中完成授权后继续，不得通过搜索引擎或第三方页面绕过权限。
+description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `agent-browser`，并继续遵守授权与安全边界。
 ---
 
 # 认证 URL 路由规则
@@ -19,14 +19,15 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 4. Chrome Plugin 可用时，不优先使用 `web`、隔离 Playwright、无登录态浏览器或普通 HTTP 抓取。
 5. 如果用户明确说“这是公开网页，用 web 搜索 / 网页抓取即可”，才允许优先走 `web`。
 
-## 回退顺序
+## 非 profile 页面路由
 
-只有当前一步不可用或被明确阻断时，才进入下一步：
+只有用户明确确认页面不依赖真实 Chrome profile 时，才进入以下路由：
 
-1. `chrome:control-chrome`
-2. `agent-browser --auto-connect`
-3. `agent-browser` 的 state / profile / session
-4. 请求用户在真实 Chrome 中完成登录、授权、验证码或权限开通后继续
+1. 已接通且能力满足的 `Chrome DevTools MCP`
+2. 需要隔离 profile、并发 session、HAR/route、视觉 diff、录制/trace、代理或其他引擎时使用 `agent-browser`
+3. 所选通道不可用时，记录阻断并说明恢复条件
+
+依赖真实 Chrome profile 的页面不进入以上回退；应请求用户修复 Chrome 连接、扩展或授权。
 
 不得把登录页、权限页、验证码页或 403 / 无权限页面替换成搜索结果、公开缓存、第三方转载或其他站点来绕过鉴权。
 
@@ -80,8 +81,8 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ### Chrome Plugin 不可用
 
 - 先按 `chrome:control-chrome` 的故障文档排查连接、扩展、浏览器发现或选择问题。
-- 若仍不可用，说明 Chrome Plugin 不可用原因，再进入 `agent-browser --auto-connect`。
-- 不得在未说明 Chrome Plugin 失败原因时直接改用隔离浏览器或 `web`。
+- 若页面依赖真实 Chrome profile，说明 Chrome Plugin 不可用原因并停在用户修复阻断处，不得进入 `agent-browser --auto-connect`。
+- 若页面已明确为公开或 local 且不依赖用户 profile，才按统一浏览器路由选择其他通道；必须说明未使用 Chrome Plugin 的原因。
 
 ### 已登录标签页可打开但正文读取被安全策略拒绝
 
@@ -114,7 +115,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ## 通过标准
 
 - 对任意 URL 任务，已优先尝试 `chrome:control-chrome`。
-- 若未使用 Chrome Plugin，已说明不可用原因并按回退顺序尝试下一通道。
+- 若未使用 Chrome Plugin，已说明页面不依赖真实 profile 或已记录连接阻断；未把其他浏览器伪装成登录态替代品。
 - 若页面需要用户授权，已停在真实授权阻断处并说明用户需要完成的动作。
 - 最终分析结论来自真实浏览器页面状态、文本、截图或等价工具输出，不来自猜测。
 - 若浏览器安全策略拒绝正文读取，已明确标记为“路由验证成功、内容读取被策略阻断”，未伪装成完整内容分析通过。

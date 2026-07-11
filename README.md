@@ -374,7 +374,7 @@ python skill-dictionary/generate_dictionary.py
 | `test-naming-rules`           | 统一测试目录和测试文件命名。                                                   |
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分。                               |
 | `test-doc-rules`              | 统一测试说明文档的结构和描述方式。                                             |
-| `agent-browser`               | 提供浏览器自动化能力，用于页面交互测试、自动化验证、页面截图和浏览器联动操作。 |
+| `agent-browser`               | 提供条件式浏览器自动化能力，重点覆盖隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎场景；普通 Chrome 状态与常规调试按统一浏览器路由处理。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
 | `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响。  |
 | `project-release-test-rules`  | 作为上线前项目级接口测试门禁，强制每次执行前先扫描并更新接口基线，再完成必测接口筛选、门禁测试、结果归档与最终放行结论。 |
@@ -747,3 +747,4 @@ claude-mem(记忆) :
 2026-07-11 22:58:00 docs: [项目四件套审查] 归档当前改动审查
 2026-07-11 22:59:00 docs: [项目四件套验收] 归档最终验收
 2026-07-12 00:26:04 feat: [命令失败恢复闭环] 完善Windows与WSL执行规则持续回写
+2026-07-12 01:44:09 feat: [浏览器工具路由收敛] 区分 Chrome Plugin、Chrome DevTools MCP 与 agent-browser

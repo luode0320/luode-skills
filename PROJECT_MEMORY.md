@@ -325,7 +325,7 @@
 ### URL 认证浏览器默认路由
 - 别名: authenticated-url-routing-rules, 已登录 Chrome 路由, URL 默认 Chrome Plugin
 - 类型: 浏览器路由规则
-- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页；只有 Chrome Plugin 不可用时，才回退到 `agent-browser --auto-connect`、state、profile 或 session。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
+- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页。依赖真实 Chrome profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用 `agent-browser` 或其他浏览器绕过；明确为公开或 local 且不依赖用户 profile 的页面，才按统一路由选择 Chrome DevTools MCP 或 `agent-browser`。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
 - 来源: 用户确认、`authenticated-url-routing-rules/SKILL.md`
 - 适用范围: URL 分析、在线文档读取、浏览器权限页面、企业系统资料访问
 - 更新时间: 2026-07-02
@@ -392,6 +392,7 @@
 - 2026-07-02：新增会话自动重命名规则，明确任务主题稳定且标题泛化、过时或不匹配时自动命中 `thread-title-rules`，调用真实线程重命名工具改为 8-24 字中文简要；标题已准确、工具不可用或用户禁止时跳过。
 - 2026-07-03：补充会话自动重命名平台能力矩阵，明确 Codex 优先用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过，`CLAUDE.md` 不等同于 Desktop 已具备自动改名能力。
 - 2026-07-02：新增 URL 认证浏览器默认路由，明确用户提供 URL 时默认优先通过 Chrome Plugin 复用用户真实 Chrome 登录态，避免隔离浏览器或 `web` 丢失权限；补充 Chrome 安全策略拒绝正文读取时只报告阻断事实并 handoff，不做绕过；执行中已确认解决的问题必须继续回灌到 skill。
+- 2026-07-12：收敛浏览器工具路由：用户真实 Chrome profile 只由 Chrome Plugin 接管；公开或 local 页面按 Chrome DevTools MCP 与 `agent-browser` 能力路由；`agent-browser` 保留为隔离 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎等条件能力，不再作为前后端联调默认强制工具。
 - 2026-07-02：补充项目内文件引用路径规则，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用都用 `\\wsl.localhost\...`，`/home/...` 仅保留给 WSL 命令与日志上下文。
 - 2026-07-02：更新上线接口测试门禁规则，新增项目基线资产库、参数依赖解析、可复用参数生命周期、失效持续更新和通用脚本复用优先口径。
 - 2026-07-02：新增 Swag OpenAPI 全量维护规则，明确 `swag/` 为唯一正式输出目录，单接口完整 YAML、总 YAML 与 `.swag-manifest.yaml` 持续维护。
@@ -438,7 +439,7 @@ entities:
       - authenticated-url-routing-rules
       - 已登录 Chrome 路由
       - URL 默认 Chrome Plugin
-    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；Chrome Plugin 不可用时才允许回退到 `agent-browser` 路线。"
+    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；依赖真实 profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，明确为公开或 local 且不依赖用户 profile 的页面才按统一路由选择 Chrome DevTools MCP 或 `agent-browser`。"
     scope: "URL 分析、在线文档读取、浏览器权限页面"
     status: "active"
     evidence_ids:

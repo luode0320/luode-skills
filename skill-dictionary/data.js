@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-12 00:14:44",
+  "generated_at": "2026-07-12 01:41:30",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -253,7 +253,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 6,
-          "auto_trigger": "当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；若已具备对应 MCP，应优先使用它们控制浏览器或 Godot 编辑器，再在缺失或不可用时回退到其他本地工具。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。",
+          "auto_trigger": "当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 session、HAR/route、视觉 diff、录制/trace、代理或多引擎需求使用 `agent-browser`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。",
           "core_responsibility": "负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。",
           "skill_path": "mcp-installation-rules/SKILL.md",
           "directory_path": "mcp-installation-rules",
@@ -3362,8 +3362,8 @@ window.SKILL_DICTIONARY = {
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
           "item_order": 8,
-          "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当用户需要与网站交互时使用，包括打开页面、填写表单、点击按钮、截图、提取数据、测试 Web 应用，或执行任何浏览器自动化任务。典型触发语句包括“打开一个网站”“填写表单”“点击按钮”“截个图”“抓取页面数据”“测试这个 Web 应用”“登录某个网站”“自动化浏览器操作”，以及任何需要通过程序控制浏览器完成的任务。",
-          "core_responsibility": "统一浏览器自动化测试与页面交互执行。",
+          "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当任务需要隔离 profile、具名并行 session、可脚本化 batch、网络/HAR、视觉 diff、录制/trace、代理或非 Chrome 引擎，或用户明确要求使用 agent-browser 时触发；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP，不因前后端联调自动强制本 skill。",
+          "core_responsibility": "提供条件式浏览器自动化能力，不固化为默认联调工具。",
           "skill_path": "agent-browser/SKILL.md",
           "directory_path": "agent-browser",
           "directory": "agent-browser",
@@ -3391,7 +3391,7 @@ window.SKILL_DICTIONARY = {
             "浏览器引擎选择",
             "观测面板（Observability Dashboard）",
             "可直接使用的模板",
-            "项目联调强制规则（新增）"
+            "项目联调规则"
           ],
           "references": [
             "agent-browser/references/authentication.md",
@@ -4045,7 +4045,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 8,
-          "auto_trigger": "当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；禁止优先使用 `web`、隔离浏览器、无登录态 Playwright 或普通抓取导致权限丢失。若 Chrome Plugin 不可用，再回退到 `agent-browser` 的 auto-connect、state、profile 或 session；若仍遇到登录页、权限页、验证码或人机验证，要求用户在真实 Chrome 中完成授权后继续，不得通过搜索引擎或第三方页面绕过权限。",
+          "auto_trigger": "当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `agent-browser`，并继续遵守授权与安全边界。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "authenticated-url-routing-rules/SKILL.md",
           "directory_path": "authenticated-url-routing-rules",
@@ -4053,7 +4053,7 @@ window.SKILL_DICTIONARY = {
           "sections": [
             "目标",
             "默认路由",
-            "回退顺序",
+            "非 profile 页面路由",
             "执行要求",
             "Chrome Plugin 确认步骤",
             "实测回灌清单",
@@ -4914,7 +4914,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 6,
-      "auto_trigger": "当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；若已具备对应 MCP，应优先使用它们控制浏览器或 Godot 编辑器，再在缺失或不可用时回退到其他本地工具。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。",
+      "auto_trigger": "当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 session、HAR/route、视觉 diff、录制/trace、代理或多引擎需求使用 `agent-browser`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。",
       "core_responsibility": "负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。",
       "skill_path": "mcp-installation-rules/SKILL.md",
       "directory_path": "mcp-installation-rules",
@@ -7939,8 +7939,8 @@ window.SKILL_DICTIONARY = {
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
       "item_order": 8,
-      "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当用户需要与网站交互时使用，包括打开页面、填写表单、点击按钮、截图、提取数据、测试 Web 应用，或执行任何浏览器自动化任务。典型触发语句包括“打开一个网站”“填写表单”“点击按钮”“截个图”“抓取页面数据”“测试这个 Web 应用”“登录某个网站”“自动化浏览器操作”，以及任何需要通过程序控制浏览器完成的任务。",
-      "core_responsibility": "统一浏览器自动化测试与页面交互执行。",
+      "auto_trigger": "面向 AI 代理的浏览器自动化 CLI。当任务需要隔离 profile、具名并行 session、可脚本化 batch、网络/HAR、视觉 diff、录制/trace、代理或非 Chrome 引擎，或用户明确要求使用 agent-browser 时触发；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP，不因前后端联调自动强制本 skill。",
+      "core_responsibility": "提供条件式浏览器自动化能力，不固化为默认联调工具。",
       "skill_path": "agent-browser/SKILL.md",
       "directory_path": "agent-browser",
       "directory": "agent-browser",
@@ -7968,7 +7968,7 @@ window.SKILL_DICTIONARY = {
         "浏览器引擎选择",
         "观测面板（Observability Dashboard）",
         "可直接使用的模板",
-        "项目联调强制规则（新增）"
+        "项目联调规则"
       ],
       "references": [
         "agent-browser/references/authentication.md",
@@ -8586,7 +8586,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 8,
-      "auto_trigger": "当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；禁止优先使用 `web`、隔离浏览器、无登录态 Playwright 或普通抓取导致权限丢失。若 Chrome Plugin 不可用，再回退到 `agent-browser` 的 auto-connect、state、profile 或 session；若仍遇到登录页、权限页、验证码或人机验证，要求用户在真实 Chrome 中完成授权后继续，不得通过搜索引擎或第三方页面绕过权限。",
+      "auto_trigger": "当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `agent-browser`，并继续遵守授权与安全边界。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "authenticated-url-routing-rules/SKILL.md",
       "directory_path": "authenticated-url-routing-rules",
@@ -8594,7 +8594,7 @@ window.SKILL_DICTIONARY = {
       "sections": [
         "目标",
         "默认路由",
-        "回退顺序",
+        "非 profile 页面路由",
         "执行要求",
         "Chrome Plugin 确认步骤",
         "实测回灌清单",

@@ -99,8 +99,8 @@
 ### 样例 12：当前功能验证需要真实浏览器操作
 
 - 当前信号：用户要求验证一个前端页面是否能正常打开、点击、输入、提交并截图留证。
-- 应命中：`functional-validation-rules` + `agent-browser`。
-- 裁决：由 `agent-browser` 负责真实浏览器执行、页面交互和截图取证；由 `functional-validation-rules` 负责判断当前需求是否通过、结论如何归档。
+- 应命中：`functional-validation-rules` + 统一浏览器工具路由矩阵。
+- 裁决：由统一浏览器工具路由矩阵选择执行工具，负责真实 `local` 浏览器执行、页面交互和截图取证；由 `functional-validation-rules` 负责判断当前需求是否通过、结论如何归档。
 - 原因：一个负责执行手段，一个负责验证结论，二者并行配合但不能互相替代。
 
 ### 样例 13：`frontend-design` 与内部前端 skill 同时命中

@@ -1,6 +1,6 @@
 ---
 name: mcp-installation-rules
-description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；若已具备对应 MCP，应优先使用它们控制浏览器或 Godot 编辑器，再在缺失或不可用时回退到其他本地工具。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。
+description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 session、HAR/route、视觉 diff、录制/trace、代理或多引擎需求使用 `agent-browser`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。
 ---
 
 # MCP 安装判定规则
@@ -17,6 +17,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 当一个项目同时包含前端与 Godot 子项目时，允许两个 MCP 同时成为推荐安装项。
 - 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。以上 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见下方"平台判定与 Claude Code MCP 配置分支"，两者不通用，不得混用同一份配置文件语义。
 - 为后续浏览器控制和 Godot 编辑器控制建立清晰的优先级，避免同类工具抢主导权。
+- 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；`agent-browser` 仅在矩阵命中隔离或高级自动化能力时使用，或作为不依赖用户 profile 的条件后备。
 
 ## 自动触发信号
 
@@ -29,7 +30,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 ## 进入后先做什么
 
 1. 先读 `references/project-signals.md`，按项目结构判断是否存在前端或 Godot 标记。
-2. 再读 `references/tool-priority.md`，确认“需要安装什么”与“后续谁优先执行”的映射关系。
+2. 再读 `references/tool-priority.md`，确认“需要安装什么”与“浏览器 / Godot 后续谁优先执行”的条件路由关系；不得把 Chrome Plugin 与 Chrome DevTools MCP 合并成同一工具。
 3. 再读 `references/config-bootstrap.md`，确认 `./codex/config.toml` / `./.codex/config.toml` 的检查顺序与默认补齐动作。
 4. 只有在需要给出当前可参考安装来源时，再读 `references/current-sources.md`。
 5. 输出结论时必须明确三件事：
@@ -44,8 +45,8 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - 若用户使用了“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”等叫法，先统一解释为官方当前名称 `Chrome DevTools MCP`
    - 结论写为“需要安装 Chrome DevTools MCP”
    - 检查项目级 `./codex/config.toml` 与 `./.codex/config.toml`；若目标配置不存在，则默认补齐对应 MCP 配置
-   - 后续浏览器控制优先级写为“Chrome DevTools MCP > agent-browser > 其他浏览器工具”
-   - 若同时命中网页验证、页面调试、网络分析、性能诊断场景，要求优先让位给 Chrome DevTools MCP
+   - 后续浏览器工具选择按 `references/tool-priority.md` 的矩阵执行：用户已有标签、登录态、Cookie 或扩展由 Chrome Plugin 接管；独立页面调试与验证优先 Chrome DevTools MCP；隔离 profile / session、HAR / route、视觉 diff、录制 / trace、代理或多引擎需求使用 `agent-browser`
+   - 若仅需不依赖用户 profile 的基础自动化，且 Chrome DevTools MCP 不可用，可按矩阵条件后备到 `agent-browser`；不满足能力或安全边界时明确阻断
 3. 若命中 Godot 标记：
    - 结论写为“需要安装 Godot AI MCP”
    - 检查项目级 `./codex/config.toml` 与 `./.codex/config.toml`；若目标配置不存在，则默认补齐对应 MCP 配置
@@ -53,7 +54,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - 若同时命中场景编辑、节点调整、运行项目、抓取编辑器状态场景，要求优先让位给 Godot AI MCP
 4. 若两类标记都命中：
    - 结论写为“两类 MCP 都需要安装”
-   - 浏览器相关工作由 Chrome DevTools MCP 主导
+   - 浏览器相关工作按 `references/tool-priority.md` 的 Chrome Plugin / Chrome DevTools MCP / `agent-browser` 条件矩阵执行
    - Godot 编辑器相关工作由 Godot AI MCP 主导
    - 若项目级 Codex 配置缺失任一 MCP，对缺失项默认补齐
 5. 若两类标记都未命中：
@@ -121,7 +122,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - `codex mcp list`
    - `codex mcp get chrome-devtools`
 8. 如果工具已写入但会话里还看不到新 MCP，先重启 Codex 会话或刷新当前会话，再做页面验证。
-9. 页面联调时，浏览器控制优先级固定按 `Chrome DevTools MCP > agent-browser > 其他本地浏览器兜底方式` 执行。
+9. 页面联调与验证按 `references/tool-priority.md` 的条件矩阵执行：用户真实 profile 走 Chrome Plugin，独立调试 / 验证优先 Chrome DevTools MCP，隔离或高级自动化走 `agent-browser`；不得用线性优先级替代场景判断。
 
 ## 适用安装结论模板
 
@@ -129,21 +130,21 @@ Codex 环境：
 
 - `需要安装 Chrome DevTools MCP`
 - `项目级 ./.codex/config.toml 已默认补齐`
-- `后续浏览器控制优先级：Chrome DevTools MCP > agent-browser > 其他本地浏览器兜底方式`
+- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ agent-browser（隔离或高级自动化条件后备），详见 references/tool-priority.md`
 - `如当前会话未刷新到新 MCP，先重启 Codex 再验证`
 
 Claude Code 结论模板（待确认阶段使用，新增）：
 
 - `需要接入 Chrome DevTools MCP`
 - `当前 Claude Code 版本的具体 MCP 配置机制尚未核实，已提示用户确认`
-- `后续浏览器控制优先级：Chrome DevTools MCP > agent-browser > 其他本地浏览器兜底方式`（该优先级结论平台无关，可直接复用）
+- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ agent-browser（隔离或高级自动化条件后备），详见 references/tool-priority.md`（该路由平台无关，可直接复用）
 
 ## 默认优先级
 
-- 浏览器控制：
-  - `Chrome DevTools MCP`
-  - `agent-browser`
-  - 其他本地浏览器兜底方式
+- 浏览器控制：按 `references/tool-priority.md` 条件路由：
+  - `Chrome Plugin`：依赖用户已有标签、登录态、Cookie、扩展或真实 profile
+  - `Chrome DevTools MCP`：独立 profile 的 DOM、控制台、Network、Performance 与页面行为验证
+  - `agent-browser`：隔离 session、多 session、HAR / route、视觉 diff、录制 / trace、代理、多引擎；在不依赖用户 profile 的基础自动化中可作为条件后备
 - Godot 编辑器控制：
   - `Godot AI MCP`
   - 其他 Godot 本地兜底方式（如仅运行命令、静态读文件、人工编辑）
@@ -152,7 +153,7 @@ Claude Code 结论模板（待确认阶段使用，新增）：
 
 - 不代替 `project-design-doc-rules` 做整项目总览同步。
 - 不代替 `godot-project-bootstrap-rules` 做 Godot 项目的规则文件（`AGENTS.md` / `CLAUDE.md`）模板补齐、图像配置模板补齐或环境就绪收口；本 skill 只负责 MCP 判定与项目级 Codex 配置补齐。
-- 不代替 `agent-browser` 做实际浏览器自动化执行；它只负责在需要时让位给更高优先级的 Chrome DevTools MCP。
+- 不代替 `agent-browser` 做实际浏览器自动化执行；浏览器工具按 `references/tool-priority.md` 的能力矩阵选择，不能用 Chrome DevTools MCP 绕过用户真实 profile，也不能用 `agent-browser` 替代需要 Chrome Plugin 登录态的任务。
 - 不代替 `find-skills` 做开放生态技能搜索；这里只判断当前项目应安装什么 MCP。
 - 不代替具体的前端 skill 或 Godot 项目实现规则。
 - 本 skill 的 Claude Code MCP 配置分支目前仅完成判定与提示义务，具体命令细节以实际核实结果为准，不作为最终结论。
