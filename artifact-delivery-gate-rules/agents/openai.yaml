@@ -1,4 +1,4 @@
 interface:
   display_name: "文档落盘闸门"
   short_description: "收口前核对需求、Bug、测试、审查文档是否真实落盘"
-  default_prompt: "使用 $artifact-delivery-gate-rules 在最终收口前检查本轮需求、Bug、测试或审查文档是否已经真实落盘到约定目录。"
+  default_prompt: "使用 $artifact-delivery-gate-rules 在最终收口前检查本轮需求、验收、实施、Bug、测试或审查文档是否真实落盘，并运行文档 profile 校验器；文档必须极致完整、零决策可交接、图文与追踪关系可验证。"
