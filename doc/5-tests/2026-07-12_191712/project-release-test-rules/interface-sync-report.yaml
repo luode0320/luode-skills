@@ -1,0 +1,13 @@
+code_interfaces:
+- health
+manifest_interfaces: []
+inventory_interfaces: []
+drift: []
+missing_manifest: true
+missing_inventory: true
+status: not_configured
+code_count: 1
+manifest_count: 0
+inventory_count: 0
+schema_drift_count: 0
+requires_refresh: true

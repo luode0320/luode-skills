@@ -1,0 +1,108 @@
+{
+  "schema_version": "2.0",
+  "run_id": "a219b6404e6c452b8db91f34f90daf5b",
+  "generated_at": "2026-07-12T12:05:49+00:00",
+  "environment": "local",
+  "gate": {
+    "gate": "PARTIAL",
+    "allow_release": false,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pending": 0,
+    "counts": {
+      "PASS": 0,
+      "EXPECTED_FAIL": 0,
+      "FAIL": 0,
+      "PENDING": 0,
+      "BLOCKED": 1
+    },
+    "p0_non_pass": [],
+    "p1_non_pass": [],
+    "p2_non_pass": [
+      "health"
+    ],
+    "unsupported": [],
+    "results": [
+      {
+        "operation_id": "health",
+        "status": "BLOCKED",
+        "reason": "LOCAL_SERVICE_UNAVAILABLE",
+        "failure_type": "LOCAL_SERVICE_UNAVAILABLE",
+        "request": "{\"method\": \"GET\", \"params\": {}, \"url\": \"http://127.0.0.1:9/health\"}",
+        "response": "{}",
+        "evidence": {
+          "transport": "urllib",
+          "reason": "<urlopen error [WinError 10061] 由于目标计算机积极拒绝，无法连接。>"
+        }
+      }
+    ]
+  },
+  "risk_statistics": {
+    "P0": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0
+    },
+    "P1": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0
+    },
+    "P2": {
+      "total": 1,
+      "passed": 0,
+      "failed": 0,
+      "pending": 1,
+      "skipped": 0
+    }
+  },
+  "parameter_summary": {
+    "total": 0,
+    "resolved": 0,
+    "unresolved": 0,
+    "source_counts": {},
+    "reused": 0,
+    "revalidated": 0,
+    "candidate": 0,
+    "stale": 0,
+    "invalid": 0,
+    "quarantined": 0,
+    "events": []
+  },
+  "sync_metadata": {
+    "code_interfaces": [
+      "health"
+    ],
+    "manifest_interfaces": [],
+    "inventory_interfaces": [],
+    "drift": [],
+    "missing_manifest": true,
+    "missing_inventory": true,
+    "status": "not_configured",
+    "code_count": 1,
+    "manifest_count": 0,
+    "inventory_count": 0,
+    "schema_drift_count": 0,
+    "requires_refresh": true
+  },
+  "results": [
+    {
+      "operation_id": "health",
+      "status": "BLOCKED",
+      "reason": "LOCAL_SERVICE_UNAVAILABLE",
+      "failure_type": "LOCAL_SERVICE_UNAVAILABLE",
+      "request": "{\"method\": \"GET\", \"params\": {}, \"url\": \"http://127.0.0.1:9/health\"}",
+      "response": "{\"dataPreview\": {}}",
+      "evidence": {
+        "transport": "urllib",
+        "reason": "<urlopen error [WinError 10061] 由于目标计算机积极拒绝，无法连接。>"
+      },
+      "dataPreview": {}
+    }
+  ]
+}

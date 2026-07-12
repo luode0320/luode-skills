@@ -1,0 +1,36 @@
+schema_version: '2.0'
+environment: local
+run_id: a219b6404e6c452b8db91f34f90daf5b
+generated_at: '2026-07-12T12:05:49+00:00'
+interface_count: 1
+risk_statistics:
+  P0:
+    total: 0
+    passed: 0
+    failed: 0
+    pending: 0
+    skipped: 0
+  P1:
+    total: 0
+    passed: 0
+    failed: 0
+    pending: 0
+    skipped: 0
+  P2:
+    total: 1
+    passed: 0
+    failed: 0
+    pending: 1
+    skipped: 0
+parameter_summary:
+  total: 0
+  resolved: 0
+  unresolved: 0
+  source_counts: {}
+  reused: 0
+  revalidated: 0
+  candidate: 0
+  stale: 0
+  invalid: 0
+  quarantined: 0
+  events: []
