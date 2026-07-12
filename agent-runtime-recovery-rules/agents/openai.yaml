@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Runtime Recovery"
+  short_description: "Recover MCP, plugins, tools, sessions, and agent hosts by verified capability"
+  default_prompt: "Use $agent-runtime-recovery-rules to diagnose runtime failures, negotiate adapter capabilities, recover safely, verify readiness, and resume only from a valid checkpoint."

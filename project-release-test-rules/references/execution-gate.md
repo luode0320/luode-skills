@@ -67,11 +67,11 @@
 
 ## 写接口场景下 EXPECTED_FAIL 的门禁准入（与 `agent-response-judgement.md` 联动）
 
-> 本节是写接口（createTransaction、createOrder、cancelOrder、refund 等）专用门禁准入规则，是对上文 PASS/FAIL/PARTIAL 三级判定的强化补充，不取代既有规则。
+> 本节是所有产生业务副作用的写入口专用门禁准入规则，是对上文 PASS/FAIL/PARTIAL 三级判定的强化补充，不取代既有规则。
 
 ### 一、为什么需要写接口专用准入
 
-- 写接口受链上手续费、币对维护、地址风控、上游业务级拒绝等外部环境影响，历史成功参数在当前时点大概率会触发 EXPECTED_FAIL。
+- 写入口受外部依赖和业务状态影响，历史成功参数在当前时点可能触发 EXPECTED_FAIL。
 - 既有规则中 P0 接口存在 UNEXPECTED_FAIL 即判 FAIL，会把所有写接口一刀切到 FAIL，导致上线测试无法推进。
 - 用写接口专用准入后：矩阵样本齐 + 4 类样本齐 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 时可走 PARTIAL。
 
@@ -79,10 +79,10 @@
 
 同时满足以下所有条件，P0 写接口可走 PARTIAL 结论：
 
-1. `test-data-construction-rules.md` 中 4 级样本（`historical_succeeded` / `historical_failed_lifecycle` / `historical_inflight` / `current_listing_available`）全部出现；缺失任一类视为矩阵缺失，直接判 PENDING。
+1. `test-data-construction-rules.md` 中项目基线声明的样本类别全部出现；缺失任一类视为矩阵缺失，直接判 PENDING。
 2. `UNEXPECTED_FAIL` 数量为 0（5xx、空 msg、堆栈、字段缺失、状态不符、敏感信息泄露等真异常不允许出现）。
 3. `EXPECTED_FAIL` 比例 ≥60%（即 `EXPECTED_FAIL` 数量 / 总样本数 ≥ 0.6）。
-4. 同一 `EXPECTED_FAIL` 子类（手续费不足 / 维护中 / 黑名单 / 超范围 / 上游业务级拒绝）连续 3 轮占比 ≥80% 时，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL。
+4. 同一 `EXPECTED_FAIL` 子类连续 3 轮占比 ≥80% 时，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL。
 5. 至少 2 个通道/链/币种的样本都有结果（覆盖度），不能单一通道假阳性。
 
 ### 三、PARTIAL 升级与降级

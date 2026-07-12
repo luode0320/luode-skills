@@ -14,7 +14,7 @@
 
 ## 当前通用入口
 
-当前已存在的通用入口为 `generate_release_test_plan.py`。agent 每次上线测试前必须先执行 `--help` 检查已有子命令，已有子命令能覆盖时不得重新生成同类脚本。
+当前已存在的通用入口为 `generate_release_test_plan.py`。agent 每次上线测试前必须先执行 `--help` 检查已有子命令，已有子命令能覆盖时不得重新生成同类脚本。脚本是兼容入口：发现 `scripts/release_test_engine/` 时，旧命令会以 `compat_command` 委派到新内核；新内核暂不可用时才执行旧资产逻辑或返回结构化 `PENDING/UNSUPPORTED_ENGINE`，不得静默伪造通过。
 
 | 子命令 | 职责 |
 | --- | --- |
@@ -28,6 +28,16 @@
 | `resolve-test-data` | 按参数来源规则解析可复用 / fixture / rule 参数并生成依赖追踪 |
 | `update-baseline-assets` | 将本轮测试结果、参数状态和历史摘要回写基线资产 |
 | `sync-interface-contract-assets` | 对账当前代码、`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml`，同步 OpenAPI 字段并输出 `interface-sync-report.yaml` |
+| `doctor` | 检查项目根目录、local 配置、依赖和 adapter 支持矩阵；输出结构化诊断结果 |
+| `run` | 调用新内核执行发现、参数解析、依赖执行、判定和门禁报告；支持 `--dry-run` |
+
+### 新内核兼容契约
+
+- 兼容入口动态导入 `release_test_engine.cli.run_pipeline(...)` 和 `release_test_engine.cli.run_doctor(...)`；入口可接受映射参数，也可接受 `project_root` 位置参数。兼容层会过滤 `func`，并为 `run_pipeline` 补齐必需的 `output_dir` 关键字，所有路径保持字符串。
+- 旧十个命令委派时额外传入 `compat_command`，值为原命令名；新内核必须保留该字段并返回 JSON 可序列化对象。
+- `doctor` 至少接收 `project_root`、`baseline_root`、`config`、`adapters`、`output`；`run` 至少接收 `project_root`、`baseline_root`、`output_dir`、`config`、`inventory`、`parameter_sources`、`reusable_params`、`plan`、`modules`、`adapters`、`include_p2`、`continue_on_failure`、`dry_run`。
+- 入口返回对象必须含 `status`（`PASS`、`FAIL`、`PARTIAL`、`PENDING`、`BLOCKED` 之一）或明确 `failure_type`；禁止返回不可 JSON 序列化对象。兼容层不会吞掉内核异常。若内核签名不支持 `compat_command` 或 `dry_run`，旧命令 / dry-run 会保留旧逻辑或返回结构化 `PENDING`，不会误执行。
+- 新内核不可导入时，旧命令保持原有资产行为；`doctor` 与 `run` 输出 `PENDING` 和 `UNSUPPORTED_ENGINE` 证据，使用方不得把该结果当作上线通过。
 
 ## 可选拆分脚本职责
 

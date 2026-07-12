@@ -1,5 +1,23 @@
 # 项目当前状态
 
+## 本轮任务交接：统一智能体运行期自恢复规则
+
+- 目标：为不限定 Codex 的统一智能体建立厂商无关的 MCP、插件、工具 transport、浏览器会话和宿主运行期自恢复规则。
+- 已完成：新增 `agent-runtime-recovery-rules/` owner skill、L0-L5 capability 协议、状态机、adapter schema、平台能力矩阵、失败案例库和 `scripts/recovery_state.py`；已把 MCP/插件运行期故障路由到统一 owner。
+- 已完成：需求、验收标准、全量顺序实施方案、实施总览、实施周期 01 和 local 测试 README 已落盘；文档入口已统一指向真实存在的 Python 状态原语与契约测试，不再引用不存在的 PowerShell wrapper。
+- 验证：契约测试 `6/6 PASS`；`py_compile` PASS；需求、验收、实施总览、实施周期 profile 均 `PASS`；skill quick validator PASS；字典生成成功；`git diff --check` PASS。
+- 当前阻断：未接入任何真实第三方 L4/L5 lifecycle adapter；没有真实 checkpoint/resume API 时只能交付工具恢复或 `manual_handoff`/`blocked`，不得宣称宿主重启后任务自动续接。
+- 范围边界：只验证 local 文件 fixture，不连接 test/prod，不猜测 CLI/进程名，不强杀进程，不自动重放非幂等写操作。
+- Git：本轮未执行 commit、push、rebase、merge 或其他历史写入。
+
+## 本轮任务交接：通用上线测试引擎
+
+- 目标：将 `project-release-test-rules` 从基线/计划生成器升级为可复用的“发现入口 -> 参数与依赖 -> local 执行 -> 自动判定 -> 报告/门禁 -> 基线复用”引擎。
+- 已完成（基线）：统一 IR v2、schema 校验、事件与原子基线存储、安全 denylist、HTTP/CLI/RPC 基础执行器、多协议发现适配器、参数命名空间、local 鉴权、依赖拓扑与失败传播、P0/P1/P2 门禁、脱敏报告、v1 基线迁移基础、doctor/run 兼容入口。
+- 当前真实状态：R1 三项回归已收口；旧轮引擎全量 `27/27 PASS`，C08 artifact replay `1/1 PASS`，C09-01 `4/4 PASS`，C09-02 `6/6 PASS`；C10 runtime matrix 与报告契约全量 `37/37 PASS`；当天上线测试目录已达到 `37/37 PASS`。
+- 当前限制：真实非 HTTP local runtime、全量 P0/P1 覆盖证据和跨项目 baseline 复用仍未完成；当前仍不得宣称上线放行。
+- Git：本轮未执行 commit、push、rebase 或其他历史写入。
+
 ## 目标与范围
 
 - 目标：把需求、验收标准、实施总览、实施周期和最小任务 Skill 升级为“极致详细、结构完整、普通模型零决策执行、图形化且可机器校验”的 Markdown 文档交接体系。
@@ -8,9 +26,9 @@
 
 ## 当前状态
 
-- 状态：原文档完备性基线和图片规则/校验实现已完成；`CHG-DOC-IMG-001` 在 CYCLE-05/T05-03 已按最新配置完成真实生图和验收。
+- 状态：通用上线测试引擎修订计划已更新至 `current_slice: TASK-RT-C11-01` 并通过 implementation_master strict validator；C09-01/02 与 C10-01/02 的实现及专项测试已完成，但 C10 四类 EVD 尚未真实落盘，故 C10 任务尚未验收；C11/C12 尚未执行。工作区保留未提交改动，本轮未执行 Git 历史写入。
 - 当前入口：`T05-03` 已完成：真实 PNG、签名、`view_image`、validator 和最终验收均通过，相关改动已按域提交。
-- 本轮增量：完成 `project-agents-bootstrap` 图像配置跟随当前 Codex provider 改造；模板、imagegen 解析器、CLI 入口、文档和 local fixture 回归均已通过。
+- 本轮增量：完成 R1 回归恢复，补齐 doctor execution matrix、HTTP 参数位置、local SQLite/cache provider、协议错误判定、报告与基线产物、v1 migration CLI；所有测试写入均为 local fixture。
 - 更新时间：2026-07-12。
 
 ## 已完成
@@ -42,6 +60,8 @@
 
 ## 阻断
 
+- 当前上线测试引擎仍受 C10 证据收口、C11、C12 阻断；缺失三方索引在 bootstrap 模式只产生 `not_configured/PENDING`，strict release 模式为 `BLOCKED`，非 HTTP 协议无真实 local runtime 时必须保持 `PENDING/UNSUPPORTED_ADAPTER`，不得放行。
+
 - 机器校验、回归测试和审查无 P0/P1 问题。
 - 真实 imagegen 已通过：2026-07-12 使用当前授权配置 `https://xm.aceapi.cc/v1` 和 `gpt-image-2` 生成 `markdown-image-workflow.diagram-v1.png`（867168 bytes，PNG 签名，1254x1254）；`view_image`、`check_images` 和 `check_orphan_images` 均通过。密钥未写入仓库或证据。
 - 严格校验 CLI 已修复 JSON 序列化问题和正文回指污染周期归属问题；当前以 `--root .` 扫描受控来源文档集，需求/验收报告均 PASS。
@@ -60,6 +80,19 @@
 
 ## 交接点
 
+- 修订版计划已更新：`doc/3-实施/2026-07-12_190609_通用上线测试引擎_修订版全量实施计划.md`。计划已补齐 C09-C12 的任务执行契约、周期依赖/领域图、固定 fixture/命令/断言、清理回滚、唯一 gate 输入和反向追踪要求；本轮只更新计划与状态记忆，未获得继续编码授权。
+
 - 规则资产、机器校验、回归测试、真实生图、图片引用和审查证据已通过；当前渠道图像配置审查记录为 `doc/6-审查/2026-07-12_173045_project-agents-image-channel_当前改动总审查.md`，改造状态为 `PASS`，相关改动已按域提交。
 - 未经用户在当前轮明确授权，不执行 `git commit`、`git push`、`git rebase`、`git merge` 或其他历史写入动作。
 - Windows PowerShell 环境 Skill 已完成本轮闭环；仅 `7z.exe`、`tlrc.exe` 的管理员权限补装仍未完成，不阻断已验证的核心环境入口。
+
+## 2026-07-12 上线测试引擎执行更新
+
+- R1：gRPC discovery、RPC local provenance、旧 CLI contract 均 PASS。
+- C02-C08 窄闭环：IR/storage `7/7`、doctor `2/2`、参数位置 `2/2`、local provider `2/2`、协议判定 `2/2`、迁移 CLI `2/2`、runtime matrix `4/4`、旧轮全量 `27/27`、本轮新增 `16/16`。
+- 产物：`doc/5-tests/2026-07-12_191712/project-release-test-rules/` 已生成 README、报告、响应、依赖图、场景、对账和逐接口脱敏文件。
+- 收口状态：`C08-03` 产物专项 PASS，交付 gate=`PARTIAL`、最终验收=`BLOCKED`；真实非 HTTP local runtime、双索引同步和 P0/P1 全量证据尚未齐全，不输出上线放行。
+- C09-01：新增 `load_interface_contract_assets` / `load_inventory` 与 `test_contract_asset_sync.py`，完成完整/缺失/非法/非 local/strict 五类验证；证据位于同一时间戳测试目录，未覆盖原始基线。
+- C09-02：新增三方集合/schema hash/reusable stale 纯内存对账与兼容 CLI 入口；报告写临时 output，源资产哈希不变，证据位于同一时间戳测试目录。
+- C10：五协议 local fixture 生命周期、strict local provenance、入口级引用阻断、唯一 `run_id`、cleanup gate 与 runtime failure type 已通过 `37/37 PASS`；待补四类 C10 EVD 后才允许进入 C11-01。
+- 未执行 Git 历史写入；所有改动保持工作树未提交状态。

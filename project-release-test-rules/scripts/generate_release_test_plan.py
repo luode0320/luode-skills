@@ -13,11 +13,15 @@
 8. resolve-test-data: 解析可复用 / fixture / rule 参数并生成依赖追踪
 9. update-baseline-assets: 按事件持续回写基线资产
 10. sync-interface-contract-assets: 对账当前代码、swag manifest 与接口测试基线
+11. doctor: 检查 local 环境、依赖与 adapter 支持矩阵
+12. run: 调用新内核执行完整上线测试流水线
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib
+import inspect
 import json
 import os
 import re
@@ -1145,7 +1149,86 @@ def print_json(data) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+def _load_engine_entrypoint(name: str):
+    """加载新内核入口；兼容层缺少内核时继续支持旧资产命令。"""
+    try:
+        module = importlib.import_module("release_test_engine.cli")
+    except ImportError:
+        return None
+    entrypoint = getattr(module, name, None)
+    return entrypoint if callable(entrypoint) else None
+
+
+def _invoke_engine(name: str, args: argparse.Namespace, **extra: Any) -> bool:
+    """调用新内核并输出机器可读结果，返回是否已完成委派。"""
+    entrypoint = _load_engine_entrypoint(name)
+    if entrypoint is None:
+        return False
+    payload = vars(args).copy()
+    payload.pop("func", None)
+    payload.update(extra)
+    parameters = inspect.signature(entrypoint).parameters
+    accepts_extra = any(parameter.kind == inspect.Parameter.VAR_KEYWORD for parameter in parameters.values())
+    expects_project_root = "project_root" in parameters and parameters["project_root"].kind in {
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    }
+    if "compat_command" in payload and expects_project_root and "compat_command" not in parameters and not accepts_extra:
+        return False
+    if payload.get("dry_run") and expects_project_root and "dry_run" not in parameters and not accepts_extra:
+        return False
+    if expects_project_root:
+        if accepts_extra:
+            # 位置参数入口声明 **kwargs 时，必须保留未显式列出的 CLI 选项，
+            # 否则 baseline/config 等兼容参数会在签名过滤阶段静默丢失。
+            keyword_payload = {
+                key: value
+                for key, value in payload.items()
+                if key not in {"project_root", "func"}
+            }
+        else:
+            keyword_payload = {
+                key: value
+                for key, value in payload.items()
+                if key in parameters and key != "project_root" and key != "func"
+            }
+        if "reusable" in parameters and payload.get("reusable_params"):
+            keyword_payload["reusable"] = read_yaml(Path(payload["reusable_params"]).resolve(), {})
+        if "sources" in parameters and payload.get("parameter_sources"):
+            keyword_payload["sources"] = read_yaml(Path(payload["parameter_sources"]).resolve(), {})
+        if "baseline_path" in parameters and payload.get("inventory"):
+            keyword_payload["baseline_path"] = str(Path(payload["inventory"]).resolve())
+        if "output_dir" in parameters and "output_dir" not in keyword_payload:
+            keyword_payload["output_dir"] = payload.get("output_dir", "doc/5-tests")
+        result = entrypoint(payload.get("project_root", "."), **keyword_payload)
+    else:
+        result = entrypoint(payload)
+    if result is None:
+        result = {"status": "PENDING", "reason": f"{name} returned no result"}
+    if not isinstance(result, dict):
+        result = {"status": "FAIL", "error": f"{name} must return a JSON object"}
+    if payload.get("output"):
+        output_path = Path(payload["output"]).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    print_json(result)
+    return True
+
+
+def _delegate_legacy_command(command: str, args: argparse.Namespace) -> bool:
+    """把旧命令映射到新内核；无内核时由原实现负责兼容回退。"""
+    # 旧十命令拥有独立输出契约，不能把它们误当成一次完整 run；仅在未来
+    # 提供显式 compat handler 时委派，当前稳定回退到原实现。
+    return _invoke_engine(
+        f"compat_{command.replace('-', '_')}",
+        args,
+        compat_command=command,
+    )
+
+
 def command_bootstrap_inventory(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("bootstrap-inventory", args):
+        return
     project_root = Path(args.project_root).resolve()
     inventory_path = Path(args.inventory).resolve()
     scanned_inventory = scan_project_interfaces(project_root)
@@ -1164,6 +1247,8 @@ def command_bootstrap_inventory(args: argparse.Namespace) -> None:
 
 
 def command_reconcile_inventory(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("reconcile-inventory", args):
+        return
     project_root = Path(args.project_root).resolve()
     inventory_path = Path(args.inventory).resolve()
     reconcile_output = Path(args.output).resolve()
@@ -1185,6 +1270,8 @@ def command_reconcile_inventory(args: argparse.Namespace) -> None:
 
 
 def command_generate_plan(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("generate-plan", args):
+        return
     inventory_path = Path(args.inventory).resolve()
     output_path = Path(args.output).resolve()
     inventory = load_interface_inventory(inventory_path)
@@ -1201,18 +1288,24 @@ def command_generate_plan(args: argparse.Namespace) -> None:
 
 
 def command_init_release_test_task(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("init-release-test-task", args):
+        return
     task_root = Path(args.task_root).resolve()
     result = ensure_release_task_root(task_root, args.title)
     print_json({"mode": "init-release-test-task", **result})
 
 
 def command_init_baseline_assets(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("init-baseline-assets", args):
+        return
     baseline_root = Path(args.baseline_root).resolve()
     result = ensure_baseline_assets(baseline_root)
     print_json({"mode": "init-baseline-assets", **result})
 
 
 def command_build_dependency_graph(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("build-dependency-graph", args):
+        return
     inventory = load_interface_inventory(Path(args.inventory).resolve())
     parameter_sources = read_yaml(Path(args.parameter_sources).resolve(), {"parameters": {}})
     graph = build_dependency_graph(inventory, parameter_sources)
@@ -1234,6 +1327,8 @@ def command_build_dependency_graph(args: argparse.Namespace) -> None:
 
 
 def command_validate_reusable_params(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("validate-reusable-params", args):
+        return
     reusable_path = Path(args.reusable_params).resolve()
     payload = read_yaml(reusable_path, {"params": {}})
     result = validate_reusable_params_payload(payload)
@@ -1328,6 +1423,8 @@ def resolve_parameters(parameter_sources: Dict[str, Any], reusable_params: Dict[
 
 
 def command_resolve_test_data(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("resolve-test-data", args):
+        return
     parameter_sources = read_yaml(Path(args.parameter_sources).resolve(), {"parameters": {}})
     reusable_params = read_yaml(Path(args.reusable_params).resolve(), {"params": {}})
     output_dir = Path(args.output_dir).resolve()
@@ -1393,6 +1490,8 @@ def apply_reusable_param_events(reusable_params: Dict[str, Any], events: List[Di
 
 
 def command_update_baseline_assets(args: argparse.Namespace) -> None:
+    if _delegate_legacy_command("update-baseline-assets", args):
+        return
     baseline_root = Path(args.baseline_root).resolve()
     event_path = Path(args.event_file).resolve()
     output_path = Path(args.output).resolve()
@@ -1428,6 +1527,10 @@ def command_update_baseline_assets(args: argparse.Namespace) -> None:
 
 
 def command_sync_interface_contract_assets(args: argparse.Namespace) -> None:
+    if _invoke_engine("sync_interface_contract_assets", args, command="sync-interface-contract-assets"):
+        return
+    if _delegate_legacy_command("sync-interface-contract-assets", args):
+        return
     project_root = Path(args.project_root).resolve()
     manifest_path = Path(args.manifest).resolve()
     inventory_path = Path(args.inventory).resolve()
@@ -1451,6 +1554,79 @@ def command_sync_interface_contract_assets(args: argparse.Namespace) -> None:
     )
 
 
+def command_doctor(args: argparse.Namespace) -> None:
+    """检查项目、local 配置和可用 adapter，输出新内核诊断结果。"""
+    if args.environment != "local":
+        print_json({"mode": "doctor", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment})
+        return
+    if _invoke_engine("run_doctor", args, command="doctor"):
+        return
+    project_root = Path(args.project_root).resolve()
+    checks = {
+        "project_root_exists": project_root.is_dir(),
+        "local_only": True,
+        "engine_available": False,
+        "environment": args.environment,
+    }
+    result = {
+        "mode": "doctor",
+        "status": "PENDING",
+        "project_root": str(project_root),
+        "checks": checks,
+        "reason": "release_test_engine.cli.run_doctor unavailable",
+    }
+    if not checks["project_root_exists"]:
+        result["status"] = "FAIL"
+        result["reason"] = "project_root does not exist"
+    if args.output:
+        output_path = Path(args.output).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    print_json(result)
+
+
+def command_run(args: argparse.Namespace) -> None:
+    """执行新内核全链路；内核缺失时返回结构化不可用结果。"""
+    if args.environment != "local":
+        print_json({"mode": "run", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment})
+        return
+    if _invoke_engine("run_pipeline", args, command="run"):
+        return
+    engine_available = _load_engine_entrypoint("run_pipeline") is not None
+    failure_type = "UNSUPPORTED_DRY_RUN" if engine_available and args.dry_run else "UNSUPPORTED_ENGINE"
+    reason = (
+        "current release_test_engine does not expose a dry-run execution mode"
+        if failure_type == "UNSUPPORTED_DRY_RUN"
+        else "release_test_engine.cli.run_pipeline unavailable"
+    )
+    print_json(
+        {
+            "mode": "run",
+            "status": "PENDING",
+            "failure_type": failure_type,
+            "reason": reason,
+            "project_root": str(Path(args.project_root).resolve()),
+        }
+    )
+
+
+def command_migrate_baseline(args: argparse.Namespace) -> None:
+    """[参数] input/output/project_fingerprint: v1 基线迁移输入；[返回] JSON 状态；最近修改时间: 2026-07-12 接入 v2 迁移。"""
+    from release_test_engine.migrate_baseline import migrate_v1_to_v2
+
+    input_path = Path(args.input).resolve()
+    output_path = Path(args.output).resolve()
+    try:
+        document = read_yaml(input_path, None)
+        if not isinstance(document, dict):
+            raise ValueError("v1 baseline must be an object")
+        migrated = migrate_v1_to_v2(document, project_fingerprint=args.project_fingerprint, source_revision=args.source_revision)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(migrated, ensure_ascii=False, indent=2), encoding="utf-8")
+    except (OSError, TypeError, ValueError) as exc:
+        print_json({"mode": "migrate-baseline", "status": "BLOCKED", "failure_type": "INVALID_V1_BASELINE", "reason": str(exc), "input": str(input_path), "output": str(output_path)})
+        return
+    print_json({"mode": "migrate-baseline", "status": "PASS", "input": str(input_path), "output": str(output_path), "schema_version": migrated.get("schema_version"), "source_revision": args.source_revision})
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="上线前接口测试资产初始化与计划生成工具")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -1516,6 +1692,48 @@ def build_parser() -> argparse.ArgumentParser:
     sync_parser.add_argument("--output", required=True, help="interface-sync-report.yaml 输出路径")
     sync_parser.add_argument("--reusable-params", default="", help="可选：reusable-params.yaml 路径，用于 schema 漂移时标记 stale")
     sync_parser.set_defaults(func=command_sync_interface_contract_assets)
+
+    doctor_parser = subparsers.add_parser(
+        "doctor",
+        help="检查项目根目录、local 配置、依赖和 adapter 支持矩阵",
+    )
+    doctor_parser.add_argument("--project-root", required=True, help="被测项目根目录")
+    doctor_parser.add_argument("--baseline-root", default="doc/5-tests/基线", help="长期基线目录")
+    doctor_parser.add_argument("--config", default="", help="可选的 local 配置或 adapter 配置文件")
+    doctor_parser.add_argument("--adapters", nargs="*", default=["auto"], help="限定检查的 adapter，默认 auto")
+    doctor_parser.add_argument("--environment", default="local", help="连接环境；仅 local 允许执行")
+    doctor_parser.add_argument("--strict-fixture", action="store_true", help="要求非 HTTP fixture 声明 local provenance、run_id、启动句柄和 cleanup")
+    doctor_parser.add_argument("--output", default="", help="可选的诊断 JSON 输出路径")
+    doctor_parser.set_defaults(func=command_doctor)
+
+    run_parser = subparsers.add_parser(
+        "run",
+        help="调用新内核执行发现、参数解析、依赖执行、判定和门禁报告",
+    )
+    run_parser.add_argument("--project-root", required=True, help="被测项目根目录")
+    run_parser.add_argument("--baseline-root", default="doc/5-tests/基线", help="长期基线目录")
+    run_parser.add_argument("--output-dir", default="doc/5-tests", help="本轮测试证据输出目录")
+    run_parser.add_argument("--config", default="", help="local 配置或 adapter 配置文件")
+    run_parser.add_argument("--environment", default="local", help="连接环境；仅 local 允许执行")
+    run_parser.add_argument("--inventory", default="", help="可选的接口基线文件；缺省时由内核自动发现")
+    run_parser.add_argument("--manifest", default="", help="可选的 swag manifest 文件")
+    run_parser.add_argument("--parameter-sources", default="", help="可选的参数来源文件")
+    run_parser.add_argument("--reusable-params", default="", help="可选的可复用参数文件")
+    run_parser.add_argument("--plan", default="", help="可选的既有测试计划文件")
+    run_parser.add_argument("--modules", nargs="*", default=[], help="限定本次上线模块")
+    run_parser.add_argument("--adapters", nargs="*", default=["auto"], help="限定执行的 adapter，默认 auto")
+    run_parser.add_argument("--include-p2", action="store_true", help="包含改动模块的 P2 接口")
+    run_parser.add_argument("--continue-on-failure", action="store_true", help="依赖失败后继续执行无关场景")
+    run_parser.add_argument("--dry-run", action="store_true", help="仅生成执行图和参数计划，不发送请求")
+    run_parser.add_argument("--strict-contracts", action="store_true", help="要求 manifest/inventory/reusable 三方契约资产完整且可审计")
+    run_parser.set_defaults(func=command_run)
+
+    migration_parser = subparsers.add_parser("migrate-baseline", help="将 v1 基线迁移为 v2 并保留迁移证据")
+    migration_parser.add_argument("--input", required=True, help="v1 基线文件")
+    migration_parser.add_argument("--output", required=True, help="v2 输出文件")
+    migration_parser.add_argument("--project-fingerprint", required=True, help="项目指纹")
+    migration_parser.add_argument("--source-revision", default="", help="源版本或提交标识")
+    migration_parser.set_defaults(func=command_migrate_baseline)
 
     return parser
 

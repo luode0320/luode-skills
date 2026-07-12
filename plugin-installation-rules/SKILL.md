@@ -15,6 +15,7 @@ description: 当用户要求分析项目、检查是否需要安装某个 AI 编
 - 明确装好后的使用方式、强度 / 参数和回退策略。
 - 通用支持多 AI 环境（Claude Code、Codex 等），不绑定单一 AI。
 - 作为可扩展框架：每个插件一个条目，未来加插件只追加条目、不改框架。
+- 仅负责 provisioning：插件检测、安装、启用、配置和首次可用性验证。已启用插件在任务执行期间失活、崩溃、超时或无响应，统一转给 `agent-runtime-recovery-rules`，不在本 skill 内臆造 reload/restart 命令。
 
 ## 自动触发信号
 
@@ -39,7 +40,8 @@ description: 当用户要求分析项目、检查是否需要安装某个 AI 编
 4. 配置补齐（如该插件需要配置文件或环境变量）。
 5. 可用性验证（按插件官方说明确认已生效）。
 6. 说明使用方式、强度 / 参数。
-7. 安装或启用失败时，回退到不依赖该插件的常规流程并记录。
+7. 安装或启用失败时（仍属于 provisioning 阶段），回退到不依赖该插件的常规流程并记录。
+8. 已启用插件在任务期间失活、崩溃、超时或无响应时，记录插件标识和最小脱敏证据，转交 `agent-runtime-recovery-rules` 的 `plugin_runtime_unhealthy` owner；由运行期 adapter 决定是否支持 reload/restart/resume。
 
 ## 必装插件（默认强制）
 
@@ -63,7 +65,7 @@ description: 当用户要求分析项目、检查是否需要安装某个 AI 编
 
 ## 与相邻 skill 的边界
 
-插件安装、启用或可用性验证失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，保留官方来源、平台和版本边界；恢复成功后自动写 candidate，active 仍需授权。
+插件安装、启用或首次可用性验证失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，保留官方来源、平台和版本边界；恢复成功后自动写 candidate，active 仍需授权。已启用插件的运行期失活不归本 casebook，统一路由到 `agent-runtime-recovery-rules` 的 `plugin_runtime_unhealthy`。
 
 - 不代替 `mcp-installation-rules`：那个负责 MCP server 的判定与配置；本 skill 负责 AI 编码插件 / agent 增强。
 - 不代替具体的编码、测试、审查 skill 的领域工作。

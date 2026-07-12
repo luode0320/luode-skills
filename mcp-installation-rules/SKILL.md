@@ -17,6 +17,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 当一个项目同时包含前端与 Godot 子项目时，允许两个 MCP 同时成为推荐安装项。
 - 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。以上 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见下方"平台判定与 Claude Code MCP 配置分支"，两者不通用，不得混用同一份配置文件语义。
 - 为后续浏览器控制和 Godot 编辑器控制建立清晰的优先级，避免同类工具抢主导权。
+- 仅负责 provisioning：安装、注册、配置补齐和首次可用性检查。已配置 MCP 在任务执行期间发生的 timeout、EOF、断开、失活或宿主异常，统一转给 `agent-runtime-recovery-rules`，不在本 skill 内猜测 reload/restart 命令。
 - 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；`agent-browser` 仅在矩阵命中隔离或高级自动化能力时使用，或作为不依赖用户 profile 的条件后备。
 
 ## 自动触发信号
@@ -63,10 +64,13 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 6. 若已确认需要某个 MCP 且项目级 Codex 配置缺失：
    - 默认补齐 `./codex/config.toml` 或 `./.codex/config.toml` 中对应 MCP 配置；两者都不存在时按 `references/config-bootstrap.md` 约定创建项目级配置文件
    - 不需要、也不得等待用户额外确认
-7. 若已确认需要某个 MCP 但当前环境尚未安装或配置补齐后仍不可用：
+7. 若已确认需要某个 MCP 但当前环境尚未安装或配置补齐后仍不可用（仍属于 provisioning 阶段）：
    - 先阻断对应工具类执行
    - 提醒先按该 MCP 的当前官方或项目主页说明完成安装，不要沿用过期博客或第三方转述里的旧命名、旧参数
    - 安装完成后再回到对应主域 skill
+8. 若 MCP 已完成配置并在任务期间出现 timeout、EOF、连接断开或不可用：
+   - 记录组件标识、失败分类和最小脱敏证据后，转交 `agent-runtime-recovery-rules` 的 `mcp_runtime_transport` owner
+   - 由运行期 adapter 自行探测 `reconnect`/`reload`/`restart`/`resume` 能力；本 skill 不执行安装流程来代替运行期恢复
 
 ## 代码图谱 MCP（CodeGraph + codebase-memory-mcp）
 
@@ -147,9 +151,9 @@ Claude Code 结论模板（待确认阶段使用，新增）：
   - `agent-browser`：隔离 session、多 session、HAR / route、视觉 diff、录制 / trace、代理、多引擎；在不依赖用户 profile 的基础自动化中可作为条件后备
 - Godot 编辑器控制：
   - `Godot AI MCP`
-
-MCP 安装、配置、注册或连接失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，按当前 AI 平台和官方版本复验；未验证或无法脱敏的经验不得写入 active。
   - 其他 Godot 本地兜底方式（如仅运行命令、静态读文件、人工编辑）
+
+MCP 安装、配置、注册或首次连接失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，按当前 AI 平台和官方版本复验；未验证或无法脱敏的经验不得写入 active。已配置 MCP 的运行期故障不归本 casebook，统一路由到 `agent-runtime-recovery-rules` 的 `mcp_runtime_transport`。
 
 ## 与相邻 skill 的边界
 

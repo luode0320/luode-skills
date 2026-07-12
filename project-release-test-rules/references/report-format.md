@@ -127,7 +127,7 @@ Agent 判定      通过
    - `{"status":true}`
    - `{"code":0}`
 3. 成功响应必须展示部分正常业务数据：
-   - 如果 `data` 是对象，保留 3-8 个关键字段，例如 `id`、`orderId`、`status`、`amount`、`from`、`to`、`exchangeName`、`cType`、`shortName`、`count`。
+   - 如果 `data` 是对象，保留 3-8 个由接口 schema 标记为关键的字段，例如资源标识、状态、数量、时间、分页和计数等。
    - 如果 `data` 是数组，保留 `count` 和前 1-3 条脱敏样本；样本只保留关键字段，禁止整段大数组塞入报告。
    - 如果 `data` 是字符串、数字或布尔值，直接展示 `data` 值。
 4. 失败或待确认响应必须展示 `httpCode` / 业务状态字段 / `msg` / `errorType`（如有）/ 错误摘要；错误摘要保留能判断原因的关键片段。

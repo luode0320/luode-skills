@@ -1,5 +1,23 @@
 # 项目长期记忆
 
+## 统一智能体运行期自恢复规则
+
+- 稳定决策：`agent-runtime-recovery-rules` 是厂商无关的运行期恢复唯一 owner，覆盖 MCP、插件、浏览器会话、工具 transport 和智能体宿主；安装/注册仍由安装类 skill 负责，失败分类与案例生命周期仍由 `execution-failure-learning-rules` 负责。
+- 稳定决策：恢复动作必须通过真实 adapter capability 准入，能力等级为 L0 观测、L1 探针、L2 重连、L3 重载、L4 受控重启、L5 检查点恢复与任务续接；无 L5 lifecycle API 时不得宣称任务自动续接。
+- 稳定决策：运行期恢复固定使用单飞锁、一次不变复验、每层最多一次动作、默认 600 秒冷却、幂等性分类和脱敏 checkpoint；非幂等或幂等性未知的写操作只允许查询状态并转人工交接。
+- 稳定决策：当前仓库只提供标准库状态原语 `agent-runtime-recovery-rules/scripts/recovery_state.py` 与 local 契约测试；真实平台插件重载、宿主重启和 L5 resume 由外部 adapter 提供，不能由规则猜测或伪造。
+- 来源：`agent-runtime-recovery-rules/SKILL.md`、`references/adapter-contract.schema.json`、`doc/2-需求/2026-07-12_210000_统一智能体运行期自恢复规则.md`。
+- 更新时间：2026-07-12。
+
+## 通用上线测试引擎
+
+- 稳定决策：`project-release-test-rules/scripts/release_test_engine/` 是协议中立内核，统一 IR 版本为 `2.0`；未知技术栈必须输出 `PENDING/UNSUPPORTED_ADAPTER`，不得伪报通过。
+- 稳定决策：所有运行连接只来自 `local` 配置；普通业务写接口允许执行，DROP/TRUNCATE/破坏性 ALTER、源码/基础设施删除等极端操作由安全 denylist 阻断。
+- 稳定决策：接口级结果固定为 `PASS`、`EXPECTED_FAIL`、`FAIL`、`PENDING`、`BLOCKED`；P0 入口任意非 `PASS` 阻断项目放行，项目门禁输出 `PASS`/`FAIL`/`PARTIAL`。
+- 稳定决策：兼容入口为 `generate_release_test_plan.py doctor/run`，旧资产命令保留回退路径；项目专属字段只能写入项目基线/adapter，通用规则不得硬编码业务实体。
+- 稳定决策：发现注册表覆盖 HTTP、CLI、GraphQL、gRPC、WebSocket、SOAP、JSON-RPC、消息、调度和事件；只有存在真实 local runner 的协议才允许 `PASS`，其余协议必须输出结构化 `PENDING`。
+- 稳定决策：报告明细的 request/response 固定为脱敏 JSON 字符串，`responses.json` 保留脱敏对象；基线以 append-only 事件和 v2 原子投影为事实源。
+
 ## 核心记忆
 
 ### 仓库定位

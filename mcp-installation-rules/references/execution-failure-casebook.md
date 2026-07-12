@@ -29,3 +29,15 @@
 - 验证：使用当前平台官方等价机制完成配置和可用性检查
 - 来源：`mcp-installation-rules/SKILL.md` 平台判定分支
 - 最后验证：2026-07-12
+
+## MCP-003
+
+- 状态：`active`
+- 类型：provisioning/runtime owner 分流
+- 错误特征：MCP 已完成配置并在任务执行期间出现 timeout、EOF、连接断开或暂时不可用
+- 根因：运行期传输或宿主生命周期故障，不是安装、注册或首次连接问题
+- 解决方案：保留当前 MCP 名称、平台、配置来源和最小脱敏失败证据，转交 `agent-runtime-recovery-rules` 的 `mcp_runtime_transport`；由 adapter 能力协商决定 reconnect/reload/restart/resume。不得回到安装流程，也不得猜测平台命令或进程名
+- 验证：运行期 owner 以原成功标准完成健康探针和恢复后验证；无 adapter 能力时明确 `manual_handoff`/`blocked`
+- 禁止动作：将运行期断连写入本安装 casebook 的恢复方案；把会话刷新或任意重启宣称为通用 MCP reload/restart
+- 来源：`execution-failure-learning-rules/references/classification-and-routing.md` provisioning/runtime 分流
+- 最后验证：2026-07-12

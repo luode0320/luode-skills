@@ -1,0 +1,1298 @@
+- 接口标识: health_health_GET
+  接口名称: health模块health接口(GET)
+  HTTP 方法: GET
+  接口路径: /health
+  所属模块: health
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: doc\5-tests\2026-07-12_180240\project-release-test-rules\tests\test_core_engine.py:93
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: order_api_order_create_POST
+  接口名称: order模块create接口(POST)
+  HTTP 方法: POST
+  接口路径: /api/order/create
+  所属模块: order
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: project-release-test-rules\references\report-format.md:53; project-release-test-rules\references\report-format.md:77;
+    project-release-test-rules\references\report-format.md:157; git-collaboration-rules\references\branch-and-commit.md:99
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: order_api_order_detail_id_GET
+  接口名称: order模块{id}接口(GET)
+  HTTP 方法: GET
+  接口路径: /api/order/detail/{id}
+  所属模块: order
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: project-release-test-rules\references\report-format.md:54; project-release-test-rules\references\report-format.md:92
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_GET
+  接口名称: orders模块orders接口(GET)
+  HTTP 方法: GET
+  接口路径: /orders
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-request-rules\references\request-examples.md:70
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_POST
+  接口名称: orders模块orders接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:58; api-endpoint-rules\references\path-and-method-semantics.md:49
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_add_POST
+  接口名称: orders模块add接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/add
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:9; api-endpoint-rules\references\endpoint-examples.md:40;
+    api-endpoint-rules\references\endpoint-examples.md:84; api-endpoint-rules\references\path-and-method-semantics.md:29;
+    api-endpoint-rules\references\path-and-method-semantics.md:49
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_approve_POST
+  接口名称: orders模块approve接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/approve
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:44
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_create_POST
+  接口名称: orders模块create接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/create
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:30
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_del_POST
+  接口名称: orders模块del接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/del
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:11; api-endpoint-rules\references\path-and-method-semantics.md:33;
+    api-endpoint-rules\references\path-and-method-semantics.md:52
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_delete_POST
+  接口名称: orders模块delete接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/delete
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:34
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_edit_POST
+  接口名称: orders模块edit接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/edit
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:38
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_export_POST
+  接口名称: orders模块export接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/export
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:41
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_get_POST
+  接口名称: orders模块get接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/get
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-request-rules\references\request-examples.md:8; api-request-rules\references\request-examples.md:65;
+    api-endpoint-rules\references\endpoint-examples.md:7; api-endpoint-rules\references\endpoint-examples.md:42;
+    api-endpoint-rules\references\endpoint-examples.md:86; api-endpoint-rules\references\path-and-method-semantics.md:24;
+    api-endpoint-rules\references\path-and-method-semantics.md:48
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_import_POST
+  接口名称: orders模块import接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/import
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:42
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_list_POST
+  接口名称: orders模块list接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/list
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-request-rules\references\request-examples.md:46; api-request-rules\references\request-examples.md:73;
+    api-endpoint-rules\references\endpoint-examples.md:8; api-endpoint-rules\references\path-and-method-semantics.md:25
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_query_POST
+  接口名称: orders模块query接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/query
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:26
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_submit_POST
+  接口名称: orders模块submit接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/submit
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\path-and-method-semantics.md:43
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_update_POST
+  接口名称: orders模块update接口(POST)
+  HTTP 方法: POST
+  接口路径: /orders/update
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:10; api-endpoint-rules\references\path-and-method-semantics.md:37;
+    api-endpoint-rules\references\path-and-method-semantics.md:50; api-endpoint-rules\references\path-and-method-semantics.md:51
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_id_DELETE
+  接口名称: orders模块{id}接口(DELETE)
+  HTTP 方法: DELETE
+  接口路径: /orders/{id}
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:53; api-endpoint-rules\references\path-and-method-semantics.md:52
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_id_GET
+  接口名称: orders模块{id}接口(GET)
+  HTTP 方法: GET
+  接口路径: /orders/{id}
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-request-rules\references\request-examples.md:62; api-endpoint-rules\references\endpoint-examples.md:50;
+    api-endpoint-rules\references\path-and-method-semantics.md:48
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_id_PATCH
+  接口名称: orders模块{id}接口(PATCH)
+  HTTP 方法: PATCH
+  接口路径: /orders/{id}
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:52; api-endpoint-rules\references\path-and-method-semantics.md:51
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: orders_orders_id_PUT
+  接口名称: orders模块{id}接口(PUT)
+  HTTP 方法: PUT
+  接口路径: /orders/{id}
+  所属模块: orders
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:51; api-endpoint-rules\references\path-and-method-semantics.md:50
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: path_path_POST
+  接口名称: path模块path接口(POST)
+  HTTP 方法: POST
+  接口路径: /path
+  所属模块: path
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:03'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route
+  发现证据: api-endpoint-rules\SKILL.md:26; code-style-consistency-rules\SKILL.md:22
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: pay_api_pay_POST
+  接口名称: pay模块pay接口(POST)
+  HTTP 方法: POST
+  接口路径: /api/pay
+  所属模块: pay
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P0
+  是否上线必测: 是
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: project-release-test-rules\references\report-format.md:55; project-release-test-rules\references\report-format.md:158
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: register_api_register_POST
+  接口名称: register模块register接口(POST)
+  HTTP 方法: POST
+  接口路径: /api/register
+  所属模块: register
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:03'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route
+  发现证据: vercel-react-best-practices\AGENTS.md:1864; vercel-react-best-practices\AGENTS.md:1880;
+    vercel-react-best-practices\rules\rerender-move-effect-to-event.md:21; vercel-react-best-practices\rules\rerender-move-effect-to-event.md:37
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: supported_supported_onramps_all_GET
+  接口名称: supported模块all接口(GET)
+  HTTP 方法: GET
+  接口路径: /supported/onramps/all
+  所属模块: supported
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: swag-openapi-maintainer-rules\references\naming-rules.md:130
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: tmp_tmp_GamesSimpleStyling.xlsx_PUT
+  接口名称: tmp模块GamesSimpleStyling.xlsx接口(PUT)
+  HTTP 方法: PUT
+  接口路径: /tmp/GamesSimpleStyling.xlsx
+  所属模块: tmp
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: spreadsheet\references\examples\openpyxl\create_spreadsheet_with_styling.py:4
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: tmp_tmp_basic_spreadsheet.xlsx_PUT
+  接口名称: tmp模块basic_spreadsheet.xlsx接口(PUT)
+  HTTP 方法: PUT
+  接口路径: /tmp/basic_spreadsheet.xlsx
+  所属模块: tmp
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: spreadsheet\references\examples\openpyxl\create_basic_spreadsheet.py:4
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: tmp_tmp_styling_spreadsheet.xlsx_PUT
+  接口名称: tmp模块styling_spreadsheet.xlsx接口(PUT)
+  HTTP 方法: PUT
+  接口路径: /tmp/styling_spreadsheet.xlsx
+  所属模块: tmp
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: spreadsheet\references\examples\openpyxl\styling_spreadsheet.py:4
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: users_users_POST
+  接口名称: users模块users接口(POST)
+  HTTP 方法: POST
+  接口路径: /users
+  所属模块: users
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: api-endpoint-rules\references\endpoint-examples.md:59
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: users_users_id_GET
+  接口名称: users模块{id}接口(GET)
+  HTTP 方法: GET
+  接口路径: /users/{id}
+  所属模块: users
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: swag-openapi-maintainer-rules\references\naming-rules.md:36
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: v1_v1_images_edits_POST
+  接口名称: v1模块edits接口(POST)
+  HTTP 方法: POST
+  接口路径: /v1/images/edits
+  所属模块: v1
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: imagegen\references\image-api.md:46
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree
+- 接口标识: v1_v1_images_generations_POST
+  接口名称: v1模块generations接口(POST)
+  HTTP 方法: POST
+  接口路径: /v1/images/generations
+  所属模块: v1
+  鉴权要求: 待确认
+  请求参数 schema: '{}'
+  响应结构摘要: '{}'
+  业务成功判定: 待确认
+  业务失败判定: 待确认
+  依赖数据: 待确认
+  数据副作用: 待确认
+  清理方式: 待确认
+  风险等级: P2
+  是否上线必测: 否
+  最近扫描时间: '2026-07-12 19:18:04'
+  最近测试时间: ''
+  最近测试结论: 待确认
+  接口角色:
+  - consumer
+  可提供字段: {}
+  参数来源: {}
+  依赖接口: []
+  依赖失败策略: PARAM_UNRESOLVED
+  可复用参数影响字段: []
+  发现来源: route,doc
+  发现证据: imagegen\references\image-api.md:45
+  完整度: 部分
+  待确认项:
+  - 鉴权要求
+  - 请求参数 schema
+  - 响应结构摘要
+  - 业务成功判定
+  - 业务失败判定
+  - 依赖数据
+  - 数据副作用
+  - 清理方式
+  - 参数来源
+  最近扫描提交: working-tree

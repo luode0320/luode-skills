@@ -30,3 +30,15 @@
 - 验证：用户确认安装后，按官方方式检查插件已启用
 - 来源：`plugin-installation-rules/SKILL.md` 必装插件流程
 - 最后验证：2026-07-12
+
+## PLUGIN-003
+
+- 状态：`active`
+- 类型：provisioning/runtime owner 分流
+- 错误特征：插件已启用并在任务执行期间失活、崩溃、超时或无响应
+- 根因：运行期插件或宿主生命周期故障，不是安装、启用或首次可用性问题
+- 解决方案：保留插件标识、AI 平台、版本和最小脱敏失败证据，转交 `agent-runtime-recovery-rules` 的 `plugin_runtime_unhealthy`；由 adapter 能力协商决定 reload/restart/resume。不得猜测 CLI、进程名或 UI 操作
+- 验证：运行期 owner 以原成功标准完成健康探针和恢复后验证；无 adapter 能力时明确 `manual_handoff`/`blocked`
+- 禁止动作：将运行期失活写入本安装 casebook 的恢复方案；把重新安装插件宣称为通用 runtime recovery
+- 来源：`execution-failure-learning-rules/references/classification-and-routing.md` provisioning/runtime 分流
+- 最后验证：2026-07-12

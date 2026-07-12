@@ -28,3 +28,6 @@
 - 2026-07-12：按用户授权完成 Windows PowerShell 环境准备：安装并验证 PowerShell 7.6.3，设置 Windows Terminal 用户级默认 profile，初始化 PowerShell 5.1/7 UTF-8 profile，安装并验证 manifest 工具；7z/tlrc 因管理员权限阻断，未绕过 UAC。
 - 2026-07-12：完成 Windows PowerShell Skill 的 Audit、JSONC Apply、重复 Apply 幂等、Rollback、quick validator、字典刷新和 WSL 原生工具路径复核；WSL PATH 无 `/mnt` 且无 Windows `.exe` 误走，改动保持未提交。
 - 2026-07-12：按用户要求升级 Windows PowerShell Skill 的自动迭代闭环；新增 SessionEnsure 会话 TTL/原子锁、RecoverCommand/wrapper 命令缺失恢复、精确 package 映射、verified discovered-tools、脱敏 failure casebook、Windows/WSL owner 分流和真实失败恢复测试。PS5/PS7 解析、两个 Skill quick validator、原有环境测试、新增恢复测试、字典、UTF-8 与 diff 检查通过；7z/tlrc 权限阻断保留，未执行 Git 历史写入。
+- 2026-07-12：针对通用上线测试引擎并行补丁后的 `23 passed, 2 errors, 1 failure` 真实状态，新增受限修订版全量实施计划，冻结 R1 回归恢复、C02-C08 垂直切片、local-only、真实测试、停止/回滚和 C08 证据门禁；本轮未获得代码实施授权，未执行 Git 历史写入。
+- 2026-07-12：按修订版上线测试引擎计划完成 R1 与 C02-C08 窄闭环实现；修复 gRPC discovery、RPC local provenance、CLI 兼容、参数位置/provider、doctor 矩阵、协议判定、报告/基线产物和 v1 migration CLI。旧轮 27/27、本轮新增 11/11 测试通过；C08-03 因非 HTTP local runtime 与最终验收输入缺失保持 BLOCKED，未执行 Git 历史写入。
+- 2026-07-12：将通用上线测试引擎修订计划升级为极致完整执行契约；校正当前证据目录为 `2026-07-12_191712`，新增 C09 双索引、C10 真实 local runtime、C11 P0/P1 全量门禁、C12 跨项目复用与证据互链任务，strict implementation validator PASS；本轮只更新计划，未授权继续编码或 Git 历史写入。
