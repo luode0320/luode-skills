@@ -8,7 +8,7 @@
 - 验证：契约测试 `6/6 PASS`；`py_compile` PASS；需求、验收、实施总览、实施周期 profile 均 `PASS`；skill quick validator PASS；字典生成成功；`git diff --check` PASS。
 - 当前阻断：未接入任何真实第三方 L4/L5 lifecycle adapter；没有真实 checkpoint/resume API 时只能交付工具恢复或 `manual_handoff`/`blocked`，不得宣称宿主重启后任务自动续接。
 - 范围边界：只验证 local 文件 fixture，不连接 test/prod，不猜测 CLI/进程名，不强杀进程，不自动重放非幂等写操作。
-- Git：本轮未执行 commit、push、rebase、merge 或其他历史写入。
+- Git：本轮已完成本地提交 `6f328a9`、`adcdba3`、`87f901b`、`a698192`、`40c514e`、`b95ad8e`；未执行 push、rebase 或 merge，工作树已清空。
 
 ## 本轮任务交接：通用上线测试引擎
 
@@ -16,7 +16,7 @@
 - 已完成（基线）：统一 IR v2、schema 校验、事件与原子基线存储、安全 denylist、HTTP/CLI/RPC 基础执行器、多协议发现适配器、参数命名空间、local 鉴权、依赖拓扑与失败传播、P0/P1/P2 门禁、脱敏报告、v1 基线迁移基础、doctor/run 兼容入口。
 - 当前真实状态：R1 三项回归已收口；旧轮引擎全量 `27/27 PASS`，C08 artifact replay `1/1 PASS`，C09-01 `4/4 PASS`，C09-02 `6/6 PASS`；C10 runtime matrix 与报告契约全量 `37/37 PASS`；当天上线测试目录已达到 `37/37 PASS`。
 - 当前限制：真实非 HTTP local runtime、全量 P0/P1 覆盖证据和跨项目 baseline 复用仍未完成；当前仍不得宣称上线放行。
-- Git：本轮未执行 commit、push、rebase 或其他历史写入。
+- Git：本轮实现、需求、实施、测试、审查和验收资产均已按域提交；未执行 push、rebase 或 merge。
 
 ## 目标与范围
 
@@ -26,7 +26,7 @@
 
 ## 当前状态
 
-- 状态：通用上线测试引擎修订计划已更新至 `current_slice: TASK-RT-C11-01` 并通过 implementation_master strict validator；C09-01/02 与 C10-01/02 的实现及专项测试已完成，但 C10 四类 EVD 尚未真实落盘，故 C10 任务尚未验收；C11/C12 尚未执行。工作区保留未提交改动，本轮未执行 Git 历史写入。
+- 状态：通用上线测试引擎修订计划已更新至 `current_slice: TASK-RT-C11-01` 并通过 implementation_master strict validator；C09-01/02 与 C10-01/02 的实现及专项测试已完成，但 C10 四类 EVD 尚未真实落盘，故 C10 任务尚未验收；C11/C12 尚未执行。本轮相关资产已按提交流程域完成本地提交，工作树干净。
 - 当前入口：`T05-03` 已完成：真实 PNG、签名、`view_image`、validator 和最终验收均通过，相关改动已按域提交。
 - 本轮增量：完成 R1 回归恢复，补齐 doctor execution matrix、HTTP 参数位置、local SQLite/cache provider、协议错误判定、报告与基线产物、v1 migration CLI；所有测试写入均为 local fixture。
 - 更新时间：2026-07-12。
@@ -95,4 +95,4 @@
 - C09-01：新增 `load_interface_contract_assets` / `load_inventory` 与 `test_contract_asset_sync.py`，完成完整/缺失/非法/非 local/strict 五类验证；证据位于同一时间戳测试目录，未覆盖原始基线。
 - C09-02：新增三方集合/schema hash/reusable stale 纯内存对账与兼容 CLI 入口；报告写临时 output，源资产哈希不变，证据位于同一时间戳测试目录。
 - C10：五协议 local fixture 生命周期、strict local provenance、入口级引用阻断、唯一 `run_id`、cleanup gate 与 runtime failure type 已通过 `37/37 PASS`；待补四类 C10 EVD 后才允许进入 C11-01。
-- 未执行 Git 历史写入；所有改动保持工作树未提交状态。
+- 本轮 Git 历史写入已完成：实现、需求、实施、测试、审查和验收域均已提交；未执行 push。
