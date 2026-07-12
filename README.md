@@ -53,6 +53,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
 - `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`、`doc/`、`skill/` 以及根目录 `项目设计.md` 等跨域共享入口、命名模板和复用策略，需求、Bug、测试主文档都收口到 `doc/` 下的子目录，不再使用 `ment/`、`bug/`、`test/` 这类旧根目录
+- Markdown 图片资产统一进入 `doc/data/images/`；需求、实施、验收和通用文档必须按当前 Markdown 位置使用 `/` 分隔相对路径，并登记 `IMG-*`、用途、来源、版本、关联 ID、引用章节、敏感状态和版权状态。真实图片必须经 `imagegen` 生成，交付门禁负责签名、命名、路径、清单和孤儿校验；`doc/data/` 根不提供兼容图片入口
 - 活动文档时间前缀统一使用 `YYYY-MM-DD_HHmmss`；实施、审查、验收等下游文档必须在时间后保留来源对象标识，来源可以是需求也可以是 Bug，避免 `YYYY-MM-DD_主题.md` 或 `时间_阶段_说明.md` 这类不可追溯命名
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - `artifact-delivery-gate-rules` 负责在需求、实施、验收、Bug、测试、审查收口前核对正式文档是否已经真实落盘，阻断“只在回复里说、不写文档”的假完成
@@ -774,3 +775,4 @@ claude-mem(记忆) :
 2026-07-12 03:57:00 test: [文档校验器测试] 归档工程文档验证单元测试
 2026-07-12 03:58:00 chore: [Skill入口提示] 同步文档完整性交接提示
 2026-07-12 03:59:00 docs: [文档完整性规则] 同步仓库规则与技能字典
+2026-07-12 15:30:00 chore: [规则与技能体系] 同步文档完整性与Windows环境规则

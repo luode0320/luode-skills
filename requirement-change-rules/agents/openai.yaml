@@ -1,4 +1,4 @@
 interface:
   display_name: "需求变更"
   short_description: "识别需求变更、重算影响，并回写同一份需求文档。"
-  default_prompt: "使用 $requirement-change-rules 判断当前新增条件属于什么类型的需求变更，重算影响范围，并更新到同一份 doc/2-需求/ 主文档。"
+  default_prompt: "使用 $requirement-change-rules 为每次变更生成唯一 CHG-*，记录来源、原值/新值、决策人、状态以及 SRC/DEC/REQ/RULE/AC/SLICE/CYCLE/TASK、文件/符号、图表、测试、交付、清理、回滚和证据影响；变更影响已确认结论必须回开需求/验收/拆分/实施文档并保留差异，P0/P1 未授权即 blocked，完成后重跑机器校验和受影响行为测试。"

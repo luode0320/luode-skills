@@ -1,8 +1,9 @@
-version: 5
+version: 6
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
-  requirement_assets: "doc/2-需求/data"
+  document_data: "doc/data"
+  document_image_assets: "doc/data/images"
   implementation_docs: "doc/3-实施"
   bug_records: "doc/4-bugs"
   test_assets: "doc/5-tests"
@@ -21,9 +22,7 @@ entry_files:
   architecture_business_flow_doc_note: "业务链路从序号 5 开始；同一链路持续更新原编号文档，新增独立链路使用当前最大业务链路编号加 1，并同步更新 4-主要业务链路.md 索引；历史编号不复用、不重排"
   requirement_doc: "{datetime}_{requirement_cn_title}.md"
   requirement_gap_doc: "{requirement_doc_stem}.gap.md"
-  requirement_asset_image: "{requirement_doc_stem}.{asset_slug}.{ext}"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
-  requirement_asset_image_note: "需求截图与外部图片素材统一放在 doc/2-需求/data/；文件名建议复用需求文档主干并追加 ASCII 素材标识，例如 2026-05-25_103000_支付路由改造.req-shot-login.png"
   requirement_gap_doc_note: "临时缺口文档必须复用对应需求文档同前缀，并在末尾追加“.gap.md”；例如：2026-04-16_141518_多业务复用Swap适配控制需求.gap.md。该文档仅在 gap 未关闭时存在，用户确认并回填主需求文档后必须删除。"
   source_object_id_note: "来源对象标识用于回指进入实施、审查或验收阶段的上游对象，可以来自需求文档或 Bug 根目录；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加“需求-”或“Bug-”类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。"
   acceptance_criteria_doc: "{datetime}_{source_object_id}_验收标准.md"
@@ -46,6 +45,9 @@ entry_files:
   review_doc: "{datetime}_{source_object_id}_{review_cn_title}.md"
   review_index_readme: "README.md"
   project_design_doc: "项目设计.md"
+naming:
+  document_asset_image: "{document_stem}.{asset_slug}-v{version}.{ext}"
+  document_asset_image_note: "所有 Markdown 位图统一放在 doc/data/images/；文件名使用文档主干、ASCII kebab-case 素材标识和递增版本，例如 2026-05-25_103000_支付路由改造.login-state-v1.png"
 root_files:
   project_design_primary: "项目设计.md"
   project_design_aliases:
@@ -95,8 +97,13 @@ policies:
   implementation_cycle_docs_allowed: true
   final_acceptance_requires_test_and_review: true
   requirement_doc_embeds_mermaid_diagrams: true
-  requirement_assets_under_doc_requirement_data: true
-  requirement_doc_embeds_assets_in_markdown: true
+  markdown_images_under_document_image_assets: true
+  markdown_image_requires_relative_path: true
+  markdown_image_requires_nonempty_alt: true
+  markdown_image_requires_asset_id: true
+  markdown_image_forbids_remote_and_data_uri: true
+  markdown_image_forbids_path_traversal: true
+  document_data_keeps_images_subdirectory_only: true
   same_bug_updates_same_root: true
   bug_doc_embeds_diagrams_in_markdown: true
   same_test_round_updates_same_root: true

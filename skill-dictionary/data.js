@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-12 03:57:35",
+  "generated_at": "2026-07-12 15:29:43",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -7,10 +7,10 @@ window.SKILL_DICTIONARY = {
     "planned_total": 83,
     "implemented_total": 83,
     "planned_missing": 0,
-    "seed_total": 25,
+    "seed_total": 26,
     "doc_total": 10,
-    "references_total": 360,
-    "agents_total": 91
+    "references_total": 363,
+    "agents_total": 92
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -90,6 +90,7 @@ window.SKILL_DICTIONARY = {
           "directory": "artifact-storage-rules",
           "sections": [
             "Skill 作用与适用场景",
+            "Markdown 图片资产契约",
             "测试目录复用优先级（写死边界）",
             "自动触发信号",
             "进入后先做什么",
@@ -1150,6 +1151,7 @@ window.SKILL_DICTIONARY = {
           "directory": "requirement-intake-rules",
           "sections": [
             "Skill 作用与适用场景",
+            "图片资产闭环",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -1328,7 +1330,8 @@ window.SKILL_DICTIONARY = {
             "执行通过 / 驳回标准",
             "执行结果归档要求",
             "极致完整性与零决策执行硬闸门",
-            "references 读取规则"
+            "references 读取规则",
+            "Markdown 图片资产实施规则"
           ],
           "references": [
             "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
@@ -3742,8 +3745,8 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 25,
-      "total_count": 25,
+      "seed_count": 26,
+      "total_count": 26,
       "items": [
         {
           "id": "\"doc\"",
@@ -4654,6 +4657,46 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "windows-powershell-environment-rules",
+          "name": "windows-powershell-environment-rules",
+          "title": "Windows PowerShell 环境准备规则",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 11,
+          "item_order": 24,
+          "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、幂等安装 manifest 工具、按精确映射恢复 command-not-found、记录脱敏失败案例和用户级 discovered tools，并在新会话入口自动检查；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "windows-powershell-environment-rules/SKILL.md",
+          "directory_path": "windows-powershell-environment-rules",
+          "directory": "windows-powershell-environment-rules",
+          "sections": [
+            "自动触发信号",
+            "默认边界",
+            "执行流程",
+            "包源与权限",
+            "WSL 隔离",
+            "验收标准",
+            "入口"
+          ],
+          "references": [
+            "windows-powershell-environment-rules/references/failure-casebook.md",
+            "windows-powershell-environment-rules/references/safety-and-validation.md",
+            "windows-powershell-environment-rules/references/tool-manifest.yaml"
+          ],
+          "agents": [
+            "windows-powershell-environment-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        },
+        {
           "id": "windows-wsl-execution-rules",
           "name": "windows-wsl-execution-rules",
           "title": "Windows / WSL 执行规范（代码在 WSL）",
@@ -4663,7 +4706,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 24,
+          "item_order": 25,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4713,7 +4756,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 25,
+          "item_order": 26,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -4810,6 +4853,7 @@ window.SKILL_DICTIONARY = {
       "directory": "artifact-storage-rules",
       "sections": [
         "Skill 作用与适用场景",
+        "Markdown 图片资产契约",
         "测试目录复用优先级（写死边界）",
         "自动触发信号",
         "进入后先做什么",
@@ -5846,6 +5890,7 @@ window.SKILL_DICTIONARY = {
       "directory": "requirement-intake-rules",
       "sections": [
         "Skill 作用与适用场景",
+        "图片资产闭环",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -6024,7 +6069,8 @@ window.SKILL_DICTIONARY = {
         "执行通过 / 驳回标准",
         "执行结果归档要求",
         "极致完整性与零决策执行硬闸门",
-        "references 读取规则"
+        "references 读取规则",
+        "Markdown 图片资产实施规则"
       ],
       "references": [
         "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
@@ -9254,6 +9300,46 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "windows-powershell-environment-rules",
+      "name": "windows-powershell-environment-rules",
+      "title": "Windows PowerShell 环境准备规则",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 11,
+      "item_order": 24,
+      "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、幂等安装 manifest 工具、按精确映射恢复 command-not-found、记录脱敏失败案例和用户级 discovered tools，并在新会话入口自动检查；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "windows-powershell-environment-rules/SKILL.md",
+      "directory_path": "windows-powershell-environment-rules",
+      "directory": "windows-powershell-environment-rules",
+      "sections": [
+        "自动触发信号",
+        "默认边界",
+        "执行流程",
+        "包源与权限",
+        "WSL 隔离",
+        "验收标准",
+        "入口"
+      ],
+      "references": [
+        "windows-powershell-environment-rules/references/failure-casebook.md",
+        "windows-powershell-environment-rules/references/safety-and-validation.md",
+        "windows-powershell-environment-rules/references/tool-manifest.yaml"
+      ],
+      "agents": [
+        "windows-powershell-environment-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
+    },
+    {
       "id": "windows-wsl-execution-rules",
       "name": "windows-wsl-execution-rules",
       "title": "Windows / WSL 执行规范（代码在 WSL）",
@@ -9263,7 +9349,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 24,
+      "item_order": 25,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -9313,7 +9399,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 25,
+      "item_order": 26,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目补充当前工作区未提交改动对应的“进行中事项”，输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",

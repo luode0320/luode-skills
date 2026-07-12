@@ -24,7 +24,7 @@ schema_version: 1
 doc_id: "唯一文档 ID"
 doc_type: "requirement|acceptance|implementation_overview|implementation_cycle|task"
 source_ids: ["来源对象 ID"]
-status: "draft|confirmed|in_progress|blocked|accepted"
+status: "draft|pending|confirmed|in_progress|blocked|accepted"
 version: "v1.0"
 current_slice: "当前优先闭环或 N/A"
 updated_at: "YYYY-MM-DD HH:mm:ss"
@@ -56,15 +56,29 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 - Mermaid 代码块必须闭合，并通过真实解析；截图只能作为证据，不能替代可维护图。
 - 图标只能辅助状态表达，正文必须同时写出文字状态；不得以颜色或 emoji 作为唯一语义。
 
-## 6. 内容完整性契约
+## 6. Markdown 图片资产契约
+
+- `doc/data/` 是文档数据总目录；Markdown 位图的唯一落点是 `doc/data/images/`，不得直接写入 `doc/data/`。
+- 目标文档必须声明“图片资产决策：需要”或 `N/A + 原因 + 证据`。声明需要时必须存在真实图片引用；声明 `N/A` 时不得存在图片引用。
+- 图片引用必须从当前 Markdown 文件位置计算，使用 `/` 分隔符和相对路径，例如 `![IMG-DOC-001 登录状态对比](../data/images/<document-stem>.login-state-v1.png)`。
+- 禁止绝对路径、反斜杠、`file://`、远程热链、Base64/data URI、HTML `<img>`、路径越界和 `doc/data/<file>` 旧路径。
+- 图片必须使用 `.png`、`.jpg`、`.jpeg` 或已验证兼容性的 `.webp`，并通过对应文件签名校验；空文件、扩展名伪装和缺失文件均阻断交付。
+- alt 文本必须非空且包含稳定的 `IMG-*` 资产 ID。资产清单登记用途、来源、相对路径、版本、关联 ID、引用章节、敏感状态和版权状态。
+- 文件名使用 `<document_stem>.<asset-slug>-v<number>.<ext>`，slug 使用 ASCII kebab-case；返修递增版本，不覆盖既有版本。
+- 流程、时序、状态、依赖和数据关系继续使用 Mermaid；图片只能补充 UI、截图证据、视觉对比、真实产物、空间布局和 Mermaid 无法准确表达的内容，不能替代 Mermaid 门禁。
+- 真实图片必须经 `imagegen` 生成或编辑并显式输出到 `doc/data/images/`；不得用程序绘图、占位图或空文件冒充。
+- `doc/data/images/` 中未被 `<root>/doc/**/*.md` 或根目录项目文档引用的文件视为孤儿，交付门禁必须在 `--check-orphan-images` 模式下阻断。
+
+## 7. 内容完整性契约
 
 - 章节必须有内容，不能用空标题或“见上文”代替。
+- `pending` 仅表示前置验收或验证尚未收口；正文必须同时写明待执行验证入口和阻断边界。
 - 禁止 `TBD`、`TODO`、`待补`、`后续再补`、`实现时再看`、`相关逻辑`、`适当处理` 等占位或模糊词。
 - `尽量`、`合理`、`正常`、`快速`、`友好` 等词必须被量化，或改为 `N/A + 原因 + 证据`。
 - 所有内部 Markdown 链接、图片引用和周期/任务回指必须可解析；失效链接阻断交付。
 - 需求、验收、实施总览、实施周期和任务卡必须互相引用，不得依赖聊天记录完成交接。
 
-## 7. 放行顺序
+## 8. 放行顺序
 
 1. 文档结构与 UTF-8 校验。
 2. 元数据、章节、字段和 ID 校验。

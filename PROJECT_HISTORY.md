@@ -4,6 +4,10 @@
 
 ## 事件
 
+- 2026-07-12：补齐 Markdown 图片资产 validator 的文件命名、九字段资产清单一致性、共享引用和 `doc/data/` 根目录错位扫描，新增正反单测后校验器达到 `21/21 PASS`；README、编码总规和最终验收状态同步，真实 imagegen 仍因 `gpt-image-2` 503 / `gpt-image-1.5` 403 保持阻断。
+
+- 2026-07-12：按 `CHG-DOC-IMG-001` 实施 Markdown 图片资产闭环；冻结 `doc/data/images/` 唯一根目录，更新 storage/requirement/implementation/delivery 规则、profile v3、validator 图片与孤儿检查，并将来源需求、验收、实施总览、全量顺序和周期 01 回写为增量执行入口；工作树保持未提交。
+
 - 2026-07-11：确认采用“项目本地四件套 + Obsidian 选择性知识流”方案；项目当前状态与稳定规则分离维护，历史事件保持追加式记录。
 - 2026-07-11：完成四件套规则闭环；同步 Obsidian、项目记忆、自举脚本、仓库规则和字典，验证缺失创建、幂等运行、历史追加保护、current 超限阻断及固定 vault CLI 沉淀。
 - 2026-07-12：完善 `windows-wsl-execution-rules` 的跨环境命令失败恢复闭环；新增脱敏去重案例库、PowerShell/WSL/JSON/编码恢复路由和收口前自动回写规则，刷新字典并完成 UTF-8、内容存在性和差异检查。
@@ -12,3 +16,15 @@
 - 2026-07-12：按用户授权完成 imagegen 实现与审查文档提交，提交为 `26f763a` 与 `83e9576`；随后同步项目当前状态。
 - 2026-07-12：按用户确认计划新增 `execution-failure-learning-rules` 元 Skill，统一 prevent/recover/learn、唯一 owner、candidate/active 授权、脱敏去重和冲突门禁；接入首批高风险 owner，完成字典刷新与 AC-001 至 AC-008 前向行为验证，改动保持未提交。
 - 2026-07-12：完成执行失败持续学习与主动预防的当前改动总审查和最终验收，结论通过；Obsidian 知识笔记与 INDEX 已通过 CLI 沉淀，Git 提交仍未执行。
+- 2026-07-12：按用户要求升级需求、验收和实施文档交接规则，新增 L1-L4 极致完整性标准、零决策执行契约、实施总览/周期/任务卡模板、图形化标准和文档 profile 校验器；新增需求与实施基线文档及正反验证，四类 Skill 自检和文档 profile 均通过，未执行本轮 Git 历史写入。
+- 2026-07-12：通过固定 `D:\\obsidian_data` vault 的 Obsidian CLI 检索并沉淀“需求与实施文档零决策交接”知识笔记，创建 `知识库/INDEX.md` 入口，未使用文件系统读写替代 CLI。
+- 2026-07-12：复核并统一三份实施文档的权威来源 ID 为 `REQ-DOC-20260712-033322`，将已落盘入口的状态从历史占位语义修正为真实状态，五类文档 profile、单元测试、Skill 校验、字典生成和差异检查再次通过。
+- 2026-07-12：完成需求与实施文档极致完备化周期 01-04 收口并启动周期 05；补齐周期 04 当前 profile 所需章节，创建周期 05 全局同步/最终验收实施文档与测试入口，后续以全量回归、审查和验收证据作为最终放行依据，改动保持未提交。
+- 2026-07-12：完成周期 05 全局同步与最终验收；更新旧的当前改动总审查和最终验收文档，补齐 C02-C05 证据互链及最终验收一致性断言；九份文档 profile、校验器单测 7/7、周期 02/03/04/05 测试、四个 Skill quick validator、Mermaid 真解析、字典和固定 Obsidian CLI 均通过，工作树保持未提交。
+- 2026-07-12：完成最终注释双 skill 闸门与实现审查收口；为校验器、测试函数和 C05 集成测试补齐中文函数头、步骤编号及补丁原因注释，修正最终验收的周期 05 测试口径为 6/6，重跑单测、集成测试、编译、quick validator 和差异检查均通过，未执行 Git 历史写入。
+- 2026-07-12：修复严格文档校验器的 JSON 集合序列化、正文回指污染周期归属和“禁用”规范词误报；补齐周期 01 任务级验收证据与 `--root .` 严格命令，需求/验收 strict 报告均为 `status: PASS`，校验器单测更新为 9/9，工作树保持未提交。
+- 2026-07-12：执行 Markdown 图片资产闭环的真实 imagegen 验证；`gpt-image-2` 返回 HTTP 503 `model_not_found`，回退 `gpt-image-1.5` 返回 HTTP 403 权限错误。未生成伪图，临时资产已清理；机器校验、回归测试和审查保持通过，C05/最终验收状态改为 `blocked`，工作树未提交。
+- 2026-07-12：记录 Windows Python 默认编码导致 quick validator 解码失败的可复用恢复方案；使用 `python -X utf8` 对同一输入复验通过，并按 `WSL-006` 以 `candidate` 写入跨环境命令失败案例库。
+- 2026-07-12：按用户授权完成 Windows PowerShell 环境准备：安装并验证 PowerShell 7.6.3，设置 Windows Terminal 用户级默认 profile，初始化 PowerShell 5.1/7 UTF-8 profile，安装并验证 manifest 工具；7z/tlrc 因管理员权限阻断，未绕过 UAC。
+- 2026-07-12：完成 Windows PowerShell Skill 的 Audit、JSONC Apply、重复 Apply 幂等、Rollback、quick validator、字典刷新和 WSL 原生工具路径复核；WSL PATH 无 `/mnt` 且无 Windows `.exe` 误走，改动保持未提交。
+- 2026-07-12：按用户要求升级 Windows PowerShell Skill 的自动迭代闭环；新增 SessionEnsure 会话 TTL/原子锁、RecoverCommand/wrapper 命令缺失恢复、精确 package 映射、verified discovered-tools、脱敏 failure casebook、Windows/WSL owner 分流和真实失败恢复测试。PS5/PS7 解析、两个 Skill quick validator、原有环境测试、新增恢复测试、字典、UTF-8 与 diff 检查通过；7z/tlrc 权限阻断保留，未执行 Git 历史写入。

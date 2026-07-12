@@ -1,0 +1,63 @@
+version: 1
+scope: windows-user
+source_order:
+  - winget
+  - scoop-existing
+  - chocolatey-existing
+tools:
+  - id: Microsoft.PowerShell
+    command: pwsh.exe
+    version_probe: '$PSVersionTable.PSVersion.ToString()'
+    minimum_major: 7
+    required: true
+  - id: BurntSushi.ripgrep.MSVC
+    command: rg.exe
+    version_probe: '--version'
+  - id: sharkdp.fd
+    command: fd.exe
+    version_probe: '--version'
+  - id: junegunn.fzf
+    command: fzf.exe
+    version_probe: '--version'
+  - id: jqlang.jq
+    command: jq.exe
+    version_probe: '--version'
+  - id: MikeFarah.yq
+    command: yq.exe
+    version_probe: '--version'
+  - id: sharkdp.bat
+    command: bat.exe
+    version_probe: '--version'
+  - id: eza-community.eza
+    command: eza.exe
+    version_probe: '--version'
+  - id: dandavison.delta
+    command: delta.exe
+    version_probe: '--version'
+  - id: 7zip.7zip
+    command: 7z.exe
+    version_probe: '--version'
+  - id: Casey.Just
+    command: just.exe
+    version_probe: '--version'
+  - id: chmln.sd
+    command: sd.exe
+    version_probe: '--version'
+  - id: ajeetdsouza.zoxide
+    command: zoxide.exe
+    version_probe: '--version'
+  - id: tldr-pages.tlrc
+    command: tlrc.exe
+    version_probe: '--version'
+  - id: Git.Git
+    command: git.exe
+    version_probe: '--version'
+  - id: GNU.Wget2
+    command: wget2.exe
+    version_probe: '--version'
+  - id: aria2.aria2
+    command: aria2c.exe
+    version_probe: '--version'
+  - id: gerardog.gsudo
+    command: gsudo.exe
+    version_probe: '--version'

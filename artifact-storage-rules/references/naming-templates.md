@@ -7,8 +7,8 @@
 - 需求文档：`doc/2-需求/YYYY-MM-DD_HHmmss_<需求中文简介标题>.md`
 - 临时缺口文档：`doc/2-需求/<需求文档同名主干>.gap.md`
 - 需求正文图示：直接写入需求主文档正文，不另建独立流程图或时序图文件
-- 需求图片素材（截图/外部图片）：`doc/2-需求/data/<需求文档同名主干>.<素材标识>.<扩展名>`
-  - 示例：`doc/2-需求/data/2026-05-25_103000_支付路由改造.req-shot-login.png`
+- Markdown 图片素材（截图/外部图片）：`doc/data/images/<文档同名主干>.<素材标识>-v<版本>.<扩展名>`
+  - 示例：`doc/data/images/2026-05-25_103000_支付路由改造.login-state-v1.png`
 - 验收标准：`doc/7-验收/YYYY-MM-DD_HHmmss_<来源对象标识>_验收标准.md`
 - 最终验收：`doc/7-验收/YYYY-MM-DD_HHmmss_<来源对象标识>_最终验收.md`
 - 需求与实施计划全量顺序实施方案：`doc/3-实施/YYYY-MM-DD_HHmmss_<项目或来源集合标识>_需求与实施计划全量顺序实施方案.md`
@@ -35,8 +35,10 @@
 - 临时缺口文档只在 gap 阶段存在；用户确认并回填主需求文档后必须删除，不保留为长期平行入口。
 - 需求文档落地时应在正文中同步补齐 Mermaid 流程图与时序图，不再另建配套图文件。
 - 需求正文中的图示应与正文、表格和口径保持一致。
-- 用户提供的需求截图与外部生成图片统一存放到 `doc/2-需求/data/`，并在需求主文档内使用 Markdown 图片语法直接引用展示。
-- 素材标识建议使用 ASCII：如 `req-shot-login`、`state-diagram-v2`，避免空格和中文标点。
+- 用户提供的需求截图与外部生成图片统一存放到 `doc/data/images/`，并按当前 Markdown 文件位置使用 `/` 分隔的相对路径直接引用展示。
+- 相对路径映射固定为：`doc/2-需求/*.md`、`doc/3-实施/*.md`、`doc/7-验收/*.md` 使用 `../data/images/<file>`；`doc/*.md` 使用 `data/images/<file>`；仓库根目录 Markdown 使用 `doc/data/images/<file>`。
+- 素材标识必须使用 ASCII kebab-case，例如 `req-shot-login`、`state-diagram`; 版本号统一由 `-v<number>` 后缀表示，返修递增版本号，避免空格和中文标点。
+- Markdown 图片禁止绝对路径、反斜杠、`file://`、Base64/data URI、HTML `<img>`、远程热链、路径越界和直接引用 `doc/data/<file>`；文档必须同时登记非空 alt 与 `IMG-*` 资产 ID。
 
 ## 架构域
 

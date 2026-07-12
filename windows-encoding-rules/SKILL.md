@@ -48,11 +48,16 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 ```
 - 若要把当前用户 PowerShell 永久切到 UTF-8，仅在 PowerShell 专项场景中执行：
 ```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1
+```
+- 若当前环境尚未提供 `pwsh`，才使用 Windows PowerShell 5.1 兼容入口：
+```powershell
 powershell -ExecutionPolicy Bypass -File .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1
 ```
-- 永久化脚本会同时补齐 Windows PowerShell 5.1 与 PowerShell 7 的用户级 profile，并写入 UTF-8 初始化片段；脚本未执行成功时，不得使用 PowerShell 执行需要稳定中文 I/O 的专项命令。
+- 永久化脚本会优先检查可用的 PowerShell 7（`pwsh` 主版本至少为 7），存在时先初始化并验证 PowerShell 7 profile，再初始化 Windows PowerShell 5.1 profile；未发现 PowerShell 7 时保留 5.1 兼容路径并明确报告状态。PowerShell 7 的安装由 Windows 环境准备 skill 负责，本脚本不安装包或修改 PATH。
+- 脚本会同时补齐 Windows PowerShell 5.1 与已检测到的 PowerShell 7 用户级 profile，并写入 UTF-8 初始化片段；脚本未执行成功时，不得使用 PowerShell 执行需要稳定中文 I/O 的专项命令。
 - 永久化脚本还应确保当前用户的 PowerShell 执行策略至少允许本地 profile 加载；若 profile 文件已落盘但新会话仍因 execution policy 被拦截，则视为脚本仍未完成闭环。
-- 脚本执行完成后，应继续用新的 PowerShell 子进程验证 `[Console]::InputEncoding`、`[Console]::OutputEncoding`、`$OutputEncoding` 与 `chcp` 是否都已经切到 UTF-8；只有验证通过，才算满足 PowerShell 专项命令前提。
+- 脚本执行完成后，应按 PowerShell 7 优先、5.1 兼容的顺序用新的 PowerShell 子进程验证 `[Console]::InputEncoding`、`[Console]::OutputEncoding`、`$OutputEncoding` 与 `chcp` 是否都已经切到 UTF-8；只有已检测 shell 的验证全部通过，才算满足 PowerShell 专项命令前提。
 - 读写文件统一使用显式 UTF-8 编码，推荐：
 ```powershell
 Get-Content -Encoding UTF8 <path>

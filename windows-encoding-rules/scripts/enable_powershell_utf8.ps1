@@ -37,9 +37,85 @@ try {
     }
 }
 
-function Get-TargetProfiles {
-    $targets = @()
+function Get-PowerShell7Command {
+    <#
+    [Parameters]
+    None.
+    [Returns]
+    PowerShell 7 command metadata, or $null when unavailable.
+    Last modified
+    2026-07-12 13:51:01 Prefer PowerShell 7 while retaining the legacy fallback.
+    #>
+    # 1. Resolve an application command so functions and aliases cannot masquerade as pwsh.
+    $pwshCommand = @(Get-Command pwsh -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1)
+    if ($null -eq $pwshCommand) {
+        return $null
+    }
 
+    $executablePath = [string]$pwshCommand.Path
+    if ([string]::IsNullOrWhiteSpace($executablePath)) {
+        $executablePath = [string]$pwshCommand.Source
+    }
+    if ([string]::IsNullOrWhiteSpace($executablePath)) {
+        return $null
+    }
+
+    # 2. Read the version from a no-profile child process so user output cannot pollute the probe.
+    $versionText = & $executablePath -NoLogo -NoProfile -Command '$PSVersionTable.PSVersion.ToString()' 2>$null | Select-Object -Last 1
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace([string]$versionText)) {
+        return $null
+    }
+
+    try {
+        $versionTextTrimmed = ([string]$versionText).Trim()
+        $version = [version]$versionTextTrimmed
+    } catch {
+        return $null
+    }
+
+    # 3. Accept major version 7 or newer; otherwise keep the Windows PowerShell 5.1 fallback.
+    if ($version.Major -lt 7) {
+        return $null
+    }
+
+    return [pscustomobject]@{
+        Path = $executablePath
+        Version = $version
+    }
+}
+
+function Get-TargetProfiles {
+    <#
+    [Parameters]
+    [pscustomobject]$PowerShell7Command - verified PowerShell 7 command metadata, or null.
+    [Returns]
+    User PowerShell profiles to initialize and verify.
+    Last modified
+    2026-07-12 13:51:01 Prefer PowerShell 7 while retaining Windows PowerShell 5.1 profiles.
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [pscustomobject]$PowerShell7Command
+    )
+
+    # 1. Add PowerShell 7 profiles first so the specialized entry uses the new shell.
+    $targets = @()
+    if ($null -ne $PowerShell7Command) {
+        $powerShell7Dir = Join-Path $HOME "Documents\\PowerShell"
+        $targets += [pscustomobject]@{
+            Label = "PowerShell7-CurrentUserAllHosts"
+            Path = Join-Path $powerShell7Dir "profile.ps1"
+            Shell = $PowerShell7Command.Path
+        }
+        $targets += [pscustomobject]@{
+            Label = "PowerShell7-CurrentUserCurrentHost"
+            Path = Join-Path $powerShell7Dir "Microsoft.PowerShell_profile.ps1"
+            Shell = $PowerShell7Command.Path
+        }
+    }
+
+    # 2. Always retain Windows PowerShell 5.1 profiles for legacy entry points.
     $windowsPowerShellDir = Join-Path $HOME "Documents\\WindowsPowerShell"
     $targets += [pscustomobject]@{
         Label = "WindowsPowerShell-CurrentUserAllHosts"
@@ -50,21 +126,6 @@ function Get-TargetProfiles {
         Label = "WindowsPowerShell-CurrentUserCurrentHost"
         Path = Join-Path $windowsPowerShellDir "Microsoft.PowerShell_profile.ps1"
         Shell = "powershell.exe"
-    }
-
-    $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
-    if ($pwshCommand) {
-        $powerShell7Dir = Join-Path $HOME "Documents\\PowerShell"
-        $targets += [pscustomobject]@{
-            Label = "PowerShell7-CurrentUserAllHosts"
-            Path = Join-Path $powerShell7Dir "profile.ps1"
-            Shell = $pwshCommand.Source
-        }
-        $targets += [pscustomobject]@{
-            Label = "PowerShell7-CurrentUserCurrentHost"
-            Path = Join-Path $powerShell7Dir "Microsoft.PowerShell_profile.ps1"
-            Shell = $pwshCommand.Source
-        }
     }
 
     $seen = @{}
@@ -129,7 +190,7 @@ $result = [ordered]@{
   }
   chcp = (cmd /c chcp)
 }
-$result | ConvertTo-Json -Compress
+$result | ConvertTo-Json -Compress -Depth 6
 '@
 
     $json = & $ShellExecutable -NoLogo -Command $probeScript
@@ -150,7 +211,15 @@ $result | ConvertTo-Json -Compress
     }
 }
 
-$targets = @(Get-TargetProfiles)
+# 1. Prefer PowerShell 7; installation belongs to the environment skill.
+$powerShell7 = Get-PowerShell7Command
+if ($null -eq $powerShell7) {
+    Write-Output "PowerShell 7 command not found; Windows PowerShell 5.1 profiles remain enabled."
+} else {
+    Write-Output "PowerShell 7 detected: version=$($powerShell7.Version)"
+}
+
+$targets = @(Get-TargetProfiles -PowerShell7Command $powerShell7)
 foreach ($target in $targets) {
     Ensure-ProfileUtf8Block -ProfilePath $target.Path
 }

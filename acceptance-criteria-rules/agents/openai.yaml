@@ -1,4 +1,4 @@
 interface:
   display_name: "验收标准"
   short_description: "把来源对象目标细化成实施前可验证完成标准，并单独落到 doc/7-验收 的验收标准文档"
-  default_prompt: "使用 $acceptance-criteria-rules 为当前来源对象（需求或 Bug）补齐实施前可验证的验收标准，覆盖主路径、异常路径和边界条件，并生成或更新 doc/7-验收 下独立的验收标准文档。"
+  default_prompt: "使用 $acceptance-criteria-rules 为当前来源对象（需求或 Bug）生成 doc/7-验收 下独立文档；每条 AC-* 必须回指 REQ/RULE，冻结角色/前置/环境/权限/样本/动作、可观察断言/阈值/错误码、主流程/异常/边界/并发/重复/兼容、清理/回滚、local 命令、失败预期和证据；只能 PASS/FAIL，缺关键字段或未决口径即 blocked，L2+ 补 Mermaid 流程/时序图。"

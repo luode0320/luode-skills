@@ -22,6 +22,8 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 ### 情况二：agent 在 Windows（如 Claude Desktop GUI）
 
 - **shell 选择**：普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用
+- **PowerShell 运行时预检**：进入上述专项场景前先检查 `pwsh` 是否存在且主版本至少为 7；优先使用 `pwsh -NoProfile`。缺少 PowerShell 7 时，调用 `windows-powershell-environment-rules` 的环境审计/安装入口；只有升级或安装被权限、网络或包管理器阻断时，才允许使用 `powershell.exe` 5.1 作为兼容回退。
+- **Windows Terminal 默认项**：PowerShell 7 的 Windows Terminal 用户级默认 profile 由 `windows-powershell-environment-rules` 负责设置与验证；本 skill 只负责命令路由，不替换系统 `powershell.exe`。
 - **看代码、改代码**：通过 `\\wsl.localhost\<distro>\home\<user>\<project>` 访问 WSL 文件
 - **普通命令默认不切 WSL**：搜索、读文件、改文件、规则检查、普通 `git status` / `git diff` / `git log` 等，默认留在 Git Bash / bash
 - **文件写入仍按 UTF-8**：普通读写留在 Git Bash / bash 时，脚本语言读写必须显式声明 UTF-8；不得因为路径在 WSL 或命令未进 WSL 就依赖 GBK / ANSI / shell 默认编码
@@ -29,7 +31,7 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 
 ## PowerShell 专项场景的保底模式
 
-这部分把社区热门 skill `powershell-windows` 的高价值规则吸收到本地，但定位是 **PowerShell 专项兜底**，不是把 PowerShell 重新升格成 Windows 默认仓库 shell。
+这部分把社区热门 skill `powershell-windows` 的高价值规则吸收到本地，但定位是 **PowerShell 专项兜底**，不是把 PowerShell 重新升格成 Windows 默认仓库 shell。专项运行时默认是 PowerShell 7+ 的 `pwsh`，`powershell.exe` 5.1 只用于明确记录的兼容回退。
 
 ### 什么时候才进入 PowerShell
 
@@ -48,11 +50,17 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 6. `ConvertTo-Json` 默认显式带 `-Depth`
 7. PowerShell 专项写文件、导日志和重定向时继续遵守 UTF-8 防护，必要时联动 `windows-encoding-rules`
 
+### 运行时选择与 5.1 回退
+
+1. Windows 专项命令先用 `pwsh -NoProfile`，并确认 `$PSVersionTable.PSVersion.Major -ge 7`。
+2. 如果 `pwsh` 不存在或版本不满足，先调用 `windows-powershell-environment-rules` 完成审计/安装；环境准备未获授权或执行被阻断时，才允许回退 `powershell.exe -NoProfile`。
+3. 在 5.1 回退路径中，`Invoke-WebRequest`、`Invoke-RestMethod`、`iwr`、`irm` 必须显式使用 `-UseBasicParsing`；不得把 5.1 回退写成新的默认入口。
+
 ### PowerShell 与主路由的关系
 
 - 如果任务本质只是 `rg` 搜索、读文件、普通 `git status` / `git diff`、规则检查或仓库盘点，**不要因为会写 PowerShell 就切到 PowerShell**
 - 如果任务本质是 Linux 运行链路里的编译、测试、调试或启动，**不要因为机器是 Windows 就放弃 WSL 执行**
-- PowerShell 在本 skill 里是专项入口，不是默认入口；默认入口仍然是 Git Bash / bash 和 `wsl.exe --cd`
+- PowerShell 在本 skill 里是专项入口，不是普通仓库命令入口；专项入口默认使用 `pwsh`，普通入口仍然是 Git Bash / bash，执行类动作仍然使用 `wsl.exe --cd`
 
 ## 跨环境命令失败恢复与经验沉淀
 

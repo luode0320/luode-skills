@@ -22,6 +22,19 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 - 对应需求、验收和实施总览：
 - 本周期不做：
 
+## 周期图片资产决策与边界
+
+- 图片资产决策：`需要` 或 `N/A + 原因 + 证据`。仅在 UI/原型、截图证据、视觉对比、真实产物、空间布局、外观基线或 Mermaid 无法准确表达时选择需要图片。
+- Mermaid 边界：任务依赖、流程、时序、状态、数据关系和周期门禁仍必须使用 Mermaid；图片不能替代任务依赖图、流程图、时序图或其它既有门禁。
+- 生成与引用：真实生成走 `imagegen`，目标为 `doc/data/images/<document_stem>.<asset-slug>-v<number>.<ext>`；正文只允许 `/` 分隔相对路径（例如 `../data/images/<document-stem>.login-state-v1.png`），禁止绝对/越界/远程/HTML/Base64/反斜杠路径及旧 `doc/data/<file>` 路径。
+- 格式校验：PNG 用于 UI/截图/文字密集图，JPEG 用于照片，WebP 仅在渲染器兼容性有证据时允许；扩展名必须与文件签名一致。
+
+## 周期图片资产清单
+
+| 图片 ID | 用途 / 生成输入 | 来源 | 相对路径 | 版本 | 关联 REQ/RULE / AC / CYCLE / TASK | 引用章节 | 敏感状态 | 版权状态 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `IMG-*` |  | `imagegen` / 用户提供 / N/A | `../data/images/<document-stem>.<asset-slug>-v<number>.<ext>` | `v1` | `REQ-* / AC-* / CYCLE-* / TASK-*` |  | `无敏感信息/需脱敏` | `已确认/待确认`
+
 ## 进入条件与收口条件
 
 | 类型 | 条件 | 证据/命令 | 状态 |
@@ -58,6 +71,14 @@ flowchart TD
 | 任务 | 文件路径 | 符号/区段 | 操作 | 修改前职责 | 修改后职责 | 调用方影响 | 兼容要求 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TASK-01` | `path/to/file` | `FunctionOrType` | 新增/修改/删除 |  |  |  |  |
+
+## 任务图片资产执行契约
+
+每个涉及图片的 `TASK-*` 必须冻结以下字段；不涉及图片时填写 `N/A + 原因 + 证据`：
+
+| 任务 | 图片决策 | 生成输入与 imagegen 命令 | 目标资产路径 | Markdown 相对引用 | `IMG-*` / 版本 | 资产清单与引用章节 | Mermaid 不替代说明 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `TASK-01` | `需要` / `N/A + 原因 + 证据` |  | `doc/data/images/<document_stem>.<asset-slug>-v<number>.<ext>` | `../data/images/<file>` |  |  |  |
 
 ## 真实测试与断言
 

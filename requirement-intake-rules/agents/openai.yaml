@@ -1,4 +1,4 @@
 interface:
   display_name: "需求接入"
   short_description: "接收 discovery 或资料，收口为同一份需求主文档。"
-  default_prompt: "使用 $requirement-intake-rules 根据 discovery 结果、需求 URL 和零散资料整理需求，按极致完整性标准冻结来源、决策、REQ/RULE、输入输出、异常边界、权限兼容、图形和双向追踪，并更新 doc/2-需求/ 同一份主文档；交给普通模型时必须做到零决策执行。"
+  default_prompt: "使用 $requirement-intake-rules 根据 discovery 结果、需求 URL 和零散资料整理需求，按极致完整性标准冻结 SRC/DEC、REQ/RULE、输入/处理/输出、异常、权限、兼容、观测、回滚、unresolved_decisions、N/A 原因证据、Mermaid 图形和 REQ/RULE-AC-TEST-EVIDENCE 双向追踪；P0/P1 未决即 blocked，P2 必须有默认授权/有效期/复核；更新 doc/2-需求/ 同一份主文档，交给普通模型时不得自行补决策。"

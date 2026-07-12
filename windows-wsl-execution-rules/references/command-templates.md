@@ -1,6 +1,6 @@
 # 命令模板
 
-代码放在 WSL 文件系统内（`/home/<user>/<project>`）。只有执行类命令进入 WSL；Windows 下普通仓库命令优先使用 Git Bash / bash。PowerShell 只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。
+代码放在 WSL 文件系统内（`/home/<user>/<project>`）。只有执行类命令进入 WSL；Windows 下普通仓库命令优先使用 Git Bash / bash。PowerShell 只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；进入这些专项场景时优先运行 PowerShell 7+ 的 `pwsh`，`powershell.exe` 5.1 只作为安装/升级被阻断时的兼容回退。
 
 ## agent 在 WSL（推荐）
 
@@ -51,11 +51,13 @@ wsl.exe --cd /home/<user>/<project> go mod download
 
 看代码、改代码、搜索、规则检查和多数 git 操作都留在 Git Bash / bash，经 `//wsl.localhost/<distro>/home/<user>/<project>` 或等价 Windows 可访问路径访问 WSL 文件。PowerShell 仅用于 Windows 专项场景；使用 PowerShell 写文件时仍必须显式指定 UTF-8。
 
+PowerShell 专项运行时预检：先运行 `pwsh -NoProfile -Command '$PSVersionTable.PSVersion'` 并确认主版本至少为 7；仅在 `pwsh` 安装/升级被阻断时，才运行 `powershell.exe -NoProfile -Command '$PSVersionTable.PSVersion'` 作为 5.1 回退。缺少 `pwsh` 时，先调用 `windows-powershell-environment-rules` 的审计/安装入口；这不会改变普通命令与执行类命令的主路由。进入 5.1 回退后，所有 `Invoke-WebRequest` / `Invoke-RestMethod`（及 `iwr` / `irm` 别名）都必须显式加 `-UseBasicParsing`。
+
 回复用户时同样按用户可访问路径引用项目内文件：项目在 WSL 且用户从 Windows 桌面访问时，普通文本路径、Markdown 链接、审查证据路径和总结路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`；只有 `wsl.exe --cd` 参数、WSL shell 命令和日志原文保留 `/home/<user>/<project>`。
 
 ## PowerShell 专项模板
 
-只有在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才用这部分模板。
+只有在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时才用这部分模板；默认通过 `pwsh -NoProfile` 执行，5.1 仅按上面的回退条件使用。
 
 ```powershell
 # 逻辑运算里的 cmdlet 单独加括号
@@ -80,7 +82,7 @@ $payload | ConvertTo-Json -Depth 10 | Out-File -Encoding utf8 result.json
 Get-Content app.log | Set-Content -Encoding utf8 app-utf8.log
 ```
 
-PowerShell 专项模板解决的是“已经进入 PowerShell 后怎么写”，不改变主路由：普通仓库命令仍优先 Git Bash / bash，执行类动作仍优先 `wsl.exe --cd` 进入 WSL。
+PowerShell 专项模板解决的是“已经进入 PowerShell 后怎么写”，不改变主路由：普通仓库命令仍优先 Git Bash / bash，执行类动作仍优先 `wsl.exe --cd` 进入 WSL；`pwsh` 只决定专项 PowerShell 运行时。
 
 ## WSL 内缓存目录建议
 

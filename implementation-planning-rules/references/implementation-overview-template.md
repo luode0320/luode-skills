@@ -31,6 +31,20 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 - 关键假设 / 待确认点：
 - `unresolved_decisions`：无，或逐项列 `DEC-*`、等级、阻断原因和升级路径。
 
+## 图片资产决策与实施边界
+
+- 图片资产决策：`需要` 或 `N/A + 原因 + 证据`。`需要` 时列出必需场景（UI/原型、截图证据、视觉对比、真实产物、空间布局、外观基线或 Mermaid 无法准确表达的内容）；`N/A` 时说明为何 Mermaid、表格或文字已经足够。
+- Mermaid 边界：流程、时序、状态、依赖和数据关系必须继续使用 Mermaid，图片不得替代既有 Mermaid 门禁；图片只能补充无法准确表达的视觉内容。
+- 生成契约：真实生成调用 `imagegen`，目标路径显式为项目根 `doc/data/images/<document_stem>.<asset-slug>-v<number>.<ext>`；失败即阻断，不得使用程序绘图、占位图或 Base64 冒充。
+- 格式契约：PNG 用于 UI、截图、文字密集图和信息图；JPEG 用于照片；WebP 只有在目标渲染器兼容性已验证并记录证据后才能使用；扩展名必须与文件签名一致。
+- 引用契约：Markdown 仅使用从当前文档位置计算的 `/` 分隔相对路径，例如 `![IMG-OVERVIEW-001 登录状态对比](../data/images/<document-stem>.login-state-v1.png)`；禁止绝对路径、反斜杠、`file://`、远程热链、HTML `<img>`、越界路径及 `doc/data/<file>` 旧路径。
+
+## 图片资产清单
+
+| 图片 ID | 用途 / 生成输入 | 来源 | 相对路径 | 版本 | 关联 REQ/RULE / AC / CYCLE / TASK | 引用章节 | 敏感状态 | 版权状态 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `IMG-*` |  | `imagegen` / 用户提供 / N/A | `../data/images/<document-stem>.<asset-slug>-v<number>.<ext>` | `v1` |  |  | `无敏感信息/需脱敏` | `已确认/待确认`
+
 ## 已冻结决策与方案比较
 
 | ID | 决策问题 | 候选方案 | 选定方案 | 排除原因 | 影响面 | 回滚 | 证据 |

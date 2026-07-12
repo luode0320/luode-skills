@@ -8,6 +8,7 @@
 - 需要知道各根目录职责时，读取 `../artifact-storage-rules/references/root-directories.md`
 - 需要知道命名模板时，读取 `../artifact-storage-rules/references/naming-templates.md`
 - 需要知道“更新原记录还是新建新记录”时，读取 `../artifact-storage-rules/references/update-policy.md`
+- 需要处理 Markdown 图片时，必须读取 `path-map.yaml` 中的 `roots.document_data`、`roots.document_image_assets`、`naming.document_asset_image` 和图片策略键；不得在下游 skill 重新定义图片根目录。
 - 需要判断新项目或多来源对象的实施顺序总表如何命名和复用时，读取 `../artifact-storage-rules/references/path-map.yaml`、`naming-templates.md` 与 `update-policy.md` 中的“需求与实施计划全量顺序实施方案”规则
 - 需要知道根目录 `项目设计.md` 的主入口、别名兼容和复用策略时，仍优先读取本 skill 的 `path-map.yaml` 与 `update-policy.md`
 
@@ -19,6 +20,7 @@
 - 不建议在各自 `SKILL.md` 中重复维护完整的 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`、`doc/`、`skill/` 模板说明。
 - 若本轮执行的是仓库内目录迁移，必须同步检查并更新仓库级 `AGENTS.md`、`README.md`、根目录 `项目设计.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`；不要只移动文件。
 - 若用户没有明确要求保留兼容层，迁移完成后应删除旧目录与旧跳转文档，不保留新旧并行入口。
+- 图片路径迁移完成后，必须全仓检索并清理历史需求域图片目录、`doc/data/<file>` 等旧路径；仅保留 `doc/data/images/`，并用相对路径从当前 Markdown 位置引用。
 - 若当前结论属于实现自审、目录归位、格式清理、语法检查或注释核对，默认归档到 `doc/6-审查/`；根级 `review/` 不再作为正式入口，`analysis/` 只有在项目明确声明该目录时才允许作为正式入口。
 
 ## 变更优先级

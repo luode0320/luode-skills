@@ -214,6 +214,33 @@
 - 更新时间: 2026-07-05
 - 状态: 启用
 
+### 需求与实施文档极致完整性契约
+- 别名: 零决策文档交接, 极致完整性, 普通模型执行契约, 文档质量 profile
+- 类型: 文档质量规则
+- 定义: 需求、验收标准、实施总览、实施周期和最小任务文档采用“结构完整、条件字段显式、决策冻结、图文一致、双向追踪、机器校验”的共同契约。所有条件字段必须填写，或使用 `N/A + 原因 + 证据`；普通模型不得自行补业务、技术、测试、回滚或停止决策。稳定追踪链固定为 `SRC -> DEC -> REQ/RULE -> AC -> CYCLE -> TASK -> 文件/符号 -> TEST -> EVIDENCE`。需求按复杂度 L1-L4 展开；L2 及以上按语义强制流程图、时序图及必要状态/数据/依赖图；实施总览、周期和任务卡分别承载整体决策、周期顺序和零决策执行动作。
+- 来源: `requirement-intake-rules/references/extreme-completeness-standard.md`、`implementation-planning-rules/references/implementation-overview-template.md`、`implementation-planning-rules/references/implementation-cycle-template.md`、`implementation-planning-rules/references/minimum-task-execution-contract.md`、`artifact-delivery-gate-rules/references/document-handoff-contract.md`
+- 适用范围: 需求域、验收域、实施域、交付闸门
+- 更新时间: 2026-07-12
+- 状态: 启用
+
+### Windows PowerShell 环境准备与工具边界
+- 别名: windows-powershell-environment-rules, PowerShell 7 默认入口, Windows CLI 工具清单
+- 类型: 环境规则
+- 定义: Windows 专项入口优先使用已验证的 PowerShell 7.6.3；Windows Terminal 用户级 `defaultProfile` 指向唯一受管 PowerShell 7 profile。PowerShell 5.1 保留为旧脚本兼容回退，不替换 `powershell.exe`，不修改 VS Code 默认终端或全局 Git 配置。Windows 侧通过固定 manifest 幂等准备并验证 `rg`、`fd`、`fzf`、`jq`、`yq`、`bat`、`eza`、`delta`、`just`、`sd`、`zoxide`、`wget2`、`aria2c`、`gsudo` 与 Git；7-Zip、tlrc 在当前非管理员环境下属于权限阻断。Windows 工具不等于 WSL 工具，WSL 进入项目后仍必须用 `command -v` 验证原生路径。
+- 来源: `windows-powershell-environment-rules/SKILL.md`、`references/tool-manifest.yaml`、`references/safety-and-validation.md`、2026-07-12 真实 Audit/Apply/Rollback 与 WSL 路径复核
+- 适用范围: Windows PowerShell 专项入口、Windows Terminal 用户设置、Windows CLI 工具安装与 WSL 隔离
+- 更新时间: 2026-07-12
+- 状态: 启用
+
+### Markdown 图片资产闭环
+- 别名: CHG-DOC-IMG-001, document_image_assets, Markdown 图片根目录
+- 类型: 资产存储与交付门禁规则
+- 定义: 所有需求、验收、实施和通用 Markdown 位图统一写入项目根 `doc/data/images/`；`doc/data/` 仅为文档数据容器，不提供直接图片入口。引用从当前 Markdown 位置计算 `/` 分隔相对路径，alt 必须非空且包含 `IMG-*`；图片决策为“需要”或 `N/A + 原因 + 证据`。真实生成必须经 `imagegen`，文件名遵循 `<document_stem>.<asset-slug>-v<number>.<ext>`；validator 校验路径、扩展名与签名、命名、九字段资产清单（用途、来源、版本、关联 ID、引用章节、敏感状态和版权状态）、决策、孤儿及 `doc/data/` 错位图片；Mermaid 仍负责流程、时序、状态、依赖和数据关系，图片不能替代 Mermaid。
+- 来源: `artifact-storage-rules/references/path-map.yaml`、`artifact-delivery-gate-rules/references/document-quality-profiles.yaml`、`REQ-DOC-20260712-033322`
+- 适用范围: 需求域、实施域、验收域、交付门禁
+- 更新时间: 2026-07-12
+- 状态: 启用
+
 ### 中间链路也受落盘闸门约束
 - 别名: 中段归档闸门, 非主入口也要落盘
 - 类型: 流程规则
@@ -400,6 +427,7 @@
 - 2026-07-01：历史上曾收紧为 PowerShell UTF-8 后承接普通命令；2026-07-02 已按新确认口径替换为 Windows 下普通仓库命令优先 Git Bash / bash，PowerShell 仅用于专项场景，执行类动作才进入 WSL。
 - 2026-07-01：恢复 README 改动日志时间戳格式为 yyyy-MM-dd HH:mm:ss 提交标题；新增提交前审查闸门，pre_commit_gate.sh 校验 doc/6-审查/ 下审查文档的审查结论、是否允许提交、阻断问题；两个审查 skill 归档时统一写入判定字段。
 - 2026-07-01：新增本地连接调试测试红线，明确需求、Bug、测试、运行时调试、启动联调和浏览器验证只能连接 local 本地数据库与本地服务，禁止连接 test / prod / staging 等非 local 环境。
+- 2026-07-12：新增 `windows-powershell-environment-rules` 并完成 Windows PowerShell 7.6.3 默认入口、UTF-8 profile、Windows CLI 工具 manifest、Terminal JSONC 幂等/回滚和 WSL 原生工具隔离验证；7z/tlrc 因管理员权限保留阻断。
 - 2026-07-01：补充计划型提问入口，明确用户只要显式索要“怎么做/先给计划/先出方案/先列步骤”，就必须先命中实施规划规则；若前置条件未齐，也要输出受限计划 / 阻断计划，而不是表现成计划规则未触发。
 - 2026-07-01：补充受限计划授权边界，明确受限计划不得作为实施授权；即使用户明确采纳，也必须先补齐前置条件并升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
 - 2026-07-03：补充 Plan Mode 包裹口径，明确运行环境若要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与模板结构。
@@ -444,6 +472,22 @@
 - 适用范围: HTTP API 文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
 - 更新时间: 2026-07-03
 - 状态: 启用
+
+## 需求与实施文档极致完备化规则
+
+- 需求、验收、实施总览、实施周期和最小任务卡均采用 Markdown + YAML front matter；复杂度为 L2 及以上时，按语义提供 Mermaid 流程图和时序图，L3/L4 追加状态、数据、依赖或故障图。
+- 高推理模型冻结业务、技术、测试、回滚、停止和异常决策；普通模型只能按 `REQ -> AC -> PLAN -> CYCLE -> TASK -> TEST -> EVIDENCE` 追踪链执行，不得补默认值或猜测未决决策。
+- 每个最小任务必须唯一归属一个实施周期，并完成“实现/落盘 -> 真实测试或有证据的免测 -> 审查 -> 验收”闭环；缺少任一证据时不得把状态写为已完成。
+- `artifact-delivery-gate-rules` 是文档质量唯一机器门禁；profile、严格追踪、N/A 理由、失效链接、Mermaid 语法和 UTF-8 检查失败时必须回开上游文档。
+- 实施规划使用单来源实施总览和项目级全量顺序实施方案两层入口；周期状态、任务状态、项目当前状态、审查和最终验收必须同步，不能保留已被后续事实超越的旧入口状态。
+
+## Windows PowerShell 环境自动迭代规则
+
+- `windows-powershell-environment-rules` 的新会话入口是 `initialize_windows_powershell.ps1 -Mode SessionEnsure`；通过用户级 TTL marker 和原子锁避免重复准备，Apply journal 不完整时写 `complete=false`，不得伪造健康状态。
+- Windows PowerShell 命令缺失统一经 `recover_windows_command.ps1` / `RecoverCommand` 路由；canonical manifest 或显式精确 `PackageId` 才能安装，未知命令不执行 `winget search` 猜包。
+- 安装并真实版本探针验证成功的非 canonical 工具写入用户级 `discovered-tools.json`，仅 `verified=true` 且通过 ID/命令/source 白名单的记录在后续会话合并读取；canonical `tool-manifest.yaml` 不运行时修改。
+- 失败摘要写入用户级 `failure-cases.json`，必须 UTF-8、原子替换、去重、限长、脱敏；PowerShell Windows owner 与 WSL 原生 shell/`127` owner 分离。
+- 当前 runtime 不提供任意 agent shell 调用的全局失败拦截；自动恢复范围仅限显式 wrapper 或未来接入 runtime hook 的路径。
 
 ## 机器索引区
 
@@ -497,6 +541,22 @@ entities:
     context_ids:
       - context.url-analysis
     updated_at: 2026-07-03
+  - entity_id: rule.windows-powershell-environment
+    name: "Windows PowerShell 环境准备与工具边界"
+    type: "环境规则"
+    aliases:
+      - windows-powershell-environment-rules
+      - PowerShell 7 默认入口
+      - Windows CLI 工具清单
+    definition: "Windows 专项入口优先使用 PowerShell 7.6.3；Windows Terminal 用户级 defaultProfile 指向唯一受管 PowerShell 7 profile；PowerShell 5.1 保留为旧脚本兼容回退。Windows 侧按固定 manifest 幂等安装并验证常用 CLI；7z/tlrc 在非管理员环境下保留权限阻断。Windows 工具不等于 WSL 工具，WSL 仍须用 command -v 验证原生路径。"
+    scope: "Windows PowerShell 专项入口、Windows Terminal 用户设置、Windows CLI 工具安装与 WSL 隔离"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.windows-powershell-environment
+      - evidence.test.windows-powershell-environment
+    context_ids:
+      - context.windows-powershell-environment
+    updated_at: 2026-07-12
   - entity_id: term.doc-top-level-mixed-naming
     name: "doc 顶层混合命名"
     type: "术语"
@@ -905,6 +965,12 @@ retrieval_hints:
       - "rule.imagegen-error-case-evolution"
     生图失败经验回写:
       - "rule.imagegen-error-case-evolution"
+    windows-powershell-environment-rules:
+      - "rule.windows-powershell-environment"
+    PowerShell 7 默认入口:
+      - "rule.windows-powershell-environment"
+    Windows CLI 工具清单:
+      - "rule.windows-powershell-environment"
     authenticated-url-routing-rules:
       - "rule.authenticated-url-routing"
     已登录 Chrome 路由:
@@ -986,6 +1052,10 @@ retrieval_hints:
       - "rule.execution-failure-learning"
     高风险调用预检:
       - "rule.execution-failure-learning"
+    Windows PowerShell 环境:
+      - "rule.windows-powershell-environment"
+    WSL 原生工具隔离:
+      - "rule.windows-powershell-environment"
     candidate active 案例:
       - "rule.execution-failure-learning"
     gpt-image-2 CLI fallback:
@@ -1052,6 +1122,14 @@ retrieval_hints:
       - "rule.execution-failure-learning"
     execution-failure-learning-rules/references/case-template.md:
       - "rule.execution-failure-learning"
+    windows-powershell-environment-rules/SKILL.md:
+      - "rule.windows-powershell-environment"
+    windows-powershell-environment-rules/references/tool-manifest.yaml:
+      - "rule.windows-powershell-environment"
+    windows-powershell-environment-rules/references/safety-and-validation.md:
+      - "rule.windows-powershell-environment"
+    windows-powershell-environment-rules/scripts/initialize_windows_powershell.ps1:
+      - "rule.windows-powershell-environment"
     doc/5-tests/2026-07-12_031353/execution_failure_learning_rules/forward_behavior_test.py:
       - "rule.execution-failure-learning"
     imagegen/SKILL.md:

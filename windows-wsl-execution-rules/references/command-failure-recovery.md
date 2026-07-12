@@ -154,6 +154,26 @@
 - 替代关系：无
 - 状态：active
 
+### 2026-07-12：Windows Python 默认编码导致 Skill 快速校验失败
+
+- 案例 ID：`WSL-006`
+- 失败阶段：`recover`
+- 环境：Windows PowerShell，执行仓库 Skill 快速校验脚本
+- 最小复现输入：直接运行 `python <workspace>/.system/skill-creator/scripts/quick_validate.py <skill-dir>`
+- 失败信号：脚本读取 UTF-8 中文文件时出现默认编码解码错误，校验未进入 Skill 规则判断
+- 触发命令类别：测试/验证脚本 / 编码 I/O
+- 根因：Windows Python 进程未启用 UTF-8 模式，脚本按系统默认代码页读取 UTF-8 仓库文件
+- 修复：在相同命令入口增加 `-X utf8`（或等价设置 `PYTHONUTF8=1`），保持输入路径和 Skill 目标不变
+- 验证：使用 `python -X utf8 <workspace>/.system/skill-creator/scripts/quick_validate.py <skill-dir>` 对同一 Skill 重跑，输出 `Skill is valid!` 且退出码为 0
+- 适用边界：适用于 Windows Python 读取 UTF-8 仓库文本的校验、生成和测试脚本；若文件字节已被错误写入，转交 `windows-encoding-rules` 的转码流程
+- 禁止动作：不要在未确认编码时重复使用默认 Python 入口，也不要把解码错误误判为 Skill 内容不合规
+- 授权：当前任务按执行失败学习规则回写 `candidate`；未获得将其晋级 `active` 的独立 Skill 维护授权
+- 发生次数：1
+- 首次观察：2026-07-12
+- 最后验证：2026-07-12
+- 替代关系：无
+- 状态：candidate
+
 ## 回写前检查
 
 - [ ] 已记录 shell、agent 侧、工作目录和退出码

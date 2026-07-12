@@ -197,3 +197,11 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - 只有在 做计划自审 时，再读 `references/plan-review-checklist.md`。
 - 只有在 判断与相邻 skill 的边界或对照正反例 时，再读 `references/plan-boundaries-and-examples.md`。
 - 只有在 维护本 skill 来源或后续继续吸收外部种子 时，再读 `references/source-notes.md`。
+## Markdown 图片资产实施规则
+
+- 实施总览、实施周期和最小任务卡必须显式写出图片资产决策：`需要`，或 `N/A + 原因 + 证据`；禁止“按需”“以后补图”等占位语。
+- 图片必需场景包括 UI/原型、截图证据、视觉对比、真实产物、空间布局、外观基线及 Mermaid 无法准确表达的视觉内容。流程、时序、状态、依赖和数据关系仍必须使用 Mermaid，图片不得替代既有图形门禁。
+- 真实图片生成必须调用 `imagegen`，将输出显式写入项目根 `doc/data/images/`；命名采用 `<document_stem>.<asset-slug>-v<number>.<ext>`，返修递增版本，生成失败即记录阻断并停止，不得使用程序绘图、占位图、Base64 或外部热链冒充。
+- Markdown 引用必须从当前文档位置计算 `/` 分隔相对路径（需求/实施文档通常为 `../data/images/<file>`），alt 非空且包含 `IMG-*`；禁止绝对路径、反斜杠、`file://`、远程图片、HTML `<img>`、越界路径和直接引用 `doc/data/<file>`。
+- 图片资产清单必须登记 `IMG-*`、用途/生成输入、来源、相对路径、版本、关联 `REQ/RULE`、`AC`、`CYCLE`、`TASK`、引用章节、敏感状态和版权状态；共享图片可多文档引用，未被任何 Markdown 引用的图片必须作为孤儿阻断。
+- 每个涉及图片的最小任务必须给出目标资产路径、生成命令、引用章节、格式/签名检查、清理或回滚步骤，并在“实现 -> 真实测试 -> 审查 -> 验收”闭环中验证；imagegen 通道不可用时不得降级为伪图。

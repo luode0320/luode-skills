@@ -25,6 +25,7 @@
 | --- | --- | --- |
 | 位图生成、编辑、真实图像 API | `imagegen` | 通道、模型能力、参数与输出校验 |
 | Windows/WSL shell、跨平台执行 | `windows-wsl-execution-rules` | shell、路径、编码、WSL/Windows 边界 |
+| Windows PowerShell command-not-found、缺失 Windows CLI、PowerShell 版本/包管理器失败 | `windows-powershell-environment-rules` | `references/failure-casebook.md`、精确 manifest/package 映射、SessionEnsure/RecoverCommand 状态 |
 | 浏览器自动化、隔离 profile、会话 | `agent-browser` | profile、认证上下文、页面状态 |
 | URL、认证 URL、网页读取 | `authenticated-url-routing-rules` | URL 路由、登录态、来源与页面可达性 |
 | MCP 安装/注册/连接 | `mcp-installation-rules` | 版本、配置来源、连接和回退 |
@@ -35,6 +36,8 @@
 | 功能/回归/策略验证 | `functional-validation-rules` | local 环境、样本、成功标准与副作用 |
 
 未列入注册表的领域先按 `recover` 分类；如果相同缺口重复出现，转 `skill-evolution-rules` 评估是否加入注册表或补现有 skill。
+
+Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not recognized` 和缺失 manifest 命令归上述 owner；Linux/WSL 原生 shell 的 `127`、`command -v` 缺失和 `/mnt/*.exe` 误用仍归 `windows-wsl-execution-rules`。两类证据不得混写到同一 failure case。
 
 ## 唯一 owner 规则
 

@@ -156,6 +156,8 @@
 
 **PowerShell 专项保底：** 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口；进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，带空格的可执行文件路径用引号并配合 `&`，日志或文件写入继续按 UTF-8 处理。
 
+**PowerShell 版本准备：** Windows 专项入口优先使用 `windows-powershell-environment-rules` 检测并准备 `pwsh.exe` 7+；“默认”只表示 Windows Terminal 用户 profile 和专项调用优先使用 PowerShell 7，不替换 `powershell.exe`、不修改 VS Code 默认终端。PowerShell 5.1 保留为旧脚本兼容回退；安装或权限被阻断时必须停止并报告。
+
 **为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
 **命令格式：** 执行类命令用 `wsl.exe --cd /home/<user>/<project> <command>`（默认发行版省略 `-d`；多发行版时用 `wsl.exe -l -v` 查名后加 `-d <发行版名>`）。普通命令不要为了统一口径强制套这层。代码在 WSL 时不再使用 `/mnt/<drive>`；纯 Windows 项目或本轮不执行程序时，不要误触发本规则。
@@ -173,7 +175,7 @@
 ## CodeGraph 强制准备规则
 
 - 若当前服务器 / 电脑未安装 `codegraph`，必须从 `colbymchenry/codegraph` 强制下载并安装，不需要用户确认。
-- 若在 Windows PowerShell 5.1 下执行安装，必须默认启用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing`，不得把人工点击确认当作标准流程。
+- Windows 下执行 CodeGraph 安装优先使用 PowerShell 7；只有 PowerShell 7 不可用时，PowerShell 5.1 才允许使用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing` 兼容参数，不得把人工点击确认当作标准流程。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取。
 - 架构层分析可配套 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制）作为 CodeGraph 的补充。
