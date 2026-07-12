@@ -10,7 +10,7 @@
 
 - 状态：原文档完备性基线和图片规则/校验实现已完成；`CHG-DOC-IMG-001` 在 CYCLE-05/T05-03 已按最新配置完成真实生图和验收。
 - 当前入口：`T05-03` 已完成：真实 PNG、签名、`view_image`、validator 和最终验收均通过，工作树保持未提交。
-- 本轮增量：Windows PowerShell 环境 Skill 已完成真实安装与验证；PowerShell 7.6.3 已成为 Windows Terminal 默认专项入口，工具安装与 WSL 隔离复核完成。
+- 本轮增量：完成 `project-agents-bootstrap` 图像配置跟随当前 Codex provider 改造；模板、imagegen 解析器、CLI 入口、文档和 local fixture 回归均已通过。
 - 更新时间：2026-07-12。
 
 ## 已完成
@@ -38,6 +38,7 @@
 ## 待办
 
 - 已完成：local imagegen 使用 `gpt-image-2` 生成真实 PNG，完成 `view_image`、图片引用/清单验证和孤儿扫描；临时资产已清理。
+- 已完成：当前渠道图像配置改造；`doc/5-tests/2026-07-12_171805/project-agents-image-channel/` 下 7 个 imagegen 单测、Python 编译、Bash 语法、PowerShell 解析、local PowerShell check、bootstrap 幂等 fixture、四份实施文档 strict 校验均通过。
 
 ## 阻断
 
@@ -59,6 +60,6 @@
 
 ## 交接点
 
-- 规则资产、机器校验、回归测试、真实生图、图片引用和审查证据已通过；C05 及最终图片验收状态为 `PASS`，工作树保持未提交。
+- 规则资产、机器校验、回归测试、真实生图、图片引用和审查证据已通过；当前渠道图像配置审查记录为 `doc/6-审查/2026-07-12_173045_project-agents-image-channel_当前改动总审查.md`，改造状态为 `PASS`，工作树保持未提交。
 - 未经用户在当前轮明确授权，不执行 `git commit`、`git push`、`git rebase`、`git merge` 或其他历史写入动作。
 - Windows PowerShell 环境 Skill 已完成本轮闭环；仅 `7z.exe`、`tlrc.exe` 的管理员权限补装仍未完成，不阻断已验证的核心环境入口。

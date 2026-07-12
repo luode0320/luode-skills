@@ -445,13 +445,14 @@ EOF
 
 GODOT_IMAGEGEN_SECTION=$(cat <<'EOF'
 - 图像配置只允许声明读取位置、`baseurl`、模型名、优先级和回退规则，禁止在仓库文档里写入真实密钥。
-- 推荐优先从环境变量或用户级配置读取，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`。
+- 图像配置默认跟随当前活动图像渠道，不固定写入某个供应商 URL；推荐优先从当前进程 provider-neutral 环境变量、当前 Codex provider 配置或用户级配置读取。
 - 图像配置应同时声明主通道、读取位置、优先级和回退配置，不得只写模型名。
 - 图像配置示例：
-  - 主通道：`baseurl=https://api.openai.com/v1`，模型 `gpt-image-1`
-  - 读取位置：当前进程环境变量、`~/.codex/auth.json`、`~/.codex/config.toml`
-  - 优先级：当前进程环境变量 > 用户项目声明的回退配置 > 用户项目声明的主配置 > `~/.codex/auth.json` > `~/.codex/config.toml`
-  - 回退规则：如果用户项目已声明回退配置里的 `api` / `baseurl`，则在当前进程环境变量之后优先使用该回退配置；若未声明或不可用，再继续使用项目主配置与 Codex local 默认配置；若这些也都不可用，则允许降级到人工补图或占位图，不得伪造已生成结果
+  - 主通道：`api: codex-auth:active_provider_api_key`、`baseurl: codex-config:active_provider_base_url`，模型 `gpt-image-2`
+  - 读取位置：当前进程 provider-neutral 环境变量、当前 Codex `model_provider` 对应的 provider 配置、Codex auth bridge
+  - 优先级：当前进程环境变量 > 用户项目声明的回退配置 > 用户项目声明的主配置 > 当前 Codex provider 配置
+  - 回退规则：如果用户项目已声明回退配置里的 `api` / `baseurl`，则在当前进程环境变量之后优先使用该回退配置；若未声明或不可用，再继续使用项目主配置与当前 Codex provider 配置；若这些也都不可用，则明确提示图像入口 unavailable
+- 运行时通过 OpenAI-compatible 适配层调用；不支持的协议不得伪造结果，也不得回退到预置渠道 URL
 - 回退规则：回退配置
   - `api: ''`
   - `baseurl: ''`

@@ -13,7 +13,7 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 
 本 skill 只有两种顶层模式：
 
-- **默认内置模式（优先）**：使用内置 `image_gen` 工具做普通生图、改图和简单透明底需求。不依赖 `OPENAI_API_KEY`。
+- **默认内置模式（优先）**：使用内置 `image_gen` 工具做普通生图、改图和简单透明底需求。不依赖 CLI 图像通道 API key。
 - **CLI fallback 模式**：使用 `scripts/image_gen.py` 以及系统入口脚本 `scripts/run_imagegen.ps1` / `scripts/run_imagegen.sh`。当内置工具在当前 turn 不可用且本地 imagegen 环境验证通过时自动启用；用户显式要求 CLI/API/模型控制时也走这条路径。
 
 CLI fallback 暴露三个子命令：
@@ -41,8 +41,8 @@ CLI fallback 暴露三个子命令：
   - Windows：`scripts/run_imagegen.ps1`
   - Linux/macOS：`scripts/run_imagegen.sh`
 - CLI fallback 验证时，优先先跑 `check`，确认：
-  - auth 来源
-  - base URL 来源
+  - 当前 provider 和 auth 来源
+  - 当前 provider 的 base URL 来源
   - `openai` 导入是否正常
   - `PIL` 导入是否正常
   - dry-run 是否成功
@@ -408,13 +408,13 @@ uv pip install pillow
 
 ### 环境
 
-- 真实 API 调用需要可用的图像通道
-- built-in 路径不需要向用户索要 `OPENAI_API_KEY`
+- 真实 API 调用需要可用的 OpenAI-compatible 图像通道
+- built-in 路径不需要向用户索要 CLI 图像通道 API key
 - CLI fallback 优先桥接：
-  1. 当前进程环境变量
+  1. 当前进程 provider-neutral 环境变量（`IMAGEGEN_API_KEY` / `IMAGEGEN_BASE_URL`）和旧变量兼容入口
   2. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）回退配置
   3. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）图像配置
-  4. `~/.codex/auth.json` + `~/.codex/config.toml`（仅 Codex 环境存在该机制）
+  4. `~/.codex/config.toml` 当前 `model_provider` 对应的 provider 与 `~/.codex/auth.json` auth bridge
   5. Claude Code 环境：当前版本暂无已确认的等价全局密钥配置文件（不假设存在 `~/.claude/auth.json` 等路径）；若前 3 级都未命中，必须明确提示用户在项目规则文件（`CLAUDE.md`）或本机环境变量中补充声明，不得静默尝试读取未经确认存在的 Claude Code 配置文件
 - 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
   1. 跑系统 `check`
@@ -423,11 +423,11 @@ uv pip install pillow
   4. 如果 env / 项目规则文件（`AGENTS.md` / `CLAUDE.md`）/ AI local config 都无法提供图像通道，再明确报 unavailable
   5. 验证成功后立刻继续出图，不要再等用户额外提示
 
-如果缺少 key，提示用户：
+如果当前 provider 缺少 API key，提示用户：
 
-1. 去 OpenAI 平台创建 API key
-2. 在本地系统环境变量中设置 `OPENAI_API_KEY`
-3. 如有需要，继续指导用户按系统/终端配置
+1. 为当前活动图像渠道配置可用 API key
+2. 在本地系统环境变量中设置 `IMAGEGEN_API_KEY`；已有 `OPENAI_API_KEY` 仍兼容
+3. 如有需要，继续指导用户按系统/终端配置当前 provider 的 base URL
 
 ## 参考文件
 

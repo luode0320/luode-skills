@@ -124,7 +124,7 @@
 - `最小复现输入`：运行系统入口的 `check` 子命令
 - `根因`：CLI fallback 依赖本地 Python 包和入口脚本环境；这不是模型调用失败。
 - `解决方案`：先运行系统入口 `check`；只缺 `openai` / `PIL` 时补齐本地依赖，再重复 `check`。不要另写一次性 SDK wrapper，也不要把程序绘图当作 fallback。
-- `验证`：Windows 使用 `scripts/run_imagegen.ps1 -Action check`，Linux/macOS 使用 `scripts/run_imagegen.sh check`；dry-run 中出现的 `OPENAI_API_KEY is not set` warning 不等于真实鉴权失败，输出不得包含密钥原值。
+- `验证`：Windows 使用 `scripts/run_imagegen.ps1 -Action check`，Linux/macOS 使用 `scripts/run_imagegen.sh check`；dry-run 中出现的图像通道 API key warning 不等于真实鉴权失败，输出不得包含密钥原值。
 - `用户确认`：安装依赖属于当前本地环境操作；若仍无可用鉴权或通道，必须报告 blocked。
 - `适用边界`：只处理本地依赖；鉴权来源不可用转交 IMG-005。
 - `禁止动作`：不要另写一次性 SDK wrapper，也不要用程序绘图冒充真实生图。

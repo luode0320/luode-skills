@@ -57,6 +57,9 @@ if ($Action -eq "check") {
     Write-Host "CODEX_HOME: $CodexHome"
     Write-Host "IMAGEGEN_PROJECT_ROOT: $ProjectRoot"
     Write-Host "ImageGen CLI: $ImageGenScript"
+    Write-Host ("IMAGEGEN_PROVIDER: " + $(if ($env:IMAGEGEN_PROVIDER) { $env:IMAGEGEN_PROVIDER } else { "unknown" }))
+    Write-Host ("IMAGEGEN_API_KEY source: " + $(if ($env:IMAGEGEN_API_KEY_SOURCE) { $env:IMAGEGEN_API_KEY_SOURCE } else { "unknown" }))
+    Write-Host ("IMAGEGEN_BASE_URL source: " + $(if ($env:IMAGEGEN_BASE_URL_SOURCE) { $env:IMAGEGEN_BASE_URL_SOURCE } else { "unknown" }))
     Write-Host ("OPENAI_API_KEY: " + $(if ($env:OPENAI_API_KEY) { "SET" } else { "MISSING" }))
     Write-Host ("OPENAI_BASE_URL: " + $(if ($env:OPENAI_BASE_URL) { "SET" } else { "MISSING" }))
     Write-Host ("OPENAI_API_KEY source: " + $(if ($env:IMAGEGEN_OPENAI_API_KEY_SOURCE) { $env:IMAGEGEN_OPENAI_API_KEY_SOURCE } else { "unknown" }))

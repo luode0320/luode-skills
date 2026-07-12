@@ -67,14 +67,39 @@ def _dependency_hint(package: str, *, upgrade: bool = False) -> str:
     )
 
 
+def _bridge_imagegen_environment() -> None:
+    """把 provider-neutral 图像变量桥接到 OpenAI-compatible SDK 变量。
+
+    [参数] 无；读取当前进程环境变量。
+    [返回] 无。
+    最近修改时间：2026-07-12 17:32:24；允许非 OpenAI provider 通过兼容层复用现有 SDK。
+    """
+    # OpenAI SDK 仍使用兼容变量名；provider-neutral 输入只在缺少旧变量时桥接。
+    # 1. 仅在旧变量缺失时桥接 API key，避免覆盖已有兼容配置。
+    if not os.getenv("OPENAI_API_KEY") and os.getenv("IMAGEGEN_API_KEY"):
+        os.environ["OPENAI_API_KEY"] = os.environ["IMAGEGEN_API_KEY"]
+    # 2. 仅在旧变量缺失时桥接 base URL，保持旧变量优先。
+    if not os.getenv("OPENAI_BASE_URL") and os.getenv("IMAGEGEN_BASE_URL"):
+        os.environ["OPENAI_BASE_URL"] = os.environ["IMAGEGEN_BASE_URL"]
+
+
 def _ensure_api_key(dry_run: bool) -> None:
-    if os.getenv("OPENAI_API_KEY"):
-        print("OPENAI_API_KEY is set.", file=sys.stderr)
+    """校验图像 API key，并区分 dry-run 与真实请求。
+
+    [参数] dry_run: 是否仅输出请求计划而不发起真实请求。
+    [返回] 无；缺少真实请求所需配置时终止进程。
+    最近修改时间：2026-07-12 17:32:24；改用 provider-neutral 提示并保留旧变量兼容。
+    """
+    # 1. 兼容旧变量和 provider-neutral 变量，只报告配置状态不打印原值。
+    if os.getenv("OPENAI_API_KEY") or os.getenv("IMAGEGEN_API_KEY"):
+        print("Image generation API key is set.", file=sys.stderr)
         return
+    # 2. dry-run 缺 key 时仅告警，允许继续输出脱敏请求计划。
     if dry_run:
-        _warn("OPENAI_API_KEY is not set; dry-run only.")
+        _warn("Image generation API key is not set; dry-run only.")
         return
-    _die("OPENAI_API_KEY is not set. Export it before running.")
+    # 3. 真实请求缺 key 时阻断，避免进入 SDK 请求流程。
+    _die("Image generation API key is not set. Configure the current provider or IMAGEGEN_API_KEY.")
 
 
 def _read_prompt(prompt: Optional[str], prompt_file: Optional[str]) -> str:
@@ -952,6 +977,13 @@ def _add_shared_args(parser: argparse.ArgumentParser) -> None:
 
 
 def main() -> int:
+    """解析 CLI 参数、校验请求并执行图像任务。
+
+    [参数] 无；命令行参数通过 argparse 读取。
+    [返回] 成功时返回 0。
+    最近修改时间：2026-07-12 17:32:24；在请求执行前加入 provider-neutral 环境桥接。
+    """
+    # 1. 解析并校验模型、尺寸、质量和任务专属参数。
     parser = argparse.ArgumentParser(
         description="Fallback CLI for explicit image generation or editing via GPT Image models"
     )
@@ -979,6 +1011,7 @@ def main() -> int:
     edit_parser.add_argument("--input-fidelity")
     edit_parser.set_defaults(func=_edit)
 
+    # 2. 解析参数并检查数量、并发和输出边界。
     args = parser.parse_args()
     if args.n < 1 or args.n > 10:
         _die("--n must be between 1 and 10")
@@ -993,6 +1026,7 @@ def main() -> int:
     if getattr(args, "downscale_max_dim", None) is not None and args.downscale_max_dim < 1:
         _die("--downscale-max-dim must be >= 1")
 
+    # 3. 校验模型、尺寸、质量、背景和模型专属参数。
     _validate_model(args.model)
     _validate_size(args.size, args.model)
     _validate_quality(args.quality)
@@ -1002,8 +1036,11 @@ def main() -> int:
         background=args.background,
         input_fidelity=getattr(args, "input_fidelity", None),
     )
+    # 4. 在鉴权检查前桥接 provider-neutral 变量，复用 OpenAI-compatible SDK。
+    _bridge_imagegen_environment()
     _ensure_api_key(args.dry_run)
 
+    # 5. 执行用户选择的生成、编辑或批处理任务。
     args.func(args)
     return 0
 

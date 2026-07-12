@@ -203,13 +203,14 @@ description: 若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；
 - 若仓库命中 Godot 项目标记，还必须补齐：
   - `## Godot 项目工具配置`
   - `## 图像生成配置`
-  - 其中 `图像配置:` 块只能声明读取位置、`baseurl`、模型名、优先级和回退规则，不能写真实 `OPENAI_API_KEY`
-  - 图像配置应同时包含：
-    - 主通道：优先 `baseurl=https://api.openai.com/v1`，模型优先写最新可用的 `gpt-image` 系列，例如 `gpt-image-1`
-    - 回退规则：回退配置
-      - `api: ''`
-      - `baseurl: ''`
-  - 回退规则：如果用户项目规则文件已声明回退配置里的 `api` / `baseurl`，则在当前进程环境变量之后优先使用该回退配置作为项目图像通道；若未声明回退配置或回退配置不可用，再继续使用项目主配置与 `~/.codex/auth.json`、`~/.codex/config.toml` 的默认配置；若这些也都不可用，则允许降级到人工补图或占位图，不得伪造已生成结果
+  - 其中 `图像配置:` 块只能声明读取位置、`baseurl`、模型名、优先级和回退规则，不能写真实密钥
+  - 图像配置默认跟随当前活动图像渠道，不固定写入某一供应商 URL：
+    - 主通道：`api: codex-auth:active_provider_api_key`、`baseurl: codex-config:active_provider_base_url`、模型 `gpt-image-2`
+    - 读取位置：当前进程 provider-neutral 环境变量、当前 Codex `model_provider` 对应的 provider 配置、Codex auth bridge
+    - 优先级：当前进程环境变量 > 用户项目声明的回退配置 > 用户项目声明的主配置 > 当前 Codex provider 配置
+    - 回退配置默认保持 `api: ''`、`baseurl: ''`
+  - 运行时通过 OpenAI-compatible 适配层调用；如果当前 provider 不提供兼容图像接口或无法解析，不得回退到预置渠道 URL，也不得伪造已生成结果
+  - 回退规则：如果用户项目规则文件已声明回退配置里的 `api` / `baseurl`，则在当前进程环境变量之后优先使用该回退配置；若未声明回退配置或回退配置不可用，再继续使用项目主配置与当前 Codex provider 配置；若这些也都不可用，则明确提示图像入口 unavailable
 
 9. 若当前服务器 / 电脑未安装 `codegraph` CLI，或当前仓库尚未初始化 CodeGraph：
    - 未安装时必须先从 `https://github.com/colbymchenry/codegraph` 强制下载并安装 `codegraph`
