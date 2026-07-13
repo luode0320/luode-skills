@@ -10,7 +10,14 @@ from pathlib import Path
 from typing import Any
 
 
-ALLOWED_STATES = {"candidate", "active", "stale", "conflicted", "rejected"}
+ALLOWED_STATES = {
+    "candidate",
+    "active",
+    "stale",
+    "conflicted",
+    "superseded",
+    "rejected",
+}
 REQUIRED_FIELDS = (
     "case_id",
     "owner_skill",
@@ -34,7 +41,9 @@ SECRET_PATTERNS = (
     re.compile(r"(?i)\b(token|password|secret|api[_-]?key)\s*[=:]\s*[^\s,;]+"),
     re.compile(r"(?i)\b(authorization)\s*:\s*[^\s,;]+"),
 )
-PRIVATE_PATH_PATTERN = re.compile(r"(?:[A-Za-z]:\\Users\\[^\s]+|/home/[^\s]+)")
+PRIVATE_PATH_PATTERN = re.compile(
+    r"(?:[A-Za-z]:\\[^\s]+|/home/[^\s]+|/mnt/[A-Za-z]/[^\s]+)"
+)
 
 
 def sanitize(value: str) -> str:
@@ -108,7 +117,10 @@ def render(payload: dict[str, Any]) -> str:
     最近修改时间: 2026-07-14 增加正反例和追加式状态事件正文。
     """
     validate(payload)
-    values = {field: text_value(payload, field) for field in REQUIRED_FIELDS}
+    values = {
+        field: text_value(payload, field)
+        for field in (*REQUIRED_FIELDS, "negative_example", "positive_example")
+    }
     state = payload.get("state", "candidate")
     today = text_value(payload, "updated")
     key = case_key(payload)
@@ -127,6 +139,8 @@ def render(payload: dict[str, Any]) -> str:
         f"case_state: {yaml_scalar(state)}",
         f"owner_skill: {yaml_scalar(values['owner_skill'])}",
         f"category: {yaml_scalar(values['category'])}",
+        f"error_signature: {yaml_scalar(values['error_signature'])}",
+        f"scope: {yaml_scalar(values['scope'])}",
         "environment: local",
         f"tool_or_model: {yaml_scalar(values['tool_or_model'])}",
         f"tool_major: {yaml_scalar(values['tool_major'])}",
@@ -159,6 +173,8 @@ def render(payload: dict[str, Any]) -> str:
         "",
         "## 状态事件",
         f"### {today} | {state} | created",
+        f"- status: {state}",
+        "- event: created",
         "- 原因：案例由受控渲染器生成。",
         "- 证据：后续状态只能通过 bridge append 追加。",
         "",
