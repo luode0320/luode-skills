@@ -64,35 +64,54 @@ DEFAULT_UNCOMMITTED_EXCLUDED_PATHS = {
     "coverage/",
     "node_modules/",
 }
-TASK_CANDIDATE_DOC_PREFIXES = (
-    "doc/2-需求/",
-    "doc/3-实施/",
-    "doc/4-bugs/",
-    "doc/5-tests/",
-    "doc/6-审查/",
-    "doc/7-验收/",
-)
-TASK_CANDIDATE_SUFFIXES = (
-    "_当前改动总审查",
-    "_当前改动代码审查",
-    "_当前改动审查",
-    "_当前总审查",
-    "_代码审查",
-    "_实施总览",
-    "_验收标准",
-    "_验收记录",
-    "_测试记录",
-    "_测试方案",
-    "_README",
-)
-GENERIC_TASK_CANDIDATES = {
-    "当前改动",
-    "当前改动代码审查",
-    "当前改动总审查",
-    "代码审查",
-    "总审查",
+DEFAULT_UNCOMMITTED_ANALYSIS_EXCLUDED_PATHS = {
+    "doc/",
+    "docs/",
+    "design/",
+    "designs/",
+    "figma/",
+    "mockup/",
+    "prototype/",
+    ".codegraph/",
 }
-
+DEFAULT_UNCOMMITTED_ANALYSIS_EXCLUDED_EXTENSIONS = {
+    ".md",
+    ".markdown",
+    ".txt",
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".ppt",
+    ".pptx",
+    ".xls",
+    ".xlsx",
+    ".fig",
+    ".sketch",
+    ".xd",
+    ".drawio",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".pid",
+    ".lock",
+    ".log",
+}
+MODULE_LABELS = {
+    "app/buysell": "买卖币",
+    "app/exchange": "兑换",
+    "app/marketactivity": "市场活动",
+    "app/system": "系统服务",
+    "app/wallet": "钱包服务",
+    "internal/controller": "接口层",
+    "internal/router": "路由层",
+    "internal/service": "服务层",
+    "crontask": "定时任务",
+    "cmd/migrate": "数据迁移",
+    "frontend": "前端页面",
+    "web": "前端页面",
+}
 
 @dataclass
 class CommitEntry:
@@ -503,6 +522,32 @@ def resolve_uncommitted_max_paths(cfg: dict) -> int:
     return value
 
 
+def resolve_uncommitted_analysis_excluded_paths(cfg: dict) -> list[str]:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - list[str]: 不参与未提交任务分析的目录前缀。
+    最近修改时间: 2026-07-10 设计文件排除改为独立配置，避免设计材料成为进行中任务依据。
+    """
+    configured = normalize_str_list(cfg.get("uncommitted_analysis_excluded_paths"))
+    if configured:
+        return [item.replace("\\", "/").lower() for item in configured]
+    return list(DEFAULT_UNCOMMITTED_ANALYSIS_EXCLUDED_PATHS)
+
+
+def resolve_uncommitted_analysis_excluded_extensions(cfg: dict) -> list[str]:
+    """
+    [参数]
+    - cfg: 工作报告配置对象。
+    [返回]
+    - list[str]: 不参与未提交任务分析的文件扩展名。
+    最近修改时间: 2026-07-10 设计文件排除改为独立配置，避免文档和设计文件污染任务摘要。
+    """
+    configured = normalize_str_list(cfg.get("uncommitted_analysis_excluded_extensions"))
+    extensions = configured or list(DEFAULT_UNCOMMITTED_ANALYSIS_EXCLUDED_EXTENSIONS)
+    return [item.lower() if item.startswith(".") else f".{item.lower()}" for item in extensions]
+
 def filter_commits_by_importance(
     commits: list[CommitEntry],
     excluded_types: set[str],
@@ -604,160 +649,167 @@ def filter_worktree_entries_by_importance(
     return filtered
 
 
-def contains_chinese(text: str) -> bool:
+def is_analysis_excluded_path(path: str, excluded_paths: list[str], excluded_extensions: list[str]) -> bool:
     """
     [参数]
-    - text: 待检查的文本。
+    - path: 工作区改动相对路径。
+    - excluded_paths: 设计和文档目录前缀。
+    - excluded_extensions: 设计和文档文件扩展名。
     [返回]
-    - bool: 是否包含中文字符。
-    最近修改时间: 2026-07-03 20:05:00 新增中文检测，支撑未提交事项优先提取中文任务简要。
+    - bool: 是否排除该路径的任务语义分析。
+    最近修改时间: 2026-07-10 明确禁止使用设计文件和文档文件生成进行中任务摘要。
     """
-    # 1. 通过中文 Unicode 范围快速判断文本里是否存在中文语义片段。
-    return bool(re.search(r"[\u4e00-\u9fff]", text))
+    normalized_path = path.replace("\\", "/").lower()
+    file_suffix = Path(normalized_path).suffix
+    return any(normalized_path.startswith(prefix) for prefix in excluded_paths) or file_suffix in excluded_extensions
 
 
-def strip_task_timestamp_prefix(text: str) -> str:
+def run_git_diff_head(repo_path: Path) -> str:
     """
     [参数]
-    - text: 可能带时间戳前缀的任务文本。
+    - repo_path: Git 仓库路径。
     [返回]
-    - str: 去掉常见时间戳前缀后的文本。
-    最近修改时间: 2026-07-03 20:05:00 新增时间戳清理，避免审查和实施文档文件名前缀污染任务摘要。
+    - str: 当前 HEAD 到工作区的已跟踪文件差异。
+    最近修改时间: 2026-07-10 新增 diff 读取，让进行中摘要基于真实代码变更内容。
     """
-    # 1. 统一清理 YYYY-MM-DD、YYYYMMDD、HHMMSS 等常见文件名前缀。
-    cleaned = re.sub(r"^\d{4}-\d{2}-\d{2}_\d{6}_", "", text)
-    cleaned = re.sub(r"^\d{8}_\d{6}_", "", cleaned)
-    cleaned = re.sub(r"^\d{4}-\d{2}-\d{2}_", "", cleaned)
-    return re.sub(r"^\d{8}_", "", cleaned)
+    cmd = ["git", "-C", str(repo_path), "diff", "HEAD", "--no-ext-diff", "--unified=0", "--"]
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+    if proc.returncode != 0:
+        stderr = proc.stderr.strip()
+        raise RuntimeError(stderr or "git 工作区差异读取失败")
+    return proc.stdout
 
 
-def normalize_task_candidate(text: str) -> str:
+def read_untracked_code_lines(repo_path: Path, entries: list[WorktreeEntry], excluded_paths: list[str], excluded_extensions: list[str]) -> list[str]:
     """
     [参数]
-    - text: 原始任务候选文本。
+    - repo_path: Git 仓库路径。
+    - entries: 工作区未提交改动列表。
+    - excluded_paths: 设计和文档目录前缀。
+    - excluded_extensions: 设计和文档文件扩展名。
     [返回]
-    - str: 归一化后的任务候选文本。
-    最近修改时间: 2026-07-03 20:05:00 新增任务候选归一化，统一清理文件名噪音并保留中文任务语义。
+    - list[str]: 新增代码文件中的有限行内容。
+    最近修改时间: 2026-07-10 支持从未跟踪代码文件补充 diff 语义，同时跳过设计和文档文件。
     """
-    # 1. 先去掉时间戳、通用尾缀和实施周期前缀，收敛到任务主体。
-    cleaned = strip_task_timestamp_prefix(text.strip())
-    cleaned = re.sub(r"^实施周期\d+_", "", cleaned)
-    while True:
-        matched_suffix = next((suffix for suffix in TASK_CANDIDATE_SUFFIXES if cleaned.endswith(suffix)), None)
-        if matched_suffix is None:
-            break
-        cleaned = cleaned[: -len(matched_suffix)]
+    lines: list[str] = []
+    for entry in entries:
+        if "?" not in entry.status or is_analysis_excluded_path(entry.path, excluded_paths, excluded_extensions):
+            continue
+        file_path = repo_path / entry.path
+        try:
+            raw = file_path.read_bytes()
+        except OSError:
+            continue
+        if b"\x00" in raw or len(raw) > 256 * 1024:
+            continue
+        lines.extend(raw.decode("utf-8", errors="replace").splitlines()[:400])
+    return lines
 
-    # 2. 再统一分隔符和空白，避免输出里夹带文件系统痕迹。
-    cleaned = cleaned.strip(" _-")
-    cleaned = re.sub(r"[_]+", " ", cleaned)
-    cleaned = re.sub(r"\s+", " ", cleaned)
-    return cleaned.strip(" -")
 
-
-def format_task_candidate(text: str) -> str | None:
+def collect_changed_code_lines(diff_text: str, excluded_paths: list[str], excluded_extensions: list[str]) -> list[str]:
     """
     [参数]
-    - text: 已归一化的任务候选文本。
+    - diff_text: Git diff 文本。
+    - excluded_paths: 设计和文档目录前缀。
+    - excluded_extensions: 设计和文档文件扩展名。
     [返回]
-    - str | None: 可直接用于周报的中文任务简要；无法可靠表达时返回空值。
-    最近修改时间: 2026-07-03 20:05:00 新增任务短句格式化，优先把混合路径候选整理成中文简要描述。
+    - list[str]: 已跟踪代码文件的新增和删除行。
+    最近修改时间: 2026-07-10 只保留代码文件 diff，排除设计文件和纯上下文行。
     """
-    # 1. 没有中文语义时直接放弃，避免把纯英文路径误当任务名。
-    cleaned = normalize_task_candidate(text)
-    if not cleaned or not contains_chinese(cleaned):
-        return None
-    if cleaned.replace(" ", "") in GENERIC_TASK_CANDIDATES:
-        return None
+    changed_lines: list[str] = []
+    current_path = ""
+    for raw_line in diff_text.splitlines():
+        if raw_line.startswith("diff --git a/"):
+            match = re.match(r"diff --git a/(.+) b/(.+)$", raw_line)
+            current_path = match.group(2) if match else ""
+            continue
+        if not current_path or is_analysis_excluded_path(current_path, excluded_paths, excluded_extensions):
+            continue
+        if raw_line.startswith(("+++", "---", "@@")):
+            continue
+        if raw_line.startswith(("+", "-")):
+            changed_lines.append(raw_line[1:].strip())
+    return changed_lines
 
-    # 2. 若前缀是英文模块名、后缀是中文任务说明，则整理成“完善 X 的 Y”。
-    first_cn_match = re.search(r"[\u4e00-\u9fff]", cleaned)
-    if first_cn_match is None:
-        return None
-
-    first_cn_index = first_cn_match.start()
-    prefix = cleaned[:first_cn_index].strip(" -")
-    suffix = cleaned[first_cn_index:].strip(" -")
-    if prefix and suffix and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ./_-]*", prefix):
-        return f"完善 {prefix} 的{suffix}"
-    return cleaned
-
-
-def extract_task_module_hint(text: str) -> str | None:
+def infer_module_label(paths: list[str], project_name: str) -> str:
     """
     [参数]
-    - text: 已格式化的任务候选文本。
+    - paths: 参与分析的代码路径。
+    - project_name: 项目名称。
     [返回]
-    - str | None: 候选里隐含的模块提示；没有时返回空值。
-    最近修改时间: 2026-07-03 20:05:00 新增模块提示提取，用于让任务摘要更贴近当前主改动目录。
+    - str: 从代码路径推导出的模块名称。
+    最近修改时间: 2026-07-10 用代码目录推导任务范围，不再依赖设计文件名。
     """
-    # 1. 从“完善 X 的Y”格式中提取模块名，供工作区候选排序加权。
-    match = re.match(r"^完善\s+(.+?)\s+的.+$", text)
-    if match is None:
-        return None
-    module = match.group(1).strip()
-    return module or None
+    normalized_paths = [path.replace("\\", "/").lower() for path in paths]
+    for module_prefix, label in MODULE_LABELS.items():
+        if any(path.startswith(module_prefix) for path in normalized_paths):
+            return label
+    return project_name
 
 
-def extract_task_candidate_from_path(path: str) -> str | None:
+def extract_diff_signals(lines: list[str]) -> list[str]:
     """
     [参数]
-    - path: 单个未提交改动路径。
+    - lines: 代码 diff 的新增和删除行。
     [返回]
-    - str | None: 从路径中提取出的任务候选；无法提取时返回空值。
-    最近修改时间: 2026-07-03 20:05:00 新增路径任务提取，优先复用中文文档名里的任务语义。
+    - list[str]: 可用于任务摘要的变更语义片段。
+    最近修改时间: 2026-07-10 从代码变更中的中文业务词和标记提取任务线索。
     """
-    # 1. 优先从文件名提取任务候选；若文件名无中文，再回退到路径中最后一个含中文的目录或文件名。
-    normalized_path = path.replace("\\", "/")
-    file_name = Path(normalized_path).stem
-    if contains_chinese(file_name):
-        return format_task_candidate(file_name)
+    signals: list[str] = []
+    seen: set[str] = set()
+    for line in lines:
+        if not line or line.startswith(("//", "/*", "*", "#")):
+            continue
+        candidates = re.findall(r"\[[^\]\n]{2,30}\]|[\u4e00-\u9fff]{4,}", line)
+        for candidate in candidates:
+            cleaned = candidate.strip("[]，。；：:、 \\\"'")
+            if len(cleaned) < 2 or not re.search(r"[\u4e00-\u9fff]", cleaned) or cleaned in seen:
+                continue
+            seen.add(cleaned)
+            signals.append(cleaned)
+            if len(signals) >= 3:
+                return signals
+    return signals
 
-    for segment in reversed(normalized_path.split("/")):
-        candidate = Path(segment).stem
-        if contains_chinese(candidate):
-            return format_task_candidate(candidate)
-    return None
 
-
-def collect_worktree_task_candidates(entries: list[WorktreeEntry]) -> list[str]:
+def summarize_code_worktree_changes(
+    project_name: str,
+    repo_path: Path,
+    entries: list[WorktreeEntry],
+    max_paths: int,
+    excluded_paths: list[str],
+    excluded_extensions: list[str],
+) -> list[str]:
     """
     [参数]
+    - project_name: 项目名称。
+    - repo_path: Git 仓库路径。
     - entries: 过滤后的工作区改动列表。
+    - max_paths: 最多展示的路径数量。
+    - excluded_paths: 设计和文档目录前缀。
+    - excluded_extensions: 设计和文档文件扩展名。
     [返回]
-    - list[str]: 按优先级排序的任务候选列表。
-    最近修改时间: 2026-07-03 20:05:00 新增候选收集，优先从需求/实施/审查等中文文档改动中推断进行中任务。
+    - list[str]: 基于代码 diff 的进行中任务摘要。
+    最近修改时间: 2026-07-10 以代码 diff 为主要证据生成进行中任务，设计文件不参与分析。
     """
-    # 1. 先按文档路径优先级收集候选，尽量让“进行中”更像任务名而不是路径列表。
-    scored_candidates: list[tuple[int, str]] = []
-    root_counts: dict[str, int] = {}
-    seen_candidates: set[str] = set()
-    for entry in entries:
-        path_parts = entry.path.split("/", 1)
-        if not path_parts or not path_parts[0] or path_parts[0] == "doc":
-            continue
-        root_counts[path_parts[0]] = root_counts.get(path_parts[0], 0) + 1
+    code_entries = [entry for entry in entries if not is_analysis_excluded_path(entry.path, excluded_paths, excluded_extensions)]
+    if not code_entries:
+        return []
 
-    for entry in entries:
-        candidate = extract_task_candidate_from_path(entry.path)
-        if not candidate or candidate in seen_candidates:
-            continue
+    diff_lines = collect_changed_code_lines(run_git_diff_head(repo_path), excluded_paths, excluded_extensions)
+    diff_lines.extend(read_untracked_code_lines(repo_path, code_entries, excluded_paths, excluded_extensions))
+    paths = [entry.path for entry in code_entries]
+    module = infer_module_label(paths, project_name)
+    signals = extract_diff_signals(diff_lines)
+    displayed_paths = list(dict.fromkeys(paths))[:max_paths]
+    path_text = "、".join(displayed_paths)
+    if len(set(paths)) > len(displayed_paths):
+        path_text = f"{path_text} 等 {len(set(paths))} 处"
 
-        score = 10
-        if entry.path.startswith(TASK_CANDIDATE_DOC_PREFIXES):
-            score += 100
-        if contains_chinese(Path(entry.path).stem):
-            score += 20
-        module_hint = extract_task_module_hint(candidate)
-        if module_hint and root_counts.get(module_hint, 0) >= 2:
-            score += 50
-
-        seen_candidates.add(candidate)
-        scored_candidates.append((score, candidate))
-
-    scored_candidates.sort(key=lambda item: (-item[0], item[1]))
-    return [item[1] for item in scored_candidates]
-
+    if signals:
+        signal_text = "、".join(signals[:2])
+        return [f"进行中: 正在推进{module}相关开发，代码变更集中在{signal_text}，涉及 {path_text}"]
+    return [f"进行中: 正在推进{module}相关开发，主要改动文件为 {path_text}"]
 
 def build_worktree_path_summary(entries: list[WorktreeEntry], max_paths: int) -> str:
     """
@@ -816,25 +868,43 @@ def build_worktree_path_summary(entries: list[WorktreeEntry], max_paths: int) ->
     return f"工作区仍有未提交改动（{summary}），涉及 {path_suffix}"
 
 
-def summarize_worktree_changes(entries: list[WorktreeEntry], max_paths: int) -> list[str]:
+def summarize_worktree_changes(
+    project_name: str,
+    repo_path: Path,
+    entries: list[WorktreeEntry],
+    max_paths: int,
+    analysis_excluded_paths: list[str],
+    analysis_excluded_extensions: list[str],
+) -> list[str]:
     """
     [参数]
+    - project_name: 项目名称。
+    - repo_path: Git 仓库路径。
     - entries: 过滤后的工作区改动列表。
     - max_paths: 最多展示的路径数量。
+    - analysis_excluded_paths: 不参与任务分析的目录前缀。
+    - analysis_excluded_extensions: 不参与任务分析的文件扩展名。
     [返回]
     - list[str]: 可直接写入报告的进行中事项列表。
-    最近修改时间: 2026-07-03 20:05:00 进行中事项优先输出中文任务简要，提取失败时再回退到路径摘要。
+    最近修改时间: 2026-07-10 优先使用代码 diff，分析失败时才回退到代码路径摘要。
     """
-    # 1. 先尝试从未提交改动里提取中文任务简要，让周报直接说明“正在做什么”。
     if not entries:
         return []
-    task_candidates = collect_worktree_task_candidates(entries)
-    if task_candidates:
-        return [f"进行中: {task_candidates[0]}"]
+    code_summary = summarize_code_worktree_changes(
+        project_name,
+        repo_path,
+        entries,
+        max_paths,
+        analysis_excluded_paths,
+        analysis_excluded_extensions,
+    )
+    if code_summary:
+        return code_summary
 
-    # 2. 没有可靠任务名时，再回退到路径与状态摘要，避免误报任务主题。
-    return [f"进行中: {build_worktree_path_summary(entries, max_paths)}"]
-
+    code_entries = [entry for entry in entries if not is_analysis_excluded_path(entry.path, analysis_excluded_paths, analysis_excluded_extensions)]
+    if not code_entries:
+        return []
+    return [f"进行中: {build_worktree_path_summary(code_entries, max_paths)}"]
 
 def summarize_project(
     project_name: str,
@@ -1018,6 +1088,8 @@ def main() -> int:
     uncommitted_excluded_keywords = resolve_uncommitted_excluded_keywords(cfg)
     uncommitted_excluded_paths = resolve_uncommitted_excluded_paths(cfg)
     uncommitted_max_paths = resolve_uncommitted_max_paths(cfg)
+    uncommitted_analysis_excluded_paths = resolve_uncommitted_analysis_excluded_paths(cfg)
+    uncommitted_analysis_excluded_extensions = resolve_uncommitted_analysis_excluded_extensions(cfg)
 
     results: list[ProjectResult] = []
     for project in cfg["projects"]:
@@ -1082,7 +1154,14 @@ def main() -> int:
                     uncommitted_excluded_keywords,
                     uncommitted_excluded_paths,
                 )
-                ongoing_items = summarize_worktree_changes(worktree_entries, uncommitted_max_paths)
+                ongoing_items = summarize_worktree_changes(
+                    project_name,
+                    project_path,
+                    worktree_entries,
+                    uncommitted_max_paths,
+                    uncommitted_analysis_excluded_paths,
+                    uncommitted_analysis_excluded_extensions,
+                )
 
             summary_result = summarize_project(project_name, project_path_raw, commits, ongoing_items)
             summary_result.release_pending_summary = project_release_pending_summary
