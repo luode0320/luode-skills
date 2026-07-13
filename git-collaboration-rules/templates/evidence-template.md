@@ -1,7 +1,7 @@
 Skill 执行证据：
 - 已读取 skill 文件：`git-collaboration-rules/SKILL.md`
 - 当前盘点命令：`git status --short`、`git diff --cached --stat`
-- 当前 staged 基础代码核查：`<已执行/未执行 + 覆盖范围 + 结论摘要；不依赖审查文档>`
+- 当前 staged 基础代码核查与基础验收：`<已执行/未执行 + 覆盖范围 + 结论摘要；不依赖审查或验收文档>`
 - 下一步命令：`scripts/pre_commit_gate.sh \"<title>\"`
 - 脚本可用性：`pre=<已找到/缺失>`、`post=<已找到/缺失>`
 
@@ -16,7 +16,9 @@ Skill 执行证据清单：
   - 并发安全性：<通过/不适用 + 摘要>
   - 系统崩溃风险：<通过/不适用 + 摘要>
   - 边界条件：<通过/不适用 + 摘要>
+  - 基础验收：<通过/不适用 + 测试、功能验证或等价验证摘要>
   - 阻断项：<无 / P0/P1 或明确风险>
+- 审查/验收文档：<未生成；Git 提交仅记录本清单 / 用户显式独立审查或最终验收时另行归档>
 - `scripts/pre_commit_gate.sh "<title>"`：<通过/阻断 或 回退 + 摘要>
 - `git commit ...`：<commit id + 标题>
 - `scripts/post_commit_gate.sh`：<通过/阻断 或 回退 + 摘要>

@@ -214,13 +214,13 @@
 - 更新时间: 2026-06-27
 - 状态: 启用
 
-### 提交前审查闸门与统一判定字段
-- 别名: 审查闸门, 审查文档判定字段, 提交前审查检查
+### Git 提交基础审查与验收闸门
+- 别名: 提交前审查检查, Git 基础验收, 提交不生成审查验收文档
 - 类型: 流程规则
-- 定义: 执行 `git commit` 前，`pre_commit_gate.sh` 第 5 步校验 `doc/6-审查/` 下最近一份审查文档，要求文档包含统一判定字段：`审查结论: 通过`、`审查范围: <文件列表或等价范围说明>`、`是否允许提交: 是`、`阻断问题: <P0/P1 摘要，没有则写无>`；审查文档缺失、审查结论非通过、不允许提交或存在未解决 P0/P1 时阻断提交。审查文档由 `implementation-review-rules` 和 `project-change-review-rules` 在归档时写入统一判定字段。
-- 来源: `git-collaboration-rules/SKILL.md`、`pre_commit_gate.sh`、`implementation-review-rules/SKILL.md`、`project-change-review-rules/SKILL.md`
+- 定义: 执行 `git commit` 前，必须直接对当前 staged 改动完成基础审查与基础验收：格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性均须通过或明确“不适用 + 原因”。结论只写入 Git 提交证据；禁止仅因提交自动生成或要求 `doc/6-审查/`、`doc/7-验收/` 文档。只有用户显式发起总审查或正式最终验收，或非 Git 场景进入最终放行时，才执行对应 skill 的文档归档。
+- 来源: 当前对话确认、`git-collaboration-rules/SKILL.md`、`project-change-review-rules/SKILL.md`、`final-acceptance-rules/SKILL.md`
 - 适用范围: 提交流程、审查域
-- 更新时间: 2026-07-01
+- 更新时间: 2026-07-13
 - 状态: 启用
 
 ### README 改动日志时间戳格式
@@ -820,6 +820,22 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-07-08
+  - entity_id: rule.git-commit-review-acceptance-evidence
+    name: "Git 提交基础审查与验收闸门"
+    type: "流程规则"
+    aliases:
+      - 提交前审查检查
+      - Git 基础验收
+      - 提交不生成审查验收文档
+    definition: "Git 提交必须直接对 staged 改动执行基础审查与基础验收，并在提交证据中记录格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性；不得因提交自动创建或要求 `doc/6-审查/`、`doc/7-验收/`。显式总审查、正式最终验收和非 Git 正式放行仍按各自规则归档。"
+    scope: "提交流程、基础审查、基础验收"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.git-collaboration
+      - evidence.dialog.git-commit-no-review-acceptance-doc
+    context_ids:
+      - context.git-collaboration
+    updated_at: 2026-07-13
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -964,6 +980,10 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "用户要求需求、实施、测试、Bug、审查、验收与代码实现按提交域拆分，不再混在同一个 commit 里"
+  - evidence_id: evidence.dialog.git-commit-no-review-acceptance-doc
+    type: "dialog"
+    source: "对话确认"
+    note: "用户要求 Git 提交保留审查验收步骤，但不自动生成审查或验收文档"
 contexts:
   - context_id: context.imagegen-maintenance
     type: "skill-maintenance"
@@ -1025,6 +1045,7 @@ lifecycle:
     - "rule.obsidian-knowledge-flow-selective-default"
     - "rule.git-obsidian-capture-link"
     - "rule.git-commit-domain-split"
+    - "rule.git-commit-review-acceptance-evidence"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
