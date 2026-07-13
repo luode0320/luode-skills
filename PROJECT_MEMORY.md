@@ -2,12 +2,22 @@
 
 ## 白话文档与附录分层规则
 
-- 需求、实施、审查、验收、Bug、测试、架构、交付和工作报告采用同一信息分层：正文先用普通业务读者能理解的中文说明结论、影响、范围、变化和完成标准；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
+- 需求、实施、审查、验收、Bug、测试、架构、交付和工作报告采用同一信息分层：H1 后单段正文固定说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
 - 审查或验收不适用时，必须说明原因和依据，但不构成任务阻断；只有需求明确要求该验证、当前必须完成且无可接受替代验证时，条件缺失才阻断。
-- 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 启用机器门禁；正文只检查 H1 后白话开场，历史文档不批量迁移，在新建或后续修改时迁移。
+- 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 启用机器门禁；24 个受管模板由 `plain-language-template-registry.yaml` 统一登记并逐项测试；未修改历史文档不批量迁移，在新建或后续修改时迁移。
 - 审查、验收、功能验证、浏览器联调和第三方验证统一使用 `review-acceptance-gate-contract.md`：不适用不阻断，受限可继续但不能正式放行，明确必需且无替代验证才阻断。
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
-- 更新时间：2026-07-13。
+- 更新时间：2026-07-14。
+
+## 任务阻断收口与恢复规则
+
+- 真实阻断唯一使用 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的 `BLK-*` 记录，至少包含任务状态、阻断阶段、依据与证据、已尝试动作与停止边界、影响、至多三步解决计划、恢复后重入点和去重键。
+- 审查、验收、功能验证、Bug 验证、执行失败和运行时恢复只生产或校验阻断事实；`reasoning-summary-structure-rules` 是唯一面向用户渲染“任务阻断收口”的 owner，避免多处输出冲突计划。
+- 仅 `blocked` 与 `manual_handoff` 触发任务阻断收口。`limited`、`not_applicable`、P2/P3、用户取消和预期负向测试不得生成 `BLK-*` 或写成任务已阻断。
+- 阻断计划最多三步；每步必须包含责任方、前置条件、动作、完成判据和验证入口。恢复后从原测试、复审、重验或健康检查的重入点继续。
+- 文档校验的正文 `N/A` 规则忽略 fenced code、示例与 Mermaid 内容，避免图中“不适用”分支被误判；正文声明仍必须给出原因或证据。
+- 来源：`artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`、`reasoning-summary-structure-rules/SKILL.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
+- 更新时间：2026-07-14。
 
 ## Windows PowerShell 环境可靠性规则
 
@@ -572,6 +582,22 @@ entities:
     context_ids:
       - context.execution-failure-learning
     updated_at: 2026-07-12
+  - entity_id: rule.task-blocker-closure
+    name: "任务阻断收口与恢复"
+    type: "流程规则"
+    aliases:
+      - BLK-* 阻断记录
+      - 任务已阻断
+      - 解决计划与重入点
+    definition: "真实阻断只以共享 BLK-* 契约记录，生产者只提供结构化事实，reasoning-summary-structure-rules 唯一渲染用户可见收口。记录必须包含状态、阶段、证据、已尝试动作、停止边界、影响、至多三步恢复计划、重入点和去重键；limited、not_applicable、P2/P3、用户取消与预期负向测试不触发。"
+    scope: "审查、验收、功能验证、Bug 验证、执行失败、运行时恢复、最终总结与文档门禁"
+    status: "active"
+    evidence_ids:
+      - evidence.doc.task-blocker-closure
+      - evidence.test.task-blocker-closure
+    context_ids:
+      - context.task-blocker-closure
+    updated_at: 2026-07-14
   - entity_id: rule.authenticated-url-routing
     name: "URL 认证浏览器默认路由"
     type: "浏览器路由规则"
@@ -610,7 +636,7 @@ entities:
       - 正文白话化
       - 执行附录
       - 追踪附录
-    definition: "研发文档正文先说明结论、影响、范围、变化和完成标准；技术细节、命令、稳定 ID、追踪矩阵和证据分别放入执行附录或追踪附录。审查、验收、功能验证、浏览器联调和第三方验证统一使用三态门禁：not_applicable 有原因和依据但不阻断，limited 可继续准备但不能正式放行，applicable 只有在来源明确要求、当前必须完成且没有验证或替代验证时才阻断。"
+    definition: "研发文档 H1 后单段正文固定说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；技术细节、命令、稳定 ID、追踪矩阵和证据分别放入执行附录或追踪附录。24 个受管模板由登记表统一覆盖，未修改历史文档不批量迁移。审查、验收、功能验证、浏览器联调和第三方验证统一使用三态门禁：not_applicable 有原因和依据但不阻断，limited 可继续准备但不能正式放行，applicable 只有在来源明确要求、当前必须完成且没有验证或替代验证时才阻断。"
     scope: "需求、实施、审查、验收、Bug、测试、架构、交付和工作报告"
     status: "active"
     evidence_ids:
@@ -835,7 +861,7 @@ entities:
       - evidence.dialog.git-commit-no-review-acceptance-doc
     context_ids:
       - context.git-collaboration
-    updated_at: 2026-07-13
+    updated_at: 2026-07-14
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -853,6 +879,16 @@ relations:
       - evidence.skill.git-collaboration
     status: "active"
 evidence:
+  - evidence_id: evidence.doc.task-blocker-closure
+    type: "doc"
+    source: "任务阻断收口共享契约"
+    path: "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md"
+    note: "唯一 BLK-* 字段、生产者边界、最终渲染 owner 和非阻断排除规则来源"
+  - evidence_id: evidence.test.task-blocker-closure
+    type: "test"
+    source: "本地任务阻断收口验证"
+    path: "artifact-delivery-gate-rules/tests/test_validate_engineering_docs.py"
+    note: "52 项文档门禁单元测试与运行时阻断事实测试证明状态边界和恢复事实可验证"
   - evidence_id: evidence.skill.imagegen
     type: "skill"
     source: "imagegen/SKILL.md"
@@ -985,6 +1021,10 @@ evidence:
     source: "对话确认"
     note: "用户要求 Git 提交保留审查验收步骤，但不自动生成审查或验收文档"
 contexts:
+  - context_id: context.task-blocker-closure
+    type: "task-scope"
+    name: "任务阻断收口与恢复"
+    note: "适用于真实 blocked 或 manual_handoff 的统一事实、解决计划和重入验证"
   - context_id: context.imagegen-maintenance
     type: "skill-maintenance"
     name: "Imagegen Skill 维护"
@@ -1031,6 +1071,7 @@ contexts:
     note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
 lifecycle:
   active:
+    - "rule.task-blocker-closure"
     - "rule.imagegen-error-case-evolution"
     - "rule.execution-failure-learning"
     - "rule.authenticated-url-routing"
@@ -1053,6 +1094,12 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    任务阻断收口:
+      - "rule.task-blocker-closure"
+    任务已阻断:
+      - "rule.task-blocker-closure"
+    BLK-*:
+      - "rule.task-blocker-closure"
     imagegen:
       - "rule.imagegen-error-case-evolution"
     execution-failure-learning-rules:

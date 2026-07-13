@@ -4,6 +4,8 @@
 
 ## 事件
 
+- 2026-07-14：完成任务阻断收口与恢复计划。新增唯一 `BLK-*` 共享契约并接入审查、验收、功能验证、Bug 验证、执行失败、运行时恢复和最终总结；真实阻断在最终结尾输出状态、证据、已尝试动作、停止边界、影响、至多三步解决计划和重入点，`limited`/`not_applicable`/P2/P3 不误报。文档门禁 52 项、运行时阻断事实 3 项、七份文档 profile、Python 编译、JSON schema 解析和字典生成均通过；Obsidian 沉淀因固定 vault 未注册而阻断，未执行 Git 历史写入。
+
 - 2026-07-13：完成 Windows PowerShell 环境可靠性升级。RequiredOnly、可选工具降级、精确包源、JSON 状态、WhatIf、profile/Terminal 事务、hash 回滚、Git Bash/WSL 分流和 UTF-8 BOM 兼容均已收口；PowerShell 5.1 与 PowerShell 7 的九项隔离回归、相关文档 profile、两个 Skill quick validator 和字典生成均通过，未执行 Git 历史写入。
 
 - 2026-07-13：完成 Obsidian 知识流跨 Windows/WSL bridge 的 TASK-OBS-08；35/35 离线回归、PowerShell parser、Python 编译、search、长正文双端 readback（13321 chars/LF181/MD5 C46A...）与 append 双端 readback（172 chars/LF11/MD5 27ec...）通过；CYCLE-OBS-02 收口，未执行 Git 历史写入。
