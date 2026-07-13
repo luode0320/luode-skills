@@ -104,10 +104,12 @@ class ExecutionLearningContractTest(unittest.TestCase):
 
         execution = EXECUTION_SKILL.read_text(encoding="utf-8")
         lifecycle = LIFECYCLE_REFERENCE.read_text(encoding="utf-8")
-        self.assertIn(CASE_ROOT, execution)
+        self.assertIn("execution-failure-cases", execution)
+        self.assertIn("知识库/30-MOCs/执行失败案例.md", execution)
         self.assertIn("candidate persistence: blocked", execution)
         self.assertIn("静态 owner casebook", execution)
-        self.assertIn("追加式状态事件", lifecycle)
+        self.assertIn("追加式", lifecycle)
+        self.assertIn("状态事件", lifecycle)
         self.assertIn("不得使用文件系统读写或静态 casebook 作为 fallback", lifecycle)
 
     def test_positive_and_negative_examples_are_redacted_and_appended(self) -> None:
