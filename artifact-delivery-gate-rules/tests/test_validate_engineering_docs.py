@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -17,11 +18,18 @@ import validate_engineering_docs as validator  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILE_FILE = ROOT / "artifact-delivery-gate-rules" / "references" / "document-quality-profiles.yaml"
+TEMPLATE_REGISTRY_FILE = ROOT / "artifact-delivery-gate-rules" / "references" / "plain-language-template-registry.yaml"
+LAYERED_OPENING = (
+    "结论：本次结果已经明确；影响：业务读者可据此了解变化；范围：本文件说明当前事项；"
+    "非范围：不处理未列出的工作；变化：正文和附录按职责分层；完成标准：读者能判断是否完成；"
+    "术语说明：无；验证状态：本地规则核对完成。"
+)
 
 
 class EngineeringDocumentValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.payload = validator.load_profiles(PROFILE_FILE)
+        self.template_registry = validator.yaml.safe_load(TEMPLATE_REGISTRY_FILE.read_text(encoding="utf-8"))
 
     def test_requirement_fixture_passes(self) -> None:
         document = ROOT / "doc" / "2-需求" / "2026-07-12_033322_需求与实施文档极致完备化.md"
@@ -240,6 +248,19 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         )
         self.assertTrue(any("N/A requires reason/evidence" in error for error in errors))
 
+    # test_na_reason_check_skips_fenced_mermaid 验证 Mermaid 的非阻断分支不会触发正文 N/A 校验。
+    # [参数] 无：构造仅含围栏内“不适用”的最小图示。
+    # [返回] None：断言不产生 N/A 原因或证据缺失错误。
+    # 最近修改时间：2026-07-14 修复 Mermaid 分支被通用 N/A 校验误判的问题。
+    def test_na_reason_check_skips_fenced_mermaid(self) -> None:
+        """验证围栏内的不适用文本不作为正文 N/A 声明。"""
+        # 1. 对 Mermaid 围栏执行 N/A 原因与证据校验。
+        errors: list[str] = []
+        validator.check_na_reasons("```mermaid\nA --> B[不适用]\n```", errors)
+
+        # 2. 围栏内容应被跳过，不能产生正文缺失错误。
+        self.assertEqual(errors, [])
+
     def test_fenced_image_decision_does_not_satisfy_document_decision(self) -> None:
         errors: list[str] = []
         validator.check_images(
@@ -352,13 +373,25 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         for field in ("status", "errors", "warnings", "ids", "traceability", "diagrams", "unresolved_decisions", "coverage"):
             self.assertIn(field, result)
 
-    def _layered_document(self, gate_yaml: str, opening: str = "本次结果已经清楚，业务人员可以继续查看完成标准。", technical: str = "技术细节放在原有章节。") -> str:
+    # _layered_document 构造符合白话契约的最小通用文档夹具。
+    # [参数] gate_yaml: review_acceptance_gates YAML 片段；opening: H1 后固定摘要；technical: 技术章节正文。
+    # [返回] str：可传入白话契约校验器的最小 Markdown 文本。
+    # 最近修改时间：2026-07-14 00:00:00 + 使用八项固定摘要和双附录策略夹具。
+    def _layered_document(
+        self,
+        gate_yaml: str,
+        opening: str = LAYERED_OPENING,
+        technical: str = "技术细节放在原有章节。",
+        status: str = "draft",
+        doc_type: str = "test",
+    ) -> str:
+        # 1. 保持 YAML 元数据完整，让测试只聚焦白话摘要和附录边界。
         return f"""---
 schema_version: 1
 doc_id: DOC-1
-doc_type: test
+doc_type: {doc_type}
 source_ids: [SRC-1]
-status: draft
+status: {status}
 version: v1.0
 current_slice: current
 updated_at: 2026-07-12
@@ -381,6 +414,21 @@ review_acceptance_gates:
 {technical}
 
 图片资产决策：N/A + 原因 + 证据：本次 fixture 不需要图片。
+"""
+
+    def _task_blocker_closure(self) -> str:
+        """构造满足统一 BLK-* 契约的真实阻断收口章节。"""
+        return """## 任务阻断收口
+
+- 阻断记录 ID: BLK-DOC-001
+- 任务状态: blocked
+- 阻断阶段: 最终验收
+- 阻断依据与证据: blocker.required_validation_missing；EVD-DOC-001。
+- 已尝试与停止边界: 已执行本地验证；缺少必要验收条件后停止。
+- 影响: 不得宣布任务完成或正式放行。
+- 解决计划: 1. 责任方: 验收 owner；前置条件: 本地环境可用；动作: 补齐验收验证；完成判据: 验收通过；验证入口: python tests。
+- 恢复后重入点: 重新执行最终验收。
+- 去重键: blocker.required_validation_missing + EVD-DOC-001
 """
 
     def test_review_acceptance_gate_not_applicable_is_non_blocking(self) -> None:
@@ -425,6 +473,7 @@ review_acceptance_gates:
         self.assertEqual(result["gates"]["release_status"], "limited")
         self.assertFalse(result["gates"]["blocking"])
         self.assertEqual(result["status"], "LIMITED")
+        self.assertFalse(result["task_blocker_closure"]["required"])
 
     def test_new_profile_document_requires_plain_language_fields(self) -> None:
         """新建受管文档缺少白话字段时不能绕过契约。"""
@@ -491,6 +540,77 @@ review_acceptance_gates:
         self.assertEqual(report["release_status"], "blocked")
         self.assertIn("gate.required_validation_missing", report["error_codes"])
 
+    def test_blocked_status_requires_task_blocker_closure(self) -> None:
+        """状态已标记阻断时，缺少恢复交接章节必须被拒绝。"""
+        text = self._layered_document("  []", status="blocked")
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "blocked.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        self.assertFalse(result["valid"])
+        self.assertIn("blocker.closure_missing", result["error_codes"])
+
+    def test_review_blocked_conclusion_requires_task_blocker_closure(self) -> None:
+        """审查结论明确阻断时，即使状态未改也必须完成收口。"""
+        text = self._layered_document("  []", technical="- 审查结论：阻断。")
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "review.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "review", self.payload["profiles"]["review"], self.payload, Path(directory))
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["task_blocker_closure"]["triggers"], ["review_conclusion_blocked"])
+
+    def test_final_acceptance_non_release_requires_task_blocker_closure(self) -> None:
+        """最终验收不通过或待重验都必须带统一阻断收口。"""
+        for conclusion in ("不通过", "待重验"):
+            with self.subTest(conclusion=conclusion), tempfile.TemporaryDirectory() as directory:
+                document = Path(directory) / "acceptance.md"
+                document.write_text(
+                    self._layered_document("  []", technical=f"- 最终验收结论：{conclusion}。"),
+                    encoding="utf-8",
+                )
+                result = validator.validate_document(
+                    document,
+                    "final_acceptance",
+                    self.payload["profiles"]["final_acceptance"],
+                    self.payload,
+                    Path(directory),
+                )
+            self.assertFalse(result["valid"])
+            self.assertIn("final_acceptance_not_released", result["task_blocker_closure"]["triggers"])
+
+    def test_task_blocker_closure_accepts_complete_recovery_plan(self) -> None:
+        """完整 BLK 记录可使真实阻断文档保留可验证交接。"""
+        text = self._layered_document("  []", status="blocked", technical=self._task_blocker_closure())
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "blocked.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        self.assertTrue(result["valid"], result["errors"])
+        self.assertEqual(result["task_blocker_closure"]["records"], ["BLK-DOC-001"])
+
+    def test_limited_not_applicable_and_normal_documents_do_not_require_task_blocker_closure(self) -> None:
+        """受限、不适用和正常通过不应被误报为任务阻断。"""
+        for gate_yaml in (
+            "  []",
+            """  - stage: third_party
+    applicability: not_applicable
+    reason: 本次范围不调用第三方接口。
+    basis: 需求范围只包含本地流程。
+    required_by_source: false
+    required_now: false
+    completed_validation: []
+    substitute_validation: []
+    manual_follow_up: N/A
+    pass_standard: N/A""",
+        ):
+            with self.subTest(gate_yaml=gate_yaml), tempfile.TemporaryDirectory() as directory:
+                document = Path(directory) / "normal.md"
+                document.write_text(self._layered_document(gate_yaml), encoding="utf-8")
+                result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+            self.assertTrue(result["valid"], result["errors"])
+            self.assertFalse(result["task_blocker_closure"]["required"])
+
     def test_review_acceptance_gate_applicable_with_completed_validation_passes(self) -> None:
         """适用验证有完成证据时允许正式放行。"""
         text = self._layered_document("""  - stage: functional_validation
@@ -510,11 +630,33 @@ review_acceptance_gates:
 
     def test_plain_language_opening_rejects_machine_details(self) -> None:
         """机器字段只能出现在技术章节，不能泄漏到 H1 后开场。"""
-        text = self._layered_document("  []", opening="REQ-1 已完成，详见 F:/work/test.py:12。")
+        text = self._layered_document("  []", opening=f"{LAYERED_OPENING} REQ-1 已完成，详见 F:/work/test.py:12。")
         errors: list[str] = []
         validator.check_plain_language_contract(text, errors)
         self.assertTrue(any("stable IDs" in error for error in errors))
         self.assertTrue(any("paths or line numbers" in error for error in errors))
+
+    def test_plain_language_opening_requires_all_fixed_summary_labels(self) -> None:
+        """固定摘要缺少任一标签时必须被机器识别。"""
+        text = self._layered_document("  []", opening=LAYERED_OPENING.replace("范围：本文件说明当前事项；", "涉及内容：本文件说明当前事项；"))
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language opening must contain summary field: 范围", errors)
+
+    def test_plain_language_opening_allows_chinese_periods_and_no_terminology_declaration(self) -> None:
+        """固定摘要允许中文句号分隔，并接受契约规定的无术语声明。"""
+        opening = LAYERED_OPENING.replace("；", "。").replace("术语说明：无", "术语说明：无技术术语需要解释")
+        text = self._layered_document("  []", opening=opening)
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertEqual(errors, [])
+
+    def test_plain_language_opening_rejects_unexplained_terminology(self) -> None:
+        """术语说明不能只列技术词，必须声明无术语或给出中文解释。"""
+        text = self._layered_document("  []", opening=LAYERED_OPENING.replace("术语说明：无", "术语说明：本次使用 API"))
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language opening terminology must be 无 or a readable Chinese explanation", errors)
 
     def test_plain_language_opening_requires_h1_and_content(self) -> None:
         """白话契约必须有 H1，且 H1 后第一段不能为空。"""
@@ -528,12 +670,26 @@ review_acceptance_gates:
         validator.check_plain_language_contract(empty_opening, errors)
         self.assertTrue(any("must not be empty" in error for error in errors))
 
-    def test_plain_language_document_allows_zero_or_one_terminal_appendix(self) -> None:
-        """没有附录或只有末尾附录都符合新策略。"""
-        text = self._layered_document("  []", technical="技术章节包含 REQ-1 和 `python test.py`。\n\n## 附录\n补充说明。")
+    def test_plain_language_document_allows_generic_or_named_terminal_appendix(self) -> None:
+        """旧通用附录和新命名双附录组都可作为末尾技术承载区。"""
+        text = self._layered_document("  []", technical="技术章节包含 REQ-1 和 `python test.py`。\n\n## 执行附录\n命令与样本。\n\n## 追踪附录\n稳定 ID 与证据。")
         errors: list[str] = []
         validator.check_plain_language_contract(text, errors)
         self.assertEqual(errors, [])
+
+    def test_plain_language_document_allows_numbered_named_terminal_appendix_group(self) -> None:
+        """带数字前缀的命名附录也属于有效的末尾附录组。"""
+        text = self._layered_document("  []", technical="## 5. 执行附录\n命令与样本。\n\n## 6. 追踪附录\n稳定 ID 与证据。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertEqual(errors, [])
+
+    def test_plain_language_document_rejects_reversed_numbered_named_appendix_group(self) -> None:
+        """编号存在时，命名附录仍必须先执行后追踪。"""
+        text = self._layered_document("  []", technical="## 5. 追踪附录\n稳定 ID 与证据。\n\n## 6. 执行附录\n命令与样本。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language appendix group must order 执行附录 before 追踪附录 at the same heading level", errors)
 
     def test_plain_language_document_rejects_multiple_or_non_terminal_appendix(self) -> None:
         """重复附录或附录后又出现同级章节时阻断。"""
@@ -544,10 +700,88 @@ review_acceptance_gates:
 
     def test_plain_language_document_rejects_non_terminal_appendix_alone(self) -> None:
         """唯一附录后仍有同级章节时必须单独阻断。"""
-        text = self._layered_document("  []", technical="## 附录\n补充说明。\n\n## 后续章节\n不应出现在附录后。")
+        text = self._layered_document("  []", technical="## 执行附录\n补充说明。\n\n## 后续章节\n不应出现在附录后。")
         errors: list[str] = []
         validator.check_plain_language_contract(text, errors)
-        self.assertIn("plain-language appendix must be terminal", errors)
+        self.assertIn("plain-language appendix group must be terminal", errors)
+
+    def test_plain_language_document_rejects_non_contiguous_named_appendix_group(self) -> None:
+        """执行附录和追踪附录之间夹入业务章节时必须阻断。"""
+        text = self._layered_document(
+            "  []",
+            technical="## 执行附录\n命令与样本。\n\n## 补充业务说明\n不属于附录组。\n\n## 追踪附录\n稳定 ID 与证据。",
+        )
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language appendix group must be contiguous", errors)
+
+    def test_plain_language_document_allows_named_group_under_generic_parent_appendix(self) -> None:
+        """通用父附录下的执行与追踪子附录属于兼容的单个末尾附录组。"""
+        text = self._layered_document(
+            "  []",
+            technical="## 附录\n\n### 执行附录\n命令与样本。\n\n### 追踪附录\n稳定 ID 与证据。",
+        )
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertEqual(errors, [])
+
+    def test_plain_language_document_rejects_parallel_generic_and_named_appendices(self) -> None:
+        """并列通用附录和命名附录不是兼容父子结构，必须阻断。"""
+        text = self._layered_document("  []", technical="## 附录\n旧说明。\n\n## 执行附录\n命令与样本。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language document must not mix generic and named appendix groups", errors)
+
+    # test_template_registry_covers_all_managed_templates 验证 registry 声明与每个模板的三层结构同步。
+    # [参数] 无：读取仓库内模板注册表与实际模板文件。
+    # [返回] None：逐项断言模板存在、固定摘要完整且末尾双附录组实际存在并有效。
+    # 最近修改时间：2026-07-14 00:00:00 + 强制 registry 中每个模板落实双附录而非仅允许其缺失。
+    def test_template_registry_covers_all_managed_templates(self) -> None:
+        """所有受管模板都必须声明并落实白话摘要和双附录结构。"""
+        # 1. 注册表是受管模板的唯一枚举来源，数量、层次和路径必须一致。
+        templates = self.template_registry["templates"]
+        self.assertEqual(self.template_registry["template_count"], len(templates))
+        self.assertEqual(
+            self.template_registry["summary_opening"]["required_labels"],
+            list(validator.PLAIN_LANGUAGE_SUMMARY_LABELS),
+        )
+        self.assertEqual(
+            self.template_registry["terminal_appendix_group"]["required_order"],
+            list(validator.PLAIN_LANGUAGE_NAMED_APPENDICES),
+        )
+
+        # 2. 每个注册模板必须实际存在，并具备 H1 固定摘要、执行附录和追踪附录。
+        for entry in templates:
+            with self.subTest(template_id=entry["template_id"]):
+                template_path = ROOT / entry["path"]
+                self.assertTrue(template_path.is_file(), entry["path"])
+                self.assertEqual(entry["layers"], ["h1_summary", "execution_appendix", "tracking_appendix"])
+                template_text = template_path.read_text(encoding="utf-8")
+                opening = validator.h1_opening(template_text)
+                for label in validator.PLAIN_LANGUAGE_SUMMARY_LABELS:
+                    self.assertRegex(opening, rf"{label}\s*[：:]")
+                appendix_records = validator.markdown_heading_records(template_text, normalize_numbering=False)
+                appendix_matches = {
+                    name: [
+                        record
+                        for record in appendix_records
+                        if re.match(
+                            rf"{validator.APPENDIX_NUMBER_PREFIX_PATTERN}{name}{validator.APPENDIX_HEADING_SUFFIX_PATTERN}",
+                            record[1],
+                        )
+                    ]
+                    for name in validator.PLAIN_LANGUAGE_NAMED_APPENDICES
+                }
+                self.assertEqual(len(appendix_matches["执行附录"]), 1, entry["path"])
+                self.assertEqual(len(appendix_matches["追踪附录"]), 1, entry["path"])
+                self.assertLess(
+                    appendix_matches["执行附录"][0][2],
+                    appendix_matches["追踪附录"][0][2],
+                    entry["path"],
+                )
+                errors: list[str] = []
+                validator.check_appendix_policy(template_text, errors)
+                self.assertEqual(errors, [], entry["path"])
 
     def test_review_acceptance_gate_missing_fields_is_rejected(self) -> None:
         """门禁记录缺少固定字段时不能被当作空门禁放行。"""
