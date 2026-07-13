@@ -50,7 +50,12 @@ def parse_frontmatter(note: str) -> dict[str, str]:
 
 
 def state_from_note(note: str) -> str:
-    """状态事件以最后一条 `status:` 记录为准。"""
+    """状态事件以最后一条 `status:` 记录为准。
+
+    [参数] note: 执行案例 Markdown 正文。
+    [返回] 最新状态事件中的状态值，缺失时返回 frontmatter 状态或 unknown。
+    最近修改时间: 2026-07-14 对齐追加式状态事件的机器字段解析。
+    """
     events = [
         line.split(":", 1)[1].strip()
         for line in note.splitlines()
@@ -67,7 +72,12 @@ def select_active(
     input_fingerprint: str,
     environment: str = "local",
 ) -> list[str]:
-    """只返回所有自动复用条件精确匹配且最终状态为 active 的案例路径。"""
+    """只返回所有自动复用条件精确匹配且最终状态为 active 的案例路径。
+
+    [参数] notes: 案例路径到正文的映射；scope: 适用范围；tool_major: 工具主版本；input_fingerprint: 输入指纹；environment: 环境。
+    [返回] 允许自动复用的案例路径列表。
+    最近修改时间: 2026-07-14 收紧 active 案例的精确匹配条件。
+    """
     selected: list[str] = []
     for path, note in notes.items():
         fields = parse_frontmatter(note)
