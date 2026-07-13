@@ -26,6 +26,13 @@ CASE_ROOT = "知识库/20-Knowledge/execution-failure-cases"
 CASE_NOTES_REFERENCE = ROOT / "obsidian-knowledge-flow/references/execution-case-notes.md"
 EXECUTION_SKILL = ROOT / "execution-failure-learning-rules/SKILL.md"
 LIFECYCLE_REFERENCE = ROOT / "execution-failure-learning-rules/references/lifecycle-and-gates.md"
+RENDERER_PATH = ROOT / "obsidian-knowledge-flow/scripts/render_execution_case.py"
+
+RENDERER_SPEC = importlib.util.spec_from_file_location("render_execution_case", RENDERER_PATH)
+assert RENDERER_SPEC and RENDERER_SPEC.loader
+renderer = importlib.util.module_from_spec(RENDERER_SPEC)
+sys.modules[RENDERER_SPEC.name] = renderer
+RENDERER_SPEC.loader.exec_module(renderer)
 
 
 def parse_frontmatter(note: str) -> dict[str, str]:
@@ -214,6 +221,94 @@ verified local action
         self.assertFalse(response["ok"])
         self.assertFalse(response["verified"])
         self.assertEqual("VAULT_NOT_REGISTERED", response["code"])
+
+    def test_renderer_matches_case_schema_and_redacts_sensitive_values(self) -> None:
+        """渲染器输出可读去重键、版本字段和 candidate 状态。"""
+        payload = {
+            "case_id": "obsidian-json-case",
+            "owner_skill": "obsidian-knowledge-flow",
+            "category": "tool-contract",
+            "tool_or_model": "obsidian-cli 1.12",
+            "tool_major": "1",
+            "error_signature": "READBACK_MISMATCH",
+            "minimal_input": "token=sk-test-secret path=C:\\Users\\private\\case.json",
+            "input_fingerprint": "sha256:case-fixture",
+            "root_cause": "读取结果不是预期 JSON",
+            "solution": "先校验 bridge 响应，再按 UTF-8 readback",
+            "verification_command": "python -X utf8 local_fixture.py",
+            "success_criteria": "同输入 readback JSON 可解析",
+            "scope": "local|obsidian-cli|major-1",
+            "avoid": "不得绕过 bridge 写 vault",
+            "negative_example": "直接记录 token 和完整响应",
+            "positive_example": "使用脱敏摘要并保存结构化断言",
+            "source": "TEST-OBS-LEARN-01",
+            "updated": "2026-07-14",
+            "state": "candidate",
+        }
+        rendered = renderer.render(payload)
+        self.assertIn("status: candidate", rendered)
+        self.assertIn("tool_major", rendered)
+        self.assertIn('error_signature: "READBACK_MISMATCH"', rendered)
+        self.assertIn('scope: "local|obsidian-cli|major-1"', rendered)
+        self.assertIn("input_fingerprint", rendered)
+        self.assertIn("obsidian-knowledge-flow|tool-contract|1|readback_mismatch|sha256:case-fixture|local|obsidian-cli|major-1", rendered)
+        self.assertIn("- status: candidate", rendered)
+        self.assertIn("- event: created", rendered)
+        self.assertNotIn("sk-test-secret", rendered)
+        self.assertNotIn("C:\\Users\\private", rendered)
+
+    def test_renderer_accepts_superseded_terminal_state(self) -> None:
+        """被新案例替代的案例可以追加 superseded 状态事件。"""
+        payload = {
+            "case_id": "superseded-case",
+            "owner_skill": "obsidian-knowledge-flow",
+            "category": "tool-contract",
+            "tool_or_model": "obsidian-cli",
+            "tool_major": "1",
+            "error_signature": "OLD_CONTRACT",
+            "minimal_input": "safe",
+            "input_fingerprint": "sha256:safe",
+            "root_cause": "旧契约已被替代",
+            "solution": "采用新案例",
+            "verification_command": "python -X utf8 local_fixture.py",
+            "success_criteria": "同输入 local fixture 通过",
+            "scope": "local|obsidian-cli|major-1",
+            "avoid": "不得自动恢复旧案例",
+            "negative_example": "继续使用旧方案",
+            "positive_example": "读取新案例后再执行",
+            "source": "TEST-OBS-LEARN-03",
+            "updated": "2026-07-14",
+            "state": "superseded",
+        }
+        rendered = renderer.render(payload)
+        self.assertIn("status: superseded", rendered)
+        self.assertIn("- status: superseded", rendered)
+
+    def test_renderer_rejects_non_local_and_expected_negative_cases(self) -> None:
+        """非 local 或预期负向场景不能生成可复用案例。"""
+        payload = {
+            "case_id": "blocked-case",
+            "owner_skill": "obsidian-knowledge-flow",
+            "category": "environment",
+            "tool_or_model": "obsidian-cli",
+            "tool_major": "1",
+            "error_signature": "ENV_BLOCKED",
+            "minimal_input": "safe",
+            "input_fingerprint": "sha256:safe",
+            "root_cause": "外部环境",
+            "solution": "停止",
+            "verification_command": "unknown",
+            "success_criteria": "unknown",
+            "scope": "production",
+            "avoid": "不得连接生产",
+            "negative_example": "连接生产验证",
+            "positive_example": "使用 local fixture",
+            "source": "TEST-OBS-LEARN-02",
+            "updated": "2026-07-14",
+            "environment": "production",
+        }
+        with self.assertRaises(ValueError):
+            renderer.render(payload)
 
 
 if __name__ == "__main__":
