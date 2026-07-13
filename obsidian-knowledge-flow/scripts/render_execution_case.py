@@ -91,7 +91,12 @@ def text_value(payload: dict[str, Any], field: str) -> str:
 
 
 def validate_stable_field(value: str, field: str, *, allow_pipe: bool = False) -> None:
-    """拒绝会污染去重键或状态事件结构的动态/路径字符。"""
+    """拒绝会污染去重键或状态事件结构的动态/路径字符。
+
+    [参数] value: 待校验的稳定字段；field: 字段名；allow_pipe: 是否允许 scope 分隔符。
+    [返回] 无；不满足稳定字段契约时抛出 ValueError。
+    最近修改时间: 2026-07-14 收紧执行案例去重键和状态事件输入边界。
+    """
     if any(ord(char) < 32 for char in value):
         raise ValueError(f"{field} contains control characters")
     if not allow_pipe and "|" in value:
@@ -101,7 +106,12 @@ def validate_stable_field(value: str, field: str, *, allow_pipe: bool = False) -
 
 
 def validate_date(value: str, field: str) -> None:
-    """确保 frontmatter 日期和状态事件标题保持 ISO 形式。"""
+    """确保 frontmatter 日期和状态事件标题保持 ISO 形式。
+
+    [参数] value: 待校验的日期或时间文本；field: 字段名。
+    [返回] 无；格式不正确时抛出 ValueError。
+    最近修改时间: 2026-07-14 防止状态事件标题注入非结构化时间文本。
+    """
     if not DATE_PATTERN.fullmatch(value):
         raise ValueError(f"{field} must be an ISO date or datetime")
 
