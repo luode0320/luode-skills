@@ -54,6 +54,22 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\windows-encoding-rules\s
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1
 ```
+- 脚本默认保持兼容：不带参数等同于 `-Mode Apply -OutputFormat Human`。环境编排或自动化测试必须使用结构化接口，不得解析人类输出：
+```powershell
+# 只读审计：不会创建 profile、事务文件，也不会修改执行策略。
+& .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1 -Mode Audit -OutputFormat Json
+
+# 正式写入：将每个 profile 的备份、写前/写后 hash 保存到指定事务文件。
+& .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1 -Mode Apply -OutputFormat Json -TransactionPath C:\temp\utf8-transaction.json
+
+# 隔离测试：必须使用绝对临时目录；脚本会强制跳过 CurrentUser ExecutionPolicy。
+& .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1 -Mode Apply -OutputFormat Json -TestMode -ProfileRoot C:\temp\utf8-profiles -TransactionPath C:\temp\utf8-transaction.json
+
+# 安全回滚：只有 profile 的当前 hash 仍等于 Apply 后 hash 时才恢复备份；否则返回 rollback_refused。
+& .\windows-encoding-rules\scripts\enable_powershell_utf8.ps1 -Mode Rollback -OutputFormat Json -TransactionPath C:\temp\utf8-transaction.json
+```
+- `TestMode` 只允许写入 `ProfileRoot` 下的临时 profile，且无论是否传入 `SkipExecutionPolicy` 都不会修改真实用户执行策略；真实模式忽略测试根目录，始终从目标 shell 自己的 `$PROFILE.CurrentUserAllHosts` 与 `$PROFILE.CurrentUserCurrentHost` 发现 profile 路径。
+- `Rollback` 只恢复由该事务改动的 profile；执行策略不自动回滚，以免覆盖用户后续调整。
 - 永久化脚本会优先检查可用的 PowerShell 7（`pwsh` 主版本至少为 7），存在时先初始化并验证 PowerShell 7 profile，再初始化 Windows PowerShell 5.1 profile；未发现 PowerShell 7 时保留 5.1 兼容路径并明确报告状态。PowerShell 7 的安装由 Windows 环境准备 skill 负责，本脚本不安装包或修改 PATH。
 - 脚本会同时补齐 Windows PowerShell 5.1 与已检测到的 PowerShell 7 用户级 profile，并写入 UTF-8 初始化片段；脚本未执行成功时，不得使用 PowerShell 执行需要稳定中文 I/O 的专项命令。
 - 永久化脚本还应确保当前用户的 PowerShell 执行策略至少允许本地 profile 加载；若 profile 文件已落盘但新会话仍因 execution policy 被拦截，则视为脚本仍未完成闭环。

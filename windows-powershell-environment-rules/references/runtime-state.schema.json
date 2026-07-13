@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "mode", "status", "canContinue", "requiredReady", "results", "issues", "changes"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "status": {"enum": ["ready", "degraded", "blocked", "busy", "failed", "rolled_back", "rollback_refused"]},
+    "canContinue": {"type": "boolean"},
+    "requiredReady": {"type": "boolean"},
+    "results": {"type": "array"},
+    "issues": {"type": "array"},
+    "changes": {"type": "array"}
+  }
+}

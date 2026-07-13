@@ -9,6 +9,15 @@
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
 - 更新时间：2026-07-13。
 
+## Windows PowerShell 环境可靠性规则
+
+- `windows-powershell-environment-rules` 的会话默认策略是 `RequiredOnly`：`ready` 和 `degraded` 可以继续，只有 `blocked`、`busy`、`failed`、`rollback_refused` 不能作为已准备好结论。
+- 包恢复只接受 manifest 或调用方提供的精确 source/package ID；未知命令不搜索猜包。Git Bash 只能从 Git 安装根目录的 `bin\\bash.exe` 加 `MINGW|MSYS` 身份识别，WSL 原生命令仍交给 `windows-wsl-execution-rules`。
+- profile 与 Terminal 的 Apply/Rollback 由事务、备份和 after hash 保护；WhatIf 不写用户状态，hash 漂移时必须拒绝覆盖。含中文的 PowerShell 5.1 脚本使用 UTF-8 BOM，避免被默认 ANSI 解码。
+- 验证固定为临时目录 fixture：PowerShell 5.1 与 PowerShell 7 都要通过 TEST-PSENV-001 至 TEST-PSENV-009；不连接网络、不安装软件、不改真实用户配置。
+- 来源：`windows-powershell-environment-rules/SKILL.md`、`references/runtime-state-contract.md`、`doc/7-验收/2026-07-13_230500_WindowsPowerShell环境可靠性升级_最终验收.md`。
+- 更新时间：2026-07-13。
+
 ## 统一智能体运行期自恢复规则
 
 - 稳定决策：`agent-runtime-recovery-rules` 是厂商无关的运行期恢复唯一 owner，覆盖 MCP、插件、浏览器会话、工具 transport 和智能体宿主；安装/注册仍由安装类 skill 负责，失败分类与案例生命周期仍由 `execution-failure-learning-rules` 负责。

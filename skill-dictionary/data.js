@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-13 20:59:08",
+  "generated_at": "2026-07-13 23:12:24",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 27,
     "doc_total": 10,
-    "references_total": 377,
+    "references_total": 380,
     "agents_total": 93
   },
   "downloaded_seeds": {
@@ -4758,7 +4758,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 25,
-          "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、幂等安装 manifest 工具、按精确映射恢复 command-not-found、记录脱敏失败案例和用户级 discovered tools，并在新会话入口自动检查；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
+          "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、以 RequiredOnly 完成会话准备、按精确的“每个包源各自包 ID”恢复 command-not-found、返回可机器读取的状态和退出码，并记录脱敏失败案例和用户级 discovered tools；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-powershell-environment-rules/SKILL.md",
           "directory_path": "windows-powershell-environment-rules",
@@ -4774,7 +4774,10 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "windows-powershell-environment-rules/references/failure-casebook.md",
+            "windows-powershell-environment-rules/references/runtime-state-contract.md",
+            "windows-powershell-environment-rules/references/runtime-state.schema.json",
             "windows-powershell-environment-rules/references/safety-and-validation.md",
+            "windows-powershell-environment-rules/references/tool-manifest.schema.json",
             "windows-powershell-environment-rules/references/tool-manifest.yaml"
           ],
           "agents": [
@@ -9492,7 +9495,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 25,
-      "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、幂等安装 manifest 工具、按精确映射恢复 command-not-found、记录脱敏失败案例和用户级 discovered tools，并在新会话入口自动检查；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
+      "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、以 RequiredOnly 完成会话准备、按精确的“每个包源各自包 ID”恢复 command-not-found、返回可机器读取的状态和退出码，并记录脱敏失败案例和用户级 discovered tools；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-powershell-environment-rules/SKILL.md",
       "directory_path": "windows-powershell-environment-rules",
@@ -9508,7 +9511,10 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "windows-powershell-environment-rules/references/failure-casebook.md",
+        "windows-powershell-environment-rules/references/runtime-state-contract.md",
+        "windows-powershell-environment-rules/references/runtime-state.schema.json",
         "windows-powershell-environment-rules/references/safety-and-validation.md",
+        "windows-powershell-environment-rules/references/tool-manifest.schema.json",
         "windows-powershell-environment-rules/references/tool-manifest.yaml"
       ],
       "agents": [

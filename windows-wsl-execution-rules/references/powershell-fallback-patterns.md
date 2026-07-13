@@ -15,6 +15,8 @@
 1. 进入专项场景前，先运行 `pwsh -NoProfile -Command '$PSVersionTable.PSVersion'`，确认主版本至少为 7。
 2. 如果 `pwsh` 不存在或版本不满足，先调用 `windows-powershell-environment-rules` 完成环境审计/安装；不要直接把 `powershell.exe` 当成默认入口。
 3. 环境准备因权限、网络或包管理器被阻断时，才允许用 `powershell.exe -NoProfile` 回退到 Windows PowerShell 5.1，并在 Web cmdlet 中显式加 `-UseBasicParsing`。
+4. 调用环境入口时读取 JSON `status`：`ready` 或 `degraded` 可以继续当前 PowerShell 专项动作；`blocked`、`busy`、`failed` 或 `rollback_refused` 必须停止。`SessionEnsure` 默认只检查 `RequiredOnly`，不能因为扩展工具缺失而强行改走 5.1。
+5. Windows CLI 在 Git Bash 中不可见时，先让环境 Skill 从 `git.exe` 安装根目录的 `bin\\bash.exe` 并以 `uname -s` 的 `MINGW|MSYS` 验证；不得用裸 `bash.exe`。若实际命中 `wsl.exe`、Linux `127` 或 `/mnt/*.exe`，保持本 skill owner，不调用 Windows 包安装恢复。
 
 ## 语法保底规则
 
@@ -142,3 +144,4 @@ catch {
 - 这份 reference 解决“既然已经进了 PowerShell，那怎么别踩坑”；专项运行时优先是 `pwsh` 7+
 - 不回答“当前任务该不该进 PowerShell”
 - “该不该进” 仍由 `windows-wsl-execution-rules/SKILL.md` 的主路由决定
+- 环境 Skill 只管理 Windows 用户级 PowerShell、Windows CLI 和已确认的 Git Bash 可见性；它的 Windows 侧成功不等于 WSL 原生工具可用。WSL 工具继续使用 `command -v` 和本 skill 的恢复链路验证。

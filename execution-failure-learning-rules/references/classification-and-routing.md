@@ -27,7 +27,7 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 | --- | --- | --- |
 | 位图生成、编辑、真实图像 API | `imagegen` | 通道、模型能力、参数与输出校验 |
 | Windows/WSL shell、跨平台执行 | `windows-wsl-execution-rules` | shell、路径、编码、WSL/Windows 边界 |
-| Windows PowerShell command-not-found、缺失 Windows CLI、PowerShell 版本/包管理器失败 | `windows-powershell-environment-rules` | `references/failure-casebook.md`、精确 manifest/package 映射、SessionEnsure/RecoverCommand 状态 |
+| Windows PowerShell command-not-found、缺失 Windows CLI、PowerShell 版本/包管理器失败、已确认 Git Bash 中 Windows CLI 不可见 | `windows-powershell-environment-rules` | `references/failure-casebook.md`、精确的每源 manifest/package 映射、SessionEnsure/RecoverCommand JSON 状态；未确认 Git Bash、`wsl.exe`、Linux 127 或 `/mnt/*.exe` 不走此 owner |
 | 浏览器自动化、隔离 profile、会话 | `agent-browser` | profile、认证上下文、页面状态 |
 | URL、认证 URL、网页读取 | `authenticated-url-routing-rules` | URL 路由、登录态、来源与页面可达性 |
 | MCP 安装/注册/首次连接 | `mcp-installation-rules` | 版本、配置来源、初次连接和回退；仅限 provisioning 阶段 |
@@ -42,7 +42,7 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 
 未列入注册表的领域先按 `recover` 分类；如果相同缺口重复出现，转 `skill-evolution-rules` 评估是否加入注册表或补现有 skill。`agent-runtime-recovery-rules` 尚未提供真实 adapter 的平台只能降级为观测/人工交接，不得把安装命令、进程名或 UI 操作当作通用恢复接口。
 
-Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not recognized` 和缺失 manifest 命令归上述 owner；Linux/WSL 原生 shell 的 `127`、`command -v` 缺失和 `/mnt/*.exe` 误用仍归 `windows-wsl-execution-rules`。两类证据不得混写到同一 failure case。
+Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not recognized` 和缺失 manifest 命令归上述 owner。Git Bash 只有在 `git.exe` 根目录下的 `bin\\bash.exe` 经 `uname -s` 确认是 `MINGW` 或 `MSYS` 后，才可作为该 owner 的 Windows CLI 可见性证据。Linux/WSL 原生 shell 的 `127`、`command -v` 缺失、`wsl.exe` 路由和 `/mnt/*.exe` 误用仍归 `windows-wsl-execution-rules`。两类证据不得混写到同一 failure case。
 
 ### Provisioning/runtime 分流
 

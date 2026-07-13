@@ -11,41 +11,38 @@
 
 ## 当前任务
 
-- 目标：完成文档白话化与审查验收条件化门禁优化计划。
-- 当前范围：共享契约、文档质量 profile、Python 校验器、校验器单测、受管样例文档、相关 Skill 引用和项目记忆。
-- 非范围：业务代码、第三方接口、测试/预发/生产环境、历史业务文档批量迁移、Git 提交和推送。
+- 目标：完成 `windows-powershell-environment-rules` 的可靠性升级。
+- 当前范围：RequiredOnly 策略、精确包源、状态机、profile/Terminal 事务与回滚、Git Bash/WSL 分流、隔离回归、规则与交付文档。
+- 非范围：真实软件下载、管理员提权、真实用户配置写入、浏览器/第三方接口、业务代码、Git 提交和推送。
 
 ## 已完成
 
-- 已建立共享白话文档契约和共享审查/验收三态门禁契约，没有新增独立 Skill。
-- 已把需求、验收、实施、Bug、测试、审查、最终验收、架构、交付和报告类 Skill 接入共享契约。
-- 校验器已支持 H1 后白话开场、代码围栏标题排除、零或唯一末尾附录、三态门禁、HEAD 标题基线和历史文档兼容策略。
-- 已修复校验器审计发现的四项缺口：新文档契约不可绕过、标题编号变化可识别、通用 profile 具备新文档约束、`limited` 不再输出为正式 `PASS`。
-- 已补齐当前需求、验收、实施总览、实施周期、当前审查和最终验收样例的白话元数据及门禁记录。
-- 已完成本轮用户授权的当前代码提交；规则、测试、需求、实施、验收和审查域已按提交边界分别归档。
+- 将共享逻辑收口到 `PowerShellEnvironment.Core.psm1`，保留原有入口脚本；状态固定为 ready、degraded、blocked、busy、failed、rolled_back、rollback_refused。
+- SessionEnsure 与 Doctor 默认 RequiredOnly；可选工具缺失只输出 degraded，不再无故阻断。
+- 包安装只接受当前来源的精确包 ID；未知命令缺少 source/package 时只记录 candidate，不猜包。
+- profile 与 Terminal 采用隔离事务、hash 回滚和漂移拒绝；WhatIf 不写状态、profile、Terminal 或 journal。
+- 新增并通过 PowerShell 5.1 与 PowerShell 7 的九项隔离回归；修复核心模块无 BOM UTF-8 使 PowerShell 5.1 解析失败的兼容问题。
+- 已落盘实施周期、当前改动审查和最终验收；条件化门禁明确浏览器与第三方验证不适用且不阻断。
 
 ## 当前状态
 
-- 状态：实现、本地回归和 Git 提交均已完成；工作树保持干净，当前分支未推送。
-- 当前入口：`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
-- 共享契约：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
-- 当前门禁口径：`not_applicable` 不阻断；`limited` 可继续准备但不能正式放行；来源明确要求、当前必须完成且没有验证或替代验证时才阻断正式放行。
+- 状态：实现、真实本地回归、审查和最终验收已完成；工作树有未提交改动。
+- 当前入口：`windows-powershell-environment-rules/scripts/initialize_windows_powershell.ps1`。
+- 正式放行：允许；浏览器和第三方验证均不适用，不构成阻断。
 
 ## 已验证
 
-- 校验器单元测试：`37/37 PASS`。
-- Python 编译：通过。
-- 需求、验收、实施总览、实施周期、当前审查和最终验收 profile：全部 `PASS`。
-- 技能字典：`implemented_total=83`、`planned_missing=0`、`seed_total=27`。
-- 30 个目标 Skill 全部引用共享白话契约；没有独立的条件化门禁 Skill。
-- `git diff --check`：通过；仅有换行风格提示，没有内容错误。
+- PowerShell 5.1 与 PowerShell 7 parser：通过。
+- 两种 PowerShell 的 TEST-PSENV-001 至 TEST-PSENV-009：全部通过。
+- 需求、验收、实施总览、实施周期、测试、审查、最终验收 profile：全部 PASS。
+- `windows-powershell-environment-rules` 与 `windows-encoding-rules` quick validator：通过。
+- 技能字典：`implemented_total=84`、`planned_missing=0`、`seed_total=27`。
 
 ## 阻断
 
-- 当前没有业务或环境阻断。
-- 当前没有实现或验证阻断；本轮只执行了用户明确要求的拉取和提交，没有执行推送。
+- 无实现、测试、审查或验收阻断。
+- 未执行 Git 提交或推送，因为当前轮没有相应授权。
 
 ## 交接点
 
-- 正式放行状态：当前规则交付允许放行；浏览器联调和第三方接口均为 `not_applicable`，不构成阻断。
-- 提交边界：本轮已按用户授权完成提交；远端同步仍未执行。
+- 后续若改 manifest、状态/退出码、Terminal/profile 事务、回滚 hash、shell 分流或隔离 runner，必须重跑两种 PowerShell 的九项回归并重新验收。

@@ -1,63 +1,30 @@
-version: 1
-scope: windows-user
-source_order:
-  - winget
-  - scoop-existing
-  - chocolatey-existing
-tools:
-  - id: Microsoft.PowerShell
-    command: pwsh.exe
-    version_probe: '$PSVersionTable.PSVersion.ToString()'
-    minimum_major: 7
-    required: true
-  - id: BurntSushi.ripgrep.MSVC
-    command: rg.exe
-    version_probe: '--version'
-  - id: sharkdp.fd
-    command: fd.exe
-    version_probe: '--version'
-  - id: junegunn.fzf
-    command: fzf.exe
-    version_probe: '--version'
-  - id: jqlang.jq
-    command: jq.exe
-    version_probe: '--version'
-  - id: MikeFarah.yq
-    command: yq.exe
-    version_probe: '--version'
-  - id: sharkdp.bat
-    command: bat.exe
-    version_probe: '--version'
-  - id: eza-community.eza
-    command: eza.exe
-    version_probe: '--version'
-  - id: dandavison.delta
-    command: delta.exe
-    version_probe: '--version'
-  - id: 7zip.7zip
-    command: 7z.exe
-    version_probe: '--version'
-  - id: Casey.Just
-    command: just.exe
-    version_probe: '--version'
-  - id: chmln.sd
-    command: sd.exe
-    version_probe: '--version'
-  - id: ajeetdsouza.zoxide
-    command: zoxide.exe
-    version_probe: '--version'
-  - id: tldr-pages.tlrc
-    command: tlrc.exe
-    version_probe: '--version'
-  - id: Git.Git
-    command: git.exe
-    version_probe: '--version'
-  - id: GNU.Wget2
-    command: wget2.exe
-    version_probe: '--version'
-  - id: aria2.aria2
-    command: aria2c.exe
-    version_probe: '--version'
-  - id: gerardog.gsudo
-    command: gsudo.exe
-    version_probe: '--version'
+{
+  "schema_version": 2,
+  "scope": "windows-user",
+  "source_order": ["winget", "scoop-existing", "chocolatey-existing"],
+  "policies": {
+    "RequiredOnly": ["powershell7"],
+    "Core": ["powershell7", "ripgrep", "fd", "fzf", "jq"],
+    "Extended": ["powershell7", "ripgrep", "fd", "fzf", "jq", "yq", "bat", "eza", "delta", "sevenzip", "just", "sd", "zoxide", "tlrc", "git", "wget2", "aria2", "gsudo"]
+  },
+  "tools": [
+    {"key":"powershell7","commands":["pwsh.exe","pwsh"],"version_probe":{"arguments":["-NoLogo","-NoProfile","-Command","$PSVersionTable.PSVersion.ToString()"],"minimum_major":7},"required":true,"host_requirements":["PowerShell7","WindowsPowerShell"],"packages":{"winget":{"id":"Microsoft.PowerShell","scope":"user"}}},
+    {"key":"ripgrep","commands":["rg.exe","rg"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"BurntSushi.ripgrep.MSVC","scope":"user"}}},
+    {"key":"fd","commands":["fd.exe","fd"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"sharkdp.fd","scope":"user"}}},
+    {"key":"fzf","commands":["fzf.exe","fzf"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"junegunn.fzf","scope":"user"}}},
+    {"key":"jq","commands":["jq.exe","jq"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"jqlang.jq","scope":"user"}}},
+    {"key":"yq","commands":["yq.exe","yq"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"MikeFarah.yq","scope":"user"}}},
+    {"key":"bat","commands":["bat.exe","bat"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"sharkdp.bat","scope":"user"}}},
+    {"key":"eza","commands":["eza.exe","eza"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"eza-community.eza","scope":"user"}}},
+    {"key":"delta","commands":["delta.exe","delta"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"dandavison.delta","scope":"user"}}},
+    {"key":"sevenzip","commands":["7z.exe","7z"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"7zip.7zip","scope":"user"}}},
+    {"key":"just","commands":["just.exe","just"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"Casey.Just","scope":"user"}}},
+    {"key":"sd","commands":["sd.exe","sd"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"chmln.sd","scope":"user"}}},
+    {"key":"zoxide","commands":["zoxide.exe","zoxide"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"ajeetdsouza.zoxide","scope":"user"}}},
+    {"key":"tlrc","commands":["tlrc.exe","tlrc"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"tldr-pages.tlrc","scope":"user"}}},
+    {"key":"git","commands":["git.exe","git"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"Git.Git","scope":"user"}}},
+    {"key":"wget2","commands":["wget2.exe","wget2"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"GNU.Wget2","scope":"user"}}},
+    {"key":"aria2","commands":["aria2c.exe","aria2c"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"aria2.aria2","scope":"user"}}},
+    {"key":"gsudo","commands":["gsudo.exe","gsudo"],"version_probe":{"arguments":["--version"]},"required":false,"host_requirements":["PowerShell7","WindowsPowerShell","Cmd","GitBash"],"packages":{"winget":{"id":"gerardog.gsudo","scope":"user"}}}
+  ]
+}

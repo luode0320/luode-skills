@@ -1,4 +1,4 @@
 interface:
   display_name: "Windows PowerShell Environment"
-  short_description: "Prepare PowerShell 7 and Windows CLI tools safely"
-  default_prompt: "Use $windows-powershell-environment-rules. At the start of a Windows session run scripts/initialize_windows_powershell.ps1 -Mode SessionEnsure before other Windows PowerShell work. On a command-not-found failure, use scripts/recover_windows_command.ps1; install only manifest entries or an explicitly approved exact PackageId, verify the command, and preserve the user-level discovered-tools state."
+  short_description: "Prepare PowerShell 7 and Windows CLI tools with conditional gates"
+  default_prompt: "Use $windows-powershell-environment-rules. At the start of a Windows session run scripts/initialize_windows_powershell.ps1 -Mode SessionEnsure -Policy RequiredOnly -OutputFormat Json before other Windows PowerShell work. Continue only for ready or degraded; read the JSON status rather than text output. On command-not-found, use scripts/recover_windows_command.ps1; install only a manifest mapping for that exact package source or an explicitly approved exact Source plus PackageId, verify the command, and keep discovered tools out of later SessionEnsure scope."
