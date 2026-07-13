@@ -1,5 +1,14 @@
 # 项目当前状态
 
+## 本轮任务交接：Obsidian 知识流跨 Windows / WSL CLI 桥接
+
+- 目标：通过 Python bridge 和 Windows PowerShell adapter 让 Windows/WSL 都只经官方 Windows Obsidian CLI 操作固定 vault `D:\obsidian_data` 下的 `知识库/`。
+- 已完成：TASK-OBS-01 文档、TASK-OBS-02 Python bridge、TASK-OBS-03 adapter；bridge 单测 `16/16 PASS`、adapter 契约测试 `17/17 PASS`、Python 编译和 PowerShell parser PASS。adapter 已补齐直调 `limit=1..100`、query/limit argv 完整性与预检/写命令语义错误边界；read/search 的合法 `Error:` 正文不再被误拒绝。
+- 已完成：Windows/WSL doctor、Windows create/read、WSL read/append、Windows readback；所有实机成功响应均为 `verified=true`，最终 smoke note 已覆盖为中性 `status: test-fixture`。
+- 当前状态：TASK-OBS-05 至 TASK-OBS-12 已收口。批处理、Skill/Agent prompt、references、端到端矩阵、全量回归、字典、项目记忆、文档/Skill 门禁与最终验收均完成；35/35 离线回归、10KB 中文长正文双端 readback、append 双端 readback、search、失败矩阵、周期 strict 和 acceptance validator 均通过。CYCLE-OBS-03 已 confirmed，原始目标完成。
+- 范围边界：不使用 vault 文件系统 fallback，不连接非 local 环境，不执行 Git 历史写入。
+- 更新时间：2026-07-13 19:02:00。
+
 ## 本轮任务交接：统一智能体运行期自恢复规则
 
 - 目标：为不限定 Codex 的统一智能体建立厂商无关的 MCP、插件、工具 transport、浏览器会话和宿主运行期自恢复规则。

@@ -20,6 +20,12 @@ related: []
 entities: []
 topics: []
 confidence: medium
+project_id: windows://d/path/to/project
+project_name: project
+project_root_native: D:\path\to\project
+project_root_windows: D:\path\to\project
+project_root_wsl: null
+path_aliases: []
 ---
 ```
 
@@ -38,6 +44,9 @@ confidence: medium
 - `entities`: 指向实体笔记的 wikilink。
 - `topics`: 主题关键词或 MOC 链接。
 - `confidence`: `low`、`medium` 或 `high`。
+- `project_id`: 项目实体的 canonical ID；Windows 项目使用 `windows://<drive>/<normalized-path>`，WSL 项目使用 `wsl://<distro>/<absolute-linux-path>`。同一实体不得因为 Linux、UNC 或 Git Bash 路径别名重复创建。
+- `project_name`: 人类可读项目名；`project_root_native`、`project_root_windows` 和 `project_root_wsl` 分别保留当前宿主、Windows 与 WSL 的规范路径，不适用字段使用 `null`。
+- `path_aliases`: 记录已知等价路径别名，仅用于检索与追溯；不得替代 `project_id` 作为实体唯一键。
 
 ## 正文章节
 

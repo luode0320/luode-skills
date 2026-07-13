@@ -8,9 +8,11 @@
 
 - Windows：`D:\obsidian_data`
 - 该根目录一旦确认，不再重新探测其他路径。
-- 如果 `D:\obsidian_data` 不存在，允许创建；创建后必须继续通过 Obsidian CLI 校验该目录能作为目标 vault 操作。
-- 如果 CLI 不能识别、不能切换或不能在该固定 vault 下执行命令，必须阻断并提示用户在 Obsidian 中打开/注册一次该 vault。
-- `知识库/` 是固定知识目录；如果缺失，只能在 `D:\obsidian_data` 内补齐，不能改用其他根目录。
+- 如果 `D:\obsidian_data` 不存在，允许创建；创建后必须继续通过 bridge doctor 校验该目录能作为目标 vault 操作。
+- 如果 bridge 不能唯一解析、不能在该固定 vault 下执行命令或 doctor 失败，必须阻断并提示用户在 Obsidian 中打开/注册一次该 vault。
+- `知识库/` 是固定知识目录和所有 bridge 笔记 path 的前缀；它不是嵌套 vault root，缺失时只能通过 bridge 在 `D:\obsidian_data` 内补齐。
+- Windows/WSL transport、应用自动启动、Unicode 分块、读回验证、超时和有限重试统一遵循 [cli-operations.md](cli-operations.md)；目录布局不授权直接文件系统创建或笔记写入。
+- selector 只由 bridge 对 `D:\obsidian_data` 的注册根动态唯一解析；文档、脚本和 Agent prompt 都不得写死 vault 名称或拼接 `vault=...` 参数。
 
 ## 目录树
 
@@ -50,5 +52,14 @@ D:\obsidian_data/
 ## 索引规则
 
 - `知识库/INDEX.md` 保持简短，只链接主要 MOC、活跃项目和检索入口。
-- 不要把 `知识库/INDEX.md` 变成完整目录。详细检索交给 Obsidian CLI、frontmatter、标签、别名、backlinks 和 MOC。
-- 新建 MOC、项目笔记或重要知识笔记时，如果能提升导航效率，就在 `知识库/INDEX.md` 中添加一个链接。
+- 不要把 `知识库/INDEX.md` 变成完整目录。详细检索交给 bridge、frontmatter、标签、别名、backlinks 和 MOC。
+- 新建 MOC、项目笔记或重要知识笔记时，如果能提升导航效率，就通过 bridge `read` 后 `append` 更新 `知识库/INDEX.md`。
+
+## 验证映射
+
+| 布局约束 | 自动化或实机测试 |
+| --- | --- |
+| 固定 root 与唯一 selector | TEST-OBS-001/011 |
+| nested root 明确阻断 | TEST-OBS-012 |
+| `知识库/` 前缀、readback 和双端 transport | TEST-OBS-004/013 |
+| references 不写死 vault 名或直接 CLI transport | TEST-OBS-016 |

@@ -1,63 +1,75 @@
-# Obsidian CLI 操作规则
+# Obsidian bridge 操作规则
 
-本 skill 默认使用官方 Obsidian CLI 操作 vault。依据官方帮助文档，CLI 需要 Obsidian 1.12.7+ installer，在 Obsidian 设置中启用 Command line interface，并依赖 Obsidian 应用运行；首个命令可以启动 Obsidian，但如果应用无法启动或 CLI 未注册，必须阻断。
+Windows 和 WSL 均只调用公开 bridge；bridge 再调用官方 Windows Obsidian CLI。依据官方帮助文档，CLI 需要 Obsidian 1.12.7+ installer、设置中的 Command line interface，并依赖 Obsidian 应用运行。WSL 的 PATH 没有原生 `obsidian` 不构成阻断；只有 bridge doctor 无法恢复应用或无法锁定固定 vault 才阻断。
 
 参考来源：https://obsidian.md/help/cli
 
 ## 必需前置
 
-执行任何 vault 读写前，先完成以下检查：
+执行任何 vault 读写前，先完成 bridge doctor：
 
-1. `obsidian` 命令存在于当前 PATH；若 PATH 缺失但本机存在明确的官方 CLI 可执行文件（如 Windows installer 的 `Obsidian.com`），允许使用该绝对路径作为本轮 `obsidian` 命令来源，并在执行证据中写清路径。
-2. `obsidian version` 或上述绝对路径的 `version` 可执行并返回版本信息。
-3. Obsidian CLI 已在 Obsidian 设置中启用并注册。
-4. 目标 vault 根目录固定为 `D:\obsidian_data`，并已通过 [vault-layout.md](vault-layout.md) 的固定根目录校验。
-5. CLI 命令能限定到这个固定 vault，且对 `知识库/` 下的相对路径生效。优先在 `D:\obsidian_data` 作为当前工作目录执行；如果 CLI 使用其他 active vault，必须阻断。
+1. 运行 `python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py doctor --json`。
+2. 断言响应的 `ok=true`、`vault_root=D:\obsidian_data`、非空 `vault_selector` 与 `verified=true`。
+3. bridge 在 Windows 直接使用适配器，在 WSL 自动使用 Windows interop；调用方不得自行选择 shell、CLI 路径或 selector。
+4. 应用不可达时，bridge 只隐藏启动一次、最长等待 15 秒并有限重试；不得杀死用户已有 Obsidian 进程，也不得无限重试。
+5. 所有笔记 path 必须是 vault 相对路径、以 `知识库/` 开头，且不得包含 `..`、盘符、UNC 或 Windows 非法字符。
 
-任何一项失败都视为 CLI 硬依赖不满足。不要回退到 `rg`、`Get-Content`、`Set-Content`、Python 或 Node 直接读写 vault Markdown 文件。
+任何一项失败都视为 bridge 硬依赖不满足。不要回退到 `rg`、`Get-Content`、`Set-Content`、Python 或 Node 直接读写 vault Markdown 文件。
 
 ## Vault 定位
 
-- 如果当前 shell 的工作目录就是目标 vault 根目录，Obsidian CLI 默认应使用该 vault。
-- 如果使用 `vault=<name>` 或 `vault=<id>`，该参数必须放在命令第一个参数位置；不要把 `vault=知识库 vault info=path` 这类组合当作合法查询，CLI 会按参数序列解析，不能信任口头拼接。
-- 使用 `obsidian vaults verbose` 或等价命令确认 CLI 认识的 vault 与解析出的根目录一致。
-- 如果默认根目录刚创建但 CLI 还不认识它，停止并提示用户在 Obsidian 中打开/注册该目录一次。
-- 如果 CLI 返回 `unable to find Obsidian`、命令超时，或怀疑存在挂起的 `Obsidian.com` 子进程，先有限等待；仍失败时可清理本轮挂起的 Obsidian CLI / 应用进程并重新启动 Obsidian，再重试前置校验。重启后仍失败必须阻断，不得改用文件系统写入目标 vault。
+- 唯一 vault root 是 `D:\obsidian_data`；`知识库/` 只是 vault 内路径前缀，不是 vault selector。
+- bridge adapter 通过官方注册列表查询动态唯一解析 selector；该查询只在 adapter 内部执行，调用方不传 vault 名称、不依赖 cwd，也不读取 listing 作为文件系统 fallback。
+- 若固定根未注册、出现零个或多个匹配项，bridge 返回稳定 vault 错误并停止；不得改用嵌套 `D:\obsidian_data\知识库` 作为 vault root。
 
 ## 常用命令模板
 
-以下命令按当前 shell 调整引号和转义。多行内容使用 `\n` 表达换行。
+以下命令由 bridge 统一处理 UTF-8、Windows/WSL transport、超时、应用恢复、selector 与读回验证。写入正文通过 UTF-8 文件传递；超过约 1800 字符时 adapter 自动分块并读回验证。
 
 ```bash
-obsidian version
-obsidian vaults verbose
-obsidian search query="关键词" limit=10 format=json
-obsidian search:context query="关键词" limit=10
-obsidian read path="知识库/20-Knowledge/topic/note.md"
-obsidian create path="知识库/10-Sessions/2026/07/session-title.md" content="# 标题\n\n正文"
-obsidian append path="知识库/20-Knowledge/topic/note.md" content="\n## 2026-07-06 更新\n\n- 新证据"
-obsidian open path="知识库/20-Knowledge/topic/note.md"
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py doctor --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py search --query "关键词" --limit 10 --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py search-context --query "关键词" --limit 10 --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py read --path "知识库/20-Knowledge/topic/note.md" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py create --path "知识库/10-Sessions/2026/07/session-title.md" --content-file "<UTF-8正文文件>" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py append --path "知识库/20-Knowledge/topic/note.md" --content-file "<UTF-8正文文件>" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py open --path "知识库/20-Knowledge/topic/note.md" --json
 ```
 
-命令帮助只使用只读入口，例如 `obsidian help` 或 `obsidian <command> --help`。不要执行 `obsidian create help`、`obsidian append help` 这类会被解析为写入命令的伪帮助。
+### Windows/WSL 调用模板
+
+- Windows Agent：在 Windows shell 中直接运行上面的 `python ... bridge.py` 命令；bridge 选择 Windows direct transport。
+- WSL Agent：在 WSL shell 中运行同一 bridge 入口；bridge 通过 `powershell.exe` 或可用的 `pwsh.exe` 调用 Windows adapter，返回 `transport=wsl-powershell-interop`。调用方不直接寻找 Linux `obsidian`。
+- 需要从 Windows shell 复核 WSL 入口时，使用 `wsl.exe -d Ubuntu-24.04 -- python3 /mnt/d/luode/luode-skills/obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py doctor --json`；该路径只指向仓库测试资产，不是 vault 访问路径。
+
+应用恢复只允许一轮：初次命令失败且错误属于应用不可达时，adapter 隐藏启动一次，最多轮询 15 秒，然后只重试原操作一次。响应中的 `attempts` 不得超过 3；参数、路径、interop、PowerShell、selector、timeout 或 readback 错误不触发无变化重试。
+
+生产入口只允许上述 allowlist；不得向 bridge 透传任意 Obsidian 子命令。
 
 ## 读写约束
 
-- 创建或更新笔记前必须先 `search` 或 `search:context` 检索现有笔记。
-- 读取内容必须使用 `obsidian read` 或等价 CLI 命令。
-- 新建笔记使用 `obsidian create`；若目标已存在，不得盲目 `overwrite`。
-- 追加证据优先使用 `obsidian append`；只有必须重排 frontmatter 或替换冲突内容时，才允许选择更精确的 CLI 更新方式。
-- 长正文、表格、多行 Mermaid 或批量沉淀内容必须拆成小块追加。单次 `content=` 参数过长会导致 CLI 超时或挂起；默认按少量表格行或约 1-2 KB 文本分块，并保留超时、重试和最终读回校验。
-- 全量批处理可以用脚本从源 vault 文件系统读取 Markdown，但前提是先通过 CLI 证明源 vault 已注册；目标 vault 的创建、覆盖、追加、读取和索引更新仍必须走 CLI。
-- 打开笔记可使用 `obsidian open`；它只负责呈现，不作为读取证据。
-- 所有 `path=` 都必须是 vault 根目录内的相对路径。
+- 创建或更新笔记前必须先 bridge `search` 或 `search-context` 检索现有笔记；读取证据必须来自 bridge `read`。
+- `create`、`append` 的响应必须 `verified=true`；没有 readback 证据的写入不得宣称成功。
+- 全量批处理可从受控 source root 读取 Markdown；target vault 的 create、append、read 与 INDEX 更新仍只走 bridge。
+- bridge 临时 request/response 文件必须在 finally 清理，正文、token、凭据和临时文件内容不得写日志。
 
 ## 阻断文案要点
 
-CLI 阻断时，说明必须包含：
+bridge 阻断时，说明必须包含：
 
-- 失败的前置项：命令不存在、版本/注册失败、应用无法运行、vault 未注册、目标路径不一致或命令执行失败。
+- 失败的前置项：interop、PowerShell、CLI、应用、vault、路径、超时或读回失败。
 - 目标 vault 根目录。
-- 用户可执行的恢复动作：安装/升级 Obsidian 1.12.7+ installer，在设置中启用 Command line interface，把默认目录作为 vault 打开/注册，重新运行命令。
+- 用户可执行的恢复动作：安装/升级 Obsidian 1.12.7+ installer，在设置中启用 Command line interface，把 `D:\obsidian_data` 打开/注册，重新运行 bridge doctor。
 
 阻断时不要写入任何笔记，也不要把直接文件读写结果当成 vault 事实。
+
+## 验证映射
+
+| bridge 能力 | 自动化或实机证据 |
+| --- | --- |
+| doctor、固定 root、唯一 selector | TEST-OBS-001/011 |
+| WSL interop 与参数 UTF-8 | TEST-OBS-003/007 |
+| create/append/readback 与路径安全 | TEST-OBS-004/008/013 |
+| 自动启动、10KB 中文和超时边界 | TEST-OBS-006/010 |
+| distill、INDEX 与脱敏 | TEST-OBS-014/015 |
+| references bridge-only 规则与禁止词扫描 | TEST-OBS-016 |

@@ -4,6 +4,9 @@
 
 ## 事件
 
+- 2026-07-13：完成 Obsidian 知识流跨 Windows/WSL bridge 的 TASK-OBS-08；35/35 离线回归、PowerShell parser、Python 编译、search、长正文双端 readback（13321 chars/LF181/MD5 C46A...）与 append 双端 readback（172 chars/LF11/MD5 27ec...）通过；CYCLE-OBS-02 收口，未执行 Git 历史写入。
+- 2026-07-13：完成 CYCLE-OBS-03 TASK-OBS-09~12；字典、项目记忆、周期 strict、验收 profile、当前改动审查和独立最终验收均 PASS，AC-OBS-001~010 全部放行，工作树保持未提交。
+
 - 2026-07-12：补齐 Markdown 图片资产 validator 的文件命名、九字段资产清单一致性、共享引用和 `doc/data/` 根目录错位扫描，新增正反单测后校验器达到 `21/21 PASS`；README、编码总规和最终验收状态同步，真实 imagegen 仍因 `gpt-image-2` 503 / `gpt-image-1.5` 403 保持阻断。
 
 - 2026-07-12：按 `CHG-DOC-IMG-001` 实施 Markdown 图片资产闭环；冻结 `doc/data/images/` 唯一根目录，更新 storage/requirement/implementation/delivery 规则、profile v3、validator 图片与孤儿检查，并将来源需求、验收、实施总览、全量顺序和周期 01 回写为增量执行入口；工作树保持未提交。

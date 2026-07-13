@@ -358,6 +358,15 @@
 - 更新时间: 2026-07-08
 - 状态: 启用
 
+### Obsidian Windows/WSL bridge 固定执行边界
+- 别名: obsidian_cli_bridge, Windows/WSL CLI bridge, bridge-only vault
+- 类型: 跨宿主执行规则
+- 定义: Windows 与 WSL 的 Obsidian 检索、创建、追加、读取和 INDEX 更新统一经 `obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py`，最终由 Windows 官方 CLI 操作唯一 vault 根 `D:\obsidian_data`；`知识库/` 只是 vault 内路径前缀，selector 必须按注册根动态唯一解析。WSL 仅通过 PowerShell interop，不安装原生 Linux CLI，不使用 vault 文件系统 fallback；写入必须 `verified=true` readback，应用恢复最多隐藏启动一次并有限重试。
+- 来源: `obsidian-knowledge-flow/SKILL.md`、`cli-operations.md`、CYCLE-OBS-01/02 实机证据
+- 适用范围: Windows/WSL 知识流、bridge transport、长正文分块与读回验证
+- 更新时间: 2026-07-13
+- 状态: 启用
+
 ### 项目四件套记忆闭环
 - 别名: PROJECT_CURRENT, PROJECT_MEMORY, PROJECT_HISTORY, 项目本地记忆四件套
 - 类型: 项目上下文规则
@@ -451,6 +460,7 @@
 - 2026-07-03：补充 Plan Mode 包裹口径，明确运行环境若要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与模板结构。
 - 2026-07-04：补充 Plan Mode 硬失败口径，明确 `Summary / Key Changes / Public Interfaces / Test Plan / Assumptions` 等通用工程计划壳不能作为实施规划主结构，且计划输出前必须执行 `implementation-planning-rules/references/plan-output-gate.md` 字段矩阵；缺核心字段时必须按模板重写。
 - 2026-07-05：明确实施周期是第一期 / 第二期 / 第三期等大进度与顺序边界，执行必须先按周期推进，周期内每个最小任务都完成“实现 -> 真实测试 -> 审查 -> 验收”后才进入下一任务 / 下一周期；文档落盘和最终验收需记录周期收口与最小任务闭环证据。
+- 2026-07-13：完成 Obsidian Windows/WSL bridge-only 固定执行边界与 CYCLE-OBS-02 实机收口；唯一 vault 根为 `D:\obsidian_data`，WSL 通过 PowerShell interop，长正文和 append 必须以 CLI readback/hash 证明一致，未使用 vault 文件系统 fallback。
 - 2026-07-05：新增新项目 / 多来源对象的“需求与实施计划全量顺序实施方案”口径，要求先用项目级总表串起需求、验收标准、实施总览、实施周期和周期内最小任务，再进入单来源对象执行。
 - 2026-07-02：新增文件写入统一 UTF-8 口径，明确代码、文档、配置、脚本、测试资产和生成文本跨 Windows / WSL / Linux 默认 UTF-8，禁止 GBK / ANSI / 默认编码落盘，命令行写入后必须回读并检查 diff。
 - 2026-07-02：新增会话自动重命名规则，明确任务主题稳定且标题泛化、过时或不匹配时自动命中 `thread-title-rules`，调用真实线程重命名工具改为 8-24 字中文简要；标题已准确、工具不可用或用户禁止时跳过。
@@ -724,6 +734,23 @@ entities:
       - context.obsidian-knowledge-flow
       - context.memory-domain
     updated_at: 2026-07-11
+  - entity_id: rule.obsidian-windows-wsl-bridge-boundary
+    name: "Obsidian Windows/WSL bridge 固定执行边界"
+    type: "跨宿主执行规则"
+    aliases:
+      - obsidian_cli_bridge
+      - Windows/WSL CLI bridge
+      - bridge-only vault
+    definition: "Windows 与 WSL 的 Obsidian 检索、创建、追加、读取和 INDEX 更新统一经 obsidian_cli_bridge.py，最终由 Windows 官方 CLI 操作唯一 vault 根 D:\\obsidian_data；知识库/ 只是 vault 内路径前缀，selector 按注册根动态唯一解析。WSL 仅通过 PowerShell interop，不安装原生 Linux CLI，不使用 vault 文件系统 fallback；写入必须 verified=true readback，应用恢复最多隐藏启动一次并有限重试。"
+    scope: "Windows/WSL 知识流、bridge transport、长正文分块与读回验证"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.obsidian-knowledge-flow
+      - evidence.doc.repo-rules
+    context_ids:
+      - context.obsidian-knowledge-flow
+      - context.memory-domain
+    updated_at: 2026-07-13
   - entity_id: rule.git-obsidian-capture-link
     name: "Git 协作联动 Obsidian 沉淀"
     type: "流程规则"

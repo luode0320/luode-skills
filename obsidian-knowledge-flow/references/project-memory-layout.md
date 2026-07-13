@@ -27,7 +27,8 @@
 - `PROJECT_MEMORY.md` 只写稳定规则、关键决策和长期事实；同一口径优先回写原条目。已有机器索引区可以继续保留，但不得把当前状态或历史流水写入其中。
 - `PROJECT_HISTORY.md` 只追加重要事件，保留日期、事件、影响、结果和关联来源，不覆盖旧事件。
 - 不记录或回显 API key、token、密码、私钥、连接串原值和其他敏感配置。
-- 项目本地 Markdown 文件使用标准文件工具；Obsidian vault 的检索、读取、创建和追加仍只能通过 Obsidian CLI 完成。
+- 项目本地 Markdown 文件使用标准文件工具；Obsidian vault 的检索、读取、创建和追加只能通过公开 bridge（bridge 调用官方 Windows CLI）完成，并固定为 vault root `D:\obsidian_data` 与相对路径前缀 `知识库/`。
+- 跨 Windows / WSL 项目身份以 bridge `project-context --root <项目根>` 的 `project_id` 为唯一键；同一 WSL 项目的 Linux、UNC 和 Git Bash 路径只能维护同一个实体，路径别名写入实体字段而不创建重复笔记。
 
 ## 优先级
 

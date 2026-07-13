@@ -5,4 +5,5 @@ interface:
     使用 $obsidian-knowledge-flow 时，先读取项目父目录规则、`PROJECT_CURRENT.md` 和
     `PROJECT_MEMORY.md`；缺失项目记忆文件时先创建，`PROJECT_HISTORY.md` 只在历史追问、状态不足
     或真实卡点时窄读。项目本地 Markdown 与 Obsidian vault 不混用；只有判定为 `Obsidian:检索`
-    或 `Obsidian:沉淀` 时，才通过固定 vault `D:\obsidian_data` 下的 Obsidian CLI 检索、读取、创建或追加笔记。
+    或 `Obsidian:沉淀` 时，才调用 `obsidian_cli_bridge.py` 操作固定 vault `D:\obsidian_data` 内的 `知识库/`。
+    Windows 由 bridge 调用官方 Windows CLI，WSL 由 bridge 自动使用 Windows interop；不得自行决定 shell、CLI 路径或 vault selector。只有 bridge doctor 失败才输出 `Obsidian:阻断`，不得用文件系统读写 vault 作为替代。

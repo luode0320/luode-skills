@@ -1,6 +1,6 @@
 ---
 name: code-style-consistency-rules
-description: 当新增或修改任意代码文件、脚本文件、配置型代码或测试代码时触发。负责跟随项目现有写法，并在本轮已触发 `code-generation-style-rules` 时依据其产出的代码风格契约检查局部一致性，避免局部风格跳变和个人偏好入侵；不要用它代替最小改动、可读性、注释规范、代码归位规则或代码生成风格契约入口。
+description: 当新增或修改任意代码文件、脚本文件、配置型代码或测试代码时触发；当用户以文字或截图指出某写法不对、这个风格不对、不能这么写、这样写不行时也必须触发。负责跟随项目现有写法，并在本轮已触发 `code-generation-style-rules` 时依据其产出的代码风格契约检查局部一致性，避免局部风格跳变和个人偏好入侵；同时作为全局用户风格反例库的唯一 owner，把用户否定的写法规范化为反例、把用户期望的写法记为正例，经用户确认后写入 `references/user-style-feedback-library.md` 全局永久生效，供写码前加载规避；不要用它代替最小改动、可读性、注释规范、代码归位规则或代码生成风格契约入口。
 ---
 
 # 代码风格一致性规则
@@ -83,9 +83,21 @@ applog.Errorf(
 )
 ```
 
+## 用户风格反馈捕获与学习
+
+只在用户以文字或截图指出“某写法不对 / 这个风格不对 / 不能这么写 / 这样写不行”时使用本节；本 skill 是全局用户风格反例库的唯一 owner。
+
+- 触发信号：文字信号包含“不能这么写、这个风格不对、这个写法不对、这样写不行、别这样写、以后不要这么写”等语义；截图信号由 `image-redbox-focus-rules` 聚焦红框后路由到本节，读图理解沿用模型原生多模态能力，本节不做 OCR。
+- 处理流程按 `references/style-feedback-workflow.md` 执行：定位被否定写法 → 提取正例（用户未给出则追问，不凭空生成）→ 生成 `语言|场景|反例签名` 去重键 → 组装 candidate 回显 → 用户确认后写入 `references/user-style-feedback-library.md` 的 active 条目 → 去重合并。
+- 生效时机：candidate 只在当轮回显不落盘，仅 active 落盘并跨项目、跨会话永久生效（确认后生效）。
+- 去重：命中同一去重键只更新出现次数与确认时间，不新增正文条目。
+- 作用域边界：全局通用偏好写入本库；项目专属一次性约定仍走 `PROJECT_STYLE.md` 与 `project-style-rules`。
+- 收口联动：本次写入若改动本 skill 的 `description` 或 `##` 标题，收口前重跑 `python skill-dictionary/generate_dictionary.py`，并走 `skill-compliance-gate-rules`。
+
 ## 自动触发信号
 
 - 新增代码文件。
+- 用户以文字或截图指出某写法不对、风格不对、不能这么写、这样写不行。
 - 修改已有文件中的实现风格。
 - 补充同目录下的新函数、新方法或新测试。
 - 调整局部写法时需要判断是否与项目现有风格冲突。
@@ -138,3 +150,6 @@ applog.Errorf(
 - 只有在判断应跟随哪个局部风格时，再读 `references/local-convention-detection.md`。
 - 只有在对照正反例时，再读 `references/consistency-examples.md`。
 - Go 代码改动默认补读 `references/go-coding-rules.md`。
+- 处理用户风格反馈（文字或截图否定某写法）时，先读 `references/style-feedback-workflow.md` 走捕获学习流程。
+- 组装或写入一条反例条目时，读 `references/style-case-template.md` 对齐字段与去重键。
+- 写码前需要规避用户已确认反例时，加载 `references/user-style-feedback-library.md` 的 active 条目。

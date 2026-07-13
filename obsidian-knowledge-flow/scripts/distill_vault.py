@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Distill every Markdown note from one Obsidian vault into a target vault.
 
-The source vault is read from the filesystem after the Obsidian CLI proves the
-vault is registered. Target notes are written only through the Obsidian CLI.
+The source vault is read from the configured local directory. Target notes are
+written only through the public Obsidian CLI bridge.
 """
 
 from __future__ import annotations
 
 import argparse
-import os
+import json
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -34,6 +35,40 @@ SECRET_PATTERNS = [
     re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
     re.compile(r"(?i)(mongodb|mysql|postgresql|redis)://[^\s`]+"),
 ]
+
+BRIDGE_PATH = Path(__file__).with_name("obsidian_cli_bridge.py")
+
+
+def run_bridge(operation: str, path: str | None = None, content: str | None = None) -> str:
+    """通过公开 bridge 执行固定 vault 的目标读写。
+
+    [参数] operation: allowlist 操作；path: 知识库相对路径；content: UTF-8 Markdown 正文。
+    [返回] bridge read 操作的正文，其他操作返回空字符串。
+    最近修改时间: 2026-07-13 17:32:38 目标读写统一交给 bridge，批处理不保留独立 transport。
+    """
+    # 1. 正文通过临时 UTF-8 文件传给 bridge，避免 Windows 命令行参数长度限制。
+    command = [sys.executable, str(BRIDGE_PATH), operation]
+    if path:
+        command.extend(["--path", path])
+    temporary_path: Path | None = None
+    if content is not None:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".md", delete=False) as temporary_file:
+            temporary_file.write(content)
+            temporary_path = Path(temporary_file.name)
+        command.extend(["--content-file", str(temporary_path)])
+    command.append("--json")
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", check=False)
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+    # 2. bridge 的退出码和 JSON 成功标记都必须通过，不能让失败写入继续执行。
+    if completed.returncode != 0:
+        raise RuntimeError(f"bridge {operation} failed: {completed.stderr.strip() or completed.stdout.strip()}")
+    response = json.loads(completed.stdout)
+    if not response.get("ok"):
+        raise RuntimeError(f"bridge {operation} failed: {response.get('code')}")
+    return str(response.get("data", {}).get("output", ""))
 
 
 @dataclass
@@ -61,127 +96,24 @@ class BatchResult:
     seconds: float
 
 
-def run_cli(cli: Path, args: list[str], timeout: int, retries: int = 1) -> str:
-    """执行 Obsidian CLI 并返回标准输出。
-
-    [参数] cli: Obsidian CLI 可执行文件路径；args: CLI 参数；timeout: 超时秒数；retries: 失败重试次数。
-    [返回] CLI 标准输出文本。
-    最近修改时间: 2026-07-07 为新增脚本补齐 CLI 调用说明。
-    """
-    command = [str(cli), *args]
-    last_error = ""
-    for attempt in range(retries + 1):
-        try:
-            completed = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=timeout,
-                check=False,
-            )
-        except subprocess.TimeoutExpired:
-            last_error = f"timeout after {timeout}s"
-        else:
-            if completed.returncode == 0:
-                return completed.stdout.strip()
-            last_error = completed.stderr.strip() or completed.stdout.strip()
-        if attempt < retries:
-            time.sleep(1.0 + attempt)
-    raise RuntimeError(f"CLI failed: {' '.join(command)} :: {last_error}")
-
-
-def to_cli_content(text: str) -> str:
-    """把多行 Markdown 转成 CLI content 参数可接受的文本。
-
-    [参数] text: 待写入的 Markdown 正文。
-    [返回] 将换行规整为字面量换行标记后的文本。
-    最近修改时间: 2026-07-07 为新增脚本补齐内容转换说明。
-    """
-    return text.replace("\r\n", "\n").replace("\r", "\n").replace("\n", r"\n")
-
-
-def parse_vaults_verbose(output: str) -> dict[str, str]:
-    """解析 `obsidian vaults verbose` 输出。
-
-    [参数] output: Obsidian CLI 返回的 vault 列表文本。
-    [返回] vault 名称到 vault 根目录的映射。
-    最近修改时间: 2026-07-07 为新增脚本补齐 vault 列表解析说明。
-    """
-    vaults: dict[str, str] = {}
-    for line in output.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        if "\t" in line:
-            name, path = line.split("\t", 1)
-        else:
-            parts = line.split(None, 1)
-            if len(parts) != 2:
-                continue
-            name, path = parts
-        vaults[name.strip()] = path.strip()
-    return vaults
-
-
-def comparable_path(path: str | Path) -> str:
-    """生成用于比较的规整绝对路径。
-
-    [参数] path: 需要比较的文件系统路径。
-    [返回] 去除尾部分隔符并忽略大小写差异的绝对路径文本。
-    最近修改时间: 2026-07-07 校验 CLI 注册路径与用户传入 root 是否一致。
-    """
-    return str(Path(path).expanduser().resolve()).rstrip("\\/").casefold()
-
-
-def assert_registered_root(
-    vaults: dict[str, str],
-    vault_name: str,
-    expected_root: Path,
-    role: str,
-) -> None:
-    """确认 CLI 注册的 vault 路径与脚本入参一致。
-
-    [参数] vaults: CLI 返回的 vault 映射；vault_name: 待检查的 vault 名；expected_root: 期望根目录；role: 错误信息中的角色名。
-    [返回] 无；不一致时抛出 RuntimeError。
-    最近修改时间: 2026-07-07 防止读写路径与已注册 vault 不一致。
-    """
-    registered_root = vaults[vault_name]
-    if comparable_path(registered_root) != comparable_path(expected_root):
-        raise RuntimeError(
-            f"{role} vault root mismatch: vault={vault_name} "
-            f"registered={registered_root} expected={expected_root}"
-        )
-
-
-def validate_cli_and_vaults(args: argparse.Namespace) -> dict[str, str]:
+def validate_cli_and_vaults(args: argparse.Namespace) -> None:
     """校验 Obsidian CLI、源 vault 和目标 vault 的注册状态。
 
     [参数] args: 命令行参数。
-    [返回] CLI 认识的 vault 名称到根目录的映射。
-    最近修改时间: 2026-07-07 增加注册路径与入参 root 一致性校验。
+    [返回] 无。
+    最近修改时间: 2026-07-13 17:32:38 删除旧 CLI 注册校验，仅保留源目录与固定目标根校验。
     """
-    version = run_cli(args.cli, ["version"], args.cli_timeout, retries=1)
-    vaults = parse_vaults_verbose(
-        run_cli(args.cli, ["vaults", "verbose"], args.cli_timeout, retries=1)
-    )
-    if args.source_vault not in vaults:
-        raise RuntimeError(f"source vault not registered: {args.source_vault}")
-    if args.target_vault not in vaults:
-        raise RuntimeError(f"target vault not registered: {args.target_vault}")
+    # 1. 固定目标 vault 的发现和 transport 仅由 bridge 负责。
+    run_bridge("doctor")
     source_root = Path(args.source_root).resolve()
-    target_root = Path(args.target_root).resolve()
     if not source_root.exists() or not source_root.is_dir():
         raise RuntimeError(f"source root is not a directory: {source_root}")
-    if not target_root.exists() or not target_root.is_dir():
-        raise RuntimeError(f"target root is not a directory: {target_root}")
-    assert_registered_root(vaults, args.source_vault, source_root, "source")
-    assert_registered_root(vaults, args.target_vault, target_root, "target")
-    print(f"obsidian_version={version}")
-    print(f"source_vault={args.source_vault} path={vaults[args.source_vault]}")
-    print(f"target_vault={args.target_vault} path={vaults[args.target_vault]}")
-    return vaults
+    if str(args.target_root).rstrip("\\/").casefold() == r"d:\obsidian_data\知识库".casefold():
+        raise RuntimeError("LEGACY_NESTED_VAULT_MODEL: target-root must be D:\\obsidian_data")
+    if str(args.target_root).rstrip("\\/").casefold() != r"d:\obsidian_data".casefold():
+        raise RuntimeError("target-root must be D:\\obsidian_data")
+    print(f"source_vault={args.source_vault} path={source_root}")
+    print("target_vault=fixed bridge vault")
 
 
 def iter_markdown_files(source_root: Path) -> list[Path]:
@@ -327,55 +259,6 @@ def build_category_index(files: list[Path], source_root: Path) -> dict[str, list
     return dict(sorted(categories.items(), key=lambda item: item[0]))
 
 
-def create_or_overwrite_note(
-    cli: Path,
-    target_vault: str,
-    path: str,
-    content: str,
-    timeout: int,
-) -> None:
-    """通过 Obsidian CLI 创建或覆盖目标笔记。
-
-    [参数] cli: CLI 路径；target_vault: 目标 vault 名；path: 目标相对路径；content: Markdown 内容；timeout: 超时秒数。
-    [返回] 无。
-    最近修改时间: 2026-07-07 为新增脚本补齐目标笔记写入说明。
-    """
-    run_cli(
-        cli,
-        [
-            f"vault={target_vault}",
-            "create",
-            f"path={path}",
-            "content=" + to_cli_content(content),
-            "overwrite",
-        ],
-        timeout,
-        retries=1,
-    )
-
-
-def append_note(cli: Path, target_vault: str, path: str, content: str, timeout: int) -> None:
-    """通过 Obsidian CLI 追加目标笔记内容。
-
-    [参数] cli: CLI 路径；target_vault: 目标 vault 名；path: 目标相对路径；content: 待追加文本；timeout: 超时秒数。
-    [返回] 无。
-    最近修改时间: 2026-07-07 为新增脚本补齐分块追加说明。
-    """
-    if not content:
-        return
-    run_cli(
-        cli,
-        [
-            f"vault={target_vault}",
-            "append",
-            f"path={path}",
-            "content=" + to_cli_content(content),
-        ],
-        timeout,
-        retries=1,
-    )
-
-
 def process_category(
     args: argparse.Namespace,
     source_root: Path,
@@ -386,8 +269,9 @@ def process_category(
 
     [参数] args: 命令行参数；source_root: 源 vault 根目录；folder: 顶层目录名；paths: 本批次文件列表。
     [返回] 本批次处理结果。
-    最近修改时间: 2026-07-07 为新增脚本补齐批次处理说明。
+    最近修改时间: 2026-07-13 17:32:38 目标笔记创建和分块追加直接复用 bridge。
     """
+    # 1. 先从源目录生成本批次的脱敏摘要和目标笔记路径。
     started = time.time()
     title = clean_slug(folder)
     target_path = f"{args.target_prefix}/{title}-逐篇沉淀.md"
@@ -468,8 +352,9 @@ confidence: medium
         "| # | 源文档 | 子类 | 摘要 | 关键词/小节 | 状态 |\n"
         "| ---: | --- | --- | --- | --- | --- |\n"
     )
+    # 2. 非 dry-run 时只经 bridge 创建和追加目标笔记。
     if not args.dry_run:
-        create_or_overwrite_note(args.cli, args.target_vault, target_path, header, args.cli_timeout)
+        run_bridge("create", target_path, header)
 
     chunk = ""
     chunk_rows = 0
@@ -480,7 +365,7 @@ confidence: medium
         )
         if len(chunk) + len(line) > args.chunk_chars or chunk_rows >= args.chunk_rows:
             if not args.dry_run:
-                append_note(args.cli, args.target_vault, target_path, chunk, args.cli_timeout)
+                run_bridge("append", target_path, chunk)
                 if args.append_delay:
                     time.sleep(args.append_delay)
             chunk = ""
@@ -488,7 +373,7 @@ confidence: medium
         chunk += line
         chunk_rows += 1
     if chunk and not args.dry_run:
-        append_note(args.cli, args.target_vault, target_path, chunk, args.cli_timeout)
+        run_bridge("append", target_path, chunk)
         if args.append_delay:
             time.sleep(args.append_delay)
 
@@ -496,7 +381,7 @@ confidence: medium
         error_text = "\n## 读取失败\n\n" + "\n".join(
             f"- `{path}`: {clean_cell(error, 220)}" for path, error in errors
         )
-        append_note(args.cli, args.target_vault, target_path, error_text, args.cli_timeout)
+        run_bridge("append", target_path, error_text)
 
     return BatchResult(
         folder=folder,
@@ -514,8 +399,9 @@ def write_rollup(args: argparse.Namespace, results: list[BatchResult]) -> None:
 
     [参数] args: 命令行参数；results: 各批次处理结果。
     [返回] 无。
-    最近修改时间: 2026-07-07 为新增脚本补齐总览写入说明。
+    最近修改时间: 2026-07-13 17:32:38 总览和 INDEX 入口的目标写入统一复用 bridge。
     """
+    # 1. 汇总批次统计并生成固定知识库前缀下的总览内容。
     total_files = sum(result.files for result in results)
     total_read = sum(result.read for result in results)
     total_errors = sum(result.errors for result in results)
@@ -560,8 +446,8 @@ confidence: medium
 | --- | --- |
 | 源 vault | `data` |
 | 源路径 | `F:/blog/data` |
-| 目标 vault | `知识库` |
-| 目标路径 | `D:/obsidian_data/知识库` |
+| 目标 vault 根 | `D:/obsidian_data` |
+| 知识路径前缀 | `知识库/` |
 | 应处理 Markdown | {total_files} |
 | 成功读取并沉淀 | {total_read} |
 | 读取失败 | {total_errors} |
@@ -591,16 +477,16 @@ confidence: medium
 - [[50-Sources/vaults/blog-data-vault|F blog data Obsidian vault]]
 """
     if not args.dry_run:
-        create_or_overwrite_note(args.cli, args.target_vault, target_path, content, args.cli_timeout)
+        run_bridge("create", target_path, content)
         index_append = f"""
 
 ## blog-data 全量逐篇沉淀
 
 - [[{args.target_prefix}/全量逐篇沉淀总览|blog-data 全量逐篇沉淀总览]]：逐篇读取并归类沉淀 `F:/blog/data` 的 Markdown。
 """
-        index = run_cli(args.cli, [f"vault={args.target_vault}", "read", "path=INDEX.md"], args.cli_timeout, retries=1)
+        index = run_bridge("read", "知识库/INDEX.md")
         if "blog-data 全量逐篇沉淀总览" not in index:
-            append_note(args.cli, args.target_vault, "INDEX.md", index_append, args.cli_timeout)
+            run_bridge("append", "知识库/INDEX.md", index_append)
 
 
 def parse_args() -> argparse.Namespace:
@@ -608,21 +494,18 @@ def parse_args() -> argparse.Namespace:
 
     [参数] 无。
     [返回] 解析后的命令行参数。
-    最近修改时间: 2026-07-07 为新增脚本补齐参数入口说明。
+    最近修改时间: 2026-07-13 17:32:38 删除已无效的 CLI、目标 vault 和超时 transport 参数。
     """
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cli", type=Path, default=Path(r"C:\Users\luode\AppData\Local\Programs\Obsidian\Obsidian.com"))
     parser.add_argument("--source-vault", default="data")
-    parser.add_argument("--target-vault", default="知识库")
     parser.add_argument("--source-root", type=Path, default=Path(r"F:\blog\data"))
-    parser.add_argument("--target-root", type=Path, default=Path(r"D:\obsidian_data\知识库"))
-    parser.add_argument("--target-prefix", default="30-MOCs/blog-data")
+    parser.add_argument("--target-root", type=Path, default=Path(r"D:\obsidian_data"))
+    parser.add_argument("--target-prefix", default="知识库/30-MOCs/blog-data")
     parser.add_argument("--include", nargs="*", default=None, help="top-level folders to process")
     parser.add_argument("--max-files", type=int, default=0, help="limit files per category for smoke tests")
-    # Obsidian CLI is sensitive to long command-line payloads, so keep appends small.
+    # bridge 会通过临时 UTF-8 文件传递正文；这里仍限制批次分块大小以控制单次写入。
     parser.add_argument("--chunk-chars", type=int, default=1800)
     parser.add_argument("--chunk-rows", type=int, default=2)
-    parser.add_argument("--cli-timeout", type=int, default=90)
     parser.add_argument("--append-delay", type=float, default=0.05)
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
@@ -633,8 +516,9 @@ def main() -> int:
 
     [参数] 无。
     [返回] 进程退出码。
-    最近修改时间: 2026-07-07 增加 CLI 注册路径一致性校验后的主流程说明。
+    最近修改时间: 2026-07-13 17:32:38 入口改为 bridge doctor 与固定目标根校验。
     """
+    # 1. 先校验 bridge、源目录和固定目标根，再开始本地源文件批处理。
     args = parse_args()
     validate_cli_and_vaults(args)
     source_root = args.source_root.resolve()
@@ -645,6 +529,7 @@ def main() -> int:
         categories = {name: paths for name, paths in categories.items() if name in include}
     if args.max_files:
         categories = {name: paths[: args.max_files] for name, paths in categories.items()}
+    # 2. 每个顶层目录独立沉淀，最后统一生成 rollup 和 INDEX 入口。
     results: list[BatchResult] = []
     for folder, paths in categories.items():
         result = process_category(args, source_root, folder, paths)

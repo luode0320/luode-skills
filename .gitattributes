@@ -21,3 +21,6 @@
 *.eot binary
 *.zip binary
 *.gz binary
+
+# 测试证据 fixture 的字节内容已被 MD5/行数记录进对应验证文档，禁止因空白检查改写
+doc/5-tests/2026-07-13_134643/skills/obsidian-knowledge-flow/fixtures/task08-long-note.md -whitespace
