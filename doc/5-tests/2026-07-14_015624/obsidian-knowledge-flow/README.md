@@ -4,6 +4,8 @@
 
 测试只使用仓库内 UTF-8 规则文件、内存 `FakeBridge` 和临时 fixture，不启动 Obsidian，不读写真实 vault，也不连接 test、staging 或 production 环境。
 
+当前结果：10 项离线契约测试通过，覆盖正反例、追加式状态、精确复用条件、脱敏、stable fingerprint、案例路径和 bridge readback；真实 vault 因未注册保持阻断。
+
 运行入口：
 
 ```powershell

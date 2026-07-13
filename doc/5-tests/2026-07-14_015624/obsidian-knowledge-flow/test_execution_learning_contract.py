@@ -51,16 +51,34 @@ def parse_frontmatter(note: str) -> dict[str, str]:
 
 def state_from_note(note: str) -> str:
     """状态事件以最后一条 `status:` 记录为准。"""
-    events = [line.split(":", 1)[1].strip() for line in note.splitlines() if line.startswith("status:")]
+    events = [
+        line.split(":", 1)[1].strip()
+        for line in note.splitlines()
+        if line.lstrip("- ").startswith("status:")
+    ]
     return events[-1] if events else parse_frontmatter(note).get("status", "unknown")
 
 
-def select_active(notes: dict[str, str], *, scope: str) -> list[str]:
-    """只返回 scope 精确匹配且最终状态为 active 的案例路径。"""
+def select_active(
+    notes: dict[str, str],
+    *,
+    scope: str,
+    tool_major: str,
+    input_fingerprint: str,
+    environment: str = "local",
+) -> list[str]:
+    """只返回所有自动复用条件精确匹配且最终状态为 active 的案例路径。"""
     selected: list[str] = []
     for path, note in notes.items():
         fields = parse_frontmatter(note)
-        if fields.get("scope") == scope and state_from_note(note) == "active":
+        if (
+            fields.get("knowledge_kind") == "execution_case"
+            and fields.get("scope") == scope
+            and fields.get("tool_major") == tool_major
+            and fields.get("input_fingerprint") == input_fingerprint
+            and fields.get("environment") == environment
+            and state_from_note(note) == "active"
+        ):
             selected.append(path)
     return selected
 
@@ -82,7 +100,8 @@ class FakeBridge:
         if operation == "search":
             return {"ok": True, "verified": True, "results": list(self.notes)}
         if operation == "read":
-            return {"ok": True, "verified": True, "content": self.notes.get(path or "", "")}
+            content = self.notes.get(path or "", "")
+            return {"ok": True, "verified": path in self.notes, "content": content}
         if operation == "create":
             assert path and content is not None
             if not path.startswith(CASE_ROOT + "/"):
@@ -154,16 +173,26 @@ status: candidate
         path = f"{CASE_ROOT}/obsidian-knowledge-flow/obsidian-json-case.md"
         self.assertTrue(fake.run("doctor")["verified"])
         self.assertTrue(fake.run("create", path=path, content=note)["verified"])
+        created_readback = fake.run("read", path=path)
+        self.assertTrue(created_readback["verified"])
+        self.assertEqual(note, created_readback["content"])
         self.assertTrue(fake.run("append", path=path, content="\nstatus: active\n")["verified"])
+        appended_readback = fake.run("read", path=path)
+        self.assertTrue(appended_readback["verified"])
+        self.assertIn("status: active", appended_readback["content"])
         self.assertEqual("active", state_from_note(fake.notes[path]))
         self.assertEqual(1, sum(call[0] == "append" for call in fake.calls))
 
-    def test_scope_matching_excludes_wrong_scope_and_terminal_failure_states(self) -> None:
-        """scope、版本或失败终态不匹配时不得自动复用案例。"""
-        def note(scope: str, status: str) -> str:
+    def test_exact_matching_excludes_wrong_scope_version_input_and_terminal_states(self) -> None:
+        """环境、版本、输入指纹或失败终态不匹配时不得自动复用案例。"""
+        def note(scope: str, status: str, *, tool_major: str = "1", fingerprint: str = "sha256:fixture", kind: str = "execution_case", environment: str = "local") -> str:
             return f"""---
 scope: {scope}
 status: {status}
+tool_major: {tool_major}
+input_fingerprint: {fingerprint}
+knowledge_kind: {kind}
+environment: {environment}
 ---
 ## 正例
 verified local action
@@ -171,12 +200,23 @@ verified local action
 
         notes = {
             f"{CASE_ROOT}/owner/a.md": note("local|obsidian-cli|major-1", "active"),
-            f"{CASE_ROOT}/owner/b.md": note("local|obsidian-cli|major-2", "active"),
-            f"{CASE_ROOT}/owner/c.md": note("local|obsidian-cli|major-1", "stale"),
-            f"{CASE_ROOT}/owner/d.md": note("local|obsidian-cli|major-1", "conflicted"),
-            f"{CASE_ROOT}/owner/e.md": note("local|obsidian-cli|major-1", "rejected"),
+            f"{CASE_ROOT}/owner/b.md": note("local|obsidian-cli|major-1", "active", tool_major="2"),
+            f"{CASE_ROOT}/owner/c.md": note("local|obsidian-cli|major-1", "active", fingerprint="sha256:other"),
+            f"{CASE_ROOT}/owner/d.md": note("local|obsidian-cli|major-1", "active", kind="knowledge"),
+            f"{CASE_ROOT}/owner/e.md": note("local|obsidian-cli|major-1", "active", environment="production"),
+            f"{CASE_ROOT}/owner/f.md": note("local|obsidian-cli|major-1", "stale"),
+            f"{CASE_ROOT}/owner/g.md": note("local|obsidian-cli|major-1", "conflicted"),
+            f"{CASE_ROOT}/owner/h.md": note("local|obsidian-cli|major-1", "rejected"),
         }
-        self.assertEqual([f"{CASE_ROOT}/owner/a.md"], select_active(notes, scope="local|obsidian-cli|major-1"))
+        self.assertEqual(
+            [f"{CASE_ROOT}/owner/a.md"],
+            select_active(
+                notes,
+                scope="local|obsidian-cli|major-1",
+                tool_major="1",
+                input_fingerprint="sha256:fixture",
+            ),
+        )
 
     def test_bridge_path_contract_rejects_escape_and_uses_utf8_json(self) -> None:
         """案例路径必须在固定知识库前缀内，正文通过 bridge JSON 传输。"""
@@ -189,6 +229,18 @@ verified local action
         self.assertIn("中文 UTF-8", request["content"])
         with self.assertRaises(bridge.BridgeError):
             bridge.build_request("create", path="知识库/../静态casebook.md", content="x")
+        with self.assertRaisesRegex(bridge.BridgeError, "execution case path"):
+            bridge.build_request(
+                "create",
+                path=f"{CASE_ROOT}/owner/nested/case.md",
+                content="x",
+            )
+        with self.assertRaisesRegex(bridge.BridgeError, "execution case path"):
+            bridge.build_request(
+                "create",
+                path=f"{CASE_ROOT}/owner/case name.md",
+                content="x",
+            )
 
     def test_bridge_failure_does_not_write_static_casebook_or_claim_persistence(self) -> None:
         """doctor/create/readback 失败时只报告 blocked，不使用文件系统 fallback。"""
@@ -231,7 +283,12 @@ verified local action
             "tool_or_model": "obsidian-cli 1.12",
             "tool_major": "1",
             "error_signature": "READBACK_MISMATCH",
-            "minimal_input": "token=sk-test-secret path=C:\\Users\\private\\case.json",
+            "minimal_input": (
+                "token=sk-test-secret path=C:\\Users\\private\\case.json "
+                "Cookie: session=cookie-value "
+                "url=https://example.test/callback?token=secret-value "
+                "email=user@example.test phone=13812345678 id=11010519491231002X"
+            ),
             "input_fingerprint": "sha256:case-fixture",
             "root_cause": "读取结果不是预期 JSON",
             "solution": "先校验 bridge 响应，再按 UTF-8 readback",
@@ -242,12 +299,15 @@ verified local action
             "negative_example": "直接记录 token 和完整响应",
             "positive_example": "使用脱敏摘要并保存结构化断言",
             "source": "TEST-OBS-LEARN-01",
+            "created": "2026-07-14",
             "updated": "2026-07-14",
+            "environment": "local",
             "state": "candidate",
         }
         rendered = renderer.render(payload)
         self.assertIn("status: candidate", rendered)
         self.assertIn("tool_major", rendered)
+        self.assertIn("project_id: unknown", rendered)
         self.assertIn('error_signature: "READBACK_MISMATCH"', rendered)
         self.assertIn('scope: "local|obsidian-cli|major-1"', rendered)
         self.assertIn("input_fingerprint", rendered)
@@ -256,9 +316,14 @@ verified local action
         self.assertIn("- event: created", rendered)
         self.assertNotIn("sk-test-secret", rendered)
         self.assertNotIn("C:\\Users\\private", rendered)
+        self.assertNotIn("cookie-value", rendered)
+        self.assertNotIn("secret-value", rendered)
+        self.assertNotIn("user@example.test", rendered)
+        self.assertNotIn("13812345678", rendered)
+        self.assertNotIn("11010519491231002X", rendered)
 
-    def test_renderer_accepts_superseded_terminal_state(self) -> None:
-        """被新案例替代的案例可以追加 superseded 状态事件。"""
+    def test_renderer_rejects_non_candidate_initial_state(self) -> None:
+        """被新案例替代的状态只能通过 append 追加，不能伪装成新建案例。"""
         payload = {
             "case_id": "superseded-case",
             "owner_skill": "obsidian-knowledge-flow",
@@ -277,12 +342,13 @@ verified local action
             "negative_example": "继续使用旧方案",
             "positive_example": "读取新案例后再执行",
             "source": "TEST-OBS-LEARN-03",
+            "created": "2026-07-14",
             "updated": "2026-07-14",
+            "environment": "local",
             "state": "superseded",
         }
-        rendered = renderer.render(payload)
-        self.assertIn("status: superseded", rendered)
-        self.assertIn("- status: superseded", rendered)
+        with self.assertRaisesRegex(ValueError, "candidate"):
+            renderer.render(payload)
 
     def test_renderer_rejects_non_local_and_expected_negative_cases(self) -> None:
         """非 local 或预期负向场景不能生成可复用案例。"""
@@ -304,10 +370,39 @@ verified local action
             "negative_example": "连接生产验证",
             "positive_example": "使用 local fixture",
             "source": "TEST-OBS-LEARN-02",
+            "created": "2026-07-14",
             "updated": "2026-07-14",
             "environment": "production",
         }
         with self.assertRaises(ValueError):
+            renderer.render(payload)
+
+    def test_renderer_rejects_unstable_input_fingerprint(self) -> None:
+        """输入指纹必须是脱敏后的稳定 sha256 标识，不能携带动态正文。"""
+        payload = {
+            "case_id": "unstable-fingerprint",
+            "owner_skill": "obsidian-knowledge-flow",
+            "category": "tool-contract",
+            "tool_or_model": "obsidian-cli",
+            "tool_major": "1",
+            "error_signature": "READBACK_MISMATCH",
+            "minimal_input": "safe",
+            "input_fingerprint": "request-id-123",
+            "root_cause": "输入指纹不稳定",
+            "solution": "使用脱敏摘要哈希",
+            "verification_command": "python -X utf8 local_fixture.py",
+            "success_criteria": "同输入 local fixture 通过",
+            "scope": "local|obsidian-cli|major-1",
+            "avoid": "不得把 request id 作为指纹",
+            "negative_example": "request-id-123",
+            "positive_example": "sha256:stable-fixture",
+            "source": "TEST-OBS-LEARN-04",
+            "created": "2026-07-14",
+            "updated": "2026-07-14",
+            "environment": "local",
+            "state": "candidate",
+        }
+        with self.assertRaisesRegex(ValueError, "input_fingerprint"):
             renderer.render(payload)
 
 
