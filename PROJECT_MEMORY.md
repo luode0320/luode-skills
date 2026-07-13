@@ -380,10 +380,10 @@
 ### Obsidian 知识流选择性默认触发链
 - 别名: obsidian-knowledge-flow, Obsidian 知识流, 选择性默认触发, 知识库检索沉淀
 - 类型: 流程规则
-- 定义: 项目启动先按“父目录平台规则 -> `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取项目本地四件套；`PROJECT_CURRENT.md` 覆盖维护当前状态且不超过 51,200 字节，`PROJECT_MEMORY.md` 只承载稳定规则与关键决策，`PROJECT_HISTORY.md` 只追加且普通启动不读。Obsidian 仍固定使用 `D:\obsidian_data` 及其 `知识库/` 工作区，仅当问题依赖跨项目历史、vault 知识或既有笔记时判定为 `检索` 并通过 CLI 检索 / 读取；仅当收口形成可复用知识时判定为 `沉淀` 并先通过 CLI 检索已有承接笔记。普通任务记录 `不适用`，CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback；项目本地 Markdown 与 vault 链路不得混用。
+- 定义: 项目启动先按“父目录平台规则 -> `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取项目本地四件套；`PROJECT_CURRENT.md` 覆盖维护当前状态且不超过 51,200 字节，`PROJECT_MEMORY.md` 只承载稳定规则与关键决策，`PROJECT_HISTORY.md` 只追加且普通启动不读。Obsidian 仍固定使用 `D:\obsidian_data` 及其 `知识库/` 工作区，仅当问题依赖跨项目历史、vault 知识或既有笔记时判定为 `检索` 并通过 CLI 检索 / 读取；仅当收口形成可复用知识时判定为 `沉淀` 并先通过 CLI 检索已有承接笔记。执行失败案例统一落到 `知识库/20-Knowledge/execution-failure-cases/<owner>/`，保留脱敏正反例、验证证据和追加式状态事件；只有 active 且 scope 精确匹配时自动复用。普通任务记录 `不适用`，CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback；项目本地 Markdown 与 vault 链路不得混用。
 - 来源: `AGENTS.md`、`CLAUDE.md`、`skill-hit-check-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`、`编码skill.md`
 - 适用范围: 记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀
-- 更新时间: 2026-07-08
+- 更新时间: 2026-07-14
 - 状态: 启用
 
 ### Obsidian Windows/WSL bridge 固定执行边界

@@ -2,32 +2,30 @@
 
 ## 当前任务
 
-- 目标：完成任务阻断收口与恢复计划，使真实阻断在任务结尾明确展示并带有可验证的解决计划。
-- 范围：共享阻断契约、生产者与最终消费者、文档门禁、运行时恢复、来源文档、审查和最终验收。
-- 非范围：业务服务、外部环境、Git 推送或历史改写。
-- 状态：已完成并通过最终验收；本轮需求、实施、测试、审查、验收和 Skill 实现资产已按域提交，未执行 push。
+- 目标：升级 `obsidian-knowledge-flow`，将执行期间的非预期失败、异常、编码/JSON/命令问题转为可检索的脱敏正反例和持续状态事件。
+- 范围：Obsidian 执行案例契约、`execution-failure-learning-rules` 的动态持久化边界、bridge-only 写入、离线契约测试和字典同步。
+- 非范围：新建独立 skill、静态 casebook 动态追加、直接文件系统写 vault、Git 推送或历史改写。
+- 状态：本地实现与离线验证完成；真实 vault 沉淀因未注册阻断。
 
 ## 已完成
 
-- 建立唯一的 `BLK-*` 共享契约，规定状态、阶段、证据、已尝试动作、停止边界、影响、至多三步解决计划、重入点与去重键。
-- 将审查、验收、功能验证、Bug 验证、执行失败和运行时恢复统一为阻断事实生产者；`reasoning-summary-structure-rules` 成为唯一用户可见渲染者。
-- 文档门禁只对 `blocked` 或 `manual_handoff` 强制阻断收口；`limited`、`not_applicable`、P2/P3、用户取消和预期负向测试不会误报。
-- 修复 `N/A` 校验误读 Mermaid 围栏的问题，并补充回归测试。
-- 来源需求、验收标准、全量顺序方案、实施总览、实施周期、总审查和最终验收文档均已归档并通过对应 profile。
+- 执行案例唯一落点为 `知识库/20-Knowledge/execution-failure-cases/<owner>/<case>.md`，静态 casebook 仅作种子与回归基线。
+- 案例契约保留失败特征、反例、正例、验证证据和追加式状态事件；只有 `active` 且 scope、工具主版本、输入指纹精确匹配时才自动复用。
+- 受控 UTF-8 渲染器执行 local-only、脱敏、去重键、状态枚举和 `superseded` 终态校验。
+- 离线执行案例契约测试 10 项通过，Python 编译、`git diff --check` 和 skill 字典生成通过。
 
 ## 阻断
 
-- Obsidian 沉淀阻断：bridge doctor 返回 `VAULT_NOT_REGISTERED`，固定 vault `D:\obsidian_data` 未注册；未使用文件系统写入替代。该阻断不影响本地任务已完成和最终验收结论。
+- Obsidian 沉淀阻断：bridge doctor 返回 `VAULT_NOT_REGISTERED`，固定 vault `D:\obsidian_data` 未注册；未使用文件系统写入替代，未声称案例已持久化。
 
 ## 验证
 
-- `python -m unittest artifact-delivery-gate-rules/tests/test_validate_engineering_docs.py`：52 项通过。
-- `python -m unittest agent-runtime-recovery-rules/tests/test_blocker_fact.py`：3 项通过。
-- `python -m unittest discover -s doc/5-tests/2026-07-14_015624/obsidian-knowledge-flow -p "test_*.py" -v`：8 项通过。
-- 需求、验收、全量顺序方案、实施总览、实施周期、总审查和最终验收文档 profile：通过。
-- Python 编译、JSON schema 解析与 `python skill-dictionary/generate_dictionary.py`：通过。
-- 本轮分域提交前后 Git 闸门：全部通过；未执行 push。
+- `python -m unittest discover -s doc/5-tests/2026-07-14_015624/obsidian-knowledge-flow -p "test_*.py" -v`：9 项通过。
+- `python -m py_compile obsidian-knowledge-flow/scripts/render_execution_case.py`：通过。
+- `git diff --check`：通过。
+- `python skill-dictionary/generate_dictionary.py`：84 个已实现 skill，0 个缺失计划项。
+- `python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py doctor --json`：阻断，`VAULT_NOT_REGISTERED`。
 
 ## 交接点
 
-- 任务完成。若恢复知识沉淀，需要在 Obsidian 中注册 `D:\obsidian_data` 后重新运行 bridge doctor，再按 bridge 检索优先规则沉淀本次共享阻断契约；不得直接写 vault 文件。
+- 本地升级已收口。恢复真实沉淀时，从 bridge doctor 重新进入，再按 `search/read/create-or-append/readback` 顺序写入脱敏案例；不得直接写 vault 文件或静态 casebook。
