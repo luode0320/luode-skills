@@ -22,6 +22,8 @@ from typing import Any, Callable, Mapping
 
 ALLOWED_COMMANDS = frozenset({"doctor", "search", "search-context", "read", "create", "append", "open", "project-context"})
 KNOWLEDGE_PREFIX = "知识库"
+EXECUTION_CASE_PREFIX = "知识库/20-Knowledge/execution-failure-cases"
+EXECUTION_CASE_SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
 VAULT_ROOT = r"D:\obsidian_data"
 WSL_UNC_PATTERN = re.compile(
     r"^(?:\\\\|//)wsl(?:\.localhost)?[\\/]+(?P<distro>[^\\/]+)[\\/]+(?P<path>.+)$",
@@ -235,6 +237,16 @@ def validate_knowledge_path(path: str) -> str:
         or parts[0] != KNOWLEDGE_PREFIX
     ):
         raise BridgeError("PATH_OUTSIDE_KNOWLEDGE", "path must remain below 知识库/")
+    # 2. 执行案例只能使用 owner/案例名.md 两级 ASCII 稳定路径，避免绕过渲染器写入动态或越界文件名。
+    if normalized.startswith(EXECUTION_CASE_PREFIX + "/"):
+        case_parts = parts[3:]
+        if (
+            len(case_parts) != 2
+            or not EXECUTION_CASE_SLUG.fullmatch(case_parts[0])
+            or not case_parts[1].endswith(".md")
+            or not EXECUTION_CASE_SLUG.fullmatch(case_parts[1][:-3])
+        ):
+            raise BridgeError("INVALID_EXECUTION_CASE_PATH", "execution case path must be owner/<ascii-slug>.md")
     return "/".join(parts)
 
 
