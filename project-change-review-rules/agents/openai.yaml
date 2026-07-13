@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Change Review"
   short_description: "Review current project changes before handoff"
-  default_prompt: "Use $project-change-review-rules to review the current project changes."
+  default_prompt: "Use $project-change-review-rules to review the current project changes. Record a deduplicated BLK-* with a concrete remediation plan and re-review entry point only when P0/P1 or another real blocker prevents continuation; do not treat P2/P3, limited, or not_applicable as blocked."

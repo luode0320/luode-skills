@@ -27,6 +27,24 @@
 阻断问题: [P1] create_service.go:45 - 请求结构体散落在 service 层
 ```
 
+阻断文档还必须包含共享契约规定的“任务阻断收口”。P0/P1 才属于实现自审的真实阻断；P2/P3、`limited` 与 `not_applicable` 继续使用原结论，不生成 `BLK-*`。
+
+```markdown
+## 任务阻断收口
+
+- 阻断记录 ID: `BLK-REVIEW-001`
+- 任务状态: `blocked`
+- 阻断阶段: 实现自审
+- 阻断依据与证据: [P1] 请求结构体散落在 service 层；`implementation-review.structure_placement`；`internal/service/order/create_service.go:45`
+- 已尝试与停止边界: 已确认结构体定义及调用方；未迁移以避免在自审阶段扩大变更；证据: 审查记录 `REV-001`
+- 影响: 不能进入测试域，也不能宣布实现自审完成
+- 解决计划: 1. 责任方: 编码实现者；前置条件: 确认 entity 归属；动作: 将请求和响应结构体迁移至 `internal/entity/order/` 并更新引用；完成判据: service 层不再含该数据结构定义；验证入口: 重新执行结构体扫描并复审当前 diff
+- 恢复后重入点: 实现自审的结构归位检查
+- 去重键: `implementation-review.structure_placement + internal/service/order/create_service.go:45`
+```
+
+同一根因已存在 `BLK-*` 时，仅引用该记录和恢复后复审入口，不重复列出解决计划。
+
 ## 正例
 
 ### 正例 1：实现完成且可读性优先

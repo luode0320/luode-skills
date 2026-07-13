@@ -1,4 +1,11 @@
 version: 3
+task_blocker_closure:
+  section: 任务阻断收口
+  required_fields: [阻断记录 ID, 任务状态, 阻断阶段, 阻断依据与证据, 已尝试与停止边界, 影响, 解决计划, 恢复后重入点, 去重键]
+  trigger_rules:
+    - status: blocked
+    - review_conclusion: 阻断
+    - final_acceptance_conclusion: [不通过, 待重验]
 image_policy:
   asset_root: doc/data/images
   data_root: doc/data

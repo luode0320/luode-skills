@@ -11,3 +11,4 @@
 - 是否已经存在正式审核结果。
 - 是否确认需求自上次验收后没有新增会使结论失效的变更。
 - 是否已经知道若本轮不通过，应回流到测试、审核、验收标准还是实施文档。
+- 结论为不通过/待重验且无法正式放行时，是否已按 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 写入或引用去重的 `BLK-*`，包含恢复动作完成判据和重验入口；`limited`、`not_applicable` 与非阻断遗留项是否未误报。

@@ -36,3 +36,9 @@
 ## 不可逆动作保护
 
 非幂等调用在故障发生后可能已在远端生效；自动重放会造成重复写入。因此只能执行只读状态查询，携带原操作摘要和幂等键供人工判断。恢复规则不得替业务层声明未知操作为幂等。
+
+## 终态阻断交接
+
+`blocked` 与 `manual_handoff` 都是任务不能继续安全推进的终态。恢复引擎必须在终态结果中输出唯一 `BLK-runtime-*` 事实，字段遵循 `../../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`：状态、运行时恢复阶段、脱敏原因和 recovery/component 证据、已尝试层级与停止边界、影响、人工或上层 agent 的恢复计划、最小健康检查重入点，以及“原因码 + 组件 ID”去重键。
+
+`healthy` 与 `resumed` 不输出阻断事实。没有 adapter、权限、可靠幂等性或恢复后健康检查时，恢复计划必须停在人工交接，不得重放操作或声称已经续接任务。

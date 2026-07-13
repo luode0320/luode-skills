@@ -48,6 +48,7 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 - 机器校验通过后，还必须做 Mermaid 真解析或记录解析器不可用的环境阻断；静态检查只能证明代码块结构，不能宣称语法解析通过。
 - 文档之间必须互相链接：需求/规则回指验收，验收回指实施周期，任务回指文件/符号、测试和证据。孤立或重复稳定 ID 阻断收口。
 - 普通模型执行演练中的 `unresolved_decisions` 必须为零个 P0/P1；演练发现需要自行补决策时，回流需求或实施规划 skill。
+- 真实任务阻断必须遵守 `references/task-blocker-closure-contract.md`：当文档 `status: blocked`、审查结论为“阻断”或最终验收结论为“不通过/待重验”时，正文必须包含“任务阻断收口”、唯一 `BLK-*` 记录和可验证解决计划；`limited`、`not_applicable` 与正常通过不触发该章节。
 
 ## 默认执行流程
 
@@ -87,6 +88,7 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 
 - 本 skill 本身不单独新建额外平行文档；它负责阻断并推动对应主域文档补齐。
 - 若发现阻断，应将“缺失哪类文档、缺什么文件、应回流哪个主域 skill”写回当前主域记录或审查报告。
+- 审查、验收或验证产生真实阻断时，当前主域记录还必须写入 `BLK-*` 任务阻断收口，明确阻断阶段、依据、已尝试动作、影响、解决计划和恢复后重入点。
 - 若本轮属于审查域且 `doc/6-审查/README.md` 尚不存在，允许补建为审查索引入口，后续持续复用。
 
 ## references 读取规则
@@ -97,3 +99,4 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 - 只要本轮涉及需求、验收或实施文档质量门禁，必须读取 `references/document-handoff-contract.md` 与 `references/document-quality-profiles.yaml`，并运行 `scripts/validate_engineering_docs.py`。
 - 只要本轮产生任何研发文档，还必须读取 `references/plain-language-document-contract.md`，检查正文能独立被普通业务读者理解，执行与追踪细节均已进入附录。
 - 只要本轮包含审查、验收、功能验证、浏览器联调或第三方验证，还必须读取 `references/review-acceptance-gate-contract.md`，校验 `review_acceptance_gates` 并单独报告正式放行状态。
+- 只要当前文档出现真实任务阻断，还必须读取 `references/task-blocker-closure-contract.md`，并由 `scripts/validate_engineering_docs.py` 校验阻断收口字段。

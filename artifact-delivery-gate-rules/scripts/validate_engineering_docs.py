@@ -40,6 +40,20 @@ PLAIN_LANGUAGE_VALUES = {
     "writing_style": "plain_chinese",
     "appendix_policy": "preserve_existing_or_one_terminal_appendix",
 }
+PLAIN_LANGUAGE_SUMMARY_LABELS = (
+    "结论",
+    "影响",
+    "范围",
+    "非范围",
+    "变化",
+    "完成标准",
+    "术语说明",
+    "验证状态",
+)
+PLAIN_LANGUAGE_NAMED_APPENDICES = ("执行附录", "追踪附录")
+PLAIN_LANGUAGE_NO_TERMINOLOGY_VALUES = {"无", "无技术术语需要解释"}
+APPENDIX_NUMBER_PREFIX_PATTERN = r"^(?:\d+(?:\.\d+)*[.)]?\s+)?"
+APPENDIX_HEADING_SUFFIX_PATTERN = r"(?:\s|[:：]|[（(]|$)"
 REVIEW_GATE_STAGES = {
     "review",
     "acceptance",
@@ -59,6 +73,19 @@ REVIEW_GATE_FIELDS = (
     "substitute_validation",
     "manual_follow_up",
     "pass_standard",
+)
+TASK_BLOCKER_SECTION = "任务阻断收口"
+TASK_BLOCKER_RECORD_PATTERN = re.compile(r"\bBLK-[A-Z0-9]+(?:-[A-Z0-9]+)*\b")
+TASK_BLOCKER_REQUIRED_FIELDS = (
+    "阻断记录 ID",
+    "任务状态",
+    "阻断阶段",
+    "阻断依据与证据",
+    "已尝试与停止边界",
+    "影响",
+    "解决计划",
+    "恢复后重入点",
+    "去重键",
 )
 
 
@@ -431,21 +458,232 @@ def validation_status(errors: List[str], gate_report: Dict[str, Any]) -> str:
     return "PASS"
 
 
+# check_task_blocker_closure 在真实任务阻断时强制统一 BLK-* 收口字段，避免只说明“阻断”而没有恢复计划。
+# [参数] text: 完整 Markdown 文本；metadata: YAML 元数据；profile_name: 当前质量 profile；errors: 累积错误；contract: 阻断契约配置。
+# [返回] dict：是否触发、触发原因、BLK 记录与稳定错误码。
+# 最近修改时间：2026-07-14 + 为审查、验收和状态阻断统一任务收口契约。
+def check_task_blocker_closure(
+    text: str,
+    metadata: Dict[str, Any],
+    profile_name: str,
+    errors: List[str],
+    contract: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    """在真实阻断文档中校验任务阻断收口章节和恢复字段。"""
+    # 1. 只识别明确的真实阻断，受限、不适用和正常通过不触发本契约。
+    contract = contract or {}
+    section_name = str(contract.get("section", TASK_BLOCKER_SECTION))
+    required_fields = tuple(str(field) for field in contract.get("required_fields", TASK_BLOCKER_REQUIRED_FIELDS))
+    trigger_reasons: List[str] = []
+    if metadata.get("status") == "blocked":
+        trigger_reasons.append("status_blocked")
+    if profile_name == "review" and re.search(
+        r"(?m)^\s*(?:[-*]\s*)?审查结论\s*[：:]\s*`?阻断`?\s*[。]?$", text
+    ):
+        trigger_reasons.append("review_conclusion_blocked")
+    if profile_name == "final_acceptance" and re.search(
+        r"(?m)^\s*(?:[-*]\s*)?(?:最终)?验收结论\s*[：:]\s*`?(?:不通过|待重验)`?(?:[。；;，,].*)?$", text
+    ):
+        trigger_reasons.append("final_acceptance_not_released")
+
+    report: Dict[str, Any] = {
+        "required": bool(trigger_reasons),
+        "triggers": trigger_reasons,
+        "section": section_name,
+        "records": [],
+        "valid": True,
+        "error_codes": [],
+    }
+    if not trigger_reasons:
+        return report
+
+    # 2. 取目标二级或更深标题正文，避免其它章节同名字段误满足阻断收口。
+    records = markdown_heading_records(text)
+    section_record = next((record for record in records if record[1] == section_name), None)
+    if section_record is None:
+        errors.append(f"[blocker.closure_missing] missing required section: {section_name}")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_missing")
+        return report
+    section_level, _, start = section_record
+    end = next(
+        (line for level, _, line in records if line > start and level <= section_level),
+        len(text.splitlines()),
+    )
+    section_text = "\n".join(text.splitlines()[start + 1 : end]).strip()
+    if not section_text:
+        errors.append(f"[blocker.closure_invalid] {section_name} must not be empty")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
+        return report
+
+    # 3. 固定字段必须在同一收口章节内非空，且 BLK 记录和状态可由下游统一消费。
+    field_values: Dict[str, str] = {}
+    for field in required_fields:
+        match = re.search(rf"(?m)^\s*(?:[-*]\s*)?{re.escape(field)}\s*[：:]\s*(\S.*)$", section_text)
+        value = match.group(1).strip() if match else ""
+        field_values[field] = value
+        if not value or value == "N/A":
+            errors.append(f"[blocker.closure_invalid] {section_name} missing non-empty field: {field}")
+            report["valid"] = False
+            report["error_codes"].append("blocker.closure_invalid")
+    blocker_records = sorted(set(TASK_BLOCKER_RECORD_PATTERN.findall(field_values.get("阻断记录 ID", ""))))
+    report["records"] = blocker_records
+    if len(blocker_records) != 1:
+        errors.append(f"[blocker.closure_invalid] {section_name} must contain exactly one BLK-* record ID")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
+    if field_values.get("任务状态") not in {"blocked", "manual_handoff"}:
+        errors.append(f"[blocker.closure_invalid] {section_name} 任务状态 must be blocked or manual_handoff")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
+    if field_values.get("已尝试与停止边界", "").startswith("N/A") and not re.search(
+        r"原因\s*[：:]|证据\s*[：:]", field_values["已尝试与停止边界"]
+    ):
+        errors.append(f"[blocker.closure_invalid] {section_name} 已尝试与停止边界 N/A requires reason and evidence")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
+    if not re.search(r"(?m)^\s*1[.、]", field_values.get("解决计划", "")):
+        errors.append(f"[blocker.closure_invalid] {section_name} 解决计划 must start with an ordered recovery step")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
+    report["error_codes"] = list(dict.fromkeys(report["error_codes"]))
+    return report
+
+
 def check_appendix_policy(text: str, errors: List[str]) -> None:
     # [参数] text: 完整 Markdown 文本；errors: 累积错误列表。
-    # [返回] None：发现重复或非末尾附录时写入错误。
-    # 最近修改时间：2026-07-13 14:00:00 + 放宽固定双附录并保留唯一末尾附录策略。
-    """允许无附录或既有附录；新增通用附录必须唯一且位于末尾。"""
-    records = markdown_heading_records(text)
-    appendix = [(level, title, line_index) for level, title, line_index in records if re.match(r"^附录(?:\s|[:：]|$)", title)]
-    if len(appendix) > 1:
+    # [返回] None：发现重复、顺序错误、非连续或非末尾附录时写入错误。
+    # 最近修改时间：2026-07-14 00:00:00 + 显式识别带数字前缀或括号说明的命名附录。
+    """校验末尾附录组：兼容单个通用附录或连续的执行/追踪附录。"""
+    # 1. 保留标题编号以显式识别“5. 执行附录”；代码围栏中的示例标题仍会被排除。
+    records = markdown_heading_records(text, normalize_numbering=False)
+    generic_appendices = [
+        (level, title, line_index)
+        for level, title, line_index in records
+        if re.match(rf"{APPENDIX_NUMBER_PREFIX_PATTERN}附录{APPENDIX_HEADING_SUFFIX_PATTERN}", title)
+    ]
+    named_appendices = {
+        name: [
+            (level, title, line_index)
+            for level, title, line_index in records
+            if re.match(rf"{APPENDIX_NUMBER_PREFIX_PATTERN}{name}{APPENDIX_HEADING_SUFFIX_PATTERN}", title)
+        ]
+        for name in PLAIN_LANGUAGE_NAMED_APPENDICES
+    }
+
+    # 2. 旧通用附录仍只允许一个；其下的命名子附录属于同一末尾组，不视为混用。
+    if len(generic_appendices) > 1:
         errors.append("plain-language document may contain at most one terminal appendix")
+    if generic_appendices:
+        level, _, line_index = generic_appendices[0]
+        named_entries = [entry for entries in named_appendices.values() for entry in entries]
+        nested_named_group = named_entries and all(
+            entry_level > level and entry_line > line_index
+            for entry_level, _, entry_line in named_entries
+        )
+        if named_entries and not nested_named_group:
+            errors.append("plain-language document must not mix generic and named appendix groups")
+        if any(other_level <= level for other_level, _, other_line in records if other_line > line_index):
+            errors.append("plain-language appendix must be terminal")
+        if nested_named_group:
+            # 2.1 通用父附录内仍按命名附录组校验顺序、连续性与末尾边界。
+            for name, entries in named_appendices.items():
+                if len(entries) > 1:
+                    errors.append(f"plain-language document may contain at most one {name}")
+            execution = named_appendices["执行附录"]
+            tracking = named_appendices["追踪附录"]
+            if execution and tracking:
+                execution_level, _, execution_line = execution[0]
+                tracking_level, _, tracking_line = tracking[0]
+                if execution_level != tracking_level or execution_line >= tracking_line:
+                    errors.append("plain-language appendix group must order 执行附录 before 追踪附录 at the same heading level")
+                elif any(
+                    other_level <= execution_level
+                    for other_level, _, other_line in records
+                    if execution_line < other_line < tracking_line
+                ):
+                    errors.append("plain-language appendix group must be contiguous")
+                if any(other_level <= tracking_level for other_level, _, other_line in records if other_line > tracking_line):
+                    errors.append("plain-language appendix group must be terminal")
         return
-    if not appendix:
+
+    # 3. 新附录组的同名标题不能重复；单个命名附录按末尾附录处理。
+    for name, entries in named_appendices.items():
+        if len(entries) > 1:
+            errors.append(f"plain-language document may contain at most one {name}")
+    execution = named_appendices["执行附录"]
+    tracking = named_appendices["追踪附录"]
+    if not execution and not tracking:
         return
-    level, _, line_index = appendix[0]
-    if any(other_level <= level for other_level, _, other_line in records if other_line > line_index):
-        errors.append("plain-language appendix must be terminal")
+
+    # 4. 两个命名附录同时存在时必须同级、按执行到追踪的顺序紧邻业务正文。
+    if execution and tracking:
+        execution_level, _, execution_line = execution[0]
+        tracking_level, _, tracking_line = tracking[0]
+        if execution_level != tracking_level or execution_line >= tracking_line:
+            errors.append("plain-language appendix group must order 执行附录 before 追踪附录 at the same heading level")
+            return
+        if any(
+            other_level <= execution_level
+            for other_level, _, other_line in records
+            if execution_line < other_line < tracking_line
+        ):
+            errors.append("plain-language appendix group must be contiguous")
+        terminal_level, _, terminal_line = tracking[0]
+    else:
+        terminal_level, _, terminal_line = (execution or tracking)[0]
+
+    # 5. 附录组最后一个同级或更高层标题之后不能再出现业务正文。
+    if any(other_level <= terminal_level for other_level, _, other_line in records if other_line > terminal_line):
+        errors.append("plain-language appendix group must be terminal")
+
+
+def h1_opening(text: str, records: List[Tuple[int, str, int]] | None = None) -> str:
+    # [参数] text: 完整 Markdown 文本；records: 已解析标题，可复用以避免重复扫描。
+    # [返回] str：H1 后、首个 H2 前的原始开场文本；找不到 H1 时返回空字符串。
+    # 最近修改时间：2026-07-14 00:00:00 + 提取固定摘要开场，供契约校验和模板覆盖测试复用。
+    """返回 H1 后唯一白话开场的文本范围。"""
+    # 1. 定位第一个 H1 与其后的第一个 H2，保持现有标题层级定义。
+    heading_records = records if records is not None else markdown_heading_records(text)
+    h1 = next((record for record in heading_records if record[0] == 1), None)
+    if h1 is None:
+        return ""
+    first_h2 = next((record for record in heading_records if record[2] > h1[2] and record[0] == 2), None)
+    # 2. 截取 H1 后到首个 H2 前的文本，保留段落分隔供调用方判定。
+    lines = text.splitlines()
+    return "\n".join(lines[h1[2] + 1 : first_h2[2] if first_h2 else len(lines)]).strip()
+
+
+def check_plain_language_summary(opening: str, errors: List[str]) -> None:
+    # [参数] opening: H1 后单段白话开场；errors: 累积错误列表。
+    # [返回] None：固定摘要标签、值和术语解释不符合契约时写入错误。
+    # 最近修改时间：2026-07-14 00:00:00 + 支持中文句号分隔的八项固定摘要和无术语固定声明。
+    """校验固定摘要标签完整性和术语说明的可读解释格式。"""
+    # 1. 每个字段必须恰好一次并使用中英文冒号分隔，避免仅凭自然语言猜测内容是否齐全。
+    values: Dict[str, str] = {}
+    for label in PLAIN_LANGUAGE_SUMMARY_LABELS:
+        matches = re.findall(rf"(?:^|[；;。])\s*{re.escape(label)}\s*[：:]\s*([^；;。\n]+)", opening)
+        if not matches:
+            errors.append(f"plain-language opening must contain summary field: {label}")
+            continue
+        if len(matches) != 1:
+            errors.append(f"plain-language opening summary field must appear once: {label}")
+            continue
+        value = matches[0].strip().rstrip("。")
+        if not value:
+            errors.append(f"plain-language opening summary field must not be empty: {label}")
+            continue
+        values[label] = value
+
+    # 2. 术语只能明确声明“无”，或使用常用中文说明其业务含义。
+    terminology = values.get("术语说明")
+    if terminology and terminology not in PLAIN_LANGUAGE_NO_TERMINOLOGY_VALUES:
+        has_chinese_explanation = bool(re.search(r"[\u4e00-\u9fff]", terminology)) and bool(
+            re.search(r"(?:是|指|表示|用于|即|意为|意思是)", terminology)
+        )
+        if not has_chinese_explanation:
+            errors.append("plain-language opening terminology must be 无 or a readable Chinese explanation")
 
 
 def check_heading_baseline(path: Path, text: str, root: Path, errors: List[str], warnings: List[str]) -> None:
@@ -524,14 +762,18 @@ def document_is_new_or_modified(path: Path, root: Path) -> bool:
     return changed.returncode != 0
 
 
-def check_plain_language_contract(text: str, errors: List[str], required: bool = False) -> Dict[str, Any]:
-    # [参数] text: 完整 Markdown 文本；errors: 累积的校验错误列表；required: 是否必须启用契约。
+def check_plain_language_contract(
+    text: str, errors: List[str], required: bool = False, allow_declared: bool = True
+) -> Dict[str, Any]:
+    # [参数] text: 完整 Markdown 文本；errors: 累积的校验错误列表；required: 是否必须启用契约；
+    #       allow_declared: 是否允许 YAML 声明独立启用契约。
     # [返回] 无：发现违反白话正文与附录分层的情况时直接写入 errors。
-    # 最近修改时间：2026-07-13 14:00:00 + 校验新建或修改文档的白话开场和门禁分层。
+    # 最近修改时间：2026-07-14 00:00:00 + 校验八项固定摘要、术语解释与双附录分层。
     """校验启用白话契约的新文档的 H1 开场、附录策略和结构化门禁。"""
     # 1. 仅对主动声明白话契约的新文档启用严格分层检查，历史文档保持兼容。
     metadata = frontmatter_metadata(text)
-    enabled = required or any(field in metadata for field in PLAIN_LANGUAGE_FIELDS)
+    # 1. 单元调用保留“声明即校验”；文件入口对未修改历史文档关闭声明触发，避免反向迁移。
+    enabled = required or (allow_declared and any(field in metadata for field in PLAIN_LANGUAGE_FIELDS))
     if not enabled:
         return {"valid": True, "blocking": False, "release_status": "allowed", "items": [], "error_codes": []}
 
@@ -540,15 +782,12 @@ def check_plain_language_contract(text: str, errors: List[str], required: bool =
             errors.append(f"plain-language front matter must set {field}: {expected}")
 
     records = markdown_heading_records(text)
-    h1 = next((record for record in records if record[0] == 1), None)
-    first_h2 = next((record for record in records if h1 and record[2] > h1[2] and record[0] == 2), None)
-    if h1 is None:
+    if not any(record[0] == 1 for record in records):
         errors.append("plain-language document must contain an H1 heading")
         opening = ""
     else:
-        lines = text.splitlines()
-        opening_lines = lines[h1[2] + 1 : first_h2[2] if first_h2 else len(lines)]
-        opening = "\n".join(opening_lines).strip()
+        # 2. H1 后必须只有一段固定摘要，且摘要字段完整、术语可被业务读者理解。
+        opening = h1_opening(text, records)
         paragraphs = [part.strip() for part in re.split(r"\n\s*\n", opening) if part.strip()]
         if not paragraphs:
             errors.append("plain-language opening paragraph after H1 must not be empty")
@@ -556,7 +795,9 @@ def check_plain_language_contract(text: str, errors: List[str], required: bool =
             errors.append("plain-language opening after H1 must be one paragraph")
         if not re.search(r"[\u4e00-\u9fff]", opening):
             errors.append("plain-language opening paragraph must use readable Chinese")
+        check_plain_language_summary(opening, errors)
 
+    # 3. 固定摘要只承载给业务读者的结论，机器细节仍须留在终端附录组。
     body = opening
     if ID_PATTERN.search(body):
         errors.append("plain-language opening must not contain stable IDs")
@@ -649,12 +890,25 @@ def check_placeholders(text: str, payload: Dict[str, Any], errors: List[str]) ->
         errors.append(f"placeholder or vague terms found: {sorted(set(hits))}")
 
 
+# [参数] text: 待校验的 Markdown 正文；errors: 追加校验错误的结果容器。
+# [返回] None：正文 N/A 或不适用声明缺少原因、理由、证据或依据时写入错误。
+# 最近修改时间：2026-07-14。
+# 改动原因：Mermaid 围栏内的分支说明不是正文声明，必须跳过以避免误报。
 def check_na_reasons(text: str, errors: List[str]) -> None:
+    # 围栏内容可能是 Mermaid 分支或规则示例，不应被当作正文 N/A 声明校验。
     frontmatter = FRONTMATTER_PATTERN.match(text)
     frontmatter_end = frontmatter.end() if frontmatter else 0
     line_start = 0
+    in_fence = False
     for line_number, line in enumerate(text.splitlines(), start=1):
         if line_start < frontmatter_end:
+            line_start += len(line) + 1
+            continue
+        if line.strip().startswith("```"):
+            in_fence = not in_fence
+            line_start += len(line) + 1
+            continue
+        if in_fence:
             line_start += len(line) + 1
             continue
         if line.lstrip().startswith("#"):
@@ -1277,8 +1531,17 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
             profile.get("plain_language_contract") == "required"
             and document_is_new_or_modified(path, root)
         )
-        gate_report = check_plain_language_contract(text, errors, required=plain_language_required)
+        gate_report = check_plain_language_contract(
+            text, errors, required=plain_language_required, allow_declared=plain_language_required
+        )
         metadata = frontmatter_metadata(text)
+        blocker_report = check_task_blocker_closure(
+            text,
+            metadata,
+            profile_name,
+            errors,
+            profile_payload.get("task_blocker_closure"),
+        )
         if plain_language_required or metadata.get("appendix_policy") == PLAIN_LANGUAGE_VALUES["appendix_policy"]:
             check_heading_baseline(path, text, root, errors, warnings)
         check_fences(text, errors)
@@ -1297,6 +1560,14 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
         ids = []
         diagrams = {}
         gate_report = {"valid": True, "blocking": False, "release_status": "allowed", "items": [], "error_codes": []}
+        blocker_report = {
+            "required": False,
+            "triggers": [],
+            "section": TASK_BLOCKER_SECTION,
+            "records": [],
+            "valid": True,
+            "error_codes": [],
+        }
     # 3. 汇总 profile、链接、图形和严格结构检查结果。
     return {
         "valid": not errors,
@@ -1316,7 +1587,8 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
             "valid": not errors,
         },
         "gates": gate_report,
-        "error_codes": gate_report.get("error_codes", []),
+        "task_blocker_closure": blocker_report,
+        "error_codes": list(dict.fromkeys(gate_report.get("error_codes", []) + blocker_report.get("error_codes", []))),
     }
 
 

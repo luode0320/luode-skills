@@ -15,6 +15,11 @@
 - `deprecated`: 仍有历史价值，但已被新规则、新路径或新决策替代。
 - `retired`: 不再使用，只保留历史。
 - `archived`: 已移出活跃检索范围。
+- `candidate`: 已完成根因确认和同输入 local 复验，但尚未满足 active 晋级门禁；只可作为诊断线索。
+- `superseded`: 已被新的执行案例替代；保留历史证据，不参与自动复用。
+- `rejected`: 方案被验证为错误或不安全；不得自动恢复为 active。
+
+执行案例的当前状态以正文最后一条追加式状态事件为准，frontmatter 的 `status` 只作创建时缓存。允许转换和 active 门禁见 [execution-case-notes.md](execution-case-notes.md)。
 
 ## 冲突流程
 

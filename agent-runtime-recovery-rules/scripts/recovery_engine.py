@@ -548,7 +548,40 @@ class RecoveryEngine:
             "component_id": request.component_id,
         }
         result.update(extra)
+        if result["status"] in {"blocked", "manual_handoff"}:
+            result["blocker"] = RecoveryEngine._blocker_fact(result["status"], reason, request)
         return result
+
+    @staticmethod
+    def _blocker_fact(status: str, reason: str, request: RecoveryRequest) -> dict[str, Any]:
+        """为不可恢复终态生成共享阻断事实。
+
+        [参数] status：终态；reason：脱敏原因；request：当前恢复请求。
+        [返回] 遵循任务阻断收口契约的可序列化事实。
+        最近修改时间：2026-07-14 01:13:25；补齐运行时阻断交接。
+        """
+
+        record_suffix = hashlib.sha256(request.recovery_id.encode("utf-8")).hexdigest()[:12]
+        evidence = f"reason={reason}; recovery_id={request.recovery_id}; component_id={request.component_id}"
+        return {
+            "record_id": f"BLK-runtime-{record_suffix}",
+            "task_status": status,
+            "stage": "运行时恢复",
+            "basis_and_evidence": evidence,
+            "attempts_and_stop_boundary": "已按 adapter capability 执行允许的探针和恢复层；当前终态禁止无变化重试。",
+            "impact": "当前任务不能宣布运行时恢复完成，也不能安全继续原操作。",
+            "resolution_plan": [
+                {
+                    "owner": "人工或上层 agent",
+                    "precondition": "提供已授权且可验证的 adapter 能力或恢复上下文。",
+                    "action": "核对组件状态、权限和幂等性后执行允许的恢复动作。",
+                    "completion_criteria": "最小健康检查和原成功标准均通过。",
+                    "verification_entrypoint": "重新调用 RecoveryEngine.recover 并检查 status 为 healthy 或 resumed。",
+                }
+            ],
+            "reentry_point": "从最小健康检查开始，再按原成功标准重新验证。",
+            "dedupe_key": f"{reason}+{request.component_id}",
+        }
 
 
 __all__ = ["InvocationResult", "RecoveryAdapter", "RecoveryEngine", "RecoveryRequest"]

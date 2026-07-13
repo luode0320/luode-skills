@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-13 23:12:24",
+  "generated_at": "2026-07-14 02:00:17",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 27,
     "doc_total": 10,
-    "references_total": 380,
+    "references_total": 383,
     "agents_total": 93
   },
   "downloaded_seeds": {
@@ -734,7 +734,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 17,
-          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
+          "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约与唯一渲染条件，不生成面向用户的阻断区块或解决计划。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
           "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
           "skill_path": "skill-compliance-gate-rules/SKILL.md",
           "directory_path": "skill-compliance-gate-rules",
@@ -777,7 +777,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 18,
-          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
           "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
           "directory_path": "reasoning-summary-structure-rules",
@@ -916,7 +916,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
           "item_order": 3,
-          "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+          "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
           "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
           "skill_path": "obsidian-knowledge-flow/SKILL.md",
           "directory_path": "obsidian-knowledge-flow",
@@ -936,6 +936,7 @@ window.SKILL_DICTIONARY = {
             "obsidian-knowledge-flow/references/cli-failure-casebook.md",
             "obsidian-knowledge-flow/references/cli-operations.md",
             "obsidian-knowledge-flow/references/conflict-staleness.md",
+            "obsidian-knowledge-flow/references/execution-case-notes.md",
             "obsidian-knowledge-flow/references/note-schema.md",
             "obsidian-knowledge-flow/references/project-memory-layout.md",
             "obsidian-knowledge-flow/references/validation-checklist.md",
@@ -4135,7 +4136,9 @@ window.SKILL_DICTIONARY = {
             "artifact-delivery-gate-rules/references/document-handoff-contract.md",
             "artifact-delivery-gate-rules/references/document-quality-profiles.yaml",
             "artifact-delivery-gate-rules/references/plain-language-document-contract.md",
-            "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md"
+            "artifact-delivery-gate-rules/references/plain-language-template-registry.yaml",
+            "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md",
+            "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md"
           ],
           "agents": [
             "artifact-delivery-gate-rules/agents/openai.yaml"
@@ -4200,7 +4203,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 10,
-          "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
+          "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "autonomous-execution-rules/SKILL.md",
           "directory_path": "autonomous-execution-rules",
@@ -5591,7 +5594,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 17,
-      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
+      "auto_trigger": "【收口强制触发】只要本轮有代码新增/修改，或执行期间出现非预期工具/命令/API/模型/浏览器/安装失败，最终回复前必须命中本 skill。负责检查已命中 skill 是否完整执行（特别是注释双 skill、`implementation-review-rules` 的测试前收口，以及 `execution-failure-learning-rules` 的失败路由）。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约与唯一渲染条件，不生成面向用户的阻断区块或解决计划。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
       "core_responsibility": "在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。",
       "skill_path": "skill-compliance-gate-rules/SKILL.md",
       "directory_path": "skill-compliance-gate-rules",
@@ -5634,7 +5637,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 18,
-      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点（放在总结最后）。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有存在原执行计划内未完成必需项、阻断项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
       "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
       "directory_path": "reasoning-summary-structure-rules",
@@ -5761,7 +5764,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
       "item_order": 3,
-      "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀和 CLI 笔记操作场景。",
+      "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
       "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
       "skill_path": "obsidian-knowledge-flow/SKILL.md",
       "directory_path": "obsidian-knowledge-flow",
@@ -5781,6 +5784,7 @@ window.SKILL_DICTIONARY = {
         "obsidian-knowledge-flow/references/cli-failure-casebook.md",
         "obsidian-knowledge-flow/references/cli-operations.md",
         "obsidian-knowledge-flow/references/conflict-staleness.md",
+        "obsidian-knowledge-flow/references/execution-case-notes.md",
         "obsidian-knowledge-flow/references/note-schema.md",
         "obsidian-knowledge-flow/references/project-memory-layout.md",
         "obsidian-knowledge-flow/references/validation-checklist.md",
@@ -8872,7 +8876,9 @@ window.SKILL_DICTIONARY = {
         "artifact-delivery-gate-rules/references/document-handoff-contract.md",
         "artifact-delivery-gate-rules/references/document-quality-profiles.yaml",
         "artifact-delivery-gate-rules/references/plain-language-document-contract.md",
-        "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md"
+        "artifact-delivery-gate-rules/references/plain-language-template-registry.yaml",
+        "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md",
+        "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md"
       ],
       "agents": [
         "artifact-delivery-gate-rules/agents/openai.yaml"
@@ -8937,7 +8943,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 10,
-      "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
+      "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "autonomous-execution-rules/SKILL.md",
       "directory_path": "autonomous-execution-rules",

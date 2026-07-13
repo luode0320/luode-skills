@@ -40,7 +40,7 @@ Git 提交例外：仅为 `git commit` 准备提交时，只执行 `git-collabor
 2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认最终验收文档路径、命名模板和同文档更新策略。
 3. 再读 `references/final-acceptance-template.md`，按统一结构生成或更新最终验收文档。
 4. 如需判断与相邻 skill 的边界，再读 `references/final-acceptance-boundaries.md`。
-5. 输出最终验收结论、逐条判定、阻断项和待重验项，并更新到当前来源对象对应的最终验收文档。
+5. 输出最终验收结论、逐条判定、阻断项和待重验项，并更新到当前来源对象对应的最终验收文档；结论为“不通过/待重验”且确实无法正式放行时，按 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 创建或引用去重的 `BLK-*`，给出补测/补审/回改后的重验入口。
 6. 如果还没有最终验收文档，则按 `artifact-storage-rules` 约定的命名规则创建；如同一天存在多个近似标题，在不改变中文语义前提下补充更具体描述以避免重名。
 7. `not_applicable` 不要求不存在的证据；`limited` 必须记录替代验证、人工补验方式和通过标准，并只能输出受限交接结论。
 8. 只有来源明确要求、当前必须完成且没有验证或替代验证时，最终验收文档才输出阻断；文档完整性、追踪和失效链接等硬门禁仍按原规则阻断。
@@ -71,6 +71,7 @@ Git 提交例外：仅为 `git commit` 准备提交时，只执行 `git-collabor
 - 文档文件名、根目录和同文档更新策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 同一个来源对象只保留一份最终验收文档；若发生重验，应在同一份文档中更新最新结论并保留失效原因。
 - 归档内容至少包含输入材料清单、实施周期收口状态、最小任务闭环证据清单、逐条验收判定、阻断项、遗留项和最终放行结论。
+- 最终结论为“不通过/待重验”且属于真实阻断时，文档必须包含共享契约的完整“任务阻断收口”；同根因已有 `BLK-*` 时引用该记录。`limited` 只能保留替代验证与人工补验交接，`not_applicable` 和非阻断遗留项不得创建阻断记录。
 
 ## references 读取规则
 
@@ -80,4 +81,5 @@ Git 提交例外：仅为 `git commit` 准备提交时，只执行 `git-collabor
 - 只有在输出或更新结构化最终验收文档时，再读 `references/final-acceptance-template.md`。
 - 只有在判断与相邻 skill 的边界时，再读 `references/final-acceptance-boundaries.md`。
 - 输出最终验收文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`。正文先说明放行结论及验收适用性；不适用项必须有原因和依据，不得无故阻断。
+- 最终结论为“不通过/待重验”且属于真实阻断时，必须读取 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`；`limited` 与 `not_applicable` 不适用该契约。
 

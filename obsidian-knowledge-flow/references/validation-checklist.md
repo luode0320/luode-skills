@@ -78,6 +78,21 @@
     - 输入：一个受控 source root 与 bridge doctor 已验证的固定目标 vault。
    - 预期：先统计源 Markdown 总数；每个顶层分类生成逐篇沉淀笔记；全量总览汇总所有批次；逐篇表格数据行数等于来源 Markdown 数；总和等于源总数；敏感主题只保存脱敏后的通用线索。
 
+## 执行失败持续学习验证
+
+8. 追加式案例与去重：
+   - 输入：同一 `case_key` 的失败、修复和第二次复验事件。
+   - 预期：首次通过 `search`/`read` 后创建一篇 `知识库/20-Knowledge/execution-failure-cases/<owner>/<case>.md`；后续只 `append`，不创建重复笔记、不覆盖历史正文；最新状态事件可被读取。
+9. 正反例与状态门禁：
+   - 输入：命令失败、编码错误、非法 JSON、路径越界和工具契约异常的脱敏 local fixture。
+   - 预期：反例记录失败动作和禁止条件；同输入 local 成功后记录正例并进入 `candidate`；确定性证据或两次稳定复验后追加 `active`；`stale`/`conflicted`/`superseded`/`rejected` 不得自动应用。
+10. 精确检索：
+   - 输入：active 案例与版本、scope、输入摘要分别匹配/不匹配的执行上下文。
+   - 预期：完全匹配才自动采用正例；候选、过期或模糊匹配只返回诊断线索。
+11. 脱敏与 bridge-only：
+   - 输入：包含 API key、token、绝对路径、完整响应和非 local 连接信息的失败记录；以及 doctor/search/read/create/append 失败。
+   - 预期：敏感值被拒绝或替换为稳定占位符；非 local 证据不能升 active；bridge 失败时不写 vault、不使用文件系统 fallback，并返回固定 root、错误码和恢复动作。
+
 ## 仓库验证
 
 在 skill 仓库中修改本 skill 后：

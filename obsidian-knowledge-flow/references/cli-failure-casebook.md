@@ -2,6 +2,8 @@
 
 本文件保存 bridge、官方 Obsidian CLI、vault 路径、超时和读写失败的脱敏经验，归属 `obsidian-knowledge-flow`。vault 笔记正文和用户敏感内容不得复制到这里。
 
+本文件是仓库内的静态规则种子和验证基线，不承载动态执行案例正文。命令、编码、JSON、路径、工具契约等新失败经过同输入 local 复验后，必须按 [execution-case-notes.md](execution-case-notes.md) 追加到固定 vault；不得把静态 casebook 作为 vault 写入失败时的 fallback。
+
 ## 统一维护规则
 
 - 状态使用 `candidate`、`active`、`stale`、`superseded`、`rejected`。

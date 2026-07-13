@@ -6,7 +6,7 @@
 
 本契约只定义跨域共性：可追溯、无未决决策、结构完整、条件字段显式、图文一致、可机械验证和可交接。需求域与实施域的专属字段由各自 Skill 的完备性契约定义。
 
-所有文档还必须遵守 [白话文档与附录分层契约](plain-language-document-contract.md)：正文先让业务读者理解结论、影响和完成标准，执行细节与机器追踪信息再进入附录。
+所有文档还必须遵守 [白话文档与附录分层契约](plain-language-document-contract.md)：H1 后的唯一摘要段必须完整说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；执行细节进入末尾执行附录，稳定 ID、追踪矩阵和证据进入紧随其后的追踪附录。具体受管入口与例外以 [白话文档模板注册表](plain-language-template-registry.yaml) 为准。
 
 ## 2. 强制语义
 
@@ -15,7 +15,7 @@
 - `N/A` 不等于省略。任何不适用字段必须说明判定依据，不能只写“无”。
 - 当前优先闭环内不得保留未决产品、业务、接口、数据、权限、异常、兼容或测试决策。
 - 普通执行模型只能按照文档执行，不能通过猜测补齐默认值、优先级、异常处理、回滚方式、文件落点或测试通过标准。
-- 文档中的每个结论都必须能回指来源、决策、需求 ID、验收 ID、实施周期、任务、文件/符号、测试或证据中的至少一个稳定锚点。
+- 文档中的每个结论都必须能回指来源、决策、需求 ID、验收 ID、实施周期、任务、文件/符号、测试或证据中的至少一个稳定锚点；这些机器锚点不得代替 H1 后摘要的业务解释。
 
 ## 3. 元数据契约
 
@@ -33,6 +33,8 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 ```
 
 `doc_id`、`source_ids`、`status`、`version`、`current_slice` 不得为空；时间必须可解析。旧文档只在被修改时补齐元数据。
+
+当 `status: blocked` 时，正文必须按 [任务阻断收口契约](task-blocker-closure-contract.md) 增加“任务阻断收口”章节；该章节用于交接阻断依据、恢复计划和恢复后的验证入口，不能只在最终回复中口头说明。
 
 新建或迁移到白话分层结构的文档还必须包含 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 与 `review_acceptance_gates`。这些字段属于机器元数据，不进入正文。门禁字段和三态判定统一读取 [审查与验收条件化门禁契约](review-acceptance-gate-contract.md)。
 

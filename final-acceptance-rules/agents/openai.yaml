@@ -1,4 +1,4 @@
 interface:
   display_name: "最终验收"
   short_description: "基于来源对象、验收标准、实施、测试和审核结果做后置最终放行"
-  default_prompt: "使用 $final-acceptance-rules 基于来源对象文档（需求或 Bug）、验收标准、实施总览/实施周期、测试结果和审核结果，为当前来源对象生成或更新 doc/7-验收 下独立的最终验收文档；若测试或审核未完成，必须明确阻断。"
+  default_prompt: "使用 $final-acceptance-rules 基于来源对象文档（需求或 Bug）、验收标准、实施总览/实施周期、测试结果和审核结果，为当前来源对象生成或更新 doc/7-验收 下独立的最终验收文档；仅在不通过/待重验且无法正式放行时，按 task-blocker-closure-contract 创建或引用去重的 `BLK-*`，写明补测、补审或回改后的重验入口；不得将 limited、not_applicable 或普通遗留项误报为阻断。"

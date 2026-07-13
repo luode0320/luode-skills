@@ -1,0 +1,137 @@
+version: 1
+scope: new_or_modified_managed_document_generation_entries
+template_count: 24
+summary_opening:
+  placement: after_h1_before_first_h2
+  paragraph_count: 1
+  required_labels: [结论, 影响, 范围, 非范围, 变化, 完成标准, 术语说明, 验证状态]
+  terminology_rule: first_technical_term_requires_business_chinese_explanation_or_no_term_declaration
+  forbidden_content: [stable_id, command, log, sql, api_payload, file_line, traceability_matrix, code_fence]
+terminal_appendix_group:
+  required_order: [执行附录, 追踪附录]
+  execution_appendix: [environment, steps, commands, samples, logs, sql, api_payload]
+  tracking_appendix: [stable_ids, sources, evidence, traceability_matrix, machine_locations]
+  placement: after_all_business_body_sections
+  contiguity: required
+  legacy_policy: preserve_existing_equivalent_appendix_name_and_responsibility
+templates:
+  - template_id: TPL-PLAIN-REQ-001
+    path: requirement-intake-rules/references/requirement-structure-template.md
+    profile: requirement
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-REQ-002
+    path: requirement-discovery-rules/references/output-template.md
+    profile: requirement
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [discovery_questions_may_remain_in_business_body_but_must_not_replace_the_summary]
+  - template_id: TPL-PLAIN-AC-001
+    path: acceptance-criteria-rules/references/acceptance-template.md
+    profile: acceptance
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-IMP-001
+    path: implementation-planning-rules/references/plan-structure-template.md
+    profile: implementation_overview
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [plan_specific_required_sections_remain_in_existing_order]
+  - template_id: TPL-PLAIN-IMP-002
+    path: implementation-planning-rules/references/implementation-overview-template.md
+    profile: implementation_overview
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-IMP-003
+    path: implementation-planning-rules/references/implementation-cycle-template.md
+    profile: implementation_cycle
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-IMP-004
+    path: implementation-planning-rules/references/minimum-task-execution-contract.md
+    profile: implementation_cycle
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [task_card_keeps_required_task_fields_in_existing_technical_sections]
+  - template_id: TPL-PLAIN-IMP-005
+    path: implementation-planning-rules/references/full-sequence-master-plan.md
+    profile: implementation_master
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-BUG-001
+    path: bug-intake-rules/references/bug-description-template.md
+    profile: bug
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-BUG-002
+    path: bug-discovery-rules/references/output-template.md
+    profile: bug
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [investigation_evidence_remains_traceable_in_tracking_appendix]
+  - template_id: TPL-PLAIN-BUG-003
+    path: bug-reproduction-rules/references/reproduction-template.md
+    profile: bug
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-BUG-004
+    path: bug-fix-proposal-rules/references/fix-proposal-template.md
+    profile: bug
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [existing_layered_structure_is_preserved_and_completed]
+  - template_id: TPL-PLAIN-BUG-005
+    path: bug-validation-rules/references/validation-template.md
+    profile: bug
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-TEST-001
+    path: test-doc-rules/references/doc-minimums.md
+    profile: test
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [existing_layered_structure_is_preserved_and_completed]
+  - template_id: TPL-PLAIN-TEST-002
+    path: test-strategy-rules/references/strategy-template.md
+    profile: test
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-TEST-003
+    path: test-regression-rules/references/regression-template-and-examples.md
+    profile: test
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [examples_must_follow_the_same_layering_contract]
+  - template_id: TPL-PLAIN-TEST-004
+    path: functional-validation-rules/references/validation-template-and-examples.md
+    profile: test
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [examples_must_follow_the_same_layering_contract]
+  - template_id: TPL-PLAIN-TEST-005
+    path: project-release-test-rules/references/report-format.md
+    profile: test
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [interface_test_results_md_is_a_technical_detail_file_and_keeps_its_block_format]
+  - template_id: TPL-PLAIN-REVIEW-001
+    path: project-change-review-rules/references/report-template.md
+    profile: review
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-FINAL-001
+    path: final-acceptance-rules/references/final-acceptance-template.md
+    profile: final_acceptance
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-ARCH-001
+    path: architecture-doc-rules/references/architecture-doc-template.md
+    profile: architecture
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-DESIGN-001
+    path: project-design-doc-rules/references/design-template.md
+    profile: project_design
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-DELIVERY-001
+    path: delivery-summary-rules/references/delivery-template.md
+    profile: delivery
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: []
+  - template_id: TPL-PLAIN-REPORT-001
+    path: work-report-summary-rules/references/report-format.md
+    profile: work_report
+    layers: [h1_summary, execution_appendix, tracking_appendix]
+    exceptions: [periodic_report_date_and_project_sections_remain_in_existing_order]

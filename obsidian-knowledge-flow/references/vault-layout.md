@@ -22,6 +22,7 @@ D:\obsidian_data/
     ├── 00-Inbox/
     ├── 10-Sessions/
     ├── 20-Knowledge/
+    │   └── execution-failure-cases/
     ├── 30-MOCs/
     ├── 40-Entities/
     ├── 50-Sources/
@@ -36,6 +37,7 @@ D:\obsidian_data/
 - `知识库/00-Inbox/`: 仅在分类不确定，或用户要求原始捕获时使用。
 - `知识库/10-Sessions/YYYY/MM/`: 每个有价值的会话片段保存为一篇会话笔记。
 - `知识库/20-Knowledge/<topic>/`: 保存长期概念、决策、流程和可复用模式。`20-Knowledge` 下最多保留两级主题目录。
+- `知识库/20-Knowledge/execution-failure-cases/<owner>/<case>.md`: 保存跨任务执行失败的追加式正反例笔记；owner、工具和状态放在 frontmatter/状态事件中，不按项目复制案例。主题导航使用 `知识库/30-MOCs/执行失败案例.md`。
 - `知识库/30-MOCs/`: 保存高价值主题地图。只有能连接多个相关笔记或提升检索效率时才创建 MOC。
 - `知识库/40-Entities/<type>/`: 保存反复出现的实体。推荐类型：`people`、`projects`、`repos`、`tools`、`terms`、`orgs`、`products`。
 - `知识库/50-Sources/<type>/`: 保存来源摘要。推荐类型：`web`、`video`、`repo`、`paper`、`dataset`。

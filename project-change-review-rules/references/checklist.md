@@ -22,6 +22,7 @@
 - 日志：是否使用正式 logger；是否具备业务上下文、错误对象、trace/span、脱敏。
 - Skill：是否漏触发对应主 skill 或最终收口闸门；已命中 skill 是否有未执行的阻断规则。
 - 验证：是否运行了与风险匹配的测试、构建、lint 或手工验证。
+- 阻断：P0/P1 或任务无法继续时，是否已读取 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 并在报告中创建或引用去重的 `BLK-*`，写明回改完成判据和复审入口；P2/P3、`limited`、`not_applicable` 是否未被误报。
 
 ## 证据要求
 

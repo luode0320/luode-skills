@@ -62,7 +62,7 @@ stateDiagram-v2
 3. 仅按能力从低到高选择一层动作：L2 reconnect、L3 reload、L4 restart；每层最多一次，动作之间重新探针。
 4. 恢复后执行 `wait_ready`、协议能力探测和最小健康调用。验证失败进入 `blocked` 或 `manual_handoff`。
 5. 只有 L5 adapter 能读取检查点、验证恢复 token、恢复上下文，并用原成功标准验证最小重放；通过后才进入 `resumed`。
-6. 将脱敏结果交给上层调用方；失败案例由 `execution-failure-learning-rules` 按 owner casebook 规则处理。
+6. 将脱敏结果交给上层调用方；终态为 `blocked` 或 `manual_handoff` 时，必须同时生成遵循 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的唯一 `BLK-*` 事实。失败案例由 `execution-failure-learning-rules` 按 owner casebook 规则处理。
 
 ## 并发、预算和冷却
 
@@ -82,7 +82,7 @@ stateDiagram-v2
 
 通过：adapter capability 真实可探测；健康探针、恢复动作、`wait_ready` 和原成功标准验证均通过；锁/预算/冷却生效；没有越权或非幂等重放。
 
-停止：无 adapter、能力声明与实际行为不一致、local 配置缺失、恢复后健康检查失败、检查点过期/损坏、写操作幂等性未知、预算/冷却冲突或宿主 API 未提供安全续接 hook。停止时只输出结构化 `manual_handoff`/`blocked` 原因，不得伪称完成。
+停止：无 adapter、能力声明与实际行为不一致、local 配置缺失、恢复后健康检查失败、检查点过期/损坏、写操作幂等性未知、预算/冷却冲突或宿主 API 未提供安全续接 hook。停止时输出结构化 `manual_handoff`/`blocked` 原因和共享阻断事实，不得伪称完成。
 
 ## 参考文件
 
