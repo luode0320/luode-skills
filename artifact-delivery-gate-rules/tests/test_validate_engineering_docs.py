@@ -352,6 +352,235 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         for field in ("status", "errors", "warnings", "ids", "traceability", "diagrams", "unresolved_decisions", "coverage"):
             self.assertIn(field, result)
 
+    def _layered_document(self, gate_yaml: str, opening: str = "本次结果已经清楚，业务人员可以继续查看完成标准。", technical: str = "技术细节放在原有章节。") -> str:
+        return f"""---
+schema_version: 1
+doc_id: DOC-1
+doc_type: test
+source_ids: [SRC-1]
+status: draft
+version: v1.0
+current_slice: current
+updated_at: 2026-07-12
+reader_level: business_general
+writing_style: plain_chinese
+appendix_policy: preserve_existing_or_one_terminal_appendix
+review_acceptance_gates:
+{gate_yaml}
+---
+# 文档说明
+{opening}
+
+## 文档信息
+这是用于测试的文档信息。
+
+## 完成标准
+读者可以根据本节判断是否完成。
+
+## 技术细节
+{technical}
+
+图片资产决策：N/A + 原因 + 证据：本次 fixture 不需要图片。
+"""
+
+    def test_review_acceptance_gate_not_applicable_is_non_blocking(self) -> None:
+        """第三方接口不适用时，不需要伪造证据，也不阻断。"""
+        text = self._layered_document("""  - stage: third_party
+    applicability: not_applicable
+    reason: 本次范围不调用第三方接口。
+    basis: 需求范围只包含本地流程。
+    required_by_source: false
+    required_now: false
+    completed_validation: []
+    substitute_validation: []
+    manual_follow_up: N/A
+    pass_standard: N/A""")
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "document.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        self.assertTrue(result["valid"], result["errors"])
+        self.assertEqual(result["gates"]["release_status"], "allowed")
+        self.assertFalse(result["gates"]["blocking"])
+
+    def test_review_acceptance_gate_limited_allows_progress_but_not_release(self) -> None:
+        """受限验证可以继续准备，但不能当作正式放行。"""
+        text = self._layered_document("""  - stage: browser_integration
+    applicability: limited
+    reason: 浏览器授权环境当前不可用。
+    basis: 当前环境只有本地功能验证条件。
+    required_by_source: true
+    required_now: true
+    completed_validation: []
+    substitute_validation: [EVD-LOCAL-VALIDATION-01]
+    manual_follow_up: 条件具备后补做浏览器联调。
+    pass_standard: 页面主流程和关键异常场景均通过。""")
+        document = Path("document.md")
+        document.write_text(text, encoding="utf-8")
+        try:
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path("."))
+        finally:
+            document.unlink(missing_ok=True)
+        self.assertTrue(result["valid"], result["errors"])
+        self.assertEqual(result["gates"]["release_status"], "limited")
+        self.assertFalse(result["gates"]["blocking"])
+        self.assertEqual(result["status"], "LIMITED")
+
+    def test_new_profile_document_requires_plain_language_fields(self) -> None:
+        """新建受管文档缺少白话字段时不能绕过契约。"""
+        text = "---\nschema_version: 1\ndoc_id: DOC-1\ndoc_type: test\nsource_ids: [SRC-1]\nstatus: draft\nversion: v1\ncurrent_slice: current\nupdated_at: 2026-07-13\n---\n# 文档说明\n这是普通中文结论。\n\n## 文档信息\n说明。\n\n## 完成标准\n说明。\n"
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "document.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        self.assertFalse(result["valid"])
+        self.assertTrue(any("reader_level" in error for error in result["errors"]))
+        self.assertTrue(any("review_acceptance_gates" in error for error in result["errors"]))
+
+    def test_unchanged_historical_document_keeps_legacy_contract(self) -> None:
+        """未修改的历史文档不因新契约缺字段而被强制迁移。"""
+        text = "---\nschema_version: 1\ndoc_id: DOC-OLD\ndoc_type: test\nsource_ids: [SRC-OLD]\nstatus: accepted\nversion: v1\ncurrent_slice: old\nupdated_at: 2026-07-01\n---\n# 历史文档\n历史正文没有白话元数据。\n\n图片资产决策：N/A + 原因 + 证据：历史文档不新增图片。\n"
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "historical.md"
+            document.write_text(text, encoding="utf-8")
+            original = validator.document_is_new_or_modified
+            try:
+                validator.document_is_new_or_modified = lambda *_: False
+                result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+            finally:
+                validator.document_is_new_or_modified = original
+        self.assertTrue(result["valid"], result["errors"])
+
+    def test_heading_baseline_preserves_numbering_text(self) -> None:
+        """标题编号变化也必须被 HEAD 基线识别。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            document = root / "document.md"
+            document.write_text("# 文档\n开场。\n\n## 2. 目标\n内容。\n", encoding="utf-8")
+            errors: list[str] = []
+            original = validator.subprocess.run
+            try:
+                def fake_run(command, **kwargs):
+                    if command[:2] == ["git", "ls-files"]:
+                        return type("Result", (), {"returncode": 0, "stdout": "document.md\n"})()
+                    if command[:3] == ["git", "show", "HEAD:document.md"]:
+                        return type("Result", (), {"returncode": 0, "stdout": "# 文档\n开场。\n\n## 1. 目标\n内容。\n"})()
+                    return type("Result", (), {"returncode": 0, "stdout": ""})()
+                validator.subprocess.run = fake_run
+                validator.check_heading_baseline(document, document.read_text(encoding="utf-8"), root, errors, [])
+            finally:
+                validator.subprocess.run = original
+        self.assertTrue(any("heading baseline mismatch" in error for error in errors))
+
+    def test_review_acceptance_gate_required_without_validation_blocks_release(self) -> None:
+        """来源明确要求且当前必须完成的验证没有证据时阻断。"""
+        text = self._layered_document("""  - stage: acceptance
+    applicability: applicable
+    reason: 来源明确要求第三方接口验收。
+    basis: 验收标准规定必须检查约定返回结果。
+    required_by_source: true
+    required_now: true
+    completed_validation: []
+    substitute_validation: []
+    manual_follow_up: N/A
+    pass_standard: 接口返回约定结果。""")
+        errors: list[str] = []
+        report = validator.check_plain_language_contract(text, errors)
+        self.assertFalse(report["valid"])
+        self.assertTrue(report["blocking"])
+        self.assertEqual(report["release_status"], "blocked")
+        self.assertIn("gate.required_validation_missing", report["error_codes"])
+
+    def test_review_acceptance_gate_applicable_with_completed_validation_passes(self) -> None:
+        """适用验证有完成证据时允许正式放行。"""
+        text = self._layered_document("""  - stage: functional_validation
+    applicability: applicable
+    reason: 本地功能验证属于当前范围。
+    basis: 当前需求要求验证本地流程。
+    required_by_source: true
+    required_now: true
+    completed_validation: [EVD-LOCAL-FUNCTIONAL-01]
+    substitute_validation: []
+    manual_follow_up: N/A
+    pass_standard: 本地功能测试全部通过。""")
+        errors: list[str] = []
+        report = validator.check_plain_language_contract(text, errors)
+        self.assertEqual(errors, [])
+        self.assertEqual(report["release_status"], "allowed")
+
+    def test_plain_language_opening_rejects_machine_details(self) -> None:
+        """机器字段只能出现在技术章节，不能泄漏到 H1 后开场。"""
+        text = self._layered_document("  []", opening="REQ-1 已完成，详见 F:/work/test.py:12。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertTrue(any("stable IDs" in error for error in errors))
+        self.assertTrue(any("paths or line numbers" in error for error in errors))
+
+    def test_plain_language_opening_requires_h1_and_content(self) -> None:
+        """白话契约必须有 H1，且 H1 后第一段不能为空。"""
+        missing_h1 = self._layered_document("  []").replace("# 文档说明", "## 文档说明", 1)
+        errors: list[str] = []
+        validator.check_plain_language_contract(missing_h1, errors)
+        self.assertTrue(any("must contain an H1" in error for error in errors))
+
+        empty_opening = self._layered_document("  []", opening="")
+        errors = []
+        validator.check_plain_language_contract(empty_opening, errors)
+        self.assertTrue(any("must not be empty" in error for error in errors))
+
+    def test_plain_language_document_allows_zero_or_one_terminal_appendix(self) -> None:
+        """没有附录或只有末尾附录都符合新策略。"""
+        text = self._layered_document("  []", technical="技术章节包含 REQ-1 和 `python test.py`。\n\n## 附录\n补充说明。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertEqual(errors, [])
+
+    def test_plain_language_document_rejects_multiple_or_non_terminal_appendix(self) -> None:
+        """重复附录或附录后又出现同级章节时阻断。"""
+        text = self._layered_document("  []", technical="## 附录\n第一个附录。\n\n## 其他章节\n不应出现在附录后。\n\n## 附录：第二个\n重复。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertTrue(any("at most one" in error for error in errors))
+
+    def test_plain_language_document_rejects_non_terminal_appendix_alone(self) -> None:
+        """唯一附录后仍有同级章节时必须单独阻断。"""
+        text = self._layered_document("  []", technical="## 附录\n补充说明。\n\n## 后续章节\n不应出现在附录后。")
+        errors: list[str] = []
+        validator.check_plain_language_contract(text, errors)
+        self.assertIn("plain-language appendix must be terminal", errors)
+
+    def test_review_acceptance_gate_missing_fields_is_rejected(self) -> None:
+        """门禁记录缺少固定字段时不能被当作空门禁放行。"""
+        text = self._layered_document("  - stage: review\n    applicability: applicable")
+        errors: list[str] = []
+        report = validator.check_plain_language_contract(text, errors)
+        self.assertFalse(report["valid"])
+        self.assertTrue(any("gate.schema_invalid" in error for error in errors))
+
+    def test_headings_ignore_code_fence_titles(self) -> None:
+        """代码块中的伪标题不应参与章节解析。"""
+        text = "# 正式标题\n开场说明。\n\n```markdown\n## 代码示例标题\n```\n\n## 正式章节\n"
+        self.assertEqual(validator.headings(text), ["正式标题", "正式章节"])
+
+    def test_tilde_fence_titles_do_not_change_heading_baseline(self) -> None:
+        """波浪线代码围栏中的伪标题也不参与标题解析。"""
+        text = "# 正式标题\n开场说明。\n\n~~~markdown\n## 代码示例标题\n~~~\n\n## 正式章节\n"
+        self.assertEqual(validator.headings(text), ["正式标题", "正式章节"])
+
+    def test_generic_document_profiles_accept_layered_document(self) -> None:
+        """所有新增文档类型 profile 都接受同一份分层文档。"""
+        text = self._layered_document("  []", technical="图片资产决策：N/A + 原因 + 证据：本次不需要视觉材料。")
+        profile_names = ("bug", "test", "review", "final_acceptance", "architecture", "delivery", "project_design", "work_report")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            document = root / "layered.md"
+            document.write_text(text, encoding="utf-8")
+            for profile_name in profile_names:
+                with self.subTest(profile=profile_name):
+                    profile = self.payload["profiles"][profile_name]
+                    result = validator.validate_document(document, profile_name, profile, self.payload, root)
+                    self.assertTrue(result["valid"], result["errors"])
+
 
 if __name__ == "__main__":
     unittest.main()
