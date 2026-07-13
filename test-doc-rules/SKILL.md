@@ -87,3 +87,5 @@ description: 当新增或修改测试 README、验证说明、测试报告、覆
 - 在定位测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径或判断是否继续沿用同一轮测试根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在职责边界混淆时，再读 `references/doc-boundaries.md`。
 - 只有在需要正反例或模板参考时，再读 `references/doc-examples.md`。
+- 输出测试 README 或证据文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先说明测什么、结论和影响，环境、命令、样本和日志进入附录。
+- 涉及审查、验收、浏览器联调或第三方验证时，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，记录适用性和替代验证，不把不适用写成阻断。

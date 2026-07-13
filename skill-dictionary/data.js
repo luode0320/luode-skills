@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-13 18:57:41",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-07-13 20:59:08",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 27,
     "doc_total": 10,
-    "references_total": 375,
+    "references_total": 377,
     "agents_total": 93
   },
   "downloaded_seeds": {
@@ -3147,7 +3147,7 @@ window.SKILL_DICTIONARY = {
             "执行通过 / 驳回标准",
             "执行结果归档要求",
             "references 读取规则",
-            "项目联调强制规则（新增）",
+            "项目联调条件化规则",
             "本地环境配置发现与连接（强制）",
             "测试样本分布优先（强制）"
           ],
@@ -3503,7 +3503,7 @@ window.SKILL_DICTIONARY = {
             "执行通过 / 驳回标准",
             "执行结果归档要求",
             "references 读取规则",
-            "项目联调强制规则（新增）",
+            "项目联调条件化规则",
             "功能验证样本分布（强制）"
           ],
           "references": [
@@ -4133,7 +4133,9 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "artifact-delivery-gate-rules/references/document-handoff-contract.md",
-            "artifact-delivery-gate-rules/references/document-quality-profiles.yaml"
+            "artifact-delivery-gate-rules/references/document-quality-profiles.yaml",
+            "artifact-delivery-gate-rules/references/plain-language-document-contract.md",
+            "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md"
           ],
           "agents": [
             "artifact-delivery-gate-rules/agents/openai.yaml"
@@ -7915,7 +7917,7 @@ window.SKILL_DICTIONARY = {
         "执行通过 / 驳回标准",
         "执行结果归档要求",
         "references 读取规则",
-        "项目联调强制规则（新增）",
+        "项目联调条件化规则",
         "本地环境配置发现与连接（强制）",
         "测试样本分布优先（强制）"
       ],
@@ -8271,7 +8273,7 @@ window.SKILL_DICTIONARY = {
         "执行通过 / 驳回标准",
         "执行结果归档要求",
         "references 读取规则",
-        "项目联调强制规则（新增）",
+        "项目联调条件化规则",
         "功能验证样本分布（强制）"
       ],
       "references": [
@@ -8865,7 +8867,9 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "artifact-delivery-gate-rules/references/document-handoff-contract.md",
-        "artifact-delivery-gate-rules/references/document-quality-profiles.yaml"
+        "artifact-delivery-gate-rules/references/document-quality-profiles.yaml",
+        "artifact-delivery-gate-rules/references/plain-language-document-contract.md",
+        "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md"
       ],
       "agents": [
         "artifact-delivery-gate-rules/agents/openai.yaml"

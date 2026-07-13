@@ -69,6 +69,8 @@ description: 当仅靠静态分析不能稳定定位 Bug，且需要在运行过
 
 ## references 读取规则
 
+- 只要创建或修改 Bug 根目录 `README.md`，必须同时读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`，正文先写结论，技术细节保留在原有章节或附录。
+- 如果本轮涉及审查、验收、功能验证、浏览器联调或第三方验证，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，按适用性记录，不把不适用条件写成阻断。
 - 默认先读 `references/runtime-entry-conditions.md`。
 - 在定位当前 Bug 根目录、入口 `README.md` 或判断是否继续复用同一根目录时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在选择诊断手段时，再读 `references/runtime-observation-methods.md`。

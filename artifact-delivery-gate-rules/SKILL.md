@@ -95,3 +95,5 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 - 只有在判断复用策略时，再读 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在判断命名模板或索引入口时，再读 `../artifact-storage-rules/references/naming-templates.md`。
 - 只要本轮涉及需求、验收或实施文档质量门禁，必须读取 `references/document-handoff-contract.md` 与 `references/document-quality-profiles.yaml`，并运行 `scripts/validate_engineering_docs.py`。
+- 只要本轮产生任何研发文档，还必须读取 `references/plain-language-document-contract.md`，检查正文能独立被普通业务读者理解，执行与追踪细节均已进入附录。
+- 只要本轮包含审查、验收、功能验证、浏览器联调或第三方验证，还必须读取 `references/review-acceptance-gate-contract.md`，校验 `review_acceptance_gates` 并单独报告正式放行状态。

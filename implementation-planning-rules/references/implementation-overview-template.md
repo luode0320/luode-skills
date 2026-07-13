@@ -2,6 +2,10 @@
 
 > 本模板用于 `implementation_overview`。它负责冻结整体技术决策、周期顺序和追踪关系；普通模型执行时必须进入具体周期的最小任务卡，不得从总览自行推导实现细节。
 
+## 白话正文与附录
+
+文档先在 H1 后用一段普通中文说清推荐方案、业务影响、范围、周期目标和完成结果，再保留当前文档原有标题、层级和顺序。文件树、任务表、命令和证据继续放在原有技术章节或已有附录；只有没有合适位置时才在末尾增加唯一的 `附录`。同时补齐 `reader_level`、`writing_style`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 元数据。
+
 ## 文档信息
 
 ```yaml
@@ -16,6 +20,10 @@ current_slice: "SLICE-..."
 baseline_commit: "commit-or-N/A-with-reason"
 template_version: "implementation-overview-v1"
 updated_at: "YYYY-MM-DD HH:mm:ss"
+reader_level: business_general
+writing_style: plain_chinese
+appendix_policy: preserve_existing_or_one_terminal_appendix
+review_acceptance_gates: []
 ```
 
 ## 当前计划最终方案简要说明

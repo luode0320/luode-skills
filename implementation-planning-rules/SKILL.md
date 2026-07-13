@@ -205,3 +205,5 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - Markdown 引用必须从当前文档位置计算 `/` 分隔相对路径（需求/实施文档通常为 `../data/images/<file>`），alt 非空且包含 `IMG-*`；禁止绝对路径、反斜杠、`file://`、远程图片、HTML `<img>`、越界路径和直接引用 `doc/data/<file>`。
 - 图片资产清单必须登记 `IMG-*`、用途/生成输入、来源、相对路径、版本、关联 `REQ/RULE`、`AC`、`CYCLE`、`TASK`、引用章节、敏感状态和版权状态；共享图片可多文档引用，未被任何 Markdown 引用的图片必须作为孤儿阻断。
 - 每个涉及图片的最小任务必须给出目标资产路径、生成命令、引用章节、格式/签名检查、清理或回滚步骤，并在“实现 -> 真实测试 -> 审查 -> 验收”闭环中验证；imagegen 通道不可用时不得降级为伪图。
+- 输出实施计划、总览、周期或任务卡前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`。正文先说推荐方案、业务影响和完成结果；文件树、符号、任务 ID、命令、测试和追踪矩阵统一放到执行或追踪附录。
+- 同时必须读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，把第三方、浏览器和专项验收写成条件化门禁，不因不适用条件阻断无关实施准备。

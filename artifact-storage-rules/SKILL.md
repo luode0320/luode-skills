@@ -126,3 +126,5 @@ description: 当需要定义、调整或解释项目中 `doc/1-架构/`、`doc/2
 - 只有在解释命名模板时，再读 `references/naming-templates.md`。
 - 只有在解释复用策略时，再读 `references/update-policy.md`。
 - 只有在需要指导其他 skill 如何引用时，再读 `references/skill-integration.md`。
+- 所有研发文档的正文与附录分层统一引用 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；本 skill 只提供落点和命名，不复制写作规则。
+- 所有涉及审查、验收、功能验证或第三方条件的文档统一引用 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`；本 skill 不复制三态判定。

@@ -1,5 +1,9 @@
 # Bug 描述模板
 
+## 白话正文与附录
+
+正文先说明发生了什么、影响谁、期望结果、当前能否继续和怎样算解决。环境、账号、步骤、日志、截图来源和证据放入附录；完整规则见 [白话文档与附录分层契约](../../artifact-delivery-gate-rules/references/plain-language-document-contract.md)。
+
 ## 用途
 
 用于把用户口头描述整理成可继续复现和定位的问题记录。

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
@@ -22,7 +23,7 @@ ID_PATTERN = re.compile(
 TASK_ID_PATTERN = re.compile(r"\b(?:TASK-[A-Z0-9]+(?:-[A-Z0-9]+)*|T\d{2}-\d{2})\b")
 EVIDENCE_ID_PATTERN = re.compile(r"\b(?:EVIDENCE-[A-Z0-9]+(?:-[A-Z0-9]+)*|EVD-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b")
 HEADING_PATTERN = re.compile(r"^#{1,6}\s+(.+?)\s*$")
-FENCE_PATTERN = re.compile(r"^\s*```([\w-]*)\s*$")
+FENCE_PATTERN = re.compile(r"^\s*(`{3,}|~{3,})([\w-]*)\s*$")
 # 图片引用由 check_images 独立校验，普通链接检查不重复处理图片语法。
 LINK_PATTERN = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
 IMAGE_PATTERN = re.compile(r"!\[([^\]]*)\]\(\s*([^)]*?)\s*\)")
@@ -32,6 +33,32 @@ FRONTMATTER_PATTERN = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
 ASSET_FILENAME_PATTERN = re.compile(
     r"^(?P<stem>.+)\.(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)-v(?P<version>\d+)"
     r"(?P<extension>\.png|\.jpg|\.jpeg|\.webp)$"
+)
+PLAIN_LANGUAGE_FIELDS = ("reader_level", "writing_style", "appendix_policy")
+PLAIN_LANGUAGE_VALUES = {
+    "reader_level": "business_general",
+    "writing_style": "plain_chinese",
+    "appendix_policy": "preserve_existing_or_one_terminal_appendix",
+}
+REVIEW_GATE_STAGES = {
+    "review",
+    "acceptance",
+    "functional_validation",
+    "browser_integration",
+    "third_party",
+}
+REVIEW_GATE_APPLICABILITY = {"applicable", "not_applicable", "limited"}
+REVIEW_GATE_FIELDS = (
+    "stage",
+    "applicability",
+    "reason",
+    "basis",
+    "required_by_source",
+    "required_now",
+    "completed_validation",
+    "substitute_validation",
+    "manual_follow_up",
+    "pass_standard",
 )
 
 
@@ -52,25 +79,67 @@ def read_document(path: Path) -> Tuple[str, List[str]]:
     return text, errors
 
 
-def headings(text: str) -> List[str]:
-    values: List[str] = []
-    for line in text.splitlines():
+def frontmatter_metadata(text: str) -> Dict[str, Any]:
+    # [参数] text: 完整 Markdown 文本。
+    # [返回] dict：可读取的 YAML 元数据；缺失或非法时返回空字典。
+    # 最近修改时间：2026-07-12 23:43:58 + 读取白话文档元数据以驱动分层校验。
+    """读取 YAML 元数据；非法或缺失的 YAML 由既有 front matter 校验报告。"""
+    # 1. 先定位 YAML 头，未提供时交由既有 front matter 校验处理。
+    match = FRONTMATTER_PATTERN.match(text)
+    if not match:
+        return {}
+    try:
+        metadata = yaml.safe_load(match.group(1))
+    except yaml.YAMLError:
+        return {}
+    return metadata if isinstance(metadata, dict) else {}
+
+
+def markdown_heading_records(text: str, normalize_numbering: bool = True) -> List[Tuple[int, str, int]]:
+    # [参数] text: 完整 Markdown 文本；normalize_numbering: 是否去掉标题编号供章节匹配。
+    # [返回] list[tuple]: 标题层级、标题文本和原始行号，已排除代码围栏。
+    # 最近修改时间：2026-07-13 14:00:00 + 让标题基线保留原始编号并排除代码围栏。
+    """返回未处于 Markdown 代码围栏内的标题记录。"""
+    records: List[Tuple[int, str, int]] = []
+    # 1. 先跳过代码围栏中的伪标题，再解析正文标题。
+    inside = False
+    marker = ""
+    for line_index, line in enumerate(text.splitlines()):
+        fence = FENCE_PATTERN.match(line)
+        if fence:
+            candidate = fence.group(1)
+            if not inside:
+                inside = True
+                marker = candidate[0]
+            elif candidate[0] == marker:
+                inside = False
+                marker = ""
+            continue
+        if inside:
+            continue
         match = HEADING_PATTERN.match(line)
         if not match:
             continue
-        value = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
-        values.append(value)
-    return values
+        level = len(match.group(0)) - len(match.group(0).lstrip("#"))
+        value = match.group(1).strip()
+        if normalize_numbering:
+            value = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", value)
+        records.append((level, value, line_index))
+    return records
+
+
+def headings(text: str) -> List[str]:
+    return [value for _, value, _ in markdown_heading_records(text)]
 
 
 def section_bodies(text: str) -> Dict[str, str]:
     lines = text.splitlines()
     sections: Dict[str, List[str]] = {}
     current = ""
-    for line in lines:
-        match = HEADING_PATTERN.match(line)
-        if match:
-            current = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
+    records_by_line = {line_index: value for _, value, line_index in markdown_heading_records(text)}
+    for line_index, line in enumerate(lines):
+        if line_index in records_by_line:
+            current = records_by_line[line_index]
             sections.setdefault(current, [])
         elif current:
             sections[current].append(line)
@@ -87,7 +156,7 @@ def mermaid_blocks(text: str) -> List[str]:
         match = FENCE_PATTERN.match(line)
         if match and not inside:
             inside = True
-            language = match.group(1).strip().lower()
+            language = match.group(2).strip().lower()
             current = []
             continue
         if match and inside:
@@ -140,29 +209,36 @@ def check_frontmatter(text: str, errors: List[str], profile: Dict[str, Any] | No
 
 
 def check_fences(text: str, errors: List[str]) -> None:
-    fences = [line for line in text.splitlines() if line.strip().startswith("```")]
+    fences = [line for line in text.splitlines() if FENCE_PATTERN.match(line)]
     if len(fences) % 2:
         errors.append("unclosed Markdown code fence")
 
 
-def check_sections(text: str, profile: Dict[str, Any], errors: List[str]) -> None:
+def check_sections(
+    text: str, profile: Dict[str, Any], errors: List[str], enforce_profile: bool = True
+) -> None:
+    # [参数] text: Markdown 文本；profile: 文档质量 profile；errors: 错误容器；enforce_profile: 是否执行专项章节约束。
+    # [返回] None：把缺失或空章节写入 errors。
+    # 最近修改时间：2026-07-13 14:00:00 + 支持历史文档兼容和新文档专项约束分离。
+    """检查 profile 章节要求。"""
+    # 1. 历史文档未启用专项约束时直接保留旧行为。
+    if not enforce_profile:
+        return
     existing = set(headings(text))
     bodies = section_bodies(text)
     lines = text.splitlines()
+    records = {line_index: (level, title) for level, title, line_index in markdown_heading_records(text)}
 
     def section_has_content(name: str) -> bool:
         for index, line in enumerate(lines):
-            match = HEADING_PATTERN.match(line)
-            if not match:
+            if index not in records:
                 continue
-            normalized = re.sub(r"^\d+(?:\.\d+)*[.)]?\s+", "", match.group(1).strip())
+            level, normalized = records[index]
             if normalized != name:
                 continue
-            level = len(line) - len(line.lstrip("#"))
-            for following in lines[index + 1 :]:
-                next_match = HEADING_PATTERN.match(following)
-                if next_match:
-                    next_level = len(following) - len(following.lstrip("#"))
+            for following_index, following in enumerate(lines[index + 1 :], start=index + 1):
+                if following_index in records:
+                    next_level, _ = records[following_index]
                     if next_level <= level:
                         break
                     return True
@@ -197,7 +273,16 @@ def markdown_table_count(text: str) -> int:
     return sum(1 for index, line in enumerate(lines[:-1]) if "|" in line and re.match(r"^\s*\|?\s*:?-{3,}", lines[index + 1]))
 
 
-def check_profile_content(text: str, profile: Dict[str, Any], errors: List[str]) -> None:
+def check_profile_content(
+    text: str, profile: Dict[str, Any], errors: List[str], enforce_profile: bool = True
+) -> None:
+    # [参数] text: Markdown 文本；profile: 文档质量 profile；errors: 错误容器；enforce_profile: 是否执行专项内容约束。
+    # [返回] None：把缺少短语或表格不足写入 errors。
+    # 最近修改时间：2026-07-13 14:00:00 + 让通用 profile 只对新建或修改文档生效。
+    """检查 profile 的短语和表格要求。"""
+    # 1. 历史文档未启用专项约束时不强制迁移旧正文。
+    if not enforce_profile:
+        return
     for phrase in profile.get("required_phrases", []):
         if str(phrase).lower() not in text.lower():
             errors.append(f"missing required content phrase: {phrase}")
@@ -205,6 +290,288 @@ def check_profile_content(text: str, profile: Dict[str, Any], errors: List[str])
     actual_tables = markdown_table_count(text)
     if actual_tables < minimum_tables:
         errors.append(f"insufficient Markdown tables: expected {minimum_tables}, got {actual_tables}")
+
+
+def check_review_acceptance_gates(
+    metadata: Dict[str, Any], errors: List[str], enforce: bool = False
+) -> Dict[str, Any]:
+    # [参数] metadata: YAML front matter；errors: 累积错误列表；enforce: 是否要求新契约字段。
+    # [返回] dict：门禁项、错误码、是否阻断和正式放行状态。
+    # 最近修改时间：2026-07-13 14:00:00 + 固化不适用、受限和正式放行的三态判定。
+    """校验结构化三态门禁，并计算可继续、受限交接和正式放行状态。"""
+    empty_report: Dict[str, Any] = {
+        "valid": True,
+        "blocking": False,
+        "release_status": "allowed",
+        "items": [],
+        "error_codes": [],
+    }
+    if "review_acceptance_gates" not in metadata:
+        if enforce:
+            errors.append("[gate.schema_missing] review_acceptance_gates must be a YAML list")
+            empty_report["valid"] = False
+            empty_report["release_status"] = "blocked"
+            empty_report["error_codes"].append("gate.schema_missing")
+        return empty_report
+    gates = metadata.get("review_acceptance_gates")
+    if not isinstance(gates, list):
+        errors.append("[gate.schema_invalid] review_acceptance_gates must be a YAML list")
+        empty_report["valid"] = False
+        empty_report["release_status"] = "blocked"
+        empty_report["error_codes"].append("gate.schema_invalid")
+        return empty_report
+
+    report = dict(empty_report)
+    for index, item in enumerate(gates, start=1):
+        prefix = f"review_acceptance_gates[{index}]"
+        if not isinstance(item, dict):
+            errors.append(f"[gate.schema_invalid] {prefix} must be a mapping")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+            continue
+        missing = [field for field in REVIEW_GATE_FIELDS if field not in item]
+        if missing:
+            errors.append(f"[gate.schema_invalid] {prefix} missing fields: {missing}")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+            continue
+        stage = item.get("stage")
+        applicability = item.get("applicability")
+        reason = item.get("reason")
+        basis = item.get("basis")
+        source_required = item.get("required_by_source")
+        now_required = item.get("required_now")
+        completed = item.get("completed_validation")
+        substitute = item.get("substitute_validation")
+        manual_follow_up = item.get("manual_follow_up")
+        pass_standard = item.get("pass_standard")
+        item_report = dict(item)
+        item_report.update({"blocking": False, "reason_code": None})
+        report["items"].append(item_report)
+
+        if stage not in REVIEW_GATE_STAGES or applicability not in REVIEW_GATE_APPLICABILITY:
+            errors.append(f"[gate.schema_invalid] {prefix} has an unsupported stage or applicability")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+        if not isinstance(reason, str) or not reason.strip() or not isinstance(basis, str) or not basis.strip():
+            errors.append(f"[gate.schema_invalid] {prefix} reason and basis must be non-empty text")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+        if not isinstance(source_required, bool) or not isinstance(now_required, bool):
+            errors.append(f"[gate.schema_invalid] {prefix} required_by_source and required_now must be booleans")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+        if not isinstance(completed, list) or not all(isinstance(value, str) for value in completed):
+            errors.append(f"[gate.schema_invalid] {prefix} completed_validation must be a string list")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+            completed = []
+        if not isinstance(substitute, list) or not all(isinstance(value, str) for value in substitute):
+            errors.append(f"[gate.schema_invalid] {prefix} substitute_validation must be a string list")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+            substitute = []
+        if not isinstance(manual_follow_up, str) or not isinstance(pass_standard, str):
+            errors.append(f"[gate.schema_invalid] {prefix} manual_follow_up and pass_standard must be text")
+            report["valid"] = False
+            report["error_codes"].append("gate.schema_invalid")
+            continue
+
+        if applicability == "not_applicable":
+            if source_required or now_required or completed or substitute or manual_follow_up != "N/A" or pass_standard != "N/A":
+                errors.append(f"[gate.schema_invalid] {prefix} not_applicable must not claim required or completed validation")
+                report["valid"] = False
+                report["error_codes"].append("gate.schema_invalid")
+        elif applicability == "limited":
+            if not substitute or manual_follow_up.strip() == "N/A" or pass_standard.strip() == "N/A":
+                errors.append(f"[gate.schema_invalid] {prefix} limited requires substitute_validation, manual_follow_up and pass_standard")
+                report["valid"] = False
+                report["error_codes"].append("gate.schema_invalid")
+            else:
+                report["release_status"] = "limited"
+        elif applicability == "applicable":
+            if pass_standard.strip() == "N/A":
+                errors.append(f"[gate.schema_invalid] {prefix} applicable requires pass_standard")
+                report["valid"] = False
+                report["error_codes"].append("gate.schema_invalid")
+            elif now_required and not completed and not substitute:
+                if source_required:
+                    item_report["blocking"] = True
+                    item_report["reason_code"] = "required_validation_missing"
+                    report["blocking"] = True
+                    report["release_status"] = "blocked"
+                    report["error_codes"].append("gate.required_validation_missing")
+                    errors.append(f"[gate.required_validation_missing] {prefix} is required now but has no validation or substitute")
+                else:
+                    errors.append(f"[gate.schema_invalid] {prefix} cannot be required_now when source did not require it")
+                    report["valid"] = False
+                    report["error_codes"].append("gate.schema_invalid")
+            elif now_required and substitute and not completed:
+                report["release_status"] = "limited"
+
+    report["error_codes"] = list(dict.fromkeys(report["error_codes"]))
+    report["valid"] = report["valid"] and not report["blocking"]
+    if report["blocking"]:
+        report["release_status"] = "blocked"
+    elif not report["valid"]:
+        report["release_status"] = "blocked"
+    return report
+
+
+def validation_status(errors: List[str], gate_report: Dict[str, Any]) -> str:
+    # [参数] errors: 普通校验错误；gate_report: 三态门禁报告。
+    # [返回] str：`PASS`、`LIMITED` 或 `BLOCKED`。
+    # 最近修改时间：2026-07-13 14:00:00 + 防止受限验证被误报为正式通过。
+    """把普通校验、受限交接和正式放行状态分开输出。"""
+    # 1. 先处理硬错误和正式阻断，再区分受限交接。
+    if errors or gate_report.get("release_status") == "blocked":
+        return "BLOCKED"
+    if gate_report.get("release_status") == "limited":
+        return "LIMITED"
+    return "PASS"
+
+
+def check_appendix_policy(text: str, errors: List[str]) -> None:
+    # [参数] text: 完整 Markdown 文本；errors: 累积错误列表。
+    # [返回] None：发现重复或非末尾附录时写入错误。
+    # 最近修改时间：2026-07-13 14:00:00 + 放宽固定双附录并保留唯一末尾附录策略。
+    """允许无附录或既有附录；新增通用附录必须唯一且位于末尾。"""
+    records = markdown_heading_records(text)
+    appendix = [(level, title, line_index) for level, title, line_index in records if re.match(r"^附录(?:\s|[:：]|$)", title)]
+    if len(appendix) > 1:
+        errors.append("plain-language document may contain at most one terminal appendix")
+        return
+    if not appendix:
+        return
+    level, _, line_index = appendix[0]
+    if any(other_level <= level for other_level, _, other_line in records if other_line > line_index):
+        errors.append("plain-language appendix must be terminal")
+
+
+def check_heading_baseline(path: Path, text: str, root: Path, errors: List[str], warnings: List[str]) -> None:
+    # [参数] path: 当前文档；text: 当前内容；root: 校验根目录；errors/warnings: 结果容器。
+    # [返回] None：标题结构变化写入 errors，无法找到 HEAD 基线写入 warnings。
+    # 最近修改时间：2026-07-13 14:00:00 + 比较 HEAD 原始标题文本、层级和顺序。
+    """已跟踪文档与 HEAD 的标题文本、层级和顺序必须一致。"""
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        warnings.append("heading baseline skipped: document is outside validation root")
+        return
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "--", relative],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    if tracked.returncode != 0:
+        warnings.append("heading baseline skipped: document is not tracked in HEAD")
+        return
+    baseline = subprocess.run(
+        ["git", "show", f"HEAD:{relative}"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    if baseline.returncode != 0:
+        warnings.append("heading baseline skipped: HEAD version is unavailable")
+        return
+    current_signature = [
+        (level, title) for level, title, _ in markdown_heading_records(text, normalize_numbering=False)
+    ]
+    baseline_signature = [
+        (level, title) for level, title, _ in markdown_heading_records(baseline.stdout, normalize_numbering=False)
+    ]
+    if current_signature != baseline_signature:
+        errors.append("heading baseline mismatch: current headings must preserve HEAD text, levels and order")
+
+
+def document_is_new_or_modified(path: Path, root: Path) -> bool:
+    # [参数] path: 当前文档路径；root: Git 和校验根目录。
+    # [返回] bool：文档是新建或相对 HEAD 已修改时返回 True。
+    # 最近修改时间：2026-07-13 14:00:00 + 只对新建或修改文档启用白话契约。
+    """新建或已修改的文档必须进入白话契约校验。"""
+    # 1. 先把文档转换为仓库相对路径，仓库外文件按新文档处理。
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return True
+    # 2. 查询 HEAD 是否跟踪该文档，未跟踪文档按新文档处理。
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "--", relative],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    if tracked.returncode != 0:
+        return True
+    # 3. 比较工作树与 HEAD，只有实际修改的历史文档才启用新契约。
+    changed = subprocess.run(
+        ["git", "diff", "--quiet", "HEAD", "--", relative],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    return changed.returncode != 0
+
+
+def check_plain_language_contract(text: str, errors: List[str], required: bool = False) -> Dict[str, Any]:
+    # [参数] text: 完整 Markdown 文本；errors: 累积的校验错误列表；required: 是否必须启用契约。
+    # [返回] 无：发现违反白话正文与附录分层的情况时直接写入 errors。
+    # 最近修改时间：2026-07-13 14:00:00 + 校验新建或修改文档的白话开场和门禁分层。
+    """校验启用白话契约的新文档的 H1 开场、附录策略和结构化门禁。"""
+    # 1. 仅对主动声明白话契约的新文档启用严格分层检查，历史文档保持兼容。
+    metadata = frontmatter_metadata(text)
+    enabled = required or any(field in metadata for field in PLAIN_LANGUAGE_FIELDS)
+    if not enabled:
+        return {"valid": True, "blocking": False, "release_status": "allowed", "items": [], "error_codes": []}
+
+    for field, expected in PLAIN_LANGUAGE_VALUES.items():
+        if metadata.get(field) != expected:
+            errors.append(f"plain-language front matter must set {field}: {expected}")
+
+    records = markdown_heading_records(text)
+    h1 = next((record for record in records if record[0] == 1), None)
+    first_h2 = next((record for record in records if h1 and record[2] > h1[2] and record[0] == 2), None)
+    if h1 is None:
+        errors.append("plain-language document must contain an H1 heading")
+        opening = ""
+    else:
+        lines = text.splitlines()
+        opening_lines = lines[h1[2] + 1 : first_h2[2] if first_h2 else len(lines)]
+        opening = "\n".join(opening_lines).strip()
+        paragraphs = [part.strip() for part in re.split(r"\n\s*\n", opening) if part.strip()]
+        if not paragraphs:
+            errors.append("plain-language opening paragraph after H1 must not be empty")
+        elif len(paragraphs) != 1:
+            errors.append("plain-language opening after H1 must be one paragraph")
+        if not re.search(r"[\u4e00-\u9fff]", opening):
+            errors.append("plain-language opening paragraph must use readable Chinese")
+
+    body = opening
+    if ID_PATTERN.search(body):
+        errors.append("plain-language opening must not contain stable IDs")
+    if re.search(r"(?mi)(?:```|~~~)|(?:^|\n)\s*(?:python|pwsh|powershell|bash|sh|go|npm|pytest|curl)\b", body):
+        errors.append("plain-language opening must not contain commands or code fences")
+    if re.search(r"(?:[A-Za-z]:\\|(?:^|\s)(?:\.\.?/|/)[\w./-]+|:\d+\b|\bline\s+\d+)", body, re.IGNORECASE):
+        errors.append("plain-language opening must not contain paths or line numbers")
+    if re.search(r"\b(?:draft|pending|confirmed|in_progress|blocked|accepted)\b", body):
+        errors.append("plain-language opening must not contain machine lifecycle states")
+    check_appendix_policy(text, errors)
+    return check_review_acceptance_gates(
+        metadata,
+        errors,
+        enforce=required or metadata.get("appendix_policy") == PLAIN_LANGUAGE_VALUES["appendix_policy"],
+    )
 
 
 # check_diagram_annotations 检查 Mermaid 图块非空且通过轻量语法前置校验。
@@ -283,10 +650,20 @@ def check_placeholders(text: str, payload: Dict[str, Any], errors: List[str]) ->
 
 
 def check_na_reasons(text: str, errors: List[str]) -> None:
+    frontmatter = FRONTMATTER_PATTERN.match(text)
+    frontmatter_end = frontmatter.end() if frontmatter else 0
+    line_start = 0
     for line_number, line in enumerate(text.splitlines(), start=1):
+        if line_start < frontmatter_end:
+            line_start += len(line) + 1
+            continue
+        if line.lstrip().startswith("#"):
+            line_start += len(line) + 1
+            continue
         searchable = re.sub(r"`[^`]*`", "", line)
         if re.search(r"\bN/A\b|不适用", searchable) and not re.search(r"原因|理由|证据|依据|不涉及|本节", searchable):
             errors.append(f"N/A requires reason/evidence at line {line_number}")
+        line_start += len(line) + 1
 
 
 def check_links(text: str, root: Path, document: Path, errors: List[str]) -> None:
@@ -883,7 +1260,7 @@ def check_strict_trace(root: Path, errors: List[str]) -> Dict[str, Any]:
 # validate_document 按指定质量 profile 汇总单份 Markdown 文档的结构、内容、链接和图形校验。
 # [参数] path: 待校验文档；profile_name: profile 名称；profile: profile 配置；profile_payload: 完整配置；root: 链接根目录。
 # [返回] dict：valid、文档标识、ID、图形计数、错误和警告。
-# 最近修改时间：2026-07-12 将 profile 约束传入 YAML 头并纳入统一校验结果。
+# 最近修改时间：2026-07-13 14:00:00 + 接入新旧文档分层策略并输出受限状态。
 def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], profile_payload: Dict[str, Any], root: Path) -> Dict[str, Any]:
     """按指定质量 profile 汇总单份 Markdown 文档的结构、内容、链接和图形校验。"""
     # 1. 读取 UTF-8 文档并准备错误、警告容器。
@@ -896,10 +1273,19 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
     if not errors:
         # 补丁说明：把 profile 传入 YAML 头检查，确保专项必填字段不会被遗漏。
         check_frontmatter(text, errors, profile)
+        plain_language_required = bool(
+            profile.get("plain_language_contract") == "required"
+            and document_is_new_or_modified(path, root)
+        )
+        gate_report = check_plain_language_contract(text, errors, required=plain_language_required)
+        metadata = frontmatter_metadata(text)
+        if plain_language_required or metadata.get("appendix_policy") == PLAIN_LANGUAGE_VALUES["appendix_policy"]:
+            check_heading_baseline(path, text, root, errors, warnings)
         check_fences(text, errors)
-        check_sections(text, profile, errors)
+        enforce_profile = profile.get("quality_scope") != "new_or_modified" or plain_language_required
+        check_sections(text, profile, errors, enforce_profile=enforce_profile)
         ids = check_ids(text, profile, errors)
-        check_profile_content(text, profile, errors)
+        check_profile_content(text, profile, errors, enforce_profile=enforce_profile)
         check_placeholders(text, profile_payload, errors)
         check_na_reasons(text, errors)
         check_links(text, root, path, errors)
@@ -910,10 +1296,11 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
     else:
         ids = []
         diagrams = {}
+        gate_report = {"valid": True, "blocking": False, "release_status": "allowed", "items": [], "error_codes": []}
     # 3. 汇总 profile、链接、图形和严格结构检查结果。
     return {
         "valid": not errors,
-        "status": "PASS" if not errors else "BLOCKED",
+        "status": validation_status(errors, gate_report),
         "profile": profile_name,
         "document": str(path),
         "ids": ids,
@@ -928,18 +1315,20 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
             "image_count": image_report.get("count", 0),
             "valid": not errors,
         },
+        "gates": gate_report,
+        "error_codes": gate_report.get("error_codes", []),
     }
 
 
 # main 解析命令行参数并输出单文档或严格追踪模式的 JSON 结果。
 # [参数] 无显式参数：从命令行读取 profile、文档、根目录和严格模式选项。
 # [返回] None：打印 JSON；校验失败时以退出码 1 结束进程。
-# 最近修改时间：2026-07-12 增加 --strict 输出，支持交付阶段统一追踪门禁。
+# 最近修改时间：2026-07-13 14:00:00 + 让 CLI 输出与三态正式放行状态保持一致。
 def main() -> None:
     """解析命令行参数并输出单文档或严格追踪模式的 JSON 结果。"""
     # 1. 解析命令行参数并加载 profile。
     parser = argparse.ArgumentParser(description="Validate engineering Markdown document completeness")
-    parser.add_argument("--profile", required=True, choices=("requirement", "acceptance", "implementation_master", "implementation_overview", "implementation_cycle"))
+    parser.add_argument("--profile", required=True, help="Quality profile name")
     parser.add_argument("--doc", required=True, type=Path, help="Markdown document to validate")
     parser.add_argument("--root", type=Path, default=None, help="Root used for local link containment")
     parser.add_argument("--profile-file", type=Path, default=None, help="Quality profile YAML path")
@@ -963,7 +1352,7 @@ def main() -> None:
         result["orphan_images"] = orphan_report
         result["errors"].extend(orphan_errors)
         result["valid"] = not result["errors"]
-        result["status"] = "PASS" if result["valid"] else "BLOCKED"
+        result["status"] = validation_status(result["errors"], result["gates"])
     # 2. 在显式开启严格模式时追加跨文档追踪摘要、覆盖率和未决决策字段。
     if args.strict:
         strict_errors: List[str] = []
@@ -979,7 +1368,7 @@ def main() -> None:
             },
             "valid": not strict_errors,
         }
-        result["status"] = "PASS" if not result["errors"] and not strict_errors else "BLOCKED"
+        result["status"] = validation_status(result["errors"] + strict_errors, result["gates"])
         result["errors"].extend(strict_errors)
         result["valid"] = not result["errors"]
     # 3. 输出 JSON 并以非零退出码标记未通过结果。

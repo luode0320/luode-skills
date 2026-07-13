@@ -2,6 +2,10 @@
 
 本模板基于 `jam01/SRS-Template` 的核心章节映射到当前项目需求文档写法，并融合本项目的图形化、归档和可验收约束。
 
+## 白话正文与附录
+
+新建文档先按 [白话文档与附录分层契约](../../artifact-delivery-gate-rules/references/plain-language-document-contract.md) 在 H1 后写一段“结论、影响、范围、变化、完成标准”的普通中文开场；保留当前文档的标题、层级和顺序。本模板其余字段、表格、图形 ID 和追踪内容放在原有技术章节或已有附录。涉及审查、验收、浏览器或第三方条件时，读取 [审查与验收条件化门禁契约](../../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md)。
+
 ## 建议结构
 
 ### 0. 文档信息

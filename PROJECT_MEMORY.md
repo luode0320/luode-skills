@@ -1,5 +1,14 @@
 # 项目长期记忆
 
+## 白话文档与附录分层规则
+
+- 需求、实施、审查、验收、Bug、测试、架构、交付和工作报告采用同一信息分层：正文先用普通业务读者能理解的中文说明结论、影响、范围、变化和完成标准；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
+- 审查或验收不适用时，必须说明原因和依据，但不构成任务阻断；只有需求明确要求该验证、当前必须完成且无可接受替代验证时，条件缺失才阻断。
+- 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 启用机器门禁；正文只检查 H1 后白话开场，历史文档不批量迁移，在新建或后续修改时迁移。
+- 审查、验收、功能验证、浏览器联调和第三方验证统一使用 `review-acceptance-gate-contract.md`：不适用不阻断，受限可继续但不能正式放行，明确必需且无替代验证才阻断。
+- 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
+- 更新时间：2026-07-13。
+
 ## 统一智能体运行期自恢复规则
 
 - 稳定决策：`agent-runtime-recovery-rules` 是厂商无关的运行期恢复唯一 owner，覆盖 MCP、插件、浏览器会话、工具 transport 和智能体宿主；安装/注册仍由安装类 skill 负责，失败分类与案例生命周期仍由 `execution-failure-learning-rules` 负责。
@@ -585,6 +594,22 @@ entities:
     context_ids:
       - context.windows-powershell-environment
     updated_at: 2026-07-12
+  - entity_id: rule.plain-language-document-layering
+    name: "白话文档与附录分层"
+    type: "文档交接规则"
+    aliases:
+      - 正文白话化
+      - 执行附录
+      - 追踪附录
+    definition: "研发文档正文先说明结论、影响、范围、变化和完成标准；技术细节、命令、稳定 ID、追踪矩阵和证据分别放入执行附录或追踪附录。审查、验收、功能验证、浏览器联调和第三方验证统一使用三态门禁：not_applicable 有原因和依据但不阻断，limited 可继续准备但不能正式放行，applicable 只有在来源明确要求、当前必须完成且没有验证或替代验证时才阻断。"
+    scope: "需求、实施、审查、验收、Bug、测试、架构、交付和工作报告"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.plain-language-document-contract
+      - evidence.test.engineering-document-validator
+    context_ids:
+      - context.document-handoff
+    updated_at: 2026-07-13
   - entity_id: term.doc-top-level-mixed-naming
     name: "doc 顶层混合命名"
     type: "术语"

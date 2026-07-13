@@ -6,6 +6,8 @@
 
 本契约只定义跨域共性：可追溯、无未决决策、结构完整、条件字段显式、图文一致、可机械验证和可交接。需求域与实施域的专属字段由各自 Skill 的完备性契约定义。
 
+所有文档还必须遵守 [白话文档与附录分层契约](plain-language-document-contract.md)：正文先让业务读者理解结论、影响和完成标准，执行细节与机器追踪信息再进入附录。
+
 ## 2. 强制语义
 
 - `MUST`：所有新建或本轮修改的目标文档必须满足；缺失即阻断。
@@ -31,6 +33,8 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 ```
 
 `doc_id`、`source_ids`、`status`、`version`、`current_slice` 不得为空；时间必须可解析。旧文档只在被修改时补齐元数据。
+
+新建或迁移到白话分层结构的文档还必须包含 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 与 `review_acceptance_gates`。这些字段属于机器元数据，不进入正文。门禁字段和三态判定统一读取 [审查与验收条件化门禁契约](review-acceptance-gate-contract.md)。
 
 ## 4. 追踪契约
 

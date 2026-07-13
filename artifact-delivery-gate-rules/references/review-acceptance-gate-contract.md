@@ -1,0 +1,68 @@
+# 审查与验收条件化门禁契约
+
+## 1. 目的
+
+这份契约是审查、验收、功能验证、浏览器联调和第三方验证共用的唯一判定依据。它解决“当前项目不需要某项验证，却因为没有条件而被错误阻断”的问题。
+
+它不放宽文档格式、链接、追踪、编码或损坏图形等交付硬门禁；它只决定某项验证在当前来源和当前阶段是否适用，以及条件不足时能否继续推进。
+
+## 2. YAML 字段
+
+门禁记录放在文档 YAML front matter 的 `review_acceptance_gates` 列表中。每条记录必须包含以下字段：
+
+```yaml
+review_acceptance_gates:
+  - stage: third_party
+    applicability: not_applicable
+    reason: 本次范围不调用第三方接口。
+    basis: 需求范围只包含本地流程。
+    required_by_source: false
+    required_now: false
+    completed_validation: []
+    substitute_validation: []
+    manual_follow_up: N/A
+    pass_standard: N/A
+```
+
+字段含义如下：
+
+| 字段 | 允许值或类型 | 说明 |
+| --- | --- | --- |
+| `stage` | `review`、`acceptance`、`functional_validation`、`browser_integration`、`third_party` | 当前记录对应的验证阶段 |
+| `applicability` | `applicable`、`not_applicable`、`limited` | 当前阶段是否适用、是否暂时受限 |
+| `reason` | 非空文本 | 为什么采用这个状态 |
+| `basis` | 非空文本 | 需求、范围、决策或环境依据 |
+| `required_by_source` | 布尔值 | 来源对象是否明确要求 |
+| `required_now` | 布尔值 | 当前是否必须完成 |
+| `completed_validation` | 字符串列表 | 已完成验证或证据标识；没有时写空列表 |
+| `substitute_validation` | 字符串列表 | 可接受的替代验证或证据标识；没有时写空列表 |
+| `manual_follow_up` | 文本 | 受限时的人工补验方式；不需要时写 `N/A` |
+| `pass_standard` | 文本 | 通过标准；不适用时写 `N/A` |
+
+校验器根据这些字段计算阻断和放行状态，不接受文档自行填写 `blocking` 或 `release_status` 作为结论。
+
+## 3. 三种状态
+
+### `not_applicable`：不适用
+
+当来源没有要求，或当前范围确实不涉及该阶段时使用。必须写清原因和依据，不需要伪造不存在的测试证据。它不阻断任务，也不阻断正式放行。
+
+### `limited`：受限
+
+当验证有必要但当前条件不足，且已经有可接受的替代验证时使用。必须写清替代验证、人工补验方式和通过标准。它允许继续文档整理、实现准备和本地验证，但不能作为正式放行依据。
+
+### `applicable`：适用
+
+当验证属于当前范围时使用。需要完成验证并留下证据；来源明确要求且当前必须完成时，没有完成验证或替代验证就阻断正式放行。
+
+## 4. 正式放行判定
+
+只有同时满足以下条件才阻断正式放行：来源明确要求、当前必须完成、验证适用、没有已完成验证、也没有可接受的替代验证。
+
+`not_applicable` 永远不因缺少测试证据阻断。`limited` 永远不能把当前结果写成正式放行，但只要替代验证、人工补验方式和通过标准齐全，就不阻断当前文档、实现准备或本地验证推进。
+
+浏览器联调、第三方接口、授权账号和专项环境默认按条件项处理；只有来源对象明确要求且当前必须完成时，才进入正式放行门禁。
+
+## 5. 与其他门禁的边界
+
+以下问题仍然是交付硬阻断，不因门禁“不适用”而放宽：文档未落盘、UTF-8 错误、YAML 损坏、必需章节缺失、失效链接、稳定 ID 或追踪关系错误、Mermaid 损坏、未解释的 P0/P1 决策，以及来源明确要求但没有验证或替代验证的项目。

@@ -31,6 +31,7 @@ placeholder_terms:
   - 正常
 profiles:
   requirement:
+    plain_language_contract: required
     required_frontmatter: [template_version]
     required_sections: [文档信息, 决策冻结, 普通模型零决策执行契约]
     required_any_sections:
@@ -47,6 +48,7 @@ profiles:
     min_tables: 3
     required_phrases: [unresolved_decisions, 追踪矩阵, N/A]
   acceptance:
+    plain_language_contract: required
     required_frontmatter: [template_version]
     required_sections: [文档信息, 验收场景, 完成条件、停止条件与交付物]
     required_any_sections:
@@ -60,6 +62,7 @@ profiles:
     min_tables: 2
     required_phrases: [通过标准, 失败标准, 范围外]
   implementation_overview:
+    plain_language_contract: required
     required_frontmatter: [complexity, baseline_commit, template_version]
     required_sections: [当前计划最终方案简要说明, 实施周期总览, 阶段计划, 最小任务清单, 现状与落点, 真实测试安排, 风险与阻断项, 自审结论]
     required_any_sections:
@@ -71,6 +74,7 @@ profiles:
     min_tables: 4
     required_phrases: [unresolved_decisions, 文件/符号, 最大推进边界, 真实测试]
   implementation_cycle:
+    plain_language_contract: required
     required_frontmatter: [complexity, baseline_commit, template_version]
     required_sections: [当前代码/文档基线, 周期内最小任务执行顺序, 最小任务闭环, 当前周期验证矩阵, 自审结论]
     required_any_sections:
@@ -85,6 +89,7 @@ profiles:
     min_tables: 4
     required_phrases: [停止条件, 回滚, 文件/符号, 真实测试]
   implementation_master:
+    plain_language_contract: required
     required_frontmatter: [complexity, baseline_commit, template_version]
     required_sections: [全量执行顺序, 自审结论]
     required_any_sections:
@@ -96,3 +101,99 @@ profiles:
     diagrams: {flowchart: 1}
     min_tables: 3
     required_phrases: [全量, 顺序, 阻断]
+  bug:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  test:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  review:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  final_acceptance:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  architecture:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  delivery:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  project_design:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
+  work_report:
+    plain_language_contract: required
+    quality_scope: new_or_modified
+    required_frontmatter: []
+    required_sections: []
+    required_any_sections:
+      - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
+      - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    id_prefixes: []
+    diagrams: {}
+    min_tables: 0
+    required_phrases: [N/A]
