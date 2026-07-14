@@ -2,6 +2,8 @@
 
 本文件定义如何从当前代码发现全量 HTTP 接口契约。当前代码是唯一真相源；旧 Swagger、旧 Apifox、README 或历史记忆只能作为线索，不能覆盖真实代码。
 
+上游/第三方出站接口不走路由扫描分支，改按 `references/third-party-discovery-rules.md` 从 client、请求构造、base URL 和响应消费代码发现。
+
 ## 路由扫描
 
 必须从真实路由入口读取所有 HTTP method + path：

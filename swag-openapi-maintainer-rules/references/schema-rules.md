@@ -35,6 +35,16 @@
 - `components.securitySchemes` 对鉴权方案去重。
 - operation 的 request / response schema 优先使用 `$ref` 指向 components。
 
+## 上游接口 schema 差异
+
+`swag/<vendor-slug>/` 是上游服务独立成套的 OpenAPI 文档，不把上游接口合并进根 `swag/openapi.yaml`。上游文档必须额外遵守：
+
+- `servers` 必须指向 manifest 的 `base_url`，且只能来自代码实际使用或 local 配置解析结果。
+- 上游自身的 Bearer、API Key、签名、Cookie 等鉴权方案按上游调用代码表达，`securitySchemes` / `securityDefinitions` 的说明必须是中文；不得套用本项目自有接口的统一鉴权或统一响应包装。
+- 上游响应只建模本项目实际请求并消费到的字段，`coverage: partial` 不代表上游服务完整 API；未消费字段不得为了补全模型而猜测加入。
+- 上游错误响应、分页、状态码和包装结构以真实 client 解码与调用方分支为准；不能因为上游看起来像本项目接口就套用自有统一错误结构。
+- 每个上游子目录仍须包含独立的 `openapi.yaml`、`.swag-manifest.yaml` 和单接口完整 YAML，复用本文件的版本、`servers`、`$ref`、中文说明和单接口无 `tags` 规则。
+
 ## 字段来源
 
 字段必须来自真实代码：

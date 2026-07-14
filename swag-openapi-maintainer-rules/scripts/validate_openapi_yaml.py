@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -326,10 +327,22 @@ def build_path_method_counts(interfaces: List[Dict[str, Any]]) -> Dict[str, int]
     return counts
 
 
-def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
+def validate_swag_dir(
+    swag_dir: Path,
+    scope: str = "self",
+    third_party_name: str | None = None,
+) -> Dict[str, Any]:
+    """校验单个 swag 目录及其 manifest。
+
+    [参数] swag_dir: 待校验的 swag 目录；scope: 校验范围，支持 self/third_party；
+    third_party_name: 上游目录名，用于校验 manifest.upstream。
+    [返回] 包含 valid、计数、errors 和 warnings 的校验结果字典。
+    最近修改时间: 2026-07-14 12:14:00（扩展上游 manifest 校验并增加裸文件名安全守卫）
+    """
     errors: List[str] = []
     warnings: List[str] = []
 
+    # 1. 保持原有单目录入口的固定文件检查，供 self scope 和上游 scope 复用。
     openapi_path = swag_dir / "openapi.yaml"
     manifest_path = swag_dir / ".swag-manifest.yaml"
     if not openapi_path.exists():
@@ -339,6 +352,7 @@ def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
     if errors:
         return {"valid": False, "errors": errors, "warnings": warnings}
 
+    # 2. 读取并校验文档基础结构，旧的 self scope 继续沿用原有返回键和值。
     try:
         openapi_doc = read_yaml(openapi_path)
         manifest = read_yaml(manifest_path)
@@ -350,6 +364,22 @@ def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
     if not isinstance(manifest, dict):
         errors.append(".swag-manifest.yaml must be a YAML object")
         manifest = {}
+
+    # 3. 仅在 third_party scope 增加上游来源元数据门禁，避免污染自有接口兼容行为。
+    if scope == "third_party":
+        if manifest.get("source_type") != "upstream":
+            errors.append("source_type must be upstream for third_party scope")
+        if manifest.get("upstream") != third_party_name:
+            errors.append(
+                "upstream must equal third-party directory name: "
+                f"expected {third_party_name}, got {manifest.get('upstream')}"
+            )
+        if not isinstance(manifest.get("base_url"), str) or not manifest.get("base_url", "").strip():
+            errors.append("base_url must be non-empty for third_party scope")
+        if not isinstance(manifest.get("coverage"), str) or not manifest.get("coverage", "").strip():
+            errors.append("coverage must exist for third_party scope")
+    elif scope != "self":
+        errors.append(f"unsupported validation scope: {scope}")
 
     interfaces = manifest_interfaces(manifest)
     expected_count = len(interfaces)
@@ -365,6 +395,17 @@ def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
 
     expected_filenames: List[str] = []
     for interface in interfaces:
+        if scope == "third_party":
+            if not isinstance(interface.get("source_client_file"), str) or not interface.get("source_client_file", "").strip():
+                errors.append(
+                    f"{interface.get('method', '<unknown>')} {interface.get('path', '<unknown>')}: "
+                    "source_client_file is required for generated third_party interface"
+                )
+            if not isinstance(interface.get("discovery_confidence"), str) or not interface.get("discovery_confidence", "").strip():
+                errors.append(
+                    f"{interface.get('method', '<unknown>')} {interface.get('path', '<unknown>')}: "
+                    "discovery_confidence is required for generated third_party interface"
+                )
         expected_filename, filename_issues = expected_interface_filename(interface, path_method_counts)
         expected_filenames.append(expected_filename)
         errors.extend(filename_issues)
@@ -380,6 +421,10 @@ def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
         errors.append(f"manifest interface files must be unique: {duplicate_filenames}")
 
     for filename in single_files:
+        # 裸文件名守卫阻止 manifest 通过目录内路径绕过 scope 隔离，不能只依赖 resolve()。
+        if any(token in str(filename) for token in ("/", "\\", "..")):
+            errors.append(f"manifest file escape / 裸文件名非法: {filename}")
+            continue
         path = (swag_dir / str(filename)).resolve()
         try:
             path.relative_to(swag_dir.resolve())
@@ -430,15 +475,80 @@ def validate_swag_dir(swag_dir: Path) -> Dict[str, Any]:
     }
 
 
+def validate_swag_tree(root_dir: Path) -> Dict[str, Any]:
+    """校验根 swag 目录及其一层上游服务子目录。
+
+    [参数] root_dir: 项目根 swag 目录。
+    [返回] 保留根目录校验结果，并追加 third_party 和 tree_warnings 的结果字典。
+    最近修改时间: 2026-07-14 12:14:00（新增树级编排以校验一层上游目录并保留旧输出结构）
+    """
+    # 1. 先校验根目录，确保旧项目无上游子目录时仍获得原有根级结果。
+    root_result = validate_swag_dir(root_dir, scope="self")
+    third_party_results: List[Dict[str, Any]] = []
+    tree_warnings: List[str] = []
+    if not root_dir.is_dir():
+        root_result["third_party"] = third_party_results
+        root_result["tree_warnings"] = tree_warnings
+        return root_result
+
+    # 2. 只扫描一层目录；没有 openapi.yaml 的目录直接跳过，避免 __pycache__ 等目录产生噪声。
+    for child_dir in sorted((path for path in root_dir.iterdir() if path.is_dir()), key=lambda path: path.name):
+        child_openapi = child_dir / "openapi.yaml"
+        child_manifest = child_dir / ".swag-manifest.yaml"
+        candidate_yaml_files = tuple(child_dir.glob("*.yaml"))
+        if not child_openapi.exists() and not child_manifest.exists():
+            if candidate_yaml_files:
+                tree_warnings.append(f"third_party candidate missing openapi.yaml or manifest: {child_dir}")
+            continue
+        if child_openapi.exists() and child_manifest.exists():
+            print(f"[swag] 上游目录: {child_dir}", file=sys.stderr)
+            result = validate_swag_dir(child_dir, scope="third_party", third_party_name=child_dir.name)
+            third_party_results.append({"name": child_dir.name, **result})
+            continue
+        if child_openapi.exists():
+            tree_warnings.append(
+                f"third_party candidate missing manifest: {child_dir} /.swag-manifest.yaml"
+            )
+        else:
+            tree_warnings.append(f"third_party candidate missing openapi.yaml: {child_dir}")
+
+    # 3. 树级结果单独承载陌生目录警告，避免把上游元数据错误混入根目录 errors。
+    root_result["third_party"] = third_party_results
+    root_result["tree_warnings"] = list(dict.fromkeys(tree_warnings))
+    return root_result
+
+
 def main() -> None:
+    """运行 swag 树校验并输出 JSON 结果。
+
+    [参数] 无；命令行参数通过 argparse 读取。
+    [返回] 无；校验失败时以退出码 1 结束进程。
+    最近修改时间: 2026-07-14 12:14:00（切换到树级校验并增加 stderr 流程日志）
+    """
     parser = argparse.ArgumentParser(description="Validate swag OpenAPI / Swagger YAML assets")
     parser.add_argument("--swag-dir", required=True, help="Path to project swag directory")
     args = parser.parse_args()
 
-    result = validate_swag_dir(Path(args.swag_dir).resolve())
+    # 1. 输出开始日志到 stderr，保证 stdout 仅包含可被 fixture 解析的 JSON 主体。
+    swag_dir = Path(args.swag_dir).resolve()
+    print(f"[swag] 开始校验: {swag_dir}", file=sys.stderr)
+    print(f"[swag] 根目录: {swag_dir}", file=sys.stderr)
+    # 2. 统一校验根目录与一层上游目录，并保留根结果字段供旧调用方读取。
+    result = validate_swag_tree(swag_dir)
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if not result["valid"]:
+    # 3. 根目录或任一已识别上游目录失败时统一返回非零退出码。
+    third_party_invalid = any(not item.get("valid", False) for item in result.get("third_party", []))
+    if not result["valid"] or third_party_invalid:
+        print(
+            f"[swag] 失败摘要: root_valid={result['valid']}, "
+            f"third_party_invalid={third_party_invalid}",
+            file=sys.stderr,
+        )
         raise SystemExit(1)
+    print(
+        f"[swag] 结束: root_valid=True, third_party={len(result.get('third_party', []))}",
+        file=sys.stderr,
+    )
 
 
 if __name__ == "__main__":

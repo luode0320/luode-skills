@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-14 02:07:05",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-14 12:37:30",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 27,
     "doc_total": 10,
-    "references_total": 383,
+    "references_total": 384,
     "agents_total": 93
   },
   "downloaded_seeds": {
@@ -4543,7 +4543,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 19,
-          "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
+          "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目自有 HTTP 接口与主动调用的上游/第三方出站接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取自有接口契约，并从 client、请求构造、base URL、响应消费代码读取上游契约；自有接口生成项目根目录 swag/ 下的全量 OpenAPI/Swagger YAML，上游接口按服务生成 swag/<vendor-slug>/ 下的独立成套文档。每个接口单独一个 YAML，同时维护对应目录的 openapi.yaml 与 manifest。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 树下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
           "directory_path": "swag-openapi-maintainer-rules",
@@ -4563,6 +4563,7 @@ window.SKILL_DICTIONARY = {
             "swag-openapi-maintainer-rules/references/discovery-rules.md",
             "swag-openapi-maintainer-rules/references/naming-rules.md",
             "swag-openapi-maintainer-rules/references/schema-rules.md",
+            "swag-openapi-maintainer-rules/references/third-party-discovery-rules.md",
             "swag-openapi-maintainer-rules/references/validation-rules.md"
           ],
           "agents": [],
@@ -9283,7 +9284,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 19,
-      "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目所有 HTTP 接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，生成或更新项目根目录 swag/ 下的全量接口 OpenAPI/Swagger YAML；每个接口单独一个 YAML，同时维护一个包含所有接口的总 YAML。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 目录下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
+      "auto_trigger": "当用户要求生成、补齐、刷新、维护项目 swag、更新 swag、导出 Apifox/OpenAPI/Swagger 接口文档，或需要让项目自有 HTTP 接口与主动调用的上游/第三方出站接口持续同步为 YAML 文档时触发。负责从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取自有接口契约，并从 client、请求构造、base URL、响应消费代码读取上游契约；自有接口生成项目根目录 swag/ 下的全量 OpenAPI/Swagger YAML，上游接口按服务生成 swag/<vendor-slug>/ 下的独立成套文档。每个接口单独一个 YAML，同时维护对应目录的 openapi.yaml 与 manifest。单接口 YAML 默认直导入 Apifox 选中的目录，不额外生成父目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文简介后缀必须去掉数字前缀、序号和无业务意义的特殊符号；头部、请求参数、响应字段都必须有中文说明，可在证据充分时做受控推导。本 skill 只生成或维护 swag/ 树下的 YAML 文档产物，不修改后端代码中的 Swagger 注解、框架接入或调试入口（那属于 api-swagger-rules）；不要用它代替 api-swagger-rules、业务接口实现、接口需求设计、功能测试或线上联调。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "swag-openapi-maintainer-rules/SKILL.md",
       "directory_path": "swag-openapi-maintainer-rules",
@@ -9303,6 +9304,7 @@ window.SKILL_DICTIONARY = {
         "swag-openapi-maintainer-rules/references/discovery-rules.md",
         "swag-openapi-maintainer-rules/references/naming-rules.md",
         "swag-openapi-maintainer-rules/references/schema-rules.md",
+        "swag-openapi-maintainer-rules/references/third-party-discovery-rules.md",
         "swag-openapi-maintainer-rules/references/validation-rules.md"
       ],
       "agents": [],

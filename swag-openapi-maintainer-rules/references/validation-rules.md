@@ -19,6 +19,18 @@
 13. `$ref` 无并列字段。
 14. `git diff --check` 通过。
 
+## 上游接口校验
+
+使用 `--swag-dir swag` 时，校验器必须同时检查根目录自有接口和每个一层 `swag/<vendor-slug>/` 上游服务子目录：
+
+- 上游子目录存在独立 `openapi.yaml` 与 `.swag-manifest.yaml`，manifest 的 `source_type` 为 `upstream`，且 `upstream` 等于子目录 slug。
+- 上游 manifest 的 `base_url` 非空，`coverage` 存在，接口均有 `source_client_file` 和 `discovery_confidence`。
+- 上游 manifest 的 `file` 必须是裸文件名，不得含 `/`、`\\` 或 `..`；根 manifest 与上游 manifest 不得跨目录登记文件。
+- 每个上游子目录独立校验 operation 数、单接口文件、中文说明、`$ref` 和文件名映射；根校验结果不因上游字段缺失而被错误污染。
+- 无 manifest 的陌生目录（例如 `__pycache__`）进入 `tree_warnings`，不因目录本身硬失败；有 YAML 但缺 manifest 的上游候选目录必须记录警告。
+
+旧项目没有上游子目录时，根目录校验行为保持兼容，输出新增 `third_party: []` 与 `tree_warnings` 字段，但既有根级校验键和值不改变。
+
 ## 推荐命令
 
 ```bash

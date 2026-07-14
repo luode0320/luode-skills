@@ -17,6 +17,57 @@ swag/
 
 禁止在 `swag/` 外生成并行正式 OpenAPI / Swagger YAML。
 
+## 上游服务子目录结构与命名
+
+本项目主动发起的外部第三方 API 和公司内部其他服务调用，统一称为上游接口，独立落在 `swag/<vendor-slug>/`。采用 B1 结构：每个上游服务子目录自成一套可独立导入的文档资产，不与自有接口或其他上游服务共用 manifest。
+
+```text
+swag/
+  openapi.yaml
+  .swag-manifest.yaml
+  moonpay/
+    openapi.yaml
+    .swag-manifest.yaml
+    v3_currencies_币种列表.yaml
+```
+
+约束如下：
+
+- `<vendor-slug>` 必须是稳定的 ASCII 小写 slug，只允许 `[a-z0-9-]`，且不得为空；同一上游服务刷新时必须复用原 slug。
+- 只允许一层上游服务子目录，即 `swag/<vendor-slug>/`；不在上游子目录下继续嵌套 vendor 目录。
+- 上游子目录复用本文件的单接口路径名、method 冲突、中文后缀清洗和长度截断规则。
+- 根 `swag/` 只维护自有接口；根 `openapi.yaml` 不聚合上游接口，根 manifest 也不得登记上游文件。
+
+上游 manifest 至少包含以下字段：
+
+```yaml
+generated_by: swag-openapi-maintainer-rules
+source_type: upstream
+upstream: moonpay
+base_url: https://api.moonpay.com
+coverage: partial
+updated_at: "2026-07-14 10:00:00"
+openapi_file: openapi.yaml
+interfaces:
+  - method: GET
+    path: /v3/currencies
+    operationId: v3_currencies_get
+    summary: 币种列表
+    summary_source: explicit
+    file: v3_currencies_币种列表.yaml
+    generated: true
+    source_client_file: internal/client/moonpay/currencies.go
+    source_symbols:
+      - MoonpayClient.ListCurrencies
+    discovery_confidence: high
+```
+
+- `source_type` 是区分自有与上游的唯一开关；上游固定使用 `upstream`。
+- `upstream` 必须等于当前子目录名；`base_url` 必须记录代码实际使用或配置解析后的上游根地址。
+- `coverage: partial` 表示只记录本项目代码实际调用并成功确定契约的接口子集，不代表上游服务的完整 API 面。
+- `source_client_file`、`source_symbols` 和 `discovery_confidence` 用于回溯出站调用来源；无法稳定确定 method、path、响应消费结构或来源文件时，必须标记待确认并阻断该接口通过。
+- 每个接口的 `file` 必须是当前上游子目录内的裸文件名，不得包含 `/`、`\\` 或 `..`；`openapi_file` 也只能指向当前子目录内的保留文件。
+
 ## 单接口文件命名
 
 基础规则：
@@ -117,6 +168,12 @@ interfaces:
 3. 不删除 `openapi.yaml` 和 `.swag-manifest.yaml`。
 4. 若中文简要说明变化导致文件名变化，且旧文件由本 skill 生成，则在 manifest 更新后删除旧文件。
 5. 删除前必须确认目标路径仍在 `swag/` 目录内，禁止路径穿越。
+
+上游清理必须额外满足目录隔离守卫：
+
+1. 只有上游子目录内 `source_type: upstream` 且 `generated: true` 的文件可由该上游 manifest 清理。
+2. 根 manifest 的清理只能作用于根 `swag/` 裸文件，不能解析或删除任何子目录文件。
+3. 上游 manifest 只能清理自身 vendor slug 目录内的裸文件，禁止通过 `file` 字段跨目录、回到根目录或进入其他上游目录。
 
 ## OperationId
 

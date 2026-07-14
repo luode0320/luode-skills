@@ -523,10 +523,10 @@
 ### Swag OpenAPI 全量维护规则
 - 别名: swag-openapi-maintainer-rules, 更新 swag, OpenAPI YAML 资产
 - 类型: API 文档资产规则
-- 定义: 当用户要求生成、补齐、刷新、维护项目 swag，或导出 Apifox / OpenAPI / Swagger YAML 时，触发 `swag-openapi-maintainer-rules`。该 skill 负责从当前代码真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取接口契约，维护项目根目录 `swag/` 作为唯一正式输出目录；每个接口一个可独立导入 Apifox 的完整 YAML，同时维护 `swag/openapi.yaml` 全量总文件和 `swag/.swag-manifest.yaml` 路由到文件映射。单接口 YAML 默认不写 operation `tags`，导入 Apifox 时直接进入用户选中的目录；单接口文件名默认采用“路径名 + 中文简要说明”格式，中文说明优先取显式 `summary`，缺失时允许受控推导，仍无法稳定得到时回退纯路径文件名并在 manifest 记录 `summary_source: unresolved`。总 YAML 可保留 `tags` 做全量分组。头部、请求参数、响应字段都必须补齐中文说明，源码注释不足时允许受控推导，但不得编造业务规则。当前代码是唯一真相源，禁止凭历史记忆或旧文档补字段；若项目存在上线测试基线，刷新 swag 后必须同步或提示同步 `doc/5-tests/基线/interface-inventory.yaml`。
+- 定义: 当用户要求生成、补齐、刷新、维护项目 swag，导出 Apifox / OpenAPI / Swagger YAML，或补齐上游/第三方出站接口文档时，触发 `swag-openapi-maintainer-rules`。自有接口继续从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取，维护根 `swag/` 的自有接口全量文档；上游接口从 client、请求构造、base URL 和响应消费代码读取，按 B1 独立落在 `swag/<vendor-slug>/`。上游 manifest 固定使用 `source_type: upstream`、`upstream`、`base_url`、`coverage: partial`、`source_client_file`、`source_symbols` 和 `discovery_confidence`；根 `openapi.yaml` 不聚合上游。每个接口仍使用可独立导入 Apifox 的完整 YAML、单接口无默认 tags、路径名加中文简要说明和中文字段描述；上游只记录本项目实际消费字段，官方资料只能离线受控补充，不能联网抓取或编造字段。根与上游清理按目录隔离，manifest 的 `file` 必须是裸文件名。自有接口若存在上线测试基线，刷新 swag 后继续同步或提示同步 `doc/5-tests/基线/interface-inventory.yaml`；上游子集不自动并入自有基线。
 - 来源: `swag-openapi-maintainer-rules/SKILL.md`
-- 适用范围: HTTP API 文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
-- 更新时间: 2026-07-03
+- 适用范围: 自有 HTTP API 与主动调用的上游/第三方出站接口文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
+- 更新时间: 2026-07-14
 - 状态: 启用
 
 ## 需求与实施文档极致完备化规则
@@ -550,6 +550,23 @@
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.swag-upstream-openapi
+    name: "上游与第三方出站接口文档规则"
+    type: "API 文档资产规则"
+    aliases:
+      - swag-openapi-maintainer-rules
+      - 上游接口文档
+      - 第三方出站接口文档
+      - swag/<vendor-slug>
+    definition: "自有接口继续在根 swag/ 维护全量文档；本项目主动调用的外部第三方 API 与内部其他服务按 B1 独立落在 swag/<vendor-slug>/，每个子目录自带 openapi、manifest 和单接口 YAML。上游 manifest 固定使用 source_type: upstream、upstream、base_url、coverage: partial、source_client_file、source_symbols、discovery_confidence；只记录代码实际调用和消费字段，根与上游清理按目录隔离，file 必须是裸文件名。"
+    scope: "swag-openapi-maintainer-rules 的出站调用发现、OpenAPI 生成、递归校验与 Apifox 导入"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.swag-openapi-maintainer
+      - evidence.dialog.swag-upstream-openapi
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-14
   - entity_id: rule.imagegen-error-case-evolution
     name: "Imagegen 错误案例持续演进"
     type: "Skill 维护规则"
@@ -879,6 +896,16 @@ relations:
       - evidence.skill.git-collaboration
     status: "active"
 evidence:
+  - evidence_id: evidence.skill.swag-openapi-maintainer
+    type: "skill"
+    source: "swag-openapi-maintainer-rules/SKILL.md 与 references"
+    path: "swag-openapi-maintainer-rules/SKILL.md"
+    note: "上游出站接口触发、B1 子目录、manifest 元数据、递归校验和根/上游隔离规则来源"
+  - evidence_id: evidence.dialog.swag-upstream-openapi
+    type: "dialog"
+    source: "2026-07-14 需求实施计划与离线验证"
+    path: "doc/5-tests/2026-07-14_121425/第三方swag校验升级验证/README.md"
+    note: "7 个离线正反例证明上游 scope、裸文件名守卫、单目录兼容和陌生目录 warning 可验证"
   - evidence_id: evidence.doc.task-blocker-closure
     type: "doc"
     source: "任务阻断收口共享契约"
@@ -1071,6 +1098,7 @@ contexts:
     note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
 lifecycle:
   active:
+    - "rule.swag-upstream-openapi"
     - "rule.task-blocker-closure"
     - "rule.imagegen-error-case-evolution"
     - "rule.execution-failure-learning"
@@ -1094,6 +1122,14 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    上游接口文档:
+      - "rule.swag-upstream-openapi"
+    第三方出站接口文档:
+      - "rule.swag-upstream-openapi"
+    swag/<vendor-slug>:
+      - "rule.swag-upstream-openapi"
+    source_type upstream:
+      - "rule.swag-upstream-openapi"
     任务阻断收口:
       - "rule.task-blocker-closure"
     任务已阻断:
