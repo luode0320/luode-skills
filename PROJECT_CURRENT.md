@@ -2,30 +2,44 @@
 
 ## 当前任务
 
-- 目标：升级 `obsidian-knowledge-flow`，将执行期间的非预期失败、异常、编码/JSON/命令问题转为可检索的脱敏正反例和持续状态事件。
-- 范围：Obsidian 执行案例契约、`execution-failure-learning-rules` 的动态持久化边界、bridge-only 写入、离线契约测试和字典同步。
-- 非范围：新建独立 skill、静态 casebook 动态追加、直接文件系统写 vault、Git 推送或历史改写。
-- 状态：本地实现与离线验证完成；真实 vault 沉淀因未注册阻断。
+- 目标：为 `swag-openapi-maintainer-rules` 增加上游/第三方出站接口文档能力。
+- 范围：B1 上游子目录契约、5 个 references 扩展、新增第三方发现规则、递归校验脚本、7 用例离线 fixture、字典刷新与项目记忆同步。
+- 非范围：不改 `api-swagger-rules` / `api-request-rules` / `编码skill.md`，不联网抓取上游文档，不到真实业务项目生成第三方 swag，不接入自有上线测试基线，不推送远端。
+- 状态：任务 1-4 已完成并真实验证，已完成本地提交，未推送远端。
 
 ## 已完成
 
-- 执行案例唯一落点为 `知识库/20-Knowledge/execution-failure-cases/<owner>/<case>.md`，静态 casebook 仅作种子与回归基线。
-- 案例契约保留失败特征、反例、正例、验证证据和追加式状态事件；只有 `active` 且 scope、工具主版本、输入指纹精确匹配时才自动复用。
-- 受控 UTF-8 渲染器执行 local-only、脱敏、去重键、状态枚举和 `superseded` 终态校验。
-- 离线执行案例契约测试 10 项通过，Python 编译、`git diff --check` 和 skill 字典生成通过。
+- 契约冻结为 B1：每个 `swag/<vendor-slug>/` 独立维护 `openapi.yaml`、`.swag-manifest.yaml` 与单接口 YAML。
+- 上游 manifest 固定使用 `source_type: upstream`、`upstream`、`base_url`、`coverage: partial`、`source_client_file`、`source_symbols` 与 `discovery_confidence`。
+- 根目录自有接口与上游目录校验隔离；根 `openapi.yaml` 不聚合上游；manifest 文件字段必须是裸文件名。
+- `validate_openapi_yaml.py` 已支持 `validate_swag_dir(scope)` 与 `validate_swag_tree`，陌生目录按 YAML 存在性产生 `tree_warnings`。
+- 离线测试资产已落在 `doc/5-tests/2026-07-14_121425/`，中文说明目录只放 README，Python 资产位于 ASCII 镜像目录。
+- 7/7 离线用例通过，覆盖正例、中文说明缺失、manifest 映射、路径逃逸、source_type 缺失、单目录兼容和陌生目录 warning。
+- 实现自审已落盘至 `doc/6-审查/2026-07-14_122718_需求-swag第三方接口文档能力升级_实现自审.md`，结论通过。
+- 当前改动总审查已落盘至 `doc/6-审查/2026-07-14_124241_需求-swag第三方接口文档能力升级_当前改动总审查.md`，结论通过且无 P0/P1 阻断。
+
+## 本轮收口
+
+- `python skill-dictionary/generate_dictionary.py` 已成功刷新 `skill-dictionary/data.js` 与根 `字典.md`。
+- `PROJECT_MEMORY.md` 已回写上游 swag 稳定契约、人类阅读区和机器索引区；机器索引 YAML 解析通过。
+- `git diff --check`、Python 编译、离线 7 用例和审查文档均已完成；提交后工作树已清空。
 
 ## 阻断
 
-- Obsidian 沉淀阻断：bridge doctor 返回 `VAULT_NOT_REGISTERED`，固定 vault `D:\obsidian_data` 未注册；未使用文件系统写入替代，未声称案例已持久化。
+- 当前无影响原始目标的环境阻断。
+- 本次执行中曾出现两项已修正的测试 fixture/边界问题：缺中文说明用例误断言根 `valid`，以及陌生目录含普通 YAML 时脚本未发 warning；修正后 7/7 通过。
 
 ## 验证
 
-- `python -m unittest discover -s doc/5-tests/2026-07-14_015624/obsidian-knowledge-flow -p "test_*.py" -v`：9 项通过。
-- `python -m py_compile obsidian-knowledge-flow/scripts/render_execution_case.py`：通过。
+- `$env:PYTHONUTF8='1'; python doc/5-tests/2026-07-14_121425/swag-openapi-maintainer-rules/scripts/validate_openapi_yaml_third_party_test.py`：7/7 通过。
+- 测试主程序通过 CLI 真实入口校验退出码、stdout JSON、root/third_party scope、裸文件名错误和 `tree_warnings`。
+- `validate_swag_dir(swag_dir)` 与无上游 fixture 的旧根级结果逐键一致。
 - `git diff --check`：通过。
-- `python skill-dictionary/generate_dictionary.py`：84 个已实现 skill，0 个缺失计划项。
-- `python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py doctor --json`：阻断，`VAULT_NOT_REGISTERED`。
+- `python skill-dictionary/generate_dictionary.py`：84 个已实现 skill，0 个缺失计划项；swag description 与新增 reference 已刷新。
+- `PROJECT_MEMORY.md` 机器索引抽取与 YAML 解析：通过。
+- CodeGraph：已安装，当前仓库索引状态 up to date；未执行写入型重建。
 
 ## 交接点
 
-- 本地升级已收口。恢复真实沉淀时，从 bridge doctor 重新进入，再按 `search/read/create-or-append/readback` 顺序写入脱敏案例；不得直接写 vault 文件或静态 casebook。
+- 当前已完成任务 4；最大边界已达到计划定义的字典/记忆更新、门禁复核和本地提交收口。
+- 不执行远端推送或业务项目真实 swag 生成。
