@@ -121,6 +121,10 @@
     {
       "path": "/home/luode/code/ellipal_activity_world_cup",
       "name": "世界cup活动"
+    },
+    {
+      "path": "/home/luode/code/ellipal_stat",
+      "name": "数据统计清洗服务"
     }
   ]
 }
