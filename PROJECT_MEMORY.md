@@ -137,10 +137,10 @@
 ### 代码生成风格入口链路
 - 别名: 代码风格契约, 生成代码前风格总控, PROJECT_STYLE 应用入口
 - 类型: 流程规则
-- 定义: 新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；后续实现必须按契约落地。`project-style-rules` 继续只维护 `PROJECT_STYLE.md` 长期风格记忆，`code-style-consistency-rules` 基于本轮契约检查局部一致性。
+- 定义: 新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；如果当前上下文已形成高度统一的局部风格，新增内容只做必要模板替换，不加入多余代码；如果实现已有接口，必须优先查找并参考既有接口实现，记录参考实现或无参考实现的降级依据；后续实现必须按契约落地。`project-style-rules` 继续只维护 `PROJECT_STYLE.md` 长期风格记忆，`code-style-consistency-rules` 基于本轮契约检查局部一致性。
 - 来源: 对话确认、`code-generation-style-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`
 - 适用范围: 编码基线域、仓库级规则自举、代码生成与修改
-- 更新时间: 2026-07-05
+- 更新时间: 2026-07-15
 - 状态: 启用
 
 ### 简单检查职责就地表达规则
@@ -732,7 +732,7 @@ entities:
       - 代码风格契约
       - 生成代码前风格总控
       - PROJECT_STYLE 应用入口
-    definition: "新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；`project-style-rules` 只维护长期风格记忆，`code-style-consistency-rules` 基于契约检查局部一致性。"
+    definition: "新增、修改或重构任意代码、脚本、测试支撑代码或配置型代码前，必须先由 `code-generation-style-rules` 读取用户本轮要求、目标文件 / 同目录样例、根目录 `PROJECT_STYLE.md` 和已命中的编码类 skill，形成本轮代码风格契约；高度统一的局部上下文只允许必要模板替换，不得加入多余代码；实现已有接口时必须优先参考既有接口实现并记录参考或降级依据；`project-style-rules` 只维护长期风格记忆，`code-style-consistency-rules` 基于契约检查局部一致性。"
     scope: "编码基线域、仓库级规则自举、代码生成与修改"
     status: "active"
     evidence_ids:
@@ -740,7 +740,7 @@ entities:
       - evidence.skill.project-agents-bootstrap
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-05
+    updated_at: 2026-07-15
   - entity_id: rule.simple-check-inline-readability
     name: "简单检查职责就地表达"
     type: "代码可读性规则"

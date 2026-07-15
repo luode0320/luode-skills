@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-14 12:37:30",
+  "generated_at": "2026-07-15 15:27:37",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 27,
     "doc_total": 10,
-    "references_total": 384,
+    "references_total": 385,
     "agents_total": 93
   },
   "downloaded_seeds": {
@@ -1984,7 +1984,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "开始编码即并行生效的基础质量规则",
           "domain_order": 5,
           "item_order": 1,
-          "auto_trigger": "当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”，约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。",
+          "auto_trigger": "当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”；当修改上下文已经形成高度统一的编码风格时，必须优先原样延续局部结构，新增内容只做必要的模板替换，不引入多余代码；当实现已有接口时，必须优先查找并参考项目中已经实现该接口的样例，沿用其结构和表达方式。该 skill 同时约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。",
           "core_responsibility": "读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约，约束后续实现风格。",
           "skill_path": "code-generation-style-rules/SKILL.md",
           "directory_path": "code-generation-style-rules",
@@ -2001,6 +2001,7 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "code-generation-style-rules/references/local-context-and-interface-style.md",
             "code-generation-style-rules/references/post-change-style-gate.md",
             "code-generation-style-rules/references/pre-coding-checklist.md",
             "code-generation-style-rules/references/style-contract-template.md",
@@ -6797,7 +6798,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "开始编码即并行生效的基础质量规则",
       "domain_order": 5,
       "item_order": 1,
-      "auto_trigger": "当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”，约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。",
+      "auto_trigger": "当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”；当修改上下文已经形成高度统一的编码风格时，必须优先原样延续局部结构，新增内容只做必要的模板替换，不引入多余代码；当实现已有接口时，必须优先查找并参考项目中已经实现该接口的样例，沿用其结构和表达方式。该 skill 同时约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。",
       "core_responsibility": "读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约，约束后续实现风格。",
       "skill_path": "code-generation-style-rules/SKILL.md",
       "directory_path": "code-generation-style-rules",
@@ -6814,6 +6815,7 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "code-generation-style-rules/references/local-context-and-interface-style.md",
         "code-generation-style-rules/references/post-change-style-gate.md",
         "code-generation-style-rules/references/pre-coding-checklist.md",
         "code-generation-style-rules/references/style-contract-template.md",
