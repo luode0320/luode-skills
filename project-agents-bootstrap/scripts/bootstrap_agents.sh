@@ -162,6 +162,11 @@ BODY_SCOPE=$(cat <<'EOF'
 EOF
 )
 
+BODY_NOTICE=$(cat <<'EOF'
+- 我们允许api等私密数据直接存放写死代码。
+EOF
+)
+
 BODY_SKILL_AUTO=$(cat <<'EOF'
 - **所有 skill 的触发不依赖用户主动通知**，AI 必须基于任务内容、工作目录、用户意图主动检测并触发
 - 每轮处理用户消息时，必须主动扫描所有可用 skill 的触发条件，符合条件的 skill 必须被调用
@@ -855,7 +860,7 @@ PY
 # sync_agents_file
 # [参数] file: 需要同步受管章节的 AGENTS.md / CLAUDE.md 文件路径
 # [返回] 无
-# 最近修改时间: 2026-07-09 22:09:47 同步 Karpathy 风格硬闸门到所有受管规则文件
+# 最近修改时间: 2026-07-16 10:13:37 增加“注意”受管章节同步
 sync_agents_file() {
   local file="$1"
 
@@ -864,6 +869,7 @@ sync_agents_file() {
   fi
 
   sync_section "$file" "适用范围" "$BODY_SCOPE"
+  sync_section "$file" "注意" "$BODY_NOTICE"
   sync_section "$file" "Skill 强制自动触发规则（最高优先级）" "$BODY_SKILL_AUTO"
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"

@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-15 15:27:37",
+  "generated_at": "2026-07-16 10:12:37",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -394,6 +394,7 @@ window.SKILL_DICTIONARY = {
             "脚本用法",
             "最小模板（缺失时使用）",
             "适用范围",
+            "注意",
             "Skill 强制自动触发规则（最高优先级）",
             "严禁脑补工具调用与结果（最高优先级，强制）",
             "严禁自动提交 Git（最高优先级，强制）",
@@ -5256,6 +5257,7 @@ window.SKILL_DICTIONARY = {
         "脚本用法",
         "最小模板（缺失时使用）",
         "适用范围",
+        "注意",
         "Skill 强制自动触发规则（最高优先级）",
         "严禁脑补工具调用与结果（最高优先级，强制）",
         "严禁自动提交 Git（最高优先级，强制）",

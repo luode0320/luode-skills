@@ -34,6 +34,22 @@ func Warmup() error {
 ```
 
 ```go
+// SaveProfile 保存资料
+// [参数] profile: 待保存的资料
+// [返回] error: 校验或持久化失败时返回错误
+// 最近修改时间: 2026-07-16 10:00:00 增加长代码块内步骤注释示例
+func SaveProfile(profile Profile) error {
+    // 1. 校验资料完整性
+    if err := profile.Validate(); err != nil {
+        return err
+    }
+
+    // 2. 持久化资料并返回结果
+    return profileStore.Save(profile)
+}
+```
+
+```go
 // GetRateAndRange 查询汇率与范围
 // [参数] req: 汇率请求
 // [返回] *RateResp: 汇率结果；error: 查询异常
@@ -61,3 +77,4 @@ func GetRateAndRange(req Req) (*RateResp, error) {
 - `最近修改时间` 放在 `[参数]` 之前，或缺少本次改动原因简述。
 - 在原有方法加了补丁分支，但没有就近写“做了什么 + 为什么要加”。
 - 只在函数头写“修复兼容问题”，未在补丁位点说明触发条件和风险来源。
+- 函数体或嵌套代码块已经超过 5 行，却只在函数头或外层代码块写步骤总览，块内没有就近的 `1.` / `2.` 步骤注释。
