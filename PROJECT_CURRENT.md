@@ -2,24 +2,20 @@
 
 ## 当前任务
 
-- 目标：为 `code-generation-style-rules` 增加局部统一风格延续和既有接口实现参考规则。
-- 范围：目标 skill、五份 references、既有代码风格需求/验收/实施文档、测试证据、项目记忆、项目风格和字典产物。
-- 非范围：不改业务代码、不新增 skill、不改 `code-style-consistency-rules` 核心职责、不改字典脚本、不提交或推送 Git。
-- 状态：本轮规则资产、文档、测试、审查、字典、项目记忆和最终验收均已完成；工作树保留未提交改动。
+- 目标：升级代码注释相关 skill，明确代码块超过 5 行非空代码/注释行时必须在代码块内部补步骤注释。
+- 范围：`comment-completion-gate-rules`、`comment-placement-granularity-rules` 及其步骤编号、注释落点、颗粒度和样例 references；同步 `PROJECT_STYLE.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 与技能字典产物。
+- 非范围：不改业务代码、不新增 skill、不改变中文表达或 Swagger 注解职责；本轮只做本地提交，不推送 Git。
+- 状态：规则资产、长期记忆、项目风格、字典刷新和静态校验均已完成；本轮改动按审查、规则资产和项目文档域分批本地提交。
+- 旁路改动：`project-agents-bootstrap` 的“注意”受管章节及同步脚本改动已按用户当前轮授权一并纳入规则资产提交。
 
 ## 已完成
 
-- 新增 `code-generation-style-rules/references/local-context-and-interface-style.md`。
-- 更新 `code-generation-style-rules/SKILL.md`，加入局部风格证据、接口参考实现、最小新增内容和多余代码驳回规则。
-- 更新编码前清单、风格优先级、风格契约模板和写后风格闸门。
-- 回开既有需求、验收标准、实施总览和实施周期02，增加 `REQ-07/08`、`RULE-05/06`、`AC-06/07/08` 及对应任务/测试追踪。
-- 更新 `PROJECT_STYLE.md` 与 `PROJECT_MEMORY.md` 的长期规则。
-- 创建测试任务 `doc/5-tests/2026-07-15_145924/`，完成局部风格、接口实现和写后闸门证据。
-- 运行需求、验收、实施总览、周期02、周期03、测试、审查和最终验收 profile，均通过。
-- 刷新 `skill-dictionary/data.js` 与根目录 `字典.md`。
-- 完成实现自审、当前改动总审查和 `SKILL-COMPLIANCE PASS` / `SKILL-AUDIT PASS`。
-- 通过 Obsidian bridge 检索、创建规则知识笔记、更新 INDEX 并 readback 验证。
-- 创建最终验收文档并正式放行本轮需求。
+- 为函数/方法体、闭包体和连续控制流代码块增加“超过 5 行非空代码/注释行”门槛，空行不计。
+- 明确每个超长代码块独立判断，步骤注释必须位于对应代码块内部并就近落位；嵌套超长块不能只依赖外层编号。
+- 同步更新注释补齐闸门、注释放置颗粒度、优先范围、步骤编号 reference、注释示例和颗粒度 reference。
+- 将新规则回写到 `PROJECT_STYLE.md` 和 `PROJECT_MEMORY.md`，并追加 `PROJECT_HISTORY.md` 事件。
+- 运行 `python skill-dictionary/generate_dictionary.py`，刷新 `skill-dictionary/data.js` 与 `字典.md` 的生成时间。
+- 完成 `git diff --check`、PROJECT_MEMORY 机器索引 YAML 解析、UTF-8 读取和规则关键词一致性校验。
 
 ## 待完成
 
@@ -27,16 +23,18 @@
 
 ## 阻断
 
-- 当前无影响原始目标的环境阻断。
-- 若局部样例或接口实现风格无法按最近同模块和稳定多数原则收敛，必须记录 `GAP-*` 并停止，不得静默选择个人偏好。
+- 当前无影响原始目标的阻断。
+- 本轮不执行 Git 推送；本地提交授权已由用户在当前轮明确给出。
 
 ## 验证
 
-- 实施前基线：需求、验收、实施总览和实施周期02 profile 均已通过 `validate_engineering_docs.py`。
-- 当前验证状态：所有计划内测试、文档校验、审查、合规和最终验收均通过。
+- `git diff --check`：通过。
+- `python skill-dictionary/generate_dictionary.py`：通过，生成 `implemented_total: 84`、`planned_missing: 0`。
+- `PROJECT_MEMORY.md` 机器索引 YAML：通过，实体 21 个、证据 35 个。
+- 注释规则 UTF-8 与关键词一致性校验：通过，9 个文件。
 - 验证环境：仅使用本地工作区和本地 Python，不连接数据库、缓存、消息队列或外部业务服务。
 
 ## 交接点
 
-- 当前已完成最终收口；不得执行 Git 历史写入。
-- 最大推进边界：完成本轮规则资产、文档、测试、审查、验收、记忆和字典收口；不扩展到业务代码或全仓库风格清洗。
+- 当前目标已完成；规则、记忆、字典和审查文档按提交域完成本地提交，不推送远端。
+- 最大推进边界：只收口本轮代码注释规则升级及其必要的项目记忆、风格、历史和字典同步，不扩展到业务代码或全仓库历史注释清洗。

@@ -143,6 +143,15 @@
 - 更新时间: 2026-07-15
 - 状态: 启用
 
+### 长代码块内步骤注释
+- 别名: 代码块五行门槛, 长代码块步骤注释, 代码块内步骤注释
+- 类型: 代码注释规则
+- 定义: 函数/方法体、闭包体和连续控制流代码块按非空行计数（代码行和已有注释行均计入，空行不计），超过 5 行时必须在该代码块内部就近补顶层编号步骤注释；每个超长代码块独立判断，嵌套代码块不能只依赖外层编号，多个步骤按 `1.`、`2.`、`3.` 展开。
+- 来源: 用户本轮需求、`comment-completion-gate-rules/SKILL.md`、`comment-placement-granularity-rules/SKILL.md`
+- 适用范围: 代码注释、步骤注释、注释放置与颗粒度、代码审查
+- 更新时间: 2026-07-16
+- 状态: 启用
+
 ### 简单检查职责就地表达规则
 - 别名: 小函数内联, 避免过度职责拆分, 简单检查不强拆函数
 - 类型: 代码可读性规则
@@ -506,6 +515,7 @@
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
+- 2026-07-16：按用户要求升级注释双 skill，明确超过 5 行有效代码的函数/方法体、闭包体和连续控制流代码块必须在块内就近补顶层步骤注释，嵌套超长代码块单独判断。
 - 2026-07-08：新增工具落点分流 util/common/util 规则，明确项目无关工具归 `util`，引用项目文件、路径、配置或约定的复用工具归 `common/util`。
 - 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
 - 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
@@ -741,6 +751,25 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-15
+  - entity_id: rule.comment-block-step-annotation
+    name: "长代码块内步骤注释"
+    type: "代码注释规则"
+    aliases:
+      - comment-completion-gate-rules
+      - comment-placement-granularity-rules
+      - 代码块五行门槛
+      - 长代码块步骤注释
+      - 代码块内步骤注释
+    definition: "函数/方法体、闭包体和连续控制流代码块按非空有效代码行计数，超过5行时必须在块内就近补顶层编号步骤注释；每个超长代码块独立判断，嵌套代码块不能只依赖外层编号。"
+    scope: "代码注释、步骤注释、注释放置与颗粒度、代码审查"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.comment-completion
+      - evidence.skill.comment-placement
+      - evidence.dialog.comment-block-step-annotation
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-16
   - entity_id: rule.simple-check-inline-readability
     name: "简单检查职责就地表达"
     type: "代码可读性规则"
@@ -973,6 +1002,20 @@ evidence:
     source: "code-generation-style-rules/SKILL.md"
     path: "code-generation-style-rules/SKILL.md"
     note: "代码生成前风格契约入口来源"
+  - evidence_id: evidence.skill.comment-completion
+    type: "skill"
+    source: "comment-completion-gate-rules/SKILL.md"
+    path: "comment-completion-gate-rules/SKILL.md"
+    note: "改动位点注释补齐、步骤编号和代码块长度门槛来源"
+  - evidence_id: evidence.skill.comment-placement
+    type: "skill"
+    source: "comment-placement-granularity-rules/SKILL.md"
+    path: "comment-placement-granularity-rules/SKILL.md"
+    note: "代码块内步骤注释落点与颗粒度来源"
+  - evidence_id: evidence.dialog.comment-block-step-annotation
+    type: "dialog"
+    source: "用户本轮需求"
+    note: "用户要求代码块超过5行时必须进行代码块内步骤注释"
   - evidence_id: evidence.skill.project-agents-bootstrap
     type: "skill"
     source: "project-agents-bootstrap/SKILL.md"
@@ -1198,6 +1241,12 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     生成代码前风格总控:
       - "rule.code-generation-style-contract"
+    代码块五行门槛:
+      - "rule.comment-block-step-annotation"
+    长代码块步骤注释:
+      - "rule.comment-block-step-annotation"
+    代码块内步骤注释:
+      - "rule.comment-block-step-annotation"
     thread-title-rules:
       - "rule.thread-title-process-trigger"
     会话自动重命名:
@@ -1263,6 +1312,10 @@ retrieval_hints:
       - "rule.code-generation-style-contract"
     风格契约:
       - "rule.code-generation-style-contract"
+    代码注释:
+      - "rule.comment-block-step-annotation"
+    注释放置颗粒度:
+      - "rule.comment-block-step-annotation"
     函数拆分:
       - "rule.simple-check-inline-readability"
     局部检查:
@@ -1334,6 +1387,14 @@ retrieval_hints:
       - "rule.implementation-cycle-minimum-task"
     code-generation-style-rules/SKILL.md:
       - "rule.code-generation-style-contract"
+    comment-completion-gate-rules/SKILL.md:
+      - "rule.comment-block-step-annotation"
+    comment-completion-gate-rules/references/comment-step-numbering-gate.md:
+      - "rule.comment-block-step-annotation"
+    comment-placement-granularity-rules/SKILL.md:
+      - "rule.comment-block-step-annotation"
+    comment-placement-granularity-rules/references/comment-placement.md:
+      - "rule.comment-block-step-annotation"
     code-readability-rules/SKILL.md:
       - "rule.simple-check-inline-readability"
     code-readability-rules/references/function-structure-rules.md:
