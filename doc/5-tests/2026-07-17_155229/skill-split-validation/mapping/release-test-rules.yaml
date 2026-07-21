@@ -1,0 +1,260 @@
+schema_version: 1
+doc_purpose: TASK-SPLIT-04-01 原子化映射；把 project-release-test-rules 的规则/资源逐条分配到接口基线组或执行放行组，禁止无主落点，engine 主 owner 唯一。
+source_skill: project-release-test-rules
+source_baseline:
+  skill_md_path: project-release-test-rules/SKILL.md
+  skill_md_bytes: 21732
+  skill_md_md5: 44dd4de1b4d987b47c01f5b2a18328ee
+  agents_openai_path: project-release-test-rules/agents/openai.yaml
+  agents_openai_bytes: 1530
+  agents_openai_md5: 26aa13803638b72879b154ef10292f4c
+  references_count: 14
+  references_total_bytes: 78907
+  scripts_entry_path: project-release-test-rules/scripts/generate_release_test_plan.py
+  scripts_entry_bytes: 73338
+  scripts_entry_md5: ada2daf8d41bcc8a64a40866a4e2d9dd
+  engine_package_path: project-release-test-rules/scripts/release_test_engine/
+  engine_package_module_count: 25
+  fingerprint_report: doc/5-tests/2026-07-17_155229/skill-split-validation/evidence/TASK-SPLIT-04-01-mapping.md
+proposed_skills:
+  group_a:
+    id: project-interface-baseline-rules
+    focus: 维护接口事实基线、Swagger/OpenAPI 双索引、参数来源与依赖图的长期资产库，负责扫描、初始化、对账和漂移判定，只消费 execution engine 的输出文件，不持有 engine 代码
+    trigger_boundary: 项目首次或缺少接口基线、接口基线需要刷新、双索引不一致或漂移、需要判定基线是否过期需要复验
+  group_b:
+    id: project-interface-release-execution-rules
+    focus: 承接 engine 统一 IR、runner/adapter/report/gate 行为、脱敏输出、测试资产归档和最终放行结论，是 engine 唯一行为 owner
+    trigger_boundary: 上线前需要做全项目接口回归测试、需要替代人工判定接口响应、需要输出上线放行结论
+shared_resources:
+  - id: RES-RT-ENGINE-CORE
+    path: scripts/release_test_engine/（25 个模块，含 storage.py、discovery.py、model.py、schema_registry.py、topology.py、graph.py、migrate_baseline.py、parameter_store.py、runner.py、report.py、gate.py、judge.py、resolver.py、safety.py、auth.py、events.py、cli.py、__init__.py、adapters/* 共 9 个协议适配器）
+    owner: group_b
+    migration_action: reference_only
+    note: engine 实现保持原路径不迁移，两个新 skill 都不复制 Python 实现；execution skill 是唯一行为 owner 并负责运行时回写基线资产文件，baseline skill 只在 references 里定义其消费的输出文件 schema（interface-inventory.yaml 等 8 个基线资产文件），不持有引擎代码副本，避免同一段代码被两个 skill 同时声明为主实现。
+  - id: RES-RT-COMPAT-ENTRY
+    path: scripts/generate_release_test_plan.py
+    owner: group_b
+    migration_action: reference_only
+    note: 兼容入口委派给 release_test_engine.cli.run_doctor/run_pipeline；doctor 子命令覆盖基线扫描职能，但入口文件维护权仍归 execution skill 统一持有，baseline skill 只在文档里说明可通过该入口触发扫描。
+  - id: RES-RT-TEST-ISOLATION
+    path: project-release-test-rules/SKILL.md#测试隔离红线（强制，和现有测试域规则一致） (11-16)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 本地 local-only 测试隔离原则（禁止污染生产代码、禁止连接非 local 环境）对两组同等适用，各自在自身 SKILL.md 中重述一份，不视为职责重叠。
+  - id: RES-RT-RESPONSIBILITY-BOUNDARY
+    path: project-release-test-rules/SKILL.md#权责边界与不负责事项 (127-134)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 与 functional-validation-rules、test-regression-rules、test-doc-rules、test-task-root-layout-rules 的边界对两组同等适用，各自重述并按自身范围收窄措辞。
+  - id: RES-RT-CROSS-SKILL-INTEGRATION
+    path: project-release-test-rules/references/existing-test-skill-integration.md（整份文件）
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 与现有测试 skill 集成关系说明对两组同等适用，各自保留一份并按自身职责范围调整措辞，不产生新的行为差异。
+rules:
+  - id: R-RT-001
+    section: frontmatter description
+    source: project-release-test-rules/SKILL.md:2
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 description 混合基线资产扫描/双索引维护与测试执行/agent 判定/放行结论两类职责；拆分后各自只描述本组触发对象与主责，不沿用旧 skill 名或旧前缀。
+  - id: R-RT-002
+    section: "## Skill 作用与适用场景"
+    source: project-release-test-rules/SKILL.md:17-29
+    owner: split
+    migration_action: split
+    note: 基线资产库长期沉淀/双索引对账/依赖图维护/可复用参数生命周期管理 -> group_a；测试范围规划/脚本工具箱复用/agent 自动判定/标准化报告与放行结论 -> group_b。
+  - id: R-RT-003
+    section: "## 自动触发信号"
+    source: project-release-test-rules/SKILL.md:30-36
+    owner: split
+    migration_action: split
+    note: 接口基线不存在或需要刷新对账 -> group_a 独立触发信号；上线前全项目接口回归、替代人工测试、输出准入结论、项目迭代后核心接口验证 -> group_b 独立触发信号。
+  - id: R-RT-004
+    section: "## 首次触发冷启动规则（强制）"
+    source: project-release-test-rules/SKILL.md:37-44
+    owner: group_a
+    migration_action: move
+    note: 核心目的是初始化 doc/5-tests/基线/ 8 个基线资产文件骨架；其中提到的测试根目录/测试计划骨架两条 bullet 是 baseline 冷启动附带的 execution 前置动作，note 中说明 group_b 仍需引用 test-task-root-layout-rules 完成对应骨架。
+  - id: R-RT-005
+    section: "## 接口基线扫描规则（强制）"
+    source: project-release-test-rules/SKILL.md:45-51
+    owner: group_a
+    migration_action: move
+    note: 全量/增量扫描、扫描来源、门禁前置步骤、基线冲突待确认标记，均为接口事实基线的核心职责。
+  - id: R-RT-006
+    section: "## Swagger/OpenAPI 双索引同步规则（强制）"
+    source: project-release-test-rules/SKILL.md:52-58
+    owner: group_a
+    migration_action: move
+    note: 三方接口集合对账、双索引缺失处理、schema_changed 标记、interface-sync-report.yaml 落盘规则，均属接口事实双索引维护。
+  - id: R-RT-007
+    section: "## 基线漂移处理规则（强制）"
+    source: project-release-test-rules/SKILL.md:59-66
+    owner: group_a
+    migration_action: move
+    note: 删除/废弃接口更新基线状态、接口契约变化先更新基线、历史结论推翻标记待重测、reusable-params 标记 stale、影响 final-acceptance-rules 输入完整性时阻断放行，均为基线漂移判定职责。
+  - id: R-RT-008
+    section: "## 基线资产库持续更新规则（强制）"
+    source: project-release-test-rules/SKILL.md:67-75
+    owner: group_a
+    migration_action: move
+    note: 8 个基线资产文件职责定义、可复用参数生命周期字段、P0/P1 复验要求、基线禁止保存明文敏感信息，均为长期资产库结构与治理规则。
+  - id: R-RT-009
+    section: "## 参数依赖与复用规则（强制）"
+    source: project-release-test-rules/SKILL.md:76-82
+    owner: group_b
+    migration_action: move
+    note: 未知必填参数解析顺序、dependency-trace.json 记录、provider 失败标记 BLOCKED_BY_DEPENDENCY/PARAM_UNRESOLVED，均发生在测试执行时构造请求参数阶段，对应 test-data-construction-rules.md，消费 baseline 的 reusable-params.yaml 但不改写其 schema。
+  - id: R-RT-010
+    section: "## 可复用脚本工具箱优先规则（强制）"
+    source: project-release-test-rules/SKILL.md:83-92
+    owner: group_b
+    migration_action: move
+    note: engine 内核路径、兼容入口委派、支持矩阵与 PENDING/BLOCKED 判定、接口级结果枚举、项目门禁枚举，均为 execution engine 行为规则，与 RES-RT-ENGINE-CORE 一致。
+  - id: R-RT-011
+    section: "## 进入后先做什么（第 1-7 条）"
+    source: project-release-test-rules/SKILL.md:94-100
+    owner: group_a
+    migration_action: move
+    note: 确认基线是否存在、读取或初始化长期资产、扫描并对账当前接口事实、双索引对账、输出漂移清单更新基线、可复用参数标记 stale、读取或生成依赖图，均为基线组前置动作。
+  - id: R-RT-012
+    section: "## 进入后先做什么（第 8-13 条）"
+    source: project-release-test-rules/SKILL.md:101-107
+    owner: group_b
+    migration_action: move
+    note: 筛选必测接口集合、创建测试任务目录、准备本地测试前置条件、解析请求参数、定义判定规则、定义输出格式与产物清单，均为执行组前置动作。
+  - id: R-RT-013
+    section: "## 默认执行流程（第 1-5 条）"
+    source: project-release-test-rules/SKILL.md:109-115
+    owner: group_a
+    migration_action: move
+    note: 基线扫描、冷启动生成初版基线、双索引对账刷新、新增删除变更待确认清单更新基线、受影响可复用参数标记 stale，均为基线组默认流程步骤。
+  - id: R-RT-014
+    section: "## 默认执行流程（第 6-17 条）"
+    source: project-release-test-rules/SKILL.md:116-126
+    owner: group_b
+    migration_action: move
+    note: 创建测试目录、筛选必测/可选/跳过接口、构建依赖图执行顺序、准备用例、执行测试、agent 判定、生成报告、输出门禁结论、归档产物、同步测试结论到基线、回写可复用参数与历史摘要、同步 final-acceptance-rules，均为执行组默认流程步骤；回写基线文件由 execution 持有写权限，baseline 只定义其 schema。
+  - id: R-RT-015
+    section: "## 需要暂停并确认的条件"
+    source: project-release-test-rules/SKILL.md:135-143
+    owner: split
+    migration_action: split
+    note: 基线资产结构损坏/可复用参数未脱敏/脚本适配配置缺失关键字段、扫描后仍无法确认接口入口鉴权方式判定规则 -> group_a；本地环境不可用鉴权信息缺失依赖数据无法准备、外部服务连接超时排查代理、agent 无法判断接口是否通过、大量接口异常无法确定实现或环境问题、最终结论 PARTIAL 需要用户确认 -> group_b。
+  - id: R-RT-016
+    section: "## 执行通过 / 驳回标准"
+    source: project-release-test-rules/SKILL.md:144-147
+    owner: split
+    migration_action: split
+    note: 通过标准中的基线扫描/双索引同步/基线对账/长期资产读取更新，以及驳回标准中未先扫描基线/缺少双索引未刷新/接口漂移未回写基线 -> group_a；通过标准中未知参数解析/可复用参数复验/P0P1 接口结果/报告格式/JSON 字符串/agent 判定理由/结论清晰，以及驳回标准中 P0 失败/凭空构造参数/失效参数复用/依赖误判/报告格式不符/结论不清晰 -> group_b。
+  - id: R-RT-017
+    section: "## 执行结果归档要求"
+    source: project-release-test-rules/SKILL.md:148-155
+    owner: split
+    migration_action: split
+    note: README 主结论、接口测试明细报告、双索引同步报告、完整响应与执行日志归档 -> group_b（由执行流程产出）；项目长期测试资产文件清单结构定义 -> group_a（baseline 定义 schema，execution 按此结构写入）。
+  - id: R-RT-018
+    section: "## references 读取规则"
+    source: project-release-test-rules/SKILL.md:157-171
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 按引用的 14 个 reference 文件各自归属拆成两份读取顺序清单；existing-test-skill-integration.md 按 RES-RT-CROSS-SKILL-INTEGRATION 在两份里各保留一条。
+  - id: R-RT-019
+    section: agents/openai.yaml default_prompt
+    source: project-release-test-rules/agents/openai.yaml
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 default_prompt 混合基线扫描对账与测试执行判定放行两类步骤；两个新 skill 各自重写 default_prompt，只描述本组职责范围，不复制整段旧文案。
+  - id: R-RT-020
+    section: "references/interface-inventory-schema.md（整份文件）"
+    source: project-release-test-rules/references/interface-inventory-schema.md
+    owner: group_a
+    migration_action: move
+    note: 接口基线字段结构定义，原文迁移不改语义。
+  - id: R-RT-021
+    section: "references/baseline-asset-rules.md（整份文件）"
+    source: project-release-test-rules/references/baseline-asset-rules.md
+    owner: group_a
+    migration_action: move
+    note: 基线资产库结构、可复用参数生命周期和持续更新策略，原文迁移不改语义。
+  - id: R-RT-022
+    section: "references/bootstrap-workflow.md（整份文件）"
+    source: project-release-test-rules/references/bootstrap-workflow.md
+    owner: group_a
+    migration_action: move
+    note: 首次触发或缺少基线时的冷启动工作流，原文迁移不改语义。
+  - id: R-RT-023
+    section: "references/openapi-inventory-sync-rules.md（整份文件）"
+    source: project-release-test-rules/references/openapi-inventory-sync-rules.md
+    owner: group_a
+    migration_action: move
+    note: Swagger/OpenAPI 双索引同步和三方对账规则，原文迁移不改语义。
+  - id: R-RT-024
+    section: "references/inventory-reconcile-rules.md（整份文件）"
+    source: project-release-test-rules/references/inventory-reconcile-rules.md
+    owner: group_a
+    migration_action: move
+    note: 扫描后对账规则，原文迁移不改语义。
+  - id: R-RT-025
+    section: "references/dependency-graph-rules.md（整份文件）"
+    source: project-release-test-rules/references/dependency-graph-rules.md
+    owner: group_a
+    migration_action: move
+    note: provider / consumer 依赖图和参数绑定构建规则，原文迁移不改语义；execution 消费该依赖图执行测试顺序，不改写其构建规则。
+  - id: R-RT-026
+    section: "references/test-selection-policy.md（整份文件）"
+    source: project-release-test-rules/references/test-selection-policy.md
+    owner: group_b
+    migration_action: move
+    note: 测试范围筛选规则，原文迁移不改语义。
+  - id: R-RT-027
+    section: "references/agent-response-judgement.md（整份文件）"
+    source: project-release-test-rules/references/agent-response-judgement.md
+    owner: group_b
+    migration_action: move
+    note: 接口响应判定规则，原文迁移不改语义。
+  - id: R-RT-028
+    section: "references/report-format.md（整份文件）"
+    source: project-release-test-rules/references/report-format.md
+    owner: group_b
+    migration_action: move
+    note: 测试报告格式规则，原文迁移不改语义。
+  - id: R-RT-029
+    section: "references/execution-gate.md（整份文件）"
+    source: project-release-test-rules/references/execution-gate.md
+    owner: group_b
+    migration_action: move
+    note: 门禁结论输出规则，原文迁移不改语义。
+  - id: R-RT-030
+    section: "references/output-artifacts.md（整份文件）"
+    source: project-release-test-rules/references/output-artifacts.md
+    owner: group_b
+    migration_action: move
+    note: 测试产物清单规则，原文迁移不改语义。
+  - id: R-RT-031
+    section: "references/test-data-construction-rules.md（整份文件）"
+    source: project-release-test-rules/references/test-data-construction-rules.md
+    owner: group_b
+    migration_action: move
+    note: 测试请求参数构造规则，原文迁移不改语义。
+  - id: R-RT-032
+    section: "references/reusable-script-toolbox.md（整份文件）"
+    source: project-release-test-rules/references/reusable-script-toolbox.md
+    owner: group_b
+    migration_action: move
+    note: 可复用测试工具脚本使用规则，原文迁移不改语义，与 RES-RT-ENGINE-CORE 呼应。
+coverage_summary:
+  total_atomized_items: 37
+  owner_group_a_count: 13
+  owner_group_b_count: 13
+  owner_shared_count: 3
+  owner_dedupe_drop_count: 0
+  owner_split_or_rewrite_count: 8
+  unmapped_items: 0
+  count_verified_by: "Select-String -Pattern '^\\s*- id:' 与 '^\\s*owner:' 实测统计，2026-07-20"
+stop_condition_check:
+  any_rule_without_owner: false
+  any_script_resource_without_owner: false
+  duplicate_owner_conflict: false
+  result: pass

@@ -1,0 +1,282 @@
+schema_version: 1
+doc_purpose: TASK-SPLIT-05-01 原子化映射；把 agent-browser 的规则/资源逐条分配到核心会话自动化组或高级验证组，禁止无主落点。
+source_skill: agent-browser
+source_baseline:
+  skill_md_path: agent-browser/SKILL.md
+  skill_md_bytes: 36228
+  skill_md_md5: 59917697eefafef9221d4484cb1d5225
+  references_count: 11
+  templates_count: 4
+  fingerprint_report: doc/5-tests/2026-07-17_155229/skill-split-validation/evidence/TASK-SPLIT-05-01-mapping.md
+proposed_skills:
+  group_a:
+    id: browser-session-automation-rules
+    focus: 隔离 profile/具名并行 session 的核心浏览器自动化：打开页面、快照、交互、认证、等待、截图、批量执行、TAPD 等业务模板
+    trigger_boundary: 需要隔离 profile、具名 session、认证登录、表单交互、数据提取或复用现有命令模板时
+  group_b:
+    id: browser-advanced-testing-rules
+    focus: HAR/网络记录、视觉 diff、trace/profiling、代理、多 session 观测面板等高级验证与观测能力
+    trigger_boundary: 需要网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、代理配置或多 session dashboard 观测时
+shared_resources:
+  - id: RES-AB-SECURITY
+    path: agent-browser/SKILL.md#安全（Content Boundaries/域名白名单/动作策略/输出上限） (483-533)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 域名白名单、内容边界、动作策略、输出上限对核心命令和高级命令同等生效，两组各自重述一份，不视为职责重叠。
+  - id: RES-AB-CONFIG
+    path: agent-browser/SKILL.md#配置文件 (731-744)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: agent-browser.json/环境变量/CLI flag 优先级对所有命令通用，两组各自重述。
+  - id: RES-AB-ENGINE
+    path: agent-browser/SKILL.md#浏览器引擎选择 (760-781)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: "--engine chrome/lightpanda 对核心和高级命令同等适用，两组各自重述。"
+  - id: RES-AB-PROJECT-INTEGRATION
+    path: agent-browser/SKILL.md#项目联调规则（触发规则补充/执行要求补充） (817-836)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 前后端联调路由、local-only 边界、进程收口要求对两组同等适用，各自重述并按自身范围收窄措辞；与 mcp-installation-rules 的路由关系不变。
+  - id: RES-AB-FAILURE-CASEBOOK
+    path: agent-browser/references/execution-failure-casebook.md（整份文件）
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 与 execution-failure-learning-rules 联动的失败案例册对核心和高级命令的执行失败恢复同等适用，两组各自保留一份。
+rules:
+  - id: R-AB-001
+    section: frontmatter description
+    source: agent-browser/SKILL.md:2
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 description 混合隔离 profile/并行 session/batch 与网络 HAR/视觉 diff/录制 trace/代理/非 Chrome 引擎两类触发；拆分后各自只描述本组触发对象。
+  - id: R-AB-002
+    section: "## 核心工作流"
+    source: agent-browser/SKILL.md:11-30
+    owner: group_a
+    migration_action: move
+    note: open -> snapshot -> 交互 -> 重新快照的基本循环，核心自动化模式。
+  - id: R-AB-003
+    section: "## 实战经验优先流程（新增）"
+    source: agent-browser/SKILL.md:32-72
+    owner: group_a
+    migration_action: move
+    note: 页面状态判定、启动参数变更清会话、导航后重抓 ref、证据留存、会话复用优先级、重试限次、截图清理，均为核心执行经验；execution-failure-casebook.md 联动按 RES-AB-FAILURE-CASEBOOK 共享。
+  - id: R-AB-004
+    section: "## 命令链式执行"
+    source: agent-browser/SKILL.md:73-89
+    owner: group_a
+    migration_action: move
+    note: open/wait/snapshot/screenshot 等核心命令的 && 串联，属于核心自动化用法。
+  - id: R-AB-005
+    section: "## 处理认证"
+    source: agent-browser/SKILL.md:90-147
+    owner: group_a
+    migration_action: move
+    note: 五种认证方案（auto-connect state save、持久化 profile、session-name、auth vault、手动 state 文件）均为核心会话能力。
+  - id: R-AB-006
+    section: "## 常用命令（核心子集）"
+    source: agent-browser/SKILL.md:148-243
+    owner: group_a
+    migration_action: split
+    note: 导航、快照、交互、获取信息、等待、下载、视口与设备模拟、捕获（screenshot/pdf）、实时预览/流式、剪贴板、对话框子集迁移到核心组；网络（network requests/route/har）与 diff 子集见 R-AB-007。
+  - id: R-AB-007
+    section: "## 常用命令（网络/Diff 子集）"
+    source: agent-browser/SKILL.md:224-242
+    owner: group_b
+    migration_action: split
+    note: network requests/request/route/har start/stop 以及 diff snapshot/screenshot/url 命令块迁移到高级验证组，与 R-AB-006 同源拆分。
+  - id: R-AB-008
+    section: "## Streaming"
+    source: agent-browser/SKILL.md:243-246
+    owner: group_a
+    migration_action: move
+    note: 每个 session 自带的 WebSocket 流服务属于核心 session 能力，不同于多 session 汇总的 Dashboard（R-AB-025）。
+  - id: R-AB-009
+    section: "## Batch 批量执行"
+    source: agent-browser/SKILL.md:247-264
+    owner: group_a
+    migration_action: move
+    note: JSON 数组批量执行核心命令序列。
+  - id: R-AB-010
+    section: "## 常见模式（除可视化浏览器调试外）"
+    source: agent-browser/SKILL.md:265-434,448-482
+    owner: group_a
+    migration_action: move
+    note: 表单提交、Auth Vault、State 持久化认证、Session 持久化、Iframe、数据提取、并行 Session、连接已运行 Chrome、配色方案、视口响应式测试、本地文件、iOS 模拟器，均为核心自动化模式。
+  - id: R-AB-011
+    section: "### 可视化浏览器（调试）"
+    source: agent-browser/SKILL.md:435-447
+    owner: split
+    migration_action: split
+    note: "--headed/highlight/inspect（打开可视浏览器、高亮元素、打开 DevTools）-> group_a 核心调试；record start（录制视频）与 profiler start/stop（性能 profiling）-> group_b 高级验证，分别对应 video-recording.md 和 profiling.md。"
+  - id: R-AB-012
+    section: "## Diff（验证变化）"
+    source: agent-browser/SKILL.md:534-558
+    owner: group_b
+    migration_action: move
+    note: snapshot/screenshot/url 三种 diff 用法及基线比较流程，均为高级验证能力。
+  - id: R-AB-013
+    section: "## 超时与慢页面"
+    source: agent-browser/SKILL.md:559-582
+    owner: group_a
+    migration_action: move
+    note: 显式等待策略，核心交互稳定性规则。
+  - id: R-AB-014
+    section: "## JavaScript 对话框（alert / confirm / prompt）"
+    source: agent-browser/SKILL.md:583-602
+    owner: group_a
+    migration_action: move
+    note: dialog status/accept/dismiss，核心交互阻塞处理。
+  - id: R-AB-015
+    section: "## Session 管理与清理"
+    source: agent-browser/SKILL.md:603-625
+    owner: group_a
+    migration_action: move
+    note: 具名 session 并行、close/close --all，核心 session 生命周期管理。
+  - id: R-AB-016
+    section: "## 测试截图清理（强制）"
+    source: agent-browser/SKILL.md:626-654
+    owner: group_a
+    migration_action: move
+    note: 截图临时性、强制收口清理、保留例外规则，核心产物治理。
+  - id: R-AB-017
+    section: "## Ref 生命周期（重要）"
+    source: agent-browser/SKILL.md:655-668
+    owner: group_a
+    migration_action: move
+    note: refs 失效场景与重新抓取规则，核心交互基础。
+  - id: R-AB-018
+    section: "## 带标注的截图（Vision 模式）"
+    source: agent-browser/SKILL.md:669-688
+    owner: group_a
+    migration_action: move
+    note: --annotate 标注截图与缓存 refs 直接交互，核心视觉辅助交互。
+  - id: R-AB-019
+    section: "## 语义定位器（Refs 的替代方案）"
+    source: agent-browser/SKILL.md:689-700
+    owner: group_a
+    migration_action: move
+    note: find text/label/role/placeholder/testid，核心定位能力。
+  - id: R-AB-020
+    section: "## JavaScript 求值（eval）"
+    source: agent-browser/SKILL.md:701-730
+    owner: group_a
+    migration_action: move
+    note: eval/--stdin/-b 及 shell 转义规避经验，核心脚本化能力。
+  - id: R-AB-021
+    section: "## 深入文档（引用表）"
+    source: agent-browser/SKILL.md:745-759
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 引用表按 10 个 reference 文件各自归属拆成两份精简表；execution-failure-casebook.md 按 RES-AB-FAILURE-CASEBOOK 在两份里各保留一条。
+  - id: R-AB-022
+    section: "## 观测面板（Observability Dashboard）"
+    source: agent-browser/SKILL.md:782-801
+    owner: group_b
+    migration_action: move
+    note: dashboard install/start/stop 是跨 session 的实时观测能力，属高级验证/监控范畴，区别于单 session 的 Streaming（R-AB-008）。
+  - id: R-AB-023
+    section: "## 可直接使用的模板（引用表）"
+    source: agent-browser/SKILL.md:802-816
+    owner: group_a
+    migration_action: move
+    note: 4 个模板（表单、认证 session、抓取工作流、TAPD 周报）全部基于核心命令，无一使用 HAR/diff/profiling/proxy，整体归核心组。
+  - id: R-AB-024
+    section: "references/authentication.md（整份文件）"
+    source: agent-browser/references/authentication.md
+    owner: group_a
+    migration_action: move
+    note: OAuth/2FA/cookie 认证与 token 刷新模式，原文迁移不改语义。
+  - id: R-AB-025
+    section: "references/browser-operation-lessons.md（整份文件）"
+    source: agent-browser/references/browser-operation-lessons.md
+    owner: group_a
+    migration_action: move
+    note: 浏览器自动化实战经验与失败分流清单，原文迁移不改语义。
+  - id: R-AB-026
+    section: "references/snapshot-refs.md（整份文件）"
+    source: agent-browser/references/snapshot-refs.md
+    owner: group_a
+    migration_action: move
+    note: Ref 生命周期、失效规则与排障，原文迁移不改语义。
+  - id: R-AB-027
+    section: "references/session-management.md（整份文件）"
+    source: agent-browser/references/session-management.md
+    owner: group_a
+    migration_action: move
+    note: 并行 session、状态持久化、并发抓取，原文迁移不改语义。
+  - id: R-AB-028
+    section: "references/screenshot-cleanup.md（整份文件）"
+    source: agent-browser/references/screenshot-cleanup.md
+    owner: group_a
+    migration_action: move
+    note: 测试截图生命周期与清理时机，原文迁移不改语义。
+  - id: R-AB-029
+    section: "references/tapd-workflow-automation.md（整份文件）"
+    source: agent-browser/references/tapd-workflow-automation.md
+    owner: group_a
+    migration_action: move
+    note: TAPD 场景自动化流程，基于核心命令，原文迁移不改语义。
+  - id: R-AB-030
+    section: "references/commands.md（整份文件）"
+    source: agent-browser/references/commands.md
+    owner: group_a
+    migration_action: move
+    note: 完整命令参考（含核心与网络/diff 选项）整份迁移到核心组作为主参考；高级验证组通过章节锚点交叉引用其网络/HAR/diff 小节，不复制整份文件，避免同一份参考被两组同时持有。
+  - id: R-AB-031
+    section: "references/video-recording.md（整份文件）"
+    source: agent-browser/references/video-recording.md
+    owner: group_b
+    migration_action: move
+    note: 调试和留档时的视频录制，原文迁移不改语义。
+  - id: R-AB-032
+    section: "references/profiling.md（整份文件）"
+    source: agent-browser/references/profiling.md
+    owner: group_b
+    migration_action: move
+    note: Chrome DevTools profiling 与性能分析，原文迁移不改语义。
+  - id: R-AB-033
+    section: "references/proxy-support.md（整份文件）"
+    source: agent-browser/references/proxy-support.md
+    owner: group_b
+    migration_action: move
+    note: 代理配置、地域测试、代理轮换，原文迁移不改语义。
+  - id: R-AB-034
+    section: "templates/form-automation.sh（整份文件）"
+    source: agent-browser/templates/form-automation.sh
+    owner: group_a
+    migration_action: move
+    note: 带校验的表单填写流程模板，原文迁移不改语义。
+  - id: R-AB-035
+    section: "templates/authenticated-session.sh（整份文件）"
+    source: agent-browser/templates/authenticated-session.sh
+    owner: group_a
+    migration_action: move
+    note: 登录一次后续复用状态模板，原文迁移不改语义。
+  - id: R-AB-036
+    section: "templates/capture-workflow.sh（整份文件）"
+    source: agent-browser/templates/capture-workflow.sh
+    owner: group_a
+    migration_action: move
+    note: 带截图的内容抓取流程模板，原文迁移不改语义。
+  - id: R-AB-037
+    section: "templates/tapd-weekly-report.sh（整份文件）"
+    source: agent-browser/templates/tapd-weekly-report.sh
+    owner: group_a
+    migration_action: move
+    note: TAPD 我的工作周维度进度统计模板，原文迁移不改语义。
+coverage_summary:
+  total_atomized_items: 42
+  owner_group_a_count: 28
+  owner_group_b_count: 6
+  owner_shared_count: 5
+  owner_dedupe_drop_count: 0
+  owner_split_or_rewrite_count: 3
+  unmapped_items: 0
+  count_verified_by: "Select-String -Pattern '^\\s*- id:' 与 '^\\s*owner:' 实测统计，2026-07-20"
+stop_condition_check:
+  any_rule_without_owner: false
+  any_script_resource_without_owner: false
+  duplicate_owner_conflict: false
+  result: pass

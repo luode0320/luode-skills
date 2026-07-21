@@ -1,0 +1,816 @@
+{
+  "schema_version": 1,
+  "root": "D:\\luode\\luode-skills",
+  "registry_source": "字典.md：主规划域（11.扩展种子之前）",
+  "skill_count": 84,
+  "disk_skill_directory_count": 111,
+  "excluded_extension_seed_count": 27,
+  "excluded_extension_seed_names": [
+    "2d-asset-design",
+    "agent-runtime-recovery-rules",
+    "agent-sprite-forge-design",
+    "artifact-delivery-gate-rules",
+    "authenticated-url-routing-rules",
+    "autonomous-execution-rules",
+    "character-sprite-animation-production",
+    "context-compression-rules",
+    "doc",
+    "execution-failure-learning-rules",
+    "find-skills",
+    "golang-patterns",
+    "image-redbox-focus-rules",
+    "imagegen",
+    "pdf",
+    "plugin-installation-rules",
+    "skill-split-preserve-rules",
+    "spreadsheet",
+    "swag-openapi-maintainer-rules",
+    "time-util-rules",
+    "vercel-react-best-practices",
+    "vue-best-practices",
+    "vue-router-best-practices",
+    "web-design-guidelines",
+    "windows-powershell-environment-rules",
+    "windows-wsl-execution-rules",
+    "work-report-summary-rules"
+  ],
+  "budget_level_counts": {
+    "normal": 71,
+    "review": 7,
+    "hard_warning": 4,
+    "split_candidate": 2
+  },
+  "thresholds": {
+    "skill_md": {
+      "normal_max_bytes": 16000,
+      "review_max_bytes": 20000,
+      "hard_warning_bytes": 24000
+    },
+    "reference": {
+      "normal_max_bytes": 12000,
+      "review_max_bytes": 16000
+    },
+    "default_text": {
+      "normal_max_bytes": 48000,
+      "hard_warning_bytes": 64000
+    }
+  },
+  "skills": [
+    {
+      "name": "team-development-rules",
+      "skill_md_bytes": 6625,
+      "reference_total_bytes": 22361,
+      "reference_max_bytes": 11600,
+      "reference_file_count": 4,
+      "default_text_bytes": 28986,
+      "budget_level": "normal"
+    },
+    {
+      "name": "artifact-storage-rules",
+      "skill_md_bytes": 13500,
+      "reference_total_bytes": 34242,
+      "reference_max_bytes": 12007,
+      "reference_file_count": 5,
+      "default_text_bytes": 47742,
+      "budget_level": "review"
+    },
+    {
+      "name": "project-design-doc-rules",
+      "skill_md_bytes": 7148,
+      "reference_total_bytes": 4616,
+      "reference_max_bytes": 2191,
+      "reference_file_count": 3,
+      "default_text_bytes": 11764,
+      "budget_level": "normal"
+    },
+    {
+      "name": "architecture-doc-rules",
+      "skill_md_bytes": 8034,
+      "reference_total_bytes": 11119,
+      "reference_max_bytes": 4239,
+      "reference_file_count": 4,
+      "default_text_bytes": 19153,
+      "budget_level": "normal"
+    },
+    {
+      "name": "project-local-skills-rules",
+      "skill_md_bytes": 4466,
+      "reference_total_bytes": 2627,
+      "reference_max_bytes": 1362,
+      "reference_file_count": 3,
+      "default_text_bytes": 7093,
+      "budget_level": "normal"
+    },
+    {
+      "name": "mcp-installation-rules",
+      "skill_md_bytes": 16880,
+      "reference_total_bytes": 13024,
+      "reference_max_bytes": 4049,
+      "reference_file_count": 5,
+      "default_text_bytes": 29904,
+      "budget_level": "review"
+    },
+    {
+      "name": "godot-project-bootstrap-rules",
+      "skill_md_bytes": 5005,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 5005,
+      "budget_level": "normal"
+    },
+    {
+      "name": "codegraph-analysis-rules",
+      "skill_md_bytes": 5877,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 5877,
+      "budget_level": "normal"
+    },
+    {
+      "name": "project-agents-bootstrap",
+      "skill_md_bytes": 70027,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 70027,
+      "budget_level": "hard_warning"
+    },
+    {
+      "name": "thread-title-rules",
+      "skill_md_bytes": 8129,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 8129,
+      "budget_level": "normal"
+    },
+    {
+      "name": "parallel-task-dispatch-rules",
+      "skill_md_bytes": 8224,
+      "reference_total_bytes": 9080,
+      "reference_max_bytes": 5852,
+      "reference_file_count": 3,
+      "default_text_bytes": 17304,
+      "budget_level": "normal"
+    },
+    {
+      "name": "skill-evolution-rules",
+      "skill_md_bytes": 7841,
+      "reference_total_bytes": 6365,
+      "reference_max_bytes": 2095,
+      "reference_file_count": 4,
+      "default_text_bytes": 14206,
+      "budget_level": "normal"
+    },
+    {
+      "name": "skill-hit-check-rules",
+      "skill_md_bytes": 9754,
+      "reference_total_bytes": 5793,
+      "reference_max_bytes": 4681,
+      "reference_file_count": 2,
+      "default_text_bytes": 15547,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-snippet-location-rules",
+      "skill_md_bytes": 5709,
+      "reference_total_bytes": 1872,
+      "reference_max_bytes": 1872,
+      "reference_file_count": 1,
+      "default_text_bytes": 7581,
+      "budget_level": "normal"
+    },
+    {
+      "name": "subagent-dispatch-rules",
+      "skill_md_bytes": 18361,
+      "reference_total_bytes": 28594,
+      "reference_max_bytes": 6780,
+      "reference_file_count": 8,
+      "default_text_bytes": 46955,
+      "budget_level": "review"
+    },
+    {
+      "name": "skill-audit-rules",
+      "skill_md_bytes": 2359,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 2359,
+      "budget_level": "normal"
+    },
+    {
+      "name": "skill-compliance-gate-rules",
+      "skill_md_bytes": 19211,
+      "reference_total_bytes": 6477,
+      "reference_max_bytes": 3393,
+      "reference_file_count": 2,
+      "default_text_bytes": 25688,
+      "budget_level": "review"
+    },
+    {
+      "name": "reasoning-summary-structure-rules",
+      "skill_md_bytes": 11370,
+      "reference_total_bytes": 12295,
+      "reference_max_bytes": 4490,
+      "reference_file_count": 3,
+      "default_text_bytes": 23665,
+      "budget_level": "normal"
+    },
+    {
+      "name": "recent-context-bootstrap-rules",
+      "skill_md_bytes": 6482,
+      "reference_total_bytes": 5144,
+      "reference_max_bytes": 2567,
+      "reference_file_count": 3,
+      "default_text_bytes": 11626,
+      "budget_level": "normal"
+    },
+    {
+      "name": "history-recall-rules",
+      "skill_md_bytes": 5322,
+      "reference_total_bytes": 4239,
+      "reference_max_bytes": 1435,
+      "reference_file_count": 4,
+      "default_text_bytes": 9561,
+      "budget_level": "normal"
+    },
+    {
+      "name": "obsidian-knowledge-flow",
+      "skill_md_bytes": 10803,
+      "reference_total_bytes": 51468,
+      "reference_max_bytes": 9649,
+      "reference_file_count": 9,
+      "default_text_bytes": 62271,
+      "budget_level": "review"
+    },
+    {
+      "name": "project-timeline-rules",
+      "skill_md_bytes": 4430,
+      "reference_total_bytes": 3828,
+      "reference_max_bytes": 1177,
+      "reference_file_count": 4,
+      "default_text_bytes": 8258,
+      "budget_level": "normal"
+    },
+    {
+      "name": "project-memory-rules",
+      "skill_md_bytes": 7516,
+      "reference_total_bytes": 14410,
+      "reference_max_bytes": 4393,
+      "reference_file_count": 7,
+      "default_text_bytes": 21926,
+      "budget_level": "normal"
+    },
+    {
+      "name": "project-style-rules",
+      "skill_md_bytes": 5569,
+      "reference_total_bytes": 3143,
+      "reference_max_bytes": 3143,
+      "reference_file_count": 1,
+      "default_text_bytes": 8712,
+      "budget_level": "normal"
+    },
+    {
+      "name": "requirement-discovery-rules",
+      "skill_md_bytes": 10269,
+      "reference_total_bytes": 12939,
+      "reference_max_bytes": 5744,
+      "reference_file_count": 4,
+      "default_text_bytes": 23208,
+      "budget_level": "normal"
+    },
+    {
+      "name": "requirement-intake-rules",
+      "skill_md_bytes": 20260,
+      "reference_total_bytes": 29486,
+      "reference_max_bytes": 12276,
+      "reference_file_count": 4,
+      "default_text_bytes": 49746,
+      "budget_level": "split_candidate"
+    },
+    {
+      "name": "requirement-gap-rules",
+      "skill_md_bytes": 11978,
+      "reference_total_bytes": 6767,
+      "reference_max_bytes": 3517,
+      "reference_file_count": 3,
+      "default_text_bytes": 18745,
+      "budget_level": "normal"
+    },
+    {
+      "name": "requirement-boundary-rules",
+      "skill_md_bytes": 7604,
+      "reference_total_bytes": 4149,
+      "reference_max_bytes": 2490,
+      "reference_file_count": 3,
+      "default_text_bytes": 11753,
+      "budget_level": "normal"
+    },
+    {
+      "name": "requirement-splitting-rules",
+      "skill_md_bytes": 9225,
+      "reference_total_bytes": 4073,
+      "reference_max_bytes": 2334,
+      "reference_file_count": 3,
+      "default_text_bytes": 13298,
+      "budget_level": "normal"
+    },
+    {
+      "name": "implementation-planning-rules",
+      "skill_md_bytes": 39147,
+      "reference_total_bytes": 77538,
+      "reference_max_bytes": 17774,
+      "reference_file_count": 13,
+      "default_text_bytes": 116685,
+      "budget_level": "hard_warning"
+    },
+    {
+      "name": "requirement-change-rules",
+      "skill_md_bytes": 12146,
+      "reference_total_bytes": 3690,
+      "reference_max_bytes": 2499,
+      "reference_file_count": 3,
+      "default_text_bytes": 15836,
+      "budget_level": "normal"
+    },
+    {
+      "name": "acceptance-criteria-rules",
+      "skill_md_bytes": 7632,
+      "reference_total_bytes": 6481,
+      "reference_max_bytes": 4952,
+      "reference_file_count": 3,
+      "default_text_bytes": 14113,
+      "budget_level": "normal"
+    },
+    {
+      "name": "final-acceptance-rules",
+      "skill_md_bytes": 8664,
+      "reference_total_bytes": 5837,
+      "reference_max_bytes": 3769,
+      "reference_file_count": 3,
+      "default_text_bytes": 14501,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-intake-rules",
+      "skill_md_bytes": 5613,
+      "reference_total_bytes": 4616,
+      "reference_max_bytes": 3272,
+      "reference_file_count": 3,
+      "default_text_bytes": 10229,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-discovery-rules",
+      "skill_md_bytes": 11566,
+      "reference_total_bytes": 12895,
+      "reference_max_bytes": 3765,
+      "reference_file_count": 4,
+      "default_text_bytes": 24461,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-gap-rules",
+      "skill_md_bytes": 5744,
+      "reference_total_bytes": 1006,
+      "reference_max_bytes": 387,
+      "reference_file_count": 3,
+      "default_text_bytes": 6750,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-reproduction-rules",
+      "skill_md_bytes": 5810,
+      "reference_total_bytes": 1814,
+      "reference_max_bytes": 1273,
+      "reference_file_count": 3,
+      "default_text_bytes": 7624,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-root-cause-rules",
+      "skill_md_bytes": 5578,
+      "reference_total_bytes": 2055,
+      "reference_max_bytes": 722,
+      "reference_file_count": 3,
+      "default_text_bytes": 7633,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-runtime-debug-rules",
+      "skill_md_bytes": 5733,
+      "reference_total_bytes": 2170,
+      "reference_max_bytes": 938,
+      "reference_file_count": 3,
+      "default_text_bytes": 7903,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-debug-log-rules",
+      "skill_md_bytes": 6789,
+      "reference_total_bytes": 1992,
+      "reference_max_bytes": 861,
+      "reference_file_count": 3,
+      "default_text_bytes": 8781,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-assertion-diagnostic-rules",
+      "skill_md_bytes": 5866,
+      "reference_total_bytes": 1725,
+      "reference_max_bytes": 731,
+      "reference_file_count": 3,
+      "default_text_bytes": 7591,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-fix-proposal-rules",
+      "skill_md_bytes": 7461,
+      "reference_total_bytes": 2779,
+      "reference_max_bytes": 1484,
+      "reference_file_count": 3,
+      "default_text_bytes": 10240,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-regression-risk-rules",
+      "skill_md_bytes": 5241,
+      "reference_total_bytes": 929,
+      "reference_max_bytes": 367,
+      "reference_file_count": 3,
+      "default_text_bytes": 6170,
+      "budget_level": "normal"
+    },
+    {
+      "name": "bug-validation-rules",
+      "skill_md_bytes": 7006,
+      "reference_total_bytes": 3051,
+      "reference_max_bytes": 2215,
+      "reference_file_count": 3,
+      "default_text_bytes": 10057,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-generation-style-rules",
+      "skill_md_bytes": 8690,
+      "reference_total_bytes": 15593,
+      "reference_max_bytes": 4857,
+      "reference_file_count": 5,
+      "default_text_bytes": 24283,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-minimal-change-rules",
+      "skill_md_bytes": 8102,
+      "reference_total_bytes": 7560,
+      "reference_max_bytes": 3356,
+      "reference_file_count": 3,
+      "default_text_bytes": 15662,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-context-resync-rules",
+      "skill_md_bytes": 4118,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 4118,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-readability-rules",
+      "skill_md_bytes": 15259,
+      "reference_total_bytes": 10097,
+      "reference_max_bytes": 4689,
+      "reference_file_count": 3,
+      "default_text_bytes": 25356,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-style-consistency-rules",
+      "skill_md_bytes": 10179,
+      "reference_total_bytes": 12951,
+      "reference_max_bytes": 2882,
+      "reference_file_count": 7,
+      "default_text_bytes": 23130,
+      "budget_level": "normal"
+    },
+    {
+      "name": "naming-rules",
+      "skill_md_bytes": 4033,
+      "reference_total_bytes": 2209,
+      "reference_max_bytes": 844,
+      "reference_file_count": 3,
+      "default_text_bytes": 6242,
+      "budget_level": "normal"
+    },
+    {
+      "name": "chinese-comment-rules",
+      "skill_md_bytes": 4836,
+      "reference_total_bytes": 868,
+      "reference_max_bytes": 333,
+      "reference_file_count": 3,
+      "default_text_bytes": 5704,
+      "budget_level": "normal"
+    },
+    {
+      "name": "comment-placement-granularity-rules",
+      "skill_md_bytes": 7312,
+      "reference_total_bytes": 3031,
+      "reference_max_bytes": 1184,
+      "reference_file_count": 3,
+      "default_text_bytes": 10343,
+      "budget_level": "normal"
+    },
+    {
+      "name": "comment-completion-gate-rules",
+      "skill_md_bytes": 17365,
+      "reference_total_bytes": 7742,
+      "reference_max_bytes": 2675,
+      "reference_file_count": 4,
+      "default_text_bytes": 25107,
+      "budget_level": "review"
+    },
+    {
+      "name": "windows-encoding-rules",
+      "skill_md_bytes": 11784,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 11784,
+      "budget_level": "normal"
+    },
+    {
+      "name": "package-structure-rules",
+      "skill_md_bytes": 7236,
+      "reference_total_bytes": 21544,
+      "reference_max_bytes": 12199,
+      "reference_file_count": 4,
+      "default_text_bytes": 28780,
+      "budget_level": "review"
+    },
+    {
+      "name": "micro-business-architecture-rules",
+      "skill_md_bytes": 6826,
+      "reference_total_bytes": 40740,
+      "reference_max_bytes": 8601,
+      "reference_file_count": 5,
+      "default_text_bytes": 47566,
+      "budget_level": "normal"
+    },
+    {
+      "name": "common-util-rules",
+      "skill_md_bytes": 8541,
+      "reference_total_bytes": 4344,
+      "reference_max_bytes": 1851,
+      "reference_file_count": 3,
+      "default_text_bytes": 12885,
+      "budget_level": "normal"
+    },
+    {
+      "name": "database-schema-rules",
+      "skill_md_bytes": 13255,
+      "reference_total_bytes": 16912,
+      "reference_max_bytes": 9418,
+      "reference_file_count": 3,
+      "default_text_bytes": 30167,
+      "budget_level": "normal"
+    },
+    {
+      "name": "database-query-rules",
+      "skill_md_bytes": 6983,
+      "reference_total_bytes": 2966,
+      "reference_max_bytes": 1259,
+      "reference_file_count": 3,
+      "default_text_bytes": 9949,
+      "budget_level": "normal"
+    },
+    {
+      "name": "api-endpoint-rules",
+      "skill_md_bytes": 6726,
+      "reference_total_bytes": 5480,
+      "reference_max_bytes": 2712,
+      "reference_file_count": 3,
+      "default_text_bytes": 12206,
+      "budget_level": "normal"
+    },
+    {
+      "name": "api-request-rules",
+      "skill_md_bytes": 6625,
+      "reference_total_bytes": 5099,
+      "reference_max_bytes": 2338,
+      "reference_file_count": 3,
+      "default_text_bytes": 11724,
+      "budget_level": "normal"
+    },
+    {
+      "name": "api-response-rules",
+      "skill_md_bytes": 6382,
+      "reference_total_bytes": 9705,
+      "reference_max_bytes": 4656,
+      "reference_file_count": 3,
+      "default_text_bytes": 16087,
+      "budget_level": "normal"
+    },
+    {
+      "name": "api-swagger-rules",
+      "skill_md_bytes": 6979,
+      "reference_total_bytes": 3952,
+      "reference_max_bytes": 1571,
+      "reference_file_count": 3,
+      "default_text_bytes": 10931,
+      "budget_level": "normal"
+    },
+    {
+      "name": "error-handling-rules",
+      "skill_md_bytes": 3823,
+      "reference_total_bytes": 1590,
+      "reference_max_bytes": 628,
+      "reference_file_count": 3,
+      "default_text_bytes": 5413,
+      "budget_level": "normal"
+    },
+    {
+      "name": "logging-trace-rules",
+      "skill_md_bytes": 11296,
+      "reference_total_bytes": 6008,
+      "reference_max_bytes": 3251,
+      "reference_file_count": 4,
+      "default_text_bytes": 17304,
+      "budget_level": "normal"
+    },
+    {
+      "name": "frontend-design",
+      "skill_md_bytes": 5715,
+      "reference_total_bytes": 0,
+      "reference_max_bytes": 0,
+      "reference_file_count": 0,
+      "default_text_bytes": 5715,
+      "budget_level": "normal"
+    },
+    {
+      "name": "frontend-component-rules",
+      "skill_md_bytes": 6079,
+      "reference_total_bytes": 4940,
+      "reference_max_bytes": 970,
+      "reference_file_count": 6,
+      "default_text_bytes": 11019,
+      "budget_level": "normal"
+    },
+    {
+      "name": "frontend-ui-visual-rules",
+      "skill_md_bytes": 8598,
+      "reference_total_bytes": 15701,
+      "reference_max_bytes": 2202,
+      "reference_file_count": 10,
+      "default_text_bytes": 24299,
+      "budget_level": "normal"
+    },
+    {
+      "name": "implementation-review-rules",
+      "skill_md_bytes": 29700,
+      "reference_total_bytes": 22211,
+      "reference_max_bytes": 7820,
+      "reference_file_count": 6,
+      "default_text_bytes": 51911,
+      "budget_level": "hard_warning"
+    },
+    {
+      "name": "project-change-review-rules",
+      "skill_md_bytes": 12444,
+      "reference_total_bytes": 5890,
+      "reference_max_bytes": 4024,
+      "reference_file_count": 2,
+      "default_text_bytes": 18334,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-strategy-rules",
+      "skill_md_bytes": 14859,
+      "reference_total_bytes": 2987,
+      "reference_max_bytes": 1903,
+      "reference_file_count": 3,
+      "default_text_bytes": 17846,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-task-root-layout-rules",
+      "skill_md_bytes": 5644,
+      "reference_total_bytes": 2270,
+      "reference_max_bytes": 2270,
+      "reference_file_count": 1,
+      "default_text_bytes": 7914,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-scattered-asset-location-rules",
+      "skill_md_bytes": 4933,
+      "reference_total_bytes": 1858,
+      "reference_max_bytes": 1858,
+      "reference_file_count": 1,
+      "default_text_bytes": 6791,
+      "budget_level": "normal"
+    },
+    {
+      "name": "go-test-compile-path-rules",
+      "skill_md_bytes": 3373,
+      "reference_total_bytes": 1483,
+      "reference_max_bytes": 1483,
+      "reference_file_count": 1,
+      "default_text_bytes": 4856,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-naming-rules",
+      "skill_md_bytes": 11222,
+      "reference_total_bytes": 9848,
+      "reference_max_bytes": 4084,
+      "reference_file_count": 3,
+      "default_text_bytes": 21070,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-program-rules",
+      "skill_md_bytes": 14750,
+      "reference_total_bytes": 7862,
+      "reference_max_bytes": 3748,
+      "reference_file_count": 3,
+      "default_text_bytes": 22612,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-doc-rules",
+      "skill_md_bytes": 8917,
+      "reference_total_bytes": 4929,
+      "reference_max_bytes": 2053,
+      "reference_file_count": 3,
+      "default_text_bytes": 13846,
+      "budget_level": "normal"
+    },
+    {
+      "name": "agent-browser",
+      "skill_md_bytes": 36228,
+      "reference_total_bytes": 53363,
+      "reference_max_bytes": 11191,
+      "reference_file_count": 11,
+      "default_text_bytes": 89591,
+      "budget_level": "hard_warning"
+    },
+    {
+      "name": "functional-validation-rules",
+      "skill_md_bytes": 15372,
+      "reference_total_bytes": 5585,
+      "reference_max_bytes": 3055,
+      "reference_file_count": 3,
+      "default_text_bytes": 20957,
+      "budget_level": "normal"
+    },
+    {
+      "name": "test-regression-rules",
+      "skill_md_bytes": 8248,
+      "reference_total_bytes": 5213,
+      "reference_max_bytes": 2569,
+      "reference_file_count": 3,
+      "default_text_bytes": 13461,
+      "budget_level": "normal"
+    },
+    {
+      "name": "project-release-test-rules",
+      "skill_md_bytes": 21732,
+      "reference_total_bytes": 78842,
+      "reference_max_bytes": 12368,
+      "reference_file_count": 14,
+      "default_text_bytes": 100574,
+      "budget_level": "split_candidate"
+    },
+    {
+      "name": "git-collaboration-rules",
+      "skill_md_bytes": 13388,
+      "reference_total_bytes": 25872,
+      "reference_max_bytes": 11869,
+      "reference_file_count": 3,
+      "default_text_bytes": 39260,
+      "budget_level": "normal"
+    },
+    {
+      "name": "delivery-summary-rules",
+      "skill_md_bytes": 6284,
+      "reference_total_bytes": 2368,
+      "reference_max_bytes": 1462,
+      "reference_file_count": 3,
+      "default_text_bytes": 8652,
+      "budget_level": "normal"
+    },
+    {
+      "name": "code-review-automation-rules",
+      "skill_md_bytes": 4877,
+      "reference_total_bytes": 4313,
+      "reference_max_bytes": 1857,
+      "reference_file_count": 3,
+      "default_text_bytes": 9190,
+      "budget_level": "normal"
+    }
+  ]
+}

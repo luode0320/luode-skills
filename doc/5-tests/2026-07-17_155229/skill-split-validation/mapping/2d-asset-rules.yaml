@@ -1,0 +1,284 @@
+schema_version: 1
+doc_purpose: TASK-SPLIT-06-01 原子化映射；把 2d-asset-design 的规则/资源逐条分配到设计闸门组或生产交接组，禁止无主落点。
+source_skill: 2d-asset-design
+source_baseline:
+  skill_md_path: 2d-asset-design/SKILL.md
+  skill_md_bytes: 29096
+  skill_md_md5: FB4E06AC8891F17FAB00CAE5D6462FE3
+  references_count: 13
+  scripts_count: 3
+  agents_count: 1
+  fingerprint_report: doc/5-tests/2026-07-17_155229/skill-split-validation/evidence/TASK-SPLIT-06-01-mapping.md
+baseline_note: "实施周期 06 计划文档「已核实文件和符号」列出 6 个设计 refs + 6 个生产 refs 共 12 个，未提及 references/asset-modes.md；实测磁盘共 13 个 references，asset-modes.md 为计划文档遗漏的第 13 个，本轮判定为 shared_duplicate 并记录修正说明，不视为映射缺口。"
+proposed_skills:
+  group_design:
+    id: game-asset-design-gate-rules
+    focus: 2D 游戏素材的设计确认闸门：参考筛选、原创性、质量阶梯、预览确认、图像设计规格、项目风格一致性
+    trigger_boundary: 需要先做资产分类、参考候选筛选、写素材 brief、图像设计 spec 交接、商业级审稿或项目视觉基线锁定时
+  group_production:
+    id: game-asset-production-handoff-rules
+    focus: 已确认设计的生产实现：真实 imagegen 调用、角色动画/地图/prop pack 生产、后处理脚本、Godot 交付
+    trigger_boundary: 设计已确认，需要实际生成、切帧、后处理、Sprite Sheet 组织或 Godot 可导入交付时
+shared_resources:
+  - id: RES-2D-ASSET-MODES
+    path: 2d-asset-design/references/asset-modes.md（整份文件）
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 资产类型/动作类型/打包预设/常见网格在设计阶段的第 1 步识别资产任务中使用，网格与 anchor 默认值又直接指导生产阶段的后处理锚点选择；两组各自保留一份原文，不视为职责重叠。
+  - id: RES-2D-AGENTS-METADATA
+    path: 2d-asset-design/agents/openai.yaml（整份文件）
+    owner: split_rewrite
+    migration_action: rewrite
+    note: display_name/short_description/default_prompt 按设计闸门与生产交接各自的职责范围重写为两份独立的 agents/openai.yaml，不复制原文。
+rules:
+  - id: R-2D-001
+    section: "frontmatter description"
+    source: 2d-asset-design/SKILL.md:3
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 description 混合设计确认、生成、后处理、Godot 交付、参考检索和联动 agent-sprite-forge-design/character-sprite-animation-production 的触发对象；拆分后设计组只描述确认闸门触发，生产组只描述生产交接触发。
+  - id: R-2D-002
+    section: "## 作用"
+    source: 2d-asset-design/SKILL.md:8-19
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 三段链路（设计/生成/后处理）拆开各自重述，设计组只保留"设计"段，生产组保留"生成+后处理"段。
+  - id: R-2D-003
+    section: "## 自动触发范围"
+    source: 2d-asset-design/SKILL.md:21-35
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 触发意图列表按是否已进入生产/后处理拆成两份，"不要用本 skill"的排除项两组各自保留。
+  - id: R-2D-004
+    section: "### 1. 先设计，再实现"
+    source: 2d-asset-design/SKILL.md:39-55
+    owner: group_design
+    migration_action: move
+    note: agent-sprite-forge-design 联动、image-generation-workflow 引用改为交叉引用生产组文件。
+  - id: R-2D-005
+    section: "### 2. 第三方素材默认只做参考，不直接入库"
+    source: 2d-asset-design/SKILL.md:57-64
+    owner: group_design
+    migration_action: move
+  - id: R-2D-006
+    section: "### 3. 先满足玩法可读性，再追求装饰细节"
+    source: 2d-asset-design/SKILL.md:66-77
+    owner: group_design
+    migration_action: move
+  - id: R-2D-007
+    section: "### 4. 只构建项目原创 2D 素材"
+    source: 2d-asset-design/SKILL.md:79-81
+    owner: group_design
+    migration_action: move
+  - id: R-2D-008
+    section: "### 5. 面向 Godot 交付"
+    source: 2d-asset-design/SKILL.md:83-93
+    owner: group_production
+    migration_action: move
+    note: 透明背景/画布尺寸/锚点/Sprite Sheet 行列/可切分动画帧/可拆层地图/Godot 继续编辑空间均为生产与 Godot 交接关注点，不属于设计确认闸门。
+  - id: R-2D-009
+    section: "### 6. 商业级场景物件优先于轻装饰交付"
+    source: 2d-asset-design/SKILL.md:95-103
+    owner: group_design
+    migration_action: move
+  - id: R-2D-010
+    section: "### 7. 商业级审稿闸门优先于结构齐全"
+    source: 2d-asset-design/SKILL.md:105-117
+    owner: group_design
+    migration_action: move
+  - id: R-2D-011
+    section: "### 8. 项目风格一致性是强制前置条件"
+    source: 2d-asset-design/SKILL.md:119-132
+    owner: group_design
+    migration_action: move
+  - id: R-2D-012
+    section: "### 第 0 步：先走设计确认闭环"
+    source: 2d-asset-design/SKILL.md:136-155
+    owner: group_design
+    migration_action: move
+  - id: R-2D-013
+    section: "### 第 1 步：识别资产任务"
+    source: 2d-asset-design/SKILL.md:157-178
+    owner: group_design
+    migration_action: move
+    note: 引用 shared_duplicate 的 asset-modes.md。
+  - id: R-2D-014
+    section: "### 第 1.2 步：先做参考候选筛选"
+    source: 2d-asset-design/SKILL.md:180-195
+    owner: group_design
+    migration_action: move
+  - id: R-2D-015
+    section: "### 第 1.5 步：判定质量阶梯"
+    source: 2d-asset-design/SKILL.md:197-206
+    owner: group_design
+    migration_action: move
+  - id: R-2D-016
+    section: "### 第 1.6 步：锁定项目视觉基线"
+    source: 2d-asset-design/SKILL.md:208-230
+    owner: group_design
+    migration_action: move
+  - id: R-2D-017
+    section: "### 第 2 步：先写素材 brief"
+    source: 2d-asset-design/SKILL.md:232-282
+    owner: group_design
+    migration_action: move
+    note: image-spec-contract、prompt-rules 均为设计组资源。
+  - id: R-2D-018
+    section: "### 第 3 步：处理外部参考"
+    source: 2d-asset-design/SKILL.md:284-309
+    owner: group_design
+    migration_action: move
+  - id: R-2D-019
+    section: "### 第 4 步：生成原始素材"
+    source: 2d-asset-design/SKILL.md:311-356
+    owner: group_production
+    migration_action: move
+    note: 真实 imagegen 调用与 image-generation-workflow 均为生产组职责；不得把本步骤的脚本合成结果伪装成生图。
+  - id: R-2D-020
+    section: "### 第 5 步：执行后处理"
+    source: 2d-asset-design/SKILL.md:358-393
+    owner: group_production
+    migration_action: move
+    note: 对应 postprocess-workflow.md 与 3 个后处理脚本。
+  - id: R-2D-021
+    section: "### 第 6 步：交付 Godot 可用结果"
+    source: 2d-asset-design/SKILL.md:395-404
+    owner: group_production
+    migration_action: move
+  - id: R-2D-022
+    section: "### 角色、怪物、Boss"
+    source: 2d-asset-design/SKILL.md:408-414
+    owner: group_production
+    migration_action: move
+    note: 锚点对齐、FX 拆分、联动 character-sprite-animation-production 均为生产实现细节，对应 character-animation-production-gate.md。
+  - id: R-2D-023
+    section: "### 投射物、命中特效、法术效果"
+    source: 2d-asset-design/SKILL.md:416-420
+    owner: group_production
+    migration_action: move
+  - id: R-2D-024
+    section: "### 地图、瓦片、场景道具"
+    source: 2d-asset-design/SKILL.md:422-457
+    owner: group_production
+    migration_action: move
+    note: 对应 map-strategies.md/layered-map-contract.md/prop-pack-contract.md 三份生产组引用；文字里的质量标准与设计组 art-direction-quality-gate 概念呼应，但权威落点是生产组这三份引用文件，故整段归生产组，不拆分。
+  - id: R-2D-025
+    section: "### UI、图标、掉落物"
+    source: 2d-asset-design/SKILL.md:459-462
+    owner: group_design
+    migration_action: move
+    note: 识别速度/小尺寸可读性是设计层认知原则，不绑定任何生产脚本或资源文件。
+  - id: R-2D-026
+    section: "## 默认交付规范"
+    source: 2d-asset-design/SKILL.md:464-472
+    owner: group_production
+    migration_action: move
+    note: PNG/RGBA/GIF/帧目录/JSON 质检信息与默认帧数均为生产交付格式规范。
+  - id: R-2D-027
+    section: "## 额外强约束"
+    source: 2d-asset-design/SKILL.md:474-483
+    owner: group_production
+    migration_action: move
+    note: 网格布局、FX 分离、prop pack 适用范围、hero prop 路线均为生产落地约束；"商业级场景物件质量"措辞与设计组质量原则呼应但不复制设计组文件。
+  - id: R-2D-028
+    section: "## 输出模式"
+    source: 2d-asset-design/SKILL.md:485-496
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 8 步输出结构中"资产目标/参考提炼/原创 brief/设计预览方案/用户确认状态"5 项归设计组，"生成方案/后处理方案/Godot 交付物"3 项归生产组，各自重述本组子集。
+  - id: R-2D-029
+    section: "## 资源"
+    source: 2d-asset-design/SKILL.md:498-514
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 引用表按 13 个 reference 与 3 个 script 各自归属拆成两份精简表；asset-modes.md 按 RES-2D-ASSET-MODES 在两份里各保留一条。
+  - id: RES-2D-001
+    section: "references/design-preview-confirmation-gate.md（整份文件）"
+    source: 2d-asset-design/references/design-preview-confirmation-gate.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-002
+    section: "references/art-direction-quality-gate.md（整份文件）"
+    source: 2d-asset-design/references/art-direction-quality-gate.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-003
+    section: "references/image-spec-contract.md（整份文件）"
+    source: 2d-asset-design/references/image-spec-contract.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-004
+    section: "references/prompt-rules.md（整份文件）"
+    source: 2d-asset-design/references/prompt-rules.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-005
+    section: "references/reference-only-policy.md（整份文件）"
+    source: 2d-asset-design/references/reference-only-policy.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-006
+    section: "references/project-style-consistency-contract.md（整份文件）"
+    source: 2d-asset-design/references/project-style-consistency-contract.md
+    owner: group_design
+    migration_action: move
+  - id: RES-2D-007
+    section: "references/character-animation-production-gate.md（整份文件）"
+    source: 2d-asset-design/references/character-animation-production-gate.md
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-008
+    section: "references/layered-map-contract.md（整份文件）"
+    source: 2d-asset-design/references/layered-map-contract.md
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-009
+    section: "references/map-strategies.md（整份文件）"
+    source: 2d-asset-design/references/map-strategies.md
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-010
+    section: "references/postprocess-workflow.md（整份文件）"
+    source: 2d-asset-design/references/postprocess-workflow.md
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-011
+    section: "references/prop-pack-contract.md（整份文件）"
+    source: 2d-asset-design/references/prop-pack-contract.md
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-012
+    section: "references/image-generation-workflow.md（整份文件）"
+    source: 2d-asset-design/references/image-generation-workflow.md
+    owner: group_production
+    migration_action: move
+    note: 描述真实 imagegen（Image Generation Skill）的设计-brief-到-生成映射规范，用于生产组实际调用生图前对齐参数，不属于本项目内部设计确认闸门。
+  - id: RES-2D-013
+    section: "scripts/compose_layered_preview.py（整份文件）"
+    source: 2d-asset-design/scripts/compose_layered_preview.py
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-014
+    section: "scripts/make_layout_guide.py（整份文件）"
+    source: 2d-asset-design/scripts/make_layout_guide.py
+    owner: group_production
+    migration_action: move
+  - id: RES-2D-015
+    section: "scripts/postprocess_sprite_sheet.py（整份文件）"
+    source: 2d-asset-design/scripts/postprocess_sprite_sheet.py
+    owner: group_production
+    migration_action: move
+coverage_summary:
+  total_atomized_items: 46
+  owner_group_design_count: 19
+  owner_group_production_count: 20
+  owner_shared_duplicate_count: 1
+  owner_split_rewrite_count: 6
+  count_verified_by: "Select-String -Pattern '^\\s*- id:' 实测统计，2026-07-20"
+  unmapped_items: 0
+stop_condition_check:
+  any_rule_without_owner: false
+  any_script_resource_without_owner: false
+  duplicate_owner_conflict: false
+  fake_imagegen_output_detected: false
+  result: pass

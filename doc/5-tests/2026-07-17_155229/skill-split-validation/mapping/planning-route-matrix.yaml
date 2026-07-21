@@ -1,0 +1,129 @@
+schema_version: 1
+skill: implementation-planning-rules
+skill_md_path: implementation-planning-rules/SKILL.md
+skill_md_bytes: 39147
+budget:
+  normal_max_bytes: 16000
+  review_max_bytes: 20000
+  hard_warning_bytes: 24000
+  size_note: "39147B 超过 hard_warning_bytes(24000) 达 15147B（约63%），体积压力真实存在，与 agent-browser（36228B）同量级，不同于 CYCLE-SPLIT-07 的 mcp-installation-rules（仅超 normal_max 880B）。"
+
+# 候选职责组：依据计划文档指定的四个复评对象划分，
+# 不是预设的“该拆成4个skill”的结论，仅作为路由样本标注依据。
+candidate_groups:
+  - id: GROUP-AUTHORING
+    name: 单来源对象计划正文撰写（核心组）
+    responsibility: "把已确认来源对象转成可执行实施总览/实施周期正文：前置检查、结构模板、边界正反例、自审、输出闸门"
+    owning_references:
+      - implementation-planning-rules/references/plan-entry-checklist.md
+      - implementation-planning-rules/references/plan-structure-template.md
+      - implementation-planning-rules/references/plan-boundaries-and-examples.md
+      - implementation-planning-rules/references/plan-review-checklist.md
+      - implementation-planning-rules/references/plan-output-gate.md
+      - implementation-planning-rules/references/source-notes.md
+    config_owner: "单来源对象实施总览/实施周期文档（artifact-storage-rules 路径命名）"
+  - id: GROUP-PLANMODE
+    name: Plan Mode 第一层路由外壳
+    responsibility: "在 Plan Mode 上下文下接住任意问题作为第一层计划外壳，判断走正式/受限/阻断计划，或 handoff 给相邻需求域 skill"
+    owning_references: []
+    config_owner: "N/A：不产出独立文档，只决定进入 GROUP-AUTHORING 正文的路由方式"
+  - id: GROUP-CYCLE-TASK
+    name: 实施周期/最小任务契约
+    responsibility: "当实施文档需要交给普通模型零决策执行、或用户要求极致详细时，补充周期/任务粒度的结构化契约"
+    owning_references:
+      - implementation-planning-rules/references/implementation-overview-template.md
+      - implementation-planning-rules/references/implementation-cycle-template.md
+      - implementation-planning-rules/references/minimum-task-execution-contract.md
+      - implementation-planning-rules/references/task-granularity-and-order.md
+      - implementation-planning-rules/references/visualization-standard.md
+    config_owner: "依附于 GROUP-AUTHORING 产出的同一份实施总览/实施周期文档，无独立文档 owner"
+  - id: GROUP-MASTERPLAN
+    name: 全量顺序总表
+    responsibility: "新项目或多来源对象场景下，维护跨需求/跨Bug的项目级执行顺序总表"
+    owning_references:
+      - implementation-planning-rules/references/full-sequence-master-plan.md
+    config_owner: "需求与实施计划全量顺序实施方案（跨来源对象总表文档，与 GROUP-AUTHORING 单来源对象总览为不同文档）"
+
+# 独立性判据来源说明：与 CYCLE-SPLIT-07 一致，计划文档本身只给出数量与平均命中两项数字门槛，
+# 未给出量化独立性上限。本轮额外引入“非核心组能否脱离核心组单独出现”作为独立性判据：
+# 若某候选组在全部样本中从未在“不命中 GROUP-AUTHORING”的情况下单独出现，则判定为
+# GROUP-AUTHORING 的条件子模式，而非真正独立的触发组。
+independence_proxy:
+  metric: non_core_groups_independent_of_authoring
+  definition: "GROUP-PLANMODE / GROUP-CYCLE-TASK / GROUP-MASTERPLAN 三组中，存在至少一条样本命中该组但不命中 GROUP-AUTHORING 的组数"
+  observed_value: 0
+  total_non_core_groups: 3
+  threshold_source: "本轮复评新增代理指标，非源计划文档预定数字；用于区分'真正独立职责'与'核心组下的条件子模式'"
+
+# 路由样本：全部锚定 SKILL.md 自身"Skill 作用与适用场景"/"进入后先做什么"一节
+# 已写明的真实触发句式与流程描述，不额外发明与文档不符的场景。
+samples:
+  - id: PLAN-ROUTE-001
+    prompt: "Plan Mode 下，来源对象和验收标准都已明确，用户问'这个功能怎么实现'"
+    expected_groups_hit: [GROUP-PLANMODE, GROUP-AUTHORING]
+  - id: PLAN-ROUTE-002
+    prompt: "Plan Mode 下，需求还完全没讲清楚，用户问'这个功能怎么实现'"
+    expected_groups_hit: [GROUP-PLANMODE, GROUP-AUTHORING]
+  - id: PLAN-ROUTE-003
+    prompt: "非 Plan Mode，来源对象和验收标准都已明确，用户直接说'请给我写一份实施计划'"
+    expected_groups_hit: [GROUP-AUTHORING]
+  - id: PLAN-ROUTE-004
+    prompt: "用户明确说'就按你刚才说的做'，采纳上一轮修复建议，但还没有正式实施计划"
+    expected_groups_hit: [GROUP-AUTHORING]
+  - id: PLAN-ROUTE-005
+    prompt: "新项目启动，涉及5个需求，需要建立需求与实施计划全量顺序实施方案"
+    expected_groups_hit: [GROUP-MASTERPLAN, GROUP-AUTHORING]
+  - id: PLAN-ROUTE-006
+    prompt: "已有一份实施总览，需要把其中一个周期细化成可以直接给普通模型执行的最小任务清单，要求极致完整"
+    expected_groups_hit: [GROUP-CYCLE-TASK, GROUP-AUTHORING]
+  - id: PLAN-ROUTE-007
+    prompt: "Plan Mode 下，用户问一个与当前项目无关的通用编程概念问题，但硬闸门仍要求先命中本 skill 判断是否适用"
+    expected_groups_hit: [GROUP-PLANMODE, GROUP-AUTHORING]
+  - id: PLAN-ROUTE-008
+    prompt: "用户只是想问一下已有实施计划当前的进度，不涉及新的计划变更或执行"
+    expected_groups_hit: []
+  - id: PLAN-ROUTE-009
+    prompt: "非 Plan Mode，用户要求对已有实施周期文档做一次计划自审，检查占位词和阶段目标混杂问题"
+    expected_groups_hit: [GROUP-AUTHORING]
+  - id: PLAN-ROUTE-010
+    prompt: "帮我调试一下这段代码报错"
+    expected_groups_hit: []
+
+# 汇总指标：由 validator 从 samples 重新计算并与此处声明值交叉核对。
+metrics:
+  total_samples: 10
+  total_hit_count: 13
+  average_hits_per_sample: 1.3
+  independent_group_count: 4
+  co_occurring_sample_count: 5
+  co_occurrence_rate: 0.5
+
+# 复评结论：不拆。表面数字门槛（4 个候选组、平均命中 1.3）达标，
+# 但独立性代理指标显示 0/3 个非核心组能脱离 GROUP-AUTHORING 单独出现，
+# 且 SKILL.md 体积虽真实超标（39147B，超 hard_warning 15147B），
+# 但候选组结构不支持"拆成多个独立 auto-trigger skill"这一形状的整改。
+conclusion:
+  decision: no_split
+  reason: >-
+    尺寸证据：implementation-planning-rules/SKILL.md 当前 39147B，超过 hard_warning_bytes(24000) 达 15147B
+    （约63%），体积压力真实存在，量级接近已拆分的 agent-browser（36228B）。
+    独立性证据：本轮以 GROUP-AUTHORING（单来源对象计划正文撰写）为核心组，标注 GROUP-PLANMODE（Plan Mode
+    路由外壳）、GROUP-CYCLE-TASK（实施周期/任务契约）、GROUP-MASTERPLAN（全量顺序总表）三个候选子组；
+    10 条锚定于 SKILL.md 自身触发语言的真实样本显示：这三个非核心组无一例外都与 GROUP-AUTHORING 同时命中
+    （observed_value=0/3），即它们从未在真实场景中脱离核心组单独构成完整响应——GROUP-PLANMODE 命中后必然
+    回流到本 skill 自己的入口检查（plan-entry-checklist.md）以判断走正式/受限/阻断计划；GROUP-CYCLE-TASK
+    只是"极致详细"要求下 GROUP-AUTHORING 的补充模板；GROUP-MASTERPLAN 命中后 SKILL.md 明确要求"再回到单个
+    来源对象的实施总览与实施周期拆分"，同样依附于核心组。
+    架构风险：本仓库 AGENTS.md 已把 GROUP-PLANMODE 的路由职责硬编码为"Plan Mode 硬闸门"，要求所有计划型
+    提问都先触发 implementation-planning-rules；若按候选组拆成多个 auto-trigger skill，GROUP-PLANMODE/
+    GROUP-CYCLE-TASK/GROUP-MASTERPLAN 三个新入口在真实使用中仍会与承载 GROUP-AUTHORING 的入口同时触发，
+    平均并发加载不会下降，反而增加路由跳转和 AGENTS.md 多处路由规则的同步改动风险，与本项目"降低单份文档
+    体积、避免截断"的治理目标相悖。
+    综合判断：体积问题真实存在，但"按候选组拆成独立 auto-trigger skill"这一具体整改形状不成立，故本轮结论
+    为不采用该拆分形状；不代表体积问题已解决。
+  next_review_condition: >-
+    体积问题的更合适解法很可能是"SKILL.md 内部去重压缩"（参照 CYCLE-SPLIT-05 对 browser-session-automation-rules
+    的处理方式：识别正文内部重复表达并合并为引用，而非拆成多个 skill），但该整改形状与本项目 CYCLE-01~07 的
+    "按独立职责拆分"范式不同，需要新建来源对象、验收标准和独立实施总览才能授权推进，不在本周期或本项目现有
+    实施总览范围内直接展开；若未来 GROUP-PLANMODE/GROUP-CYCLE-TASK/GROUP-MASTERPLAN 中任一组出现真实脱离
+    GROUP-AUTHORING 独立命中的场景，再重新按候选组拆分复评。

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "COMP-TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "本轮没有代码改动，只是回顾本轮已命中的 skill 是否存在只做了部分规则的风险，最终回复前需要合规检查。",
+      "required": ["skill-execution-compliance-gate-rules"],
+      "forbidden": ["code-change-finalization-gate-rules"],
+      "observed_hits": ["skill-execution-compliance-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "本轮修改了 Go 后端代码并新增了对应单测，准备最终回复前需要走注释双 skill、implementation-review 与真实运行验证收口。",
+      "required": ["code-change-finalization-gate-rules"],
+      "forbidden": ["skill-execution-compliance-gate-rules"],
+      "observed_hits": ["code-change-finalization-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "本轮既修改了代码，又出现一次非预期的 CLI 命令执行失败，需要联动 execution-failure-learning-rules 分类，同时最终回复前要完成代码收口闸门。",
+      "required": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-PRE-004",
+      "phase": "pre-delete",
+      "prompt": "本轮只做了只读的项目架构分析，没有工具调用失败，也没有代码改动，任务已按计划完成。",
+      "required": ["project-design-doc-rules"],
+      "forbidden": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules"
+      ],
+      "observed_hits": ["project-design-doc-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-PRE-005",
+      "phase": "pre-delete",
+      "prompt": "本轮发生了工具调用，当前运行环境存在显式的 goal 状态收口机制，原始用户目标已完成，最终回复前需要确认已经真实执行了状态收口动作。",
+      "required": ["skill-execution-compliance-gate-rules"],
+      "forbidden": ["code-change-finalization-gate-rules"],
+      "observed_hits": ["skill-execution-compliance-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-PRE-006",
+      "phase": "pre-delete",
+      "prompt": "本轮只补充了函数注释，代码有改动（注释文本），需要在最终回复前核对注释双 skill 与函数注释核对清单是否已输出。",
+      "required": ["code-change-finalization-gate-rules"],
+      "forbidden": ["skill-execution-compliance-gate-rules"],
+      "observed_hits": ["code-change-finalization-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-001",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮没有代码改动，只是回顾本轮已命中的 skill 是否存在只做了部分规则的风险，最终回复前需要合规检查。",
+      "required": ["skill-execution-compliance-gate-rules"],
+      "forbidden": ["code-change-finalization-gate-rules", "skill-compliance-gate-rules"],
+      "observed_hits": ["skill-execution-compliance-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-002",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮修改了 Go 后端代码并新增了对应单测，准备最终回复前需要走注释双 skill、implementation-review 与真实运行验证收口。",
+      "required": ["code-change-finalization-gate-rules"],
+      "forbidden": ["skill-execution-compliance-gate-rules", "skill-compliance-gate-rules"],
+      "observed_hits": ["code-change-finalization-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-003",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮既修改了代码，又出现一次非预期的 CLI 命令执行失败，需要联动 execution-failure-learning-rules 分类，同时最终回复前要完成代码收口闸门。",
+      "required": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules"
+      ],
+      "forbidden": ["skill-compliance-gate-rules"],
+      "observed_hits": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-004",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮只做了只读的项目架构分析，没有工具调用失败，也没有代码改动，任务已按计划完成。",
+      "required": ["project-design-doc-rules"],
+      "forbidden": [
+        "skill-execution-compliance-gate-rules",
+        "code-change-finalization-gate-rules",
+        "skill-compliance-gate-rules"
+      ],
+      "observed_hits": ["project-design-doc-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-005",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮发生了工具调用，当前运行环境存在显式的 goal 状态收口机制，原始用户目标已完成，最终回复前需要确认已经真实执行了状态收口动作。",
+      "required": ["skill-execution-compliance-gate-rules"],
+      "forbidden": ["code-change-finalization-gate-rules", "skill-compliance-gate-rules"],
+      "observed_hits": ["skill-execution-compliance-gate-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "COMP-TRIGGER-POST-006",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 skill-compliance-gate-rules 已删除后）本轮只补充了函数注释，代码有改动（注释文本），需要在最终回复前核对注释双 skill 与函数注释核对清单是否已输出。",
+      "required": ["code-change-finalization-gate-rules"],
+      "forbidden": ["skill-execution-compliance-gate-rules", "skill-compliance-gate-rules"],
+      "observed_hits": ["code-change-finalization-gate-rules"],
+      "source": "fixture_observation"
+    }
+  ]
+}

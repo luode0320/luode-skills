@@ -1,0 +1,8 @@
+# TASK-SPLIT-04-02 接口基线承接证据
+
+- 测试：`TEST-SPLIT-014`（`python -X utf8 -m unittest discover -s "doc/5-tests/2026-07-12_180240/project-release-test-rules/tests" -p "test*.py"`；`python -X utf8 -m unittest discover -s "doc/5-tests/2026-07-12_191712/project-release-test-rules/tests" -p "test*.py"`）。
+- 路径修正说明：周期 04 计划文档中的路径 `doc/5-tests/2026-07-12_180240_project-release-test-rules/tests` 在仓库磁盘上不存在；实际存在两个独立的 local fixture 时间戳目录 `doc/5-tests/2026-07-12_180240/project-release-test-rules/tests`（27 个测试）和 `doc/5-tests/2026-07-12_191712/project-release-test-rules/tests`（37 个测试），本轮对两者都执行了回归，覆盖计划意图的"现有 local fixture"验证范围。
+- 新建产物：`project-interface-baseline-rules/SKILL.md`（14,147B，小于 16,000B 常规预算）、`agents/openai.yaml`（1,291B）、7 个 `references/*.md`（interface-inventory-schema.md、baseline-asset-rules.md、bootstrap-workflow.md、openapi-inventory-sync-rules.md、inventory-reconcile-rules.md、dependency-graph-rules.md、existing-test-skill-integration.md，原文整份迁移，未改动内容）。
+- 引擎回归结果：`2026-07-12_180240` 套件 27 个测试中 26 个通过、1 个失败（`test_core_engine.IRContractTests.test_invalid_protocol_and_missing_contract_are_rejected`，断言字符串与当前 IR 校验错误文案格式不一致）；`2026-07-12_191712` 套件 37 个测试全部通过。
+- 失败归因核实：本轮未对 `project-release-test-rules/scripts/`、`project-release-test-rules/references/` 或任何测试 fixture 做任何修改（`git status` 对这两个路径无未提交改动，测试文件最近一次提交是 2026-07-12，早于本轮会话）；该失败是拆分前已存在的断言格式漂移，与本轮新建 baseline skill 无关，不构成回归。本轮不修复该失败（修复 engine IR 校验或测试断言属于 bug-fix 范畴，不在周期 04 的文件契约与非范围内）。
+- 结论：PASS（等价性核对：拆分前后引擎测试结果一致，均为"180240 套件 1 个既有失败 + 191712 套件全部通过"）。旧 skill 文件保持冻结基线，未做任何改动。

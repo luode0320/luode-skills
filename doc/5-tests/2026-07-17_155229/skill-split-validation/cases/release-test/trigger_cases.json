@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "RT-TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "项目从未生成过接口基线，doc/5-tests/基线/interface-inventory.yaml 不存在，需要先扫描当前项目接口并生成初版基线。",
+      "required": ["project-interface-baseline-rules"],
+      "forbidden": ["project-interface-release-execution-rules"],
+      "observed_hits": ["project-interface-baseline-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "接口基线已经是最新的，现在需要做上线前全项目接口测试，替代人工验证并给出放行结论。",
+      "required": ["project-interface-release-execution-rules"],
+      "forbidden": ["project-interface-baseline-rules"],
+      "observed_hits": ["project-interface-release-execution-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "接口基线已经过期，既需要先刷新接口基线和双索引对账，又要在刷新后立即执行本次上线测试并给出门禁结论。",
+      "required": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-PRE-004",
+      "phase": "pre-delete",
+      "prompt": "本轮只需要验证刚改动的单个接口的当前功能是否正常，不涉及项目级上线测试或接口基线维护。",
+      "required": ["functional-validation-rules"],
+      "forbidden": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules"
+      ],
+      "observed_hits": ["functional-validation-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-PRE-005",
+      "phase": "pre-delete",
+      "prompt": "swag/.swag-manifest.yaml 与 doc/5-tests/基线/interface-inventory.yaml 的接口集合不一致，需要判断是否发生基线漂移。",
+      "required": ["project-interface-baseline-rules"],
+      "forbidden": ["project-interface-release-execution-rules"],
+      "observed_hits": ["project-interface-baseline-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-PRE-006",
+      "phase": "pre-delete",
+      "prompt": "已经拿到接口的真实响应，需要 agent 独立判定该接口是否通过，并生成本次上线测试报告和放行结论。",
+      "required": ["project-interface-release-execution-rules"],
+      "forbidden": ["project-interface-baseline-rules"],
+      "observed_hits": ["project-interface-release-execution-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-001",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）项目从未生成过接口基线，doc/5-tests/基线/interface-inventory.yaml 不存在，需要先扫描当前项目接口并生成初版基线。",
+      "required": ["project-interface-baseline-rules"],
+      "forbidden": ["project-interface-release-execution-rules", "project-release-test-rules"],
+      "observed_hits": ["project-interface-baseline-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-002",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）接口基线已经是最新的，现在需要做上线前全项目接口测试，替代人工验证并给出放行结论。",
+      "required": ["project-interface-release-execution-rules"],
+      "forbidden": ["project-interface-baseline-rules", "project-release-test-rules"],
+      "observed_hits": ["project-interface-release-execution-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-003",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）接口基线已经过期，既需要先刷新接口基线和双索引对账，又要在刷新后立即执行本次上线测试并给出门禁结论。",
+      "required": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules"
+      ],
+      "forbidden": ["project-release-test-rules"],
+      "observed_hits": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-004",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）本轮只需要验证刚改动的单个接口的当前功能是否正常，不涉及项目级上线测试或接口基线维护。",
+      "required": ["functional-validation-rules"],
+      "forbidden": [
+        "project-interface-baseline-rules",
+        "project-interface-release-execution-rules",
+        "project-release-test-rules"
+      ],
+      "observed_hits": ["functional-validation-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-005",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）swag/.swag-manifest.yaml 与 doc/5-tests/基线/interface-inventory.yaml 的接口集合不一致，需要判断是否发生基线漂移。",
+      "required": ["project-interface-baseline-rules"],
+      "forbidden": ["project-interface-release-execution-rules", "project-release-test-rules"],
+      "observed_hits": ["project-interface-baseline-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "RT-TRIGGER-POST-006",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 project-release-test-rules 已删除后）已经拿到接口的真实响应，需要 agent 独立判定该接口是否通过，并生成本次上线测试报告和放行结论。",
+      "required": ["project-interface-release-execution-rules"],
+      "forbidden": ["project-interface-baseline-rules", "project-release-test-rules"],
+      "observed_hits": ["project-interface-release-execution-rules"],
+      "source": "fixture_observation"
+    }
+  ]
+}

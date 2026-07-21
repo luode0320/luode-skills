@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "report_path": "doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.json",
+  "report_sha256": "76a73a61ad843eddfd6c62f9846f2c8ad8fbba588278ea963f507ca3d26da062",
+  "matrix_path": "doc/5-tests/2026-07-17_155229/skill-split-validation/mapping/candidate-matrix.yaml",
+  "matrix_sha256": "8c587f3316f7651979617ebf410823a1a2968e4ed3f79f441d91ff34ed38c673",
+  "required_matrix_tokens": [
+    "formal_skill_count: 84",
+    "disk_skill_directory_count: 111",
+    "extension_seed_count: 27",
+    "candidate_order:",
+    "project-agents-bootstrap",
+    "skill-compliance-gate-rules",
+    "project-release-test-rules",
+    "agent-browser",
+    "2d-asset-design",
+    "mcp-installation-rules",
+    "implementation-planning-rules"
+  ]
+}

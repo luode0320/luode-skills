@@ -1,0 +1,8 @@
+# TASK-SPLIT-04-04 删除前验证证据
+
+- 测试：`TEST-SPLIT-016`（`python -X utf8 skill-dictionary/generate_dictionary.py`；`run_trigger_cases.ps1 -Phase post-delete -CasesRoot cases/release-test`）。
+- 字典刷新结果：`implemented_total: 85`（未变化）、`seed_total: 32`（较刷新前 +2，新增 `project-interface-baseline-rules`、`project-interface-release-execution-rules` 两个「扩展种子」条目）；`skill-dictionary/data.js` 与 `字典.md` 的 diff 核对确认两个新 skill 正确进入扩展种子分类，`project-release-test-rules` 保持原「已实现」分类不变（旧 skill 冻结未删除）。
+- Pre-delete 触发验证：`cases/release-test/trigger_cases.json`（6 组场景，RT-TRIGGER-PRE-001~006）全部通过，`cases/release-test/delete_cases.json`（RT-DELETE-PRE-001，旧 skill 存在 + 新 skill 存在 + mapping 冻结）通过。
+- Post-delete 触发验证：同 6 组场景模拟旧 skill 删除后重跑（RT-TRIGGER-POST-001~006，额外禁止命中 `project-release-test-rules`）全部通过，`delete_cases.json`（RT-DELETE-POST-001，旧 skill 不存在 + 新 skill 存在 + mapping 冻结）通过。全程未对真实 `project-release-test-rules/` 目录执行任何删除或重命名操作。
+- 旧入口依赖只读扫描（`rg -l "project-release-test-rules"`，排除 doc/5-tests、project-release-test-rules 自身和 doc/3-实施）：命中 `编码skill.md`、`字典.md`、`README.md`、`inventory.yaml`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`（仓库级路由/索引文件，6 处）；`functional-validation-rules/SKILL.md`、`swag-openapi-maintainer-rules/SKILL.md`、`test-strategy-rules/SKILL.md`（其他 skill 交叉引用，3 处）；`doc/2-需求/*`、`doc/6-审查/*`、`doc/7-验收/*` 共 7 处历史需求/审查/验收文档（历史记录，不涉及路由）；`artifact-delivery-gate-rules/references/plain-language-template-registry.yaml` 1 处。以上均未改写：本周期任务表（`TASK-SPLIT-04-01`~`04`）未包含专门的路由更新任务，与周期 03 的先例一致，路由切换留给未来专门任务并需要用户授权。
+- 结论：PASS。旧 `project-release-test-rules` 目录未做任何修改或删除，状态维持 `implemented`；两个新 skill 处于 `comparing`（已建立、已通过映射/引擎回归/触发/删除前检查，尚未接管路由）。

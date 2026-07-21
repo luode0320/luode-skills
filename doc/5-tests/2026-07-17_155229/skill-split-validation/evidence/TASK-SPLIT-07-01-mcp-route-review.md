@@ -1,0 +1,12 @@
+# TASK-SPLIT-07-01 MCP 路由复评证据
+
+- 复评对象：`mcp-installation-rules/SKILL.md`（16,880B）+ 5 个 `references/*.md`（`project-signals.md` 1,778B、`tool-priority.md` 4,049B、`config-bootstrap.md` 3,380B、`current-sources.md` 1,285B、`execution-failure-casebook.md` 2,532B）。体积证据：16,880B 仅超出预算矩阵 `normal_max_bytes=16000` 880B（约 5.5%），远低于 `review_max_bytes=20000` 与 `hard_warning_bytes=24000`，不构成真实截断风险，与 `2d-asset-design`（29,096B）、`agent-browser`（36,228B）等已拆分对象的体积压力量级不同。
+- 候选独立职责组：基于 SKILL.md 正文与 references 归属真实划分为两组——`GROUP-PROVISION`（安装判定：项目标记识别 + 别名归一 + Codex/Claude Code 配置补齐，独占 `project-signals.md`/`config-bootstrap.md`/`current-sources.md`/`execution-failure-casebook.md`）与 `GROUP-ROUTE`（工具路由：MCP 可用后浏览器/Godot 编辑器由谁接管，独占 `tool-priority.md`）；两组 `config_owner` 互不重叠（前者归属 Codex/Claude Code 配置文件，后者为 `N/A` 纯运行期判断），满足"配置 owner 唯一"门槛。
+- 路由样本：10 条，全部锚定 `mcp-installation-rules/SKILL.md` 自身"自动触发信号"一节已写明的真实触发句式（未额外发明与文档不符场景），落盘于 [mapping/mcp-route-matrix.yaml](/D:/luode/luode-skills/doc/5-tests/2026-07-17_155229/skill-split-validation/mapping/mcp-route-matrix.yaml)：3 条仅命中 `GROUP-PROVISION`、4 条同时命中两组、2 条仅命中 `GROUP-ROUTE`、1 条两组均不命中。
+- 数字门槛表面结果：独立组数量 2（达标，门槛 ≥2）；平均命中数 13/10=1.3（达标，门槛 ≤3）。
+- 独立性代理指标（本轮复评新增，非源计划文档预先给定数字，已在矩阵文件 `independence_proxy` 字段中如实标注来源）：`co_occurrence_rate`（两组同时命中样本占比）实测 4/10=0.4，超过本轮设定的 0.34 判定阈值；且这 4 条"同时命中"样本，恰好对应 SKILL.md"进入后先做什么"一节写明的顺序步骤（先读 `project-signals.md` 判断要不要装，再读 `tool-priority.md` 判断由谁接管），说明两组更接近"同一决策流程的先后两步"，而非彼此独立的用户意图。
+- `TEST-SPLIT-025` 真实执行：
+  1. `python -X utf8 doc/5-tests/2026-07-17_155229/skill-split-validation/validate_skill_split.py --mode route-matrix --mapping doc/5-tests/2026-07-17_155229/skill-split-validation/mapping/mcp-route-matrix.yaml` → 通过，输出 `2 个候选组、10 条样本、平均命中 1.3、共同命中占比 0.4，结论 decision=no_split`。校验器对矩阵声明的 `skill_md_bytes` 与磁盘实测字节数做了交叉核对（避免依据过期体积数字判断），并重新从 `samples` 逐条重算 `total_hit_count`/`average_hits_per_sample`/`co_occurring_sample_count`/`co_occurrence_rate`，与矩阵自报告的 `metrics` 字段逐项比对一致才算通过。
+  2. 负向验证（证明校验器非橡皮图章）：复制矩阵为临时文件，将 `average_hits_per_sample` 篡改为 `2.5` 后重跑同一命令 → 正确判定 `[失败] metrics.average_hits_per_sample 与重算平均命中数不一致`，退出码 `1`；临时文件已删除，未污染正式矩阵。
+- 结论：`decision=no_split`。理由（体积 + 独立性双重证据）与下次复评触发条件（体积超 `hard_warning` 或出现第三类与现有两组完全解耦的职责）均已写入 `mapping/mcp-route-matrix.yaml` 的 `conclusion` 字段。
+- 边界确认：本任务未安装、注册、连接任何 MCP，未创建新 skill 目录，未修改 `mcp-installation-rules` 任何文件；仅新增 `mapping/mcp-route-matrix.yaml` 一份复评产物，并为共享测试入口 `validate_skill_split.py` 增补 `route-matrix` 校验模式（复用 TASK-SPLIT-01-03 建立的通用入口惯例，未改动既有 `size`/`mapping`/`trigger`/`pre-delete`/`post-delete` 模式行为，`all` 模式批处理列表保持不变）。

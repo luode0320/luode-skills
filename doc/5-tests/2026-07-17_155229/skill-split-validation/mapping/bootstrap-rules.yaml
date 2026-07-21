@@ -1,0 +1,291 @@
+schema_version: 1
+doc_purpose: TASK-SPLIT-02-01 原子化映射；把 project-agents-bootstrap 的规则/资源逐条分配到规则文件组或项目记忆组，禁止无主落点。
+source_skill: project-agents-bootstrap
+source_baseline:
+  skill_md_path: project-agents-bootstrap/SKILL.md
+  skill_md_bytes: 70027
+  skill_md_md5: 44175ee2b02fd3280e529d7c2069feda
+  script_path: project-agents-bootstrap/scripts/bootstrap_agents.sh
+  script_bytes: 57586
+  script_lines: 945
+proposed_skills:
+  group_a:
+    id: project-rule-file-bootstrap-rules
+    focus: 规则文件自举、AGENTS/CLAUDE 同步与仓库级硬规则入口
+    trigger_boundary: 仓库规则文件缺失、损坏或需要同步补齐
+  group_b:
+    id: project-memory-file-bootstrap-rules
+    focus: PROJECT_CURRENT、PROJECT_MEMORY、PROJECT_HISTORY、PROJECT_STYLE 四件套自举与交接
+    trigger_boundary: 项目记忆四件套缺失、状态交接或长期记忆初始化
+shared_resources:
+  - id: RES-BOOT-SCRIPT
+    path: project-agents-bootstrap/scripts/bootstrap_agents.sh
+    owner: shared_single_writer
+    migration_action: keep_in_place
+    note: 唯一物理脚本不迁移、不复制；两个新 skill 都通过相对路径引用同一份脚本，脚本内部 sync_section 幂等 upsert，不产生双写冲突。
+  - id: RES-BOOT-SKILL-MD
+    path: project-agents-bootstrap/SKILL.md
+    owner: shared_frozen_baseline
+    migration_action: freeze_unchanged
+    note: 本周期不编辑此文件，保持字节不变作为对照基线（本周期任务契约未将其列为任一任务的允许文件）；主入口地位改由 AGENTS.md/README/字典等路由文件调整，删除判定留待后续门禁全部通过后再处理。
+  - id: RES-BOOT-UTIL-RESOLVE-PYTHON
+    path: scripts/bootstrap_agents.sh#resolve_python (70-102)
+    owner: shared_utility
+    migration_action: keep_in_place
+  - id: RES-BOOT-UTIL-IS-GODOT
+    path: scripts/bootstrap_agents.sh#is_godot_project (103-123)
+    owner: shared_utility
+    migration_action: keep_in_place
+    note: 供 group_a 的 Godot 章节判定使用，逻辑保留在共享脚本内。
+  - id: RES-BOOT-UTIL-EOL
+    path: scripts/bootstrap_agents.sh#detect_dominant_eol (124-158)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: RES-BOOT-UTIL-SYNC-SECTION
+    path: scripts/bootstrap_agents.sh#sync_section (626-674)
+    owner: shared_utility
+    migration_action: keep_in_place
+    note: 规则文件 owner 与记忆文件 owner 共用的幂等 upsert 引擎，禁止拆分或复制。
+rules:
+  - id: R-BOOT-001
+    section: frontmatter description
+    source: project-agents-bootstrap/SKILL.md:2
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 description 混合两职责，拆分后各自只描述本组触发对象与主责，不沿用旧前缀。
+  - id: R-BOOT-002
+    section: "## AI 环境检测与规则文件约定"
+    source: project-agents-bootstrap/SKILL.md:8-22
+    owner: group_a
+    migration_action: move
+  - id: R-BOOT-003
+    section: "## 目标（规则文件相关部分）"
+    source: project-agents-bootstrap/SKILL.md:23-30
+    owner: group_a
+    migration_action: move
+    note: Plan Mode 外壳路由、代码风格入口、Godot 图像配置目标均属规则文件内容目标。
+  - id: R-BOOT-004
+    section: "## 仓库级总控规则"
+    source: project-agents-bootstrap/SKILL.md:31-67
+    owner: dedupe_drop
+    migration_action: drop
+    canonical_source: AGENTS.md 自身 + skill-hit-check-rules skill
+    note: 与 BODY_SKILL_HIT（脚本第 226 行）和实时 AGENTS.md 正文三处重复；权威来源收敛为脚本内 BODY_SKILL_HIT 变量，本节整体去重删除，行为无回归（AGENTS.md 与 skill-hit-check-rules 已覆盖）。
+  - id: R-BOOT-005
+    section: "## 触发条件"
+    source: project-agents-bootstrap/SKILL.md:68-86
+    owner: split
+    migration_action: split
+    note: 规则文件检测/.gitattributes/.editorconfig 触发 -> group_a；统一 md 聚合指令中涉及四件套的分句 -> group_b；两组各自改写为独立触发条件，不互相引用旧 skill 名。
+  - id: R-BOOT-006
+    section: "## 会话动态重命名规则"
+    source: project-agents-bootstrap/SKILL.md:87-96
+    owner: dedupe_drop
+    migration_action: drop
+    canonical_source: thread-title-rules skill + AGENTS.md 正文
+    note: 内容与 AGENTS.md 项目文档区块重复，属于全仓通用行为而非本 skill 独有职责，去重删除。
+  - id: R-BOOT-007
+    section: "## 统一 md 补齐编排（根据 skill 补充更新 md）"
+    source: project-agents-bootstrap/SKILL.md:97-120
+    owner: split
+    migration_action: split
+    note: 表格与编排要求按目标文件拆分；AGENTS.md/CLAUDE.md 行 -> group_a；PROJECT_CURRENT/MEMORY/HISTORY 三行 -> group_b；PROJECT_STYLE 行本就只属于 project-style-rules，仅保留跨引用说明；聚合指令的统一入口改由用户同时命中两个新 skill 承担，不再需要单一超级入口。
+  - id: R-BOOT-008
+    section: "## 执行步骤 第 1-12 项（脚本调用与落盘核对）"
+    source: project-agents-bootstrap/SKILL.md:121-228
+    owner: group_a
+    migration_action: move
+    note: 步骤主线是"调用共享脚本 -> 核对结果"，主体归 group_a；第 9 项四件套缺失检查单独复制精简版给 group_b。
+  - id: R-BOOT-009
+    section: "## 执行步骤 第 13 项最低规则检查清单"
+    source: project-agents-bootstrap/SKILL.md:约178-227
+    owner: dedupe_drop
+    migration_action: drop
+    canonical_source: scripts/bootstrap_agents.sh 内 BODY_* 变量（脚本是实际写入源）
+    note: 与脚本 BODY_SKILL_HIT/BODY_NO_HALLUCINATE 等变量内容重复，属于第三份副本；两个新 skill 只需说明"受管章节内容以脚本 BODY_* 为准"，不再复制正文。
+  - id: R-BOOT-010
+    section: "## 执行步骤 CodeGraph / 插件检测子项"
+    source: project-agents-bootstrap/SKILL.md:约229-236
+    owner: group_a
+    migration_action: move
+    note: CodeGraph 与插件检测是规则文件受管章节的一部分，随 group_a 迁移；四件套侧不需要重复。
+  - id: R-BOOT-011
+    section: "## 脚本用法"
+    source: project-agents-bootstrap/SKILL.md:231-237
+    owner: split
+    migration_action: split
+    note: 通用调用参数说明两个新 skill 都需要各自精简版（各自只写与自身相关的 --target/--repo 示例）。
+  - id: R-BOOT-012
+    section: "## 最小模板（缺失时使用）+ 内嵌 AGENTS.md/CLAUDE.md 全文模板"
+    source: project-agents-bootstrap/SKILL.md:239-467
+    owner: dedupe_drop
+    migration_action: extract_to_reference
+    canonical_source: scripts/bootstrap_agents.sh 内 BODY_*/GITATTRIBUTES_CONTENT/EDITORCONFIG_CONTENT/GODOT_* 变量
+    target_path: project-rule-file-bootstrap-rules/references/规则文件模板/agents-md-template.md
+    note: 与脚本内多个 BODY_* heredoc 内容重复（第四份副本，且与脚本相比可能已漂移）；改为从脚本重新导出一份只读预览供人工查阅，脚本仍是唯一执行时写入源。
+  - id: R-BOOT-013
+    section: "## 边界"
+    source: project-agents-bootstrap/SKILL.md:468-482
+    owner: split
+    migration_action: split
+    note: 按边界条目归属拆分到两个新 skill 各自的边界章节。
+  - id: B-BOOT-BODY-SCOPE
+    source: scripts/bootstrap_agents.sh#BODY_SCOPE (159-164)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-NOTICE
+    source: scripts/bootstrap_agents.sh#BODY_NOTICE (165-169)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-SKILL-AUTO
+    source: scripts/bootstrap_agents.sh#BODY_SKILL_AUTO (170-204)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-NO-HALLUCINATE
+    source: scripts/bootstrap_agents.sh#BODY_NO_HALLUCINATE (205-213)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-NO-AUTO-COMMIT
+    source: scripts/bootstrap_agents.sh#BODY_NO_AUTO_COMMIT (214-225)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-SKILL-HIT
+    source: scripts/bootstrap_agents.sh#BODY_SKILL_HIT (226-260)
+    owner: group_a
+    migration_action: keep_in_place
+    note: 唯一权威来源；R-BOOT-004/R-BOOT-009 均去重指向这里。
+  - id: B-BOOT-BODY-CODE-GEN-STYLE
+    source: scripts/bootstrap_agents.sh#BODY_CODE_GENERATION_STYLE (261-271)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-KARPATHY
+    source: scripts/bootstrap_agents.sh#BODY_KARPATHY_HARD_GATES (272-285)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-THREAD-TITLE
+    source: scripts/bootstrap_agents.sh#BODY_THREAD_TITLE (286-296)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-COMMENT-TASK
+    source: scripts/bootstrap_agents.sh#BODY_COMMENT_TASK (297-304)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-CONTEXT-COMPRESS
+    source: scripts/bootstrap_agents.sh#BODY_CONTEXT_COMPRESS (305-312)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-CHINESE-ENC
+    source: scripts/bootstrap_agents.sh#BODY_CHINESE_ENC (313-323)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-MIN-CHANGE
+    source: scripts/bootstrap_agents.sh#BODY_MIN_CHANGE (324-328)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-LOCAL-ONLY
+    source: scripts/bootstrap_agents.sh#BODY_LOCAL_ONLY_CONNECTION (329-337)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-REUSE-FIRST
+    source: scripts/bootstrap_agents.sh#BODY_REUSE_FIRST (338-346)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-MINIMAL-LADDER
+    source: scripts/bootstrap_agents.sh#BODY_MINIMAL_LADDER (347-366)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-OUTPUT-FORMAT
+    source: scripts/bootstrap_agents.sh#BODY_OUTPUT_FORMAT (367-377)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-WINDOWS-WSL
+    source: scripts/bootstrap_agents.sh#BODY_WINDOWS_WSL (378-406)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-CODEGRAPH
+    source: scripts/bootstrap_agents.sh#BODY_CODEGRAPH (407-415)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-CODE-EXPLORE
+    source: scripts/bootstrap_agents.sh#BODY_CODE_EXPLORE (416-424)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-PLUGIN
+    source: scripts/bootstrap_agents.sh#BODY_PLUGIN (425-432)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-BODY-IMAGEGEN
+    source: scripts/bootstrap_agents.sh#BODY_IMAGEGEN (433-443)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-GODOT-TOOLING
+    source: scripts/bootstrap_agents.sh#GODOT_TOOLING_SECTION (444-450)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-GODOT-IMAGEGEN
+    source: scripts/bootstrap_agents.sh#GODOT_IMAGEGEN_SECTION (451-471)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-GITATTRIBUTES
+    source: scripts/bootstrap_agents.sh#GITATTRIBUTES_CONTENT (472-528, 两种 eol 变体)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-EDITORCONFIG
+    source: scripts/bootstrap_agents.sh#EDITORCONFIG_CONTENT (489-549, 两种 eol 变体)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: B-BOOT-PROJECT-MEMORY-MACHINE
+    source: scripts/bootstrap_agents.sh#PROJECT_MEMORY_MACHINE_SECTION (550-577)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: B-BOOT-PROJECT-CURRENT-TEMPLATE
+    source: scripts/bootstrap_agents.sh#PROJECT_CURRENT_TEMPLATE (578-614)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: B-BOOT-PROJECT-HISTORY-TEMPLATE
+    source: scripts/bootstrap_agents.sh#PROJECT_HISTORY_TEMPLATE (615-625)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: F-BOOT-CREATE-RULE-FILE
+    source: scripts/bootstrap_agents.sh#create_rule_file (675-684)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: F-BOOT-CREATE-PROJECT-MEMORY
+    source: scripts/bootstrap_agents.sh#create_project_memory_file (685-730)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: F-BOOT-ENSURE-CURRENT
+    source: scripts/bootstrap_agents.sh#ensure_project_current_file (731-764)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: F-BOOT-ENSURE-HISTORY
+    source: scripts/bootstrap_agents.sh#ensure_project_history_file (765-790)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: F-BOOT-SYNC-PROJECT-MEMORY
+    source: scripts/bootstrap_agents.sh#sync_project_memory_file (791-863)
+    owner: group_b
+    migration_action: keep_in_place
+  - id: F-BOOT-SYNC-AGENTS-FILE
+    source: scripts/bootstrap_agents.sh#sync_agents_file (864-905)
+    owner: group_a
+    migration_action: keep_in_place
+  - id: F-BOOT-MAIN-SEQUENCE
+    source: scripts/bootstrap_agents.sh#main 调用序列 (906-945)
+    owner: shared_utility
+    migration_action: keep_in_place
+    note: 单进程顺序调用两组函数，天然不产生并发双写；两个新 skill 都描述"调用同一脚本"，不新增第二份脚本入口。
+coverage_summary:
+  total_atomized_items: 55
+  owner_group_a_count: 33
+  owner_group_b_count: 7
+  owner_shared_count: 6
+  owner_dedupe_drop_count: 4
+  owner_split_or_rewrite_count: 5
+  unmapped_items: 0
+  count_verified_by: "Select-String -Pattern '^\\s*- id:' 与 '^\\s*owner:' 实测统计，2026-07-18"
+stop_condition_check:
+  any_rule_without_owner: false
+  any_script_resource_without_owner: false
+  duplicate_owner_conflict: false
+  result: pass

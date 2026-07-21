@@ -1,0 +1,178 @@
+schema_version: 1
+doc_purpose: TASK-SPLIT-03-01 原子化映射；把 skill-compliance-gate-rules 的规则/资源逐条分配到执行合规组或代码变更收口组，禁止无主落点。
+source_skill: skill-compliance-gate-rules
+source_baseline:
+  skill_md_path: skill-compliance-gate-rules/SKILL.md
+  skill_md_bytes: 19211
+  skill_md_md5: 16f5c34742279b64cae5de6daf8b1693
+  agents_openai_path: skill-compliance-gate-rules/agents/openai.yaml
+  agents_openai_bytes: 1585
+  agents_openai_md5: c63871136910cc346ba92df4f3971ffd
+  ref_gap_check_path: skill-compliance-gate-rules/references/applicability-and-gap-check.md
+  ref_gap_check_bytes: 3393
+  ref_gap_check_md5: 36ce61fb03b935a75c614c3837066111
+  ref_next_step_path: skill-compliance-gate-rules/references/next-step-suggestion-template.md
+  ref_next_step_bytes: 3084
+  ref_next_step_md5: 8c8eec079543ee2df7d3dcaefb5950a1
+proposed_skills:
+  group_a:
+    id: skill-execution-compliance-gate-rules
+    focus: 检查本轮已命中的其他 skill 是否被完整、正确执行，汇总计划内未完成必需项/阻断候选/blocked-manual_handoff 共享契约
+    trigger_boundary: 其他 skill 只执行了部分规则、多 skill 边界冲突、非预期工具/命令/API/模型执行失败需要联动 execution-failure-learning-rules、用户明确要求检查是否按 skill 全部执行
+  group_b:
+    id: code-change-finalization-gate-rules
+    focus: 本轮存在代码/测试改动时的最终收口闸门（注释双 skill、测试目录、真实运行验证、implementation-review 最低收口、router 提交前风格检查、用户手改保护）
+    trigger_boundary: 本轮发生代码新增/修改且准备最终回复前收口
+shared_resources:
+  - id: RES-COMP-RENDER-OWNER
+    path: reasoning-summary-structure-rules/SKILL.md（外部 skill，不迁移）
+    owner: shared_external_owner
+    migration_action: reference_only
+    note: 两个新 skill 都只产出 PASS/FAIL 与缺失字段，用户可见阻断区块/后续内容仍唯一由 reasoning-summary-structure-rules 渲染；本条边界在两个新 skill 中各自重申但不得实现渲染逻辑。
+  - id: RES-COMP-OUTPUT-POLICY
+    path: skill-compliance-gate-rules/SKILL.md#输出要求（简化版） (90-102)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 通用输出策略（不生成用户可见阻断模板、limited/not_applicable 不升级为阻断、可选优化不作为默认后续、禁止占位文案）对两组同等适用，各自在自身 SKILL.md 中重述一份，不视为职责重叠。
+  - id: RES-COMP-RESPONSIBILITY-BOUNDARY
+    path: skill-compliance-gate-rules/SKILL.md#权责边界与不负责事项 (126-133)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 不代替具体业务实现、不强制一次性补齐历史遗留、不误报当前阶段不适用、不输出冗长报告、不丢弃其他建议，对两组同等适用，各自重述并按自身范围收窄措辞。
+  - id: RES-COMP-REENTRY-POINT
+    path: skill-compliance-gate-rules/SKILL.md#回到主流程的重启点 (148-151)
+    owner: shared_duplicate
+    migration_action: duplicate_boundary
+    note: 阻断级/非阻断级的重启路径两组通用，各自重述并指向自身任务入口。
+rules:
+  - id: R-COMP-001
+    section: frontmatter description
+    source: skill-compliance-gate-rules/SKILL.md:2
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 description 混合代码新增/修改与非预期工具/命令/API/模型/浏览器/安装失败两类触发；拆分后各自只描述本组触发对象与主责，不沿用旧前缀或旧 skill 名。
+  - id: R-COMP-002
+    section: "## Skill 作用与适用场景"
+    source: skill-compliance-gate-rules/SKILL.md:11-30
+    owner: split
+    migration_action: split
+    note: 末端合规检查/blocked-manual_handoff 校验/非阻断时不得生成扩散性后续/结束指令优先等通用段落 -> group_a；本轮代码新增或修改时作为默认收口闸门触发及两条注释终检要求 bullet -> group_b。
+  - id: R-COMP-003
+    section: "## 自动触发信号"
+    source: skill-compliance-gate-rules/SKILL.md:31-41
+    owner: split
+    migration_action: split
+    note: 其他 skill 只做了部分规则/用户要求检查是否按 skill 全部执行/多 skill 边界冲突/非预期执行失败 -> group_a；代码改动需确认注释双 skill/代码新增修改进入最终回复前收口/工具调用需给出可核验执行证据 -> group_b。
+  - id: R-COMP-004
+    section: "## 进入后先做什么 1-5、11、13"
+    source: skill-compliance-gate-rules/SKILL.md:43-47,52,55
+    owner: group_a
+    migration_action: move
+    note: 列出命中 skill 清单、判断当前阶段规则、按 applicability-and-gap-check.md 识别缺口、识别计划内必需项与真实阻断候选、blocked/manual_handoff 校验共享契约、合并主任务状态与缺口状态、运行时状态真收口闸门（原第13项，与代码改动无关，统一归执行合规组，避免与 group_b 重复判断）。
+  - id: R-COMP-005
+    section: "## 进入后先做什么 6-10、12"
+    source: skill-compliance-gate-rules/SKILL.md:48-51,53-54
+    owner: group_b
+    migration_action: move
+    note: 当天时间戳目录一致性检查、注释闸门+函数/补丁核对清单、补注释优先级闸门、implementation-review 最低测试前收口、真实运行验证闸门、用户手改保护闸门（原第13项运行时状态真收口闸门改由 group_a 统一承接，见 R-COMP-004 备注，避免双写）。
+  - id: R-COMP-006
+    section: "## 默认执行流程 1、3、4、4.1、5、8、13、14、16、17"
+    source: skill-compliance-gate-rules/SKILL.md:60-63,64,67,73,78,86,87
+    owner: group_a
+    migration_action: move
+    note: 收集证据、识别规则、逐条核对已执行状态、execution-failure-learning-rules 核对、测试禁放扫描、形成校验结论分组、blocked/manual_handoff 渲染校验、PASS/FAIL 与缺失字段输出策略、Skill 执行证据确认（原第16项）、运行时状态收口确认（原第17项，与代码改动无关，统一归执行合规组，和阻断判定中的通用两条 R-COMP-012 保持同一 owner，避免与 group_b 重复判断）。
+  - id: R-COMP-007
+    section: "## 默认执行流程 2、6-7、9-12、15"
+    source: skill-compliance-gate-rules/SKILL.md:61,65-66,69-72,79
+    owner: group_b
+    migration_action: move
+    note: 判断本轮是否发生代码改动并进入闸门、router 风格闸门触发判断、新增测试文件当天目录检查、注释双 skill 收口确认、implementation-review 收口确认、真实运行验证确认、补注释请求确认、用户手改保护确认（原第16、17项 Skill 执行证据确认与运行时状态收口确认改由 group_a 统一承接，见 R-COMP-006 备注，避免双写）。
+  - id: R-COMP-008
+    section: "## 提交前闸门检查（internal/router）"
+    source: skill-compliance-gate-rules/SKILL.md:81-89
+    owner: group_b
+    migration_action: move
+    note: 具体代码模式检查（禁用动词方法、禁用 :id/{id}、禁用 route 列表注册、path 必须走本地常量），属于代码改动的提交前收口，不涉及其他 skill 是否被执行。
+  - id: R-COMP-009
+    section: "## 输出要求（简化版）"
+    source: skill-compliance-gate-rules/SKILL.md:90-102
+    owner: shared
+    migration_action: duplicate_boundary
+    combined_coverage: RES-COMP-OUTPUT-POLICY
+    note: 两组各自重述，参见 shared_resources.RES-COMP-OUTPUT-POLICY。
+  - id: R-COMP-010
+    section: "## 阻断判定与处理（通用两条）"
+    source: skill-compliance-gate-rules/SKILL.md:105-106
+    owner: group_a
+    migration_action: move
+    note: 缺口会直接导致实现错误/测试结论失真/归档位置错误与不补该规则就无法继续当前阶段正确推进为合规链通用阻断分级标准。
+  - id: R-COMP-011
+    section: "## 阻断判定与处理（代码改动具体项）"
+    source: skill-compliance-gate-rules/SKILL.md:107-114,117
+    owner: group_b
+    migration_action: move
+    note: 跨天目录写入、注释双 skill 闸门缺失、函数/补丁注释核对清单缺失、implementation-review 收口缺失、真实运行验证缺失、build/lint 误判为已验证、补注释优先级未满足、用户手改保护未执行。
+  - id: R-COMP-012
+    section: "## 阻断判定与处理（通用两条，工具证据/运行时状态）"
+    source: skill-compliance-gate-rules/SKILL.md:115-116
+    owner: group_a
+    migration_action: move
+    note: 工具调用但缺 Skill 执行证据与运行时状态收口机制未真实执行不特定于代码改动，归入合规链通用阻断项。
+  - id: R-COMP-013
+    section: "## 权责边界与不负责事项"
+    source: skill-compliance-gate-rules/SKILL.md:126-133
+    owner: shared
+    migration_action: duplicate_boundary
+    combined_coverage: RES-COMP-RESPONSIBILITY-BOUNDARY
+    note: 两组各自重述，参见 shared_resources.RES-COMP-RESPONSIBILITY-BOUNDARY。
+  - id: R-COMP-014
+    section: "## 执行通过 / 驳回标准"
+    source: skill-compliance-gate-rules/SKILL.md:134-142
+    owner: split
+    migration_action: split
+    note: 只说规则没做完但无可执行动作/运行时状态收口未执行/结束后仍默认追加下一步三条驳回 -> group_a；跨天目录仍推进/注释与真实验证缺失仍称已验证/代码改动未触发本闸门/补注释未先处理未提交改动/用户手改冲突未重同步驳回项 -> group_b；通过清单按各自检查项拆分复制。
+  - id: R-COMP-015
+    section: "## references 读取规则"
+    source: skill-compliance-gate-rules/SKILL.md:143-147
+    owner: split
+    migration_action: split
+    note: 默认先读 applicability-and-gap-check.md -> group_a；组织最终输出文案时读 next-step-suggestion-template.md -> group_b。
+  - id: R-COMP-016
+    section: "## 回到主流程的重启点"
+    source: skill-compliance-gate-rules/SKILL.md:148-151
+    owner: shared
+    migration_action: duplicate_boundary
+    combined_coverage: RES-COMP-REENTRY-POINT
+    note: 两组各自重述，参见 shared_resources.RES-COMP-REENTRY-POINT。
+  - id: R-COMP-017
+    section: "references/applicability-and-gap-check.md（整份文件）"
+    source: skill-compliance-gate-rules/references/applicability-and-gap-check.md
+    owner: group_a
+    migration_action: move
+    note: 可执行性判定、缺口三分类、三组合法后续候选生成，均为合规链核心逻辑，原文迁移不改语义。
+  - id: R-COMP-018
+    section: "references/next-step-suggestion-template.md（整份文件）"
+    source: skill-compliance-gate-rules/references/next-step-suggestion-template.md
+    owner: group_b
+    migration_action: move
+    note: 后续内容模板与 PASS/FAIL 收口渲染前的文案生成规则，归代码变更收口组（本组产出最终 PASS/FAIL 结论与可选后续内容草稿，用户可见渲染仍由 reasoning-summary-structure-rules 完成）。
+  - id: R-COMP-019
+    section: "agents/openai.yaml default_prompt"
+    source: skill-compliance-gate-rules/agents/openai.yaml
+    owner: split_rewrite
+    migration_action: rewrite
+    note: 旧 default_prompt 混合两组职责的调用文案；两个新 skill 各自重写 default_prompt，只描述本组职责范围，不复制整段旧文案。
+coverage_summary:
+  total_atomized_items: 23
+  owner_group_a_count: 5
+  owner_group_b_count: 5
+  owner_shared_count: 7
+  owner_dedupe_drop_count: 0
+  owner_split_or_rewrite_count: 6
+  unmapped_items: 0
+  count_verified_by: "Select-String -Pattern '^\\s*- id:' 与 '^\\s*owner:' 实测统计，2026-07-20"
+stop_condition_check:
+  any_rule_without_owner: false
+  any_script_resource_without_owner: false
+  duplicate_owner_conflict: false
+  result: pass

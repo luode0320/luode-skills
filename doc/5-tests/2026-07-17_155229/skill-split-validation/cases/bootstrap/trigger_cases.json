@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "BOOT-TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "新会话第一轮，仓库根目录缺失 AGENTS.md，需要创建规则文件。",
+      "required": ["project-rule-file-bootstrap-rules"],
+      "forbidden": ["project-memory-file-bootstrap-rules"],
+      "observed_hits": ["project-rule-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "BOOT-TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "规则文件已存在，但 PROJECT_MEMORY.md 缺少机器索引区，需要补齐四件套结构。",
+      "required": ["project-memory-file-bootstrap-rules"],
+      "forbidden": ["project-rule-file-bootstrap-rules"],
+      "observed_hits": ["project-memory-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "BOOT-TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "用户要求“根据 skill 更新项目 md”，规则文件与四件套同时需要检测。",
+      "required": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "BOOT-TRIGGER-PRE-004",
+      "phase": "pre-delete",
+      "prompt": "用户只要求补充维护 PROJECT_STYLE.md 代码风格文档。",
+      "required": ["project-style-rules"],
+      "forbidden": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "observed_hits": ["project-style-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "BOOT-TRIGGER-PRE-005",
+      "phase": "pre-delete",
+      "prompt": ".gitattributes 与 .editorconfig 缺失，需要补齐仓库级硬规则入口，四件套均已存在。",
+      "required": ["project-rule-file-bootstrap-rules"],
+      "forbidden": ["project-memory-file-bootstrap-rules"],
+      "observed_hits": ["project-rule-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "BOOT-TRIGGER-PRE-006",
+      "phase": "pre-delete",
+      "prompt": "用户要求“分析项目架构”，规则文件与四件套均已完整，无自举缺口。",
+      "required": ["project-design-doc-rules"],
+      "forbidden": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "observed_hits": ["project-design-doc-rules"],
+      "source": "fixture_observation"
+    }
+  ]
+}

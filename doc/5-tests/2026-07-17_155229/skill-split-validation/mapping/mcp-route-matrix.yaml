@@ -1,0 +1,101 @@
+schema_version: 1
+skill: mcp-installation-rules
+skill_md_path: mcp-installation-rules/SKILL.md
+skill_md_bytes: 16880
+budget:
+  normal_max_bytes: 16000
+  review_max_bytes: 20000
+  hard_warning_bytes: 24000
+  size_note: "16880B 仅超出 normal_max 880B（约 5.5%），远低于 hard_warning，不构成真实截断风险。"
+
+# 候选独立职责组：基于 SKILL.md 与 5 个 references 的真实内容分组，
+# 不是预设结论，仅作为路由样本标注的分类依据。
+candidate_groups:
+  - id: GROUP-PROVISION
+    name: MCP 安装判定
+    responsibility: "识别前端/Godot 项目标记，给出是否安装 MCP 的结论、别名归一和 Codex/Claude Code 配置补齐"
+    owning_references:
+      - mcp-installation-rules/references/project-signals.md
+      - mcp-installation-rules/references/config-bootstrap.md
+      - mcp-installation-rules/references/current-sources.md
+      - mcp-installation-rules/references/execution-failure-casebook.md
+    config_owner: "./.codex/config.toml（Codex）/ ./codex/config.toml（兼容路径）；Claude Code 配置机制待核实，未写入"
+  - id: GROUP-ROUTE
+    name: 工具路由优先级
+    responsibility: "MCP 已安装/可用后，浏览器与 Godot 编辑器控制权在 Chrome Plugin / Chrome DevTools MCP / agent-browser / Godot AI MCP 之间的运行期路由"
+    owning_references:
+      - mcp-installation-rules/references/tool-priority.md
+    config_owner: "N/A：本组不写入任何配置文件，仅做运行期工具选择判断"
+
+# 独立性判据来源说明：计划文档本身只给出“两个以上独立触发组 + 平均命中不超过 3 + 配置 owner 唯一”
+# 三项数字门槛，未给出量化的“共同命中占比”上限。本次复评依据计划文档“避免安装/注册/工具优先级
+# 被机械拆成多个高命中入口”的谨慎精神，额外引入 co_occurrence_rate 作为独立性代理指标，并如实标注
+# 该指标为本轮复评新增，而非源计划文档预先给定的数字。
+independence_proxy:
+  metric: co_occurrence_rate
+  definition: "命中样本中同时命中 GROUP-PROVISION 与 GROUP-ROUTE 两组的样本数 / 总样本数"
+  threshold: 0.34
+  threshold_source: "本轮复评新增代理指标，非源计划文档预定数字；用于避免把'同一决策流程的相邻两步'误判为'两个独立职责'"
+
+# 路由样本：全部锚定 SKILL.md 自身"自动触发信号"一节已写明的真实触发句式，
+# 不额外发明与文档不符的场景。
+samples:
+  - id: MCP-ROUTE-001
+    prompt: "检查一下这个项目是否需要装 MCP"
+    expected_groups_hit: [GROUP-PROVISION]
+  - id: MCP-ROUTE-002
+    prompt: "用户提到'谷歌浏览器 MCP'，想统一一下命名和判定口径"
+    expected_groups_hit: [GROUP-PROVISION]
+  - id: MCP-ROUTE-003
+    prompt: "分析一下这个仓库要不要装 CodeGraph 或 codebase-memory-mcp"
+    expected_groups_hit: [GROUP-PROVISION]
+  - id: MCP-ROUTE-004
+    prompt: "先分析项目，再决定浏览器该由什么工具接管"
+    expected_groups_hit: [GROUP-PROVISION, GROUP-ROUTE]
+  - id: MCP-ROUTE-005
+    prompt: "先分析项目，再决定 Godot 编辑器该由什么工具接管"
+    expected_groups_hit: [GROUP-PROVISION, GROUP-ROUTE]
+  - id: MCP-ROUTE-006
+    prompt: "当前任务即将涉及前端页面验证、浏览器联动测试，但仓库中尚未明确 MCP 接管策略"
+    expected_groups_hit: [GROUP-PROVISION, GROUP-ROUTE]
+  - id: MCP-ROUTE-007
+    prompt: "当前任务即将涉及 Godot 编辑器联动、场景编辑，但仓库中尚未明确 MCP 接管策略"
+    expected_groups_hit: [GROUP-PROVISION, GROUP-ROUTE]
+  - id: MCP-ROUTE-008
+    prompt: "MCP 都装好了，我现在要做浏览器联调，该用 Chrome Plugin 还是 agent-browser"
+    expected_groups_hit: [GROUP-ROUTE]
+  - id: MCP-ROUTE-009
+    prompt: "Godot AI MCP 已经装好，我现在要不要直接用它编辑场景"
+    expected_groups_hit: [GROUP-ROUTE]
+  - id: MCP-ROUTE-010
+    prompt: "帮我看下后端订单服务的空指针报错"
+    expected_groups_hit: []
+
+# 汇总指标：由 validator 从 samples 重新计算并与此处声明值交叉核对，
+# 任何不一致都判定为报告失真。
+metrics:
+  total_samples: 10
+  total_hit_count: 13
+  average_hits_per_sample: 1.3
+  independent_group_count: 2
+  co_occurring_sample_count: 4
+  co_occurrence_rate: 0.4
+
+# 复评结论：不拆。数字门槛（>=2 独立组、平均命中<=3）表面达标，
+# 但 co_occurrence_rate=0.4 超过本轮新增的 0.34 独立性代理阈值，
+# 且 SKILL.md 体积仅超 normal_max 880B、远低于 hard_warning，无真实截断风险，
+# 判定为"同一决策流程的两个相邻步骤"而非"两个独立职责"，不满足拆分条件。
+conclusion:
+  decision: no_split
+  reason: >-
+    尺寸证据：mcp-installation-rules/SKILL.md 当前 16880B，仅超出 normal_max_bytes(16000) 880B（约5.5%），
+    远低于 review_max_bytes(20000) 与 hard_warning_bytes(24000)，无真实截断风险，不构成体积治理意义上的拆分动机。
+    职责证据：GROUP-PROVISION 与 GROUP-ROUTE 在 owning_references 层面确有分工（各自独占一组 references，
+    config_owner 不重叠），数量与平均命中门槛（2 组、1.3 次/样本）表面达标；但 SKILL.md 自身"自动触发信号"
+    一节列出的真实触发句式中，10 条真实场景样本有 4 条（40%）同时命中两组，且这些"同时命中"场景（先判断
+    要不要装、再判断由谁接管）正是 SKILL.md"进入后先做什么"一节明确写出的顺序步骤（先读 project-signals.md
+    再读 tool-priority.md），说明两组更接近"同一决策流程的先后两步"而非彼此独立的用户意图。
+    综合尺寸与独立性两方面证据，判定为不拆分。
+  next_review_condition: >-
+    若 SKILL.md 体积超过 hard_warning_bytes(24000)，或未来新增第三类与现有 provisioning/routing 完全解耦的
+    职责（例如新增一类不依赖项目信号识别、也不参与工具路由的独立 MCP 判定逻辑），再次触发复评。

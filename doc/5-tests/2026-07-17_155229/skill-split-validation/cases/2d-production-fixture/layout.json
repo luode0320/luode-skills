@@ -1,0 +1,14 @@
+{
+  "props": [
+    {
+      "image": "doc/5-tests/2026-07-17_155229/skill-split-validation/cases/2d-production-fixture/sprite-out/frames/frame_000.png",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "image": "doc/5-tests/2026-07-17_155229/skill-split-validation/cases/2d-production-fixture/sprite-out/frames/frame_001.png",
+      "x": 60,
+      "y": 0
+    }
+  ]
+}

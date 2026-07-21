@@ -1,0 +1,21 @@
+# TASK-SPLIT-05-05 路由更新与删除前承接检查证据
+
+- 测试：字典生成脚本重跑；`run_trigger_cases.ps1 -Phase pre-delete` 与 `-Phase post-delete`，`CasesRoot=cases/agent-browser`。
+- 路由更新范围（`rg -n --fixed-strings "agent-browser" --glob '!doc/**' ...` 复核，共 11 处活跃引用文件，按 `mapping/agent-browser.yaml` 的 `group_a`（`browser-session-automation-rules`，隔离 profile/具名 session 核心自动化）/`group_b`（`browser-advanced-testing-rules`，HAR/视觉 diff/trace/代理/多引擎高级验证）分组改写）：
+  - `mcp-installation-rules/SKILL.md`：description 与正文共 9 处提及浏览器路由的段落，逐处按核心自动化/高级验证拆分为两个新 skill 名；`默认优先级`列表原 1 条 `agent-browser` 拆为 2 条。
+  - `mcp-installation-rules/references/tool-priority.md`：唯一浏览器工具矩阵来源文件，`浏览器工具边界` 表原 3 行拆为 4 行、`浏览器路由矩阵` 表原 5 行拆为 6 行，名称约定段落同步改指两个新 skill。
+  - `authenticated-url-routing-rules/SKILL.md`：description 兜底路由、后备通道编号列表、`--auto-connect` 阻断描述共 3 处改指向 `browser-session-automation-rules`（基础自动化）或视语境拆分两条。
+  - `execution-failure-learning-rules/references/classification-and-routing.md`：高风险域预检注册表原 1 行拆为 2 行，分别对应核心会话自动化与高级验证观测的失败恢复 owner。
+  - `team-development-rules/references/routing-rules.md`：浏览器联调路由矩阵行补充两个新 skill 名。
+  - `编码skill.md`：Skill 一览表 1 行拆为 2 行；`测试域内部边界判定`“浏览器联动执行”小节 2 处描述、`测试域默认分流规则` 1 处描述改为分别指出核心自动化与高级验证的归属。
+  - `README.md`：Skill 一览表 1 行拆为 2 行；历史 Git 提交日志（2026-04-03/2026-05-12/2026-07-12 三条含 `agent-browser` 字样的改动记录）为历史事实，按惯例保留不回改。
+  - `项目设计.md`：`测试域` 行的“统一浏览器路由（含 agent-browser 条件能力）”改为并列两个新 skill 名；`6.3 工具型 seed skill` 列表原 1 条改为 2 条。
+  - `PROJECT_MEMORY.md`：`### URL 认证浏览器默认路由` 核心记忆定义（第 464 行）与其机器索引镜像（第 672 行）的 2 处 `agent-browser` 改为 `browser-session-automation-rules`；第 99/533/972 行为 `TASK-SPLIT-01-02` 候选矩阵历史决策记录与 `## 变更记录` 下的历史日志条目，按惯例保留不回改。
+- 命令与结果：`python -X utf8 skill-dictionary/generate_dictionary.py` → 退出码 0，`implemented_total=88`（较周期 04 后的 87 净增 1）、`planned_missing=0`、`seed_total=33`。
+- 校验结果：
+  - `browser-session-automation-rules`、`browser-advanced-testing-rules` 均为 `"status": "implemented"`。
+  - `agent-browser` 自动降级为 `"status": "seed"`；`SKILL.md` MD5 `59917697eefafef9221d4484cb1d5225` 与 `TASK-SPLIT-05-01` 基线一致，`references/`、`templates/` 目录内容未被移动或删除。
+  - `字典.md` 同步重新生成。
+- 命令：`pwsh -NoProfile -File run_trigger_cases.ps1 -Phase pre-delete -CasesRoot cases/agent-browser` → 6 个 trigger 用例 + 1 个 pre-delete 快照全部 `[通过]`。
+- 命令：`pwsh -NoProfile -File run_trigger_cases.ps1 -Phase post-delete -CasesRoot cases/agent-browser` → 6 个 trigger 用例 + 1 个 post-delete 快照全部 `[通过]`，输出显式声明 `未删除或修改任何真实 skill 目录`。
+- 结论：路由更新未触碰任何 `.gitattributes`/`.editorconfig`/`doc/**` 历史文档；周期状态维持 `comparing`，未执行任何删除动作，等待用户对 `agent-browser` 目录的后续处置决策。

@@ -1,0 +1,9 @@
+# TASK-SPLIT-05-04 删除前验证证据
+
+- 测试：`TEST-SPLIT-020`（`python -X utf8 skill-dictionary/generate_dictionary.py`；`run_trigger_cases.ps1 -Phase pre-delete/post-delete -CasesRoot cases/agent-browser`）。
+- 字典刷新结果：`implemented_total: 85`（未变化）、`seed_total: 34`（较刷新前 +2，新增 `browser-advanced-testing-rules`、`browser-session-automation-rules` 两个「扩展种子」条目，`字典.md` 第 335/338 行）；核对 `字典.md` 第 275 行确认 `agent-browser` 保持原「已实现」分类不变（旧 skill 冻结未删除）。
+- 新建 `cases/agent-browser/trigger_cases.json`（12 组场景：`AB-TRIGGER-PRE-001~006` + `AB-TRIGGER-POST-001~006`，覆盖核心单独命中、高级单独命中、两组同时命中、两组均不命中、profiling 场景、并行 session+批量场景）与 `cases/agent-browser/delete_cases.json`（`AB-DELETE-PRE-001`/`AB-DELETE-POST-001`）。
+- Pre-delete 触发验证：`run_trigger_cases.ps1 -Phase pre-delete -CasesRoot cases/agent-browser` → `AB-TRIGGER-PRE-001~006` 与 `AB-DELETE-PRE-001`（旧 skill 存在 + 新 skill 存在 + mapping 冻结）全部通过。
+- Post-delete 触发验证：同 6 组场景模拟旧 skill 删除后重跑（`AB-TRIGGER-POST-001~006`，额外禁止命中 `agent-browser`）全部通过，`AB-DELETE-POST-001`（旧 skill 不存在 + 新 skill 存在 + mapping 冻结）通过。全程未对真实 `agent-browser/` 目录执行任何删除或重命名操作。
+- 旧入口依赖只读扫描（`rg -l "agent-browser" --glob '!doc/5-tests/**' --glob '!agent-browser/**' --glob '!skill-dictionary/**' --glob '!字典.md'`）：命中仓库级路由/索引文件 `项目设计.md`、`编码skill.md`、`README.md`、`PROJECT_MEMORY.md`（4 处）；其他 skill 交叉引用 `authenticated-url-routing-rules/SKILL.md`、`execution-failure-learning-rules/references/classification-and-routing.md`、`mcp-installation-rules/SKILL.md`、`mcp-installation-rules/references/tool-priority.md`、`team-development-rules/references/routing-rules.md`（5 处）；`doc/2-需求/*`、`doc/6-审查/*` 共 6 处历史需求/审查文档（历史记录，不涉及路由）；两个新 skill 目录内部（`browser-session-automation-rules/`、`browser-advanced-testing-rules/`）互相交叉引用及自身文件命中属预期内部结构，不计入待路由范围。以上均未改写：本周期任务表（`TASK-SPLIT-05-01~04`）未包含专门的路由更新任务，与周期 03/04 的先例一致，路由切换留给未来专门任务并需要用户授权。
+- 结论：PASS。旧 `agent-browser` 目录未做任何修改或删除，状态维持 `implemented`；两个新 skill 处于 `comparing`（已建立、已通过原子化映射/真实浏览器测试/触发/删除前检查，尚未接管路由）。

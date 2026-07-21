@@ -1,0 +1,3932 @@
+schema_version: 1
+matrix_id: MATRIX-SKILL-SPLIT-20260717
+generated_at: '2026-07-17 16:37:35'
+source_ids:
+- SRC-SKILL-SPLIT-20260716
+- DEC-SKILL-SIZE-BUDGET-20260716
+- DEC-SKILL-SPLIT-BINARY-20260716
+- DEC-SKILL-SPLIT-ORDER-20260716
+- DEC-SKILL-SPLIT-DELETE-GATE-20260716
+- DEC-SKILL-SPLIT-PLAN-ONLY-20260716
+- REQ-SKILL-SIZE-001
+- REQ-SKILL-SPLIT-001
+- AC-SKILL-SPLIT-002
+- PHASE-SPLIT-01
+- CYCLE-SPLIT-01
+- TASK-SPLIT-01-02
+- TEST-SPLIT-002
+report:
+  path: doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.json
+  sha256: 76a73a61ad843eddfd6c62f9846f2c8ad8fbba588278ea963f507ca3d26da062
+  formal_skill_count: 84
+  disk_skill_directory_count: 111
+  extension_seed_count: 27
+baseline_boundary:
+  formal_registry: 字典.md 主规划域（1 至 10 域），本轮正式预算基线为 84 个 skill。
+  extension_seed_policy: 字典.md 11.扩展种子共 27 个，不计入正式 84 个预算总数；矩阵单独列出边界条目。
+  explicit_seed_exception: 2d-asset-design 已在冻结需求中列为 P1 候选，本矩阵保留其候选决策但不把它计入 formal_skill_count。
+budget_policy:
+  decision_id: DEC-SKILL-SIZE-BUDGET-20260716
+  skill_md:
+    normal_max_bytes: 16000
+    review_max_bytes: 20000
+    hard_warning_bytes: 24000
+  reference_max:
+    normal_max_bytes: 12000
+    review_max_bytes: 16000
+  default_text:
+    normal_max_bytes: 48000
+    hard_warning_bytes: 64000
+classification_policy:
+  enter_split: 体积/加载风险成立且至少两个独立触发职责组已证明；进入对应后续周期。
+  candidate_design: 存在候选二分，但受条件周期或平均命中门槛控制，当前不进入资产实施。
+  gated_reassessment: 体积高但独立职责/平均命中尚未收敛，只记录复评条件。
+  hold: 不具备当前可证明的两个独立职责组，保持原 skill 并记录复评条件。
+  not_candidate: 当前预算未越过拆分阈值，且没有独立职责证据；仅按后续统计复评。
+  extension_seed_hold: 不属于正式 84 个基线，除明确例外外不在本周期进入候选冻结。
+candidate_order:
+- order: 1
+  skill: project-agents-bootstrap
+  registry_scope: formal_registry
+  priority: P0
+  decision: enter_split
+  next_cycle: CYCLE-SPLIT-02
+  task_ids:
+  - TASK-SPLIT-02-01
+  - TASK-SPLIT-02-02
+  - TASK-SPLIT-02-03
+  - TASK-SPLIT-02-04
+  - TASK-SPLIT-02-05
+  source_path: project-agents-bootstrap/SKILL.md
+  proposed_skill_paths:
+  - project-rule-file-bootstrap-rules/SKILL.md
+  - project-memory-file-bootstrap-rules/SKILL.md
+  proposed_skills:
+  - project-rule-file-bootstrap-rules
+  - project-memory-file-bootstrap-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids:
+  - TEST-SPLIT-003
+  - TEST-SPLIT-004
+  - TEST-SPLIT-005
+  - TEST-SPLIT-006
+- order: 2
+  skill: skill-compliance-gate-rules
+  registry_scope: formal_registry
+  priority: P0
+  decision: enter_split
+  next_cycle: CYCLE-SPLIT-03
+  task_ids:
+  - TASK-SPLIT-03-01
+  - TASK-SPLIT-03-02
+  - TASK-SPLIT-03-03
+  source_path: skill-compliance-gate-rules/SKILL.md
+  proposed_skill_paths:
+  - skill-execution-compliance-gate-rules/SKILL.md
+  - code-change-finalization-gate-rules/SKILL.md
+  proposed_skills:
+  - skill-execution-compliance-gate-rules
+  - code-change-finalization-gate-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids:
+  - TEST-SPLIT-003
+  - TEST-SPLIT-005
+  - TEST-SPLIT-006
+- order: 3
+  skill: project-release-test-rules
+  registry_scope: formal_registry
+  priority: P1
+  decision: enter_split
+  next_cycle: CYCLE-SPLIT-04
+  task_ids:
+  - TASK-SPLIT-04-01
+  - TASK-SPLIT-04-02
+  - TASK-SPLIT-04-03
+  - TASK-SPLIT-04-04
+  source_path: project-release-test-rules/SKILL.md
+  proposed_skill_paths:
+  - project-interface-baseline-rules/SKILL.md
+  - project-interface-release-execution-rules/SKILL.md
+  proposed_skills:
+  - project-interface-baseline-rules
+  - project-interface-release-execution-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids:
+  - TEST-SPLIT-003
+  - TEST-SPLIT-005
+  - TEST-SPLIT-006
+  - TEST-SPLIT-007
+- order: 4
+  skill: agent-browser
+  registry_scope: formal_registry
+  priority: P1
+  decision: enter_split
+  next_cycle: CYCLE-SPLIT-05
+  task_ids:
+  - TASK-SPLIT-05-01
+  - TASK-SPLIT-05-02
+  - TASK-SPLIT-05-03
+  - TASK-SPLIT-05-04
+  source_path: agent-browser/SKILL.md
+  proposed_skill_paths:
+  - browser-session-automation-rules/SKILL.md
+  - browser-advanced-testing-rules/SKILL.md
+  proposed_skills:
+  - browser-session-automation-rules
+  - browser-advanced-testing-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids:
+  - TEST-SPLIT-003
+  - TEST-SPLIT-005
+  - TEST-SPLIT-006
+- order: 5
+  skill: 2d-asset-design
+  registry_scope: extension_seed
+  priority: P1
+  decision: enter_split
+  next_cycle: CYCLE-SPLIT-06
+  task_ids:
+  - TASK-SPLIT-06-01
+  - TASK-SPLIT-06-02
+  - TASK-SPLIT-06-03
+  - TASK-SPLIT-06-04
+  source_path: 2d-asset-design/SKILL.md
+  proposed_skill_paths:
+  - game-asset-design-gate-rules/SKILL.md
+  - game-asset-production-handoff-rules/SKILL.md
+  proposed_skills:
+  - game-asset-design-gate-rules
+  - game-asset-production-handoff-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids:
+  - TEST-SPLIT-003
+  - TEST-SPLIT-005
+  - TEST-SPLIT-006
+- order: 6
+  skill: mcp-installation-rules
+  registry_scope: formal_registry
+  priority: P2
+  decision: candidate_design
+  next_cycle: CYCLE-SPLIT-07
+  task_ids:
+  - TASK-SPLIT-07-01
+  source_path: mcp-installation-rules/SKILL.md
+  proposed_skill_paths:
+  - browser-mcp-routing-rules/SKILL.md
+  - project-tool-mcp-provisioning-rules/SKILL.md
+  proposed_skills:
+  - browser-mcp-routing-rules
+  - project-tool-mcp-provisioning-rules
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids: []
+  implementation_test_note: N/A + 原因 + 证据：CYCLE-SPLIT-07 只做复评，尚未冻结独立实施测试入口。
+- order: 7
+  skill: implementation-planning-rules
+  registry_scope: formal_registry
+  priority: 复评
+  decision: gated_reassessment
+  next_cycle: CYCLE-SPLIT-08
+  task_ids:
+  - TASK-SPLIT-08-01
+  source_path: implementation-planning-rules/SKILL.md
+  proposed_skill_paths: []
+  proposed_skills: []
+  decision_ids:
+  - DEC-SKILL-SPLIT-BINARY-20260716
+  - DEC-SKILL-SPLIT-ORDER-20260716
+  matrix_validation_test: TEST-SPLIT-002
+  implementation_test_ids: []
+  implementation_test_note: N/A + 原因 + 证据：CYCLE-SPLIT-08 只做路由/authoring 命中复评，未冻结拆分实施入口。
+validation_scope:
+  matrix_validation_test:
+    id: TEST-SPLIT-002
+    purpose: 校验四份工程文档、候选矩阵结构、报告哈希、正式/扩展种子边界和 P0/P1 二分证据。
+    profile_names:
+    - requirement
+    - acceptance
+    - implementation_master
+    - implementation_overview
+    matrix_assertions:
+    - formal_skill_count == 84
+    - extension_seed_count == 27
+    - report.sha256 与 skill-size-report.json 实际 SHA-256 一致
+    - formal entries 与报告 84 个 skill 名称集合一致
+    - extension_seed_entries 与报告排除的 27 个种子名称集合一致
+    - 4 个 enter_split 条目均有两个 proven 独立职责组
+    - 2d-asset-design 保留在 extension_seed_entries 并标记 P1/enter_split 例外
+    - 所有条目具备资源范围、停止条件、复评条件和追踪字段
+  implementation_test_resolution: 当前矩阵只冻结对应候选的后续周期、任务和未来测试 ID；真实 skill 资产测试必须在对应 CYCLE/TASK 中单独闭环，不能用 TEST-SPLIT-002 代替。
+  allowed_paths:
+  - doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.json
+  - doc/5-tests/2026-07-17_155229/skill-split-validation/mapping/candidate-matrix.yaml
+  - doc/2-需求/2026-07-16_114619_Skill体积治理与拆分.md
+  - doc/7-验收/2026-07-16_114619_Skill体积治理与拆分_验收标准.md
+  - doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施总览.md
+  - doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_需求与实施计划全量顺序实施方案.md
+entries:
+- skill: team-development-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6625
+    reference_total_bytes: 22361
+    reference_max_bytes: 11600
+    default_text_bytes: 28986
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: artifact-storage-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 13500
+    reference_total_bytes: 34242
+    reference_max_bytes: 12007
+    default_text_bytes: 47742
+    budget_level: review
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：references 较大，但承担跨域统一存储、命名和复用单一 owner；当前没有两个独立触发对象证据。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 路径定义与复用策略形成可独立触发、独立验收的职责组，且不产生第二存储真相源。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-design-doc-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7148
+    reference_total_bytes: 4616
+    reference_max_bytes: 2191
+    default_text_bytes: 11764
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: architecture-doc-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8034
+    reference_total_bytes: 11119
+    reference_max_bytes: 4239
+    default_text_bytes: 19153
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-local-skills-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4466
+    reference_total_bytes: 2627
+    reference_max_bytes: 1362
+    default_text_bytes: 7093
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: mcp-installation-rules
+  registry_scope: formal_registry
+  priority: P2
+  decision: candidate_design
+  metrics:
+    skill_md_bytes: 16880
+    reference_total_bytes: 13024
+    reference_max_bytes: 4049
+    default_text_bytes: 29904
+    budget_level: review
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id001
+      id: A
+      focus: 浏览器/Godot/CodeGraph 等 MCP 工具的任务路由与优先级判断
+      proposed_skill: browser-mcp-routing-rules
+      trigger_boundary: 根据项目标记和任务类型选择 MCP 工具路由。
+    - &id002
+      id: B
+      focus: MCP 配置补齐、安装、启用、环境检查和 provisioning
+      proposed_skill: project-tool-mcp-provisioning-rules
+      trigger_boundary: 需要检查、安装、配置或启用 MCP。
+  split_groups:
+    status: candidate_only
+    group_a: *id001
+    group_b: *id002
+  resource_scope:
+  - SKILL.md
+  - references/browser-mcp
+  - references/godot-mcp
+  - references/codegraph
+  - references/config
+  - references/provisioning
+  stop_condition: 平均命中超过 3；配置 owner 不唯一；或路由判断必须依赖 provisioning 细节。
+  revisit_condition: 仅在 CYCLE-SPLIT-07 复评；当前不进入新 skill 实施。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-07
+    task: TASK-SPLIT-07-01
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: godot-project-bootstrap-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5005
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 5005
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: codegraph-analysis-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5877
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 5877
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-agents-bootstrap
+  registry_scope: formal_registry
+  priority: P0
+  decision: enter_split
+  metrics:
+    skill_md_bytes: 70027
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 70027
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id003
+      id: A
+      focus: 规则文件自举、AGENTS/CLAUDE 同步与仓库级硬规则入口
+      proposed_skill: project-rule-file-bootstrap-rules
+      trigger_boundary: 仓库规则文件缺失、损坏或需要同步补齐。
+    - &id004
+      id: B
+      focus: PROJECT_CURRENT、PROJECT_MEMORY、PROJECT_HISTORY、PROJECT_STYLE 四件套自举与交接
+      proposed_skill: project-memory-file-bootstrap-rules
+      trigger_boundary: 项目记忆四件套缺失、状态交接或长期记忆初始化。
+  split_groups:
+    status: frozen
+    group_a: *id003
+    group_b: *id004
+  resource_scope:
+  - SKILL.md
+  - agents/openai.yaml
+  - scripts/bootstrap_agents.sh
+  - references/规则文件模板
+  - references/项目记忆模板
+  stop_condition: 任一规则、模板或脚本无主承接；fixture 首次/重复运行不等价；或新入口平均命中稳定超过 3。
+  revisit_condition: 映射 100%、双跑 fixture 和删除前引用检查未完成前保持 splitting/comparing，不得删除旧 skill。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-02
+    task: TASK-SPLIT-02-01
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: thread-title-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8129
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 8129
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: parallel-task-dispatch-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8224
+    reference_total_bytes: 9080
+    reference_max_bytes: 5852
+    default_text_bytes: 17304
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: skill-evolution-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7841
+    reference_total_bytes: 6365
+    reference_max_bytes: 2095
+    default_text_bytes: 14206
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: skill-hit-check-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 9754
+    reference_total_bytes: 5793
+    reference_max_bytes: 4681
+    default_text_bytes: 15547
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-snippet-location-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5709
+    reference_total_bytes: 1872
+    reference_max_bytes: 1872
+    default_text_bytes: 7581
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: subagent-dispatch-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 18361
+    reference_total_bytes: 28594
+    reference_max_bytes: 6780
+    default_text_bytes: 46955
+    budget_level: review
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：文本体积进入复评区，但当前是统一委派、并发上限、生命周期和回收状态机 owner，拆分会增加命中链。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 委派决策与生命周期回收可以独立触发，且平均命中不超过 3。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: skill-audit-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 2359
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 2359
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: skill-compliance-gate-rules
+  registry_scope: formal_registry
+  priority: P0
+  decision: enter_split
+  metrics:
+    skill_md_bytes: 19211
+    reference_total_bytes: 6477
+    reference_max_bytes: 3393
+    default_text_bytes: 25688
+    budget_level: review
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id005
+      id: A
+      focus: Skill 命中链、规则完整性、触发边界、失败学习和路由合规
+      proposed_skill: skill-execution-compliance-gate-rules
+      trigger_boundary: 技能链、规则覆盖、失败路由或触发合规需要收口。
+    - &id006
+      id: B
+      focus: 代码改动注释、实现审查、用户手改和最终代码收口
+      proposed_skill: code-change-finalization-gate-rules
+      trigger_boundary: 代码/脚本改动完成后准备测试、审查或最终收口。
+  split_groups:
+    status: frozen
+    group_a: *id005
+    group_b: *id006
+  resource_scope:
+  - SKILL.md
+  - references/skill-hit-check
+  - references/skill-audit
+  - references/implementation-review
+  - references/comment-gate
+  - references/execution-failure
+  stop_condition: PASS/FAIL 主 owner 不唯一；reasoning-summary 仍被新 skill 抢占；或注释/实现/失败学习规则出现遗漏。
+  revisit_condition: 先完成原子规则映射与唯一渲染 owner 证明，再进入新 skill 骨架和触发测试。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-03
+    task: TASK-SPLIT-03-01
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: reasoning-summary-structure-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11370
+    reference_total_bytes: 12295
+    reference_max_bytes: 4490
+    default_text_bytes: 23665
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: recent-context-bootstrap-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6482
+    reference_total_bytes: 5144
+    reference_max_bytes: 2567
+    default_text_bytes: 11626
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: history-recall-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5322
+    reference_total_bytes: 4239
+    reference_max_bytes: 1435
+    default_text_bytes: 9561
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: obsidian-knowledge-flow
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 10803
+    reference_total_bytes: 51468
+    reference_max_bytes: 9649
+    default_text_bytes: 62271
+    budget_level: review
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：默认文本包较大，但当前仍是唯一 Obsidian 检索/沉淀/bridge 安全边界 owner；不能把知识流拆成互相依赖的多个入口。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 检索/沉淀与 bridge 操作能独立触发、独立验收且不削弱 vault 安全边界。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-timeline-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4430
+    reference_total_bytes: 3828
+    reference_max_bytes: 1177
+    default_text_bytes: 8258
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-memory-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7516
+    reference_total_bytes: 14410
+    reference_max_bytes: 4393
+    default_text_bytes: 21926
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-style-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5569
+    reference_total_bytes: 3143
+    reference_max_bytes: 3143
+    default_text_bytes: 8712
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-discovery-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 10269
+    reference_total_bytes: 12939
+    reference_max_bytes: 5744
+    default_text_bytes: 23208
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-intake-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 20260
+    reference_total_bytes: 29486
+    reference_max_bytes: 12276
+    default_text_bytes: 49746
+    budget_level: split_candidate
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：文本包进入拆分候选阈值，但仍围绕需求接入单一入口；当前不把需求阶段顺序拆成多个入口。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 出现两个可独立命中的需求接入对象，且不会削弱 Intake 主入口。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-gap-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11978
+    reference_total_bytes: 6767
+    reference_max_bytes: 3517
+    default_text_bytes: 18745
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-boundary-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7604
+    reference_total_bytes: 4149
+    reference_max_bytes: 2490
+    default_text_bytes: 11753
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-splitting-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 9225
+    reference_total_bytes: 4073
+    reference_max_bytes: 2334
+    default_text_bytes: 13298
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: implementation-planning-rules
+  registry_scope: formal_registry
+  priority: 复评
+  decision: gated_reassessment
+  metrics:
+    skill_md_bytes: 39147
+    reference_total_bytes: 77538
+    reference_max_bytes: 17774
+    default_text_bytes: 116685
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：体积和默认文本包均高，但 Plan Mode、计划 authoring、周期任务与全量顺序仍共享实施规划主线，当前先验证平均命中数和独立触发边界。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 平均命中不超过 3，且 Plan Mode/authoring 与周期编排能独立描述、独立验证。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: requirement-change-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 12146
+    reference_total_bytes: 3690
+    reference_max_bytes: 2499
+    default_text_bytes: 15836
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: acceptance-criteria-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7632
+    reference_total_bytes: 6481
+    reference_max_bytes: 4952
+    default_text_bytes: 14113
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: final-acceptance-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8664
+    reference_total_bytes: 5837
+    reference_max_bytes: 3769
+    default_text_bytes: 14501
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-intake-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5613
+    reference_total_bytes: 4616
+    reference_max_bytes: 3272
+    default_text_bytes: 10229
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-discovery-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11566
+    reference_total_bytes: 12895
+    reference_max_bytes: 3765
+    default_text_bytes: 24461
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-gap-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5744
+    reference_total_bytes: 1006
+    reference_max_bytes: 387
+    default_text_bytes: 6750
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-reproduction-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5810
+    reference_total_bytes: 1814
+    reference_max_bytes: 1273
+    default_text_bytes: 7624
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-root-cause-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5578
+    reference_total_bytes: 2055
+    reference_max_bytes: 722
+    default_text_bytes: 7633
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-runtime-debug-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5733
+    reference_total_bytes: 2170
+    reference_max_bytes: 938
+    default_text_bytes: 7903
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-debug-log-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6789
+    reference_total_bytes: 1992
+    reference_max_bytes: 861
+    default_text_bytes: 8781
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-assertion-diagnostic-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5866
+    reference_total_bytes: 1725
+    reference_max_bytes: 731
+    default_text_bytes: 7591
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-fix-proposal-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7461
+    reference_total_bytes: 2779
+    reference_max_bytes: 1484
+    default_text_bytes: 10240
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-regression-risk-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5241
+    reference_total_bytes: 929
+    reference_max_bytes: 367
+    default_text_bytes: 6170
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: bug-validation-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7006
+    reference_total_bytes: 3051
+    reference_max_bytes: 2215
+    default_text_bytes: 10057
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-generation-style-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8690
+    reference_total_bytes: 15593
+    reference_max_bytes: 4857
+    default_text_bytes: 24283
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-minimal-change-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8102
+    reference_total_bytes: 7560
+    reference_max_bytes: 3356
+    default_text_bytes: 15662
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-context-resync-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4118
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 4118
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-readability-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 15259
+    reference_total_bytes: 10097
+    reference_max_bytes: 4689
+    default_text_bytes: 25356
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-style-consistency-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 10179
+    reference_total_bytes: 12951
+    reference_max_bytes: 2882
+    default_text_bytes: 23130
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: naming-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4033
+    reference_total_bytes: 2209
+    reference_max_bytes: 844
+    default_text_bytes: 6242
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: chinese-comment-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4836
+    reference_total_bytes: 868
+    reference_max_bytes: 333
+    default_text_bytes: 5704
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: comment-placement-granularity-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 7312
+    reference_total_bytes: 3031
+    reference_max_bytes: 1184
+    default_text_bytes: 10343
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: comment-completion-gate-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 17365
+    reference_total_bytes: 7742
+    reference_max_bytes: 2675
+    default_text_bytes: 25107
+    budget_level: review
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：体积略超建议值，但仍围绕改动位点注释补齐单一闸门；拆分可能造成函数头/步骤/字段要求丢失。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 改动位点补齐与独立注释语义规则能分别命中且不重复渲染。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: windows-encoding-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11784
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 11784
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: package-structure-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 7236
+    reference_total_bytes: 21544
+    reference_max_bytes: 12199
+    default_text_bytes: 28780
+    budget_level: review
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：references 较大，但当前统一承担包结构、目录归位和启动入口职责，尚无两个独立触发对象证据。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 包结构与启动/业务隔离形成可独立触发组，且跨业务依赖规则仍有唯一 owner。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: micro-business-architecture-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6826
+    reference_total_bytes: 40740
+    reference_max_bytes: 8601
+    default_text_bytes: 47566
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: common-util-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8541
+    reference_total_bytes: 4344
+    reference_max_bytes: 1851
+    default_text_bytes: 12885
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: database-schema-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 13255
+    reference_total_bytes: 16912
+    reference_max_bytes: 9418
+    default_text_bytes: 30167
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: database-query-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6983
+    reference_total_bytes: 2966
+    reference_max_bytes: 1259
+    default_text_bytes: 9949
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: api-endpoint-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6726
+    reference_total_bytes: 5480
+    reference_max_bytes: 2712
+    default_text_bytes: 12206
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: api-request-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6625
+    reference_total_bytes: 5099
+    reference_max_bytes: 2338
+    default_text_bytes: 11724
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: api-response-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6382
+    reference_total_bytes: 9705
+    reference_max_bytes: 4656
+    default_text_bytes: 16087
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: api-swagger-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6979
+    reference_total_bytes: 3952
+    reference_max_bytes: 1571
+    default_text_bytes: 10931
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: error-handling-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 3823
+    reference_total_bytes: 1590
+    reference_max_bytes: 628
+    default_text_bytes: 5413
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: logging-trace-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11296
+    reference_total_bytes: 6008
+    reference_max_bytes: 3251
+    default_text_bytes: 17304
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: frontend-design
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5715
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 5715
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: frontend-component-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6079
+    reference_total_bytes: 4940
+    reference_max_bytes: 970
+    default_text_bytes: 11019
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: frontend-ui-visual-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8598
+    reference_total_bytes: 15701
+    reference_max_bytes: 2202
+    default_text_bytes: 24299
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: implementation-review-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: hold
+  metrics:
+    skill_md_bytes: 29700
+    reference_total_bytes: 22211
+    reference_max_bytes: 7820
+    default_text_bytes: 51911
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：SKILL.md 超过硬警戒，但当前仍是单一测试前实现审查 owner；未证明两个独立触发对象，避免复制最终审查权。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若独立职责证据不足、主 owner 不唯一或平均命中超过 3，保持暂缓并停止拆分。
+  revisit_condition: 形成两个独立触发对象且唯一审查 owner、命中边界和回滚关系可证明。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-change-review-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 12444
+    reference_total_bytes: 5890
+    reference_max_bytes: 4024
+    default_text_bytes: 18334
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-strategy-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 14859
+    reference_total_bytes: 2987
+    reference_max_bytes: 1903
+    default_text_bytes: 17846
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-task-root-layout-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 5644
+    reference_total_bytes: 2270
+    reference_max_bytes: 2270
+    default_text_bytes: 7914
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-scattered-asset-location-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4933
+    reference_total_bytes: 1858
+    reference_max_bytes: 1858
+    default_text_bytes: 6791
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: go-test-compile-path-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 3373
+    reference_total_bytes: 1483
+    reference_max_bytes: 1483
+    default_text_bytes: 4856
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-naming-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 11222
+    reference_total_bytes: 9848
+    reference_max_bytes: 4084
+    default_text_bytes: 21070
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-program-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 14750
+    reference_total_bytes: 7862
+    reference_max_bytes: 3748
+    default_text_bytes: 22612
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-doc-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8917
+    reference_total_bytes: 4929
+    reference_max_bytes: 2053
+    default_text_bytes: 13846
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: agent-browser
+  registry_scope: formal_registry
+  priority: P1
+  decision: enter_split
+  metrics:
+    skill_md_bytes: 36228
+    reference_total_bytes: 53363
+    reference_max_bytes: 11191
+    default_text_bytes: 89591
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id007
+      id: A
+      focus: 浏览器 profile、认证、session、页面交互、快照和基础 CLI 自动化
+      proposed_skill: browser-session-automation-rules
+      trigger_boundary: 需要复用浏览器会话、认证 profile 或执行基础页面交互。
+    - &id008
+      id: B
+      focus: HAR、diff、trace、proxy、video、profiling 和高级验证工具链
+      proposed_skill: browser-advanced-testing-rules
+      trigger_boundary: 需要高级网络、视觉差异、链路追踪或性能验证。
+  split_groups:
+    status: frozen
+    group_a: *id007
+    group_b: *id008
+  resource_scope:
+  - SKILL.md
+  - references/commands
+  - references/auth
+  - references/session
+  - references/snapshot
+  - references/har
+  - references/diff
+  - references/trace
+  - references/proxy
+  - references/profiling
+  stop_condition: 基础浏览器入口被高级验证抢占；认证/清理语义丢失；或高级验证只能依赖 session skill 上下文。
+  revisit_condition: 完成普通交互与高级验证的正反触发样本后，才允许删除旧 skill。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-05
+    task: TASK-SPLIT-05-01
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: functional-validation-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 15372
+    reference_total_bytes: 5585
+    reference_max_bytes: 3055
+    default_text_bytes: 20957
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: test-regression-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 8248
+    reference_total_bytes: 5213
+    reference_max_bytes: 2569
+    default_text_bytes: 13461
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: project-release-test-rules
+  registry_scope: formal_registry
+  priority: P1
+  decision: enter_split
+  metrics:
+    skill_md_bytes: 21732
+    reference_total_bytes: 78842
+    reference_max_bytes: 12368
+    default_text_bytes: 100574
+    budget_level: split_candidate
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id009
+      id: A
+      focus: 接口基线、OpenAPI/Swagger、inventory、参数图、依赖与漂移诊断
+      proposed_skill: project-interface-baseline-rules
+      trigger_boundary: 需要建立、扫描、同步或审查接口契约基线。
+    - &id010
+      id: B
+      focus: 执行器、协议 runner、报告、放行 gate、测试资产和运行结果收口
+      proposed_skill: project-interface-release-execution-rules
+      trigger_boundary: 需要执行接口测试、生成报告、判断放行或维护 runner。
+  split_groups:
+    status: frozen
+    group_a: *id009
+    group_b: *id010
+  resource_scope:
+  - SKILL.md
+  - references/baseline
+  - references/openapi
+  - references/parameter
+  - references/dependency
+  - references/runner
+  - references/report
+  - references/gate
+  - scripts/release_test_engine
+  stop_condition: baseline 与 execution 共享资源无主承接；真实 local engine 语义改变；或 OpenAPI 双索引/报告字段丢失。
+  revisit_condition: 先完成 baseline/runner/report/gate 的原子清单与既有 engine 测试入口映射。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-04
+    task: TASK-SPLIT-04-01
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: git-collaboration-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 13388
+    reference_total_bytes: 25872
+    reference_max_bytes: 11869
+    default_text_bytes: 39260
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: delivery-summary-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 6284
+    reference_total_bytes: 2368
+    reference_max_bytes: 1462
+    default_text_bytes: 8652
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: code-review-automation-rules
+  registry_scope: formal_registry
+  priority: 暂缓
+  decision: not_candidate
+  metrics:
+    skill_md_bytes: 4877
+    reference_total_bytes: 4313
+    reference_max_bytes: 1857
+    default_text_bytes: 9190
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_proven
+    groups:
+    - N/A + 原因 + 证据：当前没有冻结的两个独立触发职责组。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：不进入当前拆分候选。
+    group_b: N/A + 原因 + 证据：不进入当前拆分候选。
+  resource_scope:
+  - N/A + 原因 + 证据：当前只保留原 skill，不迁移资源。
+  stop_condition: 若后续出现两个独立触发职责组、加载风险继续升高或平均命中超过 3，回到候选复评。
+  revisit_condition: 下一轮体积统计或触发证据证明职责边界已独立时重新评估。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    ac_id: AC-SKILL-SPLIT-001
+    cycle: CYCLE-SPLIT-01
+    task: TASK-SPLIT-01-02
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+extension_seed_entries:
+- skill: 2d-asset-design
+  registry_scope: extension_seed
+  priority: P1
+  decision: enter_split
+  metrics:
+    skill_md_bytes: 29096
+    reference_total_bytes: 34000
+    reference_max_bytes: 5822
+    default_text_bytes: 63096
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: proven
+    groups:
+    - &id011
+      id: A
+      focus: 2D 素材设计 brief、参考筛选、原创性、质量和预览确认
+      proposed_skill: game-asset-design-gate-rules
+      trigger_boundary: 需要确定 2D 素材设计方向、原创性、质量或预览确认。
+    - &id012
+      id: B
+      focus: 角色动画、地图、生产、后处理和 Godot 交接
+      proposed_skill: game-asset-production-handoff-rules
+      trigger_boundary: 需要生产、动画、地图、后处理或 Godot 交接。
+  split_groups:
+    status: frozen
+    group_a: *id011
+    group_b: *id012
+  resource_scope:
+  - SKILL.md
+  - references/design
+  - references/quality
+  - references/preview
+  - references/production
+  - references/animation
+  - references/map
+  - scripts/
+  - agents/
+  stop_condition: 设计确认与生产交接无法独立触发；imagegen/Godot 边界丢失；或资产路径/后处理脚本不等价。
+  revisit_condition: 按冻结计划在 CYCLE-SPLIT-06 处理；当前仅作为扩展种子候选保留。
+  trace:
+    req_ids:
+    - REQ-SKILL-SIZE-001
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: CYCLE-SPLIT-06
+    task: TASK-SPLIT-06-01
+    test: TEST-SPLIT-021
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVIDENCE-SKILL-ROLE-20260716
+- skill: agent-runtime-recovery-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 7151
+    reference_total_bytes: 13691
+    reference_max_bytes: 5782
+    default_text_bytes: 20842
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: agent-sprite-forge-design
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 5348
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 5348
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: artifact-delivery-gate-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 11081
+    reference_total_bytes: 32480
+    reference_max_bytes: 8043
+    default_text_bytes: 43561
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: authenticated-url-routing-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 11203
+    reference_total_bytes: 2051
+    reference_max_bytes: 2051
+    default_text_bytes: 13254
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: autonomous-execution-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 24303
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 24303
+    budget_level: hard_warning
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: character-sprite-animation-production
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 4037
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 4037
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: context-compression-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 6245
+    reference_total_bytes: 4121
+    reference_max_bytes: 1546
+    default_text_bytes: 10366
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: doc
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 2988
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 2988
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: execution-failure-learning-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 6245
+    reference_total_bytes: 18753
+    reference_max_bytes: 6878
+    default_text_bytes: 24998
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: find-skills
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 5496
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 5496
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: golang-patterns
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 6842
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 6842
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: image-redbox-focus-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 3787
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 3787
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: imagegen
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 22336
+    reference_total_bytes: 66998
+    reference_max_bytes: 19223
+    default_text_bytes: 89334
+    budget_level: split_candidate
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: pdf
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 2517
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 2517
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: plugin-installation-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 6388
+    reference_total_bytes: 5616
+    reference_max_bytes: 3051
+    default_text_bytes: 12004
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: skill-split-preserve-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 5760
+    reference_total_bytes: 16553
+    reference_max_bytes: 6136
+    default_text_bytes: 22313
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: spreadsheet
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 6964
+    reference_total_bytes: 8256
+    reference_max_bytes: 3180
+    default_text_bytes: 15220
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: swag-openapi-maintainer-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 12702
+    reference_total_bytes: 28000
+    reference_max_bytes: 7961
+    default_text_bytes: 40702
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: time-util-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 2213
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 2213
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: vercel-react-best-practices
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 7057
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 7057
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: vue-best-practices
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 9321
+    reference_total_bytes: 102042
+    reference_max_bytes: 8452
+    default_text_bytes: 111363
+    budget_level: split_candidate
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: vue-router-best-practices
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 1499
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 1499
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: web-design-guidelines
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 1165
+    reference_total_bytes: 0
+    reference_max_bytes: 0
+    default_text_bytes: 1165
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: windows-powershell-environment-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 7464
+    reference_total_bytes: 15017
+    reference_max_bytes: 4868
+    default_text_bytes: 22481
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: windows-wsl-execution-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 19140
+    reference_total_bytes: 33869
+    reference_max_bytes: 14973
+    default_text_bytes: 53009
+    budget_level: review
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+- skill: work-report-summary-rules
+  registry_scope: extension_seed
+  priority: 扩展种子
+  decision: extension_seed_hold
+  metrics:
+    skill_md_bytes: 9242
+    reference_total_bytes: 9360
+    reference_max_bytes: 4652
+    default_text_bytes: 18602
+    budget_level: normal
+  independent_duty_evidence:
+    status: not_in_formal_baseline
+    groups:
+    - N/A + 原因 + 证据：该目录属于字典 11.扩展种子，不纳入本轮 84 个正式 skill 预算闭环。
+  split_groups:
+    status: not_applicable
+    group_a: N/A + 原因 + 证据：未获得正式规划纳入授权。
+    group_b: N/A + 原因 + 证据：未获得正式规划纳入授权。
+  resource_scope:
+  - N/A + 原因 + 证据：保留原扩展种子目录，后续专项复评决定是否纳入正式规划。
+  stop_condition: 当前 TASK-SPLIT-01-02 不扩大正式统计基线；不得因种子存在而直接修改或删除 skill。
+  revisit_condition: 正式规划纳入该扩展种子，或用户明确扩大统计基线时重新进入预算与候选冻结。
+  trace:
+    req_ids:
+    - REQ-SKILL-SPLIT-001
+    ac_id: AC-SKILL-SPLIT-002
+    cycle: N/A + 原因 + 证据：扩展种子不属于正式 84 个基线周期
+    task: N/A + 原因 + 证据：当前 TASK-SPLIT-01-02 不扩展正式基线
+    test: TEST-SPLIT-002
+    evidence_ids:
+    - EVIDENCE-SKILL-BASELINE-20260716
+    - EVD-TASK-SPLIT-01-02-*
+summary:
+  formal_skill_count: 84
+  formal_decision_counts:
+    not_candidate: 71
+    hold: 7
+    candidate_design: 1
+    enter_split: 4
+    gated_reassessment: 1
+  formal_priority_counts:
+    暂缓: 78
+    P2: 1
+    P0: 2
+    复评: 1
+    P1: 2
+  extension_seed_count: 27
+  extension_seed_decision_counts:
+    enter_split: 1
+    extension_seed_hold: 26
+completion_contract:
+  test_id: TEST-SPLIT-002
+  required_assertions:
+  - formal_skill_count == 84
+  - 每个 formal entry 具备 metrics/priority/decision/independent_duty_evidence/split_groups/resource_scope/stop_condition/revisit_condition/trace
+  - 所有 P0/P1 候选具备两个独立职责组和冻结二分
+  - 所有暂缓项具备原因和复评条件
+  - 2d-asset-design 的扩展种子边界被明确记录
+  - 四份工程文档 profile valid=true
+  failure_action: 任一断言失败回到 TASK-SPLIT-01-02，保留失败矩阵，不进入 TASK-SPLIT-01-03。

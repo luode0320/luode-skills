@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "仓库规则文件缺失或需要同步时应进入规则文件自举职责。",
+      "required": ["project-rule-file-bootstrap-rules"],
+      "forbidden": ["project-memory-file-bootstrap-rules"],
+      "observed_hits": ["project-rule-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "项目记忆文件缺失或需要初始化交接状态时应进入项目记忆自举职责。",
+      "required": ["project-memory-file-bootstrap-rules"],
+      "forbidden": ["project-rule-file-bootstrap-rules"],
+      "observed_hits": ["project-memory-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "规则文件和项目记忆文件同时缺失时允许两个新入口协同命中。",
+      "required": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "TRIGGER-POST-001",
+      "phase": "post-delete",
+      "prompt": "旧规则自举 skill 删除后，规则文件缺失场景由新规则文件入口承接。",
+      "required": ["project-rule-file-bootstrap-rules"],
+      "forbidden": ["project-agents-bootstrap"],
+      "observed_hits": ["project-rule-file-bootstrap-rules"],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "TRIGGER-POST-002",
+      "phase": "post-delete",
+      "prompt": "旧合规 gate 删除后，代码收口场景由代码变更最终收口入口承接。",
+      "required": ["code-change-finalization-gate-rules"],
+      "forbidden": ["skill-compliance-gate-rules"],
+      "observed_hits": ["code-change-finalization-gate-rules"],
+      "source": "fixture_observation"
+    }
+  ]
+}

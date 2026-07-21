@@ -1,0 +1,7 @@
+# TASK-SPLIT-04-03 执行与放行承接证据
+
+- 测试：`TEST-SPLIT-015`（`python -X utf8 -m unittest discover -s "doc/5-tests/2026-07-12_180240/project-release-test-rules/tests" -p "test*.py"`；`python -X utf8 -m unittest discover -s "doc/5-tests/2026-07-12_191712/project-release-test-rules/tests" -p "test*.py"`）。
+- 路径修正说明同 `TASK-SPLIT-04-02-baseline-skill.md`：计划文档路径与磁盘实际两个 fixture 目录（180240、191712）不完全一致，本轮对两者都执行了回归。
+- 新建产物：`project-interface-release-execution-rules/SKILL.md`（13,245B，小于 16,000B 常规预算）、`agents/openai.yaml`（1,467B）、8 个 `references/*.md`（execution-gate.md、report-format.md、output-artifacts.md、reusable-script-toolbox.md、test-data-construction-rules.md、test-selection-policy.md、agent-response-judgement.md、existing-test-skill-integration.md，原文整份迁移，未改动内容）。
+- 引擎回归结果：与 `TASK-SPLIT-04-02` 完全一致——`2026-07-12_180240` 套件 27 个测试中 26 个通过、1 个既有失败（`test_core_engine.IRContractTests.test_invalid_protocol_and_missing_contract_are_rejected`，断言字符串与当前 IR 校验错误文案格式不一致，属拆分前既有缺陷，与本轮无关）；`2026-07-12_191712` 套件 37 个测试全部通过。结果枚举（PASS/EXPECTED_FAIL/FAIL/PENDING/BLOCKED）、脱敏 JSON 输出、P0 放行判定和未知协议 PENDING 语义均未发生变化，因为本轮未对 `scripts/release_test_engine/` 做任何代码改动。
+- 结论：PASS（等价性核对：两轮引擎回归结果逐字一致，证明新建 execution skill 的文档拆分不影响 engine 行为）。旧 skill 文件保持冻结基线，未做任何改动。

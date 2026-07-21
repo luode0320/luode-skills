@@ -1,0 +1,25 @@
+# TASK-SPLIT-03-04 路由更新与删除前承接检查证据
+
+- 测试：`TEST-SPLIT-012`（`python -X utf8 skill-dictionary/generate_dictionary.py`；再执行 `run_trigger_cases.ps1 -Phase pre-delete` 与 `-Phase post-delete`，`CasesRoot=cases/compliance`）。
+- 路由更新范围（`rg -n --fixed-strings "skill-compliance-gate-rules" --glob '!doc/**' ...` 复核，共 25 处活跃引用逐一按 `mapping/compliance-rules.yaml` 的 owner 分组改写，均已核对 `git diff` 逐行确认无越界改动）：
+  - `AGENTS.md`、`CLAUDE.md`、`vercel-react-best-practices/AGENTS.md`：Skill 资产改动联动闸门一句改指向 `skill-execution-compliance-gate-rules`（执行合规组，对应 `mapping` 中未单列但按 R-COMP-004/012 同概念的执行合规语义）。
+  - `README.md`、`编码skill.md`：Skill 一览表各 1 行拆为两行，分别对应 `skill-execution-compliance-gate-rules`（执行合规）与 `code-change-finalization-gate-rules`（代码收口）。
+  - `项目设计.md`：总控层代表模块表 1 处、"最终由 X 和总结类规则收口" 1 处，均改为两个新 skill 联合表述。
+  - `code-style-consistency-rules/SKILL.md`、`references/style-feedback-workflow.md`：skill 自身 `description`/`##` 标题改动后的收口联动改指向 `skill-execution-compliance-gate-rules`（skill 资产变更场景）。
+  - `autonomous-execution-rules/SKILL.md`：与合规闸门联动一节改为同时提及两个新 skill。
+  - `frontend-design/SKILL.md`：前端改动收口清单 1 行改指向 `code-change-finalization-gate-rules`（代码收口组）。
+  - `parallel-task-dispatch-rules/references/existing-skill-mapping.md`：1 个条目拆为两个独立条目，均标注"必须串行"。
+  - `skill-audit-rules/SKILL.md`："不替代"清单改为同时列出两个新 skill。
+  - `project-change-review-rules/SKILL.md`："已命中 skill 是否执行完整"一项改指向 `skill-execution-compliance-gate-rules`（执行合规语义）。
+  - `reasoning-summary-structure-rules/SKILL.md`（2 处）、`references/summary-structure-template.md`、`references/output-examples.md`：函数注释核对闸门指向 `code-change-finalization-gate-rules`（代码收口组），skill 资产创建示例指向 `skill-execution-compliance-gate-rules`（执行合规组）。
+  - `skill-hit-check-rules/SKILL.md`（2 处）："Skill 资产改动联动闸门"指向 `skill-execution-compliance-gate-rules`；`references/hit-checklist.md`（2 处）、`references/output-format.md`、`agents/openai.yaml`：注释/代码改动收口场景改指向 `code-change-finalization-gate-rules`。
+  - `thread-title-rules/SKILL.md`：改动本身应由的收口清单改指向 `skill-execution-compliance-gate-rules`；顺带修正同一行内遗留的 `project-agents-bootstrap` 旧名（周期 02 路由遗漏，本轮顺带修正，未扩大改动范围）。
+  - `PROJECT_MEMORY.md`：`通用结束信号` 来源字段改指向 `skill-execution-compliance-gate-rules`；`审查体系收口` 定义改为同时列出两个新 skill；`99`/`972` 行为 `TASK-SPLIT-01-02` 候选矩阵历史决策记录，按仓库惯例保留原候选名不回改。
+- 命令与结果：`python -X utf8 skill-dictionary/generate_dictionary.py` → 退出码 0，`implemented_total=86`（较周期 02 后的 85 净增 1，对应本周期 1 个旧 skill 拆为 2 个新 skill）、`planned_missing=0`、`seed_total=35`。
+- 校验结果：
+  - `skill-dictionary/data.js` 中 `skill-execution-compliance-gate-rules`、`code-change-finalization-gate-rules` 均为 `"status": "implemented"`、`"domain_label": "总控层"`（`item_order` 18/19）。
+  - `skill-compliance-gate-rules` 自动降级为 `"status": "seed"`、`"domain_label": "扩展种子"`（`SKILL.md` 文件本身未改动，MD5 `16f5c34742279b64cae5de6daf8b1693` 与 `TASK-SPLIT-03-01` 基线一致，未被删除）。
+  - `字典.md` 同步重新生成。
+- 命令：`pwsh -NoProfile -File run_trigger_cases.ps1 -Phase pre-delete -CasesRoot cases/compliance` → 6 个 trigger 用例 + 1 个 pre-delete 快照全部 `[通过]`。
+- 命令：`pwsh -NoProfile -File run_trigger_cases.ps1 -Phase post-delete -CasesRoot cases/compliance` → 6 个 trigger 用例 + 1 个 post-delete 快照全部 `[通过]`，输出显式声明 `未删除或修改任何真实 skill 目录`。
+- 结论：路由更新未触碰任何 `.gitattributes`/`.editorconfig`/`doc/**` 历史文档，`project-agents-bootstrap` 内部文件（冻结态）未编辑；周期状态维持 `comparing`，未执行任何删除动作，等待用户对 `skill-compliance-gate-rules` 目录的后续处置决策。

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "source": "fixture_snapshot",
+  "cases": [
+    {
+      "id": "2D-DELETE-PRE-001",
+      "phase": "pre-delete",
+      "old_skill": "2d-asset-design",
+      "new_skills": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "old_skill_present": true,
+      "new_skills_present": true,
+      "mapping_status": "frozen",
+      "state_source": "fixture_snapshot"
+    },
+    {
+      "id": "2D-DELETE-POST-001",
+      "phase": "post-delete",
+      "old_skill": "2d-asset-design",
+      "new_skills": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "old_skill_present": false,
+      "new_skills_present": true,
+      "mapping_status": "frozen",
+      "state_source": "fixture_snapshot"
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "2D-TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "需要为一个新怪物设计参考图筛选，判断哪些外部素材可以作为风格参考、哪些不能直接拿来用，并给出原创性判断和 Tier 质量等级建议。",
+      "required": [
+        "game-asset-design-gate-rules"
+      ],
+      "forbidden": [
+        "game-asset-production-handoff-rules"
+      ],
+      "observed_hits": [
+        "game-asset-design-gate-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "素材 brief 已经确认过预览稿，现在需要真实调用图像生成接口产出角色的动作帧原始图。",
+      "required": [
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [
+        "game-asset-design-gate-rules"
+      ],
+      "observed_hits": [
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "从零开始做一个 Boss 素材：先筛参考图、定质量阶梯、确认预览稿，确认通过后立刻生成原始图并做去背切帧，最终整理成 Godot 可用的 sprite sheet。",
+      "required": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-PRE-004",
+      "phase": "pre-delete",
+      "prompt": "帮我看一下后端订单服务的日志报错，跟 2D 素材完全无关。",
+      "required": [],
+      "forbidden": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "observed_hits": [],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-PRE-005",
+      "phase": "pre-delete",
+      "prompt": "已经有一批生成好的地图瓦片原始图，现在只需要跑分层预览合成脚本和布局参考线脚本，把它们整理成 Godot 可导入的图层预览。",
+      "required": [
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [
+        "game-asset-design-gate-rules"
+      ],
+      "observed_hits": [
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-PRE-006",
+      "phase": "pre-delete",
+      "prompt": "用户想直接下载一张网上的免费像素风怪物图，问能不能原样当成正式游戏素材使用。",
+      "required": [
+        "game-asset-design-gate-rules"
+      ],
+      "forbidden": [
+        "game-asset-production-handoff-rules"
+      ],
+      "observed_hits": [
+        "game-asset-design-gate-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-001",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）需要为一个新怪物设计参考图筛选，判断哪些外部素材可以作为风格参考、哪些不能直接拿来用，并给出原创性判断和 Tier 质量等级建议。",
+      "required": [
+        "game-asset-design-gate-rules"
+      ],
+      "forbidden": [
+        "game-asset-production-handoff-rules",
+        "2d-asset-design"
+      ],
+      "observed_hits": [
+        "game-asset-design-gate-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-002",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）素材 brief 已经确认过预览稿，现在需要真实调用图像生成接口产出角色的动作帧原始图。",
+      "required": [
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [
+        "game-asset-design-gate-rules",
+        "2d-asset-design"
+      ],
+      "observed_hits": [
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-003",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）从零开始做一个 Boss 素材：先筛参考图、定质量阶梯、确认预览稿，确认通过后立刻生成原始图并做去背切帧，最终整理成 Godot 可用的 sprite sheet。",
+      "required": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [
+        "2d-asset-design"
+      ],
+      "observed_hits": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-004",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）帮我看一下后端订单服务的日志报错，跟 2D 素材完全无关。",
+      "required": [],
+      "forbidden": [
+        "game-asset-design-gate-rules",
+        "game-asset-production-handoff-rules",
+        "2d-asset-design"
+      ],
+      "observed_hits": [],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-005",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）已经有一批生成好的地图瓦片原始图，现在只需要跑分层预览合成脚本和布局参考线脚本，把它们整理成 Godot 可导入的图层预览。",
+      "required": [
+        "game-asset-production-handoff-rules"
+      ],
+      "forbidden": [
+        "game-asset-design-gate-rules",
+        "2d-asset-design"
+      ],
+      "observed_hits": [
+        "game-asset-production-handoff-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "2D-TRIGGER-POST-006",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 2d-asset-design 已删除后）用户想直接下载一张网上的免费像素风怪物图，问能不能原样当成正式游戏素材使用。",
+      "required": [
+        "game-asset-design-gate-rules"
+      ],
+      "forbidden": [
+        "game-asset-production-handoff-rules",
+        "2d-asset-design"
+      ],
+      "observed_hits": [
+        "game-asset-design-gate-rules"
+      ],
+      "source": "fixture_observation"
+    }
+  ]
+}

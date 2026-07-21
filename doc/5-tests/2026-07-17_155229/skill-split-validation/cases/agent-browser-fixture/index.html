@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="utf-8"><title>Skill Split Local Fixture</title></head>
+<body>
+  <h1 id="heading">Skill Split Local Fixture</h1>
+  <form id="demo-form">
+    <input id="email" type="email" placeholder="email" />
+    <button id="submit-btn" type="button" onclick="document.getElementById(&#39;result&#39;).innerText=&#39;submitted:&#39;+document.getElementById(&#39;email&#39;).value">Submit</button>
+  </form>
+  <p id="result"></p>
+  <script>
+    fetch("api/ping.json").then(r => r.json()).then(d => {
+      document.title = "Fixture Ready " + d.status;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "source": "fixture_snapshot",
+  "cases": [
+    {
+      "id": "DELETE-PRE-001",
+      "phase": "pre-delete",
+      "old_skill": "project-agents-bootstrap",
+      "new_skills": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "old_skill_present": true,
+      "new_skills_present": true,
+      "mapping_status": "frozen",
+      "state_source": "fixture_snapshot"
+    },
+    {
+      "id": "DELETE-POST-001",
+      "phase": "post-delete",
+      "old_skill": "project-agents-bootstrap",
+      "new_skills": [
+        "project-rule-file-bootstrap-rules",
+        "project-memory-file-bootstrap-rules"
+      ],
+      "old_skill_present": false,
+      "new_skills_present": true,
+      "mapping_status": "frozen",
+      "state_source": "fixture_snapshot"
+    }
+  ]
+}

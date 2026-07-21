@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "source": "fixture_observation",
+  "cases": [
+    {
+      "id": "AB-TRIGGER-PRE-001",
+      "phase": "pre-delete",
+      "prompt": "需要用 agent-browser 打开一个测试页面，抓快照后填写表单并点击提交按钮，验证提交结果文本。",
+      "required": [
+        "browser-session-automation-rules"
+      ],
+      "forbidden": [
+        "browser-advanced-testing-rules"
+      ],
+      "observed_hits": [
+        "browser-session-automation-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-PRE-002",
+      "phase": "pre-delete",
+      "prompt": "需要用 agent-browser 记录一段网络 HAR，分析页面加载时的所有请求。",
+      "required": [
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [
+        "browser-session-automation-rules"
+      ],
+      "observed_hits": [
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-PRE-003",
+      "phase": "pre-delete",
+      "prompt": "需要先用隔离 profile 登录目标站点，登录成功后再对登录前后的页面做一次视觉 diff 对比。",
+      "required": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [],
+      "observed_hits": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-PRE-004",
+      "phase": "pre-delete",
+      "prompt": "用户已经打开了自己的 Chrome 标签页并登录好账号，只需要普通看一下控制台报错，不涉及隔离 profile 或 HAR/diff。",
+      "required": [],
+      "forbidden": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules"
+      ],
+      "observed_hits": [],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-PRE-005",
+      "phase": "pre-delete",
+      "prompt": "需要对当前页面做一次 Chrome DevTools 性能 profiling，导出 trace 文件用于分析卡顿原因。",
+      "required": [
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [
+        "browser-session-automation-rules"
+      ],
+      "observed_hits": [
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-PRE-006",
+      "phase": "pre-delete",
+      "prompt": "需要用具名并行 session 同时打开两个站点分别抓取数据，并批量执行一组命令。",
+      "required": [
+        "browser-session-automation-rules"
+      ],
+      "forbidden": [
+        "browser-advanced-testing-rules"
+      ],
+      "observed_hits": [
+        "browser-session-automation-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-001",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）需要用 agent-browser 打开一个测试页面，抓快照后填写表单并点击提交按钮，验证提交结果文本。",
+      "required": [
+        "browser-session-automation-rules"
+      ],
+      "forbidden": [
+        "browser-advanced-testing-rules",
+        "agent-browser"
+      ],
+      "observed_hits": [
+        "browser-session-automation-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-002",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）需要用 agent-browser 记录一段网络 HAR，分析页面加载时的所有请求。",
+      "required": [
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [
+        "browser-session-automation-rules",
+        "agent-browser"
+      ],
+      "observed_hits": [
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-003",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）需要先用隔离 profile 登录目标站点，登录成功后再对登录前后的页面做一次视觉 diff 对比。",
+      "required": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [
+        "agent-browser"
+      ],
+      "observed_hits": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-004",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）用户已经打开了自己的 Chrome 标签页并登录好账号，只需要普通看一下控制台报错，不涉及隔离 profile 或 HAR/diff。",
+      "required": [],
+      "forbidden": [
+        "browser-session-automation-rules",
+        "browser-advanced-testing-rules",
+        "agent-browser"
+      ],
+      "observed_hits": [],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-005",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）需要对当前页面做一次 Chrome DevTools 性能 profiling，导出 trace 文件用于分析卡顿原因。",
+      "required": [
+        "browser-advanced-testing-rules"
+      ],
+      "forbidden": [
+        "browser-session-automation-rules",
+        "agent-browser"
+      ],
+      "observed_hits": [
+        "browser-advanced-testing-rules"
+      ],
+      "source": "fixture_observation"
+    },
+    {
+      "id": "AB-TRIGGER-POST-006",
+      "phase": "post-delete",
+      "prompt": "（模拟旧 agent-browser 已删除后）需要用具名并行 session 同时打开两个站点分别抓取数据，并批量执行一组命令。",
+      "required": [
+        "browser-session-automation-rules"
+      ],
+      "forbidden": [
+        "browser-advanced-testing-rules",
+        "agent-browser"
+      ],
+      "observed_hits": [
+        "browser-session-automation-rules"
+      ],
+      "source": "fixture_observation"
+    }
+  ]
+}

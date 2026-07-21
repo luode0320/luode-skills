@@ -1,0 +1,114 @@
+{
+  "mode": "sprite",
+  "input": "D:\\luode\\luode-skills\\doc\\5-tests\\2026-07-17_155229\\skill-split-validation\\cases\\2d-production-fixture\\test-sheet.png",
+  "rows": 2,
+  "cols": 2,
+  "anchor": "bottom",
+  "frame_count": 4,
+  "non_empty_frames": 4,
+  "max_content_width": 41,
+  "max_content_height": 41,
+  "edge_touch_frames": [],
+  "frames": [
+    {
+      "index": 0,
+      "row": 0,
+      "col": 0,
+      "bbox": [
+        12,
+        12,
+        53,
+        53
+      ],
+      "source_size": [
+        64,
+        64
+      ],
+      "trimmed_size": [
+        41,
+        41
+      ],
+      "aligned_size": [
+        41,
+        41
+      ],
+      "edge_touch": false,
+      "exported": true
+    },
+    {
+      "index": 1,
+      "row": 0,
+      "col": 1,
+      "bbox": [
+        12,
+        12,
+        53,
+        53
+      ],
+      "source_size": [
+        64,
+        64
+      ],
+      "trimmed_size": [
+        41,
+        41
+      ],
+      "aligned_size": [
+        41,
+        41
+      ],
+      "edge_touch": false,
+      "exported": true
+    },
+    {
+      "index": 2,
+      "row": 1,
+      "col": 0,
+      "bbox": [
+        12,
+        12,
+        53,
+        53
+      ],
+      "source_size": [
+        64,
+        64
+      ],
+      "trimmed_size": [
+        41,
+        41
+      ],
+      "aligned_size": [
+        41,
+        41
+      ],
+      "edge_touch": false,
+      "exported": true
+    },
+    {
+      "index": 3,
+      "row": 1,
+      "col": 1,
+      "bbox": [
+        12,
+        12,
+        53,
+        53
+      ],
+      "source_size": [
+        64,
+        64
+      ],
+      "trimmed_size": [
+        41,
+        41
+      ],
+      "aligned_size": [
+        41,
+        41
+      ],
+      "edge_touch": false,
+      "exported": true
+    }
+  ]
+}
