@@ -1,6 +1,6 @@
 ---
 name: authenticated-url-routing-rules
-description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `agent-browser`，并继续遵守授权与安全边界。
+description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`，并继续遵守授权与安全边界。
 ---
 
 # 认证 URL 路由规则
@@ -13,6 +13,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 ## 默认路由
 
+0. 例外让路：URL 属于 `tapd.cn` 域名（如 `https://www.tapd.cn/tapd_fe/...`）时，优先让位给 `tapd-openapi` skill 走 TAPD OpenAPI 读取实体数据（含其环境预检与 Token 未配置阻断）；仅当 API 无法覆盖（需要页面截图、富文本渲染确认、人工登录操作）或 TAPD env 阻断后用户仍要求直接看页面时，才回到本 skill 的浏览器路由。
 1. 只要用户消息中包含 URL 或明显的网页链接，就先触发本 skill。
 2. 优先加载并执行 `chrome:control-chrome`，通过 Chrome Plugin 接管用户已登录的真实 Chrome profile。
 3. 若用户说明“我已经在浏览器打开 / 已登录 / 默认浏览器能看 / 你看这个链接”，仍按第 2 步执行，不再询问是否需要复用登录态。
@@ -24,7 +25,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 只有用户明确确认页面不依赖真实 Chrome profile 时，才进入以下路由：
 
 1. 已接通且能力满足的 `Chrome DevTools MCP`
-2. 需要隔离 profile、并发 session、HAR/route、视觉 diff、录制/trace、代理或其他引擎时使用 `agent-browser`
+2. 需要隔离 profile、并发 session 等核心自动化时使用 `browser-session-automation-rules`；需要 HAR/route、视觉 diff、录制/trace、代理或其他引擎等高级验证时使用 `browser-advanced-testing-rules`
 3. 所选通道不可用时，记录阻断并说明恢复条件
 
 依赖真实 Chrome profile 的页面不进入以上回退；应请求用户修复 Chrome 连接、扩展或授权。
@@ -83,7 +84,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ### Chrome Plugin 不可用
 
 - 先按 `chrome:control-chrome` 的故障文档排查连接、扩展、浏览器发现或选择问题。
-- 若页面依赖真实 Chrome profile，说明 Chrome Plugin 不可用原因并停在用户修复阻断处，不得进入 `agent-browser --auto-connect`。
+- 若页面依赖真实 Chrome profile，说明 Chrome Plugin 不可用原因并停在用户修复阻断处，不得进入 `browser-session-automation-rules` 的 `--auto-connect`。
 - 若页面已明确为公开或 local 且不依赖用户 profile，才按统一浏览器路由选择其他通道；必须说明未使用 Chrome Plugin 的原因。
 
 ### 已登录标签页可打开但正文读取被安全策略拒绝

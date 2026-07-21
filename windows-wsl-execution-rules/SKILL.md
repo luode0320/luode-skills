@@ -189,7 +189,7 @@ export GOMODCACHE=$HOME/go/pkg/mod
 ## 与其他规则的协作
 
 - 涉及文件写入编码、Windows 中文编码、Git Bash / bash UTF-8 基线、PowerShell 专项 UTF-8 初始化与落盘细节时，联动 `windows-encoding-rules`。
-- 涉及仓库长期规则沉淀时，联动 `project-agents-bootstrap`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
+- 涉及仓库长期规则沉淀时，联动 `project-rule-file-bootstrap-rules`，把本规范写入仓库规则文件（`AGENTS.md` / `CLAUDE.md`）。
 - 命令执行失败且已完成恢复时，先读并按 `references/command-failure-recovery.md` 回写已验证 `candidate`；只有满足晋级门禁并取得当前任务维护授权时才转 `active`。涉及中文乱码、换行或重定向时同时联动 `windows-encoding-rules`。
 - 如果当前任务已经明确进入 PowerShell 专项场景，且出现逻辑运算括号、`Join-Path`、`ConvertTo-Json -Depth`、null check 或 ASCII-only 这类语法/风格坑，优先按本 skill 的 PowerShell 保底模式处理，不再临时口头补规则。
 

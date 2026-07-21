@@ -12,7 +12,7 @@
 
 ## 🛠 执行证据
 
-- 命中 skill：`reasoning-summary-structure-rules`、`skill-compliance-gate-rules`
+- 命中 skill：`reasoning-summary-structure-rules`、`skill-execution-compliance-gate-rules`
 - 关键动作：新建 SKILL.md + 4 references，刷新字典并核验归域。
 
 ## 🎯 要解决的问题

@@ -43,7 +43,7 @@
 
 ### 3.1 先做规则文件自举
 
-新会话首轮先联动 `project-agents-bootstrap`，确保目标项目的规则文件（`CLAUDE.md` / `AGENTS.md`）与项目记忆四件套已存在。通用规则文件自举由 `project-agents-bootstrap` 负责，本 skill 只在其完成之后接续微业务专项判断，不侵入其脚本。
+新会话首轮先联动 `project-rule-file-bootstrap-rules`（规则文件）与 `project-memory-file-bootstrap-rules`（项目记忆四件套），确保目标项目的规则文件（`CLAUDE.md` / `AGENTS.md`）与项目记忆四件套已存在。通用规则文件自举由 `project-rule-file-bootstrap-rules` 负责，本 skill 只在其完成之后接续微业务专项判断，不侵入其脚本。
 
 ### 3.2 检测为候选新项目 → 先向用户建议
 
@@ -69,7 +69,7 @@
 1. **`CLAUDE.md` / `AGENTS.md` 的 `## 微业务架构约束` 章节**：受管章节，含核心规则摘要（业务垂直切分、横向零依赖、跨业务经 `contract/` 通信、新增即新包）与指向本 skill 的引用。
 2. **`项目设计.md` 的业务索引段**：「微业务架构与业务包索引」段，作为业务包清单与公共接口契约索引的入口。
 
-写入语义：`init` 采用**按 `## 标题` 定位的幂等 upsert**——按 `## 微业务架构约束` 这个标题在目标文件中定位；存在则替换该章节内容，不存在则追加。因此**重复运行 `init` 不会重复堆叠**同名章节。该 upsert 复用 `project-agents-bootstrap` 的 header upsert 语义（定位替换 / 追加），但由本 skill 自有脚本 `micro_business.py` 实现，**不侵入、不修改** `project-agents-bootstrap` 脚本。所有写入均为 UTF-8 编码。
+写入语义：`init` 采用**按 `## 标题` 定位的幂等 upsert**——按 `## 微业务架构约束` 这个标题在目标文件中定位；存在则替换该章节内容，不存在则追加。因此**重复运行 `init` 不会重复堆叠**同名章节。该 upsert 复用 `project-rule-file-bootstrap-rules` 内 `bootstrap_agents.sh` 的 header upsert 语义（定位替换 / 追加），但由本 skill 自有脚本 `micro_business.py` 实现，**不侵入、不修改** 该脚本。所有写入均为 UTF-8 编码。
 
 ---
 
@@ -90,7 +90,7 @@
 
 ```mermaid
 flowchart TD
-  S["新业务项目 / 新会话首轮"] --> B0["先联动 project-agents-bootstrap 确保规则文件存在"]
+  S["新业务项目 / 新会话首轮"] --> B0["先联动 project-rule-file-bootstrap-rules 确保规则文件存在"]
   B0 --> D{"是否候选新项目?<br/>(无 business 根且无标记, 或处于初始化阶段)"}
   D -- "否, 但已有微业务标记" --> W["进入守护模式"]
   D -- "否且无标记" --> X["不引导, 不写标记"]

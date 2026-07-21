@@ -1,0 +1,4 @@
+interface:
+  display_name: "2D 素材设计确认闸门"
+  short_description: "为原创 2D 游戏素材把关参考筛选、原创性、质量阶梯与预览确认，产出可交给生产组的素材 brief"
+  default_prompt: "当任务需要设计、评审或确认 2D 游戏素材（角色、怪物、Boss、道具、地图、UI 位图等）时，使用此 skill 先完成参考筛选与原创性核验、Tier 0-3 质量阶梯判定、项目视觉基线核对与预览确认闭环，产出素材 brief 与 image spec，再交给 game-asset-production-handoff-rules 执行真实生成与后处理。"

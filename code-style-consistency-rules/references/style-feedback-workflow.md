@@ -18,7 +18,7 @@
 5. 回显确认：把 candidate 回显给用户，请用户确认或修正。candidate 只在当轮对话展示，不落盘。
 6. 写入 active：用户确认后，把条目改为 `status: active` 写入 `user-style-feedback-library.md`；用户否决则丢弃 candidate，不留磁盘痕迹。
 7. 去重合并：写入前用去重键比对；命中同键只更新原条目的确认时间与出现次数，不新增正文；正例有更新则更新原条目正例。
-8. 收口联动：因本次写入改动了本 skill 的 `description` 或 `##` 标题时，收口前重跑 `python skill-dictionary/generate_dictionary.py` 刷新字典产物，并走 `skill-compliance-gate-rules`。
+8. 收口联动：因本次写入改动了本 skill 的 `description` 或 `##` 标题时，收口前重跑 `python skill-dictionary/generate_dictionary.py` 刷新字典产物，并走 `skill-execution-compliance-gate-rules`。
 
 ## 与写码前加载的衔接
 

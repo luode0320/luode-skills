@@ -101,7 +101,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [examples_must_follow_the_same_layering_contract]
   - template_id: TPL-PLAIN-TEST-005
-    path: project-release-test-rules/references/report-format.md
+    path: project-interface-release-execution-rules/references/report-format.md
     profile: test
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [interface_test_results_md_is_a_technical_detail_file_and_keeps_its_block_format]

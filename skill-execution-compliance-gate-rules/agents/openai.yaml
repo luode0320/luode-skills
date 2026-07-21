@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill 执行完整性闸门"
+  short_description: "在最终回复前检查已命中 skill 的执行完整性、Skill 执行证据与运行时状态真收口"
+  default_prompt: "使用 $skill-execution-compliance-gate-rules 在最终回复前执行闸门检查：1) 逐项核对本轮已命中的 skill 是否存在“可执行但未执行”的规则缺口；2) 若出现非预期工具/命令/API/模型/浏览器/安装执行失败，核对 `execution-failure-learning-rules` 是否完成分类、active 案例检索、有限重试与同输入复验；3) 真实 `blocked/manual_handoff` 时，校验 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的状态、阶段、依据与证据、已尝试与停止条件、影响、1-3 条解决计划、恢复验证/重入点，以及唯一渲染 owner 为 `reasoning-summary-structure-rules`；4) 若本轮发生任一工具调用，最终回复必须包含 Skill 执行证据；5) 若当前运行环境存在 goal/plan/task 等显式状态收口机制，完成或阻断结论前先确认已真实收口。本 skill 只输出 PASS/FAIL 与缺失字段，不得输出用户可见的阻断区块、后续内容或解决计划；`limited/not_applicable` 不得升级为任务阻断；代码/测试改动的最终收口闸门（注释双 skill、implementation-review、真实运行验证、router 提交前检查、用户手改保护）由 `code-change-finalization-gate-rules` 负责，本 skill 不重复检查。"

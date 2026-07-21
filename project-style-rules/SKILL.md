@@ -1,6 +1,6 @@
 ---
 name: project-style-rules
-description: 从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（通常由 `project-agents-bootstrap` 统一编排联动）。
+description: 从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules`〔规则文件〕与 `project-memory-file-bootstrap-rules`〔记忆四件套骨架〕编排联动）。
 ---
 
 # 项目风格规则

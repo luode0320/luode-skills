@@ -1,0 +1,12 @@
+display_name: 项目接口事实基线
+short_description: 维护项目接口事实基线、Swagger/OpenAPI 双索引、参数来源与依赖图的长期资产库
+default_prompt: |
+  你现在需要使用project-interface-baseline-rules维护项目接口事实基线，步骤如下：
+  1. 每次执行前都先扫描当前项目接口事实；若接口基线不存在，先进入冷启动并生成初始基线。
+  2. 接口基线默认位置为doc/5-tests/基线/interface-inventory.yaml；若已存在，仍需执行增量扫描和基线对账。
+  3. 按openapi-inventory-sync-rules对账当前代码、swag manifest与interface inventory三方接口集合，任一缺失或不一致先双刷新。
+  4. 按inventory-reconcile-rules输出新增、删除、变更和待确认清单，并更新基线。
+  5. 若接口漂移影响参数来源或响应结构，将相关reusable-params.yaml参数标记为stale。
+  6. 按dependency-graph-rules读取或生成provider/consumer依赖图，供执行组筛选测试范围使用。
+  7. 基线刷新完成后，将结果交给project-interface-release-execution-rules继续测试执行、判定和放行流程。
+  8. 基线资产禁止保存明文token、密码、手机号、身份证号、银行卡号、密钥和非local环境连接信息。

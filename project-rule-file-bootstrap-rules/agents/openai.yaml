@@ -1,0 +1,4 @@
+interface:
+  display_name: "规则文件自举"
+  short_description: "检测并幂等同步 AGENTS.md / CLAUDE.md、.gitattributes、.editorconfig 的受管章节"
+  default_prompt: "使用 $project-rule-file-bootstrap-rules，检测并调用 scripts/bootstrap_agents.sh 补齐或同步当前 AI 对应的规则文件（Codex 用 AGENTS.md，Claude Code 追加 --target claude），并确认 .gitattributes、.editorconfig 已存在；四件套内容不在本 skill 范围内。"

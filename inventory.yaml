@@ -63,8 +63,8 @@
   依赖失败策略: PARAM_UNRESOLVED
   可复用参数影响字段: []
   发现来源: route,doc
-  发现证据: project-release-test-rules\references\report-format.md:53; project-release-test-rules\references\report-format.md:77;
-    project-release-test-rules\references\report-format.md:157; git-collaboration-rules\references\branch-and-commit.md:99
+  发现证据: project-interface-release-execution-rules\references\report-format.md:53; project-interface-release-execution-rules\references\report-format.md:77;
+    project-interface-release-execution-rules\references\report-format.md:157; git-collaboration-rules\references\branch-and-commit.md:99
   完整度: 部分
   待确认项:
   - 鉴权要求
@@ -103,7 +103,7 @@
   依赖失败策略: PARAM_UNRESOLVED
   可复用参数影响字段: []
   发现来源: route,doc
-  发现证据: project-release-test-rules\references\report-format.md:54; project-release-test-rules\references\report-format.md:92
+  发现证据: project-interface-release-execution-rules\references\report-format.md:54; project-interface-release-execution-rules\references\report-format.md:92
   完整度: 部分
   待确认项:
   - 鉴权要求
@@ -931,7 +931,7 @@
   依赖失败策略: PARAM_UNRESOLVED
   可复用参数影响字段: []
   发现来源: route,doc
-  发现证据: project-release-test-rules\references\report-format.md:55; project-release-test-rules\references\report-format.md:158
+  发现证据: project-interface-release-execution-rules\references\report-format.md:55; project-interface-release-execution-rules\references\report-format.md:158
   完整度: 部分
   待确认项:
   - 鉴权要求

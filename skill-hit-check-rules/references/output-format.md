@@ -33,6 +33,6 @@
 
 `命中检查:通过; Git规则:不适用`
 
-`命中技能:skill-hit-check-rules,comment-placement-granularity-rules,comment-completion-gate-rules,skill-compliance-gate-rules`
+`命中技能:skill-hit-check-rules,comment-placement-granularity-rules,comment-completion-gate-rules,code-change-finalization-gate-rules`
 
 `并行技能:无`

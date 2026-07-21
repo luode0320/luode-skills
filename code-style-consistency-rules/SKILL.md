@@ -92,7 +92,7 @@ applog.Errorf(
 - 生效时机：candidate 只在当轮回显不落盘，仅 active 落盘并跨项目、跨会话永久生效（确认后生效）。
 - 去重：命中同一去重键只更新出现次数与确认时间，不新增正文条目。
 - 作用域边界：全局通用偏好写入本库；项目专属一次性约定仍走 `PROJECT_STYLE.md` 与 `project-style-rules`。
-- 收口联动：本次写入若改动本 skill 的 `description` 或 `##` 标题，收口前重跑 `python skill-dictionary/generate_dictionary.py`，并走 `skill-compliance-gate-rules`。
+- 收口联动：本次写入若改动本 skill 的 `description` 或 `##` 标题，收口前重跑 `python skill-dictionary/generate_dictionary.py`，并走 `skill-execution-compliance-gate-rules`。
 
 ## 自动触发信号
 

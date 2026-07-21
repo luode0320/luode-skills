@@ -178,9 +178,10 @@
 | `architecture-doc-rules` | 当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档，包括总架构、目录树、模块职责、主要业务链路或单条业务链路时自动触发。 | 负责维护 `1-4` 四个有序中文主入口；业务链路从 `5` 开始依次下推，同一链路保留编号更新，新链路使用最大编号加一，并区分它与根目录 `项目设计.md` 的总览分层关系。 |
 | `project-local-skills-rules` | 当用户要求“分析项目并总结项目专属 skill”，或要求把项目私有编码规则沉淀到项目目录时自动触发。 | 负责把项目专属规则拆成多个独立 skill，并统一落到项目根目录 `skill/`，供后续预热和编码阶段优先命中。 |
 | `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。 |
-| `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-agents-bootstrap`、`mcp-installation-rules` 与 `imagegen`。 |
+| `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-rule-file-bootstrap-rules`、`mcp-installation-rules` 与 `imagegen`。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
-| `project-agents-bootstrap` | 当新会话首轮进入项目、仓库级规则文件缺失或需要同步补齐 `AGENTS.md` / `CLAUDE.md` 时自动触发。 | 负责为项目补齐或同步仓库级规则文件，并把基础硬规则、自举模板和关键白名单口径统一收口。 |
+| `project-rule-file-bootstrap-rules` | 当新会话首轮进入项目、仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）、`.gitattributes`、`.editorconfig` 缺失或需要同步补齐受管章节时自动触发。 | 负责检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在规则文件的受管章节做增量幂等 upsert，保留用户自定义内容；不负责项目记忆四件套。 |
+| `project-memory-file-bootstrap-rules` | 当项目记忆四件套（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md`）任一缺失或需要新会话交接初始化时自动触发。 | 负责检测、创建并维护项目记忆四件套的结构骨架与大小闸门；不负责规则文件本身，也不替代 `project-memory-rules` 的事实抽取。 |
 | `thread-title-rules` | 当当前 Codex / Claude / agent 会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。 |
 | `parallel-task-dispatch-rules` | 当任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时自动触发。 | 负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。 |
 | `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
@@ -188,7 +189,8 @@
 | `code-snippet-location-rules` | 当用户只粘贴代码片段、报错片段或函数片段，并说“这里改一下 / 这段需要修改 / 这里有问题”，但没有明确给出文件路径、符号全名或模块位置时自动触发。 | 负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。 |
 | `subagent-dispatch-rules` | 当任一 skill 已命中并准备进入执行阶段时自动触发。负责自动分析 subagent 委派条件，满足可委派条件即自动委派并产出真实启动证据；批量委派时优先运行 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行。 | 作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。 |
 | `skill-audit-rules` | 当主任务存在多 skill 组合、并行拆分或规则收口风险时自动触发。 | 负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。 |
-| `skill-compliance-gate-rules` | 当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。 | 在最终回复前执行一次 skill 完整性闸门检查，补齐主任务优先的下一步建议，并对代码改动执行注释终检。 |
+| `skill-execution-compliance-gate-rules` | 当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。 | 在最终回复前执行一次 skill 执行完整性闸门检查，补齐主任务优先的下一步建议，并校验 `blocked/manual_handoff` 共享契约。 |
+| `code-change-finalization-gate-rules` | 当本轮存在代码新增/修改（含测试文件），准备最终回复前触发。 | 校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。 |
 | `reasoning-summary-structure-rules` | 当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：Skill 命中检查、Skill 执行证据、当前要解决的问题、解决方案与根因、结果与结论、以及条件字段与下一步建议。 | 作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。 |
 
 ### 总控层默认分流决策表
@@ -566,10 +568,12 @@ Bug 域采用两条互补路径：
 | `test-naming-rules`           | 当创建新的测试任务目录、测试文件、测试脚本、测试数据目录时自动触发。             | 统一测试目录和文件命名。     |
 | `test-program-rules`          | 当新增测试程序、模拟程序、验证脚本、数据构造脚本时自动触发。                     | 统一测试程序职责和辅助脚本边界。 |
 | `test-doc-rules`              | 当新增或修改测试 `README.md`、验证说明、测试报告、覆盖说明时自动触发。           | 统一测试说明文档结构。       |
-| `agent-browser`               | 当任务需要隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理或其他引擎，或用户明确要求该工具时自动触发；普通 Chrome 状态与常规页面调试按统一浏览器路由选择。 | 提供条件式浏览器自动化能力，不固化为默认联调工具。 |
+| `browser-session-automation-rules` | 当任务需要隔离 profile、具名/并发 session、认证登录、表单交互、批量执行等核心浏览器自动化，或用户明确要求该工具时自动触发；普通 Chrome 状态与常规页面调试按统一浏览器路由选择。 | 提供条件式核心浏览器自动化能力，不固化为默认联调工具。 |
+| `browser-advanced-testing-rules` | 当任务需要网络/HAR、视觉 diff、trace/profiling、代理或多引擎等高级验证与观测能力，或用户明确要求该工具时自动触发。 | 提供条件式浏览器高级验证与观测能力，不固化为默认联调工具。 |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求与验收标准时自动触发。 | 负责当前需求对应的功能正确性验证。 |
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
-| `project-release-test-rules`  | 当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时自动触发。 | 负责每次执行前扫描并更新接口基线，完成项目级核心接口门禁测试、结论归档与最终放行输入。 |
+| `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有执行引擎实现。 |
+| `project-interface-release-execution-rules` | 当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时自动触发。 | 在接口基线就绪后完成项目级核心接口门禁测试、结论归档与最终放行输入，是 `release_test_engine` 的唯一行为 owner。 |
 
 ### 测试域内部边界判定
 
@@ -590,9 +594,9 @@ Bug 域采用两条互补路径：
 
 3. 浏览器联动执行
 
-- 由统一浏览器路由负责：用户真实 Chrome 状态使用 Chrome Plugin，常规调试和页面验证使用已接通且能力满足的 Chrome DevTools MCP，隔离或高级自动化使用 `agent-browser`
+- 由统一浏览器路由负责：用户真实 Chrome 状态使用 Chrome Plugin，常规调试和页面验证使用已接通且能力满足的 Chrome DevTools MCP，隔离核心自动化使用 `browser-session-automation-rules`，高级验证与观测使用 `browser-advanced-testing-rules`
 - 聚焦“如何通过真实浏览器执行页面打开、点击、输入、登录、截图、抓取页面证据和查看网络请求”，工具选择不由测试域单独写死
-- `agent-browser` 适用于隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和其他引擎场景
+- `browser-session-automation-rules` 适用于隔离 profile、并发 session 场景；`browser-advanced-testing-rules` 适用于网络/HAR、视觉 diff、录制/trace、代理和其他引擎场景
 - 不替代功能验证、回归验证或联调归因，只负责浏览器执行手段与操作能力
 
 4. 功能验证
@@ -620,7 +624,7 @@ Bug 域采用两条互补路径：
 
 7. 上线前项目级接口门禁
 
-- 由 `project-release-test-rules` 负责
+- 由 `project-interface-baseline-rules`（接口基线）与 `project-interface-release-execution-rules`（门禁执行）共同负责
 - 聚焦“当前版本上线前，项目级核心接口是否具备统一放行条件”
 - 每次执行前都必须先扫描当前接口事实并与接口基线对账；首次触发执行全量建基线，后续执行默认做增量扫描
 - 对新增接口、删除接口和接口信息漂移先更新基线，再筛选必测接口并输出门禁结论
@@ -630,11 +634,11 @@ Bug 域采用两条互补路径：
 
 - 讨论“测什么、覆盖哪些场景、优先级怎么排”时，进入 `test-strategy-rules`
 - 讨论“测试目录建在哪、怎么命名、README 怎么写”时，进入测试资源管理相关 skill
-- 讨论“需要用真实浏览器打开页面、点击、输入、登录、截图、抓取页面数据或查看页面网络请求”时，先按统一浏览器路由选择 Chrome Plugin、Chrome DevTools MCP 或 `agent-browser`
+- 讨论“需要用真实浏览器打开页面、点击、输入、登录、截图、抓取页面数据或查看页面网络请求”时，先按统一浏览器路由选择 Chrome Plugin、Chrome DevTools MCP、`browser-session-automation-rules` 或 `browser-advanced-testing-rules`
 - 讨论“当前需求是否实现正确”时，进入 `functional-validation-rules`
 - 讨论“上下游系统是否打通、环境是否一致、链路是否闭环”时，先进入 `test-strategy-rules` 重新拆分验证路径，必要时升级到总控层协调
 - 讨论“旧功能有没有被这次改动带坏、回归范围怎么定、回归用例怎么选”时，进入 `test-regression-rules`
-- 讨论“上线前全项目接口要不要放行、核心接口是否全量过门禁、接口基线是否需要冷启动或增量更新”时，进入 `project-release-test-rules`
+- 讨论“上线前全项目接口要不要放行、核心接口是否全量过门禁、接口基线是否需要冷启动或增量更新”时，进入 `project-interface-baseline-rules`（基线冷启动/增量更新）与 `project-interface-release-execution-rules`（放行/门禁判定）
 
 ### 测试域内部顺序
 
@@ -644,7 +648,7 @@ Bug 域采用两条互补路径：
 - 然后执行 `functional-validation-rules`
 - 涉及跨系统或跨环境时，回到 `test-strategy-rules` 重新确认验证路径与证据收集方式
 - 再执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证
-- 准备上线或需要统一放行结论时，最后执行 `project-release-test-rules`，先扫描并更新接口基线，再完成项目级接口门禁
+- 准备上线或需要统一放行结论时，最后先执行 `project-interface-baseline-rules` 扫描并更新接口基线，再执行 `project-interface-release-execution-rules` 完成项目级接口门禁
 
 ## 十二、交付域
 

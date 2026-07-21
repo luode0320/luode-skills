@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目记忆四件套自举"
+  short_description: "检测并结构性补齐 PROJECT_CURRENT/MEMORY/HISTORY 三件套骨架与大小闸门"
+  default_prompt: "使用 $project-memory-file-bootstrap-rules，检测并调用 ../project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh 补齐项目记忆四件套结构骨架（PROJECT_CURRENT.md 覆盖维护 + 51200 字节上限、PROJECT_MEMORY.md 双区骨架、PROJECT_HISTORY.md 只追加），不做事实抽取；规则文件不在本 skill 范围内。"

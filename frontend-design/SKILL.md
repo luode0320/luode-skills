@@ -15,7 +15,7 @@ license: Complete terms in LICENSE.txt
   - `comment-completion-gate-rules`
   - `chinese-comment-rules`
   - `implementation-review-rules`
-  - `skill-compliance-gate-rules`
+  - `code-change-finalization-gate-rules`
 - 上述任一 skill 未命中，不得给出“已完成前端改动”或“可提交”结论。
 - 前端测试前收口统一并入 `implementation-review-rules`：至少检查 import 排序/分组、重复或未使用 import、缩进、连续空行、模板 / script / style 区块排版，以及语法、类型、引用与目录归位；若项目存在 Prettier、ESLint、vue-tsc、tsc、npm/yarn/pnpm lint 等本地命令，优先执行对应命令并记录结果。
 - 前端注释收口必须覆盖新增或修改的函数、事件处理、异步数据加载、条件渲染、复杂样式和兼容/兜底逻辑；前端代码和后端代码一样属于代码改动，不能以“这是前端”作为跳过注释双 skill 的理由。

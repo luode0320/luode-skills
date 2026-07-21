@@ -1,4 +1,4 @@
 interface:
   display_name: "Godot 项目自举"
   short_description: "自动补齐 Godot 项目的规则文件模板、Godot AI MCP 配置与图像生成入口约定"
-  default_prompt: "使用 $godot-project-bootstrap-rules 检查当前仓库是否为 Godot 项目；若命中，则联动 project-agents-bootstrap、mcp-installation-rules 与 imagegen，把项目级规则文件（AGENTS.md / CLAUDE.md）中的 Godot 工具配置与图像生成配置模板补齐，并检查 ./codex/config.toml 或 ./.codex/config.toml 是否已包含 Godot AI MCP。规则文件只能写读取约定、baseurl、模型名、优先级和回退规则，不能写真实 OPENAI_API_KEY。"
+  default_prompt: "使用 $godot-project-bootstrap-rules 检查当前仓库是否为 Godot 项目；若命中，则联动 project-rule-file-bootstrap-rules、mcp-installation-rules 与 imagegen，把项目级规则文件（AGENTS.md / CLAUDE.md）中的 Godot 工具配置与图像生成配置模板补齐，并检查 ./codex/config.toml 或 ./.codex/config.toml 是否已包含 Godot AI MCP。规则文件只能写读取约定、baseurl、模型名、优先级和回退规则，不能写真实 OPENAI_API_KEY。"

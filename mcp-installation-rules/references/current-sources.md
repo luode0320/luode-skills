@@ -28,3 +28,18 @@
 
 - Godot 生态变化较快，默认以项目主页或资产库中的当前安装说明为准。
 - 后续只要任务涉及 Godot 编辑器操控，就优先让位给该 MCP。
+
+## TAPD 技能包（tapd-skills）
+
+- 官方技能仓库：
+  - `https://cnb.cool/tapd.cn/skills/tapd-skills`
+- 归档直下地址（默认安装方式，不用 git clone）：
+  - `https://cnb.cool/tapd.cn/skills/tapd-skills/-/git/archive/main.tar.gz`
+- Token 获取入口（TAPD 开放平台，登录后获取个人 API Token）：
+  - `https://www.tapd.cn/open_platform/open_api_redirect`
+
+使用原则：
+
+- 用户口中的“TAPD MCP”默认按 `tapd-skills` 技能包处理（含 `tapd-openapi` / `tapd-cli` / `tapd-addcomment` 三个 skill），通过环境变量 + TAPD OpenAPI 直连工作，不需要常驻 MCP server 进程。
+- 默认安装方式是下载归档解包，不用 `git clone` 拉取仓库历史。
+- `TAPD_TOKEN`、`TAPD_WORKSPACE_IDS` 属于用户私密配置，由用户自行填写，不得代填、不得写入示例真值。

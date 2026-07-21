@@ -105,11 +105,11 @@ description: 用于在正式生产 2D 游戏素材前完成美术设计收口。
 
 这些情况出现时，默认继续回炉设计图，而不是进入生产。
 
-## 和 2d-asset-design 的关系
+## 和 game-asset-production-handoff-rules 的关系
 
 - `agent-sprite-forge-design` 负责设计阶段和用户确认闭环。
-- `2d-asset-design` 负责在确认后继续生产、后处理和 Godot 交付。
-- `2d-asset-design` 命中正式素材任务时，应先命中本 skill。
+- `game-asset-production-handoff-rules` 负责在确认后继续生产、后处理和 Godot 交付。
+- `game-asset-production-handoff-rules` 命中正式素材任务时，应先命中本 skill。
 
 ## 参考来源
 

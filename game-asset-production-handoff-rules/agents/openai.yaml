@@ -1,0 +1,4 @@
+interface:
+  display_name: "2D 素材生产交接"
+  short_description: "在设计预览确认后，真实生成角色/怪物/地图/道具原始素材，并执行去背切帧对齐等后处理，交付 Godot 可用结果"
+  default_prompt: "当设计预览已经用户确认，需要真实调用图像生成能力产出最终生产素材、生产角色/怪物/Boss 动作与 Sprite Sheet、生产地图/瓦片/场景道具，或对已生成原始图执行去背/切帧/对齐/拼表/GIF预览/QA元数据等后处理并整理成 Godot 可导入交付物时，使用此 skill；设计尚未确认前请先转交 game-asset-design-gate-rules。"

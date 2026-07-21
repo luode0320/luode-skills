@@ -1,6 +1,6 @@
 ---
 name: mcp-installation-rules
-description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 session、HAR/route、视觉 diff、录制/trace、代理或多引擎需求使用 `agent-browser`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。
+description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`，HAR/route、视觉 diff、录制/trace、代理或多引擎等高级验证需求使用 `browser-advanced-testing-rules`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。当用户提出接入“TAPD MCP / TAPD 技能 / TAPD OpenAPI / tapd-skills”时，按本 skill 的「TAPD 技能包（tapd-skills）安装规则」处理：归档直下安装（不用 git clone），环境变量按项目级配置补齐，`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 由用户自行填写。
 ---
 
 # MCP 安装判定规则
@@ -18,7 +18,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 - 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。以上 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见下方"平台判定与 Claude Code MCP 配置分支"，两者不通用，不得混用同一份配置文件语义。
 - 为后续浏览器控制和 Godot 编辑器控制建立清晰的优先级，避免同类工具抢主导权。
 - 仅负责 provisioning：安装、注册、配置补齐和首次可用性检查。已配置 MCP 在任务执行期间发生的 timeout、EOF、断开、失活或宿主异常，统一转给 `agent-runtime-recovery-rules`，不在本 skill 内猜测 reload/restart 命令。
-- 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；`agent-browser` 仅在矩阵命中隔离或高级自动化能力时使用，或作为不依赖用户 profile 的条件后备。
+- 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；`browser-session-automation-rules` 仅在矩阵命中隔离 profile / session 自动化能力时使用，或作为不依赖用户 profile 的条件后备；`browser-advanced-testing-rules` 仅在矩阵命中 HAR / 视觉 diff / trace / 代理 / 多引擎等高级验证能力时使用。
 
 ## 自动触发信号
 
@@ -46,8 +46,8 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - 若用户使用了“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”等叫法，先统一解释为官方当前名称 `Chrome DevTools MCP`
    - 结论写为“需要安装 Chrome DevTools MCP”
    - 检查项目级 `./codex/config.toml` 与 `./.codex/config.toml`；若目标配置不存在，则默认补齐对应 MCP 配置
-   - 后续浏览器工具选择按 `references/tool-priority.md` 的矩阵执行：用户已有标签、登录态、Cookie 或扩展由 Chrome Plugin 接管；独立页面调试与验证优先 Chrome DevTools MCP；隔离 profile / session、HAR / route、视觉 diff、录制 / trace、代理或多引擎需求使用 `agent-browser`
-   - 若仅需不依赖用户 profile 的基础自动化，且 Chrome DevTools MCP 不可用，可按矩阵条件后备到 `agent-browser`；不满足能力或安全边界时明确阻断
+   - 后续浏览器工具选择按 `references/tool-priority.md` 的矩阵执行：用户已有标签、登录态、Cookie 或扩展由 Chrome Plugin 接管；独立页面调试与验证优先 Chrome DevTools MCP；隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`；HAR / route、视觉 diff、录制 / trace、代理或多引擎需求使用 `browser-advanced-testing-rules`
+   - 若仅需不依赖用户 profile 的基础自动化，且 Chrome DevTools MCP 不可用，可按矩阵条件后备到 `browser-session-automation-rules`；不满足能力或安全边界时明确阻断
 3. 若命中 Godot 标记：
    - 结论写为“需要安装 Godot AI MCP”
    - 检查项目级 `./codex/config.toml` 与 `./.codex/config.toml`；若目标配置不存在，则默认补齐对应 MCP 配置
@@ -55,7 +55,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - 若同时命中场景编辑、节点调整、运行项目、抓取编辑器状态场景，要求优先让位给 Godot AI MCP
 4. 若两类标记都命中：
    - 结论写为“两类 MCP 都需要安装”
-   - 浏览器相关工作按 `references/tool-priority.md` 的 Chrome Plugin / Chrome DevTools MCP / `agent-browser` 条件矩阵执行
+   - 浏览器相关工作按 `references/tool-priority.md` 的 Chrome Plugin / Chrome DevTools MCP / `browser-session-automation-rules` / `browser-advanced-testing-rules` 条件矩阵执行
    - Godot 编辑器相关工作由 Godot AI MCP 主导
    - 若项目级 Codex 配置缺失任一 MCP，对缺失项默认补齐
 5. 若两类标记都未命中：
@@ -89,11 +89,44 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
 
 **安装与配置：**
 
-- CodeGraph 的强制安装与 `codegraph init` 初始化由 `project-agents-bootstrap` 的 CodeGraph 准备规则负责。
+- CodeGraph 的强制安装与 `codegraph init` 初始化由 `project-rule-file-bootstrap-rules` 的 CodeGraph 准备规则负责。
 - codebase-memory-mcp 按官方仓库 `https://github.com/DeusData/codebase-memory-mcp` 的当前说明安装并建立索引；**不要沿用第三方博客转述里的旧命名、旧参数或旧安装路径**，一切以官方仓库 README 为准。
 - 两者均为 stdio 类 MCP，需要时把对应 server 配置补齐到项目级 MCP / Codex 配置（与本 skill 其他 MCP 的配置补齐策略一致）。
 - 安装或建立索引失败时，回退到 CodeGraph，再回退到本地搜索与文件读取，不阻塞主任务。
 
+## TAPD 技能包（tapd-skills）安装规则
+
+当用户提出“下载安装 TAPD MCP / 接入 TAPD / TAPD 技能 / TAPD OpenAPI”时，按本节处理。TAPD 官方当前提供的是技能包（skills）形态：`tapd-openapi`（OpenAPI 全量调用）、`tapd-cli`（命令行封装）、`tapd-addcomment`（写评论脚本），通过环境变量 + TAPD OpenAPI 直连工作，不需要常驻 MCP server 进程；名称收口后仍统称“TAPD 技能包”。
+
+**安装方式（归档直下，不用 git clone）：**
+
+1. 从官方仓库归档地址下载：`https://cnb.cool/tapd.cn/skills/tapd-skills/-/git/archive/main.tar.gz`。
+2. 解包后将 `skills/` 下的 `tapd-openapi`、`tapd-cli`、`tapd-addcomment` 复制到当前技能根目录（本仓库即 `D:\luode\luode-skills`，Codex Desktop 侧经 `C:\Users\luode\.codex\skills` 符号链接自动可见）。
+3. 已存在同名 skill 目录时不得覆盖，先对比差异再决定是否更新。
+4. 下载或解包失败时，退回官方仓库页面 `https://cnb.cool/tapd.cn/skills/tapd-skills` 按当前说明处理，不得沿用第三方转述。
+
+**环境变量配置（项目级 Codex 配置补齐）：**
+
+按 `references/config-bootstrap.md` 的检查顺序（`./codex/config.toml` -> `./.codex/config.toml`，都缺失时创建后者），在项目级配置中补齐 TAPD 环境变量。Codex 项目级配置没有独立 env 段时，写入 `[shell_environment_policy.set]`；若用户在其他宿主（如 Claude Code）使用 JSON `env` 段，保持同一组 key：
+
+```toml
+[shell_environment_policy.set]
+TAPD_API_ENDPOINT = "https://api.tapd.cn"
+TAPD_TOKEN = ""
+TAPD_WORKSPACE_IDS = ""
+TAPD_SITE_URL = "https://www.tapd.cn"
+```
+
+- `TAPD_API_ENDPOINT`、`TAPD_SITE_URL` 使用上述默认值即可。
+- `TAPD_TOKEN`、`TAPD_WORKSPACE_IDS` 属于用户私密配置，**必须留空并提示用户自行填写**；agent 不得代填、不得把任何真值写进仓库或示例。
+- Token 获取入口：TAPD 开放平台 `https://www.tapd.cn/open_platform/open_api_redirect`（登录后获取个人 API Token）；`TAPD_WORKSPACE_IDS` 为项目 ID 列表，逗号分隔，取自 TAPD 项目 URL。
+- 配置写入后必须回读确认 UTF-8 未乱码；`TAPD_TOKEN` 仍为空时视为“已安装未激活”，提示用户填写后重启会话生效，不得阻断其他任务。
+
+**使用路由：**
+
+- TAPD 需求 / 缺陷 / 任务 / 迭代 / Wiki / 评论 / 工时等操作，优先由 `tapd-openapi` skill 接管；写评论场景可直接用 `tapd-addcomment`；终端批量脚本场景用 `tapd-cli`（需 Node.js 18+）。
+- 用户消息出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动触发 `tapd-openapi`（按需联动 `tapd-addcomment` / `tapd-cli`），优先走 OpenAPI 而不是浏览器打开页面；执行前必须按 `tapd-openapi` 的「环境预检」检查 env，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并输出配置指引。
+- `TAPD_TOKEN` 泄露防护：任何输出、日志、提交中不得回显 Token 明文。
 ## 平台判定与 Claude Code MCP 配置分支（新增）
 
 以上"覆盖 Codex 本地配置缺口"及下方"Chrome DevTools MCP 安装流程"中出现的 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见本节，两者不通用，不得混用同一份配置文件语义。
@@ -126,7 +159,7 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - `codex mcp list`
    - `codex mcp get chrome-devtools`
 8. 如果工具已写入但会话里还看不到新 MCP，先重启 Codex 会话或刷新当前会话，再做页面验证。
-9. 页面联调与验证按 `references/tool-priority.md` 的条件矩阵执行：用户真实 profile 走 Chrome Plugin，独立调试 / 验证优先 Chrome DevTools MCP，隔离或高级自动化走 `agent-browser`；不得用线性优先级替代场景判断。
+9. 页面联调与验证按 `references/tool-priority.md` 的条件矩阵执行：用户真实 profile 走 Chrome Plugin，独立调试 / 验证优先 Chrome DevTools MCP，隔离核心自动化走 `browser-session-automation-rules`，高级验证与观测走 `browser-advanced-testing-rules`；不得用线性优先级替代场景判断。
 
 ## 适用安装结论模板
 
@@ -134,21 +167,22 @@ Codex 环境：
 
 - `需要安装 Chrome DevTools MCP`
 - `项目级 ./.codex/config.toml 已默认补齐`
-- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ agent-browser（隔离或高级自动化条件后备），详见 references/tool-priority.md`
+- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ browser-session-automation-rules（隔离核心自动化条件后备）/ browser-advanced-testing-rules（高级验证条件后备），详见 references/tool-priority.md`
 - `如当前会话未刷新到新 MCP，先重启 Codex 再验证`
 
 Claude Code 结论模板（待确认阶段使用，新增）：
 
 - `需要接入 Chrome DevTools MCP`
 - `当前 Claude Code 版本的具体 MCP 配置机制尚未核实，已提示用户确认`
-- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ agent-browser（隔离或高级自动化条件后备），详见 references/tool-priority.md`（该路由平台无关，可直接复用）
+- `后续浏览器工具路由：Chrome Plugin（用户真实 profile）/ Chrome DevTools MCP（独立调试验证）/ browser-session-automation-rules（隔离核心自动化条件后备）/ browser-advanced-testing-rules（高级验证条件后备），详见 references/tool-priority.md`（该路由平台无关，可直接复用）
 
 ## 默认优先级
 
 - 浏览器控制：按 `references/tool-priority.md` 条件路由：
   - `Chrome Plugin`：依赖用户已有标签、登录态、Cookie、扩展或真实 profile
   - `Chrome DevTools MCP`：独立 profile 的 DOM、控制台、Network、Performance 与页面行为验证
-  - `agent-browser`：隔离 session、多 session、HAR / route、视觉 diff、录制 / trace、代理、多引擎；在不依赖用户 profile 的基础自动化中可作为条件后备
+  - `browser-session-automation-rules`：隔离 profile、具名 session、认证登录、表单交互、批量执行；在不依赖用户 profile 的基础自动化中可作为条件后备
+  - `browser-advanced-testing-rules`：HAR / route、视觉 diff、录制 / trace、代理、多引擎、多 session 观测面板
 - Godot 编辑器控制：
   - `Godot AI MCP`
   - 其他 Godot 本地兜底方式（如仅运行命令、静态读文件、人工编辑）
@@ -159,7 +193,7 @@ MCP 安装、配置、注册或首次连接失败时，先触发 `execution-fail
 
 - 不代替 `project-design-doc-rules` 做整项目总览同步。
 - 不代替 `godot-project-bootstrap-rules` 做 Godot 项目的规则文件（`AGENTS.md` / `CLAUDE.md`）模板补齐、图像配置模板补齐或环境就绪收口；本 skill 只负责 MCP 判定与项目级 Codex 配置补齐。
-- 不代替 `agent-browser` 做实际浏览器自动化执行；浏览器工具按 `references/tool-priority.md` 的能力矩阵选择，不能用 Chrome DevTools MCP 绕过用户真实 profile，也不能用 `agent-browser` 替代需要 Chrome Plugin 登录态的任务。
+- 不代替 `browser-session-automation-rules` 或 `browser-advanced-testing-rules` 做实际浏览器自动化执行；浏览器工具按 `references/tool-priority.md` 的能力矩阵选择，不能用 Chrome DevTools MCP 绕过用户真实 profile，也不能用 `browser-session-automation-rules`/`browser-advanced-testing-rules` 替代需要 Chrome Plugin 登录态的任务。
 - 不代替 `find-skills` 做开放生态技能搜索；这里只判断当前项目应安装什么 MCP。
 - 不代替具体的前端 skill 或 Godot 项目实现规则。
 - 本 skill 的 Claude Code MCP 配置分支目前仅完成判定与提示义务，具体命令细节以实际核实结果为准，不作为最终结论。

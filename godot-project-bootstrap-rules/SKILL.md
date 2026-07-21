@@ -22,7 +22,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 进入后先做什么
 
 1. 先按 `mcp-installation-rules` 的项目识别规则确认是否为 Godot 项目。
-2. 强制联动 `project-agents-bootstrap`，确保仓库根目录规则文件（`AGENTS.md` / `CLAUDE.md`）存在。
+2. 强制联动 `project-rule-file-bootstrap-rules`，确保仓库根目录规则文件（`AGENTS.md` / `CLAUDE.md`）存在。
 3. 检查规则文件（`AGENTS.md` / `CLAUDE.md`）是否已包含：
    - `## Godot 项目工具配置`
    - `## 图像生成配置`
@@ -74,7 +74,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 
 - 不替代 `mcp-installation-rules` 做 MCP 安装来源分析；这里只负责把 Godot 项目的完整准备流串起来。
 - 不替代 `imagegen` 做实际图片生成；这里只保证项目的图像配置入口存在且格式可读。
-- 不替代 `project-agents-bootstrap` 做通用仓库规则补齐；这里只追加 Godot 项目的专项模板。
+- 不替代 `project-rule-file-bootstrap-rules` 做通用仓库规则补齐；这里只追加 Godot 项目的专项模板。
 
 ## 通过标准
 

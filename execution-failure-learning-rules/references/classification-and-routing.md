@@ -28,7 +28,8 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 | 位图生成、编辑、真实图像 API | `imagegen` | 通道、模型能力、参数与输出校验 |
 | Windows/WSL shell、跨平台执行 | `windows-wsl-execution-rules` | shell、路径、编码、WSL/Windows 边界 |
 | Windows PowerShell command-not-found、缺失 Windows CLI、PowerShell 版本/包管理器失败、已确认 Git Bash 中 Windows CLI 不可见 | `windows-powershell-environment-rules` | `references/failure-casebook.md`、精确的每源 manifest/package 映射、SessionEnsure/RecoverCommand JSON 状态；未确认 Git Bash、`wsl.exe`、Linux 127 或 `/mnt/*.exe` 不走此 owner |
-| 浏览器自动化、隔离 profile、会话 | `agent-browser` | profile、认证上下文、页面状态 |
+| 浏览器核心自动化、隔离 profile、会话 | `browser-session-automation-rules` | profile、认证上下文、页面状态 |
+| 浏览器高级验证、HAR/网络记录、视觉 diff、trace/代理/多引擎 | `browser-advanced-testing-rules` | 网络记录、视觉基线、trace/性能样本、代理配置 |
 | URL、认证 URL、网页读取 | `authenticated-url-routing-rules` | URL 路由、登录态、来源与页面可达性 |
 | MCP 安装/注册/首次连接 | `mcp-installation-rules` | 版本、配置来源、初次连接和回退；仅限 provisioning 阶段 |
 | Codex/AI 插件安装或启用 | `plugin-installation-rules` | 官方来源、版本、启用状态；仅限 provisioning 阶段 |

@@ -32,7 +32,7 @@ description: 【强制自动触发】当主任务存在多 skill 组合、并行
 
 - 不替代 `skill-hit-check-rules`
 - 不替代 `parallel-task-dispatch-rules`
-- 不替代 `skill-compliance-gate-rules`
+- 不替代 `skill-execution-compliance-gate-rules` / `code-change-finalization-gate-rules`
 - 不执行写入型任务
 - 只看当前轮次，不继承历史轮次的 skill 推断结果。
 - 只看主线程本轮已声明的 skill，不靠历史记忆补全未声明项。

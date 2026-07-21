@@ -6,11 +6,11 @@
 - 触发压缩时，必须先联动 `recent-context-bootstrap-rules`。
 - 预热负责补上下文来源，本 skill 负责压缩和降噪。
 
-## 与项目 `AGENTS.md` / `project-agents-bootstrap` 的关系
+## 与项目 `AGENTS.md` / `project-rule-file-bootstrap-rules` 的关系
 
 - 压缩后恢复最近上下文不等于恢复仓库级硬规则。
 - 触发压缩时，必须重新读取当前项目根目录 `AGENTS.md`，再继续主任务。
-- 若项目根目录缺失 `AGENTS.md`，或读取后发现规则不完整，应转交 `project-agents-bootstrap` 补齐后再继续。
+- 若项目根目录缺失 `AGENTS.md`，或读取后发现规则不完整，应转交 `project-rule-file-bootstrap-rules` 补齐后再继续。
 - 仓库级 `AGENTS.md` 规则优先级高于压缩摘要中的口头记忆，冲突时以重新读取后的 `AGENTS.md` 为准。
 
 ## 与 `history-recall-rules` 的关系
