@@ -39,7 +39,7 @@
 
 ## 通用上线测试引擎
 
-- 稳定决策：`project-release-test-rules/scripts/release_test_engine/` 是协议中立内核，统一 IR 版本为 `2.0`；未知技术栈必须输出 `PENDING/UNSUPPORTED_ADAPTER`，不得伪报通过。
+- 稳定决策：`project-interface-release-execution-rules/scripts/release_test_engine/` 是协议中立内核，统一 IR 版本为 `2.0`；未知技术栈必须输出 `PENDING/UNSUPPORTED_ADAPTER`，不得伪报通过。
 - 稳定决策：所有运行连接只来自 `local` 配置；普通业务写接口允许执行，DROP/TRUNCATE/破坏性 ALTER、源码/基础设施删除等极端操作由安全 denylist 阻断。
 - 稳定决策：接口级结果固定为 `PASS`、`EXPECTED_FAIL`、`FAIL`、`PENDING`、`BLOCKED`；P0 入口任意非 `PASS` 阻断项目放行，项目门禁输出 `PASS`/`FAIL`/`PARTIAL`。
 - 稳定决策：兼容入口为 `generate_release_test_plan.py doctor/run`，旧资产命令保留回退路径；项目专属字段只能写入项目基线/adapter，通用规则不得硬编码业务实体。
@@ -82,6 +82,33 @@
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`artifact-storage-rules/references/naming-templates.md`
 - 适用范围: 需求域、实施域、Bug 域、测试域、审查域、验收域
 - 更新时间: 2026-06-29
+- 状态: 启用
+
+### Skill 体积治理统计基线
+- 别名: Skill 体积预算, 规则文档体积基线, 默认文本包
+- 类型: 统计口径
+- 定义: 截至 2026-07-17，正式字典主规划包含 84 个 skill；仓库根目录实际存在 111 个带 `SKILL.md` 的目录，其中 27 个属于扩展种子，不纳入主规划拆分基线。默认文本包定义为单个 skill 的 `SKILL.md` 加 `references/` 下全部文本资源的原始字节数。预算等级固定为 `normal`、`review`、`split_candidate`、`hard_warning`：`normal` 不超过 `SKILL.md` 16,000 B、单 reference 最大 12,000 B、默认文本包 48,000 B；超过建议值进入 `review`，超过 SKILL.md 20,000 B、单 reference 16,000 B 或默认文本包 64,000 B 进入 `split_candidate`，SKILL.md 超过 24,000 B 进入 `hard_warning`。
+- 来源: `doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.py`、`doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.json`、`字典.md`、`doc/2-需求/2026-07-16_114619_Skill体积治理与拆分.md`
+- 适用范围: Skill 体积盘点、候选冻结和后续职责拆分复评
+- 更新时间: 2026-07-17
+- 状态: 启用
+
+### Skill 体积候选冻结
+- 别名: Skill 拆分候选矩阵, 候选顺序, 正式/扩展种子双层追踪
+- 类型: 拆分决策
+- 定义: `TASK-SPLIT-01-02` 将正式 84 个 skill 与扩展种子 27 个分层记录在 `candidate-matrix.yaml`；正式进入拆分的 4 项为 `project-agents-bootstrap`、`skill-compliance-gate-rules`、`project-release-test-rules`、`agent-browser`，每项均有两个独立职责组；`2d-asset-design` 作为 P1 扩展种子例外进入 CYCLE-SPLIT-06；MCP 进入 P2 候选设计，implementation-planning 进入条件复评，其余保持暂缓或不候选。
+- 来源: `doc/5-tests/2026-07-17_155229/skill-split-validation/mapping/candidate-matrix.yaml`、`doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md`、`doc/7-验收/2026-07-16_114619_Skill体积治理与拆分_验收标准.md`
+- 适用范围: 后续 CYCLE-SPLIT-02 至 CYCLE-SPLIT-08 的候选进入、职责映射和测试入口选择
+- 更新时间: 2026-07-17
+- 状态: 启用
+
+### Skill 拆分通用测试入口
+- 别名: `TEST-SPLIT-003`, 五类拆分验证, pre/post-delete fixture
+- 类型: 测试契约
+- 定义: `TASK-SPLIT-01-03` 固化 `validate_skill_split.py` 的 `size`、`mapping`、`trigger`、`pre-delete`、`post-delete` 五类模式，并由 `run_trigger_cases.ps1` 通过 `-CasesRoot` 转发。报告和矩阵路径必须位于仓库根目录内，fixture 根必须位于当前测试时间戳目录内；越界必须非零失败，不删除真实 skill。
+- 来源: `doc/5-tests/2026-07-17_155229/技能拆分验证/README.md`、`doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md`
+- 适用范围: CYCLE-SPLIT-02 至 CYCLE-SPLIT-08 的静态覆盖、触发、删除前后和路径边界验证
+- 更新时间: 2026-07-17
 - 状态: 启用
 
 ### 架构专题文档规则
@@ -174,7 +201,7 @@
 - 别名: 结束即停, 不扩散下一步, 停止建议, 三类合法后续
 - 类型: 流程规则
 - 定义: 当用户明确表达“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”等结束指令，或不存在三类合法后续时，该指令对 Codex、Claude Code、浏览器 agent、子 agent 或其他长文本 agent 通用；agent 必须停止自动继续、工具执行和扩散性后续建议，只保留必要的最小收口结论。最终收口只允许三类合法后续：原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog。可选优化、额外整理、未来迭代、体验提升、文档再润色等内容，若不属于原计划必需项，不得作为默认后续内容输出。无下一步时强制不输出“下一步状态”“下一步建议”“等待用户新指令”“无需继续动作”等占位文案，避免循环 loop 会话误触发。Codex goal 仅是运行时状态收口机制的一种特例；若当前环境存在 goal / plan / task 等显式状态机制，且已满足完成或阻断条件，必须按真实机制完成状态收口。
-- 来源: `autonomous-execution-rules`、`reasoning-summary-structure-rules`、`skill-compliance-gate-rules`、`AGENTS.md`
+- 来源: `autonomous-execution-rules`、`reasoning-summary-structure-rules`、`skill-execution-compliance-gate-rules`、`AGENTS.md`
 - 适用范围: 多 agent 收口、最终总结、连续执行、skill 合规闸门
 - 更新时间: 2026-06-29
 - 状态: 启用
@@ -182,7 +209,7 @@
 ### 普通 Markdown 输出规则
 - 别名: text 代码块禁用, 自然语言不用代码围栏, 输出格式规则
 - 类型: 输出规则
-- 定义: 普通说明、方案、流程、总结、审查报告、线程拆分和状态回报必须使用普通 Markdown 段落、列表、表格或引用块；不得用 ` ```text `、无语言代码围栏、缩进代码块或 HTML 包裹整段自然语言输出。代码围栏只用于真实代码、命令、配置片段、日志片段、JSON/YAML 等需要等宽保真的内容。该规则由 `reasoning-summary-structure-rules` 负责收口检查，并由 `project-agents-bootstrap` 同步进 `AGENTS.md` / `CLAUDE.md` 的“输出格式规则”章节。
+- 定义: 普通说明、方案、流程、总结、审查报告、线程拆分和状态回报必须使用普通 Markdown 段落、列表、表格或引用块；不得用 ` ```text `、无语言代码围栏、缩进代码块或 HTML 包裹整段自然语言输出。代码围栏只用于真实代码、命令、配置片段、日志片段、JSON/YAML 等需要等宽保真的内容。该规则由 `reasoning-summary-structure-rules` 负责收口检查，并由 `project-rule-file-bootstrap-rules` 同步进 `AGENTS.md` / `CLAUDE.md` 的“输出格式规则”章节。
 - 来源: 用户截图确认、`reasoning-summary-structure-rules`、`project-agents-bootstrap`、`PROJECT_STYLE.md`
 - 适用范围: 最终回复、中间进度、审查报告、线程拆分、仓库规则文件模板
 - 更新时间: 2026-06-30
@@ -227,7 +254,7 @@
 ### 审查体系收口
 - 别名: 审查链路
 - 类型: 流程规则
-- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-compliance-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/6-审查/`，不再允许仅在最终回复中口头保留通过结论。
+- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-execution-compliance-gate-rules` / `code-change-finalization-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/6-审查/`，不再允许仅在最终回复中口头保留通过结论。
 - 来源: `README.md`、`项目设计.md`
 - 适用范围: 审查域
 - 更新时间: 2026-06-27
@@ -434,7 +461,7 @@
 ### URL 认证浏览器默认路由
 - 别名: authenticated-url-routing-rules, 已登录 Chrome 路由, URL 默认 Chrome Plugin
 - 类型: 浏览器路由规则
-- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页。依赖真实 Chrome profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用 `agent-browser` 或其他浏览器绕过；明确为公开或 local 且不依赖用户 profile 的页面，才按统一路由选择 Chrome DevTools MCP 或 `agent-browser`。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
+- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页。依赖真实 Chrome profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用 `browser-session-automation-rules` 或其他浏览器绕过；明确为公开或 local 且不依赖用户 profile 的页面，才按统一路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
 - 来源: 用户确认、`authenticated-url-routing-rules/SKILL.md`
 - 适用范围: URL 分析、在线文档读取、浏览器权限页面、企业系统资料访问
 - 更新时间: 2026-07-02
@@ -516,16 +543,17 @@
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
 - 2026-07-16：按用户要求升级注释双 skill，明确超过 5 行有效代码的函数/方法体、闭包体和连续控制流代码块必须在块内就近补顶层步骤注释，嵌套超长代码块单独判断。
+- 2026-07-17：完成 Skill 体积治理与职责拆分周期 01。确认 84/111/27 统计口径、冻结候选矩阵并完成五类通用测试入口；当前改动总审查通过，TASK-SPLIT-01-03 验收通过，周期 01 收口但不进入周期 02，真实 skill、字典和 Git 历史保持未修改。
 - 2026-07-08：新增工具落点分流 util/common/util 规则，明确项目无关工具归 `util`，引用项目文件、路径、配置或约定的复用工具归 `common/util`。
 - 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
 - 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
 - 2026-07-08：新增 Git 协作联动 Obsidian 沉淀规则，明确提交 / 推送 / PR 收口形成可复用事实时先检索并沉淀，但沉淀不构成提交授权。
 
 ### 上线接口测试门禁规则
-- 别名: project-release-test-rules, 上线测试门禁
+- 别名: project-release-test-rules（历史名，已拆分）, project-interface-baseline-rules, project-interface-release-execution-rules, 上线测试门禁
 - 类型: 测试域核心规则
-- 定义: 上线前项目级全接口测试门禁，替代人工接口回归验证，输出上线准入结论。每个业务项目必须在 `doc/5-tests/基线/` 长期维护接口清单、参数来源、依赖图、可复用参数、场景目录、脚本适配、执行历史和变更日志；同时将 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 作为当前代码接口事实的双索引，任一缺失、陈旧或接口集合不一致时，先刷新 swag 与测试基线两边。若目标接口参数无法直接确定，agent 必须按 `reusable_param -> upstream_api -> local_database -> local_cache -> openapi_example -> fixture -> rule` 解析，并把来源写入依赖追踪；已测试通过的参数可持续复用，但必须有 `candidate/reusable/stale/invalid/quarantined/retired` 生命周期、复验、失效归因和持续回写机制。已有通用脚本能力优先复用，缺能力时扩展 `project-release-test-rules/scripts/generate_release_test_plan.py` 的通用子命令，不为每次上线重复生成一次性脚本。
-- 来源: `project-release-test-rules/SKILL.md`、`project-release-test-rules/references/baseline-asset-rules.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
+- 定义: 上线前项目级全接口测试门禁，替代人工接口回归验证，输出上线准入结论。每个业务项目必须在 `doc/5-tests/基线/` 长期维护接口清单、参数来源、依赖图、可复用参数、场景目录、脚本适配、执行历史和变更日志；同时将 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 作为当前代码接口事实的双索引，任一缺失、陈旧或接口集合不一致时，先刷新 swag 与测试基线两边。若目标接口参数无法直接确定，agent 必须按 `reusable_param -> upstream_api -> local_database -> local_cache -> openapi_example -> fixture -> rule` 解析，并把来源写入依赖追踪；已测试通过的参数可持续复用，但必须有 `candidate/reusable/stale/invalid/quarantined/retired` 生命周期、复验、失效归因和持续回写机制。已有通用脚本能力优先复用，缺能力时扩展 `project-interface-release-execution-rules/scripts/generate_release_test_plan.py` 的通用子命令，不为每次上线重复生成一次性脚本。
+- 来源: `project-interface-baseline-rules/SKILL.md`、`project-interface-baseline-rules/references/baseline-asset-rules.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
 - 适用范围: 全项目上线前接口测试、回归验证、上线准入判定
 - 更新时间: 2026-07-02
 - 状态: 启用
@@ -538,6 +566,15 @@
 - 适用范围: 自有 HTTP API 与主动调用的上游/第三方出站接口文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
 - 更新时间: 2026-07-14
 - 状态: 启用
+
+## Skill 体积治理与职责拆分
+
+- 稳定统计口径：正式字典主规划有 84 个 skill，磁盘有 111 个带 `SKILL.md` 的目录，其中 27 个属于扩展种子，不纳入正式预算基线；默认文本包按 `SKILL.md` 与直接 references 文本字节数统计。
+- 稳定测试契约：通用入口覆盖 `size`、`mapping`、`trigger`、`pre-delete`、`post-delete` 五类模式；报告和矩阵路径不得越出仓库根目录，fixture 根不得越出当天测试时间戳目录；越界必须非零失败且不得删除真实 skill。
+- 当前状态：2026-07-17 已完成周期 01 的三个最小任务及其“实现 -> 真实测试 -> 审查 -> 验收”闭环；周期 01 已收口，周期 02 尚未进入，真实 skill、字典和 Git 历史保持未修改。
+- 证据来源：需求、验收、实施总览、实施周期 01、测试 README、当前改动审查报告和 `validate_skill_split.py` 的本地验证结果。
+- Obsidian 沉淀：`知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md`，并已通过 bridge 更新 `知识库/INDEX.md` 导航入口。
+- 更新时间：2026-07-17。
 
 ## 需求与实施文档极致完备化规则
 
@@ -632,7 +669,7 @@ entities:
       - authenticated-url-routing-rules
       - 已登录 Chrome 路由
       - URL 默认 Chrome Plugin
-    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；依赖真实 profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，明确为公开或 local 且不依赖用户 profile 的页面才按统一路由选择 Chrome DevTools MCP 或 `agent-browser`。"
+    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；依赖真实 profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，明确为公开或 local 且不依赖用户 profile 的页面才按统一路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`。"
     scope: "URL 分析、在线文档读取、浏览器权限页面"
     status: "active"
     evidence_ids:
@@ -908,6 +945,77 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-07-14
+  - entity_id: fact.skill-size-baseline-20260717
+    name: "Skill 体积治理统计基线"
+    type: "统计口径"
+    aliases:
+      - Skill 体积预算
+      - 84 个正式 skill
+      - 默认文本包
+      - 扩展种子排除
+    definition: "正式字典主规划统计 84 个 skill；根目录实际 111 个带 SKILL.md 的目录中有 27 个扩展种子，不纳入主规划拆分基线。默认文本包为 SKILL.md 与 references 全部文本资源的原始字节总数；预算等级按 16,000/20,000/24,000 B、12,000/16,000 B 和 48,000/64,000 B 阈值分为 normal、review、split_candidate、hard_warning。"
+    scope: "全仓 skill 体积盘点、候选冻结和职责拆分复评"
+    status: "active"
+    evidence_ids:
+      - evidence.test.skill-size-report-20260717
+      - evidence.doc.skill-size-plan-20260717
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-17
+  - entity_id: fact.skill-split-candidate-matrix-20260717
+    name: "Skill 体积候选矩阵"
+    type: "拆分决策"
+    aliases:
+      - Skill 拆分候选矩阵
+      - 候选顺序
+      - 正式/扩展种子双层追踪
+    definition: "TASK-SPLIT-01-02 将 84 个正式 skill 与 27 个扩展种子分层记录；正式 enter_split 为 project-agents-bootstrap、skill-compliance-gate-rules、project-release-test-rules、agent-browser，各自具备两个独立职责组；2d-asset-design 为 P1 扩展种子例外；mcp-installation-rules 为 P2 candidate_design；implementation-planning-rules 为 gated_reassessment。"
+    scope: "CYCLE-SPLIT-02 至 CYCLE-SPLIT-08 的候选进入、职责映射和测试入口选择"
+    status: "active"
+    evidence_ids:
+      - evidence.test.skill-candidate-matrix-20260717
+      - evidence.doc.skill-split-plan-20260717
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-17
+  - entity_id: fact.skill-split-validation-entry-20260717
+    name: "Skill 拆分通用测试入口"
+    type: "测试契约"
+    aliases:
+      - TEST-SPLIT-003
+      - 五类拆分验证
+      - pre/post-delete fixture
+    definition: "TASK-SPLIT-01-03 固化 validate_skill_split.py 的 size、mapping、trigger、pre-delete、post-delete 五类模式，并由 run_trigger_cases.ps1 通过 -CasesRoot 转发；报告和矩阵路径必须位于仓库根目录内，fixture 根必须位于当前测试时间戳目录内，越界必须非零失败且不得删除真实 skill。"
+    scope: "CYCLE-SPLIT-02 至 CYCLE-SPLIT-08 的静态覆盖、触发、删除前后和路径边界验证"
+    status: "active"
+    evidence_ids:
+      - evidence.test.skill-split-validation-entry-20260717
+      - evidence.doc.skill-split-entry-plan-20260717
+      - evidence.review.skill-split-current-diff-20260717
+      - evidence.accept.skill-split-task-01-03-20260717
+      - evidence.doc.skill-split-cycle-01-close-20260717
+      - evidence.obsidian.skill-split-plan-20260717
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-17
+  - entity_id: fact.skill-split-cycle-01-closure-20260717
+    name: "Skill 拆分周期 01 收口状态"
+    type: "周期状态"
+    aliases:
+      - 周期 01 收口
+      - TASK-SPLIT-01-03 验收完成
+      - 周期 02 未进入
+    definition: "周期 01 的三个最小任务均完成实现、真实测试、审查和验收；通用测试入口只验证离线 fixture 契约，不代表真实 skill 已拆分，周期 02 保持未进入。"
+    scope: "Skill 体积治理与职责拆分实施周期"
+    status: "active"
+    evidence_ids:
+      - evidence.review.skill-split-current-diff-20260717
+      - evidence.accept.skill-split-task-01-03-20260717
+      - evidence.doc.skill-split-cycle-01-close-20260717
+      - evidence.obsidian.skill-split-plan-20260717
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-07-17
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -1090,6 +1198,46 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "用户要求 Git 提交保留审查验收步骤，但不自动生成审查或验收文档"
+  - evidence_id: evidence.test.skill-size-report-20260717
+    type: "test"
+    source: "TASK-SPLIT-01-01 真实统计与验收"
+    path: "doc/5-tests/2026-07-17_155229/skill-split-validation/skill-size-report.json"
+    note: "报告证明正式注册 skill 84 个、磁盘目录 111 个、排除扩展种子 27 个，并记录各 skill 的字节数与预算等级。"
+  - evidence_id: evidence.doc.skill-size-plan-20260717
+    type: "doc"
+    source: "Skill 体积治理与职责拆分需求及周期 01 文档"
+    path: "doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md"
+    note: "需求、验收、实施总览、周期和任务证据统一冻结体积阈值、统计口径、ASCII 测试路径与四项闭环。"
+  - evidence_id: evidence.test.skill-split-validation-entry-20260717
+    type: "test"
+    source: "TASK-SPLIT-01-03 通用测试入口真实验证"
+    path: "doc/5-tests/2026-07-17_155229/skill-split-validation/validate_skill_split.py"
+    note: "Python/PowerShell help、all、pre-delete、post-delete、py_compile 和仓库/fixture 路径越界负向测试通过；正向退出码为 0，越界按预期非零。"
+  - evidence_id: evidence.doc.skill-split-entry-plan-20260717
+    type: "doc"
+    source: "TASK-SPLIT-01-03 测试入口计划与验收同步"
+    path: "doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md"
+    note: "周期、需求、验收、总览、全量顺序方案、README 和 PROJECT_CURRENT 已同步当前入口、边界、失败预期和证据槽位。"
+  - evidence_id: evidence.review.skill-split-current-diff-20260717
+    type: "review"
+    source: "TASK-SPLIT-01-03 当前改动总审查"
+    path: "doc/6-审查/2026-07-17_181312_REQ-SKILL-SPLIT-20260716_通用测试入口当前改动审查.md"
+    note: "审查确认通用入口、fixture 路由、路径边界和停止边界无 P0/P1，结论为通过。"
+  - evidence_id: evidence.accept.skill-split-task-01-03-20260717
+    type: "acceptance"
+    source: "TASK-SPLIT-01-03 任务验收"
+    path: "doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md"
+    note: "TEST-SPLIT-003、工程文档 profile、UTF-8 和真实 skill/字典未修改边界均通过；仅表示测试入口任务完成。"
+  - evidence_id: evidence.doc.skill-split-cycle-01-close-20260717
+    type: "doc"
+    source: "Skill 体积治理与职责拆分周期 01 收口同步"
+    path: "doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md"
+    note: "周期文档、测试 README、需求/验收/实施门禁和 PROJECT_CURRENT 已同步完成状态，周期 02 保持未进入。"
+  - evidence_id: evidence.obsidian.skill-split-plan-20260717
+    type: "knowledge"
+    source: "Obsidian 知识流阶段收口沉淀"
+    path: "知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md"
+    note: "通过固定 vault bridge create/readback 沉淀统计口径、候选顺序、五类验证契约和当前周期状态，并通过 bridge append/readback 更新 INDEX。"
 contexts:
   - context_id: context.task-blocker-closure
     type: "task-scope"
@@ -1165,6 +1313,14 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    Skill 体积预算:
+      - "fact.skill-size-baseline-20260717"
+    84 个正式 skill:
+      - "fact.skill-size-baseline-20260717"
+    默认文本包:
+      - "fact.skill-size-baseline-20260717"
+    扩展种子排除:
+      - "fact.skill-size-baseline-20260717"
     上游接口文档:
       - "rule.swag-upstream-openapi"
     第三方出站接口文档:

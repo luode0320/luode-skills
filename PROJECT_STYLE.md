@@ -306,9 +306,9 @@
 ### 上线测试脚本工具箱写法
 - 别名: release test scripts, 基线资产脚本, 可复用参数脚本, 双索引同步脚本
 - 类型: 工具风格
-- 示例: `python project-release-test-rules/scripts/generate_release_test_plan.py sync-interface-contract-assets --project-root . --manifest swag/.swag-manifest.yaml --inventory doc/5-tests/基线/interface-inventory.yaml --output doc/5-tests/<时间戳>_上线前项目接口测试/ascii-artifacts/interface-sync-report.yaml`
-- 说明: 上线测试通用脚本优先沉淀为 `project-release-test-rules/scripts/generate_release_test_plan.py` 的子命令；项目差异写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试目录，不写死进通用脚本。连续复用且变复杂的能力再拆成独立脚本，但必须保持总入口可发现、可复用、`--help` 可验证。`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 的双索引同步也走同一总入口子命令，并固定输出 `interface-sync-report.yaml`。
-- 来源: `project-release-test-rules/references/reusable-script-toolbox.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
+- 示例: `python project-interface-release-execution-rules/scripts/generate_release_test_plan.py sync-interface-contract-assets --project-root . --manifest swag/.swag-manifest.yaml --inventory doc/5-tests/基线/interface-inventory.yaml --output doc/5-tests/<时间戳>_上线前项目接口测试/ascii-artifacts/interface-sync-report.yaml`
+- 说明: 上线测试通用脚本优先沉淀为 `project-interface-release-execution-rules/scripts/generate_release_test_plan.py` 的子命令；项目差异写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试目录，不写死进通用脚本。连续复用且变复杂的能力再拆成独立脚本，但必须保持总入口可发现、可复用、`--help` 可验证。`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 的双索引同步也走同一总入口子命令，并固定输出 `interface-sync-report.yaml`。
+- 来源: `project-interface-release-execution-rules/references/reusable-script-toolbox.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
 - 适用范围: 上线接口测试脚本、基线初始化、依赖图、参数解析、基线回写
 - 更新时间: 2026-07-02
 - 状态: 启用
