@@ -52,7 +52,7 @@
 - `bug-root-cause-rules`
   - 做什么：定位 bug 根因、调用链和影响面。
   - 建议：根因裁决必须串行；调用链、日志、复现样例、近期改动和影响面等证据收集可在边界清晰时条件并行，最终由主 agent 统一归纳裁决。
-- `bug-gap-rules`
+- `bug-intake-rules` 的 `discovery-and-gap` 条件路由
   - 做什么：识别 Bug 描述中缺少的复现条件、环境信息、日志和影响范围。
   - 建议：必须串行，它负责先补齐信息缺口，再进入后续分析。
 - `bug-fix-proposal-rules`

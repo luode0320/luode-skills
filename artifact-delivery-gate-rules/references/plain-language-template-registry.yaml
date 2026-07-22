@@ -21,7 +21,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-REQ-002
-    path: requirement-discovery-rules/references/output-template.md
+    path: requirement-intake-rules/references/initial-discovery-output-template.md
     profile: requirement
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [discovery_questions_may_remain_in_business_body_but_must_not_replace_the_summary]
@@ -61,7 +61,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-BUG-002
-    path: bug-discovery-rules/references/output-template.md
+    path: bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-output-template.md
     profile: bug
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [investigation_evidence_remains_traceable_in_tracking_appendix]
@@ -81,7 +81,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-TEST-001
-    path: test-doc-rules/references/doc-minimums.md
+    path: test-strategy-rules 的 test-asset-governance 条件路由/references/doc-minimums.md
     profile: test
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [existing_layered_structure_is_preserved_and_completed]

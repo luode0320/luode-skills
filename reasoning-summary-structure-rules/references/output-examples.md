@@ -8,35 +8,35 @@
 
 **命中检查:通过** · skill-compliance-gate:PASS ✅
 
-> 一句话结论：新建 `bug-discovery-rules` 并接入 Bug 域链路。
+> 一句话结论：将 Bug 主动侦察收敛到 `bug-intake-rules` 的 `discovery-and-gap` 条件路由。
 
 ## 🛠 执行证据
 
 - 命中 skill：`reasoning-summary-structure-rules`、`skill-execution-compliance-gate-rules`
-- 关键动作：新建 SKILL.md + 4 references，刷新字典并核验归域。
+- 关键动作：迁移 route references，刷新字典并核验归域。
 
 ## 🎯 要解决的问题
 
 | 维度 | 内容 |
 |---|---|
 | 用户原始需求 | bug 也能像需求一样主动侦察查问题 |
-| 模型理解的需求 | 新建对称的主动侦察 skill，支持看代码 / 只读连本地库 / 读截图 |
+| 模型理解的需求 | 在现有 Bug 主入口内增加对称的主动侦察条件路由，支持看代码 / 只读连本地库 / 读截图 |
 | 是否一致 | ✅ 一致 |
 
 ## 🔧 方案与根因
 
-- 方案：新建 `bug-discovery-rules` 作为 Bug 域侦察前置，相邻 skill 让路 / 回流。
-- 根因：原 Bug 域缺一个“追问前先主动取证”的角色。
+- 方案：以 `bug-intake-rules` 的 `discovery-and-gap` 条件路由承接 Bug 域侦察前置，相邻 skill 让路 / 回流。
+- 根因：原 Bug 主入口缺少“追问前先主动取证”的条件路由。
 - Obsidian 检索：已通过 `obsidian-knowledge-flow` 读取 `20-Knowledge/bug-domain/active-debug-flow.md` 作为历史规则证据。
 
 ## ✅ 验证
 
-- 字典 `implemented_total 78→79`、`planned_missing 0`，bug-discovery 归 Bug 域非种子。
+- 字典已刷新且 `planned_missing 0`，主动侦察归入 Bug 主入口条件路由。
 
 ## 📌 结果与结论
 
-> 本次解决的问题：补齐“Bug 也能先主动侦察再定位”的能力缺口。
-> 采用的方法：新建 `bug-discovery-rules` 并接入 Bug 域链路。
+> 本次解决的问题：在 Bug 主入口内补齐“先主动侦察再定位”的能力。
+> 采用的方法：以 `bug-intake-rules` 的 `discovery-and-gap` 条件路由承接侦察规则。
 > 结果确认：用户要的主动侦察能力已落地，并可继续向下游定位链路流转。
 > Obsidian 沉淀：已通过 `obsidian-knowledge-flow` 更新 `20-Knowledge/bug-domain/active-debug-flow.md`。
 
@@ -44,7 +44,7 @@
 
 | 文件 | 改动 |
 |---|---|
-| `bug-discovery-rules/` | 新建 SKILL.md + 4 references |
+| `bug-intake-rules/references/discovery-and-gap.md` | 承接 Bug 主动侦察条件路由与迁移资源 |
 | `编码skill.md` | Bug 域表格登记一行 |
 ```
 

@@ -1,1 +1,4 @@
-interface:   display_name: "测试策略"   short_description: "以 test-task-root-layout-rules 为基准，制定测试优先级并统一写回时间戳任务 README"   default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略，说明应优先做哪些验证、哪些路径可后补；策略摘要统一写回 `doc/5-tests/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`（中文目录名按策略摘要主题动态命名），如需多轮独立测试则给出多个时间戳根目录方案。"
+interface:
+  display_name: "测试策略与资产治理"
+  short_description: "制定测试策略，并通过 test-asset-governance 统一承接测试文档、命名、根布局和散落资产规则"
+  default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略；若涉及测试 README、验证说明、报告、命名、时间戳任务根目录、中文 README、ASCII 代码镜像或散落测试资产，进入 test-asset-governance 路由并读取 references/test-asset-governance.md；策略摘要统一写回 artifact-storage-rules 约定的测试任务 README。"

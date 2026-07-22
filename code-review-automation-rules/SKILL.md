@@ -55,6 +55,11 @@ description: 当用户主动提出“审核代码”“review 当前分支提交
 - 不输出跨 commit 归因结论，除非能证明由该 commit 直接引入。
 - 不参与默认自动审查链；当前 diff 总审查由 `project-change-review-rules` 承接，测试前实现闸门由 `implementation-review-rules` 承接。
 
+## CYCLE-SS-05 条件路由标记
+
+- `specialized-lifecycle`：仅处理当前分支相对 `main` 的提交级审查；不接管测试前实现自审、当前改动总审查或最终验收。
+- 该专责入口在审查与验收域引用化期间保留，不合并、不删除，也不被共享证据契约替代。
+
 ## 执行结果归档要求
 
 - 提交级审查报告必须归档到 `artifact-storage-rules` 约定的 `doc/6-审查/` 主文档位置，命名遵循中央模板，不再使用项目根目录固定文件名。

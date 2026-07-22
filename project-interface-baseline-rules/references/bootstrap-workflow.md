@@ -30,7 +30,7 @@
 4. 创建 `doc/5-tests/基线/interface-inventory.yaml`。
 5. 同步创建 `dependency-graph.yaml`、`parameter-sources.yaml`、`reusable-params.yaml`、`scenario-catalog.yaml`、`script-adapter.yaml`、`execution-history.yaml`、`baseline-change-log.md` 和 `README.md`。
 6. 根据接口角色、参数来源和可提供字段生成第一版空依赖图；无法识别的依赖写入待确认，不得猜测。
-7. 调用 `test-task-root-layout-rules` 创建新的时间戳根目录。
+7. 调用 `test-strategy-rules 的 test-asset-governance 条件路由` 创建新的时间戳根目录。
 8. 在中文说明目录创建主 `README.md`，说明本次是冷启动建立基线。
 9. 在 ASCII 镜像目录创建计划骨架、结果骨架、依赖追踪、已解析参数和证据目录。
 

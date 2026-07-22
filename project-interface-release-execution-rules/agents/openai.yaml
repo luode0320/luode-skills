@@ -1,7 +1,7 @@
 display_name: 上线接口测试执行与放行
 short_description: 依赖接口基线执行上线前全接口测试，自动判定接口是否通过，输出上线放行结论
 default_prompt: |
-  你现在需要使用project-interface-release-execution-rules完成上线前接口测试执行工作，步骤如下：
+  你现在需要使用project-interface-release-execution-rules完成上线前接口测试执行工作，步骤如下（先读取 `references/shared-evidence-and-specialized-contracts.md`）：
   1. 先确认project-interface-baseline-rules是否已提供最新接口基线；基线过期或不存在时先转交对方刷新，不自行扫描。
   2. 根据本次上线改动的模块列表，按照test-selection-policy筛选必测接口。
   3. 调用generate_release_test_plan.py（委派release_test_engine.cli）完成测试计划生成或测试目录骨架创建。

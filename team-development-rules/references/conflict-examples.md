@@ -50,9 +50,9 @@
 ### 样例 6：运行时诊断同时命中 debug 日志和断言诊断
 
 - 当前信号：静态定位已经卡住，团队同时想加 debug 日志、加断言、打断点。
-- 应命中：`bug-runtime-debug-rules` + `bug-debug-log-rules` / `bug-assertion-diagnostic-rules`。
-- 裁决：先由 `bug-runtime-debug-rules` 判断本轮诊断目标和最小手段；只有在“日志是最小证据路径”时再进入 `bug-debug-log-rules`，只有在“需要快速暴露不变量破坏”时再进入 `bug-assertion-diagnostic-rules`。
-- 原因：`bug-runtime-debug-rules` 是诊断入口裁决层；日志和断言是子手段，不应一上来并行乱用。
+- 应命中：`bug-intake-rules` 的 `runtime-diagnostics` 条件路由。
+- 裁决：先由该条件路由判断本轮诊断目标和最小手段；只有“日志是最小证据路径”时才增加可回收临时日志，只有“需要快速暴露不变量破坏”时才增加诊断断言。
+- 原因：运行时诊断仍由单一 canonical owner 裁决；日志、断言与断点是条件手段，不应一上来并行乱用。
 
 ### 样例 7：测试阶段同时命中策略、功能验证和回归验证
 

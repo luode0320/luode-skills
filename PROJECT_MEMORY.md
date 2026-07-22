@@ -1,5 +1,17 @@
 # 项目长期记忆
 
+
+## 六域 Skill 精简与自动触发保护规则
+
+- 稳定决策：需求、实施、测试、Bug、审查、验收域精简时，用户习惯、自动触发、授权、安全、local、输出协议、暂停与停止边界均为保护语义；可以迁移位置，不得删除或弱化。
+- 稳定决策：同生命周期收敛为单主入口加条件路由；主 Skill 保留触发摘要和职责边界，重复细则下沉 references。
+- 稳定决策：退役旧 Skill 前必须具备 source-target mapping、trigger contract、protected semantic IDs、active consumers、physical asset owner、baseline hashes、rollback locator 与正负 post-delete 证据；缺任一项保持 `hold`。
+- 稳定决策：`implementation-planning-rules` 保持 Plan Mode 唯一入口，只做正文去重和 references 化，不拆为竞争入口。
+- 稳定决策：历史归档不批量回写旧名称；活跃资产必须完成引用切换。
+- 来源：`doc/2-需求/2026-07-21_221037_六域Skill结构精简与自动触发保持.md`、`doc/7-验收/2026-07-21_221037_六域Skill结构精简与自动触发保持_验收标准.md`。
+- 更新时间：2026-07-21。
+
+
 ## 白话文档与附录分层规则
 
 - 需求、实施、审查、验收、Bug、测试、架构、交付和工作报告采用同一信息分层：H1 后单段正文固定说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
@@ -123,8 +135,8 @@
 ### 需求主动侦察链路
 - 别名: 老板式 idea 转需求, idea 侦察, 需求 discovery
 - 类型: 流程规则
-- 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-discovery-rules` 主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径或 URL，形成有证据来源的需求设计；外部资料默认遵循“官方文档/官网/自有仓库与站点优先，公共 GitHub 与社区资料只作补充”的优先级。已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
-- 来源: 对话确认、`requirement-discovery-rules`
+- 定义: 当用户只提出一句话 idea、粗略想法或老板式方向时，优先由 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察当前项目代码、文档、数据库线索、上下游服务、第三方调用、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径或 URL，形成有证据来源的需求设计；外部资料默认遵循“官方文档/官网/自有仓库与站点优先，公共 GitHub 与社区资料只作补充”的优先级。已验证可复用的资料位置、数据库、URL、项目路径和侦察经验必须继续通过 `project-memory-rules` 回写长期记忆。
+- 来源: 对话确认、`requirement-intake-rules/references/initial-discovery-route.md`
 - 适用范围: 需求域
 - 更新时间: 2026-06-28
 - 状态: 启用
@@ -132,8 +144,8 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审查 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部默认仍以 `requirement-discovery-rules` 为第一入口；`requirement-intake-rules` 负责在 discovery 初稿后立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。需求、验收标准和实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
-- 来源: `requirement-discovery-rules/references/requirement-domain-routing.md`、`编码skill.md`
+- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审查 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部统一由 `requirement-intake-rules` 作为第一入口；粗略 idea 进入 `initial-discovery` 路由，主入口负责立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。需求、验收标准和实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
+- 来源: `requirement-intake-rules/references/initial-discovery-domain-routing.md`、`编码skill.md`
 - 适用范围: 需求域
 - 更新时间: 2026-06-30
 - 状态: 启用
@@ -591,6 +603,8 @@
 - 安装并真实版本探针验证成功的非 canonical 工具写入用户级 `discovered-tools.json`，仅 `verified=true` 且通过 ID/命令/source 白名单的记录在后续会话合并读取；canonical `tool-manifest.yaml` 不运行时修改。
 - 失败摘要写入用户级 `failure-cases.json`，必须 UTF-8、原子替换、去重、限长、脱敏；PowerShell Windows owner 与 WSL 原生 shell/`127` owner 分离。
 - 当前 runtime 不提供任意 agent shell 调用的全局失败拦截；自动恢复范围仅限显式 wrapper 或未来接入 runtime hook 的路径。
+
+- 2026-07-21：六域 Skill 精简采用“单主入口 + 条件路由”；需求 discovery 已迁移到 `requirement-intake-rules` 的 `initial-discovery`，自动触发、local 安全、证据、记忆回写、输出和停止边界保持不变。
 
 ## 机器索引区
 

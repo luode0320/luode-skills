@@ -11,7 +11,7 @@
 
 ## 应转交相邻 skill 的情况
 
-- 信息不全且缺字段、缺流程、缺规则：转 `requirement-gap-rules`。
+- 信息不全且缺字段、缺流程、缺规则：转 `gap-routing` 条件路由。
 - 范围、兼容性、旧逻辑影响不清：转 `requirement-boundary-rules`。
 - 需求过大、跨多个模块或多个实施阶段：转 `requirement-splitting-rules`。
 - 需求一次打包多个独立子系统或多个相对独立主线：先转 `requirement-splitting-rules`，再分别细化。

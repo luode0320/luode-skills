@@ -86,7 +86,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
-- 用户只给一句话 idea 或老板式方向时，先进入 `requirement-discovery-rules` 主动侦察项目、数据、代码、上下游、关联项目、GitHub、相关网站和官方 API 文档；用户给出需求链接、资料、原型、物料时，进入需求域继续接入
+- 用户只给一句话 idea 或老板式方向时，进入 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察项目、数据、代码、上下游、关联项目、GitHub、相关网站和官方 API 文档；用户给出需求链接、资料、原型、物料时，进入同一需求主入口继续接入
 - 但如果用户同一轮明确是在索要计划（如“怎么做”“先给计划”“这个怎么改最合适”），或新项目 / 多来源对象需要“实施顺序总表”“需求与实施计划全量顺序实施方案”，则先进入 `implementation-planning-rules` 输出正式实施计划或全量顺序实施方案；前置条件未齐时输出受限计划 / 阻断计划，再回流需求域补齐缺口；当前上下文处于 `Plan Mode` 时，也先进入 `implementation-planning-rules` 作为第一层计划外壳，再按需回流前置域
 - 需求域中的澄清默认一次只推进一个真实关键缺口；若正式需求主文档尚未真实落盘，禁止进入实施规划或正式编码
 - 来源对象文档（需求或 Bug）、验收标准和实施计划即使都已完成，也不得自动开始实施；必须等用户明确说“开始实施/开始执行”后，才允许正式进入编码
@@ -119,7 +119,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 ├── 字典.md
 ├── skill-dictionary/
 ├── team-development-rules/
-├── requirement-discovery-rules/
+├── requirement-intake-rules/references/initial-discovery-route.md
 ├── requirement-intake-rules/
 ├── bug-intake-rules/
 ├── ...
@@ -300,7 +300,7 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                         | 功能                                                                                                      |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `requirement-discovery-rules` | 从一句话 idea 或粗略方向出发，主动侦察项目代码、数据库线索、历史资料、上下游、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径 / URL，按“官方/自有优先”形成有证据来源的需求设计，并把可复用线索回写长期记忆。 |
+| `requirement-intake-rules` / `initial-discovery` | 从一句话 idea 或粗略方向出发，在唯一需求主入口内主动侦察项目代码、数据库线索、历史资料、上下游、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径 / URL，按“官方/自有优先”形成有证据来源的需求设计，并把可复用线索回写长期记忆。 |
 | `requirement-intake-rules`    | 作为需求主文档入口，接收 discovery 结果、需求 URL、资料、物料和上下文，discovery 初稿后立即创建主需求文档，收口目标、前提、输入输出，并按 `artifact-storage-rules` 沉淀需求文档。 |
 | `requirement-gap-rules`       | 只处理主动侦察后仍缺少的关键前提、字段、流程、业务规则等内容；先生成临时缺口文档，用户确认后回填主需求文档并删除临时缺口文档。 |
 | `requirement-boundary-rules`  | 判断需求边界、影响范围、上下游、非目标范围，防止越界实现。                                                |
@@ -314,13 +314,9 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                            | 功能                                                           |
 | -------------------------------- | -------------------------------------------------------------- |
-| `bug-intake-rules`               | 规范化问题描述，把 Bug 从“现象”整理为可分析问题单。            |
-| `bug-gap-rules`                  | 补齐定位 Bug 所需的基础上下文、环境信息、输入条件、表现路径。  |
+| `bug-intake-rules`               | 统一 Bug 主入口；基础描述不足时自动进入 `discovery-and-gap` 主动侦察与缺口收敛，静态定位不足时自动进入 `runtime-diagnostics` 选择断点、临时日志或诊断断言。 |
 | `bug-reproduction-rules`         | 输出标准复现步骤、复现条件和复现结论。                         |
 | `bug-root-cause-rules`           | 分析根因，区分是实现缺陷、设计缺陷、边界缺陷还是历史遗留问题。 |
-| `bug-runtime-debug-rules`        | 通过运行时调试、断点、调试过程缩小问题范围并定位异常位置。     |
-| `bug-debug-log-rules`            | 通过临时调试日志补充运行期证据，辅助定位难以静态分析的问题。   |
-| `bug-assertion-diagnostic-rules` | 使用程序断言和诊断检查来缩小 Bug 发生区间。                    |
 | `bug-fix-proposal-rules`         | 先输出修复建议和修改方案，待确认后再进入正式修复。             |
 | `bug-regression-risk-rules`      | 识别修复后可能带来的兼容风险和回归风险。                       |
 | `bug-validation-rules`           | 负责 Bug 修复后的验证闭环，确认问题确实被修复且未引入新问题。  |
@@ -369,12 +365,12 @@ python skill-dictionary/generate_dictionary.py
 | Skill                         | 功能                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------ |
 | `test-strategy-rules`         | 先决定测试层级、测试重点和覆盖策略。                                           |
-| `test-task-root-layout-rules` | 统一测试任务根目录、时间戳根目录和中文/ASCII 镜像布局。                        |
-| `test-scattered-asset-location-rules` | 统一识别并迁移散落在 `doc/5-tests/` 根目录外的测试资产。                     |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 统一测试任务根目录、时间戳根目录和中文/ASCII 镜像布局。                        |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 统一识别并迁移散落在 `doc/5-tests/` 根目录外的测试资产。                     |
 | `go-test-compile-path-rules`  | 统一 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。                |
-| `test-naming-rules`           | 统一测试目录和测试文件命名。                                                   |
+| `test-strategy-rules 的 test-asset-governance 条件路由`           | 统一测试目录和测试文件命名。                                                   |
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分。                               |
-| `test-doc-rules`              | 统一测试说明文档的结构和描述方式。                                             |
+| `test-strategy-rules 的 test-asset-governance 条件路由`              | 统一测试说明文档的结构和描述方式。                                             |
 | `agent-browser`               | 提供条件式浏览器自动化能力，重点覆盖隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎场景；普通 Chrome 状态与常规调试按统一浏览器路由处理。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
 | `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响。  |
@@ -853,3 +849,4 @@ claude-mem(记忆) :
 2026-07-21 11:40:49 feat: [Skill体积治理与拆分] 完成5个候选拆分、真实删除与规则模板同步
 2026-07-21 11:42:59 feat: [TAPD技能] 新增tapd-cli/tapd-openapi/tapd-addcomment技能包
 2026-07-21 11:45:16 chore: [项目记忆同步] 同步规则文件与项目记忆四件套
+2026-07-22 08:25:22 feat: [六域Skill精简] 合并重复规则并保留自动触发

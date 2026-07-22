@@ -50,3 +50,33 @@
 - 2026-07-17：按冻结计划完成 `TASK-SPLIT-01-02`。冻结 `candidate-matrix.yaml`（84 个正式条目、27 个扩展种子、7 个候选顺序、4 个正式二分候选），修正正式/磁盘/扩展种子统计口径和 `TEST-SPLIT-002` 入口冲突；四份工程文档与周期 01 profile、矩阵 YAML/哈希/名称集合断言均通过，skill 资产、字典和 Git 历史保持未修改。
 - 2026-07-17：进入并实现 `TASK-SPLIT-01-03`。新增五类 Skill 拆分验证入口、PowerShell `-CasesRoot` 转发和仓库/fixture 路径边界；Python/PowerShell 正向模式、编译和越界负向测试已通过，计划文档与项目当前状态同步，真实 skill、字典和 Git 历史保持未修改；审查与验收待当前周期收口。
 - 2026-07-17：完成 `TASK-SPLIT-01-03` 的当前改动总审查与任务验收。审查报告结论通过，需求/验收/实施总览/周期 01/测试 README 和审查 profile 均通过；周期 01 三个任务全部完成四项闭环并收口，CYCLE-SPLIT-02 保持未进入，真实 skill、字典和 Git 历史保持未修改。
+
+- 2026-07-21：用户确认继续精简需求、实施、测试、Bug、审查、验收六域 Skill，并冻结“六域总方案分周期、回归通过后真实删除、单主入口加条件路由、用户习惯与自动触发不可删除”的来源对象。已持久化需求、验收标准、全量顺序方案、实施总览和六份实施周期文档；尚未修改 Skill 资产、字典或 Git 历史。
+
+- 2026-07-21：完成 `CYCLE-SS-01`。冻结 36 个目标 Skill、11 个拟退役候选、source-target manifest、保护语义、资产 SHA-256、活跃消费者、72 条触发 fixtures 和 baseline validator；Python 编译、baseline、PowerShell wrapper、越界与非法阶段负向测试、测试文档 profile、周期 profile、审查与任务验收均通过。未修改真实 Skill、字典或 Git 历史。
+
+- 2026-07-21：完成 `CYCLE-SS-02` 需求域 discovery 第一个候选的 owner 合并、9 个 live consumer 迁移、scoped pre-delete/post-delete、真实删除和字典刷新；新增增量删除验证器生命周期，保留历史归档与未迁移候选边界，未执行 Git 历史写入。
+## 2026-07-21：CYCLE-SS-03 实施与测试域结构收敛完成
+
+- `implementation-planning-rules` 与 `project-interface-release-execution-rules` 完成 references 化，保留原自动触发和执行契约。
+- 四个测试资产入口合并到 `test-strategy-rules` 的 `test-asset-governance` 条件路由，并在迁移验证后真实删除旧目录。
+- 活跃消费者、资产冻结记录、字典、触发 fixtures、测试/审查/验收证据完成收口；字典 `planned_missing=0`。
+- 本周期未执行 Git 历史写入；`.codex/config.toml` 继续排除；Obsidian 仍因 `VAULT_NOT_REGISTERED` 阻断。
+
+## 2026-07-21：CYCLE-SS-04 Bug 域入口收敛完成
+
+- `bug-intake-rules` 增加 `discovery-and-gap` 与 `runtime-diagnostics` 条件路由，完整承接主动侦察、缺口、运行时断点、临时日志与诊断断言规则。
+- 五个重复 source 完成资产迁移、活跃消费者切换、scoped pre-delete/post-delete 和真实删除；冻结 SHA-256、rollback locator、迁移 map 与任务级测试/审查/验收证据均保留。
+- route validator、五个 scoped post-delete、字典生成和工程文档收口通过；字典 `implemented_total=76`、`planned_missing=0`。未执行 Git 历史写入；`.codex/config.toml` 保持排除；Obsidian 仍因 `VAULT_NOT_REGISTERED` 阻断。
+
+## 2026-07-21：CYCLE-SS-05 审查与验收域引用化完成
+
+- 四个保留自动触发的 owner 已将重复证据、归档、暂停和阻断细则下沉到各自 `shared-evidence-and-specialized-contracts.md`；原 description、trigger aliases、阶段职责、用户习惯、授权、安全、停止、输出和证据归档保持可验证。
+- `code-review-automation-rules` 明确保留 `specialized-lifecycle`，未被合并或删除。
+- CYCLE-SS-05 baseline/route、全量 baseline/trigger、字典和工程文档 profiles 通过。
+- CYCLE-SS-06 全链路 post-delete 随后发现 `requirement-gap-rules` 仍存在，说明此前 `CAND-SS-REQUIREMENT-04` 的 merge_retire 未闭环；六域总体放行保持阻断。
+
+## 2026-07-21：CYCLE-SS-06 全链路收口与六域最终验收
+
+- 全量 post-delete 发现并纠正 `requirement-gap-rules` 漏删：细则迁入 `requirement-intake-rules` 的 `gap-routing`，旧 source 真实删除，active-consumers、asset inventory、manifest 和根规划同步。
+- 全量 baseline、trigger、post-delete 和字典通过；六域最终审查与最终验收文档已落盘。

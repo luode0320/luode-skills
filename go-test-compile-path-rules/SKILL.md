@@ -23,18 +23,18 @@ description: 当 Go 项目中的测试路径会进入编译链路、出现源码
 - Go 源码目录绝对不允许出现 `*_test.go`。
 - 会被 Go 编译链路扫描的测试目录路径必须保持 ASCII。
 - 白盒同包诉求不是例外通道；统一处理方式是先改 seam，再把测试资产放回 `doc/5-tests/<时间戳>/` 的 ASCII 镜像路径。
-- 若某个测试文件既违规落在源码目录，又属于散落资产，同时触发 `test-scattered-asset-location-rules` 处理迁移。
+- 若某个测试文件既违规落在源码目录，又属于散落资产，同时触发 `test-strategy-rules 的 test-asset-governance 条件路由` 处理迁移。
 
 ## 默认执行流程
 1. 先读 `references/go-compile-path.md`，判断当前问题属于源码目录禁放、中文编译路径还是白盒同包诉求。
-2. 如果当前测试任务目录尚未建立，先转交 `test-task-root-layout-rules`。
-3. 若当前文件散落在非测试目录，同时转交 `test-scattered-asset-location-rules`。
+2. 如果当前测试任务目录尚未建立，先转交 `test-strategy-rules 的 test-asset-governance 条件路由`。
+3. 若当前文件散落在非测试目录，同时转交 `test-strategy-rules 的 test-asset-governance 条件路由`。
 4. 根据引用文档选择对应整改动作：改 seam、迁移到 `doc/5-tests/<时间戳>/` ASCII 镜像路径、清理中文可编译路径。
 5. 复核 `go test ./...` 不再因路径问题失真后，再进入后续测试程序实现阶段。
 
 ## 权责边界与不负责事项
 - 只负责 Go 测试编译路径和禁放规则，不负责测试任务根布局。
-- 不负责一般性的散落资产迁移，那属于 `test-scattered-asset-location-rules`。
+- 不负责一般性的散落资产迁移，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。
 - 不负责测试程序实现细节、断言写法或测试说明组织。
 
 ## 通过 / 驳回标准
