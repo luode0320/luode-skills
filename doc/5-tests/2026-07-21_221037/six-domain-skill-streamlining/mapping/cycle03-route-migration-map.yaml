@@ -1,0 +1,77 @@
+schema_version: 1
+mapping_id: MAP-SS-CYCLE03-20260721
+source_id: SRC-SKILL-STREAMLINE-20260721-001
+owner_routes:
+- source_skill: implementation-planning-rules
+  target_owner: implementation-planning-rules
+  action: reference_refactor
+  target_route: plan-mode-and-cycle-contracts
+  migrated_assets:
+  - implementation-planning-rules/references/plan-mode-and-cycle-contracts.md
+  preserved:
+  - Plan Mode 第一层计划外壳
+  - 需求与实施计划全量顺序实施方案
+  - 实施总览/实施周期/最小任务闭环
+  - 只读计划、约 5 文件边界、真实 local 测试、暂停/停止/回滚/最大推进边界
+- source_skill: project-interface-release-execution-rules
+  target_owner: project-interface-release-execution-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  migrated_assets:
+  - project-interface-release-execution-rules/references/shared-evidence-and-specialized-contracts.md
+  preserved:
+  - local 测试隔离红线
+  - 接口基线前置依赖
+  - 参数来源/复用复验
+  - 脚本工具箱优先
+  - 请求/响应 JSON 字符串
+  - agent 独立判定
+  - 报告/门禁/归档/最终验收回写
+- source_skill: test-doc-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  migrated_assets:
+  - test-strategy-rules/references/test-asset-governance.md
+  preserved:
+  - README 主入口
+  - 中文目录只放 README
+  - ASCII 真实代码路径镜像
+  - artifact-storage 与 artifact-delivery gate
+  - local 测试红线
+  - 禁止污染生产代码
+- source_skill: test-naming-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  migrated_assets:
+  - test-strategy-rules/references/test-asset-governance.md
+  preserved:
+  - 时间戳目录命名
+  - 中文说明目录命名
+  - 真实代码路径镜像命名
+  - Go 可编译路径联动
+  - 暂停/驳回/归档
+- source_skill: test-scattered-asset-location-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  migrated_assets:
+  - test-strategy-rules/references/test-asset-governance.md
+  preserved:
+  - 散落脚本/mock/fixture/数据/说明识别与迁移
+  - 唯一中央测试根目录
+  - 迁移后引用清理
+  - 回滚与证据
+- source_skill: test-task-root-layout-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  migrated_assets:
+  - test-strategy-rules/references/test-asset-governance.md
+  preserved:
+  - doc/5-tests 根目录
+  - 当天 yyyy-MM-DD_HHmmss
+  - 中文 README 与 ASCII 镜像并列
+  - 历史目录复用需授权
+  - local 环境提示

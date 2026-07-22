@@ -1,0 +1,106 @@
+schema_version: 1
+mapping_id: MAP-SS-CYCLE05-20260721
+source_id: SRC-SKILL-STREAMLINE-20260721-001
+owner_routes:
+- source_skill: implementation-review-rules
+  baseline_description_sha256: 3dca03257ab284859b22d9f517dd157b7a40cb18206080a62361afc4501b1a6e
+  target_owner: implementation-review-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  source_assets:
+  - implementation-review-rules/agents/openai.yaml
+  - implementation-review-rules/references/format-cleanup-checks.md
+  - implementation-review-rules/references/placement-and-dependency-checks.md
+  - implementation-review-rules/references/review-boundaries.md
+  - implementation-review-rules/references/review-examples.md
+  - implementation-review-rules/references/review-scope.md
+  - implementation-review-rules/references/syntax-and-reference-checks.md
+  - implementation-review-rules/SKILL.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - 授权与停止边界
+  - 输出与证据归档
+  - 审查或验收边界
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: implementation-review-rules
+- source_skill: project-change-review-rules
+  baseline_description_sha256: 18d03e73a9655920b433f25fc049a6daffa76f8b49a8c3a4d938c6a00b57bb7d
+  target_owner: project-change-review-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  source_assets:
+  - project-change-review-rules/agents/openai.yaml
+  - project-change-review-rules/references/checklist.md
+  - project-change-review-rules/references/report-template.md
+  - project-change-review-rules/SKILL.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - 授权与停止边界
+  - 输出与证据归档
+  - 审查或验收边界
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: project-change-review-rules
+- source_skill: acceptance-criteria-rules
+  baseline_description_sha256: a5ce3ad01d0e55e5defc6b4e1c3078802d62567e48e9a0a8f06dd13e69f69ec9
+  target_owner: acceptance-criteria-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  source_assets:
+  - acceptance-criteria-rules/agents/openai.yaml
+  - acceptance-criteria-rules/references/acceptance-boundaries.md
+  - acceptance-criteria-rules/references/acceptance-template.md
+  - acceptance-criteria-rules/references/testable-criteria-checklist.md
+  - acceptance-criteria-rules/SKILL.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - 授权与停止边界
+  - 输出与证据归档
+  - 审查或验收边界
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: acceptance-criteria-rules
+- source_skill: final-acceptance-rules
+  baseline_description_sha256: e691fbfbbf224de2e8ada3e9b5307423e3e966ca9bf66145fcb6f0f90f616d14
+  target_owner: final-acceptance-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  source_assets:
+  - final-acceptance-rules/agents/openai.yaml
+  - final-acceptance-rules/references/final-acceptance-boundaries.md
+  - final-acceptance-rules/references/final-acceptance-checklist.md
+  - final-acceptance-rules/references/final-acceptance-template.md
+  - final-acceptance-rules/SKILL.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - 授权与停止边界
+  - 输出与证据归档
+  - 审查或验收边界
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: final-acceptance-rules
+- source_skill: code-review-automation-rules
+  baseline_description_sha256: 609aac8960e7f9498c899e0d7041b73f449ee623d41092c14e4f90a4f9b30192
+  target_owner: code-review-automation-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  source_assets:
+  - code-review-automation-rules/agents/openai.yaml
+  - code-review-automation-rules/references/report-and-wecom.md
+  - code-review-automation-rules/references/review-prompt-template.md
+  - code-review-automation-rules/references/review-workflow.md
+  - code-review-automation-rules/SKILL.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - 授权与停止边界
+  - 输出与证据归档
+  - 审查或验收边界
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: code-review-automation-rules

@@ -1,0 +1,81 @@
+schema_version: 1
+migration_id: MAP-SS-REQUIREMENT-DISCOVERY-TO-INTAKE-20260721
+source_skill: requirement-discovery-rules
+target_owner: requirement-intake-rules
+target_route: initial-discovery
+status: post_delete_pass
+protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+section_mapping:
+  - source: frontmatter.description
+    target: requirement-intake-rules/SKILL.md#frontmatter.description
+    mode: merged
+  - source: SKILL.md#核心原则
+    target: requirement-intake-rules/references/initial-discovery-route.md#核心保护规则
+    mode: moved_and_deduplicated
+  - source: SKILL.md#自动触发信号
+    target: requirement-intake-rules/SKILL.md#条件路由initial-discovery
+    mode: merged
+  - source: SKILL.md#进入后先做什么
+    target: requirement-intake-rules/references/initial-discovery-route.md#进入后执行
+    mode: moved_and_deduplicated
+  - source: SKILL.md#默认执行流程
+    target: requirement-intake-rules/references/initial-discovery-route.md#进入后执行
+    mode: moved_and_deduplicated
+  - source: SKILL.md#权责边界与不负责事项
+    target: requirement-intake-rules/references/initial-discovery-route.md#目的与适用范围
+    mode: merged
+  - source: SKILL.md#需要暂停并确认的条件
+    target: requirement-intake-rules/references/initial-discovery-route.md#暂停与拒绝
+    mode: moved_and_deduplicated
+  - source: SKILL.md#执行通过 / 驳回标准
+    target: requirement-intake-rules/references/initial-discovery-route.md#通过标准
+    mode: moved_and_deduplicated
+  - source: SKILL.md#执行结果归档要求
+    target: requirement-intake-rules/references/initial-discovery-route.md#归档要求
+    mode: moved_and_deduplicated
+  - source: SKILL.md#references 读取规则
+    target: requirement-intake-rules/references/initial-discovery-route.md#条件引用
+    mode: moved_and_deduplicated
+  - source: agents/openai.yaml
+    target: requirement-intake-rules/agents/openai.yaml
+    mode: merged
+  - source: references/discovery-checklist.md
+    target: requirement-intake-rules/references/initial-discovery-checklist.md
+    mode: moved
+  - source: references/evidence-and-memory.md
+    target: requirement-intake-rules/references/initial-discovery-evidence-and-memory.md
+    mode: moved
+  - source: references/output-template.md
+    target: requirement-intake-rules/references/initial-discovery-output-template.md
+    mode: moved_and_route_names_updated
+  - source: references/requirement-domain-routing.md
+    target: requirement-intake-rules/references/initial-discovery-domain-routing.md
+    mode: moved_and_merge_policy_updated
+write_set:
+  - requirement-intake-rules/SKILL.md
+  - requirement-intake-rules/agents/openai.yaml
+  - requirement-intake-rules/references/initial-discovery-route.md
+  - requirement-intake-rules/references/initial-discovery-checklist.md
+  - requirement-intake-rules/references/initial-discovery-evidence-and-memory.md
+  - requirement-intake-rules/references/initial-discovery-output-template.md
+  - requirement-intake-rules/references/initial-discovery-domain-routing.md
+  - requirement-intake-rules/references/intake-boundaries-and-examples.md
+  - requirement-discovery-rules/SKILL.md
+  - requirement-discovery-rules/agents/openai.yaml
+  - requirement-discovery-rules/references/discovery-checklist.md
+  - requirement-discovery-rules/references/evidence-and-memory.md
+  - requirement-discovery-rules/references/output-template.md
+  - requirement-discovery-rules/references/requirement-domain-routing.md
+  - active-consumers.json
+  - domain-asset-inventory.json
+  - domain-streamlining-manifest.yaml
+rollback:
+  baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+  before_delete_source_root: requirement-discovery-rules
+  rollback_action: 恢复 source 目录、owner references、活跃消费者、manifest、inventory 和字典生成物；不回滚已闭环周期。

@@ -1,0 +1,119 @@
+schema_version: 1
+mapping_id: MAP-SS-CYCLE04-20260721
+source_id: SRC-SKILL-STREAMLINE-20260721-001
+owner_routes:
+- source_skill: bug-discovery-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: discovery-and-gap
+  migrated_assets:
+  - bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-bug-domain-routing.md
+  - bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-discovery-checklist.md
+  - bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md
+  - bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-output-template.md
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - local 安全边界
+  - 授权与停止边界
+  - 证据归档
+  - 清理与回滚
+  source_assets:
+  - bug-discovery-rules/references/bug-domain-routing.md
+  - bug-discovery-rules/references/discovery-checklist.md
+  - bug-discovery-rules/references/evidence-and-db-readonly.md
+  - bug-discovery-rules/references/output-template.md
+  - bug-discovery-rules/SKILL.md
+  target_route_document: bug-intake-rules/references/discovery-and-gap.md
+- source_skill: bug-gap-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: discovery-and-gap
+  migrated_assets:
+  - bug-intake-rules/references/discovery-and-gap-bug-gap-rules-blocking-signals.md
+  - bug-intake-rules/references/discovery-and-gap-bug-gap-rules-gap-checklist.md
+  - bug-intake-rules/references/discovery-and-gap-bug-gap-rules-gap-examples.md
+  - bug-intake-rules/references/discovery-and-gap-bug-gap-rules-openai.yaml
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - local 安全边界
+  - 授权与停止边界
+  - 证据归档
+  - 清理与回滚
+  source_assets:
+  - bug-gap-rules/agents/openai.yaml
+  - bug-gap-rules/references/blocking-signals.md
+  - bug-gap-rules/references/gap-checklist.md
+  - bug-gap-rules/references/gap-examples.md
+  - bug-gap-rules/SKILL.md
+  target_route_document: bug-intake-rules/references/discovery-and-gap.md
+- source_skill: bug-assertion-diagnostic-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  migrated_assets:
+  - bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-entry-conditions.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-examples.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-placement.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-openai.yaml
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - local 安全边界
+  - 授权与停止边界
+  - 证据归档
+  - 清理与回滚
+  source_assets:
+  - bug-assertion-diagnostic-rules/agents/openai.yaml
+  - bug-assertion-diagnostic-rules/references/assertion-entry-conditions.md
+  - bug-assertion-diagnostic-rules/references/assertion-examples.md
+  - bug-assertion-diagnostic-rules/references/assertion-placement.md
+  - bug-assertion-diagnostic-rules/SKILL.md
+  target_route_document: bug-intake-rules/references/runtime-diagnostics.md
+- source_skill: bug-debug-log-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  migrated_assets:
+  - bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-cleanup.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-examples.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-placement.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-openai.yaml
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - local 安全边界
+  - 授权与停止边界
+  - 证据归档
+  - 清理与回滚
+  source_assets:
+  - bug-debug-log-rules/agents/openai.yaml
+  - bug-debug-log-rules/references/debug-log-cleanup.md
+  - bug-debug-log-rules/references/debug-log-examples.md
+  - bug-debug-log-rules/references/debug-log-placement.md
+  - bug-debug-log-rules/SKILL.md
+  target_route_document: bug-intake-rules/references/runtime-diagnostics.md
+- source_skill: bug-runtime-debug-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  migrated_assets:
+  - bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-entry-conditions.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-exit-and-handoff.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-observation-methods.md
+  - bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-openai.yaml
+  preserved:
+  - 自动触发别名
+  - 用户习惯
+  - local 安全边界
+  - 授权与停止边界
+  - 证据归档
+  - 清理与回滚
+  source_assets:
+  - bug-runtime-debug-rules/agents/openai.yaml
+  - bug-runtime-debug-rules/references/runtime-entry-conditions.md
+  - bug-runtime-debug-rules/references/runtime-exit-and-handoff.md
+  - bug-runtime-debug-rules/references/runtime-observation-methods.md
+  - bug-runtime-debug-rules/SKILL.md
+  target_route_document: bug-intake-rules/references/runtime-diagnostics.md

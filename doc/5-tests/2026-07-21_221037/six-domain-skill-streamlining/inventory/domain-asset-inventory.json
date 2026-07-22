@@ -1,0 +1,1641 @@
+{
+  "requirement-boundary-rules": {
+    "root": "requirement-boundary-rules",
+    "file_count": 5,
+    "package_bytes": 12470,
+    "files": [
+      {
+        "path": "requirement-boundary-rules/agents/openai.yaml",
+        "bytes": 592,
+        "sha256": "0e4305ec2aea868e21b8941ad04193ff5989f94a1df06186175ec63c2c05da28"
+      },
+      {
+        "path": "requirement-boundary-rules/references/acceptance-routing-examples.md",
+        "bytes": 835,
+        "sha256": "a9fd69a071a197e514212e46e27028c8a3fcddc4651c8016eb824b9feda12426"
+      },
+      {
+        "path": "requirement-boundary-rules/references/boundary-checklist.md",
+        "bytes": 2490,
+        "sha256": "75ab3b58e9355a6dc02618d926fa9dc236a25d3385d1ca3837de6bc0ab5ba948"
+      },
+      {
+        "path": "requirement-boundary-rules/references/history-vs-change.md",
+        "bytes": 855,
+        "sha256": "cfd044d38573b110bf8f71458cba30a396c7db102cd5c04121996b1885cfcc10"
+      },
+      {
+        "path": "requirement-boundary-rules/SKILL.md",
+        "bytes": 7698,
+        "sha256": "91e7fcc3254e7eefe01cdefd73b303b8ef4dac64654b534aa7421cbba7c6028a"
+      }
+    ]
+  },
+  "requirement-change-rules": {
+    "root": "requirement-change-rules",
+    "file_count": 5,
+    "package_bytes": 16523,
+    "files": [
+      {
+        "path": "requirement-change-rules/agents/openai.yaml",
+        "bytes": 569,
+        "sha256": "ffef421411a3069eca8d7e5c60ddb76da9d9d087664407ae66e25b39ff3bd8e4"
+      },
+      {
+        "path": "requirement-change-rules/references/change-classification.md",
+        "bytes": 538,
+        "sha256": "700a4440d12e06bd8817a33433be6cd5ff2a9f1ae8d20f59aa569211597110d7"
+      },
+      {
+        "path": "requirement-change-rules/references/change-decision-examples.md",
+        "bytes": 666,
+        "sha256": "fdd13ddb0a077b8fe5317e6df64e0ea189df1d3ca275b88308e5cb070c3a45ab"
+      },
+      {
+        "path": "requirement-change-rules/references/impact-recheck.md",
+        "bytes": 2499,
+        "sha256": "2737b6e5745d0189e4a5106dcae4953875061ed3eb61c7612f55eb4419381bc0"
+      },
+      {
+        "path": "requirement-change-rules/SKILL.md",
+        "bytes": 12251,
+        "sha256": "e77c4401699ff9a4678935f52e1fefe79e2d7bafc1ded8cb00fbd41d801900f5"
+      }
+    ]
+  },
+  "requirement-discovery-rules": {
+    "root": "requirement-discovery-rules",
+    "file_count": 6,
+    "package_bytes": 23719,
+    "files": [
+      {
+        "path": "requirement-discovery-rules/agents/openai.yaml",
+        "bytes": 369,
+        "sha256": "b991a13302d13660c2670b9249ff1e9988b2586f1da32bea9e0909a5cb0af60d"
+      },
+      {
+        "path": "requirement-discovery-rules/references/discovery-checklist.md",
+        "bytes": 1684,
+        "sha256": "ac03bd3532a1dc61b128640c55d8e4aa9728f16387afdb6392a401556d523659"
+      },
+      {
+        "path": "requirement-discovery-rules/references/evidence-and-memory.md",
+        "bytes": 2597,
+        "sha256": "fb455e1b3ef5352195a8ffa2bd9755445e200457b436d51ff003d01104a380f3"
+      },
+      {
+        "path": "requirement-discovery-rules/references/output-template.md",
+        "bytes": 2965,
+        "sha256": "6a268cbf8ee0fcc394bb5b3511d846b84f1e91d7c9ffae281ab008c0f955541c"
+      },
+      {
+        "path": "requirement-discovery-rules/references/requirement-domain-routing.md",
+        "bytes": 5739,
+        "sha256": "28cbddd6c469e3b913a717ec6a576e60b16322531a575bbdd45b8b9e00e9db6b"
+      },
+      {
+        "path": "requirement-discovery-rules/SKILL.md",
+        "bytes": 10365,
+        "sha256": "9a5f285521f4c18419cedaccf55c30a2b5c51fe4156517c14c6c1c4cde76110c"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-02-03"
+  },
+  "requirement-gap-rules": {
+    "root": "requirement-gap-rules",
+    "file_count": 5,
+    "package_bytes": 19428,
+    "files": [
+      {
+        "path": "requirement-gap-rules/agents/openai.yaml",
+        "bytes": 625,
+        "sha256": "d959e3363797596891ccff496b964136ac3df2909fe54f629535913be47f5d7f"
+      },
+      {
+        "path": "requirement-gap-rules/references/missing-info-checklist.md",
+        "bytes": 3517,
+        "sha256": "a588580631ce4c08b2c1b136d2e7285d4ebeb545a597918a4ea7a266f43a1548"
+      },
+      {
+        "path": "requirement-gap-rules/references/pause-triggers.md",
+        "bytes": 964,
+        "sha256": "b3f8b346869ccf2bc85e220c202f366bd96fc71795767a750eccfedc0c04ca26"
+      },
+      {
+        "path": "requirement-gap-rules/references/requirement-gap-examples.md",
+        "bytes": 2233,
+        "sha256": "2c355033c32f6e479f8891581a09e108c00ad780cfe75ae3ca2967bd3de95eea"
+      },
+      {
+        "path": "requirement-gap-rules/SKILL.md",
+        "bytes": 12089,
+        "sha256": "3bf4f8cec5672255406942eaec21ed3cca70ab0705a85986359c6a5cd9f9eff6"
+      }
+    ],
+    "retired": true
+  },
+  "requirement-intake-rules": {
+    "root": "requirement-intake-rules",
+    "file_count": 17,
+    "package_bytes": 101906,
+    "files": [
+      {
+        "path": "requirement-intake-rules/agents/openai.yaml",
+        "bytes": 738,
+        "sha256": "ccd519829de3cf7c6ecb5153669288527c5bb9d9eab950e8a397288eddaba383"
+      },
+      {
+        "path": "requirement-intake-rules/references/extreme-completeness-standard.md",
+        "bytes": 8246,
+        "sha256": "b479b3d20a5604969bdc7820d0eec56f1825e9ba40fd1bfc8784f06bd1859fba"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing-source/agents/openai.yaml",
+        "bytes": 625,
+        "sha256": "d959e3363797596891ccff496b964136ac3df2909fe54f629535913be47f5d7f"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing-source/migrated-gap-rule.md",
+        "bytes": 12089,
+        "sha256": "3bf4f8cec5672255406942eaec21ed3cca70ab0705a85986359c6a5cd9f9eff6"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing-source/references/missing-info-checklist.md",
+        "bytes": 3517,
+        "sha256": "a588580631ce4c08b2c1b136d2e7285d4ebeb545a597918a4ea7a266f43a1548"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing-source/references/pause-triggers.md",
+        "bytes": 964,
+        "sha256": "b3f8b346869ccf2bc85e220c202f366bd96fc71795767a750eccfedc0c04ca26"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing-source/references/requirement-gap-examples.md",
+        "bytes": 2233,
+        "sha256": "2c355033c32f6e479f8891581a09e108c00ad780cfe75ae3ca2967bd3de95eea"
+      },
+      {
+        "path": "requirement-intake-rules/references/gap-routing.md",
+        "bytes": 12918,
+        "sha256": "1dccb6b83c31eeb7aacb6d99522c90b7512b84e5fa4dccb56086a3bc85546ee2"
+      },
+      {
+        "path": "requirement-intake-rules/references/initial-discovery-checklist.md",
+        "bytes": 1652,
+        "sha256": "9e7bd10786da92d15b1b7bf4467fb2bd949e0e0551b50d157b804e7613ae3b3a"
+      },
+      {
+        "path": "requirement-intake-rules/references/initial-discovery-domain-routing.md",
+        "bytes": 4718,
+        "sha256": "b29c69dcaaf25052430a3f59de52389b06b52a13bc1ad7f1206fd14720e82ce0"
+      },
+      {
+        "path": "requirement-intake-rules/references/initial-discovery-evidence-and-memory.md",
+        "bytes": 2551,
+        "sha256": "4f2996d933fa7bb85c9b2b4dc916d6b66c9a645aab6ed6c0cee86b36aa84b0f7"
+      },
+      {
+        "path": "requirement-intake-rules/references/initial-discovery-output-template.md",
+        "bytes": 2971,
+        "sha256": "c7fe7a34ef91b2c15a83509244a3a3048d8964d3c7dab37461b9f2f6dbd17cff"
+      },
+      {
+        "path": "requirement-intake-rules/references/initial-discovery-route.md",
+        "bytes": 5123,
+        "sha256": "9b76f718751d96efa0507ac6e8af4135d66416535a142b8510cac22f2c3c83f4"
+      },
+      {
+        "path": "requirement-intake-rules/references/intake-boundaries-and-examples.md",
+        "bytes": 3202,
+        "sha256": "77cc69cad5f7379c78d04a07d01ff3cda93f78e6261829c9f2770c6d002a4507"
+      },
+      {
+        "path": "requirement-intake-rules/references/intake-checklist.md",
+        "bytes": 5798,
+        "sha256": "3c95730a15a3bd78b475214976f799b38cb21fede48a4f2f542e7190878deddb"
+      },
+      {
+        "path": "requirement-intake-rules/references/requirement-structure-template.md",
+        "bytes": 12433,
+        "sha256": "6e1c88666a8047fc3b71116eed8494efb66b2b6cb17648176d87706defd0f9aa"
+      },
+      {
+        "path": "requirement-intake-rules/SKILL.md",
+        "bytes": 22128,
+        "sha256": "35e4d89c1e8ae5d2b99e59ff23891e3f6433a071900202082a6b675e1236e30e"
+      }
+    ]
+  },
+  "requirement-splitting-rules": {
+    "root": "requirement-splitting-rules",
+    "file_count": 5,
+    "package_bytes": 13996,
+    "files": [
+      {
+        "path": "requirement-splitting-rules/agents/openai.yaml",
+        "bytes": 580,
+        "sha256": "6d5653b1619d06c1ad879167b7c36e64f66f389f2bf451665e7b0c4e67090205"
+      },
+      {
+        "path": "requirement-splitting-rules/references/splitting-dimensions.md",
+        "bytes": 2350,
+        "sha256": "1bbff415d3a5fdce9844bd3126e1e39e98ec18e1e09bb2f6b275a09938d0b1af"
+      },
+      {
+        "path": "requirement-splitting-rules/references/splitting-examples.md",
+        "bytes": 978,
+        "sha256": "7c767277d37fbfcba22716a4e798fc2f43692001e1ad368c19cad58ec9907f5f"
+      },
+      {
+        "path": "requirement-splitting-rules/references/splitting-sequence.md",
+        "bytes": 761,
+        "sha256": "063567f75df517306ba4bfc52fcec29282b14d9751277f8389a2649a20ea737a"
+      },
+      {
+        "path": "requirement-splitting-rules/SKILL.md",
+        "bytes": 9327,
+        "sha256": "1014063c8180c85912d1324a9f3243ceaddc2d58282c9e2b1e6a793e599322fa"
+      }
+    ]
+  },
+  "artifact-delivery-gate-rules": {
+    "root": "artifact-delivery-gate-rules",
+    "file_count": 10,
+    "package_bytes": 174188,
+    "files": [
+      {
+        "path": "artifact-delivery-gate-rules/agents/openai.yaml",
+        "bytes": 421,
+        "sha256": "e60e381648d715ca904a29add28ea0ba38d6c9ecfedb6f34b532c2ad4ccc578c"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/document-handoff-contract.md",
+        "bytes": 7254,
+        "sha256": "d67109f8048cf04e8f6cb3f95d01d6d784ab0939165c0b2b5a8eca5cc6e6080f"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/document-quality-profiles.yaml",
+        "bytes": 8043,
+        "sha256": "6e88c99b5795628a1a9b7499acc4f248f1aea1d485604d827401793dbf07c80f"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/plain-language-document-contract.md",
+        "bytes": 3874,
+        "sha256": "513fad525c8c9c806be4c35de4b16723a51c1c9097c7c23bf32d85f272b4e0a2"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/plain-language-template-registry.yaml",
+        "bytes": 6752,
+        "sha256": "50f0798f653cfd9323bd4279639b0dcc8893a28c404a3bd800b00ca2bdd14ae2"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md",
+        "bytes": 4147,
+        "sha256": "d092e8d2d2beb8c656ae3eebd6087686e6a239a2dbf0279ac1f0516139803bbd"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md",
+        "bytes": 2707,
+        "sha256": "7deaae6ef5b7477e405085962ad9966cc05478f172cd93703854bbd4dec7268f"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/scripts/validate_engineering_docs.py",
+        "bytes": 82323,
+        "sha256": "d44a48433f493533471e5683107e0e8181d4b563c41922806db6ec3dea4bbf00"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/SKILL.md",
+        "bytes": 11176,
+        "sha256": "52b4b209cfed100c61efa73a80a4138c24fad7b80dbf76f996903ed25ac06001"
+      },
+      {
+        "path": "artifact-delivery-gate-rules/tests/test_validate_engineering_docs.py",
+        "bytes": 47491,
+        "sha256": "33eb4997287ce0eddf0f0cac20ce3ad5e5d9644f4b5bac5eb96a2d4c7ed457a4"
+      }
+    ]
+  },
+  "artifact-storage-rules": {
+    "root": "artifact-storage-rules",
+    "file_count": 7,
+    "package_bytes": 48459,
+    "files": [
+      {
+        "path": "artifact-storage-rules/agents/openai.yaml",
+        "bytes": 443,
+        "sha256": "979a139888d25ce8e8b220c573a23eda77d87f1422cedfd4440f5104ab0c48af"
+      },
+      {
+        "path": "artifact-storage-rules/references/naming-templates.md",
+        "bytes": 12151,
+        "sha256": "156aba20bb57049f97e28ae78151c5d83a2a0c5ee9bff156dc06dbf6b746583d"
+      },
+      {
+        "path": "artifact-storage-rules/references/path-map.yaml",
+        "bytes": 8565,
+        "sha256": "32086aa1d102cddfc5d228d3e445edf7146b4507c44c8c4becaf27d4499986be"
+      },
+      {
+        "path": "artifact-storage-rules/references/root-directories.md",
+        "bytes": 5078,
+        "sha256": "ef07a41558de0fbb137fdae10f24a5dff1b99ff6f2d701fb5ba0406d316ef9f3"
+      },
+      {
+        "path": "artifact-storage-rules/references/skill-integration.md",
+        "bytes": 2960,
+        "sha256": "26fc7d585e8b5efb59ab7b626779e09d549c4185e5eef0455016c13944e6acd6"
+      },
+      {
+        "path": "artifact-storage-rules/references/update-policy.md",
+        "bytes": 5632,
+        "sha256": "1efbd0237fdbb1536d8d1238ccfdca6824c28f5410c3805cc8d9b5d09f77a08e"
+      },
+      {
+        "path": "artifact-storage-rules/SKILL.md",
+        "bytes": 13630,
+        "sha256": "2a5b6b1018bfa3de095e0f07406a173f41c91bb1e4899af44563103211261234"
+      }
+    ]
+  },
+  "autonomous-execution-rules": {
+    "root": "autonomous-execution-rules",
+    "file_count": 2,
+    "package_bytes": 27123,
+    "files": [
+      {
+        "path": "autonomous-execution-rules/agents/openai.yaml",
+        "bytes": 2512,
+        "sha256": "11c8fe1c012d45a5db3429c6c8349f98c6e85146f3da1c1625f24d0ac40e564f"
+      },
+      {
+        "path": "autonomous-execution-rules/SKILL.md",
+        "bytes": 24611,
+        "sha256": "173ac4c6f82d7f16811b0e6c522a56827ad4ec55928059ba8d98321dcdaae5a9"
+      }
+    ]
+  },
+  "implementation-planning-rules": {
+    "root": "implementation-planning-rules",
+    "file_count": 16,
+    "package_bytes": 119149,
+    "files": [
+      {
+        "path": "implementation-planning-rules/agents/openai.yaml",
+        "bytes": 1025,
+        "sha256": "9b45012116bbb355c330dbfd3c13101b543d9b79536648d77925b3a33d0a0041"
+      },
+      {
+        "path": "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
+        "bytes": 3367,
+        "sha256": "be5966d3d64788ea83960920e040bd2ef3cea7e5fbfe4ad11cb620afb6c97a97"
+      },
+      {
+        "path": "implementation-planning-rules/references/full-sequence-master-plan.md",
+        "bytes": 3640,
+        "sha256": "bd74aa890c944a58359d1a778ac97ce346550ad4bfa139d8723c1bcd78f4dd73"
+      },
+      {
+        "path": "implementation-planning-rules/references/implementation-cycle-template.md",
+        "bytes": 6559,
+        "sha256": "dfcaf3a672ab182440f77ae11390afba1883af907b9916ba7c49f68d57fd8b31"
+      },
+      {
+        "path": "implementation-planning-rules/references/implementation-overview-template.md",
+        "bytes": 7653,
+        "sha256": "dfc32d0a17e9741fd72773e1e99460e8713b9b01b7205147132f7127cb72f977"
+      },
+      {
+        "path": "implementation-planning-rules/references/minimum-task-execution-contract.md",
+        "bytes": 5159,
+        "sha256": "e173df73f3bfd0bdd75670b3de36f3ef38608c1133c625cbae8bd1fca35efec9"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-boundaries-and-examples.md",
+        "bytes": 1655,
+        "sha256": "62f3ef0dabf2d2d70a957afcf83dcff964eb4cd1feb2b1d7ebf1a0161633fec6"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-entry-checklist.md",
+        "bytes": 2851,
+        "sha256": "02335fe0bdc00ae5fdab890b71dbc5768516e5de3f26fc017c0104eebb684672"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-mode-and-cycle-contracts.md",
+        "bytes": 27245,
+        "sha256": "dae1df19f6009e200865a2cd7b3240d5a01704e8e8e3fa2a636c521c5f2c567c"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-output-gate.md",
+        "bytes": 10420,
+        "sha256": "0f1682b77a3d18e89bf3d59a9db72d31f49cdd17f7f68b09a61546271f00db19"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-review-checklist.md",
+        "bytes": 8363,
+        "sha256": "878d519baee8b3ab4a292248e838f19b76e82dbc109aea61e28d61591c1257fc"
+      },
+      {
+        "path": "implementation-planning-rules/references/plan-structure-template.md",
+        "bytes": 18057,
+        "sha256": "e33f27c44369d4427d3a9f8b4bd799a752f9f89f7f2b6804401120145e135ec7"
+      },
+      {
+        "path": "implementation-planning-rules/references/source-notes.md",
+        "bytes": 545,
+        "sha256": "3e9b7c79baa2d1a5f0abda748bd79c9c2528c5fdbab2a6bedabccdc05c81cb09"
+      },
+      {
+        "path": "implementation-planning-rules/references/task-granularity-and-order.md",
+        "bytes": 7573,
+        "sha256": "723ad59a3b0d7d5ed2b73a4c18734ad6718b5eb0ec5205d1480cc9e97e76430c"
+      },
+      {
+        "path": "implementation-planning-rules/references/visualization-standard.md",
+        "bytes": 2302,
+        "sha256": "7bfb607111f4e0803833df2b7dd524a12a2ce59a971c4031a4483bc00b90d7e2"
+      },
+      {
+        "path": "implementation-planning-rules/SKILL.md",
+        "bytes": 12735,
+        "sha256": "8ebd9e55fb7f059f0ed5ff7d3e885383df72168589f3bb5f12761ce04af8565c"
+      }
+    ]
+  },
+  "functional-validation-rules": {
+    "root": "functional-validation-rules",
+    "file_count": 5,
+    "package_bytes": 21919,
+    "files": [
+      {
+        "path": "functional-validation-rules/agents/openai.yaml",
+        "bytes": 861,
+        "sha256": "1721a9e2faaae558e6130aba53f6a512c5d4d6e91279cf40a7878a4df3679a75"
+      },
+      {
+        "path": "functional-validation-rules/references/validation-boundaries.md",
+        "bytes": 1255,
+        "sha256": "c3041885425d2aa251dfaba0b6a3710332fef8ca6011bfa65b0c6e2a4a849176"
+      },
+      {
+        "path": "functional-validation-rules/references/validation-scope.md",
+        "bytes": 1302,
+        "sha256": "792680d4c105a6bb9c2e7b9b5241ee3d78948dee3088460d77fb4a9e72dfb3eb"
+      },
+      {
+        "path": "functional-validation-rules/references/validation-template-and-examples.md",
+        "bytes": 3055,
+        "sha256": "cb1f906c84b37a7ebf07a1f3645ba1dc998c5de1ca25d292aff8191e8f982e8d"
+      },
+      {
+        "path": "functional-validation-rules/SKILL.md",
+        "bytes": 15446,
+        "sha256": "7ab9de9aefd827a5d3e02792d70201fa8e927c85380c0a2966e1c03607a5c7aa"
+      }
+    ]
+  },
+  "project-interface-baseline-rules": {
+    "root": "project-interface-baseline-rules",
+    "file_count": 9,
+    "package_bytes": 45409,
+    "files": [
+      {
+        "path": "project-interface-baseline-rules/agents/openai.yaml",
+        "bytes": 1291,
+        "sha256": "4fdc5dc509c77abd44f40faf3632c451906978f269a15148a547447b76724fc2"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/baseline-asset-rules.md",
+        "bytes": 4525,
+        "sha256": "54c62638669938ed566f7f06a8a7793bafb311754946ccda3c764d136af0a8fa"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/bootstrap-workflow.md",
+        "bytes": 2626,
+        "sha256": "c834078b8694288d7d3330d0a609ed72d2568ff33ee5966f89074ff7db4ada88"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/dependency-graph-rules.md",
+        "bytes": 3307,
+        "sha256": "99dfc56d3660bb90660425871a0df8efe96eb0ca2c72290d742c7f97204de553"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/existing-test-skill-integration.md",
+        "bytes": 4438,
+        "sha256": "109f8db39583e42d9268ac6c1d273c6da4ba79a81ab9fd272cc32d7b88855023"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/interface-inventory-schema.md",
+        "bytes": 7168,
+        "sha256": "524ada1547c5170bf63f64cc59fae83e741b2f143fabcc261198f04ba5e0605a"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/inventory-reconcile-rules.md",
+        "bytes": 2090,
+        "sha256": "1d06a1d88df4e4e4b04954b60cff1837a33973ae00b50214d3d45f10397d5262"
+      },
+      {
+        "path": "project-interface-baseline-rules/references/openapi-inventory-sync-rules.md",
+        "bytes": 5596,
+        "sha256": "518bd7540df8b29720555f886c1205d84249c42511b95098bc45d6749185952b"
+      },
+      {
+        "path": "project-interface-baseline-rules/SKILL.md",
+        "bytes": 14368,
+        "sha256": "37611b4f9018ade363f1e9913ba060493253f1a84afc096eb1747f89f0ed60d8"
+      }
+    ]
+  },
+  "project-interface-release-execution-rules": {
+    "root": "project-interface-release-execution-rules",
+    "file_count": 42,
+    "package_bytes": 348747,
+    "files": [
+      {
+        "path": "project-interface-release-execution-rules/agents/openai.yaml",
+        "bytes": 1540,
+        "sha256": "5e4fb4d14d88e8aeca4eb197f8160a0288f51093ee7f1cf645e8085957fcd116"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/agent-response-judgement.md",
+        "bytes": 10099,
+        "sha256": "7100e2356e6ea6a2c176da022cafdc8a2eeca170a138db9e816b66ca0d7dc60e"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/execution-gate.md",
+        "bytes": 6462,
+        "sha256": "683d6f346602a4afa03c667c2e35babfeafd4acd6941a8d3419bfe383965f36e"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/existing-test-skill-integration.md",
+        "bytes": 4438,
+        "sha256": "109f8db39583e42d9268ac6c1d273c6da4ba79a81ab9fd272cc32d7b88855023"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/output-artifacts.md",
+        "bytes": 2281,
+        "sha256": "f05d9d3f7879818ba6ac738282b7ef3a109da4ce13483aa7b7f14416f7b31f73"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/report-format.md",
+        "bytes": 12618,
+        "sha256": "680a424a299a04dd79eee6c4fbc56eeaad183748fcfc0d2f6d9727070b7ad3ba"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/reusable-script-toolbox.md",
+        "bytes": 5715,
+        "sha256": "8a9b137694489289b0e756c5091b18abee53be37212085934d9df7f134716712"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/shared-evidence-and-specialized-contracts.md",
+        "bytes": 9143,
+        "sha256": "1be91288360050ca76b6ed140ac6d6065a7bd3ec06e7554114c525c5619612a5"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/test-data-construction-rules.md",
+        "bytes": 9651,
+        "sha256": "d91a01c8dc333ac3678fe051e6d93c3362192128ee48a684315e871e3ada6e50"
+      },
+      {
+        "path": "project-interface-release-execution-rules/references/test-selection-policy.md",
+        "bytes": 3833,
+        "sha256": "676e28fc10c2434ad4c46974fd287955b7b45136602ffb7d88ed61d8e1fb2d14"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/generate_release_test_plan.py",
+        "bytes": 75086,
+        "sha256": "e9831f4f9e0471e2042d0f34cbb701b7c8c9b71e404b3a4f091d0bfe707d99b8"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/__init__.py",
+        "bytes": 1322,
+        "sha256": "5b6f24725c68d0962772815c5471d0fe597377b09e3424027190125551e3a9ac"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/__init__.py",
+        "bytes": 11961,
+        "sha256": "f23744f848b3fc5d19687c44e399f7470f44b05f2ecc167a519ba5c8235b5dfe"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/base.py",
+        "bytes": 3484,
+        "sha256": "145cd47c353dc8654ccbd429571810686fc0277e3586459ce79bc1b48266e56f"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/cli_entry.py",
+        "bytes": 1374,
+        "sha256": "5f49480b8d39df056795a22c9a4f9e37f1fb29381497501499dd8b1b6e2b4964"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/event_handler.py",
+        "bytes": 1590,
+        "sha256": "c48cc984577de4c7d68cb80224511245256835c7de4d69153185a71ccc9aca04"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/graphql.py",
+        "bytes": 4543,
+        "sha256": "db1ae78688391c19950f08787e5ce50fb1406da3c00c4f79958c4bed99f30122"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/grpc.py",
+        "bytes": 3376,
+        "sha256": "e3974ba6953649119ad398047c41a25d76eea8e14e51f0ac4b043ccc8e531357"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/http_openapi.py",
+        "bytes": 2573,
+        "sha256": "325d51160bd8f4e809eb4613766d1e902dd9e4e25410cbf8b26c48415888e01a"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/messaging.py",
+        "bytes": 3083,
+        "sha256": "fc2bf61081e4e6661857c14a81e20fd627c3f5393eaa63703c1c699e1860711a"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/scheduler.py",
+        "bytes": 1337,
+        "sha256": "31089d7c5864536ee87b7b9939c1c5df1c3de9b3fd562fe04bf6a9ca741b0fdb"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/soap_jsonrpc.py",
+        "bytes": 5416,
+        "sha256": "5a66398203c2842f16441bef1a7dbeee255eb6e67ddbc6c137108edecc470bf9"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/adapters/websocket.py",
+        "bytes": 3214,
+        "sha256": "8685562a77cda7cc43e50a07e1827c49211808596cc6c9fe12a223179e62c73b"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/auth.py",
+        "bytes": 2506,
+        "sha256": "7f3a64e34f61b47beaf34111a108d190df99b19e3cea8e9229811ef64191024c"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/cli.py",
+        "bytes": 23897,
+        "sha256": "a4cbde6c4a451a26741c17657837d8197664e6582cf9e1e2b15e655ca67e647d"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/dependency_diagnostics.py",
+        "bytes": 865,
+        "sha256": "0942a30cc6ced3bdd37f738bbe77a4a05f1af8ac54ef8b0e4ebbd37cda7f1c4d"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/discovery.py",
+        "bytes": 17219,
+        "sha256": "361c8c96aaa58ecb0f085e4093cfdf8d59c7d00874551c97ae50b2ca292521aa"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/events.py",
+        "bytes": 1943,
+        "sha256": "2bf47cb1bd39519dc527e458a9522a453f68e2d6556004d4636602e4c24da787"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/gate.py",
+        "bytes": 2633,
+        "sha256": "8e3b6f5bc07b065b5bbc01c0f5ce7da055d831c35b872bace66219f08abfef7b"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/graph.py",
+        "bytes": 11807,
+        "sha256": "23169f66bc0555e97f77e47a7d73ceeccbefe8e9cce21bc77de16ced5b93cbb1"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/judge.py",
+        "bytes": 4813,
+        "sha256": "18f83b1e3ce1ebbded9d90b6b00f7ca981b1974ee3b4be66b31996820ec718a8"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/migrate_baseline.py",
+        "bytes": 1146,
+        "sha256": "1d25ee56c2b6884b5fd458cbd16de42be2527ceae862c28e42616120a12df66e"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/model.py",
+        "bytes": 6441,
+        "sha256": "6612e61c14244d0b25a8c9a1fb3615b0b50771d21724aca9976400b55db1663e"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/parameter_store.py",
+        "bytes": 2665,
+        "sha256": "da26d67628bc47e67f34b3bb1169e1a918a52439948ecf0c668c6e7e54ceed6e"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/report.py",
+        "bytes": 34690,
+        "sha256": "4691ad6132d96a9cc5157d367f7d6fadcc028491e1d1018139379539825be892"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/resolver.py",
+        "bytes": 5634,
+        "sha256": "0125f1fca0cbcaea1f04a8012fe53541932f471459604adeb9e5402f3d797e59"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/runner.py",
+        "bytes": 22406,
+        "sha256": "dc1c4cd984dd1cc67ae9b2acf6fb527515578d83c2b23e8b6e968796cea5fcac"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/safety.py",
+        "bytes": 2941,
+        "sha256": "f63a9c38f795f23a7ef5b0a000372bfa303c994158c8a1ed3301b61139ce9ebb"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/schema_registry.py",
+        "bytes": 6913,
+        "sha256": "80abafb8792dc18135af18cff93230be3bf5de63c0f444123f07147106adc073"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/storage.py",
+        "bytes": 7607,
+        "sha256": "4d36c5d608169894b09766460850a5d6f75c2bf3eb1420478a9ebaea7017b741"
+      },
+      {
+        "path": "project-interface-release-execution-rules/scripts/release_test_engine/topology.py",
+        "bytes": 3254,
+        "sha256": "aa2704a26de6e89c5c2ab3f9abd970f4e81dd03e6720beb669bd61e5e1de0877"
+      },
+      {
+        "path": "project-interface-release-execution-rules/SKILL.md",
+        "bytes": 5228,
+        "sha256": "e89a7759a3b2bb689cf222b573b261473c20f61ab7d4d4296b3be16ab1cf0c94"
+      }
+    ]
+  },
+  "test-doc-rules": {
+    "root": "test-doc-rules",
+    "file_count": 5,
+    "package_bytes": 14558,
+    "files": [
+      {
+        "path": "test-doc-rules/agents/openai.yaml",
+        "bytes": 576,
+        "sha256": "31299eee4eb519adad312fdd8c3bab5f401f3885217d43dea7f2e14b0b96997a"
+      },
+      {
+        "path": "test-doc-rules/references/doc-boundaries.md",
+        "bytes": 1415,
+        "sha256": "37fafe9dd20252fe1f4c4bf2c29868ce23c86a8809033bd4961319b586aaa4c0"
+      },
+      {
+        "path": "test-doc-rules/references/doc-examples.md",
+        "bytes": 1491,
+        "sha256": "fb873dda68671da43215f8e022f612745e33ee0e3b593033754915551b3bbd87"
+      },
+      {
+        "path": "test-doc-rules/references/doc-minimums.md",
+        "bytes": 2068,
+        "sha256": "405d697ca603cc1d90b3d067a64e96ce5099d43c85c632c987fc5c36c2984fb7"
+      },
+      {
+        "path": "test-doc-rules/SKILL.md",
+        "bytes": 9008,
+        "sha256": "54a784e9e9270ba47cd396c0e75b629fcc9ce7c8c8a8ad0d5369ce4d427163bd"
+      }
+    ],
+    "retired": true
+  },
+  "test-naming-rules": {
+    "root": "test-naming-rules",
+    "file_count": 5,
+    "package_bytes": 21443,
+    "files": [
+      {
+        "path": "test-naming-rules/agents/openai.yaml",
+        "bytes": 368,
+        "sha256": "0543124f7f50e822bc7fd20cba240ebf1c1023a2845871d99b97088bd02f6aef"
+      },
+      {
+        "path": "test-naming-rules/references/naming-baseline.md",
+        "bytes": 3103,
+        "sha256": "f78c408136ca100ffa62eb12eece4b5c8d200b72304b256251ea62e69e066f6a"
+      },
+      {
+        "path": "test-naming-rules/references/naming-boundaries.md",
+        "bytes": 2661,
+        "sha256": "ee26802b4b41e240db64d5710128003a08b6e0fc10f84f82220cbaf6add4e32e"
+      },
+      {
+        "path": "test-naming-rules/references/naming-examples.md",
+        "bytes": 4084,
+        "sha256": "a0096877c38238488250294aafcbdd4a3343c24e40cb063670cf0710f1db553b"
+      },
+      {
+        "path": "test-naming-rules/SKILL.md",
+        "bytes": 11227,
+        "sha256": "bcde38c39cfc9d9dad538947ed7f55bc9ce6ce4f58ac299a4e4bd09ff99a1a55"
+      }
+    ],
+    "retired": true
+  },
+  "test-program-rules": {
+    "root": "test-program-rules",
+    "file_count": 5,
+    "package_bytes": 23796,
+    "files": [
+      {
+        "path": "test-program-rules/agents/openai.yaml",
+        "bytes": 607,
+        "sha256": "4ba06aad0f8d74ece712fd36a19a690a2c3a8c687fec59b9058f44d08d861a6e"
+      },
+      {
+        "path": "test-program-rules/references/program-boundaries.md",
+        "bytes": 1985,
+        "sha256": "d8f91da2dce6488885d1fb744f29bb75cb448cdd8302788d995aadc247463902"
+      },
+      {
+        "path": "test-program-rules/references/program-examples.md",
+        "bytes": 2181,
+        "sha256": "468367990d46b24064cb470a042300963b34c7fa86b02e453a3343046bc0809e"
+      },
+      {
+        "path": "test-program-rules/references/program-types-and-splitting.md",
+        "bytes": 3748,
+        "sha256": "7af40edb9d7cecbf5de5837bcf134eda74644959ffc4f0fae6b1fa55355ae6e4"
+      },
+      {
+        "path": "test-program-rules/SKILL.md",
+        "bytes": 15275,
+        "sha256": "46cd86600a78f5ad7b7d8f6216dc1b5a11e218b04aa1f26115b5fc7b53c88402"
+      }
+    ]
+  },
+  "test-regression-rules": {
+    "root": "test-regression-rules",
+    "file_count": 5,
+    "package_bytes": 14147,
+    "files": [
+      {
+        "path": "test-regression-rules/agents/openai.yaml",
+        "bytes": 576,
+        "sha256": "9d17087b6e6587800a07aee73fa70b52c5c045f3ff9b6ba1ca80007aa42a71df"
+      },
+      {
+        "path": "test-regression-rules/references/regression-boundaries.md",
+        "bytes": 1382,
+        "sha256": "b273e1b586819d51098fc8846134a31f22fc900d724af2d58be4a8b20caa6ac7"
+      },
+      {
+        "path": "test-regression-rules/references/regression-scope-selection.md",
+        "bytes": 1388,
+        "sha256": "0d514ad4480964d6392de3998e937f0d45c15024eca81571367c13add0c895dd"
+      },
+      {
+        "path": "test-regression-rules/references/regression-template-and-examples.md",
+        "bytes": 2569,
+        "sha256": "3633752f237e37eb9d7d0eff741ba8d8d970c97ea3c8d474c3f807afa3f388c6"
+      },
+      {
+        "path": "test-regression-rules/SKILL.md",
+        "bytes": 8232,
+        "sha256": "408dcbfcfc495832c12e58f5f432e4c23263bab6805f0370acde84731721a9d4"
+      }
+    ]
+  },
+  "test-scattered-asset-location-rules": {
+    "root": "test-scattered-asset-location-rules",
+    "file_count": 3,
+    "package_bytes": 7128,
+    "files": [
+      {
+        "path": "test-scattered-asset-location-rules/agents/openai.yaml",
+        "bytes": 329,
+        "sha256": "ab471d7ef6f6e9797a1894792fce1e777db68bf3619275bdbccd69335d5c4eb0"
+      },
+      {
+        "path": "test-scattered-asset-location-rules/references/scattered-asset-migration.md",
+        "bytes": 1858,
+        "sha256": "be0d82c8a6b2cc39cc54ff5ea6b494f3c6d5f2f5edbdf3dd98806b736bc8e43f"
+      },
+      {
+        "path": "test-scattered-asset-location-rules/SKILL.md",
+        "bytes": 4941,
+        "sha256": "b33ab7b0e4ddcadaad092a805148d835dc8386e26eb6bf09cdf48d31316d2cea"
+      }
+    ],
+    "retired": true
+  },
+  "test-strategy-rules": {
+    "root": "test-strategy-rules",
+    "file_count": 6,
+    "package_bytes": 49281,
+    "files": [
+      {
+        "path": "test-strategy-rules/agents/openai.yaml",
+        "bytes": 590,
+        "sha256": "220b6988cb5ca07dd4626b6f790e6ee73579e30bb199c5b9f42ce1622586b00d"
+      },
+      {
+        "path": "test-strategy-rules/references/priority-model.md",
+        "bytes": 528,
+        "sha256": "1caea9ce2cce4973b6aa88cdda21102d9b7b4bf018b3e620bdda0b233adbe330"
+      },
+      {
+        "path": "test-strategy-rules/references/strategy-dimensions.md",
+        "bytes": 567,
+        "sha256": "cf030b6ba490361faf193c4593e684c112c0837123079135abfad865ca333cfd"
+      },
+      {
+        "path": "test-strategy-rules/references/strategy-template.md",
+        "bytes": 1903,
+        "sha256": "4f819de2a2091c12b9d72c5f39814e493cbdf2f17878b8bb630e9ba9e7ee7679"
+      },
+      {
+        "path": "test-strategy-rules/references/test-asset-governance.md",
+        "bytes": 29105,
+        "sha256": "c200a5950f47f76edd3ccea6d7f2474d063b1a1db3730ad187d3462bee32f98a"
+      },
+      {
+        "path": "test-strategy-rules/SKILL.md",
+        "bytes": 16588,
+        "sha256": "8baedcdde54489718b778a65953840c46faece5c8f79c030e25adfb17de0182d"
+      }
+    ]
+  },
+  "test-task-root-layout-rules": {
+    "root": "test-task-root-layout-rules",
+    "file_count": 3,
+    "package_bytes": 8263,
+    "files": [
+      {
+        "path": "test-task-root-layout-rules/agents/openai.yaml",
+        "bytes": 338,
+        "sha256": "3946e40497fc4b82c351d97d58b30a9c15482625d1c1112e80c6c9942302def4"
+      },
+      {
+        "path": "test-task-root-layout-rules/references/task-root-layout.md",
+        "bytes": 2270,
+        "sha256": "ecb417531e5053d74ff429b8e2c0bdccea5eba7adf5fcb918f1046c6550c3824"
+      },
+      {
+        "path": "test-task-root-layout-rules/SKILL.md",
+        "bytes": 5655,
+        "sha256": "16cc852d9d4b4e6182884045400870157012308e60ef26554aad257956f091d8"
+      }
+    ],
+    "retired": true
+  },
+  "bug-assertion-diagnostic-rules": {
+    "root": "bug-assertion-diagnostic-rules",
+    "file_count": 5,
+    "package_bytes": 8007,
+    "files": [
+      {
+        "path": "bug-assertion-diagnostic-rules/agents/openai.yaml",
+        "bytes": 335,
+        "sha256": "f039eef539f3f6b3fc0f3d2fe60f3970c16c3fb9924a09ab313ca2f6f1d6fc00"
+      },
+      {
+        "path": "bug-assertion-diagnostic-rules/references/assertion-entry-conditions.md",
+        "bytes": 418,
+        "sha256": "f4333f7e15b11799fd61ab77fb47adc299ac321f461573b7225f856d75d9b440"
+      },
+      {
+        "path": "bug-assertion-diagnostic-rules/references/assertion-examples.md",
+        "bytes": 576,
+        "sha256": "3b6c6cae2322f54820fe267a8e7457493acc0461784f1806a8f5431630122fdd"
+      },
+      {
+        "path": "bug-assertion-diagnostic-rules/references/assertion-placement.md",
+        "bytes": 731,
+        "sha256": "748e8ab45770f981456850ecee1c2f1dd7a355a4e7667b803a2e677032f99651"
+      },
+      {
+        "path": "bug-assertion-diagnostic-rules/SKILL.md",
+        "bytes": 5947,
+        "sha256": "c248998bda1db97bd446d12282c7a4b17ab92378495f2fb61ef1efd1d9e066bc"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-04-03"
+  },
+  "bug-debug-log-rules": {
+    "root": "bug-debug-log-rules",
+    "file_count": 5,
+    "package_bytes": 9210,
+    "files": [
+      {
+        "path": "bug-debug-log-rules/agents/openai.yaml",
+        "bytes": 335,
+        "sha256": "793c46382442acd9f08b494a5c38d69b24ebb80781034a3abbf4aeb8c6c6a379"
+      },
+      {
+        "path": "bug-debug-log-rules/references/debug-log-cleanup.md",
+        "bytes": 533,
+        "sha256": "13d5e7914f0d823075b4ec860932cb50f579677ed76f295f5d778f4a3a84890c"
+      },
+      {
+        "path": "bug-debug-log-rules/references/debug-log-examples.md",
+        "bytes": 861,
+        "sha256": "bd77d0078a24e932db3bd2397f461d3933d71a8a1af0b14a7281cfdce7d7c247"
+      },
+      {
+        "path": "bug-debug-log-rules/references/debug-log-placement.md",
+        "bytes": 604,
+        "sha256": "3dec4bfe0ff89ea670d419bf9ef8631581d9b434789be9a85819e0200ed2d7ac"
+      },
+      {
+        "path": "bug-debug-log-rules/SKILL.md",
+        "bytes": 6877,
+        "sha256": "7eea269cb1d097bcce9b88f5780a06e6e48b062d17aa23c851072becbccea10f"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-04-03"
+  },
+  "bug-discovery-rules": {
+    "root": "bug-discovery-rules",
+    "file_count": 5,
+    "package_bytes": 24638,
+    "files": [
+      {
+        "path": "bug-discovery-rules/references/bug-domain-routing.md",
+        "bytes": 3062,
+        "sha256": "60c0e5529b2c5d33c4ab0ec9ce46b708b18f67719ae7be566592d5474144ffbf"
+      },
+      {
+        "path": "bug-discovery-rules/references/discovery-checklist.md",
+        "bytes": 2858,
+        "sha256": "e86a9bf829add33da6c322f82770b9fa86eb20194b352784237164a17aa4d33e"
+      },
+      {
+        "path": "bug-discovery-rules/references/evidence-and-db-readonly.md",
+        "bytes": 3316,
+        "sha256": "a683a0ee2f901815518101aac3a5a6a8ed5ec24958ff8ca59f1cf6dc20b3f906"
+      },
+      {
+        "path": "bug-discovery-rules/references/output-template.md",
+        "bytes": 3823,
+        "sha256": "e72b443b6571a00aea90a68dfb0e9694625ffaaac3ef9380bd5831c653754ec9"
+      },
+      {
+        "path": "bug-discovery-rules/SKILL.md",
+        "bytes": 11579,
+        "sha256": "e4909f8734edd393d521d413032a52e9d644d9f886b968c8e0a818a3342c245a"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-04-03"
+  },
+  "bug-fix-proposal-rules": {
+    "root": "bug-fix-proposal-rules",
+    "file_count": 5,
+    "package_bytes": 10682,
+    "files": [
+      {
+        "path": "bug-fix-proposal-rules/agents/openai.yaml",
+        "bytes": 335,
+        "sha256": "498aea14fbdaf95b5381a9482ea24b7d5de3a1fa4213b67b5701694378cfdafc"
+      },
+      {
+        "path": "bug-fix-proposal-rules/references/confirm-before-coding.md",
+        "bytes": 756,
+        "sha256": "5157e38d2ff7a7547fcfff7b2734a5aff7b75162ae57bb12d4117da392b8500e"
+      },
+      {
+        "path": "bug-fix-proposal-rules/references/fix-proposal-template.md",
+        "bytes": 1519,
+        "sha256": "c7c5ea76149f15096e1a6265af3c9d0a10038359e54d9e86dfa17d8768f0eb1b"
+      },
+      {
+        "path": "bug-fix-proposal-rules/references/risk-assessment-checklist.md",
+        "bytes": 579,
+        "sha256": "ce326daf05cd43925c4798c22679fb5582a812a6fb9f1eb2bf7a5dcd363e98c9"
+      },
+      {
+        "path": "bug-fix-proposal-rules/SKILL.md",
+        "bytes": 7493,
+        "sha256": "dea0f38faafd4a35130814628c66eab320ec6a31698b14b7028a4d53c9d76f85"
+      }
+    ]
+  },
+  "bug-gap-rules": {
+    "root": "bug-gap-rules",
+    "file_count": 5,
+    "package_bytes": 7168,
+    "files": [
+      {
+        "path": "bug-gap-rules/agents/openai.yaml",
+        "bytes": 304,
+        "sha256": "e61a2a490a762b1f2880fef89d7446a5c670c1089e5149d91ebb48d2bcdef238"
+      },
+      {
+        "path": "bug-gap-rules/references/blocking-signals.md",
+        "bytes": 357,
+        "sha256": "b5ee26ced8bba2da73cca5888ca7da5e4d1c92ef7c01317825f536df627f12bd"
+      },
+      {
+        "path": "bug-gap-rules/references/gap-checklist.md",
+        "bytes": 401,
+        "sha256": "35fba0ba8cb9798209b2e9de7c334490e7d7f9dec3e785cb4ed20ae349122931"
+      },
+      {
+        "path": "bug-gap-rules/references/gap-examples.md",
+        "bytes": 284,
+        "sha256": "7cc87991c1e1cce481a7cb5a3df4c4b9cddaf9b686bac4e3a783e5aee8742a1e"
+      },
+      {
+        "path": "bug-gap-rules/SKILL.md",
+        "bytes": 5822,
+        "sha256": "60df55a77f8214ac357b125cc36e9374069a7919ff79731b06879497e709669a"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-04-03"
+  },
+  "bug-intake-rules": {
+    "root": "bug-intake-rules",
+    "file_count": 27,
+    "package_bytes": 70942,
+    "files": [
+      {
+        "path": "bug-intake-rules/agents/openai.yaml",
+        "bytes": 721,
+        "sha256": "a7465182d371dd1ee294eea9ec6514736a1b8ed81edebc5d1a6d3a5bd9ec98e3"
+      },
+      {
+        "path": "bug-intake-rules/references/bug-description-template.md",
+        "bytes": 3282,
+        "sha256": "a37fdadb514804eb90a780a6302b618bfa5a4ea237de999105057a32ced45511"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-bug-domain-routing.md",
+        "bytes": 3062,
+        "sha256": "60c0e5529b2c5d33c4ab0ec9ce46b708b18f67719ae7be566592d5474144ffbf"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-discovery-checklist.md",
+        "bytes": 2858,
+        "sha256": "e86a9bf829add33da6c322f82770b9fa86eb20194b352784237164a17aa4d33e"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md",
+        "bytes": 3316,
+        "sha256": "a683a0ee2f901815518101aac3a5a6a8ed5ec24958ff8ca59f1cf6dc20b3f906"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-output-template.md",
+        "bytes": 3823,
+        "sha256": "e72b443b6571a00aea90a68dfb0e9694625ffaaac3ef9380bd5831c653754ec9"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-gap-rules-blocking-signals.md",
+        "bytes": 357,
+        "sha256": "b5ee26ced8bba2da73cca5888ca7da5e4d1c92ef7c01317825f536df627f12bd"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-gap-rules-gap-checklist.md",
+        "bytes": 401,
+        "sha256": "35fba0ba8cb9798209b2e9de7c334490e7d7f9dec3e785cb4ed20ae349122931"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-gap-rules-gap-examples.md",
+        "bytes": 284,
+        "sha256": "7cc87991c1e1cce481a7cb5a3df4c4b9cddaf9b686bac4e3a783e5aee8742a1e"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap-bug-gap-rules-openai.yaml",
+        "bytes": 304,
+        "sha256": "e61a2a490a762b1f2880fef89d7446a5c670c1089e5149d91ebb48d2bcdef238"
+      },
+      {
+        "path": "bug-intake-rules/references/discovery-and-gap.md",
+        "bytes": 17251,
+        "sha256": "9ec358e2565b7805e5951a10196c63cd3721aa7829d14760fc848cff4e09f6b9"
+      },
+      {
+        "path": "bug-intake-rules/references/intake-examples.md",
+        "bytes": 865,
+        "sha256": "39bf2cea8a871221ab5779b98e3ff164a74d5dab97f8ab33fd76fb73d799954c"
+      },
+      {
+        "path": "bug-intake-rules/references/minimum-intake-fields.md",
+        "bytes": 536,
+        "sha256": "ae9e01179bddf04bf61726193b5db11576b0ce599d205ca799e18fc48ad38aed"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-entry-conditions.md",
+        "bytes": 418,
+        "sha256": "f4333f7e15b11799fd61ab77fb47adc299ac321f461573b7225f856d75d9b440"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-examples.md",
+        "bytes": 576,
+        "sha256": "3b6c6cae2322f54820fe267a8e7457493acc0461784f1806a8f5431630122fdd"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-placement.md",
+        "bytes": 731,
+        "sha256": "748e8ab45770f981456850ecee1c2f1dd7a355a4e7667b803a2e677032f99651"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-openai.yaml",
+        "bytes": 335,
+        "sha256": "f039eef539f3f6b3fc0f3d2fe60f3970c16c3fb9924a09ab313ca2f6f1d6fc00"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-cleanup.md",
+        "bytes": 533,
+        "sha256": "13d5e7914f0d823075b4ec860932cb50f579677ed76f295f5d778f4a3a84890c"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-examples.md",
+        "bytes": 861,
+        "sha256": "bd77d0078a24e932db3bd2397f461d3933d71a8a1af0b14a7281cfdce7d7c247"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-debug-log-placement.md",
+        "bytes": 604,
+        "sha256": "3dec4bfe0ff89ea670d419bf9ef8631581d9b434789be9a85819e0200ed2d7ac"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-debug-log-rules-openai.yaml",
+        "bytes": 335,
+        "sha256": "793c46382442acd9f08b494a5c38d69b24ebb80781034a3abbf4aeb8c6c6a379"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-openai.yaml",
+        "bytes": 366,
+        "sha256": "0e8e7ad765a51ff162764b33a12017c4b3ed9ab1e395035c17849b01f5d7de63"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-entry-conditions.md",
+        "bytes": 628,
+        "sha256": "d2ca447f0f0314287c7c9e747bddebe397feb497c8bc068bc18204c337665420"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-exit-and-handoff.md",
+        "bytes": 961,
+        "sha256": "7a21b03ba7c1c08c2b1776a4651a51e90e3766d638d0c0f391616364e3ced62a"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-observation-methods.md",
+        "bytes": 644,
+        "sha256": "601b1ef39f3acf26dd3cadd014a6feab81b8ad828c142c6f53bae59503cc06b5"
+      },
+      {
+        "path": "bug-intake-rules/references/runtime-diagnostics.md",
+        "bytes": 18892,
+        "sha256": "723e7e58faaaeb1d79fb7eb0da34801e2311f10df48ad0a719f4f4e99dbaab65"
+      },
+      {
+        "path": "bug-intake-rules/SKILL.md",
+        "bytes": 7998,
+        "sha256": "46b3bd6de551a920461fd7cffd1d8941d0fb819d46eaec6029f5a05dea140003"
+      }
+    ]
+  },
+  "bug-regression-risk-rules": {
+    "root": "bug-regression-risk-rules",
+    "file_count": 5,
+    "package_bytes": 6594,
+    "files": [
+      {
+        "path": "bug-regression-risk-rules/agents/openai.yaml",
+        "bytes": 316,
+        "sha256": "e6b7e725176655008b664a3d83f7fd595c6e93fa9b5d0ff109e4b78cb31036cd"
+      },
+      {
+        "path": "bug-regression-risk-rules/references/risk-dimensions.md",
+        "bytes": 298,
+        "sha256": "086aa499e7bcc082f44e507ba39bd6645c4f75126bea96f7a7ab8451785d3408"
+      },
+      {
+        "path": "bug-regression-risk-rules/references/risk-examples.md",
+        "bytes": 284,
+        "sha256": "79a227c57922b431f8a54616f137b2d9a1138fa2ad9888e49febb43de01b079e"
+      },
+      {
+        "path": "bug-regression-risk-rules/references/risk-ranking-and-scope.md",
+        "bytes": 377,
+        "sha256": "5b01e93a0ce9f131517673c150fc7b516b882c04979cea91a28889cfae47114d"
+      },
+      {
+        "path": "bug-regression-risk-rules/SKILL.md",
+        "bytes": 5319,
+        "sha256": "4999584269b35bcb5ec56d2dd7a4a0290eaa919b25013b17a6e1a7c7a25115e2"
+      }
+    ]
+  },
+  "bug-reproduction-rules": {
+    "root": "bug-reproduction-rules",
+    "file_count": 5,
+    "package_bytes": 8107,
+    "files": [
+      {
+        "path": "bug-reproduction-rules/agents/openai.yaml",
+        "bytes": 303,
+        "sha256": "864a2e69cf85ffe818979297250617b1ac5d6796f4b4d7099320b7292eeabff2"
+      },
+      {
+        "path": "bug-reproduction-rules/references/reproduction-examples.md",
+        "bytes": 305,
+        "sha256": "985f7a63edca5b8ad5a9abf0f33329821c136b3eff90e1f7fe069f2339867631"
+      },
+      {
+        "path": "bug-reproduction-rules/references/reproduction-template.md",
+        "bytes": 1279,
+        "sha256": "4edaf4e91939c3ff6294896e394fbbb72f9ec0acd9ffad3e34aedb2233edb5f7"
+      },
+      {
+        "path": "bug-reproduction-rules/references/stability-checks.md",
+        "bytes": 253,
+        "sha256": "3c2cb0ba081c3263ea64834b5bfe3f728fab3085b1d3232dcb82f897aa01c256"
+      },
+      {
+        "path": "bug-reproduction-rules/SKILL.md",
+        "bytes": 5967,
+        "sha256": "1f8fef357eba610b06887e572130197cdc485d0688291daa9431e49c02336a1b"
+      }
+    ]
+  },
+  "bug-root-cause-rules": {
+    "root": "bug-root-cause-rules",
+    "file_count": 5,
+    "package_bytes": 8120,
+    "files": [
+      {
+        "path": "bug-root-cause-rules/agents/openai.yaml",
+        "bytes": 314,
+        "sha256": "2ebf3e4091c7f48e6583d5fd9517ccf045c6c6cb0087298b89ef33d9145456b3"
+      },
+      {
+        "path": "bug-root-cause-rules/references/root-cause-evidence.md",
+        "bytes": 702,
+        "sha256": "2133a9d43077bf3c3c1f97a6ff876897617771e932707956c9a8e7dec7ed47e3"
+      },
+      {
+        "path": "bug-root-cause-rules/references/static-analysis-path.md",
+        "bytes": 749,
+        "sha256": "fbbd8f281ae59536522075868021e0d3c9b451b048a4545d87c2e2849ff2a744"
+      },
+      {
+        "path": "bug-root-cause-rules/references/when-to-stop-static-analysis.md",
+        "bytes": 681,
+        "sha256": "1ea42e0ed5b3ef6649d00da77bdf25b0d4ad174bba88c5ac6c22b7e7f014c0f4"
+      },
+      {
+        "path": "bug-root-cause-rules/SKILL.md",
+        "bytes": 5674,
+        "sha256": "b95dbc20b5ce18fab8ead4ab86dabd3a8ae5cc2ac7c3337d4fd7ca1d85fc683d"
+      }
+    ]
+  },
+  "bug-runtime-debug-rules": {
+    "root": "bug-runtime-debug-rules",
+    "file_count": 5,
+    "package_bytes": 8409,
+    "files": [
+      {
+        "path": "bug-runtime-debug-rules/agents/openai.yaml",
+        "bytes": 366,
+        "sha256": "0e8e7ad765a51ff162764b33a12017c4b3ed9ab1e395035c17849b01f5d7de63"
+      },
+      {
+        "path": "bug-runtime-debug-rules/references/runtime-entry-conditions.md",
+        "bytes": 628,
+        "sha256": "d2ca447f0f0314287c7c9e747bddebe397feb497c8bc068bc18204c337665420"
+      },
+      {
+        "path": "bug-runtime-debug-rules/references/runtime-exit-and-handoff.md",
+        "bytes": 961,
+        "sha256": "7a21b03ba7c1c08c2b1776a4651a51e90e3766d638d0c0f391616364e3ced62a"
+      },
+      {
+        "path": "bug-runtime-debug-rules/references/runtime-observation-methods.md",
+        "bytes": 644,
+        "sha256": "601b1ef39f3acf26dd3cadd014a6feab81b8ad828c142c6f53bae59503cc06b5"
+      },
+      {
+        "path": "bug-runtime-debug-rules/SKILL.md",
+        "bytes": 5810,
+        "sha256": "7fccf112095b2016cefe7cc8a9447dd0203166f80ac387da90339be97e2b40a6"
+      }
+    ],
+    "retired": true,
+    "retirement_evidence": "TASK-SS-04-03"
+  },
+  "bug-validation-rules": {
+    "root": "bug-validation-rules",
+    "file_count": 5,
+    "package_bytes": 10803,
+    "files": [
+      {
+        "path": "bug-validation-rules/agents/openai.yaml",
+        "bytes": 625,
+        "sha256": "4dd4b3f2b6b0c4eed523c60970f9c084082ae95aaabd461fe1a2ce1034c8d425"
+      },
+      {
+        "path": "bug-validation-rules/references/validation-boundaries.md",
+        "bytes": 556,
+        "sha256": "49118cc329f395beefe70b833cbd2bd6cd66d6ce9cbe8a60de6aeb7c0371b3b5"
+      },
+      {
+        "path": "bug-validation-rules/references/validation-checklist.md",
+        "bytes": 341,
+        "sha256": "c9362ab64e2f60209f8fc9d3e570461210d94dcf34f18cb34bce354f4290c0cb"
+      },
+      {
+        "path": "bug-validation-rules/references/validation-template.md",
+        "bytes": 2221,
+        "sha256": "474ceb40c67392e5e848fa61c9f40d431b0f63c8cdca2f22e4e7724fde1d5b2e"
+      },
+      {
+        "path": "bug-validation-rules/SKILL.md",
+        "bytes": 7060,
+        "sha256": "1e288a5f2323c469730e8fc617998ca1f26b1e47053507ddba4bed4d53d65fb3"
+      }
+    ]
+  },
+  "code-review-automation-rules": {
+    "root": "code-review-automation-rules",
+    "file_count": 5,
+    "package_bytes": 9846,
+    "files": [
+      {
+        "path": "code-review-automation-rules/agents/openai.yaml",
+        "bytes": 396,
+        "sha256": "ce21870fd234f4e12aad12a36c204d0ff06e910cd2c42e7068a04a088f5539fb"
+      },
+      {
+        "path": "code-review-automation-rules/references/report-and-wecom.md",
+        "bytes": 772,
+        "sha256": "948c5f3e36b662995a3691524960a9c1cdf882f1a848e9f98a0d5557716d7e9d"
+      },
+      {
+        "path": "code-review-automation-rules/references/review-prompt-template.md",
+        "bytes": 1897,
+        "sha256": "c3dfa53e1eb1520282a63560a02f85dde4e99cbe8df9bd4db353f70d415ac58e"
+      },
+      {
+        "path": "code-review-automation-rules/references/review-workflow.md",
+        "bytes": 1662,
+        "sha256": "c7a58d16ee287112b769882705b8dbaffb9142c6a8206260014568c88714d710"
+      },
+      {
+        "path": "code-review-automation-rules/SKILL.md",
+        "bytes": 5119,
+        "sha256": "6c1a10a7d23edfd325ea06d766235df1e22b69f345f586ffe09309b83dd22f52"
+      }
+    ]
+  },
+  "implementation-review-rules": {
+    "root": "implementation-review-rules",
+    "file_count": 9,
+    "package_bytes": 55399,
+    "files": [
+      {
+        "path": "implementation-review-rules/agents/openai.yaml",
+        "bytes": 1251,
+        "sha256": "c427659534ded45dab1e690819f8a3a9257612407c64b46a794fcdf90095d88f"
+      },
+      {
+        "path": "implementation-review-rules/references/format-cleanup-checks.md",
+        "bytes": 1704,
+        "sha256": "b8766ba83cc06ed4577b0bec96b9154c0aa4b984c8fed0a39f90ea5134176cf7"
+      },
+      {
+        "path": "implementation-review-rules/references/placement-and-dependency-checks.md",
+        "bytes": 4547,
+        "sha256": "00391b5b26a41275330855ef9a253f993abd586fe7ed959f091299e277269dff"
+      },
+      {
+        "path": "implementation-review-rules/references/review-boundaries.md",
+        "bytes": 2231,
+        "sha256": "70bcdf315e8c2494a310921c543c562f8809c79581e29906ef43f381948f7836"
+      },
+      {
+        "path": "implementation-review-rules/references/review-examples.md",
+        "bytes": 7976,
+        "sha256": "de8627fcf71e2eac0d585dcb7a6a6c36694922b4ce513132a6df8044b274c410"
+      },
+      {
+        "path": "implementation-review-rules/references/review-scope.md",
+        "bytes": 4185,
+        "sha256": "2161548784ed2da199b54ed7315ec73e2b0e9623d4cb747dcb149b1e66d7e31d"
+      },
+      {
+        "path": "implementation-review-rules/references/shared-evidence-and-specialized-contracts.md",
+        "bytes": 9203,
+        "sha256": "8969ccb1a3f5ecccae7a89a0ddbcbc649f6c2d1aae783ab35db7a02f20f07712"
+      },
+      {
+        "path": "implementation-review-rules/references/syntax-and-reference-checks.md",
+        "bytes": 1415,
+        "sha256": "c40dffb21ed7dbe42dca1de82f829116cf5c636592038f5166d6ad7ef7b1d4ef"
+      },
+      {
+        "path": "implementation-review-rules/SKILL.md",
+        "bytes": 22887,
+        "sha256": "37f3ca4d9338493efe10cda3d6679733dee7811f3be5d20183d9523dcb7715f2"
+      }
+    ]
+  },
+  "project-change-review-rules": {
+    "root": "project-change-review-rules",
+    "file_count": 5,
+    "package_bytes": 21134,
+    "files": [
+      {
+        "path": "project-change-review-rules/agents/openai.yaml",
+        "bytes": 421,
+        "sha256": "cbacae23834a5e08cdb20a4279738758502504a970b52ca155b615493bd26da1"
+      },
+      {
+        "path": "project-change-review-rules/references/checklist.md",
+        "bytes": 1866,
+        "sha256": "2001e18d89ddc9804c71c4d92ca14fa49c7a0826b67e3866a4534a155e306d4e"
+      },
+      {
+        "path": "project-change-review-rules/references/report-template.md",
+        "bytes": 4044,
+        "sha256": "1a861d6800df259b2b3abbccb575c924355ba1ecc8757c29a6ae7a107e30c09a"
+      },
+      {
+        "path": "project-change-review-rules/references/shared-evidence-and-specialized-contracts.md",
+        "bytes": 7330,
+        "sha256": "2313c6183284f95be778dd7a66438e6f1f502def93be1ebeedc6d528b8d2ade1"
+      },
+      {
+        "path": "project-change-review-rules/SKILL.md",
+        "bytes": 7473,
+        "sha256": "a24a686076af0011c2f687b27040e1150546b9a2db327b628d391c3659863a07"
+      }
+    ]
+  },
+  "acceptance-criteria-rules": {
+    "root": "acceptance-criteria-rules",
+    "file_count": 6,
+    "package_bytes": 17293,
+    "files": [
+      {
+        "path": "acceptance-criteria-rules/agents/openai.yaml",
+        "bytes": 633,
+        "sha256": "7c7c67c0ab9e6b258191847df28ff41d5223afcd02c6831ee6d3b97229a3408d"
+      },
+      {
+        "path": "acceptance-criteria-rules/references/acceptance-boundaries.md",
+        "bytes": 668,
+        "sha256": "655d020d37c8f0e9373d035d4944601d2a611f14ea22bacd1d5b7835df91a9ae"
+      },
+      {
+        "path": "acceptance-criteria-rules/references/acceptance-template.md",
+        "bytes": 4996,
+        "sha256": "074241a33057521bb253b1a00d07fdcc7bc8d65ead3fa894c06b6c9f3e6fc377"
+      },
+      {
+        "path": "acceptance-criteria-rules/references/shared-evidence-and-specialized-contracts.md",
+        "bytes": 7428,
+        "sha256": "fde5b1e86eb39fd9dddf26aff7f640033e21c37f24863c91c0fb48fe6ce46434"
+      },
+      {
+        "path": "acceptance-criteria-rules/references/testable-criteria-checklist.md",
+        "bytes": 858,
+        "sha256": "ece2256ab466755244dcaf90300675374f70bd6c50779c23694eec3bc1780da8"
+      },
+      {
+        "path": "acceptance-criteria-rules/SKILL.md",
+        "bytes": 2710,
+        "sha256": "72f82f29d2e222015e89be07f7f21b8536e1dd40e6b7e570099710b86eaf8d05"
+      }
+    ]
+  },
+  "final-acceptance-rules": {
+    "root": "final-acceptance-rules",
+    "file_count": 6,
+    "package_bytes": 17765,
+    "files": [
+      {
+        "path": "final-acceptance-rules/agents/openai.yaml",
+        "bytes": 650,
+        "sha256": "5db7fd63d8040593c11e672379d83ab512696fc6fe83522ebfd277d206d810ff"
+      },
+      {
+        "path": "final-acceptance-rules/references/final-acceptance-boundaries.md",
+        "bytes": 838,
+        "sha256": "575e0605a4a9924dbb78b3e9156177971b2d1341561a8e96c2efa9e6513400e5"
+      },
+      {
+        "path": "final-acceptance-rules/references/final-acceptance-checklist.md",
+        "bytes": 1244,
+        "sha256": "e3e7d4c8f9d4a591ca57fa51ab9f783ba0eb20f643096d1b94892c6fd79aa75b"
+      },
+      {
+        "path": "final-acceptance-rules/references/final-acceptance-template.md",
+        "bytes": 3790,
+        "sha256": "f6bb13c2d45271fec93bae3a99d1c7fe32dab1e0a9f4c9e8b04b2ea85647e7c9"
+      },
+      {
+        "path": "final-acceptance-rules/references/shared-evidence-and-specialized-contracts.md",
+        "bytes": 7408,
+        "sha256": "c5e9770ced985b39c2cc1686d9e49fc43e909c1b0073c1218b0a2480191a88ea"
+      },
+      {
+        "path": "final-acceptance-rules/SKILL.md",
+        "bytes": 3835,
+        "sha256": "869b267ba3e8ddb31f08fa06cc463f4433b4e58c22820092f943dd42318c78d6"
+      }
+    ]
+  }
+}

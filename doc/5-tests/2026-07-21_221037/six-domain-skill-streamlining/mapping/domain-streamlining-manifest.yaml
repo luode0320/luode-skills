@@ -1,0 +1,1182 @@
+schema_version: 1
+manifest_id: MANIFEST-SS-20260721
+source_id: SRC-SKILL-STREAMLINE-20260721-001
+scope:
+  domain_count: 6
+  skill_count: 36
+  retire_candidate_count: 11
+  baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+  excluded_paths:
+  - .codex/config.toml
+  - doc/** historical archives
+  - .git/**
+canonical_contracts:
+  trigger_contract: 每个源 description 的触发语义必须在目标主入口或必读条件路由中可定位。
+  protected_semantics: 自动触发、用户习惯、授权、安全、输出、停止和 local 红线不得删除。
+  deletion_gate: 只有 pre-delete、consumer、资产、字典和 post-delete 全部通过才允许将 delete_authorized
+    改为 true。
+asset_inventory: inventory/domain-asset-inventory.json
+active_consumer_index: inventory/active-consumers.json
+trigger_cases: fixtures/trigger-cases.yaml
+candidates:
+- candidate_id: CAND-SS-REQUIREMENT-01
+  domain: requirement
+  source_skill: requirement-boundary-rules
+  target_owner: requirement-boundary-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - requirement-boundary
+    - requirement-boundary-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_BOUNDARY_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_BOUNDARY_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-boundary-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-boundary-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-boundary-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REQUIREMENT-02
+  domain: requirement
+  source_skill: requirement-change-rules
+  target_owner: requirement-change-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - requirement-change
+    - requirement-change-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_CHANGE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_CHANGE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-change-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-change-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-change-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REQUIREMENT-03
+  domain: requirement
+  source_skill: requirement-discovery-rules
+  target_owner: requirement-intake-rules
+  action: merge_retire
+  target_route: initial-discovery
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 粗略想法
+    - 目标不清
+    - 新需求 idea
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_DISCOVERY_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_DISCOVERY_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-discovery-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-discovery-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-discovery-rules
+  test_status: post_delete_pass
+  migration_evidence: TASK-SS-02-01,TASK-SS-02-02,TASK-SS-02-03
+- candidate_id: CAND-SS-REQUIREMENT-04
+  domain: requirement
+  source_skill: requirement-gap-rules
+  target_owner: requirement-intake-rules
+  action: merge_retire
+  target_route: gap-routing
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 需求信息不全
+    - 缺少字段
+    - 前提缺失
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_GAP_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_GAP_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-gap-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-gap-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-gap-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-REQUIREMENT-05
+  domain: requirement
+  source_skill: requirement-intake-rules
+  target_owner: requirement-intake-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - requirement-intake
+    - requirement-intake-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_INTAKE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_INTAKE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-intake-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-intake-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-intake-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REQUIREMENT-06
+  domain: requirement
+  source_skill: requirement-splitting-rules
+  target_owner: requirement-splitting-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - requirement-splitting
+    - requirement-splitting-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_SPLITTING_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REQUIREMENT-REQUIREMENT_SPLITTING_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#requirement-splitting-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#requirement-splitting-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: requirement-splitting-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-IMPLEMENTATION-01
+  domain: implementation
+  source_skill: artifact-delivery-gate-rules
+  target_owner: artifact-delivery-gate-rules
+  action: canonical_owner
+  target_route: canonical-owner
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - artifact-delivery-gate
+    - artifact-delivery-gate-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-ARTIFACT_DELIVERY_GATE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-ARTIFACT_DELIVERY_GATE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#artifact-delivery-gate-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#artifact-delivery-gate-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: artifact-delivery-gate-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-IMPLEMENTATION-02
+  domain: implementation
+  source_skill: artifact-storage-rules
+  target_owner: artifact-storage-rules
+  action: canonical_owner
+  target_route: canonical-owner
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - artifact-storage
+    - artifact-storage-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-ARTIFACT_STORAGE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-ARTIFACT_STORAGE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#artifact-storage-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#artifact-storage-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: artifact-storage-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-IMPLEMENTATION-03
+  domain: implementation
+  source_skill: autonomous-execution-rules
+  target_owner: autonomous-execution-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - autonomous-execution
+    - autonomous-execution-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-AUTONOMOUS_EXECUTION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-AUTONOMOUS_EXECUTION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#autonomous-execution-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#autonomous-execution-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: autonomous-execution-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-IMPLEMENTATION-04
+  domain: implementation
+  source_skill: implementation-planning-rules
+  target_owner: implementation-planning-rules
+  action: reference_refactor
+  target_route: plan-mode-and-cycle-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - implementation-planning
+    - implementation-planning-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-IMPLEMENTATION_PLANNING_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-IMPLEMENTATION-IMPLEMENTATION_PLANNING_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#implementation-planning-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#implementation-planning-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: implementation-planning-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-TEST-01
+  domain: test
+  source_skill: functional-validation-rules
+  target_owner: functional-validation-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - functional-validation
+    - functional-validation-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-FUNCTIONAL_VALIDATION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-FUNCTIONAL_VALIDATION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#functional-validation-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#functional-validation-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: functional-validation-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-TEST-02
+  domain: test
+  source_skill: project-interface-baseline-rules
+  target_owner: project-interface-baseline-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - project-interface-baseline
+    - project-interface-baseline-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-PROJECT_INTERFACE_BASELINE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-PROJECT_INTERFACE_BASELINE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#project-interface-baseline-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#project-interface-baseline-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: project-interface-baseline-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-TEST-03
+  domain: test
+  source_skill: project-interface-release-execution-rules
+  target_owner: project-interface-release-execution-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - project-interface-release-execution
+    - project-interface-release-execution-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-PROJECT_INTERFACE_RELEASE_EXECUTION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-PROJECT_INTERFACE_RELEASE_EXECUTION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#project-interface-release-execution-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#project-interface-release-execution-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: project-interface-release-execution-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-TEST-04
+  domain: test
+  source_skill: test-doc-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 测试 README
+    - 测试说明
+    - 测试文档
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_DOC_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_DOC_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-doc-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-doc-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-doc-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-TEST-05
+  domain: test
+  source_skill: test-naming-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 测试命名
+    - 时间戳测试目录
+    - 中文说明目录
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_NAMING_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_NAMING_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-naming-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-naming-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-naming-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-TEST-06
+  domain: test
+  source_skill: test-program-rules
+  target_owner: test-program-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - test-program
+    - test-program-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_PROGRAM_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_PROGRAM_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-program-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-program-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-program-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-TEST-07
+  domain: test
+  source_skill: test-regression-rules
+  target_owner: test-regression-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - test-regression
+    - test-regression-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_REGRESSION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_REGRESSION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-regression-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-regression-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-regression-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-TEST-08
+  domain: test
+  source_skill: test-scattered-asset-location-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 测试脚本散落
+    - fixture 散落
+    - 迁移散落测试资产
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_SCATTERED_ASSET_LOCATION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_SCATTERED_ASSET_LOCATION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-scattered-asset-location-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-scattered-asset-location-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-scattered-asset-location-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-TEST-09
+  domain: test
+  source_skill: test-strategy-rules
+  target_owner: test-strategy-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - test-strategy
+    - test-strategy-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_STRATEGY_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_STRATEGY_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-strategy-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-strategy-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-strategy-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-TEST-10
+  domain: test
+  source_skill: test-task-root-layout-rules
+  target_owner: test-strategy-rules
+  action: merge_retire
+  target_route: test-asset-governance
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 新建测试任务目录
+    - 测试任务根目录
+    - 测试资产镜像
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_TASK_ROOT_LAYOUT_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-TEST-TEST_TASK_ROOT_LAYOUT_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#test-task-root-layout-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#test-task-root-layout-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: test-task-root-layout-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-01
+  domain: bug
+  source_skill: bug-assertion-diagnostic-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 状态不变量
+    - 诊断断言
+    - 快速失败
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_ASSERTION_DIAGNOSTIC_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_ASSERTION_DIAGNOSTIC_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-assertion-diagnostic-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-assertion-diagnostic-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-assertion-diagnostic-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-02
+  domain: bug
+  source_skill: bug-debug-log-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 临时 debug 日志
+    - 关键分支日志
+    - 上下游输入输出日志
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_DEBUG_LOG_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_DEBUG_LOG_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-debug-log-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-debug-log-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-debug-log-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-03
+  domain: bug
+  source_skill: bug-discovery-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: discovery-and-gap
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 一句话 Bug
+    - 截图中的异常
+    - 现象不清
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_DISCOVERY_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_DISCOVERY_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-discovery-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-discovery-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-discovery-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-04
+  domain: bug
+  source_skill: bug-fix-proposal-rules
+  target_owner: bug-fix-proposal-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-fix-proposal
+    - bug-fix-proposal-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_FIX_PROPOSAL_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_FIX_PROPOSAL_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-fix-proposal-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-fix-proposal-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-fix-proposal-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-BUG-05
+  domain: bug
+  source_skill: bug-gap-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: discovery-and-gap
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 缺少复现条件
+    - 缺少环境信息
+    - 缺少输入数据
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_GAP_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_GAP_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-gap-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-gap-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-gap-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-06
+  domain: bug
+  source_skill: bug-intake-rules
+  target_owner: bug-intake-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-intake
+    - bug-intake-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_INTAKE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_INTAKE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-intake-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-intake-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-intake-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-BUG-07
+  domain: bug
+  source_skill: bug-regression-risk-rules
+  target_owner: bug-regression-risk-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-regression-risk
+    - bug-regression-risk-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_REGRESSION_RISK_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_REGRESSION_RISK_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-regression-risk-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-regression-risk-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-regression-risk-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-BUG-08
+  domain: bug
+  source_skill: bug-reproduction-rules
+  target_owner: bug-reproduction-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-reproduction
+    - bug-reproduction-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_REPRODUCTION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_REPRODUCTION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-reproduction-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-reproduction-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-reproduction-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-BUG-09
+  domain: bug
+  source_skill: bug-root-cause-rules
+  target_owner: bug-root-cause-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-root-cause
+    - bug-root-cause-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_ROOT_CAUSE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_ROOT_CAUSE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-root-cause-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-root-cause-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-root-cause-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-BUG-10
+  domain: bug
+  source_skill: bug-runtime-debug-rules
+  target_owner: bug-intake-rules
+  action: merge_retire
+  target_route: runtime-diagnostics
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - 断点调试
+    - 单步观察
+    - 调用栈观察
+    same_lifecycle_single_primary: true
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_RUNTIME_DEBUG_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_RUNTIME_DEBUG_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-runtime-debug-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-runtime-debug-rules
+  baseline_status: frozen
+  delete_authorized: true
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-runtime-debug-rules
+  test_status: post_delete_pass
+- candidate_id: CAND-SS-BUG-11
+  domain: bug
+  source_skill: bug-validation-rules
+  target_owner: bug-validation-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - bug-validation
+    - bug-validation-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_VALIDATION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-BUG-BUG_VALIDATION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  - RULE-SS-LOCAL-001
+  active_consumer_index: inventory/active-consumers.json#bug-validation-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#bug-validation-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: bug-validation-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REVIEW-01
+  domain: review
+  source_skill: code-review-automation-rules
+  target_owner: code-review-automation-rules
+  action: retain_specialized
+  target_route: specialized-lifecycle
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - code-review-automation
+    - code-review-automation-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REVIEW-CODE_REVIEW_AUTOMATION_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REVIEW-CODE_REVIEW_AUTOMATION_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#code-review-automation-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#code-review-automation-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: code-review-automation-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REVIEW-02
+  domain: review
+  source_skill: implementation-review-rules
+  target_owner: implementation-review-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - implementation-review
+    - implementation-review-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REVIEW-IMPLEMENTATION_REVIEW_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REVIEW-IMPLEMENTATION_REVIEW_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#implementation-review-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#implementation-review-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: implementation-review-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-REVIEW-03
+  domain: review
+  source_skill: project-change-review-rules
+  target_owner: project-change-review-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - project-change-review
+    - project-change-review-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-REVIEW-PROJECT_CHANGE_REVIEW_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-REVIEW-PROJECT_CHANGE_REVIEW_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#project-change-review-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#project-change-review-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: project-change-review-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-ACCEPTANCE-01
+  domain: acceptance
+  source_skill: acceptance-criteria-rules
+  target_owner: acceptance-criteria-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - acceptance-criteria
+    - acceptance-criteria-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-ACCEPTANCE-ACCEPTANCE_CRITERIA_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-ACCEPTANCE-ACCEPTANCE_CRITERIA_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#acceptance-criteria-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#acceptance-criteria-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: acceptance-criteria-rules
+  test_status: baseline_pending
+- candidate_id: CAND-SS-ACCEPTANCE-02
+  domain: acceptance
+  source_skill: final-acceptance-rules
+  target_owner: final-acceptance-rules
+  action: reference_refactor
+  target_route: shared-evidence-and-specialized-contracts
+  trigger_contract:
+    preserve_description: true
+    trigger_aliases:
+    - final-acceptance
+    - final-acceptance-rules
+    same_lifecycle_single_primary: false
+    positive_fixture_ids:
+    - TRIGGER-SS-ACCEPTANCE-FINAL_ACCEPTANCE_RULES-POS
+    negative_fixture_ids:
+    - TRIGGER-SS-ACCEPTANCE-FINAL_ACCEPTANCE_RULES-NEG
+  protected_semantics:
+  - RULE-SS-TRIGGER-001
+  - RULE-SS-USER-HABIT-001
+  - RULE-SS-AUTH-001
+  - RULE-SS-SAFETY-001
+  - RULE-SS-OUTPUT-001
+  - RULE-SS-STOP-001
+  active_consumer_index: inventory/active-consumers.json#final-acceptance-rules
+  asset_inventory_index: inventory/domain-asset-inventory.json#final-acceptance-rules
+  baseline_status: frozen
+  delete_authorized: false
+  rollback_locator:
+    baseline_commit: 548fe02a42b6572b75330fc8b8827b62a4218b5f
+    source_root: final-acceptance-rules
+  test_status: baseline_pending
+summary:
+  domains:
+  - acceptance
+  - bug
+  - implementation
+  - requirement
+  - review
+  - test
+  all_skills: 36
+  retire_candidates: 11
+  retain_or_refactor: 25
+  unmapped: 0

@@ -1,0 +1,852 @@
+schema_version: 1
+cases:
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_BOUNDARY_RULES-POS
+  domain: requirement
+  source_skill: requirement-boundary-rules
+  target_owner: requirement-boundary-rules
+  target_route: specialized-lifecycle
+  prompt: requirement-boundary；requirement-boundary-rules
+  required_source_tokens:
+  - requirement-boundary-rules
+  required_target_tokens:
+  - requirement-boundary-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_BOUNDARY_RULES-NEG
+  domain: requirement
+  source_skill: requirement-boundary-rules
+  target_owner: requirement-boundary-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 requirement-boundary-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_CHANGE_RULES-POS
+  domain: requirement
+  source_skill: requirement-change-rules
+  target_owner: requirement-change-rules
+  target_route: specialized-lifecycle
+  prompt: requirement-change；requirement-change-rules
+  required_source_tokens:
+  - requirement-change-rules
+  required_target_tokens:
+  - requirement-change-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_CHANGE_RULES-NEG
+  domain: requirement
+  source_skill: requirement-change-rules
+  target_owner: requirement-change-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 requirement-change-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_DISCOVERY_RULES-POS
+  domain: requirement
+  source_skill: requirement-discovery-rules
+  target_owner: requirement-intake-rules
+  target_route: initial-discovery
+  prompt: 粗略想法；目标不清；新需求 idea
+  required_source_tokens:
+  - 粗略想法
+  - 目标不清
+  - 新需求 idea
+  required_target_tokens:
+  - requirement-intake-rules
+  - initial-discovery
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_DISCOVERY_RULES-NEG
+  domain: requirement
+  source_skill: requirement-discovery-rules
+  target_owner: requirement-intake-rules
+  target_route: initial-discovery
+  prompt: 不属于 requirement-discovery-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_GAP_RULES-POS
+  domain: requirement
+  source_skill: requirement-gap-rules
+  target_owner: requirement-intake-rules
+  target_route: gap-routing
+  prompt: 需求信息不全；缺少字段；前提缺失
+  required_source_tokens:
+  - 需求信息不全
+  - 缺少字段
+  - 前提缺失
+  required_target_tokens:
+  - requirement-intake-rules
+  - gap-routing
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_GAP_RULES-NEG
+  domain: requirement
+  source_skill: requirement-gap-rules
+  target_owner: requirement-intake-rules
+  target_route: gap-routing
+  prompt: 不属于 requirement-gap-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_INTAKE_RULES-POS
+  domain: requirement
+  source_skill: requirement-intake-rules
+  target_owner: requirement-intake-rules
+  target_route: specialized-lifecycle
+  prompt: requirement-intake；requirement-intake-rules
+  required_source_tokens:
+  - requirement-intake-rules
+  required_target_tokens:
+  - requirement-intake-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_INTAKE_RULES-NEG
+  domain: requirement
+  source_skill: requirement-intake-rules
+  target_owner: requirement-intake-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 requirement-intake-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_SPLITTING_RULES-POS
+  domain: requirement
+  source_skill: requirement-splitting-rules
+  target_owner: requirement-splitting-rules
+  target_route: specialized-lifecycle
+  prompt: requirement-splitting；requirement-splitting-rules
+  required_source_tokens:
+  - requirement-splitting-rules
+  required_target_tokens:
+  - requirement-splitting-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REQUIREMENT-REQUIREMENT_SPLITTING_RULES-NEG
+  domain: requirement
+  source_skill: requirement-splitting-rules
+  target_owner: requirement-splitting-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 requirement-splitting-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-IMPLEMENTATION-ARTIFACT_DELIVERY_GATE_RULES-POS
+  domain: implementation
+  source_skill: artifact-delivery-gate-rules
+  target_owner: artifact-delivery-gate-rules
+  target_route: canonical-owner
+  prompt: artifact-delivery-gate；artifact-delivery-gate-rules
+  required_source_tokens:
+  - artifact-delivery-gate-rules
+  required_target_tokens:
+  - artifact-delivery-gate-rules
+  - canonical-owner
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-IMPLEMENTATION-ARTIFACT_DELIVERY_GATE_RULES-NEG
+  domain: implementation
+  source_skill: artifact-delivery-gate-rules
+  target_owner: artifact-delivery-gate-rules
+  target_route: canonical-owner
+  prompt: 不属于 artifact-delivery-gate-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-IMPLEMENTATION-ARTIFACT_STORAGE_RULES-POS
+  domain: implementation
+  source_skill: artifact-storage-rules
+  target_owner: artifact-storage-rules
+  target_route: canonical-owner
+  prompt: artifact-storage；artifact-storage-rules
+  required_source_tokens:
+  - artifact-storage-rules
+  required_target_tokens:
+  - artifact-storage-rules
+  - canonical-owner
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-IMPLEMENTATION-ARTIFACT_STORAGE_RULES-NEG
+  domain: implementation
+  source_skill: artifact-storage-rules
+  target_owner: artifact-storage-rules
+  target_route: canonical-owner
+  prompt: 不属于 artifact-storage-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-IMPLEMENTATION-AUTONOMOUS_EXECUTION_RULES-POS
+  domain: implementation
+  source_skill: autonomous-execution-rules
+  target_owner: autonomous-execution-rules
+  target_route: specialized-lifecycle
+  prompt: autonomous-execution；autonomous-execution-rules
+  required_source_tokens:
+  - autonomous-execution-rules
+  required_target_tokens:
+  - autonomous-execution-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-IMPLEMENTATION-AUTONOMOUS_EXECUTION_RULES-NEG
+  domain: implementation
+  source_skill: autonomous-execution-rules
+  target_owner: autonomous-execution-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 autonomous-execution-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-IMPLEMENTATION-IMPLEMENTATION_PLANNING_RULES-POS
+  domain: implementation
+  source_skill: implementation-planning-rules
+  target_owner: implementation-planning-rules
+  target_route: plan-mode-and-cycle-contracts
+  prompt: implementation-planning；implementation-planning-rules
+  required_source_tokens:
+  - implementation-planning-rules
+  required_target_tokens:
+  - implementation-planning-rules
+  - plan-mode-and-cycle-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-IMPLEMENTATION-IMPLEMENTATION_PLANNING_RULES-NEG
+  domain: implementation
+  source_skill: implementation-planning-rules
+  target_owner: implementation-planning-rules
+  target_route: plan-mode-and-cycle-contracts
+  prompt: 不属于 implementation-planning-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-FUNCTIONAL_VALIDATION_RULES-POS
+  domain: test
+  source_skill: functional-validation-rules
+  target_owner: functional-validation-rules
+  target_route: specialized-lifecycle
+  prompt: functional-validation；functional-validation-rules
+  required_source_tokens:
+  - functional-validation-rules
+  required_target_tokens:
+  - functional-validation-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-FUNCTIONAL_VALIDATION_RULES-NEG
+  domain: test
+  source_skill: functional-validation-rules
+  target_owner: functional-validation-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 functional-validation-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-PROJECT_INTERFACE_BASELINE_RULES-POS
+  domain: test
+  source_skill: project-interface-baseline-rules
+  target_owner: project-interface-baseline-rules
+  target_route: specialized-lifecycle
+  prompt: project-interface-baseline；project-interface-baseline-rules
+  required_source_tokens:
+  - project-interface-baseline-rules
+  required_target_tokens:
+  - project-interface-baseline-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-PROJECT_INTERFACE_BASELINE_RULES-NEG
+  domain: test
+  source_skill: project-interface-baseline-rules
+  target_owner: project-interface-baseline-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 project-interface-baseline-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-PROJECT_INTERFACE_RELEASE_EXECUTION_RULES-POS
+  domain: test
+  source_skill: project-interface-release-execution-rules
+  target_owner: project-interface-release-execution-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: project-interface-release-execution；project-interface-release-execution-rules
+  required_source_tokens:
+  - project-interface-release-execution-rules
+  required_target_tokens:
+  - project-interface-release-execution-rules
+  - shared-evidence-and-specialized-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-PROJECT_INTERFACE_RELEASE_EXECUTION_RULES-NEG
+  domain: test
+  source_skill: project-interface-release-execution-rules
+  target_owner: project-interface-release-execution-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: 不属于 project-interface-release-execution-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_DOC_RULES-POS
+  domain: test
+  source_skill: test-doc-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 测试 README；测试说明；测试文档
+  required_source_tokens:
+  - 测试 README
+  - 测试说明
+  - 测试文档
+  required_target_tokens:
+  - test-strategy-rules
+  - test-asset-governance
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_DOC_RULES-NEG
+  domain: test
+  source_skill: test-doc-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 不属于 test-doc-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_NAMING_RULES-POS
+  domain: test
+  source_skill: test-naming-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 测试命名；时间戳测试目录；中文说明目录
+  required_source_tokens:
+  - 测试命名
+  - 时间戳测试目录
+  - 中文说明目录
+  required_target_tokens:
+  - test-strategy-rules
+  - test-asset-governance
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_NAMING_RULES-NEG
+  domain: test
+  source_skill: test-naming-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 不属于 test-naming-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_PROGRAM_RULES-POS
+  domain: test
+  source_skill: test-program-rules
+  target_owner: test-program-rules
+  target_route: specialized-lifecycle
+  prompt: test-program；test-program-rules
+  required_source_tokens:
+  - test-program-rules
+  required_target_tokens:
+  - test-program-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_PROGRAM_RULES-NEG
+  domain: test
+  source_skill: test-program-rules
+  target_owner: test-program-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 test-program-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_REGRESSION_RULES-POS
+  domain: test
+  source_skill: test-regression-rules
+  target_owner: test-regression-rules
+  target_route: specialized-lifecycle
+  prompt: test-regression；test-regression-rules
+  required_source_tokens:
+  - test-regression-rules
+  required_target_tokens:
+  - test-regression-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_REGRESSION_RULES-NEG
+  domain: test
+  source_skill: test-regression-rules
+  target_owner: test-regression-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 test-regression-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_SCATTERED_ASSET_LOCATION_RULES-POS
+  domain: test
+  source_skill: test-scattered-asset-location-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 测试脚本散落；fixture 散落；迁移散落测试资产
+  required_source_tokens:
+  - 测试脚本散落
+  - fixture 散落
+  - 迁移散落测试资产
+  required_target_tokens:
+  - test-strategy-rules
+  - test-asset-governance
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_SCATTERED_ASSET_LOCATION_RULES-NEG
+  domain: test
+  source_skill: test-scattered-asset-location-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 不属于 test-scattered-asset-location-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_STRATEGY_RULES-POS
+  domain: test
+  source_skill: test-strategy-rules
+  target_owner: test-strategy-rules
+  target_route: specialized-lifecycle
+  prompt: test-strategy；test-strategy-rules
+  required_source_tokens:
+  - test-strategy-rules
+  required_target_tokens:
+  - test-strategy-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_STRATEGY_RULES-NEG
+  domain: test
+  source_skill: test-strategy-rules
+  target_owner: test-strategy-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 test-strategy-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-TEST-TEST_TASK_ROOT_LAYOUT_RULES-POS
+  domain: test
+  source_skill: test-task-root-layout-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 新建测试任务目录；测试任务根目录；测试资产镜像
+  required_source_tokens:
+  - 新建测试任务目录
+  - 测试任务根目录
+  - 测试资产镜像
+  required_target_tokens:
+  - test-strategy-rules
+  - test-asset-governance
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-TEST-TEST_TASK_ROOT_LAYOUT_RULES-NEG
+  domain: test
+  source_skill: test-task-root-layout-rules
+  target_owner: test-strategy-rules
+  target_route: test-asset-governance
+  prompt: 不属于 test-task-root-layout-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_ASSERTION_DIAGNOSTIC_RULES-POS
+  domain: bug
+  source_skill: bug-assertion-diagnostic-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 状态不变量；诊断断言；快速失败
+  required_source_tokens:
+  - 状态不变量
+  - 诊断断言
+  - 快速失败
+  required_target_tokens:
+  - bug-intake-rules
+  - runtime-diagnostics
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_ASSERTION_DIAGNOSTIC_RULES-NEG
+  domain: bug
+  source_skill: bug-assertion-diagnostic-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 不属于 bug-assertion-diagnostic-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_DEBUG_LOG_RULES-POS
+  domain: bug
+  source_skill: bug-debug-log-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 临时 debug 日志；关键分支日志；上下游输入输出日志
+  required_source_tokens:
+  - 临时 debug 日志
+  - 关键分支日志
+  - 上下游输入输出日志
+  required_target_tokens:
+  - bug-intake-rules
+  - runtime-diagnostics
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_DEBUG_LOG_RULES-NEG
+  domain: bug
+  source_skill: bug-debug-log-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 不属于 bug-debug-log-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_DISCOVERY_RULES-POS
+  domain: bug
+  source_skill: bug-discovery-rules
+  target_owner: bug-intake-rules
+  target_route: discovery-and-gap
+  prompt: 一句话 Bug；截图中的异常；现象不清
+  required_source_tokens:
+  - 一句话 Bug
+  - 截图中的异常
+  - 现象不清
+  required_target_tokens:
+  - bug-intake-rules
+  - discovery-and-gap
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_DISCOVERY_RULES-NEG
+  domain: bug
+  source_skill: bug-discovery-rules
+  target_owner: bug-intake-rules
+  target_route: discovery-and-gap
+  prompt: 不属于 bug-discovery-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_FIX_PROPOSAL_RULES-POS
+  domain: bug
+  source_skill: bug-fix-proposal-rules
+  target_owner: bug-fix-proposal-rules
+  target_route: specialized-lifecycle
+  prompt: bug-fix-proposal；bug-fix-proposal-rules
+  required_source_tokens:
+  - bug-fix-proposal-rules
+  required_target_tokens:
+  - bug-fix-proposal-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_FIX_PROPOSAL_RULES-NEG
+  domain: bug
+  source_skill: bug-fix-proposal-rules
+  target_owner: bug-fix-proposal-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-fix-proposal-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_GAP_RULES-POS
+  domain: bug
+  source_skill: bug-gap-rules
+  target_owner: bug-intake-rules
+  target_route: discovery-and-gap
+  prompt: 缺少复现条件；缺少环境信息；缺少输入数据
+  required_source_tokens:
+  - 缺少复现条件
+  - 缺少环境信息
+  - 缺少输入数据
+  required_target_tokens:
+  - bug-intake-rules
+  - discovery-and-gap
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_GAP_RULES-NEG
+  domain: bug
+  source_skill: bug-gap-rules
+  target_owner: bug-intake-rules
+  target_route: discovery-and-gap
+  prompt: 不属于 bug-gap-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_INTAKE_RULES-POS
+  domain: bug
+  source_skill: bug-intake-rules
+  target_owner: bug-intake-rules
+  target_route: specialized-lifecycle
+  prompt: bug-intake；bug-intake-rules
+  required_source_tokens:
+  - bug-intake-rules
+  required_target_tokens:
+  - bug-intake-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_INTAKE_RULES-NEG
+  domain: bug
+  source_skill: bug-intake-rules
+  target_owner: bug-intake-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-intake-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_REGRESSION_RISK_RULES-POS
+  domain: bug
+  source_skill: bug-regression-risk-rules
+  target_owner: bug-regression-risk-rules
+  target_route: specialized-lifecycle
+  prompt: bug-regression-risk；bug-regression-risk-rules
+  required_source_tokens:
+  - bug-regression-risk-rules
+  required_target_tokens:
+  - bug-regression-risk-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_REGRESSION_RISK_RULES-NEG
+  domain: bug
+  source_skill: bug-regression-risk-rules
+  target_owner: bug-regression-risk-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-regression-risk-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_REPRODUCTION_RULES-POS
+  domain: bug
+  source_skill: bug-reproduction-rules
+  target_owner: bug-reproduction-rules
+  target_route: specialized-lifecycle
+  prompt: bug-reproduction；bug-reproduction-rules
+  required_source_tokens:
+  - bug-reproduction-rules
+  required_target_tokens:
+  - bug-reproduction-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_REPRODUCTION_RULES-NEG
+  domain: bug
+  source_skill: bug-reproduction-rules
+  target_owner: bug-reproduction-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-reproduction-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_ROOT_CAUSE_RULES-POS
+  domain: bug
+  source_skill: bug-root-cause-rules
+  target_owner: bug-root-cause-rules
+  target_route: specialized-lifecycle
+  prompt: bug-root-cause；bug-root-cause-rules
+  required_source_tokens:
+  - bug-root-cause-rules
+  required_target_tokens:
+  - bug-root-cause-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_ROOT_CAUSE_RULES-NEG
+  domain: bug
+  source_skill: bug-root-cause-rules
+  target_owner: bug-root-cause-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-root-cause-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_RUNTIME_DEBUG_RULES-POS
+  domain: bug
+  source_skill: bug-runtime-debug-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 断点调试；单步观察；调用栈观察
+  required_source_tokens:
+  - 断点调试
+  - 单步观察
+  - 调用栈观察
+  required_target_tokens:
+  - bug-intake-rules
+  - runtime-diagnostics
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_RUNTIME_DEBUG_RULES-NEG
+  domain: bug
+  source_skill: bug-runtime-debug-rules
+  target_owner: bug-intake-rules
+  target_route: runtime-diagnostics
+  prompt: 不属于 bug-runtime-debug-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-BUG-BUG_VALIDATION_RULES-POS
+  domain: bug
+  source_skill: bug-validation-rules
+  target_owner: bug-validation-rules
+  target_route: specialized-lifecycle
+  prompt: bug-validation；bug-validation-rules
+  required_source_tokens:
+  - bug-validation-rules
+  required_target_tokens:
+  - bug-validation-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-BUG-BUG_VALIDATION_RULES-NEG
+  domain: bug
+  source_skill: bug-validation-rules
+  target_owner: bug-validation-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 bug-validation-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REVIEW-CODE_REVIEW_AUTOMATION_RULES-POS
+  domain: review
+  source_skill: code-review-automation-rules
+  target_owner: code-review-automation-rules
+  target_route: specialized-lifecycle
+  prompt: code-review-automation；code-review-automation-rules
+  required_source_tokens:
+  - code-review-automation-rules
+  required_target_tokens:
+  - code-review-automation-rules
+  - specialized-lifecycle
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REVIEW-CODE_REVIEW_AUTOMATION_RULES-NEG
+  domain: review
+  source_skill: code-review-automation-rules
+  target_owner: code-review-automation-rules
+  target_route: specialized-lifecycle
+  prompt: 不属于 code-review-automation-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REVIEW-IMPLEMENTATION_REVIEW_RULES-POS
+  domain: review
+  source_skill: implementation-review-rules
+  target_owner: implementation-review-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: implementation-review；implementation-review-rules
+  required_source_tokens:
+  - implementation-review-rules
+  required_target_tokens:
+  - implementation-review-rules
+  - shared-evidence-and-specialized-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REVIEW-IMPLEMENTATION_REVIEW_RULES-NEG
+  domain: review
+  source_skill: implementation-review-rules
+  target_owner: implementation-review-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: 不属于 implementation-review-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-REVIEW-PROJECT_CHANGE_REVIEW_RULES-POS
+  domain: review
+  source_skill: project-change-review-rules
+  target_owner: project-change-review-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: project-change-review；project-change-review-rules
+  required_source_tokens:
+  - project-change-review-rules
+  required_target_tokens:
+  - project-change-review-rules
+  - shared-evidence-and-specialized-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-REVIEW-PROJECT_CHANGE_REVIEW_RULES-NEG
+  domain: review
+  source_skill: project-change-review-rules
+  target_owner: project-change-review-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: 不属于 project-change-review-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-ACCEPTANCE-ACCEPTANCE_CRITERIA_RULES-POS
+  domain: acceptance
+  source_skill: acceptance-criteria-rules
+  target_owner: acceptance-criteria-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: acceptance-criteria；acceptance-criteria-rules
+  required_source_tokens:
+  - acceptance-criteria-rules
+  required_target_tokens:
+  - acceptance-criteria-rules
+  - shared-evidence-and-specialized-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-ACCEPTANCE-ACCEPTANCE_CRITERIA_RULES-NEG
+  domain: acceptance
+  source_skill: acceptance-criteria-rules
+  target_owner: acceptance-criteria-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: 不属于 acceptance-criteria-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。
+- id: TRIGGER-SS-ACCEPTANCE-FINAL_ACCEPTANCE_RULES-POS
+  domain: acceptance
+  source_skill: final-acceptance-rules
+  target_owner: final-acceptance-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: final-acceptance；final-acceptance-rules
+  required_source_tokens:
+  - final-acceptance-rules
+  required_target_tokens:
+  - final-acceptance-rules
+  - shared-evidence-and-specialized-contracts
+  phase: pre_delete_and_post_delete
+  expected: 迁移后只进入目标 owner；未迁移前仅作为基线样本，不宣称触发迁移完成。
+- id: TRIGGER-SS-ACCEPTANCE-FINAL_ACCEPTANCE_RULES-NEG
+  domain: acceptance
+  source_skill: final-acceptance-rules
+  target_owner: final-acceptance-rules
+  target_route: shared-evidence-and-specialized-contracts
+  prompt: 不属于 final-acceptance-rules 的业务请求
+  required_source_tokens: []
+  required_target_tokens: []
+  phase: pre_delete_and_post_delete
+  expected: 不得仅因同域关键词误命中目标路由。

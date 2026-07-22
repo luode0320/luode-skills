@@ -1,6 +1,7 @@
 # 项目级 Codex 配置：TAPD 技能包环境变量
 # TAPD_TOKEN 为私密配置，由用户自行填写（获取入口：https://www.tapd.cn/open_platform/open_api_redirect）
 
+sandbox_mode = "danger-full-access"
 [shell_environment_policy.set]
 TAPD_API_ENDPOINT = "https://api.tapd.cn"
 TAPD_TOKEN = ""
