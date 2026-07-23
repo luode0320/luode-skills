@@ -77,7 +77,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 若本轮命中 `parallel-task-dispatch-rules`，还必须额外输出 `并行技能`
 - 若最终没有真正启动任何并行 skill，也必须明确写 `并行技能:无`
 - 本仓库默认处于 subagent 完全授权模式，用户已允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work
-- 若 `parallel-task-dispatch-rules` 判定允许并行且无阻断，必须继续联动 `subagent-dispatch-rules` 做真实启动判定；完全授权模式满足工具显式授权条件，只输出线程分配或并行技能列表不算真正并行
+- `parallel-task-dispatch-rules` 统一完成并行分类、授权与能力检查、真实启动、观测、回收和关闭；完全授权模式可满足工具显式授权前提，但系统规则、工具元数据和用户当前轮禁止优先，只输出线程分配或并行技能列表不算真正并行
 
 例如：
 
@@ -278,9 +278,8 @@ python skill-dictionary/generate_dictionary.py
 | `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `artifact-delivery-gate-rules` | 在需求、Bug、测试、审查收口前检查正式文档是否真实落盘到中央约定目录，主入口与中间链路结论一视同仁；缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
-| `parallel-task-dispatch-rules` | 在执行前判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，必须联动 `subagent-dispatch-rules` 做真实启动判定。本仓库完全授权模式满足工具显式授权条件，应输出并行技能列表并真实启动，或在环境/风险/写集阻断时回退为“并行技能:无”。 |
+| `parallel-task-dispatch-rules` | 任一 Skill 进入实质执行前统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结互斥写集，并在系统能力和授权允许时真实启动、观测、回收及关闭子代理；输出计划、启动、完成、关闭数量，失败时真实回退串行。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
-| `subagent-dispatch-rules` | 任一 skill 命中后自动分析 subagent 委派条件；本仓库完全授权模式视为用户已给出项目级 standing authorization，允许在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent。批量委派时优先使用 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准。 |
 | `skill-audit-rules` | 当本轮存在多 skill 组合、并行拆分或规则收口风险时，负责只读审计是否漏触发应有 skill 或漏执行关键规则。 |
 | `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查；只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出后续内容。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性；默认不输出后续内容，只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出。 |
@@ -302,7 +301,7 @@ python skill-dictionary/generate_dictionary.py
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `requirement-intake-rules` / `initial-discovery` | 从一句话 idea 或粗略方向出发，在唯一需求主入口内主动侦察项目代码、数据库线索、历史资料、上下游、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径 / URL，按“官方/自有优先”形成有证据来源的需求设计，并把可复用线索回写长期记忆。 |
 | `requirement-intake-rules`    | 作为需求主文档入口，接收 discovery 结果、需求 URL、资料、物料和上下文，discovery 初稿后立即创建主需求文档，收口目标、前提、输入输出，并按 `artifact-storage-rules` 沉淀需求文档。 |
-| `requirement-gap-rules`       | 只处理主动侦察后仍缺少的关键前提、字段、流程、业务规则等内容；先生成临时缺口文档，用户确认后回填主需求文档并删除临时缺口文档。 |
+| `requirement-intake-rules` / `gap-routing` | 只处理主动侦察后仍缺少的关键前提、字段、流程、业务规则等内容；先生成临时缺口文档，用户确认后回填主需求文档并删除临时缺口文档。 |
 | `requirement-boundary-rules`  | 判断需求边界、影响范围、上下游、非目标范围，防止越界实现。                                                |
 | `requirement-splitting-rules` | 把大需求拆成可执行的小任务项，明确模块拆分和实施顺序。                                                    |
 | `implementation-planning-rules` | 把确认后的来源对象（需求或 Bug）转成实施总览与实施周期，作为独立实施域进入编码前的正式入口；新项目或多来源对象先维护“需求与实施计划全量顺序实施方案”作为跨需求执行顺序总表；实施周期按第一期 / 第二期 / 第三期等大进度排序，周期内继续拆到最小任务闭环；当前上下文处于 `Plan Mode` 时，它还是第一层计划外壳，先命中再回流需求侦察、需求接入、缺口、边界、拆分或其他域。                              |
@@ -852,3 +851,4 @@ claude-mem(记忆) :
 2026-07-22 08:25:22 feat: [六域Skill精简] 合并重复规则并保留自动触发
 2026-07-22 08:29:17 docs: [需求域精简] 归档自动触发入口收敛
 2026-07-22 08:29:38 docs: [实施域精简] 归档全链路实施计划与周期
+2026-07-24 00:44:15 refactor: [总控层 Skill] 合并路由并收口执行规则

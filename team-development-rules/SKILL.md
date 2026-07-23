@@ -5,81 +5,70 @@ description: 当任务阶段不明确、领域边界不清、多个 skill 同时
 
 # 团队研发总控规则
 
-仅在研发流程需要协调时使用这个 skill。
-如果当前任务已经是明确的小型单域任务，立即让位给对应的小 skill，不要抢执行权。
+仅在阶段不明、Skill 冲突、存在跳阶段风险，或需要裁决暂停/重启/继续/终止时使用。
+任务已是明确的小型单域任务时立即让位，不抢执行权。
 
 ## Skill 作用与适用场景
 
-- 先判断当前处于需求、Bug、编码、编码审查、测试还是交付阶段。
-- 如果用户先问历史记录、历史方案或项目历程，先判断是否应进入记忆域。
-- 再判断应该交给哪个域或哪个小 skill 接手。
-- 在多个 skill 同时命中时做去重、裁决和让路。
-- 在前置条件未满足时阻断流程，防止跳阶段推进。
-- 进入编码阶段时，默认提醒联动 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，避免改动位点注释漏触发。
-- 前端样式排版异常（如对不齐、歪斜、间距错乱）默认先命中 `web-design-guidelines` 做审查，再由 `frontend-design` 实施修复。
-- 用户提交图片/截图时，默认先命中 `image-redbox-focus-rules`，优先聚焦红框标注区域再进入对应主域 skill。
-- Go 场景命中外部 skill 时，默认以本仓库内置自适应规则为主，外部 skill 仅作补充约束，不得覆盖内置强制规则。
+- 判断当前研发阶段和唯一主域 Owner。
+- 裁决多个 Skill 的先后、主辅和让路关系。
+- 发现前置条件缺失时阻断跳阶段推进。
+- 裁决暂停、重启、继续或终止，但不代替目标 Skill 执行细则。
+- 注释、图片红框、前端视觉、Go 内外规则等用户习惯保留在 `references/routing-rules.md` 与 `references/conflict-examples.md`，按需读取，不在入口正文重复展开。
 
 ## 自动触发信号
 
-- 新任务刚进入，但阶段不明确。
-- 用户问题可能是“历史回忆 / 项目历程”，但还不清楚该进入哪个记忆类 skill。
-- 描述同时像需求又像 Bug，或同时跨多个阶段。
-- 多个 skill 同时命中，可能重复、冲突或顺序错位。
-- 需要决定流程是暂停、重启、继续还是终止。
-- 用户明确要求按团队完整研发流程处理。
-- 用户直接给出“提交git / 提交 git / commit一下 / 帮我提交”这类执行型 Git 短指令，但当前上下文又混有阶段信息，可能被误分流；这类指令必须优先转交 `git-collaboration-rules`，不得先进入记忆、需求、Bug、编码或交付分流。
+- 当前阶段或领域边界无法唯一判断。
+- 同一输入同时像需求、Bug、编码、审查、测试或交付，存在竞争路由。
+- 多个 Skill 同时命中且职责、顺序或优先级冲突。
+- 用户要求暂停、重启、继续、终止或完整研发流程，且需要阶段裁决。
+- 当前动作疑似越过必要前置阶段。
+- 明确单域任务、明确 Git 动作或已有唯一 Owner 时不触发；Git 与阶段信息混杂且可能误路由时仅做冲突裁决，并立即让位给 `git-collaboration-rules`。
 
 ## 进入后先做什么
 
-1. 先判断当前阶段。
-1.1 若发现本轮尚未执行 `skill-hit-check-rules`，立即中断当前流程并回到命中检查步骤；在命中检查完成前不得继续任何领域动作或工具调用。
-2. 若用户输入执行型 Git 短指令（如“提交git”），优先直达 `git-collaboration-rules`，不等待“测试已完成”之类附加信号，也不得先路由到 `autonomous-execution-rules` 或 `delivery-summary-rules`。
-3. 如果问题明显是在查历史，优先判断是否应进入记忆域。
-4. 再判断这是需求类、Bug 类还是交付收口类问题。
-5. 每轮开局先路由到 `skill-hit-check-rules` 做命中检查，再进入具体主域；不要把它当成业务 skill，而要把它当成总控入口的一部分。
-6. 若任务包含图片/截图输入，先路由到 `image-redbox-focus-rules` 抽取红框重点，再路由到对应主域 skill。
-7. 若任务属于前端样式排版异常（如对不齐、歪斜、间距错乱），优先路由到 `web-design-guidelines` 做审查，输出问题清单后再路由到 `frontend-design` 修复。
-8. 若任务属于前端 UI、组件、样式的调整/改进或界面 Bug 修复（且非上述排版审查类），优先路由到 `frontend-design`，再按需叠加 `frontend-component-rules` 或 `frontend-ui-visual-rules`。
-9. 若任务属于 Go，先叠加本仓库内置 Go 相关规则（如 `package-structure-rules`、`api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`database-query-rules`、`database-schema-rules`），再按需叠加外部 skill（如 `golang-patterns`）。
-10. 如果已经进入写代码阶段，默认叠加 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`，再判断代码位点 skill。
-11. 最后判断当前流程是否应该被阻断，或是否允许进入下一阶段。
+1. 若本轮尚未完成 `skill-hit-check-rules`，立即停止并返回唯一首入口。
+2. 只确认本 skill 的触发原因：阶段不明、边界冲突、跳阶段或流程状态裁决。
+3. 当前轮存在明确 Git 动作时，优先交给 `git-collaboration-rules`，不继承历史轮次授权。
+4. 读取路由、阻断或冲突 reference，确定唯一主域和必要辅助 Skill。
+5. 输出当前阶段、接手 Skill、阻断状态、原因和允许的下一动作，然后退出。
 
 ## 默认执行流程
 
-1. 读取 `references/routing-rules.md`，判断当前任务应进入哪个域或 skill。
-2. 如果存在阶段跳跃风险，读取 `references/stage-blockers.md` 判断是否阻断。
-3. 如果存在多 skill 并行命中或冲突，读取 `references/conflict-examples.md` 做裁决。
-4. 输出当前阶段、建议接手 skill、是否阻断、阻断原因和下一步动作。
-5. 在结论明确后退出，不继续代替目标 skill 执行细则。
+1. 阶段或领域不明时读取 `references/routing-rules.md`。
+2. 怀疑跳阶段时读取 `references/stage-blockers.md`。
+3. 多 Skill 竞争时读取 `references/conflict-examples.md`。
+4. 涉及公共方法变更时按需读取 `references/05-method-change-guard.md`。
+5. 裁决完成后立即把执行权交还目标 Skill，不在总控层继续业务实现。
 
 ## 权责边界与不负责事项
 
-- 只负责阶段分析、路由分流、冲突裁决和流程阻断。
-- 不代替数据库、接口、配置、日志、错误处理、测试、交付等小 skill 执行细则。
-- 不因为任务涉及“全流程”就默认长期驻留在上下文中。
-- 对明确的小 skill 场景，只做一次分流或直接让路，不做主执行。
+- 不执行需求澄清、Bug 定位、编码、测试、审查、验收、交付或 Git 操作。
+- 不复制各领域 Skill 的参数、命令、证据、停止或回滚细则。
+- 不在已有明确 Owner 时重复分流。
+- 不以总控判断覆盖用户明确的安全、授权、停止和最大推进边界。
 
 ## 需要暂停并确认的条件
 
-- 需求和 Bug 无法判定，且两条路径会导向不同处理流程。
-- 当前任务同时跨两个阶段，但前一阶段的前置条件未满足。
-- 多个 skill 的规则明显冲突，且不能按既定优先级裁决。
-- 用户要求跳过关键环节，例如跳过需求澄清、Bug 定位、编码审查或测试。
+- 同一输入存在两个互斥主域且仓库事实无法裁决。
+- 前置条件缺失，继续会形成跳阶段或无授权执行。
+- 用户明确暂停、停止、终止或禁止某条路线。
+- 规则冲突涉及安全、写集、数据环境、Git 写历史或不可逆动作，无法由既有优先级消解。
 
 ## 执行通过 / 驳回标准
 
-- 通过：能够明确给出当前阶段、所属域、建议命中的 skill、是否阻断下一阶段，以及阻断原因。
-- 驳回：仍然无法说明任务归属，或把已经明确的小 skill 场景错误拦回总控层，或允许任务跳过关键前置阶段。
+- 通过：给出唯一主域、必要辅助 Skill、阶段状态和是否阻断，并及时让路。
+- 驳回：明确单域仍抢执行权、重复实现领域细则、越过前置阶段，或忽略用户停止与安全边界。
 
 ## 执行结果归档要求
 
-- 出现冲突裁决、阶段阻断、流程重启、流程终止时，将结论归档到 `analysis/` 或 `doc/6-审查/`。
-- 归档内容至少包含任务背景、当前阶段、裁决或阻断原因、下一步建议和涉及的 skill。
-- 如果只是普通分流且没有冲突或阻断，可以不单独归档。
+- 默认不新建文档；路由结论进入当前任务的中间进度或既有主任务产物。
+- 只有用户明确要求或主域规则要求时，才由对应文档 Owner 落盘。
 
 ## references 读取规则
 
-- 默认先读 `references/routing-rules.md`。
-- 只有在判断是否允许进入下一阶段时，再读 `references/stage-blockers.md`。
-- 只有在多个 skill 冲突、重复命中或顺序错位时，再读 `references/conflict-examples.md`。
+- 阶段/领域判断：`references/routing-rules.md`
+- 跳阶段：`references/stage-blockers.md`
+- 多 Skill 冲突与用户习惯：`references/conflict-examples.md`
+- 公共方法变更保护：`references/05-method-change-guard.md`
+- 不满足对应条件时不加载，避免总控正文再次膨胀。

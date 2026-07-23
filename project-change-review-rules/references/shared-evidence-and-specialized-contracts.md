@@ -74,7 +74,7 @@
 - 存在 P0/P1 未处理问题。
 - 当前 diff 边界不清，且无法确认改动是否完整。
 - 涉及安全、权限、数据库、接口契约、公共工具旧行为，但缺少必要验证或兼容说明。
-- 本轮存在代码改动，但未逐项核验或未完整满足 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules`：包括方法头 `[参数]` / `[返回]` / `最近修改时间` / 改动原因、字段定义或结构体字面量字段中文说明、步骤编号 `1/2/3` 就近注释、补丁“做了什么 + 为什么要加”注释任一缺失。
+- 本轮存在代码改动，但未取得 `comment-placement-granularity-rules` 与 `comment-completion-gate-rules` 的 PASS / FAIL、缺口和可复核证据，或任一 Owner 判定为 FAIL。详细注释字段只由两个注释 Owner 定义。
 - 改动明显违反项目 AGENTS/CLAUDE 规则或已命中 skill 的阻断条件。
 - 只看了 `git status`，没有读取实际 diff 或关键文件。
 

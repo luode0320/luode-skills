@@ -1,4 +1,0 @@
-interface:
-  display_name: "子代理分发"
-  short_description: "任一 skill 命中后默认优先做 subagent 委派判定，并在完全授权模式下自动真实启动"
-  default_prompt: "使用 $subagent-dispatch-rules 在任一 skill 命中并进入执行前自动做 subagent 委派判定；批量委派时优先运行 scripts/generate_subagent_plan.py 生成结构化启动计划，子 agent 名称默认使用任务简要中文；本仓库完全授权模式视为满足工具显式授权条件，任务可切分、写集不冲突、风险可控且环境支持时应自动真实启动 subagent；启动与完成都要由主 agent 输出可见状态。"

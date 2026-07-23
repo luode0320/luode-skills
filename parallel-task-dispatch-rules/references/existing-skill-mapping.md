@@ -40,7 +40,7 @@
 - `test-regression-rules`
   - 做什么：判断修复或改动后需要补哪些回归测试。
   - 建议：条件并行，仅在回归覆盖范围能按模块或服务稳定拆分时。
-- `subagent-dispatch-rules`
+- `parallel-task-dispatch-rules`
   - 做什么：判断是否需要派发子代理，并定义子任务边界。
   - 建议：条件并行，它是分发器，不是执行器；应与本 skill 配合使用。
 - `acceptance-criteria-rules`
@@ -58,7 +58,7 @@
 - `bug-fix-proposal-rules`
   - 做什么：形成修复方案、评估风险和备选路径。
   - 建议：必须串行，当修复方案会改同一条代码路径或共享抽象时。
-- `requirement-gap-rules`
+- `requirement-intake-rules`（`gap-routing`）
   - 做什么：识别需求描述里的缺口、歧义和未收敛项。
   - 建议：必须串行，它负责先把需求补完整，再进入后续工作。
 - `requirement-boundary-rules`
@@ -79,7 +79,7 @@
 
 ## 分发建议
 
-- `parallel-task-dispatch-rules` 负责并行判定与线程规划，`subagent-dispatch-rules` 负责授权确认与真实启动；两者应视为“规划器 + 执行器”组合，不应只跑前者。
+- `parallel-task-dispatch-rules` 在一个入口内完成并行判定、线程规划、授权确认、真实启动、回收与关闭；不得只做规划而跳过生命周期证据。
 - 注释补充、实现自审和当前 diff 总审查这类工作，只有在文件归属明确后才并行。
 - 只读审查可以并行检查同一批文件；真正的代码修改、注释补写和格式修正仍要按文件写入串行。
 - 同一文件内的代码修改和注释修改必须串行，不能拆成多个线程同时写。

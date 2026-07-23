@@ -1,9 +1,9 @@
 # 子 agent 启动计划 Schema
 
-`subagent-dispatch-rules` 在需要批量启动子 agent 时，先运行：
+`parallel-task-dispatch-rules` 在需要批量启动子 agent 时，先运行：
 
 ```bash
-python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-input.json>
+python parallel-task-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-input.json>
 ```
 
 脚本只负责生成“启动计划 JSON”，不直接调用平台工具。
@@ -14,7 +14,7 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
 ```json
 {
   "task_summary": "补充子代理启动计划脚本并测试",
-  "execution_skill": "subagent-dispatch-rules",
+  "execution_skill": "parallel-task-dispatch-rules",
   "shared_constraints": [
     "不要回退他人改动",
     "不要修改写集外文件"
@@ -24,10 +24,10 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
       "thread": "A",
       "goal": "编写子 agent 计划脚本",
       "write_scope": [
-        "subagent-dispatch-rules/scripts/generate_subagent_plan.py"
+        "parallel-task-dispatch-rules/scripts/generate_subagent_plan.py"
       ],
       "read_scope": [
-        "subagent-dispatch-rules/SKILL.md"
+        "parallel-task-dispatch-rules/SKILL.md"
       ],
       "expected_output": "输出脚本变更摘要与自测结果",
       "agent_type": "worker",
@@ -47,7 +47,7 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
   - 脚本会从这里提取“任务简要中文”，作为各子 agent 名称前缀。
 - `execution_skill`
   - 选填。
-  - 默认 `subagent-dispatch-rules`。
+  - 默认 `parallel-task-dispatch-rules`。
 - `shared_constraints`
   - 选填。
   - 所有子 agent 共用的约束。
@@ -86,7 +86,7 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
 {
   "task_name": "补充子代理启动计划",
   "task_summary": "补充子代理启动计划脚本并测试",
-  "execution_skill": "subagent-dispatch-rules",
+  "execution_skill": "parallel-task-dispatch-rules",
   "planned_thread_count": 1,
   "max_concurrent": 5,
   "batch_count": 1,
@@ -100,10 +100,10 @@ python subagent-dispatch-rules/scripts/generate_subagent_plan.py --input <plan-i
       "goal": "编写子 agent 计划脚本",
       "expected_output": "输出脚本变更摘要与自测结果",
       "write_scope": [
-        "subagent-dispatch-rules/scripts/generate_subagent_plan.py"
+        "parallel-task-dispatch-rules/scripts/generate_subagent_plan.py"
       ],
       "read_scope": [
-        "subagent-dispatch-rules/SKILL.md"
+        "parallel-task-dispatch-rules/SKILL.md"
       ],
       "shared_constraints": [
         "不要回退他人改动",

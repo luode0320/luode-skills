@@ -1,4 +1,4 @@
 interface:
   display_name: "新会话预热"
-  short_description: "新会话开始时自动压缩最近 3 天项目上下文，并在必要时弱读取根目录设计文档"
-  default_prompt: "使用 $recent-context-bootstrap-rules 先扫描近 3 天的 ment、test、bug、doc、skill 和 git 提交，并补充读取当前项目根目录 `./skill`、`./.skills` 与系统 skills 的最小索引，压缩出与当前任务相关的前置上下文；如果当前任务涉及整项目架构梳理，再弱读取根目录 `项目设计.md` 及同类文档作为参考，然后进入对应主域继续处理。"
+  short_description: "新会话缺上下文时预热，或按恢复契约条件补近期事实"
+  default_prompt: "使用 $recent-context-bootstrap-rules 在新会话缺少项目近期事实时扫描近 3 天来源；若由 $context-compression-rules 调用，必须先确认 recent_context_state=missing，并只补共享 context-recovery-contract 记录的缺失项。当前上下文充分、状态 uncertain 或用户已停止时不得触发；完成后输出来源、补齐项、仍缺项并立即交还主域。"

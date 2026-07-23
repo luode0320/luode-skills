@@ -16,7 +16,7 @@
 
 - 当前信号：用户提出新接口，但字段、鉴权和返回结构都不完整，同时要求直接开始实现。
 - 应命中：`team-development-rules` + 需求域 skill。
-- 裁决：先进入 `requirement-gap-rules` 和 `requirement-boundary-rules`，不允许直接进入编码。
+- 裁决：先进入 `requirement-intake-rules` 的 `gap-routing` 和 `requirement-boundary-rules`，不允许直接进入编码。
 - 原因：阶段优先，需求前置条件未满足。
 
 ### 样例 2：新增接口同时命中多个位点 skill
@@ -65,7 +65,7 @@
 
 - 当前信号：用户提出一个新需求，同时要求先回忆以前有没有做过类似页面、接口或流程。
 - 应命中：`history-recall-rules` + 需求域 skill。
-- 裁决：先由 `history-recall-rules` 补回历史方案和历史结论；历史补齐后回到 `requirement-intake-rules` / `requirement-gap-rules` 继续做当前需求澄清。
+- 裁决：先由 `history-recall-rules` 补回历史方案和历史结论；历史补齐后回到 `requirement-intake-rules` 的主流程或 `gap-routing` 继续做当前需求澄清。
 - 原因：历史回忆只是辅助信息，不代替当前需求分析；先补上下文，再继续需求主流程。
 
 ### 样例 9：用户要求“写项目历程报告”，但当前也需要交付说明

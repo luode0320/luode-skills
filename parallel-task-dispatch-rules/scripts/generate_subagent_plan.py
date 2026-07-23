@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_EXECUTION_SKILL = "subagent-dispatch-rules"
+DEFAULT_EXECUTION_SKILL = "parallel-task-dispatch-rules"
 DEFAULT_TASK_NAME = "并行子任务"
 MAX_TASK_NAME_LENGTH = 10
 # 与 SKILL.md「并发上限与空闲回收（强制）」规定的并发上限保持一致，脚本不提供覆盖参数

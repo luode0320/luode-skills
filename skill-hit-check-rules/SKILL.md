@@ -1,113 +1,98 @@
 ---
 name: skill-hit-check-rules
-description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。凡本轮新增或修改任意 `*_test.go` 或涉及测试程序/mock/fixture/数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules` 并路由到 `test-strategy-rules`，且源码目录严禁创建 `*_test.go`。
+description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。
 ---
 
 # Skill 命中检查规则（最小闭环版）
 
 ## -1.4 极简硬闸门（强制）
-- 每轮首条中间进度最少要求以下字段：
+
+- 本 skill 是每轮用户新消息的唯一首入口，必须先完成命中检查，再执行任何领域动作。
+- 首条中间进度固定包含：
   - `命中检查:<通过/阻断>; Git规则:<通过/不适用/阻断>`
   - `命中技能:<skill1,skill2,...>`
-- 仓库任务必须追加一行：`Obsidian:<检索/沉淀/不适用/阻断>`。
-- 若本轮存在 Git 意图，`Git规则` 不得为 `不适用`。
-- 未输出上述必填行即判定 `阻断`，禁止执行领域命令。
+  - 仓库任务追加 `Obsidian:<检索/沉淀/不适用/阻断>`
+  - 命中 `parallel-task-dispatch-rules` 时追加 `并行技能:<skill.../无>`
+- 固定字段的 Markdown 形态以 `references/output-format.md` 为准；缺少必填字段即阻断领域执行。
 
 ## -1.5 违规处理（强制）
-- 若发生“先执行命令、后做命中检查”，立即停止后续命令并重启流程。
-- 重启后仅需补齐两行命中输出，不再强制输出额外恢复提示文案。
+
+- 若发生“先执行命令、后做命中检查”，立即停止后续命令，补齐固定字段后重走命中流程。
+- 不得用额外恢复文案替代固定字段，也不得把迟到的命中声明伪装成首条合规。
 
 ## -1. 触发确认（强制）
-- 每轮用户新消息都必须命中本 skill，且必须先执行命中检查，再执行任何领域动作。
-- 若处理本仓库任务，必须同时命中 `parallel-task-dispatch-rules`。
-- 若处理本仓库任务，必须先做 Obsidian 选择性默认判断：依赖历史知识、知识库内容、用户偏好、重复实体或长期项目事实时判定 `检索`；阶段收口或最终回复前形成可复用事实、决策、流程、定义、来源或调试经验时判定 `沉淀`；无上述价值时判定 `不适用`；CLI / vault 不可用且影响检索或沉淀时判定 `阻断`。
-- Obsidian 判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`，并按该 skill 的 `SKILL.md` 与必要 references 执行；判断为 `不适用` 时不得为了形式调用 Obsidian CLI。
-- 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，推荐同时命中 `skill-audit-rules`。
-- 若本轮新增或修改任意 `*_test.go`，或涉及测试程序 / mock / fixture / 数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules`，并路由到 `test-strategy-rules` 的 test-asset-governance；【硬规则】源码目录（`internal/`、`common/`、`api/`、`cmd/`、`utils/`、`app/` 等）严禁创建 `*_test.go`，Go 测试须落 `doc/5-tests/<时间戳>/` ASCII 镜像，白盒诉求改 seam。
-- 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须同时命中 `skill-execution-compliance-gate-rules` 做收口闸门；详见「## 2.3 Skill 资产改动联动闸门」。
-- 若用户消息包含任一 Git 意图（关键词或语义），必须同时命中 `git-collaboration-rules`。
-- 若应命中未命中，判定 `阻断`，禁止继续执行对应领域命令。
+
+- 每轮都命中本 skill；自动触发不依赖用户点名，也不因任务简单而跳过。
+- 仓库任务联动 `parallel-task-dispatch-rules` 并执行 Obsidian 选择性判断。
+- 当前轮存在 Git 意图时联动 `git-collaboration-rules`；只识别当前轮，不继承历史授权。
+- 修改 Skill 资产时联动 `skill-execution-compliance-gate-rules`，并按职责边界追加 `skill-evolution-rules`、`skill-audit-rules`。
+- 联动条件、用户习惯、负向边界和漏触发防护统一见 `references/hit-checklist.md`；本入口不复制各 Owner 的执行细则。
 
 ## -1.0 新会话首轮保障（强制）
-- 新会话第一条用户消息与普通轮次同等处理，不得因“缺少历史上下文”跳过本 skill。
-- 无论是否已加载其他 skill，首条中间进度必须先输出“Skill 命中检查”，之后才能执行任何命令。
-- 若首轮直接执行了领域命令（如 `git status`、`npm`、`go test`）而未先输出命中检查，判定为流程违规。
+
+- 新会话第一条与普通轮次同等处理，必须先输出命中检查。
+- 新会话的规则文件和项目上下文准备交给对应自举或恢复 Skill；本 skill 只负责确认已正确联动，不代替其执行。
 
 ## -1.1 Git 意图识别（强制）
-以下任一命中即视为 Git 意图，不要求用户必须出现单词 `git`：
-- 显式关键词：`git`、`commit`、`push`、`pull`、`rebase`、`merge`、`cherry-pick`、`stash`、`status`、`diff`、`log`
-- 中文动作词：`提交`、`推送`、`拉取`、`合并`、`变基`、`暂存`、`提交代码`、`提代码`
-- 高频口语表达：`提交git`、`帮我提交`、`commit一下`、`给我推上去`、`看下git状态`、`看下改动`
-- 语义等价表达：请求“把当前改动入库/提交到分支/同步到远端/查看当前提交记录”
 
-未命中上述字面词但语义上等价时，仍必须判定为 Git 意图并联动命中 `git-collaboration-rules`。
+- Git 关键词、中文动作词、口语表达和语义等价表达的识别清单见 `references/hit-checklist.md`。
+- 一旦当前轮命中 Git 意图，必须联动 `git-collaboration-rules`；具体盘点、提交、推送、证据和回退步骤只由该 Skill 定义。
 
 ## -1.1.1 Git 仅限当前轮次（新增，强制）
-- Git 意图判定只基于“当前这轮用户消息”，不得引用、继承或延续历史轮次里出现过的 `提交git`、`commit一下`、`推送代码` 等表达。
-- 若当前这轮用户消息未出现 Git 意图，即使之前某一轮已经说过“提交git”，本轮的 `Git规则` 也必须判定为 `不适用` 或 `阻断`，不得继续执行 Git 协作命令。
-- 不得因为“上一轮已进入 Git 流程”“刚刚提交过一次”就默认本轮继续沿用 Git 协作授权。
+
+- Git 意图和写历史授权只基于当前轮用户消息。
+- 当前轮未出现 Git 意图时，不得沿用先前轮次的提交、推送、合并或同步授权。
 
 ## -1.2 Git 判定优先级（强制）
-- 若同一消息同时命中多个领域，Git 判定优先级高于普通开发任务，必须先联动命中 `git-collaboration-rules`。
-- 只要用户意图中包含“提交/推送/查看改动或状态/同步分支”等 Git 协作动作，不得以“需求过短”或“口语化表达”降级为普通对话。
+
+- 同一消息同时命中 Git 与其他领域时，先确认 Git 联动，再进入其他领域判断。
+- 本优先级只保证不漏触发，不授权越过 `git-collaboration-rules` 的安全和提交边界。
 
 ## -1.3 新会话首轮联动（强制）
-- 若为新会话第一轮，必须同时命中 `project-rule-file-bootstrap-rules`（不依赖用户意图）。
-- 命中后需先执行仓库根目录规则文件检测（Codex 检查 `AGENTS.md`，Claude Code 检查 `CLAUDE.md`）：若缺失则先补齐，再继续主任务。
-- 未联动 `project-rule-file-bootstrap-rules` 或跳过规则文件检测，判定 `阻断`。
-- 若首轮检测到根目录规则文件不存在，必须先创建完成；创建完成前一律禁止进入主任务（包括分析、读码、执行命令、修改代码）。
-- 若出现”先做主任务、后补规则文件”的顺序，按严重流程违规处理：立即停止当前任务，回滚到首轮闸门重走。
+
+- 新会话按当前平台联动规则文件与项目上下文自举；缺失或损坏时由对应 Owner 修复。
+- 自举未完成时禁止进入主任务；详细文件范围、幂等和用户内容保护不在本 skill 重复定义。
 
 ## 0. 首条消息格式（强制）
-每轮第一条中间进度必须以以下模板开头：
-- `templates/hit-check-template.md`
-- 模板必须按普通 Markdown 渲染：`**Skill 命中检查**` 标题独立一行，字段行整行使用单反引号包裹；不得放入代码围栏（三反引号 / 三波浪线）、缩进代码块或 HTML。
-- 最小必填两行（可在模板基础上扩展，但不得缺失）：
-  - `命中检查:<通过/阻断>; Git规则:<通过/不适用/阻断>`
-  - `命中技能:<skill1,skill2,...>`
-- 仓库任务还必须追加：
-  - `Obsidian:<检索/沉淀/不适用/阻断>`
+
+- 使用 `templates/hit-check-template.md`，并遵守 `references/output-format.md`。
+- 标题、字段、Git、Obsidian 与并行行必须使用普通 Markdown，不得放进代码围栏、缩进代码块或 HTML。
 
 ## 1. 最小流程
-1. 判定命中 skill（基于用户本轮请求）
-2. 首条输出两行命中信息
-3. 若为新会话第一轮，先执行 `project-rule-file-bootstrap-rules` 的规则文件检测（Codex → `AGENTS.md`，Claude Code → `CLAUDE.md`）
-4. 若缺失则立即创建规则文件，创建完成前禁止进入主任务
-5. 仅当规则文件已存在（原有或新建）后，才允许进入主任务执行
+
+1. 基于当前轮请求匹配所有可用 Skill 的 `description` 与条件路由。
+2. 输出固定首条字段。
+3. 执行 Git、并行、Obsidian、Skill 资产及新会话自举的联动摘要判断。
+4. 将执行权交给对应 Owner Skill；本入口不复制领域流程。
 
 ## 1.1 首条闸门（强制阻断）
-若本轮命中任一 skill，但首条中间进度未按模板输出“Skill 命中检查”，则不得执行对应领域命令。
-特别地：命中 `git-collaboration-rules` 时，未输出两行命中信息前，禁止执行任何 `git` 命令（`status` 与 `diff --cached --stat` 盘点命令除外）。
+
+- 未完成固定首条字段时，不得执行对应领域命令。
+- Git 场景的盘点例外与后续许可边界以 `git-collaboration-rules` 为准。
 
 ## 1.2 执行期失败联动（强制）
-- 工具、命令、API、模型、浏览器、MCP、安装器、生成器或测试入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，立即联动 `execution-failure-learning-rules`，不得先做第二次无变化重试。
-- 已注册高风险 owner Skill 即将执行模型、CLI、浏览器、安装或生成器调用时，先由 `execution-failure-learning-rules` 检索 active 案例；精确匹配才允许应用，版本、环境或输入不匹配时必须重新诊断。
-- 预期负向测试、用户取消、权限阻断和业务 Bug 不进入执行案例；分别转测试域、恢复/授权处理或 `bug-*`。
+
+- 非预期失败或“退出码成功但产物不达标”时，联动 `execution-failure-learning-rules`，不得无变化重试。
+- 失败分类、active 案例、恢复和沉淀全部由该 Skill 定义，本入口只负责不漏触发。
 
 ## 2. Git 联动闸门（强制）
-若命中 `git-collaboration-rules`，则：
-1. 本 skill 只校验 Git 场景是否正确联动 `git-collaboration-rules`，不定义具体提交步骤、证据清单或仓库脚本。
-2. Git 提交、推送、状态盘点、证据输出和等价回退检查，以 `git-collaboration-rules` 的当前规则为准。
-3. 不得在本 skill 中硬编码项目本地脚本路径；仓库是否存在提交前后 gate 脚本，由 Git 协作 skill 或项目级规则自行判定。
+
+- 本 skill 只校验当前轮是否正确联动 `git-collaboration-rules`。
+- Git 操作、脚本、证据、提交标题和回退检查以 `git-collaboration-rules` 为唯一事实 Owner。
 
 ## 2.3 Skill 资产改动联动闸门（强制）
-若本轮新增或修改任意 skill 资产（`SKILL.md`、`references/`、`scripts/`、`agents/` 等）：
-1. 必须命中 `skill-execution-compliance-gate-rules`，并在收口前给出 PASS / FAIL 结论；未给出不得宣称完成。
-2. 若改动了 skill 的 `description` 或触发条件，必须追加命中 `skill-evolution-rules`。
-3. 若涉及多个 skill、职责边界或规则收口风险，必须追加命中 `skill-audit-rules`。
-4. 若改动了任一 skill 的 `description` 或新增 / 修改了 `##` 级标题，收口前必须重新运行 skill 字典生成脚本（`python skill-dictionary/generate_dictionary.py`），刷新 `data.js` 与 `字典.md`，禁止手改生成产物。
-5. 以上联动未走完，不得进入最终收口。
+
+- 本 skill 只输出联动摘要：是否命中执行合规、演进和多 Skill 审计。
+- PASS / FAIL、保护语义、迁移证据和字典刷新要求以 `skill-execution-compliance-gate-rules`、`skill-evolution-rules`、`skill-audit-rules` 为准。
 
 ## 3. 通过标准
-- 首条中间进度与最终回复都含“Skill 命中检查”
-- 仓库任务下已正确联动 `parallel-task-dispatch-rules`
-- 仓库任务下已输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时已正确联动 `obsidian-knowledge-flow`
-- Git 场景下已正确联动 `git-collaboration-rules`
-- 无“只命中未执行”
-- 最终回复必须包含固定校验行：
-  - `命中检查:通过`
-  - 仓库任务追加：`Obsidian:<检索/沉淀/不适用/阻断>`
-  - Git 场景追加：`Git规则:通过`
+
+- 每轮先完成固定命中字段，且真实执行所有已命中 Skill 的必要步骤。
+- Git、并行、Obsidian、Skill 资产和失败恢复均已正确联动，没有在本入口复制 Owner 细则。
+- 最终回复保留 `命中检查:通过`；仓库任务保留 Obsidian 状态；Git 场景保留 `Git规则:通过`。
 
 ## 4. 执行文件
+
 - `templates/hit-check-template.md`
+- `references/output-format.md`
+- `references/hit-checklist.md`

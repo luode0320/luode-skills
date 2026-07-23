@@ -15,6 +15,8 @@ description: 当统一智能体运行期间出现 MCP、插件、浏览器会话
 
 禁止以下动作：猜测进程名或 CLI 参数；没有 capability 声明就重载/重启；用 UI 点击、强杀任意同名进程或删除配置冒充宿主恢复；自动重放未知幂等性的写操作；把工具恢复误报为任务续接；跨 local 配置连接 test、staging、pre、release 或 production 环境。
 
+`task-plan-rehydration-rules` 通过 `PROJECT_CURRENT.md` 和 `update_plan` 重建悬浮任务列表，只属于展示层 rehydration，不是本 Skill 的 L5 checkpoint/resume。它不能把 `restarted`、`manual_handoff` 或未知执行结果提升为 `resumed`，也不能恢复执行授权。
+
 ## 能力等级
 
 adapter 必须声明组件、版本、作用域、支持的操作、权限边界、副作用、回滚和验证入口。能力等级是上限，不是保证：只有动作成功且健康验证通过才可推进状态。
@@ -75,6 +77,8 @@ stateDiagram-v2
 ## 幂等性与续接
 
 调用方必须把原操作标为 `read_only`、`idempotent`、`idempotent_with_key` 或 `non_idempotent`。只有前三类可以在 L5 经过恢复后自动重放；`non_idempotent` 只能查询目标状态、记录不确定结果并转 `manual_handoff`。重放必须使用原请求的幂等键或等价去重凭据，且仍满足原成功标准。
+
+悬浮任务列表中的 `in_progress` 只表示中断前展示状态，不证明原操作未执行或可以重放。恢复后必须先查询真实磁盘、测试和目标系统状态，再按上述幂等性分类处理。
 
 检查点只保存脱敏控制信息，不保存完整 prompt、响应、凭据、业务数据、图片或原始用户输入。最小字段与校验规则见 [adapter-contract.schema.json](references/adapter-contract.schema.json)。
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# bootstrap_agents.sh: 检查并补齐仓库规则文件（project-rule-file-bootstrap-rules）与项目记忆四件套（project-memory-file-bootstrap-rules）共用入口
+# bootstrap_agents.sh: project-rule-file-bootstrap-rules 的唯一入口，统一执行 rule-bootstrap 与 memory-bootstrap
 # 用法:
 #   bootstrap_agents.sh
 #   bootstrap_agents.sh --repo /path/to/repo
@@ -154,7 +154,7 @@ detect_dominant_eol() {
 }
 
 # ---- 受管章节正文（单引号 heredoc，原样保留反引号等特殊字符）----
-# 章节内容以本脚本（project-rule-file-bootstrap-rules 与 project-memory-file-bootstrap-rules 共用）为权威源，创建与同步共用同一份正文，避免脱节。
+# 章节内容以本脚本（project-rule-file-bootstrap-rules 唯一 owner）为权威源，创建与同步共用同一份正文，避免脱节。
 
 BODY_LANGUAGE=$(cat <<'EOF'
 - 【最高优先级，强制】本仓库所有面向用户的自然语言输出——最终回复、中间进度、工具叙述、模型推理 / 思考过程（reasoning）——默认一律使用简体中文。
@@ -170,7 +170,8 @@ EOF
 )
 
 BODY_NOTICE=$(cat <<'EOF'
-- 我们允许api等私密数据直接存放写死代码。
+- 允许在代码、文档和配置中使用环境变量名、占位符和空配置模板。
+- 禁止将真实 API key、token、密码、私钥、连接串原值或其他敏感配置写入代码、文档、日志、输出或 Git 提交。
 EOF
 )
 
@@ -196,6 +197,7 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 - `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
+- `PROJECT_CURRENT.md` 中的唯一任务投影托管区由 `task-plan-rehydration-rules` 管理。新会话、上下文恢复或 Desktop 重开后的首次继续回合检测到有效活动投影时，必须在领域动作前调用 `update_plan` 重建悬浮任务列表；UI 重建不恢复执行授权，进行中步骤先核验中断点。
 
 ### Obsidian 知识流选择性默认触发（强制）
 
@@ -233,7 +235,7 @@ EOF
 BODY_SKILL_HIT=$(cat <<'EOF'
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
-- 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-rule-file-bootstrap-rules` 进行规则文件自举补齐；若同时涉及项目记忆四件套，联动 `project-memory-file-bootstrap-rules`；两条规则同样适用于其他项目仓库。
+- 若本轮涉及创建、补齐或更新仓库级规则文件，或同时涉及项目记忆四件套，默认额外启用 `project-rule-file-bootstrap-rules`，由其 `rule-bootstrap` / `memory-bootstrap` 条件路由统一自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -255,6 +257,7 @@ BODY_SKILL_HIT=$(cat <<'EOF'
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 自动审查白名单只保留 `implementation-review-rules` 与最终收口前的 `project-change-review-rules`。
+- 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-evolution-rules` 或功能测试；未授权不得晋级 active。
 - `project-change-review-rules` 同时支持两类触发：用户明确要求审查当前改动，或本轮存在代码改动且准备最终收口。
 - `code-review-automation-rules` 仅用于当前分支提交级审查，不纳入默认自动审查链。
 - 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-evolution-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
@@ -292,7 +295,7 @@ EOF
 
 BODY_THREAD_TITLE=$(cat <<'EOF'
 - 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
-- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 环境优先使用真实 `set_thread_title` 工具，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认视为无真实自动改名工具并显式跳过。
+- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按真实工具发现结果更新当前会话标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 修正重试仍失败则直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在可直接作用于当前会话的 `set_thread_title` 时回退一次，MCP 成功后停止。其他宿主只按真实工具能力执行，不按模型名称推断能力。
 - 会话重命名不等待用户显式要求，也不等待最终总结；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，都应在过程中尽早尝试重命名。
 - 但任务主题尚未稳定、标题已准确、工具不可用、无法可靠确定当前会话 ID、用户明确禁止，或只是最小任务内部小步骤推进时必须跳过，并说明原因。
 - `CLAUDE.md` 仅用于 Claude Code 仓库规则自举，不等同于 Claude Desktop 已具备自动会话改名能力。
@@ -313,7 +316,7 @@ BODY_CONTEXT_COMPRESS=$(cat <<'EOF'
 - 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
 - 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
 - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
-- 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-rule-file-bootstrap-rules` 补齐规则文件；若项目记忆四件套同样缺失或不完整，联动 `project-memory-file-bootstrap-rules` 补齐，再继续主任务。
+- 若压缩后发现规则文件或项目记忆四件套缺失、损坏或结构不完整，必须先触发 `project-rule-file-bootstrap-rules`，按 `rule-bootstrap` / `memory-bootstrap` 条件路由补齐后再继续主任务。
 EOF
 )
 
@@ -616,6 +619,20 @@ PROJECT_CURRENT_TEMPLATE=$(cat <<'EOF'
 ## 下一执行点
 
 - 待补充
+
+<!-- BEGIN TASK PLAN PROJECTION -->
+```json
+{
+  "version": 1,
+  "state": "inactive",
+  "plan_key": "",
+  "source_document": "",
+  "plan_fingerprint": "",
+  "updated_at": "1970-01-01T00:00:00Z",
+  "steps": []
+}
+```
+<!-- END TASK PLAN PROJECTION -->
 EOF
 )
 
@@ -725,7 +742,7 @@ create_project_memory_file() {
 
 ## 变更记录
 
-- 2026-07-03: 由 `project-memory-file-bootstrap-rules` 初始化双区骨架
+- 2026-07-03: 由 `project-rule-file-bootstrap-rules` 的 `memory-bootstrap` 初始化双区骨架
 
 ## 机器索引区
 

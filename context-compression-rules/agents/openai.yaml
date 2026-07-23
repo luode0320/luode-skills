@@ -1,4 +1,4 @@
 interface:
   display_name: "上下文压缩"
-  short_description: "上下文压缩完成后自动补载 skills 和记忆，输出可继续执行的最小上下文包"
-  default_prompt: "使用 $context-compression-rules，在压缩完成后联动 $recent-context-bootstrap-rules 加载最近上下文和 skill 索引（系统的所有 skills 与 `./.skills`），再整理成可继续执行的最小摘要；必须输出编码许可状态（confirmed/not-confirmed/unknown），若非 confirmed 则不得直接进入编码。"
+  short_description: "压缩后恢复规则与当前状态，仅在缺近期事实时条件预热"
+  default_prompt: "使用 $context-compression-rules 按共享 context-recovery-contract 重载当前平台规则文件与项目当前上下文，恢复目标、范围、验证、下一执行点和编码许可；PROJECT_CURRENT 存在任务投影时先调用 $task-plan-rehydration-rules，真实 update_plan 后记录 task_projection，进行中步骤先核验；再判定 recent_context_state，只有明确为 missing 时才联动 $recent-context-bootstrap-rules。"

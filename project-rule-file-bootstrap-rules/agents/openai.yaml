@@ -1,4 +1,4 @@
 interface:
-  display_name: "规则文件自举"
-  short_description: "检测并幂等同步 AGENTS.md / CLAUDE.md、.gitattributes、.editorconfig 的受管章节"
-  default_prompt: "使用 $project-rule-file-bootstrap-rules，检测并调用 scripts/bootstrap_agents.sh 补齐或同步当前 AI 对应的规则文件（Codex 用 AGENTS.md，Claude Code 追加 --target claude），并确认 .gitattributes、.editorconfig 已存在；四件套内容不在本 skill 范围内。"
+  display_name: "项目规则与记忆自举"
+  short_description: "统一执行规则文件与项目记忆骨架的双路由幂等自举"
+  default_prompt: "使用 $project-rule-file-bootstrap-rules，根据触发条件执行 rule-bootstrap 和 memory-bootstrap：调用唯一 scripts/bootstrap_agents.sh，补齐或同步 AGENTS.md / CLAUDE.md、.gitattributes、.editorconfig、PROJECT_CURRENT.md、PROJECT_MEMORY.md、PROJECT_HISTORY.md；新建 PROJECT_CURRENT 时包含 task-plan-rehydration-rules 的 inactive 空投影槽位，既有文件不重写；保护非受管内容，校验 UTF-8、51200 字节、机器索引和历史只追加，不做事实抽取。"

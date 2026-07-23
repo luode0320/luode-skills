@@ -27,7 +27,7 @@
 | 用户明确问“上次怎么做的”“之前有没有修过 / 做过 / 讨论过”“以前类似问题怎么处理” | 记忆域 / `history-recall-rules` | 先补回历史上下文，再回到需求、Bug、编码或交付主流程 |
 | 用户要求输出项目开发历程、关键决策回顾、项目时间线报告 | 记忆域 / `project-timeline-rules` | 这是长期历史分析，不等于当前一次交付摘要 |
 | 用户提出新功能、新页面、新接口、新模块，尚未开始写代码，且没有显式索要计划 | 需求域 / `requirement-intake-rules` | 先理解目标、背景、输入输出和上下游 |
-| 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-gap-rules`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现；若仍可继续侦察，优先回流 `requirement-intake-rules` 的 `initial-discovery` 路由 |
+| 需求描述缺字段、缺流程、缺边界、缺验收标准 | 需求域 / `requirement-intake-rules` 的 `gap-routing`、`requirement-boundary-rules`、`acceptance-criteria-rules` | 先补信息再实现；若仍可继续侦察，优先回流 `requirement-intake-rules` 的 `initial-discovery` 路由 |
 | 需求过大，涉及多个模块、多个页面、多个接口或多个实施波次 | 需求域 / `requirement-splitting-rules` | 先拆成可独立推进的子项，再决定实施顺序 |
 | 需求、边界和验收标准已基本稳定，但正式编码前仍需要先写实施方案、明确文件落点、任务顺序和验证闭环 | 实施域 / `implementation-planning-rules` | 单来源对象先转成可执行实施总览/实施周期；多来源对象先补全量顺序实施方案，再进入各来源对象实施总览/实施周期 |
 | 需求、前置验收标准与实施文档都已确认，且用户已明确“开始实施”“开始执行”或“按实施计划执行” | 连续执行链路 / `autonomous-execution-rules` + 实施/编码/测试/验收域 | 默认先定位当前实施周期（第一期、第二期、第三期等大进度），再按周期内最小任务逐个推进“实现 -> 真实测试 -> 审查 -> 验收”；当前周期全部最小任务收口后再进入下一周期，除阻断级节点外不在中间重复确认 |

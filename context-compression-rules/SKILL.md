@@ -1,81 +1,80 @@
 ---
 name: context-compression-rules
-description: 当当前会话已发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），并强制重新读取当前项目根目录 `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code），避免压缩后丢失 skill 记忆或仓库级硬规则，再输出可直接续做的最小上下文包；压缩包必须显式携带”是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。
+description: 当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责按共享 context-recovery-contract 重新读取当前平台规则文件与项目当前上下文，恢复目标、阶段、约束、必命中 skill 和“是否允许开始/继续实现代码”的许可状态；只有确认缺少继续任务所需的近期项目事实时，才条件联动 recent-context-bootstrap-rules 补载近 3 天上下文与 skill 索引。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。
 ---
 
 # 上下文压缩规则
 
-只在上下文压缩已经发生后使用这个 skill。
-如果当前会话没有发生压缩，不要提前触发它。
+只在上下文压缩已经发生后使用这个 skill；尚未压缩时不得提前触发。
 
 ## Skill 作用与适用场景
 
-- 在上下文压缩完成后，快速恢复任务继续所需的最小信息。
-- 在压缩后立即联动 `recent-context-bootstrap-rules`，补齐最近 3 天项目前情和 skill 候选能力。
-- 在压缩后强制重新读取当前项目根目录规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和流程闸门。
-- 统一区分“必须保留”“可折叠”“可丢弃”的信息层级，降低后续误判。
-- 产出可立即继续执行的压缩后上下文包，而不是仅输出泛化总结。
-- 显式恢复“编码许可状态”（`confirmed` / `not-confirmed` / `unknown`），防止压缩后误判为可直接编码。
+- 按共享恢复契约重建继续当前任务所需的最小上下文。
+- 强制重新读取当前平台规则文件和项目当前上下文，恢复仓库级硬规则与主线状态。
+- 判断近期事实是 `sufficient`、`missing` 还是 `uncertain`；不得把“发生压缩”直接等同于“必须预热最近 3 天”。
+- 只有确认状态为 `missing` 时，才条件联动 `recent-context-bootstrap-rules`。
+- 恢复编码许可状态 `confirmed` / `not-confirmed` / `unknown`；未确认默认 `unknown`，不得直接编码。
+- 输出可立即交还主域的最小上下文包，不代替主域执行。
 
 ## 自动触发信号
 
-- 刚完成一次“压缩上下文 / 自动压缩上下文 / 上下文太多”后的摘要重组。
+- 刚完成“压缩上下文 / 自动压缩上下文 / 上下文太多”后的摘要重组。
+- 系统自动压缩后准备继续执行当前任务。
 - 用户明确表示“已经压缩完了，继续”或“按压缩结果继续执行”。
-- 系统自动压缩上下文后，进入新一轮执行前的首个任务回合。
-- 压缩后主域即将继续执行，但存在“skill 记忆可能丢失”的风险。
-- 压缩后即将继续执行，但仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）规则可能已经脱离当前上下文。
+- 压缩后存在规则、Skill、范围、许可或下一执行点丢失风险。
 
 ## 进入后先做什么
 
-1. 先确认上下文压缩已经完成，而不是仍处在压缩前阶段。
-2. 立即联动 `recent-context-bootstrap-rules`，补齐最近活动摘要与可用 skill 索引。
-3. 强制重新读取当前项目根目录规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）；若项目存在仓库级硬规则，必须先恢复这些规则，再继续任何领域动作。
-4. 明确当前任务目标、当前阶段和下一步动作，防止压缩后丢主线。
-5. 恢复并标记“编码许可状态”：若未见明确确认证据，默认 `unknown`。
-6. 以“可继续执行”为目标，整理保留项、折叠项和剔除项。
-7. 输出最小上下文包后，立即转交当前主域 skill 继续执行。
+1. 确认压缩已经完成；未完成则不触发。
+2. 读取 `references/context-recovery-contract.md`，按固定顺序恢复规则、项目状态、目标、范围、验证和许可。
+3. 重新读取当前平台规则文件；项目存在 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 时按契约读取，不把 `PROJECT_HISTORY.md` 当作默认来源。
+4. `PROJECT_CURRENT.md` 存在任务投影托管区时，先调用 `task-plan-rehydration-rules` 校验有效活动投影并真实调用 `update_plan` 重建悬浮任务列表；失活、损坏、过期、工具不可用分别记录状态，不伪报恢复。
+5. 评估近期事实状态：只有明确缺少继续任务所需的最近改动、证据或执行点时才标记 `missing`。
+6. 状态为 `missing` 时条件联动 `recent-context-bootstrap-rules`；`sufficient` 时直接继续，`uncertain` 时先核验现有来源，不得无条件预热。
+7. 输出最小上下文包并交还当前主域。
 
 ## 默认执行流程
 
-1. 默认先读 `references/trigger-signals.md`，确认是否满足“压缩后自动触发”条件。
-2. 再读 `references/compression-playbook.md`，确认保留/折叠/剔除规则和压缩模板。
-3. 再读 `references/boundary-rules.md`，确认与 `recent-context-bootstrap-rules`、`history-recall-rules`、主域 skill 的让路关系。
-4. 强制联动 `recent-context-bootstrap-rules`，并按其规则加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的最小 skill 索引。
-5. 强制重新读取当前项目根目录规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）；若未完成该动作，判定为压缩收口未完成，禁止继续主任务。
-6. 输出压缩后的上下文包，至少包含：当前目标、已确认事实、关键约束、关键路径、待确认项、下一步动作、编码许可状态（`confirmed` / `not-confirmed` / `unknown`）、当前项目规则文件已重载状态。
-7. 压缩完成后立即退出，交还主执行权，不在本 skill 内停留。
+1. 读 `references/trigger-signals.md` 确认压缩后触发。
+2. 读 `references/context-recovery-contract.md` 执行共享恢复顺序和近期事实判定。
+3. 读 `references/compression-playbook.md` 生成保留、折叠和剔除结果。
+4. 读 `references/boundary-rules.md` 确认与近期预热、历史回忆和主域的边界。
+5. 读取当前状态后按 `task-plan-rehydration-rules` 输出 `task_projection` 恢复状态；进行中步骤只恢复 UI，不直接继续未知写操作。
+6. 仅当 `recent_context_state=missing` 时调用 `recent-context-bootstrap-rules`；否则记录未调用原因。
+7. 输出当前目标、已确认事实、约束、关键路径、待确认项、下一动作、编码许可、规则重载状态、任务投影和近期事实路由状态。
+8. 立即退出并交还主执行权。
 
 ## 权责边界与不负责事项
 
-- 只负责上下文压缩与信息降噪，不代替需求澄清、Bug 定位、编码实现或测试验证。
-- 不代替 `history-recall-rules` 的深度历史回忆。
-- 不代替 `project-timeline-rules` 的长期项目历程整理。
-- 不把压缩结果伪装成“已确认业务结论”。
-- 不因压缩而删除仍影响下一步决策的关键约束和风险。
-- 不得把压缩前“默认继续执行”误当成“已确认可开始/继续编码”。
-- 不得跳过当前项目根目录规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）的重新读取；若仓库级硬规则未恢复，禁止直接继续主任务。
+- 不代替需求、Bug、编码、测试、审查、验收或交付。
+- 不代替 `history-recall-rules` 的明确历史回溯，也不输出长期时间线。
+- 不把压缩摘要、旧记忆或近期材料伪装成当前已确认事实。
+- 不因压缩而删除仍影响决策的用户习惯、安全、授权、停止、回滚和范围边界。
+- 不得在规则未恢复或编码许可不是 `confirmed` 时继续编码。
+- 用户明确停止、终止或不要继续时，恢复动作只允许形成最小收口，不得重启原任务。
 
 ## 需要暂停并确认的条件
 
-- 用户明确拒绝压缩，要求保留完整原文上下文。
-- 当前关键信息存在冲突，压缩会放大误解风险。
-- 任务目标尚未明确，先压缩会导致主线断裂。
-- 最近上下文预热尚未完成，缺少可压缩的稳定输入。
+- 当前平台规则文件缺失、损坏或无法读取。
+- 现有摘要、项目状态与当前工作区事实冲突，无法确定有效来源。
+- 编码许可为 `not-confirmed` 或 `unknown`，但下一步要求修改代码。
+- 近期事实状态持续为 `uncertain`，且继续会引入错误决策。
+- 用户明确停止、终止或撤销继续执行授权。
 
 ## 执行通过 / 驳回标准
 
-- 通过：压缩后信息更短但可直接继续执行，且关键目标、约束、风险、下一步完整保留；编码许可状态明确；规则文件已重新读取且仓库级硬规则已恢复。
-- 驳回：压缩后虽然更短，但无法支持继续执行，或丢失关键约束导致方向错误；或未输出编码许可状态；或未重新读取当前项目根目录规则文件就直接继续主任务。
+- 通过：规则与项目状态已恢复，近期事实完成三态判定，只有 `missing` 才调用近期预热，编码许可和下一动作明确。
+- 驳回：压缩后无条件调用 `recent-context-bootstrap-rules`、跳过规则重载、把不确定内容写成事实，或未确认许可就继续编码。
 
 ## 执行结果归档要求
 
-- 默认不新建独立持久化文档，压缩包作为当前会话内过渡产物使用。
-- 如果压缩结论影响当前需求、Bug、测试或交付路径，应写回当前主任务文档。
-- 归档时至少包含：触发原因、压缩范围、保留项、剔除项、下一步动作。
-- 若压缩后补做了规则文件恢复，应在压缩包中显式记录”规则文件已重载”结论。
+- 默认不新建持久化文档；恢复结果进入当前会话上下文。
+- 若主域要求更新当前任务状态，由对应项目记忆或文档 Owner 执行，本 skill 不越权写入。
+- 最小证据包括规则重载状态、项目状态来源、近期事实三态、是否调用近期预热及原因、编码许可和下一执行点。
 
 ## references 读取规则
 
-- 默认先读 `references/trigger-signals.md`。
-- 再读 `references/compression-playbook.md`。
-- 只有在判断边界与让路关系时，再读 `references/boundary-rules.md`。
+- 触发判断：`references/trigger-signals.md`
+- 共享恢复契约：`references/context-recovery-contract.md`
+- 压缩模板：`references/compression-playbook.md`
+- 边界与让路：`references/boundary-rules.md`

@@ -4,7 +4,8 @@ interface:
   default_prompt: >-
     使用 $project-memory-rules 维护项目根目录四件套：先读取 `PROJECT_CURRENT.md`，再读取
     `PROJECT_MEMORY.md`；缺失的 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`
-    由 bootstrap 创建。`PROJECT_CURRENT.md` 覆盖式维护当前任务且不得超过 51,200 字节，
+    由 bootstrap 创建。`PROJECT_CURRENT.md` 覆盖式维护当前任务且不得超过 51,200 字节，并原样保留
+    `task-plan-rehydration-rules` 的唯一任务投影托管区，不解析、复制或改写其中字段；
     `PROJECT_HISTORY.md` 只追加关键事件并默认不读。`PROJECT_MEMORY.md` 只保存稳定规则、关键决策
     和长期事实，继续保留“人类阅读区 + 底部机器索引区”的兼容结构；不得新增
     `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。执行时必须完整读取 `PROJECT_MEMORY.md`，

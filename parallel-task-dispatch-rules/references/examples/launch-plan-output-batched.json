@@ -1,7 +1,7 @@
 {
   "task_name": "七个模块只读侦察排查",
   "task_summary": "七个模块只读侦察排查",
-  "execution_skill": "subagent-dispatch-rules",
+  "execution_skill": "parallel-task-dispatch-rules",
   "planned_thread_count": 7,
   "max_concurrent": 5,
   "batch_count": 2,
