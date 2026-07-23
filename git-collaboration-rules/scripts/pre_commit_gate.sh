@@ -35,7 +35,7 @@ classify_commit_domain() {
   esac
 
   case "$path" in
-    *_test.*|*.spec.*|*.test.*) printf 'test\n'; return 0 ;;
+    *_test.*|test_*.*|*.spec.*|*.test.*) printf 'test\n'; return 0 ;;
   esac
 
   printf 'implementation\n'

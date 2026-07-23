@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-23 17:50:46",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-07-24 01:14:51",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 75,
-    "implemented_total": 75,
+    "planned_total": 73,
+    "implemented_total": 73,
     "planned_missing": 0,
-    "seed_total": 33,
+    "seed_total": 34,
     "doc_total": 10,
-    "references_total": 554,
-    "agents_total": 88
+    "references_total": 562,
+    "agents_total": 87
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -24,10 +24,10 @@ window.SKILL_DICTIONARY = {
       "label": "总控层",
       "description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "order": 1,
-      "implemented_count": 20,
+      "implemented_count": 18,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 20,
+      "total_count": 18,
       "items": [
         {
           "id": "team-development-rules",
@@ -371,7 +371,7 @@ window.SKILL_DICTIONARY = {
         {
           "id": "project-rule-file-bootstrap-rules",
           "name": "project-rule-file-bootstrap-rules",
-          "title": "规则文件自举 Skill",
+          "title": "项目规则与记忆自举 Skill",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "orchestration",
@@ -379,63 +379,27 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 9,
-          "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图），且在规则文件、`.gitattributes`、`.editorconfig` 任一缺失或未完成受管章节同步前，阻断其余项目分析、需求、Bug、编码、测试与交付主任务；也可被“创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在的规则文件持续执行受管章节的增量幂等 upsert（覆盖 Skill 强制触发、严禁脑补工具调用、严禁自动提交 Git、Skill 命中强制规则、代码生成风格入口、Windows/WSL 执行、CodeGraph、插件检测、图像生成等章节），保留用户已有的非受管内容。若仓库命中 Godot 项目标记，还需额外补齐 Godot 工具接管与图像生成配置章节。不负责 `PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md` 四件套内容，四件套自举由 `project-memory-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 作为唯一执行入口，不重复实现或复制脚本逻辑。",
-          "core_responsibility": "负责检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在规则文件的受管章节做增量幂等 upsert，保留用户自定义内容；不负责项目记忆四件套。",
+          "auto_trigger": "新会话第一轮默认自动触发，不依赖用户点名；当 Codex 的 `AGENTS.md`、Claude Code 的 `CLAUDE.md`、`.gitattributes`、`.editorconfig`，或项目记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`，`PROJECT_STYLE.md` 按需）任一缺失、结构不完整、需要新会话交接或长期记忆首次初始化时也自动触发；同时兼容“创建、补齐或更新 AGENTS.md / CLAUDE.md”“补充仓库级规则”“根据 skill 更新项目 md”“初始化项目四件套”“补齐 PROJECT_CURRENT / MEMORY / HISTORY”等显式请求。作为项目自举唯一 owner，统一提供 `rule-bootstrap` 与 `memory-bootstrap` 两个条件路由：前者幂等创建或同步规则文件、`.gitattributes`、`.editorconfig` 及受管章节并保护非受管内容，后者维护 `PROJECT_CURRENT.md` 的 UTF-8 与 51,200 字节闸门、`PROJECT_MEMORY.md` 的人类区和机器索引区、`PROJECT_HISTORY.md` 的只追加骨架；不替代 `project-memory-rules` 的事实抽取或 `project-style-rules` 的风格维护。两个路由只使用 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`，不得复制第二份实现；CodeGraph 自动准备语义与触发时机保持不变。",
+          "core_responsibility": "作为项目自举唯一入口，按 `rule-bootstrap` / `memory-bootstrap` 条件路由维护规则文件和 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 骨架，保护非受管内容、UTF-8、大小闸门和历史只追加；事实抽取仍由 `project-memory-rules` 负责。",
           "skill_path": "project-rule-file-bootstrap-rules/SKILL.md",
           "directory_path": "project-rule-file-bootstrap-rules",
           "directory": "project-rule-file-bootstrap-rules",
           "sections": [
             "AI 环境检测与规则文件约定",
             "目标",
-            "触发条件",
-            "执行步骤",
+            "条件路由与自动触发",
+            "`rule-bootstrap` 职责",
+            "`memory-bootstrap` 职责",
+            "统一执行步骤",
             "脚本用法",
-            "受管章节内容来源",
             "边界"
           ],
           "references": [
-            "project-rule-file-bootstrap-rules/references/规则文件模板/agents-md-sections-index.md"
+            "project-rule-file-bootstrap-rules/references/规则文件模板/agents-md-sections-index.md",
+            "project-rule-file-bootstrap-rules/references/项目记忆模板/四件套模板.md"
           ],
           "agents": [
             "project-rule-file-bootstrap-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
-          ]
-        },
-        {
-          "id": "project-memory-file-bootstrap-rules",
-          "name": "project-memory-file-bootstrap-rules",
-          "title": "项目记忆四件套自举 Skill",
-          "status": "implemented",
-          "status_label": "已实现",
-          "domain_id": "orchestration",
-          "domain_label": "总控层",
-          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
-          "domain_order": 1,
-          "item_order": 10,
-          "auto_trigger": "当项目根目录的记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 按需）任一缺失、需要新会话交接、或长期记忆首次初始化时自动触发；也可被用户“根据 skill 更新项目记忆 / 初始化项目四件套 / 补齐 PROJECT_CURRENT|MEMORY|HISTORY”等显式请求触发。负责检测、创建和结构性维护 `PROJECT_CURRENT.md`（当前状态骨架，覆盖式维护，UTF-8 字节数不得超过 51,200）、`PROJECT_MEMORY.md`（人类阅读区 + 底部机器索引区双区骨架，稳定合并维护）、`PROJECT_HISTORY.md`（只追加历史事件骨架，不覆盖已有内容）三个文件的结构与大小闸门；不负责从代码或对话中抽取具体业务事实、实体关系或历史事件内容，事实抽取仍由 `project-memory-rules` 负责，`PROJECT_STYLE.md` 的风格合并仍由 `project-style-rules` 负责。不负责 `AGENTS.md` / `CLAUDE.md` 规则文件或 `.gitattributes` / `.editorconfig`，那部分由 `project-rule-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 作为唯一执行入口，不重复实现或复制脚本逻辑。",
-          "core_responsibility": "负责检测、创建并维护项目记忆四件套的结构骨架与大小闸门；不负责规则文件本身，也不替代 `project-memory-rules` 的事实抽取。",
-          "skill_path": "project-memory-file-bootstrap-rules/SKILL.md",
-          "directory_path": "project-memory-file-bootstrap-rules",
-          "directory": "project-memory-file-bootstrap-rules",
-          "sections": [
-            "目标",
-            "四件套职责边界",
-            "触发条件",
-            "执行步骤",
-            "脚本用法",
-            "模板来源",
-            "边界"
-          ],
-          "references": [
-            "project-memory-file-bootstrap-rules/references/项目记忆模板/四件套模板.md"
-          ],
-          "agents": [
-            "project-memory-file-bootstrap-rules/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -454,9 +418,9 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 11,
-          "auto_trigger": "【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按平台能力矩阵调用真实线程重命名工具重命名当前会话：Codex 使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认视为无真实自动改名工具并显式跳过；不等待用户显式要求，也不等到最终总结。问题过于闲聊、主题过散、标题已准确、工具不可用或用户明确禁止时不改名。不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。",
-          "core_responsibility": "负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。",
+          "item_order": 10,
+          "auto_trigger": "【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按当前宿主真实工具发现结果执行：优先调用统一 MCP 工具 `rename_current_thread`；工具未暴露或首次调用返回非 `INVALID_TITLE` 失败时，仅在真实存在 `set_thread_title` 时执行一次原生回退；`INVALID_TITLE` 修正重试仍失败则直接跳过；两者均不可用、无法可靠确定当前会话、标题已准确或用户明确禁止时显式跳过。不得通过线程列表猜测当前会话，不等待用户显式要求，也不等到最终总结；不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。",
+          "core_responsibility": "负责生成 8-24 字中文简要标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在 `set_thread_title` 时回退一次；禁止通过线程列表、路径或时间猜测当前会话，其他宿主按真实工具能力决定执行或显式跳过。",
           "skill_path": "thread-title-rules/SKILL.md",
           "directory_path": "thread-title-rules",
           "directory": "thread-title-rules",
@@ -470,7 +434,9 @@ window.SKILL_DICTIONARY = {
             "工具与证据约束",
             "通过标准"
           ],
-          "references": [],
+          "references": [
+            "thread-title-rules/references/rename-tool-contract.md"
+          ],
           "agents": [
             "thread-title-rules/agents/openai.yaml"
           ],
@@ -478,38 +444,47 @@ window.SKILL_DICTIONARY = {
           "focus_points": [
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。",
-            "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
           ]
         },
         {
           "id": "parallel-task-dispatch-rules",
           "name": "parallel-task-dispatch-rules",
-          "title": "并行任务分发规则",
+          "title": "并行与子代理统一分发规则",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "orchestration",
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 12,
-          "auto_trigger": "【强制自动触发】当研发、分析、侦察、审查、测试或文档任务进入实质执行前触发，不限于固定 skill 映射；主 agent 必须自主判断当前目标是否存在可由子 agent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件；若判定为可并行或条件并行且无阻断，必须联动 `subagent-dispatch-rules` 做真实启动判定。本仓库完全授权模式视为满足工具显式授权条件；只要环境支持、写集不冲突且风险可控，就应发起真实子线程 / 子代理并行执行。适用于项目分析、代码库侦察、需求完善侦察、Bug 分诊与证据收集、代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；单一根因裁决、接口边界冻结、数据库 schema 变更等必须先串行定边界，但其旁路证据收集可在边界清晰时条件并行。",
-          "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。",
+          "item_order": 11,
+          "auto_trigger": "【强制自动触发】当任一 skill 已命中并准备进入研发、分析、侦察、审查、测试、文档或其他实质执行阶段时触发，不依赖用户逐次点名，也不限于固定 skill 映射。统一负责判断任务应串行、条件并行还是可并行，评估上下文重复读取与启动成本，冻结主线程和子线程职责及互斥写集，确认风险可控，检查系统工具能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭 subagent / multi-agent / thread，输出计划线程数、实际启动数、完成数、关闭数和回退原因。本仓库项目级完全授权可满足工具显式授权前提，但系统规则、工具元数据、安全边界和用户当前轮明确禁止始终优先。适用于独立问题、证据来源、文件集、模块或职责边界可切分的任务；单一根因裁决、需求或接口边界冻结、数据库 schema 与架构方向等主路径必须串行，旁路证据可在边界清晰且不重复读取大段上下文时并行。不要用本 skill 代替领域执行、最终裁决、测试、审查或验收。",
+          "core_responsibility": "统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结主/子职责与互斥写集，检查系统能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭子代理，输出计划线程数、实际启动数、完成数、关闭数和回退原因。",
           "skill_path": "parallel-task-dispatch-rules/SKILL.md",
           "directory_path": "parallel-task-dispatch-rules",
           "directory": "parallel-task-dispatch-rules",
           "sections": [
             "目标",
-            "核心判定规则",
-            "典型分类",
-            "分发流程",
-            "输出要求",
-            "与 subagent-dispatch-rules 的联动闸门",
+            "统一状态机",
+            "分类与委派硬规则",
+            "授权与平台优先级",
+            "生命周期与并发上限",
+            "可见输出协议",
+            "失败、冲突与回退",
+            "权责边界",
             "执行通过 / 驳回标准",
-            "references 读取规则"
+            "references 与脚本"
           ],
           "references": [
+            "parallel-task-dispatch-rules/references/blockers-and-fallbacks.md",
+            "parallel-task-dispatch-rules/references/delegation-decision-matrix.md",
+            "parallel-task-dispatch-rules/references/examples/launch-plan-input-batched.json",
+            "parallel-task-dispatch-rules/references/examples/launch-plan-input.json",
+            "parallel-task-dispatch-rules/references/examples/launch-plan-output-batched.json",
+            "parallel-task-dispatch-rules/references/examples/launch-plan-output.json",
             "parallel-task-dispatch-rules/references/existing-skill-mapping.md",
+            "parallel-task-dispatch-rules/references/launch-plan-schema.md",
+            "parallel-task-dispatch-rules/references/subagent-task-templates.md",
             "parallel-task-dispatch-rules/references/task-classification.md",
             "parallel-task-dispatch-rules/references/thread-template.md"
           ],
@@ -533,7 +508,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 13,
+          "item_order": 12,
           "auto_trigger": "当研发任务已经进入需求、Bug、编码、审查、测试或交付主流程，且当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充时触发。负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务；待 skill 更新并重新加载后，再回到原任务继续执行。不要用它代替需求补齐、Bug 定位或具体代码实现。",
           "core_responsibility": "负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。",
           "skill_path": "skill-evolution-rules/SKILL.md",
@@ -577,8 +552,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 14,
-          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。凡本轮新增或修改任意 `*_test.go` 或涉及测试程序/mock/fixture/数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules` 并路由到 `test-strategy-rules`，且源码目录严禁创建 `*_test.go`。",
+          "item_order": 13,
+          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -625,7 +600,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 15,
+          "item_order": 14,
           "auto_trigger": "当用户只粘贴一段代码、报错片段、函数片段或截图转写代码，并说“这里改一下/这段需要修改/这里有问题”等，但没有明确给出文件路径、符号全名、模块位置或可唯一定位的代码位点时触发。负责先按“用户明确路径、当前活动编辑器/当前打开文件/当前选区、代码片段精确匹配、仓库搜索候选、询问确认”的优先级定位真实目标文件，避免把相似代码误判到仓库其他位置；不要用它代替 code-context-resync-rules 的已知文件重读，也不要代替具体业务实现、Bug 定位或代码修改规则。",
           "core_responsibility": "负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。",
           "skill_path": "code-snippet-location-rules/SKILL.md",
@@ -656,58 +631,6 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "subagent-dispatch-rules",
-          "name": "subagent-dispatch-rules",
-          "title": "子代理分发规则",
-          "status": "implemented",
-          "status_label": "已实现",
-          "domain_id": "orchestration",
-          "domain_label": "总控层",
-          "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
-          "domain_order": 1,
-          "item_order": 16,
-          "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件；委派判定不需要用户逐次要求，但真实启动必须服从当前环境的 subagent / multi-agent / thread 工具元数据、系统规则和权限策略。本仓库默认采用 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控时自动启动 subagent；该项目级 standing authorization 视为满足工具的显式授权条件。只有缺少当前轮授权且缺少项目级完全授权声明时，才判定为“工具授权不支持自动启动”并回退本地执行。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
-          "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。",
-          "skill_path": "subagent-dispatch-rules/SKILL.md",
-          "directory_path": "subagent-dispatch-rules",
-          "directory": "subagent-dispatch-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "主 agent 可见公告（强制）",
-            "真实启动证据（强制）",
-            "平台能力矩阵（新增）",
-            "并发上限与空闲回收（强制）",
-            "子任务优先委派清单",
-            "必须主 agent 本地执行的场景",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "references 读取规则"
-          ],
-          "references": [
-            "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
-            "subagent-dispatch-rules/references/delegation-decision-matrix.md",
-            "subagent-dispatch-rules/references/examples/launch-plan-input-batched.json",
-            "subagent-dispatch-rules/references/examples/launch-plan-input.json",
-            "subagent-dispatch-rules/references/examples/launch-plan-output-batched.json",
-            "subagent-dispatch-rules/references/examples/launch-plan-output.json",
-            "subagent-dispatch-rules/references/launch-plan-schema.md",
-            "subagent-dispatch-rules/references/subagent-task-templates.md"
-          ],
-          "agents": [
-            "subagent-dispatch-rules/agents/openai.yaml"
-          ],
-          "has_license": false,
-          "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
-          ]
-        },
-        {
           "id": "skill-audit-rules",
           "name": "skill-audit-rules",
           "title": "Skill 审计规则",
@@ -717,7 +640,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 17,
+          "item_order": 15,
           "auto_trigger": "【强制自动触发】当主任务存在多 skill 组合、并行拆分或规则收口风险时触发。负责只读审计当前任务是否漏触发应有的 skill，以及已触发 skill 是否还有未执行完的规则；默认优先并行；输出补漏提醒和遗漏清单。只有存在原执行计划内未完成必需项、阻断缺口或用户明确要求建议时，才输出必要后续动作；不得把可选优化伪装成必需后续，原始目标已完成且无三类合法后续时不得输出下一步类占位文案。本 skill 不改代码、不写文件、不做最终收口。",
           "core_responsibility": "负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。",
           "skill_path": "skill-audit-rules/SKILL.md",
@@ -753,7 +676,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 18,
+          "item_order": 16,
           "auto_trigger": "只要本轮任务已命中其他 skill 且可能存在“只做了部分规则”的风险、多 skill 边界冲突、非预期工具/命令/API/模型/浏览器/安装执行失败需要联动 `execution-failure-learning-rules`、任一工具调用后最终回复需要给出可核验的 Skill 执行证据、或当前运行环境存在 goal/plan/task 等显式状态收口机制需要确认真实收口，最终回复前必须命中本 skill。负责检查已命中 skill 的执行完整性、`blocked/manual_handoff` 共享阻断契约的校验与唯一渲染边界、Skill 执行证据与运行时状态真收口。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约与唯一渲染条件，不生成面向用户的阻断区块或解决计划。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
           "core_responsibility": "在最终回复前执行一次 skill 执行完整性闸门检查，补齐主任务优先的下一步建议，并校验 `blocked/manual_handoff` 共享契约。",
           "skill_path": "skill-execution-compliance-gate-rules/SKILL.md",
@@ -794,8 +717,8 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 19,
-          "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。 本 skill 的测试目录闸门已升级为源码目录 `*_test.go` 具名阻断检查：扫描 `internal/`、`common/`、`api/`、`cmd/`、`utils/`、`app/` 等源码目录若新增或保留 `*_test.go` 即判违规并阻断“已完成”结论，要求改 seam 并迁移到 `doc/5-tests/<时间戳>/` ASCII 镜像。",
+          "item_order": 17,
+          "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。",
           "core_responsibility": "校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。",
           "skill_path": "code-change-finalization-gate-rules/SKILL.md",
           "directory_path": "code-change-finalization-gate-rules",
@@ -813,9 +736,7 @@ window.SKILL_DICTIONARY = {
             "回到主流程的重启点",
             "输出要求（简化版）"
           ],
-          "references": [
-            "code-change-finalization-gate-rules/references/next-step-suggestion-template.md"
-          ],
+          "references": [],
           "agents": [
             "code-change-finalization-gate-rules/agents/openai.yaml"
           ],
@@ -823,7 +744,8 @@ window.SKILL_DICTIONARY = {
           "focus_points": [
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+            "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。",
+            "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
           ]
         },
         {
@@ -836,9 +758,9 @@ window.SKILL_DICTIONARY = {
           "domain_label": "总控层",
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
-          "item_order": 20,
-          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
-          "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
+          "item_order": 18,
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
           "directory_path": "reasoning-summary-structure-rules",
           "directory": "reasoning-summary-structure-rules",
@@ -848,6 +770,7 @@ window.SKILL_DICTIONARY = {
             "进入后先做什么",
             "默认执行流程",
             "输出要求（固定顺序）",
+            "图形化优先规则（强制）",
             "总结视觉规范（强制）",
             "权责边界与不负责事项",
             "执行通过 / 驳回标准",
@@ -891,7 +814,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
           "item_order": 1,
-          "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发。负责优先从 `artifact-storage-rules` 约定的近 3 天需求、测试、Bug、文档、项目专属 skill 根目录和 git 提交中提取最近活动，并按需加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的 skill 清单；如果当前任务涉及整项目分析、架构梳理或模块总览，也可额外读取根目录 `项目设计.md` 及其同类设计文档作为弱参考源，但不把它当成最新事实；如果部分目录不存在，则只使用存在的目录和 git 信息；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线、project-design-doc-rules 的设计文档同步，或当前主域本身的分析执行。",
+          "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发；也可在 context-compression-rules 按共享 context-recovery-contract 确认缺少继续任务所需的近期事实后被条件调用。负责优先从 `artifact-storage-rules` 约定的近 3 天需求、测试、Bug、文档、项目专属 skill 根目录和 git 提交中提取最近活动，并按需加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的 skill 清单；如果当前任务涉及整项目分析、架构梳理或模块总览，也可额外读取根目录 `项目设计.md` 及其同类设计文档作为弱参考源，但不把它当成最新事实；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线、project-design-doc-rules 的设计文档同步，或当前主域本身的分析执行。",
           "core_responsibility": "负责优先从 `artifact-storage-rules` 约定目录和最近 Git 提交中压缩前置上下文；如果当前任务涉及整项目分析，可额外弱读取根目录项目设计类文档，再把任务转交真正主域。",
           "skill_path": "recent-context-bootstrap-rules/SKILL.md",
           "directory_path": "recent-context-bootstrap-rules",
@@ -1090,6 +1013,7 @@ window.SKILL_DICTIONARY = {
             "project-memory-rules/references/memory-index-schema.md",
             "project-memory-rules/references/memory-relation-types.md",
             "project-memory-rules/references/memory-retrieval-patterns.md",
+            "project-memory-rules/references/project-knowledge-source-contract.md",
             "project-memory-rules/references/project-memory-template.md"
           ],
           "agents": [
@@ -1113,7 +1037,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
           "item_order": 6,
-          "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules`〔规则文件〕与 `project-memory-file-bootstrap-rules`〔记忆四件套骨架〕编排联动）。",
+          "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap`〔规则文件〕与 `memory-bootstrap`〔记忆四件套骨架〕条件路由编排联动）。",
           "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
           "skill_path": "project-style-rules/SKILL.md",
           "directory_path": "project-style-rules",
@@ -1162,41 +1086,31 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 1,
-          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是需求域唯一自动触发入口和唯一需求主文档 owner。对一句话 idea、老板式方向、粗略想法、资料不足但可通过项目/代码/schema/上下游/URL/官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对已整理资料直接做需求接入；对侦察后仍无法补齐且影响实现方向的关键缺口进入 `gap-routing`。支持从需求 URL、零散资料、物料和补充说明中整理需求，先结合当前项目上下文逐步澄清目标、约束和成功标准，对存在多个合理方向的需求先收敛方案，再补齐到可进入后续代码开发的程度，并将结果沉淀到 `artifact-storage-rules` 约定的需求文档根目录；同一需求后续只能持续更新同一份需求主文档；不要用它代替需求边界、拆分、变更或验收标准类 skill。",
+          "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是新需求接入唯一自动触发入口和唯一需求主文档 Owner。对一句话 idea、老板式方向、粗略想法，或资料不足但可通过项目、代码、schema、上下游、URL、GitHub、网站、官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对侦察后仍无法补齐、存在多个合理解释，且会影响实现方向的关键缺口进入 `gap-routing`；对已整理资料直接做需求接入。保留“需求信息不全、缺少字段/流程/规则/成功标准/关键前提”等 gap aliases。范围、兼容或旧逻辑归属不清时由 `requirement-boundary-rules` 专项自动触发；需求过大、多模块、多页面、多接口、多角色或多独立子系统时由 `requirement-splitting-rules` 专项自动触发；已确认需求在编码中新增条件、修改默认值、优先级、范围或交付物时由 `requirement-change-rules` 专项自动触发。四个 Owner 均保持自动触发，本 Skill 不吞并专项信号。",
           "core_responsibility": "作为需求域唯一主入口，先主动侦察可由项目、数据库线索、代码、上下游、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径 / URL 取得的证据，再把 discovery 或用户已有资料收口为同一份需求主文档，并回写可复用记忆。",
           "skill_path": "requirement-intake-rules/SKILL.md",
           "directory_path": "requirement-intake-rules",
           "directory": "requirement-intake-rules",
           "sections": [
-            "Skill 作用与适用场景",
-            "条件路由：initial-discovery",
-            "图片资产闭环",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "initial-discovery 条件 references 读取规则",
-            "references 读取规则",
-            "极致完整性交付硬闸门"
+            "职责",
+            "自动触发与条件路由",
+            "最小执行流程",
+            "保护闸门",
+            "References"
           ],
           "references": [
             "requirement-intake-rules/references/extreme-completeness-standard.md",
-            "requirement-intake-rules/references/gap-routing-source/agents/openai.yaml",
-            "requirement-intake-rules/references/gap-routing-source/migrated-gap-rule.md",
-            "requirement-intake-rules/references/gap-routing-source/references/missing-info-checklist.md",
-            "requirement-intake-rules/references/gap-routing-source/references/pause-triggers.md",
-            "requirement-intake-rules/references/gap-routing-source/references/requirement-gap-examples.md",
             "requirement-intake-rules/references/gap-routing.md",
             "requirement-intake-rules/references/initial-discovery-checklist.md",
-            "requirement-intake-rules/references/initial-discovery-domain-routing.md",
             "requirement-intake-rules/references/initial-discovery-evidence-and-memory.md",
             "requirement-intake-rules/references/initial-discovery-output-template.md",
             "requirement-intake-rules/references/initial-discovery-route.md",
             "requirement-intake-rules/references/intake-boundaries-and-examples.md",
             "requirement-intake-rules/references/intake-checklist.md",
+            "requirement-intake-rules/references/missing-info-checklist.md",
+            "requirement-intake-rules/references/pause-triggers.md",
+            "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+            "requirement-intake-rules/references/requirement-gap-examples.md",
             "requirement-intake-rules/references/requirement-structure-template.md"
           ],
           "agents": [
@@ -1220,21 +1134,17 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 2,
-          "auto_trigger": "当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时触发。负责明确改动边界和影响面，并将边界结论持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求缺口识别或 Bug 根因定位 skill。",
+          "auto_trigger": "当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时专项自动触发。负责范围、归属、兼容性和上下游影响裁决，并将结论回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；信息缺失转 `requirement-intake-rules#gap-routing`，历史缺陷转 Bug 域，不代替需求接入、拆分、变更、验收或实施规划。",
           "core_responsibility": "明确改动边界和影响面。",
           "skill_path": "requirement-boundary-rules/SKILL.md",
           "directory_path": "requirement-boundary-rules",
           "directory": "requirement-boundary-rules",
           "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
+            "职责与触发",
+            "路由",
+            "最小执行流程",
+            "暂停、通过与驳回",
+            "References"
           ],
           "references": [
             "requirement-boundary-rules/references/acceptance-routing-examples.md",
@@ -1262,21 +1172,17 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 3,
-          "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤、多个角色协作，或一次性覆盖多个独立子系统、多个产品子域、多个相对独立主线，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求接入、边界确认或项目排期管理。",
+          "auto_trigger": "当需求较大、涉及多个模块、接口、页面、步骤、角色协作，或一次覆盖多个独立子系统、产品子域、相对独立主线，无法作为单一闭环稳定推进时专项自动触发。负责业务切片、依赖关系和当前优先闭环，并将结果回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；文件/符号落点、实施周期、真实测试命令和任务级“实现-测试-审查-验收”由 `implementation-planning-rules` 负责，不代替需求接入、边界裁决或项目排期。",
           "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
           "skill_path": "requirement-splitting-rules/SKILL.md",
           "directory_path": "requirement-splitting-rules",
           "directory": "requirement-splitting-rules",
           "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
+            "职责与触发",
+            "职责归位",
+            "最小执行流程",
+            "暂停、通过与驳回",
+            "References"
           ],
           "references": [
             "requirement-splitting-rules/references/splitting-dimensions.md",
@@ -1353,21 +1259,18 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 5,
-          "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论，并将变更结果持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要把历史缺陷误当成需求变更。",
+          "auto_trigger": "当已确认或已进入实现的需求被补充、修正、插入新条件、改变优先级、调整默认值、范围或交付物形态时专项自动触发。负责变更分类、影响失效传播、回流边界/Bug/拆分的判断，以及向验收、实施、测试和审查 Owner 发出重开与重规划信号；结论回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档。它不拥有实施总览或实施周期结构；信息不全转 `requirement-intake-rules#gap-routing`，原实现不符合原需求转 Bug 域。",
           "core_responsibility": "重新确认变更范围和影响。",
           "skill_path": "requirement-change-rules/SKILL.md",
           "directory_path": "requirement-change-rules",
           "directory": "requirement-change-rules",
           "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
+            "职责与触发",
+            "路由",
+            "职责归位",
+            "最小执行流程",
+            "暂停、通过与驳回",
+            "References"
           ],
           "references": [
             "requirement-change-rules/references/change-classification.md",
@@ -2942,6 +2845,7 @@ window.SKILL_DICTIONARY = {
             "测试样本分布优先（强制）"
           ],
           "references": [
+            "test-strategy-rules/references/doc-minimums.md",
             "test-strategy-rules/references/priority-model.md",
             "test-strategy-rules/references/strategy-dimensions.md",
             "test-strategy-rules/references/strategy-template.md",
@@ -3291,6 +3195,10 @@ window.SKILL_DICTIONARY = {
           "references": [
             "git-collaboration-rules/references/branch-and-commit.md",
             "git-collaboration-rules/references/collaboration-examples.md",
+            "git-collaboration-rules/references/commit-scope-and-clean-tree.md",
+            "git-collaboration-rules/references/current-turn-authorization.md",
+            "git-collaboration-rules/references/pre-post-gates.md",
+            "git-collaboration-rules/references/staged-review-and-evidence.md",
             "git-collaboration-rules/references/sync-and-pr-scope.md"
           ],
           "agents": [
@@ -3409,8 +3317,8 @@ window.SKILL_DICTIONARY = {
       "order": 11,
       "implemented_count": 0,
       "planned_count": 0,
-      "seed_count": 33,
-      "total_count": 33,
+      "seed_count": 34,
+      "total_count": 34,
       "items": [
         {
           "id": "\"doc\"",
@@ -3775,14 +3683,17 @@ window.SKILL_DICTIONARY = {
             "触发信号",
             "默认执行策略",
             "必须暂停确认的关键节点",
+            "关键节点提问格式（强制）",
             "与其他 Skill 的协作",
             "禁止事项",
             "通过 / 驳回标准",
-            "references 读取规则"
+            "快速示例"
           ],
           "references": [
-            "autonomous-execution-rules/references/ask-format.md",
-            "autonomous-execution-rules/references/examples.md"
+            "autonomous-execution-rules/references/blocker-handoff.md",
+            "autonomous-execution-rules/references/continuation-and-pause.md",
+            "autonomous-execution-rules/references/execution-authorization-and-plan-boundary.md",
+            "autonomous-execution-rules/references/termination-loop-prevention.md"
           ],
           "agents": [
             "autonomous-execution-rules/agents/openai.yaml"
@@ -3839,7 +3750,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 11,
-          "auto_trigger": "当当前会话已发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），并强制重新读取当前项目根目录 `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code），避免压缩后丢失 skill 记忆或仓库级硬规则，再输出可直接续做的最小上下文包；压缩包必须显式携带”是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
+          "auto_trigger": "当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责按共享 context-recovery-contract 重新读取当前平台规则文件与项目当前上下文，恢复目标、阶段、约束、必命中 skill 和“是否允许开始/继续实现代码”的许可状态；只有确认缺少继续任务所需的近期项目事实时，才条件联动 recent-context-bootstrap-rules 补载近 3 天上下文与 skill 索引。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "context-compression-rules/SKILL.md",
           "directory_path": "context-compression-rules",
@@ -3858,6 +3769,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "context-compression-rules/references/boundary-rules.md",
             "context-compression-rules/references/compression-playbook.md",
+            "context-compression-rules/references/context-recovery-contract.md",
             "context-compression-rules/references/trigger-signals.md"
           ],
           "agents": [
@@ -4517,6 +4429,46 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "task-plan-rehydration-rules",
+          "name": "task-plan-rehydration-rules",
+          "title": "任务计划断点恢复规则",
+          "status": "seed",
+          "status_label": "扩展种子",
+          "domain_id": "seed",
+          "domain_label": "扩展种子",
+          "domain_description": "已入库但未并入主规划的参考 skill",
+          "domain_order": 11,
+          "item_order": 25,
+          "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Desktop 或宿主关闭后用户在同一任务首次发送“继续/继续任务/按计划继续”、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或计划完成需要停止后续重放时自动触发。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、校验和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
+          "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+          "skill_path": "task-plan-rehydration-rules/SKILL.md",
+          "directory_path": "task-plan-rehydration-rules",
+          "directory": "task-plan-rehydration-rules",
+          "sections": [
+            "目标",
+            "自动触发信号",
+            "唯一 Owner 边界",
+            "保存和状态迁移流程",
+            "首次继续回合恢复流程",
+            "数据与安全约束",
+            "工具不可用和停止条件",
+            "通过标准",
+            "执行入口"
+          ],
+          "references": [
+            "task-plan-rehydration-rules/references/task-plan-projection-contract.md"
+          ],
+          "agents": [
+            "task-plan-rehydration-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+            "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+            "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+          ]
+        },
+        {
           "id": "test-program-rules",
           "name": "test-program-rules",
           "title": "测试程序规则",
@@ -4526,7 +4478,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 25,
+          "item_order": 26,
           "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中；若发现资产散落在 `doc/5-tests/` 根目录之外，应先按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢；Go 场景下还必须遵循 `go-test-compile-path-rules`，避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules 的 test-asset-governance 条件路由、test-strategy-rules 的 test-asset-governance 条件路由、test-strategy-rules 的 test-asset-governance 条件路由、`bug-intake-rules` 的 `runtime-diagnostics` 条件路由或功能验证规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "test-program-rules/SKILL.md",
@@ -4570,7 +4522,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 26,
+          "item_order": 27,
           "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "time-util-rules/SKILL.md",
@@ -4603,7 +4555,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 27,
+          "item_order": 28,
           "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -4635,7 +4587,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 28,
+          "item_order": 29,
           "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-best-practices/SKILL.md",
@@ -4691,7 +4643,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 29,
+          "item_order": 30,
           "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "vue-router-best-practices/SKILL.md",
@@ -4717,7 +4669,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 30,
+          "item_order": 31,
           "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "web-design-guidelines/SKILL.md",
@@ -4747,7 +4699,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 31,
+          "item_order": 32,
           "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、以 RequiredOnly 完成会话准备、按精确的“每个包源各自包 ID”恢复 command-not-found、返回可机器读取的状态和退出码，并记录脱敏失败案例和用户级 discovered tools；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-powershell-environment-rules/SKILL.md",
@@ -4790,7 +4742,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 32,
+          "item_order": 33,
           "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -4841,7 +4793,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "扩展种子",
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
-          "item_order": 33,
+          "item_order": 34,
           "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目分析当前工作区未提交代码 diff，补充对应的“进行中事项”，排除设计文件和文档文件后输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "work-report-summary-rules/SKILL.md",
@@ -5219,7 +5171,7 @@ window.SKILL_DICTIONARY = {
     {
       "id": "project-rule-file-bootstrap-rules",
       "name": "project-rule-file-bootstrap-rules",
-      "title": "规则文件自举 Skill",
+      "title": "项目规则与记忆自举 Skill",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "orchestration",
@@ -5227,63 +5179,27 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 9,
-      "auto_trigger": "若当前 AI 为 Claude Code，目标规则文件为 `CLAUDE.md`；若为 Codex，目标规则文件为 `AGENTS.md`；新会话第一轮默认自动触发（不依赖用户意图），且在规则文件、`.gitattributes`、`.editorconfig` 任一缺失或未完成受管章节同步前，阻断其余项目分析、需求、Bug、编码、测试与交付主任务；也可被“创建、补齐或更新 AGENTS.md / CLAUDE.md / 补充仓库级规则”等显式请求触发。负责在项目根目录检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在的规则文件持续执行受管章节的增量幂等 upsert（覆盖 Skill 强制触发、严禁脑补工具调用、严禁自动提交 Git、Skill 命中强制规则、代码生成风格入口、Windows/WSL 执行、CodeGraph、插件检测、图像生成等章节），保留用户已有的非受管内容。若仓库命中 Godot 项目标记，还需额外补齐 Godot 工具接管与图像生成配置章节。不负责 `PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md` 四件套内容，四件套自举由 `project-memory-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 作为唯一执行入口，不重复实现或复制脚本逻辑。",
-      "core_responsibility": "负责检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在规则文件的受管章节做增量幂等 upsert，保留用户自定义内容；不负责项目记忆四件套。",
+      "auto_trigger": "新会话第一轮默认自动触发，不依赖用户点名；当 Codex 的 `AGENTS.md`、Claude Code 的 `CLAUDE.md`、`.gitattributes`、`.editorconfig`，或项目记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`，`PROJECT_STYLE.md` 按需）任一缺失、结构不完整、需要新会话交接或长期记忆首次初始化时也自动触发；同时兼容“创建、补齐或更新 AGENTS.md / CLAUDE.md”“补充仓库级规则”“根据 skill 更新项目 md”“初始化项目四件套”“补齐 PROJECT_CURRENT / MEMORY / HISTORY”等显式请求。作为项目自举唯一 owner，统一提供 `rule-bootstrap` 与 `memory-bootstrap` 两个条件路由：前者幂等创建或同步规则文件、`.gitattributes`、`.editorconfig` 及受管章节并保护非受管内容，后者维护 `PROJECT_CURRENT.md` 的 UTF-8 与 51,200 字节闸门、`PROJECT_MEMORY.md` 的人类区和机器索引区、`PROJECT_HISTORY.md` 的只追加骨架；不替代 `project-memory-rules` 的事实抽取或 `project-style-rules` 的风格维护。两个路由只使用 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`，不得复制第二份实现；CodeGraph 自动准备语义与触发时机保持不变。",
+      "core_responsibility": "作为项目自举唯一入口，按 `rule-bootstrap` / `memory-bootstrap` 条件路由维护规则文件和 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 骨架，保护非受管内容、UTF-8、大小闸门和历史只追加；事实抽取仍由 `project-memory-rules` 负责。",
       "skill_path": "project-rule-file-bootstrap-rules/SKILL.md",
       "directory_path": "project-rule-file-bootstrap-rules",
       "directory": "project-rule-file-bootstrap-rules",
       "sections": [
         "AI 环境检测与规则文件约定",
         "目标",
-        "触发条件",
-        "执行步骤",
+        "条件路由与自动触发",
+        "`rule-bootstrap` 职责",
+        "`memory-bootstrap` 职责",
+        "统一执行步骤",
         "脚本用法",
-        "受管章节内容来源",
         "边界"
       ],
       "references": [
-        "project-rule-file-bootstrap-rules/references/规则文件模板/agents-md-sections-index.md"
+        "project-rule-file-bootstrap-rules/references/规则文件模板/agents-md-sections-index.md",
+        "project-rule-file-bootstrap-rules/references/项目记忆模板/四件套模板.md"
       ],
       "agents": [
         "project-rule-file-bootstrap-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
-      ]
-    },
-    {
-      "id": "project-memory-file-bootstrap-rules",
-      "name": "project-memory-file-bootstrap-rules",
-      "title": "项目记忆四件套自举 Skill",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "orchestration",
-      "domain_label": "总控层",
-      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
-      "domain_order": 1,
-      "item_order": 10,
-      "auto_trigger": "当项目根目录的记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 按需）任一缺失、需要新会话交接、或长期记忆首次初始化时自动触发；也可被用户“根据 skill 更新项目记忆 / 初始化项目四件套 / 补齐 PROJECT_CURRENT|MEMORY|HISTORY”等显式请求触发。负责检测、创建和结构性维护 `PROJECT_CURRENT.md`（当前状态骨架，覆盖式维护，UTF-8 字节数不得超过 51,200）、`PROJECT_MEMORY.md`（人类阅读区 + 底部机器索引区双区骨架，稳定合并维护）、`PROJECT_HISTORY.md`（只追加历史事件骨架，不覆盖已有内容）三个文件的结构与大小闸门；不负责从代码或对话中抽取具体业务事实、实体关系或历史事件内容，事实抽取仍由 `project-memory-rules` 负责，`PROJECT_STYLE.md` 的风格合并仍由 `project-style-rules` 负责。不负责 `AGENTS.md` / `CLAUDE.md` 规则文件或 `.gitattributes` / `.editorconfig`，那部分由 `project-rule-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 作为唯一执行入口，不重复实现或复制脚本逻辑。",
-      "core_responsibility": "负责检测、创建并维护项目记忆四件套的结构骨架与大小闸门；不负责规则文件本身，也不替代 `project-memory-rules` 的事实抽取。",
-      "skill_path": "project-memory-file-bootstrap-rules/SKILL.md",
-      "directory_path": "project-memory-file-bootstrap-rules",
-      "directory": "project-memory-file-bootstrap-rules",
-      "sections": [
-        "目标",
-        "四件套职责边界",
-        "触发条件",
-        "执行步骤",
-        "脚本用法",
-        "模板来源",
-        "边界"
-      ],
-      "references": [
-        "project-memory-file-bootstrap-rules/references/项目记忆模板/四件套模板.md"
-      ],
-      "agents": [
-        "project-memory-file-bootstrap-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -5302,9 +5218,9 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 11,
-      "auto_trigger": "【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按平台能力矩阵调用真实线程重命名工具重命名当前会话：Codex 使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认视为无真实自动改名工具并显式跳过；不等待用户显式要求，也不等到最终总结。问题过于闲聊、主题过散、标题已准确、工具不可用或用户明确禁止时不改名。不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。",
-      "core_responsibility": "负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。",
+      "item_order": 10,
+      "auto_trigger": "【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按当前宿主真实工具发现结果执行：优先调用统一 MCP 工具 `rename_current_thread`；工具未暴露或首次调用返回非 `INVALID_TITLE` 失败时，仅在真实存在 `set_thread_title` 时执行一次原生回退；`INVALID_TITLE` 修正重试仍失败则直接跳过；两者均不可用、无法可靠确定当前会话、标题已准确或用户明确禁止时显式跳过。不得通过线程列表猜测当前会话，不等待用户显式要求，也不等到最终总结；不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。",
+      "core_responsibility": "负责生成 8-24 字中文简要标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在 `set_thread_title` 时回退一次；禁止通过线程列表、路径或时间猜测当前会话，其他宿主按真实工具能力决定执行或显式跳过。",
       "skill_path": "thread-title-rules/SKILL.md",
       "directory_path": "thread-title-rules",
       "directory": "thread-title-rules",
@@ -5318,7 +5234,9 @@ window.SKILL_DICTIONARY = {
         "工具与证据约束",
         "通过标准"
       ],
-      "references": [],
+      "references": [
+        "thread-title-rules/references/rename-tool-contract.md"
+      ],
       "agents": [
         "thread-title-rules/agents/openai.yaml"
       ],
@@ -5326,38 +5244,47 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。",
-        "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
       ]
     },
     {
       "id": "parallel-task-dispatch-rules",
       "name": "parallel-task-dispatch-rules",
-      "title": "并行任务分发规则",
+      "title": "并行与子代理统一分发规则",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "orchestration",
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 12,
-      "auto_trigger": "【强制自动触发】当研发、分析、侦察、审查、测试或文档任务进入实质执行前触发，不限于固定 skill 映射；主 agent 必须自主判断当前目标是否存在可由子 agent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界。负责判断当前工作应并行、条件并行还是串行推进，并给出线程拆分、文件归属、收口合并与回退条件；若判定为可并行或条件并行且无阻断，必须联动 `subagent-dispatch-rules` 做真实启动判定。本仓库完全授权模式视为满足工具显式授权条件；只要环境支持、写集不冲突且风险可控，就应发起真实子线程 / 子代理并行执行。适用于项目分析、代码库侦察、需求完善侦察、Bug 分诊与证据收集、代码规范检查、注释补充、格式清理、lint 修复、测试补充、文档更新等可独立推进的任务；审查类 skill 只要能只读或按独立文件集检查，默认优先并行；单一根因裁决、接口边界冻结、数据库 schema 变更等必须先串行定边界，但其旁路证据收集可在边界清晰时条件并行。",
-      "core_responsibility": "负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。",
+      "item_order": 11,
+      "auto_trigger": "【强制自动触发】当任一 skill 已命中并准备进入研发、分析、侦察、审查、测试、文档或其他实质执行阶段时触发，不依赖用户逐次点名，也不限于固定 skill 映射。统一负责判断任务应串行、条件并行还是可并行，评估上下文重复读取与启动成本，冻结主线程和子线程职责及互斥写集，确认风险可控，检查系统工具能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭 subagent / multi-agent / thread，输出计划线程数、实际启动数、完成数、关闭数和回退原因。本仓库项目级完全授权可满足工具显式授权前提，但系统规则、工具元数据、安全边界和用户当前轮明确禁止始终优先。适用于独立问题、证据来源、文件集、模块或职责边界可切分的任务；单一根因裁决、需求或接口边界冻结、数据库 schema 与架构方向等主路径必须串行，旁路证据可在边界清晰且不重复读取大段上下文时并行。不要用本 skill 代替领域执行、最终裁决、测试、审查或验收。",
+      "core_responsibility": "统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结主/子职责与互斥写集，检查系统能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭子代理，输出计划线程数、实际启动数、完成数、关闭数和回退原因。",
       "skill_path": "parallel-task-dispatch-rules/SKILL.md",
       "directory_path": "parallel-task-dispatch-rules",
       "directory": "parallel-task-dispatch-rules",
       "sections": [
         "目标",
-        "核心判定规则",
-        "典型分类",
-        "分发流程",
-        "输出要求",
-        "与 subagent-dispatch-rules 的联动闸门",
+        "统一状态机",
+        "分类与委派硬规则",
+        "授权与平台优先级",
+        "生命周期与并发上限",
+        "可见输出协议",
+        "失败、冲突与回退",
+        "权责边界",
         "执行通过 / 驳回标准",
-        "references 读取规则"
+        "references 与脚本"
       ],
       "references": [
+        "parallel-task-dispatch-rules/references/blockers-and-fallbacks.md",
+        "parallel-task-dispatch-rules/references/delegation-decision-matrix.md",
+        "parallel-task-dispatch-rules/references/examples/launch-plan-input-batched.json",
+        "parallel-task-dispatch-rules/references/examples/launch-plan-input.json",
+        "parallel-task-dispatch-rules/references/examples/launch-plan-output-batched.json",
+        "parallel-task-dispatch-rules/references/examples/launch-plan-output.json",
         "parallel-task-dispatch-rules/references/existing-skill-mapping.md",
+        "parallel-task-dispatch-rules/references/launch-plan-schema.md",
+        "parallel-task-dispatch-rules/references/subagent-task-templates.md",
         "parallel-task-dispatch-rules/references/task-classification.md",
         "parallel-task-dispatch-rules/references/thread-template.md"
       ],
@@ -5381,7 +5308,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 13,
+      "item_order": 12,
       "auto_trigger": "当研发任务已经进入需求、Bug、编码、审查、测试或交付主流程，且当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充时触发。负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务；待 skill 更新并重新加载后，再回到原任务继续执行。不要用它代替需求补齐、Bug 定位或具体代码实现。",
       "core_responsibility": "负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。",
       "skill_path": "skill-evolution-rules/SKILL.md",
@@ -5425,8 +5352,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 14,
-      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。凡本轮新增或修改任意 `*_test.go` 或涉及测试程序/mock/fixture/数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules` 并路由到 `test-strategy-rules`，且源码目录严禁创建 `*_test.go`。",
+      "item_order": 13,
+      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -5473,7 +5400,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 15,
+      "item_order": 14,
       "auto_trigger": "当用户只粘贴一段代码、报错片段、函数片段或截图转写代码，并说“这里改一下/这段需要修改/这里有问题”等，但没有明确给出文件路径、符号全名、模块位置或可唯一定位的代码位点时触发。负责先按“用户明确路径、当前活动编辑器/当前打开文件/当前选区、代码片段精确匹配、仓库搜索候选、询问确认”的优先级定位真实目标文件，避免把相似代码误判到仓库其他位置；不要用它代替 code-context-resync-rules 的已知文件重读，也不要代替具体业务实现、Bug 定位或代码修改规则。",
       "core_responsibility": "负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。",
       "skill_path": "code-snippet-location-rules/SKILL.md",
@@ -5504,58 +5431,6 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "subagent-dispatch-rules",
-      "name": "subagent-dispatch-rules",
-      "title": "子代理分发规则",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "orchestration",
-      "domain_label": "总控层",
-      "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
-      "domain_order": 1,
-      "item_order": 16,
-      "auto_trigger": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件；委派判定不需要用户逐次要求，但真实启动必须服从当前环境的 subagent / multi-agent / thread 工具元数据、系统规则和权限策略。本仓库默认采用 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控时自动启动 subagent；该项目级 standing authorization 视为满足工具的显式授权条件。只有缺少当前轮授权且缺少项目级完全授权声明时，才判定为“工具授权不支持自动启动”并回退本地执行。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
-      "core_responsibility": "作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。",
-      "skill_path": "subagent-dispatch-rules/SKILL.md",
-      "directory_path": "subagent-dispatch-rules",
-      "directory": "subagent-dispatch-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "主 agent 可见公告（强制）",
-        "真实启动证据（强制）",
-        "平台能力矩阵（新增）",
-        "并发上限与空闲回收（强制）",
-        "子任务优先委派清单",
-        "必须主 agent 本地执行的场景",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "references 读取规则"
-      ],
-      "references": [
-        "subagent-dispatch-rules/references/blockers-and-fallbacks.md",
-        "subagent-dispatch-rules/references/delegation-decision-matrix.md",
-        "subagent-dispatch-rules/references/examples/launch-plan-input-batched.json",
-        "subagent-dispatch-rules/references/examples/launch-plan-input.json",
-        "subagent-dispatch-rules/references/examples/launch-plan-output-batched.json",
-        "subagent-dispatch-rules/references/examples/launch-plan-output.json",
-        "subagent-dispatch-rules/references/launch-plan-schema.md",
-        "subagent-dispatch-rules/references/subagent-task-templates.md"
-      ],
-      "agents": [
-        "subagent-dispatch-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
-      ]
-    },
-    {
       "id": "skill-audit-rules",
       "name": "skill-audit-rules",
       "title": "Skill 审计规则",
@@ -5565,7 +5440,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 17,
+      "item_order": 15,
       "auto_trigger": "【强制自动触发】当主任务存在多 skill 组合、并行拆分或规则收口风险时触发。负责只读审计当前任务是否漏触发应有的 skill，以及已触发 skill 是否还有未执行完的规则；默认优先并行；输出补漏提醒和遗漏清单。只有存在原执行计划内未完成必需项、阻断缺口或用户明确要求建议时，才输出必要后续动作；不得把可选优化伪装成必需后续，原始目标已完成且无三类合法后续时不得输出下一步类占位文案。本 skill 不改代码、不写文件、不做最终收口。",
       "core_responsibility": "负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。",
       "skill_path": "skill-audit-rules/SKILL.md",
@@ -5601,7 +5476,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 18,
+      "item_order": 16,
       "auto_trigger": "只要本轮任务已命中其他 skill 且可能存在“只做了部分规则”的风险、多 skill 边界冲突、非预期工具/命令/API/模型/浏览器/安装执行失败需要联动 `execution-failure-learning-rules`、任一工具调用后最终回复需要给出可核验的 Skill 执行证据、或当前运行环境存在 goal/plan/task 等显式状态收口机制需要确认真实收口，最终回复前必须命中本 skill。负责检查已命中 skill 的执行完整性、`blocked/manual_handoff` 共享阻断契约的校验与唯一渲染边界、Skill 执行证据与运行时状态真收口。若存在原执行计划内未完成必需项或阻断级规则缺口，禁止给“已完成”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约与唯一渲染条件，不生成面向用户的阻断区块或解决计划。除此之外默认直接结束，不额外制造任何下一步区块、下一步建议、等待指令文案或“无需继续动作”占位。",
       "core_responsibility": "在最终回复前执行一次 skill 执行完整性闸门检查，补齐主任务优先的下一步建议，并校验 `blocked/manual_handoff` 共享契约。",
       "skill_path": "skill-execution-compliance-gate-rules/SKILL.md",
@@ -5642,8 +5517,8 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 19,
-      "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。 本 skill 的测试目录闸门已升级为源码目录 `*_test.go` 具名阻断检查：扫描 `internal/`、`common/`、`api/`、`cmd/`、`utils/`、`app/` 等源码目录若新增或保留 `*_test.go` 即判违规并阻断“已完成”结论，要求改 seam 并迁移到 `doc/5-tests/<时间戳>/` ASCII 镜像。",
+      "item_order": 17,
+      "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。",
       "core_responsibility": "校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。",
       "skill_path": "code-change-finalization-gate-rules/SKILL.md",
       "directory_path": "code-change-finalization-gate-rules",
@@ -5661,9 +5536,7 @@ window.SKILL_DICTIONARY = {
         "回到主流程的重启点",
         "输出要求（简化版）"
       ],
-      "references": [
-        "code-change-finalization-gate-rules/references/next-step-suggestion-template.md"
-      ],
+      "references": [],
       "agents": [
         "code-change-finalization-gate-rules/agents/openai.yaml"
       ],
@@ -5671,7 +5544,8 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。"
+        "重点看是否只做分流、阻断或全局基础约定，没有越权覆盖单域 skill。",
+        "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
       ]
     },
     {
@@ -5684,9 +5558,9 @@ window.SKILL_DICTIONARY = {
       "domain_label": "总控层",
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
-      "item_order": 20,
-      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：必须包含 Skill 命中检查、Skill 执行证据、当前要解决的问题（同时写清用户原始需求与模型理解的需求）、问题的解决方案与根因、验证结果（有验证时）以及当前结果与结论；若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结必须与推理过程视觉分界，采用统一严谨的 markdown 排版（`---` 分隔线 + 固定一级主标题 `# 📋 本轮总结` + 二级标题小节 + 表格 / 引用块 / 状态徽章），标题字号大于正文且加粗、层级分明。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步，禁止输出下一步区块、等待类文案或“无需继续动作”占位文案。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
-      "core_responsibility": "作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。",
+      "item_order": 18,
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
       "directory_path": "reasoning-summary-structure-rules",
       "directory": "reasoning-summary-structure-rules",
@@ -5696,6 +5570,7 @@ window.SKILL_DICTIONARY = {
         "进入后先做什么",
         "默认执行流程",
         "输出要求（固定顺序）",
+        "图形化优先规则（强制）",
         "总结视觉规范（强制）",
         "权责边界与不负责事项",
         "执行通过 / 驳回标准",
@@ -5727,7 +5602,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
       "item_order": 1,
-      "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发。负责优先从 `artifact-storage-rules` 约定的近 3 天需求、测试、Bug、文档、项目专属 skill 根目录和 git 提交中提取最近活动，并按需加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的 skill 清单；如果当前任务涉及整项目分析、架构梳理或模块总览，也可额外读取根目录 `项目设计.md` 及其同类设计文档作为弱参考源，但不把它当成最新事实；如果部分目录不存在，则只使用存在的目录和 git 信息；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线、project-design-doc-rules 的设计文档同步，或当前主域本身的分析执行。",
+      "auto_trigger": "当当前会话刚开始、缺少历史上下文、用户直接提出与当前项目相关的需求、Bug、编码、测试或交付问题时自动触发；也可在 context-compression-rules 按共享 context-recovery-contract 确认缺少继续任务所需的近期事实后被条件调用。负责优先从 `artifact-storage-rules` 约定的近 3 天需求、测试、Bug、文档、项目专属 skill 根目录和 git 提交中提取最近活动，并按需加载系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills` 的 skill 清单；如果当前任务涉及整项目分析、架构梳理或模块总览，也可额外读取根目录 `项目设计.md` 及其同类设计文档作为弱参考源，但不把它当成最新事实；不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线、project-design-doc-rules 的设计文档同步，或当前主域本身的分析执行。",
       "core_responsibility": "负责优先从 `artifact-storage-rules` 约定目录和最近 Git 提交中压缩前置上下文；如果当前任务涉及整项目分析，可额外弱读取根目录项目设计类文档，再把任务转交真正主域。",
       "skill_path": "recent-context-bootstrap-rules/SKILL.md",
       "directory_path": "recent-context-bootstrap-rules",
@@ -5926,6 +5801,7 @@ window.SKILL_DICTIONARY = {
         "project-memory-rules/references/memory-index-schema.md",
         "project-memory-rules/references/memory-relation-types.md",
         "project-memory-rules/references/memory-retrieval-patterns.md",
+        "project-memory-rules/references/project-knowledge-source-contract.md",
         "project-memory-rules/references/project-memory-template.md"
       ],
       "agents": [
@@ -5949,7 +5825,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
       "item_order": 6,
-      "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules`〔规则文件〕与 `project-memory-file-bootstrap-rules`〔记忆四件套骨架〕编排联动）。",
+      "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap`〔规则文件〕与 `memory-bootstrap`〔记忆四件套骨架〕条件路由编排联动）。",
       "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
       "skill_path": "project-style-rules/SKILL.md",
       "directory_path": "project-style-rules",
@@ -5986,41 +5862,31 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 1,
-      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是需求域唯一自动触发入口和唯一需求主文档 owner。对一句话 idea、老板式方向、粗略想法、资料不足但可通过项目/代码/schema/上下游/URL/官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对已整理资料直接做需求接入；对侦察后仍无法补齐且影响实现方向的关键缺口进入 `gap-routing`。支持从需求 URL、零散资料、物料和补充说明中整理需求，先结合当前项目上下文逐步澄清目标、约束和成功标准，对存在多个合理方向的需求先收敛方案，再补齐到可进入后续代码开发的程度，并将结果沉淀到 `artifact-storage-rules` 约定的需求文档根目录；同一需求后续只能持续更新同一份需求主文档；不要用它代替需求边界、拆分、变更或验收标准类 skill。",
+      "auto_trigger": "当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是新需求接入唯一自动触发入口和唯一需求主文档 Owner。对一句话 idea、老板式方向、粗略想法，或资料不足但可通过项目、代码、schema、上下游、URL、GitHub、网站、官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对侦察后仍无法补齐、存在多个合理解释，且会影响实现方向的关键缺口进入 `gap-routing`；对已整理资料直接做需求接入。保留“需求信息不全、缺少字段/流程/规则/成功标准/关键前提”等 gap aliases。范围、兼容或旧逻辑归属不清时由 `requirement-boundary-rules` 专项自动触发；需求过大、多模块、多页面、多接口、多角色或多独立子系统时由 `requirement-splitting-rules` 专项自动触发；已确认需求在编码中新增条件、修改默认值、优先级、范围或交付物时由 `requirement-change-rules` 专项自动触发。四个 Owner 均保持自动触发，本 Skill 不吞并专项信号。",
       "core_responsibility": "作为需求域唯一主入口，先主动侦察可由项目、数据库线索、代码、上下游、关联项目、GitHub、相关网站、官方 API 文档和用户补充路径 / URL 取得的证据，再把 discovery 或用户已有资料收口为同一份需求主文档，并回写可复用记忆。",
       "skill_path": "requirement-intake-rules/SKILL.md",
       "directory_path": "requirement-intake-rules",
       "directory": "requirement-intake-rules",
       "sections": [
-        "Skill 作用与适用场景",
-        "条件路由：initial-discovery",
-        "图片资产闭环",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "initial-discovery 条件 references 读取规则",
-        "references 读取规则",
-        "极致完整性交付硬闸门"
+        "职责",
+        "自动触发与条件路由",
+        "最小执行流程",
+        "保护闸门",
+        "References"
       ],
       "references": [
         "requirement-intake-rules/references/extreme-completeness-standard.md",
-        "requirement-intake-rules/references/gap-routing-source/agents/openai.yaml",
-        "requirement-intake-rules/references/gap-routing-source/migrated-gap-rule.md",
-        "requirement-intake-rules/references/gap-routing-source/references/missing-info-checklist.md",
-        "requirement-intake-rules/references/gap-routing-source/references/pause-triggers.md",
-        "requirement-intake-rules/references/gap-routing-source/references/requirement-gap-examples.md",
         "requirement-intake-rules/references/gap-routing.md",
         "requirement-intake-rules/references/initial-discovery-checklist.md",
-        "requirement-intake-rules/references/initial-discovery-domain-routing.md",
         "requirement-intake-rules/references/initial-discovery-evidence-and-memory.md",
         "requirement-intake-rules/references/initial-discovery-output-template.md",
         "requirement-intake-rules/references/initial-discovery-route.md",
         "requirement-intake-rules/references/intake-boundaries-and-examples.md",
         "requirement-intake-rules/references/intake-checklist.md",
+        "requirement-intake-rules/references/missing-info-checklist.md",
+        "requirement-intake-rules/references/pause-triggers.md",
+        "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+        "requirement-intake-rules/references/requirement-gap-examples.md",
         "requirement-intake-rules/references/requirement-structure-template.md"
       ],
       "agents": [
@@ -6044,21 +5910,17 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 2,
-      "auto_trigger": "当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时触发。负责明确改动边界和影响面，并将边界结论持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求缺口识别或 Bug 根因定位 skill。",
+      "auto_trigger": "当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时专项自动触发。负责范围、归属、兼容性和上下游影响裁决，并将结论回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；信息缺失转 `requirement-intake-rules#gap-routing`，历史缺陷转 Bug 域，不代替需求接入、拆分、变更、验收或实施规划。",
       "core_responsibility": "明确改动边界和影响面。",
       "skill_path": "requirement-boundary-rules/SKILL.md",
       "directory_path": "requirement-boundary-rules",
       "directory": "requirement-boundary-rules",
       "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
+        "职责与触发",
+        "路由",
+        "最小执行流程",
+        "暂停、通过与驳回",
+        "References"
       ],
       "references": [
         "requirement-boundary-rules/references/acceptance-routing-examples.md",
@@ -6086,21 +5948,17 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 3,
-      "auto_trigger": "当需求较大、涉及多个模块、多个接口、多个页面、多个步骤、多个角色协作，或一次性覆盖多个独立子系统、多个产品子域、多个相对独立主线，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求接入、边界确认或项目排期管理。",
+      "auto_trigger": "当需求较大、涉及多个模块、接口、页面、步骤、角色协作，或一次覆盖多个独立子系统、产品子域、相对独立主线，无法作为单一闭环稳定推进时专项自动触发。负责业务切片、依赖关系和当前优先闭环，并将结果回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；文件/符号落点、实施周期、真实测试命令和任务级“实现-测试-审查-验收”由 `implementation-planning-rules` 负责，不代替需求接入、边界裁决或项目排期。",
       "core_responsibility": "负责任务拆分、模块拆分和实施顺序。",
       "skill_path": "requirement-splitting-rules/SKILL.md",
       "directory_path": "requirement-splitting-rules",
       "directory": "requirement-splitting-rules",
       "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
+        "职责与触发",
+        "职责归位",
+        "最小执行流程",
+        "暂停、通过与驳回",
+        "References"
       ],
       "references": [
         "requirement-splitting-rules/references/splitting-dimensions.md",
@@ -6177,21 +6035,18 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 5,
-      "auto_trigger": "当编码过程中需求被补充、修正、插入新条件、改变优先级、调整默认值或交付物形态时触发。负责识别变更类型、重算影响范围和决定是否需要回退前序结论，并将变更结果持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要把历史缺陷误当成需求变更。",
+      "auto_trigger": "当已确认或已进入实现的需求被补充、修正、插入新条件、改变优先级、调整默认值、范围或交付物形态时专项自动触发。负责变更分类、影响失效传播、回流边界/Bug/拆分的判断，以及向验收、实施、测试和审查 Owner 发出重开与重规划信号；结论回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档。它不拥有实施总览或实施周期结构；信息不全转 `requirement-intake-rules#gap-routing`，原实现不符合原需求转 Bug 域。",
       "core_responsibility": "重新确认变更范围和影响。",
       "skill_path": "requirement-change-rules/SKILL.md",
       "directory_path": "requirement-change-rules",
       "directory": "requirement-change-rules",
       "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
+        "职责与触发",
+        "路由",
+        "职责归位",
+        "最小执行流程",
+        "暂停、通过与驳回",
+        "References"
       ],
       "references": [
         "requirement-change-rules/references/change-classification.md",
@@ -7706,6 +7561,7 @@ window.SKILL_DICTIONARY = {
         "测试样本分布优先（强制）"
       ],
       "references": [
+        "test-strategy-rules/references/doc-minimums.md",
         "test-strategy-rules/references/priority-model.md",
         "test-strategy-rules/references/strategy-dimensions.md",
         "test-strategy-rules/references/strategy-template.md",
@@ -8043,6 +7899,10 @@ window.SKILL_DICTIONARY = {
       "references": [
         "git-collaboration-rules/references/branch-and-commit.md",
         "git-collaboration-rules/references/collaboration-examples.md",
+        "git-collaboration-rules/references/commit-scope-and-clean-tree.md",
+        "git-collaboration-rules/references/current-turn-authorization.md",
+        "git-collaboration-rules/references/pre-post-gates.md",
+        "git-collaboration-rules/references/staged-review-and-evidence.md",
         "git-collaboration-rules/references/sync-and-pr-scope.md"
       ],
       "agents": [
@@ -8503,14 +8363,17 @@ window.SKILL_DICTIONARY = {
         "触发信号",
         "默认执行策略",
         "必须暂停确认的关键节点",
+        "关键节点提问格式（强制）",
         "与其他 Skill 的协作",
         "禁止事项",
         "通过 / 驳回标准",
-        "references 读取规则"
+        "快速示例"
       ],
       "references": [
-        "autonomous-execution-rules/references/ask-format.md",
-        "autonomous-execution-rules/references/examples.md"
+        "autonomous-execution-rules/references/blocker-handoff.md",
+        "autonomous-execution-rules/references/continuation-and-pause.md",
+        "autonomous-execution-rules/references/execution-authorization-and-plan-boundary.md",
+        "autonomous-execution-rules/references/termination-loop-prevention.md"
       ],
       "agents": [
         "autonomous-execution-rules/agents/openai.yaml"
@@ -8567,7 +8430,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 11,
-      "auto_trigger": "当当前会话已发生”压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责在压缩后立即联动 recent-context-bootstrap-rules 重新加载最近项目上下文（含系统的所有 skills 与当前项目根目录下 `./skill`、`./.skills`），并强制重新读取当前项目根目录 `AGENTS.md`（Codex）/ `CLAUDE.md`（Claude Code），避免压缩后丢失 skill 记忆或仓库级硬规则，再输出可直接续做的最小上下文包；压缩包必须显式携带”是否允许开始/继续实现代码”的许可状态，默认 `unknown`，在未重新确认前不得直接进入编码。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
+      "auto_trigger": "当当前会话已发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的压缩重组，或继续执行前刚得到压缩摘要时自动触发。负责按共享 context-recovery-contract 重新读取当前平台规则文件与项目当前上下文，恢复目标、阶段、约束、必命中 skill 和“是否允许开始/继续实现代码”的许可状态；只有确认缺少继续任务所需的近期项目事实时，才条件联动 recent-context-bootstrap-rules 补载近 3 天上下文与 skill 索引。不要把它代替 history-recall-rules 的深度历史回忆、project-timeline-rules 的长期时间线分析或当前主域执行。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "context-compression-rules/SKILL.md",
       "directory_path": "context-compression-rules",
@@ -8586,6 +8449,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "context-compression-rules/references/boundary-rules.md",
         "context-compression-rules/references/compression-playbook.md",
+        "context-compression-rules/references/context-recovery-contract.md",
         "context-compression-rules/references/trigger-signals.md"
       ],
       "agents": [
@@ -9245,6 +9109,46 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "task-plan-rehydration-rules",
+      "name": "task-plan-rehydration-rules",
+      "title": "任务计划断点恢复规则",
+      "status": "seed",
+      "status_label": "扩展种子",
+      "domain_id": "seed",
+      "domain_label": "扩展种子",
+      "domain_description": "已入库但未并入主规划的参考 skill",
+      "domain_order": 11,
+      "item_order": 25,
+      "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Desktop 或宿主关闭后用户在同一任务首次发送“继续/继续任务/按计划继续”、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或计划完成需要停止后续重放时自动触发。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、校验和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
+      "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
+      "skill_path": "task-plan-rehydration-rules/SKILL.md",
+      "directory_path": "task-plan-rehydration-rules",
+      "directory": "task-plan-rehydration-rules",
+      "sections": [
+        "目标",
+        "自动触发信号",
+        "唯一 Owner 边界",
+        "保存和状态迁移流程",
+        "首次继续回合恢复流程",
+        "数据与安全约束",
+        "工具不可用和停止条件",
+        "通过标准",
+        "执行入口"
+      ],
+      "references": [
+        "task-plan-rehydration-rules/references/task-plan-projection-contract.md"
+      ],
+      "agents": [
+        "task-plan-rehydration-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "先决定它是并入主规划、保持外部种子，还是拆成多个更窄的内部 skill。",
+        "如果准备纳入体系，先补上与主规划域的映射关系和落位说明。",
+        "重点看这个种子是否真的能落入主规划，还是保持独立参考更合适。"
+      ]
+    },
+    {
       "id": "test-program-rules",
       "name": "test-program-rules",
       "title": "测试程序规则",
@@ -9254,7 +9158,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 25,
+      "item_order": 26,
       "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码时触发。负责统一测试程序职责拆分、辅助代码边界和长期保留策略；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把真实测试代码、脚本、mock、fixture 和执行产物统一落在中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中；若发现资产散落在 `doc/5-tests/` 根目录之外，应先按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢；Go 场景下还必须遵循 `go-test-compile-path-rules`，避免中文进入会被 Go 工具链编译的路径；测试脚本执行时必须向控制台输出关键过程日志，便于观察执行进度与定位失败步骤；Go 场景下白盒/黑盒/集成测试都遵循同一落点规则，源码目录禁止 `*_test.go`，白盒诉求通过 seam 解决；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 test-strategy-rules 的 test-asset-governance 条件路由、test-strategy-rules 的 test-asset-governance 条件路由、test-strategy-rules 的 test-asset-governance 条件路由、`bug-intake-rules` 的 `runtime-diagnostics` 条件路由或功能验证规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "test-program-rules/SKILL.md",
@@ -9298,7 +9202,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 26,
+      "item_order": 27,
       "auto_trigger": "当新增或修改时间、日期、时区、时间窗、开始结束区间、时间字符串格式化/解析、定时任务或报表快照口径时触发。负责统一强制通过项目内 timeUtil 处理时间；不要用它代替数据库时间规则或业务口径规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "time-util-rules/SKILL.md",
@@ -9331,7 +9235,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 27,
+      "item_order": 28,
       "auto_trigger": "来自 Vercel Engineering 的 React / Next.js 性能优化指南。适用于编写、评审、重构 React/Next.js 代码时，确保采用高性能实现模式。触发场景包括 React 组件、Next.js 页面、数据获取、包体积优化与性能改进任务。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vercel-react-best-practices/SKILL.md",
@@ -9363,7 +9267,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 28,
+      "item_order": 29,
       "auto_trigger": "Vue.js 任务必须命中本 skill。默认推荐使用 Composition API + `<script setup>` + TypeScript。覆盖 Vue 3、SSR、Volar、vue-tsc。凡是 Vue、`.vue`、Vue Router、Pinia 或 Vite + Vue 相关工作都应加载。除非项目明确要求 Options API，否则始终优先 Composition API。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-best-practices/SKILL.md",
@@ -9419,7 +9323,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 29,
+      "item_order": 30,
       "auto_trigger": "\"Vue Router 4 模式、导航守卫、路由参数以及路由与组件生命周期交互的最佳实践。\"",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "vue-router-best-practices/SKILL.md",
@@ -9445,7 +9349,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 30,
+      "item_order": 31,
       "auto_trigger": "用于审查 UI 代码是否符合 Web Interface Guidelines。适用于“帮我审查 UI”“检查可访问性”“设计审计”“UX 评审”“按最佳实践检查网站”等请求。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "web-design-guidelines/SKILL.md",
@@ -9475,7 +9379,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 31,
+      "item_order": 32,
       "auto_trigger": "当 Windows 环境需要检查或准备 PowerShell 专项入口、Windows Terminal 用户级默认 profile、UTF-8 profile 或常用 Windows CLI 工具，或执行过程中出现命令缺失时触发。负责优先使用 PowerShell 7、以 RequiredOnly 完成会话准备、按精确的“每个包源各自包 ID”恢复 command-not-found、返回可机器读取的状态和退出码，并记录脱敏失败案例和用户级 discovered tools；不替换 powershell.exe、不猜测未知包、不改变 WSL 原生命令路径。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-powershell-environment-rules/SKILL.md",
@@ -9518,7 +9422,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 32,
+      "item_order": 33,
       "auto_trigger": "当项目代码位于 WSL 文件系统内（如 `/home/user/project`）、且当前任务发生在 Windows 环境时触发。核心边界：普通仓库命令默认优先使用 Git Bash / bash，只有执行类动作才优先进入 WSL，例如编译、运行/启动程序、测试、调试、会真实启动运行时的依赖安装；看代码、改代码、搜索、读写规则文件、普通 git 操作与多数只读检查默认留在 Git Bash / bash。PowerShell 不作为 Windows 下普通仓库命令入口，只在 `.ps1` 脚本、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用；一旦进入这些 PowerShell 专项场景，还必须遵守本 skill 内吸收自热门社区 skill `powershell-windows` 的保底模式（逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth、重定向与编码防护等）。agent 在 WSL 时直接访问代码与执行；agent 在 Windows 时（如 Claude Desktop GUI），普通命令通过 Git Bash / bash 访问 `//wsl.localhost/distro/...` 或等价 Windows 可访问路径，执行类动作再用 `wsl.exe --cd /home/user/project target-command` 进 WSL。无论文件写入发生在 Windows、WSL 还是 Linux，都必须遵守 UTF-8 文件写入规则，禁止 GBK/ANSI/默认编码落盘。回复中需要引用项目内文件路径（Markdown 链接、审查证据路径、截图说明、最终总结里的文件路径等）时同样触发本 skill：这条只看用户查看环境，与 agent 自身运行在 WSL 还是 Windows 无关——只要用户从 Windows 桌面 / GUI 客户端访问、项目代码在 WSL，就必须输出 `\\\\wsl.localhost\\distro\\...`，不能因为 agent 本身直接跑在 WSL 内（无需 `wsl.exe` 包裹）就顺手把 `/home/...` 当成用户可打开路径输出。纯 Windows 项目或不需要启动执行的任务，不要误切到 WSL。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "windows-wsl-execution-rules/SKILL.md",
@@ -9569,7 +9473,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "扩展种子",
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
-      "item_order": 33,
+      "item_order": 34,
       "auto_trigger": "当用户提出“生成年报/月报/周报/日报”“汇总年报/月报/周报/日报”“按项目统计最近提交并输出日报/周报/月报/年报”等请求时触发。负责基于 skill 配置的项目路径与项目名称，统计指定时间范围内的 Git 提交，并按项目分析当前工作区未提交代码 diff，补充对应的“进行中事项”，排除设计文件和文档文件后输出结构化报告（含日期+星期、按项目分组、报告内容点）；报告语言必须为中文且使用 UTF-8 编码，所有时间统一按北京时间；只允许统计当前用户本人提交，严禁混入其他作者提交；日报只统计一天，周报统计自然周，月报统计自然月，年报统计自然年；默认过滤低价值提交（如重命名/回滚/构建/文档/测试），未提交事项也必须使用 Git 工作区真实证据并显式标注为 `进行中`；并按 `?报-YYYYMMDDHHMMSS` 格式自动保存到 `/home/luode/code`（可在配置中覆盖）；不要把它代替发布总结、需求文档或测试报告。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "work-report-summary-rules/SKILL.md",
@@ -9695,7 +9599,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "75 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
+    "73 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
     "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
     "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
   ]

@@ -1,3 +1,4 @@
 .system/*
 .tmp*
 __pycache__/
+thread-title-rules/mcp/node_modules/

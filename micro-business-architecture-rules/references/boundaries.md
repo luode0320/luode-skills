@@ -20,7 +20,7 @@
 | `code-readability-rules` | 强边界 / 防冲突 | `contract/` 接口只为**真实存在的跨业务调用点**建立；本 skill 服从其反过度抽象、反单实现接口判定，禁止为「解耦/以后扩展」预建单实现接口。 |
 | `artifact-storage-rules` | 依赖 | 任何 doc 产物的路径与命名一律引用其 `references/path-map.yaml`，本 skill 不自定义目录或命名规则。 |
 | `architecture-doc-rules` | 弱联动 | 业务包与接口契约的结构结论**可**回写到 `doc/1-架构/3-模块职责.md`，属可选增强，不是本 skill 的强制产物。 |
-| `project-rule-file-bootstrap-rules` / `project-memory-file-bootstrap-rules` | 衔接 | 新会话首轮的规则文件（前者）与项目记忆四件套（后者）自举交给它们；微业务标记的 upsert 由本 skill 自有脚本完成，不侵入 bootstrap 脚本。 |
+| `project-rule-file-bootstrap-rules` | 衔接 | 新会话首轮的规则文件与项目记忆四件套自举交给该唯一 Owner 的 `rule-bootstrap` / `memory-bootstrap` 条件路由；微业务标记的 upsert 由本 skill 自有脚本完成，不侵入 bootstrap 脚本。 |
 | `implementation-planning-rules` | 术语区分 | 其「垂直切片」是**任务拆分**语义，本 skill 的「业务包切分」是**代码目录**语义，两者不可混用、不得互相误触发。 |
 
 ---
@@ -49,9 +49,9 @@
 - 弱在何处：这是**可选增强**而非强制产物。本 skill 的强制产物是各业务包 README、全局业务包索引与公共接口契约清单（见 `md-convention.md`）；是否额外回写架构文档由项目按需决定。
 - 落点约束：若回写，路径仍遵循 `artifact-storage-rules` 的 `path-map.yaml`，不因回写而绕开路径单一真相源。
 
-## 5. `project-rule-file-bootstrap-rules` / `project-memory-file-bootstrap-rules`（衔接）
+## 5. `project-rule-file-bootstrap-rules`（衔接）
 
-- 衔接内容：新会话首轮的规则文件（`CLAUDE.md` / `AGENTS.md`）检测与创建由 `project-rule-file-bootstrap-rules` 负责，项目记忆四件套（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md` 等）的自举由 `project-memory-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`。
+- 衔接内容：新会话首轮的规则文件（`CLAUDE.md` / `AGENTS.md`）与项目记忆四件套（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md`）均由 `project-rule-file-bootstrap-rules` 负责，分别进入 `rule-bootstrap` / `memory-bootstrap` 条件路由，并复用唯一 `scripts/bootstrap_agents.sh`。
 - 本 skill 的接续点：在 bootstrap 完成通用规则文件自举之后，本 skill 负责微业务专项引导（建议采用微业务架构）与标记写入。
 - 关键隔离：微业务标记的幂等 upsert（向 `CLAUDE.md` / `AGENTS.md` 追加受管章节 `## 微业务架构约束`、向根目录 `项目设计.md` 追加业务索引段）由本 skill 自有脚本 `micro_business.py init` 完成，**不侵入、不修改** bootstrap 的脚本；本 skill 只复用 bootstrap 的 header upsert 语义（定位替换 / 追加），不改写其实现。
 

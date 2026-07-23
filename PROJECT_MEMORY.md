@@ -1,6 +1,16 @@
 # 项目长期记忆
 
 
+## Codex Desktop 任务投影断点恢复规则
+
+- 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 schema、计划指纹、敏感字段拒绝、51,200 字节闸门、原子写入、失活和 `update_plan` payload。
+- 稳定决策：正式实施周期文档仍是真实计划源；任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态，不保存 prompt、响应、凭据、线程 ID、业务数据或原始用户输入。
+- 稳定决策：任务状态迁移固定先原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先校验活动投影并重建 UI，进行中步骤必须先核验中断点。
+- 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`。
+- 更新时间：2026-07-23。
+
+
 ## 六域 Skill 精简与自动触发保护规则
 
 - 稳定决策：需求、实施、测试、Bug、审查、验收域精简时，用户习惯、自动触发、授权、安全、local、输出协议、暂停与停止边界均为保护语义；可以迁移位置，不得删除或弱化。
@@ -144,16 +154,16 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审查 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部统一由 `requirement-intake-rules` 作为第一入口；粗略 idea 进入 `initial-discovery` 路由，主入口负责立即创建需求主文档，`requirement-gap-rules` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。需求、验收标准和实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
-- 来源: `requirement-intake-rules/references/initial-discovery-domain-routing.md`、`编码skill.md`
+- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审查 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部统一由 `requirement-intake-rules` 作为第一入口；粗略 idea 进入 `initial-discovery` 路由，主入口负责立即创建需求主文档，`requirement-intake-rules` 的 `gap-routing` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。需求、验收标准和实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
+- 来源: `requirement-intake-rules/references/requirement-domain-shared-contract.md`、`编码skill.md`
 - 适用范围: 需求域
-- 更新时间: 2026-06-30
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### 需求临时缺口文档规则
 - 别名: gap 临时文档, 缺口阻断文档
 - 类型: 流程规则
-- 定义: `requirement-gap-rules` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/2-需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
+- 定义: `requirement-intake-rules` 的 `gap-routing` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/2-需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
 
 ### 双层验收规则
 - 别名: 前置验收 + 最终验收, 验收双层机制, Bug 验收
@@ -221,7 +231,7 @@
 ### 普通 Markdown 输出规则
 - 别名: text 代码块禁用, 自然语言不用代码围栏, 输出格式规则
 - 类型: 输出规则
-- 定义: 普通说明、方案、流程、总结、审查报告、线程拆分和状态回报必须使用普通 Markdown 段落、列表、表格或引用块；不得用 ` ```text `、无语言代码围栏、缩进代码块或 HTML 包裹整段自然语言输出。代码围栏只用于真实代码、命令、配置片段、日志片段、JSON/YAML 等需要等宽保真的内容。该规则由 `reasoning-summary-structure-rules` 负责收口检查，并由 `project-rule-file-bootstrap-rules` 同步进 `AGENTS.md` / `CLAUDE.md` 的“输出格式规则”章节。
+- 定义: 普通说明、方案、流程、总结、审查报告、线程拆分和状态回报必须使用普通 Markdown 段落、列表、表格或引用块；不得用 ` ```text `、无语言代码围栏、缩进代码块或 HTML 包裹整段自然语言输出。代码围栏只用于真实代码、命令、配置片段、日志片段、JSON/YAML 等需要等宽保真的内容。最终总结在存在流程、依赖、状态、执行链、跨角色交互或量化结果时，优先在执行证据前输出 1 张、必要时最多 2 张 Mermaid 图形；每张图前写图形目的和关联 ID，图形只表达真实事实并与正文术语一致，简单单点任务不强制造图。该规则由 `reasoning-summary-structure-rules` 负责收口检查，并由 `project-rule-file-bootstrap-rules` 同步进 `AGENTS.md` / `CLAUDE.md` 的“输出格式规则”章节。
 - 来源: 用户截图确认、`reasoning-summary-structure-rules`、`project-agents-bootstrap`、`PROJECT_STYLE.md`
 - 适用范围: 最终回复、中间进度、审查报告、线程拆分、仓库规则文件模板
 - 更新时间: 2026-06-30
@@ -239,8 +249,8 @@
 ### 并行执行闭环规则
 - 别名: 并行识别必须真启动, 规划器加执行器, 子线程启动证据
 - 类型: 流程规则
-- 定义: `parallel-task-dispatch-rules` 只负责并行判定与线程拆分，不再允许单独停留在“识别出可并行”。本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。当并行判定为可并行或条件并行且无任务阻断时，必须继续联动 `subagent-dispatch-rules` 做真实启动判定并发起真实子线程 / 子代理执行，同时核对计划线程数、实际启动线程数与关闭/回收线程数。仅输出线程分配文案、`并行技能` 列表或口头启动说明，不视为真正并行已生效。并行识别不以固定 skill 映射为白名单；项目分析、找 Bug、需求完善侦察、资料/日志/调用链证据收集等任务，只要能拆成独立问题、独立证据来源、独立目录、独立模块或独立文件集，主 agent 必须优先形成只读 sidecar 子任务计划并在授权成立时真实委派。单一根因、需求边界、接口契约、schema 或架构方向等最终裁决仍由主 agent 串行负责。
-- 来源: `parallel-task-dispatch-rules`、`parallel-task-dispatch-rules/references/task-classification.md`、`subagent-dispatch-rules`、`subagent-dispatch-rules/references/delegation-decision-matrix.md`
+- 定义: `parallel-task-dispatch-rules` 是并行分类与子代理生命周期的唯一 Owner，不允许停留在“识别出可并行”。本仓库默认处于 subagent 完全授权模式，但系统规则、工具元数据和用户当前轮禁止优先；统一状态机在任务可切分、写集不冲突、风险可控且环境支持时完成真实启动、主路径继续、结果回收和关闭，并核对计划线程数、实际启动数、完成数与关闭数。仅输出线程分配文案、`并行技能` 列表或口头启动说明，不视为真正并行。并行识别不以固定 skill 映射为白名单；项目分析、找 Bug、需求完善侦察、资料/日志/调用链证据收集等任务，只要能拆成独立问题或证据源且不重复读取大段上下文，应优先形成 sidecar 计划并在授权成立时真实委派。单一根因、需求边界、接口契约、schema 或架构方向等最终裁决仍由主 agent 串行负责。
+- 来源: `parallel-task-dispatch-rules`、`parallel-task-dispatch-rules/references/task-classification.md`、`parallel-task-dispatch-rules/references/delegation-decision-matrix.md`
 - 适用范围: 并行开发、并发审查、项目分析、需求侦察、Bug 分诊、sidecar 子任务分发
 - 更新时间: 2026-06-30
 - 状态: 启用
@@ -248,8 +258,8 @@
 ### 子 agent 启动计划脚本
 - 别名: generate_subagent_plan, 批量委派计划, 中文任务名子 agent
 - 类型: 工具规则
-- 定义: `subagent-dispatch-rules` 在批量委派前优先运行 `subagent-dispatch-rules/scripts/generate_subagent_plan.py` 生成结构化启动计划。脚本只负责输出计划 JSON，不直接调用平台工具；真实启动仍由主 agent 读取计划后调用 subagent / multi-agent / thread 工具。脚本生成的 `agent_name` / `logical_agent_name` 默认使用“任务简要中文 + 线程标识”，用于主 agent 侧的中文逻辑命名与计划线程数核对；平台 UI 实际昵称仍以启动工具返回值为准。
-- 来源: `subagent-dispatch-rules`
+- 定义: `parallel-task-dispatch-rules` 在批量委派前按需运行 `parallel-task-dispatch-rules/scripts/generate_subagent_plan.py` 生成结构化启动计划。脚本只负责输出计划 JSON，不直接调用平台工具；真实启动仍由主 agent 读取计划后调用 subagent / multi-agent / thread 工具。脚本生成的 `agent_name` / `logical_agent_name` 默认使用“任务简要中文 + 线程标识”，用于主 agent 侧的中文逻辑命名与计划线程数核对；平台 UI 实际昵称仍以启动工具返回值为准。
+- 来源: `parallel-task-dispatch-rules`
 - 适用范围: 批量子任务委派、并行线程规划
 - 更新时间: 2026-06-29
 - 状态: 启用
@@ -257,8 +267,8 @@
 ### 子 agent 生命周期回收
 - 别名: close_agent 回收, 子代理关闭, 已完成子线程释放
 - 类型: 流程规则
-- 定义: subagent 启动成功后，即使执行已完成，仍会继续占用并发槽位；主 agent 在结果回收并完成整合后，必须继续调用真实 `close_agent` / 等价关闭工具完成释放。`subagent-dispatch-rules` 的通过标准需要同时核对计划线程数、实际启动线程数与实际关闭线程数。
-- 来源: `subagent-dispatch-rules`
+- 定义: subagent 启动成功后，即使执行已完成，仍会继续占用并发槽位；主 agent 在结果回收并完成整合后，必须继续调用真实 `close_agent` / 等价关闭工具完成释放。`parallel-task-dispatch-rules` 的通过标准同时核对计划线程数、实际启动数、完成数与关闭数。
+- 来源: `parallel-task-dispatch-rules`
 - 适用范围: 所有真实子 agent / 并行代理执行场景
 - 更新时间: 2026-06-29
 - 状态: 启用
@@ -419,10 +429,10 @@
 ### 会话自动重命名规则
 - 别名: thread-title-rules, 会话标题自动更新, 任务中文简要
 - 类型: 工作台规则
-- 定义: 当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，也必须在过程中尽早判定是否改名，不等待最终总结。由 agent 生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题。Codex 环境优先使用真实 `set_thread_title`；若当前工具列表尚未直接暴露 `set_thread_title` 或 `list_threads`，必须先通过 `tool_search` 发现线程工具，再按 `cwd`、最近更新时间和当前任务主题可靠识别当前会话后执行改名；只有完成工具发现后仍无真实工具时才可跳过。Claude Code 仅在存在真实改名工具时执行；Claude Desktop 默认视为无真实自动改名工具，必须显式跳过并说明原因。标题已准确、用户明确禁止或只是最小任务内部小步骤推进时跳过；禁止用正文伪造工具调用或猜测结果宣称已改名。
-- 来源: 用户本轮确认、`thread-title-rules/SKILL.md`、`project-agents-bootstrap/SKILL.md`
-- 适用范围: 会话管理、任务检索、总控层自动触发、仓库规则自举
-- 更新时间: 2026-07-05
+- 定义: 当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，也必须在过程中尽早判定是否改名，不等待最终总结。由 agent 生成 8-24 字中文简要标题，并按真实工具能力更新当前会话标题。Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，由工具从可信 MCP 元数据识别当前任务；首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时，仅在真实存在可直接作用于当前会话的 `set_thread_title` 时回退一次，MCP 成功后不得重复调用。禁止通过 `list_threads`、`cwd`、最近更新时间、preview 或标题相似度猜测当前会话。其他宿主只按真实工具发现结果执行，不按模型名称推断能力；标题已准确、用户明确禁止、主题不稳定或只是最小任务内部小步骤推进时跳过，禁止伪造工具调用或猜测结果宣称成功。
+- 来源: 用户本轮确认、`thread-title-rules/SKILL.md`、`thread-title-rules/references/rename-tool-contract.md`
+- 适用范围: Codex App 会话管理、任务检索、总控层自动触发、模型无关工具路由
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### Obsidian 知识流选择性默认触发链
@@ -505,14 +515,14 @@
 
 - 2026-06-27：初始化根目录长期记忆文档，补齐 doc 顶层目录口径、审查链收口和长期规则回写约束。
 - 2026-06-27：新增需求主动侦察链路，明确老板式 idea 先由 agent 查项目、数据、代码、上下游和补充路径，再形成需求设计并回写可复用侦察线索。
-- 2026-06-27：明确 `requirement-discovery-rules` 是需求域第一入口，现有需求 skill 暂不合并为大 skill，改为通过路由 reference 收敛职责重叠。
+- 2026-06-27：曾将独立 Discovery Skill 设为需求域第一入口；当前稳定口径已迁移为 `requirement-intake-rules#initial-discovery`，四个需求 Owner 保持独立，通过条件路由与 reference 收敛职责重叠。
 - 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
 - 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/6-审查/`，不再写项目根目录固定文件名。
 - 2026-06-28：明确“需求/验收标准/实施计划完成不等于自动开工”，必须等用户明确“开始实施/开始执行”后才能进入编码；一旦开工，后续按实施周期自动串行推进实现、测试、审查与验收闭环。
 - 2026-06-30：统一实施执行口径为“最小任务闭环优先于实施周期浏览”，并统一主执行链术语为“实现 -> 真实测试 -> 审查 -> 验收”。
 - 2026-06-29：将实施执行粒度从“实施周期闭环”细化为“最小任务闭环”；实施周期继续作为文档管理容器，真正执行顺序改为每个最小任务依次完成实现、真实测试、审查、验收后再进入下一个最小任务。
 - 2026-06-29：补充长文本执行边界；“开始实施/开始实现/开始执行/直接做/继续做完/按文档实现”等开工词必须有执行计划、任务完成条件、任务停止 / 结束条件和最大推进边界，缺少时先补受限计划并停在计划收口处，不得直接实现。
-- 2026-06-29：新增并行执行闭环口径，明确 `parallel-task-dispatch-rules` 判定可并行后必须继续联动 `subagent-dispatch-rules` 做真实启动判定，不能只停留在文本规划；2026-06-30 补充工具授权优先级，真实启动需服从工具元数据。
+- 2026-06-29：建立并行规划与真实启动闭环；2026-06-30 补充工具授权优先级；2026-07-22 收敛为 `parallel-task-dispatch-rules` 单一状态机，统一分类、授权、启动、观测、回收与关闭，不能只停留在文本规划。
 - 2026-06-29：新增 `generate_subagent_plan.py` 启动计划脚本，明确批量委派先生成计划 JSON，再由主 agent 读取计划并真实启动；子 agent 名称默认使用任务简要中文。
 - 2026-06-29：补充子 agent 生命周期口径，明确中文任务名属于主 agent 逻辑名，平台 UI 昵称由启动工具返回；结果收回后仍必须调用 `close_agent` 完成回收。
 - 2026-06-30：扩展并行识别口径，明确并行不再依赖固定 skill 映射白名单；主 agent 在项目分析、找 Bug、需求完善侦察、证据收集等任务中必须自主识别可委派的只读 sidecar 子任务并优先尝试真实 subagent 并行。
@@ -606,11 +616,38 @@
 
 - 2026-07-21：六域 Skill 精简采用“单主入口 + 条件路由”；需求 discovery 已迁移到 `requirement-intake-rules` 的 `initial-discovery`，自动触发、local 安全、证据、记忆回写、输出和停止边界保持不变。
 
+## 总控层单向路由与合并规则
+
+- 稳定决策：`skill-hit-check-rules` 是每轮唯一首入口；它只确认联动，不复制 Git、失败恢复、并行或 Skill 资产 Owner 的执行细则。
+- 稳定决策：`parallel-task-dispatch-rules` 是并行分类与子代理生命周期的唯一 Owner，一次状态机完成串行/条件并行/可并行判定、上下文成本、互斥写集、系统能力与授权、真实启动、主路径继续、结果回收、关闭和回退；计划、启动、完成、关闭数量必须可核对。
+- 稳定决策：`project-rule-file-bootstrap-rules` 是项目自举唯一 Owner，内部保留 `rule-bootstrap` 与 `memory-bootstrap`；规则文件非受管内容、UTF-8、`PROJECT_CURRENT.md` 51,200 字节、机器索引和 `PROJECT_HISTORY.md` 只追加均为保护语义。
+- 稳定决策：压缩恢复先执行共享 `context-recovery-contract`；只有 `recent_context_state=missing` 才条件调用 `recent-context-bootstrap-rules`，新会话预热、压缩恢复和明确历史回忆三个入口保持独立。
+- 稳定决策：注释细则由注释 Owner 定义，上层审查和收口只消费 PASS/FAIL、缺口与证据；执行合规和代码收口只产生状态，不重复定义最终 Markdown；`reasoning-summary-structure-rules` 唯一渲染阻断、合法后续和无下一步收口。
+- 稳定决策：退役总控 Skill 前必须有 protected semantic mapping、trigger fixtures、active consumer 清零、physical asset owner、baseline tree、rollback locator、生命周期证据和 post-delete PASS；失败候选保持 HOLD，不为目标数量强删。
+- 来源：`doc/2-需求/2026-07-22_223221_总控层Skill精简合并与单向路由.md`、`doc/5-tests/2026-07-22_223221/control-plane-streamlining/`。
+- 更新时间：2026-07-22。
+
 ## 机器索引区
 
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.control-plane-single-direction-routing
+    name: "总控层单向路由与合并规则"
+    type: "Skill 治理规则"
+    aliases:
+      - 总控层精简
+      - 并行与子代理统一 Owner
+      - 项目自举双条件路由
+    definition: "每轮由 skill-hit-check-rules 唯一进入；并行分类与子代理生命周期统一归 parallel-task-dispatch-rules，项目规则和记忆骨架自举统一归 project-rule-file-bootstrap-rules 的 rule-bootstrap/memory-bootstrap；压缩恢复只在近期事实缺失时条件调用 recent-context-bootstrap-rules；最终 Markdown 由 reasoning-summary-structure-rules 唯一渲染。退役候选必须完成保护语义、触发正负样本、消费者、资产、回滚和 post-delete 门禁。"
+    scope: "总控入口、上下文恢复、项目自举、并行委派、执行收口和最终总结"
+    status: "active"
+    evidence_ids:
+      - evidence.control-plane-streamlining
+      - evidence.control-plane-post-delete
+    context_ids:
+      - context.skill-governance
+    updated_at: 2026-07-22
   - entity_id: rule.swag-upstream-openapi
     name: "上游与第三方出站接口文档规则"
     type: "API 文档资产规则"
@@ -1030,6 +1067,23 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
+  - entity_id: rule.task-plan-rehydration
+    name: "Codex Desktop 任务投影断点恢复"
+    type: "运行时恢复规则"
+    aliases:
+      - 任务投影
+      - 悬浮任务列表恢复
+      - task-plan-rehydration-rules
+      - PROJECT_CURRENT 任务投影
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活和 update_plan payload；首次继续回合只重建 UI，进行中步骤先核验，且不恢复执行授权或 L5 resume。"
+    scope: "Codex Desktop 计划模式多步骤任务、上下文恢复和宿主重开后的首次继续回合"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.task-plan-rehydration
+      - evidence.doc.task-plan-rehydration-requirement
+    context_ids:
+      - context.task-plan-rehydration
+    updated_at: 2026-07-23
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -1252,6 +1306,16 @@ evidence:
     source: "Obsidian 知识流阶段收口沉淀"
     path: "知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md"
     note: "通过固定 vault bridge create/readback 沉淀统计口径、候选顺序、五类验证契约和当前周期状态，并通过 bridge append/readback 更新 INDEX。"
+  - evidence_id: evidence.skill.task-plan-rehydration
+    type: "skill"
+    source: "任务投影断点恢复唯一 Owner 与机器契约"
+    path: "task-plan-rehydration-rules/SKILL.md"
+    note: "定义首次继续触发、状态同步顺序、UI 与执行授权边界、失活和工具不可用语义。"
+  - evidence_id: evidence.doc.task-plan-rehydration-requirement
+    type: "doc"
+    source: "Codex Desktop 任务悬浮窗断点恢复需求与实施文档"
+    path: "doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md"
+    note: "冻结任务投影字段、恢复时机、安全边界、验收标准和四周期实施顺序。"
 contexts:
   - context_id: context.task-blocker-closure
     type: "task-scope"
@@ -1301,6 +1365,10 @@ contexts:
     type: "repository-convention"
     name: "记忆域"
     note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
+  - context_id: context.task-plan-rehydration
+    type: "task-scope"
+    name: "任务悬浮窗断点恢复"
+    note: "适用于任务投影持久化、Desktop 重开后的首次继续回合、上下文恢复和进行中步骤核验"
 lifecycle:
   active:
     - "rule.swag-upstream-openapi"
@@ -1320,6 +1388,7 @@ lifecycle:
     - "rule.git-obsidian-capture-link"
     - "rule.git-commit-domain-split"
     - "rule.git-commit-review-acceptance-evidence"
+    - "rule.task-plan-rehydration"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -1327,6 +1396,14 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    任务投影:
+      - "rule.task-plan-rehydration"
+    悬浮任务列表恢复:
+      - "rule.task-plan-rehydration"
+    Desktop 继续任务:
+      - "rule.task-plan-rehydration"
+    update_plan 重建:
+      - "rule.task-plan-rehydration"
     Skill 体积预算:
       - "fact.skill-size-baseline-20260717"
     84 个正式 skill:
@@ -1520,6 +1597,14 @@ retrieval_hints:
     提交域隔离:
       - "rule.git-commit-domain-split"
   sources:
+    task-plan-rehydration-rules/SKILL.md:
+      - "rule.task-plan-rehydration"
+    task-plan-rehydration-rules/references/task-plan-projection-contract.md:
+      - "rule.task-plan-rehydration"
+    task-plan-rehydration-rules/scripts/task_plan_projection.py:
+      - "rule.task-plan-rehydration"
+    doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md:
+      - "rule.task-plan-rehydration"
     execution-failure-learning-rules/SKILL.md:
       - "rule.execution-failure-learning"
     execution-failure-learning-rules/references/classification-and-routing.md:

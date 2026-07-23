@@ -3817,7 +3817,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
-- 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-rule-file-bootstrap-rules` 进行规则文件自举补齐；若同时涉及项目记忆四件套，联动 `project-memory-file-bootstrap-rules`；两条规则同样适用于其他项目仓库。
+- 若本轮涉及创建、补齐或更新仓库级规则文件或项目记忆四件套，默认启用 `project-rule-file-bootstrap-rules`，再按 `rule-bootstrap` / `memory-bootstrap` 条件路由分别处理；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -3859,7 +3859,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
 - 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
 - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
-- 若压缩后发现规则文件缺失、损坏或规则不完整，必须先触发 `project-rule-file-bootstrap-rules` 补齐规则文件；若项目记忆四件套同样缺失或不完整，联动 `project-memory-file-bootstrap-rules` 补齐，再继续主任务。
+- 若压缩后发现规则文件或项目记忆四件套缺失、损坏或不完整，必须触发 `project-rule-file-bootstrap-rules`，按 `rule-bootstrap` / `memory-bootstrap` 条件路由补齐后再继续主任务。
 
 ## 变更最小化
 
@@ -3984,7 +3984,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 ## 会话动态重命名规则
 
 - 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
-- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 环境优先使用真实 `set_thread_title` 工具，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认视为无真实自动改名工具并显式跳过。
+- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按真实工具发现结果更新当前会话标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 修正重试仍失败则直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在可直接作用于当前会话的 `set_thread_title` 时回退一次，MCP 成功后停止。其他宿主只按真实工具能力执行，不按模型名称推断能力。
 - 会话重命名不等待用户显式要求，也不等待最终总结；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，都应在过程中尽早尝试重命名。
 - 但任务主题尚未稳定、标题已准确、工具不可用、无法可靠确定当前会话 ID、用户明确禁止，或只是最小任务内部小步骤推进时必须跳过，并说明原因。
 - `CLAUDE.md` 仅用于 Claude Code 仓库规则自举，不等同于 Claude Desktop 已具备自动会话改名能力。
@@ -4013,7 +4013,3 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
 - 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
 - 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
-
-## 注意
-
-- 我们允许api等私密数据直接存放写死代码。

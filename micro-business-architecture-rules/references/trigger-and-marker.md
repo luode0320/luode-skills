@@ -43,7 +43,7 @@
 
 ### 3.1 先做规则文件自举
 
-新会话首轮先联动 `project-rule-file-bootstrap-rules`（规则文件）与 `project-memory-file-bootstrap-rules`（项目记忆四件套），确保目标项目的规则文件（`CLAUDE.md` / `AGENTS.md`）与项目记忆四件套已存在。通用规则文件自举由 `project-rule-file-bootstrap-rules` 负责，本 skill 只在其完成之后接续微业务专项判断，不侵入其脚本。
+新会话首轮先联动 `project-rule-file-bootstrap-rules`，由其按 `rule-bootstrap` / `memory-bootstrap` 条件路由确保目标项目的规则文件（`CLAUDE.md` / `AGENTS.md`）与项目记忆四件套已存在。本 skill 只在统一自举完成后接续微业务专项判断，不侵入其脚本。
 
 ### 3.2 检测为候选新项目 → 先向用户建议
 

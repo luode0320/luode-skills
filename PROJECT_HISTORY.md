@@ -80,3 +80,49 @@
 
 - 全量 post-delete 发现并纠正 `requirement-gap-rules` 漏删：细则迁入 `requirement-intake-rules` 的 `gap-routing`，旧 source 真实删除，active-consumers、asset inventory、manifest 和根规划同步。
 - 全量 baseline、trigger、post-delete 和字典通过；六域最终审查与最终验收文档已落盘。
+
+## 2026-07-22：总控层 Skill 单向路由精简与两组合并
+
+- 将并行分类与子代理真实生命周期合并到 `parallel-task-dispatch-rules`，迁移脚本、references、examples 和 Agent 元数据后删除 `subagent-dispatch-rules`。
+- 将规则文件和项目记忆骨架自举合并到 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap` / `memory-bootstrap`，迁移模板后删除 `project-memory-file-bootstrap-rules`。
+- 修复压缩恢复无条件调用新会话预热的冲突；入口、阶段、自治、Git、实现审查、合规、代码收口、注释和最终输出完成引用化去重。
+- 14 个最小任务均完成 TEST / REVIEW / ACCEPT；总控 validator 的 baseline、trigger、post-delete、15 个 quick validate、11 个工程文档 profile、字典和活跃消费者清零检查通过。
+- 字典从 75 降为 73，`planned_missing=0`；当前轮没有 Git 写历史授权，改动保持未提交；Obsidian 仍因 `VAULT_NOT_REGISTERED` 仅阻断 vault 沉淀。
+- 最终收口复验：独立当前改动审查 P0=0、P1=0，review 与 final_acceptance 严格 profile 均 PASS；子代理生命周期为计划/启动/完成/关闭 6/6/6/6、最大同时活跃 4；项目当前状态更新为全部完成且无待办。
+
+## 2026-07-22：最终总结 Mermaid 图形化任务转为保留交接
+
+- `reasoning-summary-structure-rules` 的图形化实现、Quick Validate、YAML、基础差异和字典已完成；当时尚待 Mermaid CLI 真实解析、独立只读审计、Obsidian 判断和最终验收。
+- 当前需求域精简任务接管 `PROJECT_CURRENT.md` 前，已将上述未完成项保留为独立交接事实；本轮不回退、不覆盖其现有未提交改动，也不把它伪报为已经最终放行。
+
+## 2026-07-22：模型无关会话重命名工具落地
+
+- 保留 `thread-title-rules` 为唯一自动触发 Owner，新增 `rename_current_thread` 本地 MCP 工具；模型只传 `title`，当前线程 ID 由可信 MCP 元数据解析。
+- 工具通过 Codex App Server 的 `thread/name/set` 改名，禁止线程列表、路径、时间或标题相似度猜测，并保留 `set_thread_title` 单次兼容回退。
+- 修复 Skill 联接路径与真实仓库路径不一致导致 MCP 入口未启动的问题；新增 stdio 握手回归，自动化测试 13/13 通过。
+- 全局 `thread_session` MCP 已注册；持久化 `codex exec` 真实发现并调用返回 `RENAMED`，当前任务改名为“模型无关会话重命名”并经 `thread/read` 回读一致；一次性测试任务已归档。
+- 非 GPT 工具调用模型当前未配置，因此跨模型实机验证未执行；Obsidian bridge 仍因 `VAULT_NOT_REGISTERED` 阻断沉淀，不影响本地实现。
+
+## 2026-07-23：模型无关会话重命名工具最终放行
+
+- 使用正式 `codex mcp add` 注册 `thread_session`，新持久化 Codex App 任务真实发现 `rename_current_thread`，schema 仅包含 `title`，调用返回 `RENAMED`，App 立即回读标题一致；两次一次性测试任务均已归档。
+- Windows 清理改为等待真实退出并使用 `taskkill /t /f` 终止完整进程树；增加真实后代进程测试。JSON-RPC 解析拒绝合法 JSON 非对象响应，避免未捕获异常。
+- `_meta` 明确仅属于 Codex App 宿主适配器信任边界，移除未声明的 turn metadata `threadId` 别名；活动旧原生优先路由清零，首次 `INVALID_TITLE` 重试与原生回退次数已消除歧义。
+- MCP 自动化 16/16、Node 语法、Quick Validate、npm audit、UTF-8/YAML、字典、四个工程文档 profile 和 `git diff --check` 均通过；独立最终复审 P0/P1/P2 均为 0，Skill 合规与项目改动审查 PASS。
+- 当前模型选择器仅提供 GPT 系列，因此非 GPT 实机验证继续标记为环境不具备；本结论只放行 Codex App 第一版，不扩展到其他宿主。
+
+## 2026-07-22：需求域 Skill 精简、旧路由收口与职责归位完成
+
+- 保留 `requirement-intake-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 四个独立自动触发 Owner；discovery 与 gap 继续作为 Intake 内部 `initial-discovery` / `gap-routing` 条件路由，不恢复退役顶层 Skill。
+- 新增需求域共享契约和三个直接 Gap 支持 reference，删除 `initial-discovery-domain-routing.md` 与 `gap-routing-source/` 迁移快照；13 个冻结活跃消费者全部迁移，两个旧名称的活跃命中均为 0。
+- 专项验证器补齐真实自然语言路由、重复 fixture 与名称自证负向、LF/CRLF 工作树指纹、6 个候选 worktree hash、消费者/保护契约精确集合、22 个 reference 精确集合与递归可达性、唯一 Agent、无 scripts 以及拆分/变更全树职责负向门禁。
+- baseline、trigger、consumer、reference、post-cleanup 五阶段全部 `valid=true`；九个相关 Skill Quick Validate、十二个工程文档严格 profile、UTF-8/YAML/JSON/Python AST、字典和 `git diff --check` 通过，字典保持 `implemented_total=73`、`planned_missing=0`；共享工作树当前 `seed_total=34`，范围外新增种子未改变需求域 Owner 数量。
+- 十二个最小任务完成实现、真实测试、审查和验收闭环；最终独立只读复审 P0=0、P1=0，最终当前改动审查和最终验收均 PASS。当前轮未授权 Git 写历史，改动保持未提交；Obsidian 因 `VAULT_NOT_REGISTERED` 只阻断 vault 沉淀。
+
+## 2026-07-23：Codex Desktop 任务悬浮窗断点恢复进入真实重启验收
+
+- 新增 `task-plan-rehydration-rules`，以 `PROJECT_CURRENT.md` 唯一托管区保存当前周期步骤、顺序和三态状态；恢复时由 Agent 真实调用 `update_plan` 重建悬浮任务列表。
+- 投影脚本完成严格 UTF-8、字段白名单、敏感字段拒绝、SHA-256 指纹、51,200 字节闸门、原子替换、失活和五个 CLI 子命令；17 项单元测试通过。
+- 项目记忆、自举、连续执行、上下文恢复和运行时恢复完成职责接入；UI 重建不恢复执行授权，也不等同于 L5 resume，进行中步骤必须先核验。
+- 六个受影响 Skill quick validate、临时目录自举幂等、字典生成和 `git diff --check` 通过；严格追踪修复定向回归 3/3 通过。
+- `TASK-RTP-01` 至 `TASK-RTP-07` 已完成阶段审查与验收；活动投影推进到 `TASK-RTP-08 in_progress`，等待用户真实关闭并重开 Desktop 后完成首次继续回合验收。

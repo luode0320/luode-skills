@@ -41,7 +41,7 @@
 - 需要通过真实浏览器打开页面、点击、输入、登录、截图、提取页面数据或验证前端交互时，自动进入浏览器联动测试规则
 - 进入上线或交付阶段时，自动进入提交流程、交付说明和团队发布前置收口规则
 - 只要本轮命中 `parallel-task-dispatch-rules`，中间进度除了 `命中检查`、`命中技能` 之外，还必须明确输出 `并行技能`；若最终未并行，也要显式写 `并行技能:无`
-- 若 `parallel-task-dispatch-rules` 判定可并行或条件并行且无阻断，不允许停留在“识别到可并行”；必须继续联动 `subagent-dispatch-rules` 发起真实子线程，并核对计划线程数与实际启动线程数
+- `parallel-task-dispatch-rules` 必须在一个入口内完成分类、授权检查、真实启动、观测、回收和关闭；只识别到可并行而没有真实工具证据不得写成已并行
 
 ## 二、总体设计原则
 
@@ -180,18 +180,16 @@
 | `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-rule-file-bootstrap-rules`、`mcp-installation-rules` 与 `imagegen`。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
-| `project-rule-file-bootstrap-rules` | 当新会话首轮进入项目、仓库级规则文件（`AGENTS.md` / `CLAUDE.md`）、`.gitattributes`、`.editorconfig` 缺失或需要同步补齐受管章节时自动触发。 | 负责检测并创建缺失的规则文件、`.gitattributes`、`.editorconfig`，并对已存在规则文件的受管章节做增量幂等 upsert，保留用户自定义内容；不负责项目记忆四件套。 |
-| `project-memory-file-bootstrap-rules` | 当项目记忆四件套（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md`）任一缺失或需要新会话交接初始化时自动触发。 | 负责检测、创建并维护项目记忆四件套的结构骨架与大小闸门；不负责规则文件本身，也不替代 `project-memory-rules` 的事实抽取。 |
-| `thread-title-rules` | 当当前 Codex / Claude / agent 会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题，并按平台能力矩阵调用当前环境真实线程重命名工具更新当前会话标题；Codex 优先使用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过。 |
-| `parallel-task-dispatch-rules` | 当任务准备进入执行阶段，且存在可按文件集、模块边界或职责边界拆分的独立子任务时自动触发。 | 负责判断当前工作应并行、条件并行还是串行推进；若允许并行且无阻断，继续联动 `subagent-dispatch-rules` 发起真实子线程，并输出并行技能与文件归属。 |
+| `project-rule-file-bootstrap-rules` | 当仓库级规则文件、`.gitattributes`、`.editorconfig` 或项目记忆四件套缺失、损坏或需要幂等同步时自动触发。 | 作为项目自举唯一入口，按 `rule-bootstrap` / `memory-bootstrap` 条件路由维护规则文件和 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 骨架，保护非受管内容、UTF-8、大小闸门和历史只追加；事实抽取仍由 `project-memory-rules` 负责。 |
+| `thread-title-rules` | 当当前 Codex / Claude / agent 会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在 `set_thread_title` 时回退一次；禁止通过线程列表、路径或时间猜测当前会话，其他宿主按真实工具能力决定执行或显式跳过。 |
+| `parallel-task-dispatch-rules` | 任一 skill 命中并准备进入实质执行阶段时强制自动触发。 | 统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结主/子职责与互斥写集，检查系统能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭子代理，输出计划线程数、实际启动数、完成数、关闭数和回退原因。 |
 | `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
 | `skill-hit-check-rules` | 当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若本轮同时命中 `parallel-task-dispatch-rules`，还要额外输出并行触发的 skill 列表；若未命中则明确告知未命中及原因。 | 在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。 |
 | `code-snippet-location-rules` | 当用户只粘贴代码片段、报错片段或函数片段，并说“这里改一下 / 这段需要修改 / 这里有问题”，但没有明确给出文件路径、符号全名或模块位置时自动触发。 | 负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。 |
-| `subagent-dispatch-rules` | 当任一 skill 已命中并准备进入执行阶段时自动触发。负责自动分析 subagent 委派条件，满足可委派条件即自动委派并产出真实启动证据；批量委派时优先运行 `scripts/generate_subagent_plan.py` 生成结构化启动计划，脚本输出中文逻辑任务名，平台 UI 昵称仍以启动工具返回值为准；仅在用户明确禁止、任务不可切分、风险不可控、写集冲突或环境不支持时回退本地执行。 | 作为全局委派协调层，统一判定“可委派/不可委派/本地优先”，优先分发代码规则、注释、审查等 sidecar 子任务并回收结果；并强制主 agent 输出可见的 subagent 启动/完成状态、逻辑名与平台昵称映射，以及计划线程数、实际启动线程数与回收关闭线程数。 |
 | `skill-audit-rules` | 当主任务存在多 skill 组合、并行拆分或规则收口风险时自动触发。 | 负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。 |
 | `skill-execution-compliance-gate-rules` | 当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。 | 在最终回复前执行一次 skill 执行完整性闸门检查，补齐主任务优先的下一步建议，并校验 `blocked/manual_handoff` 共享契约。 |
 | `code-change-finalization-gate-rules` | 当本轮存在代码新增/修改（含测试文件），准备最终回复前触发。 | 校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。 |
-| `reasoning-summary-structure-rules` | 当进入本轮最终推理总结或结束输出阶段时自动触发。负责强制检查总结结构是否完整：Skill 命中检查、Skill 执行证据、当前要解决的问题、解决方案与根因、结果与结论、以及条件字段与下一步建议。 | 作为最终总结结构闸门，统一收口输出顺序和必填字段，防止关键信息缺失。 |
+| `reasoning-summary-structure-rules` | 当进入本轮最终推理总结或结束输出阶段时自动触发。负责检查总结结构完整性；存在流程、依赖、状态、执行链、跨角色交互或量化结果时，按内容优先输出 Mermaid 图形化总览，简单单点任务不强制造图。 | 作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。 |
 
 ### 总控层默认分流决策表
 

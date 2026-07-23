@@ -81,7 +81,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-TEST-001
-    path: test-strategy-rules 的 test-asset-governance 条件路由/references/doc-minimums.md
+    path: test-strategy-rules/references/doc-minimums.md
     profile: test
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [existing_layered_structure_is_preserved_and_completed]

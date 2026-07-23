@@ -136,11 +136,11 @@
 ### 子 agent 状态公告写法
 - 别名: subagent 公告, 逻辑名平台昵称双写
 - 类型: 工具风格
-- 示例: `Subagent 状态：\n- 已启动：019f...\n- 逻辑名：端到端子代理启动-A\n- 平台昵称：Avicenna\n- 线程：A\n- 执行 skill：subagent-dispatch-rules`
+- 示例: `Subagent 状态：\n- 已启动：019f...\n- 逻辑名：端到端子代理启动-A\n- 平台昵称：Avicenna\n- 线程：A\n- 执行 skill：parallel-task-dispatch-rules`
 - 说明: 子 agent 公告默认同时写 `逻辑名` 与 `平台昵称`。逻辑名来自脚本或主 agent 计划中的中文任务名，平台昵称来自真实启动工具返回值；完成公告还要补 `回收：已调用 close_agent`。
-- 来源: `subagent-dispatch-rules`
+- 来源: `parallel-task-dispatch-rules`
 - 适用范围: 子 agent 启动、完成、回收进度消息
-- 更新时间: 2026-06-29
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### 子 agent 完全授权写法
@@ -148,9 +148,9 @@
 - 类型: 工具风格
 - 示例: `子线程启动:已启动2个/计划2个/实际2个`、`授权:项目级完全授权模式已生效`
 - 说明: 本仓库默认完全授权 subagent 自动启动；当任务可切分、写集不冲突、风险可控且环境支持时，主 agent 应将项目级 standing authorization 视为满足工具显式授权条件，不再因为当前轮没逐字说 subagent 而回退。
-- 来源: `subagent-dispatch-rules`
+- 来源: `parallel-task-dispatch-rules`
 - 适用范围: subagent 启动判定、并行回退公告、最终执行证据
-- 更新时间: 2026-07-03
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### 命中检查可见输出样式
@@ -207,10 +207,10 @@
 - 别名: thread-title 命名, 任务标题自动命名, 会话重命名
 - 类型: 工具风格
 - 示例: `会话自动重命名规则`、`超大单 sheet 导出`、`稳定币费率异常`、`审查-超大单导出`、`提交-费率修复`
-- 说明: 会话标题使用“任务对象 + 动作 / 症状 / 阶段”的 8-24 字中文简要，不默认加项目名，不只写泛化动作。避免 `提交 git`、`开始实施`、`继续做`、`修复 bug`、`更新文档`、`goal执行` 这类只表达动作或状态、不表达任务对象的标题。标题变更必须来自真实线程重命名工具；Codex 优先使用 `set_thread_title`，若首屏未直接暴露 `set_thread_title` 或 `list_threads`，先经 `tool_search` 发现线程工具，再决定改名或跳过；用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时可在过程中尝试改名，不等最终总结；Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认记录“平台无真实自动改名工具”并跳过。工具不可用、标题已准确或只是小步骤推进时只记录跳过。
-- 来源: 用户本轮确认、`thread-title-rules/SKILL.md`
-- 适用范围: Codex / Claude Code / Claude Desktop 跳过证据 / agent 会话标题、任务检索、最终执行证据
-- 更新时间: 2026-07-05
+- 说明: 会话标题使用“任务对象 + 动作 / 症状 / 阶段”的 8-24 字中文简要，不默认加项目名，不只写泛化动作。避免 `提交 git`、`开始实施`、`继续做`、`修复 bug`、`更新文档`、`goal执行` 这类只表达动作或状态、不表达任务对象的标题。标题变更必须来自真实线程重命名工具；Codex App 优先调用只接收 `title` 的 `rename_current_thread`，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时仅回退一次真实 `set_thread_title`，MCP 成功后停止。禁止通过线程列表、路径、时间或标题相似度猜测当前会话；其他宿主只按真实工具能力执行。用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时可在过程中尝试改名，不等最终总结；工具不可用、标题已准确、用户禁止或只是小步骤推进时记录跳过。
+- 来源: 用户本轮确认、`thread-title-rules/SKILL.md`、`thread-title-rules/references/rename-tool-contract.md`
+- 适用范围: Codex App 会话标题、其他宿主跳过证据、任务检索、最终执行证据
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### 普通说明不用代码围栏
@@ -273,6 +273,16 @@
 - 更新时间: 2026-07-02
 - 状态: 启用
 
+### Markdown 托管区先校验后原子替换
+- 别名: 托管区原子写入, PROJECT_CURRENT 投影写入, 用户正文保护
+- 类型: Python 工具风格
+- 示例: `同目录 NamedTemporaryFile -> flush -> os.fsync -> os.replace`、`候选全文 UTF-8 字节数先校验`、`区块外正文逐字保留`
+- 说明: 在 Markdown 中维护机器托管区时，使用唯一成对 marker 和字段白名单；先解析并校验已有区块、候选全文和最终字节数，再在同目录完整写入临时文件并原子替换。失败路径清理临时文件并保持原文件不变；Windows 不支持目录 fsync 时只降级目录刷新，不跳过文件 fsync。不得用按标题整段重写的通用脚本处理高频运行时投影。
+- 来源: `task-plan-rehydration-rules/scripts/task_plan_projection.py`、`project-interface-release-execution-rules/scripts/release_test_engine/storage.py`
+- 适用范围: `PROJECT_CURRENT.md` 任务投影、Markdown 机器受管区、跨进程运行时状态
+- 更新时间: 2026-07-23
+- 状态: 启用
+
 ### 实施计划按垂直切片书写
 - 别名: 依赖图优先, 垂直切片计划, 单任务约5文件
 - 类型: 文档风格
@@ -298,9 +308,9 @@
 - 类型: 文档风格
 - 示例: `正文: 只写最小必要定义与结论`、`附录5.1: 指标名/口径/公式/数据来源/适用范围`、`附录5.2: 术语/别名/定义/易混点`、`附录5.3: 逻辑主题/触发条件/判定规则/异常例外`
 - 说明: 需求主文档默认采用“正文摘要 + 附录详解”。正文只保留当前评审、实现和验收需要立刻读懂的最小指标说明、术语定义和主链路逻辑；核心指标的统计口径、公式、数据来源、适用范围，关键术语的别名与易混点，以及核心逻辑的判定条件、优先级、例外和边界统一沉到附录。若正文已经引用这些概念，但附录没有补齐详解，视为需求文档未收口。
-- 来源: `requirement-intake-rules`、`requirement-gap-rules`、对话确认
+- 来源: `requirement-intake-rules` 的 `initial-discovery` / `gap-routing`、对话确认
 - 适用范围: `doc/2-需求/` 主需求文档、需求接入自审、需求 gap 判定
-- 更新时间: 2026-07-03
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ### 上线测试脚本工具箱写法
@@ -320,7 +330,7 @@
 - 说明: OpenAPI / Swagger 正式产物固定写入项目根目录 `swag/`；单接口文件按 path 去掉开头 `/`、`/` 替换 `_`、保留原 path 大小写命名，同一路径多 method 时先追加小写 method，再拼中文简要说明后缀。中文后缀优先取显式 `summary`，缺失时允许基于 path 动词、controller 名、DTO 名和 route 上下文做受控推导；仍无法稳定得到时回退纯路径文件名，并在 manifest 记录 `summary_source: unresolved`。单接口 YAML 默认不通过 `tags` 制造 Apifox 父目录，总 YAML 可保留 `tags` 做全量分组。头部、请求参数、响应字段都必须补齐中文说明；源码注释不足时允许基于字段名、DTO 名、route 上下文做受控推导，但不得编造业务规则。校验脚本放在对应 skill 的 `scripts/validate_openapi_yaml.py`，生成逻辑第一版可由 agent 读代码生成，但收口必须脚本校验。
 - 来源: `swag-openapi-maintainer-rules/SKILL.md`、`swag-openapi-maintainer-rules/references/naming-rules.md`
 - 适用范围: Swagger/OpenAPI 导出、Apifox YAML、swag 资产维护
-- 更新时间: 2026-07-03
+- 更新时间: 2026-07-22
 - 状态: 启用
 
 ## 废弃写法

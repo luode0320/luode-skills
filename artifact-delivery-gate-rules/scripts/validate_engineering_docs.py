@@ -1429,13 +1429,29 @@ def check_diagrams(text: str, profile: Dict[str, Any], errors: List[str]) -> Dic
     return counts
 
 
-# check_strict_trace 检查跨文档追踪链和任务唯一归属，供周期收口时的严格模式使用。
-# [参数] root: 文档扫描根目录；errors: 累积严格模式错误列表。
+# check_strict_trace 检查同一来源对象的跨文档追踪链和任务唯一归属，供周期收口时的严格模式使用。
+# [参数] root: 文档扫描根目录；errors: 累积严格模式错误列表；target_document: 当前校验目标文档。
 # [返回] dict：文档数量、任务 ID、证据 ID 和周期归属摘要。
-# 最近修改时间：2026-07-12 新增严格追踪，确保任务具备唯一周期归属和四类证据。
-def check_strict_trace(root: Path, errors: List[str]) -> Dict[str, Any]:
-    """检查跨文档追踪链和任务唯一归属，供周期收口时的严格模式使用。"""
-    # 1. 限定当前来源对象文档，排除历史样例、测试夹具和其它来源对象的任务。
+# 最近修改时间：2026-07-23；改动原因：按目标文档 source_ids 选域，移除旧需求 ID 硬编码。
+def check_strict_trace(
+    root: Path,
+    errors: List[str],
+    target_document: Path | None = None,
+) -> Dict[str, Any]:
+    """检查同一来源对象的跨文档追踪链和任务唯一归属。"""
+    # 1. 优先使用目标文档的根来源 ID，避免严格模式混入其它历史来源对象。
+    source_anchors: set[str] = set()
+    if target_document is not None and target_document.exists():
+        target_metadata = frontmatter_metadata(target_document.read_text(encoding="utf-8"))
+        target_sources = {
+            str(value)
+            for value in target_metadata.get("source_ids", [])
+            if isinstance(value, str) and value.strip()
+        }
+        root_sources = {value for value in target_sources if value.startswith("SRC-")}
+        source_anchors = root_sources or target_sources
+
+    # 2. 限定当前来源对象文档，排除测试、审查和其它来源对象的任务。
     all_documents = sorted(root.rglob("*.md"))
     documents = []
     for path in all_documents:
@@ -1443,14 +1459,23 @@ def check_strict_trace(root: Path, errors: List[str]) -> Dict[str, Any]:
         if "/doc/5-tests/" in normalized_path or "/doc/6-审查/" in normalized_path:
             continue
         content = path.read_text(encoding="utf-8")
-        if "REQ-DOC-20260712-033322" in content or "REQ-DOC-20260712-033322" in path.name:
-            documents.append(path)
-    if not documents and len(all_documents) <= 3:
-        documents = all_documents
+        if source_anchors:
+            metadata = frontmatter_metadata(content)
+            document_sources = {
+                str(value)
+                for value in metadata.get("source_ids", [])
+                if isinstance(value, str) and value.strip()
+            }
+            document_id = metadata.get("doc_id")
+            if isinstance(document_id, str) and document_id.strip():
+                document_sources.add(document_id)
+            if not source_anchors.intersection(document_sources):
+                continue
+        documents.append(path)
     corpus = "\n".join(path.read_text(encoding="utf-8") for path in documents)
     cycle_documents = [path for path in documents if re.search(r"实施周期\d+", path.name)]
     tasks: set[str] = set()
-    # 仅把任务清单表格首列或最小 fixture 中的唯一任务视为周期归属，避免正文回指造成重复归属。
+    # 3. 仅把任务清单表格首列或最小 fixture 中的唯一任务视为周期归属，避免正文回指造成重复归属。
     for path in cycle_documents:
         content = path.read_text(encoding="utf-8")
         owned = set(re.findall(r"^\s*\|\s*`?((?:TASK-[A-Z0-9]+(?:-[A-Z0-9]+)*|T\d{2}-\d{2}))`?\s*\|", content, re.MULTILINE))
@@ -1476,7 +1501,7 @@ def check_strict_trace(root: Path, errors: List[str]) -> Dict[str, Any]:
             owned = set(TASK_ID_PATTERN.findall(content))
         # 只记录任务清单中的归属，避免正文“下一任务/回指”污染周期边界。
         cycles.setdefault(cycle, set()).update(owned)
-    # 2. 逐任务检查唯一归属、真实测试/停止契约和 IMPL/TEST/REVIEW 证据。
+    # 4. 逐任务检查唯一归属、真实测试/停止契约和 IMPL/TEST/REVIEW 证据。
     for task in tasks:
         owners = [cycle for cycle, owned in cycles.items() if task in owned]
         if len(owners) != 1:
@@ -1488,7 +1513,7 @@ def check_strict_trace(root: Path, errors: List[str]) -> Dict[str, Any]:
         for suffix in required_suffixes:
             if not re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus):
                 errors.append(f"task is missing evidence category {suffix}: {task}")
-    # 3. 检查跨域追踪链是否至少出现所有必要 ID 前缀。
+    # 5. 检查跨域追踪链是否至少出现所有必要 ID 前缀。
     required_links = ("REQ", "AC", "CYCLE", "TASK", "TEST", "EVIDENCE")
     link_patterns = {
         "TASK": r"(?:\bTASK-[A-Z0-9]+(?:-[A-Z0-9]+)*\b|\bT\d{2}-\d{2}\b)",
@@ -1628,7 +1653,7 @@ def main() -> None:
     # 2. 在显式开启严格模式时追加跨文档追踪摘要、覆盖率和未决决策字段。
     if args.strict:
         strict_errors: List[str] = []
-        trace = check_strict_trace(root, strict_errors)
+        trace = check_strict_trace(root, strict_errors, document)
         result["strict"] = {"valid": not strict_errors, "errors": strict_errors, "trace": trace}
         result["traceability"] = trace
         result["coverage"] = {
