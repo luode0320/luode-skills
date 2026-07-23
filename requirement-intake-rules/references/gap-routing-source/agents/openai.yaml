@@ -1,4 +1,0 @@
-interface:
-  display_name: "需求缺口识别"
-  short_description: "识别侦察后仍缺的关键信息，先写临时缺口文档，再回填主需求文档。"
-  default_prompt: "使用 $requirement-gap-rules 先走 discovery，再以唯一 GAP-* 登记缺失字段、证据、SRC/REQ/RULE/AC 影响、P0/P1/P2、责任人、补齐动作、验证命令、失败预期、清理/回滚和关闭证据；P0/P1 或无授权默认值即 blocked，P2 必须写授权人/有效期/复核；把结果写入 doc/2-需求/ 临时缺口文档，确认后回填同一主文档并删除临时文档，不得让普通模型猜测。"

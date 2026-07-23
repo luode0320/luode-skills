@@ -15,8 +15,8 @@
 - 同一个需求只保留一份需求入口文档，流程和时序表达随主文档正文一并维护，不再拆分独立图文件。
 - 需求、实施、验收和通用 Markdown 文档的位图统一复用 `doc/data/images/`；同一图片允许多文档引用，任何删除动作必须先检索全部 Markdown 引用并确认替代版本已落盘。
 - 图片返修沿用同一资产主干并递增 `-v<number>`；旧版本只有在无任何引用、资产清单已更新且回滚证据保留时才可删除。
-- `requirement-gap-rules`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 默认围绕这同一份需求文档推进。
-- `requirement-gap-rules` 在关键缺口阻断时允许创建一份临时缺口文档，命名复用对应需求文档主干并追加 `.gap.md`；该文档仅用于 gap 未关闭阶段，用户确认并回填主需求文档后必须删除。
+- `requirement-intake-rules` 的 `gap-routing`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 默认围绕这同一份需求文档推进。
+- `requirement-intake-rules` 的 `gap-routing` 在关键缺口阻断时允许创建一份临时缺口文档，命名复用对应需求文档主干并追加 `.gap.md`；该文档仅用于 gap 未关闭阶段，用户确认并回填主需求文档后必须删除。
 - `requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 的稳定结论仍直接更新主需求文档，不额外新建平行长期入口。
 - 验收标准、最终验收和实施文档都与来源对象文档分开维护；来源对象可以是需求或 Bug，同一来源对象各自只保留一份主文档；实施域允许在一份实施总览下按需拆实施周期文档。
 - 新项目、项目初期或多来源对象需要统一排序时，应在 `doc/3-实施/` 下维护一份“需求与实施计划全量顺序实施方案”；同一项目或同一来源集合只保留一份总顺序文档，后续新增需求、优先级调整、依赖变化或周期顺序变化都更新原文档。

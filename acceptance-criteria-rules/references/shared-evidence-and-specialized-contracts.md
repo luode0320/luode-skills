@@ -41,7 +41,7 @@
 ## 权责边界与不负责事项
 
 - 只负责写清验收标准，不直接执行测试，那属于测试域。
-- 不代替 `requirement-gap-rules` 补基础信息；前提没补齐时不要硬写验收。
+- 不代替 `requirement-intake-rules` 的 `gap-routing` 补基础信息；前提没补齐时不要硬写验收。
 - 不代替 `requirement-boundary-rules` 决定是否允许修改旧逻辑，但要把范围外写清。
 - 不把实现方案、技术细节和验收标准混写在一起。
 - 不把验收标准直接混写进需求文档或 Bug 文档；验收标准必须单独维护在 `artifact-storage-rules` 约定的验收标准文档中。

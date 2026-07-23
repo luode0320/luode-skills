@@ -1,94 +1,46 @@
 ---
 name: requirement-boundary-rules
-description: 当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时触发。负责明确改动边界和影响面，并将边界结论持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求缺口识别或 Bug 根因定位 skill。
+description: 当需求边界不清、影响范围不明、兼容性不明确、是否允许改旧逻辑不清楚，或需要区分当前需求、历史问题、需求变更和验收偏差时专项自动触发。负责范围、归属、兼容性和上下游影响裁决，并将结论回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；信息缺失转 `requirement-intake-rules#gap-routing`，历史缺陷转 Bug 域，不代替需求接入、拆分、变更、验收或实施规划。
 ---
 
 # 需求边界判定规则
 
-只在判断“这件事到底算不算当前需求范围”时使用这个 skill。
-如果当前问题是信息缺失，先交给 `requirement-gap-rules`；如果已经确定是历史缺陷，转入 Bug 域。
+## 职责与触发
 
-## Skill 作用与适用场景
+- 只负责判断“是否属于本次需求、是否允许修改旧逻辑、影响哪些上下游、采用什么兼容边界”。
+- 用户提出“顺手改旧逻辑”、当前需求暴露历史问题、验收偏差归因不清、旧接口/页面/流程可能受影响时自动触发。
+- 边界结论必须唯一归属为：当前需求、明确排除项、独立变更、Bug 或历史问题；不得重复归属或留空。
+- `BOUND-*` 字段、证据、权限、兼容、数据影响、回滚和验收回指只由 `references/boundary-checklist.md` 定义，根文件不复制细则。
 
-- 判断当前问题属于当前需求、需求变更还是历史问题。
-- 明确本次允许改哪些层、哪些模块、哪些旧逻辑。
-- 识别兼容性影响面和上下游影响面。
-- 将边界结论回写到当前需求对应、由 `artifact-storage-rules` 统一约定的同一份需求主文档中。
-- 在边界结论更新时同步维护图形化表达（流程图/时序图/边界表），避免只改文字不改图导致理解偏差。
-- 防止把历史遗留缺陷混入当前需求一起做。
-- 在边界未裁清前，阻断进入 `acceptance-criteria-rules` 与 `implementation-planning-rules`。
+## 路由
 
-## 自动触发信号
+- 资料、字段、流程、规则或关键前提缺失：转 `requirement-intake-rules#gap-routing`；能主动查证时先走 `initial-discovery`。
+- 原实现不符合原需求、脱离当前需求仍客观存在：转 Bug 域。
+- 已确认需求新增条件、改变范围、默认值、优先级或交付物：转 `requirement-change-rules`。
+- 边界稳定但需求体量过大：转 `requirement-splitting-rules`。
+- 边界稳定后才允许进入 `acceptance-criteria-rules`，随后进入 `implementation-planning-rules`。
 
-- 用户说“顺手一起改一下旧逻辑”。
-- 需求实施中暴露出历史问题，不确定该不该一起处理。
-- 验收不通过，但原因不确定是理解偏差还是代码缺陷。
-- 当前需求可能影响旧接口、旧页面、旧流程或兼容行为。
+## 最小执行流程
 
-## 进入后先做什么
+1. 读取 `../requirement-intake-rules/references/requirement-domain-shared-contract.md`，确认唯一主文档和 Owner 边界。
+2. 读取 `references/boundary-checklist.md`，冻结 In Scope、Out of Scope、允许/禁止修改层、上下游、权限、兼容和数据影响。
+3. 历史问题与变更难以区分时读取 `references/history-vs-change.md`；验收偏差归因时读取 `references/acceptance-routing-examples.md`。
+4. 将边界、排除项、兼容影响和流转结论回写同一份需求主文档；路径、图片和更新策略由 `artifact-storage-rules` 负责。
+5. 边界变化影响正文、矩阵、Mermaid、拆分、验收或实施计划时，声明受影响项并移交对应 Owner 更新；最终落盘由 `artifact-delivery-gate-rules` 核验。
 
-1. 先列出当前明确属于本次需求的目标。
-2. 再列出被顺带发现的问题、旧逻辑或兼容风险。
-3. 判断这些内容属于当前需求、需求变更还是历史缺陷。
-4. 找到当前需求对应的需求主文档；如果还没有，就按 `artifact-storage-rules` 的路径与命名模板初始化同一份文档。
-5. 给出“纳入本次 / 拆出去 / 转 Bug 域”的结论，并准备回写到该文档。
+## 暂停、通过与驳回
 
-## 默认执行流程
+- 暂停：当前问题既像需求变更又像历史缺陷；兼容调整会显著扩大范围；多个历史问题是否并入未获确认；验收失败无法归因。
+- 暂停期间保持 `blocked`，不得进入前置验收、实施规划或编码；未授权兼容、权限、数据迁移和回滚方案不得写成确定结论。
+- 通过：范围、排除项、归属、兼容和上下游影响清晰，结论已回写同一主文档并保留证据与回滚路径。
+- 驳回：历史问题与当前需求混做、需求偏差直接误判为 Bug、边界未稳定即进入下游，或只改文字未声明受影响图表和下游结论。
+- 用户明确暂停、停止或不继续时立即停止扩散；恢复时从已落盘的 `BOUND-*` 状态继续。
 
-1. 默认先读 `references/boundary-checklist.md`，判断当前改动边界和影响面。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认需求主文档根目录、入口文件模板和同文档复用策略。
-3. 如果涉及历史问题与需求变更的区分，再读 `references/history-vs-change.md`。
-4. 如果涉及验收不通过或理解偏差判断，再读 `references/acceptance-routing-examples.md`。
-5. 输出当前需求范围、排除项、兼容影响面和建议流转路径，并更新到当前需求对应的需求主文档。
-6. 如果该需求还没有文档，则按 `artifact-storage-rules` 的中央目录与入口模板创建同一份需求文档后再更新。
-7. 同步更新文档中的 Mermaid 图、图片资产决策和关键边界表，保证图文口径一致；图片若属于本次范围，统一落在 `doc/data/images/` 并登记 `IMG-*`，若不属于范围写 `N/A + 原因 + 证据`。
-8. 如果问题不属于当前需求范围，不要在需求域内硬做下去。
-9. 在边界结论未稳定前，不进入 `acceptance-criteria-rules` 或 `implementation-planning-rules`。
+## References
 
-## 权责边界与不负责事项
-
-- 只负责边界和归属判断，不负责补齐缺失信息，那属于 `requirement-gap-rules`。
-- 不负责静态定位或运行时定位代码缺陷，那属于 Bug 域。
-- 不直接制定完整验收标准，那属于 `acceptance-criteria-rules`。
-- 不因为“可以一起改”就默认放宽边界。
-- 不为同一个需求单独新建边界文档；边界结论只能更新同一个需求主文档。
-
-## 需要暂停并确认的条件
-
-- 当前问题既像需求变更，又像历史缺陷，无法单边归类。
-- 本次需求如果纳入兼容性调整，会明显扩大改动范围。
-- 用户要求同时处理多个历史问题，但未确认这些问题是否并入当前任务。
-- 验收不通过，但无法判断是需求理解偏差还是实现错误。
-
-## 执行通过 / 驳回标准
-
-- 通过：能够明确指出哪些属于当前需求、哪些属于需求变更、哪些属于历史问题，以及这些项应如何流转，并将结论回写到同一个需求主文档。
-- 驳回：把边界说不清，或把历史问题和当前需求混在一起推进，或把需求偏差直接误判成 Bug。
-
-## 执行结果归档要求
-
-- 将边界结论、排除项、兼容影响面和流转建议记录到当前需求对应的需求主文档。
-- 所有需求域相关 skill 都应复用同一个需求文档；边界规则只更新其中的范围、排除项和流转结论。
-- 需求主文档的根目录、入口文件模板和复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 归档内容至少包含当前需求范围、拆出项、转 Bug 项和原因。
-- 若边界结论变化影响流程或职责分工，必须同时更新对应图形化组件（Mermaid 图或边界矩阵）。
-- 若边界结论影响截图、UI/原型、视觉证据或图片共享/删除，必须更新图片资产清单、`IMG-*` 关联范围、引用文档和回滚路径；禁止把图片直接放在 `doc/data/` 或历史需求域图片目录。
-- 如果本次边界天然清晰且无争议，也应在同一份需求文档中体现最终边界结论，而不是完全不留痕。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对当前边界结论与相关图形化更新是否已经真实落到同一份需求主文档；未落盘不得判定边界分析完成。
-
-### 极致完整性边界闸门
-
-- 每个边界结论必须使用唯一 `BOUND-*`，同时冻结 In Scope、Out of Scope、允许/禁止修改层、上下游、权限、兼容、数据影响、责任人、证据、回滚和验收回指。
-- 每个功能点只能归属当前需求、明确排除项、独立变更、Bug 或历史问题之一；重复归属、空白归属和未授权默认兼容均阻断。
-- 边界变化必须同步更新正文、范围矩阵、Mermaid 图、拆分矩阵、验收映射和实施周期；只改文字不改图表视为未收口。
-- 图片边界必须明确 In Scope/Out of Scope、来源与版权、敏感状态、共享消费者和删除条件；引用路径统一为从当前文档位置计算的 `../data/images/<file>` 相对路径。
-- 不适用项写 `N/A + 原因 + 证据`；关键权限、兼容、迁移或回滚结论缺失时状态为 `blocked`。
-
-## references 读取规则
-
-- 默认先读 `references/boundary-checklist.md`。
-- 在定位当前需求主文档、创建初始文档或判断是否继续更新同一文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 只有在区分历史问题和需求变更时，再读 `references/history-vs-change.md`。
-- 只有在处理验收不通过的归因时，再读 `references/acceptance-routing-examples.md`。
-- 回写需求文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；边界结论先用业务语言说明，`BOUND-*` 与证据进入追踪附录。
-- 边界涉及浏览器、第三方或专项验收时，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
+- 共享路由与保护语义：`../requirement-intake-rules/references/requirement-domain-shared-contract.md`
+- 边界字段与 `BOUND-*`：`references/boundary-checklist.md`
+- 历史问题与需求变更：`references/history-vs-change.md`
+- 验收偏差路由样例：`references/acceptance-routing-examples.md`
+- 文档路径和同文档更新：`../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/update-policy.md`
+- 普通语言与落盘门禁：`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`

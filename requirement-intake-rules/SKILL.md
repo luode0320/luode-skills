@@ -1,165 +1,61 @@
 ---
 name: requirement-intake-rules
-description: 当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是需求域唯一自动触发入口和唯一需求主文档 owner。对一句话 idea、老板式方向、粗略想法、资料不足但可通过项目/代码/schema/上下游/URL/官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对已整理资料直接做需求接入；对侦察后仍无法补齐且影响实现方向的关键缺口进入 `gap-routing`。支持从需求 URL、零散资料、物料和补充说明中整理需求，先结合当前项目上下文逐步澄清目标、约束和成功标准，对存在多个合理方向的需求先收敛方案，再补齐到可进入后续代码开发的程度，并将结果沉淀到 `artifact-storage-rules` 约定的需求文档根目录；同一需求后续只能持续更新同一份需求主文档；不要用它代替需求边界、拆分、变更或验收标准类 skill。
+description: 当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是新需求接入唯一自动触发入口和唯一需求主文档 Owner。对一句话 idea、老板式方向、粗略想法，或资料不足但可通过项目、代码、schema、上下游、URL、GitHub、网站、官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对侦察后仍无法补齐、存在多个合理解释，且会影响实现方向的关键缺口进入 `gap-routing`；对已整理资料直接做需求接入。保留“需求信息不全、缺少字段/流程/规则/成功标准/关键前提”等 gap aliases。范围、兼容或旧逻辑归属不清时由 `requirement-boundary-rules` 专项自动触发；需求过大、多模块、多页面、多接口、多角色或多独立子系统时由 `requirement-splitting-rules` 专项自动触发；已确认需求在编码中新增条件、修改默认值、优先级、范围或交付物时由 `requirement-change-rules` 专项自动触发。四个 Owner 均保持自动触发，本 Skill 不吞并专项信号。
 ---
 
 # 需求接入规则
 
-只在任务刚进入研发、需要先把需求讲清楚并整理成可继续推进的输入时使用这个 skill。 如果当前争议是侦察后仍无法补齐的关键缺口，进入本 skill 的 `gap-routing`；需求边界、需求变更或验收标准问题继续转交相邻需求域 skill。
+## 职责
 
-## Skill 作用与适用场景
-- 把需求 URL、口头描述、聊天片段、零散资料、截图、物料、会议结论和 discovery 侦察结果整理成统一的研发入口。
-- 先结合当前项目目录、已有文档、现有实现和最近改动理解上下文，避免脱离仓库现状整理需求。
-- 优先根据需求 URL 和现有资料补齐目标、背景、上下游、输入输出、依赖和交付物形态。
-- 用一次只推进一个关键点的方式逐步澄清需求，优先收敛目的、约束、成功标准和关键前提。
-- 澄清时只允许提出真实缺口，不允许把 agent 的业务猜测写成待确认答案让用户二选一背书。
-- 当存在多条合理方向时，先整理 2-3 个可行方案、权衡和推荐结论，再继续收口需求。
-- 在资料或数据资源本身存在逻辑冲突时，先停止继续给实现建议，转入逐步完善需求。
-- 当需求明显同时覆盖多个独立子系统或多个相对独立的大能力块时，先转入需求拆分，而不是继续深挖单点细节。
-- 帮助判断下一步应进入本 skill 的 `gap-routing`、边界确认、需求拆分还是直接实现。
-- `initial-discovery` 路由形成初稿后，立即生成或更新结构化需求主文档并保存到 `artifact-storage-rules` 约定的需求文档根目录；后续稳定结论持续回写这里。
-- 若需求涉及新增文件，需求文档必须使用目录树（`text` 代码块）记录新增文件清单，并在树节点后标注用途说明。
-- 若需求涉及新增数据库表或新增/修改字段，需求文档必须附可执行 SQL（建表 SQL 或 ALTER SQL），不得只写口头描述。
-- 若用户提供需求截图或需生成外部图片素材，必须统一保存到 `doc/data/images/`，并从 `doc/2-需求/<file>.md` 以 `../data/images/<file>` 相对路径在需求主文档中引用展示。
-- 在需求文档落地时，主文档正文内必须同步补齐 Mermaid 流程图与 Mermaid 时序图代码块，不再另建独立流程图 / 时序图文件。
-- 需求主文档正文应优先使用图形化组件表达关键信息，至少包含 Mermaid 流程图（`flowchart`）与 Mermaid 时序图（`sequenceDiagram`）代码块；仅用大段文字描述复杂流程视为不达标。
-- 需求主文档默认采用“正文摘要 + 附录详解”结构：正文只保留当前评审和决策必需的最小指标解释、术语定义与主链路逻辑，详细口径统一沉到附录。
-- 若正文出现核心指标、关键术语或核心判定逻辑，附录必须按需补齐其定义、口径、公式、边界、别名、优先级、例外与易混点，避免解释散落在正文各处。
-- 对关键范围、角色分工、模块边界、状态流转等信息，优先使用表格、对比矩阵或结构图，不要只给线性段落。
-- 需求文档落地前先做一次轻量自审，检查占位词、矛盾、歧义和范围是否失控；文档落地后先请用户确认，再进入后续实现或计划阶段。
-- 正式需求主文档未真实落盘前，禁止进入实现、禁止补丁式试做、禁止“先做再补文档”。
-- 若用户已在同一任务中明确“开始执行/按文档实现”，也只表示后续在完成前置验收标准与实施规划、并再次确认正式开工后可以连续推进；不得把需求文档确认本身当作直接开工信号。
-- 作为需求域文档锚点，定义“同一需求只保留一份由 `artifact-storage-rules` 约定的需求主文档，后续需求子 skill 只能持续回写该文档”的规则。
-- 避免还没讲清需求就直接进入编码或误走 Bug 流程。
+- 只负责新需求接入、需求资料整理和唯一需求主文档维护。
+- 同一需求只维护一份主文档；`initial-discovery`、`gap-routing`、边界、拆分和变更结论都回写该文档，不创建竞争入口。
+- 正式需求主文档未真实落盘、关键条件路由未收敛、前置验收未建立或实施规划未完成时，不得进入正式编码。
+- 需求域路由、共享保护语义和下游移交统一执行 `references/requirement-domain-shared-contract.md`；根文件减重不代表任何规则、别名、local、安全、授权、暂停、停止或回滚语义失效。
 
-## 条件路由：initial-discovery
+## 自动触发与条件路由
 
-`initial-discovery` 是本 skill 内唯一的主动侦察路由，物理 owner 仍为 `requirement-intake-rules`；它承接原独立 discovery 入口 的触发、证据、local 安全、记忆回写、暂停、通过和归档规则，不形成第二个生命周期入口。
+1. **直接接入**：需求资料已经足以说明目标、范围、输入输出、约束和成功标准时，直接整理并更新唯一需求主文档。
+2. **`initial-discovery`**：一句话 idea、粗略方向、资料可由项目事实、代码、schema、上下游、URL、GitHub、网站或官方文档主动查证时，先侦察再追问。
+3. **`gap-routing`**：主动侦察后仍缺少字段、流程、规则、关键前提或成功标准，存在多个合理解释且继续推进会改变方向时，一次只推进一个真实关键缺口。
+4. **专项自动触发**：
+   - 范围、兼容、上下游或旧逻辑归属不清：`requirement-boundary-rules`。
+   - 多模块、多页面、多接口、多角色、多独立子系统或无法形成单一闭环：`requirement-splitting-rules`。
+   - 已确认需求新增条件、改变默认值、优先级、范围或交付物：`requirement-change-rules`。
+5. **邻域排除**：原实现不符合原需求时进入 Bug 域；实施前定义“做到什么算完成”时进入 `acceptance-criteria-rules`；Plan Mode 或编码前实施拆解进入 `implementation-planning-rules`。
 
-- 路由 marker：`initial-discovery`。
-- 触发：一句话 idea、老板式方向、粗略想法、可通过项目/代码/schema/上下游/URL/官方资料主动查证的资料缺口，或用户补充新的侦察入口。
-- 保护：先侦察再追问、一次一个真实关键问题、只读优先、证据可追溯、不得脑补、不得在主需求文档落盘前实现。
-- 环境：数据库、缓存、消息队列、HTTP/RPC 和服务连接只能使用 local 配置；test、staging、pre、release、prod/production 一律阻断。
-- 交接：可开发结论回到同一份需求主文档；侦察后仍无法补齐且会影响实现方向的内容进入 `gap-routing`；不得新建平行长期侦察文档。
-- 细则：读取 `references/initial-discovery-route.md` 及其条件 references。
+## 最小执行流程
 
-## 图片资产闭环
+1. 读取 `references/requirement-domain-shared-contract.md`，确认当前 Owner、route 和禁止抢占的邻域。
+2. 读取 `references/intake-checklist.md`，结合当前项目和真实资料完成接入。
+3. 需要主动侦察时执行 `references/initial-discovery-route.md` 及其条件 references；所有连接只允许使用 local 配置，禁止回退到 test、staging、pre、release、prod/production。
+4. 侦察后仍有方向级缺口时执行 `references/gap-routing.md`；禁止 Agent 猜测，缺口关闭后回填主文档并删除临时缺口文档。
+5. 需求过大、边界不清或已发生变更时，移交对应专项 Skill；专项 Skill 结论仍回写同一份主文档。
+6. 需求稳定后先移交 `acceptance-criteria-rules`，再由 `implementation-planning-rules` 形成实施总览、周期、文件/符号落点和真实测试闭环。
+7. 最终落盘、图片、路径和文档存在性由 `artifact-storage-rules` 与 `artifact-delivery-gate-rules` 核验；未落盘不得以最终回复代替。
 
-需求入口必须先作图片决策：正文写“图片资产决策：需要”，或写 `N/A + 原因 + 证据`。标记为需要时，按 `artifact-storage-rules` 生成/归档真实图片到 `doc/data/images/`，文件名使用 `<document_stem>.<asset-slug>-v<number>.<ext>`，并登记唯一 `IMG-*`、用途、来源、版本、相对路径、关联 `SRC/DEC/REQ/RULE/AC`、敏感状态和版权状态。
+## 保护闸门
 
-- 必需图片场景包括 UI/原型、截图证据、视觉对比、真实产物、空间布局、外观基线及 Mermaid 无法准确表达的内容；流程、时序、状态、依赖和数据关系仍必须使用 Mermaid。
-- 需求 Markdown 图片引用必须使用非空 alt、`/` 分隔的相对路径 `../data/images/<file>`；禁止绝对路径、反斜杠、`file://`、Base64/data URI、HTML `<img>`、外部热链、路径越界和直接引用 `doc/data/` 根文件。
-- 真实生成必须调用 `imagegen`，失败时必需场景标记为 `blocked`；不得用程序绘图或占位图代替。PNG 用于 UI/截图/文字密集图，JPEG 用于照片，WebP 仅在兼容性已验证时使用。
-- 同一图片可被多个文档引用；返修沿用资产主干并递增 `-v<number>`。删除或替换前检索所有 Markdown 引用，清单与正文不一致、存在孤儿或缺失文件时不得放行。
+- 一次只推进一个真实关键问题；能主动查证的先查证，不能查证的再提问。
+- 不得把 Agent 猜测、未授权默认值或多个合理方向中的任一项写成已确认结论。
+- P0/P1 未决、无授权默认值、权限/兼容/数据/异常边界不明时状态为 `blocked`；P2 默认值必须记录授权人、有效期和复核证据。
+- 用户明确暂停、停止或不继续时立即停止需求扩散；恢复时从已落盘状态和未关闭 route 继续。
+- 需求变化、缺口关闭或路线回退必须保留差异、来源、回滚和关闭证据；不得覆盖历史事实后声称已验证。
+- 图片、Mermaid、结构、稳定 ID、`N/A + 原因 + 证据`、追踪字段和普通语言正文规则不得在根文件重复定义，必须执行其唯一 Owner reference。
 
-## 自动触发信号
-- 用户刚提出新功能、新页面、新接口、新模块、新脚本或新自动化任务。
-- 需求描述还停留在一句话、聊天片段、需求 URL、零散文档摘录或杂项物料。
-- 当前还没有明确目标用户、业务目的、输入输出和上下游依赖。
-- 用户同时给出需求链接、资料包、字段说明、流程图、截图或数据样例，需要统一整理。
-- 资料之间存在明显逻辑冲突、字段对不上、流程不闭环或数据资源本身有问题。
-- 当前需求还只是粗略想法，存在多种合理做法，需要先比较方向再收敛；如果资料可通过项目、数据库、代码、上下游或用户补充路径主动获得，先进入 `initial-discovery` 条件路由。
-- 一个需求同时塞入多个独立子系统、多个产品子域或多条相对独立主线，明显不能直接细化到实现级别。
-- 总控层需要先把任务落到需求域入口，而不是直接分配代码位点。
+## References
 
-## 进入后先做什么
-1. 先收集并排序需求来源，优先阅读需求 URL，再补读聊天描述、附件、物料和数据样例。
-2. 在问需求细节前，先查看当前项目相关目录、已有文档、相似实现和最近改动，建立现状上下文。
-3. 先判断当前请求是否一次打包了多个独立子系统或多个相对独立的大能力块；如果是，先暂停继续细化，转 `requirement-splitting-rules`。
-4. 抽取这次需求到底要解决什么问题、服务谁、产出什么。
-5. 再梳理输入、输出、调用方、被调用方、关键依赖和可用数据资源。
-6. 列出已明确项、默认前提和待确认项，不提前脑补业务规则。
-7. 澄清时一次只推进一个关键问题，优先问目的、约束、成功标准和关键前提。
-8. 如果存在多个合理方向，先整理 2-3 个方案、权衡和推荐结论，再继续收口。
-9. 检查资料、字段、流程、物料和数据资源之间是否自洽；一旦发现逻辑冲突，先停止继续给实现建议。
-10. 判断下一步应该转入哪个需求域子 skill。
-11. 若需求主文档尚未落盘，则当前轮只能继续完成文档落地与确认，不得越过文档入口直接进入实施规划或实现。
-
-## 默认执行流程
-1. 默认先读 `references/intake-checklist.md`，确认需求 URL、资料、项目上下文、澄清节奏和入口信息最少要补齐哪些内容。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认需求文档根目录、命名模板和同文档更新策略。
-3. 再读 `references/requirement-structure-template.md`，把零散需求整理成统一文档结构，并准备产出到中央约定位置。
-4. 需要对照边界或正反例时，再读 `references/intake-boundaries-and-examples.md`，判断当前问题该留在接入层，还是转交相邻需求 skill。
-5. 先探索当前项目上下文；若用户只给 idea 或缺失信息可通过项目资源、关联项目、GitHub、相关网站 URL、官方 API 文档主动获得，先进入 `initial-discovery` 条件路由侦察，再用“一次一个关键问题”的方式补齐仍无法获得的目的、约束、成功标准和关键前提。
-6. 若存在多个合理方向，先输出 2-3 个可行方案、权衡和推荐结论，再决定当前需求的推荐方向。
-7. 若需求明显覆盖多个独立子系统或多个相对独立的大能力块，立即转交 `requirement-splitting-rules`，不在本 skill 内继续细化到实现级别。
-8. 输出标准化需求接入摘要、资料逻辑检查结论、待确认项列表、推荐方向和下一步分流建议。
-9. 若 `initial-discovery` 后资料、字段、流程、业务规则、前提、成功标准或数据资源仍不完整，进入本 skill 的 `gap-routing`，并读取 `references/gap-routing.md`。
-10. 若范围、兼容性、旧逻辑影响或“这是不是本次需求”不清，转交 `requirement-boundary-rules`。
-11. `initial-discovery` 输出初稿后立即按 `artifact-storage-rules` 约定的命名模板生成或更新需求主文档；如同一天存在多个近似标题，在不改变中文语义前提下补充更具体描述以避免重名。
-12. 若涉及新增文件，文档中必须补齐“新增文件清单（目录树代码块 + 用途注释）”；仍用普通文字条目视为文档未收口。
-13. 若涉及数据库新表或字段变更，文档中必须补齐对应 SQL（`CREATE TABLE` / `ALTER TABLE`）；缺 SQL 视为文档未收口。
-14. 同步确认需求主文档正文中的 Mermaid 流程图与 Mermaid 时序图均已补齐，并与正文口径一致。
-15. 若用户提供需求截图或需生成外部图片，统一保存到 `doc/data/images/`，并在需求主文档中补齐 Markdown 图片引用（例如 `![IMG-REQ-001 登录页原型](../data/images/2026-05-25_103000_支付路由改造.login-state-v1.png)`）。
-16. 在需求主文档中补齐图形化组件：至少包含 Mermaid 流程图与 Mermaid 时序图代码块，并用表格或矩阵呈现关键边界/职责/状态映射。
-17. 若需求涉及核心指标、关键术语或核心逻辑，按“正文摘要 + 附录详解”补齐附录：正文保留摘要和引用，附录补齐详细解释，并确认正文与附录之间可互相回指。
-18. 文档落地后先做一次轻量自审：检查 `TBD/TODO/待补` 等占位词、内部矛盾、双重解读、范围是否过大，以及图文、正文与附录是否一致。
-19. 自审通过后，请用户先 review 当前需求主文档；如用户提出修改，继续更新同一份文档并重新自审，不新建平行记录。
-20. 后续进入 `gap-routing`、`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules` 时，必须继续更新这同一份文档，不得并行新建第二份需求记录。
-21. 若用户在确认需求文档时已明确后续希望直接推进，可记录为“具备连续执行意图”，但仍必须先完成前置验收标准与实施规划；只有用户在实施文档确认后再次明确“开始实施 / 开始执行”，才正式激活连续执行状态。
-22. 在需求主文档、配套图、附录详解和必要资产未真实落盘前，禁止把“需求已经讲清”当作开工依据。
-
-## 权责边界与不负责事项
-- 只负责需求接入整理、资料归并、基础逻辑核对和文档落地；缺口识别由本入口的 `gap-routing` 条件路由承接。
-- 不替代 `requirement-boundary-rules` 做影响面和旧逻辑改动边界判断。
-- 不负责把大需求拆成实施波次或子任务项，那属于 `requirement-splitting-rules`。
-- 不把历史故障、线上异常或旧行为错误误判成新需求，疑似缺陷应转 Bug 域。
-- 不在需求资料已发生逻辑冲突时继续输出实现建议，而是先停下来给用户补齐和修正建议。
-- 不在需求文档尚未收敛、仍存在明显占位词、矛盾或重大歧义时直接进入实现。
-- 不为同一个需求重复新建多份入口文档；若该需求文档已存在，应直接更新原文档。
-- 不允许以“理解已经差不多”“先做个版本看看”为理由绕过需求主文档落地闸门。
-- 不允许把 agent 猜测写成需求答案再让用户被动确认；没有证据时只能写缺口或候选方向。
-
-## 需要暂停并确认的条件
-- 连目标和交付物都无法说清，无法形成最小接入结论。
-- 需求 URL、资料、字段说明、流程图或数据样例之间出现明显逻辑冲突。
-- 数据资源本身不成立、口径互相矛盾、关键字段对不上或流程无法闭环。
-- 当前任务同时像需求又像历史 Bug，归属无法判定。
-- 关键输入输出、上下游依赖或目标角色完全未知。
-- 当前请求一次覆盖多个独立子系统或多个相对独立的大能力块，但尚未先做拆分。
-- 用户一次性提出多项不相干诉求，明显需要先拆任务。
-
-## 执行通过 / 驳回标准
-- 通过：能够基于需求 URL、资料和补充说明形成一份可供后续代码开发继续使用的结构化需求文档，至少说明目标、输入输出、上下游、约束、资料来源、待确认项、推荐方向和下一步流向，并完成最小自审与用户确认门槛；且后续阶段以前置文档真实落盘为入口。
-- 驳回：仍停留在原始口头描述层，没有形成结构化入口；或资料本身有逻辑问题却继续给实现建议；或把需求接入与缺口、边界、Bug 归属混成一件事；或文档仍存在明显占位词、矛盾、重大歧义却直接往下推进；或复杂流程没有任何图形化表达仅靠文字堆叠；或需求主文档未落盘就进入实施规划 / 实现。
-
-## 执行结果归档要求
-- 将需求接入摘要、资料来源、待确认项和分流结论记录到 `artifact-storage-rules` 约定的需求文档根目录。
-- 需求主文档文件名、根目录和同文档更新策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- `requirement-intake-rules` 是需求域统一文档入口；同一个需求后续的补齐、边界、拆分、变更都必须继续更新这同一份主文档，不重复新建平行主记录。
-- 若后续进入 gap 阶段，可在 `doc/2-需求/` 下临时创建缺口文档承载待确认缺口；但缺口补齐后的稳定结论必须回填主需求文档，且不得让临时缺口文档替代主文档入口。
-- 归档内容至少包含需求来源、需求 URL、资料列表、项目上下文、目标、输入输出、上下游依赖、约束、资料逻辑检查结论、待确认项、推荐方向和自审结论；仅当需求尚未进入可验收/可规划状态或用户明确要求建议时，补写必要后续动作。
-- 若涉及新增文件，必须在归档中包含“新增文件清单目录树（`text` 代码块）”，并在树节点后标注用途；普通文字条目不合格。
-- 若涉及数据库新表或字段变更，必须在归档中包含对应 SQL（`CREATE TABLE` / `ALTER TABLE`）；仅写“会改表”不合格。
-- 若用户提供需求截图或需要外部图片素材，必须归档到 `doc/data/images/`，并在需求主文档中使用非空 alt 的 Markdown 图片语法按 `../data/images/<file>` 相对路径引用展示；仅保存文件、不登记 `IMG-*` 或不引用视为不合格。
-- 需求主文档正文必须包含可直接阅读的图形化组件（至少 Mermaid 流程图 + Mermaid 时序图代码块）；仅文字堆叠视为不合格。
-- 若正文出现核心指标、关键术语或核心逻辑，归档中必须按“正文摘要 + 附录详解”补齐对应附录内容；正文只有结论、附录没有口径解释视为不合格。
-- 如果需求暂时不能进入开发，也要在文档中明确写出阻断原因和待补齐项，而不是不落文档。
-- 如果用户对需求文档提出修改，应继续更新这同一份文档并保留最新确认状态，而不是另开新文档。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对需求主文档正文中的 Mermaid 图示、`doc/data/images/` 资产文件、图片决策、`IMG-*` 清单和相对引用是否真实落盘；未落盘或存在旧路径不得判定需求文档已完成。
-
-## initial-discovery 条件 references 读取规则
-
-- 进入 `initial-discovery` 时默认读取 `references/initial-discovery-route.md`。
-- 侦察入口与成果清单读取 `references/initial-discovery-checklist.md`。
-- 证据等级、用户补充线索、外部来源和长期记忆回写读取 `references/initial-discovery-evidence-and-memory.md`。
-- 侦察输出结构读取 `references/initial-discovery-output-template.md`。
-- 需求域承接、合并边界和下游移交读取 `references/initial-discovery-domain-routing.md`。
-
-## references 读取规则
-- 默认先读 `references/intake-checklist.md`。
-- 只要需求文档需要交给普通模型继续执行，或用户要求“极致详细 / 极致完整 / 完善文档”，必须读取 `references/extreme-completeness-standard.md`，并按其中的复杂度等级、零决策交接、字段矩阵、图形和追踪要求落盘。
-- 在决定需求文档根目录、命名模板和同文档更新策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 只有在需要输出结构化需求文档模板、方案比选记录和文档自审门槛时，再读 `references/requirement-structure-template.md`。
-- 只有在判断是否应转交相邻 skill、是否需要先拆需求或对照正反例时，再读 `references/intake-boundaries-and-examples.md`。
-
-## 极致完整性交付硬闸门
-
-- 需求主文档默认按 `references/extreme-completeness-standard.md` 选择 L1-L4 复杂度等级；结构永远完整，内容按触发条件展开，不能以“需求简单”为由删除章节。
-- 需求主文档必须声明 `unresolved_decisions`。存在 P0/P1 未决产品、业务、接口、数据、权限、异常、兼容或测试决策时，状态必须为 `blocked`，不得进入验收、实施规划或编码。
-- 每条 `REQ-*` / `RULE-*` 必须包含输入、处理规则、输出、异常、权限、兼容、观测和 `AC-*` 回指；不适用项必须写 `N/A + 原因 + 证据`。
-- 每个结论必须可回指 `SRC-*` / `DEC-*`，每个验收必须可回指实施周期和真实测试；不允许把关键口径留在聊天记录中。
-- L2 及以上需求必须同时提供流程图和时序图；L3/L4 按语义追加状态图、ER 图、依赖图或故障图。图前必须写目的和关联 ID，图内术语必须与正文一致。
-- 需求文档落盘后，先运行 `artifact-delivery-gate-rules` 的文档校验器，再进行用户确认；机器校验或自审未通过时，不得以最终回复代替文档修复。
-- 输出或更新需求文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先用白话说明结论、影响和完成标准，稳定 ID、字段契约、命令和追踪信息只写入附录。
-- 需求涉及审查、验收、浏览器联调或第三方接口时，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，冻结适用性而不是默认阻断。
+- 需求域路由、单一主文档、共享保护语义和下游移交：`references/requirement-domain-shared-contract.md`
+- 接入检查：`references/intake-checklist.md`
+- 接入边界和正反例：`references/intake-boundaries-and-examples.md`
+- 极致完整性、稳定 ID、N/A 和追踪：`references/extreme-completeness-standard.md`
+- 需求结构与占位模板：`references/requirement-structure-template.md`
+- 主动侦察：`references/initial-discovery-route.md`
+- 侦察清单：`references/initial-discovery-checklist.md`
+- 侦察证据和记忆：`references/initial-discovery-evidence-and-memory.md`
+- 侦察输出：`references/initial-discovery-output-template.md`
+- 关键缺口：`references/gap-routing.md`
+- 缺口清单：`references/missing-info-checklist.md`
+- 暂停条件：`references/pause-triggers.md`
+- 缺口正反例：`references/requirement-gap-examples.md`
+- 文档路径和图片根目录：`../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/update-policy.md`
+- 普通语言和最终门禁：`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`

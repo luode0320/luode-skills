@@ -2,7 +2,7 @@
 
 ## 和相邻 skill 的边界
 
-- 信息缺失：先转 `requirement-gap-rules`。
+- 信息缺失：先转 `requirement-intake-rules` 的 `gap-routing`。
 - 范围争议：先转 `requirement-boundary-rules`。
 - 真正执行验证：转 `functional-validation-rules` 或 `test-regression-rules`。
 - 最终放行结论：转 `final-acceptance-rules`。

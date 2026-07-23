@@ -1,4 +1,4 @@
 interface:
   display_name: "需求接入"
-  short_description: "接收资料或进入 initial-discovery 路由，收口为同一份需求主文档。"
-  default_prompt: "使用 $requirement-intake-rules；遇到粗略 idea 或可主动查证的资料缺口先进入 initial-discovery 路由，再根据侦察结果、需求 URL 和零散资料整理需求，按极致完整性标准冻结 SRC/DEC、REQ/RULE、输入/处理/输出、异常、权限、兼容、观测、回滚、unresolved_decisions、N/A 原因证据、Mermaid 图形和 REQ/RULE-AC-TEST-EVIDENCE 双向追踪；P0/P1 未决即 blocked，P2 必须有默认授权/有效期/复核；更新 doc/2-需求/ 同一份主文档，交给普通模型时不得自行补决策。"
+  short_description: "新需求接入唯一入口，含 initial-discovery 与 gap-routing。"
+  default_prompt: "使用 $requirement-intake-rules 作为新需求接入唯一自动触发入口和唯一需求主文档 Owner；粗略 idea 或可主动查证资料先走 initial-discovery，侦察后仍有方向级关键缺口才走 gap-routing，并保留一次一个真实问题、禁止猜测、local、授权、暂停、停止和回滚规则。范围、兼容或旧逻辑归属交 requirement-boundary-rules，多模块或多独立子系统交 requirement-splitting-rules，已确认需求的新增条件或默认值变化交 requirement-change-rules；专项 Skill 继续自动触发。"

@@ -1,4 +1,4 @@
 interface:
   display_name: "需求拆分"
-  short_description: "将大需求拆分，并更新同一份 doc/2-需求/ 主文档。"
-  default_prompt: "使用 $requirement-splitting-rules 为每个垂直切片生成唯一 SLICE-*，冻结 REQ/RULE 归属、范围、输入输出、文件/符号、依赖 DAG、权限/兼容、异常边界、local 测试命令/样本/断言、失败预期、清理、回滚、责任人和证据；保证唯一归属、无环依赖、实现-测试-审查-验收独立闭环，P0/P1 未决即 blocked，并更新同一份 doc/2-需求/ 主文档。"
+  short_description: "拆业务切片、依赖关系和当前优先闭环。"
+  default_prompt: "使用 $requirement-splitting-rules；为业务切片生成唯一 SLICE-*，冻结用户价值、REQ/RULE 归属、范围、业务输入输出、依赖、权限/兼容、异常边界、优先级和证据，保证唯一归属与无环业务依赖。不要在需求拆分阶段定义文件/符号、实施周期或测试命令；稳定后先交 acceptance-criteria-rules，再由 implementation-planning-rules 冻结实施与真实测试闭环。"

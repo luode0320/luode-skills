@@ -1,102 +1,47 @@
 ---
 name: requirement-splitting-rules
-description: 当需求较大、涉及多个模块、多个接口、多个页面、多个步骤、多个角色协作，或一次性覆盖多个独立子系统、多个产品子域、多个相对独立主线，无法作为单一实现单元稳定推进时触发。负责拆出任务边界、实施顺序和最小闭环，并将拆分结果持续更新到 `requirement-intake-rules` 约定、且路径与命名由 `artifact-storage-rules` 统一定义的同一份需求主文档中；不要用它代替需求接入、边界确认或项目排期管理。
+description: 当需求较大、涉及多个模块、接口、页面、步骤、角色协作，或一次覆盖多个独立子系统、产品子域、相对独立主线，无法作为单一闭环稳定推进时专项自动触发。负责业务切片、依赖关系和当前优先闭环，并将结果回写到 `requirement-intake-rules` 维护、由 `artifact-storage-rules` 定位的同一份需求主文档；文件/符号落点、实施周期、真实测试命令和任务级“实现-测试-审查-验收”由 `implementation-planning-rules` 负责，不代替需求接入、边界裁决或项目排期。
 ---
 
 # 需求拆分规则
 
-只在需求已经基本成立，但体量过大或结构过复杂，需要拆成多个可执行单元时使用这个 skill。
-如果当前问题还是信息不全、边界不清或需求发生变化，请先转交对应需求域 skill，而不是直接拆分。
+## 职责与触发
 
-## Skill 作用与适用场景
+- 只在需求目标和主要边界已经成立、但体量或结构无法作为单一闭环推进时使用。
+- 多模块、多接口、多页面、多步骤、多角色、跨端联动、多独立子系统或多个产品子域出现时自动触发。
+- 负责顶层子系统拆分、垂直业务切片、业务依赖关系、推荐顺序和当前优先闭环。
+- 每个需求点只能归属一个主 `SLICE-*`；共享能力单列依赖，依赖关系必须无环并写明阻断条件。
 
-- 把“大而全”的需求拆成可独立实现、可独立验证的子任务。
-- 当需求一次打包多个独立子系统或多个相对独立大能力块时，先做顶层拆解，再分别细化。
-- 明确拆分维度，如按模块、按流程阶段、按角色视角、按数据链路拆开。
-- 确定先后顺序、依赖关系和最小闭环，避免同时铺开导致失控。
-- 保证每个子项都能形成相对独立的“需求澄清 -> 实现 -> 验证”闭环，而不是彼此纠缠的伪子任务。
-- 对拆分结果优先使用图形化表达（拆分结构图、依赖流向图、子项矩阵），避免只给文字列表导致理解成本高。
-- 将拆分结果回写到当前需求对应的同一份需求主文档中，保持需求文档单源更新。
-- 减少一次性大改动，提升后续 skill 命中和实施稳定性。
-- 在拆分未完成、当前优先闭环未明确前，阻断进入 `acceptance-criteria-rules` 与 `implementation-planning-rules`。
+## 职责归位
 
-## 自动触发信号
+- `references/splitting-dimensions.md` 唯一定义业务切片字段、依赖 DAG、暂停和移交输入。
+- 本 Skill 不冻结代码文件/符号、不创建实施总览或周期、不定义真实测试命令、样本断言、清理和任务级回滚。
+- 上述实施字段不得删除：拆分完成后必须移交 `implementation-planning-rules`，由其把当前优先 `SLICE-*` 转成文件/符号、周期、任务和逐任务“实现 -> 真实测试 -> 审查 -> 验收”闭环。
+- 前置验收字段和 `AC-*` 由 `acceptance-criteria-rules` 负责；文档路径、图片和最终落盘分别由 `artifact-storage-rules`、`artifact-delivery-gate-rules` 负责。
 
-- 一个需求同时影响多个模块、接口、页面或数据链路。
-- 用户一次性要求交付多步流程、多角色能力或跨端联动。
-- 用户一次性提出像“聊天 + 文件 + 计费 + 分析”这类多个独立子系统或多个产品子域能力。
-- 当前任务如果不拆，会导致改动范围过大、测试难以收口。
-- 总控层或需求域判断需要形成阶段化、波次化推进方案。
+## 最小执行流程
 
-## 进入后先做什么
+1. 读取 `../requirement-intake-rules/references/requirement-domain-shared-contract.md`，确认需求已稳定且仍使用唯一主文档。
+2. 读取 `references/splitting-dimensions.md`，先判断按独立子系统、业务流程、角色、风险或依赖拆分。
+3. 多个独立子系统先做顶层拆分，不在同一轮把所有子系统细节写深。
+4. 读取 `references/splitting-sequence.md` 明确业务依赖和当前优先闭环；需要正反例时读取 `references/splitting-examples.md`。
+5. 将 `SLICE-*`、范围、业务输入输出、依赖、阻断条件和推荐顺序回写同一份需求主文档。
+6. 只把第一闭环或当前优先切片回流 intake/边界/变更继续收敛；稳定后先交 `acceptance-criteria-rules`，再交 `implementation-planning-rules`。
 
-1. 先确认需求目标和范围已经基本成立，不带着明显缺口直接拆。
-2. 先判断当前问题是“一个大流程需要阶段拆分”，还是“多个独立子系统需要先拆成子项目”。
-3. 如果是多个独立子系统，先停止继续细化单个子系统的细节，先把顶层子项目拆出来。
-4. 识别本次拆分的主维度，是按独立子系统、模块、流程、角色还是依赖关系。
-5. 划出最小可落地闭环，避免拆成大量无法独立验证的碎片。
-6. 找到当前需求对应的需求主文档；如果还没有，就按 `artifact-storage-rules` 的路径与命名模板初始化同一份文档。
-7. 明确每个子项的依赖、先后顺序和可独立验收点，并准备回写到该文档。
+## 暂停、通过与驳回
 
-## 默认执行流程
+- 暂停：目标或边界仍不稳定；切片仍互相纠缠；多个方案风险差异显著且未裁决；多个互不相关需求仍被打包。
+- 暂停期间保持 `blocked`，P0/P1 未决不得包装成可执行切片；用户明确停止时立即停止扩散。
+- 通过：形成清晰的业务切片、唯一归属、无环依赖、当前优先闭环和下游移交输入，并已回写同一主文档。
+- 驳回：机械按技术层切块、把小需求过度拆碎、多个独立子系统未先顶层拆分、拆分阶段直接定义实施文件/命令，或创建平行拆分文档。
+- 切片变化必须保留来源、差异、受影响验收/计划和回滚条件；恢复时从已落盘的 `SLICE-*` 状态继续。
 
-1. 默认先读 `references/splitting-dimensions.md`，先确认应该按什么维度拆需求。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认需求主文档根目录、入口文件模板和同文档复用策略。
-3. 如需继续展开，再读 `references/splitting-sequence.md`，需要安排子项先后顺序和最小闭环。
-4. 需要对照边界或正反例时，再读 `references/splitting-examples.md`，需要判断拆分是否合理或对照正反例。
-5. 如果需求覆盖多个独立子系统，先做顶层子项目拆分，不在这一轮继续细化每个子系统的实现细节。
-6. 输出需求拆分方案、子任务边界、依赖关系和实施顺序建议，并更新到当前需求对应的需求主文档。
-7. 如果该需求还没有文档，则按 `artifact-storage-rules` 的中央目录与入口模板创建同一份需求文档后再更新。
-8. 在主文档中补齐可视化拆分结果（建议 Mermaid 子项结构图 + 依赖关系图 + 子项表格）；若子项需要 UI/截图等真实视觉证据，图片统一进入 `doc/data/images/` 并登记 `IMG-*`，不得用图片替代 Mermaid。
-9. 拆分完成后，只把第一闭环子项或当前优先子项继续回流 `requirement-intake-rules` / 相邻需求 skill 做细化；其余子项保留顶层描述即可，不要一次性把所有子项都写深。
-10. 如果当前优先子项已经澄清充分、边界稳定、验收清楚，但编码前仍需要先拆文件落点和执行步骤，转交 `implementation-planning-rules`。
-11. 若拆分过程中发现范围争议，回流 `requirement-boundary-rules`。
-12. 在拆分未收敛、当前优先闭环未明确前，不进入 `acceptance-criteria-rules` 或 `implementation-planning-rules`。
+## References
 
-## 权责边界与不负责事项
-
-- 只负责拆分结构，不替代 `requirement-intake-rules` 做需求入口整理。
-- 不代替 `requirement-boundary-rules` 决定旧逻辑是否允许改动。
-- 不负责排期、工时承诺或项目管理层面的资源分配。
-- 不把一个本来就很小的需求过度拆碎，导致实施成本反而上升。
-- 不把多个独立子系统的细节同时写深，导致拆分文档本身失控。
-- 不为同一个需求额外新建拆分文档；拆分结果只能更新同一个需求主文档。
-
-## 需要暂停并确认的条件
-
-- 需求目标本身还不稳定，拆分结论会随时失效。
-- 拆分后每个子项仍然互相纠缠，无法形成相对独立边界。
-- 多个拆分方案对风险和顺序影响显著不同，暂时无法裁定。
-- 用户把多个互不相关的需求打包，需要先回到需求接入重整。
-
-## 执行通过 / 驳回标准
-
-- 通过：能够给出清晰的子任务清单、各自边界、依赖关系和推荐实施顺序，并保证每个子项都能形成相对独立闭环，同时将结果回写到同一个需求主文档。
-- 驳回：只是把原需求机械切块，没有说明拆分依据、依赖关系和最小闭环，或把小需求拆得过细，或明明是多个独立子系统却没有先做顶层拆分。
-
-## 执行结果归档要求
-
-- 将拆分方案、依赖关系和实施顺序记录到当前需求对应的需求主文档。
-- 所有需求域相关 skill 都应复用同一个需求文档；拆分只是对同一份文档追加“任务拆分 / 实施顺序”信息。
-- 需求主文档的根目录、入口文件模板和复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 归档内容至少包含拆分维度、子项说明、依赖前提和建议波次。
-- 归档内容应包含至少一种可视化拆分表达（结构图/依赖图/矩阵表），仅文字列表不建议通过。
-- 若拆分项包含图片资产，归档中必须记录图片决策、`IMG-*`、版本、相对引用、共享消费者、敏感/版权状态和删除/回滚条件；不适用项写 `N/A + 原因 + 证据`。
-- 如拆分结论会影响多个团队或多个阶段，应在同一份文档中保留版本化更新说明。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对拆分方案、依赖关系、实施顺序和可视化表达是否已经真实写入同一份需求主文档；未落盘不得判定需求拆分完成。
-
-### 极致完整性切片闸门
-
-- 每个垂直切片必须使用唯一 `SLICE-*`，冻结目标、REQ/RULE 归属、范围、输入输出、文件/符号、依赖、权限/兼容、异常边界、测试命令、样本断言、清理、回滚和证据。
-- 每个需求点只能有一个主切片；共享能力必须单列依赖切片，依赖图必须无环并标明阻断条件和顺序。
-- 每个切片必须独立完成“实现 -> 真实测试 -> 审查 -> 验收”；缺少文件/符号、真实命令、失败预期、清理或回滚任一项即 `blocked`。
-- 切片变化必须同步更新拆分表、依赖图、实施周期和验收映射；P0/P1 未决不得拆成可执行任务。
-
-## references 读取规则
-
-- 默认先读 `references/splitting-dimensions.md`。
-- 在定位当前需求主文档、创建初始文档或判断是否继续更新同一文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 只有在 确定实施顺序与依赖关系 时，再读 `references/splitting-sequence.md`。
-- 只有在 对照拆分样例或判断是否过度拆分 时，再读 `references/splitting-examples.md`。
-- 输出需求拆分文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文说明各切片带来的业务结果，`SLICE-*`、依赖图和测试命令进入附录。
-- 拆分涉及外部验证条件时，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，将条件挂到对应切片而不是全局阻断。
+- 共享路由与保护语义：`../requirement-intake-rules/references/requirement-domain-shared-contract.md`
+- 业务切片、依赖 DAG 与 `SLICE-*`：`references/splitting-dimensions.md`
+- 业务顺序与当前优先闭环：`references/splitting-sequence.md`
+- 正反例：`references/splitting-examples.md`
+- 实施总览、周期、文件/符号与真实测试：`../implementation-planning-rules/SKILL.md`
+- 前置验收：`../acceptance-criteria-rules/SKILL.md`
+- 文档路径和落盘门禁：`../artifact-storage-rules/references/path-map.yaml`、`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`

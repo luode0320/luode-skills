@@ -162,7 +162,7 @@
 - 不负责测试程序实现、断言方式和脚本内容，那属于 `test-program-rules`。
 - 不负责测试说明文档章节和记录格式，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。
 - 不负责功能是否正确、覆盖是否充分，那属于 `functional-validation-rules` 和 `test-regression-rules`。
-- 如果名称无法确定是因为需求目标、场景边界或 Bug 定义本身不清，应回流 `requirement-gap-rules`、`requirement-boundary-rules` 或 Bug 域相关 skill。
+- 如果名称无法确定是因为需求目标、场景边界或 Bug 定义本身不清，应回流 `requirement-intake-rules` 的 `gap-routing`、`requirement-boundary-rules` 或 Bug 域相关 skill。
 
 ## 需要暂停并确认的条件
 

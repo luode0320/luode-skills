@@ -64,5 +64,5 @@
 - 默认读取 `references/initial-discovery-checklist.md`。
 - 涉及证据等级、用户线索、外部来源和记忆回写时读取 `references/initial-discovery-evidence-and-memory.md`。
 - 组织侦察输出时读取 `references/initial-discovery-output-template.md`。
-- 判断需求域承接、合并边界和下游移交时读取 `references/initial-discovery-domain-routing.md`。
+- 判断需求域承接、合并边界和下游移交时读取 `references/requirement-domain-shared-contract.md`。
 - 需求文档落地时继续读取 `artifact-delivery-gate-rules` 的普通语言与审查验收契约。
