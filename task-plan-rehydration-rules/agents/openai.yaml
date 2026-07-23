@@ -1,0 +1,4 @@
+interface:
+  display_name: "任务计划断点恢复"
+  short_description: "保存并恢复 Codex Desktop 悬浮任务列表"
+  default_prompt: "使用 $task-plan-rehydration-rules 校验 PROJECT_CURRENT 中的活动任务投影，在首次继续回合调用 update_plan 重建悬浮任务列表，并先核验进行中步骤的中断点。"
