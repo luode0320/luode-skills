@@ -1,0 +1,86 @@
+[
+  {
+    "file": "engineering-doc-acceptance.json",
+    "profile": "acceptance",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-01.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-02.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-03.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-04.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-05.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-cycle-06.json",
+    "profile": "implementation_cycle",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-final-acceptance.json",
+    "profile": "final_acceptance",
+    "valid": true,
+    "status": "PASS",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-master.json",
+    "profile": "implementation_master",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-overview.json",
+    "profile": "implementation_overview",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-requirement.json",
+    "profile": "requirement",
+    "valid": true,
+    "status": "LIMITED",
+    "errors": []
+  },
+  {
+    "file": "engineering-doc-review.json",
+    "profile": "review",
+    "valid": true,
+    "status": "PASS",
+    "errors": []
+  }
+]

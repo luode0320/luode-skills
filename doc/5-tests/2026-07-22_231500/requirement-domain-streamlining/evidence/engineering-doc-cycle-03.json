@@ -1,0 +1,344 @@
+{
+  "valid": true,
+  "status": "LIMITED",
+  "profile": "implementation_cycle",
+  "document": "F:\\luode-skills\\doc\\3-实施\\2026-07-22_231500_需求域Skill精简旧路由收口与职责归位_实施周期03_主入口和共享契约减重.md",
+  "ids": [
+    "AC-REQ",
+    "AC-REQ-0003",
+    "CYCLE-REQ-03",
+    "CYCLE-REQ-03-PLAN",
+    "REQ-03-01",
+    "REQ-03-02",
+    "REQ-REQ-0003",
+    "ROLLBACK-REQ-03",
+    "SRC-REQ-DOMAIN-20260722-001",
+    "TASK-REQ-03-01",
+    "TASK-REQ-03-02",
+    "TEST-REQ-03-01",
+    "TEST-REQ-03-02"
+  ],
+  "diagrams": {
+    "flowchart": 1,
+    "sequenceDiagram": 0,
+    "stateDiagram-v2": 0,
+    "erDiagram": 0
+  },
+  "images": {
+    "count": 0,
+    "ids": [],
+    "paths": [],
+    "decision": "na",
+    "manifest": {
+      "required": false,
+      "rows": 0,
+      "ids": [],
+      "valid": true
+    },
+    "asset_root": "F:\\luode-skills\\doc\\data\\images",
+    "valid": true
+  },
+  "errors": [],
+  "warnings": [
+    "heading baseline skipped: document is not tracked in HEAD"
+  ],
+  "traceability": {
+    "documents": 11,
+    "tasks": [
+      "TASK-REQ-01-01",
+      "TASK-REQ-01-02",
+      "TASK-REQ-02-01",
+      "TASK-REQ-02-02",
+      "TASK-REQ-03-01",
+      "TASK-REQ-03-02",
+      "TASK-REQ-04-01",
+      "TASK-REQ-04-02",
+      "TASK-REQ-05-01",
+      "TASK-REQ-05-02",
+      "TASK-REQ-06-01",
+      "TASK-REQ-06-02"
+    ],
+    "evidence": [
+      "EVD-REQ-FINAL",
+      "EVD-REQ-FINAL-ACCEPT-01",
+      "EVD-REQ-FINAL-ACCEPT-02",
+      "EVD-REQ-FINAL-ACCEPT-03",
+      "EVD-REQ-FINAL-REVIEW-01",
+      "EVD-REQ-FINAL-REVIEW-02",
+      "EVD-REQ-FINAL-REVIEW-03",
+      "EVD-TASK-REQ-01-01-ACCEPT",
+      "EVD-TASK-REQ-01-01-IMPL",
+      "EVD-TASK-REQ-01-01-REVIEW",
+      "EVD-TASK-REQ-01-01-TEST",
+      "EVD-TASK-REQ-01-02-ACCEPT",
+      "EVD-TASK-REQ-01-02-IMPL",
+      "EVD-TASK-REQ-01-02-REVIEW",
+      "EVD-TASK-REQ-01-02-TEST",
+      "EVD-TASK-REQ-02-01-ACCEPT",
+      "EVD-TASK-REQ-02-01-IMPL",
+      "EVD-TASK-REQ-02-01-REVIEW",
+      "EVD-TASK-REQ-02-01-TEST",
+      "EVD-TASK-REQ-02-02-ACCEPT",
+      "EVD-TASK-REQ-02-02-IMPL",
+      "EVD-TASK-REQ-02-02-REVIEW",
+      "EVD-TASK-REQ-02-02-TEST",
+      "EVD-TASK-REQ-03-01-ACCEPT",
+      "EVD-TASK-REQ-03-01-IMPL",
+      "EVD-TASK-REQ-03-01-REVIEW",
+      "EVD-TASK-REQ-03-01-TEST",
+      "EVD-TASK-REQ-03-02-ACCEPT",
+      "EVD-TASK-REQ-03-02-IMPL",
+      "EVD-TASK-REQ-03-02-REVIEW",
+      "EVD-TASK-REQ-03-02-TEST",
+      "EVD-TASK-REQ-04-01-ACCEPT",
+      "EVD-TASK-REQ-04-01-IMPL",
+      "EVD-TASK-REQ-04-01-REVIEW",
+      "EVD-TASK-REQ-04-01-TEST",
+      "EVD-TASK-REQ-04-02-ACCEPT",
+      "EVD-TASK-REQ-04-02-IMPL",
+      "EVD-TASK-REQ-04-02-REVIEW",
+      "EVD-TASK-REQ-04-02-TEST",
+      "EVD-TASK-REQ-05-01-ACCEPT",
+      "EVD-TASK-REQ-05-01-IMPL",
+      "EVD-TASK-REQ-05-01-REVIEW",
+      "EVD-TASK-REQ-05-01-TEST",
+      "EVD-TASK-REQ-05-02-ACCEPT",
+      "EVD-TASK-REQ-05-02-IMPL",
+      "EVD-TASK-REQ-05-02-REVIEW",
+      "EVD-TASK-REQ-05-02-TEST",
+      "EVD-TASK-REQ-06-01-ACCEPT",
+      "EVD-TASK-REQ-06-01-IMPL",
+      "EVD-TASK-REQ-06-01-REVIEW",
+      "EVD-TASK-REQ-06-01-TEST",
+      "EVD-TASK-REQ-06-02-ACCEPT",
+      "EVD-TASK-REQ-06-02-IMPL",
+      "EVD-TASK-REQ-06-02-REVIEW",
+      "EVD-TASK-REQ-06-02-TEST"
+    ],
+    "cycles": {
+      "01": [
+        "TASK-REQ-01-01",
+        "TASK-REQ-01-02"
+      ],
+      "02": [
+        "TASK-REQ-02-01",
+        "TASK-REQ-02-02"
+      ],
+      "03": [
+        "TASK-REQ-03-01",
+        "TASK-REQ-03-02"
+      ],
+      "04": [
+        "TASK-REQ-04-01",
+        "TASK-REQ-04-02"
+      ],
+      "05": [
+        "TASK-REQ-05-01",
+        "TASK-REQ-05-02"
+      ],
+      "06": [
+        "TASK-REQ-06-01",
+        "TASK-REQ-06-02"
+      ]
+    },
+    "required_evidence_categories": [
+      "IMPL",
+      "TEST",
+      "REVIEW",
+      "ACCEPT"
+    ],
+    "valid": true
+  },
+  "unresolved_decisions": {
+    "count": 0,
+    "items": []
+  },
+  "coverage": {
+    "task_evidence": {
+      "required_categories": [
+        "IMPL",
+        "TEST",
+        "REVIEW",
+        "ACCEPT"
+      ],
+      "tasks": 12,
+      "evidence": 55,
+      "valid": true
+    },
+    "valid": true
+  },
+  "gates": {
+    "valid": true,
+    "blocking": false,
+    "release_status": "limited",
+    "items": [
+      {
+        "stage": "review",
+        "applicability": "limited",
+        "reason": "实施任务正在逐项闭环，当前文档先冻结审查门槛。",
+        "basis": "需求域 Skill 资产和消费者迁移需逐任务审查。",
+        "required_by_source": true,
+        "required_now": false,
+        "completed_validation": [],
+        "substitute_validation": [
+          "artifact-delivery-gate-rules/scripts/validate_engineering_docs.py"
+        ],
+        "manual_follow_up": "全部专项验证和当前改动审查完成后更新。",
+        "pass_standard": "无 P0/P1，保护语义、触发契约、消费者和回滚证据完整。",
+        "blocking": false,
+        "reason_code": null
+      },
+      {
+        "stage": "acceptance",
+        "applicability": "limited",
+        "reason": "当前文档用于冻结实施与放行条件，最终验收在实施收口后执行。",
+        "basis": "baseline/trigger/consumer/reference/post-cleanup 必须全部通过。",
+        "required_by_source": true,
+        "required_now": false,
+        "completed_validation": [],
+        "substitute_validation": [
+          "artifact-delivery-gate-rules/scripts/validate_engineering_docs.py"
+        ],
+        "manual_follow_up": "按 AC-REQ-* 逐条验收。",
+        "pass_standard": "所有完成条件通过且无未决 P0/P1。",
+        "blocking": false,
+        "reason_code": null
+      },
+      {
+        "stage": "third_party",
+        "applicability": "not_applicable",
+        "reason": "本任务只读写 local 仓库文件和本地 Python 验证器。",
+        "basis": "不连接数据库、缓存、消息队列、HTTP/RPC 或生产服务。",
+        "required_by_source": false,
+        "required_now": false,
+        "completed_validation": [],
+        "substitute_validation": [],
+        "manual_follow_up": "N/A",
+        "pass_standard": "N/A",
+        "blocking": false,
+        "reason_code": null
+      }
+    ],
+    "error_codes": []
+  },
+  "task_blocker_closure": {
+    "required": false,
+    "triggers": [],
+    "section": "任务阻断收口",
+    "records": [],
+    "valid": true,
+    "error_codes": []
+  },
+  "error_codes": [],
+  "strict": {
+    "valid": true,
+    "errors": [],
+    "trace": {
+      "documents": 11,
+      "tasks": [
+        "TASK-REQ-01-01",
+        "TASK-REQ-01-02",
+        "TASK-REQ-02-01",
+        "TASK-REQ-02-02",
+        "TASK-REQ-03-01",
+        "TASK-REQ-03-02",
+        "TASK-REQ-04-01",
+        "TASK-REQ-04-02",
+        "TASK-REQ-05-01",
+        "TASK-REQ-05-02",
+        "TASK-REQ-06-01",
+        "TASK-REQ-06-02"
+      ],
+      "evidence": [
+        "EVD-REQ-FINAL",
+        "EVD-REQ-FINAL-ACCEPT-01",
+        "EVD-REQ-FINAL-ACCEPT-02",
+        "EVD-REQ-FINAL-ACCEPT-03",
+        "EVD-REQ-FINAL-REVIEW-01",
+        "EVD-REQ-FINAL-REVIEW-02",
+        "EVD-REQ-FINAL-REVIEW-03",
+        "EVD-TASK-REQ-01-01-ACCEPT",
+        "EVD-TASK-REQ-01-01-IMPL",
+        "EVD-TASK-REQ-01-01-REVIEW",
+        "EVD-TASK-REQ-01-01-TEST",
+        "EVD-TASK-REQ-01-02-ACCEPT",
+        "EVD-TASK-REQ-01-02-IMPL",
+        "EVD-TASK-REQ-01-02-REVIEW",
+        "EVD-TASK-REQ-01-02-TEST",
+        "EVD-TASK-REQ-02-01-ACCEPT",
+        "EVD-TASK-REQ-02-01-IMPL",
+        "EVD-TASK-REQ-02-01-REVIEW",
+        "EVD-TASK-REQ-02-01-TEST",
+        "EVD-TASK-REQ-02-02-ACCEPT",
+        "EVD-TASK-REQ-02-02-IMPL",
+        "EVD-TASK-REQ-02-02-REVIEW",
+        "EVD-TASK-REQ-02-02-TEST",
+        "EVD-TASK-REQ-03-01-ACCEPT",
+        "EVD-TASK-REQ-03-01-IMPL",
+        "EVD-TASK-REQ-03-01-REVIEW",
+        "EVD-TASK-REQ-03-01-TEST",
+        "EVD-TASK-REQ-03-02-ACCEPT",
+        "EVD-TASK-REQ-03-02-IMPL",
+        "EVD-TASK-REQ-03-02-REVIEW",
+        "EVD-TASK-REQ-03-02-TEST",
+        "EVD-TASK-REQ-04-01-ACCEPT",
+        "EVD-TASK-REQ-04-01-IMPL",
+        "EVD-TASK-REQ-04-01-REVIEW",
+        "EVD-TASK-REQ-04-01-TEST",
+        "EVD-TASK-REQ-04-02-ACCEPT",
+        "EVD-TASK-REQ-04-02-IMPL",
+        "EVD-TASK-REQ-04-02-REVIEW",
+        "EVD-TASK-REQ-04-02-TEST",
+        "EVD-TASK-REQ-05-01-ACCEPT",
+        "EVD-TASK-REQ-05-01-IMPL",
+        "EVD-TASK-REQ-05-01-REVIEW",
+        "EVD-TASK-REQ-05-01-TEST",
+        "EVD-TASK-REQ-05-02-ACCEPT",
+        "EVD-TASK-REQ-05-02-IMPL",
+        "EVD-TASK-REQ-05-02-REVIEW",
+        "EVD-TASK-REQ-05-02-TEST",
+        "EVD-TASK-REQ-06-01-ACCEPT",
+        "EVD-TASK-REQ-06-01-IMPL",
+        "EVD-TASK-REQ-06-01-REVIEW",
+        "EVD-TASK-REQ-06-01-TEST",
+        "EVD-TASK-REQ-06-02-ACCEPT",
+        "EVD-TASK-REQ-06-02-IMPL",
+        "EVD-TASK-REQ-06-02-REVIEW",
+        "EVD-TASK-REQ-06-02-TEST"
+      ],
+      "cycles": {
+        "01": [
+          "TASK-REQ-01-01",
+          "TASK-REQ-01-02"
+        ],
+        "02": [
+          "TASK-REQ-02-01",
+          "TASK-REQ-02-02"
+        ],
+        "03": [
+          "TASK-REQ-03-01",
+          "TASK-REQ-03-02"
+        ],
+        "04": [
+          "TASK-REQ-04-01",
+          "TASK-REQ-04-02"
+        ],
+        "05": [
+          "TASK-REQ-05-01",
+          "TASK-REQ-05-02"
+        ],
+        "06": [
+          "TASK-REQ-06-01",
+          "TASK-REQ-06-02"
+        ]
+      },
+      "required_evidence_categories": [
+        "IMPL",
+        "TEST",
+        "REVIEW",
+        "ACCEPT"
+      ],
+      "valid": true
+    }
+  }
+}

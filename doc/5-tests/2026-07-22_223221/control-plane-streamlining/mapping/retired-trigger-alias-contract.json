@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "contracts": [
+    {
+      "source_skill": "subagent-dispatch-rules",
+      "target_owner": "parallel-task-dispatch-rules",
+      "baseline_commit": "76ee419d59396d919fea04ed55ea373ddeb8cb26",
+      "source_description": "当任一 skill 已命中并准备进入执行阶段时自动触发。负责先自动判断当前任务是否满足 subagent 委派条件；委派判定不需要用户逐次要求，但真实启动必须服从当前环境的 subagent / multi-agent / thread 工具元数据、系统规则和权限策略。本仓库默认采用 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控时自动启动 subagent；该项目级 standing authorization 视为满足工具的显式授权条件。只有缺少当前轮授权且缺少项目级完全授权声明时，才判定为“工具授权不支持自动启动”并回退本地执行。不要用它代替需求分析、Bug 定位、编码实现、测试验证或交付收口本身。",
+      "source_description_sha256": "733ad2750d13c5c005b908fc70a96f10aa7ba9b81dffca9839369116e5a3cd5b",
+      "required_target_tokens": [
+        "任一 skill 已命中并准备进入",
+        "不依赖用户逐次点名",
+        "subagent / multi-agent / thread",
+        "工具元数据",
+        "系统规则",
+        "当前轮授权",
+        "项目级完全授权",
+        "可切分",
+        "写集",
+        "风险可控",
+        "真实启动",
+        "回退",
+        "不要用本 skill 代替"
+      ]
+    },
+    {
+      "source_skill": "project-memory-file-bootstrap-rules",
+      "target_owner": "project-rule-file-bootstrap-rules",
+      "baseline_commit": "76ee419d59396d919fea04ed55ea373ddeb8cb26",
+      "source_description": "当项目根目录的记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 按需）任一缺失、需要新会话交接、或长期记忆首次初始化时自动触发；也可被用户“根据 skill 更新项目记忆 / 初始化项目四件套 / 补齐 PROJECT_CURRENT|MEMORY|HISTORY”等显式请求触发。负责检测、创建和结构性维护 `PROJECT_CURRENT.md`（当前状态骨架，覆盖式维护，UTF-8 字节数不得超过 51,200）、`PROJECT_MEMORY.md`（人类阅读区 + 底部机器索引区双区骨架，稳定合并维护）、`PROJECT_HISTORY.md`（只追加历史事件骨架，不覆盖已有内容）三个文件的结构与大小闸门；不负责从代码或对话中抽取具体业务事实、实体关系或历史事件内容，事实抽取仍由 `project-memory-rules` 负责，`PROJECT_STYLE.md` 的风格合并仍由 `project-style-rules` 负责。不负责 `AGENTS.md` / `CLAUDE.md` 规则文件或 `.gitattributes` / `.editorconfig`，那部分由 `project-rule-file-bootstrap-rules` 负责；两者共用同一份 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 作为唯一执行入口，不重复实现或复制脚本逻辑。",
+      "source_description_sha256": "e4afe1f326bf76780a11a7def878fbf9e18a48ea9db41e74711cd6b17e3dcd67",
+      "required_target_tokens": [
+        "项目记忆四件套",
+        "新会话交接",
+        "长期记忆首次初始化",
+        "初始化项目四件套",
+        "补齐 PROJECT_CURRENT",
+        "51,200",
+        "人类区",
+        "机器索引区",
+        "只追加",
+        "project-memory-rules",
+        "project-style-rules",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gitattributes",
+        ".editorconfig",
+        "bootstrap_agents.sh"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "valid": true,
+  "coverage_count": 18,
+  "unique_semantic_ids": 18,
+  "records": [
+    {
+      "semantic_id": "PS-TC-001",
+      "canonical_owner": "skill-hit-check-rules",
+      "evidence_path": "skill-hit-check-rules/SKILL.md",
+      "assertion_token": "唯一首入口",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-002",
+      "canonical_owner": "skill-hit-check-rules",
+      "evidence_path": "skill-hit-check-rules/SKILL.md",
+      "assertion_token": "自动触发不依赖用户点名",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-003",
+      "canonical_owner": "skill-hit-check-rules",
+      "evidence_path": "skill-hit-check-rules/references/output-format.md",
+      "assertion_token": "命中检查",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-004",
+      "canonical_owner": "git-collaboration-rules",
+      "evidence_path": "git-collaboration-rules/references/current-turn-authorization.md",
+      "assertion_token": "当前轮",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-005",
+      "canonical_owner": "implementation-planning-rules",
+      "evidence_path": "implementation-planning-rules/SKILL.md",
+      "assertion_token": "Plan Mode",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-006",
+      "canonical_owner": "autonomous-execution-rules",
+      "evidence_path": "autonomous-execution-rules/references/termination-loop-prevention.md",
+      "assertion_token": "明确结束",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-007",
+      "canonical_owner": "parallel-task-dispatch-rules",
+      "evidence_path": "parallel-task-dispatch-rules/SKILL.md",
+      "assertion_token": "系统规则和工具元数据优先",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-008",
+      "canonical_owner": "parallel-task-dispatch-rules",
+      "evidence_path": "parallel-task-dispatch-rules/SKILL.md",
+      "assertion_token": "互斥 write set",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-009",
+      "canonical_owner": "AGENTS.md",
+      "evidence_path": "AGENTS.md",
+      "assertion_token": "只能使用 `local`",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-010",
+      "canonical_owner": "code-context-resync-rules",
+      "evidence_path": "code-context-resync-rules/SKILL.md",
+      "assertion_token": "用户手动修改",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-011",
+      "canonical_owner": "AGENTS.md",
+      "evidence_path": "AGENTS.md",
+      "assertion_token": "UTF-8",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-012",
+      "canonical_owner": "project-rule-file-bootstrap-rules",
+      "evidence_path": "project-rule-file-bootstrap-rules/SKILL.md",
+      "assertion_token": "非受管",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-013",
+      "canonical_owner": "project-rule-file-bootstrap-rules",
+      "evidence_path": "project-rule-file-bootstrap-rules/SKILL.md",
+      "assertion_token": "51,200",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-014",
+      "canonical_owner": "project-rule-file-bootstrap-rules",
+      "evidence_path": "project-rule-file-bootstrap-rules/SKILL.md",
+      "assertion_token": "只追加",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-015",
+      "canonical_owner": "artifact-delivery-gate-rules",
+      "evidence_path": "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md",
+      "assertion_token": "BLK-*",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-016",
+      "canonical_owner": "artifact-delivery-gate-rules",
+      "evidence_path": "artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md",
+      "assertion_token": "not_applicable",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-017",
+      "canonical_owner": "reasoning-summary-structure-rules",
+      "evidence_path": "reasoning-summary-structure-rules/SKILL.md",
+      "assertion_token": "唯一面向用户渲染",
+      "present": true
+    },
+    {
+      "semantic_id": "PS-TC-018",
+      "canonical_owner": "reasoning-summary-structure-rules",
+      "evidence_path": "reasoning-summary-structure-rules/references/conditional-sections-rules.md",
+      "assertion_token": "等待用户新指令",
+      "present": true
+    }
+  ],
+  "errors": []
+}

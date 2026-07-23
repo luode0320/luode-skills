@@ -1,0 +1,11 @@
+{
+  "valid": true,
+  "parent_agents_exists": true,
+  "project_current_exists": true,
+  "project_memory_exists": true,
+  "project_history_exists": true,
+  "project_current_bytes": 2955,
+  "project_current_limit": 51200,
+  "machine_index_entities": 26,
+  "errors": []
+}

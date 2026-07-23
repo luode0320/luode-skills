@@ -1,0 +1,305 @@
+{
+  "valid": true,
+  "phase": "reference",
+  "repo_root": "F:\\luode-skills",
+  "errors": [],
+  "data": {
+    "candidate_count": 6,
+    "markdown_links_checked": 97,
+    "broken_links": [],
+    "utf8_file_count": 30,
+    "single_line_markdown": [],
+    "agent_results": [
+      {
+        "skill": "requirement-intake-rules",
+        "unique_openai_yaml": true,
+        "mentions_owner": true
+      },
+      {
+        "skill": "requirement-boundary-rules",
+        "unique_openai_yaml": true,
+        "mentions_owner": true
+      },
+      {
+        "skill": "requirement-splitting-rules",
+        "unique_openai_yaml": true,
+        "mentions_owner": true
+      },
+      {
+        "skill": "requirement-change-rules",
+        "unique_openai_yaml": true,
+        "mentions_owner": true
+      }
+    ],
+    "reference_reachability": [
+      {
+        "skill": "requirement-intake-rules",
+        "expected_assets": [
+          "extreme-completeness-standard.md",
+          "gap-routing.md",
+          "initial-discovery-checklist.md",
+          "initial-discovery-evidence-and-memory.md",
+          "initial-discovery-output-template.md",
+          "initial-discovery-route.md",
+          "intake-boundaries-and-examples.md",
+          "intake-checklist.md",
+          "missing-info-checklist.md",
+          "pause-triggers.md",
+          "requirement-domain-shared-contract.md",
+          "requirement-gap-examples.md",
+          "requirement-structure-template.md"
+        ],
+        "actual_assets": [
+          "extreme-completeness-standard.md",
+          "gap-routing.md",
+          "initial-discovery-checklist.md",
+          "initial-discovery-evidence-and-memory.md",
+          "initial-discovery-output-template.md",
+          "initial-discovery-route.md",
+          "intake-boundaries-and-examples.md",
+          "intake-checklist.md",
+          "missing-info-checklist.md",
+          "pause-triggers.md",
+          "requirement-domain-shared-contract.md",
+          "requirement-gap-examples.md",
+          "requirement-structure-template.md"
+        ],
+        "reachable": [
+          "requirement-intake-rules/references/extreme-completeness-standard.md",
+          "requirement-intake-rules/references/gap-routing.md",
+          "requirement-intake-rules/references/initial-discovery-checklist.md",
+          "requirement-intake-rules/references/initial-discovery-evidence-and-memory.md",
+          "requirement-intake-rules/references/initial-discovery-output-template.md",
+          "requirement-intake-rules/references/initial-discovery-route.md",
+          "requirement-intake-rules/references/intake-boundaries-and-examples.md",
+          "requirement-intake-rules/references/intake-checklist.md",
+          "requirement-intake-rules/references/missing-info-checklist.md",
+          "requirement-intake-rules/references/pause-triggers.md",
+          "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+          "requirement-intake-rules/references/requirement-gap-examples.md",
+          "requirement-intake-rules/references/requirement-structure-template.md"
+        ],
+        "orphan": []
+      },
+      {
+        "skill": "requirement-boundary-rules",
+        "expected_assets": [
+          "acceptance-routing-examples.md",
+          "boundary-checklist.md",
+          "history-vs-change.md"
+        ],
+        "actual_assets": [
+          "acceptance-routing-examples.md",
+          "boundary-checklist.md",
+          "history-vs-change.md"
+        ],
+        "reachable": [
+          "requirement-boundary-rules/references/acceptance-routing-examples.md",
+          "requirement-boundary-rules/references/boundary-checklist.md",
+          "requirement-boundary-rules/references/history-vs-change.md"
+        ],
+        "orphan": []
+      },
+      {
+        "skill": "requirement-splitting-rules",
+        "expected_assets": [
+          "splitting-dimensions.md",
+          "splitting-examples.md",
+          "splitting-sequence.md"
+        ],
+        "actual_assets": [
+          "splitting-dimensions.md",
+          "splitting-examples.md",
+          "splitting-sequence.md"
+        ],
+        "reachable": [
+          "requirement-splitting-rules/references/splitting-dimensions.md",
+          "requirement-splitting-rules/references/splitting-examples.md",
+          "requirement-splitting-rules/references/splitting-sequence.md"
+        ],
+        "orphan": []
+      },
+      {
+        "skill": "requirement-change-rules",
+        "expected_assets": [
+          "change-classification.md",
+          "change-decision-examples.md",
+          "impact-recheck.md"
+        ],
+        "actual_assets": [
+          "change-classification.md",
+          "change-decision-examples.md",
+          "impact-recheck.md"
+        ],
+        "reachable": [
+          "requirement-change-rules/references/change-classification.md",
+          "requirement-change-rules/references/change-decision-examples.md",
+          "requirement-change-rules/references/impact-recheck.md"
+        ],
+        "orphan": []
+      }
+    ],
+    "script_results": [
+      {
+        "skill": "requirement-intake-rules",
+        "scripts": []
+      },
+      {
+        "skill": "requirement-boundary-rules",
+        "scripts": []
+      },
+      {
+        "skill": "requirement-splitting-rules",
+        "scripts": []
+      },
+      {
+        "skill": "requirement-change-rules",
+        "scripts": []
+      }
+    ],
+    "gap_semantic_coverage": [
+      {
+        "source": "识别需求描述中的关键缺失项",
+        "target": "识别需求描述中的关键缺失项",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "先做了再补需求",
+        "target": "先做了再补需求",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "TBD/TODO/待补",
+        "target": "TBD/TODO/待补",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "图缺失或图文冲突应作为缺口处理",
+        "target": "图缺失或图文冲突应作为缺口处理",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "正文摘要 + 附录详解",
+        "target": "正文摘要 + 附录详解",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "临时缺口文档",
+        "target": "临时缺口文档",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "多种合理解释",
+        "target": "多种合理解释",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "不允许“先做一版看看”",
+        "target": "不允许“先做一版看看”",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "doc/data/images/",
+        "target": "doc/data/images/",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "artifact-delivery-gate-rules",
+        "target": "artifact-delivery-gate-rules",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "P0/P1",
+        "target": "P0/P1",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "blocked",
+        "target": "blocked",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "用户确认并补齐缺口后",
+        "target": "用户确认并补齐缺口后",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "关键缺口未清零",
+        "target": "关键缺口未清零",
+        "source_ok": true,
+        "target_ok": true
+      },
+      {
+        "source": "回填主需求文档",
+        "target": "回填主需求文档",
+        "source_ok": true,
+        "target_ok": true
+      }
+    ],
+    "protected_semantic_results": [
+      {
+        "id": "RULE-REQ-AUTO",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-HABIT",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-LOCAL",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-AUTH",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-STOP",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-ROLLBACK",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-SINGLE-DOC",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-GAP-OWNER",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-NEIGHBOR",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "id": "RULE-REQ-UTF8",
+        "missing": [],
+        "valid": true
+      }
+    ]
+  }
+}

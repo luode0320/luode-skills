@@ -1,0 +1,390 @@
+schema_version: 1
+manifest_id: MANIFEST-TC-20260722
+source_id: SRC-CONTROL-PLANE-20260722-001
+baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+scope:
+  candidate_count: 18
+  retire_candidate_count: 2
+  expected_skill_total_after_delete: 73
+protected_semantics: mapping/protected-semantics.json
+asset_inventory: inventory/control-plane-assets.json
+trigger_fixtures: fixtures/trigger-cases.yaml
+candidates:
+- candidate_id: TC-001
+  source_skill: skill-hit-check-rules
+  target_owner: skill-hit-check-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-001
+  - PS-TC-002
+  - PS-TC-003
+  - PS-TC-004
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: afbfebd26753201ceac88b82031a04ccd0a01f08
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: skill-hit-check-rules
+  write_set:
+  - skill-hit-check-rules/**
+  delete_authorized: true
+- candidate_id: TC-002
+  source_skill: team-development-rules
+  target_owner: team-development-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-002
+  - PS-TC-005
+  - PS-TC-006
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 4d8ce10b48284bc8fbd1b6abe3f6cad451dd1a2a
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: team-development-rules
+  write_set:
+  - team-development-rules/**
+  delete_authorized: true
+- candidate_id: TC-003
+  source_skill: context-compression-rules
+  target_owner: context-compression-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-005
+  - PS-TC-006
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: cfa973c982dfdb659a2e77626daff87f90f2449a
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: context-compression-rules
+  write_set:
+  - context-compression-rules/**
+  delete_authorized: true
+- candidate_id: TC-004
+  source_skill: recent-context-bootstrap-rules
+  target_owner: recent-context-bootstrap-rules
+  action: retain_specialized
+  protected_semantics:
+  - PS-TC-002
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: dfc5236a5a9fc95db80b52155ac1d01ad028120c
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: recent-context-bootstrap-rules
+  write_set:
+  - recent-context-bootstrap-rules/**
+  delete_authorized: true
+- candidate_id: TC-005
+  source_skill: project-rule-file-bootstrap-rules
+  target_owner: project-rule-file-bootstrap-rules
+  action: canonical_owner
+  protected_semantics:
+  - PS-TC-011
+  - PS-TC-012
+  - PS-TC-013
+  - PS-TC-014
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: e9f3f26dd2b37be2d413ef3680b15b503b26dcf0
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: project-rule-file-bootstrap-rules
+  write_set:
+  - project-rule-file-bootstrap-rules/**
+  delete_authorized: true
+- candidate_id: TC-006
+  source_skill: project-memory-file-bootstrap-rules
+  target_owner: project-rule-file-bootstrap-rules
+  action: merge_retire
+  protected_semantics:
+  - PS-TC-011
+  - PS-TC-013
+  - PS-TC-014
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: c7b6fe01da3cd056d86eb848b2df6584d2b6698a
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: project-memory-file-bootstrap-rules
+  write_set:
+  - project-memory-file-bootstrap-rules/**
+  - project-rule-file-bootstrap-rules/**
+  delete_authorized: false
+- candidate_id: TC-007
+  source_skill: parallel-task-dispatch-rules
+  target_owner: parallel-task-dispatch-rules
+  action: canonical_owner
+  protected_semantics:
+  - PS-TC-002
+  - PS-TC-007
+  - PS-TC-008
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: acdb6d16d78f28bbd34cf67330542a6288b73d60
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: parallel-task-dispatch-rules
+  write_set:
+  - parallel-task-dispatch-rules/**
+  delete_authorized: true
+- candidate_id: TC-008
+  source_skill: subagent-dispatch-rules
+  target_owner: parallel-task-dispatch-rules
+  action: merge_retire
+  protected_semantics:
+  - PS-TC-002
+  - PS-TC-007
+  - PS-TC-008
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 4055025e68993696f9f4e68840e7d8f709a2a1b1
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: subagent-dispatch-rules
+  write_set:
+  - subagent-dispatch-rules/**
+  - parallel-task-dispatch-rules/**
+  delete_authorized: false
+- candidate_id: TC-009
+  source_skill: autonomous-execution-rules
+  target_owner: autonomous-execution-rules
+  action: internal_refactor
+  protected_semantics:
+  - PS-TC-005
+  - PS-TC-006
+  - PS-TC-015
+  - PS-TC-018
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 0235fb611a78aee35115bbf0da83cd1367112581
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: autonomous-execution-rules
+  write_set:
+  - autonomous-execution-rules/**
+  delete_authorized: true
+- candidate_id: TC-010
+  source_skill: git-collaboration-rules
+  target_owner: git-collaboration-rules
+  action: internal_refactor
+  protected_semantics:
+  - PS-TC-003
+  - PS-TC-004
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: cb8b9f3ff0a6b2561f2820a0488d962176a8a354
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: git-collaboration-rules
+  write_set:
+  - git-collaboration-rules/**
+  delete_authorized: true
+- candidate_id: TC-011
+  source_skill: implementation-review-rules
+  target_owner: implementation-review-rules
+  action: internal_refactor
+  protected_semantics:
+  - PS-TC-009
+  - PS-TC-010
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: c1744e7ec2e5b2f5d13ad47626c3f653270bf43b
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: implementation-review-rules
+  write_set:
+  - implementation-review-rules/**
+  delete_authorized: true
+- candidate_id: TC-012
+  source_skill: skill-execution-compliance-gate-rules
+  target_owner: skill-execution-compliance-gate-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-015
+  - PS-TC-016
+  - PS-TC-017
+  - PS-TC-018
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 5135b9a34a97979a32706f8ef40cbcaf2f8c04c8
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: skill-execution-compliance-gate-rules
+  write_set:
+  - skill-execution-compliance-gate-rules/**
+  delete_authorized: true
+- candidate_id: TC-013
+  source_skill: code-change-finalization-gate-rules
+  target_owner: code-change-finalization-gate-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-010
+  - PS-TC-015
+  - PS-TC-016
+  - PS-TC-017
+  - PS-TC-018
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 54771ad9be20d44c02b6085a700c68ed20a47553
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: code-change-finalization-gate-rules
+  write_set:
+  - code-change-finalization-gate-rules/**
+  delete_authorized: true
+- candidate_id: TC-014
+  source_skill: reasoning-summary-structure-rules
+  target_owner: reasoning-summary-structure-rules
+  action: canonical_owner
+  protected_semantics:
+  - PS-TC-015
+  - PS-TC-016
+  - PS-TC-017
+  - PS-TC-018
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 6a9735b3ae94a79d2732d6893fd2192a855def34
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: reasoning-summary-structure-rules
+  write_set:
+  - reasoning-summary-structure-rules/**
+  delete_authorized: true
+- candidate_id: TC-015
+  source_skill: project-memory-rules
+  target_owner: project-memory-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-011
+  - PS-TC-013
+  - PS-TC-014
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: cbfb626528c6be29747f9bcd6ffe67ccd6b90030
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: project-memory-rules
+  write_set:
+  - project-memory-rules/**
+  delete_authorized: true
+- candidate_id: TC-016
+  source_skill: project-style-rules
+  target_owner: project-style-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-010
+  - PS-TC-011
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: a80494a711444c6dfe975a8f83acfadeec91b0a4
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: project-style-rules
+  write_set:
+  - project-style-rules/**
+  delete_authorized: true
+- candidate_id: TC-017
+  source_skill: project-change-review-rules
+  target_owner: project-change-review-rules
+  action: reference_refactor
+  protected_semantics:
+  - PS-TC-010
+  - PS-TC-016
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: 4f5c0aff54a7ccdf96fc0f6c82e9ae819e70826a
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: project-change-review-rules
+  write_set:
+  - project-change-review-rules/**
+  delete_authorized: true
+- candidate_id: TC-018
+  source_skill: comment-completion-gate-rules
+  target_owner: comment-completion-gate-rules
+  action: canonical_owner
+  protected_semantics:
+  - PS-TC-010
+  trigger_contract:
+    preserve_description: true
+    positive_negative_required: true
+    neighbor_competition_required: true
+  baseline:
+    commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    tree: beb05833c6eb69f36f6b78137660c888499e9e71
+  rollback_locator:
+    baseline_commit: 76ee419d59396d919fea04ed55ea373ddeb8cb26
+    source_root: comment-completion-gate-rules
+  write_set:
+  - comment-completion-gate-rules/**
+  delete_authorized: true

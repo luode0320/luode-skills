@@ -1,0 +1,116 @@
+{
+  "contract_version": 2,
+  "mappings": [
+    {
+      "id": "RULE-REQ-AUTO",
+      "source": "四个原 description",
+      "target": "四个当前 SKILL.md",
+      "owner": "对应需求 Owner",
+      "assertion": [
+        "专项自动触发",
+        "initial-discovery",
+        "gap-routing"
+      ],
+      "evidence": "trigger-result.json"
+    },
+    {
+      "id": "RULE-REQ-HABIT",
+      "source": "原 Gap 一次一个问题/禁止猜测",
+      "target": "requirement-intake-rules/SKILL.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "一次只推进一个真实关键问题",
+        "不得把 Agent 猜测"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-LOCAL",
+      "source": "原 Discovery/Gap local 红线",
+      "target": "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "local 红线",
+        "prod/production 一律阻断"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-AUTH",
+      "source": "未授权默认值禁止确定",
+      "target": "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "未授权默认值",
+        "不得写成确定结论"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-STOP",
+      "source": "用户停止即停止扩散",
+      "target": "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "暂停与停止",
+        "立即停止扩散"
+      ],
+      "evidence": "trigger-result.json"
+    },
+    {
+      "id": "RULE-REQ-ROLLBACK",
+      "source": "变更与路线回退保留证据",
+      "target": "requirement-intake-rules/references/requirement-domain-shared-contract.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "回滚与证据",
+        "关闭证据"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-SINGLE-DOC",
+      "source": "同一需求只维护一份主文档",
+      "target": "requirement-intake-rules/SKILL.md",
+      "owner": "requirement-intake-rules",
+      "assertion": [
+        "同一需求只维护一份主文档"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-GAP-OWNER",
+      "source": "旧 Gap 运行正文",
+      "target": "requirement-intake-rules/references/gap-routing.md",
+      "owner": "requirement-intake-rules#gap-routing",
+      "assertion": [
+        "需求关键缺口条件路由",
+        "极致完整性缺口闸门",
+        "图片缺口专用判定"
+      ],
+      "evidence": "reference-result.json"
+    },
+    {
+      "id": "RULE-REQ-NEIGHBOR",
+      "source": "边界/拆分/变更/Bug 邻域",
+      "target": "四个需求 SKILL.md",
+      "owner": "对应需求 Owner",
+      "assertion": [
+        "原实现不符合原需求",
+        "implementation-planning-rules",
+        "Bug 域"
+      ],
+      "evidence": "trigger-result.json"
+    },
+    {
+      "id": "RULE-REQ-UTF8",
+      "source": "项目 UTF-8 写入规则",
+      "target": "requirement-intake-rules/references/requirement-structure-template.md",
+      "owner": "windows-encoding-rules",
+      "assertion": [
+        "UTF-8"
+      ],
+      "evidence": "static-quality-summary.json"
+    }
+  ]
+}

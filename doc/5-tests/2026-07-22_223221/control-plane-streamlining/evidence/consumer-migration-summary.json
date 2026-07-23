@@ -1,0 +1,8 @@
+{
+  "valid": true,
+  "scan_scope": "active governance assets including PROJECT_CURRENT.md and PROJECT_MEMORY.md; excludes .git/.tmp/doc/skill-dictionary, PROJECT_HISTORY.md and generated 字典.md",
+  "hits": {
+    "subagent-dispatch-rules": [],
+    "project-memory-file-bootstrap-rules": []
+  }
+}

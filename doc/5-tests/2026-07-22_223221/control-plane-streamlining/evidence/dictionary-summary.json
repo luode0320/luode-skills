@@ -1,0 +1,9 @@
+{
+  "data_file": "skill-dictionary/data.js",
+  "markdown_file": "字典.md",
+  "implemented_total": 73,
+  "planned_missing": 0,
+  "seed_total": 33,
+  "valid": true,
+  "exit_code": 0
+}

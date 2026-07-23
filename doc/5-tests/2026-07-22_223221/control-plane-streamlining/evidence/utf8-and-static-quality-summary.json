@@ -1,0 +1,12 @@
+{
+  "valid": true,
+  "checked_text_files": 153,
+  "untracked_full_whitespace_checked": 109,
+  "json_files_parsed": 34,
+  "yaml_files_parsed": 8,
+  "python_files_ast_parsed": 2,
+  "bash_files_syntax_checked": 1,
+  "javascript_files_syntax_checked": 1,
+  "git_diff_check_exit": 0,
+  "errors": []
+}

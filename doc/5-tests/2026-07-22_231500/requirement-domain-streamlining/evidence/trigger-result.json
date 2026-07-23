@@ -1,0 +1,272 @@
+{
+  "valid": true,
+  "phase": "trigger",
+  "repo_root": "F:\\luode-skills",
+  "errors": [],
+  "data": {
+    "fixture_count": 14,
+    "case_results": [
+      {
+        "id": "TRG-01",
+        "expected_owner": "requirement-intake-rules",
+        "route": "initial-discovery",
+        "actual_owner": "requirement-intake-rules",
+        "actual_route": "initial-discovery",
+        "negative": [
+          "requirement-gap-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "粗略",
+          "initial-discovery",
+          "官方"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-02",
+        "expected_owner": "requirement-intake-rules",
+        "route": "intake",
+        "actual_owner": "requirement-intake-rules",
+        "actual_route": "intake",
+        "negative": [
+          "requirement-splitting-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "直接接入",
+          "唯一需求主文档"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-03",
+        "expected_owner": "requirement-intake-rules",
+        "route": "gap-routing",
+        "actual_owner": "requirement-intake-rules",
+        "actual_route": "gap-routing",
+        "negative": [
+          "requirement-discovery-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "gap-routing",
+          "成功标准",
+          "多个合理解释"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-04",
+        "expected_owner": "requirement-boundary-rules",
+        "route": "boundary",
+        "actual_owner": "requirement-boundary-rules",
+        "actual_route": "boundary",
+        "negative": [
+          "requirement-intake-rules#intake"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "范围",
+          "顺手改旧逻辑",
+          "专项自动触发"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-05",
+        "expected_owner": "requirement-splitting-rules",
+        "route": "splitting",
+        "actual_owner": "requirement-splitting-rules",
+        "actual_route": "splitting",
+        "negative": [
+          "implementation-planning-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "多模块",
+          "多接口",
+          "单一闭环",
+          "专项自动触发"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-06",
+        "expected_owner": "requirement-change-rules",
+        "route": "change",
+        "actual_owner": "requirement-change-rules",
+        "actual_route": "change",
+        "negative": [
+          "bug-intake-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "新增条件",
+          "默认值",
+          "交付物",
+          "专项自动触发"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-07",
+        "expected_owner": "bug-intake-rules",
+        "route": "bug",
+        "actual_owner": "bug-intake-rules",
+        "actual_route": "bug",
+        "negative": [
+          "requirement-change-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "结果不符",
+          "Bug"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-08",
+        "expected_owner": "acceptance-criteria-rules",
+        "route": "acceptance",
+        "actual_owner": "acceptance-criteria-rules",
+        "actual_route": "acceptance",
+        "negative": [
+          "final-acceptance-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "实施前",
+          "做到什么算完成"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-09",
+        "expected_owner": "functional-validation-rules",
+        "route": "functional-validation",
+        "actual_owner": "functional-validation-rules",
+        "actual_route": "functional-validation",
+        "negative": [
+          "requirement-intake-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "验证新功能",
+          "页面交互"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-10",
+        "expected_owner": "final-acceptance-rules",
+        "route": "final-acceptance",
+        "actual_owner": "final-acceptance-rules",
+        "actual_route": "final-acceptance",
+        "negative": [
+          "acceptance-criteria-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "测试与审核均已完成",
+          "最终放行"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-11",
+        "expected_owner": "history-recall-rules",
+        "route": "history",
+        "actual_owner": "history-recall-rules",
+        "actual_route": "history",
+        "negative": [
+          "requirement-change-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "上次怎么做的",
+          "类似需求"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-12",
+        "expected_owner": "implementation-planning-rules",
+        "route": "planning",
+        "actual_owner": "implementation-planning-rules",
+        "actual_route": "planning",
+        "negative": [
+          "autonomous-execution-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "先给计划",
+          "先列步骤"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-13",
+        "expected_owner": "stop",
+        "route": "no-new-action",
+        "actual_owner": "stop",
+        "actual_route": "no-new-action",
+        "negative": [
+          "requirement-intake-rules",
+          "autonomous-execution-rules#continue"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "明确结束指令",
+          "停止自动继续",
+          "无下一步"
+        ],
+        "valid": true
+      },
+      {
+        "id": "TRG-14",
+        "expected_owner": "requirement-intake-rules",
+        "route": "intake",
+        "actual_owner": "requirement-intake-rules",
+        "actual_route": "intake",
+        "negative": [
+          "team-development-rules"
+        ],
+        "negative_hits": [],
+        "deterministic": true,
+        "normalized_stable": true,
+        "assertion_tokens": [
+          "新需求接入唯一自动触发入口",
+          "直接接入"
+        ],
+        "valid": true
+      }
+    ]
+  }
+}

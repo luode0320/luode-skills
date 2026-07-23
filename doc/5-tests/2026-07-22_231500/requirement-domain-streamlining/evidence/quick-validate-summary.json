@@ -1,0 +1,47 @@
+[
+  {
+    "skill": "requirement-intake-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "requirement-boundary-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "requirement-splitting-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "requirement-change-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "acceptance-criteria-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "artifact-storage-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "parallel-task-dispatch-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "team-development-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  },
+  {
+    "skill": "test-strategy-rules",
+    "exit": 0,
+    "output": "Skill is valid!"
+  }
+]

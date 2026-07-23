@@ -1,0 +1,77 @@
+{
+  "valid": true,
+  "phase": "consumer",
+  "repo_root": "F:\\luode-skills",
+  "errors": [],
+  "data": {
+    "active_old_refs": [],
+    "active_old_count": 0,
+    "consumers": [
+      {
+        "file": "requirement-boundary-rules/SKILL.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "requirement-change-rules/SKILL.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "acceptance-criteria-rules/references/acceptance-boundaries.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "acceptance-criteria-rules/references/shared-evidence-and-specialized-contracts.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "artifact-storage-rules/references/root-directories.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "artifact-storage-rules/references/update-policy.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "parallel-task-dispatch-rules/references/existing-skill-mapping.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "team-development-rules/references/conflict-examples.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "team-development-rules/references/routing-rules.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "test-strategy-rules/references/test-asset-governance.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "README.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "PROJECT_MEMORY.md",
+        "old_hits": [],
+        "valid": true
+      },
+      {
+        "file": "PROJECT_STYLE.md",
+        "old_hits": [],
+        "valid": true
+      }
+    ]
+  }
+}

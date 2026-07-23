@@ -27,6 +27,7 @@
 - 完成 6 个受影响 Skill 的 UTF-8 quick validate、字典刷新、临时目录自举幂等验证和 `git diff --check`。
 - 落盘真实重启前测试记录、阶段审查和阶段验收；任务一至任务七具备实现、测试、审查和验收证据。
 - 已从会话 `019f851d-f04d-75f1-87c3-7bb2290d43c4` 取得真实证据：该会话标题为“继续精简需求流程 skill (2)”，与当前 `REQ-RTP-001/CYCLE-RTP-04` 投影不是同一来源；它不应错误重建九步恢复计划。该会话首条命中列表同时漏掉 `task-plan-rehydration-rules`，已补齐继续类消息路由、来源不确定阻断、精确 CLI 参数和 20 项回归测试。
+- 修正 Plan Mode 与任务投影的阶段边界：Plan Mode 只形成、修改或确认执行计划并保留用户选择；不读取投影、不调用 `update_plan`、不创建任务悬浮窗。只有 Plan Mode 结束后进入执行阶段，才允许重建 UI 并核验中断点。
 
 ## 待完成
 
@@ -46,6 +47,7 @@
 - 严格追踪定向回归：3/3 通过。
 - 任务投影脚本单元测试：17/17 通过。
 - 任务投影脚本及恢复路由回归：19/19 通过。
+- Plan Mode 不恢复任务悬浮窗回归：21/21 通过；`task-plan-rehydration-rules`、`skill-hit-check-rules` 与 `implementation-planning-rules` 的 UTF-8 quick validate 通过。
 - 当前“恢复任务悬浮计划”会话已真实调用 `update_plan`，九步 `TASK-RTP` 悬浮列表重建成功；该结果不代表其它任务会话应显示这九步。
 - 严格追踪修复定向回归：3/3 通过。
 - 6 个受影响 Skill quick validate：UTF-8 模式全部通过。

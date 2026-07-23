@@ -1,0 +1,234 @@
+{
+  "valid": true,
+  "phase": "baseline",
+  "repo_root": "F:\\luode-skills",
+  "errors": [],
+  "data": {
+    "candidate_count": 6,
+    "baseline_inventory_count": 6,
+    "baseline_inventory_results": [
+      {
+        "file": "requirement-intake-rules/SKILL.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "35E4D89C1E8AE5D2B99E59FF23891E3F6433A071900202082A6B675E1236E30E",
+          "9C98C2EC6BD04399B2AE5105B59F9293CEF8C86E1BFD9276E2B6494D8A32E3E3"
+        ]
+      },
+      {
+        "file": "requirement-intake-rules/references/initial-discovery-domain-routing.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "B29C69DCAAF25052430A3F59DE52389B06B52A13BC1AD7F1206FD14720E82CE0",
+          "AEC2C4E4E4B7578BAA2C56AC36CF90518FCC6A341930C004E7642C5727C5C70D"
+        ]
+      },
+      {
+        "file": "requirement-intake-rules/references/gap-routing-source/migrated-gap-rule.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "3BF4F8CEC5672255406942EAEC21ED3CCA70AB0705A85986359C6A5CD9F9EFF6",
+          "84ED179E70C679A7164487538858B0A26EF234B2360644752B5CF95CAA83FAA3"
+        ]
+      },
+      {
+        "file": "requirement-boundary-rules/SKILL.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "84F7D2E456A35EE9D891125EF1B9462DBA2088F566279EF3EE6B7E4E945E6B72",
+          "91E7FCC3254E7EEFE01CDEFD73B303B8EF4DAC64654B534AA7421CBBA7C6028A"
+        ]
+      },
+      {
+        "file": "requirement-splitting-rules/SKILL.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "1A0EA8F53C176241BE7AF0D6A819BBC629616129CDCA975D4C4E914EE492447F",
+          "1014063C8180C85912D1324A9F3243CEADDC2D58282C9E2B1E6A793E599322FA"
+        ]
+      },
+      {
+        "file": "requirement-change-rules/SKILL.md",
+        "git_hash_valid": true,
+        "worktree_hash_valid": true,
+        "accepted_worktree_hashes": [
+          "60E512F442A6311949EC8870AE6D85133EA39B96ED6A2A3FD4A5DBC294339584",
+          "E77C4401699FF9A4678935F52E1FEFE79E2D7BAFC1DED8CB00FBD41D801900F5"
+        ]
+      }
+    ],
+    "candidate_hash_results": [
+      {
+        "id": "CAND-REQ-INTAKE",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      },
+      {
+        "id": "CAND-REQ-DISCOVERY",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      },
+      {
+        "id": "CAND-REQ-GAP",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      },
+      {
+        "id": "CAND-REQ-BOUNDARY",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      },
+      {
+        "id": "CAND-REQ-SPLITTING",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      },
+      {
+        "id": "CAND-REQ-CHANGE",
+        "baseline_hash_valid": true,
+        "worktree_hash_checked": true,
+        "worktree_hash_valid": true
+      }
+    ],
+    "protected_semantic_count": 10,
+    "protected_existing_status": {
+      "autonomous-execution-rules/SKILL.md": "M autonomous-execution-rules/SKILL.md",
+      "context-compression-rules/SKILL.md": "M context-compression-rules/SKILL.md",
+      "git-collaboration-rules/SKILL.md": "M git-collaboration-rules/SKILL.md",
+      "implementation-review-rules/SKILL.md": "M implementation-review-rules/SKILL.md",
+      "project-change-review-rules/SKILL.md": "M project-change-review-rules/SKILL.md",
+      "project-rule-file-bootstrap-rules/SKILL.md": "M project-rule-file-bootstrap-rules/SKILL.md",
+      "reasoning-summary-structure-rules/SKILL.md": "M reasoning-summary-structure-rules/SKILL.md",
+      "recent-context-bootstrap-rules/SKILL.md": "M recent-context-bootstrap-rules/SKILL.md",
+      "skill-hit-check-rules/SKILL.md": "M skill-hit-check-rules/SKILL.md"
+    },
+    "protected_existing_contract_results": [
+      {
+        "file": "autonomous-execution-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "context-compression-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "git-collaboration-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "implementation-review-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "project-change-review-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "project-rule-file-bootstrap-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "reasoning-summary-structure-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "recent-context-bootstrap-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      },
+      {
+        "file": "skill-hit-check-rules/SKILL.md",
+        "missing": [],
+        "valid": true
+      }
+    ],
+    "baseline_consumer_check": {
+      "active_old_refs": [],
+      "active_old_count": 0,
+      "consumers": [
+        {
+          "file": "requirement-boundary-rules/SKILL.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "requirement-change-rules/SKILL.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "acceptance-criteria-rules/references/acceptance-boundaries.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "acceptance-criteria-rules/references/shared-evidence-and-specialized-contracts.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "artifact-storage-rules/references/root-directories.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "artifact-storage-rules/references/update-policy.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "parallel-task-dispatch-rules/references/existing-skill-mapping.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "team-development-rules/references/conflict-examples.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "team-development-rules/references/routing-rules.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "test-strategy-rules/references/test-asset-governance.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "README.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "PROJECT_MEMORY.md",
+          "old_hits": [],
+          "valid": true
+        },
+        {
+          "file": "PROJECT_STYLE.md",
+          "old_hits": [],
+          "valid": true
+        }
+      ]
+    }
+  }
+}

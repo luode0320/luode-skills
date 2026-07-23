@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-07-22",
+  "planned_count": 6,
+  "started_count": 6,
+  "completed_count": 6,
+  "closed_count": 6,
+  "max_active": 4,
+  "fallback_count": 0,
+  "agents": [
+    {
+      "agent_id": "019f8a3c-8287-7970-90e8-7c176e5e6189",
+      "logical_name": "入口与上下文恢复",
+      "platform_nickname": "Leibniz",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    },
+    {
+      "agent_id": "019f8a3c-d9e4-7cd1-9987-ad5e4c181368",
+      "logical_name": "项目自举合并",
+      "platform_nickname": "Zeno",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    },
+    {
+      "agent_id": "019f8a3d-321a-7821-89ec-0b4d5dba5b97",
+      "logical_name": "自治与Git减重",
+      "platform_nickname": "Sagan",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    },
+    {
+      "agent_id": "019f8a3d-940d-74a0-a1f5-93dc01f39c79",
+      "logical_name": "审查与最终输出去重",
+      "platform_nickname": "Ptolemy",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    },
+    {
+      "agent_id": "019f8a49-c329-7b42-b9c9-425b8be2850c",
+      "logical_name": "工程文档门禁修复",
+      "platform_nickname": "Boyle",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    },
+    {
+      "agent_id": "019f8a5d-b66a-7a63-8161-63fa4b68f88a",
+      "logical_name": "总控层最终只读审查",
+      "platform_nickname": "Ampere",
+      "status": "completed",
+      "closed": true,
+      "spawn_tool_result_observed": true,
+      "completion_notification_observed": true,
+      "close_tool_result_observed": true
+    }
+  ],
+  "note": "6 个子代理均有当前会话真实 spawn 返回、完成通知和 close_agent 返回；主 agent 在执行期间持续推进互斥写集工作，最大同时活跃 4。"
+}

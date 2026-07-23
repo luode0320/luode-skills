@@ -651,6 +651,37 @@ review_acceptance_gates:
         validator.check_plain_language_contract(text, errors)
         self.assertEqual(errors, [])
 
+    # test_strict_trace_scopes_documents_by_target_source 验证严格追踪只读取目标来源对象文档。
+    # [参数] 无：在临时目录创建一组完整目标文档和一组缺证据的无关文档。
+    # [返回] None：断言无关来源对象不会污染目标严格追踪结果。
+    # 最近修改时间：2026-07-23；改动原因：覆盖按目标 source_ids 选域并防止旧来源硬编码回归。
+    def test_strict_trace_scopes_documents_by_target_source(self) -> None:
+        """验证严格追踪只读取与目标文档共享根来源 ID 的文档。"""
+        # 1. 构造目标完整周期和无关缺证据周期，确保两者 source_ids 不相交。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "目标_实施周期01.md"
+            target.write_text(
+                "---\ndoc_id: CYCLEDOC-A\nsource_ids: [SRC-A]\n---\n"
+                "REQ-A AC-A CYCLE-A T01-01 TEST-A EVIDENCE-A\n"
+                "T01-01 真实测试 停止 EVD-T01-01-IMPL-01 EVD-T01-01-TEST-01 "
+                "EVD-T01-01-REVIEW-01 EVD-T01-01-ACCEPT-01",
+                encoding="utf-8",
+            )
+            (root / "无关_实施周期02.md").write_text(
+                "---\ndoc_id: CYCLEDOC-B\nsource_ids: [SRC-B]\n---\n"
+                "REQ-B AC-B CYCLE-B T02-01 TEST-B EVIDENCE-B\n"
+                "T02-01 真实测试 停止 EVD-T02-01-IMPL-01",
+                encoding="utf-8",
+            )
+            errors: list[str] = []
+            trace = validator.check_strict_trace(root, errors, target)
+
+        # 2. 目标来源必须独立通过，报告不得包含无关任务。
+        self.assertEqual(errors, [])
+        self.assertEqual(trace["documents"], 1)
+        self.assertEqual(trace["tasks"], ["T01-01"])
+
     def test_plain_language_opening_rejects_unexplained_terminology(self) -> None:
         """术语说明不能只列技术词，必须声明无术语或给出中文解释。"""
         text = self._layered_document("  []", opening=LAYERED_OPENING.replace("术语说明：无", "术语说明：本次使用 API"))

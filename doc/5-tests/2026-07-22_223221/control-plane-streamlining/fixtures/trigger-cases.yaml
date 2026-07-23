@@ -1,0 +1,94 @@
+schema_version: 1
+cases:
+- id: TR-TC-001
+  input: 检查这个需求
+  expect:
+  - skill-hit-check-rules
+  reject: []
+- id: TR-TC-002
+  input: 提交git
+  expect:
+  - skill-hit-check-rules
+  - git-collaboration-rules
+  reject: []
+- id: TR-TC-003
+  input: 上一轮说过提交，现在继续实现
+  expect:
+  - skill-hit-check-rules
+  reject:
+  - git-collaboration-rules
+- id: TR-TC-004
+  input: 先给实施计划
+  expect:
+  - implementation-planning-rules
+  reject: []
+- id: TR-TC-005
+  input: 上下文刚压缩，继续恢复
+  expect:
+  - context-compression-rules
+  reject:
+  - recent-context-bootstrap-rules
+- id: TR-TC-006
+  input: 新会话，恢复最近三天项目进度
+  expect:
+  - recent-context-bootstrap-rules
+  reject:
+  - context-compression-rules
+- id: TR-TC-007
+  input: 缺少 AGENTS.md
+  expect:
+  - project-rule-file-bootstrap-rules
+  reject:
+  - project-memory-file-bootstrap-rules
+- id: TR-TC-008
+  input: 缺少 PROJECT_CURRENT.md
+  expect:
+  - project-rule-file-bootstrap-rules
+  reject:
+  - project-memory-file-bootstrap-rules
+- id: TR-TC-009
+  input: 三个独立模块并行审计
+  expect:
+  - parallel-task-dispatch-rules
+  reject:
+  - subagent-dispatch-rules
+- id: TR-TC-010
+  input: 同一文件同一根因需要统一裁决
+  expect:
+  - parallel-task-dispatch-rules
+  reject:
+  - subagent-dispatch-rules
+- id: TR-TC-011
+  input: 代码已完成准备进入测试
+  expect:
+  - implementation-review-rules
+  reject: []
+- id: TR-TC-012
+  input: 任意代码修改准备最终回复
+  expect:
+  - code-change-finalization-gate-rules
+  - comment-completion-gate-rules
+  reject: []
+- id: TR-TC-013
+  input: 只发生工具调用准备收口
+  expect:
+  - skill-execution-compliance-gate-rules
+  reject:
+  - code-change-finalization-gate-rules
+- id: TR-TC-014
+  input: 测试审查完成准备正式放行
+  expect:
+  - final-acceptance-rules
+  reject:
+  - artifact-delivery-gate-rules
+- id: TR-TC-015
+  input: 研发文档应落盘但尚未写入
+  expect:
+  - artifact-delivery-gate-rules
+  reject:
+  - final-acceptance-rules
+- id: TR-TC-016
+  input: 用户明确说停止不要扩散
+  expect:
+  - autonomous-execution-rules
+  reject: []

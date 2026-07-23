@@ -1,0 +1,210 @@
+{
+  "contract_version": 2,
+  "cases": [
+    {
+      "id": "TRG-01",
+      "prompt": "我只有一个粗略 idea，能否先从项目代码和官方资料查清目标？",
+      "expected_owner": "requirement-intake-rules",
+      "owner_file": "requirement-intake-rules/SKILL.md",
+      "route": "initial-discovery",
+      "negative": [
+        "requirement-gap-rules"
+      ],
+      "assertion_tokens": [
+        "粗略",
+        "initial-discovery",
+        "官方"
+      ]
+    },
+    {
+      "id": "TRG-02",
+      "prompt": "需求资料完整，请整理成唯一需求主文档。",
+      "expected_owner": "requirement-intake-rules",
+      "owner_file": "requirement-intake-rules/SKILL.md",
+      "route": "intake",
+      "negative": [
+        "requirement-splitting-rules"
+      ],
+      "assertion_tokens": [
+        "直接接入",
+        "唯一需求主文档"
+      ]
+    },
+    {
+      "id": "TRG-03",
+      "prompt": "已经查过资料，但关键字段和成功标准仍有两种合理解释。",
+      "expected_owner": "requirement-intake-rules",
+      "owner_file": "requirement-intake-rules/SKILL.md",
+      "route": "gap-routing",
+      "negative": [
+        "requirement-discovery-rules"
+      ],
+      "assertion_tokens": [
+        "gap-routing",
+        "成功标准",
+        "多个合理解释"
+      ]
+    },
+    {
+      "id": "TRG-04",
+      "prompt": "这个需求是否属于本次范围，能否顺手改旧逻辑？",
+      "expected_owner": "requirement-boundary-rules",
+      "owner_file": "requirement-boundary-rules/SKILL.md",
+      "route": "boundary",
+      "negative": [
+        "requirement-intake-rules#intake"
+      ],
+      "assertion_tokens": [
+        "范围",
+        "顺手改旧逻辑",
+        "专项自动触发"
+      ]
+    },
+    {
+      "id": "TRG-05",
+      "prompt": "需求涉及多个模块、页面、接口和角色，不能做成单一闭环。",
+      "expected_owner": "requirement-splitting-rules",
+      "owner_file": "requirement-splitting-rules/SKILL.md",
+      "route": "splitting",
+      "negative": [
+        "implementation-planning-rules"
+      ],
+      "assertion_tokens": [
+        "多模块",
+        "多接口",
+        "单一闭环",
+        "专项自动触发"
+      ]
+    },
+    {
+      "id": "TRG-06",
+      "prompt": "编码中新增了条件并修改默认值和交付物。",
+      "expected_owner": "requirement-change-rules",
+      "owner_file": "requirement-change-rules/SKILL.md",
+      "route": "change",
+      "negative": [
+        "bug-intake-rules"
+      ],
+      "assertion_tokens": [
+        "新增条件",
+        "默认值",
+        "交付物",
+        "专项自动触发"
+      ]
+    },
+    {
+      "id": "TRG-07",
+      "prompt": "原实现不符合已经确认的原需求，请定位并修复。",
+      "expected_owner": "bug-intake-rules",
+      "owner_file": "bug-intake-rules/SKILL.md",
+      "route": "bug",
+      "negative": [
+        "requirement-change-rules"
+      ],
+      "assertion_tokens": [
+        "结果不符",
+        "Bug"
+      ]
+    },
+    {
+      "id": "TRG-08",
+      "prompt": "实施前先定义做到什么算完成。",
+      "expected_owner": "acceptance-criteria-rules",
+      "owner_file": "acceptance-criteria-rules/SKILL.md",
+      "route": "acceptance",
+      "negative": [
+        "final-acceptance-rules"
+      ],
+      "assertion_tokens": [
+        "实施前",
+        "做到什么算完成"
+      ]
+    },
+    {
+      "id": "TRG-09",
+      "prompt": "实现后验证功能行为和交互。",
+      "expected_owner": "functional-validation-rules",
+      "owner_file": "functional-validation-rules/SKILL.md",
+      "route": "functional-validation",
+      "negative": [
+        "requirement-intake-rules"
+      ],
+      "assertion_tokens": [
+        "验证新功能",
+        "页面交互"
+      ]
+    },
+    {
+      "id": "TRG-10",
+      "prompt": "测试和审查完成后判断是否放行。",
+      "expected_owner": "final-acceptance-rules",
+      "owner_file": "final-acceptance-rules/SKILL.md",
+      "route": "final-acceptance",
+      "negative": [
+        "acceptance-criteria-rules"
+      ],
+      "assertion_tokens": [
+        "测试与审核均已完成",
+        "最终放行"
+      ]
+    },
+    {
+      "id": "TRG-11",
+      "prompt": "上次类似需求是怎么做的？",
+      "expected_owner": "history-recall-rules",
+      "owner_file": "history-recall-rules/SKILL.md",
+      "route": "history",
+      "negative": [
+        "requirement-change-rules"
+      ],
+      "assertion_tokens": [
+        "上次怎么做的",
+        "类似需求"
+      ]
+    },
+    {
+      "id": "TRG-12",
+      "prompt": "请先给出完整实施计划和步骤。",
+      "expected_owner": "implementation-planning-rules",
+      "owner_file": "implementation-planning-rules/SKILL.md",
+      "route": "planning",
+      "negative": [
+        "autonomous-execution-rules"
+      ],
+      "assertion_tokens": [
+        "先给计划",
+        "先列步骤"
+      ]
+    },
+    {
+      "id": "TRG-13",
+      "prompt": "停止，不要继续整理或输出下一步。",
+      "expected_owner": "stop",
+      "owner_file": "autonomous-execution-rules/SKILL.md",
+      "route": "no-new-action",
+      "negative": [
+        "requirement-intake-rules",
+        "autonomous-execution-rules#continue"
+      ],
+      "assertion_tokens": [
+        "明确结束指令",
+        "停止自动继续",
+        "无下一步"
+      ]
+    },
+    {
+      "id": "TRG-14",
+      "prompt": "这是一个单一明确需求，请直接按需求入口判断。",
+      "expected_owner": "requirement-intake-rules",
+      "owner_file": "requirement-intake-rules/SKILL.md",
+      "route": "intake",
+      "negative": [
+        "team-development-rules"
+      ],
+      "assertion_tokens": [
+        "新需求接入唯一自动触发入口",
+        "直接接入"
+      ]
+    }
+  ]
+}

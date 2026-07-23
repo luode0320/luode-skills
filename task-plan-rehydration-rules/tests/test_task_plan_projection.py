@@ -325,6 +325,9 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertIn("PROJECT_CURRENT.md", document)
             self.assertIn("继续", document)
             self.assertIn("update_plan", document)
+        for phrase in ("接着做", "接着执行", "恢复任务", "恢复执行", "按原计划继续", "继续上次任务", "往下做", "继续刚才的工作"):
+            self.assertIn(phrase, hit_skill)
+            self.assertIn(phrase, hit_checklist)
 
     def test_documented_cli_uses_real_project_current_option(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：锁定可执行恢复命令。"""
@@ -346,8 +349,37 @@ class TaskPlanProjectionTests(unittest.TestCase):
             document = document_path.read_text(encoding="utf-8")
             self.assertIn("task-plan-rehydration-rules", document)
             self.assertIn("首条命中列表", document)
-            self.assertIn("继续任务", document)
+            self.assertIn("任意“继续”或恢复意图", document)
             self.assertIn("update_plan", document)
+
+    def test_plan_mode_does_not_rehydrate_task_list(self) -> None:
+        """验证 Plan Mode 不读取投影或重建任务悬浮窗。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-24 02:08:25；改动原因：覆盖规划阶段与执行阶段的任务悬浮窗边界。
+        """
+        # 1. 读取恢复 Owner、总控路由和平台规则的全部受影响入口。
+        rehydration_skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        documents = (
+            rehydration_skill,
+            (REPOSITORY_ROOT / "skill-hit-check-rules" / "SKILL.md").read_text(encoding="utf-8"),
+            (REPOSITORY_ROOT / "skill-hit-check-rules" / "references" / "hit-checklist.md").read_text(
+                encoding="utf-8"
+            ),
+            (REPOSITORY_ROOT / "AGENTS.md").read_text(encoding="utf-8"),
+            (REPOSITORY_ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
+        )
+        # 2. Plan Mode 必须明确禁止读取投影、调用 update_plan 与创建悬浮窗。
+        for document in documents:
+            self.assertIn("Plan Mode", document)
+            self.assertIn("不读取", document)
+            self.assertIn("update_plan", document)
+        # 3. 实施规划规则仍保留用户选择流程，不能因恢复规则放宽。
+        planning_coverage = (
+            REPOSITORY_ROOT / "implementation-planning-rules" / "references" / "plan-question-coverage.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("request_user_input", planning_coverage)
 
 
 if __name__ == "__main__":

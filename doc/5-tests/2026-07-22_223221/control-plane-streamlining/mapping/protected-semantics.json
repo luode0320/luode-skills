@@ -1,0 +1,20 @@
+{
+  "PS-TC-001": "每轮第一调用必须命中 skill-hit-check-rules",
+  "PS-TC-002": "自动触发不依赖用户主动点名 Skill",
+  "PS-TC-003": "首条命中检查固定字段保持",
+  "PS-TC-004": "Git 授权只来自当前轮消息",
+  "PS-TC-005": "Plan Mode 与计划型请求保持唯一计划入口",
+  "PS-TC-006": "用户明确停止后禁止自动继续和扩散",
+  "PS-TC-007": "项目级 subagent 授权不覆盖系统工具授权",
+  "PS-TC-008": "并行写集冲突时禁止启动",
+  "PS-TC-009": "local 环境红线保持",
+  "PS-TC-010": "用户手改必须保留",
+  "PS-TC-011": "所有写入保持 UTF-8",
+  "PS-TC-012": "规则文件非受管内容不得覆盖",
+  "PS-TC-013": "PROJECT_CURRENT 不超过 51200 字节",
+  "PS-TC-014": "PROJECT_HISTORY 只追加不覆盖",
+  "PS-TC-015": "真实阻断只生成唯一 BLK 事实",
+  "PS-TC-016": "limited 与 not_applicable 不升级为真实阻断",
+  "PS-TC-017": "最终用户总结由 reasoning summary 唯一渲染",
+  "PS-TC-018": "无合法后续时禁止等待或下一步占位文案"
+}

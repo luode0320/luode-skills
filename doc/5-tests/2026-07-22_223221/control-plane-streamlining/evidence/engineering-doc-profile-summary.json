@@ -1,0 +1,110 @@
+{
+  "valid": true,
+  "count": 13,
+  "records": [
+    {
+      "profile": "requirement",
+      "doc": "doc/2-需求/2026-07-22_223221_总控层Skill精简合并与单向路由.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "acceptance",
+      "doc": "doc/7-验收/2026-07-22_223221_总控层Skill精简合并与单向路由_验收标准.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_master",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_需求与实施计划全量顺序实施方案.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_overview",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施总览.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期01_基线、映射与冻结.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期02_入口与阶段路由减重.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期03_上下文恢复与项目自举.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期04_并行与子代理统一.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期05_执行、恢复和自治减重.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期06_收口、证据和最终输出去重.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "implementation_cycle",
+      "doc": "doc/3-实施/2026-07-22_223221_总控层Skill精简合并与单向路由_实施周期07_消费者迁移、删除与收口.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "LIMITED",
+      "errors": []
+    },
+    {
+      "profile": "review",
+      "doc": "doc/6-审查/2026-07-22_223221_总控层Skill精简合并与单向路由_最终当前改动审查.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "profile": "final_acceptance",
+      "doc": "doc/7-验收/2026-07-22_223221_总控层Skill精简合并与单向路由_最终验收.md",
+      "exit_code": 0,
+      "valid": true,
+      "status": "PASS",
+      "errors": []
+    }
+  ]
+}
