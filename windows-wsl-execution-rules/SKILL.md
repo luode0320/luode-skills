@@ -62,6 +62,15 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 - 如果任务本质是 Linux 运行链路里的编译、测试、调试或启动，**不要因为机器是 Windows 就放弃 WSL 执行**
 - PowerShell 在本 skill 里是专项入口，不是普通仓库命令入口；专项入口默认使用 `pwsh`，普通入口仍然是 Git Bash / bash，执行类动作仍然使用 `wsl.exe --cd`
 
+## PowerShell 使用优先级阶梯（硬约束）
+
+本节是全仓库 PowerShell / bash / WSL 选择的**唯一硬约束真源（canonical）**。其它规则文件只做指向与收紧，冲突时以本节为准。四级优先级必须**从上往下逐级判断，停在成立的那一级**：
+
+1. **能用 bash 就不用 PowerShell（普通仓库命令红线）**：凡是搜索、读写文件、规则检查、普通 `git status` / `git diff` / `git log` 盘点等普通仓库命令，只要 Git Bash / bash 能完成，一律用 bash，禁止因为身处 Windows 或顺手就切到 PowerShell。
+2. **执行类命令优先进 WSL（不用 PowerShell）**：编译、运行、测试、调试，以及会真实联网启动运行时的依赖安装等执行类命令，优先用 `wsl.exe --cd /home/<user>/<project> <command>` 在 WSL 内执行，同样不落到 PowerShell。
+3. **仅 PowerShell 专项场景才允许 PowerShell**：只有运行 `.ps1`、使用 Windows 专用 cmdlet、做 PowerShell profile / 编码初始化、或用户明确要求 PowerShell 时，才允许进入 PowerShell；PowerShell 不是普通仓库命令入口。
+4. **进入 PS 专项场景必须优先 PowerShell 7**：专项运行时先用 `pwsh -NoProfile` 并确认 `$PSVersionTable.PSVersion.Major -ge 7`；`powershell.exe` 5.1 仅在 `pwsh` 缺失或版本不足、且升级被权限 / 网络 / 包管理器阻断时才允许回退，回退时必须显式记录阻断原因，禁止把 5.1 写成默认入口。
+
 ## 跨环境命令失败恢复与经验沉淀
 
 命令执行前后由 `execution-failure-learning-rules` 路由本 skill 的 `prevent`、`recover`、`learn` 三种模式。这里的命令包括普通仓库命令、执行类命令、JSON/编码处理、测试与验证脚本、`pre-commit` / `post-commit` gate 以及它们的回退检查；这是一条 agent 执行期规则，不表示有后台监控进程。

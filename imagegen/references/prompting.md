@@ -19,6 +19,9 @@ This file is about prompt structure, specificity, and iteration. Fallback-only e
 - [Fallback-only execution controls](#fallback-only-execution-controls)
 - [Use-case tips](#use-case-tips)
 - [Where to find copy/paste recipes](#where-to-find-copypaste-recipes)
+- [Use-case taxonomy](#use-case-taxonomy)
+- [共享 prompt 模板](#共享-prompt-模板)
+- [Prompt 最佳实践](#prompt-最佳实践)
 
 ## Structure
 - Use a consistent order: scene/backdrop -> subject -> key details -> constraints -> output intent.
@@ -116,3 +119,71 @@ Edit:
 
 ## Where to find copy/paste recipes
 For copy/paste prompt specs (examples only), see `references/sample-prompts.md`. This file focuses on principles, specificity, and iteration patterns.
+
+## Use-case taxonomy
+
+下面这些 slug 保持英文，不要擅自翻译或改名：
+
+### Generate
+
+- `photorealistic-natural`
+- `product-mockup`
+- `ui-mockup`
+- `infographic-diagram`
+- `scientific-educational`
+- `ads-marketing`
+- `productivity-visual`
+- `logo-brand`
+- `illustration-story`
+- `stylized-concept`
+- `historical-scene`
+
+### Edit
+
+- `text-localization`
+- `identity-preserve`
+- `precise-object-edit`
+- `lighting-weather`
+- `background-extraction`
+- `style-transfer`
+- `compositing`
+- `sketch-to-render`
+
+## 共享 prompt 模板
+
+```text
+Use case: <taxonomy slug>
+Asset type: <where the asset will be used>
+Primary request: <user's main prompt>
+Input images: <Image 1: role; Image 2: role> (optional)
+Scene/backdrop: <environment>
+Subject: <main subject>
+Style/medium: <photo/illustration/3D/etc>
+Composition/framing: <wide/close/top-down; placement>
+Lighting/mood: <lighting + mood>
+Color palette: <palette notes>
+Materials/textures: <surface details>
+Text (verbatim): "<exact text>"
+Constraints: <must keep/must avoid>
+Avoid: <negative constraints>
+```
+
+说明：
+
+- `Asset type` 和 `Input images` 是 prompt 结构，不是 CLI 独立参数
+- `Scene/backdrop` 指画面背景，不等于 CLI 的 `background` 参数
+- `Quality`、`input_fidelity`、mask、输出格式、输出路径这类是 CLI 执行参数，不要混进 built-in 工具参数语义里
+
+## Prompt 最佳实践
+
+- prompt 顺序优先按：场景 -> 主体 -> 细节 -> 约束
+- 写清楚用途，帮助模型进入正确质量模式
+- 文本内容要逐字明确
+- 多图输入时，按图片编号说明各自用途
+- edit 任务要反复强调 invariants
+- 每轮迭代只改一个重点
+- prompt 已经很具体时，不要过度扩写
+
+更多共享原则看：
+
+- `references/sample-prompts.md`

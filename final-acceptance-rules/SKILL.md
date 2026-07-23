@@ -38,4 +38,4 @@ Git 提交例外：仅为 `git commit` 准备提交时，只执行 `git-collabor
 
 ## references 读取规则
 
-- 默认先读取 `references/shared-evidence-and-specialized-contracts.md`，再按其中路由读取最终验收清单、模板、边界说明及 artifact-delivery-gate / artifact-storage-rules 的共享契约。
+- 读取顺序遵循「共享证据和专属契约」：先读 `references/shared-evidence-and-specialized-contracts.md`，再按其中路由读取最终验收清单、模板、边界说明及 artifact-delivery-gate / artifact-storage-rules 的共享契约。

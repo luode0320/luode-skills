@@ -12,6 +12,12 @@ January 2026
 
 ---
 
+## 语言
+
+- 【最高优先级，强制】本仓库所有面向用户的自然语言输出——最终回复、中间进度、工具叙述、模型推理 / 思考过程（reasoning）——默认一律使用简体中文。
+- 禁止推理、思考、总结或中间进度漂移到英文、日文或其他语言；代码符号、命令、路径、原始字段名、报错原文等必要技术片段可保留原文，但解释性文字必须使用中文。
+- 发送前自检：一旦发现推理或输出中出现成段非中文自然语言，必须改回简体中文后再输出。
+
 ## Abstract
 
 Comprehensive performance optimization guide for React and Next.js applications, designed for AI agents and LLMs. Contains 40+ rules across 8 categories, prioritized by impact from critical (eliminating waterfalls, reducing bundle size) to incremental (advanced patterns). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
@@ -3811,7 +3817,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
 - 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
-- 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-rule-file-bootstrap-rules` 进行规则文件自举补齐；若同时涉及项目记忆四件套，联动 `project-memory-file-bootstrap-rules`；该规则同样适用于其他项目仓库。
+- 若本轮涉及创建、补齐或更新仓库级规则文件，默认额外启用 `project-rule-file-bootstrap-rules` 进行规则文件自举补齐；若同时涉及项目记忆四件套，联动 `project-memory-file-bootstrap-rules`；两条规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
@@ -4007,3 +4013,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
 - 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
 - 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
+
+## 注意
+
+- 我们允许api等私密数据直接存放写死代码。

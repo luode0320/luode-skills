@@ -72,94 +72,12 @@ description: 当用户要求分析项目、检查当前项目是否需要安装 
    - 记录组件标识、失败分类和最小脱敏证据后，转交 `agent-runtime-recovery-rules` 的 `mcp_runtime_transport` owner
    - 由运行期 adapter 自行探测 `reconnect`/`reload`/`restart`/`resume` 能力；本 skill 不执行安装流程来代替运行期恢复
 
-## 代码图谱 MCP（CodeGraph + codebase-memory-mcp）
-
-适用于任何需要长期理解和维护的代码仓库（不限前端 / Godot）。这是一组配合使用的代码图谱 MCP：
-
-| 工具 | 仓库 | 定位 |
-|------|------|------|
-| CodeGraph | `colbymchenry/codegraph` | **默认入口**：日常理解代码、查调用链、分析改动影响 |
-| codebase-memory-mcp | `DeusData/codebase-memory-mcp` | **架构分析补充**：项目架构关系、跨模块依赖、函数调用频率、Route/Service/Controller 关系、ADR 记录 |
-
-**配合规则：**
-
-- CodeGraph 作默认入口，codebase-memory-mcp 作高级图分析工具；不要用 memory-mcp 替代日常的 CodeGraph 探索。
-- 仅在架构层任务（架构梳理、跨模块依赖、调用频率统计、ADR）才补充使用 codebase-memory-mcp。
-- 两个工具的结果与当前代码不一致时，以当前代码为准，并重新同步对应索引。
-
-**安装与配置：**
-
-- CodeGraph 的强制安装与 `codegraph init` 初始化由 `project-rule-file-bootstrap-rules` 的 CodeGraph 准备规则负责。
-- codebase-memory-mcp 按官方仓库 `https://github.com/DeusData/codebase-memory-mcp` 的当前说明安装并建立索引；**不要沿用第三方博客转述里的旧命名、旧参数或旧安装路径**，一切以官方仓库 README 为准。
-- 两者均为 stdio 类 MCP，需要时把对应 server 配置补齐到项目级 MCP / Codex 配置（与本 skill 其他 MCP 的配置补齐策略一致）。
-- 安装或建立索引失败时，回退到 CodeGraph，再回退到本地搜索与文件读取，不阻塞主任务。
-
-## TAPD 技能包（tapd-skills）安装规则
-
-当用户提出“下载安装 TAPD MCP / 接入 TAPD / TAPD 技能 / TAPD OpenAPI”时，按本节处理。TAPD 官方当前提供的是技能包（skills）形态：`tapd-openapi`（OpenAPI 全量调用）、`tapd-cli`（命令行封装）、`tapd-addcomment`（写评论脚本），通过环境变量 + TAPD OpenAPI 直连工作，不需要常驻 MCP server 进程；名称收口后仍统称“TAPD 技能包”。
-
-**安装方式（归档直下，不用 git clone）：**
-
-1. 从官方仓库归档地址下载：`https://cnb.cool/tapd.cn/skills/tapd-skills/-/git/archive/main.tar.gz`。
-2. 解包后将 `skills/` 下的 `tapd-openapi`、`tapd-cli`、`tapd-addcomment` 复制到当前技能根目录（本仓库即 `D:\luode\luode-skills`，Codex Desktop 侧经 `C:\Users\luode\.codex\skills` 符号链接自动可见）。
-3. 已存在同名 skill 目录时不得覆盖，先对比差异再决定是否更新。
-4. 下载或解包失败时，退回官方仓库页面 `https://cnb.cool/tapd.cn/skills/tapd-skills` 按当前说明处理，不得沿用第三方转述。
-
-**环境变量配置（项目级 Codex 配置补齐）：**
-
-按 `references/config-bootstrap.md` 的检查顺序（`./codex/config.toml` -> `./.codex/config.toml`，都缺失时创建后者），在项目级配置中补齐 TAPD 环境变量。Codex 项目级配置没有独立 env 段时，写入 `[shell_environment_policy.set]`；若用户在其他宿主（如 Claude Code）使用 JSON `env` 段，保持同一组 key：
-
-```toml
-[shell_environment_policy.set]
-TAPD_API_ENDPOINT = "https://api.tapd.cn"
-TAPD_TOKEN = ""
-TAPD_WORKSPACE_IDS = ""
-TAPD_SITE_URL = "https://www.tapd.cn"
-```
-
-- `TAPD_API_ENDPOINT`、`TAPD_SITE_URL` 使用上述默认值即可。
-- `TAPD_TOKEN`、`TAPD_WORKSPACE_IDS` 属于用户私密配置，**必须留空并提示用户自行填写**；agent 不得代填、不得把任何真值写进仓库或示例。
-- Token 获取入口：TAPD 开放平台 `https://www.tapd.cn/open_platform/open_api_redirect`（登录后获取个人 API Token）；`TAPD_WORKSPACE_IDS` 为项目 ID 列表，逗号分隔，取自 TAPD 项目 URL。
-- 配置写入后必须回读确认 UTF-8 未乱码；`TAPD_TOKEN` 仍为空时视为“已安装未激活”，提示用户填写后重启会话生效，不得阻断其他任务。
-
-**使用路由：**
-
-- TAPD 需求 / 缺陷 / 任务 / 迭代 / Wiki / 评论 / 工时等操作，优先由 `tapd-openapi` skill 接管；写评论场景可直接用 `tapd-addcomment`；终端批量脚本场景用 `tapd-cli`（需 Node.js 18+）。
-- 用户消息出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动触发 `tapd-openapi`（按需联动 `tapd-addcomment` / `tapd-cli`），优先走 OpenAPI 而不是浏览器打开页面；执行前必须按 `tapd-openapi` 的「环境预检」检查 env，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并输出配置指引。
-- `TAPD_TOKEN` 泄露防护：任何输出、日志、提交中不得回显 Token 明文。
-## 平台判定与 Claude Code MCP 配置分支（新增）
-
-以上"覆盖 Codex 本地配置缺口"及下方"Chrome DevTools MCP 安装流程"中出现的 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见本节，两者不通用，不得混用同一份配置文件语义。
-
-执行本 skill 任何配置补齐动作前，先判断当前运行环境是 Codex 还是 Claude Code：
-
-- **Codex 分支**：完全复用下方"Chrome DevTools MCP 安装流程"小节（该小节专属 Codex CLI 环境），逐字不变。
-- **Claude Code 分支（待确认）**：当前尚未实测确认 Claude Code 的项目级 MCP 配置具体机制（可能是项目根目录 `.mcp.json` 文件，也可能存在 `claude mcp add` 等命令，需在实际 Claude Code 版本中核实）。在核实之前，遇到 Claude Code 环境下的 MCP 安装/配置需求时：
-  - 不得照搬 Codex 分支的 `codex mcp add/list/get` 命令，这些命令在 Claude Code 环境不存在，执行会直接失败（`command not found`）；
-  - 应先向用户确认当前 Claude Code 版本支持的 MCP 配置方式（可查阅当前会话可用的官方文档/帮助，或询问用户），确认后再执行配置补齐动作；
-  - 若确认存在等价的项目级配置文件（如 `.mcp.json`），比照 Codex 分支的"检测缺失 → 默认补齐最小可用配置"思路执行，但具体 key/value schema 需以确认结果为准，不得照抄 Codex 的 TOML `command`/`args` 字段名假设它们同样适用于 Claude Code 的 JSON schema；
-  - 配置补齐后的可用性检查同理，需要用当前确认的 Claude Code 等价命令/机制替代 `codex mcp list` / `codex mcp get`，若没有等价查询手段，则通过让用户在下一次会话中确认新 MCP 是否出现在可用工具列表来间接验证。
-
-## Chrome DevTools MCP 安装流程（本节专属 Codex CLI 环境）
-
-当项目命中前端标记，且用户希望当前会话后续由浏览器侧 MCP 接管时，按下面流程执行：
-
-1. 先统一名称为 `Chrome DevTools MCP`，不要把“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”拆成多个工具名。
-2. 先检查项目级配置路径：
-   - `./codex/config.toml`
-   - `./.codex/config.toml`
-3. 如果项目级配置不存在，默认创建 `./.codex/config.toml`。
-4. 如果项目级配置中没有 `chrome-devtools` 对应项，默认补齐最小可用配置：
-   - `command = "npx"`
-   - `args = ["-y", "chrome-devtools-mcp@latest"]`
-5. 如果当前运行环境是 Windows 且需要更稳的启动路径，优先使用官方仓库给出的 Windows 兜底参数，而不是自己臆造命令。
-6. 执行安装命令：
-   - `codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest`
-7. 安装后立即做可用性检查：
-   - `codex mcp list`
-   - `codex mcp get chrome-devtools`
-8. 如果工具已写入但会话里还看不到新 MCP，先重启 Codex 会话或刷新当前会话，再做页面验证。
-9. 页面联调与验证按 `references/tool-priority.md` 的条件矩阵执行：用户真实 profile 走 Chrome Plugin，独立调试 / 验证优先 Chrome DevTools MCP，隔离核心自动化走 `browser-session-automation-rules`，高级验证与观测走 `browser-advanced-testing-rules`；不得用线性优先级替代场景判断。
+> MCP 分支安装细节已下沉到 references，按需读取：
+>
+> - 代码图谱 MCP（CodeGraph + codebase-memory-mcp）的配合规则、安装与配置详见 `references/codegraph-mcp.md`。
+> - TAPD 技能包（tapd-skills）安装方式、环境变量配置与使用路由详见 `references/tapd-skills-install.md`；强约束：`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 必须留空由用户自行填写，agent 不得代填，任何输出 / 日志 / 提交不得回显 Token 明文，TAPD 相关技能名称统一归一为“TAPD 技能包”。
+> - 平台判定与 Claude Code MCP 配置分支详见 `references/claude-code-branch.md`；强约束：`./codex/config.toml` / `./.codex/config.toml` 仅指 Codex CLI 项目级配置，Claude Code 不通用，不得混用同一份配置文件语义。
+> - Chrome DevTools MCP 安装流程详见 `references/chrome-devtools-codex.md`；强约束：该流程专属 Codex CLI 环境，`codex mcp add / list / get` 在 Claude Code 环境不存在，不得照搬。
 
 ## 适用安装结论模板
 
@@ -216,3 +134,7 @@ MCP 安装、配置、注册或首次连接失败时，先触发 `execution-fail
 - 只有在判断优先级和回退关系时，再读 `references/tool-priority.md`。
 - 只有在判断 `./codex/config.toml` / `./.codex/config.toml` 是否缺失、该补齐哪类 MCP 配置以及如何落盘时，再读 `references/config-bootstrap.md`。
 - 只有在需要给出当前推荐来源或安装入口时，再读 `references/current-sources.md`。
+- 只有在需要 CodeGraph 与 codebase-memory-mcp 的配合、安装与配置细节时，再读 `references/codegraph-mcp.md`。
+- 只有在处理 TAPD 技能包安装、环境变量配置或使用路由时，再读 `references/tapd-skills-install.md`。
+- 只有在需要区分 Codex 与 Claude Code 平台、判断 MCP 配置分支时，再读 `references/claude-code-branch.md`。
+- 只有在 Codex CLI 环境执行 Chrome DevTools MCP 安装流程时，再读 `references/chrome-devtools-codex.md`。

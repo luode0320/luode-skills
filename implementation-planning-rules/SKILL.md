@@ -11,6 +11,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 ## Skill 作用与适用场景
 
 - 若当前上下文处于 `Plan Mode`，本 skill 负责接住第一层计划路由，不允许把问题直接绕过去交给需求、Bug、测试或交付域；若当前问题仍存在需求前置缺口，应把它们显式 handoff 给相邻计划前置 skill，而不是直接跳到实施步骤。
+- 若当前上下文处于 `Plan Mode`，必须按 `references/plan-question-coverage.md` 逐维度识别实现层不确定决策点并向用户弹窗多选；用户未选择即为“未决(待用户选择)”，禁止采纳推荐项或默认推进，覆盖不足或存在未决决策点时正式计划不放行。
 - 若当前上下文处于 `Plan Mode`，且运行环境要求最终计划放进 `<proposed_plan>` 或其他专用计划包裹中，包裹层不改变本 skill 的正文格式要求；外层是渲染协议，内层仍必须按本 skill 模板组织。
 - 把已经确认的来源对象（需求或 Bug）或当前优先子项，转成编码前可执行的实施规划。
 - 当新项目启动或项目初期同时存在多份需求、验收标准、实施总览或实施周期时，先建立“需求与实施计划全量顺序实施方案”，统一排列需求 -> 验收标准 -> 实施总览 -> 实施周期 -> 周期内最小任务的全量执行顺序。
@@ -70,6 +71,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - 只要实施文档需要交给普通模型继续执行，或用户要求“极致详细 / 极致完整 / 完善实施文档”，必须同时读取 `references/implementation-overview-template.md`、`references/implementation-cycle-template.md`、`references/minimum-task-execution-contract.md` 和 `references/visualization-standard.md`。
 - 只有在 判断或输出新项目 / 多来源对象 / 多实施文档的总执行顺序 时，再读 `references/full-sequence-master-plan.md`。
 - 只要当前处于 Plan Mode、最终回复使用 `<proposed_plan>`、或输出正式计划 / 受限计划 / 阻断计划，必须在最终输出前读 `references/plan-output-gate.md`。
+- 只要当前处于 Plan Mode、需要识别实现层不确定决策点、或在最终计划输出前，必须读 `references/plan-question-coverage.md`。
 - 只有在 判断任务颗粒度、依赖顺序和最小闭环 时，再读 `references/task-granularity-and-order.md`。
 - 只有在 做计划自审 时，再读 `references/plan-review-checklist.md`。
 - 只有在 判断与相邻 skill 的边界或对照正反例 时，再读 `references/plan-boundaries-and-examples.md`。

@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-22 03:05:07",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-07-23 17:50:46",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 0,
     "seed_total": 33,
     "doc_total": 10,
-    "references_total": 547,
+    "references_total": 554,
     "agents_total": 88
   },
   "downloaded_seeds": {
@@ -264,10 +264,6 @@ window.SKILL_DICTIONARY = {
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
-            "代码图谱 MCP（CodeGraph + codebase-memory-mcp）",
-            "TAPD 技能包（tapd-skills）安装规则",
-            "平台判定与 Claude Code MCP 配置分支（新增）",
-            "Chrome DevTools MCP 安装流程（本节专属 Codex CLI 环境）",
             "适用安装结论模板",
             "默认优先级",
             "与相邻 skill 的边界",
@@ -276,10 +272,14 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "mcp-installation-rules/references/chrome-devtools-codex.md",
+            "mcp-installation-rules/references/claude-code-branch.md",
+            "mcp-installation-rules/references/codegraph-mcp.md",
             "mcp-installation-rules/references/config-bootstrap.md",
             "mcp-installation-rules/references/current-sources.md",
             "mcp-installation-rules/references/execution-failure-casebook.md",
             "mcp-installation-rules/references/project-signals.md",
+            "mcp-installation-rules/references/tapd-skills-install.md",
             "mcp-installation-rules/references/tool-priority.md"
           ],
           "agents": [
@@ -578,7 +578,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 14,
-          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。凡本轮新增或修改任意 `*_test.go` 或涉及测试程序/mock/fixture/数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules` 并路由到 `test-strategy-rules`，且源码目录严禁创建 `*_test.go`。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -795,7 +795,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 19,
-          "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。",
+          "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。 本 skill 的测试目录闸门已升级为源码目录 `*_test.go` 具名阻断检查：扫描 `internal/`、`common/`、`api/`、`cmd/`、`utils/`、`app/` 等源码目录若新增或保留 `*_test.go` 即判违规并阻断“已完成”结论，要求改 seam 并迁移到 `doc/5-tests/<时间戳>/` ASCII 镜像。",
           "core_responsibility": "校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。",
           "skill_path": "code-change-finalization-gate-rules/SKILL.md",
           "directory_path": "code-change-finalization-gate-rules",
@@ -1325,6 +1325,7 @@ window.SKILL_DICTIONARY = {
             "implementation-planning-rules/references/plan-entry-checklist.md",
             "implementation-planning-rules/references/plan-mode-and-cycle-contracts.md",
             "implementation-planning-rules/references/plan-output-gate.md",
+            "implementation-planning-rules/references/plan-question-coverage.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
             "implementation-planning-rules/references/plan-structure-template.md",
             "implementation-planning-rules/references/source-notes.md",
@@ -3477,9 +3478,6 @@ window.SKILL_DICTIONARY = {
             "工作流",
             "透明底规则",
             "Prompt 增强",
-            "Use-case taxonomy",
-            "共享 prompt 模板",
-            "Prompt 最佳实践",
             "`gpt-image-2` 指南",
             "CLI fallback 专属约定",
             "参考文件"
@@ -3777,13 +3775,15 @@ window.SKILL_DICTIONARY = {
             "触发信号",
             "默认执行策略",
             "必须暂停确认的关键节点",
-            "关键节点提问格式（强制）",
             "与其他 Skill 的协作",
             "禁止事项",
             "通过 / 驳回标准",
-            "快速示例"
+            "references 读取规则"
           ],
-          "references": [],
+          "references": [
+            "autonomous-execution-rules/references/ask-format.md",
+            "autonomous-execution-rules/references/examples.md"
+          ],
           "agents": [
             "autonomous-execution-rules/agents/openai.yaml"
           ],
@@ -4800,6 +4800,7 @@ window.SKILL_DICTIONARY = {
             "适用场景",
             "核心架构：先看 agent 在哪运行",
             "PowerShell 专项场景的保底模式",
+            "PowerShell 使用优先级阶梯（硬约束）",
             "跨环境命令失败恢复与经验沉淀",
             "什么算执行类命令",
             "为什么只有执行类动作优先在 WSL",
@@ -5111,10 +5112,6 @@ window.SKILL_DICTIONARY = {
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
-        "代码图谱 MCP（CodeGraph + codebase-memory-mcp）",
-        "TAPD 技能包（tapd-skills）安装规则",
-        "平台判定与 Claude Code MCP 配置分支（新增）",
-        "Chrome DevTools MCP 安装流程（本节专属 Codex CLI 环境）",
         "适用安装结论模板",
         "默认优先级",
         "与相邻 skill 的边界",
@@ -5123,10 +5120,14 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "mcp-installation-rules/references/chrome-devtools-codex.md",
+        "mcp-installation-rules/references/claude-code-branch.md",
+        "mcp-installation-rules/references/codegraph-mcp.md",
         "mcp-installation-rules/references/config-bootstrap.md",
         "mcp-installation-rules/references/current-sources.md",
         "mcp-installation-rules/references/execution-failure-casebook.md",
         "mcp-installation-rules/references/project-signals.md",
+        "mcp-installation-rules/references/tapd-skills-install.md",
         "mcp-installation-rules/references/tool-priority.md"
       ],
       "agents": [
@@ -5425,7 +5426,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 14,
-      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。",
+      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。凡本轮新增或修改任意 `*_test.go` 或涉及测试程序/mock/fixture/数据构造脚本，必须同时命中 `go-test-compile-path-rules` 与 `test-program-rules` 并路由到 `test-strategy-rules`，且源码目录严禁创建 `*_test.go`。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -5642,7 +5643,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 19,
-      "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。",
+      "auto_trigger": "只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、`implementation-review-rules` 最低测试前收口、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。 本 skill 的测试目录闸门已升级为源码目录 `*_test.go` 具名阻断检查：扫描 `internal/`、`common/`、`api/`、`cmd/`、`utils/`、`app/` 等源码目录若新增或保留 `*_test.go` 即判违规并阻断“已完成”结论，要求改 seam 并迁移到 `doc/5-tests/<时间戳>/` ASCII 镜像。",
       "core_responsibility": "校验注释双 skill 终检、测试目录一致性、`implementation-review-rules` 最低收口、真实运行验证与提交前风格检查。",
       "skill_path": "code-change-finalization-gate-rules/SKILL.md",
       "directory_path": "code-change-finalization-gate-rules",
@@ -6148,6 +6149,7 @@ window.SKILL_DICTIONARY = {
         "implementation-planning-rules/references/plan-entry-checklist.md",
         "implementation-planning-rules/references/plan-mode-and-cycle-contracts.md",
         "implementation-planning-rules/references/plan-output-gate.md",
+        "implementation-planning-rules/references/plan-question-coverage.md",
         "implementation-planning-rules/references/plan-review-checklist.md",
         "implementation-planning-rules/references/plan-structure-template.md",
         "implementation-planning-rules/references/source-notes.md",
@@ -8204,9 +8206,6 @@ window.SKILL_DICTIONARY = {
         "工作流",
         "透明底规则",
         "Prompt 增强",
-        "Use-case taxonomy",
-        "共享 prompt 模板",
-        "Prompt 最佳实践",
         "`gpt-image-2` 指南",
         "CLI fallback 专属约定",
         "参考文件"
@@ -8504,13 +8503,15 @@ window.SKILL_DICTIONARY = {
         "触发信号",
         "默认执行策略",
         "必须暂停确认的关键节点",
-        "关键节点提问格式（强制）",
         "与其他 Skill 的协作",
         "禁止事项",
         "通过 / 驳回标准",
-        "快速示例"
+        "references 读取规则"
       ],
-      "references": [],
+      "references": [
+        "autonomous-execution-rules/references/ask-format.md",
+        "autonomous-execution-rules/references/examples.md"
+      ],
       "agents": [
         "autonomous-execution-rules/agents/openai.yaml"
       ],
@@ -9527,6 +9528,7 @@ window.SKILL_DICTIONARY = {
         "适用场景",
         "核心架构：先看 agent 在哪运行",
         "PowerShell 专项场景的保底模式",
+        "PowerShell 使用优先级阶梯（硬约束）",
         "跨环境命令失败恢复与经验沉淀",
         "什么算执行类命令",
         "为什么只有执行类动作优先在 WSL",

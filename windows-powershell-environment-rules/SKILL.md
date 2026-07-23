@@ -23,6 +23,8 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 
 ## 默认边界
 
+**PowerShell 专项调用默认优先 PowerShell 7（`pwsh`），Windows PowerShell 5.1 仅在 pwsh7 缺失且升级被阻断时回退；能用 bash / WSL 完成的普通仓库与执行类命令一律不走 PowerShell。完整判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+
 - “默认 PowerShell”只表示 Windows Terminal 默认 profile 和 agent 的 PowerShell 专项调用优先使用 `pwsh.exe -NoLogo`。
 - 永不替换、重命名或覆盖系统 `powershell.exe`，保留 Windows PowerShell 5.1 作为旧脚本回退。
 - 不修改 VS Code 终端、不修改全局 Git 配置、不把 Windows 工具当作 WSL 原生工具。

@@ -2,6 +2,12 @@
 
 > Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
 
+## 语言
+
+- 【最高优先级，强制】本仓库所有面向用户的自然语言输出——最终回复、中间进度、工具叙述、模型推理 / 思考过程（reasoning）——默认一律使用简体中文。
+- 禁止推理、思考、总结或中间进度漂移到英文、日文或其他语言；代码符号、命令、路径、原始字段名、报错原文等必要技术片段可保留原文，但解释性文字必须使用中文。
+- 发送前自检：一旦发现推理或输出中出现成段非中文自然语言，必须改回简体中文后再输出。
+
 ## 适用范围
 
 - 本文件适用于本仓库下所有代码与文档变更。
@@ -88,7 +94,6 @@
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 自动审查白名单只保留 `implementation-review-rules` 与最终收口前的 `project-change-review-rules`。
-- 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-evolution-rules` 或功能测试；未授权不得晋级 active。
 - `project-change-review-rules` 同时支持两类触发：用户明确要求审查当前改动，或本轮存在代码改动且准备最终收口。
 - `code-review-automation-rules` 仅用于当前分支提交级审查，不纳入默认自动审查链。
 - 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-evolution-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
@@ -145,6 +150,8 @@
 
 ## Windows / WSL 执行规则
 
+**PowerShell 使用四级硬约束（能 bash 不 PowerShell、优先 PowerShell 7）：① 普通仓库命令（搜索 / 读写文件 / 规则检查 / 普通 `git status` / `git diff` / `git log` 盘点）能用 Git Bash / bash 完成的一律用 bash，禁止切到 PowerShell；② 执行类命令（编译 / 运行 / 测试 / 调试 / 会真实联网启动运行时的依赖安装）优先用 `wsl.exe --cd` 进 WSL，同样不落 PowerShell；③ 仅 PowerShell 专项场景（`.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化、用户明确要求）才允许 PowerShell；④ 进入 PS 专项必须优先 PowerShell 7（`pwsh -NoProfile`，`$PSVersionTable.PSVersion.Major -ge 7`），Windows PowerShell 5.1 仅在 pwsh7 缺失且升级被权限 / 网络 / 包管理器阻断时回退并记录原因，禁止写成默认入口。完整判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+
 > 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。若当前动作已经明确进入 PowerShell 专项场景，还必须同时写入 PowerShell 保底模式：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，以及 UTF-8 重定向防护。
 
 **先看 agent 在哪运行：**
@@ -156,8 +163,6 @@
   - 编译、运行、启动程序、测试、调试，以及会真实启动运行时的依赖安装：`wsl.exe --cd /home/<user>/<project> <command>`
 
 **PowerShell 专项保底：** 只有必须进入 PowerShell 时才进入，不把 PowerShell 当普通仓库命令入口；进入后遵守这几条硬规则：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、属性访问前先 null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，带空格的可执行文件路径用引号并配合 `&`，日志或文件写入继续按 UTF-8 处理。
-
-**PowerShell 版本准备：** Windows 专项入口优先使用 `windows-powershell-environment-rules` 检测并准备 `pwsh.exe` 7+；“默认”只表示 Windows Terminal 用户 profile 和专项调用优先使用 PowerShell 7，不替换 `powershell.exe`、不修改 VS Code 默认终端。PowerShell 5.1 保留为旧脚本兼容回退；安装或权限被阻断时必须停止并报告。
 
 **为什么只有执行类动作在 WSL：** 只有 WSL 进程能正常联网，且运行产物面向 Linux；普通读写、搜索、规则检查不依赖 WSL 运行时，强行切换反而容易引入路径或权限问题。
 
@@ -176,7 +181,7 @@
 ## CodeGraph 强制准备规则
 
 - 若当前服务器 / 电脑未安装 `codegraph`，必须从 `colbymchenry/codegraph` 强制下载并安装，不需要用户确认。
-- Windows 下执行 CodeGraph 安装优先使用 PowerShell 7；只有 PowerShell 7 不可用时，PowerShell 5.1 才允许使用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing` 兼容参数，不得把人工点击确认当作标准流程。
+- 若在 Windows PowerShell 5.1 下执行安装，必须默认启用 `Invoke-WebRequest` / `Invoke-RestMethod` 的 `UseBasicParsing`，不得把人工点击确认当作标准流程。
 - 安装完成后必须为当前项目执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
 - 若下载、安装或初始化失败，明确记录不可用并回退到本地搜索与文件读取。
 - 架构层分析可配套 codebase-memory-mcp（`DeusData/codebase-memory-mcp`，按官方说明安装，非强制）作为 CodeGraph 的补充。
@@ -273,3 +278,7 @@
 - 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
 - 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
 - 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
+
+## 注意
+
+- 我们允许api等私密数据直接存放写死代码。

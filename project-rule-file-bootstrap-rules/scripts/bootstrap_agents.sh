@@ -156,6 +156,13 @@ detect_dominant_eol() {
 # ---- 受管章节正文（单引号 heredoc，原样保留反引号等特殊字符）----
 # 章节内容以本脚本（project-rule-file-bootstrap-rules 与 project-memory-file-bootstrap-rules 共用）为权威源，创建与同步共用同一份正文，避免脱节。
 
+BODY_LANGUAGE=$(cat <<'EOF'
+- 【最高优先级，强制】本仓库所有面向用户的自然语言输出——最终回复、中间进度、工具叙述、模型推理 / 思考过程（reasoning）——默认一律使用简体中文。
+- 禁止推理、思考、总结或中间进度漂移到英文、日文或其他语言；代码符号、命令、路径、原始字段名、报错原文等必要技术片段可保留原文，但解释性文字必须使用中文。
+- 发送前自检：一旦发现推理或输出中出现成段非中文自然语言，必须改回简体中文后再输出。
+EOF
+)
+
 BODY_SCOPE=$(cat <<'EOF'
 - 本文件适用于本仓库下所有代码与文档变更。
 - 把 `Plan Mode` 的默认计划外壳沉到仓库级规则里，保证所有计划型提问都会先触发 `implementation-planning-rules` 再回流前置域。
@@ -627,44 +634,69 @@ sync_section() {
   local file="$1"
   local header="$2"
   local body="$3"
+  local mode="${4:-}"
 
   # shellcheck disable=SC2086
-  $PYTHON_BIN - "$file" "$header" "$body" <<'PY'
+  $PYTHON_BIN - "$file" "$header" "$body" "$mode" <<'PY'
 from pathlib import Path
 import sys
 
 path = Path(sys.argv[1])
 header = f"## {sys.argv[2]}"
 body = sys.argv[3].splitlines()
+mode = sys.argv[4] if len(sys.argv) > 4 else ""
 
 lines = path.read_text(encoding="utf-8").splitlines()
-out = []
-replaced = False
-i = 0
 
-while i < len(lines):
-    line = lines[i]
-    if line == header:
-        if not replaced:
-            out.append(line)
-            out.append("")
-            out.extend(body)
-            replaced = True
-        i += 1
-        while i < len(lines) and not lines[i].startswith("## "):
+if mode == "top":
+    # 先移除文件中已存在的同名章节，再插入到顶部（引言块之后、首个 ## 之前），
+    # 确保无论目标文件是全新创建还是已存在，该章节都稳定落在最高优先级位。
+    cleaned = []
+    i = 0
+    while i < len(lines):
+        if lines[i] == header:
             i += 1
-        if i < len(lines):
+            while i < len(lines) and not lines[i].startswith("## "):
+                i += 1
+            continue
+        cleaned.append(lines[i])
+        i += 1
+    insert_at = len(cleaned)
+    for idx, text in enumerate(cleaned):
+        if text.startswith("## "):
+            insert_at = idx
+            break
+    prefix = cleaned[:insert_at]
+    if prefix and prefix[-1] != "":
+        prefix = prefix + [""]
+    block = [header, ""] + body + [""]
+    out = prefix + block + cleaned[insert_at:]
+else:
+    out = []
+    replaced = False
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line == header:
+            if not replaced:
+                out.append(line)
+                out.append("")
+                out.extend(body)
+                replaced = True
+            i += 1
+            while i < len(lines) and not lines[i].startswith("## "):
+                i += 1
+            if i < len(lines):
+                out.append("")
+            continue
+        out.append(line)
+        i += 1
+    if not replaced:
+        if out and out[-1] != "":
             out.append("")
-        continue
-    out.append(line)
-    i += 1
-
-if not replaced:
-    if out and out[-1] != "":
+        out.append(header)
         out.append("")
-    out.append(header)
-    out.append("")
-    out.extend(body)
+        out.extend(body)
 
 path.write_text("\n".join(out) + "\n", encoding="utf-8")
 PY
@@ -868,6 +900,7 @@ sync_agents_file() {
     return 0
   fi
 
+  sync_section "$file" "语言" "$BODY_LANGUAGE" top
   sync_section "$file" "适用范围" "$BODY_SCOPE"
   sync_section "$file" "注意" "$BODY_NOTICE"
   sync_section "$file" "Skill 强制自动触发规则（最高优先级）" "$BODY_SKILL_AUTO"

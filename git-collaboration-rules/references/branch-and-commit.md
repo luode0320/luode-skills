@@ -195,6 +195,8 @@ git log -1 --pretty=%B | rg '\\n'
 
 ## Windows/PowerShell 提交说明格式（重点：换行）
 
+**提交类普通命令同样优先 bash（能 bash 不 PowerShell）；下方 PowerShell 示例仅作 PowerShell 专项场景保底，且专项场景优先 PowerShell 7、5.1 仅阻断回退。判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+
 Windows/PowerShell 场景下，提交消息格式必须满足：
 
 ```text

@@ -289,74 +289,7 @@ This likely needs true native transparency. The default path uses a chroma-key b
 - 用户没要求的品牌、文案、故事设定
 - 没依据的左右位置要求
 
-## Use-case taxonomy
-
-下面这些 slug 保持英文，不要擅自翻译或改名：
-
-### Generate
-
-- `photorealistic-natural`
-- `product-mockup`
-- `ui-mockup`
-- `infographic-diagram`
-- `scientific-educational`
-- `ads-marketing`
-- `productivity-visual`
-- `logo-brand`
-- `illustration-story`
-- `stylized-concept`
-- `historical-scene`
-
-### Edit
-
-- `text-localization`
-- `identity-preserve`
-- `precise-object-edit`
-- `lighting-weather`
-- `background-extraction`
-- `style-transfer`
-- `compositing`
-- `sketch-to-render`
-
-## 共享 prompt 模板
-
-```text
-Use case: <taxonomy slug>
-Asset type: <where the asset will be used>
-Primary request: <user's main prompt>
-Input images: <Image 1: role; Image 2: role> (optional)
-Scene/backdrop: <environment>
-Subject: <main subject>
-Style/medium: <photo/illustration/3D/etc>
-Composition/framing: <wide/close/top-down; placement>
-Lighting/mood: <lighting + mood>
-Color palette: <palette notes>
-Materials/textures: <surface details>
-Text (verbatim): "<exact text>"
-Constraints: <must keep/must avoid>
-Avoid: <negative constraints>
-```
-
-说明：
-
-- `Asset type` 和 `Input images` 是 prompt 结构，不是 CLI 独立参数
-- `Scene/backdrop` 指画面背景，不等于 CLI 的 `background` 参数
-- `Quality`、`input_fidelity`、mask、输出格式、输出路径这类是 CLI 执行参数，不要混进 built-in 工具参数语义里
-
-## Prompt 最佳实践
-
-- prompt 顺序优先按：场景 -> 主体 -> 细节 -> 约束
-- 写清楚用途，帮助模型进入正确质量模式
-- 文本内容要逐字明确
-- 多图输入时，按图片编号说明各自用途
-- edit 任务要反复强调 invariants
-- 每轮迭代只改一个重点
-- prompt 已经很具体时，不要过度扩写
-
-更多共享原则看：
-
-- `references/prompting.md`
-- `references/sample-prompts.md`
+> Use-case taxonomy（用例 slug 清单）、共享 prompt 模板、Prompt 最佳实践三块已并入 `references/prompting.md`，需要 prompt 结构、slug 清单、模板或最佳实践时按需读取。
 
 ## `gpt-image-2` 指南
 
@@ -431,7 +364,7 @@ uv pip install pillow
 
 ## 参考文件
 
-- `references/prompting.md`
+- `references/prompting.md`（含 Use-case taxonomy、共享 prompt 模板、Prompt 最佳实践三块）
 - `references/sample-prompts.md`
 - `references/cli.md`
 - `references/image-api.md`
