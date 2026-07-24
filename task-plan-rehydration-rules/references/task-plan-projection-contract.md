@@ -8,7 +8,9 @@
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
-  "version": 1,
+  "version": 2,
+  "projection_origin": "persisted",
+  "synthesis_mode": "none",
   "state": "active",
   "plan_key": "REQ-RTP-001/CYCLE-RTP-01",
   "source_document": "doc/3-实施/example.md",
@@ -34,7 +36,9 @@
 
 | 字段 | 约束 |
 |---|---|
-| `version` | 固定为整数 `1` |
+| `version` | 允许 `1` 或 `2`；新写入的补建投影固定为 `2` |
+| `projection_origin` | `version: 2` 必填；`persisted` 或 `synthesized` |
+| `synthesis_mode` | `version: 2` 必填；`none`、`exact` 或 `fallback` |
 | `state` | `active` 或 `inactive` |
 | `plan_key` | 活动投影非空；空失活槽位允许空字符串 |
 | `source_document` | 活动投影非空；空失活槽位允许空字符串 |
@@ -50,7 +54,7 @@
 | `step` | 非空字符串，最多 256 个 Unicode 字符 |
 | `status` | `pending`、`in_progress` 或 `completed` |
 
-最多一个步骤处于 `in_progress`。`active` 必须包含至少一个未完成步骤；`inactive` 只允许空步骤或全部完成步骤。
+最多一个步骤处于 `in_progress`。`active` 必须包含至少一个未完成步骤；`inactive` 只允许空步骤或全部完成步骤。`persisted` 必须保留非空 `plan_key` 和 `source_document`；`synthesized/exact` 必须使用稳定且非空的 `plan_key`，推荐 `SYNTH-EXACT/<stable-source-id>` 形式，并保留 `source_document`；`synthesized/fallback` 必须使用 `SYNTH-FALLBACK/<UTC>` 形式的 `plan_key` 且 `source_document` 为空字符串。
 
 ## 指纹
 
@@ -70,7 +74,9 @@
 
 ```json
 {
-  "version": 1,
+  "version": 2,
+  "projection_origin": "persisted",
+  "synthesis_mode": "none",
   "state": "inactive",
   "plan_key": "",
   "source_document": "",
@@ -114,3 +120,51 @@
 ```
 
 脚本只生成 payload，不直接调用 UI 工具。Agent 必须真实调用 `update_plan` 后才能声称悬浮任务列表已重建。
+
+## synthesize 输入输出
+
+无投影补建时脚本新增：
+
+```text
+synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json
+```
+
+输入固定字段：
+
+```json
+{
+  "trigger": "continue",
+  "current_message": "继续",
+  "project_current_summary": {
+    "goal": "...",
+    "current_scope": "...",
+    "next_execution_point": "...",
+    "source_document_hint": "doc/3-实施/..."
+  },
+  "thread_evidence": {
+    "recent_task_labels": ["REQ-001", "TASK-001"],
+    "completed_step_hints": ["TASK-001"],
+    "current_step_hint": "TASK-002"
+  },
+  "candidate_source_documents": ["doc/3-实施/..."]
+}
+```
+
+`thread_evidence.conflicts` 可由上层只读子代理契约额外提供，但 `synthesize` 脚本不要求该字段存在；脚本只消费固定输入中的当前会话提示与候选来源文档。
+
+输出固定字段：
+
+```json
+{
+  "mode": "exact | fallback",
+  "projection": { "...合法 version:2 投影..." },
+  "payload": { "...active 时的 update_plan 参数..." },
+  "evidence": {
+    "identity_confidence": "high | low",
+    "status_confidence": "explicit | conservative",
+    "used_sources": ["project_current", "thread_history", "source_document"]
+  }
+}
+```
+
+`exact` 仅在唯一来源文档、普通当前状态可指向唯一任务、存在明确步骤提示且无冲突时成立；其他情况统一输出固定三步 `fallback` 安全恢复列表。

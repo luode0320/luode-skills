@@ -197,7 +197,7 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 - `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
-- `PROJECT_CURRENT.md` 中的唯一任务投影托管区由 `task-plan-rehydration-rules` 管理。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前校验投影。只有当前回合能证明与活动投影属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；失活、损坏、过期、来源不匹配或归属不确定时必须明确退出，禁止静默跳过或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
+- `PROJECT_CURRENT.md` 中的唯一任务投影托管区由 `task-plan-rehydration-rules` 管理。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前校验投影。只有当前回合能证明与活动投影属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若托管投影缺失，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配或归属不确定时必须明确退出，禁止静默跳过或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
 
 ### Obsidian 知识流选择性默认触发（强制）
 
@@ -598,6 +598,7 @@ PROJECT_CURRENT_TEMPLATE=$(cat <<'EOF'
 
 - 状态：初始化
 - 当前执行点：待补充
+- 来源文档提示：待补充
 - 更新时间：待补充
 
 ## 已完成
@@ -623,7 +624,9 @@ PROJECT_CURRENT_TEMPLATE=$(cat <<'EOF'
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
-  "version": 1,
+  "version": 2,
+  "projection_origin": "persisted",
+  "synthesis_mode": "none",
   "state": "inactive",
   "plan_key": "",
   "source_document": "",

@@ -6,16 +6,17 @@
 
 ## 当前任务
 
-- 目标：实现 Codex Desktop 任务悬浮窗断点恢复，在同一任务首次继续回合从 `PROJECT_CURRENT.md` 重建任务列表。
-- 范围：新任务投影 Skill、原子读写脚本、相邻 Owner 接入、工程文档、测试、字典、项目记忆、审查与验收。
-- 非范围：修改 Codex Desktop 产品代码、在用户没有发送新消息时自动恢复、自动重放未知幂等性的写操作。
-- 状态：实施中；`TASK-RTP-01` 至 `TASK-RTP-07` 已完成，`TASK-RTP-08` 已完成归属保护修复，等待正确任务会话再次真实验收。
+- 目标：实现 Codex Desktop 在“继续”但无历史任务投影时，也能正式补建悬浮任务列表。
+- 范围：`version: 2` 投影 schema、`synthesize` 脚本入口、只读子代理证据契约、继续路由、规则文案、测试、字典、项目记忆与审查收口。
+- 非范围：修改 Codex Desktop 产品代码、跨会话搜索、自动恢复未知幂等性的写操作、无用户新消息时自动显示悬浮窗。
+- 状态：实施中；`TASK-SYN-01`、`TASK-SYN-02`、`TASK-SYN-03` 已完成，`TASK-SYN-04` 正在进行真实重开前的最终验证与验收收口。
 
 ## 基线与保护边界
 
 - 基线 commit：`76ee419d59396d919fea04ed55ea373ddeb8cb26`。
 - 当前工作树存在大量用户未提交改动；所有编辑基于当前磁盘内容增量完成，不执行 reset、checkout 或覆盖式回退。
 - 投影只保存任务 ID、悬浮文案和三态状态，不保存 prompt、响应、凭据、线程 ID、业务数据或原始用户输入。
+- 无投影补建只允许使用当前会话与项目文档证据；子代理只做只读证据收集，不做最终归属裁决。
 - 当前轮没有 Git 写历史授权，最终保持已改动未提交。
 
 ## 已完成
@@ -28,12 +29,13 @@
 - 落盘真实重启前测试记录、阶段审查和阶段验收；任务一至任务七具备实现、测试、审查和验收证据。
 - 已从会话 `019f851d-f04d-75f1-87c3-7bb2290d43c4` 取得真实证据：该会话标题为“继续精简需求流程 skill (2)”，与当前 `REQ-RTP-001/CYCLE-RTP-04` 投影不是同一来源；它不应错误重建九步恢复计划。该会话首条命中列表同时漏掉 `task-plan-rehydration-rules`，已补齐继续类消息路由、来源不确定阻断、精确 CLI 参数和 20 项回归测试。
 - 修正 Plan Mode 与任务投影的阶段边界：Plan Mode 只形成、修改或确认执行计划并保留用户选择；不读取投影、不调用 `update_plan`、不创建任务悬浮窗。只有 Plan Mode 结束后进入执行阶段，才允许重建 UI 并核验中断点。
+- 已实现 `version: 2` 投影 schema、`projection_origin/synthesis_mode` 与 `synthesize` CLI，覆盖 `exact` 正式补建和固定三步 `fallback` 安全恢复列表。
+- 已完成 30 项任务投影脚本与恢复路由回归，其中包含无投影精确补建、证据不足回退、payload explanation 分支和文档契约断言。
 
 ## 待完成
 
-- 在保存 `REQ-RTP-001/CYCLE-RTP-04` 的正确任务会话中完成一次关闭重开后“继续任务”验收；对会话 `019f851d-f04d-75f1-87c3-7bb2290d43c4` 则验证首条命中包含恢复 Owner，并在归属不确定 / 不匹配时明确不重建。
-- 重启通过后完成 `TASK-RTP-09` 的 Skill 合规、严格追踪、项目改动总审查和最终验收。
-- 最终完成后把活动投影设为 `inactive`。
+- 在 Codex Desktop 中分别完成 persisted、exact synth 与 fallback synth 三条路径的真实关闭/重开验收。
+- 验收通过后把当前 `TASK-SYN-*` 活动投影设为 `inactive`，再决定是否回到旧 `REQ-RTP-001` 验收链路。
 
 ## 阻断
 
@@ -45,8 +47,11 @@
 
 - 8 份工程文档 profile：通过。
 - 严格追踪定向回归：3/3 通过。
-- 任务投影脚本单元测试：17/17 通过。
-- 任务投影脚本及恢复路由回归：19/19 通过。
+- `PROJECT_CURRENT` 投影校验与 payload 生成：通过；当前活动投影已升级到 `version: 2`，并可稳定生成 `TASK-SYN-*` 悬浮列表 payload。
+- 任务投影脚本及恢复路由回归：30/30 通过。
+- `task-plan-rehydration-rules`、`skill-hit-check-rules`、`project-rule-file-bootstrap-rules` quick validate：通过；`bootstrap_agents.sh` 的 `bash -n` 通过。
+- 字典刷新：通过；`implemented_total=73`、`planned_missing=0`、`seed_total=34`。
+- `git diff --check`：通过（仅剩现有 LF->CRLF warning，无 diff 硬错误）。
 - Plan Mode 不恢复任务悬浮窗回归：21/21 通过；`task-plan-rehydration-rules`、`skill-hit-check-rules` 与 `implementation-planning-rules` 的 UTF-8 quick validate 通过。
 - 当前“恢复任务悬浮计划”会话已真实调用 `update_plan`，九步 `TASK-RTP` 悬浮列表重建成功；该结果不代表其它任务会话应显示这九步。
 - 严格追踪修复定向回归：3/3 通过。
@@ -58,62 +63,39 @@
 
 ## 下一执行点
 
-- 在正确的“恢复任务悬浮计划”会话中发送新的“继续任务”；首次继续回合必须先命中恢复 Owner、校验活动投影并调用 `update_plan`，再核验 `TASK-RTP-08` 中断点。其它任务会话只做归属校验，不得错投。
+- 在 Codex Desktop 中执行真实关闭/重开验收，分别覆盖 persisted、exact synth 和 fallback synth 三条路径；验收完成后把当前活动投影失活，并决定是否并回旧 `REQ-RTP-001` 收口链路。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
-  "version": 1,
+  "version": 2,
   "state": "active",
-  "plan_key": "REQ-RTP-001/CYCLE-RTP-04",
+  "projection_origin": "persisted",
+  "synthesis_mode": "none",
+  "plan_key": "REQ-RTP-001/SYNTH-CYCLE-01",
   "source_document": "doc/3-实施/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复_实施总览.md",
-  "plan_fingerprint": "d1ac84f3ffcb0089c1a8ee65be62320926d6723360a490ccd9ae54c64a2a0104",
-  "updated_at": "2026-07-22T18:02:02Z",
+  "plan_fingerprint": "d3a583e140cf5500adec980a5491a97ead5ca20163a5b0371851b3e577385b9e",
+  "updated_at": "2026-07-24T01:00:00Z",
   "steps": [
     {
-      "id": "TASK-RTP-01",
-      "step": "[TASK-RTP-01] 冻结需求、验收与实施文档",
+      "id": "TASK-SYN-01",
+      "step": "[TASK-SYN-01] 冻结补建 schema、证据边界与 explanation 契约",
       "status": "completed"
     },
     {
-      "id": "TASK-RTP-02",
-      "step": "[TASK-RTP-02] 创建任务投影核心规则",
+      "id": "TASK-SYN-02",
+      "step": "[TASK-SYN-02] 实现 synthesize 脚本与 exact/fallback 状态映射",
       "status": "completed"
     },
     {
-      "id": "TASK-RTP-03",
-      "step": "[TASK-RTP-03] 实现投影脚本和单元测试",
+      "id": "TASK-SYN-03",
+      "step": "[TASK-SYN-03] 接入继续路由、规则同步与 PROJECT_CURRENT 投影升级",
       "status": "completed"
     },
     {
-      "id": "TASK-RTP-04",
-      "step": "[TASK-RTP-04] 接入项目记忆与自举模板",
-      "status": "completed"
-    },
-    {
-      "id": "TASK-RTP-05",
-      "step": "[TASK-RTP-05] 接入执行状态同步",
-      "status": "completed"
-    },
-    {
-      "id": "TASK-RTP-06",
-      "step": "[TASK-RTP-06] 接入重开与上下文恢复",
-      "status": "completed"
-    },
-    {
-      "id": "TASK-RTP-07",
-      "step": "[TASK-RTP-07] 刷新字典和项目记忆",
-      "status": "completed"
-    },
-    {
-      "id": "TASK-RTP-08",
-      "step": "[TASK-RTP-08] 完成 Desktop 真实关闭重开验收",
+      "id": "TASK-SYN-04",
+      "step": "[TASK-SYN-04] 完成 quick validate、字典刷新与真实重开验收",
       "status": "in_progress"
-    },
-    {
-      "id": "TASK-RTP-09",
-      "step": "[TASK-RTP-09] 完成合规审查和最终验收",
-      "status": "pending"
     }
   ]
 }
