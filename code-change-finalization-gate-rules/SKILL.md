@@ -16,7 +16,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
 - 注释链只消费 `comment-completion-gate-rules` 的 PASS/FAIL；该 PASS 必须包含其对 `comment-placement-granularity-rules` 的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
 - 核验新增测试文件的当天时间戳目录一致性、补注释优先级、`implementation-review-rules` 最低测试前收口、真实运行验证状态、`internal/router` 风格和用户手改保护。
-- Go 测试资产链只消费 `go-test-compile-path-rules`、`test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和 seam 细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
+- Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和 seam 细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
 - 只产出专项闸门 PASS/FAIL 与证据；最终输出和后续内容统一由 `reasoning-summary-structure-rules` 渲染。
 
 ## 自动触发信号
@@ -26,7 +26,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 
 ## 进入后先做什么
 
-1. 涉及 Go 测试资产时，先核验 `go-test-compile-path-rules`、`test-program-rules` 与 test-asset-governance 的适用性结论和 PASS/FAIL；再检查新增测试文件是否全部位于同一个当天时间戳目录。
+1. 涉及 Go 测试资产时，先核验 `test-program-rules`（含《Go 测试编译路径（强制）》）与 test-asset-governance 的适用性结论和 PASS/FAIL；再检查新增测试文件是否全部位于同一个当天时间戳目录。
 2. 核验 `comment-completion-gate-rules` 的 PASS/FAIL 和可追溯证据；FAIL 或无证据直接不通过，不在本入口重复字段级注释检查。
 3. 补注释请求只核验 comment-completion 的优先范围结论，不复制函数头、方法块或补丁字段定义。
 4. 核验 `implementation-review-rules` 已完成最低测试前收口。

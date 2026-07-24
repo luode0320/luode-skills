@@ -1,0 +1,40 @@
+schema_version: 1
+record_id: REC-SS-TEST-GO-COLLAPSE-20260724
+supersedes_note: 不隶属冻结清单 MANIFEST-SS-20260721；独立记账，避免污染其 36/11 硬锁与已失效校验器。
+candidates:
+- candidate_id: CAND-SS-TEST-11
+  domain: test
+  source_skill: go-test-compile-path-rules
+  target_owner: test-program-rules
+  target_section: "## Go 测试编译路径（强制）"
+  action: merge_retire
+  protected_semantics:
+  - RULE-GO-SRC-NO-TEST-FILE-001   # 源码目录禁放 *_test.go
+  - RULE-GO-ASCII-COMPILE-PATH-001 # 可编译测试路径必须 ASCII
+  - RULE-GO-WHITEBOX-SEAM-001      # 白盒同包诉求统一改 seam
+  - RULE-GO-SCATTERED-ROUTE-001    # 散落资产转交 test-asset-governance
+  trigger_contract:
+    preserve_description: true
+    absorbed_trigger_aliases:
+    - 编译链路
+    - 中文可编译路径
+    - 白盒同包
+    - 源码目录 *_test.go
+  external_consumers_updated:
+  - code-change-finalization-gate-rules/SKILL.md
+  - skill-hit-check-rules/references/hit-checklist.md
+  - 编码skill.md
+  - README.md
+  baseline_status: current_cycle
+  delete_authorized: true
+  test_status: post_delete_pass
+  rollback_locator:
+    baseline_commit: 8102ca95463e392e7dc534fa80e9d75876da3d56
+    source_root: go-test-compile-path-rules
+    source_files:
+    - path: go-test-compile-path-rules/SKILL.md
+      sha256: ef5919c6b9f129d34723eb58cfc6b15c2f214b54a498a99d83094a3fe3087cc2
+    - path: go-test-compile-path-rules/agents/openai.yaml
+      sha256: c5ef525a0d13d600c5893fc56b79fff757677f6cb05ce25c82f8a91d49b0256b
+    - path: go-test-compile-path-rules/references/go-compile-path.md
+      sha256: 8be7df7a74242939089103785ffcd81dd8b078be3e4b0e92d1938476d04e456c

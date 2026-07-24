@@ -98,7 +98,7 @@
 只在"测试资产名称应该怎么起"这个问题上使用这个 skill。
 如果当前争议是测试资源放在哪里，请转交 `test-strategy-rules 的 test-asset-governance 条件路由`；如果当前问题是已有测试资产散落在错误目录，还要转交 `test-strategy-rules 的 test-asset-governance 条件路由`；如果是测试程序具体怎么写，请转交 `test-program-rules`。
 
-**重要：本 skill 必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基础，所有测试资产必须统一放在中央约定的测试根目录下；测试任务根目录命名必须遵循中央模板；中文说明目录单独使用中文任务简介命名；会被 Go 编译的真实测试路径必须保持 ASCII，并服从 `go-test-compile-path-rules`。**
+**重要：本 skill 必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基础，所有测试资产必须统一放在中央约定的测试根目录下；测试任务根目录命名必须遵循中央模板；中文说明目录单独使用中文任务简介命名；会被 Go 编译的真实测试路径必须保持 ASCII，并服从 `test-program-rules` 的《Go 测试编译路径（强制）》。**
 
 ## 测试隔离红线（强制）
 
@@ -145,7 +145,7 @@
 ## 默认执行流程
 
 1. 先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认测试根目录、时间戳根目录模板、中文说明目录命名、ASCII 镜像路径和同一轮测试是否继续复用同一根目录。
-2. 再确认遵循 `artifact-storage-rules`、`test-strategy-rules 的 test-asset-governance 条件路由` 与 `go-test-compile-path-rules` 的约定：所有测试资产在中央约定的测试根目录下；任务根目录使用统一模板；中文说明目录单独使用中文任务简介；真实测试路径按真实代码路径镜像组织，并在 Go 可编译路径中保持 ASCII。
+2. 再确认遵循 `artifact-storage-rules`、`test-strategy-rules 的 test-asset-governance 条件路由` 与 `test-program-rules` 的《Go 测试编译路径（强制）》 的约定：所有测试资产在中央约定的测试根目录下；任务根目录使用统一模板；中文说明目录单独使用中文任务简介；真实测试路径按真实代码路径镜像组织，并在 Go 可编译路径中保持 ASCII。
 3. 对时间戳目录执行一致性检查：目录时间必须来自运行时当前时间，且新增测试文件必须落在当前任务时间戳目录下的镜像路径。
 4. 若复用旧任务目录，检查提交说明或任务说明是否包含“复用旧目录原因 + 旧任务ID”；缺任一项则判定命名流程未完成。
 5. 默认先读 `references/naming-baseline.md`，确认命名维度、顺序和禁用写法。
@@ -158,7 +158,7 @@
 ## 权责边界与不负责事项
 
 - 只负责命名规则，不负责测试目录放置方案，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。
-- 必须遵循 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 的约定：统一使用中央测试根目录；时间戳根目录使用统一模板；中文说明目录单独使用中文任务简介；真实测试路径按真实代码路径镜像命名；涉及 Go 可编译路径时还必须服从 `go-test-compile-path-rules`。
+- 必须遵循 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 的约定：统一使用中央测试根目录；时间戳根目录使用统一模板；中文说明目录单独使用中文任务简介；真实测试路径按真实代码路径镜像命名；涉及 Go 可编译路径时还必须服从 `test-program-rules` 的《Go 测试编译路径（强制）》。
 - 不负责测试程序实现、断言方式和脚本内容，那属于 `test-program-rules`。
 - 不负责测试说明文档章节和记录格式，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。
 - 不负责功能是否正确、覆盖是否充分，那属于 `functional-validation-rules` 和 `test-regression-rules`。
@@ -223,7 +223,7 @@
 - 严禁为了测试目的向生产代码目录新增测试专用方法、测试专用数据、测试专用结构体字段。
 - 迁移时优先处理当前任务直接相关的散落资产，不在当前任务中顺手做全仓库大扫除。
 - 若某文件同时承担生产与测试双重职责，先拆分职责，再分别归位。
-- 若散落问题同时涉及 Go 编译路径、源码目录 `*_test.go` 或白盒同包诉求，立即转交 `go-test-compile-path-rules` 一并处理。
+- 若散落问题同时涉及 Go 编译路径、源码目录 `*_test.go` 或白盒同包诉求，立即转交 `test-program-rules` 的《Go 测试编译路径（强制）》 一并处理。
 - 若散落资产中包含指向 `test` 环境配置、`test` 数据库连接或“修改 test 配置后运行”的脚本 / 说明，必须一并判定为本地测试规则违规并迁移或改写为 `local` 环境用法。
 
 ## 默认执行流程
@@ -231,13 +231,13 @@
 1. 先读 `references/scattered-asset-migration.md`，判断当前文件是否属于测试资产以及属于哪种散落类型。
 2. 再确认当前任务应归属的测试时间戳根目录；若根布局尚未建立，先转交 `test-strategy-rules 的 test-asset-governance 条件路由`。
 3. 只迁移与当前任务直接相关的散落资产，并补齐对应的中文说明或引用路径。
-4. 若散落位置位于 Go 可编译路径或源码目录，需要同时触发 `go-test-compile-path-rules`。
+4. 若散落位置位于 Go 可编译路径或源码目录，需要同时触发 `test-program-rules` 的《Go 测试编译路径（强制）》。
 5. 迁移后确认：当前任务的测试资产不再散落，且未把生产职责误迁成测试职责。
 
 ## 权责边界与不负责事项
 
 - 只负责识别和迁移散落测试资产，不负责创建测试任务根布局。
-- 不负责 Go 编译路径 ASCII 约束、源码目录 `*_test.go` 禁放和 seam 方案，那属于 `go-test-compile-path-rules`。
+- 不负责 Go 编译路径 ASCII 约束、源码目录 `*_test.go` 禁放和 seam 方案，那属于 `test-program-rules` 的《Go 测试编译路径（强制）》。
 - 不负责测试文件如何命名或测试程序如何编写。
 - 不在当前任务中无限扩展为全仓库历史测试资产治理。
 
@@ -303,7 +303,7 @@
 ## 权责边界与不负责事项
 
 - 只负责测试任务根目录和布局，不负责散落资产迁移。
-- 不负责 Go 编译路径冲突、源码目录 `*_test.go` 禁放和 seam 方案，那属于 `go-test-compile-path-rules`。
+- 不负责 Go 编译路径冲突、源码目录 `*_test.go` 禁放和 seam 方案，那属于 `test-program-rules` 的《Go 测试编译路径（强制）》。
 - 不负责测试名称本身，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。
 - 不负责测试程序写法，那属于 `test-program-rules`。
 - 不负责测试说明内容结构，那属于 `test-strategy-rules 的 test-asset-governance 条件路由`。

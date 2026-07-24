@@ -26,7 +26,7 @@
 
 ## Go 测试资产场景补充
 
-- 本轮新增或修改任意 `*_test.go`，或涉及测试程序、mock、fixture、数据构造脚本时，必须检查并命中 `go-test-compile-path-rules`、`test-program-rules`，并按适用性路由到 `test-strategy-rules` 的 test-asset-governance。
+- 本轮新增或修改任意 `*_test.go`，或涉及测试程序、mock、fixture、数据构造脚本时，必须检查并命中 `test-program-rules`（含《Go 测试编译路径（强制）》），并按适用性路由到 `test-strategy-rules` 的 test-asset-governance。
 - 源码目录禁放、ASCII 镜像、白盒 seam 和测试资产落点由上述专职 Owner 定义；本入口只负责自动触发和联动，不复制其目录清单、扫描命令或整改步骤。
 
 ## 代码改动收口场景补充

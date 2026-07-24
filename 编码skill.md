@@ -572,7 +572,7 @@ Bug 域采用两条互补路径：
 
 2. 测试资源管理
 
-- 由 `test-strategy-rules 的 test-asset-governance 条件路由`、`test-strategy-rules 的 test-asset-governance 条件路由`、`go-test-compile-path-rules`、`test-strategy-rules 的 test-asset-governance 条件路由`、`test-program-rules`、`test-strategy-rules 的 test-asset-governance 条件路由` 共同负责
+- 由 `test-strategy-rules 的 test-asset-governance 条件路由`、`test-strategy-rules 的 test-asset-governance 条件路由`、`test-program-rules`、`test-strategy-rules 的 test-asset-governance 条件路由` 共同负责
 - 重点解决测试目录、命名、测试程序落点、测试说明文档等组织问题
 - 只管理测试资产如何存放、如何命名、如何描述
 - 不负责判断功能是否正确
