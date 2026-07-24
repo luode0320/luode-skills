@@ -34,6 +34,9 @@
 - `bug-regression-risk-rules`
   - 做什么：审查 Bug 修复可能带来的回归风险、兼容性风险和验证优先级。
   - 建议：可并行，只读审查，适合和修复线程并发跑。
+- `mcp-installation-rules` / `plugin-installation-rules` / `thread-title-rules` 的 provisioning **检测**
+  - 做什么：只读探测依赖是否安装、目标 config 是否已含对应表 / 键、工具是否已暴露、项目结构标记等。
+  - 建议：可并行，多个独立工具的检测扇出为互不重叠的只读线程；存在只读探测入口时优先使用（如 `bootstrap.mjs --check`）。检测子 agent 禁止任何写动作，细则见 `provisioning-delegation.md`。
 
 ## 条件并行
 
@@ -76,6 +79,9 @@
 - `code-change-finalization-gate-rules`
   - 做什么：在最终收口前检查代码/测试改动是否完成注释、测试、真实运行验证与提交前风格闸门。
   - 建议：必须串行，它是代码收口闸门，不适合并行跑。
+- `mcp-installation-rules` / `plugin-installation-rules` / `thread-title-rules` 的 provisioning **写 config 安装 / 注册**
+  - 做什么：向 config 文件写入 / 补齐 MCP、插件、工具的注册表项。
+  - 建议：必须串行，集中到单一“安装子 agent”独占对应 config 文件的写；同一时刻至多一个安装子 agent 活跃，绝不并行两个 config 写入者。目录级、写集互斥的 `npm ci` 等可并行，但任何 config 写不得并发。细则见 `provisioning-delegation.md`。
 
 ## 分发建议
 

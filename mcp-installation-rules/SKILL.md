@@ -1,6 +1,6 @@
 ---
 name: mcp-installation-rules
-description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`，HAR/route、视觉 diff、录制/trace、代理或多引擎等高级验证需求使用 `browser-advanced-testing-rules`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。当用户提出接入“TAPD MCP / TAPD 技能 / TAPD OpenAPI / tapd-skills”时，按本 skill 的「TAPD 技能包（tapd-skills）安装规则」处理：归档直下安装（不用 git clone），环境变量按项目级配置补齐，`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 由用户自行填写。
+description: 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器应优先由哪个工具接管，或任务即将涉及前端页面验证、浏览器联动、Godot 编辑器操控且需要先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按官方当前名称 `Chrome DevTools MCP` 处理。负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、优先级、Codex 配置补齐规则和后续工具让路规则；浏览器工具必须按 `references/tool-priority.md` 路由：依赖用户真实 Chrome profile 时使用 Chrome Plugin，独立调试与验证优先使用 Chrome DevTools MCP，隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`，HAR/route、视觉 diff、录制/trace、代理或多引擎等高级验证需求使用 `browser-advanced-testing-rules`；不得将 Chrome Plugin 与 Chrome DevTools MCP 视为同一能力，工具不可用且无等价安全能力时明确阻断。此外，任何代码仓库默认推荐 CodeGraph（代码探索默认入口）与 codebase-memory-mcp（架构分析补充）这组代码图谱 MCP，安装与配置以官方仓库为准。当用户提出接入“TAPD MCP / TAPD 技能 / TAPD OpenAPI / tapd-skills”时，按本 skill 的「TAPD 技能包（tapd-skills）安装规则」处理：归档直下安装（不用 git clone），环境变量按项目级配置补齐，`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 由用户自行填写。MCP 检测与安装默认经 parallel-task-dispatch-rules 委派子代理执行（检测只读并行、写 config 的安装串行独占），细则见 parallel-task-dispatch-rules/references/provisioning-delegation.md。
 ---
 
 # MCP 安装判定规则
@@ -106,6 +106,14 @@ Claude Code 结论模板（待确认阶段使用，新增）：
   - 其他 Godot 本地兜底方式（如仅运行命令、静态读文件、人工编辑）
 
 MCP 安装、配置、注册或首次连接失败时，先触发 `execution-failure-learning-rules` 的 `recover`，查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)，按当前 AI 平台和官方版本复验；未验证或无法脱敏的经验不得写入 active。已配置 MCP 的运行期故障不归本 casebook，统一路由到 `agent-runtime-recovery-rules` 的 `mcp_runtime_transport`。
+
+## 子代理委派（provisioning）
+
+- 本 skill 的 MCP 检测与安装默认经 `parallel-task-dispatch-rules` 委派子代理执行，细则以 `../parallel-task-dispatch-rules/references/provisioning-delegation.md` 为唯一事实来源，本节只引用、不复制策略正文。
+- 检测（依赖是否安装、目标 config 是否已含对应 `[mcp_servers.*]`、工具是否已暴露、项目结构标记）默认派只读检测子 agent，多工具可并行扇出，检测子 agent 禁止任何写动作。
+- 写 config 的安装 / 注册默认集中到单一“安装子 agent”串行独占对应 config 文件（本 skill 写项目级 `./.codex/config.toml`）；同一时刻至多一个安装子 agent 活跃，绝不并行两个 config 写入者。
+- 主 agent 负责冻结写集、汇总检测、裁决冲突、收口校验，并输出计划线程数 / 实际启动数 / 完成数 / 关闭数 / 回退原因。
+- 系统规则、平台工具元数据、用户当前轮禁止仍高于该默认；无真实子代理工具或用户当轮禁止时回退主 agent 本地串行，并如实说明。
 
 ## 与相邻 skill 的边界
 

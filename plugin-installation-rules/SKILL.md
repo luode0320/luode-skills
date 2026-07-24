@@ -1,6 +1,6 @@
 ---
 name: plugin-installation-rules
-description: 当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的"插件检测 → 安装 → 验证 → 使用 → 回退"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。
+description: 当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的"插件检测 → 安装 → 验证 → 使用 → 回退"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。插件检测与安装默认经 parallel-task-dispatch-rules 委派子代理执行（检测只读并行、写 config 的安装串行独占），细则见 parallel-task-dispatch-rules/references/provisioning-delegation.md。
 ---
 
 # 插件检测安装使用规则
@@ -62,6 +62,14 @@ description: 当用户要求分析项目、检查是否需要安装某个 AI 编
 - **通用多 AI**：同一插件常有 Claude Code / Codex / Cursor 等多种接入方式，按当前 AI 环境选对应方式，不要把某一种当成唯一。
 - **安全边界**：减码 / 优化类插件不得削弱数据校验、访问控制、输入验证等安全代码。
 - **失败回退**：安装或启用失败时，明确记录不可用，回退到常规流程，不阻塞主任务。
+
+## 子代理委派（provisioning）
+
+- 本 skill 的插件检测与安装默认经 `parallel-task-dispatch-rules` 委派子代理执行，细则以 `../parallel-task-dispatch-rules/references/provisioning-delegation.md` 为唯一事实来源，本节只引用、不复制策略正文。
+- 检测（插件是否已安装 / 启用、依赖是否就绪、项目结构标记）默认派只读检测子 agent，多插件可并行扇出，检测子 agent 禁止任何写动作。
+- 涉及写 config 的安装 / 注册默认集中到单一“安装子 agent”串行独占对应 config 文件；插件官方以平台命令安装时，命令级安装可独立执行，但任何 config 文件写不得并发。
+- 主 agent 负责冻结写集、汇总检测、裁决冲突、收口校验，并输出计划线程数 / 实际启动数 / 完成数 / 关闭数 / 回退原因。
+- 系统规则、平台工具元数据、用户当前轮禁止仍高于该默认；无真实子代理工具或用户当轮禁止时回退主 agent 本地串行，并如实说明。
 
 ## 与相邻 skill 的边界
 

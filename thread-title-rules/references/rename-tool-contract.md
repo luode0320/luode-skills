@@ -35,9 +35,18 @@ rename_current_thread({
 
 ## 本机安装与注册
 
-- 在 Skill 目录执行 `npm ci --omit=dev --prefix thread-title-rules/mcp` 安装锁定依赖；`node_modules` 只作为本机运行依赖，不进入 Git。
-- 在 `~/.codex/config.toml` 注册 `mcp_servers.thread_session`，命令指向 Node.js 20+，参数指向 `thread-title-rules/mcp/index.mjs`。
-- MCP 配置在新任务或宿主重载后生效；旧任务没有重新加载工具列表时，不得声称工具已经暴露。
+安装与注册是统一工具生效的前置条件，缺任一步 `rename_current_thread` 都不会暴露给模型。默认由 Skill 自举完成，不假设用户已手工执行。
+
+provisioning 委派：检测与安装 / 注册默认经 `parallel-task-dispatch-rules` 委派子代理执行，唯一事实来源为 `../parallel-task-dispatch-rules/references/provisioning-delegation.md`。检测默认派只读检测子 agent 运行 `node thread-title-rules/mcp/bootstrap.mjs --check`（只探测现状、不装依赖、不写 config、不备份，输出附 `mode:"check"`）；写 `~/.codex/config.toml` 的注册默认派单一“安装子 agent”串行独占执行 `node thread-title-rules/mcp/bootstrap.mjs`，同一时刻至多一个安装子 agent 活跃，主 agent 收口校验并裁决冲突。无真实子代理工具或用户当轮禁止时回退主 agent 本地串行执行同一脚本。
+
+- 首选自举：运行 `node thread-title-rules/mcp/bootstrap.mjs`。脚本幂等且带备份，会：
+  1. `mcp/node_modules` 缺失时执行 `npm ci --omit=dev` 安装锁定依赖；已安装则跳过。`node_modules` 只作本机运行依赖，不进入 Git。
+  2. `~/.codex/config.toml`（`CODEX_HOME` 优先，否则 `~/.codex`）缺少 `[mcp_servers.thread_session]` 时，先做时间戳备份，再以 UTF-8 无 BOM 追加注册块；`command` 指向当前 Node（`process.execPath`），`args` 指向 `mcp/index.mjs`。
+  3. 打印稳定 JSON：`{ok, deps, registered, reloadRequired, configPath, serverPath, backupPath}`。
+- 手工等价步骤（自举不可用时的回退）：
+  1. 在 Skill 目录执行 `npm ci --omit=dev --prefix thread-title-rules/mcp`。
+  2. 在 `~/.codex/config.toml` 注册 `[mcp_servers.thread_session]`，`command` 指向 Node.js 20+，`args` 指向 `thread-title-rules/mcp/index.mjs`。
+- MCP 配置在新任务或宿主重载后生效；旧任务没有重新加载工具列表时，不得声称工具已经暴露。自举返回 `registered:"added"` 或 `already` 但工具仍未暴露时，只提示重载并本轮跳过，不重复写注册。
 
 ## App Server 调用
 
@@ -45,6 +54,7 @@ rename_current_thread({
 - Windows 通过 `cmd.exe /d /s /c codex.cmd app-server --stdio` 启动；其他平台使用 `codex app-server --stdio`。
 - 请求参数固定为 `{threadId, name}`，其中 `threadId` 来自可信 MCP 元数据，`name` 来自校验后的标题。
 - 收到对应请求 ID 的成功响应才返回 `RENAMED`；通知、日志或进程退出码不能单独作为成功证据。
+- App Server 冷启动可能较慢，默认协议超时偏小会误报 `TIMEOUT`；`TIMEOUT` 不做同输入 MCP 重试，可按 Skill 路由回退原生工具。
 - 无论成功、失败或超时，都必须关闭 stdin 并回收子进程；超时后允许强制终止该次启动的 App Server 子进程。
 
 ## 返回码与 Skill 路由
@@ -58,13 +68,13 @@ rename_current_thread({
 | `APP_SERVER_REJECTED` | App Server 返回协议错误或拒绝请求 | 原生工具存在时回退一次，否则跳过 |
 | `TIMEOUT` | 初始化或改名请求超时 | 不做同输入 MCP 重试；原生工具存在时回退一次 |
 
-未知返回码、缺失字段或格式错误结果不得写成成功，统一按 MCP 失败处理。
+工具未暴露不是上表返回码，而是“未安装 / 未注册 / 宿主未重载”状态：应先按“本机安装与注册”自举，再按 `reloadRequired` 提示重载并本轮跳过。未知返回码、缺失字段或格式错误结果不得写成成功，统一按 MCP 失败处理。
 
 ## 安全与兼容边界
 
 - 工具只能改名调用它的当前任务，不能接收或选择任意线程 ID。
 - 当前任务身份依赖 Codex App 宿主注入元数据；能够直接启动本机 MCP 客户端或 App Server 的同一操作系统用户不在该身份边界内。本工具不提供跨用户隔离，也不声称可以防止本机同权限客户端伪造 `_meta`。
-- 不直接修改 SQLite、rollout 文件或其他内部存储。
+- 自举只写 Codex 全局配置与本机依赖，不直接修改 SQLite、rollout 文件或其他内部存储。
 - 不使用 UI 自动点击模拟改名。
 - 第一版只声明支持 Codex App 的持久化任务；`codex exec --ephemeral` 创建的临时线程不保证可被 App Server 改名。其他宿主必须提供经过真实验证的适配器。
 - 模型无关只表示支持工具调用的模型共用同一 MCP 工具；完全不支持工具调用的模型仍必须显式跳过。

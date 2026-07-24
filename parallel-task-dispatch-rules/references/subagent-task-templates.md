@@ -81,6 +81,44 @@ Subagent 状态：
 - 若冲突，优先保留主路径正确性
 ```
 
+## 模板 4：provisioning 只读检测（只读、可并行）
+
+```text
+任务目标：
+- 只读探测 <工具/MCP/插件名> 的 provisioning 现状，不做任何写动作。
+
+只读范围：
+- 检查项：依赖是否安装（如 node_modules）、目标 config 是否已含对应表 / 键、工具是否已暴露、项目结构标记。
+- 优先入口：存在只读探测命令时使用（如 `node bootstrap.mjs --check`），禁止装依赖 / 写 config / 备份。
+- 规则依据：parallel-task-dispatch-rules/references/provisioning-delegation.md
+
+输出要求：
+- 输出状态 JSON 或结构化结论：deps、registered、exposed、configPath 等真实现状。
+- 多工具检测时各线程写集互不重叠，结果回主 agent 汇总。
+- 严禁任何写动作；若发现只读入口缺失，回报主 agent，不得擅自改写。
+```
+
+## 模板 5：安装子 agent（单实例、串行、独占 config 写）
+
+```text
+任务目标：
+- 完成 <工具/MCP/插件名> 的安装 / 注册，独占写目标 config 文件。
+
+写集边界：
+- 允许写：<目标 config 文件绝对路径>（单一文件，单写者）。
+- 允许的目录级安装：<各工具目录内 npm ci 等互斥写集>。
+- 禁止：并发任何其它 config 写入者；改写集外文件。
+
+强制流程：
+- 写前备份目标 config；幂等追加（已存在则判为 already，不重复写）。
+- 写后回读校验：表头唯一、备份存在、幂等复跑为 already。
+- UTF-8 无 BOM 写入；完成后回报主 agent 收口，等待关闭回收。
+- 规则依据：parallel-task-dispatch-rules/references/provisioning-delegation.md
+
+同时刻不变量：
+- 至多一个安装子 agent 活跃；多个工具的 config 注册由这一个安装子 agent 顺序完成。
+```
+
 ## 回收结果最小清单
 
 - 子任务是否完成目标。
