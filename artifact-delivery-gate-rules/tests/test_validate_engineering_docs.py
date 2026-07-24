@@ -323,6 +323,36 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         )
         self.assertTrue(any("unbalanced Mermaid delimiter" in error for error in errors))
 
+    # test_min_diagrams_rejects_insufficient_total 验证图表总量低于 min_diagrams 时会被门禁拒绝。
+    # [参数] 无：构造只含 1 张流程图但要求总量 >=3 的样本。
+    # [返回] None：断言错误列表包含总量不足提示。
+    # 最近修改时间：2026-07-24 新增图表总量下限负例，覆盖复杂实施文档缺语义补图场景。
+    def test_min_diagrams_rejects_insufficient_total(self) -> None:
+        """验证图表总量低于 min_diagrams 时会被门禁拒绝。"""
+        # 1. 只提供 1 张流程图，profile 要求 flowchart>=1 且总量>=3。
+        errors: list[str] = []
+        text = "```mermaid\nflowchart TD\n  A --> B\n```\n"
+        validator.check_diagrams(text, {"diagrams": {"flowchart": 1}, "min_diagrams": 3}, errors)
+        # 2. 断言按类型下限通过、但总量下限拦截。
+        self.assertTrue(any("insufficient total diagrams" in error for error in errors))
+
+    # test_min_diagrams_accepts_flowchart_plus_semantic 验证 1 流程图 + 语义补图满足总量下限。
+    # [参数] 无：构造流程图 + 时序图 + 状态图共 3 张。
+    # [返回] None：断言无总量不足错误。
+    # 最近修改时间：2026-07-24 新增图表总量下限正例，锁定“至少 1 流程图 + 语义补图”口径。
+    def test_min_diagrams_accepts_flowchart_plus_semantic(self) -> None:
+        """验证 1 流程图 + 语义补图满足总量下限。"""
+        # 1. 提供流程图、时序图、状态图共 3 张，profile 要求总量>=3。
+        errors: list[str] = []
+        text = (
+            "```mermaid\nflowchart TD\n  A --> B\n```\n"
+            "```mermaid\nsequenceDiagram\n  A->>B: call\n```\n"
+            "```mermaid\nstateDiagram-v2\n  s1 --> s2\n```\n"
+        )
+        validator.check_diagrams(text, {"diagrams": {"flowchart": 1}, "min_diagrams": 3}, errors)
+        # 2. 断言总量下限不再报错。
+        self.assertFalse(any("insufficient total diagrams" in error for error in errors))
+
     # test_strict_trace_rejects_orphan_task 验证缺少 REVIEW 证据的孤立任务会被严格追踪拒绝。
     # [参数] 无：在临时目录创建最小周期文档。
     # [返回] None：断言严格追踪报告缺少 REVIEW 证据。

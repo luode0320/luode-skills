@@ -77,7 +77,8 @@ profiles:
       - [任务完成、停止与最大推进边界, 总体任务停止/结束条件, 自审结论]
       - [追踪矩阵, 最小任务清单]
     id_prefixes: [SRC, DEC, REQ, AC, CYCLE, TASK, TEST, ROLLBACK]
-    diagrams: {flowchart: 1, sequenceDiagram: 1}
+    diagrams: {flowchart: 1}
+    min_diagrams: 3
     min_tables: 4
     required_phrases: [unresolved_decisions, 文件/符号, 最大推进边界, 真实测试]
   implementation_cycle:
@@ -93,6 +94,7 @@ profiles:
       - [周期追踪矩阵, 当前周期验证矩阵]
     id_prefixes: [CYCLE, TASK, TEST, ROLLBACK, AC]
     diagrams: {flowchart: 1}
+    min_diagrams: 2
     min_tables: 4
     required_phrases: [停止条件, 回滚, 文件/符号, 真实测试]
   implementation_master:
@@ -106,6 +108,7 @@ profiles:
       - [依赖与阻断, 依赖、进入、收口与阻断]
     id_prefixes: [REQ, AC, CYCLE, TASK, TEST]
     diagrams: {flowchart: 1}
+    min_diagrams: 1
     min_tables: 3
     required_phrases: [全量, 顺序, 阻断]
   bug:

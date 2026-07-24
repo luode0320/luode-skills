@@ -1426,6 +1426,10 @@ def check_diagrams(text: str, profile: Dict[str, Any], errors: List[str]) -> Dic
     for diagram_type, minimum in required.items():
         if counts.get(diagram_type, 0) < int(minimum):
             errors.append(f"insufficient {diagram_type} diagrams: expected {minimum}, got {counts.get(diagram_type, 0)}")
+    # 在按类型下限之外追加图表总量下限：用受支持 Mermaid 图块总数表达“至少 1 流程图 + 语义补图”。
+    minimum_total = int(profile.get("min_diagrams", 0))
+    if minimum_total and len(blocks) < minimum_total:
+        errors.append(f"insufficient total diagrams: expected {minimum_total}, got {len(blocks)}")
     return counts
 
 
