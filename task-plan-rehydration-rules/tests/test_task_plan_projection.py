@@ -55,6 +55,32 @@ class TaskPlanProjectionTests(unittest.TestCase):
             "steps": steps,
         }
 
+    def _sample_v2(
+        self,
+        statuses: tuple[str, ...] = ("completed", "in_progress", "pending"),
+        *,
+        synthesis_mode: str = "exact",
+        updated_at: str = "2026-07-24T00:00:00Z",
+    ) -> dict[str, object]:
+        """构造合法 version:2 精确或兜底投影。"""
+        steps = [
+            {"id": f"TASK-SYN-{index:02d}", "step": f"[TASK-SYN-{index:02d}] 步骤 {index}", "status": status}
+            for index, status in enumerate(statuses, 1)
+        ]
+        return {
+            "version": 2,
+            "projection_origin": "synthesized",
+            "synthesis_mode": synthesis_mode,
+            "state": "active" if any(status != "completed" for status in statuses) else "inactive",
+            "plan_key": (
+                f"{projection.EXACT_PREFIX}plan" if synthesis_mode == "exact" else f"{projection.FALLBACK_PREFIX}20260724T000000Z"
+            ),
+            "source_document": "doc/3-实施/plan.md" if synthesis_mode == "exact" else "",
+            "plan_fingerprint": projection.compute_plan_fingerprint(steps),
+            "updated_at": updated_at,
+            "steps": steps,
+        }
+
     # _write_current 创建带普通正文的临时 PROJECT_CURRENT.md。
     # [参数] root: 临时目录；text: 初始正文。
     # [返回] Path：创建的文件路径。
@@ -84,6 +110,32 @@ class TaskPlanProjectionTests(unittest.TestCase):
             env=environment,
         )
 
+    def _synthesis_context(
+        self,
+        *,
+        current_step_hint: str | None = "TASK-SYN-02",
+        completed_step_hints: list[str] | None = None,
+        candidate_source_documents: list[str] | None = None,
+        conflicts: list[str] | None = None,
+    ) -> dict[str, object]:
+        """构造 synthesize 输入上下文。"""
+        return {
+            "trigger": "continue",
+            "current_message": "继续",
+            "project_current_summary": {
+                "goal": "恢复无投影任务",
+                "current_scope": "补建悬浮任务列表",
+                "next_execution_point": "继续当前任务执行",
+                "source_document_hint": "doc/3-实施/plan.md",
+            },
+            "thread_evidence": {
+                "recent_task_labels": ["REQ-SYN-001", "TASK-SYN-02"],
+                "completed_step_hints": ["TASK-SYN-01"] if completed_step_hints is None else completed_step_hints,
+                "current_step_hint": current_step_hint,
+            },
+            "candidate_source_documents": ["doc/3-实施/plan.md"] if candidate_source_documents is None else candidate_source_documents,
+        }
+
     def test_fingerprint_ignores_status_and_time(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：锁定指纹身份字段。"""
         first = self._sample()
@@ -96,6 +148,19 @@ class TaskPlanProjectionTests(unittest.TestCase):
         payload = projection.build_update_plan_payload(sample)
         self.assertEqual(payload["explanation"], projection.EXPLANATION)
         self.assertEqual(payload["plan"], [{"step": item["step"], "status": item["status"]} for item in sample["steps"]])
+
+    def test_version_two_projection_builds_mode_specific_payload(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：锁定补建 explanation 分支。"""
+        exact = self._sample_v2()
+        fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
+        self.assertEqual(
+            projection.build_update_plan_payload(exact)["explanation"],
+            projection.EXPLANATION_SYNTH_EXACT,
+        )
+        self.assertEqual(
+            projection.build_update_plan_payload(fallback)["explanation"],
+            projection.EXPLANATION_SYNTH_FALLBACK,
+        )
 
     def test_state_migrations_survive_new_reads(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖跨进程等价重读。"""
@@ -129,6 +194,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             second = path.read_text(encoding="utf-8")
             self.assertEqual(second.count(projection.BEGIN_MARKER), 1)
             self.assertIn("用户正文。", second)
+            self.assertIn('"version": 2', second)
 
     def test_marker_damage_is_rejected(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖半标记、重复和逆序。"""
@@ -266,6 +332,103 @@ class TaskPlanProjectionTests(unittest.TestCase):
         # 2. 校验后字段和值保持不变。
         self.assertEqual(projection.validate_projection(slot), slot)
 
+    def test_version_two_contracts_validate_exact_and_fallback(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖 version:2 合法分支。"""
+        exact = self._sample_v2()
+        fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
+        self.assertEqual(projection.validate_projection(exact)["projection_origin"], "synthesized")
+        self.assertEqual(projection.validate_projection(fallback)["synthesis_mode"], "fallback")
+
+    def test_version_two_contract_rejects_invalid_origin_mode_and_source(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止补建投影混用 persisted 语义。"""
+        invalid = self._sample_v2()
+        invalid["projection_origin"] = "persisted"
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.validate_projection(invalid)
+        fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
+        fallback["source_document"] = "doc/3-实施/plan.md"
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.validate_projection(fallback)
+
+    def test_synthesize_projection_builds_exact_from_unique_source(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖无投影精确补建路径。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            source_path = source_dir / "plan.md"
+            source_path.write_text(
+                "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n- [TASK-SYN-03] 回归验证\n",
+                encoding="utf-8",
+            )
+            result = projection.synthesize_projection(current_path, self._synthesis_context())
+            self.assertEqual(result["mode"], "exact")
+            self.assertEqual(result["projection"]["version"], 2)
+            self.assertEqual(result["projection"]["projection_origin"], "synthesized")
+            self.assertEqual(result["projection"]["synthesis_mode"], "exact")
+            self.assertEqual(result["projection"]["steps"][0]["status"], "completed")
+            self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
+            self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION_SYNTH_EXACT)
+
+    def test_synthesize_projection_falls_back_when_source_is_ambiguous(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止多候选来源时猜业务步骤。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            result = projection.synthesize_projection(
+                current_path,
+                self._synthesis_context(candidate_source_documents=["a.md", "b.md"]),
+            )
+            self.assertEqual(result["mode"], "fallback")
+            self.assertEqual(result["projection"]["synthesis_mode"], "fallback")
+            self.assertEqual(
+                [step["id"] for step in result["projection"]["steps"]],
+                ["RECOVERY-01", "RECOVERY-02", "RECOVERY-03"],
+            )
+            self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION_SYNTH_FALLBACK)
+
+    def test_synthesize_projection_falls_back_when_explicit_hints_are_missing(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止无状态证据时误做 exact。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            result = projection.synthesize_projection(
+                current_path,
+                self._synthesis_context(current_step_hint=None, completed_step_hints=[]),
+            )
+            self.assertEqual(result["mode"], "fallback")
+
+    def test_synthesize_projection_uses_first_unfinished_step_when_only_completed_hints_exist(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖 only-completed-hints 的保守映射。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            (source_dir / "plan.md").write_text(
+                "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n- [TASK-SYN-03] 回归验证\n",
+                encoding="utf-8",
+            )
+            result = projection.synthesize_projection(
+                current_path,
+                self._synthesis_context(current_step_hint=None, completed_step_hints=["TASK-SYN-01"]),
+            )
+            self.assertEqual(result["mode"], "exact")
+            self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
+            self.assertEqual(result["evidence"]["status_confidence"], "conservative")
+
+    def test_synthesize_projection_falls_back_when_no_source_document_exists(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖无来源文档兜底路径。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            result = projection.synthesize_projection(
+                current_path,
+                self._synthesis_context(candidate_source_documents=[]),
+            )
+            self.assertEqual(result["mode"], "fallback")
+
     def test_deactivate_completes_steps_atomically(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：最后一步完成和失活不留中间态。"""
         # 1. 写入含进行中步骤的活动投影，再执行单次失活迁移。
@@ -294,6 +457,27 @@ class TaskPlanProjectionTests(unittest.TestCase):
             payload_result = self._run_cli("payload", "--project-current", str(path))
             self.assertEqual(payload_result.returncode, 0, payload_result.stderr)
             self.assertIn("plan", json.loads(payload_result.stdout))
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            source_path = source_dir / "plan.md"
+            source_path.write_text(
+                "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n",
+                encoding="utf-8",
+            )
+            synthesis_input = root / "synthesis.json"
+            synthesis_input.write_text(
+                json.dumps(self._synthesis_context(), ensure_ascii=False),
+                encoding="utf-8",
+            )
+            synthesize_result = self._run_cli(
+                "synthesize",
+                "--project-current",
+                str(path),
+                "--input",
+                str(synthesis_input),
+            )
+            self.assertEqual(synthesize_result.returncode, 0, synthesize_result.stderr)
+            self.assertIn("mode", json.loads(synthesize_result.stdout))
             fingerprint_result = self._run_cli("fingerprint", "--input", str(input_path))
             self.assertEqual(fingerprint_result.returncode, 0, fingerprint_result.stderr)
             deactivate_result = self._run_cli(
@@ -335,7 +519,16 @@ class TaskPlanProjectionTests(unittest.TestCase):
         skill_document = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("validate --project-current PROJECT_CURRENT.md", skill_document)
         self.assertIn("payload --project-current PROJECT_CURRENT.md", skill_document)
+        self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", skill_document)
         self.assertNotIn("--file PROJECT_CURRENT.md", skill_document)
+
+    def test_contract_document_mentions_version_two_and_synthesize(self) -> None:
+        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：锁定无投影补建契约文档。"""
+        contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
+        self.assertIn("projection_origin", contract_document)
+        self.assertIn("synthesis_mode", contract_document)
+        self.assertIn("SYNTH-FALLBACK/", contract_document)
+        self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", contract_document)
 
     def test_platform_rules_and_bootstrap_keep_continue_route(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止受管平台规则遗漏恢复路由。"""
