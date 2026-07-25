@@ -1,0 +1,77 @@
+{
+  "text_assertions": [
+    {
+      "file": "implementation-review-rules/references/shared-evidence-and-specialized-contracts.md",
+      "must_contain": [
+        "代码质量 Owner 结果消费契约"
+      ],
+      "must_not_contain": [
+        "[参数]",
+        "[返回]",
+        "1/2/3",
+        "var (...)"
+      ]
+    },
+    {
+      "file": "common-util-rules/SKILL.md",
+      "must_contain": [
+        "公共资格",
+        "package-structure-rules"
+      ],
+      "must_not_contain": [
+        "存放位置",
+        "应放在哪"
+      ]
+    },
+    {
+      "file": "common-util-rules/references/util-placement.md",
+      "must_contain": [
+        "转交 `package-structure-rules`"
+      ],
+      "must_not_contain": [
+        "utils/logger.go",
+        "小型无状态工具放"
+      ]
+    },
+    {
+      "file": "README.md",
+      "must_contain": [
+        "目录落点交给 `package-structure-rules`"
+      ],
+      "must_not_contain": [
+        "公共代码的编写与存放规范"
+      ]
+    },
+    {
+      "file": "编码skill.md",
+      "must_contain": [
+        "注释三 Owner"
+      ],
+      "must_not_contain": [
+        "注释双 skill",
+        "存放位置和调用方式"
+      ]
+    },
+    {
+      "file": "项目设计.md",
+      "must_contain": [
+        "注释三 Owner"
+      ],
+      "must_not_contain": [
+        "注释双 skill"
+      ]
+    }
+  ],
+  "required_agent_yaml": [
+    "code-generation-style-rules",
+    "code-minimal-change-rules",
+    "code-readability-rules",
+    "code-style-consistency-rules",
+    "naming-rules",
+    "comment-placement-granularity-rules",
+    "comment-completion-gate-rules",
+    "chinese-comment-rules",
+    "package-structure-rules",
+    "common-util-rules"
+  ]
+}

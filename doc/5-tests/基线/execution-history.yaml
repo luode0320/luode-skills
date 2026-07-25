@@ -1,0 +1,4594 @@
+schema_version: '2.0'
+latest_gate:
+  allow_release: false
+  cleanup_failures: &id004 []
+  coverage: &id005
+    coverage_complete: true
+    duplicate: []
+    expected: 1
+    missing: []
+    non_pass: 1
+    passed: 0
+    required_risks:
+    - P0
+    - P1
+    risk_mismatch: []
+    selected: 1
+    source_mismatch: []
+    unexpected: []
+  evidence_manifest_status: PASS
+  failed: 1
+  failure_type: SCENARIO_NON_PASS
+  gate: FAIL
+  non_pass: &id006
+  - external-default-flow
+  passed: 0
+  pending: 0
+  results: &id007
+  - captures: {}
+    cleanup: []
+    cleanup_required: false
+    consumers:
+    - frontend.trigger-test
+    duration_ms: 21
+    failure_type: SCENARIO_TRANSPORT_FAILED
+    reason: deterministic scenario assertion or transport failed
+    risk: P0
+    run_id: e90d935862004de9a7b34ca608888b6d
+    scenario_id: external-default-flow
+    source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+    status: FAIL
+    steps: []
+  total: 1
+interface_inventory: []
+dependency_graph:
+  edges: &id001 []
+  nodes: &id002 []
+  order: &id003 []
+  schema_version: '2.0'
+scenarios: []
+events:
+- schema_version: '2.0'
+  event_id: run-22a39df1230945d8a47d7531bce38215
+  run_id: 22a39df1230945d8a47d7531bce38215
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:51:25+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 41
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: fe5b64241f724cf798134f3eb78d6837
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-c12ede5f7521441fb164f6c38c3e8781
+  run_id: c12ede5f7521441fb164f6c38c3e8781
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:52:45+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 567db32bfdd14974b0f3fb59a956c61e
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-085b4259922f43299c4d4c85134baffc
+  run_id: 085b4259922f43299c4d4c85134baffc
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:53:16+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 35
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: a13c0ac590e947c5859dfc307d34b0d8
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-6fb0520bc1f84577a2e7cb5693284ad0
+  run_id: 6fb0520bc1f84577a2e7cb5693284ad0
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:53:38+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 29d4320c31cc4a87b92c64efefea4cf8
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-4453bfd6481d44538b1ade59d985bb03
+  run_id: 4453bfd6481d44538b1ade59d985bb03
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:55:42+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: d3aec802380f4708943d9d720159d4fd
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0d167dfec35540428547ed8b5be474e5
+  run_id: 0d167dfec35540428547ed8b5be474e5
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:55:56+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 0459e61d520b47fc84e3cf3aeeeb1a07
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-c747255308894f38b5f8b2ea62ebdefd
+  run_id: c747255308894f38b5f8b2ea62ebdefd
+  event_type: execution.completed
+  occurred_at: '2026-07-25T12:56:13+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 1c876057c8264c09afe685e20cc1d429
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-68578662c8ed4c71b6baa1078c2962ae
+  run_id: 68578662c8ed4c71b6baa1078c2962ae
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:04:40+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: ead24dc781bb4efdacedaafcdbc00b1a
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-b7a389bde82b4c3badb265f0270e68e9
+  run_id: b7a389bde82b4c3badb265f0270e68e9
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:04:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 56702f3bef4643629f7a7f369a1c92b1
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a8bf6b534f014be68b41d3b6fa2b156b
+  run_id: a8bf6b534f014be68b41d3b6fa2b156b
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:05:17+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 7c724243d44e4a28951148077671675c
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0810ca9ee58340b39d2862890e992fbf
+  run_id: 0810ca9ee58340b39d2862890e992fbf
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:14:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 341415ba90924e7b8fdbd08e79892509
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-e39c2933355e4147b999a1405fc0e493
+  run_id: e39c2933355e4147b999a1405fc0e493
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:16:21+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: e2d9c92860d347829924f756de668881
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-00b42dc9d38a4a9e9d88c03593abf1f4
+  run_id: 00b42dc9d38a4a9e9d88c03593abf1f4
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:16:56+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: eac06d49a47b43098cd22a10856abea9
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-ad36e842caf0489899c5eb34e7fc0bd4
+  run_id: ad36e842caf0489899c5eb34e7fc0bd4
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:17:24+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4167b60a890349a1a0cc1264fc5bcbb6
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-f5572fb4d79e44baae76624d881edb86
+  run_id: f5572fb4d79e44baae76624d881edb86
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:34:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4fb79473b0fc4796b40f158f6eead99c
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-f0923c30c0a4431898de98e003b52dae
+  run_id: f0923c30c0a4431898de98e003b52dae
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:39:04+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 0681432b5ccf4822aec1016f52aaaabc
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0d02a1d9eafb45d89b19d5f3e7f9c6c1
+  run_id: 0d02a1d9eafb45d89b19d5f3e7f9c6c1
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:44:32+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 599f38e786ec4670bb3054b1f6c145e0
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-9986166e19cb4e3daa5c724d85eea924
+  run_id: 9986166e19cb4e3daa5c724d85eea924
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:44:41+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: fcc36bb959bf47ab8df580ca8ff53647
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-8ec260302a274faf8269cb51c6a4593b
+  run_id: 8ec260302a274faf8269cb51c6a4593b
+  event_type: execution.completed
+  occurred_at: '2026-07-25T13:44:49+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_ASSERTION_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 02680654969947e38be1c14df9031a49
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-bc58bb832116422f842985f60defa7bb
+  run_id: bc58bb832116422f842985f60defa7bb
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:11:18+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 25
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 70128b6803ff4ab281af5e9d42fe0f12
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-d2fd45896093464ca2913e66a862ca79
+  run_id: d2fd45896093464ca2913e66a862ca79
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:11:20+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 28
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 9763e104f62642cfbea8b0b0d0ea63b9
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-f0cb03fc8e304633a9ed05808dddbd6d
+  run_id: f0cb03fc8e304633a9ed05808dddbd6d
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:12:05+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 7f473f15fd954c1788e3559314212c99
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-fed247f6d7bf438bb281ebaab9e9555b
+  run_id: fed247f6d7bf438bb281ebaab9e9555b
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:12:06+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 5428a72215494ca38ecc952247831430
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-ac8b9de48beb4309b78ffb045d60d897
+  run_id: ac8b9de48beb4309b78ffb045d60d897
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:15:27+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: f321e80251994dc2b86fdc6bcd86a4ad
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-e0f8229281d8488ba24ca7eb64bb4dd2
+  run_id: e0f8229281d8488ba24ca7eb64bb4dd2
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:15:27+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: cc81a85a5da04ff295c5dd0b954b8413
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-f7788ff3fd1d44d58fd8105311e15a5f
+  run_id: f7788ff3fd1d44d58fd8105311e15a5f
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:17:36+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 9a33411369d04632a763581d4fa0921e
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-672a344d20a2410d808ef65609a7901b
+  run_id: 672a344d20a2410d808ef65609a7901b
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:17:37+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 18
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 50647cb7a27841248b76373d4a4570a8
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-6bc7e2e21d7b44f185e60ca467364062
+  run_id: 6bc7e2e21d7b44f185e60ca467364062
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:33:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: dfb90993e7454a68b060a8754c73ff3c
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-4b3afedd2cf74720b0e80ea191635110
+  run_id: 4b3afedd2cf74720b0e80ea191635110
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:33:58+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: c7b9cf6291c440cdbb3c9924c6914deb
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-53a9b55b7aaf4e48ba40361279a6856c
+  run_id: 53a9b55b7aaf4e48ba40361279a6856c
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:39:28+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: ee6c8e93467b422a8d21d1c23a6f6192
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-372a551d62bb473fb3b3f2cccdc544ea
+  run_id: 372a551d62bb473fb3b3f2cccdc544ea
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:39:30+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 20
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 1164813fcd3448d48402dbafd65d6816
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0f8ccdd09b9e4087b3f4bc645182b7e5
+  run_id: 0f8ccdd09b9e4087b3f4bc645182b7e5
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:40:48+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 08a0a373838b4f1daa224d695735f800
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-9c29e9c34467410b8789d260d2845c09
+  run_id: 9c29e9c34467410b8789d260d2845c09
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:40:49+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 26
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: e1e36ee8746643f0bc40a8a069fb72e0
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-674920aad9df43808d562c0b1cffa1a0
+  run_id: 674920aad9df43808d562c0b1cffa1a0
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:42:13+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: eb1b05a7d367444197e82eaea5f10927
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-137a899eeacf4ce99acf9e0e4aec90fb
+  run_id: 137a899eeacf4ce99acf9e0e4aec90fb
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:42:15+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4b45b03129d5457bbd63c015495592bf
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-630fff8139534f2ea35eb5f0ec3fc2af
+  run_id: 630fff8139534f2ea35eb5f0ec3fc2af
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:59:52+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: bd35fe5b6f9f4b9f835d55d88a5b5c42
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0052a9caf1634360905e5f363e1788bd
+  run_id: 0052a9caf1634360905e5f363e1788bd
+  event_type: execution.completed
+  occurred_at: '2026-07-25T14:59:56+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 49
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 2de7787c23784570a727594fa01a04b6
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-02b3df6b83ee43cb958d6082c7b72879
+  run_id: 02b3df6b83ee43cb958d6082c7b72879
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:18+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 124fc8abe96541b880eb4a5f204e036b
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a465c976391d4d08974f954945b4a5ed
+  run_id: a465c976391d4d08974f954945b4a5ed
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:19+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4be4af2f8096454cabc736b5b5061aec
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-ec4334bbd955452f981af6ea7b668587
+  run_id: ec4334bbd955452f981af6ea7b668587
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:22+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 52
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: f438d877d610482691e975bcba4dc621
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-5a7981cd7434458f86785e93a292ed43
+  run_id: 5a7981cd7434458f86785e93a292ed43
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:22+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 55
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 9b97c3343f23496784b63f563505af00
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-8f742f0fdb5c47cea76e03139b8046e9
+  run_id: 8f742f0fdb5c47cea76e03139b8046e9
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:39+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 6
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: ab3fd085aa174852baf656dfa651136f
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-52bb98e479904952969b0925f010e731
+  run_id: 52bb98e479904952969b0925f010e731
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:00:42+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 39
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: f8f82f00766841d9b939a597e4409a2e
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a0fa063164914917a540fc950d1d43a1
+  run_id: a0fa063164914917a540fc950d1d43a1
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:10:13+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 41
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 43c38ef0b1e64129869a1d20a6e24fc1
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-7c559ac0fdbe4889aeecd111068ca878
+  run_id: 7c559ac0fdbe4889aeecd111068ca878
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:10:17+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 38
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 7def26c4da85479985c93ec8195f2353
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-15695d32704d4de587741c8b03fe5ab6
+  run_id: 15695d32704d4de587741c8b03fe5ab6
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:11:06+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 2b7b52d4e8944d9fa0ce27a2ff54ca9b
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-71e2efd36d2b4bb5822c1a3190e4c1ce
+  run_id: 71e2efd36d2b4bb5822c1a3190e4c1ce
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:11:11+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 48
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 5610470211d94224ac2193d75a87f200
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-7704f1af999643e5bb141bca018be3ad
+  run_id: 7704f1af999643e5bb141bca018be3ad
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:11:40+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: e8fbfe86eedc4d4184992a0c814645ec
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-35404429cfbc48e79525a53745f33869
+  run_id: 35404429cfbc48e79525a53745f33869
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:11:44+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 41
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: ccbab119eda14459b86ce20bdfdd1867
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-20ce15f9009c4604af98e3ed4a96a6b2
+  run_id: 20ce15f9009c4604af98e3ed4a96a6b2
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:12:06+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 83060d4c015043e6b27b17941a7f912d
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-2d58e73347f34a37b20a23dd7f302b5d
+  run_id: 2d58e73347f34a37b20a23dd7f302b5d
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:12:09+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 37
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: deea9b100dda4b47a03b12040c6881b0
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-e310772927fe4e5580852df52a692213
+  run_id: e310772927fe4e5580852df52a692213
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:13:26+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4a2254d545a44964aeec423d7d998247
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-9954aea01ba84e919275b82d3deaa23f
+  run_id: 9954aea01ba84e919275b82d3deaa23f
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:13:32+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 47
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 144840e3f5f34ed685bad39f5bad3a06
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-77ce1da95597490dae25107bff8509d4
+  run_id: 77ce1da95597490dae25107bff8509d4
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:15:07+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: da9ccbe641f44673b6c8a6e69fc2f9b7
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a2665337a74943fcaad49d4488e7a3d8
+  run_id: a2665337a74943fcaad49d4488e7a3d8
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:15:11+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 34
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 72cfa16bc7ec48c09d04f7dcba89191b
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0319e2c8e207421ab94850fd11ae4eba
+  run_id: 0319e2c8e207421ab94850fd11ae4eba
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:15:35+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: c84aeaefb13a4f858fc51f70a888a7f2
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-385b458c23644b489571712150fba230
+  run_id: 385b458c23644b489571712150fba230
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:15:39+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 49
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: f1a3dec460ca4487ac10ca36f2f55be1
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-bc733c713aa24775ae4a541010002d31
+  run_id: bc733c713aa24775ae4a541010002d31
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:15:58+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 8ba897b7d214494fbc5c16c200343e11
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-e7c41e5e78b34b4abe07b1e9b5b150e7
+  run_id: e7c41e5e78b34b4abe07b1e9b5b150e7
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:16:00+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 27
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 2d2ad75d5ebe456287982c8227b5a5a6
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-735370f09218488abdce6effec63bb2f
+  run_id: 735370f09218488abdce6effec63bb2f
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:20:17+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 25
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: e53e4d537cdf4bc2a40bb81255d7dbc9
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-116e3ba39bfc4908a44752d253adaa38
+  run_id: 116e3ba39bfc4908a44752d253adaa38
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:20:18+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: d601e61e70d64fb8b7feea980e87e8ad
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a61d3d2f02984297b88df3f45878f451
+  run_id: a61d3d2f02984297b88df3f45878f451
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:20:22+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: true
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 0
+        passed: 1
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 0
+      failure_type: ''
+      gate: PASS
+      non_pass: []
+      passed: 1
+      pending: 0
+      results:
+      - captures:
+          token: '***'
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - local.manifest
+        duration_ms: 41
+        failure_type: ''
+        reason: all deterministic assertions passed
+        risk: P0
+        run_id: 51f82094a4b8455fb88a522486350e66
+        scenario_id: manifest-long
+        source_fingerprint: 249092fc8ac741787ec05525c8ffd409ad9c60b189c18b329f73f7c2ed097e67
+        status: PASS
+        steps:
+        - action: http.request
+          duration_ms: 40
+          failure_type: ''
+          output:
+            body:
+              token: '***'
+            body_bytes:
+              length: 37
+              sha256: 477146122fadd20405441473d74e6e6506d0d8429642292bf2cb53f41da444cc
+            body_length: 37
+            body_sha256: 477146122fadd20405441473d74e6e6506d0d8429642292bf2cb53f41da444cc
+            headers:
+              Content-Length: '37'
+              Content-Type: application/json
+              Date: Sat, 25 Jul 2026 15:20:21 GMT
+              Server: BaseHTTP/0.6 Python/3.14.6
+            media_type: application/json
+            status: 200
+          run_id: 51f82094a4b8455fb88a522486350e66
+          scenario_id: manifest-long
+          status: PASS
+          step_id: read
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-4c6adddef57f474c83f0321462cec294
+  run_id: 4c6adddef57f474c83f0321462cec294
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:20:24+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: true
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 0
+        passed: 1
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 0
+      failure_type: ''
+      gate: PASS
+      non_pass: []
+      passed: 1
+      pending: 0
+      results:
+      - captures:
+          token: '***'
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - local.manifest
+        duration_ms: 49
+        failure_type: ''
+        reason: all deterministic assertions passed
+        risk: P0
+        run_id: 17043a840f444506af938752f207f698
+        scenario_id: manifest-short
+        source_fingerprint: f90ea78a433fa2f07e57071f89f1c3d0fc0f7e838db729403547afe76a054f89
+        status: PASS
+        steps:
+        - action: http.request
+          duration_ms: 49
+          failure_type: ''
+          output:
+            body:
+              token: '***'
+            body_bytes:
+              length: 14
+              sha256: 74a5f861a38a1e7c7ee41854dd4dd028883b0d77f895c80ec0ab3e98af0ddb4c
+            body_length: 14
+            body_sha256: 74a5f861a38a1e7c7ee41854dd4dd028883b0d77f895c80ec0ab3e98af0ddb4c
+            headers:
+              Content-Length: '14'
+              Content-Type: application/json
+              Date: Sat, 25 Jul 2026 15:20:24 GMT
+              Server: BaseHTTP/0.6 Python/3.14.6
+            media_type: application/json
+            status: 200
+          run_id: 17043a840f444506af938752f207f698
+          scenario_id: manifest-short
+          status: PASS
+          step_id: read
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-a73ecb44c68142108be925a1d66b1578
+  run_id: a73ecb44c68142108be925a1d66b1578
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:21:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 23
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: a808846972b845d287ccc0cfeff93915
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-27b7f6dd0b754219bd12b992043083e5
+  run_id: 27b7f6dd0b754219bd12b992043083e5
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:21:59+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 29
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: d4dcbde57bdc42deb10eab787f2c1ab8
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-59a4b1bb85bd40d7ba677475cff89a92
+  run_id: 59a4b1bb85bd40d7ba677475cff89a92
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:22:41+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 263e97f5b6c94c269d01ec8a91435a61
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-d99d15f5521d46748b3a998abc30d858
+  run_id: d99d15f5521d46748b3a998abc30d858
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:22:43+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 24
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 12064376de05469d8cff3ab25ad3ec34
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0540d97baadd446eaa136fd0beaf09cf
+  run_id: 0540d97baadd446eaa136fd0beaf09cf
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:22:55+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: d39a20d6993b4befb7d8a90a7b91d72a
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-23387f08b38441b58942c7b8819c30be
+  run_id: 23387f08b38441b58942c7b8819c30be
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:22:57+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 18
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: da017514073c47d39855f9e0cc01bb88
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-2a29014ffdcc4a0d826f6531d06ad898
+  run_id: 2a29014ffdcc4a0d826f6531d06ad898
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:23:11+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 80ad9c048cc0476aa2647c4cb10eb9cc
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-c71e30216c0c46749f8a4567b2441ce1
+  run_id: c71e30216c0c46749f8a4567b2441ce1
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:23:13+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 24
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 30981acd8b1f41cda27ec573faf9a38b
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-6b89f1aa21654c6ba4d021def5236936
+  run_id: 6b89f1aa21654c6ba4d021def5236936
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:24:41+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 362da4d2237b414ba320301c4f1e2550
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-3583a122746745f69bd5067188d2bb65
+  run_id: 3583a122746745f69bd5067188d2bb65
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:24:43+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 21
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 78e4e44cb7ec41c2b726d25e98275ec3
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-271be11470034a2cb29de218cff6d340
+  run_id: 271be11470034a2cb29de218cff6d340
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:41:50+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 27
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 4804f86ce4814b4dbd7d9a7c37bd8fd5
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-d9d16a6f074f4adbb174abf750537741
+  run_id: d9d16a6f074f4adbb174abf750537741
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:41:53+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 29
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 253db91f2f6043ac9d4148195fdd82ed
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-0f4a263426624bc9b405055e5d7672be
+  run_id: 0f4a263426624bc9b405055e5d7672be
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:43:43+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 59ca844f9a1f423ba86d593688408d23
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-77b83b58e6ac45be83405c96f0bcce31
+  run_id: 77b83b58e6ac45be83405c96f0bcce31
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:43:43+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 25
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: c0c23a74c834468693de61542bb75760
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-f76539345b1140afbd586dfaacf6de6a
+  run_id: f76539345b1140afbd586dfaacf6de6a
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:46:59+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: f27e75abe8a4440b812318f98e3c0f11
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-7d812e77c9a749ad9dbf4afd17711607
+  run_id: 7d812e77c9a749ad9dbf4afd17711607
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:47:01+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 22
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: a137d675c6d9405b8c000ab66bca2d87
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-923618a5973e4429a215ed9575ab922d
+  run_id: 923618a5973e4429a215ed9575ab922d
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:47:12+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 0fc835c65a054e4aac36c3f6bd0a0a6d
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-de8dbda544604eaca94f33389a66e6ec
+  run_id: de8dbda544604eaca94f33389a66e6ec
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:47:15+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 45
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 2db0c1164e29423f8fcf244834e6437c
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-4810561ce7a947b18a83b7ac39caf567
+  run_id: 4810561ce7a947b18a83b7ac39caf567
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:47:32+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 0
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 22e47bf3786540aeb008505a06a980e2
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-3e6b406299e54c53a393c0be226b04f5
+  run_id: 3e6b406299e54c53a393c0be226b04f5
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:47:34+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 24
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: 384d85d5ad8642489a9d352184d376e2
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-25f61212305d4cc185302d78d9abd29e
+  run_id: 25f61212305d4cc185302d78d9abd29e
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:57:43+00:00'
+  payload:
+    dependency_graph:
+      edges: []
+      nodes: []
+      order: []
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: []
+      coverage:
+        coverage_complete: true
+        duplicate: []
+        expected: 1
+        missing: []
+        non_pass: 1
+        passed: 0
+        required_risks:
+        - P0
+        - P1
+        risk_mismatch: []
+        selected: 1
+        source_mismatch: []
+        unexpected: []
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass:
+      - external-default-flow
+      passed: 0
+      pending: 0
+      results:
+      - captures: {}
+        cleanup: []
+        cleanup_required: false
+        consumers:
+        - frontend.trigger-test
+        duration_ms: 1
+        failure_type: SCENARIO_TRANSPORT_FAILED
+        reason: deterministic scenario assertion or transport failed
+        risk: P0
+        run_id: a0a0f93b8c894a21b7bf285c9ee9202f
+        scenario_id: external-default-flow
+        source_fingerprint: e2d29fe9b2d465cfdfba7e42b81ad7a99cf80da986e0bf722b90b9b111bfcc75
+        status: FAIL
+        steps: []
+      total: 1
+    interfaces: []
+    results: []
+- schema_version: '2.0'
+  event_id: run-c3459b9243694c8592c644f83a64bf7b
+  run_id: c3459b9243694c8592c644f83a64bf7b
+  event_type: execution.completed
+  occurred_at: '2026-07-25T15:57:45+00:00'
+  payload:
+    dependency_graph:
+      edges: *id001
+      nodes: *id002
+      order: *id003
+      schema_version: '2.0'
+    gate:
+      allow_release: false
+      cleanup_failures: *id004
+      coverage: *id005
+      evidence_manifest_status: PASS
+      failed: 1
+      failure_type: SCENARIO_NON_PASS
+      gate: FAIL
+      non_pass: *id006
+      passed: 0
+      pending: 0
+      results: *id007
+      total: 1
+    interfaces: []
+    results: []
