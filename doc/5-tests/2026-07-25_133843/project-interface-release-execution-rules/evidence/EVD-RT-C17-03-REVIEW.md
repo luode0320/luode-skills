@@ -11,4 +11,3 @@
 - scenario 硬切后 legacy 请求不会静默降级。
 - CLI 参数和纯函数均有中文函数头、步骤注释和 local 路径校验。
 - 真实测试没有连接 test、staging、pre 或 production。
-

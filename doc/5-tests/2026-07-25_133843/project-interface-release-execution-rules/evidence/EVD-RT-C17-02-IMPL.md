@@ -14,4 +14,3 @@ C17-02 已完成 legacy/shadow 双轨对账。默认 `legacy` 不改变旧接口
 ## 停止边界
 
 非 local 场景目录、P0/P1 覆盖缺口、场景失败、清理失败或未解释差异均不得报告 shadow PASS。
-
