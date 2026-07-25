@@ -317,7 +317,7 @@ python skill-dictionary/generate_dictionary.py
 | `bug-reproduction-rules`         | 输出标准复现步骤、复现条件和复现结论。                         |
 | `bug-root-cause-rules`           | 分析根因，区分是实现缺陷、设计缺陷、边界缺陷还是历史遗留问题。 |
 | `bug-fix-proposal-rules`         | 先输出修复建议和修改方案，待确认后再进入正式修复。             |
-| `bug-regression-risk-rules`      | 识别修复后可能带来的兼容风险和回归风险。                       |
+| `bug-fix-proposal-rules#regression-risk` | 在高影响修复中识别兼容风险、回归风险与验证优先级。 |
 | `bug-validation-rules`           | 负责 Bug 修复后的验证闭环，确认问题确实被修复且未引入新问题。  |
 
 ### 5. 编码基线域
@@ -859,3 +859,4 @@ claude-mem(记忆) :
 2026-07-24 01:18:24 docs: [需求文档] 归档本轮 Skill 治理需求
 2026-07-24 21:21:15 feat: [任务投影补建] 支持无历史投影恢复
 2026-07-24 22:31:07 test: [任务投影补建] 覆盖无投影恢复回归
+2026-07-25 13:21:57 refactor: [Bug域与Goal投影] 收敛规则并补齐生命周期能力

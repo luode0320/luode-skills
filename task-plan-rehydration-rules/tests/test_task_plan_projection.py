@@ -81,6 +81,37 @@ class TaskPlanProjectionTests(unittest.TestCase):
             "steps": steps,
         }
 
+
+    def _goal_sample(
+        self,
+        statuses: tuple[str, ...] = ("in_progress", "pending", "pending"),
+        *,
+        state: str = "active",
+        synthesis_mode: str = "goal_default",
+    ) -> dict[str, object]:
+        """构造不含 Goal 原文的合法 version:3 Goal 投影。
+
+        [参数] statuses: 固定安全三步状态；state: Goal 投影状态；synthesis_mode: Goal 合成模式。
+        [返回] dict：符合 Goal v3 身份和指纹约束的测试投影。
+        最近修改时间：2026-07-25；改动原因：覆盖 Goal 安全三步、阻断和完成迁移。
+        """
+        # 1. 仅从生产常量组装测试样本，防止测试意外允许自定义 Goal 文案。
+        steps = [
+            {"id": item[0], "step": item[1], "status": status}
+            for item, status in zip(projection.GOAL_DEFAULT_STEPS, statuses, strict=True)
+        ]
+        return {
+            "version": 3,
+            "projection_origin": "goal",
+            "synthesis_mode": synthesis_mode,
+            "state": state,
+            "plan_key": projection.GOAL_PLAN_KEY,
+            "source_document": "",
+            "plan_fingerprint": projection.compute_plan_fingerprint(steps),
+            "updated_at": "2026-07-25T00:00:00Z",
+            "steps": steps,
+        }
+
     # _write_current 创建带普通正文的临时 PROJECT_CURRENT.md。
     # [参数] root: 临时目录；text: 初始正文。
     # [返回] Path：创建的文件路径。
@@ -194,7 +225,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             second = path.read_text(encoding="utf-8")
             self.assertEqual(second.count(projection.BEGIN_MARKER), 1)
             self.assertIn("用户正文。", second)
-            self.assertIn('"version": 2', second)
+            self.assertIn('"version": 3', second)
 
     def test_marker_damage_is_rejected(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖半标记、重复和逆序。"""
@@ -349,6 +380,157 @@ class TaskPlanProjectionTests(unittest.TestCase):
         fallback["source_document"] = "doc/3-实施/plan.md"
         with self.assertRaises(projection.ProjectionContractError):
             projection.validate_projection(fallback)
+
+    def test_goal_version_three_contract_rejects_original_goal_content(self) -> None:
+        """验证 Goal 投影拒绝原文、标识与自定义步骤。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：防止 Goal 原文或运行时身份被持久化到悬浮窗投影。
+        """
+        # 1. 基线样本必须可通过 v3 Goal 契约，随后逐项注入被禁止的敏感字段。
+        valid = self._goal_sample()
+        self.assertEqual(projection.validate_projection(valid)["projection_origin"], "goal")
+        for field in ("objective", "goal_objective", "goal_id", "goal_prompt", "thread_id", "user_input"):
+            candidate = dict(valid)
+            candidate[field] = "不得保存的原文"
+            with self.subTest(field=field), self.assertRaises(projection.ProjectionContractError):
+                projection.validate_projection(candidate)
+        # 2. 即使重新计算指纹，也不得通过自定义步骤文案绕过固定安全列表。
+        altered_steps = [dict(step) for step in valid["steps"]]
+        altered_steps[0]["step"] = "[GOAL-01] 泄漏 Goal 原文"
+        valid["steps"] = altered_steps
+        valid["plan_fingerprint"] = projection.compute_plan_fingerprint(altered_steps)
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.validate_projection(valid)
+
+    def test_goal_blocked_and_inactive_state_rules(self) -> None:
+        """验证阻断 Goal 只观察，完成 Goal 不可重放。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：锁定 blocked 无进行中步骤和 complete 无 payload 的安全边界。
+        """
+        # 1. 阻断投影仍可展示历史完成进度，但绝不保留进行中状态。
+        blocked = self._goal_sample(("completed", "pending", "pending"), state="blocked", synthesis_mode="goal_blocked")
+        payload = projection.build_update_plan_payload(blocked)
+        self.assertEqual(payload["explanation"], projection.EXPLANATION_GOAL_BLOCKED)
+        self.assertNotIn("in_progress", [item["status"] for item in payload["plan"]])
+        # 2. 契约拒绝阻断中的进行中步骤，失活 Goal 同样不得生成 UI payload。
+        invalid = self._goal_sample(("completed", "in_progress", "pending"), state="blocked", synthesis_mode="goal_blocked")
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.validate_projection(invalid)
+        inactive = self._goal_sample(("completed", "completed", "completed"), state="inactive")
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.build_update_plan_payload(inactive)
+
+    def test_goal_events_create_restore_block_complete_and_preserve_formal(self) -> None:
+        """验证 Goal 生命周期、正式计划保护和 fallback 替换边界。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：锁定四个 Goal 事件、正式最小任务优先和 fallback 安全列表让位。
+        """
+        # 1. 新建、恢复、阻断和完成必须只迁移固定安全三步，并以 inactive 终止重放。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            created = projection.handle_goal_event(path, "create")
+            self.assertEqual(created["action"], "created")
+            self.assertEqual(created["projection"]["version"], 3)
+            self.assertEqual(created["projection"]["steps"][0]["status"], "in_progress")
+            before_restore = path.read_bytes()
+            restored = projection.handle_goal_event(path, "restore")
+            self.assertEqual(restored["action"], "restored")
+            self.assertEqual(path.read_bytes(), before_restore)
+            blocked = projection.handle_goal_event(path, "blocked")
+            self.assertEqual(blocked["projection"]["state"], "blocked")
+            self.assertNotIn("in_progress", [item["status"] for item in blocked["projection"]["steps"]])
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.handle_goal_event(path, "restore")
+            completed = projection.handle_goal_event(path, "complete")
+            self.assertEqual(completed["payload"], None)
+            self.assertEqual(completed["projection"]["state"], "inactive")
+            self.assertTrue(all(item["status"] == "completed" for item in completed["projection"]["steps"]))
+            # 2. 活动 persisted 正式计划必须被保护，Goal 创建不能覆盖真实实施任务。
+            projection.upsert_projection(path, self._sample())
+            formal_before = path.read_bytes()
+            preserved = projection.handle_goal_event(path, "create")
+            self.assertEqual(preserved["action"], "preserved_formal")
+            self.assertEqual(path.read_bytes(), formal_before)
+            # 3. 正式计划不关联 Goal 默认三步，后续 Goal 事件必须无副作用地保持真实实施任务。
+            for event in ("restore", "blocked", "complete"):
+                preserved_after_event = projection.handle_goal_event(path, event)
+                self.assertEqual(preserved_after_event["action"], "preserved_formal")
+                self.assertIsNone(preserved_after_event["payload"])
+                self.assertEqual(path.read_bytes(), formal_before)
+            # 4. synthesized fallback 仅是恢复兜底，创建 Goal 时必须替换为 Goal 安全三步。
+            fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
+            projection.upsert_projection(path, fallback)
+            created_from_fallback = projection.handle_goal_event(path, "create")
+            self.assertEqual(created_from_fallback["action"], "created")
+            self.assertEqual(created_from_fallback["projection"]["projection_origin"], "goal")
+            self.assertEqual([item["id"] for item in created_from_fallback["projection"]["steps"]], ["GOAL-01", "GOAL-02", "GOAL-03"])
+
+    def test_goal_projection_is_replaced_by_formal_write(self) -> None:
+        """验证正式最小任务写入会替换活动 Goal 安全三步。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：固定正式实施计划优先于默认 Goal 悬浮列表的运行中切换。
+        """
+        # 1. 先建立活动 Goal 投影，再通过常规 write 写入正式最小任务。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            projection.handle_goal_event(path, "create")
+            projection.upsert_projection(path, self._sample())
+            # 2. 写入后必须以正式来源为准，避免 Goal 默认步骤遮挡真实实施进度。
+            replaced = projection.load_projection(path)
+            self.assertEqual(replaced["projection_origin"], "persisted")
+            self.assertEqual(replaced["steps"][0]["id"], "TASK-RTP-01")
+
+    def test_goal_cli_and_invalid_event_preserve_original_file(self) -> None:
+        """验证 Goal CLI 生命周期及失败时的原文件保护。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：确保 CLI 入口与函数调用具有相同的原子迁移和失败语义。
+        """
+        # 1. CLI 依次创建、阻断和完成 Goal，完成后恢复必须稳定返回契约错误。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            create = self._run_cli("goal", "--project-current", str(path), "--event", "create")
+            self.assertEqual(create.returncode, 0, create.stderr)
+            self.assertEqual(json.loads(create.stdout)["action"], "created")
+            blocked = self._run_cli("goal", "--project-current", str(path), "--event", "blocked")
+            self.assertEqual(blocked.returncode, 0, blocked.stderr)
+            complete = self._run_cli("goal", "--project-current", str(path), "--event", "complete")
+            self.assertEqual(complete.returncode, 0, complete.stderr)
+            before = hashlib.sha256(path.read_bytes()).hexdigest()
+            restore = self._run_cli("goal", "--project-current", str(path), "--event", "restore")
+            self.assertEqual(restore.returncode, 2)
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before)
+
+    def test_legacy_versions_upgrade_to_version_three_only_when_written(self) -> None:
+        """验证 v1/v2 兼容读取和成功写入时升级 v3。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：确保 Goal v3 引入不拒绝既有常规投影。
+        """
+        # 1. 旧版本常规投影写回后统一升级，旧版本 Goal 语义仍必须被拒绝。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            legacy = self._sample_v2()
+            projection.upsert_projection(path, legacy)
+            loaded = projection.load_projection(path)
+            self.assertEqual(loaded["version"], 3)
+            self.assertEqual(loaded["projection_origin"], "synthesized")
+            v2_goal = self._sample_v2()
+            v2_goal["projection_origin"] = "goal"
+            v2_goal["synthesis_mode"] = "goal_default"
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.validate_projection(v2_goal)
 
     def test_synthesize_projection_builds_exact_from_unique_source(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖无投影精确补建路径。"""
@@ -520,14 +702,45 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self.assertIn("validate --project-current PROJECT_CURRENT.md", skill_document)
         self.assertIn("payload --project-current PROJECT_CURRENT.md", skill_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", skill_document)
+        self.assertIn("goal --project-current PROJECT_CURRENT.md --event create", skill_document)
         self.assertNotIn("--file PROJECT_CURRENT.md", skill_document)
 
-    def test_contract_document_mentions_version_two_and_synthesize(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：锁定无投影补建契约文档。"""
+    def test_goal_lifecycle_route_documents_keep_order_and_plan_mode_boundary(self) -> None:
+        """验证 Goal 生命周期文档锁定 Owner、持久化顺序与 Plan Mode 边界。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：防止 Goal 路由漏交接、UI 先于持久化刷新或 Plan Mode 越界。
+        """
+        # 1. 任务投影 Owner 必须覆盖三个 Goal 工具，并明确先落盘再刷新 UI。
+        rehydration_document = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
+        for token in ("create_goal", "get_goal", "update_goal", "先持久化", "Plan Mode"):
+            self.assertIn(token, rehydration_document)
+        self.assertIn("成功持久化 -> 读取返回 payload -> 调用 `update_plan`", contract_document)
+        # 2. 自主执行 Owner 只能交接生命周期，不得借悬浮窗扩大执行授权。
+        autonomous_document = (REPOSITORY_ROOT / "autonomous-execution-rules" / "SKILL.md").read_text(encoding="utf-8")
+        for token in ("create_goal", "get_goal", "update_goal", "不因此自动取得", "不得把 blocked payload", "Plan Mode"):
+            self.assertIn(token, autonomous_document)
+
+    def test_contract_document_mentions_version_three_goal_and_synthesize(self) -> None:
+        """验证契约文档锁定 v3 Goal 与补建 CLI。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25；改动原因：防止 Goal 生命周期命令或 Plan Mode 安全边界从文档契约中丢失。
+        """
+        # 1. v3 字段、固定 Goal 身份和四个 CLI 事件必须在公开契约中可追溯。
         contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
         self.assertIn("projection_origin", contract_document)
         self.assertIn("synthesis_mode", contract_document)
         self.assertIn("SYNTH-FALLBACK/", contract_document)
+        self.assertIn("GOAL/ACTIVE", contract_document)
+        self.assertIn("goal_default", contract_document)
+        self.assertIn("fallback 只是恢复兜底，替换为 Goal 固定安全三步", contract_document)
+        for event in ("create", "restore", "blocked", "complete"):
+            self.assertIn(f"goal --project-current PROJECT_CURRENT.md --event {event}", contract_document)
+        self.assertIn("Plan Mode 不读取、写入或刷新投影", contract_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", contract_document)
 
     def test_platform_rules_and_bootstrap_keep_continue_route(self) -> None:

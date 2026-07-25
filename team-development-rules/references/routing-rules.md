@@ -38,7 +38,7 @@
 | 需要先构造稳定步骤、确认触发条件和复现频率 | Bug 域 / `bug-reproduction-rules` | 先回答“怎么复现、是否稳定发生” |
 | 需要判断问题归属模块、服务、页面、接口、数据流或责任边界 | Bug 域 / `bug-root-cause-rules` | 在根因定位时一并划清归属和影响面，再决定优先定位入口 |
 | 静态阅读代码不足以定位 Bug | Bug 域 / `bug-intake-rules` 的 `runtime-diagnostics` 条件路由 | 先选择最小必要的断点、临时日志或诊断断言进入运行时诊断 |
-| Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`、`bug-regression-risk-rules` | 先给修复建议和回归风险，再决定是否实施 |
+| Bug 已定位，需要形成修复建议、风险评估或确认是否应先等待用户确认 | Bug 域 / `bug-fix-proposal-rules`；高影响修复进入 `#regression-risk` | 先给修复建议和回归风险，再决定是否实施 |
 | 需求或 Bug 已澄清，开始新增或修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再叠加位点 skill |
 | 当前任务是后端 HTTP API 的 Swagger/OpenAPI 框架接入、接口文档同步、Swagger 调试入口、文档暴露路径或环境开关策略 | 代码位点域 / `api-swagger-rules` | 这是接口契约文档和调试入口规则，不代替接口入口、请求、响应或功能验证 |
 | 当前任务是构建前端页面、Web 组件或前端应用，并且重点在整体界面落地质量、设计方向、成品效果或避免模板化 AI 审美 | 代码位点域 / `frontend-design` | 当与内部前端规则重叠时，优先由 `frontend-design` 主导 |

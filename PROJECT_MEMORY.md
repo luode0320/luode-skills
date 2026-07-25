@@ -4,11 +4,12 @@
 ## Codex Desktop 任务投影断点恢复规则
 
 - 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 schema、计划指纹、敏感字段拒绝、51,200 字节闸门、原子写入、失活和 `update_plan` payload。
-- 稳定决策：正式实施周期文档仍是真实计划源；任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态，不保存 prompt、响应、凭据、线程 ID、业务数据或原始用户输入。
+- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。Goal 专属 v3 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、线程 ID、业务数据或原始用户输入。
 - 稳定决策：任务状态迁移固定先原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先校验活动投影并重建 UI，进行中步骤必须先核验中断点。
+- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表，Goal complete 将三步完成并写为 `inactive`，payload 必为 `null`。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
-- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`。
-- 更新时间：2026-07-23。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 更新时间：2026-07-25。
 
 
 ## 六域 Skill 精简与自动触发保护规则
@@ -1075,8 +1076,8 @@ entities:
       - 悬浮任务列表恢复
       - task-plan-rehydration-rules
       - PROJECT_CURRENT 任务投影
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活和 update_plan payload；首次继续回合只重建 UI，进行中步骤先核验，且不恢复执行授权或 L5 resume。"
-    scope: "Codex Desktop 计划模式多步骤任务、上下文恢复和宿主重开后的首次继续回合"
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活和 update_plan payload；常规恢复与 Goal create/get/update 统一先持久化再刷新 UI，Goal 固定安全三步不保存原文，blocked 仅观察、complete 失活，且不恢复执行授权或 L5 resume。"
+    scope: "Codex Desktop 计划模式多步骤任务、Goal 生命周期、上下文恢复和宿主重开后的首次继续回合"
     status: "active"
     evidence_ids:
       - evidence.skill.task-plan-rehydration

@@ -22,8 +22,11 @@ MAX_STEP_CHARS = 256
 EXPLANATION = "悬浮任务列表已从 PROJECT_CURRENT 重建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_EXACT = "悬浮任务列表已根据当前会话与项目文档正式补建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_FALLBACK = "悬浮任务列表已根据当前会话与项目文档生成安全恢复列表；进行中步骤必须先核验中断点"
+EXPLANATION_GOAL_ACTIVE = "Goal 任务进度已恢复；进行中步骤必须先核验中断点"
+EXPLANATION_GOAL_BLOCKED = "Goal 当前已阻断；任务列表仅用于观察进度，不恢复执行授权"
 FALLBACK_PREFIX = "SYNTH-FALLBACK/"
 EXACT_PREFIX = "SYNTH-EXACT/"
+GOAL_PLAN_KEY = "GOAL/ACTIVE"
 TOP_LEVEL_FIELDS_V1 = {
     "version",
     "state",
@@ -34,14 +37,21 @@ TOP_LEVEL_FIELDS_V1 = {
     "steps",
 }
 TOP_LEVEL_FIELDS_V2 = TOP_LEVEL_FIELDS_V1 | {"projection_origin", "synthesis_mode"}
+TOP_LEVEL_FIELDS_V3 = TOP_LEVEL_FIELDS_V2
 STEP_FIELDS = {"id", "step", "status"}
 STEP_STATUSES = {"pending", "in_progress", "completed"}
-PROJECTION_ORIGINS = {"persisted", "synthesized"}
-SYNTHESIS_MODES = {"none", "exact", "fallback"}
+PROJECTION_STATES = {"active", "blocked", "inactive"}
+PROJECTION_ORIGINS = {"persisted", "synthesized", "goal"}
+SYNTHESIS_MODES = {"none", "exact", "fallback", "goal_default", "goal_blocked"}
 SAFE_FALLBACK_STEPS = (
     ("RECOVERY-01", "[RECOVERY-01] 核对当前任务目标与范围", "in_progress"),
     ("RECOVERY-02", "[RECOVERY-02] 确认中断点与未完成工作", "pending"),
     ("RECOVERY-03", "[RECOVERY-03] 继续当前任务执行", "pending"),
+)
+GOAL_DEFAULT_STEPS = (
+    ("GOAL-01", "[GOAL-01] 确认当前闭环", "in_progress"),
+    ("GOAL-02", "[GOAL-02] 执行并更新进度", "pending"),
+    ("GOAL-03", "[GOAL-03] 验证并完成 Goal", "pending"),
 )
 SENSITIVE_KEYS = {
     "prompt",
@@ -54,6 +64,10 @@ SENSITIVE_KEYS = {
     "thread_id",
     "user_input",
     "business_data",
+    "objective",
+    "goal_objective",
+    "goal_id",
+    "goal_prompt",
 }
 BLOCK_PATTERN = re.compile(
     rf"{re.escape(BEGIN_MARKER)}\r?\n```json\r?\n(?P<json>.*?)\r?\n```\r?\n{re.escape(END_MARKER)}",
@@ -167,7 +181,13 @@ def validate_projection(
     expected_fingerprint: str | None = None,
     expected_source_document: str | None = None,
 ) -> dict[str, Any]:
-    """校验投影字段、状态、指纹和可选来源预期。"""
+    """校验投影字段、状态、指纹和可选来源预期。
+
+    [参数] value: 待校验投影；expected_fingerprint: 可选预期指纹；expected_source_document: 可选预期来源。
+    [返回] dict：字段已标准化且符合版本契约的投影。
+    最近修改时间：2026-07-25；改动原因：新增 Goal v3 身份、阻断与终态契约。
+    """
+    # 1. 先拒绝非对象和敏感字段，避免任何 Goal 原文进入后续状态计算。
     if not isinstance(value, Mapping):
         raise ProjectionContractError("projection root must be an object")
     _reject_sensitive_keys(value)
@@ -176,17 +196,20 @@ def validate_projection(
         expected_fields = TOP_LEVEL_FIELDS_V1
     elif version == 2:
         expected_fields = TOP_LEVEL_FIELDS_V2
+    elif version == 3:
+        expected_fields = TOP_LEVEL_FIELDS_V3
     else:
-        raise ProjectionContractError("version must be 1 or 2")
+        raise ProjectionContractError("version must be 1, 2 or 3")
     actual_fields = set(value)
     if actual_fields != expected_fields:
         missing = sorted(expected_fields - actual_fields)
         unknown = sorted(actual_fields - expected_fields)
         raise ProjectionContractError(f"projection fields mismatch: missing={missing}, unknown={unknown}")
 
+    # 2. 再按版本确定允许字段与状态边界，保留 v1/v2 读取兼容性。
     state = value.get("state")
-    if state not in {"active", "inactive"}:
-        raise ProjectionContractError("state must be active or inactive")
+    if state not in PROJECTION_STATES or (version < 3 and state == "blocked"):
+        raise ProjectionContractError("projection state is invalid")
     plan_key = _validate_string_field("plan_key", value.get("plan_key"))
     source_document = _validate_string_field("source_document", value.get("source_document"))
     fingerprint = _validate_string_field("plan_fingerprint", value.get("plan_fingerprint"))
@@ -203,10 +226,15 @@ def validate_projection(
             raise ProjectionContractError("projection_origin is invalid")
         if synthesis_mode not in SYNTHESIS_MODES:
             raise ProjectionContractError("synthesis_mode is invalid")
+        if version == 2 and (projection_origin == "goal" or synthesis_mode.startswith("goal_")):
+            raise ProjectionContractError("version 2 does not support Goal projection semantics")
+        # 3. 来源与合成模式必须一一对应，Goal 专属模式不得泄漏到常规投影。
         if projection_origin == "persisted" and synthesis_mode != "none":
             raise ProjectionContractError("persisted projection must use synthesis_mode none")
         if projection_origin == "synthesized" and synthesis_mode == "none":
             raise ProjectionContractError("synthesized projection must use exact or fallback mode")
+        if projection_origin != "goal" and synthesis_mode.startswith("goal_"):
+            raise ProjectionContractError("only Goal projection may use Goal synthesis modes")
 
     if not normalized_steps:
         if state != "inactive" or any((plan_key, source_document, fingerprint)):
@@ -215,24 +243,49 @@ def validate_projection(
         computed = compute_plan_fingerprint(normalized_steps)
         if not re.fullmatch(r"[0-9a-f]{64}", fingerprint) or fingerprint != computed:
             raise ProjectionContractError("plan_fingerprint does not match ordered step ids and text")
-        if state == "active" and all(step["status"] == "completed" for step in normalized_steps):
-            raise ProjectionContractError("an all-completed projection must be inactive")
-        if state == "inactive" and any(step["status"] != "completed" for step in normalized_steps):
-            raise ProjectionContractError("inactive projection may only retain completed steps")
-        if projection_origin == "persisted":
-            if not plan_key.strip() or not source_document.strip():
-                raise ProjectionContractError("persisted projection requires plan_key and source_document")
-        elif synthesis_mode == "exact":
-            if not plan_key.strip():
-                raise ProjectionContractError("exact synthesized projection requires plan_key")
-            if not source_document.strip():
-                raise ProjectionContractError("exact synthesized projection requires source_document")
+        # 4. Goal 只能使用固定安全三步和受限状态组合，禁止带入目标原文或自定义步骤。
+        if projection_origin == "goal":
+            expected_goal_steps = [(item[0], item[1]) for item in GOAL_DEFAULT_STEPS]
+            actual_goal_steps = [(step["id"], step["step"]) for step in normalized_steps]
+            if version != 3 or plan_key != GOAL_PLAN_KEY or source_document:
+                raise ProjectionContractError("Goal projection must use fixed v3 identity fields")
+            if actual_goal_steps != expected_goal_steps:
+                raise ProjectionContractError("Goal projection steps must use the fixed safe default list")
+            if state == "active" and synthesis_mode == "goal_default":
+                if all(step["status"] == "completed" for step in normalized_steps):
+                    raise ProjectionContractError("an all-completed Goal projection must be inactive")
+            elif state == "blocked" and synthesis_mode == "goal_blocked":
+                if any(step["status"] == "in_progress" for step in normalized_steps):
+                    raise ProjectionContractError("blocked Goal projection must not have an in_progress step")
+                if all(step["status"] == "completed" for step in normalized_steps):
+                    raise ProjectionContractError("an all-completed Goal projection must be inactive")
+            elif state == "inactive" and synthesis_mode == "goal_default":
+                if any(step["status"] != "completed" for step in normalized_steps):
+                    raise ProjectionContractError("inactive Goal projection may only retain completed steps")
+            else:
+                raise ProjectionContractError("Goal projection state and synthesis_mode combination is invalid")
         else:
-            if not plan_key.startswith(FALLBACK_PREFIX):
-                raise ProjectionContractError("fallback synthesized projection must use SYNTH-FALLBACK plan_key")
-            if source_document:
-                raise ProjectionContractError("fallback synthesized projection must not set source_document")
+            if state == "active" and all(step["status"] == "completed" for step in normalized_steps):
+                raise ProjectionContractError("an all-completed projection must be inactive")
+            if state == "inactive" and any(step["status"] != "completed" for step in normalized_steps):
+                raise ProjectionContractError("inactive projection may only retain completed steps")
+            if state == "blocked":
+                raise ProjectionContractError("only Goal projection may use blocked state")
+            if projection_origin == "persisted":
+                if not plan_key.strip() or not source_document.strip():
+                    raise ProjectionContractError("persisted projection requires plan_key and source_document")
+            elif synthesis_mode == "exact":
+                if not plan_key.strip():
+                    raise ProjectionContractError("exact synthesized projection requires plan_key")
+                if not source_document.strip():
+                    raise ProjectionContractError("exact synthesized projection requires source_document")
+            else:
+                if not plan_key.startswith(FALLBACK_PREFIX):
+                    raise ProjectionContractError("fallback synthesized projection must use SYNTH-FALLBACK plan_key")
+                if source_document:
+                    raise ProjectionContractError("fallback synthesized projection must not set source_document")
 
+    # 5. 最后校验调用方提供的身份预期，避免错源恢复到当前会话。
     if expected_fingerprint is not None and fingerprint != expected_fingerprint:
         raise ProjectionContractError("projection fingerprint does not match expected fingerprint")
     if expected_source_document is not None and source_document != expected_source_document:
@@ -247,7 +300,7 @@ def validate_projection(
         "updated_at": value["updated_at"],
         "steps": normalized_steps,
     }
-    if version == 2:
+    if version >= 2:
         normalized["projection_origin"] = projection_origin
         normalized["synthesis_mode"] = synthesis_mode
     return normalized
@@ -288,7 +341,13 @@ def load_projection(
     expected_fingerprint: str | None = None,
     expected_source_document: str | None = None,
 ) -> dict[str, Any]:
-    """从严格 UTF-8 文件读取并校验任务投影。"""
+    """从严格 UTF-8 文件读取并校验任务投影。
+
+    [参数] path: PROJECT_CURRENT 路径；expected_fingerprint: 可选预期指纹；expected_source_document: 可选来源。
+    [返回] dict：已通过读取和身份校验的投影。
+    最近修改时间：2026-07-25；改动原因：Goal 生命周期与恢复路径共用同一安全读取入口。
+    """
+    # 1. 严格按 UTF-8 读取，避免编码损坏后产生无法判断归属的投影。
     target = Path(path)
     try:
         document = target.read_bytes().decode("utf-8", errors="strict")
@@ -304,21 +363,34 @@ def load_projection(
     )
 
 
-def _to_version_two_projection(projection: Mapping[str, Any]) -> dict[str, Any]:
-    """把 version:1 兼容投影升级为 version:2。"""
+def _to_version_three_projection(projection: Mapping[str, Any]) -> dict[str, Any]:
+    """把兼容投影升级为统一写出的 version:3。
+
+    [参数] projection: 已读取的 v1、v2 或 v3 投影。
+    [返回] dict：可安全写回的 v3 投影。
+    最近修改时间：2026-07-25；改动原因：将 Goal 专属 v3 与旧版本读取兼容边界集中到写入前。
+    """
+    # 1. 先按原版本校验，再仅在成功写入路径转换，避免读取旧投影时发生隐式迁移。
     normalized = validate_projection(projection)
-    if normalized["version"] == 2:
+    if normalized["version"] == 3:
         return dict(normalized)
     upgraded = dict(normalized)
-    upgraded["version"] = 2
-    upgraded["projection_origin"] = "persisted"
-    upgraded["synthesis_mode"] = "none"
+    upgraded["version"] = 3
+    if "projection_origin" not in upgraded:
+        upgraded["projection_origin"] = "persisted"
+        upgraded["synthesis_mode"] = "none"
     return validate_projection(upgraded)
 
 
 def render_projection_block(projection: Mapping[str, Any], newline: str = "\n") -> str:
-    """把合法投影渲染为唯一托管区块。"""
-    normalized = _to_version_two_projection(projection)
+    """把合法投影渲染为唯一托管区块。
+
+    [参数] projection: 待写入投影；newline: 目标文档换行符。
+    [返回] str：带 JSON 围栏和唯一标记的 v3 托管区块。
+    最近修改时间：2026-07-25；改动原因：统一 Goal 生命周期和常规任务的 v3 写入格式。
+    """
+    # 1. 仅在渲染写入前升级版本，保持读取操作无副作用。
+    normalized = _to_version_three_projection(projection)
     encoded = json.dumps(normalized, ensure_ascii=False, indent=2)
     encoded = encoded.replace("\n", newline)
     return newline.join((BEGIN_MARKER, "```json", encoded, "```", END_MARKER))
@@ -362,7 +434,13 @@ def _write_text_atomic(path: Path, document: str) -> None:
 
 
 def upsert_projection(path: str | os.PathLike[str], projection: Mapping[str, Any]) -> dict[str, Any]:
-    """新增或替换唯一任务投影区块，并保护非托管正文。"""
+    """新增或替换唯一任务投影区块，并保护非托管正文。
+
+    [参数] path: PROJECT_CURRENT 路径；projection: 待持久化投影。
+    [返回] dict：原子写入后可重读的 v3 投影。
+    最近修改时间：2026-07-25；改动原因：Goal 事件与正式计划必须共享先持久化的唯一写入入口。
+    """
+    # 1. 先完整读取并验证原正文，保证托管区替换不会覆盖用户维护的状态信息。
     target = Path(path)
     try:
         original_bytes = target.read_bytes()
@@ -370,7 +448,7 @@ def upsert_projection(path: str | os.PathLike[str], projection: Mapping[str, Any
     except (OSError, UnicodeDecodeError) as error:
         raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
 
-    normalized = _to_version_two_projection(projection)
+    normalized = _to_version_three_projection(projection)
     bounds = _validate_markers(document)
     newline = "\r\n" if "\r\n" in document else "\n"
     block = render_projection_block(normalized, newline)
@@ -390,22 +468,38 @@ def deactivate_projection(
     *,
     updated_at: str | None = None,
 ) -> dict[str, Any]:
-    """将现有活动投影失活，保留完成步骤作为恢复证据。"""
+    """将现有活动投影失活，保留完成步骤作为恢复证据。
+
+    [参数] path: PROJECT_CURRENT 路径；updated_at: 可选 UTC 完成时间。
+    [返回] dict：全部步骤完成且已失活的 v3 投影。
+    最近修改时间：2026-07-25；改动原因：Goal complete 与常规周期完成共用原子终态迁移。
+    """
+    # 1. 将所有步骤一次性设为完成，避免终态文件中残留进行中步骤。
     projection = load_projection(path)
     projection["steps"] = [
         {"id": step["id"], "step": step["step"], "status": "completed"}
         for step in projection["steps"]
     ]
     projection["state"] = "inactive"
+    if projection.get("projection_origin") == "goal":
+        projection["synthesis_mode"] = "goal_default"
     projection["updated_at"] = updated_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return upsert_projection(path, projection)
 
 
 def _payload_explanation(projection: Mapping[str, Any]) -> str:
-    """根据投影来源生成 explanation。"""
-    normalized = _to_version_two_projection(projection)
+    """根据投影来源生成 explanation。
+
+    [参数] projection: 已通过契约的投影。
+    [返回] str：与来源和阻断状态一致的 UI 说明。
+    最近修改时间：2026-07-25；改动原因：为 Goal 活动与阻断观察列表提供专属提示。
+    """
+    # 1. 先规范化版本，再依据来源而非业务内容选择无敏感数据的提示语。
+    normalized = _to_version_three_projection(projection)
     origin = normalized["projection_origin"]
     mode = normalized["synthesis_mode"]
+    if origin == "goal":
+        return EXPLANATION_GOAL_BLOCKED if normalized["state"] == "blocked" else EXPLANATION_GOAL_ACTIVE
     if origin == "synthesized" and mode == "exact":
         return EXPLANATION_SYNTH_EXACT
     if origin == "synthesized" and mode == "fallback":
@@ -414,14 +508,144 @@ def _payload_explanation(projection: Mapping[str, Any]) -> str:
 
 
 def build_update_plan_payload(projection: Mapping[str, Any]) -> dict[str, Any]:
-    """生成可直接传给 update_plan 的参数对象。"""
+    """生成可直接传给 update_plan 的参数对象。
+
+    [参数] projection: 已持久化或待验证的投影。
+    [返回] dict：可由主会话传给 update_plan 的安全 payload。
+    最近修改时间：2026-07-25；改动原因：允许 blocked Goal 仅观察刷新，禁止 completed Goal 重放。
+    """
+    # 1. 只允许活动投影和 Goal 阻断观察投影生成 UI 数据，失活投影不得重放。
     normalized = validate_projection(projection)
-    if normalized["state"] != "active":
-        raise ProjectionContractError("inactive projection cannot build update_plan payload")
+    payload_allowed = normalized["state"] == "active" or (
+        normalized["state"] == "blocked" and normalized.get("projection_origin") == "goal"
+    )
+    if not payload_allowed:
+        raise ProjectionContractError("only active or blocked Goal projection can build update_plan payload")
     return {
         "explanation": _payload_explanation(normalized),
         "plan": [{"step": step["step"], "status": step["status"]} for step in normalized["steps"]],
     }
+
+
+def _goal_default_projection() -> dict[str, Any]:
+    """构建不含 Goal 原文的固定安全三步。
+
+    [参数] 无。
+    [返回] dict：固定标识、固定文案和初始状态的活动 Goal v3 投影。
+    最近修改时间：2026-07-25；改动原因：Goal 创建不保存目标原文也能提供可观察进度。
+    """
+    # 1. 只从常量复制安全步骤，禁止通过调用参数或运行时输入构造悬浮窗文案。
+    steps = [{"id": item[0], "step": item[1], "status": item[2]} for item in GOAL_DEFAULT_STEPS]
+    return validate_projection(
+        {
+            "version": 3,
+            "state": "active",
+            "projection_origin": "goal",
+            "synthesis_mode": "goal_default",
+            "plan_key": GOAL_PLAN_KEY,
+            "source_document": "",
+            "plan_fingerprint": compute_plan_fingerprint(steps),
+            "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "steps": steps,
+        }
+    )
+
+
+def handle_goal_event(path: str | os.PathLike[str], event: str) -> dict[str, Any]:
+    """按 Goal 生命周期持久化或恢复安全任务投影。
+
+    [参数] path: PROJECT_CURRENT 路径；event: create、restore、blocked 或 complete。
+    [返回] dict：事件动作、投影和可选 UI payload；complete 固定返回 null payload。
+    最近修改时间：2026-07-25；改动原因：将 Goal 创建、恢复、阻断和完成统一交给任务投影 Owner。
+    """
+    # 1. 先限制事件集合并读取既有投影；只有 create 可在无投影时初始化安全三步。
+    if event not in {"create", "restore", "blocked", "complete"}:
+        raise ProjectionContractError("Goal event is invalid")
+    try:
+        projection = load_projection(path)
+    except ProjectionContractError as error:
+        if event == "create" and str(error) == "task projection block is missing":
+            projection = None
+        else:
+            raise
+
+    if event == "create":
+        # 2. 仅保护活动正式计划；fallback 恢复列表不是正式来源，必须让位给 Goal 安全三步。
+        formal_projection = projection is not None and projection["state"] == "active" and (
+            projection.get("projection_origin", "persisted") == "persisted"
+            or (projection.get("projection_origin") == "synthesized" and projection.get("synthesis_mode") == "exact")
+        )
+        if formal_projection:
+            return {
+                "ok": True,
+                "action": "preserved_formal",
+                "projection": projection,
+                "payload": build_update_plan_payload(projection),
+            }
+        if projection is not None and projection["state"] == "active" and projection.get("projection_origin") == "goal":
+            return {
+                "ok": True,
+                "action": "created",
+                "projection": projection,
+                "payload": build_update_plan_payload(projection),
+            }
+        projection = upsert_projection(path, _goal_default_projection())
+        return {
+            "ok": True,
+            "action": "created",
+            "projection": projection,
+            "payload": build_update_plan_payload(projection),
+        }
+
+    # 3. 正式计划被保留后与 Goal 默认投影不建立关联，后续 Goal 事件不得失活或改写真实实施任务。
+    formal_projection = projection is not None and projection["state"] == "active" and (
+        projection.get("projection_origin", "persisted") == "persisted"
+        or (projection.get("projection_origin") == "synthesized" and projection.get("synthesis_mode") == "exact")
+    )
+    if formal_projection:
+        return {"ok": True, "action": "preserved_formal", "projection": projection, "payload": None}
+    # 4. 其余生命周期事件只允许操作已有 Goal 安全投影，防止外部计划被错误迁移。
+    if projection is None or projection.get("projection_origin") != "goal":
+        raise ProjectionContractError("Goal event requires an existing Goal projection")
+    if event == "restore":
+        if projection["state"] != "active":
+            raise ProjectionContractError("Goal restore requires an active Goal projection")
+        return {
+            "ok": True,
+            "action": "restored",
+            "projection": projection,
+            "payload": build_update_plan_payload(projection),
+        }
+    if event == "blocked":
+        # 5. blocked 只保留观察价值，所有进行中步骤回退为 pending 且不恢复执行授权。
+        if projection["state"] != "active":
+            raise ProjectionContractError("Goal blocked event requires an active Goal projection")
+        projection["state"] = "blocked"
+        projection["synthesis_mode"] = "goal_blocked"
+        projection["steps"] = [
+            {"id": step["id"], "step": step["step"], "status": "pending" if step["status"] == "in_progress" else step["status"]}
+            for step in projection["steps"]
+        ]
+        projection["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        projection = upsert_projection(path, projection)
+        return {
+            "ok": True,
+            "action": "blocked",
+            "projection": projection,
+            "payload": build_update_plan_payload(projection),
+        }
+    # 6. complete 接受活动或阻断 Goal，并以一次原子写入终止悬浮窗重放。
+    if projection["state"] not in {"active", "blocked"}:
+        raise ProjectionContractError("Goal complete event requires an active or blocked Goal projection")
+    projection["steps"] = [
+        {"id": step["id"], "step": step["step"], "status": "completed"}
+        for step in projection["steps"]
+    ]
+    projection["state"] = "inactive"
+    projection["synthesis_mode"] = "goal_default"
+    projection["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    projection = upsert_projection(path, projection)
+    return {"ok": True, "action": "completed", "projection": projection, "payload": None}
 
 
 def _read_json_input(source: str) -> Any:
@@ -694,7 +918,13 @@ def synthesize_projection(path: str | os.PathLike[str], context: Any) -> dict[st
 
 
 def main() -> None:
-    """解析 CLI 子命令并返回稳定退出码。"""
+    """解析 CLI 子命令并返回稳定退出码。
+
+    [参数] 无；命令行参数由 argparse 读取。
+    [返回] None：成功输出 JSON，契约或 I/O 失败输出稳定错误码。
+    最近修改时间：2026-07-25；改动原因：增加 Goal 生命周期事件 CLI，同时保持既有命令兼容。
+    """
+    # 1. 注册全部子命令，Goal 事件仅接受四个受控生命周期值。
     parser = argparse.ArgumentParser(description="Maintain PROJECT_CURRENT task plan projection")
     subparsers = parser.add_subparsers(dest="command", required=True)
     fingerprint_parser = subparsers.add_parser("fingerprint")
@@ -712,6 +942,9 @@ def main() -> None:
     deactivate_parser = subparsers.add_parser("deactivate")
     deactivate_parser.add_argument("--project-current", required=True)
     deactivate_parser.add_argument("--updated-at")
+    goal_parser = subparsers.add_parser("goal")
+    goal_parser.add_argument("--project-current", required=True)
+    goal_parser.add_argument("--event", choices=("create", "restore", "blocked", "complete"), required=True)
     for current in (validate_parser, payload_parser):
         current.add_argument("--expected-fingerprint")
         current.add_argument("--expected-source-document")
@@ -741,6 +974,9 @@ def main() -> None:
             _print_json(build_update_plan_payload(projection))
         elif args.command == "synthesize":
             _print_json(synthesize_projection(args.project_current, _read_json_input(args.input)))
+        elif args.command == "goal":
+            # 2. CLI 只持久化和返回 payload，主会话决定是否调用 update_plan。
+            _print_json(handle_goal_event(args.project_current, args.event))
         else:
             projection = deactivate_projection(args.project_current, updated_at=args.updated_at)
             _print_json({"ok": True, "projection": projection})

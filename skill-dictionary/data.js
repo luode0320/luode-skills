@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-07-24 21:20:06",
+  "generated_at": "2026-07-25 02:55:31",
   "repo_root": "/mnt/f/luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
     "planned_total": 73,
-    "implemented_total": 73,
-    "planned_missing": 0,
+    "implemented_total": 72,
+    "planned_missing": 1,
     "seed_total": 33,
     "doc_total": 10,
-    "references_total": 562,
-    "agents_total": 86
+    "references_total": 565,
+    "agents_total": 85
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -1375,8 +1375,8 @@ window.SKILL_DICTIONARY = {
       "label": "Bug 域",
       "description": "问题录入、定位、运行时诊断、修复建议",
       "order": 4,
-      "implemented_count": 6,
-      "planned_count": 0,
+      "implemented_count": 5,
+      "planned_count": 1,
       "seed_count": 0,
       "total_count": 6,
       "items": [
@@ -1411,6 +1411,7 @@ window.SKILL_DICTIONARY = {
           ],
           "references": [
             "bug-intake-rules/references/bug-description-template.md",
+            "bug-intake-rules/references/bug-lifecycle-common-contract.md",
             "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-bug-domain-routing.md",
             "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-discovery-checklist.md",
             "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md",
@@ -1422,6 +1423,7 @@ window.SKILL_DICTIONARY = {
             "bug-intake-rules/references/discovery-and-gap.md",
             "bug-intake-rules/references/intake-examples.md",
             "bug-intake-rules/references/minimum-intake-fields.md",
+            "bug-intake-rules/references/reference-index.md",
             "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-entry-conditions.md",
             "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-examples.md",
             "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-placement.md",
@@ -1541,7 +1543,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 4,
           "item_order": 4,
-          "auto_trigger": "当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 根目录；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。",
+          "auto_trigger": "当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发；公共方法、共享模块、接口、数据库、缓存、兼容性、异常语义或历史能力变化的高影响修复自动进入 `#regression-risk` 条件路由。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 根目录；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。",
           "core_responsibility": "先给修改建议，再决定是否实施。",
           "skill_path": "bug-fix-proposal-rules/SKILL.md",
           "directory_path": "bug-fix-proposal-rules",
@@ -1551,6 +1553,7 @@ window.SKILL_DICTIONARY = {
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
+            "条件路由：regression-risk",
             "根因修复优先（反打补丁式修复）",
             "权责边界与不负责事项",
             "需要暂停并确认的条件",
@@ -1561,6 +1564,10 @@ window.SKILL_DICTIONARY = {
           "references": [
             "bug-fix-proposal-rules/references/confirm-before-coding.md",
             "bug-fix-proposal-rules/references/fix-proposal-template.md",
+            "bug-fix-proposal-rules/references/regression-risk.md",
+            "bug-fix-proposal-rules/references/regression-risk/risk-dimensions.md",
+            "bug-fix-proposal-rules/references/regression-risk/risk-examples.md",
+            "bug-fix-proposal-rules/references/regression-risk/risk-ranking-and-scope.md",
             "bug-fix-proposal-rules/references/risk-assessment-checklist.md"
           ],
           "agents": [
@@ -1574,44 +1581,28 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "bug-regression-risk-rules",
-          "name": "bug-regression-risk-rules",
-          "title": "Bug 回归风险规则",
-          "status": "implemented",
-          "status_label": "已实现",
+          "id": "bug-fix-proposal-rules#regression-risk",
+          "name": "bug-fix-proposal-rules#regression-risk",
+          "title": "bug-fix-proposal-rules#regression-risk",
+          "status": "planned",
+          "status_label": "规划中",
           "domain_id": "bug",
           "domain_label": "Bug 域",
           "domain_description": "问题录入、定位、运行时诊断、修复建议",
           "domain_order": 4,
           "item_order": 5,
-          "auto_trigger": "【强制自动触发】当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。负责识别回归风险点、风险等级、验证优先级并统一记录到 Bug 根目录；默认优先并行；不要把它代替实际回归测试。",
-          "core_responsibility": "识别回归风险。",
-          "skill_path": "bug-regression-risk-rules/SKILL.md",
-          "directory_path": "bug-regression-risk-rules",
-          "directory": "bug-regression-risk-rules",
-          "sections": [
-            "Skill 作用与适用场景",
-            "自动触发信号",
-            "进入后先做什么",
-            "默认执行流程",
-            "权责边界与不负责事项",
-            "需要暂停并确认的条件",
-            "执行通过 / 驳回标准",
-            "执行结果归档要求",
-            "references 读取规则"
-          ],
-          "references": [
-            "bug-regression-risk-rules/references/risk-dimensions.md",
-            "bug-regression-risk-rules/references/risk-examples.md",
-            "bug-regression-risk-rules/references/risk-ranking-and-scope.md"
-          ],
-          "agents": [
-            "bug-regression-risk-rules/agents/openai.yaml"
-          ],
+          "auto_trigger": "当修复可能影响公共方法、共享模块、已有接口、数据库、缓存、兼容性、异常语义或历史能力时自动进入。",
+          "core_responsibility": "识别回归风险并确定验证优先级。",
+          "skill_path": "",
+          "directory_path": "",
+          "directory": "",
+          "sections": [],
+          "references": [],
+          "agents": [],
           "has_license": false,
           "focus_points": [
-            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
+            "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
             "重点看静态定位与运行时诊断的切换条件是否清楚。"
           ]
         },
@@ -3675,7 +3666,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 9,
-          "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
+          "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护 Goal 的 create/get/update 生命周期需要交接任务投影但不恢复执行许可时同样触发。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "autonomous-execution-rules/SKILL.md",
           "directory_path": "autonomous-execution-rules",
@@ -3685,6 +3676,7 @@ window.SKILL_DICTIONARY = {
             "执行许可状态（新增）",
             "触发信号",
             "默认执行策略",
+            "Goal 生命周期交接",
             "必须暂停确认的关键节点",
             "关键节点提问格式（强制）",
             "与其他 Skill 的协作",
@@ -4405,7 +4397,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 11,
           "item_order": 24,
-          "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、校验、synthesize 补建和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
+          "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Goal 的 create/get/update 生命周期成功返回、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、Goal 安全三步、校验、synthesize 补建和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "task-plan-rehydration-rules/SKILL.md",
           "directory_path": "task-plan-rehydration-rules",
@@ -4415,6 +4407,7 @@ window.SKILL_DICTIONARY = {
             "自动触发信号",
             "唯一 Owner 边界",
             "保存和状态迁移流程",
+            "Goal 生命周期投影流程",
             "首次继续回合恢复流程",
             "数据与安全约束",
             "工具不可用和停止条件",
@@ -6142,6 +6135,7 @@ window.SKILL_DICTIONARY = {
       ],
       "references": [
         "bug-intake-rules/references/bug-description-template.md",
+        "bug-intake-rules/references/bug-lifecycle-common-contract.md",
         "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-bug-domain-routing.md",
         "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-discovery-checklist.md",
         "bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md",
@@ -6153,6 +6147,7 @@ window.SKILL_DICTIONARY = {
         "bug-intake-rules/references/discovery-and-gap.md",
         "bug-intake-rules/references/intake-examples.md",
         "bug-intake-rules/references/minimum-intake-fields.md",
+        "bug-intake-rules/references/reference-index.md",
         "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-entry-conditions.md",
         "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-examples.md",
         "bug-intake-rules/references/runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-placement.md",
@@ -6272,7 +6267,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "问题录入、定位、运行时诊断、修复建议",
       "domain_order": 4,
       "item_order": 4,
-      "auto_trigger": "当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 根目录；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。",
+      "auto_trigger": "当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发；公共方法、共享模块、接口、数据库、缓存、兼容性、异常语义或历史能力变化的高影响修复自动进入 `#regression-risk` 条件路由。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 根目录；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。",
       "core_responsibility": "先给修改建议，再决定是否实施。",
       "skill_path": "bug-fix-proposal-rules/SKILL.md",
       "directory_path": "bug-fix-proposal-rules",
@@ -6282,6 +6277,7 @@ window.SKILL_DICTIONARY = {
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
+        "条件路由：regression-risk",
         "根因修复优先（反打补丁式修复）",
         "权责边界与不负责事项",
         "需要暂停并确认的条件",
@@ -6292,52 +6288,14 @@ window.SKILL_DICTIONARY = {
       "references": [
         "bug-fix-proposal-rules/references/confirm-before-coding.md",
         "bug-fix-proposal-rules/references/fix-proposal-template.md",
+        "bug-fix-proposal-rules/references/regression-risk.md",
+        "bug-fix-proposal-rules/references/regression-risk/risk-dimensions.md",
+        "bug-fix-proposal-rules/references/regression-risk/risk-examples.md",
+        "bug-fix-proposal-rules/references/regression-risk/risk-ranking-and-scope.md",
         "bug-fix-proposal-rules/references/risk-assessment-checklist.md"
       ],
       "agents": [
         "bug-fix-proposal-rules/agents/openai.yaml"
-      ],
-      "has_license": false,
-      "focus_points": [
-        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
-        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
-        "重点看静态定位与运行时诊断的切换条件是否清楚。"
-      ]
-    },
-    {
-      "id": "bug-regression-risk-rules",
-      "name": "bug-regression-risk-rules",
-      "title": "Bug 回归风险规则",
-      "status": "implemented",
-      "status_label": "已实现",
-      "domain_id": "bug",
-      "domain_label": "Bug 域",
-      "domain_description": "问题录入、定位、运行时诊断、修复建议",
-      "domain_order": 4,
-      "item_order": 5,
-      "auto_trigger": "【强制自动触发】当 Bug 修复可能影响公共方法、共享模块、已有接口、数据库行为、缓存行为、兼容性或其他历史能力时触发。负责识别回归风险点、风险等级、验证优先级并统一记录到 Bug 根目录；默认优先并行；不要把它代替实际回归测试。",
-      "core_responsibility": "识别回归风险。",
-      "skill_path": "bug-regression-risk-rules/SKILL.md",
-      "directory_path": "bug-regression-risk-rules",
-      "directory": "bug-regression-risk-rules",
-      "sections": [
-        "Skill 作用与适用场景",
-        "自动触发信号",
-        "进入后先做什么",
-        "默认执行流程",
-        "权责边界与不负责事项",
-        "需要暂停并确认的条件",
-        "执行通过 / 驳回标准",
-        "执行结果归档要求",
-        "references 读取规则"
-      ],
-      "references": [
-        "bug-regression-risk-rules/references/risk-dimensions.md",
-        "bug-regression-risk-rules/references/risk-examples.md",
-        "bug-regression-risk-rules/references/risk-ranking-and-scope.md"
-      ],
-      "agents": [
-        "bug-regression-risk-rules/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
@@ -6385,6 +6343,32 @@ window.SKILL_DICTIONARY = {
       "focus_points": [
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看静态定位与运行时诊断的切换条件是否清楚。"
+      ]
+    },
+    {
+      "id": "bug-fix-proposal-rules#regression-risk",
+      "name": "bug-fix-proposal-rules#regression-risk",
+      "title": "bug-fix-proposal-rules#regression-risk",
+      "status": "planned",
+      "status_label": "规划中",
+      "domain_id": "bug",
+      "domain_label": "Bug 域",
+      "domain_description": "问题录入、定位、运行时诊断、修复建议",
+      "domain_order": 4,
+      "item_order": 5,
+      "auto_trigger": "当修复可能影响公共方法、共享模块、已有接口、数据库、缓存、兼容性、异常语义或历史能力时自动进入。",
+      "core_responsibility": "识别回归风险并确定验证优先级。",
+      "skill_path": "",
+      "directory_path": "",
+      "directory": "",
+      "sections": [],
+      "references": [],
+      "agents": [],
+      "has_license": false,
+      "focus_points": [
+        "先补齐触发 description、邻接边界和最小 references，再决定是否正式建目录。",
+        "优先确认它与同域相邻 skill 的拆分边界，避免新建后职责重叠。",
         "重点看静态定位与运行时诊断的切换条件是否清楚。"
       ]
     },
@@ -8322,7 +8306,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 9,
-      "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护。",
+      "auto_trigger": "当多步骤任务尚未闭环且存在原执行计划内可直接执行的必需下一步时自动触发（不仅限于回合结束前）。用于多步骤研发任务（需求实现、Bug 修复、重构、测试闭环、文档同步）的连续推进策略：在非关键节点默认自主执行计划内必需动作，不在每个子步骤后征求确认；仅在关键决策节点或高风险节点暂停并给出结构化选项。用户说“开始实施 / 开始实现 / 开始执行 / 直接做 / 继续做完 / 按文档实现 / 按建议执行 / 按方案执行 / 就按你刚才说的做”等开工类指令时，必须已有执行计划，或先给出包含完成定义、停止条件和最大推进边界的本轮计划；缺少计划或停止条件时不得直接实现。真实 `blocked/manual_handoff` 时，先完成运行时状态收口，再按共享契约交接结构化事实，不生成用户可见的阻断文案。若用户给出明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”），该指令对所有 agent 通用，必须立即停止自动继续和扩散性输出。任务完成后若不存在“原计划未完成必需项 / 阻断项 / 用户显式要求的建议”三类合法后续，必须强制无下一步，不得输出可能触发循环 loop 的“等待用户新指令 / 无需继续动作 / 下一步状态”占位文案。若刚发生上下文压缩且未重新确认“是否开始/继续实现代码”，必须暂停确认，不得直接进入编码。不要用于绕过系统安全限制、权限审批或高风险操作防护 Goal 的 create/get/update 生命周期需要交接任务投影但不恢复执行许可时同样触发。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "autonomous-execution-rules/SKILL.md",
       "directory_path": "autonomous-execution-rules",
@@ -8332,6 +8316,7 @@ window.SKILL_DICTIONARY = {
         "执行许可状态（新增）",
         "触发信号",
         "默认执行策略",
+        "Goal 生命周期交接",
         "必须暂停确认的关键节点",
         "关键节点提问格式（强制）",
         "与其他 Skill 的协作",
@@ -9052,7 +9037,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 11,
       "item_order": 24,
-      "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、校验、synthesize 补建和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
+      "auto_trigger": "当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、任务步骤状态发生 pending/in_progress/completed 迁移、Goal 的 create/get/update 生命周期成功返回、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活、Goal 安全三步、校验、synthesize 补建和 update_plan payload；实际 UI 重建必须由 Agent 调用 update_plan，且进行中步骤先核验中断点。不要把 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "task-plan-rehydration-rules/SKILL.md",
       "directory_path": "task-plan-rehydration-rules",
@@ -9062,6 +9047,7 @@ window.SKILL_DICTIONARY = {
         "自动触发信号",
         "唯一 Owner 边界",
         "保存和状态迁移流程",
+        "Goal 生命周期投影流程",
         "首次继续回合恢复流程",
         "数据与安全约束",
         "工具不可用和停止条件",
@@ -9533,8 +9519,7 @@ window.SKILL_DICTIONARY = {
     }
   ],
   "recommendations": [
-    "73 个规划 skill 已全部独立落地，后续优化优先检查 description 命中率、相邻 skill 边界和 references 的信息密度。",
-    "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。",
-    "可以开始按域做第二轮巡检：先审触发 description 是否足够具体，再审 references 是否过厚、过空或与相邻 skill 重叠。"
+    "Bug 域还缺 1 个环节，尤其是复现、范围界定、诊断日志和修复后验证，建议补完整闭环。",
+    "当前规划同时包含 `frontend-component-rules` 与 `frontend-ui-visual-rules`，建议前者聚焦组件工程与状态边界，后者聚焦页面视觉与交互体验，避免触发歧义。"
   ]
 };

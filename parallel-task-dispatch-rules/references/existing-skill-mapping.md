@@ -31,9 +31,9 @@
 - `project-change-review-rules`
   - 做什么：对当前工作区 diff 做总审查，补抓边界、风险、遗漏和阻断项。
   - 建议：可并行，只读审查；若与主线程同时跑，必须指定单一收口线程统一汇总结论。
-- `bug-regression-risk-rules`
-  - 做什么：审查 Bug 修复可能带来的回归风险、兼容性风险和验证优先级。
-  - 建议：可并行，只读审查，适合和修复线程并发跑。
+- `bug-fix-proposal-rules#regression-risk`
+  - 做什么：在高影响 Bug 修复建议内审查回归风险、兼容性风险和验证优先级。
+  - 建议：可并行，只读分析；主线程仍负责把结论写入修复建议和 Bug 根目录。
 - `mcp-installation-rules` / `plugin-installation-rules` / `thread-title-rules` 的 provisioning **检测**
   - 做什么：只读探测依赖是否安装、目标 config 是否已含对应表 / 键、工具是否已暴露、项目结构标记等。
   - 建议：可并行，多个独立工具的检测扇出为互不重叠的只读线程；存在只读探测入口时优先使用（如 `bootstrap.mjs --check`）。检测子 agent 禁止任何写动作，细则见 `provisioning-delegation.md`。
