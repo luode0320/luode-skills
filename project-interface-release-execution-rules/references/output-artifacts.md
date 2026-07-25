@@ -17,6 +17,14 @@
 - `inventory-reconcile.yaml`
 - `dependency-graph.json`
 - `scenario-results.json`
+- `interface-results.json`
+- `consumer-coverage.json`
+- `protocol-capabilities.json`
+- `cleanup-report.json`
+- `dual-gate-diff.json`
+- `evidence-manifest.json`
+- `.release-test-engine/shadow-evidence/<run_id>.json`（仅 shadow 硬切历史证据，路径相对项目根）
+- `.release-test-engine/verification-evidence/<摘要>.json`（candidate 晋级证据，绑定正向、故障与清理运行）
 - `artifacts/raw-request/<接口标识>.json`
 - `artifacts/raw-response/<接口标识>.json`
 - `artifacts/masked-response/<接口标识>.json`
@@ -33,6 +41,7 @@
 - 完整响应必须落盘，不能只保留在主报告中。
 - 对账结果必须作为独立产物留存，便于追溯本轮新增、删除和漂移。
 - 双索引同步结果必须作为独立产物留存，便于追溯当前代码、`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 是否一致。
+- shadow evidence 必须绑定文件 SHA-256，并能从场景目录全集和脱敏场景结果独立重算门禁；普通报告摘要不能替代该文件。
 - 若某接口未执行，必须在结果中记录未执行原因，不能静默省略。
 - 每个由 provider、local 数据、fixture 或规则解析出的参数都必须有依赖追踪产物。
 - 每个新增、复验成功、失效、隔离或废弃的可复用参数都必须写入 `reusable-param-events.yaml`。

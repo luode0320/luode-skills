@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码风格契约"
+  short_description: "读取项目风格、局部样例和接口参考实现，形成本轮代码风格契约"
+  default_prompt: "使用 $code-generation-style-rules 在写代码前读取 PROJECT_STYLE.md、当前文件和同目录样例，形成本轮代码风格契约；专项质量判断仍交给对应 Owner。"

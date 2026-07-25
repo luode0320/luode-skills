@@ -7,11 +7,11 @@ import json
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from .discovery import discover_project
 from .graph import build_dependency_graph
-from .gate import aggregate_gate
+from .gate import aggregate_gate, compare_gate_tracks, enforce_gate_mode, evaluate_scenario_cutover, persist_cutover_evidence, seal_cutover_record
 from .judge import judge
 from .model import InterfaceIR
 from .report import project_execution_to_baseline, write_report
@@ -23,6 +23,10 @@ from .graph import topological_order
 from .adapters import adapter_matrix_status
 from .discovery import load_inventory
 from .graph import reconcile_contract_assets
+from .scenario_loader import load_scenario_catalog
+from .scenario_model import scenario_requires_cleanup
+from .scenario_runner import run_scenario
+from .tool_env import inspect_tool_environment
 
 
 def _contract_provenance(path: Path, *, source_type: str, status: str, reason: str = "") -> dict[str, Any]:
@@ -188,10 +192,20 @@ def _options(value: str | Path | Mapping[str, Any]) -> dict[str, Any]:
 
 
 def run_doctor(project_root: str | Path | Mapping[str, Any], *, environment: str = "local", strict_fixture: bool = False) -> dict[str, Any]:
+    """检查 local 项目、隔离工具环境和协议 runtime，不执行安装或网络探针。
+
+    [参数] project_root: 项目根目录或选项映射；environment: 配置环境；strict_fixture: 是否启用严格 fixture 检查。
+    [返回] 项目发现、适配器矩阵和工具环境的 doctor 结果。
+    最近修改时间: 2026-07-25 18:10:00 改动原因: 接入 C18-02 隔离工具环境能力检查。
+    """
+
     options = _options(project_root)
     root = Path(options.get("project_root", ".")).resolve()
     environment = str(options.get("environment", environment))
     strict_fixture = bool(options.get("strict_fixture", strict_fixture))
+    tool_environment = inspect_tool_environment()
+    if environment != "local":
+        return {"mode": "doctor", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "project_root": str(root), "environment": environment, "tool_environment": tool_environment}
     if not root.is_dir():
         return {"mode": "doctor", "status": "FAIL", "reason": "project root does not exist", "project_root": str(root)}
     result = discover_project(root)
@@ -210,16 +224,16 @@ def run_doctor(project_root: str | Path | Mapping[str, Any], *, environment: str
         if interface_failures:
             capability["failure_type"] = interface_failures[0]
     execution_pending = any(item.get("execution_status") != "ready" for item in matrix.values())
-    status = "PENDING" if not result.interfaces or execution_pending else ("PARTIAL" if result.unsupported else "PASS")
-    return {"mode": "doctor", "status": status, "project_root": str(root), "project_fingerprint": result.project_fingerprint, "interface_count": len(result.interfaces), "unsupported_count": len(result.unsupported), "environment": environment, "strict_fixture": bool(strict_fixture), "adapter_matrix": matrix}
+    status = "BLOCKED" if tool_environment["status"] == "BLOCKED" else "PENDING" if not result.interfaces or execution_pending else ("PARTIAL" if result.unsupported else "PASS")
+    return {"mode": "doctor", "status": status, "project_root": str(root), "project_fingerprint": result.project_fingerprint, "interface_count": len(result.interfaces), "unsupported_count": len(result.unsupported), "environment": environment, "strict_fixture": bool(strict_fixture), "adapter_matrix": matrix, "tool_environment": tool_environment}
 
 
-def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: str | Path = "doc/5-tests", environment: str = "local", reusable: Mapping[str, Any] | None = None, sources: Mapping[str, Any] | None = None, baseline_path: str | Path | None = None, baseline_root: str | Path | None = None, config: str | Path | Mapping[str, Any] | None = None, inventory: str | Path | None = None, manifest: str | Path | None = None, reusable_params: str | Path | None = None, plan: str | Path | None = None, modules: list[str] | None = None, adapters: list[str] | None = None, include_p2: bool = False, continue_on_failure: bool = False, dry_run: bool = False, strict_fixture: bool = False, strict_contracts: bool = False, env: Mapping[str, str] | None = None, **_: Any) -> dict[str, Any]:
+def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: str | Path = "doc/5-tests", environment: str = "local", reusable: Mapping[str, Any] | None = None, sources: Mapping[str, Any] | None = None, baseline_path: str | Path | None = None, baseline_root: str | Path | None = None, config: str | Path | Mapping[str, Any] | None = None, inventory: str | Path | None = None, manifest: str | Path | None = None, reusable_params: str | Path | None = None, plan: str | Path | None = None, modules: list[str] | None = None, adapters: list[str] | None = None, include_p2: bool = False, continue_on_failure: bool = False, dry_run: bool = False, strict_fixture: bool = False, strict_contracts: bool = False, gate_mode: str = "legacy", scenario_catalog: str | Path | Mapping[str, Any] | None = None, gate_history: str | Path | Iterable[Mapping[str, Any]] | None = None, gate_state: str | Path | Mapping[str, Any] | None = None, env: Mapping[str, str] | None = None, **_: Any) -> dict[str, Any]:
     """执行本地项目级接口测试并归档报告。
 
-    [参数] project_root: 项目根目录或选项映射；其余参数控制环境、资产、基线和输出。
+    [参数] project_root: 项目根目录或选项映射；其余参数控制环境、资产、基线、场景、窗口和输出。
     [返回] 包含接口、依赖图、门禁和产物路径的执行结果。
-    最近修改时间: 2026-07-13 01:05:00 改动原因: 让映射入口严格透传 fixture 生命周期和契约门禁开关。
+    最近修改时间：2026-07-26 01:20:00，场景目录加载同时回读晋级与 shadow 文件证据。
     """
 
     options = _options(project_root)
@@ -240,9 +254,39 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
     adapters = options.get("adapters", adapters) or []
     strict_fixture = bool(options.get("strict_fixture", strict_fixture))
     strict_contracts = bool(options.get("strict_contracts", strict_contracts))
+    gate_mode = str(options.get("gate_mode", gate_mode)).lower()
+    scenario_catalog = options.get("scenario_catalog", scenario_catalog)
+    gate_history = options.get("gate_history", gate_history)
+    gate_state = options.get("gate_state", gate_state)
+    # 1. 解析 gate state 并确认请求模式没有违反已激活的硬切状态。
+    state_document: Mapping[str, Any] = {}
+    if isinstance(gate_state, Mapping):
+        # 1.1 内存状态直接使用；文件状态必须限制在项目根。
+        state_document = gate_state
+    elif gate_state:
+        # 1.2 文件状态解析为绝对路径并执行 local 边界检查。
+        state_path = Path(gate_state)
+        state_path = (root / state_path).resolve() if not state_path.is_absolute() else state_path.resolve()
+        try:
+            state_path.relative_to(root)
+        except ValueError as exc:
+            raise PermissionError("NON_LOCAL_GATE_STATE") from exc
+        state_document = _load_asset(state_path)
+    mode_check = enforce_gate_mode(gate_mode, state_document)
+    if not mode_check["allowed"]:
+        return {"mode": "run", "status": "BLOCKED", "failure_type": mode_check["failure_type"], "gate_mode": gate_mode}
+    if gate_mode not in {"legacy", "shadow", "scenario"}:
+        raise ValueError("gate_mode must be legacy, shadow or scenario")
+    # 2. 发布执行必须经过同一隔离工具环境 doctor，缺依赖或版本漂移时不启动任何接口或协议场景。
+    tool_environment = inspect_tool_environment()
+    if tool_environment["status"] != "PASS":
+        return {"mode": "run", "status": "BLOCKED", "failure_type": "TOOL_ENV_BLOCKED", "gate_mode": gate_mode, "tool_environment": tool_environment}
+    # 3. doctor 通过后加载 local 契约事实、发现接口并完成三方对账。
     reusable = reusable or _load_asset(options.get("reusable_params"))
     sources = sources or _load_asset(options.get("parameter_sources"))
     config_data = _load_asset(config) if config else {}
+    if scenario_catalog is None and isinstance(config_data.get("scenario_catalog"), (str, Path, Mapping)):
+        scenario_catalog = config_data["scenario_catalog"]
     env = dict(env or options.get("env", {}) or config_data.get("env", {}) or {})
     if not baseline_path and baseline_root:
         baseline_path = Path(baseline_root) / "execution-history.yaml"
@@ -286,6 +330,7 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
     if adapters and "auto" not in adapters:
         allowed = {str(item) for item in adapters}
         discovery = type(discovery)(discovery.project_fingerprint, tuple(item for item in discovery.interfaces if item.protocol in allowed or item.adapter in allowed), discovery.unsupported)
+    # 4. 构建接口依赖图并按拓扑顺序执行 legacy 接口轨道。
     graph = build_dependency_graph(discovery.interfaces)
     # 显式绑定优先；无绑定时补充唯一字段匹配，并保持确定性排序。
     existing = {(edge.get("provider"), edge.get("consumer"), edge.get("field")) for edge in graph["edges"]}
@@ -298,9 +343,11 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
     pipeline_run_id = uuid.uuid4().hex
     raw_results = []
     for operation_id in graph["order"]:
+        # 4.1 每个接口先汇集上游结果，再解析参数并决定执行或待确认。
         interface = by_id[operation_id]
         runtime_sources = dict(sources)
         for edge in graph["edges"]:
+            # 4.2 只处理指向当前接口的依赖边，并阻断失败上游。
             if edge.get("consumer") != operation_id:
                 continue
             provider_id = str(edge.get("provider", ""))
@@ -314,6 +361,7 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
             bindings = edge.get("bindings", [])
             field = edge.get("field", "")
             for binding in bindings or [{"target": field, "response_path": f"$.body.data.{field}"}]:
+                # 4.3 每个绑定只从结构化响应路径提取值并标记 upstream_api 来源。
                 target = str(binding.get("target", binding.get("field", field)))
                 response_path = str(binding.get("response_path", f"$.body.data.{target}"))
                 value = _extract_path(provider_result.get("response", {}), response_path)
@@ -332,23 +380,92 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
     judged = [judge(item, by_id.get(item.get("operation_id"))) for item in raw_results]
     gate = aggregate_gate(judged, discovery.interfaces, unsupported=discovery.unsupported)
     if strict_contracts and sync_metadata.get("status") != "PASS":
+        # 5.1 strict 模式下任何契约对账缺口都覆盖 legacy 放行结论为阻断。
         gate = dict(gate)
         gate["gate"] = "BLOCKED"
         gate["allow_release"] = False
         gate["contract_sync_blocked"] = True
         gate["contract_sync_failures"] = list(sync_metadata.get("failure_types", []))
     run_id = pipeline_run_id
+    scenario_results: list[dict[str, Any]] = []
+    dual_gate_diff: dict[str, Any] | None = None
+    expected_scenarios: dict[str, dict[str, Any]] = {}
+    scenario_fingerprint = ""
+    # 6. shadow 或 scenario 模式运行同一 verified 场景全集并生成双轨差异。
+    if gate_mode != "legacy":
+        # 6.1 shadow/scenario 只从项目根内的 local 场景目录加载，避免把外部资产带入发布门禁。
+        if scenario_catalog is not None:
+            if isinstance(scenario_catalog, (str, Path)):
+                # 6.2 文件目录必须限制在项目根；内存映射继续交给同一 loader。
+                catalog_path = Path(scenario_catalog)
+                catalog_path = (root / catalog_path).resolve() if not catalog_path.is_absolute() else catalog_path.resolve()
+                try:
+                    catalog_path.relative_to(root)
+                except ValueError as exc:
+                    raise PermissionError("NON_LOCAL_SCENARIO_CATALOG") from exc
+                catalog_source: str | Path | Mapping[str, Any] = catalog_path
+            else:
+                catalog_source = scenario_catalog
+            catalog = load_scenario_catalog(catalog_source, project_root=root)
+            # 1.1 目录全集、来源指纹和清理要求由已加载模型产生，结果子集不能自报覆盖完整。
+            expected_scenarios = {
+                scenario_id: {
+                    "risk": item.risk,
+                    "source_fingerprint": item.source_fingerprint,
+                    "cleanup_required": scenario_requires_cleanup(item),
+                }
+                for scenario_id, item in catalog.scenarios.items()
+            }
+            scenario_results = [run_scenario(item, environment=environment) for item in catalog.scenarios.values()]
+        scenario_fingerprint = hashlib.sha256(json.dumps(expected_scenarios, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        dual_gate_diff = compare_gate_tracks(gate, scenario_results, run_id=run_id, expected_scenarios=expected_scenarios)
+        if gate_mode == "shadow":
+            # 2. shadow 仍由 legacy 决定放行，但把当前真实运行追加到历史后计算硬切资格。
+            history_source: Iterable[Mapping[str, Any]] = []
+            if isinstance(gate_history, Iterable) and not isinstance(gate_history, (str, bytes, Path, Mapping)):
+                # 7.1 调用方传入的内存历史按原顺序参与连续窗口计算。
+                history_source = gate_history
+            elif gate_history:
+                # 7.2 文件历史必须位于项目根并只读取 history 数组。
+                history_path = Path(gate_history)
+                history_path = (root / history_path).resolve() if not history_path.is_absolute() else history_path.resolve()
+                try:
+                    history_path.relative_to(root)
+                except ValueError as exc:
+                    raise PermissionError("NON_LOCAL_GATE_HISTORY") from exc
+                loaded_history = _load_asset(history_path)
+                history_source = loaded_history if isinstance(loaded_history, list) else loaded_history.get("history", [])
+            # 7.3 当前运行先持久化可重算 artifact，再把路径和文件摘要封入历史记录。
+            persisted = persist_cutover_evidence(
+                root,
+                run_id=run_id,
+                environment=environment,
+                scenario_fingerprint=scenario_fingerprint,
+                expected_scenarios=expected_scenarios,
+                scenario_results=scenario_results,
+                legacy_gate=gate,
+            )
+            scenario_truth = persisted["scenario_gate"]
+            evidence_diff = persisted["dual_gate_diff"]
+            current_record = seal_cutover_record({
+                "run_id": run_id,
+                "environment": environment,
+                "scenario_gate": scenario_truth["gate"],
+                "coverage_complete": scenario_truth["coverage"]["coverage_complete"],
+                "cleanup_failed": len(scenario_truth["cleanup_failures"]),
+                "unexplained_differences": evidence_diff["unexplained_differences"],
+                "scenario_fingerprint": scenario_fingerprint,
+                "evidence_path": persisted["evidence_path"],
+                "artifact_sha256": persisted["artifact_sha256"],
+            })
+            cutover = evaluate_scenario_cutover([*history_source, current_record], current_run_id=run_id, scenario_fingerprint=scenario_fingerprint, project_root=root)
+            dual_gate_diff["cutover"] = cutover
+            dual_gate_diff["current_record"] = current_record
+        else:
+            # 3. scenario 只在持久化硬切状态已激活时运行，并完全采用场景真值。
+            gate = dict(dual_gate_diff["scenario_gate"])
+
     baseline_projection: dict[str, Any] | None = None
-    if baseline_path:
-        # 1. 先完成事件追加和原子投影，再把真实事件/投影状态写入报告，避免报告声称已更新但基线尚未落盘。
-        baseline_projection = project_execution_to_baseline(
-            baseline_path,
-            run_id,
-            gate,
-            interfaces=[item.to_dict() for item in discovery.interfaces],
-            dependency_graph=graph,
-            results=judged,
-        )
     artifacts = write_report(
         output_dir,
         judged,
@@ -371,6 +488,21 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
             "strict_contracts": strict_contracts,
             "interfaces": [item.to_dict() for item in discovery.interfaces],
         },
+        scenario_results=scenario_results,
+        dual_gate_diff=dual_gate_diff,
     )
+    # 4. 报告清单可能把原 PASS 降为 FAIL/PENDING，CLI 和后续 baseline 必须采用该最终门禁。
+    gate = dict(artifacts.pop("gate"))
+    evidence_manifest_status = str(artifacts.pop("evidence_manifest_status"))
+    if baseline_path:
+        # 4.1 只有正式报告完成脱敏复核后才投影 baseline，避免先写入可放行的错误结论。
+        baseline_projection = project_execution_to_baseline(baseline_path, run_id, gate, interfaces=[item.to_dict() for item in discovery.interfaces], dependency_graph=graph, results=judged)
+        artifacts = write_report(
+            output_dir, judged, gate, run_id=run_id, interfaces=[item.to_dict() for item in discovery.interfaces], dependency_graph=graph, environment=environment, canonical_layout=default_output,
+            baseline_summary={"updated": True, "projection_status": "PASS", "path": str(baseline_path), "event_count": len(baseline_projection.get("events", [])), "latest_gate": baseline_projection.get("latest_gate", {})},
+            sync_metadata=sync_metadata, runtime_matrix={"strict_fixture": strict_fixture, "strict_contracts": strict_contracts, "interfaces": [item.to_dict() for item in discovery.interfaces]}, scenario_results=scenario_results, dual_gate_diff=dual_gate_diff,
+        )
+        gate = dict(artifacts.pop("gate"))
+        evidence_manifest_status = str(artifacts.pop("evidence_manifest_status"))
     baseline_updated = baseline_projection is not None
-    return {"mode": "run", "status": gate["gate"], "run_id": run_id, "project_fingerprint": discovery.project_fingerprint, "interfaces": [item.to_dict() for item in discovery.interfaces], "unsupported": list(discovery.unsupported), "dependency_graph": graph, "gate": gate, "artifacts": artifacts, "baseline_path": str(baseline_path) if baseline_path else "", "baseline_updated": baseline_updated, "inventory": str(inventory or ""), "manifest": str(manifest or ""), "reusable_params": str(reusable_params or ""), "contract_assets": contract_assets, "sync_metadata": sync_metadata, "plan": str(plan or ""), "modules": list(modules), "include_p2": bool(include_p2), "continue_on_failure": bool(continue_on_failure), "strict_fixture": bool(strict_fixture), "strict_contracts": bool(strict_contracts)}
+    return {"mode": "run", "status": gate["gate"], "run_id": run_id, "project_fingerprint": discovery.project_fingerprint, "interfaces": [item.to_dict() for item in discovery.interfaces], "unsupported": list(discovery.unsupported), "dependency_graph": graph, "gate": gate, "gate_mode": gate_mode, "scenario_results": scenario_results, "dual_gate_diff": dual_gate_diff or {}, "artifacts": artifacts, "evidence_manifest_status": evidence_manifest_status, "baseline_path": str(baseline_path) if baseline_path else "", "baseline_updated": baseline_updated, "inventory": str(inventory or ""), "manifest": str(manifest or ""), "reusable_params": str(reusable_params or ""), "contract_assets": contract_assets, "sync_metadata": sync_metadata, "plan": str(plan or ""), "modules": list(modules), "include_p2": bool(include_p2), "continue_on_failure": bool(continue_on_failure), "strict_fixture": bool(strict_fixture), "strict_contracts": bool(strict_contracts), "cutover": gate.get("cutover", {})}

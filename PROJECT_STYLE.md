@@ -50,7 +50,7 @@
   }
   ```
 - 说明: 函数/方法体、闭包体和连续控制流代码块按非空行计数（代码行和已有注释行均计入，空行不计），超过 5 行时必须在代码块内部就近写顶层编号步骤注释；多个步骤使用 `1.`、`2.`、`3.`，嵌套超长代码块单独检查，不能只在函数头或外层代码块写总览。注释解释步骤意图、边界或原因，不逐行复述代码。
-- 来源: 用户本轮需求、`comment-completion-gate-rules`、`comment-placement-granularity-rules`
+- 来源: 用户本轮需求、`comment-completion-gate-rules`（补齐闸门主 Owner）、`comment-placement-granularity-rules`（放置与颗粒度辅助 Owner）
 - 适用范围: 函数/方法体、闭包体、控制流代码块、代码审查和注释补齐
 - 更新时间: 2026-07-16
 - 状态: 启用
@@ -118,7 +118,7 @@
 - 类型: 包结构风格
 - 示例: `util/date/parse.go`、`common/util/path/project_root.go`
 - 说明: 与当前项目没有特征关联关系、脱离当前业务上下文仍然成立的可复用逻辑，优先收进 `util`；需要引用项目文件、项目路径、配置、命名约定、目录结构或其他项目上下文的可复用逻辑，优先收进 `common/util`。不要把项目耦合工具混进独立 `util`，也不要把真正与项目无关的通用工具塞进 `common/util`。
-- 来源: 对话确认、`common-util-rules`、`package-structure-rules`
+- 来源: 对话确认、`common-util-rules`（公共资格与复用）、`package-structure-rules`（目录落点与依赖方向）
 - 适用范围: 通用工具、公共函数、复用代码、`util` / `common/util` 子包归位
 - 更新时间: 2026-07-08
 - 状态: 启用

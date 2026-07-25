@@ -191,53 +191,45 @@ Agent 判定      通过
 - 主要失效类型：expired / schema_changed / state_changed / ...
 ```
 
-## 写接口样本分布块（强制）
+## 项目适配报告扩展块（按需）
 
-> 本节定义写接口（createTransaction、createOrder、cancelOrder、refund 等）明细报告必须附带的"写接口样本分布"块格式。`test-data-construction-rules.md` 中规定 4 类样本必须全部出现，本节定义其呈现格式。
+> 通用报告不内置固定样本数、固定样本类别、固定业务失败子类或固定业务实体分布。只有 local `doc/5-tests/基线/script-adapter.yaml` 的 `release_gate_extensions` 命中当前入口，并声明 `report_extensions` 时，才输出本块。
 
-### 一、什么时候必须带写接口样本分布块
+### 一、启用条件
 
-- 任何写接口的接口明细块中，`Agent 判定` 字段如果是 `PASS` / `EXPECTED_FAIL` / `UNEXPECTED_FAIL` / `PENDING` 四类之一，必须紧随其后附带「写接口样本分布」块。
-- 缺少"写接口样本分布"块的上线测试报告，视为报告不合格，需要补齐后重新提交。
-- 读接口（getHistory、getRateAndRange 等）的明细块不需要附带本块。
+- adapter 中对应规则必须完整提供 `rule_id`、`applies_to`、`sample_categories`、`thresholds`、`business_failure_categories`、`report_extensions`、`decision` 和 `rollback`。
+- 当前接口或场景必须命中 `applies_to`；未命中时不得为了凑报告而输出空扩展块。
+- 未声明 adapter 或 `report_extensions` 为空时，继续输出通用接口/场景报告，不得应用历史项目的报告字段。
 
-### 二、块格式（强制，不得使用 Markdown 表格）
-
-接口明细块中紧跟 `判定理由` 字段后插入以下块（顺序与字段名固定）：
+### 二、块格式（不得使用 Markdown 表格）
 
 ```text
-【写接口样本分布】
-接口标识        order_create_POST
-样本总数        N
-PASS 数量       N1
-EXPECTED_FAIL   N2（其中 手续费不足 K1 / 维护中 K2 / 黑名单 K3 / 超范围 K4 / 上游业务级拒绝 K5）
-UNEXPECTED_FAIL N3
-PENDING         N4
-样本来源分布
-  historical_succeeded         数量 / 占比
-  historical_failed_lifecycle  数量 / 占比
-  historical_inflight         数量 / 占比
-  current_listing_available    数量 / 占比
-通道/链/币种分布
-  <通道A>   数量
-  <通道B>   数量
-  ...
-矩阵完整性     完整 / 缺失 <类别>
+【项目适配报告扩展】
+规则 ID          <rule_id>
+适用入口/场景    <applies_to 命中项>
+adapter 指纹     <sha256>
+样本类别         <adapter 声明类别及实际数量>
+阈值对账         <字段：实际值 / 声明阈值 / 是否满足>
+业务失败分类     <adapter 声明分类及实际数量>
+报告扩展字段     <adapter 声明字段及脱敏值>
+项目适配判定     PASS / FAIL / PARTIAL / PENDING / BLOCKED
+判定规则         <decision>
+回滚规则         <rollback>
 ```
 
-### 三、字段说明
+### 三、字段约束
 
-- `样本总数`：所有 4 类样本加起来的条数，必须 ≥10。
-- `EXPECTED_FAIL` 行的 `K1..K5` 是子分类计数，5 个子分类对应 5 类业务允许失败（手续费不足 / 维护中 / 黑名单 / 超范围 / 上游业务级拒绝）。
-- `样本来源分布` 必须显式标注 4 类样本各自的数量与占比，缺一类记为 0。
-- `通道/链/币种分布` 至少列出实际命中的通道；少于 2 个通道时必须显式标注"覆盖度不足"。
-- `矩阵完整性` 字段值必须是 `完整` 或 `缺失 <类别>`，缺失类别只能是 4 类样本之一。
+- 所有类别、阈值、分类和扩展字段均来自当前 adapter；通用模板不补默认名称、数量、比例或业务实体。
+- adapter 要求但本轮没有样本的类别必须以实际数量 0 展示，不得省略或伪造。
+- `业务失败分类` 只能展示 adapter 白名单中的分类；未声明分类必须单独标为未识别，不能计入 `EXPECTED_FAIL`。
+- adapter 指纹、实际值和阈值对账必须可由本轮机器结果复算；不一致视为报告不可信并阻断门禁。
+- 扩展字段继续遵守脱敏与最小持久化要求，不得落盘 token、Cookie、密码、完整鉴权报文或其它敏感值。
 
 ### 四、判定理由补充
 
-- 写接口的 `判定理由` 字段必须显式说明 EXPECTED_FAIL 命中的是哪个子分类。
-- 4 类样本缺失时，`判定理由` 字段必须说明缺失原因（数据库无数据 / 列表接口不可用 / 上游业务变化 / 其他）。
-- `矩阵完整性` 与 `判定理由` 必须保持一致；不一致视为报告伪造。
+- 判定理由必须引用 `rule_id`，说明命中的 adapter 条件、实际值和未满足项。
+- `PENDING` 或 `BLOCKED` 必须写明缺失字段、非 local 来源、安全问题或样本缺口。
+- 项目适配块与通用判定冲突时采用更严格结果，并在判定理由中解释差异。
 
 ## 执行附录
 

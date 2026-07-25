@@ -65,42 +65,34 @@
 3. PARTIAL结论必须经过相关负责人确认风险可接受后，才能作为允许上线的依据，不能直接自动放行。
 4. 最终结论必须写入测试报告主README.md，作为上线审批的附件留存。
 
-## 写接口场景下 EXPECTED_FAIL 的门禁准入（与 `agent-response-judgement.md` 联动）
+## 项目适配门禁扩展（按需）
 
-> 本节是所有产生业务副作用的写入口专用门禁准入规则，是对上文 PASS/FAIL/PARTIAL 三级判定的强化补充，不取代既有规则。
+> 通用引擎不内置固定比例、固定样本数量、固定业务实体数量或固定业务失败子类。只有项目 local 基线中的 `doc/5-tests/基线/script-adapter.yaml` 显式声明扩展规则时，才允许在通用 PASS/FAIL/PARTIAL 门禁之外应用项目门禁。
 
-### 一、为什么需要写接口专用准入
+### 一、启用条件
 
-- 写入口受外部依赖和业务状态影响，历史成功参数在当前时点可能触发 EXPECTED_FAIL。
-- 既有规则中 P0 接口存在 UNEXPECTED_FAIL 即判 FAIL，会把所有写接口一刀切到 FAIL，导致上线测试无法推进。
-- 用写接口专用准入后：矩阵样本齐 + 4 类样本齐 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 时可走 PARTIAL。
+- 项目适配规则必须位于 `release_gate_extensions`，且每条规则完整提供 `rule_id`、`applies_to`、`sample_categories`、`thresholds`、`business_failure_categories`、`report_extensions`、`decision` 和 `rollback`。
+- `applies_to` 必须列出适用接口或场景；禁止用未限定范围的项目规则影响全部接口。
+- `sample_categories`、`thresholds` 和 `business_failure_categories` 的名称与数值完全由项目声明；通用引擎不得补入默认比例、默认数量、默认实体名或默认失败分类。
+- adapter 只能来自 local 配置，且只能声明数据和规则；禁止嵌入任意代码、原始 SQL、test/prod 地址或敏感值。
+- 缺少 adapter、扩展数组为空或目标入口未命中 `applies_to` 时，只执行通用门禁，不生成项目适配结论。
 
-### 二、PARTIAL 准入条件（写接口专用）
+### 二、判定规则
 
-同时满足以下所有条件，P0 写接口可走 PARTIAL 结论：
+1. 已命中扩展规则时，样本类别、阈值、业务失败分类和覆盖实体全部按该规则逐项校验，不允许使用通用默认值补缺。
+2. adapter 声明不完整、类型错误、规则 ID 重复或实际样本缺少必需类别时，状态为 `PENDING`；非 local 来源或包含禁止内容时状态为 `BLOCKED`。
+3. `EXPECTED_FAIL` 只有命中 adapter 明确列出的业务失败分类时才成立；未声明的业务失败不得自行归入允许集合。
+4. 项目规则要求的 `UNEXPECTED_FAIL`、连续运行、比例、数量或覆盖度条件只按 adapter 中的精确阈值计算。
+5. 任一项目扩展规则未满足时，按其 `decision` 输出 FAIL、PENDING 或 PARTIAL；不得因为历史项目曾使用某个阈值而沿用旧结论。
 
-1. `test-data-construction-rules.md` 中项目基线声明的样本类别全部出现；缺失任一类视为矩阵缺失，直接判 PENDING。
-2. `UNEXPECTED_FAIL` 数量为 0（5xx、空 msg、堆栈、字段缺失、状态不符、敏感信息泄露等真异常不允许出现）。
-3. `EXPECTED_FAIL` 比例 ≥60%（即 `EXPECTED_FAIL` 数量 / 总样本数 ≥ 0.6）。
-4. 同一 `EXPECTED_FAIL` 子类连续 3 轮占比 ≥80% 时，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL。
-5. 至少 2 个通道/链/币种的样本都有结果（覆盖度），不能单一通道假阳性。
+### 三、报告与证据
 
-### 三、PARTIAL 升级与降级
+- 报告必须记录 adapter 相对路径、文件指纹、`rule_id`、适用入口、实际值、声明阈值、判定和回滚规则。
+- `report_extensions` 只决定项目扩展字段；通用报告不得写死字段名、枚举值或业务对象。
+- 适配规则变更后必须重新运行对应场景并生成新证据，旧报告不能作为当前门禁依据。
 
-- 满足第二节所有条件 → PARTIAL 准入；剩余的 `EXPECTED_FAIL` 子类需在 PARTIAL 风险项列表中逐项说明影响范围与缓解措施。
-- 不满足第二节任一条件 → 维持既有规则（P0 不通过即 FAIL，或按既有 PARTIAL 条件判定）。
-- `UNEXPECTED_FAIL > 0` → 直接 FAIL（不因 EXPECTED_FAIL 比例高而豁免）。
+### 四、与通用门禁的关系
 
-### 四、人工阻断条件
-
-满足以下任一条件，必须升级为人工阻断（`PENDING` + 阻断说明），不进入 PARTIAL：
-
-- 同一 `EXPECTED_FAIL` 子类连续 3 轮占比 ≥80%（业务已经形成稳定失败模式，需要人工评估是否调整参数策略或确认业务预期）。
-- 4 类样本中任意一类缺失（矩阵不完整，无法证明接口在所有业务态下都按预期工作）。
-- 代理配置错误或上游服务不可用（外部环境阻断，不是接口代码问题，但仍需人工确认环境后重测）。
-
-### 五、与既有 PARTIAL 条件的关系
-
-- 本节不取代既有 PARTIAL 条件（"无 P0 接口不通过、待确认、跳过的情况"）。
-- 本节只在写接口场景下，放宽 `EXPECTED_FAIL` 计入 PARTIAL 准入；其他类型接口仍按既有规则。
-- 既有 PARTIAL 风险项列表要求（风险等级、影响范围、严重程度、修复计划、补测计划、回滚方案）仍然适用。
+- 项目适配扩展不能放宽 P0/P1 场景全集覆盖、清理成功、非 local 阻断、敏感信息保护和 runtime 真实性要求。
+- 未配置项目扩展不是 PASS 证据；它只表示当前项目不启用额外业务门禁。
+- 项目适配结论与通用门禁冲突时采用更严格结果，并在报告中记录冲突来源。

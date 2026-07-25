@@ -20,7 +20,11 @@ Subagent 状态：
 - 平台昵称：<spawn 返回昵称；没有则写未提供>
 - 执行 skill：<skill-name>
 - 结果：<一句话结果摘要>
-- 回收：<已调用 close_agent / 回收失败原因>
+- 执行终态：<completed / failed / canceled / interrupted / abandoned / unknown>
+- 关闭动作：<close_agent / equivalent_release / interrupt_agent / none>
+- 关闭工具结果：<success / failed / unavailable>
+- 复查结果：<不再活跃且不占用资源 / 仍活跃 / 未知>
+- 告警原因：<无 / 具体原因>
 ```
 
 ## 模板 1：只读核查任务
@@ -127,7 +131,9 @@ Subagent 状态：
 - 是否存在需要主 agent 决策的冲突项。
 - 主 agent 是否已输出启动公告与完成公告。
 - 主 agent 是否已记录逻辑名、平台昵称和 agent_id 的映射。
-- 主 agent 是否已调用 `close_agent` / 等价关闭工具完成回收。
+- 主 agent 是否已记录扫描阶段、执行终态、关闭动作、关闭工具结果和复查结果。
+- 主 agent 是否已调用真实关闭工具并通过关闭后复查；`interrupt_agent` 不计作关闭。
+- 主 agent 是否已在最终回复前完成终局扫描，并对未关闭实例逐一告警。
 
 ## 启动计划脚本约定
 

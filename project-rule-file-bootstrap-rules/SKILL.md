@@ -56,7 +56,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 
 | 目标文件 | 本 skill 职责 | 不属于本 skill |
 |---|---|---|
-| `PROJECT_CURRENT.md` | 缺失时创建当前状态骨架和唯一失活任务投影槽位；已存在时验证 UTF-8 与 51,200 字节上限，不重写已有内容 | 当前状态的具体内容覆盖维护、活动投影更新和 `update_plan` payload |
+| `PROJECT_CURRENT.md` | 缺失时创建当前状态骨架和 v4 空任务投影 registry；已存在时验证 UTF-8 与 51,200 字节上限，不重写已有内容 | 当前项目概览与会话状态维护、registry 活动 projection 更新和 `update_plan` payload |
 | `PROJECT_MEMORY.md` | 缺失时创建人类阅读区与机器索引区双区骨架；机器索引区缺失或 schema 不完整时只补最小受管结构 | 事实抽取、实体关系和长期事实更新 |
 | `PROJECT_HISTORY.md` | 缺失时创建追加式骨架；已存在时只验证 UTF-8，不覆盖、不重排历史内容 | 具体历史事件追加 |
 | `PROJECT_STYLE.md` | 不创建、不检测，仅保留其由 `project-style-rules` 按需维护的边界 | 风格主文档创建与合并 |
@@ -65,7 +65,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 
 - 不得新增 `PROJECT_MEMORY_INDEX.yaml` 或其他平行机器索引文件。
 - `PROJECT_MEMORY.md` 的人类正文属于非受管内容，补齐机器索引区时不得覆盖。
-- 新项目模板只提供 `state: inactive` 的空任务投影槽位；既有项目首次补齐、活动状态、指纹、原子写入和失活均由 `task-plan-rehydration-rules` 负责，本 Skill 不扩大“既有文件不重写”边界。
+- 新项目模板只提供 v4 registry 中空的 `projections` 数组；既有项目首次补齐、会话归属、活动状态、指纹、原子写入和失活均由 `task-plan-rehydration-rules` 负责，本 Skill 不扩大“既有文件不重写”边界。
 - 模板只读预览见 [`references/项目记忆模板/四件套模板.md`](references/项目记忆模板/四件套模板.md)；执行时写入源仍以唯一脚本内的 `PROJECT_CURRENT_TEMPLATE`、`PROJECT_MEMORY_MACHINE_SECTION`、`PROJECT_HISTORY_TEMPLATE` 为准。
 
 ## 统一执行步骤

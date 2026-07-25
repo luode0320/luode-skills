@@ -47,6 +47,7 @@
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
 - `PROJECT_CURRENT.md` 中的唯一任务投影托管区由 `task-plan-rehydration-rules` 管理。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。当前回合处于 Plan Mode 时该 Skill 只作候选命中并明确退出，不读取投影、不调用 `update_plan`、不创建任务悬浮窗；只有 Plan Mode 已结束且当前回合能证明与活动投影属于同一来源对象时，才在任何领域动作前校验投影并调用 `update_plan` 重建悬浮任务列表。若托管投影缺失，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配或归属不确定时必须明确退出，禁止静默跳过或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
+- 长任务自动 Goal 采用跨会话 standing authorization：默认执行模式取得 `confirmed` 后，从首次真实执行动作累计主动执行时间，扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff`；未完成任务在当前会话无活动或阻断投影且时间严格大于 600 秒时，主 Agent 必须先调用只读 `probe-timeout`，仅在 `goal_check_required` 后按 `get_goal -> 复用匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行。Goal 摘要必须单行中文、不超过 80 字并脱敏，不得落盘；不匹配、工具不可用、失败或结果不明确时禁止重复创建，改用原 `ensure-timeout` 降级普通投影。Plan Mode、许可不足、任务已完成或计时丢失时不得创建 Goal；子 Agent 不得调用 Goal 或主悬浮窗工具。该授权不扩大编码、文件、外部副作用或 Git 权限。
 
 ### Obsidian 知识流选择性默认触发（强制）
 

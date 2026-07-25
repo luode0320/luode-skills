@@ -131,7 +131,8 @@ httpConfig:
 
 ## 写入入口样本矩阵（强制）
 
-- 每个写入入口至少准备 `historical_valid`、`historical_rejected`、`current_valid`、`boundary` 四类样本；项目基线可声明不同类别，但必须给出来源和理由。
-- P0 默认每类不少于 3 条、总数不少于 10 条；P1 可按风险降级，P2 记录最小代表样本。
+- 每个写入入口的样本类别必须来自 local `doc/5-tests/基线/script-adapter.yaml` 对应 `release_gate_extensions[].sample_categories`；通用规则不预设类别名称。
+- P0/P1/P2 的最小样本量、类别数量和覆盖维度必须来自同一扩展规则的 `thresholds`；未声明或声明不完整时标记为 `PENDING`，不得使用通用默认数量推断覆盖充分。
 - 每条样本记录来源引用、状态、幂等键、清理策略和是否产生外部副作用；重复参数组合只计一次。
-- 允许的业务拒绝必须由项目基线声明；没有声明时统一为 `PENDING`，不得猜测为 `EXPECTED_FAIL`。
+- 允许的业务拒绝必须由 `business_failure_categories` 显式声明；没有声明或未命中白名单时不得猜测为 `EXPECTED_FAIL`。
+- 写入样本不得嵌入任意代码、原始 SQL、非 local 连接信息或敏感值；清理能力缺失时不得执行写入场景。

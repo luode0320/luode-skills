@@ -25,10 +25,11 @@ import inspect
 import json
 import os
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Set, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Set, Tuple
 
 import yaml
 
@@ -1149,6 +1150,28 @@ def print_json(data) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
+def _status_exit_code(result: Mapping[str, Any]) -> int:
+    """把结构化状态映射为冻结的 CLI 退出码。
+
+    [参数] result: CLI 或内核返回对象。
+    [返回] 0=PASS、1=FAIL、2=契约无效、3=BLOCKED、4=PENDING。
+    最近修改时间: 2026-07-25 19:55:00 改动原因: 发布流水线不能把失败 JSON 当成进程成功。
+    """
+
+    # 1. 契约无效优先返回 2；环境、安全和清理阻断统一返回 3。
+    status = str(result.get("status", "PENDING")).upper()
+    failure_type = str(result.get("failure_type", "")).upper()
+    if "INVALID" in failure_type or failure_type in {"SCENARIO_VALIDATION_FAILED", "CONTRACT_INVALID"}:
+        return 2
+    if status == "PASS":
+        return 0
+    if status == "FAIL":
+        return 1
+    if status == "BLOCKED":
+        return 3
+    return 4
+
+
 def _load_engine_entrypoint(name: str):
     """加载新内核入口；兼容层缺少内核时继续支持旧资产命令。"""
     try:
@@ -1159,11 +1182,16 @@ def _load_engine_entrypoint(name: str):
     return entrypoint if callable(entrypoint) else None
 
 
-def _invoke_engine(name: str, args: argparse.Namespace, **extra: Any) -> bool:
-    """调用新内核并输出机器可读结果，返回是否已完成委派。"""
+def _invoke_engine(name: str, args: argparse.Namespace, **extra: Any) -> dict[str, Any] | None:
+    """调用新内核并输出机器可读结果。
+
+    [参数] name: 内核入口名；args: CLI 参数；extra: 兼容附加参数。
+    [返回] 已输出的结果对象；内核不可用或签名不兼容时返回 None。
+    最近修改时间: 2026-07-25 19:55:00 改动原因: 主程序必须根据真实状态映射进程退出码。
+    """
     entrypoint = _load_engine_entrypoint(name)
     if entrypoint is None:
-        return False
+        return None
     payload = vars(args).copy()
     payload.pop("func", None)
     payload.update(extra)
@@ -1174,11 +1202,13 @@ def _invoke_engine(name: str, args: argparse.Namespace, **extra: Any) -> bool:
         inspect.Parameter.POSITIONAL_OR_KEYWORD,
     }
     if "compat_command" in payload and expects_project_root and "compat_command" not in parameters and not accepts_extra:
-        return False
+        return None
     if payload.get("dry_run") and expects_project_root and "dry_run" not in parameters and not accepts_extra:
-        return False
+        return None
     if expects_project_root:
+        # 1.1 位置参数入口按是否接受扩展参数构造关键字载荷。
         if accepts_extra:
+            # 1.2 支持扩展参数时保留未显式列出的兼容选项。
             # 位置参数入口声明 **kwargs 时，必须保留未显式列出的 CLI 选项，
             # 否则 baseline/config 等兼容参数会在签名过滤阶段静默丢失。
             keyword_payload = {
@@ -1212,7 +1242,7 @@ def _invoke_engine(name: str, args: argparse.Namespace, **extra: Any) -> bool:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print_json(result)
-    return True
+    return result
 
 
 def _delegate_legacy_command(command: str, args: argparse.Namespace) -> bool:
@@ -1554,27 +1584,26 @@ def command_sync_interface_contract_assets(args: argparse.Namespace) -> None:
     )
 
 
-def command_doctor(args: argparse.Namespace) -> None:
-    """检查项目、local 配置和可用 adapter，输出新内核诊断结果。"""
+def command_doctor(args: argparse.Namespace) -> int:
+    """检查项目、local 配置和可用 adapter，并返回冻结退出码。
+
+    [参数] args: doctor 命令参数。
+    [返回] 结构化诊断对应的 CLI 退出码。
+    最近修改时间: 2026-07-25 19:55:00 改动原因: doctor 阻断不能被 shell 解释为成功。
+    """
+
+    # 1. 非 local 在加载或发现项目之前立即阻断。
     if args.environment != "local":
-        print_json({"mode": "doctor", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment})
-        return
-    if _invoke_engine("run_doctor", args, command="doctor"):
-        return
+        result = {"mode": "doctor", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment}
+        print_json(result)
+        return _status_exit_code(result)
+    delegated = _invoke_engine("run_doctor", args, command="doctor")
+    if delegated is not None:
+        return _status_exit_code(delegated)
+    # 2. 兼容层缺少内核时保留旧结构，但明确返回 PENDING 退出码。
     project_root = Path(args.project_root).resolve()
-    checks = {
-        "project_root_exists": project_root.is_dir(),
-        "local_only": True,
-        "engine_available": False,
-        "environment": args.environment,
-    }
-    result = {
-        "mode": "doctor",
-        "status": "PENDING",
-        "project_root": str(project_root),
-        "checks": checks,
-        "reason": "release_test_engine.cli.run_doctor unavailable",
-    }
+    checks = {"project_root_exists": project_root.is_dir(), "local_only": True, "engine_available": False, "environment": args.environment}
+    result = {"mode": "doctor", "status": "PENDING", "project_root": str(project_root), "checks": checks, "reason": "release_test_engine.cli.run_doctor unavailable"}
     if not checks["project_root_exists"]:
         result["status"] = "FAIL"
         result["reason"] = "project_root does not exist"
@@ -1583,31 +1612,32 @@ def command_doctor(args: argparse.Namespace) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print_json(result)
+    return _status_exit_code(result)
 
 
-def command_run(args: argparse.Namespace) -> None:
-    """执行新内核全链路；内核缺失时返回结构化不可用结果。"""
+def command_run(args: argparse.Namespace) -> int:
+    """执行新内核全链路并返回冻结退出码。
+
+    [参数] args: run/release-run/external-run 命令参数。
+    [返回] 内核结构化状态对应的 CLI 退出码。
+    最近修改时间: 2026-07-25 19:55:00 改动原因: FAIL/BLOCKED/PENDING 不再返回进程码 0。
+    """
+
+    # 1. 非 local 在内核调用前固定为环境阻断。
     if args.environment != "local":
-        print_json({"mode": "run", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment})
-        return
-    if _invoke_engine("run_pipeline", args, command="run"):
-        return
+        result = {"mode": "run", "status": "BLOCKED", "failure_type": "ENV_BLOCKED", "environment": args.environment}
+        print_json(result)
+        return _status_exit_code(result)
+    delegated = _invoke_engine("run_pipeline", args, command="run")
+    if delegated is not None:
+        return _status_exit_code(delegated)
+    # 2. 内核或 dry-run 能力缺失保持 PENDING，禁止兼容层伪造执行成功。
     engine_available = _load_engine_entrypoint("run_pipeline") is not None
     failure_type = "UNSUPPORTED_DRY_RUN" if engine_available and args.dry_run else "UNSUPPORTED_ENGINE"
-    reason = (
-        "current release_test_engine does not expose a dry-run execution mode"
-        if failure_type == "UNSUPPORTED_DRY_RUN"
-        else "release_test_engine.cli.run_pipeline unavailable"
-    )
-    print_json(
-        {
-            "mode": "run",
-            "status": "PENDING",
-            "failure_type": failure_type,
-            "reason": reason,
-            "project_root": str(Path(args.project_root).resolve()),
-        }
-    )
+    reason = "current release_test_engine does not expose a dry-run execution mode" if failure_type == "UNSUPPORTED_DRY_RUN" else "release_test_engine.cli.run_pipeline unavailable"
+    result = {"mode": "run", "status": "PENDING", "failure_type": failure_type, "reason": reason, "project_root": str(Path(args.project_root).resolve())}
+    print_json(result)
+    return _status_exit_code(result)
 
 
 def command_migrate_baseline(args: argparse.Namespace) -> None:
@@ -1627,7 +1657,124 @@ def command_migrate_baseline(args: argparse.Namespace) -> None:
         print_json({"mode": "migrate-baseline", "status": "BLOCKED", "failure_type": "INVALID_V1_BASELINE", "reason": str(exc), "input": str(input_path), "output": str(output_path)})
         return
     print_json({"mode": "migrate-baseline", "status": "PASS", "input": str(input_path), "output": str(output_path), "schema_version": migrated.get("schema_version"), "source_revision": args.source_revision})
-def build_parser() -> argparse.ArgumentParser:
+
+
+def command_migrate_scenario_results(args: argparse.Namespace) -> int:
+    """迁移旧场景结果并保留弃用提示，不把旧接口结果提升为场景通过。
+
+    [参数] input/output/project_root: 旧资产、输出路径和项目根目录。
+    [返回] JSON 迁移摘要。
+    最近修改时间: 2026-07-25 17:40:00 改动原因: 提供 C18-01 兼容 CLI 迁移入口。
+    """
+
+    # 1. 输入输出都要求位于项目根内，迁移失败时不修改任何输入资产。
+    from release_test_engine.scenario_migration import migrate_scenario_results
+
+    root = Path(args.project_root).resolve()
+    input_path = Path(args.input)
+    output_path = Path(args.output)
+    input_path = (root / input_path).resolve() if not input_path.is_absolute() else input_path.resolve()
+    output_path = (root / output_path).resolve() if not output_path.is_absolute() else output_path.resolve()
+    try:
+        # 1.1 先确认输入输出都在项目根内，再执行非覆盖迁移。
+        input_path.relative_to(root)
+        output_path.relative_to(root)
+        result = migrate_scenario_results(input_path, output_path)
+    except (OSError, TypeError, ValueError) as exc:
+        result = {"status": "BLOCKED", "failure_type": "SCENARIO_MIGRATION_INVALID", "reason": str(exc), "input": str(input_path), "output": str(output_path)}
+    print_json(result)
+    return _status_exit_code(result)
+def _resolve_project_asset(project_root: str | Path, value: str | Path) -> Path:
+    """解析项目根内的 local CLI 资产路径。
+
+    [参数] project_root: 被测项目根；value: 输入或输出路径。
+    [返回] 已确认位于项目根内的绝对路径。
+    最近修改时间: 2026-07-25 20:05:00 改动原因: external 子命令不得读取或写入项目外资产。
+    """
+
+    # 1. 相对路径以项目根为基准，绝对路径也必须通过 relative_to 边界检查。
+    root = Path(project_root).resolve()
+    path = Path(value)
+    path = (root / path).resolve() if not path.is_absolute() else path.resolve()
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise PermissionError("NON_LOCAL_EXTERNAL_ASSET") from exc
+    return path
+
+
+def command_external_generate(args: argparse.Namespace) -> int:
+    """从接口事实生成 candidate 场景目录。
+
+    [参数] args: project_root/interfaces/output/consumer/source_name。
+    [返回] candidate 的 PENDING 退出码或无效契约退出码。
+    最近修改时间: 2026-07-25 20:05:00 改动原因: 补齐冻结的 external-generate 公共入口。
+    """
+
+    from release_test_engine.scenario_generation import generate_candidates
+
+    # 1. 生成只接受项目根内的接口事实文件，candidate 不能直接返回 PASS。
+    try:
+        # 1.1 解析接口事实、生成 candidate 并以 UTF-8 写入项目根内输出。
+        input_path = _resolve_project_asset(args.project_root, args.interfaces)
+        output_path = _resolve_project_asset(args.project_root, args.output)
+        document = read_yaml(input_path, None)
+        interfaces = document.get("interfaces", []) if isinstance(document, Mapping) else document
+        if not isinstance(interfaces, list):
+            raise ValueError("interfaces asset must be an array or contain interfaces array")
+        generated = generate_candidates(interfaces, consumer=args.consumer, source_name=args.source_name)
+        write_yaml(output_path, generated)
+        result = {"mode": "external-generate", "status": "PENDING", "failure_type": "SCENARIO_CANDIDATE_PENDING", "candidate_count": len(generated.get("scenarios", {})), "output": str(output_path)}
+    except (OSError, PermissionError, TypeError, ValueError) as exc:
+        result = {"mode": "external-generate", "status": "BLOCKED", "failure_type": "INVALID_EXTERNAL_GENERATION", "reason": str(exc)}
+    print_json(result)
+    return _status_exit_code(result)
+
+
+def _validate_external_catalog(args: argparse.Namespace, *, require_verified: bool) -> int:
+    """校验场景目录，并可额外要求全部 verified。
+
+    [参数] args: project_root/catalog；require_verified: 是否要求正式门禁生命周期。
+    [返回] PASS、契约无效或 candidate PENDING 对应的退出码。
+    最近修改时间：2026-07-26 01:20:00，external 校验回读项目根内 verification artifact。
+    """
+
+    from release_test_engine.scenario_loader import load_scenario_catalog
+    from release_test_engine.scenario_model import ScenarioValidationError
+
+    # 1. loader 负责 schema、来源指纹和五项验证；verify 再阻断非 verified 生命周期。
+    try:
+        # 1.1 目录先经过完整 loader，再根据命令语义判定 candidate 是否保持 PENDING。
+        catalog_path = _resolve_project_asset(args.project_root, args.catalog)
+        catalog = load_scenario_catalog(catalog_path, project_root=Path(args.project_root).resolve())
+        pending = sorted(item.scenario_id for item in catalog.scenarios.values() if item.lifecycle != "verified")
+        status = "PENDING" if require_verified and pending else "PASS"
+        result = {"mode": "external-verify" if require_verified else "external-validate", "status": status, "failure_type": "SCENARIO_NOT_VERIFIED" if pending and require_verified else "", "scenario_count": len(catalog.scenarios), "pending_scenarios": pending}
+    except (OSError, PermissionError, ScenarioValidationError, TypeError, ValueError) as exc:
+        result = {"mode": "external-verify" if require_verified else "external-validate", "status": "BLOCKED", "failure_type": "INVALID_EXTERNAL_SCENARIO", "reason": str(exc)}
+    print_json(result)
+    return _status_exit_code(result)
+
+
+def command_external_validate(args: argparse.Namespace) -> int:
+    """[参数] args: 场景目录参数；[返回] validate 退出码；最近修改时间: 2026-07-25 20:05:00，补齐公共入口。"""
+    return _validate_external_catalog(args, require_verified=False)
+
+
+def command_external_verify(args: argparse.Namespace) -> int:
+    """[参数] args: 场景目录参数；[返回] verify 退出码；最近修改时间: 2026-07-25 20:05:00，阻断 candidate 门禁。"""
+    return _validate_external_catalog(args, require_verified=True)
+
+
+def build_parser(*, include_external_scenarios: bool = False) -> argparse.ArgumentParser:
+    """构造旧命令兼容解析器，并按需注册消费者场景入口。
+
+    [参数] include_external_scenarios: 是否注册场景迁移和独立发布入口。
+    [返回] argparse.ArgumentParser: 可直接解析命令行的参数解析器。
+    最近修改时间：2026-07-25 23:50:00，external-run 使用独立 scenario 默认值且不污染旧入口。
+    """
+
+    # 1. 默认命令集合继续保持旧 CLI 公共契约，新入口只由真实主程序显式启用。
     parser = argparse.ArgumentParser(description="上线前接口测试资产初始化与计划生成工具")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -1726,7 +1873,50 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--continue-on-failure", action="store_true", help="依赖失败后继续执行无关场景")
     run_parser.add_argument("--dry-run", action="store_true", help="仅生成执行图和参数计划，不发送请求")
     run_parser.add_argument("--strict-contracts", action="store_true", help="要求 manifest/inventory/reusable 三方契约资产完整且可审计")
+    run_parser.add_argument("--gate-mode", choices=("legacy", "shadow", "scenario"), default="legacy", help="选择 legacy、shadow 或 scenario 门禁轨道")
+    run_parser.add_argument("--scenario-catalog", default="", help="项目根内 external-scenario/1.0 场景目录")
+    run_parser.add_argument("--gate-history", default="", help="项目根内连续 shadow 运行历史文件")
+    run_parser.add_argument("--gate-state", default="", help="项目根内门禁切换状态文件")
     run_parser.set_defaults(func=command_run)
+
+    # 2. 场景入口复用 run 的参数对象，避免两个发布命令产生参数漂移。
+    if include_external_scenarios:
+        # 2.1 仅增强入口暴露 release-run 和六个 external 子命令，旧解析器保持原命令集合。
+        release_run_parser = subparsers.add_parser(
+            "release-run",
+            help="兼容入口：按 gate-mode 执行上线接口与消费者场景门禁",
+        )
+        for action in run_parser._actions[1:]:
+            if action.dest in {"help", "func"}:
+                continue
+            release_run_parser._add_action(action)
+        release_run_parser.set_defaults(func=command_run)
+        external_run_parser = subparsers.add_parser("external-run", help="执行 verified 消费者场景门禁")
+        for action in run_parser._actions[1:]:
+            # 2.2 external-run 使用独立 gate-mode action，避免共享 argparse action 污染旧入口默认值。
+            if action.dest in {"help", "func", "gate_mode"}:
+                continue
+            external_run_parser._add_action(action)
+        external_run_parser.add_argument("--gate-mode", choices=("legacy", "shadow", "scenario"), default="scenario", help="选择 legacy、shadow 或 scenario 门禁轨道；默认 scenario")
+        external_run_parser.set_defaults(func=command_run)
+        external_doctor_parser = subparsers.add_parser("external-doctor", help="检查隔离工具环境与外部协议 runtime")
+        for action in doctor_parser._actions[1:]:
+            if action.dest in {"help", "func"}:
+                continue
+            external_doctor_parser._add_action(action)
+        external_doctor_parser.set_defaults(func=command_doctor)
+        external_generate_parser = subparsers.add_parser("external-generate", help="从接口事实生成 candidate 场景目录")
+        external_generate_parser.add_argument("--project-root", required=True, help="项目根目录")
+        external_generate_parser.add_argument("--interfaces", required=True, help="项目根内接口事实 YAML/JSON")
+        external_generate_parser.add_argument("--output", required=True, help="项目根内 candidate 输出")
+        external_generate_parser.add_argument("--consumer", required=True, help="消费者身份")
+        external_generate_parser.add_argument("--source-name", required=True, help="来源资产名称")
+        external_generate_parser.set_defaults(func=command_external_generate)
+        for command_name, handler in (("external-validate", command_external_validate), ("external-verify", command_external_verify)):
+            catalog_parser = subparsers.add_parser(command_name, help="校验 external-scenario/1.0 场景目录")
+            catalog_parser.add_argument("--project-root", required=True, help="项目根目录")
+            catalog_parser.add_argument("--catalog", required=True, help="项目根内场景目录")
+            catalog_parser.set_defaults(func=handler)
 
     migration_parser = subparsers.add_parser("migrate-baseline", help="将 v1 基线迁移为 v2 并保留迁移证据")
     migration_parser.add_argument("--input", required=True, help="v1 基线文件")
@@ -1735,14 +1925,32 @@ def build_parser() -> argparse.ArgumentParser:
     migration_parser.add_argument("--source-revision", default="", help="源版本或提交标识")
     migration_parser.set_defaults(func=command_migrate_baseline)
 
+    # 3. 旧资产迁移只在消费者场景模式出现，默认兼容解析器不暴露新增命令。
+    if include_external_scenarios:
+        # 3.1 旧场景结果迁移命令只在增强入口出现，防止兼容 CLI 意外扩面。
+        scenario_migration_parser = subparsers.add_parser("external-migrate", help="迁移旧接口列表式 scenario-results.json 为待验证场景报告")
+        scenario_migration_parser.add_argument("--project-root", required=True, help="项目根目录")
+        scenario_migration_parser.add_argument("--input", required=True, help="旧 scenario-results.json")
+        scenario_migration_parser.add_argument("--output", required=True, help="新场景结果输出路径")
+        scenario_migration_parser.set_defaults(func=command_migrate_scenario_results)
+
     return parser
 
 
-def main() -> None:
-    parser = build_parser()
+def main() -> int:
+    """启用完整消费者场景命令并分派当前 CLI 请求。
+
+    [参数] 无。
+    [返回] 子命令冻结退出码；旧资产命令保持 0。
+    最近修改时间: 2026-07-25 20:05:00 改动原因: FAIL/BLOCKED/PENDING 必须传播到进程状态。
+    """
+
+    # 1. 真实命令行启用外部场景能力，旧 build_parser 调用方仍保持兼容集合。
+    parser = build_parser(include_external_scenarios=True)
     args = parser.parse_args()
-    args.func(args)
+    result = args.func(args)
+    return result if isinstance(result, int) else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

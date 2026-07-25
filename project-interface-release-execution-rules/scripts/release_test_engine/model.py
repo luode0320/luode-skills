@@ -146,8 +146,14 @@ class InterfaceIR:
 
 
 def validate_ir(document: Mapping[str, Any]) -> None:
-    """校验统一 IR；失败时抛出包含所有路径的 ``IRValidationError``。"""
+    """校验统一 IR，并保留旧调用方可识别的点路径错误文本。
 
+    [参数] document: 待校验的 IR 文档。
+    [返回] None: 校验失败时抛出包含全部路径的 ``IRValidationError``。
+    最近修改时间: 2026-07-25 16:45:00 改动原因: 兼容旧版本必填字段错误文本。
+    """
+
+    # 1. 先执行完整 schema 和版本校验，保留新版调用方需要的全部错误。
     errors: list[str] = []
     if not isinstance(document, Mapping):
         raise IRValidationError(["$ must be an object"])
@@ -162,11 +168,17 @@ def validate_ir(document: Mapping[str, Any]) -> None:
         if not isinstance(item, Mapping):
             errors.append(f"{prefix} must be an object")
             continue
+        # 2. 补回旧 CLI 和报告消费者依赖的点路径文本，再检查协议与置信度。
+        required_fields = IR_SCHEMA["$defs"]["interface"]["required"]
+        for field_name in required_fields:
+            if field_name not in item:
+                errors.append(f"{prefix}.{field_name} is required")
         if item.get("protocol") not in ALLOWED_PROTOCOLS:
             errors.append(f"{prefix}.protocol is unsupported")
         confidence = item.get("confidence")
         if isinstance(confidence, (int, float)) and not 0 <= confidence <= 1:
             errors.append(f"{prefix}.confidence must be between 0 and 1")
+        # 3. 参数位置继续使用协议中立白名单，未知位置不能进入执行阶段。
         for parameter_index, parameter in enumerate(item.get("parameters", [])):
             if parameter.get("location") not in ALLOWED_LOCATIONS:
                 errors.append(f"{prefix}.parameters[{parameter_index}].location is unsupported")

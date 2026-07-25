@@ -3,12 +3,18 @@
 
 ## Codex Desktop 任务投影断点恢复规则
 
-- 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 schema、计划指纹、敏感字段拒绝、51,200 字节闸门、原子写入、失活和 `update_plan` payload。
-- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。Goal 专属 v3 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、线程 ID、业务数据或原始用户输入。
-- 稳定决策：任务状态迁移固定先原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先校验活动投影并重建 UI，进行中步骤必须先核验中断点。
+- 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 v4 registry schema、计划指纹、敏感字段拒绝、51,200 字节闸门、同目录排他锁、原子写入、失活和 `update_plan` payload。
+- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
+- 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
+- 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
+- 稳定决策：默认执行回合中的简单任务开始时允许没有悬浮窗；取得 `confirmed` 后从首次真实执行动作开始计时，扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff`，只有严格大于 600 秒且当前会话无活动或阻断投影时才进入只读 `probe-timeout`，599 秒、600 秒及扣减后不超过 600 秒均不升级。
+- 稳定决策：`probe-timeout` 不创建锁文件、临时文件、projection 或 payload；`goal_check_required` 后只允许主 Agent 按 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行，子 Agent 不得调用 Goal 或主悬浮窗工具。
+- 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
+- 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或 Obsidian。
+- 稳定决策：超时升级只在工具返回、阶段进度或回合结束前等可执行检查点运行，不承诺后台第 601 秒自动唤醒；计时起止与暂停秒数不进入 projection schema 或项目长期状态，计时上下文丢失后重新计时而不是推算。
 - 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表，Goal complete 将三步完成并写为 `inactive`，payload 必为 `null`。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
-- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
 - 更新时间：2026-07-25。
 
 
@@ -197,7 +203,7 @@
 - 别名: 代码块五行门槛, 长代码块步骤注释, 代码块内步骤注释
 - 类型: 代码注释规则
 - 定义: 函数/方法体、闭包体和连续控制流代码块按非空行计数（代码行和已有注释行均计入，空行不计），超过 5 行时必须在该代码块内部就近补顶层编号步骤注释；每个超长代码块独立判断，嵌套代码块不能只依赖外层编号，多个步骤按 `1.`、`2.`、`3.` 展开。
-- 来源: 用户本轮需求、`comment-completion-gate-rules/SKILL.md`、`comment-placement-granularity-rules/SKILL.md`
+- 来源: 用户本轮需求、`comment-completion-gate-rules/SKILL.md`（补齐闸门主 Owner）、`comment-placement-granularity-rules/SKILL.md`（放置与颗粒度辅助 Owner）
 - 适用范围: 代码注释、步骤注释、注释放置与颗粒度、代码审查
 - 更新时间: 2026-07-16
 - 状态: 启用
@@ -215,7 +221,7 @@
 - 别名: util 归位, common/util 归位, util 与 common/util 区分
 - 类型: 包结构/复用规则
 - 定义: `util` 仅存放与当前项目无关、脱离项目上下文仍成立的通用工具；`common/util` 仅存放可复用但依赖当前项目文件、路径、配置、命名约定或目录结构的工具。引用项目文件或项目约定的复用工具不要放进独立 `util`。
-- 来源: 对话确认、`common-util-rules`、`package-structure-rules`
+- 来源: 对话确认、`common-util-rules`（公共资格与复用）、`package-structure-rules`（目录落点与依赖方向）
 - 适用范围: 通用工具、公共函数、复用代码、包归位
 - 更新时间: 2026-07-08
 - 状态: 启用
@@ -265,13 +271,13 @@
 - 更新时间: 2026-06-29
 - 状态: 启用
 
-### 子 agent 生命周期回收
-- 别名: close_agent 回收, 子代理关闭, 已完成子线程释放
+### 子 agent 生命周期与终局对账
+- 别名: close_agent 回收, 子代理关闭, 已完成子线程释放, 终局扫描, 未关闭告警
 - 类型: 流程规则
-- 定义: subagent 启动成功后，即使执行已完成，仍会继续占用并发槽位；主 agent 在结果回收并完成整合后，必须继续调用真实 `close_agent` / 等价关闭工具完成释放。`parallel-task-dispatch-rules` 的通过标准同时核对计划线程数、实际启动数、完成数与关闭数。
+- 定义: `parallel-task-dispatch-rules` 对当前会话全部非根 agent 执行进入前预检、批次回收和最终回复前终局扫描。完成、失败、取消、中断和放弃均不等于关闭；只有真实关闭或平台契约明确的等价资源释放成功且关闭后重新枚举不再活跃，才计入关闭数。平台没有真实关闭能力时只记录未关闭告警并禁止下一批，不得伪报全部关闭。统一对账保留计划线程数、实际启动数、完成数、关闭数，并新增终态数、终局扫描数、仍活跃数、未关闭数和告警原因。
 - 来源: `parallel-task-dispatch-rules`
 - 适用范围: 所有真实子 agent / 并行代理执行场景
-- 更新时间: 2026-06-29
+- 更新时间: 2026-07-25
 - 状态: 启用
 
 ### 审查体系收口
@@ -529,6 +535,7 @@
 - 2026-06-30：扩展并行识别口径，明确并行不再依赖固定 skill 映射白名单；主 agent 在项目分析、找 Bug、需求完善侦察、证据收集等任务中必须自主识别可委派的只读 sidecar 子任务并优先尝试真实 subagent 并行。
 - 2026-06-30：修正 subagent 自动启动口径，明确自动的是委派判定；真实启动必须服从当前工具元数据和授权策略。若工具要求用户显式授权，先检查当前轮授权与项目级完全授权；仅两者均不存在时，才回退本地执行并记录实际启动数为 0。
 - 2026-06-30：根据用户确认启用 subagent 完全授权模式；项目级 standing authorization 视为满足工具显式授权条件，不再因缺少逐次 subagent 指令而回退本地执行。
+- 2026-07-25：补充子 agent 三段生命周期扫描、关闭后复查和数量对账规则；`interrupt_agent`、完成通知和停止采样不计关闭，平台无真实关闭工具时仅告警并阻止下一批。
 - 2026-06-28：将正式活动文档目录迁移为 `doc/1-架构/` 到 `doc/7-验收/` 的编号顺序，并新增 `architecture-doc-rules` 承接长期架构专题文档。
 - 2026-06-28：固定架构域四个中文主入口，补齐目录树、模块职责、主要业务链路示例，并明确单条业务链路的新增与更新策略。
 - 2026-06-28：架构域文件改为固定顺序编号，基础入口占用 `1-4`，业务链路从 `5` 开始按最大编号加一，历史编号不复用、不重排。
@@ -640,7 +647,7 @@ entities:
       - 总控层精简
       - 并行与子代理统一 Owner
       - 项目自举双条件路由
-    definition: "每轮由 skill-hit-check-rules 唯一进入；并行分类与子代理生命周期统一归 parallel-task-dispatch-rules，项目规则和记忆骨架自举统一归 project-rule-file-bootstrap-rules 的 rule-bootstrap/memory-bootstrap；压缩恢复只在近期事实缺失时条件调用 recent-context-bootstrap-rules；最终 Markdown 由 reasoning-summary-structure-rules 唯一渲染。退役候选必须完成保护语义、触发正负样本、消费者、资产、回滚和 post-delete 门禁。"
+    definition: "每轮由 skill-hit-check-rules 唯一进入；并行分类与子代理生命周期统一归 parallel-task-dispatch-rules，生命周期必须执行进入前预检、批次回收和最终回复前终局扫描，只有真实关闭并复查不活跃才计关闭，未关闭实例阻止下一批；项目规则和记忆骨架自举统一归 project-rule-file-bootstrap-rules 的 rule-bootstrap/memory-bootstrap；压缩恢复只在近期事实缺失时条件调用 recent-context-bootstrap-rules；最终 Markdown 由 reasoning-summary-structure-rules 唯一渲染。退役候选必须完成保护语义、触发正负样本、消费者、资产、回滚和 post-delete 门禁。"
     scope: "总控入口、上下文恢复、项目自举、并行委派、执行收口和最终总结"
     status: "active"
     evidence_ids:
@@ -648,7 +655,7 @@ entities:
       - evidence.control-plane-post-delete
     context_ids:
       - context.skill-governance
-    updated_at: 2026-07-22
+    updated_at: 2026-07-25
   - entity_id: rule.swag-upstream-openapi
     name: "上游与第三方出站接口文档规则"
     type: "API 文档资产规则"
@@ -1076,15 +1083,18 @@ entities:
       - 悬浮任务列表恢复
       - task-plan-rehydration-rules
       - PROJECT_CURRENT 任务投影
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT 托管区的 schema、指纹、原子写入、失活和 update_plan payload；常规恢复与 Goal create/get/update 统一先持久化再刷新 UI，Goal 固定安全三步不保存原文，blocked 仅观察、complete 失活，且不恢复执行授权或 L5 resume。"
-    scope: "Codex Desktop 计划模式多步骤任务、Goal 生命周期、上下文恢复和宿主重开后的首次继续回合"
+      - 简单任务十分钟升级
+      - ensure-timeout
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；常规恢复与 Goal 生命周期按会话先持久化再刷新 UI。简单任务可暂不创建悬浮窗，但从首次真实执行开始，扣除 Plan Mode、等待用户、blocked 和 manual_handoff 后的主动执行时间严格大于 600 秒时必须在可执行检查点按 exact 优先、固定三步 fallback 的顺序升级；计时不持久化，也不承诺后台唤醒。"
+    scope: "Codex Desktop 默认执行回合、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和无活动悬浮窗任务的十分钟升级"
     status: "active"
     evidence_ids:
       - evidence.skill.task-plan-rehydration
       - evidence.doc.task-plan-rehydration-requirement
+      - evidence.doc.task-plan-timeout-cycle
     context_ids:
       - context.task-plan-rehydration
-    updated_at: 2026-07-23
+    updated_at: 2026-07-25
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -1211,7 +1221,7 @@ evidence:
     type: "skill"
     source: "common-util-rules/SKILL.md"
     path: "common-util-rules/SKILL.md"
-    note: "公共工具复用、存放位置和 util/common/util 分流规则来源"
+    note: "公共工具资格、复用检索、防重复封装和冻结策略来源；目录落点由 package-structure-rules 承接"
   - evidence_id: evidence.skill.package-structure-rules
     type: "skill"
     source: "package-structure-rules/SKILL.md"
@@ -1311,12 +1321,17 @@ evidence:
     type: "skill"
     source: "任务投影断点恢复唯一 Owner 与机器契约"
     path: "task-plan-rehydration-rules/SKILL.md"
-    note: "定义首次继续触发、状态同步顺序、UI 与执行授权边界、失活和工具不可用语义。"
+    note: "定义 v4 多会话 registry、首次继续按 session_id 精确触发、十分钟超时升级、状态同步顺序、UI 与执行授权边界、失活和工具不可用语义。"
   - evidence_id: evidence.doc.task-plan-rehydration-requirement
     type: "doc"
     source: "Codex Desktop 任务悬浮窗断点恢复需求与实施文档"
     path: "doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md"
-    note: "冻结任务投影字段、恢复时机、安全边界、验收标准和四周期实施顺序。"
+    note: "冻结任务投影字段、恢复时机、安全边界、验收标准和五周期实施顺序。"
+  - evidence_id: evidence.doc.task-plan-timeout-cycle
+    type: "doc"
+    source: "Codex Desktop 任务悬浮窗十分钟超时升级实施周期"
+    path: "doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md"
+    note: "冻结严格大于 600 秒、四类暂停、exact/fallback、无后台唤醒和 57 项回归证据。"
 contexts:
   - context_id: context.task-blocker-closure
     type: "task-scope"
@@ -1369,7 +1384,7 @@ contexts:
   - context_id: context.task-plan-rehydration
     type: "task-scope"
     name: "任务悬浮窗断点恢复"
-    note: "适用于任务投影持久化、Desktop 重开后的首次继续回合、上下文恢复和进行中步骤核验"
+    note: "适用于任务投影持久化、Desktop 重开后的首次继续回合、上下文恢复、进行中步骤核验和简单任务十分钟升级"
 lifecycle:
   active:
     - "rule.swag-upstream-openapi"
@@ -1404,6 +1419,10 @@ retrieval_hints:
     Desktop 继续任务:
       - "rule.task-plan-rehydration"
     update_plan 重建:
+      - "rule.task-plan-rehydration"
+    简单任务十分钟升级:
+      - "rule.task-plan-rehydration"
+    ensure-timeout:
       - "rule.task-plan-rehydration"
     Skill 体积预算:
       - "fact.skill-size-baseline-20260717"
@@ -1605,6 +1624,8 @@ retrieval_hints:
     task-plan-rehydration-rules/scripts/task_plan_projection.py:
       - "rule.task-plan-rehydration"
     doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md:
+      - "rule.task-plan-rehydration"
+    doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md:
       - "rule.task-plan-rehydration"
     execution-failure-learning-rules/SKILL.md:
       - "rule.execution-failure-learning"

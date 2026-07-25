@@ -3,47 +3,33 @@
 from __future__ import annotations
 
 import json
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from .storage import BaselineStore
 from .events import BaselineEvent, utc_now
-
-
-SENSITIVE_FIELDS = {
-    "token",
-    "access_token",
-    "refresh_token",
-    "password",
-    "secret",
-    "authorization",
-    "cookie",
-    "set-cookie",
-    "phone",
-    "idcard",
-    "bankcard",
-    "api-key",
-    "api_key",
-    "apikey",
-    "x-api-key",
-}
-
-
-def _redact(value: Any) -> Any:
-    """递归脱敏报告对象，避免请求、响应和基线携带凭据原值。
-
-    [参数] value: 待脱敏的映射、序列或标量。
-    [返回] 与输入结构兼容、敏感字段替换为 ``***`` 的值。
-    最近修改时间: 2026-07-12 21:10:00 改动原因: 统一报告和基线的凭据脱敏边界。
-    """
-
-    if isinstance(value, Mapping):
-        return {key: ("***" if str(key).lower() in SENSITIVE_FIELDS else _redact(child)) for key, child in value.items()}
-    if isinstance(value, list):
-        return [_redact(item) for item in value]
-    return value
+from .report_support import (
+    ensure_report_output_path as _ensure_report_output_path,
+    interface_fields as _interface_fields,
+    parameter_summary as _parameter_summary,
+    parse_jsonish as _parse_jsonish,
+    redact_evidence as _redact,
+    risk_statistics as _risk_statistics,
+    safe_name as _safe_name,
+    sensitive_evidence_values as _sensitive_evidence_values,
+    status_counts as _status_counts,
+    write_text as _write_text,
+    yaml_dump as _yaml_dump,
+)
+from .scenario_report import (
+    cleanup_summary as _cleanup_summary,
+    evidence_gate as _evidence_gate,
+    external_asset as _external_asset,
+    normalize_scenario_result as _scenario_report_item,
+    scenario_status_summary as _scenario_status_summary,
+    write_evidence_manifest,
+)
+from .storage import BaselineStore
 
 
 def _json_contract(value: Any) -> str:
@@ -114,109 +100,6 @@ def _response_contract(value: Any) -> str:
     """
 
     return json.dumps(_response_summary(value), ensure_ascii=False, sort_keys=True)
-
-
-def _status_counts(items: Iterable[Mapping[str, Any]]) -> dict[str, int]:
-    """统计接口状态并保留旧 gate 计数键。
-
-    [参数] items: 接口判定结果集合。
-    [返回] 各合法状态及 skipped 的数量。
-    最近修改时间: 2026-07-12 21:10:00 改动原因: 让风险统计和门禁摘要使用同一状态口径。
-    """
-
-    statuses = ("PASS", "EXPECTED_FAIL", "FAIL", "PENDING", "BLOCKED", "SKIPPED")
-    counts = {status: 0 for status in statuses}
-    for item in items:
-        status = str(item.get("status", "PENDING")).upper()
-        counts[status if status in counts else "PENDING"] += 1
-    return counts
-
-
-def _risk_statistics(items: Iterable[Mapping[str, Any]], interfaces: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, int]]:
-    """按 P0/P1/P2 汇总接口状态，未执行接口计入 skipped。
-
-    [参数] items: 测试结果；interfaces: operation_id 到接口 IR 的映射。
-    [返回] 风险等级到总数、通过、不通过、待确认和跳过数量的映射。
-    最近修改时间: 2026-07-12 21:10:00 改动原因: 补齐 README 与 JSON 的风险等级统计。
-    """
-
-    result_by_id = {str(item.get("operation_id", "")): item for item in items}
-    buckets: dict[str, dict[str, int]] = {}
-    source = interfaces or result_by_id
-    for operation_id, interface in source.items():
-        item = result_by_id.get(str(operation_id), {})
-        risk = str(interface.get("risk", item.get("risk", "P2"))).upper()
-        risk = risk if risk in {"P0", "P1", "P2"} else "P2"
-        counts = buckets.setdefault(risk, {"total": 0, "passed": 0, "failed": 0, "pending": 0, "skipped": 0})
-        counts["total"] += 1
-        status = str(item.get("status", "SKIPPED")).upper()
-        if status == "PASS":
-            counts["passed"] += 1
-        elif status in {"PENDING", "BLOCKED"}:
-            counts["pending"] += 1
-        elif status == "SKIPPED":
-            counts["skipped"] += 1
-        else:
-            counts["failed"] += 1
-    for risk in ("P0", "P1", "P2"):
-        buckets.setdefault(risk, {"total": 0, "passed": 0, "failed": 0, "pending": 0, "skipped": 0})
-    return {risk: buckets[risk] for risk in ("P0", "P1", "P2")}
-
-
-def _parameter_summary(items: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
-    """汇总参数解析、复用和失效状态，供报告与 baseline 共用。
-
-    [参数] items: 带 dependency_trace 的接口结果集合。
-    [返回] 参数总数、来源计数、成功/失败计数和生命周期计数。
-    最近修改时间: 2026-07-12 21:10:00 改动原因: 取代固定 0 参数摘要并支持基线复用。
-    """
-
-    traces: list[Mapping[str, Any]] = []
-    events: list[Mapping[str, Any]] = []
-    for item in items:
-        evidence = item.get("evidence", {})
-        if not isinstance(evidence, Mapping):
-            continue
-        trace = evidence.get("dependency_trace", [])
-        if isinstance(trace, list):
-            traces.extend(entry for entry in trace if isinstance(entry, Mapping))
-        reusable_events = evidence.get("reusable_param_events", [])
-        if isinstance(reusable_events, list):
-            events.extend(entry for entry in reusable_events if isinstance(entry, Mapping))
-    source_counts: dict[str, int] = {}
-    resolved = unresolved = 0
-    lifecycle = {name: 0 for name in ("reused", "revalidated", "candidate", "stale", "invalid", "quarantined")}
-    for trace in traces:
-        source = str(trace.get("source_type", trace.get("type", "unknown")))
-        source_counts[source] = source_counts.get(source, 0) + 1
-        if trace.get("resolved") is True:
-            resolved += 1
-        else:
-            unresolved += 1
-        status = str(trace.get("status", "")).lower()
-        if status in {"reusable", "reused"}:
-            lifecycle["reused"] += 1
-        if status == "revalidated" or trace.get("revalidated") is True:
-            lifecycle["revalidated"] += 1
-        if status in {"candidate", "stale", "invalid", "quarantined"}:
-            lifecycle[status] += 1
-    for event in events:
-        status = str(event.get("status", event.get("to_status", ""))).lower()
-        if status in lifecycle:
-            lifecycle[status] += 1
-    return {
-        "total": len(traces),
-        "resolved": resolved,
-        "unresolved": unresolved,
-        "source_counts": dict(sorted(source_counts.items())),
-        "reused": lifecycle["reused"],
-        "revalidated": lifecycle["revalidated"],
-        "candidate": lifecycle["candidate"],
-        "stale": lifecycle["stale"],
-        "invalid": lifecycle["invalid"],
-        "quarantined": lifecycle["quarantined"],
-        "events": [dict(event) for event in events],
-    }
 
 
 def _sync_summary(interface_map: Mapping[str, Mapping[str, Any]], metadata: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -363,97 +246,6 @@ def _report_item(item: Mapping[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _safe_name(value: Any) -> str:
-    """将接口标识转换为稳定的归档文件名。
-
-    [参数] value: 接口标识。
-    [返回] 仅包含 ASCII 安全字符的文件名片段。
-    最近修改时间: 2026-07-12 18:30 改动原因: 支持每接口证据归档。
-    """
-
-    name = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value or "unknown"))
-    return name.strip("._") or "unknown"
-
-
-def _parse_jsonish(value: Any) -> Any:
-    """解析报告中的 JSON 字符串，失败时保留原始值。
-
-    [参数] value: 任意请求或响应证据。
-    [返回] 可序列化的结构化值。
-    最近修改时间: 2026-07-12 18:30 改动原因: 统一证据文件格式。
-    """
-
-    if isinstance(value, str):
-        try:
-            return json.loads(value)
-        except (TypeError, ValueError):
-            return {"raw": value}
-    return value
-
-
-def _yaml_dump(value: Any) -> str:
-    """以 UTF-8 输出 YAML，缺少 PyYAML 时退化为合法 JSON。
-
-    [参数] value: 待归档对象。
-    [返回] YAML 或 JSON 文本。
-    最近修改时间: 2026-07-12 18:30 改动原因: 生成规范归档骨架。
-    """
-
-    try:
-        import yaml
-        return yaml.safe_dump(value, allow_unicode=True, sort_keys=False)
-    except ImportError:
-        return json.dumps(value, ensure_ascii=False, indent=2) + "\n"
-
-
-def _interface_fields(interface: Mapping[str, Any] | None, item: Mapping[str, Any], index: int) -> dict[str, str]:
-    """从接口 IR 和判定结果提取块状报告字段。
-
-    [参数] interface: 接口 IR 字典；item: 判定结果；index: 接口序号。
-    [返回] 标准报告字段映射。
-    最近修改时间: 2026-07-12 18:30 改动原因: 对齐 report-format 块状字段。
-    """
-
-    interface = interface or {}
-    entrypoint = interface.get("entrypoint", {}) if isinstance(interface.get("entrypoint", {}), Mapping) else {}
-    method = str(entrypoint.get("method", "")).upper()
-    path = str(entrypoint.get("path", entrypoint.get("url", "")))
-    endpoint = f"{method} {path}".strip() or str(item.get("operation_id", "unknown"))
-    status = str(item.get("status", "PENDING"))
-    verdict = {"PASS": "通过", "EXPECTED_FAIL": "不通过", "FAIL": "不通过", "BLOCKED": "待确认", "PENDING": "待确认"}.get(status, "待确认")
-    failure = str(item.get("failure_type", "") or "")
-    runtime_failures = {"BLOCKED_BY_DEPENDENCY", "PARAM_UNRESOLVED", "ENV_BLOCKED", "BASELINE_STALE", "UNSUPPORTED_ADAPTER", "LOCAL_CONFIG_PROVENANCE_INVALID"}
-    block = failure if failure in runtime_failures or failure.startswith("FIXTURE_") else "无"
-    traces = item.get("evidence", {}).get("dependency_trace", []) if isinstance(item.get("evidence", {}), Mapping) else []
-    source = ", ".join(str(trace.get("source_type", "")) for trace in traces if isinstance(trace, Mapping) and trace.get("source_type")) or "无"
-    return {
-        "number": str(index),
-        "endpoint": endpoint,
-        "name": str(interface.get("summary", interface.get("operation_id", item.get("operation_id", "unknown")))),
-        "operation_id": str(item.get("operation_id", interface.get("operation_id", "unknown"))),
-        "verdict": verdict,
-        "block": block,
-        "reason": str(item.get("reason", "")),
-        "risk": str(interface.get("risk", "P2")),
-        "source": ", ".join(str(e.get("source", e.get("type", ""))) for e in interface.get("evidence", []) if isinstance(e, Mapping)) or str(interface.get("adapter", "unknown")),
-        "parameter_source": source,
-        "allow_release": "否" if status != "PASS" else "是",
-    }
-
-
-def _write_text(path: Path, value: str) -> str:
-    """创建父目录并以 UTF-8 写入文本。
-
-    [参数] path: 输出路径；value: 文本内容。
-    [返回] 输出文件绝对路径字符串。
-    最近修改时间: 2026-07-12 18:30 改动原因: 统一归档写入行为。
-    """
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(value, encoding="utf-8")
-    return str(path)
-
-
 def write_report(
     output_dir: str | Path,
     results: Iterable[Mapping[str, Any]],
@@ -468,26 +260,59 @@ def write_report(
     sync_metadata: Mapping[str, Any] | None = None,
     baseline_summary: Mapping[str, Any] | None = None,
     runtime_matrix: Mapping[str, Any] | None = None,
-) -> dict[str, str]:
-    """生成中文主报告、ASCII 镜像和逐接口证据。
+    scenario_results: Iterable[Mapping[str, Any]] = (),
+    consumer_coverage: Mapping[str, Any] | None = None,
+    protocol_capabilities: Mapping[str, Any] | None = None,
+    cleanup_report: Mapping[str, Any] | None = None,
+    dual_gate_diff: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """生成兼容接口报告、独立场景报告和脱敏证据清单。
 
-    [参数] output_dir: 归档根目录；results: 判定结果；gate: 门禁结论；其余为接口、依赖和环境元数据。
+    [参数] output_dir: 归档根目录；results: 接口判定结果；gate: 接口门禁；scenario_results: 真实场景结果；其余为接口、依赖和外部场景资产。
     [返回] 关键归档文件路径映射。
-    最近修改时间: 2026-07-12 21:10:00 改动原因: 补齐风险、参数、同步元数据和响应预览产物。
+    最近修改时间：2026-07-25 23:18:15，manifest 非 PASS 回流最终门禁并在 mkdir 前校验输出路径。
     """
 
+    # 1. 所有调用方输入先生成脱敏副本，后续统计、渲染和归档禁止再读取原始对象。
     root = Path(output_dir)
+    _ensure_report_output_path(root)
     root.mkdir(parents=True, exist_ok=True)
-    items = [dict(item) for item in results]
-    interface_map = {str(item.get("operation_id", "")): dict(item) for item in interfaces}
+    raw_items = [dict(item) for item in results]
+    raw_interfaces = [dict(item) for item in interfaces]
+    raw_scenario_items = [dict(item) for item in scenario_results]
+    sensitive_values = _sensitive_evidence_values({
+        # 1.1 三类核心运行输入共同参与敏感原值提取，防止接口与场景边界漏扫。
+        "results": raw_items,
+        "interfaces": raw_interfaces,
+        "scenario_results": raw_scenario_items,
+        "gate": gate,
+        "dependency_graph": dependency_graph,
+        # 1.2 附属报告输入按字段组加入扫描，原值仅在当前调用内存中存在。
+        "parameter_summary": parameter_summary,
+        "sync_metadata": sync_metadata,
+        "baseline_summary": baseline_summary,
+        "runtime_matrix": runtime_matrix,
+        "consumer_coverage": consumer_coverage,
+        "protocol_capabilities": protocol_capabilities,
+        "cleanup_report": cleanup_report,
+        "dual_gate_diff": dual_gate_diff,
+    })
+    items = [dict(_redact(item)) for item in raw_items]
+    interface_map = {str(item.get("operation_id", "")): dict(_redact(item)) for item in raw_interfaces}
+    gate = dict(_redact(dict(gate)))
+    dependency_graph = _redact(dependency_graph) if dependency_graph else None
+    baseline_summary = _redact(baseline_summary) if baseline_summary else None
     artifact_root = root / "ascii-artifacts" if canonical_layout else root
+    _ensure_report_output_path(artifact_root)
     artifact_root.mkdir(parents=True, exist_ok=True)
     report_items = [_report_item(item) for item in items]
-    interface_data = {str(item.get("operation_id", "")): dict(item) for item in interfaces}
+    # 1.3 接口与场景分别归档；旧调用方不传场景时只得到明确的未配置集合。
+    scenario_items = [_scenario_report_item(_redact(item)) for item in raw_scenario_items]
+    interface_data = dict(interface_map)
     risks = _risk_statistics(items, interface_data)
-    parameters = dict(parameter_summary or _parameter_summary(items))
-    sync = _sync_summary(interface_data, sync_metadata)
-    runtime = _runtime_matrix(items, interface_data, run_id, runtime_matrix)
+    parameters = dict(_redact(parameter_summary or _parameter_summary(items)))
+    sync = _sync_summary(interface_data, _redact(sync_metadata) if sync_metadata else None)
+    runtime = _runtime_matrix(items, interface_data, run_id, _redact(runtime_matrix) if runtime_matrix else None)
     generated_at = utc_now()
     payload = {
         "schema_version": "2.0",
@@ -501,9 +326,30 @@ def write_report(
         "runtime_matrix": runtime,
         "results": report_items,
     }
+    interface_payload = {
+        "schema_version": "2.0",
+        "run_id": run_id,
+        "generated_at": generated_at,
+        "environment": environment,
+        "gate": dict(gate),
+        "risk_statistics": risks,
+        "parameter_summary": parameters,
+        "sync_metadata": sync,
+        "runtime_matrix": runtime,
+        "results": report_items,
+    }
+    coverage = _scenario_status_summary(scenario_items, run_id, _redact(consumer_coverage) if consumer_coverage else None)
+    cleanup = _cleanup_summary(scenario_items, run_id, _redact(cleanup_report) if cleanup_report else None)
+    capabilities = _external_asset(_redact(protocol_capabilities) if protocol_capabilities else None, name="protocol-capabilities", run_id=run_id)
+    gate_diff = _external_asset(_redact(dual_gate_diff) if dual_gate_diff else None, name="dual-gate-diff", run_id=run_id)
+    scenario_status = coverage["status"] if scenario_items else "not_configured"
+    # 2. 兼容报告继续使用接口结果，新文件不再让接口结果冒充场景结果。
     json_path = Path(_write_text(artifact_root / "release-test-report.json", json.dumps(payload, ensure_ascii=False, indent=2)))
+    interface_results_path = Path(_write_text(artifact_root / "interface-results.json", json.dumps(interface_payload, ensure_ascii=False, indent=2)))
+    # 3. 人工可读明细只渲染脱敏字段，失败原因已收敛为安全机器码或通用摘要。
     markdown: list[str] = ["# 接口测试明细", ""]
     for index, item in enumerate(items, 1):
+        # 3.1 每个接口沿用固定块状字段顺序，便于人工与机器消费者稳定读取。
         interface = interface_map.get(str(item.get("operation_id", "")), {})
         fields = _interface_fields(interface, item, index)
         operation = fields["operation_id"]
@@ -533,15 +379,22 @@ def write_report(
     for item in items:
         responses.append(_redact(_parse_jsonish(item.get("response", {}))))
     _write_text(evidence_path, json.dumps(responses, ensure_ascii=False, indent=2))
+    # 4. 项目级依赖、场景、能力和双轨资产使用同一运行身份集中归档。
     graph = dict(dependency_graph or {})
     _write_text(artifact_root / "dependency-graph.json", json.dumps(graph, ensure_ascii=False, indent=2))
-    _write_text(artifact_root / "scenario-results.json", json.dumps(report_items, ensure_ascii=False, indent=2))
+    _write_text(artifact_root / "scenario-results.json", json.dumps({"schema_version": "external-scenario/1.0", "run_id": run_id, "status": scenario_status, "results": scenario_items}, ensure_ascii=False, indent=2))
+    _write_text(artifact_root / "consumer-coverage.json", json.dumps(coverage, ensure_ascii=False, indent=2))
+    _write_text(artifact_root / "protocol-capabilities.json", json.dumps(capabilities, ensure_ascii=False, indent=2))
+    _write_text(artifact_root / "cleanup-report.json", json.dumps(cleanup, ensure_ascii=False, indent=2))
+    _write_text(artifact_root / "dual-gate-diff.json", json.dumps(gate_diff, ensure_ascii=False, indent=2))
     _write_text(artifact_root / "interface-sync-report.yaml", _yaml_dump(sync))
     _write_text(artifact_root / "runtime-matrix.yaml", _yaml_dump(runtime))
     _write_text(artifact_root / "inventory-reconcile.yaml", _yaml_dump({"run_id": run_id, "added": [], "deleted": [], "changed": [], "pending": sync.get("drift", []), "status": sync.get("status", "not_configured")}))
     _write_text(artifact_root / "release-test-plan.yaml", _yaml_dump({"schema_version": "2.0", "environment": environment, "run_id": run_id, "generated_at": generated_at, "interface_count": len(items), "risk_statistics": risks, "parameter_summary": parameters}))
     _write_text(artifact_root / "artifacts" / "dependency-trace.json", json.dumps([item.get("evidence", {}).get("dependency_trace", []) for item in items], ensure_ascii=False, indent=2))
+    # 5. 逐接口证据继续保留兼容目录结构，但原始命名只表示目录角色，内容已经脱敏。
     for item in items:
+        # 5.1 请求、响应、参数和依赖追踪分别写入兼容位置，内容只来自安全副本。
         operation = _safe_name(item.get("operation_id", "unknown"))
         request = _redact(_parse_jsonish(item.get("request", {})))
         response = _redact(_parse_jsonish(item.get("response", {})))
@@ -552,6 +405,7 @@ def write_report(
         _write_text(artifact_root / "artifacts" / "resolved-params" / f"{operation}.json", json.dumps(request, ensure_ascii=False, indent=2))
         _write_text(artifact_root / "artifacts" / "dependency-trace" / f"{operation}.json", json.dumps(trace, ensure_ascii=False, indent=2))
     _write_text(artifact_root / "artifacts" / "reusable-param-events.yaml", _yaml_dump({"schema_version": "2.0", "run_id": run_id, "events": parameters.get("events", [])}))
+    # 6. 最后生成基线摘要和发布结论 README，阻断列表只引用已脱敏接口结果。
     baseline_info = dict(baseline_summary or {})
     baseline_info.update({"schema_version": "2.0", "run_id": run_id, "event_id": f"run-{run_id}", "event_type": "execution.completed", "parameter_summary": parameters, "risk_statistics": risks})
     baseline_info.setdefault("updated", False)
@@ -578,12 +432,22 @@ def write_report(
         "", "## 参数复用与失效摘要", f"- 本轮参数总数：{parameters.get('total', 0)}", f"- 已解析参数数：{parameters.get('resolved', 0)}", f"- 未解析参数数：{parameters.get('unresolved', 0)}", f"- 本轮复用参数数：{parameters.get('reused', 0)}", f"- 复验成功参数数：{parameters.get('revalidated', 0)}", f"- 新增 candidate 参数数：{parameters.get('candidate', 0)}", f"- 标记 stale 参数数：{parameters.get('stale', 0)}", f"- 标记 invalid 参数数：{parameters.get('invalid', 0)}", f"- 标记 quarantined 参数数：{parameters.get('quarantined', 0)}", f"- 状态计数：{json.dumps(status_counts, ensure_ascii=False, sort_keys=True)}",
     ]
     readme_path = Path(_write_text(root / "README.md", "\n".join(readme) + "\n"))
-    if not canonical_layout:
-        # 兼容已有自定义 output_dir 调用方的平铺文件契约。
-        _write_text(root / "release-test-report.json", json.dumps(payload, ensure_ascii=False, indent=2))
-        _write_text(root / "interface-test-results.md", "\n".join(markdown))
-        _write_text(root / "responses.json", json.dumps(responses, ensure_ascii=False, indent=2))
-    return {"report": str(md_path), "json": str(json_path), "responses": str(evidence_path), "readme": str(readme_path), "runtime_matrix": str(artifact_root / "runtime-matrix.yaml"), "artifact_root": str(artifact_root)}
+    # 7. 清单只记录相对路径、摘要哈希和脱敏状态，不把原始请求响应复制进索引。
+    additional_files = [("output-root/README.md", readme_path)] if canonical_layout else []
+    evidence_path = Path(write_evidence_manifest(artifact_root, run_id, sensitive_values=sensitive_values, additional_files=additional_files))
+    evidence_status = str(json.loads(evidence_path.read_text(encoding="utf-8"))["status"])
+    final_gate = _evidence_gate(gate, evidence_status)
+    if final_gate != gate:
+        # 7.1 清单非 PASS 时重写所有门禁摘要，再重算哈希，禁止 JSON/README 继续声称可放行。
+        gate = final_gate
+        payload["gate"] = dict(gate)
+        interface_payload["gate"] = dict(gate)
+        _write_text(json_path, json.dumps(payload, ensure_ascii=False, indent=2))
+        _write_text(interface_results_path, json.dumps(interface_payload, ensure_ascii=False, indent=2))
+        readme = [f"### 结论等级：{gate.get('gate', 'PENDING')}" if line.startswith("### 结论等级：") else f"- 是否允许上线：{'是' if gate.get('allow_release') else '否'}" if line.startswith("- 是否允许上线：") else line for line in readme]
+        _write_text(readme_path, "\n".join(readme) + "\n")
+        evidence_path = Path(write_evidence_manifest(artifact_root, run_id, sensitive_values=sensitive_values, additional_files=additional_files))
+    return {"report": str(md_path), "json": str(json_path), "interface_results": str(interface_results_path), "scenario_results": str(artifact_root / "scenario-results.json"), "consumer_coverage": str(artifact_root / "consumer-coverage.json"), "protocol_capabilities": str(artifact_root / "protocol-capabilities.json"), "cleanup_report": str(artifact_root / "cleanup-report.json"), "dual_gate_diff": str(artifact_root / "dual-gate-diff.json"), "evidence_manifest": str(evidence_path), "evidence_manifest_status": evidence_status, "gate": gate, "responses": str(artifact_root / "responses.json"), "readme": str(readme_path), "runtime_matrix": str(artifact_root / "runtime-matrix.yaml"), "artifact_root": str(artifact_root)}
 
 
 def project_execution_to_baseline(

@@ -126,3 +126,5 @@
 - 项目记忆、自举、连续执行、上下文恢复和运行时恢复完成职责接入；UI 重建不恢复执行授权，也不等同于 L5 resume，进行中步骤必须先核验。
 - 六个受影响 Skill quick validate、临时目录自举幂等、字典生成和 `git diff --check` 通过；严格追踪修复定向回归 3/3 通过。
 - `TASK-RTP-01` 至 `TASK-RTP-07` 已完成阶段审查与验收；活动投影推进到 `TASK-RTP-08 in_progress`，等待用户真实关闭并重开 Desktop 后完成首次继续回合验收。
+
+- 2026-07-25：完成 CYCLE-RTP-06 长任务自动 Goal 优先升级实现。新增无写入 `probe-timeout`、严格 600 秒边界、Goal 单次创建/复用/失败降级、脱敏摘要与跨项目 standing authorization；63 项回归、Skill 校验、字典、严格文档门禁、真实 Goal 工具链和测试投影清理通过。Computer Use 禁止自动操作 Codex 应用，独立视觉确认保持 LIMITED；Obsidian 沉淀因固定 vault 未注册而阻断，工作树保持未提交。

@@ -37,6 +37,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 3. 每个最小任务必须独立完成“实现 -> 真实测试 -> 审查 -> 验收”，不得批量实现后统一验证；每次状态迁移都先原子更新投影，再刷新悬浮任务列表。
 4. 当前周期未收口不得跳到后续周期；当前周期收口且仍有计划内必需周期时自动继续。当前投影全部完成后先写为 `inactive`，后续回合不得重放。
 5. 中间进度只说明已完成与正在推进的必需动作，不交还非关键执行权；`update_plan` 不可用或失败时只能说明磁盘投影已保存，不得声称 UI 已刷新。
+5.1 默认执行回合中的简单任务可以先不创建任务投影，但必须在取得 `confirmed` 后从第一个真实执行动作开始累计主动执行时间；当前会话仍无活动或阻断 projection 且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后严格超过 600 秒时，先把计时交给 `task-plan-rehydration-rules` 的只读 `probe-timeout`。仅 `goal_check_required` 时由当前主 Agent 先 `get_goal`，复用明确匹配的活动 Goal，或在无活动 Goal 时使用脱敏摘要调用一次 `create_goal`；不匹配、不可用、失败或结果不明确时禁止重复创建并降级原 `ensure-timeout` 普通投影。任何投影成功持久化后才能调用 `update_plan`。
 6. 遇到关键节点、高风险、越界、冲突或授权不足时立即暂停。
 7. 真实 `blocked/manual_handoff` 先收口运行时状态，再交接结构化事实。
 8. 原始目标完成后只允许三类合法后续；无合法后续时直接结束。
@@ -45,7 +46,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 
 ## Goal 生命周期交接
 
-- `create_goal` 成功只表示 Goal 运行时已创建；在默认执行回合把事件交给 `task-plan-rehydration-rules` 创建安全三步投影，不因此自动取得编码、写入或外部副作用的执行许可。
+- `create_goal` 成功只表示 Goal 运行时已创建；用户已对“严格超过 600 秒且资格探测通过后自动创建一次 Goal”给出 standing authorization，但该授权只覆盖当前主 Agent 的 Goal 生命周期调用，不授予新的编码、文件写入、外部副作用或 Git 权限。创建后把事件交给 `task-plan-rehydration-rules` 创建安全三步投影，且不因此自动取得任何实现授权。
 - `get_goal` 证明活动 Goal 仍存在时，可交给投影 Owner 恢复已有活动 Goal 悬浮列表；恢复 UI 前仍需核验中断点，且不得自动重放未知幂等写操作。若创建时已保留活动正式计划，Owner 返回 `preserved_formal` 且不重写、不刷新，正式计划仍走自身恢复路径。
 - `update_goal` 进入 `blocked` 时，交给投影 Owner 持久化无进行中步骤的观察列表；不得把 blocked payload 解释为可以继续执行。`update_goal` 进入 `complete` 时，交给 Owner 失活 Goal 安全投影，随后真实收口 Goal；若结果为 `preserved_formal`，不得失活、改写或刷新独立的正式计划。
 - Plan Mode、无活动 Goal、来源不匹配、损坏投影或工具失败时退出 Goal 投影路径；投影和 `update_plan` 从不改变本 Skill 的授权状态。

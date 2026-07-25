@@ -5,10 +5,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
 import sys
 import tempfile
+import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -19,6 +22,13 @@ END_MARKER = "<!-- END TASK PLAN PROJECTION -->"
 MAX_FILE_BYTES = 51_200
 MAX_STEPS = 20
 MAX_STEP_CHARS = 256
+MAX_PROJECTIONS = 64
+REGISTRY_VERSION = 4
+REGISTRY_SCHEMA = "task_plan_projection_registry"
+LEGACY_SESSION_ID = "legacy/default"
+LOCK_RETRIES = 40
+LOCK_WAIT_SECONDS = 0.05
+TIMEOUT_SECONDS = 600.0
 EXPLANATION = "悬浮任务列表已从 PROJECT_CURRENT 重建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_EXACT = "悬浮任务列表已根据当前会话与项目文档正式补建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_FALLBACK = "悬浮任务列表已根据当前会话与项目文档生成安全恢复列表；进行中步骤必须先核验中断点"
@@ -38,6 +48,8 @@ TOP_LEVEL_FIELDS_V1 = {
 }
 TOP_LEVEL_FIELDS_V2 = TOP_LEVEL_FIELDS_V1 | {"projection_origin", "synthesis_mode"}
 TOP_LEVEL_FIELDS_V3 = TOP_LEVEL_FIELDS_V2
+REGISTRY_FIELDS = {"version", "registry_schema", "registry_updated_at", "projections"}
+PROJECTION_ENTRY_FIELDS = (TOP_LEVEL_FIELDS_V3 - {"version"}) | {"projection_id", "session_id"}
 STEP_FIELDS = {"id", "step", "status"}
 STEP_STATUSES = {"pending", "in_progress", "completed"}
 PROJECTION_STATES = {"active", "blocked", "inactive"}
@@ -85,6 +97,59 @@ class ProjectionIOError(OSError):
     """任务投影文件读取或原子写入失败。"""
 
 
+def _validate_session_id(value: Any) -> str:
+    """校验受控会话标识，拒绝空值、换行和过长输入。
+
+    [参数] value: 宿主提供的原始会话标识。
+    [返回] str：可持久化到受控字段的会话标识。
+    最近修改时间：2026-07-25 00:00:00；改动原因：为多会话注册表建立唯一归属边界。
+    """
+    if not isinstance(value, str) or not value.strip():
+        raise ProjectionContractError("session_id must be a non-empty string")
+    if len(value) > 256 or any(char in value for char in "\r\n"):
+        raise ProjectionContractError("session_id is invalid")
+    return value
+
+
+def _require_session_id(value: Any) -> str:
+    """要求状态变更入口显式提供会话归属，禁止静默生成伪会话。
+
+    [参数] value: 待检查的会话标识。
+    [返回] str：通过格式校验的会话标识。
+    最近修改时间：2026-07-25 00:00:00；改动原因：移除状态变更 API 的 legacy/default 回退。
+    """
+    # 1. 缺少会话归属时立即拒绝，避免多个宿主会话写入同一伪投影。
+    if value is None:
+        raise ProjectionContractError("session_id is required for state-changing operations")
+    return _validate_session_id(value)
+
+
+def compute_projection_id(session_id: str, projection: Mapping[str, Any]) -> str:
+    """根据会话和计划身份生成稳定投影 ID。
+
+    [参数] session_id: 原始会话标识；projection: 合法任务投影。
+    [返回] str：不暴露业务步骤内容的稳定投影 ID。
+    最近修改时间：2026-07-25 00:00:00；改动原因：为每个会话当前投影提供可校验身份。
+    """
+    # 1. 先规范化会话和兼容版本，避免旧格式直接参与身份计算。
+    sid = _validate_session_id(session_id)
+    normalized = _to_version_three_projection(projection)
+    # 2. 只使用会话与计划身份字段计算摘要，状态迁移不改变同一计划的 ID。
+    identity = json.dumps(
+        {
+            "session_id": sid,
+            "plan_key": normalized["plan_key"],
+            "source_document": normalized["source_document"],
+            "projection_origin": normalized["projection_origin"],
+            "synthesis_mode": normalized["synthesis_mode"],
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return f"SESSION/{hashlib.sha256(identity).hexdigest()}"
+
+
 def compute_plan_fingerprint(steps: Sequence[Mapping[str, Any]]) -> str:
     """根据任务 ID、顺序和文案计算稳定指纹。"""
     if not isinstance(steps, Sequence) or isinstance(steps, (str, bytes, bytearray)):
@@ -123,16 +188,55 @@ def _reject_sensitive_keys(value: Any, path: str = "projection") -> None:
             _reject_sensitive_keys(child, f"{path}[{index}]")
 
 
-def _validate_utc_timestamp(value: Any) -> None:
-    """校验更新时间为带 UTC 时区的 ISO-8601。"""
+def _parse_utc_timestamp(field_name: str, value: Any) -> datetime:
+    """解析带 UTC 时区的 ISO-8601 时间。
+
+    [参数] field_name: 错误信息中的字段名；value: 待解析时间。
+    [返回] datetime：规范化前、带 UTC 时区的时间对象。
+    最近修改时间：2026-07-25 00:00:00；改动原因：复用超时起止时间与投影更新时间的 UTC 校验。
+    """
+    # 1. 先拒绝空值和非法 ISO-8601，避免时间差计算接受隐式本地时间。
     if not isinstance(value, str) or not value.strip():
-        raise ProjectionContractError("updated_at must be a non-empty UTC ISO-8601 string")
+        raise ProjectionContractError(f"{field_name} must be a non-empty UTC ISO-8601 string")
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as error:
-        raise ProjectionContractError("updated_at must be valid ISO-8601") from error
+        raise ProjectionContractError(f"{field_name} must be valid ISO-8601") from error
+    # 2. 只接受显式 UTC，禁止把本地时间或其它时区静默换算为执行计时起点。
     if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
-        raise ProjectionContractError("updated_at must use UTC timezone")
+        raise ProjectionContractError(f"{field_name} must use UTC timezone")
+    return parsed
+
+
+def _validate_utc_timestamp(value: Any) -> None:
+    """校验更新时间为带 UTC 时区的 ISO-8601。
+
+    [参数] value: 待校验更新时间。
+    [返回] None。
+    最近修改时间：2026-07-25 00:00:00；改动原因：统一复用 UTC 时间解析入口并保持既有错误模型。
+    """
+    # 1. 更新时间只需要校验，解析结果由调用方按原契约忽略。
+    _parse_utc_timestamp("updated_at", value)
+
+
+def _validate_paused_seconds(value: Any) -> float:
+    """校验并规范化暂停秒数。
+
+    [参数] value: CLI 或 Python API 传入的暂停秒数。
+    [返回] float：有限且非负的暂停秒数。
+    最近修改时间：2026-07-25 00:00:00；改动原因：从墙钟耗时中扣除 Plan Mode、等待用户、blocked 和 manual_handoff 暂停。
+    """
+    # 1. bool 虽是 int 子类，但不属于合法秒数；其它输入统一尝试转为浮点数。
+    if isinstance(value, bool):
+        raise ProjectionContractError("paused_seconds must be a non-negative finite number")
+    try:
+        paused_seconds = float(value)
+    except (TypeError, ValueError) as error:
+        raise ProjectionContractError("paused_seconds must be a non-negative finite number") from error
+    # 2. 拒绝负数、NaN 和无穷值，确保边界比较稳定可复验。
+    if not math.isfinite(paused_seconds) or paused_seconds < 0:
+        raise ProjectionContractError("paused_seconds must be a non-negative finite number")
+    return paused_seconds
 
 
 def _validate_string_field(field_name: str, field_value: Any) -> str:
@@ -185,7 +289,7 @@ def validate_projection(
 
     [参数] value: 待校验投影；expected_fingerprint: 可选预期指纹；expected_source_document: 可选预期来源。
     [返回] dict：字段已标准化且符合版本契约的投影。
-    最近修改时间：2026-07-25；改动原因：新增 Goal v3 身份、阻断与终态契约。
+    最近修改时间：2026-07-25 00:00:00；改动原因：新增 Goal v3 身份、阻断与终态契约。
     """
     # 1. 先拒绝非对象和敏感字段，避免任何 Goal 原文进入后续状态计算。
     if not isinstance(value, Mapping):
@@ -306,6 +410,143 @@ def validate_projection(
     return normalized
 
 
+def _projection_entry_from_projection(projection: Mapping[str, Any], session_id: str) -> dict[str, Any]:
+    """把 v3 投影包装为带会话归属的 registry entry。
+
+    [参数] projection: v1-v3 投影；session_id: 原始会话标识。
+    [返回] dict：符合 v4 registry 的会话投影条目。
+    最近修改时间：2026-07-25 00:00:00；改动原因：统一旧投影与多会话条目之间的转换。
+    """
+    # 1. 先统一旧版本字段，再由会话和计划身份生成稳定 projection_id。
+    sid = _validate_session_id(session_id)
+    normalized = _to_version_three_projection(projection)
+    # 2. 只复制契约允许的投影字段，避免把原始输入扩散到注册表。
+    return {
+        "projection_id": compute_projection_id(sid, normalized),
+        "session_id": sid,
+        "projection_origin": normalized["projection_origin"],
+        "synthesis_mode": normalized["synthesis_mode"],
+        "state": normalized["state"],
+        "plan_key": normalized["plan_key"],
+        "source_document": normalized["source_document"],
+        "plan_fingerprint": normalized["plan_fingerprint"],
+        "updated_at": normalized["updated_at"],
+        "steps": normalized["steps"],
+    }
+
+
+def _projection_from_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+    """从 registry entry 还原既有 v3 投影接口。
+
+    [参数] entry: 已通过外层结构检查的 registry 条目。
+    [返回] dict：兼容既有 payload 和 Goal 逻辑的 v3 投影。
+    最近修改时间：2026-07-25 00:00:00；改动原因：减少 v4 改造对既有业务校验的侵入。
+    """
+    # 1. 将 registry entry 映射回旧版业务投影，再复用既有校验逻辑。
+    return validate_projection(
+        {
+            "version": 3,
+            "projection_origin": entry["projection_origin"],
+            "synthesis_mode": entry["synthesis_mode"],
+            "state": entry["state"],
+            "plan_key": entry["plan_key"],
+            "source_document": entry["source_document"],
+            "plan_fingerprint": entry["plan_fingerprint"],
+            "updated_at": entry["updated_at"],
+            "steps": entry["steps"],
+        }
+    )
+
+
+def validate_projection_entry(value: Any) -> dict[str, Any]:
+    """校验 registry 中的单个会话投影条目。
+
+    [参数] value: 待校验的会话投影条目。
+    [返回] dict：字段、身份和内部投影均规范化的条目。
+    最近修改时间：2026-07-25 00:00:00；改动原因：防止会话归属和计划身份不一致。
+    """
+    # 1. 先锁定条目字段白名单，再复用 v3 投影契约校验业务状态。
+    if not isinstance(value, Mapping) or set(value) != PROJECTION_ENTRY_FIELDS:
+        raise ProjectionContractError(
+            f"projection entry fields must be exactly {sorted(PROJECTION_ENTRY_FIELDS)}"
+        )
+    session_id = _validate_session_id(value.get("session_id"))
+    projection = _projection_from_entry(value)
+    projection_id = _validate_string_field("projection_id", value.get("projection_id"))
+    # 2. 最后复算投影身份，拒绝调用方伪造 projection_id。
+    expected_projection_id = compute_projection_id(session_id, projection)
+    if projection_id != expected_projection_id:
+        raise ProjectionContractError("projection_id does not match session and plan identity")
+    normalized = _projection_entry_from_projection(projection, session_id)
+    normalized["projection_id"] = projection_id
+    return normalized
+
+
+def validate_registry(value: Any) -> dict[str, Any]:
+    """校验 v4 多会话任务投影注册表。
+
+    [参数] value: 待校验的注册表对象。
+    [返回] dict：字段顺序稳定且全部条目已规范化的 v4 注册表。
+    最近修改时间：2026-07-25 00:00:00；改动原因：建立单文件多会话状态总契约。
+    """
+    # 1. 校验顶层 schema、版本和时间，避免旧单投影被误解释为注册表。
+    if not isinstance(value, Mapping) or set(value) != REGISTRY_FIELDS:
+        actual = set(value) if isinstance(value, Mapping) else set()
+        raise ProjectionContractError(
+            f"registry fields mismatch: missing={sorted(REGISTRY_FIELDS - actual)}, "
+            f"unknown={sorted(actual - REGISTRY_FIELDS)}"
+        )
+    if value.get("version") != REGISTRY_VERSION:
+        raise ProjectionContractError("registry version must be 4")
+    if value.get("registry_schema") != REGISTRY_SCHEMA:
+        raise ProjectionContractError("registry_schema is invalid")
+    _validate_utc_timestamp(value.get("registry_updated_at"))
+    projections = value.get("projections")
+    if not isinstance(projections, list) or len(projections) > MAX_PROJECTIONS:
+        raise ProjectionContractError(f"projections must be an array of at most {MAX_PROJECTIONS} entries")
+    # 2. 逐条校验会话投影，并保证 projection_id 与 session_id 都不重复。
+    normalized_entries = []
+    projection_ids: set[str] = set()
+    session_ids: set[str] = set()
+    for index, entry in enumerate(projections):
+        try:
+            normalized = validate_projection_entry(entry)
+        except ProjectionContractError as error:
+            raise ProjectionContractError(f"projections[{index}] is invalid: {error}") from error
+        if normalized["projection_id"] in projection_ids:
+            raise ProjectionContractError(f"duplicate projection_id: {normalized['projection_id']}")
+        if normalized["session_id"] in session_ids:
+            raise ProjectionContractError(f"duplicate session_id: {normalized['session_id']}")
+        projection_ids.add(normalized["projection_id"])
+        session_ids.add(normalized["session_id"])
+        normalized_entries.append(normalized)
+    return {
+        "version": REGISTRY_VERSION,
+        "registry_schema": REGISTRY_SCHEMA,
+        "registry_updated_at": value["registry_updated_at"],
+        "projections": normalized_entries,
+    }
+
+
+def _new_registry(projections: Sequence[Mapping[str, Any]] = ()) -> dict[str, Any]:
+    """创建合法的空或带条目的 v4 注册表。
+
+    [参数] projections: 可选初始会话投影条目序列。
+    [返回] dict：带 UTC 更新时间的合法 v4 注册表。
+    最近修改时间：2026-07-25 00:00:00；改动原因：统一 bootstrap、迁移和首次写入的构造路径。
+    """
+    # 1. 复制条目后统一生成 registry 元数据，并通过顶层契约校验。
+    entries = [dict(item) for item in projections]
+    return validate_registry(
+        {
+            "version": REGISTRY_VERSION,
+            "registry_schema": REGISTRY_SCHEMA,
+            "registry_updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "projections": entries,
+        }
+    )
+
+
 def _validate_markers(document: str) -> tuple[int, int] | None:
     """校验托管标记数量和顺序。"""
     begins = [match.start() for match in re.finditer(re.escape(BEGIN_MARKER), document)]
@@ -320,8 +561,14 @@ def _validate_markers(document: str) -> tuple[int, int] | None:
     return match.start(), match.end()
 
 
-def extract_projection(document: str) -> dict[str, Any] | None:
-    """从文档中解析并校验任务投影。"""
+def _extract_raw_projection_value(document: str) -> Any | None:
+    """从唯一托管区读取未经业务解释的 JSON 值。
+
+    [参数] document: PROJECT_CURRENT.md 全文。
+    [返回] Any | None：托管区 JSON 值；无托管区时返回 None。
+    最近修改时间：2026-07-25 00:00:00；改动原因：在同一读取入口区分旧投影和 v4 registry。
+    """
+    # 1. 先校验唯一 marker，再严格解析 JSON，避免读取损坏托管区。
     bounds = _validate_markers(document)
     if bounds is None:
         return None
@@ -329,23 +576,60 @@ def extract_projection(document: str) -> dict[str, Any] | None:
     if match is None:
         raise ProjectionContractError("task projection block is malformed")
     try:
-        value = json.loads(match.group("json"))
+        return json.loads(match.group("json"))
     except json.JSONDecodeError as error:
         raise ProjectionContractError(f"task projection JSON is invalid: {error.msg}") from error
+
+
+def extract_projection(document: str) -> dict[str, Any] | None:
+    """从旧版单投影托管区解析并校验 v1-v3 投影。
+
+    [参数] document: PROJECT_CURRENT.md 全文。
+    [返回] dict | None：合法旧投影；无托管区时返回 None。
+    最近修改时间：2026-07-25 00:00:00；改动原因：保留旧版显式读取但拒绝误读 v4 registry。
+    """
+    # 1. 读取原始值并拒绝 v4 注册表，保持旧 API 的单投影语义明确。
+    value = _extract_raw_projection_value(document)
+    if value is None:
+        return None
+    if isinstance(value, Mapping) and value.get("version") == REGISTRY_VERSION:
+        raise ProjectionContractError("v4 registry requires session-aware loading")
     return validate_projection(value)
+
+
+def extract_registry(document: str, *, session_id: str | None = None) -> dict[str, Any] | None:
+    """解析 v4 注册表，并把 v1-v3 单投影包装为内存中的单条注册表。
+
+    [参数] document: PROJECT_CURRENT.md 全文；session_id: 旧活动投影迁移归属。
+    [返回] dict | None：合法 v4 注册表；无托管区时返回 None。
+    最近修改时间：2026-07-25 00:00:00；改动原因：统一新旧格式读取并阻止旧活动投影无归属恢复。
+    """
+    # 1. v4 直接按 registry 契约读取，旧版投影进入显式兼容路径。
+    value = _extract_raw_projection_value(document)
+    if value is None:
+        return None
+    if isinstance(value, Mapping) and value.get("version") == REGISTRY_VERSION:
+        return validate_registry(value)
+    legacy = validate_projection(value)
+    # 2. 旧活动投影必须由调用方提供真实会话归属；只有明确 inactive 可无会话只读。
+    if session_id is None and legacy["state"] != "inactive":
+        raise ProjectionContractError("active legacy projection requires session_id before recovery")
+    sid = _validate_session_id(session_id or LEGACY_SESSION_ID)
+    return _new_registry([_projection_entry_from_projection(legacy, sid)])
 
 
 def load_projection(
     path: str | os.PathLike[str],
     *,
+    session_id: str | None = None,
     expected_fingerprint: str | None = None,
     expected_source_document: str | None = None,
 ) -> dict[str, Any]:
     """从严格 UTF-8 文件读取并校验任务投影。
 
-    [参数] path: PROJECT_CURRENT 路径；expected_fingerprint: 可选预期指纹；expected_source_document: 可选来源。
+    [参数] path: PROJECT_CURRENT 路径；session_id: 可选会话标识；expected_fingerprint: 可选预期指纹；expected_source_document: 可选来源。
     [返回] dict：已通过读取和身份校验的投影。
-    最近修改时间：2026-07-25；改动原因：Goal 生命周期与恢复路径共用同一安全读取入口。
+    最近修改时间：2026-07-25 00:00:00；改动原因：按 session_id 精确读取 v4 registry 中的目标投影。
     """
     # 1. 严格按 UTF-8 读取，避免编码损坏后产生无法判断归属的投影。
     target = Path(path)
@@ -353,14 +637,59 @@ def load_projection(
         document = target.read_bytes().decode("utf-8", errors="strict")
     except (OSError, UnicodeDecodeError) as error:
         raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
-    projection = extract_projection(document)
-    if projection is None:
+    registry = extract_registry(document, session_id=session_id)
+    if registry is None:
         raise ProjectionContractError("task projection block is missing")
+    entries = registry["projections"]
+    if session_id is not None:
+        sid = _validate_session_id(session_id)
+        matches = [entry for entry in entries if entry["session_id"] == sid]
+    elif len(entries) == 1:
+        matches = entries
+    else:
+        legacy_matches = [entry for entry in entries if entry["session_id"] == LEGACY_SESSION_ID]
+        matches = legacy_matches
+    if len(matches) != 1:
+        raise ProjectionContractError("session_id is required when multiple projections are active")
     return validate_projection(
-        projection,
+        _projection_from_entry(matches[0]),
         expected_fingerprint=expected_fingerprint,
         expected_source_document=expected_source_document,
     )
+
+
+def load_registry(path: str | os.PathLike[str], *, session_id: str | None = None) -> dict[str, Any]:
+    """从严格 UTF-8 文件读取 v4 注册表。
+
+    [参数] path: PROJECT_CURRENT.md 路径；session_id: 旧活动投影兼容归属。
+    [返回] dict：合法 v4 注册表或旧投影的内存包装结果。
+    最近修改时间：2026-07-25 00:00:00；改动原因：提供多会话注册表公共读取入口。
+    """
+    # 1. 严格读取 UTF-8 文档，再交由统一兼容入口完成版本判断。
+    target = Path(path)
+    try:
+        document = target.read_bytes().decode("utf-8", errors="strict")
+    except (OSError, UnicodeDecodeError) as error:
+        raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
+    registry = extract_registry(document, session_id=session_id)
+    if registry is None:
+        raise ProjectionContractError("task projection block is missing")
+    return registry
+
+
+def _find_registry_entry(registry: Mapping[str, Any], session_id: str) -> dict[str, Any] | None:
+    """按会话定位唯一投影，允许目标会话尚未创建投影。
+
+    [参数] registry: 合法 v4 注册表；session_id: 当前会话标识。
+    [返回] dict | None：唯一匹配条目；无匹配时返回 None。
+    最近修改时间：2026-07-25 00:00:00；改动原因：禁止恢复时跨会话选择投影。
+    """
+    # 1. 只按当前 session_id 查询，发现重复归属时立即拒绝恢复。
+    sid = _validate_session_id(session_id)
+    matches = [entry for entry in registry["projections"] if entry["session_id"] == sid]
+    if len(matches) > 1:
+        raise ProjectionContractError("multiple projections match session_id")
+    return matches[0] if matches else None
 
 
 def _to_version_three_projection(projection: Mapping[str, Any]) -> dict[str, Any]:
@@ -368,7 +697,7 @@ def _to_version_three_projection(projection: Mapping[str, Any]) -> dict[str, Any
 
     [参数] projection: 已读取的 v1、v2 或 v3 投影。
     [返回] dict：可安全写回的 v3 投影。
-    最近修改时间：2026-07-25；改动原因：将 Goal 专属 v3 与旧版本读取兼容边界集中到写入前。
+    最近修改时间：2026-07-25 00:00:00；改动原因：将 Goal 专属 v3 与旧版本读取兼容边界集中到写入前。
     """
     # 1. 先按原版本校验，再仅在成功写入路径转换，避免读取旧投影时发生隐式迁移。
     normalized = validate_projection(projection)
@@ -382,18 +711,32 @@ def _to_version_three_projection(projection: Mapping[str, Any]) -> dict[str, Any
     return validate_projection(upgraded)
 
 
-def render_projection_block(projection: Mapping[str, Any], newline: str = "\n") -> str:
-    """把合法投影渲染为唯一托管区块。
+def render_registry_block(registry: Mapping[str, Any], newline: str = "\n") -> str:
+    """把合法 v4 注册表渲染为唯一托管区块。
 
-    [参数] projection: 待写入投影；newline: 目标文档换行符。
-    [返回] str：带 JSON 围栏和唯一标记的 v3 托管区块。
-    最近修改时间：2026-07-25；改动原因：统一 Goal 生命周期和常规任务的 v3 写入格式。
+    [参数] registry: 待渲染注册表；newline: 目标文档换行符。
+    [返回] str：带唯一标记和 JSON 围栏的托管区块。
+    最近修改时间：2026-07-25 00:00:00；改动原因：统一多会话注册表的落盘格式。
     """
-    # 1. 仅在渲染写入前升级版本，保持读取操作无副作用。
-    normalized = _to_version_three_projection(projection)
+    # 1. 先校验并规范化 registry，再按目标换行符渲染稳定 JSON。
+    normalized = validate_registry(registry)
     encoded = json.dumps(normalized, ensure_ascii=False, indent=2)
     encoded = encoded.replace("\n", newline)
     return newline.join((BEGIN_MARKER, "```json", encoded, "```", END_MARKER))
+
+
+def render_projection_block(
+    projection: Mapping[str, Any], newline: str = "\n", *, session_id: str | None = None
+) -> str:
+    """把单个投影包装为 v4 注册表托管区块。
+
+    [参数] projection: 待写入投影；newline: 目标文档换行符；session_id: 会话标识。
+    [返回] str：带 JSON 围栏和唯一标记的 v4 托管区块。
+    最近修改时间：2026-07-25 00:00:00；改动原因：将单投影入口兼容到多会话注册表并强制会话归属。
+    """
+    # 1. 保留旧函数名，统一通过 v4 注册表渲染，避免继续生成单投影文件。
+    entry = _projection_entry_from_projection(projection, _require_session_id(session_id))
+    return render_registry_block(_new_registry([entry]), newline)
 
 
 def _write_text_atomic(path: Path, document: str) -> None:
@@ -433,25 +776,77 @@ def _write_text_atomic(path: Path, document: str) -> None:
                 pass
 
 
-def upsert_projection(path: str | os.PathLike[str], projection: Mapping[str, Any]) -> dict[str, Any]:
-    """新增或替换唯一任务投影区块，并保护非托管正文。
+@contextmanager
+def _projection_file_lock(path: Path):
+    """使用同目录排他锁串行化跨进程注册表读改写。
 
-    [参数] path: PROJECT_CURRENT 路径；projection: 待持久化投影。
-    [返回] dict：原子写入后可重读的 v3 投影。
-    最近修改时间：2026-07-25；改动原因：Goal 事件与正式计划必须共享先持久化的唯一写入入口。
+    [参数] path: PROJECT_CURRENT.md 路径。
+    [返回] context manager：持锁期间允许一次完整读改写。
+    最近修改时间：2026-07-25 00:00:00；改动原因：防止多个会话同时写入时产生丢失更新。
     """
-    # 1. 先完整读取并验证原正文，保证托管区替换不会覆盖用户维护的状态信息。
-    target = Path(path)
+    lock_path = path.with_name(f".{path.name}.lock")
+    lock_fd: int | None = None
     try:
-        original_bytes = target.read_bytes()
-        document = original_bytes.decode("utf-8", errors="strict")
-    except (OSError, UnicodeDecodeError) as error:
-        raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
+        # 1. 以 O_EXCL 创建锁文件，避免两个会话同时读取旧注册表再互相覆盖。
+        for _ in range(LOCK_RETRIES):
+            try:
+                lock_fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                break
+            except FileExistsError:
+                time.sleep(LOCK_WAIT_SECONDS)
+        if lock_fd is None:
+            raise ProjectionIOError(f"unable to acquire PROJECT_CURRENT lock: {path}")
+        os.write(lock_fd, str(os.getpid()).encode("ascii", errors="ignore"))
+        yield
+    except OSError as error:
+        if isinstance(error, ProjectionIOError):
+            raise
+        raise ProjectionIOError(f"unable to lock PROJECT_CURRENT: {path}") from error
+    finally:
+        if lock_fd is not None:
+            try:
+                os.close(lock_fd)
+            except OSError:
+                pass
+            try:
+                os.unlink(lock_path)
+            except OSError:
+                pass
 
+
+def _upsert_projection_while_locked(
+    target: Path,
+    document: str,
+    bounds: tuple[int, int] | None,
+    registry: Mapping[str, Any],
+    projection: Mapping[str, Any],
+    session_id: str,
+) -> dict[str, Any]:
+    """在调用方已持有文件锁时新增或替换会话投影。
+
+    [参数] target: 目标文件；document: 锁内读取的原文；bounds: 托管区边界；registry: 已校验注册表；projection: 新投影；session_id: 当前会话。
+    [返回] dict：成功原子落盘的 v3 投影。
+    最近修改时间：2026-07-25 00:00:00；改动原因：让超时条件检查与条件写入共享同一临界区。
+    """
+    # 1. 基于锁内快照只替换当前会话条目，其它会话投影保持原样。
     normalized = _to_version_three_projection(projection)
-    bounds = _validate_markers(document)
+    entry = _projection_entry_from_projection(normalized, session_id)
+    updated_registry = dict(registry)
+    updated_registry["projections"] = [dict(item) for item in registry["projections"]]
+    replaced = False
+    for index, current in enumerate(updated_registry["projections"]):
+        if current["session_id"] == session_id:
+            updated_registry["projections"][index] = entry
+            replaced = True
+            break
+    if not replaced:
+        updated_registry["projections"].append(entry)
+
+    # 2. 先校验完整候选 registry 和文件大小，再执行唯一一次原子替换。
+    updated_registry["registry_updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    updated_registry = validate_registry(updated_registry)
     newline = "\r\n" if "\r\n" in document else "\n"
-    block = render_projection_block(normalized, newline)
+    block = render_registry_block(updated_registry, newline)
     if bounds is None:
         separator = "" if not document or document.endswith(("\n", "\r")) else newline
         candidate = document + separator + block + newline
@@ -463,19 +858,67 @@ def upsert_projection(path: str | os.PathLike[str], projection: Mapping[str, Any
     return normalized
 
 
+def upsert_projection(
+    path: str | os.PathLike[str], projection: Mapping[str, Any], *, session_id: str | None = None
+) -> dict[str, Any]:
+    """新增或替换指定会话投影，并保护其它会话与非托管正文。
+
+    [参数] path: PROJECT_CURRENT 路径；projection: 待持久化投影；session_id: 会话标识。
+    [返回] dict：原子写入后可重读的 v3 投影。
+    最近修改时间：2026-07-25 00:00:00；改动原因：复用持锁 upsert 并保持多会话写入串行化。
+    """
+    # 1. 在锁内读取并校验最新 registry，避免多个会话基于同一旧快照互相覆盖。
+    target = Path(path)
+    sid = _require_session_id(session_id)
+    with _projection_file_lock(target):
+        try:
+            original_bytes = target.read_bytes()
+            document = original_bytes.decode("utf-8", errors="strict")
+        except (OSError, UnicodeDecodeError) as error:
+            raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
+        bounds = _validate_markers(document)
+        registry = extract_registry(document, session_id=sid) or _new_registry()
+        # 2. 调用只允许在持锁状态使用的写入函数，完成校验和原子替换。
+        return _upsert_projection_while_locked(target, document, bounds, registry, projection, sid)
+
+
+def migrate_projection(path: str | os.PathLike[str], session_id: str) -> dict[str, Any]:
+    """把现有 v1-v3 单投影立即迁移为 v4 注册表。
+
+    [参数] path: PROJECT_CURRENT.md 路径；session_id: 旧投影归属的真实会话标识。
+    [返回] dict：迁移后或原本已存在的 v4 注册表。
+    最近修改时间：2026-07-25 00:00:00；改动原因：提供显式且可验证的旧格式升级入口。
+    """
+    # 1. 已是 v4 时只校验返回，避免重复迁移改变现有多会话状态。
+    sid = _validate_session_id(session_id)
+    target = Path(path)
+    document = _read_utf8_text(target, label="UTF-8 PROJECT_CURRENT")
+    raw = _extract_raw_projection_value(document)
+    if raw is None:
+        raise ProjectionContractError("task projection block is missing")
+    if isinstance(raw, Mapping) and raw.get("version") == REGISTRY_VERSION:
+        return validate_registry(raw)
+    # 2. 旧格式必须绑定调用方提供的会话，再通过统一 upsert 原子写入。
+    legacy = validate_projection(raw)
+    upsert_projection(target, legacy, session_id=sid)
+    return load_registry(target)
+
+
 def deactivate_projection(
     path: str | os.PathLike[str],
     *,
+    session_id: str | None = None,
     updated_at: str | None = None,
 ) -> dict[str, Any]:
     """将现有活动投影失活，保留完成步骤作为恢复证据。
 
-    [参数] path: PROJECT_CURRENT 路径；updated_at: 可选 UTC 完成时间。
+    [参数] path: PROJECT_CURRENT 路径；session_id: 会话标识；updated_at: 可选 UTC 完成时间。
     [返回] dict：全部步骤完成且已失活的 v3 投影。
-    最近修改时间：2026-07-25；改动原因：Goal complete 与常规周期完成共用原子终态迁移。
+    最近修改时间：2026-07-25 00:00:00；改动原因：Goal complete 与常规周期完成共用原子终态迁移并强制会话归属。
     """
     # 1. 将所有步骤一次性设为完成，避免终态文件中残留进行中步骤。
-    projection = load_projection(path)
+    sid = _require_session_id(session_id)
+    projection = load_projection(path, session_id=sid)
     projection["steps"] = [
         {"id": step["id"], "step": step["step"], "status": "completed"}
         for step in projection["steps"]
@@ -484,7 +927,7 @@ def deactivate_projection(
     if projection.get("projection_origin") == "goal":
         projection["synthesis_mode"] = "goal_default"
     projection["updated_at"] = updated_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    return upsert_projection(path, projection)
+    return upsert_projection(path, projection, session_id=sid)
 
 
 def _payload_explanation(projection: Mapping[str, Any]) -> str:
@@ -492,7 +935,7 @@ def _payload_explanation(projection: Mapping[str, Any]) -> str:
 
     [参数] projection: 已通过契约的投影。
     [返回] str：与来源和阻断状态一致的 UI 说明。
-    最近修改时间：2026-07-25；改动原因：为 Goal 活动与阻断观察列表提供专属提示。
+    最近修改时间：2026-07-25 00:00:00；改动原因：为 Goal 活动与阻断观察列表提供专属提示。
     """
     # 1. 先规范化版本，再依据来源而非业务内容选择无敏感数据的提示语。
     normalized = _to_version_three_projection(projection)
@@ -512,7 +955,7 @@ def build_update_plan_payload(projection: Mapping[str, Any]) -> dict[str, Any]:
 
     [参数] projection: 已持久化或待验证的投影。
     [返回] dict：可由主会话传给 update_plan 的安全 payload。
-    最近修改时间：2026-07-25；改动原因：允许 blocked Goal 仅观察刷新，禁止 completed Goal 重放。
+    最近修改时间：2026-07-25 00:00:00；改动原因：允许 blocked Goal 仅观察刷新，禁止 completed Goal 重放。
     """
     # 1. 只允许活动投影和 Goal 阻断观察投影生成 UI 数据，失活投影不得重放。
     normalized = validate_projection(projection)
@@ -532,7 +975,7 @@ def _goal_default_projection() -> dict[str, Any]:
 
     [参数] 无。
     [返回] dict：固定标识、固定文案和初始状态的活动 Goal v3 投影。
-    最近修改时间：2026-07-25；改动原因：Goal 创建不保存目标原文也能提供可观察进度。
+    最近修改时间：2026-07-25 00:00:00；改动原因：Goal 创建不保存目标原文也能提供可观察进度。
     """
     # 1. 只从常量复制安全步骤，禁止通过调用参数或运行时输入构造悬浮窗文案。
     steps = [{"id": item[0], "step": item[1], "status": item[2]} for item in GOAL_DEFAULT_STEPS]
@@ -551,20 +994,26 @@ def _goal_default_projection() -> dict[str, Any]:
     )
 
 
-def handle_goal_event(path: str | os.PathLike[str], event: str) -> dict[str, Any]:
+def handle_goal_event(
+    path: str | os.PathLike[str], event: str, *, session_id: str | None = None
+) -> dict[str, Any]:
     """按 Goal 生命周期持久化或恢复安全任务投影。
 
-    [参数] path: PROJECT_CURRENT 路径；event: create、restore、blocked 或 complete。
+    [参数] path: PROJECT_CURRENT 路径；event: create、restore、blocked 或 complete；session_id: 会话标识。
     [返回] dict：事件动作、投影和可选 UI payload；complete 固定返回 null payload。
-    最近修改时间：2026-07-25；改动原因：将 Goal 创建、恢复、阻断和完成统一交给任务投影 Owner。
+    最近修改时间：2026-07-25 00:00:00；改动原因：将 Goal 创建、恢复、阻断和完成统一交给任务投影 Owner，并强制会话归属。
     """
     # 1. 先限制事件集合并读取既有投影；只有 create 可在无投影时初始化安全三步。
     if event not in {"create", "restore", "blocked", "complete"}:
         raise ProjectionContractError("Goal event is invalid")
+    sid = _require_session_id(session_id)
     try:
-        projection = load_projection(path)
+        registry = load_registry(path, session_id=sid)
+        entry = _find_registry_entry(registry, sid)
+        projection = _projection_from_entry(entry) if entry is not None else None
     except ProjectionContractError as error:
         if event == "create" and str(error) == "task projection block is missing":
+            registry = _new_registry()
             projection = None
         else:
             raise
@@ -589,7 +1038,7 @@ def handle_goal_event(path: str | os.PathLike[str], event: str) -> dict[str, Any
                 "projection": projection,
                 "payload": build_update_plan_payload(projection),
             }
-        projection = upsert_projection(path, _goal_default_projection())
+        projection = upsert_projection(path, _goal_default_projection(), session_id=sid)
         return {
             "ok": True,
             "action": "created",
@@ -627,7 +1076,7 @@ def handle_goal_event(path: str | os.PathLike[str], event: str) -> dict[str, Any
             for step in projection["steps"]
         ]
         projection["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-        projection = upsert_projection(path, projection)
+        projection = upsert_projection(path, projection, session_id=sid)
         return {
             "ok": True,
             "action": "blocked",
@@ -644,7 +1093,7 @@ def handle_goal_event(path: str | os.PathLike[str], event: str) -> dict[str, Any
     projection["state"] = "inactive"
     projection["synthesis_mode"] = "goal_default"
     projection["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    projection = upsert_projection(path, projection)
+    projection = upsert_projection(path, projection, session_id=sid)
     return {"ok": True, "action": "completed", "projection": projection, "payload": None}
 
 
@@ -690,8 +1139,14 @@ def _extract_frontmatter_fields(document: str) -> dict[str, str]:
 
 
 def _extract_markdown_section(document: str, heading_text: str) -> str:
-    """按二级标题提取 Markdown 小节正文。"""
-    pattern = re.compile(rf"^##\\s+.*{re.escape(heading_text)}.*\\n(?P<body>.*?)(?=^##\\s+|\\Z)", re.M | re.S)
+    """按二级标题提取 Markdown 小节正文。
+
+    [参数] document: Markdown 全文；heading_text: 标题必须包含的文本。
+    [返回] str：目标二级标题下、下一个二级标题前的正文；未命中时返回空字符串。
+    最近修改时间：2026-07-25 18:23:00；改动原因：限制标题匹配不跨行并兼容 LF/CRLF，避免 exact 任务清单被吞为空区段。
+    """
+    # 1. 标题字符只在当前行匹配，正文再以非贪婪方式读取到下一二级标题或文末。
+    pattern = re.compile(rf"^##\s+[^\r\n]*{re.escape(heading_text)}[^\r\n]*\r?\n(?P<body>.*?)(?=^##\s+|\Z)", re.M | re.S)
     match = pattern.search(document)
     return match.group("body") if match else ""
 
@@ -710,16 +1165,36 @@ def _parse_markdown_table(section_text: str) -> list[list[str]]:
             continue
         rows.append(cells)
     return rows
+
+
 def _extract_task_steps_from_document(path: Path) -> list[dict[str, str]]:
-    """从正式实施文档中提取唯一 TASK 步骤。"""
+    """从正式实施文档中提取唯一 TASK 步骤。
+
+    [参数] path: 正式实施文档路径。
+    [返回] list[dict[str, str]]：按文档顺序生成的任务投影步骤。
+    最近修改时间：2026-07-25 18:18:00；改动原因：兼容正式周期标题及任务 ID 不在首列的最小任务清单。
+    """
+    # 1. 兼容清单标题和工程文档门禁的标准执行顺序标题，再按表头定位任务 ID 与目标列。
     document = _read_utf8_text(path, label="source document")
     task_section = _extract_markdown_section(document, "最小任务清单")
+    if not task_section:
+        task_section = _extract_markdown_section(document, "周期内最小任务执行顺序")
     steps: list[dict[str, str]] = []
     seen: set[str] = set()
     if task_section:
-        for cells in _parse_markdown_table(task_section):
-            header = cells[0]
-            goal = cells[1] if len(cells) > 1 else ""
+        rows = _parse_markdown_table(task_section)
+        task_id_column = 0
+        goal_column = 1
+        if rows and "任务 ID" in rows[0]:
+            header_row = rows.pop(0)
+            task_id_column = header_row.index("任务 ID")
+            if "唯一目标" in header_row:
+                goal_column = header_row.index("唯一目标")
+        for cells in rows:
+            if max(task_id_column, goal_column) >= len(cells):
+                continue
+            header = cells[task_id_column]
+            goal = cells[goal_column]
             match = re.fullmatch(r"`(?P<id>TASK-[A-Z0-9-]+)`", header)
             if match is None:
                 continue
@@ -731,6 +1206,7 @@ def _extract_task_steps_from_document(path: Path) -> list[dict[str, str]]:
             seen.add(task_id)
             steps.append({"id": task_id, "step": f"[{task_id}] {goal.strip()}", "status": "pending"})
     else:
+        # 2. 没有清单章节时保留既有标签扫描兜底，不扩大可接受的任务语法。
         for match in TASK_LABEL_PATTERN.finditer(document):
             task_id = match.group("id")
             label = match.group("label").strip()
@@ -738,13 +1214,20 @@ def _extract_task_steps_from_document(path: Path) -> list[dict[str, str]]:
                 continue
             seen.add(task_id)
             steps.append({"id": task_id, "step": label, "status": "pending"})
+    # 3. 两条路径都没有任务时返回契约错误，禁止生成空 exact 投影。
     if not steps:
         raise ProjectionContractError("source document does not contain any task definitions")
     return steps
 
 
 def _normalize_context(context: Any) -> dict[str, Any]:
-    """校验 synthesize 输入上下文的必要结构。"""
+    """校验 synthesize 输入上下文的必要结构。
+
+    [参数] context: 继续恢复或超时升级的补建证据。
+    [返回] dict：字段完整且触发类型受控的上下文副本。
+    最近修改时间：2026-07-25 00:00:00；改动原因：允许 continue 与 timeout 共用 exact/fallback 合成链路。
+    """
+    # 1. 先校验顶层字段和触发类型，禁止其它场景借合成入口写入投影。
     if not isinstance(context, Mapping):
         raise ProjectionContractError("synthesis context must be an object")
     trigger = context.get("trigger")
@@ -752,8 +1235,8 @@ def _normalize_context(context: Any) -> dict[str, Any]:
     project_current_summary = context.get("project_current_summary")
     thread_evidence = context.get("thread_evidence")
     candidate_source_documents = context.get("candidate_source_documents")
-    if trigger != "continue":
-        raise ProjectionContractError("synthesis trigger must be continue")
+    if trigger not in {"continue", "timeout"}:
+        raise ProjectionContractError("synthesis trigger must be continue or timeout")
     if not isinstance(current_message, str) or not current_message.strip():
         raise ProjectionContractError("current_message must be a non-empty string")
     if not isinstance(project_current_summary, Mapping):
@@ -762,6 +1245,7 @@ def _normalize_context(context: Any) -> dict[str, Any]:
         raise ProjectionContractError("thread_evidence must be an object")
     if not isinstance(candidate_source_documents, list):
         raise ProjectionContractError("candidate_source_documents must be an array")
+    # 2. 当前状态和线程证据必须保持既有白名单结构，超时路径不放宽业务证据要求。
     for key in ("goal", "current_scope", "next_execution_point", "source_document_hint"):
         if key not in project_current_summary:
             raise ProjectionContractError(f"project_current_summary missing field: {key}")
@@ -778,6 +1262,7 @@ def _normalize_context(context: Any) -> dict[str, Any]:
             raise ProjectionContractError(f"thread_evidence.{field_name} must be a string array")
     if current_step_hint is not None and not isinstance(current_step_hint, str):
         raise ProjectionContractError("thread_evidence.current_step_hint must be a string or null")
+    # 3. 候选来源按输入顺序去重，避免重复路径被误判为多来源冲突。
     normalized_candidates = []
     for candidate in candidate_source_documents:
         if not isinstance(candidate, str) or not candidate.strip():
@@ -874,8 +1359,18 @@ def _build_fallback_projection() -> dict[str, Any]:
     )
 
 
-def synthesize_projection(path: str | os.PathLike[str], context: Any) -> dict[str, Any]:
-    """根据当前会话与项目文档生成 exact 或 fallback 补建结果。"""
+def synthesize_projection(
+    path: str | os.PathLike[str], context: Any, session_id: str | None = None
+) -> dict[str, Any]:
+    """根据当前会话与项目文档生成 exact 或 fallback 补建结果。
+
+    [参数] path: PROJECT_CURRENT.md 路径；context: 补建证据；session_id: 当前会话标识。
+    [返回] dict：补建模式、投影、payload、会话归属和证据摘要。
+    最近修改时间：2026-07-25 00:00:00；改动原因：让补建结果显式绑定当前会话。
+    """
+    # 1. 有会话输入时先校验归属，再复用既有证据判定 exact 或 fallback。
+    if session_id is not None:
+        _validate_session_id(session_id)
     project_current_path = Path(path)
     _read_utf8_text(project_current_path, label="UTF-8 PROJECT_CURRENT")
     normalized_context = _normalize_context(context)
@@ -891,6 +1386,7 @@ def synthesize_projection(path: str | os.PathLike[str], context: Any) -> dict[st
         hint = source_document_hint.replace("\\", "/")
         exact_candidate = candidate == hint
 
+    # 2. 只有唯一来源与明确步骤证据同时成立时生成 exact，否则固定 fallback。
     try:
         if not exact_candidate:
             raise ProjectionContractError("fallback requested")
@@ -905,7 +1401,8 @@ def synthesize_projection(path: str | os.PathLike[str], context: Any) -> dict[st
         identity_confidence = "low"
         status_confidence = "conservative"
         used_sources = ["project_current", "thread_history"] + (["source_document"] if exact_candidate else [])
-    return {
+    # 3. payload 始终根据当前补建投影生成；会话标识只进入受控返回字段。
+    result = {
         "mode": mode,
         "projection": projection,
         "payload": build_update_plan_payload(projection),
@@ -915,6 +1412,159 @@ def synthesize_projection(path: str | os.PathLike[str], context: Any) -> dict[st
             "used_sources": used_sources,
         },
     }
+    if session_id is not None:
+        result["session_id"] = session_id
+    return result
+
+
+def _calculate_effective_elapsed_seconds(
+    *, started_at: str, observed_at: str, paused_seconds: Any = 0
+) -> float:
+    """计算扣除暂停后的主动执行秒数。
+
+    [参数] started_at: 首次真实执行时间；observed_at: 当前检查时间；paused_seconds: 不计时的暂停秒数。
+    [返回] float：非负且不超过墙钟时长的主动执行秒数。
+    最近修改时间：2026-07-25 20:30:00；改动原因：让只读探测与持久化升级共享同一时间边界。
+    """
+    # 1. 统一校验 UTC 时间和暂停区间，避免两个超时入口产生边界漂移。
+    started = _parse_utc_timestamp("started_at", started_at)
+    observed = _parse_utc_timestamp("observed_at", observed_at)
+    normalized_paused_seconds = _validate_paused_seconds(paused_seconds)
+    if observed < started:
+        raise ProjectionContractError("observed_at must not be earlier than started_at")
+    wall_elapsed_seconds = (observed - started).total_seconds()
+    if normalized_paused_seconds > wall_elapsed_seconds:
+        raise ProjectionContractError("paused_seconds must not exceed wall elapsed seconds")
+    return wall_elapsed_seconds - normalized_paused_seconds
+
+
+def probe_timeout_projection(
+    path: str | os.PathLike[str],
+    *,
+    started_at: str,
+    observed_at: str,
+    session_id: str | None = None,
+    paused_seconds: Any = 0,
+) -> dict[str, Any]:
+    """只读判断当前会话是否应进入 Goal 检查。
+
+    [参数] path: PROJECT_CURRENT.md 路径；started_at: 首次真实执行时间；observed_at: 当前检查时间；session_id: 当前会话；paused_seconds: 不计时暂停秒数。
+    [返回] dict：not_due、already_active、blocked_goal_preserved 或 goal_check_required；payload 固定为空。
+    最近修改时间：2026-07-25 20:30:00；改动原因：在创建 Goal 前提供无投影写入的严格十分钟资格探测。
+    """
+    # 1. 先校验会话和时间；非法输入不得触碰项目状态。
+    sid = _require_session_id(session_id)
+    effective_elapsed_seconds = _calculate_effective_elapsed_seconds(
+        started_at=started_at,
+        observed_at=observed_at,
+        paused_seconds=paused_seconds,
+    )
+    # 2. 直接读取原子维护的 registry；探测不能创建锁文件或其它临时文件。
+    target = Path(path)
+    try:
+        document = target.read_bytes().decode("utf-8", errors="strict")
+    except (OSError, UnicodeDecodeError) as error:
+        raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
+    _validate_markers(document)
+    registry = extract_registry(document, session_id=sid)
+    if effective_elapsed_seconds <= TIMEOUT_SECONDS:
+        action = "not_due"
+    else:
+        current_entry = _find_registry_entry(registry, sid) if registry is not None else None
+        if current_entry is None or current_entry["state"] == "inactive":
+            action = "goal_check_required"
+        elif current_entry["state"] == "blocked":
+            action = "blocked_goal_preserved"
+        else:
+            action = "already_active"
+    # 3. 探测只返回控制事实；不生成 projection 或 UI payload，也不写入文件。
+    return {
+        "ok": True,
+        "action": action,
+        "effective_elapsed_seconds": effective_elapsed_seconds,
+        "payload": None,
+        "session_id": sid,
+    }
+
+
+def ensure_timeout_projection(
+    path: str | os.PathLike[str],
+    *,
+    started_at: str,
+    observed_at: str,
+    context: Any,
+    session_id: str | None = None,
+    paused_seconds: Any = 0,
+) -> dict[str, Any]:
+    """在有效执行耗时超过十分钟时为当前会话补建任务投影。
+
+    [参数] path: PROJECT_CURRENT.md 路径；started_at: 首次真实执行时间；observed_at: 本次观测时间；context: 合成证据；session_id: 当前会话；paused_seconds: 不计时的暂停秒数。
+    [返回] dict：not_due、already_active、blocked_goal_preserved 或 escalated 动作及可用 payload。
+    最近修改时间：2026-07-25 00:00:00；改动原因：让无悬浮窗任务在有效执行超过 600 秒后强制升级。
+    """
+    # 1. 先校验会话、时间和暂停输入；任一非法输入都不得触碰磁盘状态。
+    sid = _require_session_id(session_id)
+    effective_elapsed_seconds = _calculate_effective_elapsed_seconds(
+        started_at=started_at,
+        observed_at=observed_at,
+        paused_seconds=paused_seconds,
+    )
+    _reject_sensitive_keys(context)
+    normalized_context = _normalize_context(context)
+    if normalized_context["trigger"] != "timeout":
+        raise ProjectionContractError("ensure-timeout requires synthesis trigger timeout")
+
+    # 2. 锁内严格读取并校验现有 registry；损坏状态必须报错，不能以无投影处理。
+    target = Path(path)
+    with _projection_file_lock(target):
+        try:
+            document = target.read_bytes().decode("utf-8", errors="strict")
+        except (OSError, UnicodeDecodeError) as error:
+            raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
+        bounds = _validate_markers(document)
+        registry = extract_registry(document, session_id=sid)
+        if effective_elapsed_seconds <= TIMEOUT_SECONDS:
+            return {
+                "ok": True,
+                "action": "not_due",
+                "effective_elapsed_seconds": effective_elapsed_seconds,
+                "payload": None,
+            }
+
+        # 3. 超时后只检查当前会话；活动投影和 blocked Goal 都直接返回且不重复写入。
+        current_entry = _find_registry_entry(registry, sid) if registry is not None else None
+        if current_entry is not None and current_entry["state"] in {"active", "blocked"}:
+            current_projection = _projection_from_entry(current_entry)
+            action = "already_active" if current_entry["state"] == "active" else "blocked_goal_preserved"
+            return {
+                "ok": True,
+                "action": action,
+                "effective_elapsed_seconds": effective_elapsed_seconds,
+                "projection": current_projection,
+                "payload": build_update_plan_payload(current_projection),
+            }
+
+        # 4. inactive 或无当前会话投影时在同一临界区完成合成与条件写入，消除 TOCTOU 覆盖窗口。
+        synthesis_result = synthesize_projection(target, normalized_context, session_id=sid)
+        persisted_projection = _upsert_projection_while_locked(
+            target,
+            document,
+            bounds,
+            registry or _new_registry(),
+            synthesis_result["projection"],
+            sid,
+        )
+    # 5. payload 只根据成功原子落盘的结果生成；写入失败时不会进入返回路径。
+    return {
+        "ok": True,
+        "action": "escalated",
+        "effective_elapsed_seconds": effective_elapsed_seconds,
+        "mode": synthesis_result["mode"],
+        "projection": persisted_projection,
+        "payload": build_update_plan_payload(persisted_projection),
+        "evidence": synthesis_result["evidence"],
+        "session_id": sid,
+    }
 
 
 def main() -> None:
@@ -922,7 +1572,7 @@ def main() -> None:
 
     [参数] 无；命令行参数由 argparse 读取。
     [返回] None：成功输出 JSON，契约或 I/O 失败输出稳定错误码。
-    最近修改时间：2026-07-25；改动原因：增加 Goal 生命周期事件 CLI，同时保持既有命令兼容。
+    最近修改时间：2026-07-25 00:00:00；改动原因：增加 v4 registry、session_id、migrate 和超时升级 CLI。
     """
     # 1. 注册全部子命令，Goal 事件仅接受四个受控生命周期值。
     parser = argparse.ArgumentParser(description="Maintain PROJECT_CURRENT task plan projection")
@@ -931,20 +1581,42 @@ def main() -> None:
     fingerprint_parser.add_argument("--input", required=True)
     validate_parser = subparsers.add_parser("validate")
     validate_parser.add_argument("--project-current", required=True)
+    validate_parser.add_argument("--session-id")
     write_parser = subparsers.add_parser("write")
     write_parser.add_argument("--project-current", required=True)
     write_parser.add_argument("--input", required=True)
+    write_parser.add_argument("--session-id", required=True)
     payload_parser = subparsers.add_parser("payload")
     payload_parser.add_argument("--project-current", required=True)
+    payload_parser.add_argument("--session-id")
     synthesize_parser = subparsers.add_parser("synthesize")
     synthesize_parser.add_argument("--project-current", required=True)
     synthesize_parser.add_argument("--input", required=True)
+    synthesize_parser.add_argument("--session-id")
+    probe_timeout_parser = subparsers.add_parser("probe-timeout")
+    probe_timeout_parser.add_argument("--project-current", required=True)
+    probe_timeout_parser.add_argument("--started-at", required=True)
+    probe_timeout_parser.add_argument("--observed-at", required=True)
+    probe_timeout_parser.add_argument("--session-id", required=True)
+    probe_timeout_parser.add_argument("--paused-seconds", default="0")
+    ensure_timeout_parser = subparsers.add_parser("ensure-timeout")
+    ensure_timeout_parser.add_argument("--project-current", required=True)
+    ensure_timeout_parser.add_argument("--started-at", required=True)
+    ensure_timeout_parser.add_argument("--observed-at", required=True)
+    ensure_timeout_parser.add_argument("--input", required=True)
+    ensure_timeout_parser.add_argument("--session-id", required=True)
+    ensure_timeout_parser.add_argument("--paused-seconds", default="0")
     deactivate_parser = subparsers.add_parser("deactivate")
     deactivate_parser.add_argument("--project-current", required=True)
     deactivate_parser.add_argument("--updated-at")
+    deactivate_parser.add_argument("--session-id", required=True)
+    migrate_parser = subparsers.add_parser("migrate")
+    migrate_parser.add_argument("--project-current", required=True)
+    migrate_parser.add_argument("--session-id", required=True)
     goal_parser = subparsers.add_parser("goal")
     goal_parser.add_argument("--project-current", required=True)
     goal_parser.add_argument("--event", choices=("create", "restore", "blocked", "complete"), required=True)
+    goal_parser.add_argument("--session-id", required=True)
     for current in (validate_parser, payload_parser):
         current.add_argument("--expected-fingerprint")
         current.add_argument("--expected-source-document")
@@ -958,27 +1630,60 @@ def main() -> None:
         elif args.command == "validate":
             projection = load_projection(
                 args.project_current,
+                session_id=args.session_id,
                 expected_fingerprint=args.expected_fingerprint,
                 expected_source_document=args.expected_source_document,
             )
             _print_json({"ok": True, "projection": projection})
         elif args.command == "write":
-            projection = upsert_projection(args.project_current, _read_json_input(args.input))
+            projection = upsert_projection(
+                args.project_current, _read_json_input(args.input), session_id=args.session_id
+            )
             _print_json({"ok": True, "projection": projection})
         elif args.command == "payload":
             projection = load_projection(
                 args.project_current,
+                session_id=args.session_id,
                 expected_fingerprint=args.expected_fingerprint,
                 expected_source_document=args.expected_source_document,
             )
             _print_json(build_update_plan_payload(projection))
         elif args.command == "synthesize":
-            _print_json(synthesize_projection(args.project_current, _read_json_input(args.input)))
+            _print_json(
+                synthesize_projection(
+                    args.project_current, _read_json_input(args.input), session_id=args.session_id
+                )
+            )
+        elif args.command == "probe-timeout":
+            _print_json(
+                probe_timeout_projection(
+                    args.project_current,
+                    started_at=args.started_at,
+                    observed_at=args.observed_at,
+                    session_id=args.session_id,
+                    paused_seconds=args.paused_seconds,
+                )
+            )
+        elif args.command == "ensure-timeout":
+            _print_json(
+                ensure_timeout_projection(
+                    args.project_current,
+                    started_at=args.started_at,
+                    observed_at=args.observed_at,
+                    context=_read_json_input(args.input),
+                    session_id=args.session_id,
+                    paused_seconds=args.paused_seconds,
+                )
+            )
         elif args.command == "goal":
             # 2. CLI 只持久化和返回 payload，主会话决定是否调用 update_plan。
-            _print_json(handle_goal_event(args.project_current, args.event))
+            _print_json(handle_goal_event(args.project_current, args.event, session_id=args.session_id))
+        elif args.command == "migrate":
+            _print_json({"ok": True, "registry": migrate_projection(args.project_current, args.session_id)})
         else:
-            projection = deactivate_projection(args.project_current, updated_at=args.updated_at)
+            projection = deactivate_projection(
+                args.project_current, session_id=args.session_id, updated_at=args.updated_at
+            )
             _print_json({"ok": True, "projection": projection})
     except ProjectionContractError as error:
         _print_json({"error": "contract", "message": str(error)}, sys.stderr)

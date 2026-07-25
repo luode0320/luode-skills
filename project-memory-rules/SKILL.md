@@ -1,6 +1,6 @@
 ---
 name: project-memory-rules
-description: 从对话、代码与项目文档中抽取并维护项目本地四件套：`PROJECT_CURRENT.md` 保存可交接的当前状态并覆盖更新，`PROJECT_MEMORY.md` 保存稳定规则、关键决策和长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。`PROJECT_MEMORY.md` 继续保留兼容的“人类阅读区 + 底部机器索引区”结构，但不再作为当前状态或历史流水的唯一承载文件；不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。
+description: 从对话、代码与项目文档中抽取并维护项目本地四件套：`PROJECT_CURRENT.md` 保存项目概览与多会话可交接的当前状态并覆盖更新，`PROJECT_MEMORY.md` 保存稳定规则、关键决策和长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。`PROJECT_MEMORY.md` 继续保留兼容的“人类阅读区 + 底部机器索引区”结构，但不再作为当前状态或历史流水的唯一承载文件；不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。
 ---
 
 # 项目记忆规则
@@ -18,7 +18,7 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 - 记录项目中的指标、参数、表字段、缓存键、变量、公式、常量、状态、术语、脚本职责、方法映射或别名。
 - 从代码中抽取长期稳定事实，并持续回写到 `PROJECT_MEMORY.md`。
-- 对话中出现新的明确事实、旧事实被修订、废弃或冲突时，增量更新 `PROJECT_MEMORY.md`；当前任务进度覆盖写入 `PROJECT_CURRENT.md`，重要完成或阻断事件追加到 `PROJECT_HISTORY.md`。
+- 对话中出现新的明确事实、旧事实被修订、废弃或冲突时，增量更新 `PROJECT_MEMORY.md`；项目概览与各会话当前任务摘要覆盖写入 `PROJECT_CURRENT.md`，重要完成或阻断事件追加到 `PROJECT_HISTORY.md`。
 - 用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，作为四件套的记忆维护方参与统一编排。
 
 ## 双区模型
@@ -38,7 +38,7 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 ## 默认流程
 
-1. 启动时先读取 `PROJECT_CURRENT.md`，再读取 `PROJECT_MEMORY.md`；缺失文件由 bootstrap 创建。读取当前状态时识别任务投影托管区，投影 schema、指纹、状态和 `update_plan` payload 统一交给 `task-plan-rehydration-rules`。
+1. 启动时先读取 `PROJECT_CURRENT.md`，再读取 `PROJECT_MEMORY.md`；缺失文件由 bootstrap 创建。读取当前状态时识别任务投影 registry 托管区，按当前 `session_id` 选择 projection；投影 schema、指纹、状态和 `update_plan` payload 统一交给 `task-plan-rehydration-rules`。
 2. 读取当前的 `PROJECT_MEMORY.md` 全文，而不是只读某个词条。
 3. 检查底部是否已有固定 `## 机器索引区`；若缺失，先补齐最小骨架。
 4. 再读取当前对话、相关代码与已有项目文档，按来源优先级抽取明确事实。
@@ -54,7 +54,7 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 - 不创建 `PROJECT_MEMORY_INDEX.yaml`、`PROJECT_MEMORY.log.md` 或其他平行记忆根文件。
 - `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 是项目本地记忆三文件；不得用其中一个替代另一个职责。
-- `PROJECT_CURRENT.md` 采用覆盖式维护，UTF-8 字节数不得超过 51,200；超限必须阻断并压缩。覆盖普通当前状态时必须原样保留 `task-plan-rehydration-rules` 的唯一任务投影托管区，不得删除、复制、解析或改写其中字段。
+- `PROJECT_CURRENT.md` 采用覆盖式维护，UTF-8 字节数不得超过 51,200；超限必须阻断并压缩。覆盖普通项目概览或会话任务摘要时必须原样保留 `task-plan-rehydration-rules` 的单一 registry 托管区，不得删除、复制、解析或改写其中字段；不得将一个会话的摘要覆盖为其它会话状态。
 - `PROJECT_HISTORY.md` 只追加关键事件；初始化或重复 bootstrap 不得覆盖已有历史。
 - 不保留待确认区、草稿区或临时区。
 - `PROJECT_MEMORY.md` 的标题、章节名、条目标题和字段名必须使用中文；英文只允许作为代码符号、文件名、原始字段名或别名保留。

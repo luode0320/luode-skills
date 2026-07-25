@@ -134,7 +134,7 @@ python parallel-task-dispatch-rules/scripts/generate_subagent_plan.py --input <p
 - `message`
   - 直接用于真实 `spawn_agent` / 等价平台工具的委派消息草案。
 - `max_concurrent`
-  - 固定为 5，与 `SKILL.md`「并发上限与空闲回收（强制）」规定的并发上限一致；脚本不提供覆盖参数。
+  - 固定为 5，与 `SKILL.md`「生命周期与并发上限」规定的并发上限一致；脚本不提供覆盖参数。
 - `batch_count`
   - `= ceil(threads 总数 / max_concurrent)`，表示需要分几批启动。
 - `threads[*].batch_index`
@@ -146,7 +146,7 @@ python parallel-task-dispatch-rules/scripts/generate_subagent_plan.py --input <p
 2. 读取输出 JSON。
 3. 用 `threads[*].agent_name` 或 `threads[*].logical_agent_name` 作为中文逻辑任务名，写入主 agent 的启动/完成公告。
 4. 用 `threads[*].message` 作为子 agent 委派消息。
-5. 按 `threads[*].batch_index` 分批启动：先启动 `batch_index=1` 的全部线程，且同一批次内线程数不得超过 `max_concurrent`；必须等这一批全部完成并 `close_agent` 回收后，才能启动 `batch_index=2` 及后续批次。
+5. 按 `threads[*].batch_index` 分批启动：先启动 `batch_index=1` 的全部线程，且同一批次内线程数不得超过 `max_concurrent`；必须等这一批全部终态、完成真实关闭动作并重新枚举复查通过后，才能启动 `batch_index=2` 及后续批次。
 6. 若当前轮授权或项目级完全授权允许，逐个调用真实 subagent / multi-agent / thread 工具，并记录工具返回的 `nickname` 作为平台昵称；若授权不允许自动启动，记录未启动原因。
 7. 建立运行时映射：`logical_agent_name -> platform_nickname -> agent_id`。
 8. 启动后核对：
@@ -154,7 +154,7 @@ python parallel-task-dispatch-rules/scripts/generate_subagent_plan.py --input <p
    - `batch_count` 与实际分批启动次数是否一致
    - 实际成功启动的线程数
    - 未启动线程及原因
-9. 结果收回后，立即调用 `close_agent` / 等价关闭工具，并核对“已关闭线程数”与“已完成线程数”一致，再启动下一批。
+9. 结果收回后，逐实例记录扫描阶段、执行终态、关闭动作、关闭工具结果和复查结果；只有真实关闭双重判定通过才增加 `关闭数`。失败、取消、中断或放弃实例同样需要回收，关闭数不要求等于完成数；`未关闭数 > 0` 时禁止启动下一批。
 
 ## 平台昵称说明
 

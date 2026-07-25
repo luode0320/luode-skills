@@ -6,9 +6,12 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -26,6 +29,8 @@ SPEC.loader.exec_module(projection)
 
 class TaskPlanProjectionTests(unittest.TestCase):
     """验证托管区、状态、原子写入和 CLI 契约。"""
+
+    TEST_SESSION_ID = "test-session"
 
     # _sample 构造合法活动或失活投影。
     # [参数] statuses: 步骤状态；state: 投影状态；updated_at: UTC 时间。
@@ -93,7 +98,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] statuses: 固定安全三步状态；state: Goal 投影状态；synthesis_mode: Goal 合成模式。
         [返回] dict：符合 Goal v3 身份和指纹约束的测试投影。
-        最近修改时间：2026-07-25；改动原因：覆盖 Goal 安全三步、阻断和完成迁移。
+        最近修改时间：2026-07-25 00:00:00；改动原因：覆盖 Goal 安全三步、阻断和完成迁移。
         """
         # 1. 仅从生产常量组装测试样本，防止测试意外允许自定义 Goal 文案。
         steps = [
@@ -112,6 +117,58 @@ class TaskPlanProjectionTests(unittest.TestCase):
             "steps": steps,
         }
 
+    def _sample_v4_entry(
+        self,
+        session_id: str,
+        statuses: tuple[str, ...] = ("completed", "in_progress", "pending"),
+        *,
+        state: str = "active",
+    ) -> dict[str, object]:
+        """构造带会话归属的 v4 注册表投影条目。"""
+        projection_value = self._sample(statuses, state=state)
+        # 用会话前缀区分步骤，payload 断言可以发现跨会话串线。
+        normalized_session = re.sub(r"[^A-Za-z0-9]+", "-", session_id).strip("-").upper() or "SESSION"
+        for index, step in enumerate(projection_value["steps"], 1):
+            task_id = f"TASK-{normalized_session}-{index:02d}"
+            step["id"] = task_id
+            step["step"] = f"[{task_id}] 会话 {session_id} 步骤 {index}"
+        projection_value["plan_key"] = f"REQ-RTP-{normalized_session}/CYCLE-RTP-01"
+        projection_value["plan_fingerprint"] = projection.compute_plan_fingerprint(projection_value["steps"])
+        normalized = projection.validate_projection(projection_value)
+        return {
+            "projection_id": projection.compute_projection_id(session_id, normalized),
+            "session_id": session_id,
+            "projection_origin": normalized.get("projection_origin", "persisted"),
+            "synthesis_mode": normalized.get("synthesis_mode", "none"),
+            "state": normalized["state"],
+            "plan_key": normalized["plan_key"],
+            "source_document": normalized["source_document"],
+            "plan_fingerprint": normalized["plan_fingerprint"],
+            "updated_at": normalized["updated_at"],
+            "steps": normalized["steps"],
+        }
+
+    def _sample_v4_projection(
+        self,
+        session_id: str,
+        statuses: tuple[str, ...] = ("completed", "in_progress", "pending"),
+        *,
+        state: str = "active",
+    ) -> dict[str, object]:
+        """构造供 write/upsert API 接收的带会话区分步骤的 v3 投影。"""
+        entry = self._sample_v4_entry(session_id, statuses, state=state)
+        return {
+            "version": 3,
+            "projection_origin": entry["projection_origin"],
+            "synthesis_mode": entry["synthesis_mode"],
+            "state": entry["state"],
+            "plan_key": entry["plan_key"],
+            "source_document": entry["source_document"],
+            "plan_fingerprint": entry["plan_fingerprint"],
+            "updated_at": entry["updated_at"],
+            "steps": entry["steps"],
+        }
+
     # _write_current 创建带普通正文的临时 PROJECT_CURRENT.md。
     # [参数] root: 临时目录；text: 初始正文。
     # [返回] Path：创建的文件路径。
@@ -121,6 +178,23 @@ class TaskPlanProjectionTests(unittest.TestCase):
         path = root / "PROJECT_CURRENT.md"
         path.write_text(text, encoding="utf-8", newline="")
         return path
+
+    def _write_legacy_projection(self, root: Path, legacy: dict[str, object]) -> Path:
+        """写入未迁移的 v1-v3 单投影托管区。"""
+        legacy_json = json.dumps(legacy, ensure_ascii=False, indent=2)
+        return self._write_current(
+            root,
+            "# 项目当前状态\n\n用户正文。\n"
+            + "\n".join(
+                (
+                    projection.BEGIN_MARKER,
+                    "```json",
+                    legacy_json,
+                    "```",
+                    projection.END_MARKER,
+                )
+            ),
+        )
 
     # _run_cli 执行脚本子命令并固定 UTF-8 子进程环境。
     # [参数] arguments: CLI 参数。
@@ -144,14 +218,21 @@ class TaskPlanProjectionTests(unittest.TestCase):
     def _synthesis_context(
         self,
         *,
+        trigger: str = "continue",
         current_step_hint: str | None = "TASK-SYN-02",
         completed_step_hints: list[str] | None = None,
         candidate_source_documents: list[str] | None = None,
         conflicts: list[str] | None = None,
     ) -> dict[str, object]:
-        """构造 synthesize 输入上下文。"""
+        """构造 synthesize 输入上下文。
+
+        [参数] trigger: 合成触发类型；current_step_hint: 当前步骤；completed_step_hints: 已完成步骤；candidate_source_documents: 候选来源；conflicts: 兼容保留参数。
+        [返回] dict：可供 continue 或 timeout 路径使用的证据上下文。
+        最近修改时间：2026-07-25 00:00:00；改动原因：复用既有样本覆盖超时升级入口。
+        """
+        # 1. 保持原有证据结构，只允许测试按场景替换触发类型和步骤提示。
         return {
-            "trigger": "continue",
+            "trigger": trigger,
             "current_message": "继续",
             "project_current_summary": {
                 "goal": "恢复无投影任务",
@@ -201,8 +282,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             # 2. 每次都从磁盘重新读取，确认新进程可见的三态与写入一致。
             for statuses in (("in_progress", "pending"), ("completed", "in_progress"), ("completed", "completed")):
                 state = "inactive" if all(status == "completed" for status in statuses) else "active"
-                projection.upsert_projection(path, self._sample(statuses, state=state))
-                loaded = projection.load_projection(path)
+                projection.upsert_projection(path, self._sample(statuses, state=state), session_id=self.TEST_SESSION_ID)
+                loaded = projection.load_projection(path, session_id=self.TEST_SESSION_ID)
                 self.assertEqual([item["status"] for item in loaded["steps"]], list(statuses))
 
     def test_inactive_projection_rejects_payload(self) -> None:
@@ -217,15 +298,15 @@ class TaskPlanProjectionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             original = "# 项目当前状态\r\n\r\n用户正文。\r\n"
             path = self._write_current(Path(directory), original)
-            projection.upsert_projection(path, self._sample())
+            projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             first = path.read_bytes()
             self.assertTrue(first.startswith(original.encode("utf-8")))
             # 2. 再次更新只替换唯一托管区，不重复标记或删除用户内容。
-            projection.upsert_projection(path, self._sample(("completed", "in_progress")))
+            projection.upsert_projection(path, self._sample(("completed", "in_progress")), session_id=self.TEST_SESSION_ID)
             second = path.read_text(encoding="utf-8")
             self.assertEqual(second.count(projection.BEGIN_MARKER), 1)
             self.assertIn("用户正文。", second)
-            self.assertIn('"version": 3', second)
+            self.assertIn('"version": 4', second)
 
     def test_marker_damage_is_rejected(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖半标记、重复和逆序。"""
@@ -324,14 +405,14 @@ class TaskPlanProjectionTests(unittest.TestCase):
             path = self._write_current(root, "x" * projection.MAX_FILE_BYTES)
             before = hashlib.sha256(path.read_bytes()).hexdigest()
             with self.assertRaises(projection.ProjectionContractError):
-                projection.upsert_projection(path, self._sample())
+                projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before)
             # 2. 原子替换失败时保留原正文并清理同目录临时文件。
             path.write_text("用户正文\n", encoding="utf-8")
             before_bytes = path.read_bytes()
             with mock.patch.object(projection.os, "replace", side_effect=OSError("boom")):
                 with self.assertRaises(projection.ProjectionIOError):
-                    projection.upsert_projection(path, self._sample())
+                    projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             self.assertEqual(path.read_bytes(), before_bytes)
             self.assertEqual(list(root.glob(".PROJECT_CURRENT.md.*.tmp")), [])
 
@@ -341,11 +422,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             sample = self._sample()
-            block = projection.render_projection_block(sample, "\n")
+            block = projection.render_projection_block(sample, "\n", session_id=self.TEST_SESSION_ID)
             prefix_length = projection.MAX_FILE_BYTES - len(block.encode("utf-8")) - 2
             path = self._write_current(root, "x" * prefix_length)
             # 2. 边界值允许写入，最终文件大小必须精确相等。
-            projection.upsert_projection(path, sample)
+            projection.upsert_projection(path, sample, session_id=self.TEST_SESSION_ID)
             self.assertEqual(len(path.read_bytes()), projection.MAX_FILE_BYTES)
 
     def test_empty_inactive_slot_is_valid(self) -> None:
@@ -386,7 +467,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：防止 Goal 原文或运行时身份被持久化到悬浮窗投影。
+        最近修改时间：2026-07-25 00:00:00；改动原因：防止 Goal 原文或运行时身份被持久化到悬浮窗投影。
         """
         # 1. 基线样本必须可通过 v3 Goal 契约，随后逐项注入被禁止的敏感字段。
         valid = self._goal_sample()
@@ -409,7 +490,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：锁定 blocked 无进行中步骤和 complete 无 payload 的安全边界。
+        最近修改时间：2026-07-25 00:00:00；改动原因：锁定 blocked 无进行中步骤和 complete 无 payload 的安全边界。
         """
         # 1. 阻断投影仍可展示历史完成进度，但绝不保留进行中状态。
         blocked = self._goal_sample(("completed", "pending", "pending"), state="blocked", synthesis_mode="goal_blocked")
@@ -429,45 +510,45 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：锁定四个 Goal 事件、正式最小任务优先和 fallback 安全列表让位。
+        最近修改时间：2026-07-25 00:00:00；改动原因：锁定四个 Goal 事件、正式最小任务优先和 fallback 安全列表让位。
         """
         # 1. 新建、恢复、阻断和完成必须只迁移固定安全三步，并以 inactive 终止重放。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             path = self._write_current(root)
-            created = projection.handle_goal_event(path, "create")
+            created = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             self.assertEqual(created["action"], "created")
             self.assertEqual(created["projection"]["version"], 3)
             self.assertEqual(created["projection"]["steps"][0]["status"], "in_progress")
             before_restore = path.read_bytes()
-            restored = projection.handle_goal_event(path, "restore")
+            restored = projection.handle_goal_event(path, "restore", session_id=self.TEST_SESSION_ID)
             self.assertEqual(restored["action"], "restored")
             self.assertEqual(path.read_bytes(), before_restore)
-            blocked = projection.handle_goal_event(path, "blocked")
+            blocked = projection.handle_goal_event(path, "blocked", session_id=self.TEST_SESSION_ID)
             self.assertEqual(blocked["projection"]["state"], "blocked")
             self.assertNotIn("in_progress", [item["status"] for item in blocked["projection"]["steps"]])
             with self.assertRaises(projection.ProjectionContractError):
-                projection.handle_goal_event(path, "restore")
-            completed = projection.handle_goal_event(path, "complete")
+                projection.handle_goal_event(path, "restore", session_id=self.TEST_SESSION_ID)
+            completed = projection.handle_goal_event(path, "complete", session_id=self.TEST_SESSION_ID)
             self.assertEqual(completed["payload"], None)
             self.assertEqual(completed["projection"]["state"], "inactive")
             self.assertTrue(all(item["status"] == "completed" for item in completed["projection"]["steps"]))
             # 2. 活动 persisted 正式计划必须被保护，Goal 创建不能覆盖真实实施任务。
-            projection.upsert_projection(path, self._sample())
+            projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             formal_before = path.read_bytes()
-            preserved = projection.handle_goal_event(path, "create")
+            preserved = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             self.assertEqual(preserved["action"], "preserved_formal")
             self.assertEqual(path.read_bytes(), formal_before)
             # 3. 正式计划不关联 Goal 默认三步，后续 Goal 事件必须无副作用地保持真实实施任务。
             for event in ("restore", "blocked", "complete"):
-                preserved_after_event = projection.handle_goal_event(path, event)
+                preserved_after_event = projection.handle_goal_event(path, event, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(preserved_after_event["action"], "preserved_formal")
                 self.assertIsNone(preserved_after_event["payload"])
                 self.assertEqual(path.read_bytes(), formal_before)
             # 4. synthesized fallback 仅是恢复兜底，创建 Goal 时必须替换为 Goal 安全三步。
             fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
-            projection.upsert_projection(path, fallback)
-            created_from_fallback = projection.handle_goal_event(path, "create")
+            projection.upsert_projection(path, fallback, session_id=self.TEST_SESSION_ID)
+            created_from_fallback = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             self.assertEqual(created_from_fallback["action"], "created")
             self.assertEqual(created_from_fallback["projection"]["projection_origin"], "goal")
             self.assertEqual([item["id"] for item in created_from_fallback["projection"]["steps"]], ["GOAL-01", "GOAL-02", "GOAL-03"])
@@ -477,13 +558,13 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：固定正式实施计划优先于默认 Goal 悬浮列表的运行中切换。
+        最近修改时间：2026-07-25 00:00:00；改动原因：固定正式实施计划优先于默认 Goal 悬浮列表的运行中切换。
         """
         # 1. 先建立活动 Goal 投影，再通过常规 write 写入正式最小任务。
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
-            projection.handle_goal_event(path, "create")
-            projection.upsert_projection(path, self._sample())
+            projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
+            projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             # 2. 写入后必须以正式来源为准，避免 Goal 默认步骤遮挡真实实施进度。
             replaced = projection.load_projection(path)
             self.assertEqual(replaced["projection_origin"], "persisted")
@@ -494,20 +575,20 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：确保 CLI 入口与函数调用具有相同的原子迁移和失败语义。
+        最近修改时间：2026-07-25 00:00:00；改动原因：确保 CLI 入口与函数调用具有相同的原子迁移和失败语义。
         """
         # 1. CLI 依次创建、阻断和完成 Goal，完成后恢复必须稳定返回契约错误。
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
-            create = self._run_cli("goal", "--project-current", str(path), "--event", "create")
+            create = self._run_cli("goal", "--project-current", str(path), "--event", "create", "--session-id", "legacy/default")
             self.assertEqual(create.returncode, 0, create.stderr)
             self.assertEqual(json.loads(create.stdout)["action"], "created")
-            blocked = self._run_cli("goal", "--project-current", str(path), "--event", "blocked")
+            blocked = self._run_cli("goal", "--project-current", str(path), "--event", "blocked", "--session-id", "legacy/default")
             self.assertEqual(blocked.returncode, 0, blocked.stderr)
-            complete = self._run_cli("goal", "--project-current", str(path), "--event", "complete")
+            complete = self._run_cli("goal", "--project-current", str(path), "--event", "complete", "--session-id", "legacy/default")
             self.assertEqual(complete.returncode, 0, complete.stderr)
             before = hashlib.sha256(path.read_bytes()).hexdigest()
-            restore = self._run_cli("goal", "--project-current", str(path), "--event", "restore")
+            restore = self._run_cli("goal", "--project-current", str(path), "--event", "restore", "--session-id", "legacy/default")
             self.assertEqual(restore.returncode, 2)
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before)
 
@@ -516,14 +597,14 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：确保 Goal v3 引入不拒绝既有常规投影。
+        最近修改时间：2026-07-25 00:00:00；改动原因：确保 Goal v3 引入不拒绝既有常规投影。
         """
         # 1. 旧版本常规投影写回后统一升级，旧版本 Goal 语义仍必须被拒绝。
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
             legacy = self._sample_v2()
-            projection.upsert_projection(path, legacy)
-            loaded = projection.load_projection(path)
+            projection.upsert_projection(path, legacy, session_id=self.TEST_SESSION_ID)
+            loaded = projection.load_projection(path, session_id=self.TEST_SESSION_ID)
             self.assertEqual(loaded["version"], 3)
             self.assertEqual(loaded["projection_origin"], "synthesized")
             v2_goal = self._sample_v2()
@@ -552,6 +633,38 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["projection"]["steps"][0]["status"], "completed")
             self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
             self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION_SYNTH_EXACT)
+
+    def test_synthesize_projection_reads_task_columns_by_header(self) -> None:
+        """验证正式清单可在顺序列之后提取任务 ID 与目标。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 18:18:00；改动原因：防止正式周期表因任务 ID 不在首列而静默降级 fallback。
+        """
+        # 1. 使用工程文档门禁的标准标题及“顺序、任务 ID、唯一目标”列布局构造来源文档。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            (source_dir / "plan.md").write_text(
+                "## 周期内最小任务执行顺序\n\n"
+                "| 顺序 | 任务 ID | 唯一目标 | 状态 |\n"
+                "|---:|---|---|---|\n"
+                "| 1 | `TASK-SYN-01` | 冻结补建契约 | completed |\n"
+                "| 2 | `TASK-SYN-02` | 实现补建引擎 | in_progress |\n"
+                "| 3 | `TASK-SYN-03` | 回归验证 | pending |\n",
+                encoding="utf-8",
+            )
+            # 2. exact 结果必须按表头提取三项任务并保留显式完成与进行中状态。
+            result = projection.synthesize_projection(current_path, self._synthesis_context())
+            self.assertEqual(result["mode"], "exact")
+            self.assertEqual(
+                [step["id"] for step in result["projection"]["steps"]],
+                ["TASK-SYN-01", "TASK-SYN-02", "TASK-SYN-03"],
+            )
+            self.assertEqual(result["projection"]["steps"][0]["status"], "completed")
+            self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
 
     def test_synthesize_projection_falls_back_when_source_is_ambiguous(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止多候选来源时猜业务步骤。"""
@@ -611,13 +724,592 @@ class TaskPlanProjectionTests(unittest.TestCase):
             )
             self.assertEqual(result["mode"], "fallback")
 
+    def test_probe_timeout_is_read_only_at_boundary_and_when_due(self) -> None:
+        """验证 599/600/601 秒边界只返回资格状态且不写文件。"""
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            before = current_path.read_bytes()
+            directory_before = set(current_path.parent.iterdir())
+            observations = (
+                ("2026-07-25T00:09:59Z", "not_due"),
+                ("2026-07-25T00:10:00Z", "not_due"),
+                ("2026-07-25T00:10:00.001Z", "goal_check_required"),
+                ("2026-07-25T00:10:01Z", "goal_check_required"),
+            )
+            with mock.patch.object(
+                projection,
+                "_projection_file_lock",
+                side_effect=AssertionError("probe-timeout must not create a lock file"),
+            ):
+                for observed_at, expected_action in observations:
+                    result = projection.probe_timeout_projection(
+                        current_path,
+                        started_at="2026-07-25T00:00:00Z",
+                        observed_at=observed_at,
+                        session_id=self.TEST_SESSION_ID,
+                    )
+                    self.assertEqual(result["action"], expected_action)
+                    self.assertIsNone(result["payload"])
+                    self.assertEqual(current_path.read_bytes(), before)
+                    self.assertEqual(set(current_path.parent.iterdir()), directory_before)
+
+    def test_probe_timeout_subtracts_pause_and_preserves_existing_states(self) -> None:
+        """验证暂停扣除、活动投影和阻断 Goal 均不会进入 Goal 检查。"""
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            before = current_path.read_bytes()
+            paused = projection.probe_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:15:01Z",
+                paused_seconds=301,
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(paused["action"], "not_due")
+            active = self._sample()
+            projection.upsert_projection(current_path, active, session_id=self.TEST_SESSION_ID)
+            active_bytes = current_path.read_bytes()
+            active_result = projection.probe_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(active_result["action"], "already_active")
+            self.assertEqual(current_path.read_bytes(), active_bytes)
+            blocked = self._goal_sample(("completed", "pending", "pending"), state="blocked", synthesis_mode="goal_blocked")
+            projection.upsert_projection(current_path, blocked, session_id=self.TEST_SESSION_ID)
+            blocked_bytes = current_path.read_bytes()
+            blocked_result = projection.probe_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(blocked_result["action"], "blocked_goal_preserved")
+            self.assertEqual(current_path.read_bytes(), blocked_bytes)
+            self.assertNotEqual(before, active_bytes)
+
+    def test_probe_timeout_isolates_sessions_and_allows_inactive_current_session(self) -> None:
+        """验证其它会话活动投影不阻断当前会话，当前失活投影仍可升级。"""
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            projection.upsert_projection(current_path, self._sample(), session_id="other-session")
+            other_only = projection.probe_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:00.001Z",
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(other_only["action"], "goal_check_required")
+            inactive = self._sample(("completed", "completed", "completed"), state="inactive")
+            projection.upsert_projection(current_path, inactive, session_id=self.TEST_SESSION_ID)
+            current_inactive = projection.probe_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(current_inactive["action"], "goal_check_required")
+
+    def test_probe_timeout_rejects_invalid_input_and_damaged_registry_without_writing(self) -> None:
+        """验证非法时间和损坏 registry 都保持原文件字节不变。"""
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            for started_at, observed_at, paused_seconds in (
+                ("invalid", "2026-07-25T00:10:01Z", 0),
+                ("2026-07-25T00:10:01Z", "2026-07-25T00:00:00Z", 0),
+                ("2026-07-25T00:00:00Z", "2026-07-25T00:10:01Z", 602),
+            ):
+                before = current_path.read_bytes()
+                with self.assertRaises(projection.ProjectionContractError):
+                    projection.probe_timeout_projection(
+                        current_path,
+                        started_at=started_at,
+                        observed_at=observed_at,
+                        paused_seconds=paused_seconds,
+                        session_id=self.TEST_SESSION_ID,
+                    )
+                self.assertEqual(current_path.read_bytes(), before)
+            current_path.write_text(
+                f"# 当前\n\n{projection.BEGIN_MARKER}\n```json\n{{broken}}\n```\n{projection.END_MARKER}\n",
+                encoding="utf-8",
+            )
+            before = current_path.read_bytes()
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.probe_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at="2026-07-25T00:10:01Z",
+                    session_id=self.TEST_SESSION_ID,
+                )
+            self.assertEqual(current_path.read_bytes(), before)
+
+    def test_probe_timeout_cli_returns_goal_check_required_without_writing(self) -> None:
+        """验证真实 CLI 返回 Goal 检查动作且不改写 PROJECT_CURRENT。"""
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            before = current_path.read_bytes()
+            result = self._run_cli(
+                "probe-timeout",
+                "--project-current",
+                str(current_path),
+                "--started-at",
+                "2026-07-25T00:00:00Z",
+                "--observed-at",
+                "2026-07-25T00:10:01Z",
+                "--session-id",
+                "cli-probe-timeout",
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["action"], "goal_check_required")
+            self.assertIsNone(output["payload"])
+            self.assertEqual(current_path.read_bytes(), before)
+
+    def test_ensure_timeout_uses_strict_boundary_and_persists_exact_projection(self) -> None:
+        """验证 599、600、601 秒边界及 exact 原子持久化。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：锁定严格大于十分钟才创建悬浮任务投影。
+        """
+        # 1. 每个边界使用独立文件，确保未到期场景没有被前一轮写入污染。
+        observations = (
+            ("2026-07-25T00:09:59Z", "not_due"),
+            ("2026-07-25T00:10:00Z", "not_due"),
+            ("2026-07-25T00:10:01Z", "escalated"),
+        )
+        for observed_at, expected_action in observations:
+            with self.subTest(observed_at=observed_at), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                current_path = self._write_current(root)
+                source_dir = root / "doc" / "3-实施"
+                source_dir.mkdir(parents=True)
+                (source_dir / "plan.md").write_text(
+                    "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n",
+                    encoding="utf-8",
+                )
+                before = current_path.read_bytes()
+                # 2. 调用超时入口并验证 600 秒仍不写、601 秒才持久化 exact 投影。
+                result = projection.ensure_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at=observed_at,
+                    context=self._synthesis_context(trigger="timeout"),
+                    session_id=self.TEST_SESSION_ID,
+                )
+                self.assertEqual(result["action"], expected_action)
+                if expected_action == "not_due":
+                    self.assertEqual(current_path.read_bytes(), before)
+                    self.assertIsNone(result["payload"])
+                else:
+                    self.assertEqual(result["mode"], "exact")
+                    persisted = projection.load_projection(current_path, session_id=self.TEST_SESSION_ID)
+                    self.assertEqual(persisted["synthesis_mode"], "exact")
+                    self.assertEqual(result["payload"], projection.build_update_plan_payload(persisted))
+
+    def test_ensure_timeout_subtracts_paused_seconds_before_boundary_check(self) -> None:
+        """验证暂停时间从墙钟耗时扣除后再应用严格阈值。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：Plan Mode、等待用户、blocked 和 manual_handoff 暂停不得计入十分钟。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            (source_dir / "plan.md").write_text(
+                "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n",
+                encoding="utf-8",
+            )
+            before = current_path.read_bytes()
+            # 1. 墙钟 901 秒扣除 301 秒后恰为 600 秒，必须保持不写。
+            not_due = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:15:01Z",
+                paused_seconds=301,
+                context=self._synthesis_context(trigger="timeout"),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(not_due["action"], "not_due")
+            self.assertEqual(not_due["effective_elapsed_seconds"], 600)
+            self.assertEqual(current_path.read_bytes(), before)
+            # 2. 墙钟增加一秒后有效耗时为 601 秒，必须创建当前会话投影。
+            escalated = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:15:02Z",
+                paused_seconds=301,
+                context=self._synthesis_context(trigger="timeout"),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(escalated["action"], "escalated")
+            self.assertEqual(escalated["effective_elapsed_seconds"], 601)
+
+    def test_ensure_timeout_uses_fallback_when_exact_evidence_is_ambiguous(self) -> None:
+        """验证超时升级沿用固定三步 fallback。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：来源无法唯一确认时禁止猜测正式任务。
+        """
+        # 1. 多来源证据必须走 fallback，且持久化结果与返回 payload 一致。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            result = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                context=self._synthesis_context(
+                    trigger="timeout", candidate_source_documents=["a.md", "b.md"]
+                ),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(result["action"], "escalated")
+            self.assertEqual(result["mode"], "fallback")
+            persisted = projection.load_projection(current_path, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(persisted["synthesis_mode"], "fallback")
+            self.assertEqual([step["id"] for step in persisted["steps"]], ["RECOVERY-01", "RECOVERY-02", "RECOVERY-03"])
+
+    def test_ensure_timeout_keeps_existing_active_session_projection_unchanged(self) -> None:
+        """验证当前会话已有活动投影时不重复写入。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：避免超时检查覆盖已存在的正式任务悬浮窗。
+        """
+        # 1. 预置当前会话活动投影，超时检查应返回 already_active 并保持文件字节不变。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            projection.upsert_projection(current_path, self._sample(), session_id=self.TEST_SESSION_ID)
+            before = current_path.read_bytes()
+            result = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                context=self._synthesis_context(trigger="timeout"),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(result["action"], "already_active")
+            self.assertEqual(current_path.read_bytes(), before)
+            self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION)
+
+    def test_ensure_timeout_preserves_blocked_goal_and_replaces_inactive_projection(self) -> None:
+        """验证 blocked Goal 受保护而 inactive 投影可被超时升级替换。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：区分暂停观察状态与可安全替换的历史终态。
+        """
+        # 1. blocked Goal 必须原字节保留，并返回只观察用途的 payload。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            projection.handle_goal_event(current_path, "create", session_id=self.TEST_SESSION_ID)
+            projection.handle_goal_event(current_path, "blocked", session_id=self.TEST_SESSION_ID)
+            before = current_path.read_bytes()
+            blocked = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                context=self._synthesis_context(trigger="timeout"),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(blocked["action"], "blocked_goal_preserved")
+            self.assertEqual(blocked["payload"]["explanation"], projection.EXPLANATION_GOAL_BLOCKED)
+            self.assertEqual(current_path.read_bytes(), before)
+        # 2. inactive 投影不再代表当前悬浮窗，超过阈值后允许被 fallback 替换。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            inactive = self._sample(("completed", "completed"), state="inactive")
+            projection.upsert_projection(current_path, inactive, session_id=self.TEST_SESSION_ID)
+            replaced = projection.ensure_timeout_projection(
+                current_path,
+                started_at="2026-07-25T00:00:00Z",
+                observed_at="2026-07-25T00:10:01Z",
+                context=self._synthesis_context(
+                    trigger="timeout", candidate_source_documents=["a.md", "b.md"]
+                ),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(replaced["action"], "escalated")
+            self.assertEqual(replaced["mode"], "fallback")
+            self.assertEqual(
+                projection.load_projection(current_path, session_id=self.TEST_SESSION_ID)["state"],
+                "active",
+            )
+
+    def test_ensure_timeout_serializes_active_check_synthesis_and_upsert(self) -> None:
+        """验证同会话并发超时检查只有一个调用执行合成和写入。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：防止检查后写入之间的 TOCTOU 覆盖。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            context = self._synthesis_context(
+                trigger="timeout", candidate_source_documents=["a.md", "b.md"]
+            )
+            synthesis_started = threading.Event()
+            release_synthesis = threading.Event()
+            second_started = threading.Event()
+            results: list[dict[str, object]] = []
+            errors: list[BaseException] = []
+            call_count = 0
+            count_lock = threading.Lock()
+            original_synthesize = projection.synthesize_projection
+
+            def delayed_synthesize(*args: object, **kwargs: object) -> dict[str, object]:
+                """暂停首个合成调用，为第二线程制造稳定竞争窗口。
+
+                [参数] args/kwargs: 原合成函数参数。
+                [返回] dict：原合成结果。
+                最近修改时间：2026-07-25 00:00:00；改动原因：验证锁覆盖完整条件写入临界区。
+                """
+                nonlocal call_count
+                # 1. 记录真实合成次数并等待测试线程允许继续写入。
+                with count_lock:
+                    call_count += 1
+                synthesis_started.set()
+                release_synthesis.wait(timeout=2)
+                return original_synthesize(*args, **kwargs)
+
+            def run_timeout(mark_second: bool = False) -> None:
+                """执行一次同会话超时检查并收集线程结果。
+
+                [参数] mark_second: 是否标记第二线程已开始调用。
+                [返回] None。
+                最近修改时间：2026-07-25 00:00:00；改动原因：集中捕获并发线程结果与异常。
+                """
+                # 1. 第二线程在进入生产函数前发出信号，主线程据此释放首个合成。
+                if mark_second:
+                    second_started.set()
+                try:
+                    results.append(
+                        projection.ensure_timeout_projection(
+                            current_path,
+                            started_at="2026-07-25T00:00:00Z",
+                            observed_at="2026-07-25T00:10:01Z",
+                            context=context,
+                            session_id=self.TEST_SESSION_ID,
+                        )
+                    )
+                except BaseException as error:  # pragma: no cover - 失败内容由主线程断言
+                    errors.append(error)
+
+            # 1. 首线程持锁停在 synthesize，第二线程开始后应阻塞在同一文件锁。
+            with mock.patch.object(projection, "synthesize_projection", side_effect=delayed_synthesize):
+                first = threading.Thread(target=run_timeout)
+                second = threading.Thread(target=run_timeout, kwargs={"mark_second": True})
+                first.start()
+                self.assertTrue(synthesis_started.wait(timeout=2))
+                second.start()
+                self.assertTrue(second_started.wait(timeout=2))
+                time.sleep(0.1)
+                release_synthesis.set()
+                first.join(timeout=3)
+                second.join(timeout=3)
+            # 2. 只有一个线程允许合成和写入，后到线程必须观察到 active 后无副作用返回。
+            self.assertFalse(first.is_alive())
+            self.assertFalse(second.is_alive())
+            self.assertEqual(errors, [])
+            self.assertEqual(call_count, 1)
+            self.assertEqual({item["action"] for item in results}, {"escalated", "already_active"})
+            self.assertEqual(len(projection.load_registry(current_path)["projections"]), 1)
+
+    def test_ensure_timeout_rejects_invalid_time_and_pause_without_writing(self) -> None:
+        """验证非法 UTC 时间、倒序时间和暂停秒数均不写文件。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：锁定失败路径的原文件保护。
+        """
+        # 1. 每组非法输入都使用同一成功标准：契约错误且原文件字节完全不变。
+        invalid_cases = (
+            ("invalid", "2026-07-25T00:10:01Z", 0),
+            ("2026-07-25T00:00:00", "2026-07-25T00:10:01Z", 0),
+            ("2026-07-25T00:10:02Z", "2026-07-25T00:10:01Z", 0),
+            ("2026-07-25T00:00:00Z", "2026-07-25T00:10:01Z", -1),
+            ("2026-07-25T00:00:00Z", "2026-07-25T00:10:01Z", 602),
+        )
+        for started_at, observed_at, paused_seconds in invalid_cases:
+            with self.subTest(started_at=started_at, paused_seconds=paused_seconds), tempfile.TemporaryDirectory() as directory:
+                current_path = self._write_current(Path(directory))
+                before = current_path.read_bytes()
+                with self.assertRaises(projection.ProjectionContractError):
+                    projection.ensure_timeout_projection(
+                        current_path,
+                        started_at=started_at,
+                        observed_at=observed_at,
+                        paused_seconds=paused_seconds,
+                        context=self._synthesis_context(trigger="timeout"),
+                        session_id=self.TEST_SESSION_ID,
+                    )
+                self.assertEqual(current_path.read_bytes(), before)
+        # 2. ensure-timeout 只接受 timeout 触发，continue 仍只属于显式恢复入口。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            before = current_path.read_bytes()
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at="2026-07-25T00:10:01Z",
+                    context=self._synthesis_context(trigger="continue"),
+                    session_id=self.TEST_SESSION_ID,
+                )
+            self.assertEqual(current_path.read_bytes(), before)
+
+    def test_ensure_timeout_rejects_damaged_registry_without_writing(self) -> None:
+        """验证损坏 registry 不得被当成无投影后覆盖。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：保护现有多会话 registry 的故障现场。
+        """
+        # 1. 构造 JSON 损坏的唯一托管区，超时入口必须非写入失败。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(
+                Path(directory),
+                "# 项目当前状态\n\n"
+                + "\n".join((projection.BEGIN_MARKER, "```json", "{broken", "```", projection.END_MARKER)),
+            )
+            before = current_path.read_bytes()
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at="2026-07-25T00:10:01Z",
+                    context=self._synthesis_context(trigger="timeout"),
+                    session_id=self.TEST_SESSION_ID,
+                )
+            self.assertEqual(current_path.read_bytes(), before)
+
+    def test_ensure_timeout_rejects_sensitive_context_and_oversized_result_without_writing(self) -> None:
+        """验证敏感证据和超限候选都保持原文件不变。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：把隐私与 51,200 字节闸门覆盖到超时升级路径。
+        """
+        # 1. 上下文包含递归敏感字段时，在读取和写入 registry 前直接拒绝。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory))
+            before = current_path.read_bytes()
+            sensitive_context = self._synthesis_context(trigger="timeout")
+            sensitive_context["token"] = "不得持久化"
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at="2026-07-25T00:10:01Z",
+                    context=sensitive_context,
+                    session_id=self.TEST_SESSION_ID,
+                )
+            self.assertEqual(current_path.read_bytes(), before)
+        # 2. 合成后的完整 PROJECT_CURRENT 超过上限时，原子写入前拒绝并保留原字节。
+        with tempfile.TemporaryDirectory() as directory:
+            current_path = self._write_current(Path(directory), "# 项目当前状态\n" + ("x" * 51_000))
+            before = current_path.read_bytes()
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_timeout_projection(
+                    current_path,
+                    started_at="2026-07-25T00:00:00Z",
+                    observed_at="2026-07-25T00:10:01Z",
+                    context=self._synthesis_context(
+                        trigger="timeout", candidate_source_documents=["a.md", "b.md"]
+                    ),
+                    session_id=self.TEST_SESSION_ID,
+                )
+            self.assertEqual(current_path.read_bytes(), before)
+
+    def test_ensure_timeout_cli_persists_payload_and_keeps_errors_non_destructive(self) -> None:
+        """验证 ensure-timeout CLI 的成功输出和稳定错误码。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：覆盖真实子进程参数解析、持久化与错误模型。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current_path = self._write_current(root)
+            context_path = root / "timeout-context.json"
+            context_path.write_text(
+                json.dumps(
+                    self._synthesis_context(
+                        trigger="timeout", candidate_source_documents=["a.md", "b.md"]
+                    ),
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            # 1. 真实 CLI 超过阈值后必须先持久化 fallback，再返回可用 payload。
+            escalated = self._run_cli(
+                "ensure-timeout",
+                "--project-current",
+                str(current_path),
+                "--started-at",
+                "2026-07-25T00:00:00Z",
+                "--observed-at",
+                "2026-07-25T00:15:02Z",
+                "--paused-seconds",
+                "301",
+                "--input",
+                str(context_path),
+                "--session-id",
+                "cli-timeout",
+            )
+            self.assertEqual(escalated.returncode, 0, escalated.stderr)
+            escalated_output = json.loads(escalated.stdout)
+            self.assertEqual(escalated_output["action"], "escalated")
+            self.assertEqual(escalated_output["mode"], "fallback")
+            self.assertIn("plan", escalated_output["payload"])
+            # 2. 后续非法时间返回契约错误，且不得改写刚才已持久化的 registry。
+            before = current_path.read_bytes()
+            invalid = self._run_cli(
+                "ensure-timeout",
+                "--project-current",
+                str(current_path),
+                "--started-at",
+                "invalid",
+                "--observed-at",
+                "2026-07-25T00:15:02Z",
+                "--input",
+                str(context_path),
+                "--session-id",
+                "cli-timeout",
+            )
+            self.assertEqual(invalid.returncode, 2)
+            self.assertEqual(json.loads(invalid.stderr)["error"], "contract")
+            self.assertEqual(current_path.read_bytes(), before)
+            # 3. 缺少必填 session_id 时 argparse 返回 2，且同样不能改写现有 registry。
+            missing_required = self._run_cli(
+                "ensure-timeout",
+                "--project-current",
+                str(current_path),
+                "--started-at",
+                "2026-07-25T00:00:00Z",
+                "--observed-at",
+                "2026-07-25T00:10:01Z",
+                "--input",
+                str(context_path),
+            )
+            self.assertEqual(missing_required.returncode, 2)
+            self.assertEqual(current_path.read_bytes(), before)
+
     def test_deactivate_completes_steps_atomically(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：最后一步完成和失活不留中间态。"""
         # 1. 写入含进行中步骤的活动投影，再执行单次失活迁移。
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
-            projection.upsert_projection(path, self._sample(("completed", "in_progress")))
-            result = projection.deactivate_projection(path, updated_at="2026-07-23T02:00:00Z")
+            projection.upsert_projection(path, self._sample(("completed", "in_progress")), session_id=self.TEST_SESSION_ID)
+            result = projection.deactivate_projection(
+                path, session_id=self.TEST_SESSION_ID, updated_at="2026-07-23T02:00:00Z"
+            )
             # 2. 所有步骤必须完成，且失活结果不能生成 UI payload。
             self.assertEqual(result["state"], "inactive")
             self.assertTrue(all(step["status"] == "completed" for step in result["steps"]))
@@ -632,11 +1324,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
             path = self._write_current(root)
             input_path = root / "projection.json"
             input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
-            write_result = self._run_cli("write", "--project-current", str(path), "--input", str(input_path))
+            write_result = self._run_cli("write", "--project-current", str(path), "--input", str(input_path), "--session-id", "legacy/default")
             self.assertEqual(write_result.returncode, 0, write_result.stderr)
             # 2. 顺序验证读取、payload、指纹和失活四个真实命令。
-            self.assertEqual(self._run_cli("validate", "--project-current", str(path)).returncode, 0)
-            payload_result = self._run_cli("payload", "--project-current", str(path))
+            self.assertEqual(self._run_cli("validate", "--project-current", str(path), "--session-id", "legacy/default").returncode, 0)
+            payload_result = self._run_cli("payload", "--project-current", str(path), "--session-id", "legacy/default")
             self.assertEqual(payload_result.returncode, 0, payload_result.stderr)
             self.assertIn("plan", json.loads(payload_result.stdout))
             source_dir = root / "doc" / "3-实施"
@@ -666,6 +1358,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 "deactivate",
                 "--project-current",
                 str(path),
+                "--session-id",
+                "legacy/default",
                 "--updated-at",
                 "2026-07-23T02:00:00Z",
             )
@@ -674,10 +1368,225 @@ class TaskPlanProjectionTests(unittest.TestCase):
             # 3. 契约输入和缺失文件分别返回稳定的 2、3 退出码。
             damaged_path = root / "damaged.json"
             damaged_path.write_text("{}", encoding="utf-8")
-            contract_result = self._run_cli("write", "--project-current", str(path), "--input", str(damaged_path))
+            contract_result = self._run_cli("write", "--project-current", str(path), "--input", str(damaged_path), "--session-id", "legacy/default")
             self.assertEqual(contract_result.returncode, 2)
-            missing_result = self._run_cli("validate", "--project-current", str(root / "missing.md"))
+            missing_result = self._run_cli("validate", "--project-current", str(root / "missing.md"), "--session-id", "legacy/default")
             self.assertEqual(missing_result.returncode, 3)
+
+    def test_v4_registry_keeps_two_sessions_and_interleaved_upserts(self) -> None:
+        """验证两个会话可在同一托管区并存，交错写入不会互相覆盖。"""
+        # 1. 交错写入两个会话，再分别读取验证注册表没有丢失更新。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            session_a = "thread-alpha"
+            session_b = "thread-beta"
+            entry_a = self._sample_v4_projection(session_a)
+            entry_b = self._sample_v4_projection(session_b)
+
+            projection.upsert_projection(path, entry_a, session_id=session_a)
+            projection.upsert_projection(path, entry_b, session_id=session_b)
+            entry_a_updated = self._sample_v4_projection(session_a, ("completed", "completed", "in_progress"))
+            projection.upsert_projection(path, entry_a_updated, session_id=session_a)
+
+            registry = projection.load_registry(path)
+            self.assertEqual(registry["version"], 4)
+            self.assertEqual(
+                {item["session_id"] for item in registry["projections"]},
+                {session_a, session_b},
+            )
+            loaded_a = projection.load_projection(path, session_id=session_a)
+            loaded_b = projection.load_projection(path, session_id=session_b)
+            self.assertEqual(loaded_a["steps"][-1]["status"], "in_progress")
+            self.assertEqual(loaded_b["steps"][1]["status"], "in_progress")
+            self.assertNotEqual(loaded_a["steps"][0]["id"], loaded_b["steps"][0]["id"])
+
+    def test_payload_and_deactivate_are_scoped_to_session(self) -> None:
+        """验证 payload 与失活只操作指定会话投影。"""
+        # 1. 建立两个会话，验证 payload 和失活都只作用于目标会话。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            session_a = "session-a"
+            session_b = "session-b"
+            projection.upsert_projection(path, self._sample_v4_projection(session_a), session_id=session_a)
+            projection.upsert_projection(path, self._sample_v4_projection(session_b), session_id=session_b)
+
+            payload_a = projection.build_update_plan_payload(
+                projection.load_projection(path, session_id=session_a)
+            )
+            self.assertTrue(all("SESSION-A" in item["step"] for item in payload_a["plan"]))
+            self.assertFalse(any("SESSION-B" in item["step"] for item in payload_a["plan"]))
+
+            deactivated_b = projection.deactivate_projection(
+                path,
+                session_id=session_b,
+                updated_at="2026-07-25T02:00:00Z",
+            )
+            self.assertEqual(deactivated_b["state"], "inactive")
+            self.assertEqual(projection.load_projection(path, session_id=session_a)["state"], "active")
+            self.assertEqual(projection.load_projection(path, session_id=session_b)["state"], "inactive")
+
+    def test_goal_events_are_isolated_by_session(self) -> None:
+        """验证 Goal 生命周期只迁移当前会话的安全投影。"""
+        # 1. 分别创建两个会话的 Goal，再只阻断其中一个。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            session_a = "goal-a"
+            session_b = "goal-b"
+            created_a = projection.handle_goal_event(path, "create", session_id=session_a)
+            created_b = projection.handle_goal_event(path, "create", session_id=session_b)
+            self.assertEqual(created_a["action"], "created")
+            self.assertEqual(created_b["action"], "created")
+            self.assertEqual(
+                {item["session_id"] for item in projection.load_registry(path)["projections"]},
+                {session_a, session_b},
+            )
+
+            blocked_a = projection.handle_goal_event(path, "blocked", session_id=session_a)
+            self.assertEqual(blocked_a["projection"]["state"], "blocked")
+            self.assertEqual(projection.load_projection(path, session_id=session_b)["state"], "active")
+
+    def test_v1_v3_migrate_wraps_legacy_projection_without_loss(self) -> None:
+        """验证 v1-v3 单投影迁移为 v4 注册表且保留原任务字段。"""
+        # 1. 逐个迁移 v1、v2、v3 样本，核对版本与任务指纹均被保留。
+        legacy_v1 = self._sample()
+        legacy_v2 = self._sample_v2()
+        legacy_v3 = dict(legacy_v2)
+        legacy_v3["version"] = 3
+        for legacy in (legacy_v1, legacy_v2, legacy_v3):
+            with self.subTest(version=legacy["version"]), tempfile.TemporaryDirectory() as directory:
+                # 将迁移入口作用于仍为 legacy 的文件，避免把写入升级与 migrate 混为一谈。
+                path = self._write_legacy_projection(Path(directory), legacy)
+                migration = self._run_cli(
+                    "migrate", "--project-current", str(path), "--session-id", "legacy-session"
+                )
+                self.assertEqual(migration.returncode, 0, migration.stderr)
+                migrated = projection.load_registry(path)
+                self.assertEqual(migrated["version"], 4)
+                self.assertEqual(len(migrated["projections"]), 1)
+                self.assertEqual(migrated["projections"][0]["session_id"], "legacy-session")
+                self.assertEqual(
+                    migrated["projections"][0]["plan_fingerprint"],
+                    legacy["plan_fingerprint"],
+                )
+
+    def test_active_legacy_projection_requires_session_id_but_inactive_remains_readable(self) -> None:
+        """验证旧版活动投影不能在缺少会话归属时恢复，失活单投影仍可只读。"""
+        # 1. 活动旧投影必须拒绝无归属恢复，失活旧投影仍允许只读兼容。
+        active_v1 = self._sample()
+        active_v2 = self._sample_v2()
+        active_v3 = dict(active_v2)
+        active_v3["version"] = 3
+        inactive_v1 = self._sample(("completed",), state="inactive")
+        inactive_v2 = self._sample_v2(("completed",))
+        inactive_v3 = dict(inactive_v2)
+        inactive_v3["version"] = 3
+
+        for legacy in (active_v1, active_v2, active_v3):
+            with self.subTest(version=legacy["version"], state="active"), tempfile.TemporaryDirectory() as directory:
+                path = self._write_legacy_projection(Path(directory), legacy)
+                with self.assertRaises(projection.ProjectionContractError):
+                    projection.load_projection(path)
+                with self.assertRaises(projection.ProjectionContractError):
+                    projection.load_registry(path)
+
+        for legacy in (inactive_v1, inactive_v2, inactive_v3):
+            with self.subTest(version=legacy["version"], state="inactive"), tempfile.TemporaryDirectory() as directory:
+                path = self._write_legacy_projection(Path(directory), legacy)
+                self.assertEqual(projection.load_projection(path)["state"], "inactive")
+                registry = projection.load_registry(path)
+                self.assertEqual(registry["projections"][0]["state"], "inactive")
+
+    def test_registry_rejects_duplicate_session_id(self) -> None:
+        """验证每个会话最多保存一个当前投影。"""
+        # 1. 构造同一会话的两个不同计划，确认注册表拒绝重复归属。
+        session_id = "duplicate-session"
+        first = self._sample_v4_entry(session_id)
+        second_projection = self._sample_v4_projection(session_id)
+        second_projection["plan_key"] = "REQ-RTP-DUPLICATE/CYCLE-RTP-02"
+        second = {
+            "projection_id": projection.compute_projection_id(session_id, second_projection),
+            "session_id": session_id,
+            "projection_origin": second_projection["projection_origin"],
+            "synthesis_mode": second_projection["synthesis_mode"],
+            "state": second_projection["state"],
+            "plan_key": second_projection["plan_key"],
+            "source_document": second_projection["source_document"],
+            "plan_fingerprint": second_projection["plan_fingerprint"],
+            "updated_at": second_projection["updated_at"],
+            "steps": second_projection["steps"],
+        }
+        registry = {
+            "version": 4,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-07-25T00:00:00Z",
+            "projections": [first, second],
+        }
+        self.assertNotEqual(first["projection_id"], second["projection_id"])
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.validate_registry(registry)
+
+    def test_session_id_is_allowed_only_in_controlled_field(self) -> None:
+        """验证原始 session_id 可保存，其它敏感字段仍被递归拒绝。"""
+        # 1. 受控 session_id 可通过校验，其它敏感字段必须拒绝。
+        entry = self._sample_v4_entry("raw-thread-id")
+        registry = {
+            "version": 4,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-07-25T00:00:00Z",
+            "projections": [entry],
+        }
+        self.assertEqual(projection.validate_registry(registry)["projections"][0]["session_id"], "raw-thread-id")
+        for field in ("thread_id", "prompt", "response", "token", "api_key", "password", "secret", "private_key"):
+            candidate = json.loads(json.dumps(registry, ensure_ascii=False))
+            candidate["projections"][0][field] = "不得持久化"
+            with self.subTest(field=field), self.assertRaises(projection.ProjectionContractError):
+                projection.validate_registry(candidate)
+
+    def test_cli_requires_session_id_for_registry_operations(self) -> None:
+        """验证 CLI 的 validate/write/payload/deactivate/goal 均按 session_id 定位。"""
+        # 1. 所有状态相关 CLI 都显式传入 session_id，并验证命令链路成功。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            input_path = root / "projection.json"
+            input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
+            write = self._run_cli(
+                "write", "--project-current", str(path), "--input", str(input_path), "--session-id", "cli-a"
+            )
+            self.assertEqual(write.returncode, 0, write.stderr)
+            self.assertEqual(
+                self._run_cli("validate", "--project-current", str(path), "--session-id", "cli-a").returncode,
+                0,
+            )
+            payload = self._run_cli("payload", "--project-current", str(path), "--session-id", "cli-a")
+            self.assertEqual(payload.returncode, 0, payload.stderr)
+            deactivate = self._run_cli(
+                "deactivate", "--project-current", str(path), "--session-id", "cli-a"
+            )
+            self.assertEqual(deactivate.returncode, 0, deactivate.stderr)
+            goal = self._run_cli(
+                "goal", "--project-current", str(path), "--event", "create", "--session-id", "cli-b"
+            )
+            self.assertEqual(goal.returncode, 0, goal.stderr)
+
+    def test_state_changing_python_api_requires_session_id(self) -> None:
+        """验证 Python 状态变更入口不再静默写入 legacy/default 会话。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-07-25 00:00:00；改动原因：覆盖 Python API 的显式 session_id 契约。
+        """
+        # 1. 缺少 session_id 的 Python 状态变更入口必须返回契约错误。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.upsert_projection(path, self._sample())
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.handle_goal_event(path, "create")
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.deactivate_projection(path)
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.render_projection_block(self._sample())
 
     def test_continue_route_is_mandatory_in_hit_check(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止继续回合漏命中恢复 Owner。"""
@@ -710,7 +1619,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：防止 Goal 路由漏交接、UI 先于持久化刷新或 Plan Mode 越界。
+        最近修改时间：2026-07-25 00:00:00；改动原因：防止 Goal 路由漏交接、UI 先于持久化刷新或 Plan Mode 越界。
         """
         # 1. 任务投影 Owner 必须覆盖三个 Goal 工具，并明确先落盘再刷新 UI。
         rehydration_document = (ROOT / "SKILL.md").read_text(encoding="utf-8")
@@ -728,7 +1637,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25；改动原因：防止 Goal 生命周期命令或 Plan Mode 安全边界从文档契约中丢失。
+        最近修改时间：2026-07-25 00:00:00；改动原因：防止 Goal 生命周期命令或 Plan Mode 安全边界从文档契约中丢失。
         """
         # 1. v3 字段、固定 Goal 身份和四个 CLI 事件必须在公开契约中可追溯。
         contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
@@ -742,6 +1651,37 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertIn(f"goal --project-current PROJECT_CURRENT.md --event {event}", contract_document)
         self.assertIn("Plan Mode 不读取、写入或刷新投影", contract_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", contract_document)
+
+    def test_auto_goal_timeout_contract_is_consistent(self) -> None:
+        """验证超时 Goal 优先、单次创建、脱敏摘要和普通投影降级在所有 Owner 入口一致。"""
+        documents = {
+            "owner": (ROOT / "SKILL.md").read_text(encoding="utf-8"),
+            "contract": (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8"),
+            "agent": (ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8"),
+            "autonomous": (REPOSITORY_ROOT / "autonomous-execution-rules" / "SKILL.md").read_text(encoding="utf-8"),
+            "pause": (
+                REPOSITORY_ROOT / "autonomous-execution-rules" / "references" / "continuation-and-pause.md"
+            ).read_text(encoding="utf-8"),
+            "agents_rules": (REPOSITORY_ROOT / "AGENTS.md").read_text(encoding="utf-8"),
+            "claude_rules": (REPOSITORY_ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
+        }
+        for name, document in documents.items():
+            with self.subTest(document=name):
+                self.assertIn("probe-timeout", document)
+                self.assertIn("get_goal", document)
+                self.assertIn("create_goal", document)
+                self.assertIn("ensure-timeout", document)
+                self.assertIn("600 秒", document)
+                self.assertIn("Plan Mode", document)
+        for name in ("owner", "contract", "agent", "agents_rules", "claude_rules"):
+            with self.subTest(summary_document=name):
+                self.assertIn("80", documents[name])
+                self.assertIn("脱敏", documents[name])
+        self.assertIn("完成当前已确认的长任务并完成验证收口", documents["owner"])
+        self.assertIn("完成当前已确认的长任务并完成验证收口", documents["contract"])
+        self.assertIn("只允许再调用一次 `get_goal`", documents["owner"])
+        self.assertIn("禁止无变化重试 `create_goal`", documents["owner"])
+        self.assertIn("子 Agent 不得调用", documents["owner"])
 
     def test_platform_rules_and_bootstrap_keep_continue_route(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止受管平台规则遗漏恢复路由。"""

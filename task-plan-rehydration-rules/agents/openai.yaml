@@ -1,4 +1,4 @@
 interface:
   display_name: "任务计划断点恢复"
   short_description: "保存并恢复 Codex Desktop 悬浮任务列表"
-  default_prompt: "使用 $task-plan-rehydration-rules 管理 Codex Desktop 悬浮任务列表：Goal 的 create/get/update 成功后，先用 goal CLI 持久化或恢复不含 Goal 原文的安全三步，再由主会话调用 update_plan；Goal blocked 只显示观察列表且不恢复执行权，Goal complete 必须失活且不生成 payload。正式最小任务优先并可替换 Goal 安全三步。继续场景优先校验 PROJECT_CURRENT 活动投影；托管投影缺失时先派只读子代理收集证据，再用 synthesize 生成 exact 或 fallback 投影。Plan Mode 不读取、写入或刷新投影。"
+  default_prompt: "使用 $task-plan-rehydration-rules 管理 Codex Desktop 悬浮任务列表：PROJECT_CURRENT 使用 v4 registry 按原始 session_id 隔离多个会话投影。Goal 的 create/get/update 成功后，先用带 session-id 的 goal CLI 持久化或恢复不含 Goal 原文的安全三步，再由主会话调用 update_plan；blocked 只显示观察列表，complete 必须失活。正式最小任务优先并只替换当前会话 Goal 安全三步。继续场景按 session_id 校验活动投影，缺失时以 exact 或 fallback 补建。默认执行回合取得 confirmed 后从首次真实执行动作计时；未完成任务无活动或阻断投影且扣除 Plan Mode、等待用户、blocked 和 manual_handoff 后严格超过 600 秒时，先调用只读 probe-timeout。仅 goal_check_required 时由主 Agent 按 get_goal -> 复用匹配 Goal 或 create_goal 一次 -> goal create -> update_plan 执行；摘要单行中文且不超过 80 字，必须脱敏且不得落盘。Goal 不匹配、不可用、失败或结果不明确时禁止重复创建，降级原 ensure-timeout 普通 exact/fallback 投影。Plan Mode、许可不足、任务完成或计时丢失时不调用 Goal 或 update_plan。"
