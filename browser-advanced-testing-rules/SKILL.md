@@ -1,12 +1,14 @@
 ---
 name: browser-advanced-testing-rules
-description: 面向 AI 代理的浏览器高级验证与观测：网络 HAR 记录/路由拦截、视觉与页面 diff、性能 profiling、会话录制 trace、代理配置、非 Chrome 引擎、跨 session 观测面板（dashboard）。当任务需要网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、代理配置或多 session 观测面板时触发。普通打开页面、快照交互、认证登录、隔离 profile、批量执行请转交 `browser-session-automation-rules`；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP。
+description: 面向 AI 代理的本地浏览器高级验证与观测：网络 HAR 记录/路由拦截、视觉与页面 diff、性能 profiling、会话录制 trace、代理配置、非 Chrome 引擎、跨 session 观测面板（dashboard）。当任务需要本地网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、调试代理或多 session 观测面板时触发。普通打开页面、快照交互、认证登录、隔离 profile、批量执行请转交 `browser-session-automation-rules`；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP；云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等 Browser Use Cloud 专属需求转交 `browser-use-cloud-rules`。
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 ---
 
 # 使用 agent-browser 进行浏览器高级验证与观测
 
 本 skill 与 `browser-session-automation-rules` 是同源拆分：核心工作流（打开页面、快照、交互、认证、session 管理、批量执行、截图清理）由对方负责；本 skill 只负责网络 HAR 记录、视觉/页面 diff、性能 profiling、录制 trace、代理配置、非 Chrome 引擎和多 session 观测面板。域名白名单、动作策略、输出上限、配置文件优先级、`--engine` 引擎选择和项目联调路由规则两组同等适用，各自维护一份。
+
+本 skill 只管理本地高级验证，不接 Browser Use Cloud。需要 Cloud 托管环境或地域出口时转交 `browser-use-cloud-rules`；本地代理能力不能被描述成 Cloud 托管代理，Cloud 缺 key、账单或费用确认时也不得回退本 skill 绕过收费闸门。
 
 执行前命中浏览器、session 或高风险调用时，先触发 `execution-failure-learning-rules` 的 `prevent` 并查阅 [references/execution-failure-casebook.md](references/execution-failure-casebook.md)；执行失败后走 `recover`，修复并按同一成功标准复验后再写 candidate。
 
@@ -126,7 +128,7 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 
 ### 触发规则补充（强制）
 - 当项目同时存在前端与后端且任务进入“测试/验证/联调”阶段时，必须完成真实 local 浏览器联调；具体工具按 `mcp-installation-rules` 的统一路由选择。
-- 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有 HAR/route、视觉 diff、录制/trace、代理或其他引擎场景才使用本 skill；隔离 profile、并发 session、批量执行或其他核心自动化场景见 `browser-session-automation-rules`。
+- 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有本地 HAR/route、视觉 diff、录制/trace、调试代理或其他引擎场景才使用本 skill；隔离 profile、并发 session、批量执行或其他核心自动化场景见 `browser-session-automation-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
 - 所选浏览器通道不可用且没有满足安全边界的替代通道时，记录本地联调阻断，不强行切换工具。
 - 若系统需要登录授权而当前上下文缺失有效授权信息，必须先向用户获取登录账户或 token，再继续联调。
 - 若准备开始前后端联调，允许主动关闭用户已启动的前端与后端进程，并按当前任务重新启动前后端服务后再调试。

@@ -47,6 +47,7 @@
 | 代码已经完成，准备进入测试，但还没做静态自审 | 编码审查域 | 先完成 `implementation-review-rules` 的测试前收口，再进入测试域 |
 | 编码审查通过，但还没明确先测什么、测到什么程度 | 测试域 / `test-strategy-rules` | 先定测试策略和优先级，再分流执行验证 |
 | 需要用真实浏览器打开本地页面、测试环境页面或网站，执行点击、输入、登录、截图、抓取页面数据、查看网络请求或验证前端交互 | 测试域 / 统一浏览器工具路由矩阵 | 由统一矩阵按用户登录态、调试能力、隔离性和高级自动化需求选择 Chrome Plugin、Chrome DevTools MCP、`browser-session-automation-rules` 或 `browser-advanced-testing-rules`；工具选择不代替功能验证、回归验证或联调归因 |
+| 任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身或站点允许的合规验证码处理，或用户明确点名 Browser Use Cloud | 浏览器 Cloud 域 / `browser-use-cloud-rules` | 只接 Browser Use Cloud，不接本地 Browser Use；每次 `run_session` / `send_task` 前都检查本机 `BROWSER_USE_API_KEY`、Billing、当前动作硬费用上限并取得当次确认，免费层也不例外；Cloud 不得替代真实 Chrome 或绕过权限、安全策略和业务副作用授权 |
 | 需要确认当前需求或当前改动本身是否做对 | 测试域 / `functional-validation-rules` | 聚焦当前功能正确性，不扩张成回归或联调问题 |
 | 当前看起来不是单点功能错误，而是跨系统、跨环境、跨链路联调失败 | 测试域 / `test-strategy-rules` | 先重新拆分验证路径与证据收集方式，再决定落到功能验证、回归或统一浏览器执行 |
 | 需要确认修复或改动有没有把旧能力带坏 | 测试域 / `test-regression-rules`、`bug-validation-rules` | 聚焦兼容性、影响面和修复闭环，不混入功能验证 |

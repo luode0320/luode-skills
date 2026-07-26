@@ -234,7 +234,7 @@ EOF
 
 BODY_SKILL_HIT=$(cat <<'EOF'
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
-- 最低要求：至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`。
+- 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，或同时涉及项目记忆四件套，默认额外启用 `project-rule-file-bootstrap-rules`，由其 `rule-bootstrap` / `memory-bootstrap` 条件路由统一自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。

@@ -36,7 +36,9 @@
 <!-- END TASK PLAN PROJECTION -->
 ````
 
-标记必须成对、顺序正确且只出现一次。零个区块时 `write` 或 Goal 创建可在文件末尾追加；已有一个区块时只替换区块本身。缺半边、重复、嵌套或逆序标记全部拒绝。registry 内 `projections` 可为空；空 registry 只能由当前会话按契约创建或迁移。
+标记必须成对、顺序正确且只出现一次。零个区块时 `write`、`ensure-start` 或 Goal 创建可在文件末尾追加；已有一个区块时只替换区块本身。缺半边、重复、嵌套或逆序标记全部拒绝。registry 内 `projections` 可为空；空 registry 只能由当前会话按契约创建或迁移。
+
+默认执行模式取得 `confirmed` 后，首次领域动作前必须先以 `ensure-start`（或正式投影等价的 `write`）持久化当前会话的活动投影；持久化成功结果必须直接包含同一会话的 `update_plan` payload，主 Agent 的下一动作固定为调用该工具。持久化与 UI 调用之间不得发生其它领域写操作。
 
 ## Schema 与兼容性
 
@@ -51,13 +53,13 @@ v4 registry 顶层字段必须且只能包含：
 
 每个 v4 projection 的字段必须且只能包含：`projection_id`、`session_id`、`projection_origin`、`synthesis_mode`、`state`、`plan_key`、`source_document`、`plan_fingerprint`、`updated_at`、`steps`。`session_id` 非空且原样保存宿主会话 / 线程标识，仅允许出现在该字段；`projection_id` 非空且在 registry 内唯一，推荐使用 `session:<session-id>:<plan-key-hash>`。
 
-旧 v1-v3 projection 读取时必须绑定当前调用提供的 `session_id` 后包装为 v4 registry；没有 `session_id` 时仅允许读取明确 `inactive` 的单 projection，活动投影必须返回归属错误，不得写入、恢复或迁移。任何成功 `write`、`deactivate`、Goal 生命周期或 `migrate` 都统一输出 v4。
+旧 v1-v3 projection 读取时必须绑定当前调用解析出的 `session_id` 后包装为 v4 registry；解析顺序固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退，两者冲突、均缺失或非法时失败关闭，不得写入、恢复或迁移。任何成功 `write`、`ensure-start`、`deactivate`、Goal 生命周期或 `migrate` 都统一输出 v4。
 
 每个步骤必须且只能包含 `id`、`step`、`status`。其中 `id` 非空且当前投影内唯一，`step` 非空且最多 256 个 Unicode 字符，`status` 只能为 `pending`、`in_progress` 或 `completed`。常规活动投影最多一个 `in_progress`；常规 `active` 必须有未完成步骤，`inactive` 仅允许空步骤或全部完成步骤。
 
 `persisted` 必须保留非空 `plan_key` 和 `source_document`；`synthesized/exact` 必须使用稳定且非空的 `plan_key`（推荐 `SYNTH-EXACT/<stable-source-id>`）并保留 `source_document`；`synthesized/fallback` 必须使用 `SYNTH-FALLBACK/<UTC>` 形式的 `plan_key` 且 `source_document` 为空字符串。
 
-读取 v1/v2/v3 不会改写文件；只有下一次成功 `write`、`deactivate`、`migrate` 或 Goal 生命周期写入才升级为 v4。v2/v3 单 projection 不允许在没有 `session_id` 时被猜测归属，避免旧投影被错误解释或覆盖其它会话。
+读取 v1/v2/v3 不会改写文件；只有下一次成功 `write`、`ensure-start`、`deactivate`、`migrate` 或 Goal 生命周期写入才升级为 v4。v2/v3 单 projection 不允许在没有可解析 `session_id` 时被猜测归属，避免旧投影被错误解释或覆盖其它会话。
 
 ## Goal 安全投影
 
@@ -93,7 +95,7 @@ Goal 投影的 ID、顺序和文案必须与上述三步完全一致，只允许
 |---|---|---|
 | 创建、活动、恢复 | `active + goal_default` | 固定三步，最多一个进行中；生成 payload |
 | Goal 阻断 | `blocked + goal_blocked` | 已完成步骤保留，未完成步骤均为 `pending`，不得有进行中；生成仅观察用途的 payload |
-| Goal 完成 | `inactive + goal_default` | 三步全部完成；payload 为 `null` |
+| Goal 完成 | `inactive + goal_default` | 三步全部完成；返回一次性完成收口 payload，失活后不得再次生成活动 payload |
 | Goal 创建遇到 fallback | 既有 `synthesized/fallback` | fallback 只是恢复兜底，替换为 Goal 固定安全三步 |
 | 正式计划接管 | 既有 `persisted` 或 `synthesized/exact` | `create` 返回 `preserved_formal`；正式计划优先且保持独立，不写入 Goal 标识 |
 | 已接管后的 Goal 生命周期 | `preserved_formal` | `restore`、`blocked`、`complete` 都返回无副作用的 `preserved_formal`；不得失活、改写或刷新真实正式计划 |
@@ -110,11 +112,21 @@ Goal 投影的 ID、顺序和文案必须与上述三步完全一致，只允许
 
 活动 Goal 的 payload 使用“Goal 任务进度已恢复；进行中步骤必须先核验中断点”。阻断 Goal 的 payload 使用“Goal 当前已阻断；任务列表仅用于观察进度，不恢复执行授权”。常规 persisted/exact/fallback 投影保留各自既有说明。
 
-脚本只生成 payload，不直接调用 UI 工具。主 Agent 固定按“成功持久化 -> 读取返回 payload -> 调用 `update_plan`”执行，且只在默认执行回合调用；Plan Mode 不读取、写入或刷新投影。Goal 投影和 UI 重建均不构成执行授权。
+脚本只生成 payload，不直接调用 UI 工具。主 Agent 固定按“成功持久化 -> 读取返回 payload -> 下一动作调用 `update_plan`”执行；两者之间禁止代码、文档、测试、委派等领域写操作。`update_plan` 失败或不可用时进入 `UI_SYNC_BLOCKED`，保留当前 session projection 并禁止继续领域写入，后续检查点优先重试 UI。Plan Mode 不读取、写入或刷新投影。Goal 投影和 UI 重建均不构成执行授权。
+
+## 首次持久化与会话解析
+
+默认执行模式取得 `confirmed` 后，任何任务首次领域动作前都必须为当前会话持久化活动 projection；`active` 和 `blocked` projection 都必须有悬浮任务列表，`inactive` 不创建。入口固定为：
+
+```text
+ensure-start --project-current PROJECT_CURRENT.md --input projection_or_synthesis_context.json [--session-id <session-id>]
+```
+
+会话解析顺序固定为显式 `--session-id`，其次为宿主环境 `CODEX_THREAD_ID`。两者同时存在但不一致、任一值非法、或两者都缺失时失败关闭且不得写文件。成功结果必须同时返回绑定当前 session 的 projection 和可直接传给 `update_plan` 的 payload；正式 `write` 也必须返回同样的 payload。
 
 ## `probe-timeout` 与 Goal 优先超时升级
 
-默认执行回合允许简单任务最初没有悬浮任务列表，但未完成任务不得无限期保持无 projection。无写入资格探测入口固定为：
+正常任务不得因“简单”而跳过首次投影；十分钟只作缺失 projection 的异常修复闸门。已真实执行但当前 session 仍无活动或阻断 projection 时，才允许使用无写入资格探测入口：
 
 ```text
 probe-timeout --project-current PROJECT_CURRENT.md --started-at <UTC-ISO-8601> --observed-at <UTC-ISO-8601> --paused-seconds <seconds> --session-id <session-id>
@@ -154,7 +166,7 @@ goal --project-current PROJECT_CURRENT.md --event complete --session-id <session
 | `create` | 无活动正式计划时原子写入安全三步；活动正式计划不覆盖 | `created` 或 `preserved_formal` | 活动 Goal 或正式计划 payload |
 | `restore` | Goal 安全投影只读；活动正式计划不改写 | `restored` 或 `preserved_formal` | 仅活动 Goal payload；正式计划为 `null` |
 | `blocked` | Goal 安全投影原子写入阻断状态并清除进行中步骤；正式计划无副作用 | `blocked` 或 `preserved_formal` | 阻断 Goal 观察 payload；正式计划为 `null` |
-| `complete` | Goal 安全投影原子写入全部完成、失活状态；正式计划无副作用 | `completed` 或 `preserved_formal` | `null` |
+| `complete` | Goal 安全投影先生成一次性完成收口 payload，再原子写入全部完成、失活状态；正式计划无副作用 | `completed` 或 `preserved_formal` | 完成收口 payload 或 `preserved_formal` 的 `null` |
 
 `restore` 只能恢复活动 Goal 安全投影；阻断和失活 Goal 不恢复执行。`preserved_formal` 表示由于隐私边界没有 Goal 与正式计划的可持久化关联，Goal 生命周期不得替代正式计划自身的状态迁移。非法事件、错误状态迁移、损坏标记或 UTF-8 错误必须返回非零，并保持原文件不变。
 
@@ -166,4 +178,4 @@ goal --project-current PROJECT_CURRENT.md --event complete --session-id <session
 synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json --session-id <session-id>
 ```
 
-`synthesize` 处理 `continue` 和 `timeout` 两种触发下的正式计划 exact/fallback 补建；它不从 Goal 原文生成任务。输出仍包含 `mode`、绑定当前 `session_id` 的合法 projection、活动时的 `payload` 与最小证据。`exact` 仅在唯一来源文档、普通当前状态可指向唯一任务、存在明确步骤提示且无冲突时成立；其他情况统一生成当前会话的固定三步 `fallback` 安全恢复列表。其它会话 projection 不得被读取、覆盖或作为恢复候选。
+`synthesize` 处理 `start`、`continue` 和 `timeout` 三种触发下的正式计划 exact/fallback 补建；它不从 Goal 原文生成任务。输出仍包含 `mode`、绑定当前 `session_id` 的合法 projection、活动时的 `payload` 与最小证据。`exact` 仅在唯一来源文档、普通当前状态可指向唯一任务、存在明确步骤提示且无冲突时成立；其他情况统一生成当前会话的固定三步 `fallback` 安全恢复列表。其它会话 projection 不得被读取、覆盖或作为恢复候选。

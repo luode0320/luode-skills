@@ -1,6 +1,6 @@
 ---
 name: authenticated-url-routing-rules
-description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`，并继续遵守授权与安全边界。
+description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP、`browser-session-automation-rules` 或高级验证 Skill；只有任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码等 Cloud 专属能力，或用户明确点名 Browser Use Cloud 时，才让位给 `browser-use-cloud-rules`，且不得跳过密钥、费用和安全闸门。
 ---
 
 # 认证 URL 路由规则
@@ -19,6 +19,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 3. 若用户说明“我已经在浏览器打开 / 已登录 / 默认浏览器能看 / 你看这个链接”，仍按第 2 步执行，不再询问是否需要复用登录态。
 4. Chrome Plugin 可用时，不优先使用 `web`、隔离 Playwright、无登录态浏览器或普通 HTTP 抓取。
 5. 如果用户明确说“这是公开网页，用 web 搜索 / 网页抓取即可”，才允许优先走 `web`。
+6. Browser Use Cloud 不是 Chrome Plugin、应用内 Browser、Chrome DevTools MCP 或本地自动化的故障后备；只有统一矩阵命中 Cloud 专属需求，或用户明确点名 Cloud，才转交 `browser-use-cloud-rules`。
 
 ## 非 profile 页面路由
 
@@ -26,7 +27,8 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 1. 已接通且能力满足的 `Chrome DevTools MCP`
 2. 需要隔离 profile、并发 session 等核心自动化时使用 `browser-session-automation-rules`；需要 HAR/route、视觉 diff、录制/trace、代理或其他引擎等高级验证时使用 `browser-advanced-testing-rules`
-3. 所选通道不可用时，记录阻断并说明恢复条件
+3. 只有需要云端自主长链、托管并发、地域出口、托管代理、隐身或站点允许的合规验证码处理时，才转交 `browser-use-cloud-rules`；缺 `BROWSER_USE_API_KEY` 时提醒用户在本机环境变量配置并重启 Codex，禁止在聊天中粘贴 key
+4. 所选通道不可用时，记录阻断并说明恢复条件；不得把 Browser Use Cloud 当作不等价回退
 
 依赖真实 Chrome profile 的页面不进入以上回退；应请求用户修复 Chrome 连接、扩展或授权。
 
@@ -110,6 +112,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ## 安全边界
 
 - 不要求用户粘贴 cookie、token、localStorage、sessionStorage 或账号密码。
+- 不要求用户在聊天中粘贴 `BROWSER_USE_API_KEY`；Cloud 只从本机环境变量读取，默认不选择 Cloud profile，也不上传 Cookie、本地 Chrome profile 或登录状态。
 - 不把认证 state、profile、截图、HAR、导出文件等敏感临时产物提交到仓库。
 - 如果必须临时保存 state 文件，必须说明其敏感性，放入忽略路径或任务后删除。
 - 不在未确认范围的情况下跨域跳转到无关站点。
@@ -120,6 +123,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 - 对任意 URL 任务，已优先尝试 `chrome:control-chrome`。
 - 若未使用 Chrome Plugin，已说明页面不依赖真实 profile 或已记录连接阻断；未把其他浏览器伪装成登录态替代品。
 - 若页面需要用户授权，已停在真实授权阻断处并说明用户需要完成的动作。
+- 若命中 Browser Use Cloud，已由 `browser-use-cloud-rules` 完成 key、Billing、当前动作硬费用上限、逐次确认和 session 清理；普通 URL 未被 Cloud 抢占。
 - 最终分析结论来自真实浏览器页面状态、文本、截图或等价工具输出，不来自猜测。
 - 若浏览器安全策略拒绝正文读取，已明确标记为“路由验证成功、内容读取被策略阻断”，未伪装成完整内容分析通过。
 

@@ -16,7 +16,7 @@
 - 禁止先完成多个任务的实现，再统一测试、审查或验收。
 - 当前最小任务进入 `in_progress`、完成为 `completed` 或下一个任务保持 `pending` 时，先由 `task-plan-rehydration-rules` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；磁盘写入失败不得刷新 UI，工具失败不得回滚已持久化状态。
 - Desktop 或宿主中断后恢复到 `in_progress` 步骤时，先核验磁盘、测试和外部状态；未知或非幂等写操作不得自动重放。任务投影恢复不改变 `confirmed/unknown/revoked` 执行许可。
-- 简单任务在默认执行回合开始时可以没有悬浮任务列表，但只在许可为 `confirmed` 后从第一个真实执行动作开始维护主动执行时间，并在每次工具返回、阶段进度更新和回合结束前检查。当前会话仍无活动或阻断 projection 且扣除 Plan Mode、等待用户、`blocked` 与 `manual_handoff` 后严格超过 600 秒时，先调用只读 `probe-timeout`；`goal_check_required` 后只允许主 Agent 依次执行 `get_goal`、复用匹配 Goal 或一次 `create_goal`、Goal 安全投影和 `update_plan`。不匹配、不可用、失败或不明确时降级原 `ensure-timeout`，禁止重复创建。恰好 600 秒、任务完成、许可不足或计时丢失均不触发。
+- 默认执行回合取得 `confirmed` 后，无论任务大小，都必须在首个领域动作前为当前 `session_id` 持久化 `active` 或 `blocked` projection，并将持久化成功后的下一动作固定为 `update_plan`；在同步成功前不得执行领域写入。当前会话仍无活动或阻断 projection 且扣除 Plan Mode、等待用户、`blocked` 与 `manual_handoff` 后严格超过 600 秒时，十分钟入口只允许先调用只读 `probe-timeout` 作为缺失投影的异常修复；`goal_check_required` 后只允许主 Agent 依次执行 `get_goal`、复用匹配 Goal 或一次 `create_goal`、Goal 安全投影和 `update_plan`。不匹配、不可用、失败或不明确时降级原 `ensure-timeout`，禁止重复创建。恰好 600 秒、任务完成、许可不足或计时丢失均不触发。
 - 可自行消解的不确定项采用最小可逆决策继续；不能自行消解且会改变目标、接口或风险时暂停。
 
 ### 必须暂停

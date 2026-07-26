@@ -15,6 +15,10 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
   - 命中 `parallel-task-dispatch-rules` 时追加 `并行技能:<skill.../无>`
 - 固定字段的 Markdown 形态以 `references/output-format.md` 为准；缺少必填字段即阻断领域执行。
 - 全程中文自检（硬闸，不可跳过）：本轮全程，含**每一次**工具前导语 / 中间叙述发送前，先自检草稿是否为简体中文；发现成段非中文（英文 / 日文等）自然语言必须改回简体中文再发送，代码符号、命令、路径、原始字段名、报错原文等技术片段除外。思考 / 推理通道同口径尽力而为。最终总结阶段的中文自检以 `reasoning-summary-structure-rules` 为准，本条负责过程叙述的全程覆盖，二者互补不重复。
+- 默认执行模式取得 `confirmed` 后，必须先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作只能是立即调用 `update_plan`，不得插入其它领域动作。
+- 当前处于 Plan Mode 时，命中列表不得包含 `reasoning-summary-structure-rules`；该 Skill 明确判定 `NOT_APPLICABLE`，计划出口只交给 `implementation-planning-rules`。
+- `update_plan` 成功后才放行领域动作；失败或不可用时进入 `UI_SYNC_BLOCKED`，保留当前 session projection 并禁止继续领域写入，下一检查点优先重试同步。`Plan Mode` 不持久化活动 projection，也不调用 `update_plan`；`inactive` projection 不创建悬浮任务列表，禁止跨 session 读取、刷新或覆盖。
+- 十分钟只作缺失 projection 的异常修复闸门：任务已真实执行但当前 session 没有活动 projection 时，才先执行只读 `probe-timeout`，随后补建并同步；不作为正常任务首次显示悬浮窗的入口。
 
 ## -1.5 违规处理（强制）
 

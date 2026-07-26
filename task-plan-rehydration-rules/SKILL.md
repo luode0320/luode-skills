@@ -1,6 +1,6 @@
 ---
 name: task-plan-rehydration-rules
-description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、默认执行回合中的未完成任务没有活动悬浮窗且主动执行时间严格超过 10 分钟、任务步骤状态发生 pending/in_progress/completed 迁移、Goal 的 create/get/update 生命周期成功返回、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 多会话 registry 托管区的 schema、指纹、原子写入、失活、Goal 安全三步、10 分钟 Goal 优先升级、失败降级、校验、synthesize 补建和 update_plan payload；实际 Goal 工具与 UI 工具必须由主 Agent 调用，且进行中步骤先核验中断点。不要把 Goal 或 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。
+description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗、默认执行模式取得 confirmed 后首次领域动作前需要 ensure-start、任务步骤状态发生 pending/in_progress/completed 迁移、Goal 的 create/get/update 生命周期成功返回、Desktop 或宿主关闭后用户在同一任务首次发送任意“继续”或恢复意图、上下文压缩恢复时检测到 PROJECT_CURRENT 存在活动任务投影，或历史投影缺失但需要根据当前会话与项目文档补建悬浮任务列表时自动触发。任意继续语义包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。作为任务投影唯一 Owner，负责 PROJECT_CURRENT 多会话 registry 托管区的 schema、指纹、原子写入、失活、Goal 安全三步、持久化后立即返回 update_plan payload、十分钟异常修复、失败降级、校验、synthesize 补建和 update_plan payload；实际 Goal 工具与 UI 工具必须由主 Agent 调用，且进行中步骤先核验中断点。不要把 Goal 或 UI 重建当作执行授权或 L5 checkpoint resume，也不要重放未知幂等性的写操作。
 ---
 
 # 任务计划断点恢复规则
@@ -12,15 +12,16 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 ## 自动触发信号
 
 - 正式实施周期首次进入执行，需要把最小任务同步到悬浮任务列表。
+- 默认执行模式取得 `confirmed` 后，首次领域动作前必须先用 `ensure-start` 持久化当前会话投影；成功后立即使用返回 payload 调用 `update_plan`。
 - 任一任务从 `pending` 迁移为 `in_progress`，或从 `in_progress` 迁移为 `completed`。
 - 当前周期全部完成，需要把投影设为 `inactive`。
 - Desktop 或宿主关闭后，用户在同一任务首次发送任意“继续”或恢复意图；至少包括“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达。
 - 上下文压缩恢复、新会话恢复或项目状态重载时，`PROJECT_CURRENT.md` 存在有效活动投影。
 - 历史投影缺失，但当前会话和项目文档需要补建正式悬浮任务列表。
-- `update_plan` 调用失败后需要保留磁盘状态，并在下一个可用回合重建 UI。
+- `update_plan` 调用失败或不可用时进入 `UI_SYNC_BLOCKED`：保留当前 session 磁盘状态，禁止继续领域写入，并在下一个可用检查点优先重试 UI。
 - 当前实施周期把最小任务委派给子智能体（`spawn_agent` / 多智能体并行 / delegation）执行，主智能体需要维持并持续更新面向用户的主计划投影。
 - `create_goal` 成功后、默认执行回合检测到活动 Goal、`update_goal` 成功进入 `blocked` 或 `complete` 时，需要生成、恢复或迁移 Goal 专属投影。
-- 默认执行回合开始时允许简单任务暂不创建悬浮窗；若任务仍未完成、当前会话没有活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 暂停后的主动执行时间严格超过 600 秒，必须先探测并优先自动创建或复用 Goal，失败时降级普通悬浮窗。
+- 默认执行回合不允许因任务简单而跳过首次投影；若历史状态仍缺少当前会话 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 暂停后的主动执行时间严格超过 600 秒，才进入十分钟异常探测并优先自动创建或复用 Goal，失败时降级普通悬浮窗。
 
 ## 唯一 Owner 边界
 
@@ -35,14 +36,14 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 ## 保存和状态迁移流程
 
 1. 从当前正式实施周期提取最多 20 个最小任务，只保留任务 ID、悬浮窗文案和三态状态。
-2. 使用 `scripts/task_plan_projection.py write` 校验并原子更新 `PROJECT_CURRENT.md`。
-3. 确认命令成功后，使用脚本 `payload` 输出的数据真实调用 `update_plan`。
-4. `update_plan` 成功后才能说明悬浮任务列表已刷新；工具不可用或调用失败时只说明磁盘投影已保存。
-5. 当前会话的当前周期全部完成后调用 `deactivate`；该会话的失活投影不得再次生成 payload，也不得影响其它会话投影。
+2. 默认执行首次领域动作前使用 `ensure-start`（正式投影可复用 `write`）校验并原子更新 `PROJECT_CURRENT.md`。
+3. 确认命令成功后，必须把同一结果中的 `payload` 作为下一动作调用 `update_plan`；中间不得执行其它领域写操作。
+4. `update_plan` 成功后才能说明悬浮任务列表已刷新；工具不可用或调用失败时进入 `UI_SYNC_BLOCKED`，只说明磁盘 projection 已保存并停止领域写入。
+5. 当前会话的当前周期全部完成后调用 `deactivate`；成功落盘后可使用一次性完成收口 payload 刷新 UI，随后该会话的失活投影不得再次生成活动 payload，也不得影响其它会话投影。
 
 固定顺序是“先持久化，再调用工具”。不得先刷新 UI 再补写磁盘状态。
 
-## 无悬浮窗任务的 10 分钟 Goal 优先升级
+## 缺失投影任务的 10 分钟异常修复
 
 1. 只在默认执行回合取得 `confirmed` 执行许可并进入第一个真实执行动作时开始计时；需求澄清、Plan Mode 计划编写和尚未取得执行许可的阶段不开始计时。
 2. Agent 只在当前执行上下文维护开始时间和累计暂停秒数。等待用户、真实 `blocked` 与 `manual_handoff` 期间暂停累计；这些计时事实不写入 projection、步骤文案、`PROJECT_CURRENT.md` 普通正文或其它长期状态。
@@ -53,7 +54,7 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 7. `get_goal` 返回的活动 Goal 与当前已确认任务来源和目标明确匹配时复用，不调用 `create_goal`；没有活动 Goal 时，主 Agent 使用脱敏任务摘要调用一次 `create_goal`；活动 Goal 不匹配或无法可靠确认匹配时，不覆盖、不创建第二个 Goal，直接进入普通投影降级。
 8. `create_goal` 结果不明确时，只允许再调用一次 `get_goal` 确认，禁止无变化重试 `create_goal`。确认存在匹配活动 Goal 后，执行带当前 `session_id` 的 `goal --event create` 原子同步固定安全三步；脚本成功后才使用 payload 调用 `update_plan`。
 9. Goal 工具不可用、创建失败、复核仍不明确、活动 Goal 不匹配，或 Goal 已成功但安全投影写入失败时，调用原 `ensure-timeout` 生成当前会话 `exact/fallback` 普通投影。Goal 已成功后不得再次创建；`ensure-timeout` 只作为失败降级入口，不再是到期后的首选入口。
-10. 投影成功但 `update_plan` 失败时保留磁盘投影，不声称 UI 已刷新；后续检查点只恢复 UI，不重新创建 Goal。Goal 完成和阻断继续遵守既有真实完成条件与连续三次相同阻断门槛。
+10. 投影成功但 `update_plan` 失败时进入 `UI_SYNC_BLOCKED`，保留磁盘投影并禁止领域写入；后续检查点只恢复 UI，不重新创建 Goal。Goal 完成和阻断继续遵守既有真实完成条件与连续三次相同阻断门槛。
 
 **Goal 目标摘要契约**
 
@@ -69,9 +70,9 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 1. `create_goal` 成功后，只在默认执行回合执行带当前 `session_id` 的 `goal --event create`。若该会话已有活动正式投影，脚本返回 `preserved_formal`，不得覆盖正式最小任务；否则原子写入不含 Goal 原文的固定三步，且不得影响其它会话投影。
 2. Desktop 或会话重开后，先通过 `get_goal` 确认仍有活动 Goal；随后执行带同一 `session_id` 的 `goal --event restore`。活动 Goal 安全投影返回可恢复 payload；此前已保留的正式计划返回 `preserved_formal` 且不重写、不刷新，仍由其自身的正式计划恢复路径负责。阻断、失活、来源不匹配、损坏或 Plan Mode 一律明确退出。
 3. `update_goal` 成功进入 `blocked` 时，执行 `goal --event blocked`：若当前是 Goal 安全投影，先持久化“无进行中步骤”的观察投影，再使用返回 payload 调用 `update_plan`；若 `create` 已返回 `preserved_formal`，则返回同名无副作用结果，保持正式计划独立且不得调用 `update_plan`。此 UI 仅观察进度，绝不恢复执行授权。
-4. `update_goal` 成功进入 `complete` 时，执行 `goal --event complete`：Goal 安全投影须先持久化三步完成、投影失活且 `payload: null`；`preserved_formal` 同样返回无副作用结果，不得失活真实正式计划，也不得调用 `update_plan` 重放已完成 Goal。
+4. `update_goal` 成功进入 `complete` 时，执行 `goal --event complete`：Goal 安全投影须先生成一次性全完成收口 payload，再持久化三步完成并失活；失活后不得重放，`preserved_formal` 同样返回无副作用结果，不得失活真实正式计划。
 5. Goal 运行中出现正式实施最小任务时，仍用带当前 `session_id` 的 `write` 写入正式投影；仅替换当前会话投影中的安全三步，其它会话投影保持不变。投影不得保存 Goal 原文、Goal ID、线程 ID、原始用户输入、prompt、response、业务数据或凭据。
-6. 每个脚本事件成功后才读取返回 payload 并由当前主会话调用 `update_plan`；工具不可用或调用失败时仅说明投影已保存。Plan Mode 不调用 Goal CLI，也不调用 `update_plan`。
+6. 每个脚本事件成功后才读取返回 payload 并由当前主会话调用 `update_plan`；工具不可用或调用失败时进入 `UI_SYNC_BLOCKED`，仅说明投影已保存并停止领域写入。Plan Mode 不调用 Goal CLI，也不调用 `update_plan`。
 
 
 **主智能体投影责任（多智能体委派场景）**
@@ -100,6 +101,7 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 
 - 托管区契约、字段白名单和状态规则见 [task-plan-projection-contract.md](references/task-plan-projection-contract.md)。
 - 投影不得保存 prompt、响应、凭据、token、线程 ID、业务数据或原始用户输入；原始宿主会话 / 线程标识只允许出现在受控字段 `session_id`，不得出现在其它字段或步骤文案中。
+- 所有 CLI/Python 状态入口按显式 `session_id` 优先、`CODEX_THREAD_ID` 回退解析；两者冲突或均缺失时停止，禁止猜测 `legacy/default` 或其它会话。
 - 最多一个 `in_progress`；允许因阻断暂时没有 `in_progress`。
 - 指纹只根据有序任务 ID 和文案计算，状态与更新时间不参与。
 - 读取兼容 `version: 1/2/3`；任何成功写入统一为 `version: 4` registry。registry 的 `projections[]` 按 `session_id + projection_id` 隔离多个会话；v4 保留 `projection_origin=goal` 和 `synthesis_mode=goal_default|goal_blocked`，Goal 固定 `plan_key=GOAL/ACTIVE`、空 `source_document` 与安全三步；`blocked` 仅允许 Goal 且没有 `in_progress`。v1-v3 单投影只作读取 / migrate 兼容，不能覆盖其它会话 projection。
@@ -117,6 +119,8 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 ## 通过标准
 
 - 合法 registry 可跨进程稳定读取；多个会话 projection 可并存、交错写入互不覆盖，并按 `session_id` 生成精确 `update_plan` payload。
+- 首次 `ensure-start` 或 `write` 成功后直接返回同一当前会话 payload；主 Agent 下一动作必须调用 `update_plan`，不得先执行其它领域写操作。
+- 状态入口统一按显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退解析；两者冲突、均缺失或非法时失败关闭且不写文件。
 - 无活动 projection 的未完成任务在主动执行时间严格超过 600 秒后，先由只读 `probe-timeout` 返回 `goal_check_required`，再由主 Agent 优先创建或复用 Goal；只有 Goal 不匹配、不可用、失败或结果不明确时才通过 `ensure-timeout` 原子降级普通投影。未到阈值、已有活动 projection、已有 `blocked` Goal 观察投影和非法计时输入均不产生重复或错误写入。
 - 状态迁移先落盘，崩溃发生在工具调用前时仍能恢复最新状态。
 - 完成、损坏、过期和来源不匹配投影不会重放。
@@ -127,6 +131,8 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 
 - 脚本：`scripts/task_plan_projection.py`
 - 校验：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py validate --project-current PROJECT_CURRENT.md`
+- 首次持久化并返回 payload：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py ensure-start --project-current PROJECT_CURRENT.md --input projection_or_synthesis_context.json --session-id <session-id>`（`--session-id` 可由 `CODEX_THREAD_ID` 回退）
+- 写入正式投影并返回 payload：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py write --project-current PROJECT_CURRENT.md --input projection.json --session-id <session-id>`
 - 生成当前会话 payload：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py payload --project-current PROJECT_CURRENT.md --session-id <session-id>`
 - 创建 Goal 投影：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py goal --project-current PROJECT_CURRENT.md --event create --session-id <session-id>`
 - 恢复 Goal 投影：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py goal --project-current PROJECT_CURRENT.md --event restore --session-id <session-id>`

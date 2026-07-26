@@ -1,6 +1,6 @@
 ---
 name: browser-session-automation-rules
-description: 面向 AI 代理的核心浏览器自动化：打开页面、抓取快照、点击/填写/选择等交互、处理认证登录、隔离 profile、具名并行 session、批量执行、截图与截图清理。当任务需要隔离 profile、具名并行 session、可脚本化 batch、常规页面交互与登录，或用户明确要求使用 agent-browser 时触发；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP，不因前后端联调自动强制本 skill。若需要网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、代理或多 session 观测面板，转交 `browser-advanced-testing-rules`。
+description: 面向 AI 代理的本地核心浏览器自动化：打开页面、抓取快照、点击/填写/选择等交互、处理认证登录、隔离 profile、具名并行 session、批量执行、截图与截图清理。当任务需要本地隔离 profile、具名并行 session、可脚本化 batch、常规页面交互与登录，或用户明确要求使用 agent-browser 时触发；普通用户 Chrome profile 和一般页面调试优先按浏览器路由选择 Chrome Plugin 或 Chrome DevTools MCP，不因前后端联调自动强制本 skill。若需要网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、代理或多 session 观测面板，转交 `browser-advanced-testing-rules`；若明确需要云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等 Browser Use Cloud 专属能力，转交 `browser-use-cloud-rules`，不得把本地 session 与 Cloud session 混用。
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 ---
 
@@ -9,6 +9,8 @@ allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 这个 CLI 通过 CDP 直接使用 Chrome/Chromium。可通过 `npm i -g agent-browser`、`brew install agent-browser` 或 `cargo install agent-browser` 安装。执行 `agent-browser install` 下载 Chrome，执行 `agent-browser upgrade` 更新到最新版本。
 
 本 skill 与 `browser-advanced-testing-rules` 是同源拆分：本 skill 负责“打开页面、抓取快照、执行交互、认证登录、session 管理”这条核心自动化链路；网络 HAR、视觉/页面 diff、性能 profiling、录制 trace、代理配置和多 session 观测面板由对方负责。域名白名单、动作策略、输出上限、配置文件优先级、`--engine` 引擎选择和项目联调路由规则两组同等适用，各自维护一份。
+
+本 skill 只管理本地 `agent-browser`，不接 Browser Use Cloud。Cloud 专属场景按唯一浏览器矩阵转交 `browser-use-cloud-rules`；Cloud 不可用、缺 key、余额不明或费用闸门未通过时，不得改用本地 profile 复制登录态或绕过原安全边界。
 
 ## 核心工作流
 
@@ -417,7 +419,7 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 
 ### 触发规则补充（强制）
 - 当项目同时存在前端与后端且任务进入“测试/验证/联调”阶段时，必须完成真实 local 浏览器联调；具体工具按 `mcp-installation-rules` 的统一路由选择。
-- 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有隔离 profile、并发 session、批量执行或其他核心自动化场景才使用本 skill；HAR/route、视觉 diff、录制/trace、代理或其他引擎场景见 `browser-advanced-testing-rules`。
+- 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有本地隔离 profile、并发 session、批量执行或其他核心自动化场景才使用本 skill；HAR/route、视觉 diff、录制/trace、代理或其他引擎场景见 `browser-advanced-testing-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
 - 所选浏览器通道不可用且没有满足安全边界的替代通道时，记录本地联调阻断，不强行切换工具。
 - 若系统需要登录授权而当前上下文缺失有效授权信息，必须先向用户获取登录账户或 token，再继续联调。
 - 若准备开始前后端联调，允许主动关闭用户已启动的前端与后端进程，并按当前任务重新启动前后端服务后再调试。

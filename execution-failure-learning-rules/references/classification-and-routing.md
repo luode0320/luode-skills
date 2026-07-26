@@ -30,6 +30,7 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 | Windows PowerShell command-not-found、缺失 Windows CLI、PowerShell 版本/包管理器失败、已确认 Git Bash 中 Windows CLI 不可见 | `windows-powershell-environment-rules` | `references/failure-casebook.md`、精确的每源 manifest/package 映射、SessionEnsure/RecoverCommand JSON 状态；未确认 Git Bash、`wsl.exe`、Linux 127 或 `/mnt/*.exe` 不走此 owner |
 | 浏览器核心自动化、隔离 profile、会话 | `browser-session-automation-rules` | profile、认证上下文、页面状态 |
 | 浏览器高级验证、HAR/网络记录、视觉 diff、trace/代理/多引擎 | `browser-advanced-testing-rules` | 网络记录、视觉基线、trace/性能样本、代理配置 |
+| Browser Use Cloud 收费动作、Billing、硬费用上限、Cloud session 生命周期 | `browser-use-cloud-rules` | key 仅检查存在性、401/403、余额、当前动作可写 `maxCostUsd`、逐次确认、`strategy=session` 清理与实际费用回读 |
 | URL、认证 URL、网页读取 | `authenticated-url-routing-rules` | URL 路由、登录态、来源与页面可达性 |
 | MCP 安装/注册/首次连接 | `mcp-installation-rules` | 版本、配置来源、初次连接和回退；仅限 provisioning 阶段 |
 | Codex/AI 插件安装或启用 | `plugin-installation-rules` | 官方来源、版本、启用状态；仅限 provisioning 阶段 |

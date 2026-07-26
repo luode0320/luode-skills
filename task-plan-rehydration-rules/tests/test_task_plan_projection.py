@@ -32,6 +32,28 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
     TEST_SESSION_ID = "test-session"
 
+    def setUp(self) -> None:
+        """隔离宿主会话环境，避免显式测试会话与当前 Desktop 串线。
+
+        [参数] 无。
+        [返回] None：完成每个测试的宿主环境隔离。
+        最近修改时间：2026-07-26 00:00:00；改动原因：让新增会话回退测试不受真实宿主环境污染。
+        """
+        # 1. 移除宿主会话变量并注册清理回调，确保每个用例独立运行。
+        self._host_thread_id = os.environ.pop(projection.SESSION_ENV_NAME, None)
+        self.addCleanup(self._restore_host_thread_id)
+
+    def _restore_host_thread_id(self) -> None:
+        """恢复测试前的宿主会话环境。
+
+        [参数] 无。
+        [返回] None：恢复测试前的环境变量状态。
+        最近修改时间：2026-07-26 00:00:00；改动原因：避免测试清理影响后续宿主会话。
+        """
+        # 1. 仅在测试前存在宿主会话时恢复，保持原本缺失状态不变。
+        if self._host_thread_id is not None:
+            os.environ[projection.SESSION_ENV_NAME] = self._host_thread_id
+
     # _sample 构造合法活动或失活投影。
     # [参数] statuses: 步骤状态；state: 投影状态；updated_at: UTC 时间。
     # [返回] dict：带正确指纹的投影。
@@ -510,7 +532,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：锁定四个 Goal 事件、正式最小任务优先和 fallback 安全列表让位。
+        最近修改时间：2026-07-26 00:00:00；改动原因：锁定 Goal 完成收口 payload 与正式计划保护。
         """
         # 1. 新建、恢复、阻断和完成必须只迁移固定安全三步，并以 inactive 终止重放。
         with tempfile.TemporaryDirectory() as directory:
@@ -530,7 +552,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             with self.assertRaises(projection.ProjectionContractError):
                 projection.handle_goal_event(path, "restore", session_id=self.TEST_SESSION_ID)
             completed = projection.handle_goal_event(path, "complete", session_id=self.TEST_SESSION_ID)
-            self.assertEqual(completed["payload"], None)
+            self.assertTrue(completed["payload"])
+            self.assertTrue(all(item["status"] == "completed" for item in completed["payload"]["plan"]))
             self.assertEqual(completed["projection"]["state"], "inactive")
             self.assertTrue(all(item["status"] == "completed" for item in completed["projection"]["steps"]))
             # 2. 活动 persisted 正式计划必须被保护，Goal 创建不能覆盖真实实施任务。
@@ -558,7 +581,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：固定正式实施计划优先于默认 Goal 悬浮列表的运行中切换。
+        最近修改时间：2026-07-26 00:00:00；改动原因：固定正式计划写入与 session 精确读取的兼容路径。
         """
         # 1. 先建立活动 Goal 投影，再通过常规 write 写入正式最小任务。
         with tempfile.TemporaryDirectory() as directory:
@@ -566,7 +589,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
             # 2. 写入后必须以正式来源为准，避免 Goal 默认步骤遮挡真实实施进度。
-            replaced = projection.load_projection(path)
+            replaced = projection.load_projection(path, session_id=self.TEST_SESSION_ID)
             self.assertEqual(replaced["projection_origin"], "persisted")
             self.assertEqual(replaced["steps"][0]["id"], "TASK-RTP-01")
 
@@ -614,7 +637,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 projection.validate_projection(v2_goal)
 
     def test_synthesize_projection_builds_exact_from_unique_source(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖无投影精确补建路径。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：覆盖绑定 session 的无投影精确补建路径。"""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
@@ -625,7 +648,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n- [TASK-SYN-03] 回归验证\n",
                 encoding="utf-8",
             )
-            result = projection.synthesize_projection(current_path, self._synthesis_context())
+            result = projection.synthesize_projection(current_path, self._synthesis_context(), session_id=self.TEST_SESSION_ID)
             self.assertEqual(result["mode"], "exact")
             self.assertEqual(result["projection"]["version"], 2)
             self.assertEqual(result["projection"]["projection_origin"], "synthesized")
@@ -639,7 +662,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25 18:18:00；改动原因：防止正式周期表因任务 ID 不在首列而静默降级 fallback。
+        最近修改时间：2026-07-26 00:00:00；改动原因：保持正式周期表 session 绑定与任务列提取兼容。
         """
         # 1. 使用工程文档门禁的标准标题及“顺序、任务 ID、唯一目标”列布局构造来源文档。
         with tempfile.TemporaryDirectory() as directory:
@@ -657,7 +680,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 encoding="utf-8",
             )
             # 2. exact 结果必须按表头提取三项任务并保留显式完成与进行中状态。
-            result = projection.synthesize_projection(current_path, self._synthesis_context())
+            result = projection.synthesize_projection(current_path, self._synthesis_context(), session_id=self.TEST_SESSION_ID)
             self.assertEqual(result["mode"], "exact")
             self.assertEqual(
                 [step["id"] for step in result["projection"]["steps"]],
@@ -667,13 +690,14 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
 
     def test_synthesize_projection_falls_back_when_source_is_ambiguous(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止多候选来源时猜业务步骤。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：保持 session 绑定下的多来源安全 fallback。"""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
             result = projection.synthesize_projection(
                 current_path,
                 self._synthesis_context(candidate_source_documents=["a.md", "b.md"]),
+                session_id=self.TEST_SESSION_ID,
             )
             self.assertEqual(result["mode"], "fallback")
             self.assertEqual(result["projection"]["synthesis_mode"], "fallback")
@@ -684,18 +708,19 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION_SYNTH_FALLBACK)
 
     def test_synthesize_projection_falls_back_when_explicit_hints_are_missing(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止无状态证据时误做 exact。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：保持 session 绑定下的缺证据 fallback。"""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
             result = projection.synthesize_projection(
                 current_path,
                 self._synthesis_context(current_step_hint=None, completed_step_hints=[]),
+                session_id=self.TEST_SESSION_ID,
             )
             self.assertEqual(result["mode"], "fallback")
 
     def test_synthesize_projection_uses_first_unfinished_step_when_only_completed_hints_exist(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖 only-completed-hints 的保守映射。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：保持 session 绑定下的未完成步骤保守映射。"""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
@@ -708,19 +733,21 @@ class TaskPlanProjectionTests(unittest.TestCase):
             result = projection.synthesize_projection(
                 current_path,
                 self._synthesis_context(current_step_hint=None, completed_step_hints=["TASK-SYN-01"]),
+                session_id=self.TEST_SESSION_ID,
             )
             self.assertEqual(result["mode"], "exact")
             self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
             self.assertEqual(result["evidence"]["status_confidence"], "conservative")
 
     def test_synthesize_projection_falls_back_when_no_source_document_exists(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：覆盖无来源文档兜底路径。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：保持 session 绑定下的无来源兜底路径。"""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
             result = projection.synthesize_projection(
                 current_path,
                 self._synthesis_context(candidate_source_documents=[]),
+                session_id=self.TEST_SESSION_ID,
             )
             self.assertEqual(result["mode"], "fallback")
 
@@ -1317,7 +1344,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 projection.build_update_plan_payload(result)
 
     def test_cli_subcommands_and_exit_codes(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：验证五个真实 CLI 入口。"""
+        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：验证会话回退和 payload 返回后的全部 CLI 入口。"""
         # 1. 准备临时状态文件和合法 JSON，通过 write 初始化活动投影。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -1349,6 +1376,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 str(path),
                 "--input",
                 str(synthesis_input),
+                "--session-id",
+                "legacy/default",
             )
             self.assertEqual(synthesize_result.returncode, 0, synthesize_result.stderr)
             self.assertIn("mode", json.loads(synthesize_result.stdout))
@@ -1470,7 +1499,12 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 )
 
     def test_active_legacy_projection_requires_session_id_but_inactive_remains_readable(self) -> None:
-        """验证旧版活动投影不能在缺少会话归属时恢复，失活单投影仍可只读。"""
+        """验证旧版活动投影不能在缺少会话归属时恢复，失活单投影仍可只读。
+
+        [参数] 无。
+        [返回] None：断言旧格式活动与失活投影的会话归属边界。
+        最近修改时间：2026-07-26 00:00:00；改动原因：覆盖旧格式读取与显式 session 兼容边界。
+        """
         # 1. 活动旧投影必须拒绝无归属恢复，失活旧投影仍允许只读兼容。
         active_v1 = self._sample()
         active_v2 = self._sample_v2()
@@ -1492,8 +1526,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
         for legacy in (inactive_v1, inactive_v2, inactive_v3):
             with self.subTest(version=legacy["version"], state="inactive"), tempfile.TemporaryDirectory() as directory:
                 path = self._write_legacy_projection(Path(directory), legacy)
-                self.assertEqual(projection.load_projection(path)["state"], "inactive")
-                registry = projection.load_registry(path)
+                self.assertEqual(
+                    projection.load_projection(path, session_id=self.TEST_SESSION_ID)["state"],
+                    "inactive",
+                )
+                registry = projection.load_registry(path, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(registry["projections"][0]["state"], "inactive")
 
     def test_registry_rejects_duplicate_session_id(self) -> None:
@@ -1574,7 +1611,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：覆盖 Python API 的显式 session_id 契约。
+        最近修改时间：2026-07-26 00:00:00；改动原因：补充 synthesize 入口缺失会话的失败关闭断言。
         """
         # 1. 缺少 session_id 的 Python 状态变更入口必须返回契约错误。
         with tempfile.TemporaryDirectory() as directory:
@@ -1587,6 +1624,175 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 projection.deactivate_projection(path)
             with self.assertRaises(projection.ProjectionContractError):
                 projection.render_projection_block(self._sample())
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.synthesize_projection(path, self._synthesis_context())
+
+    def test_ensure_start_persists_then_returns_payload_for_current_session(self) -> None:
+        """验证首次持久化和悬浮任务 payload 在同一入口完成。
+
+        [参数] 无。
+        [返回] None：断言当前会话先写盘并返回可同步 payload。
+        最近修改时间：2026-07-26 00:00:00；改动原因：覆盖首次持久化即悬浮窗同步契约。
+        """
+        # 1. 用合法活动投影执行 ensure-start，并核对返回 payload 与磁盘内容一致。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            result = projection.ensure_start_projection(
+                path,
+                self._sample(),
+                session_id=self.TEST_SESSION_ID,
+            )
+            self.assertEqual(result["action"], "created")
+            self.assertEqual(result["session_id"], self.TEST_SESSION_ID)
+            self.assertTrue(result["payload"]["plan"])
+            persisted = projection.load_projection(path, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(result["payload"], projection.build_update_plan_payload(persisted))
+
+    def test_ensure_start_isolated_from_other_session_and_idempotent(self) -> None:
+        """验证其它会话不阻断当前会话创建，当前会话重复调用只恢复 payload。
+
+        [参数] 无。
+        [返回] None：断言多会话隔离和重复调用幂等。
+        最近修改时间：2026-07-26 00:00:00；改动原因：防止首次投影覆盖其它宿主会话。
+        """
+        # 1. 先写入其它会话，再重复创建当前会话，确认 registry 和字节内容均受保护。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            projection.upsert_projection(path, self._sample_v4_projection("other-session"), session_id="other-session")
+            first = projection.ensure_start_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
+            before_repeat = path.read_bytes()
+            second = projection.ensure_start_projection(path, self._sample(("pending", "in_progress", "pending")), session_id=self.TEST_SESSION_ID)
+            self.assertEqual(first["action"], "created")
+            self.assertEqual(second["action"], "already_active")
+            self.assertEqual(path.read_bytes(), before_repeat)
+            registry = projection.load_registry(path)
+            self.assertEqual(
+                {entry["session_id"] for entry in registry["projections"]},
+                {"other-session", self.TEST_SESSION_ID},
+            )
+
+    def test_session_resolution_prefers_explicit_and_fails_conflict_or_missing(self) -> None:
+        """验证显式会话优先、环境回退、冲突和缺失均失败关闭。
+
+        [参数] 无。
+        [返回] None：断言会话来源冲突和缺失均不写盘。
+        最近修改时间：2026-07-26 00:00:00；改动原因：锁定显式 session 与宿主环境的失败关闭边界。
+        """
+        # 1. 依次构造显式/环境、冲突和缺失输入，观察归属与原子保护结果。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            with mock.patch.dict(os.environ, {projection.SESSION_ENV_NAME: "env-session"}, clear=False):
+                with self.assertRaises(projection.ProjectionContractError):
+                    projection.ensure_start_projection(path, self._sample(), session_id="explicit-session")
+                result = projection.ensure_start_projection(path, self._sample())
+                self.assertEqual(result["session_id"], "env-session")
+            path_without_session = self._write_current(Path(directory), "# 新文件\n")
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_start_projection(path_without_session, self._sample())
+
+    def test_cli_state_entry_uses_environment_session_and_rejects_conflict(self) -> None:
+        """验证 CLI 缺省参数回退宿主会话，冲突时保持文件不变。
+
+        [参数] 无。
+        [返回] None：断言 CLI 使用环境会话并在冲突时失败关闭。
+        最近修改时间：2026-07-26 00:00:00；改动原因：覆盖 CLI 会话解析与原文件哈希保护。
+        """
+        # 1. 先验证环境回退成功，再以冲突显式值确认 CLI 不写入原文件。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            input_path = root / "projection.json"
+            input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
+            with mock.patch.dict(os.environ, {projection.SESSION_ENV_NAME: "env-cli"}, clear=False):
+                write = self._run_cli(
+                    "write",
+                    "--project-current",
+                    str(path),
+                    "--input",
+                    str(input_path),
+                )
+                self.assertEqual(write.returncode, 0, write.stderr)
+                self.assertEqual(
+                    projection.load_projection(path, session_id="env-cli")["state"],
+                    "active",
+                )
+                before_conflict = path.read_bytes()
+                conflict = self._run_cli(
+                    "write",
+                    "--project-current",
+                    str(path),
+                    "--input",
+                    str(input_path),
+                    "--session-id",
+                    "explicit-cli",
+                )
+                self.assertNotEqual(conflict.returncode, 0)
+                self.assertEqual(path.read_bytes(), before_conflict)
+
+    def test_ensure_start_context_builds_fallback_and_cli_write_returns_payload(self) -> None:
+        """验证 start 上下文可生成 fallback，write CLI 在持久化后直接返回 payload。
+
+        [参数] 无。
+        [返回] None：断言 start 补建与 write 返回值均可直接同步 UI。
+        最近修改时间：2026-07-26 00:00:00；改动原因：覆盖首次上下文入口和兼容 write payload。
+        """
+        # 1. 用缺少来源文档的 start 上下文走安全 fallback，再核对 write CLI payload。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            context = self._synthesis_context(
+                trigger="start",
+                current_step_hint=None,
+                candidate_source_documents=[],
+            )
+            result = projection.ensure_start_projection(path, context, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(result["action"], "created")
+            self.assertEqual(result["mode"], "fallback")
+            self.assertEqual(result["payload"]["plan"][0]["status"], "in_progress")
+
+            input_path = root / "projection.json"
+            input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
+            write = self._run_cli(
+                "write",
+                "--project-current",
+                str(path),
+                "--input",
+                str(input_path),
+                "--session-id",
+                "cli-payload",
+            )
+            self.assertEqual(write.returncode, 0, write.stderr)
+            write_output = json.loads(write.stdout)
+            self.assertTrue(write_output["payload"]["plan"])
+
+    def test_deactivate_and_goal_complete_return_one_time_completion_payload(self) -> None:
+        """验证失活与 Goal 完成均返回全完成收口 payload，失活后不可重放。
+
+        [参数] 无。
+        [返回] None：断言完成 payload 一次性返回且终态不可再次刷新。
+        最近修改时间：2026-07-26 00:00:00；改动原因：覆盖完成收口与 inactive 重放保护。
+        """
+        # 1. 通过 CLI 完成失活并检查全完成 payload，随后验证 inactive 不再生成 UI payload。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            projection.upsert_projection(path, self._sample(), session_id=self.TEST_SESSION_ID)
+            input_path = root / "projection.json"
+            input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
+            result = self._run_cli(
+                "deactivate",
+                "--project-current",
+                str(path),
+                "--session-id",
+                self.TEST_SESSION_ID,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["projection"]["state"], "inactive")
+            self.assertTrue(output["payload"])
+            self.assertTrue(all(item["status"] == "completed" for item in output["payload"]["plan"]))
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.build_update_plan_payload(output["projection"])
 
     def test_continue_route_is_mandatory_in_hit_check(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止继续回合漏命中恢复 Owner。"""
@@ -1609,6 +1815,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
         # 1. 恢复 Owner 文档必须使用解析器真实提供的参数名，避免命中后执行失败。
         skill_document = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("validate --project-current PROJECT_CURRENT.md", skill_document)
+        self.assertIn("ensure-start --project-current PROJECT_CURRENT.md", skill_document)
         self.assertIn("payload --project-current PROJECT_CURRENT.md", skill_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", skill_document)
         self.assertIn("goal --project-current PROJECT_CURRENT.md --event create", skill_document)
@@ -1626,7 +1833,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
         contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
         for token in ("create_goal", "get_goal", "update_goal", "先持久化", "Plan Mode"):
             self.assertIn(token, rehydration_document)
-        self.assertIn("成功持久化 -> 读取返回 payload -> 调用 `update_plan`", contract_document)
+        self.assertIn("成功持久化 -> 读取返回 payload -> 下一动作调用 `update_plan`", contract_document)
         # 2. 自主执行 Owner 只能交接生命周期，不得借悬浮窗扩大执行授权。
         autonomous_document = (REPOSITORY_ROOT / "autonomous-execution-rules" / "SKILL.md").read_text(encoding="utf-8")
         for token in ("create_goal", "get_goal", "update_goal", "不因此自动取得", "不得把 blocked payload", "Plan Mode"):
@@ -1651,6 +1858,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertIn(f"goal --project-current PROJECT_CURRENT.md --event {event}", contract_document)
         self.assertIn("Plan Mode 不读取、写入或刷新投影", contract_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", contract_document)
+        self.assertIn("ensure-start", contract_document)
+        self.assertIn("CODEX_THREAD_ID", contract_document)
 
     def test_auto_goal_timeout_contract_is_consistent(self) -> None:
         """验证超时 Goal 优先、单次创建、脱敏摘要和普通投影降级在所有 Owner 入口一致。"""
