@@ -271,7 +271,7 @@ python skill-dictionary/generate_dictionary.py
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `architecture-doc-rules` | 统一 `doc/1-架构/` 下 `1-总架构.md` 到 `4-主要业务链路.md` 四个有序中文主入口；业务链路从序号 `5` 开始按最大编号加一，支持更新原编号链路或追加新链路，并维护与根目录 `项目设计.md` 的分层关系。 |
 | `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
-| `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP 时，负责根据项目结构给出安装结论、安装流程、优先级、项目级 Codex `config.toml` 缺失时的默认补齐规则，并把“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等名称统一收口为 Chrome DevTools MCP。 |
+| `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP、Browser Use Cloud MCP 或 Godot AI MCP 时，负责根据项目结构和统一矩阵给出安装、配置与让路结论；Browser Use Cloud 只用于云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等专属场景，不作为其它浏览器工具的故障后备。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `project-agents-bootstrap` | 新会话首轮或仓库级规则文件缺失时，负责补齐和同步 `AGENTS.md` / `CLAUDE.md` 及其关键受管章节。 |
@@ -370,6 +370,7 @@ python skill-dictionary/generate_dictionary.py
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分；含 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。 |
 | `test-strategy-rules 的 test-asset-governance 条件路由`              | 统一测试说明文档的结构和描述方式。                                             |
 | `agent-browser`               | 提供条件式浏览器自动化能力，重点覆盖隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎场景；普通 Chrome 状态与常规调试按统一浏览器路由处理。 |
+| `browser-use-cloud-rules`     | 仅接 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身和合规验证码场景；每次 `run_session` / `send_task` 前提醒本机配置 `BROWSER_USE_API_KEY`，检查 Billing、当前动作硬费用上限并取得当次确认，完成后停止遗留 session 并回读实际费用。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
 | `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响。  |
 | `project-release-test-rules`  | 作为上线前项目级接口测试门禁，强制每次执行前先扫描并更新接口基线，再完成必测接口筛选、门禁测试、结果归档与最终放行结论。 |
@@ -873,3 +874,4 @@ claude-mem(记忆) :
 2026-07-26 00:08:00 style: [测试证据空白] 清理证据文件末尾空白
 2026-07-26 00:09:00 docs: [研发规则审查] 归档实现与当前改动审查
 2026-07-26 00:10:00 docs: [研发规则验收] 归档最终验收标准与结论
+2026-07-26 14:40:00 feat: [Browser Use Cloud路由] 新增Cloud专属Skill、费用预检与统一浏览器路由

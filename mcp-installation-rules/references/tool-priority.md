@@ -10,6 +10,7 @@
 | `Chrome DevTools MCP` | 独立浏览器调试与验证：DOM、样式、控制台、Network、Performance、Coverage、运行时状态 | 不依赖用户真实 profile 的本地页面调试、页面行为验证、网络或性能诊断 | 未安装或未接通时，只有在任务不依赖 DevTools 专属能力且不需要真实 profile 时，才按下方条件后备；否则阻断 |
 | `browser-session-automation-rules` | 隔离 profile / 具名 session 的核心浏览器自动化：打开、快照、交互、认证、等待、截图、批量执行 | 任务需要隔离 profile、具名 session、认证登录、表单交互、数据提取，或独立 profile 的基础自动化在 Chrome DevTools MCP 不可用时 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的真实 profile / 登录态 |
 | `browser-advanced-testing-rules` | 浏览器高级验证与观测：HAR / 网络记录、视觉 diff、trace / profiling、代理、多 session 观测面板 | 任务明确需要网络 HAR、视觉 / 页面 diff、性能 profiling、录制 trace、代理配置或多 session dashboard 观测 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的真实 profile / 登录态 |
+| `browser-use-cloud-rules` | Browser Use Cloud 托管自主执行：云端长链、托管并发、地域出口、托管代理、隐身环境和合规验证码处理 | 任务明确需要 Cloud 专属能力，或用户明确点名 Browser Use Cloud 并接受密钥、账单、硬费用上限和逐次确认闸门 | 不作为其它浏览器工具的故障后备；缺 key、账单/余额不明、无硬费用上限或未取得当次确认时默认停止 |
 
 ## 浏览器路由矩阵
 
@@ -23,18 +24,22 @@
 | 隔离 profile、具名 session、认证登录、表单交互、批量执行 | `browser-session-automation-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | HAR / route、视觉 diff、录制 / trace、代理、多引擎、多 session 观测面板 | `browser-advanced-testing-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | 不依赖真实 profile 的基础打开、点击、填写或一次性截图 | `Chrome DevTools MCP`（可用时） | Chrome DevTools MCP 不可用时可条件后备 `browser-session-automation-rules`；仍需满足 local 与安全约束 |
+| 云端自主长链、托管并发、地域出口、托管代理、隐身或站点允许的合规验证码处理 | `browser-use-cloud-rules` | 先提醒本机配置 `BROWSER_USE_API_KEY`，再执行 Billing、当前动作硬费用上限和逐次确认；任一条件不明即停止 |
+| 用户明确要求 Browser Use Cloud | `browser-use-cloud-rules` | 仍不得跳过密钥、账单、费用、profile、业务副作用和 session 清理闸门 |
 
 名称约定：
 
 - `Chrome DevTools MCP` 是本仓库统一使用的官方工具名。
 - 用户提到“谷歌浏览器 MCP”“Google Chrome MCP”“Chrome MCP”“Chrome DevTools for agents”时，默认都映射到 `Chrome DevTools MCP`，不要在规则里并列成多个不同工具。
 - `Chrome Plugin` 是用户真实 Chrome profile 的连接能力，不等同于 `Chrome DevTools MCP`；前者的登录态和浏览器状态不能由后者、`browser-session-automation-rules` 或 `browser-advanced-testing-rules` 自动推断、复制或绕过。
+- `Browser Use Cloud` 只表示 Browser Use 托管云能力，不包含本地开源 Browser Use；它不得复制用户 Cookie、密码、本地 Chrome profile 或登录状态，也不得替代 Chrome Plugin、Chrome DevTools MCP、应用内 Browser 或本地自动化 Skill。
 
 ## 通用约束
 
 - 浏览器联调必须完成真实的 local 验证并保留工具与结果证据；“选择工具”不能代替验证本身。
 - 路由判断本身不触发 MCP 安装或修改用户 Chrome profile；也不得为绕过连接失败而切换到不等价工具。
 - 当所需能力不存在、工具未接通且没有满足安全边界的等价后备时，明确记录阻断，不虚构验证结果。
+- Browser Use Cloud 可能消耗免费额度或余额；免费层也必须逐次确认。任何 `run_session`、`send_task` 前均由 `browser-use-cloud-rules` 检查 `BROWSER_USE_API_KEY`、Billing 和当前动作的硬费用上限，并在结束后停止遗留 session、回读实际费用。
 
 ## Godot 编辑器相关
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Browser Use Cloud 安全路由"
+  short_description: "按费用、密钥与生命周期闸门安全使用 Browser Use Cloud"
+  default_prompt: "使用 $browser-use-cloud-rules 判断任务是否需要 Browser Use Cloud，执行安全预检，并在每次收费动作前取得确认。"
