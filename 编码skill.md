@@ -177,7 +177,7 @@
 | `project-design-doc-rules` | 当用户要求分析整个项目、梳理架构 / 模块 / 主链路、同步根目录 `项目设计.md`，或在完成全项目分析后补建该文档时自动触发。 | 负责把根目录项目设计类文档当作弱参考源读取，按代码与当前文档优先原则判断偏移，并统一同步或补建根目录 `项目设计.md`。 |
 | `architecture-doc-rules` | 当需要创建、更新、审查或解释 `doc/1-架构/` 下的长期架构文档，包括总架构、目录树、模块职责、主要业务链路或单条业务链路时自动触发。 | 负责维护 `1-4` 四个有序中文主入口；业务链路从 `5` 开始依次下推，同一链路保留编号更新，新链路使用最大编号加一，并区分它与根目录 `项目设计.md` 的总览分层关系。 |
 | `project-local-skills-rules` | 当用户要求“分析项目并总结项目专属 skill”，或要求把项目私有编码规则沉淀到项目目录时自动触发。 | 负责把项目专属规则拆成多个独立 skill，并统一落到项目根目录 `skill/`，供后续预热和编码阶段优先命中。 |
-| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务即将涉及前端页面验证 / Godot 编辑器联动且需先根据项目结构决定是否安装 Chrome DevTools MCP 或 Godot AI MCP 时自动触发。 | 负责识别前端项目与 Godot 项目标记，给出 MCP 安装结论、安装流程、优先级和后续工具让路规则，并将“谷歌浏览器 MCP / Google Chrome MCP / Chrome DevTools for agents”等称呼统一归一到 Chrome DevTools MCP；若项目级 Codex `config.toml` 缺少目标 MCP 配置，则默认补齐；MCP 检测与安装默认经 `parallel-task-dispatch-rules` 委派子代理（检测只读并行、写 config 的安装由单一安装子 agent 串行独占，主 agent 收口），细则见 `parallel-task-dispatch-rules/references/provisioning-delegation.md`。 |
+| `mcp-installation-rules` | 当用户要求分析项目、检查当前项目是否需要安装 MCP、判断浏览器或 Godot 编辑器该由哪个工具优先接管，或任务需要先判断 Chrome DevTools MCP、Browser Use Cloud MCP 或 Godot AI MCP 时自动触发。 | 负责项目标记、安装配置和统一浏览器路由；Browser Use Cloud 仅转交云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等专属需求，不作为其它浏览器工具的故障后备；MCP 检测只读并行，写 config 串行独占。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`export_presets.cfg` 等 Godot 项目标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。 | 负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口，并联动 `project-rule-file-bootstrap-rules`、`mcp-installation-rules` 与 `imagegen`。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系、影响面或重构范围时自动触发。 | 负责优先提醒使用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到 `rg`、`find`、`read` 等本地手段。 |
 | `project-rule-file-bootstrap-rules` | 当仓库级规则文件、`.gitattributes`、`.editorconfig` 或项目记忆四件套缺失、损坏或需要幂等同步时自动触发。 | 作为项目自举唯一入口，按 `rule-bootstrap` / `memory-bootstrap` 条件路由维护规则文件和 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 骨架，保护非受管内容、UTF-8、大小闸门和历史只追加；事实抽取仍由 `project-memory-rules` 负责。 |
@@ -208,7 +208,7 @@
 | -------- | -------------------- | ---- |
 | 当前争议是研发文档、Bug 记录、测试任务目录、项目通用文档或根目录项目设计主文档应该放到哪里、叫什么、是否复用原记录 | 总控层 / `artifact-storage-rules` | 先确定全局目录和命名约定，再回到对应主域继续执行 |
 | 用户要求分析当前项目并整理项目专属编码规则，或要求把规则沉淀成多个项目私有 skill | 总控层 / `project-local-skills-rules` | 先按主题拆分项目专属 skill，再统一写入项目根目录 `skill/`，避免规则只停留在口头总结 |
-| 用户要求检查当前项目是否需要安装 MCP，或任务即将涉及前端页面验证 / Godot 编辑器操控，需要先判断是否应安装 Chrome DevTools MCP 或 Godot AI MCP | 总控层 / `mcp-installation-rules` | 先按项目结构识别前端与 Godot 标记，明确需要安装的 MCP，再把浏览器或编辑器控制权让给对应工具 |
+| 用户要求检查当前项目是否需要安装 MCP，或任务即将涉及前端页面验证 / Godot 编辑器操控，需要先判断 Chrome DevTools MCP、Browser Use Cloud MCP 或 Godot AI MCP | 总控层 / `mcp-installation-rules` | 先按项目结构与能力条件明确需要安装的 MCP，再把浏览器或编辑器控制权让给对应工具；Browser Use Cloud 只有专属需求才进入收费与安全闸门 |
 | 用户要求分析代码库结构、调用链、符号关系、影响面或重构范围，需要先缩小跨文件搜索 | 总控层 / `codegraph-analysis-rules` | 先用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到本地搜索与阅读 |
 | 当前主流程已经明确，但执行中发现已命中的某个 skill 触发不准、规则缺失、边界不清、references 不足，继续推进只能靠临时口头规则兜底 | 总控辅助 / `skill-evolution-rules` | 先判断这是不是 skill gap，再决定补旧 skill、补相邻 skill 还是新增独立 skill；阻断级 gap 应先暂停当前任务 |
 | 用户只粘贴一段代码、函数或报错片段并说“这里改”，但没有提供文件路径或可唯一定位的代码位置 | 总控层 / `code-snippet-location-rules` | 先依据明确路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件，再进入代码重读或具体修改 |
@@ -555,6 +555,7 @@ Bug 域采用两条互补路径：
 | `test-strategy-rules`         | 当功能实现和编码审查完成后开始制定测试策略、补测试、写验证脚本或做回归检查时触发；当新增/修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定测试任务根目录、时间戳目录、中文 README、ASCII 镜像，或发现测试资产散落时进入 `test-asset-governance` 条件路由。 | 统一测试优先级、测试类型组合、覆盖范围以及测试文档、命名、任务根布局和散落资产治理。 |
 | `browser-session-automation-rules` | 当任务需要隔离 profile、具名/并发 session、认证登录、表单交互、批量执行等核心浏览器自动化，或用户明确要求该工具时自动触发；普通 Chrome 状态与常规页面调试按统一浏览器路由选择。 | 提供条件式核心浏览器自动化能力，不固化为默认联调工具。 |
 | `browser-advanced-testing-rules` | 当任务需要网络/HAR、视觉 diff、trace/profiling、代理或多引擎等高级验证与观测能力，或用户明确要求该工具时自动触发。 | 提供条件式浏览器高级验证与观测能力，不固化为默认联调工具。 |
+| `browser-use-cloud-rules` | 当任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码，或用户明确点名 Browser Use Cloud 时自动触发。 | 作为 Cloud 执行、安全、费用和 session 生命周期的唯一 Owner；每次收费动作前检查本机 key、Billing、当前动作硬费用上限并取得当次确认。 |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求与验收标准时自动触发。 | 负责当前需求对应的功能正确性验证。 |
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
 | `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有执行引擎实现。 |
@@ -579,9 +580,10 @@ Bug 域采用两条互补路径：
 
 3. 浏览器联动执行
 
-- 由统一浏览器路由负责：用户真实 Chrome 状态使用 Chrome Plugin，常规调试和页面验证使用已接通且能力满足的 Chrome DevTools MCP，隔离核心自动化使用 `browser-session-automation-rules`，高级验证与观测使用 `browser-advanced-testing-rules`
+- 由统一浏览器路由负责：用户真实 Chrome 状态使用 Chrome Plugin，常规调试和页面验证使用已接通且能力满足的 Chrome DevTools MCP，本地隔离核心自动化使用 `browser-session-automation-rules`，本地高级验证与观测使用 `browser-advanced-testing-rules`，Cloud 专属需求使用 `browser-use-cloud-rules`
 - 聚焦“如何通过真实浏览器执行页面打开、点击、输入、登录、截图、抓取页面证据和查看网络请求”，工具选择不由测试域单独写死
 - `browser-session-automation-rules` 适用于隔离 profile、并发 session 场景；`browser-advanced-testing-rules` 适用于网络/HAR、视觉 diff、录制/trace、代理和其他引擎场景
+- `browser-use-cloud-rules` 只接云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码；免费层也要逐次确认，缺 `BROWSER_USE_API_KEY` 时只提醒本机配置并重启 Codex，禁止在聊天中粘贴 key
 - 不替代功能验证、回归验证或联调归因，只负责浏览器执行手段与操作能力
 
 4. 功能验证
@@ -619,7 +621,7 @@ Bug 域采用两条互补路径：
 
 - 讨论“测什么、覆盖哪些场景、优先级怎么排”时，进入 `test-strategy-rules`
 - 讨论“测试目录建在哪、怎么命名、README 怎么写”时，进入测试资源管理相关 skill
-- 讨论“需要用真实浏览器打开页面、点击、输入、登录、截图、抓取页面数据或查看页面网络请求”时，先按统一浏览器路由选择 Chrome Plugin、Chrome DevTools MCP、`browser-session-automation-rules` 或 `browser-advanced-testing-rules`
+- 讨论“需要用真实浏览器打开页面、点击、输入、登录、截图、抓取页面数据或查看页面网络请求”时，先按统一浏览器路由选择 Chrome Plugin、Chrome DevTools MCP、`browser-session-automation-rules`、`browser-advanced-testing-rules` 或 Cloud 专属的 `browser-use-cloud-rules`
 - 讨论“当前需求是否实现正确”时，进入 `functional-validation-rules`
 - 讨论“上下游系统是否打通、环境是否一致、链路是否闭环”时，先进入 `test-strategy-rules` 重新拆分验证路径，必要时升级到总控层协调
 - 讨论“旧功能有没有被这次改动带坏、回归范围怎么定、回归用例怎么选”时，进入 `test-regression-rules`

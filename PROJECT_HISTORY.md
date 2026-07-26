@@ -128,3 +128,33 @@
 - `TASK-RTP-01` 至 `TASK-RTP-07` 已完成阶段审查与验收；活动投影推进到 `TASK-RTP-08 in_progress`，等待用户真实关闭并重开 Desktop 后完成首次继续回合验收。
 
 - 2026-07-25：完成 CYCLE-RTP-06 长任务自动 Goal 优先升级实现。新增无写入 `probe-timeout`、严格 600 秒边界、Goal 单次创建/复用/失败降级、脱敏摘要与跨项目 standing authorization；63 项回归、Skill 校验、字典、严格文档门禁、真实 Goal 工具链和测试投影清理通过。Computer Use 禁止自动操作 Codex 应用，独立视觉确认保持 LIMITED；Obsidian 沉淀因固定 vault 未注册而阻断，工作树保持未提交。
+
+- 2026-07-26：确认 `BUG-PLAN-WAIT-20260726-001` 的原会话时间线：Plan Mode 决策选择框返回 `{"answers":{}}` 后错误进入“结果与结论”总结并结束任务。冻结永久等待状态契约：决策调用完全省略 `autoResolutionMs`；空答案、缺失答案和宿主隐式超时只能立即串行重发同一选择框；部分答案保留并只重发剩余问题；未决期间禁止总结、`final_answer`、`task_complete`、默认选择、Goal 和任务投影恢复。
+- 2026-07-26：完成 `CYCLE-PMW-01` 的文档与规则切片：新增 Bug、验收、实施总览、周期和专项测试资产；`implementation-planning-rules`、`reasoning-summary-structure-rules` 与 Agent 提示加入 `RULE-PMW-001..004`、`AC-PMW-001..007`、`SUMMARY-GATE-PMW-001`。专项行为回归 10/10、四份工程文档 profile、Skill quick validate、UTF-8、Python AST 和 `git diff --check` 通过；真实 Desktop 两个以上空答案周期尚未验证，整体状态保持 `LIMITED`，未执行 Git 历史写入。
+- 2026-07-26：本轮 Obsidian bridge `doctor` 返回 `VAULT_NOT_REGISTERED`，固定 vault `D:\obsidian_data` 检索/沉淀按规则阻断，未使用文件系统 fallback；该限制不影响项目本地四件套和本地回归证据。
+
+- 2026-07-26：完成 `TASK-PMW-03` 与 `TASK-PMW-04` 的本地收口。专项测试 README 的 `test` profile、最终验收文档 `ACCEPT-PMW-FINAL-001`、实现审查 `REVIEW-PMW-001`、当前改动总审查 `REVIEW-PMW-002` 均已落盘并通过对应门禁；任务投影脚本已将当前会话状态更新为 `TASK-PMW-01/02/03 completed`、`TASK-PMW-04 in_progress`。自动回归仍为 10/10，真实 Desktop `TEST-PMW-013` 尚未执行，周期与最终验收保持 `LIMITED`，未执行 Git 历史写入。
+- 2026-07-26：复核 `TASK-PMW-02/03/04` 的任务证据类别并补齐 `EVD-TASK-PMW-*-IMPL/TEST/REVIEW/ACCEPT` 的逐项稳定 ID；实施周期、两份审查和最终验收 strict profile 重新通过，八份工程文档 profile 均为 `valid: true`、`LIMITED`。专项回归保持 10/10，真实 Desktop `TEST-PMW-013` 仍未取得证据，未执行 Git 历史写入。
+- 2026-07-26：针对复核发现的冻结集合标识缺口，将 `result_and_conclusion` 与中文“结果与结论”显式同步到规划 Owner、总结 Owner、Agent 提示、专项消费方测试和项目稳定记忆；专项回归仍为 10/10，八份工程文档 strict profile、两个 Skill quick_validate、AST、YAML、UTF-8 与 `git diff --check` 均通过。真实 Desktop `TEST-PMW-013` 仍未执行，周期继续保持 `LIMITED`，未执行 Git 历史写入。
+- 2026-07-26：尝试执行真实 Desktop `TEST-PMW-013`；`computer-use` 初始化成功，但安全规则禁止自动化 Codex Desktop/扩展，无法取得宿主空答案周期和最终选择恢复证据。按既定边界保持 `LIMITED/HOST_BLOCKED`，不创建伪造通过证据，也未执行 Git 历史写入。
+
+## 2026-07-26：Browser Use Cloud 专属路由与收费安全能力落地
+
+- 新增 `browser-use-cloud-rules`、只读预检脚本和 local mock 测试，只接 Browser Use Cloud，不安装或接入本地 Browser Use。
+- 统一浏览器矩阵新增 Cloud 专属分支；真实 Chrome、DevTools、本地核心自动化和本地高级验证继续由原 Owner 接管，Cloud 不作为故障后备或安全策略绕过手段。
+- 每次 `run_session`、`send_task` 前分别检查本机 `BROWSER_USE_API_KEY`、Billing、当前动作可写硬费用上限并取得当次确认；无硬上限默认停止，免费层也不跳过确认。
+- 14 个 local mock 单元测试、8 个正负 trigger fixture、7 个相关 Skill 校验和两个实施周期 strict 门禁通过；未配置真实 key、未调用真实 Cloud、未消费额度、未执行 Git 历史写入。
+
+## 2026-07-26：任务悬浮窗首次持久化即同步进入周期 07
+
+- 用户反馈会话约 29 分钟仍未看到任务悬浮窗，确认旧口径把十分钟异常修复误当作正常首显入口；冻结“`confirmed` 后首个领域动作前持久化当前 session，写盘成功后的下一动作立即 `update_plan`”硬闸门。
+- 新增 `ensure-start`、显式 `--session-id` 优先与 `CODEX_THREAD_ID` 回退、冲突/缺失失败关闭、payload 返回和一次性完成收口；保留 v1-v4 兼容、`UI_SYNC_BLOCKED`、active/blocked/inactive 可见性和十分钟异常修复边界。
+- 新增/更新周期 07、Bug、需求与验收文档；投影专项回归 69/69、三个 Skill 校验、字典、UTF-8、文档 strict profile 和 `git diff --check` 通过；真实 Desktop 首显证据受宿主自动化限制，状态保持 `LIMITED/HOST_BLOCKED`。
+- 当前工作树保留未提交状态，未执行 Git 历史写入；Obsidian 固定 vault 未注册，本轮不绕过 CLI 写入。
+
+## 2026-07-26：结果与结论适中详细度切片完成
+
+- 完成 `REQ-SUMMARY-DETAIL-001`：`reasoning-summary-structure-rules` 的结果区默认保持 3 句，复杂、受限或存在关键边界时按事实扩展至 4–5 句，固定覆盖“解决了什么、采用什么方法、结果/验证状态如何”。
+- 规则、模板、条件说明、公开示例和专项测试均已同步；空泛“已完成”、超过五句、复制完整测试清单、逐文件改动和执行流水账的候选均有拒绝边界，既有总结顺序、图形化条件和 `WAITING_DECISION` 闸门保持不变。
+- 专项回归 9/9、Skill quick_validate、Python 编译、目标差异检查、六份工程文档 strict、实现审查和最终验收均通过；真实模型输出、Desktop UI 和外部服务不在本来源对象范围内。
+- 当前会话结果详细度投影已在完成 payload 传递给 `update_plan` 后迁移为 `inactive`，三个任务均为 `completed`；未执行 Git 历史写入，Obsidian 沉淀因固定 vault `VAULT_NOT_REGISTERED` 继续阻断。

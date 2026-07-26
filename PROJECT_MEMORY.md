@@ -7,15 +7,27 @@
 - 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
 - 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
 - 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
-- 稳定决策：默认执行回合中的简单任务开始时允许没有悬浮窗；取得 `confirmed` 后从首次真实执行动作开始计时，扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff`，只有严格大于 600 秒且当前会话无活动或阻断投影时才进入只读 `probe-timeout`，599 秒、600 秒及扣减后不超过 600 秒均不升级。
+- 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。`update_plan` 失败进入 `UI_SYNC_BLOCKED`，保留 projection 并禁止继续领域写入；`inactive` 不创建悬浮任务列表。
+- 稳定决策：任务投影会话解析固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退；两者冲突、非法或同时缺失时失败关闭。`ensure-start` 和带 payload 的 `write` 是首次持久化入口，返回结果必须绑定当前 session 并携带可直接调用的 `update_plan` payload。
+- 稳定决策：十分钟只作缺失 projection 的异常修复闸门。任务已真实执行但当前会话缺少活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后主动执行时间严格大于 600 秒时，才先调用只读 `probe-timeout`，随后补建并立即同步；不再把十分钟作为正常任务首次显示悬浮窗的入口。
 - 稳定决策：`probe-timeout` 不创建锁文件、临时文件、projection 或 payload；`goal_check_required` 后只允许主 Agent 按 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行，子 Agent 不得调用 Goal 或主悬浮窗工具。
 - 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
 - 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或 Obsidian。
 - 稳定决策：超时升级只在工具返回、阶段进度或回合结束前等可执行检查点运行，不承诺后台第 601 秒自动唤醒；计时起止与暂停秒数不进入 projection schema 或项目长期状态，计时上下文丢失后重新计时而不是推算。
-- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表，Goal complete 将三步完成并写为 `inactive`，payload 必为 `null`。
+- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将三步写为 `inactive`，失活后禁止重放。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
-- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
-- 更新时间：2026-07-25。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/3-实施/2026-07-26_150000_CodexDesktop任务悬浮窗断点恢复_实施周期07_首次持久化即悬浮窗同步.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 更新时间：2026-07-26。
+
+
+## Plan Mode 决策选择框永久等待规则
+
+- 稳定决策：Plan Mode 决策型 `request_user_input` 必须完全省略 `autoResolutionMs`；选择框未得到用户选择时保持 `WAITING_DECISION`，没有等待时间或重发次数上限，宿主空答案不代表取消、授权、默认选择或完成。
+- 稳定决策：`answers:{}`、答案缺失、缺少预期问题 ID、`null`/空返回和宿主隐式超时的下一动作只能是立即串行重发同一未决选择框；重发保持问题 ID、选项、推荐标记和冻结文案，部分答案只保存并重发剩余问题，每次只保留一个活动选择框。
+- 稳定决策：未决循环期间禁止冻结集合 `commentary`、`limited_plan`、`pending_summary`、`proposed_plan`、`final`、`summary`、`final_answer`、`task_complete`、`result_and_conclusion` 及中文“结果与结论”输出；也不得自动采用推荐项、创建 Goal、恢复任务投影或触发自动升级；总结消费方必须拒绝任何未决 `request_user_input` / `WAITING_DECISION`。
+- 稳定决策：只有用户完成全部选择、明确授权“你来定/按推荐”、明确要求停止，或工具明确不可恢复且无法再次调用时才离开等待；工具故障仍保持未决并报告宿主阻断。上下文压缩或会话恢复必须保留问题身份、选项、已选答案和等待状态。
+- 来源：`implementation-planning-rules/SKILL.md`、`implementation-planning-rules/references/plan-question-coverage.md`、`implementation-planning-rules/references/plan-output-gate.md`、`reasoning-summary-structure-rules/SKILL.md`、`doc/4-bugs/2026-07-26_040639_PlanMode选择框永久等待/README.md`、`doc/7-验收/2026-07-26_040639_BUG-PLAN-WAIT-20260726-001_验收标准.md`、`doc/5-tests/2026-07-26_040607/plan_mode_wait_loop/test_plan_mode_wait_loop.py`。
+- 更新时间：2026-07-26。
 
 
 ## 六域 Skill 精简与自动触发保护规则
@@ -490,10 +502,28 @@
 ### URL 认证浏览器默认路由
 - 别名: authenticated-url-routing-rules, 已登录 Chrome 路由, URL 默认 Chrome Plugin
 - 类型: 浏览器路由规则
-- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页。依赖真实 Chrome profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用 `browser-session-automation-rules` 或其他浏览器绕过；明确为公开或 local 且不依赖用户 profile 的页面，才按统一路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`。遇到登录页、权限页、验证码或人机验证时，不得用 `web`、搜索引擎、第三方转载或无登录态浏览器绕过权限。若 Chrome 已成功认领用户标签页但浏览器安全策略拒绝读取正文，必须停止绕过尝试，只报告 URL / 标题 / 认领状态和策略阻断事实，并将标签页保留为 handoff。后续执行中遇到并确认解决的 URL 认证、真实 Chrome 接管、登录态复用、权限页、正文读取策略或 handoff 问题，必须按“触发条件 -> 允许动作 -> 禁止动作 -> 收口证据”回写本 skill。
+- 定义: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时，默认优先触发 `authenticated-url-routing-rules`，并优先使用 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，复用登录态、扩展、权限和已打开标签页。依赖真实 Chrome profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用本地自动化或 Browser Use Cloud 绕过；明确为公开或 local 且不依赖用户 profile 的页面，才按统一矩阵选择 Chrome DevTools MCP、`browser-session-automation-rules` 或高级验证 Skill。只有云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码等 Cloud 专属需求，或用户明确点名 Browser Use Cloud 时，才转交 `browser-use-cloud-rules`。遇到登录页、权限页、验证码、人机验证或正文安全策略阻断时，不得用 Cloud、搜索结果、第三方转载或其它浏览器绕过权限。
 - 来源: 用户确认、`authenticated-url-routing-rules/SKILL.md`
 - 适用范围: URL 分析、在线文档读取、浏览器权限页面、企业系统资料访问
-- 更新时间: 2026-07-02
+- 更新时间: 2026-07-26
+- 状态: 启用
+
+### Browser Use Cloud 收费与安全路由
+- 别名: browser-use-cloud-rules, BROWSER_USE_API_KEY, Cloud 浏览器
+- 类型: 浏览器路由规则
+- 定义: Browser Use Cloud 只用于云端自主长链、托管并发、地域出口、托管代理、隐身或服务商提供且站点允许的合规验证码处理，不接本地开源 Browser Use，也不替换 Chrome Plugin、应用内 Browser、Chrome DevTools MCP 或本地 agent-browser。每次 `run_session`、`send_task` 前都只从本机 `BROWSER_USE_API_KEY` 检查凭据存在性，查询 Billing，验证当前动作的可写 `inputSchema.properties.maxCostUsd`，展示任务、profile、代理、地域、录制、`keep_alive=false`、余额和费用上限，并取得当次明确确认；免费层也不能跳过。无硬费用上限默认停止。完成、失败或取消后读取 session，活跃时固定 `stop_session(strategy="session")`，只有最终 `status="stopped"` 且 `totalCostUsd` 为非负有限值才算收口。
+- 来源: `browser-use-cloud-rules/SKILL.md`、`mcp-installation-rules/references/tool-priority.md`、`doc/7-验收/2026-07-26_063000_REQ-BU-20260726-001_验收标准.md`
+- 适用范围: Browser Use Cloud 路由、收费动作、密钥提醒、session 生命周期
+- 更新时间: 2026-07-26
+- 状态: 启用
+
+### 结果与结论适中详细度契约
+- 别名: reasoning-summary-structure-rules, 结果区 3–5 句, 适中详细结论
+- 类型: 最终总结输出规则
+- 定义: `reasoning-summary-structure-rules` 的结果区默认用 3 个简短句子依次回答本次解决的问题、采用的方法以及结果/验证状态；复杂、受限或存在关键边界时，只有在事实需要时扩展到第 4–5 句说明范围边界、残留卡点或验证限制。不得用“已完成”等空泛状态词替代核心信息，也不得复制命令、完整测试清单、逐文件改动或执行流水账；该契约不改变既有总结章节顺序、图形化条件、`WAITING_DECISION` 阻断和任务阻断收口 Owner。
+- 来源: `reasoning-summary-structure-rules/SKILL.md`、`reasoning-summary-structure-rules/references/conditional-sections-rules.md`、`reasoning-summary-structure-rules/references/output-examples.md`、`doc/7-验收/2026-07-26_162000_REQ-SUMMARY-DETAIL-001_最终验收.md`
+- 适用范围: 最终回复、审查/验收收口、复杂度与边界驱动的结果区详细度
+- 更新时间: 2026-07-26
 - 状态: 启用
 
 ## 术语表
@@ -561,6 +591,8 @@
 - 2026-07-03：补充会话自动重命名平台能力矩阵，明确 Codex 优先用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过，`CLAUDE.md` 不等同于 Desktop 已具备自动改名能力。
 - 2026-07-02：新增 URL 认证浏览器默认路由，明确用户提供 URL 时默认优先通过 Chrome Plugin 复用用户真实 Chrome 登录态，避免隔离浏览器或 `web` 丢失权限；补充 Chrome 安全策略拒绝正文读取时只报告阻断事实并 handoff，不做绕过；执行中已确认解决的问题必须继续回灌到 skill。
 - 2026-07-12：收敛浏览器工具路由：用户真实 Chrome profile 只由 Chrome Plugin 接管；公开或 local 页面按 Chrome DevTools MCP 与 `agent-browser` 能力路由；`agent-browser` 保留为隔离 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎等条件能力，不再作为前后端联调默认强制工具。
+- 2026-07-26：新增 Browser Use Cloud 条件路由，只接云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码专属场景；逐次收费动作执行 key、Billing、硬费用上限和人工确认，结束后销毁遗留 session 并回读实际费用，免费层也不例外。
+- 2026-07-26：完成 `REQ-SUMMARY-DETAIL-001` 结果与结论详细度切片；简单任务结果区固定 3 句，复杂、受限或有关键边界时按事实扩展至 4–5 句，始终覆盖问题、方法和结果/验证状态，禁止空泛状态词和流水账；专项回归 9/9、Skill 校验、工程文档 strict、审查与最终验收通过，未执行 Git 历史写入。
 - 2026-07-02：补充项目内文件引用路径规则，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用都用 `\\wsl.localhost\...`，`/home/...` 仅保留给 WSL 命令与日志上下文。
 - 2026-07-02：更新上线接口测试门禁规则，新增项目基线资产库、参数依赖解析、可复用参数生命周期、失效持续更新和通用脚本复用优先口径。
 - 2026-07-02：新增 Swag OpenAPI 全量维护规则，明确 `swag/` 为唯一正式输出目录，单接口完整 YAML、总 YAML 与 `.swag-manifest.yaml` 持续维护。
@@ -728,14 +760,47 @@ entities:
       - authenticated-url-routing-rules
       - 已登录 Chrome 路由
       - URL 默认 Chrome Plugin
-    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；依赖真实 profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，明确为公开或 local 且不依赖用户 profile 的页面才按统一路由选择 Chrome DevTools MCP 或 `browser-session-automation-rules`。"
+    definition: "当用户提供 URL、网页地址或在线文档链接并要求读取、分析、截图或排查页面时，默认优先命中 `authenticated-url-routing-rules`，并优先通过 `chrome:control-chrome` 复用用户已登录的真实 Chrome profile；依赖真实 profile 的页面在 Chrome Plugin 不可用时停在连接/授权阻断，不得用本地自动化或 Browser Use Cloud 绕过；只有 Cloud 专属需求或用户明确点名时才转交 `browser-use-cloud-rules`。"
     scope: "URL 分析、在线文档读取、浏览器权限页面"
     status: "active"
     evidence_ids:
       - evidence.skill.authenticated-url-routing
     context_ids:
       - context.url-analysis
-    updated_at: 2026-07-03
+    updated_at: 2026-07-26
+  - entity_id: rule.browser-use-cloud-safety
+    name: "Browser Use Cloud 收费与安全路由"
+    type: "浏览器路由规则"
+    aliases:
+      - browser-use-cloud-rules
+      - BROWSER_USE_API_KEY
+      - Cloud 浏览器
+    definition: "Browser Use Cloud 只用于 Cloud 专属能力，不接本地 Browser Use，也不替换现有浏览器路由。每次 run_session/send_task 前检查本机 key、Billing、当前动作可写 maxCostUsd 并取得当次确认；免费层也确认，无硬上限默认停止。任务结束后用 strategy=session 停止遗留 session，只有 stopped 且实际总费用合法才收口。"
+    scope: "Browser Use Cloud 路由、收费动作、密钥提醒、session 生命周期"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.browser-use-cloud
+      - evidence.accept.browser-use-cloud-20260726
+    context_ids:
+      - context.url-analysis
+    updated_at: 2026-07-26
+  - entity_id: rule.reasoning-summary-detail
+    name: "结果与结论适中详细度契约"
+    type: "最终总结输出规则"
+    aliases:
+      - reasoning-summary-structure-rules
+      - 结果区 3–5 句
+      - 适中详细结论
+    definition: "最终结果区默认使用 3 个简短句子回答解决的问题、采用的方法和结果/验证状态；复杂、受限或存在关键边界时按事实扩展到第 4–5 句，仅补充必要范围边界、残留卡点或验证限制。禁止用空泛状态词替代核心信息，也禁止复制命令、完整测试清单、逐文件改动或执行流水账；不改变既有总结顺序、图形化条件、WAITING_DECISION 阻断或任务阻断收口 Owner。"
+    scope: "最终回复、审查验收收口、结果区详细度和结论可复核性"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.reasoning-summary-detail
+      - evidence.test.reasoning-summary-detail
+      - evidence.accept.reasoning-summary-detail-20260726
+    context_ids:
+      - context.final-summary
+    updated_at: 2026-07-26
   - entity_id: rule.windows-powershell-environment
     name: "Windows PowerShell 环境准备与工具边界"
     type: "环境规则"
@@ -1083,18 +1148,42 @@ entities:
       - 悬浮任务列表恢复
       - task-plan-rehydration-rules
       - PROJECT_CURRENT 任务投影
-      - 简单任务十分钟升级
+      - 缺失投影十分钟异常修复
       - ensure-timeout
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；常规恢复与 Goal 生命周期按会话先持久化再刷新 UI。简单任务可暂不创建悬浮窗，但从首次真实执行开始，扣除 Plan Mode、等待用户、blocked 和 manual_handoff 后的主动执行时间严格大于 600 秒时必须在可执行检查点按 exact 优先、固定三步 fallback 的顺序升级；计时不持久化，也不承诺后台唤醒。"
-    scope: "Codex Desktop 默认执行回合、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和无活动悬浮窗任务的十分钟升级"
+      - ensure-start
+      - UI_SYNC_BLOCKED
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan，失败进入 UI_SYNC_BLOCKED 并禁止继续领域写入。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退，冲突或缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门；计时不持久化，也不承诺后台唤醒。"
+    scope: "Codex Desktop 默认执行回合、首次任务可见性、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
     status: "active"
     evidence_ids:
       - evidence.skill.task-plan-rehydration
       - evidence.doc.task-plan-rehydration-requirement
       - evidence.doc.task-plan-timeout-cycle
+      - evidence.doc.task-plan-first-persist-cycle
     context_ids:
       - context.task-plan-rehydration
     updated_at: 2026-07-25
+  - entity_id: rule.plan-mode-decision-wait-loop
+    name: "Plan Mode 决策选择框永久等待"
+    type: "交互状态规则"
+    aliases:
+      - Plan Mode 永久等待
+      - 空答案循环重发
+      - WAITING_DECISION
+      - SUMMARY-GATE-PMW-001
+    definition: "Plan Mode 决策型 request_user_input 完全省略 autoResolutionMs；空答案、缺失答案、缺少预期问题 ID、null/空返回和宿主隐式超时均保持 WAITING_DECISION，并在旧调用返回后立即串行重发同一未决选择框。重发无次数或时间上限，部分答案只重发剩余问题且始终单活动框；未决期间禁止 commentary、limited_plan、pending_summary、proposed_plan、final、summary、final_answer、task_complete、result_and_conclusion、中文结果与结论、默认选择、Goal 和任务投影恢复。只有完整选择、明确代选、明确停止或明确不可恢复工具故障才离开等待。"
+    scope: "Plan Mode 决策提问、宿主空答案消费、部分答案保存、总结输出闸门和上下文恢复"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.implementation-planning-plan-wait
+      - evidence.skill.reasoning-summary-plan-wait
+      - evidence.test.plan-mode-wait-loop
+      - evidence.doc.bug-plan-wait
+      - evidence.doc.acceptance-plan-wait
+    context_ids:
+      - context.plan-mode-wait-loop
+      - context.implementation-flow
+    updated_at: 2026-07-26
 relations:
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
@@ -1156,6 +1245,16 @@ evidence:
     source: "authenticated-url-routing-rules/SKILL.md"
     path: "authenticated-url-routing-rules/SKILL.md"
     note: "URL 默认走真实 Chrome 登录态的技能定义来源"
+  - evidence_id: evidence.skill.browser-use-cloud
+    type: "skill"
+    source: "browser-use-cloud-rules/SKILL.md"
+    path: "browser-use-cloud-rules/SKILL.md"
+    note: "Browser Use Cloud 专属路由、费用预检和 session 收口来源"
+  - evidence_id: evidence.accept.browser-use-cloud-20260726
+    type: "acceptance"
+    source: "REQ-BU-20260726-001 最终验收"
+    path: "doc/7-验收/2026-07-26_063000_REQ-BU-20260726-001_最终验收.md"
+    note: "记录 Cloud 专属路由、逐次收费确认、本地回归和禁止真实收费测试的正式验收证据。"
   - evidence_id: evidence.skill.artifact-storage
     type: "skill"
     source: "artifact-storage-rules/SKILL.md"
@@ -1174,6 +1273,46 @@ evidence:
     source: "implementation-planning-rules/SKILL.md"
     path: "implementation-planning-rules/SKILL.md"
     note: "实施周期、最小任务清单和计划闸门来源"
+  - evidence_id: evidence.skill.implementation-planning-plan-wait
+    type: "skill"
+    source: "Plan Mode 永久等待规则改动"
+    path: "implementation-planning-rules/SKILL.md"
+    note: "RULE-PMW-001..004、空答案串行重发、部分答案保留、无上限和单活动选择框契约来源"
+  - evidence_id: evidence.skill.reasoning-summary-plan-wait
+    type: "skill"
+    source: "Plan Mode 总结消费方闸门改动"
+    path: "reasoning-summary-structure-rules/SKILL.md"
+    note: "SUMMARY-GATE-PMW-001 拒绝未决选择的总结、final_answer 和 task_complete 来源"
+  - evidence_id: evidence.skill.reasoning-summary-detail
+    type: "skill"
+    source: "结果与结论详细度规则改动"
+    path: "reasoning-summary-structure-rules/SKILL.md"
+    note: "结果区 3 句核心、复杂边界 4–5 句上限、问题方法结果/验证覆盖和流水账拒绝契约来源"
+  - evidence_id: evidence.test.reasoning-summary-detail
+    type: "test"
+    source: "结果与结论适中详细度专项回归"
+    path: "doc/5-tests/2026-07-26_153733/reasoning-summary-structure-rules/test_result_conclusion_detail.py"
+    note: "9 项本地正负样例验证句数、核心信息、复杂边界、重复流水账和 WAITING_DECISION 兼容"
+  - evidence_id: evidence.accept.reasoning-summary-detail-20260726
+    type: "acceptance"
+    source: "REQ-SUMMARY-DETAIL-001 最终验收"
+    path: "doc/7-验收/2026-07-26_162000_REQ-SUMMARY-DETAIL-001_最终验收.md"
+    note: "记录 3–5 句结果区契约、七项验收标准、9/9 回归、审查结论和真实模型/UI 非范围边界"
+  - evidence_id: evidence.test.plan-mode-wait-loop
+    type: "test"
+    source: "Plan Mode 永久等待专项行为回归"
+    path: "doc/5-tests/2026-07-26_040607/plan_mode_wait_loop/test_plan_mode_wait_loop.py"
+    note: "10 个本地标准库用例覆盖无超时字段、2/10/100 次空答案、部分答案、延迟选择、授权、停止、故障、历史负例和总结闸门"
+  - evidence_id: evidence.doc.bug-plan-wait
+    type: "bug"
+    source: "BUG-PLAN-WAIT-20260726-001"
+    path: "doc/4-bugs/2026-07-26_040639_PlanMode选择框永久等待/README.md"
+    note: "原会话空答案后输出总结的时间线、影响范围、状态契约和停止边界"
+  - evidence_id: evidence.doc.acceptance-plan-wait
+    type: "acceptance"
+    source: "BUG-PLAN-WAIT-20260726-001 验收标准"
+    path: "doc/7-验收/2026-07-26_040639_BUG-PLAN-WAIT-20260726-001_验收标准.md"
+    note: "AC-PMW-001..007、真实 Desktop 两个以上空答案周期和 LIMITED 口径来源"
   - evidence_id: evidence.skill.autonomous-execution
     type: "skill"
     source: "autonomous-execution-rules/SKILL.md"
@@ -1332,6 +1471,11 @@ evidence:
     source: "Codex Desktop 任务悬浮窗十分钟超时升级实施周期"
     path: "doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md"
     note: "冻结严格大于 600 秒、四类暂停、exact/fallback、无后台唤醒和 57 项回归证据。"
+  - evidence_id: evidence.doc.task-plan-first-persist-cycle
+    type: "doc"
+    source: "Codex Desktop 任务悬浮窗首次持久化与立即刷新实施周期"
+    path: "doc/3-实施/2026-07-26_150000_BUG-RTP-20260726-001_首次持久化与立即刷新_实施周期07.md"
+    note: "冻结 confirmed 后首次持久化、下一动作 update_plan、会话解析、UI_SYNC_BLOCKED 和十分钟异常修复边界。"
 contexts:
   - context_id: context.task-blocker-closure
     type: "task-scope"
@@ -1384,7 +1528,15 @@ contexts:
   - context_id: context.task-plan-rehydration
     type: "task-scope"
     name: "任务悬浮窗断点恢复"
-    note: "适用于任务投影持久化、Desktop 重开后的首次继续回合、上下文恢复、进行中步骤核验和简单任务十分钟升级"
+    note: "适用于 confirmed 后首次任务投影持久化、立即刷新悬浮列表、Desktop 重开后的首次继续回合、上下文恢复、进行中步骤核验和缺失投影十分钟异常修复"
+  - context_id: context.plan-mode-wait-loop
+    type: "task-scope"
+    name: "Plan Mode 决策永久等待"
+    note: "适用于决策选择框空答案串行重发、部分答案合并、单活动框、无限等待和未决总结闸门"
+  - context_id: context.final-summary
+    type: "task-scope"
+    name: "最终总结结果区"
+    note: "适用于结果区问题、方法、结果/验证状态的 3 句核心契约，以及复杂、受限或有关键边界时的 4–5 句受控扩展"
 lifecycle:
   active:
     - "rule.swag-upstream-openapi"
@@ -1405,6 +1557,8 @@ lifecycle:
     - "rule.git-commit-domain-split"
     - "rule.git-commit-review-acceptance-evidence"
     - "rule.task-plan-rehydration"
+    - "rule.plan-mode-decision-wait-loop"
+    - "rule.reasoning-summary-detail"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -1422,8 +1576,32 @@ retrieval_hints:
       - "rule.task-plan-rehydration"
     简单任务十分钟升级:
       - "rule.task-plan-rehydration"
+    首次持久化立即刷新:
+      - "rule.task-plan-rehydration"
+    ensure-start:
+      - "rule.task-plan-rehydration"
+    UI_SYNC_BLOCKED:
+      - "rule.task-plan-rehydration"
     ensure-timeout:
       - "rule.task-plan-rehydration"
+    Plan Mode 永久等待:
+      - "rule.plan-mode-decision-wait-loop"
+    空答案循环重发:
+      - "rule.plan-mode-decision-wait-loop"
+    WAITING_DECISION:
+      - "rule.plan-mode-decision-wait-loop"
+    SUMMARY-GATE-PMW-001:
+      - "rule.plan-mode-decision-wait-loop"
+    结果与结论详细度:
+      - "rule.reasoning-summary-detail"
+    结果区 3–5 句:
+      - "rule.reasoning-summary-detail"
+    适中详细结论:
+      - "rule.reasoning-summary-detail"
+    简单任务 3 句:
+      - "rule.reasoning-summary-detail"
+    复杂任务 4–5 句:
+      - "rule.reasoning-summary-detail"
     Skill 体积预算:
       - "fact.skill-size-baseline-20260717"
     84 个正式 skill:
@@ -1563,6 +1741,12 @@ retrieval_hints:
       - "rule.imagegen-error-case-evolution"
     URL 分析:
       - "rule.authenticated-url-routing"
+    最终总结:
+      - "rule.reasoning-summary-detail"
+    结果区详细度:
+      - "rule.reasoning-summary-detail"
+    结论可复核性:
+      - "rule.reasoning-summary-detail"
     文档目录命名:
       - "term.doc-top-level-mixed-naming"
     目录迁移与收口:
@@ -1658,6 +1842,28 @@ retrieval_hints:
     implementation-planning-rules/SKILL.md:
       - "rule.implementation-cycle-minimum-task"
       - "rule.implementation-sequence-master-plan"
+      - "rule.plan-mode-decision-wait-loop"
+    implementation-planning-rules/references/plan-question-coverage.md:
+      - "rule.plan-mode-decision-wait-loop"
+    implementation-planning-rules/references/plan-output-gate.md:
+      - "rule.plan-mode-decision-wait-loop"
+    reasoning-summary-structure-rules/SKILL.md:
+      - "rule.plan-mode-decision-wait-loop"
+      - "rule.reasoning-summary-detail"
+    reasoning-summary-structure-rules/references/conditional-sections-rules.md:
+      - "rule.reasoning-summary-detail"
+    reasoning-summary-structure-rules/references/output-examples.md:
+      - "rule.reasoning-summary-detail"
+    doc/5-tests/2026-07-26_153733/reasoning-summary-structure-rules/test_result_conclusion_detail.py:
+      - "rule.reasoning-summary-detail"
+    doc/7-验收/2026-07-26_162000_REQ-SUMMARY-DETAIL-001_最终验收.md:
+      - "rule.reasoning-summary-detail"
+    doc/4-bugs/2026-07-26_040639_PlanMode选择框永久等待/README.md:
+      - "rule.plan-mode-decision-wait-loop"
+    doc/7-验收/2026-07-26_040639_BUG-PLAN-WAIT-20260726-001_验收标准.md:
+      - "rule.plan-mode-decision-wait-loop"
+    doc/5-tests/2026-07-26_040607/plan_mode_wait_loop/test_plan_mode_wait_loop.py:
+      - "rule.plan-mode-decision-wait-loop"
     autonomous-execution-rules/SKILL.md:
       - "rule.implementation-cycle-minimum-task"
     final-acceptance-rules/SKILL.md:
