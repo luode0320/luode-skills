@@ -12,7 +12,14 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 
 - 若当前上下文处于 `Plan Mode`，本 skill 负责接住第一层计划路由，不允许把问题直接绕过去交给需求、Bug、测试或交付域；若当前问题仍存在需求前置缺口，应把它们显式 handoff 给相邻计划前置 skill，而不是直接跳到实施步骤。
 - 若当前上下文处于 `Plan Mode`，必须按 `references/plan-question-coverage.md` 逐维度识别实现层不确定决策点并向用户弹窗多选；用户未选择即为“未决(待用户选择)”，禁止采纳推荐项或默认推进，覆盖不足或存在未决决策点时正式计划不放行。
+- `implementation-planning-rules` 是 Plan Mode 的唯一计划 Owner：正式、受限和阻断计划均由本 Skill 负责，`reasoning-summary-structure-rules` 在 Plan Mode 下必须判定为 `NOT_APPLICABLE`，不得参与命中列表、模板读取或最终渲染。
+- `RULE-PMW-001`：Plan Mode 决策提问进入 `WAITING_DECISION` 后，`request_user_input` 调用必须完全省略 `autoResolutionMs` 字段；该状态没有次数或时间上限，宿主返回空结果不构成取消、授权或完成。
+- `RULE-PMW-001` 的上限约束：重发次数没有上限，等待时长没有上限，不得以宿主空答案次数达到某个阈值为由结束任务。
+- `RULE-PMW-002`：`request_user_input` 返回 `answers:{}`、缺少答案、缺少预期问题 ID 或宿主隐式超时时，空答案后的下一动作只能是重新调用同一选择框（立即重新调用同一未决选择框）；重发保持原问题 ID、选项、推荐标记和冻结文案。部分答案必须保存并仅重发剩余问题，且旧调用返回后才创建下一次调用，始终只保留一个活动选择框。
+- `RULE-PMW-003`：永久等待/重发循环期间禁止任何冻结集合内的可见输出（`commentary`、`limited_plan`、`pending_summary`、`proposed_plan`、`final`、`summary`、`final_answer`、`task_complete`、`result_and_conclusion`），也不得自动采用推荐项、创建 Goal、恢复任务投影或触发自动升级；上下文压缩时必须保留 `WAITING_DECISION`、未决问题 ID、选项和已选答案。
+- `RULE-PMW-004`：只有用户完成全部选择、明确授权“你来定/按推荐”、明确要求停止，或工具明确不可恢复且无法再次调用时，才允许离开等待状态；工具故障仍须保持决策未决并报告宿主阻断，不得输出方案总结。
 - 若当前上下文处于 `Plan Mode`，且运行环境要求最终计划放进 `<proposed_plan>` 或其他专用计划包裹中，包裹层不改变本 skill 的正文格式要求；外层是渲染协议，内层仍必须按本 skill 模板组织。
+- Plan Mode 无未决决策时，唯一合法用户可见计划出口是一对完整的 `<proposed_plan>` 与 `</proposed_plan>` 标签；不得由总结 Skill 生成 `final_answer`、`# 📋 本轮总结` 或其它总结容器。
 - 把已经确认的来源对象（需求或 Bug）或当前优先子项，转成编码前可执行的实施规划。
 - 当新项目启动或项目初期同时存在多份需求、验收标准、实施总览或实施周期时，先建立“需求与实施计划全量顺序实施方案”，统一排列需求 -> 验收标准 -> 实施总览 -> 实施周期 -> 周期内最小任务的全量执行顺序。
 - “需求与实施计划全量顺序实施方案”是跨需求 / 跨来源对象的总调度表；它不替代单个来源对象的实施总览、实施周期和最小任务文档，只负责把这些文档串成一个可执行的项目级顺序。

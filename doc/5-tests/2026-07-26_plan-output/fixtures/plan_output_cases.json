@@ -1,0 +1,65 @@
+{
+  "plan_ready": {
+    "mode": "plan",
+    "status": "ready",
+    "visible_messages": [
+      "<proposed_plan>\n当前计划最终方案简要说明\nAgent 对当前问题的理解\n本轮范围\n非范围\n当前优先闭环\n关键假设 / 待确认点\n实施周期总览\n阶段计划\n最小任务清单\n真实测试安排\n任务完成、停止与最大推进边界\n</proposed_plan>"
+    ],
+    "required_plan_sections": [
+      "当前计划最终方案简要说明",
+      "Agent 对当前问题的理解",
+      "本轮范围",
+      "非范围",
+      "当前优先闭环",
+      "关键假设 / 待确认点",
+      "实施周期总览",
+      "阶段计划",
+      "最小任务清单",
+      "真实测试安排",
+      "任务完成、停止与最大推进边界"
+    ],
+    "hit_skills": [
+      "skill-hit-check-rules",
+      "implementation-planning-rules"
+    ]
+  },
+  "plan_waiting": {
+    "mode": "plan",
+    "status": "WAITING_DECISION",
+    "visible_messages": [],
+    "tool_calls": [
+      "request_user_input"
+    ],
+    "forbidden_tokens": [
+      "commentary",
+      "proposed_plan",
+      "final",
+      "final_answer",
+      "summary",
+      "task_complete",
+      "result_and_conclusion",
+      "结果与结论",
+      "# 📋 本轮总结"
+    ]
+  },
+  "plan_compacted": {
+    "mode": "plan",
+    "status": "context_compacted",
+    "visible_messages": [],
+    "recovery_owner": "implementation-planning-rules",
+    "forbidden_tokens": [
+      "final_answer",
+      "# 📋 本轮总结"
+    ]
+  },
+  "default_summary": {
+    "mode": "default",
+    "status": "ready",
+    "visible_messages": [
+      "---\n# 📋 本轮总结\n---"
+    ],
+    "hit_skills": [
+      "reasoning-summary-structure-rules"
+    ]
+  }
+}
