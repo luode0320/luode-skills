@@ -1,6 +1,6 @@
 ---
 name: skill-hit-check-rules
-description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`。
+description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮把 `reasoning-summary-structure-rules` 预声明为收口 Owner；同时执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `总结闸门`（登记 `reasoning-summary-structure-rules` 是否已声明为收口 Owner）。
 ---
 
 # Skill 命中检查规则（最小闭环版）
@@ -13,10 +13,12 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
   - `命中技能:<skill1,skill2,...>`
   - 仓库任务追加 `Obsidian:<检索/沉淀/不适用/阻断>`
   - 命中 `parallel-task-dispatch-rules` 时追加 `并行技能:<skill.../无>`
+  - 非 Plan Mode 的仓库实质任务追加 `总结闸门:<收口Owner已声明 reasoning-summary-structure-rules / 不适用(Plan Mode)>`
 - 固定字段的 Markdown 形态以 `references/output-format.md` 为准；缺少必填字段即阻断领域执行。
 - 全程中文自检（硬闸，不可跳过）：本轮全程，含**每一次**工具前导语 / 中间叙述发送前，先自检草稿是否为简体中文；发现成段非中文（英文 / 日文等）自然语言必须改回简体中文再发送，代码符号、命令、路径、原始字段名、报错原文等技术片段除外。思考 / 推理通道同口径尽力而为。最终总结阶段的中文自检以 `reasoning-summary-structure-rules` 为准，本条负责过程叙述的全程覆盖，二者互补不重复。
 - 默认执行模式取得 `confirmed` 后，必须先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作只能是立即调用 `update_plan`，不得插入其它领域动作。
-- 当前处于 Plan Mode 时，命中列表不得包含 `reasoning-summary-structure-rules`；该 Skill 明确判定 `NOT_APPLICABLE`，计划出口只交给 `implementation-planning-rules`。
+- 非 Plan Mode 的仓库实质任务轮，首条命中列表必须把 `reasoning-summary-structure-rules` 预声明为收口 Owner 并置 `总结闸门:收口Owner已声明 reasoning-summary-structure-rules`；收尾必须按该 Skill 的固定总结结构输出，不得只在回合末端凭自觉临时补触发。
+- 当前处于 Plan Mode 时，命中列表不得包含 `reasoning-summary-structure-rules`，`总结闸门` 置 `不适用(Plan Mode)`；该 Skill 明确判定 `NOT_APPLICABLE`，计划出口只交给 `implementation-planning-rules`。
 - `update_plan` 成功后才放行领域动作；失败或不可用时进入 `UI_SYNC_BLOCKED`，保留当前 session projection 并禁止继续领域写入，下一检查点优先重试同步。`Plan Mode` 不持久化活动 projection，也不调用 `update_plan`；`inactive` projection 不创建悬浮任务列表，禁止跨 session 读取、刷新或覆盖。
 - 十分钟只作缺失 projection 的异常修复闸门：任务已真实执行但当前 session 没有活动 projection 时，才先执行只读 `probe-timeout`，随后补建并同步；不作为正常任务首次显示悬浮窗的入口。
 
@@ -28,7 +30,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 ## -1. 触发确认（强制）
 
 - 每轮都命中本 skill；自动触发不依赖用户点名，也不因任务简单而跳过。
-- 仓库任务联动 `parallel-task-dispatch-rules` 并执行 Obsidian 选择性判断。
+- 仓库任务联动 `parallel-task-dispatch-rules` 并执行 Obsidian 选择性判断；非 Plan Mode 的实质任务轮同时默认联动 `reasoning-summary-structure-rules` 作为收口 Owner。
 - 当前轮存在 Git 意图时联动 `git-collaboration-rules`；只识别当前轮，不继承历史授权。
 - 修改 Skill 资产时联动 `skill-execution-compliance-gate-rules`，并按职责边界追加 `skill-evolution-rules`、`skill-audit-rules`。
 - 联动条件、用户习惯、负向边界和漏触发防护统一见 `references/hit-checklist.md`；本入口不复制各 Owner 的执行细则。

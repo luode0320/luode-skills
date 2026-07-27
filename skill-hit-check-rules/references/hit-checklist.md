@@ -37,7 +37,7 @@
 
 ## 代码改动收口场景补充
 
-- 本轮发生代码新增或修改并准备收口时，检查 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`implementation-review-rules`、`code-change-finalization-gate-rules`。
+- 本轮发生代码新增或修改并准备收口时，检查 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`implementation-review-rules`、`code-change-finalization-gate-rules`，并按 `reasoning-summary-structure-rules` 输出最终总结（Plan Mode 除外）。
 - 具体注释字段、审查步骤、测试证据和 PASS / FAIL 由各 Owner 定义；缺少任一必需 Owner 时先补执行再收口。
 
 ## 代码改动中段场景补充
@@ -50,6 +50,7 @@
 - 以触发条件为准，不以“任务简单”“已经知道怎么做”或“用户没点名”为由跳过。
 - 可以多 Skill 同时命中；`skill-hit-check-rules` 是总控入口，不算业务 Owner。
 - 仓库任务默认联动 `parallel-task-dispatch-rules`，由其统一判断串行、条件并行、真实启动、回收和回退；用户禁止或环境不支持时必须真实回退，不能伪报并行。
+- 非 Plan Mode 的仓库实质任务默认预声明 `reasoning-summary-structure-rules` 为收口 Owner，并在首条 `总结闸门` 字段登记；收尾按其固定总结结构输出。Plan Mode 下该 Owner 判定 `NOT_APPLICABLE`、不得命中，`总结闸门` 置 `不适用(Plan Mode)`。
 - 仓库任务执行 Obsidian 选择性判断：依赖历史知识或用户长期偏好时为 `检索`，形成可复用知识时为 `沉淀`，无价值时为 `不适用`，CLI 或 vault 不可用且影响动作时为 `阻断`。仅 `检索` 或 `沉淀` 联动 `obsidian-knowledge-flow`。
 - Skill 资产新增或修改时联动 `skill-execution-compliance-gate-rules`；description 或触发条件变化追加 `skill-evolution-rules`；多 Skill、职责边界或收口风险追加 `skill-audit-rules`。
 - 非预期执行失败联动 `execution-failure-learning-rules`；预期负向测试、用户取消、权限阻断和业务 Bug 分别交给其专属 Owner。
@@ -77,4 +78,5 @@
 - 不确定时可标记候选命中并继续核验，不得跳过命中检查。
 - 不得把“只命中名称”当作已执行；必须完成 Owner Skill 的必要动作。
 - 不得在代码已改动后直到最终回复才首次补声明注释或收口 Skill。
+- 不得整轮实质任务到最终回复才首次意识到应命中 `reasoning-summary-structure-rules`；非 Plan Mode 时首条命中检查即须把它预声明为收口 Owner 并登记 `总结闸门`。
 - 不得遗漏用户明确的停止、安全、授权、清理、回滚和输出协议。
