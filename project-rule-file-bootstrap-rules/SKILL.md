@@ -1,6 +1,6 @@
 ---
 name: project-rule-file-bootstrap-rules
-description: 新会话第一轮默认自动触发，不依赖用户点名；当 Codex 的 `AGENTS.md`、Claude Code 的 `CLAUDE.md`、`.gitattributes`、`.editorconfig`，或项目记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`，`PROJECT_STYLE.md` 按需）任一缺失、结构不完整、需要新会话交接或长期记忆首次初始化时也自动触发；同时兼容“创建、补齐或更新 AGENTS.md / CLAUDE.md”“补充仓库级规则”“根据 skill 更新项目 md”“初始化项目四件套”“补齐 PROJECT_CURRENT / MEMORY / HISTORY”等显式请求。作为项目自举唯一 owner，统一提供 `rule-bootstrap` 与 `memory-bootstrap` 两个条件路由：前者幂等创建或同步规则文件、`.gitattributes`、`.editorconfig` 及受管章节并保护非受管内容，后者维护 `PROJECT_CURRENT.md` 的 UTF-8 与 51,200 字节闸门、`PROJECT_MEMORY.md` 的人类区和机器索引区、`PROJECT_HISTORY.md` 的只追加骨架；不替代 `project-memory-rules` 的事实抽取或 `project-style-rules` 的风格维护。两个路由只使用 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`，不得复制第二份实现；CodeGraph 自动准备语义与触发时机保持不变。
+description: 新会话第一轮默认自动触发，不依赖用户点名；当 Codex 的 `AGENTS.md`、Claude Code 的 `CLAUDE.md`、`.gitattributes`、`.editorconfig`，或项目记忆四件套（`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`，`PROJECT_STYLE.md` 按需）任一缺失、结构不完整、需要新会话交接或长期记忆首次初始化时也自动触发；同时兼容“创建、补齐或更新 AGENTS.md / CLAUDE.md”“补充仓库级规则”“根据 skill 更新项目 md”“更新项目规则md”“更新规则md”“更新md”“初始化项目四件套”“补齐 PROJECT_CURRENT / MEMORY / HISTORY”等显式请求。作为项目自举唯一 owner，统一提供 `rule-bootstrap` 与 `memory-bootstrap` 两个条件路由：前者幂等创建或同步规则文件、`.gitattributes`、`.editorconfig` 及受管章节并保护非受管内容，后者维护 `PROJECT_CURRENT.md` 的 UTF-8 与 51,200 字节闸门、`PROJECT_MEMORY.md` 的人类区和机器索引区、`PROJECT_HISTORY.md` 的只追加骨架；不替代 `project-memory-rules` 的事实抽取或 `project-style-rules` 的风格维护。两个路由只使用 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`，不得复制第二份实现；CodeGraph 自动准备语义与触发时机保持不变。
 ---
 
 # 项目规则与记忆自举 Skill
@@ -37,7 +37,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 路由规则：
 
 1. 新会话第一轮默认同时检查两个路由，不依赖用户主动通知。
-2. 用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md”等聚合表达时，同时验收两个路由，不得只完成其中一组文件就收口。
+2. 用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 更新项目规则md / 更新规则md / 更新md”等聚合表达时，同时验收两个路由，不得只完成其中一组文件就收口。
 3. 两个路由共享一次脚本执行；路由只决定触发原因、核对重点和逐文件结果，不产生第二套实现。
 4. 任一路由未完成前，阻断项目分析、架构梳理、需求、Bug、编码、测试与交付主任务。
 5. 若当前处于 `Plan Mode`，首轮自举期间仍须把 `implementation-planning-rules` 默认外壳路由同步进规则文件。
