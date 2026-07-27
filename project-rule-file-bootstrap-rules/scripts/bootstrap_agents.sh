@@ -239,6 +239,7 @@ BODY_SKILL_HIT=$(cat <<'EOF'
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
+- 非 Plan Mode 的仓库实质任务，首条中间进度还必须输出 `闸门预告`：按 `skill-hit-check-rules` 的延迟触发 gate 注册表登记本轮将适用的收口 / 中段 / 测试前 / 失败时等延迟 gate（含 `reasoning-summary-structure-rules`），无适用项写 `无`，Plan Mode 置 `不适用(Plan Mode)`；收口时逐项复核 `闸门预告` 的声明与执行是否一致，不得只在回合末端凭自觉临时补触发延迟 gate。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。
 - 进入分析、侦察、需求、Bug、审查、测试、文档或编码等实质执行前，主 agent 必须自主判断是否存在可由 subagent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界；不得只依赖固定 skill 映射表。
 - 是否值得启动 subagent，必须同时评估上下文重复读取成本与启动成本；若子任务为了完成目标需要重复读取主 agent 已掌握的大段共享上下文、重复扫描同一批核心文件，或主 agent 一次聚焦读取即可在短链路内完成，则判定为必须串行 / 本地优先，不得为了形式上的并行强行启动。

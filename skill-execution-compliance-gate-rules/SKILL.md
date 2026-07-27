@@ -29,7 +29,7 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 ## 进入后先做什么
 
 1. 列出本轮实际命中的 skill，不臆造未命中项。
-2. 读取 `references/applicability-and-gap-check.md`，只核验当前阶段可执行规则。
+2. 读取 `references/applicability-and-gap-check.md`，只核验当前阶段可执行规则；并读取 `../skill-hit-check-rules/references/deferred-gate-registry.md`，核对本轮首条 `闸门预告` 登记的延迟 gate 声明与执行是否一致。
 3. 分类计划内必需缺口、真实阻断候选和不适用项；`limited/not_applicable` 不得升级为阻断。
 4. 出现非预期执行失败时，核验 `execution-failure-learning-rules` 的分类、恢复、同输入复验和状态处理证据。
 5. 核验本轮工具调用的 Skill 执行证据，以及 goal/plan/task 等显式状态的真实收口动作。
@@ -38,7 +38,7 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 ## 默认执行流程
 
 1. 收集本轮编辑、命令、测试、日志、产物和运行时状态证据。
-2. 逐 Skill 核对当前阶段规则，记录执行状态和证据定位。
+2. 逐 Skill 核对当前阶段规则，记录执行状态和证据定位；对照延迟触发 gate 注册表与本轮 `闸门预告`，凡登记过或注册表判定当前阶段必需的延迟 gate 未执行即计入缺口。
 3. 对非预期执行失败核验失败学习链；对代码/测试改动只检查是否已交给 `code-change-finalization-gate-rules`，不重复执行专项闸门。
 4. 校验共享阻断事实的状态、阶段、依据、已尝试与停止条件、影响、恢复入口和去重关系。
 5. 形成唯一合规结论：PASS，或 FAIL + 缺失字段/未完成动作。

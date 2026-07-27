@@ -8,4 +8,4 @@
 
 `并行技能:<skill1,skill2,... / 无>`
 
-`总结闸门:<收口Owner已声明 reasoning-summary-structure-rules / 不适用(Plan Mode)>`
+`闸门预告:<checkpoint→gate;... / 无 / 不适用(Plan Mode)>`
