@@ -685,6 +685,15 @@
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
 - 更新时间：2026-07-29。
 
+## 非 Plan Mode 最小计划分级规则
+
+- 稳定决策：计划任何时候都需要，只是确认方式不同——Plan Mode 下先出计划、等用户明确确认后再执行；非 Plan Mode 下先出最小计划、默认直接执行，不必逐条等待确认。
+- 稳定决策：`implementation-planning-rules` 新增 `minimum-plan-grading` 条件路由，按改动量把非 Plan Mode 任务分三级：微小（预计 1 个文件、数行以内、无分支）沿用 Karpathy 硬闸门隐性收敛，不强制可见计划；中等（预计 2-5 个文件，或存在分支/方案选择、影响面不完全确定）编码前必须先输出一段对话内可见的最小计划（改动目标、方案、影响范围、验证方式），输出后默认直接执行；重量级（命中原有多文件/多模块/多接口触发条件，或 Plan Mode）沿用完整实施总览/实施周期/Plan Mode 流程。
+- 稳定决策：Bug 域的同等分级义务固定交给 `bug-fix-proposal-rules` 及其 `references/confirm-before-coding.md`，`minimum-plan-grading` 不重复接管，避免同一次修复被两套分级规则同时套用。
+- 稳定决策：中等分级的最小计划默认不必写入 `artifact-storage-rules` 的正式实施文档；若执行中发现改动量超出预期（触达文件明显超过 5 个或触及公共模块），必须停下重新评估分级并按需升级为重量级。
+- 来源：对话确认、`implementation-planning-rules/SKILL.md`、`implementation-planning-rules/references/minimum-plan-grading.md`、`bug-fix-proposal-rules/references/confirm-before-coding.md`。
+- 更新时间：2026-07-29。
+
 ## 机器索引区
 
 ```yaml
