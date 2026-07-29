@@ -35,6 +35,18 @@ class QueryRenderTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertEqual(path, json.loads(result.stdout)["entry"]["canonical_path"])
 
+    def test_ip_package_has_unique_path(self):
+        """确认 IP 技术工具包只由根 utils 返回唯一目录。
+
+        [参数] self 为 unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 00:00:00 新增 IP 地址工具包的唯一查询断言。
+        """
+        # 1. 查询 IP 工具包，避免请求地址处理被误归入业务层或源码根 util。
+        result = run("query", "--artifact", "utils", "--category", "ip")
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual("utils/ip", json.loads(result.stdout)["entry"]["canonical_path"])
+
     def test_source_util_language_has_unique_path(self):
         """确认 source-util 按语言返回唯一的源码根工具函数目录。
 
@@ -57,6 +69,37 @@ class QueryRenderTests(unittest.TestCase):
         # 2. 旧 artifact 不能作为兼容查询被悄悄接受。
         removed = run("query", "--artifact", "util", "--category", "discovery", "--technology", "polaris")
         self.assertEqual(2, removed.returncode)
+
+    def test_backend_governance_file_has_unique_path(self):
+        """确认后端根 AGENTS 文件可由 Catalog 唯一查询。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:00:00 新增根治理文件查询断言。
+        """
+        # 1. 通过 artifact 与 category 精确查询，避免文件位置回退到源码根或 doc。
+        result = run("query", "--artifact", "project-governance", "--category", "agents")
+        self.assertEqual(0, result.returncode, result.stderr)
+        entry = json.loads(result.stdout)["entry"]
+        self.assertEqual("AGENTS.md", entry["canonical_path"])
+        self.assertEqual("file", entry["node_kind"])
+
+    def test_claude_governance_file_has_unique_path_for_each_project_kind(self):
+        """确认三类项目的 Claude 规则文件都可由 Catalog 唯一查询。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:45:00 新增三类项目根 CLAUDE.md 查询断言。
+        """
+        # 1. 按项目类型查询 Claude 规则文件，确认不会回退为后端默认条目。
+        for project_kind in ("fullstack", "backend", "frontend"):
+            result = run(
+                "query", "--project-kind", project_kind, "--artifact", "project-governance", "--category", "claude",
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            entry = json.loads(result.stdout)["entry"]
+            self.assertEqual("CLAUDE.md", entry["canonical_path"])
+            self.assertEqual("AGENTS.md", entry["content_must_match"])
 
     def test_migration_operation_has_unique_path(self):
         """确认原有自动迁移查询没有被工具目录调整破坏。
@@ -87,12 +130,12 @@ class QueryRenderTests(unittest.TestCase):
 
         [参数] self 为 unittest 测试实例。
         [返回] 无。
-        最近修改时间: 2026-07-28 21:45:00 新增两个工具目录的渲染断言。
+        最近修改时间: 2026-07-29 23:45:00 增加双平台规则文件与根治理文件的渲染断言。
         """
         # 1. 渲染全部项目树，并核对关键节点和创建策略注释。
         result = run("render", "--all")
         self.assertEqual(0, result.returncode, result.stderr)
-        for value in ("<fullstack-workspace>/", "<backend-project>/", "<frontend-project>/", "utils/", "源码根 util", "polaris/", "nacos/", "security-headers/", "mocks/", "业务公开的 JSON 字符串通信函数", "[必需·提交]"):
+        for value in ("<fullstack-workspace>/", "<backend-project>/", "<frontend-project>/", "utils/", "ip/", "请求 IP 提取、标准化、公私网判断与地址归属查询工具", "源码根 util", "polaris/", "nacos/", "security-headers/", "mocks/", "业务公开的 JSON 字符串通信函数", "AGENTS.md", "CLAUDE.md", "正文与 AGENTS.md 一致", "PROJECT_CURRENT.md", "PROJECT_STYLE.md", "[必需·提交]"):
             self.assertIn(value, result.stdout)
 
 

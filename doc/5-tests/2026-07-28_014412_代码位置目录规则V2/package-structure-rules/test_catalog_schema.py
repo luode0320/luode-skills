@@ -37,6 +37,33 @@ class CatalogSchemaTests(unittest.TestCase):
         ):
             self.assertIn(field, self.catalog)
 
+    def test_project_governance_files_cover_all_project_kinds(self):
+        """确认三类项目根的治理文件有唯一位置、创建策略和正文 Owner。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:45:00 新增三类 CLAUDE 文件与正文一致性契约断言。
+        """
+        # 1. 每个根文件必须以 file 节点登记，避免被 init 当作目录创建。
+        entries = {entry["id"]: entry for entry in self.catalog["entries"]}
+        for project_kind in ("fullstack", "backend", "frontend"):
+            for category, entry_suffix, path, policy, owner in (
+                ("agents", "agents", "AGENTS.md", "required", "project-rule-file-bootstrap-rules"),
+                ("claude", "claude", "CLAUDE.md", "required", "project-rule-file-bootstrap-rules"),
+                ("current", "project-current", "PROJECT_CURRENT.md", "required", "project-memory-rules"),
+                ("memory", "project-memory", "PROJECT_MEMORY.md", "required", "project-memory-rules"),
+                ("history", "project-history", "PROJECT_HISTORY.md", "required", "project-memory-rules"),
+                ("style", "project-style", "PROJECT_STYLE.md", "conditional", "project-style-rules"),
+            ):
+                entry = entries[f"{project_kind}.root.{entry_suffix}"]
+                self.assertEqual(path, entry["canonical_path"])
+                self.assertEqual(policy, entry["creation_policy"])
+                self.assertEqual("file", entry["node_kind"])
+                self.assertEqual([".md"], entry["allowed_extensions"])
+                self.assertEqual(owner, entry["owner_skill"])
+                if category == "claude":
+                    self.assertEqual("AGENTS.md", entry["content_must_match"])
+
     def test_adoption_manifest_contract_is_declared_in_catalog_and_schema(self):
         """确认旧项目收敛清单的字段、路径和后端语言约束已经冻结。
 
@@ -78,6 +105,19 @@ class CatalogSchemaTests(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
         paths = {entry["canonical_path"] for entry in entries if entry["artifact_kind"] == "database_migration"}
         self.assertEqual(8, len(paths))
+
+    def test_ip_utils_entry_has_a_unique_catalog_path(self):
+        """确认 IP 技术工具包有且只有一个可查询的规范位置。
+
+        [参数] self 为 unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 00:00:00 新增 IP 工具包 Catalog 唯一性断言。
+        """
+        # 1. 以 artifact 与 category 精确筛选，避免 IP 能力出现并列工具目录。
+        entries = [entry for entry in self.catalog["entries"] if entry["artifact_kind"] == "utils" and entry.get("category") == "ip"]
+        self.assertEqual(1, len(entries))
+        self.assertEqual("backend.utils.ip", entries[0]["id"])
+        self.assertEqual("utils/ip", entries[0]["canonical_path"])
 
     def test_legacy_adoption_example_has_a_unique_catalog_entry(self):
         """确认收敛清单示例引用的数据库仓储目录可被唯一定位。

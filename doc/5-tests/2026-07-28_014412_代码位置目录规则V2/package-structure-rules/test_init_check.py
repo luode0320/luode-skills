@@ -1,6 +1,7 @@
 """CLI init 与只读 check 真实行为测试。"""
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -10,6 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 CLI = ROOT / "package-structure-rules" / "scripts" / "placement_catalog.py"
+BOOTSTRAP = ROOT / "project-rule-file-bootstrap-rules" / "scripts" / "bootstrap_agents.sh"
+GIT_BASH = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Git" / "bin" / "bash.exe"
 
 
 def run(*args):
@@ -22,13 +25,25 @@ def run(*args):
     return subprocess.run([sys.executable, str(CLI), *args], cwd=ROOT, text=True, encoding="utf-8", capture_output=True, check=False)
 
 
+def git_bash_path(path):
+    """将 Windows 绝对路径转换为 Git Bash 可识别的挂载路径。
+
+    [参数] path：待传给 Git Bash 的本地路径。
+    [返回] str：Git Bash 使用的盘符挂载绝对路径。
+    最近修改时间: 2026-07-29 23:59:00 补齐双平台 bootstrap 测试辅助函数的注释契约。
+    """
+    # 1. 先解析真实绝对路径，再转换盘符和分隔符以保持 Git Bash 调用一致。
+    resolved = path.resolve()
+    return f"/{resolved.drive[0].lower()}{resolved.as_posix()[2:]}"
+
+
 class InitCheckTests(unittest.TestCase):
     def test_init_creates_required_and_explicit_enabled_paths_only(self):
         """确认 init 只创建必需目录和显式启用的根 utils 工具包。
 
         [参数] self 为 unittest 测试实例。
         [返回] 无。
-        最近修改时间: 2026-07-28 21:45:00 更新服务发现启用 ID 与根目录断言。
+        最近修改时间: 2026-07-29 23:45:00 增加必需双平台规则文件的初始化断言。
         """
         # 1. 启用单个服务发现包，确认 init 不批量创建其他条件目录。
         with tempfile.TemporaryDirectory() as directory:
@@ -36,8 +51,91 @@ class InitCheckTests(unittest.TestCase):
             result = run("init", "--project-kind", "backend", "--root", str(root), "--enable", "backend.utils.discovery.polaris")
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertTrue((root / "config" / "yaml").is_dir())
+            for filename in ("AGENTS.md", "CLAUDE.md", "PROJECT_CURRENT.md", "PROJECT_MEMORY.md", "PROJECT_HISTORY.md"):
+                self.assertTrue((root / filename).is_file())
+            self.assertEqual((root / "AGENTS.md").read_bytes(), (root / "CLAUDE.md").read_bytes())
+            self.assertFalse((root / "PROJECT_STYLE.md").exists())
             self.assertTrue((root / "utils" / "discovery" / "polaris").is_dir())
             self.assertFalse((root / "utils" / "discovery" / "nacos").exists())
+
+    def test_init_creates_project_style_only_when_explicitly_enabled(self):
+        """确认条件 PROJECT_STYLE 文件不会随必需根文件被批量创建。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:00:00 新增条件根治理文件初始化断言。
+        """
+        # 1. 仅显式启用长期风格文件，确保 init 不把其他条件目录一并创建。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run("init", "--project-kind", "backend", "--root", str(root), "--enable", "backend.root.project-style")
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((root / "PROJECT_STYLE.md").is_file())
+            self.assertFalse((root / "utils").exists())
+
+    def test_init_creates_matched_rule_files_for_all_project_kinds(self):
+        """确认三类项目初始化都会创建同内容的双平台规则文件。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:45:00 新增 fullstack、backend、frontend 根文件初始化断言。
+        """
+        # 1. 对三种项目骨架逐一初始化，确认目录规则只创建位置且双文件字节相同。
+        for project_kind in ("fullstack", "backend", "frontend"):
+            with self.subTest(project_kind=project_kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                result = run("init", "--project-kind", project_kind, "--root", str(root))
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertTrue((root / "AGENTS.md").is_file())
+                self.assertTrue((root / "CLAUDE.md").is_file())
+                self.assertEqual((root / "AGENTS.md").read_bytes(), (root / "CLAUDE.md").read_bytes())
+
+    def test_bootstrap_both_uses_agents_as_claude_source(self):
+        """确认双平台自举始终以 AGENTS.md 覆盖同步 CLAUDE.md。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:55:00 新增双平台规则文件同步与幂等行为断言。
+        """
+        # 1. 构造两份不同的规则正文，验证显式 both 模式仅以 AGENTS.md 为唯一正文源。
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertTrue(GIT_BASH.is_file(), "缺少 Git for Windows Bash，无法验证 bootstrap 脚本")
+            root = Path(directory)
+            agents = root / "AGENTS.md"
+            claude = root / "CLAUDE.md"
+            agents.write_text("# Codex 规则\n", encoding="utf-8")
+            claude.write_text("# Claude 漂移规则\n", encoding="utf-8")
+            result = subprocess.run(
+                [str(GIT_BASH), git_bash_path(BOOTSTRAP), "--repo", git_bash_path(root), "--target", "both"],
+                cwd=ROOT, text=True, encoding="utf-8", capture_output=True, check=False,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(agents.read_bytes(), claude.read_bytes())
+
+            # 2. 重复执行不得重新制造正文差异或改变已同步的规则文件。
+            before = agents.read_bytes()
+            retry = subprocess.run(
+                [str(GIT_BASH), git_bash_path(BOOTSTRAP), "--repo", git_bash_path(root), "--target", "both"],
+                cwd=ROOT, text=True, encoding="utf-8", capture_output=True, check=False,
+            )
+            self.assertEqual(0, retry.returncode, retry.stderr)
+            self.assertEqual(before, agents.read_bytes())
+            self.assertEqual(agents.read_bytes(), claude.read_bytes())
+
+    def test_init_creates_explicit_ip_package_only(self):
+        """确认 init 只在显式启用时创建 IP 技术工具包。
+
+        [参数] self 为 unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 00:00:00 新增 IP 工具包初始化正反向断言。
+        """
+        # 1. 启用 IP 工具包，确认 init 不顺带创建其他条件工具目录。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run("init", "--project-kind", "backend", "--root", str(root), "--enable", "backend.utils.ip")
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((root / "utils" / "ip").is_dir())
+            self.assertFalse((root / "utils" / "time").exists())
 
     def test_strict_rejects_mixed_content_without_writing(self):
         """确认 strict 拒绝根 utils 文件、旧根 util 与源码根 util 子目录。
@@ -75,6 +173,30 @@ class InitCheckTests(unittest.TestCase):
             self.assertIn("自动迁移目录禁止 SQL 文件", errors)
             self.assertIn("独立 SQL 目录禁止生产源码", errors)
 
+    def test_strict_rejects_mismatched_rule_files_without_writing(self):
+        """确认 strict 只读拒绝同根双平台规则文件正文漂移。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 23:45:00 新增 AGENTS.md 与 CLAUDE.md 内容一致性断言。
+        """
+        # 1. 先构造不一致正文并比较检查前后哈希，确认 strict 不会自动覆盖用户规则。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "AGENTS.md").write_text("# 共同规则\n", encoding="utf-8")
+            (root / "CLAUDE.md").write_text("# 漂移规则\n", encoding="utf-8")
+            before = json.loads(run("hash", "--root", str(root)).stdout)["sha256"]
+            rejected = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
+            after = json.loads(run("hash", "--root", str(root)).stdout)["sha256"]
+            self.assertEqual(2, rejected.returncode)
+            self.assertEqual(before, after)
+            self.assertIn("CLAUDE.md 必须与 AGENTS.md 一致", rejected.stdout)
+
+            # 2. 用户自行统一正文后，检查必须放行而不要求额外目录或迁移操作。
+            (root / "CLAUDE.md").write_text("# 共同规则\n", encoding="utf-8")
+            accepted = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
+            self.assertEqual(0, accepted.returncode, accepted.stdout)
+
     def test_strict_accepts_four_language_source_util_files(self):
         """确认四种后端语言的源码根 util 允许直接存放本语言代码文件。
 
@@ -103,7 +225,7 @@ class InitCheckTests(unittest.TestCase):
 
         [参数] self 为 unittest 测试实例。
         [返回] 无。
-        最近修改时间: 2026-07-28 23:20:00 补齐根 utils 正向工具包边界断言。
+        最近修改时间: 2026-07-29 00:00:00 将 IP 技术工具包纳入根 utils 正向边界断言。
         """
         # 1. 根 utils 只包含工具包子目录及其代码文件，不能触发根目录文件或非法服务发现子目录错误。
         with tempfile.TemporaryDirectory() as directory:
@@ -111,6 +233,7 @@ class InitCheckTests(unittest.TestCase):
             for package, filename in (
                 ("utils/time", "format.go"),
                 ("utils/cron", "scheduler.go"),
+                ("utils/ip", "address.go"),
                 ("utils/json", "codec.go"),
                 ("utils/log", "logger.go"),
                 ("utils/discovery/polaris", "register.go"),
