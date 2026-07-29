@@ -230,12 +230,12 @@
 - 状态: 启用
 
 ### 后端工具落点分流规则
-- 别名: 后端 utils 归位, 源码根 util 归位, utils 与源码根 util 区分
+- 别名: 后端 utils 归位, 源码根 util 归位, IP 工具包归位, utils 与源码根 util 区分
 - 类型: 包结构/复用规则
-- 定义: 后端中可脱离项目独立复制的工具包与 SDK 仅放根 `utils/<package>/`；根 `utils/` 不得有直接文件且不得依赖项目其他包。可引用项目其他包但不承载业务流程的高关联工具函数直接放入语言源码根 `util/<function>.<ext>`，不得创建子目录。业务域私有辅助继续放 `business/<domain>/util/`；前端工具目录不受此规则影响。
+- 定义: 后端中可脱离项目独立复制的工具包与 SDK 仅放根 `utils/<package>/`；根 `utils/` 不得有直接文件且不得依赖项目其他包。请求 IP 提取、规范化、公私网判断和国家/地区归属查询适配固定在 `utils/ip/`，不承载代理信任、风控、业务黑白名单或业务地域策略。可引用项目其他包但不承载业务流程的高关联工具函数直接放入语言源码根 `util/<function>.<ext>`，不得创建子目录。业务域私有辅助继续放 `business/<domain>/util/`；前端工具目录不受此规则影响。
 - 来源: 对话确认、`common-util-rules`（公共资格与复用）、`package-structure-rules`（目录落点与依赖方向）
 - 适用范围: 后端通用工具、SDK、高关联工具函数、业务域私有辅助归位
-- 更新时间: 2026-07-28
+- 更新时间: 2026-07-29
 - 状态: 启用
 
 ### 微业务跨域 JSON RPC 规则
@@ -680,6 +680,7 @@
 
 - 稳定决策：`package-structure-rules` 是三类项目的代码位置、查找与引用唯一 Owner；人工目录树、JSON 兼容 YAML Catalog、CLI 和相邻 Skill 必须保持一致。
 - 稳定决策：后端技术工具、SDK 和服务注册发现统一位于项目根 `utils/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。语言源码根 `util/` 只直接存放可引用项目其他包的高关联工具函数，禁止子目录。
+- 稳定决策：前后端同仓、独立后端和独立前端项目根都直接保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 是条件文件。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取。Catalog 将六项建模为 `.md` 文件节点，`init` 只创建五个必需文件位置，且仅在显式启用时创建 `PROJECT_STYLE.md`，不负责或覆盖各 Owner 的文件正文；strict 仅只读拒绝双文件正文漂移。
 - 稳定决策：`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/` 与 `database/sql/index/`，两者严格隔离。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
@@ -980,8 +981,9 @@ entities:
     aliases:
       - 后端 utils 归位
       - 源码根 util 归位
+      - IP 工具包归位
       - utils 与源码根 util 区分
-    definition: "可独立复制的后端工具包与 SDK 位于根 utils/<package>/，根 utils 不得直接存放文件且不得依赖项目其他包；可引用项目其他包的高关联工具函数直接位于语言源码根 util/<function>.<ext>，不得创建子目录。业务域 util 保留为域私有辅助能力。"
+    definition: "可独立复制的后端工具包与 SDK 位于根 utils/<package>/，根 utils 不得直接存放文件且不得依赖项目其他包；IP 提取、规范化、公私网判断和国家/地区归属查询适配固定于 utils/ip/，不承载代理信任或业务策略；可引用项目其他包的高关联工具函数直接位于语言源码根 util/<function>.<ext>，不得创建子目录。业务域 util 保留为域私有辅助能力。"
     scope: "后端通用工具、SDK、高关联工具函数、业务域私有辅助归位"
     status: "active"
     evidence_ids:
@@ -990,7 +992,40 @@ entities:
       - evidence.dialog.backend-utils-source-util-placement
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-28
+    updated_at: 2026-07-29
+  - entity_id: rule.backend-root-governance-files
+    name: "后端根治理文件位置"
+    type: "项目治理目录规则"
+    aliases:
+      - 后端根 AGENTS
+      - 后端根 CLAUDE
+      - 项目四件套根位置
+      - 后端 PROJECT_STYLE
+    definition: "后端项目根直接保存 AGENTS.md、CLAUDE.md、PROJECT_CURRENT.md、PROJECT_MEMORY.md、PROJECT_HISTORY.md；PROJECT_STYLE.md 仅在有长期风格时创建。AGENTS.md 与 CLAUDE.md 正文必须一致。Catalog 将六项登记为 Markdown 文件节点；init 只创建五个必需文件位置，条件风格文件必须显式启用，strict 只读拒绝双规则文件正文漂移，正文仍由各自 Owner 维护。"
+    scope: "后端项目骨架、Catalog 查询、目录树渲染和 init 初始化"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.dialog.backend-root-governance-files
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-29
+  - entity_id: rule.project-dual-platform-rule-files
+    name: "三类项目双平台协作规则文件"
+    type: "项目治理目录规则"
+    aliases:
+      - AGENTS 与 CLAUDE 一致
+      - Codex 与 Claude Code 规则文件
+      - 双平台项目根规则
+    definition: "前后端同仓、独立后端和独立前端项目根都必须提交 AGENTS.md 与 CLAUDE.md，两个文件正文必须一致，分别供 Codex 与 Claude Code 读取。Catalog 对每种项目类型提供唯一文件节点；init 只创建空文件位置，strict 只读比对已同时存在的正文，bootstrap_agents.sh --target both 以 AGENTS.md 同步 CLAUDE.md。"
+    scope: "三类项目目录树、Catalog 查询、初始化、严格检查和项目规则自举"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.dialog.project-dual-platform-rule-files
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-29
   - entity_id: rule.micro-business-json-rpc-boundary
     name: "微业务跨域 JSON RPC 边界"
     type: "包结构与业务隔离规则"
@@ -1432,6 +1467,14 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "当前对话确认后端根 utils 与源码根 util 的分流口径"
+  - evidence_id: evidence.dialog.backend-root-governance-files
+    type: "dialog"
+    source: "对话确认"
+    note: "当前对话确认后端项目根的四个必需治理文件和条件 PROJECT_STYLE 文件"
+  - evidence_id: evidence.dialog.project-dual-platform-rule-files
+    type: "dialog"
+    source: "对话确认"
+    note: "用户确认前后端同仓、独立后端和独立前端项目根均应成对保存正文一致的 AGENTS.md 与 CLAUDE.md。"
   - evidence_id: evidence.skill.micro-business-architecture-rules
     type: "skill"
     source: "micro-business-architecture-rules/SKILL.md"

@@ -6,9 +6,9 @@
 
 ## 当前任务
 
-- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC 与旧项目渐进采纳升级。
-- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则与旧项目 `adoption` 渐进采纳的唯一查询、只读检查、测试、审查和验收闭环。
-- 当前状态：`TASK-05-01` 至 `TASK-09-03` 已完成。CYCLE-09 已通过 30 项本地行为测试、五类文档严格校验、Python 编译和两个目标 Skill 快速校验；当前会话 CYCLE-09 投影已按专属脚本失活。
+- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC、旧项目渐进采纳、`utils/ip/` 工具包和后端根治理文件升级。
+- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则、旧项目 `adoption` 渐进采纳、`utils/ip/` 与后端根治理文件的唯一查询、只读检查、测试、审查和验收闭环。
+- 当前状态：`TASK-05-01` 至 `TASK-12-03` 已完成。CYCLE-12 已通过 41 项本地行为测试、五类文档严格校验、Python 编译、三类 `CLAUDE.md` 唯一查询、双平台规则文件严格一致性检查和 Git Bash 双目标同步复核；当前会话 CYCLE-12 投影已失活收口。
 
 ## 范围与边界
 
@@ -23,16 +23,18 @@
 - 每个微业务域按需提供扁平 `rpc/`；跨域只导入目标域精确 `rpc/`，请求和响应均为 JSON 字符串，统一采用 `Response{code,status,message,data}` 语义。
 - Catalog、CLI、微业务隔离脚本、CodeGraph fixture、目录树和引用契约已同步；本地行为回归 21/21 通过，`py_compile`、关键 query 与完整树渲染通过。
 - 旧项目使用 `doc/1-架构/3-目录规则收敛清单.yaml` 进行人工登记：已采纳 V2 目录可原地扩展，遗留源码仅可维护已登记快照，新业务和独立逻辑必须进入 Catalog 唯一 V2 路径。
+- `utils/ip/` 已固定为 IP 提取、规范化、公私网判断与国家/地区归属查询的独立工具包；不承载代理信任、风控、业务黑白名单或业务地域策略。
+- 三类项目根固定保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在真实存在长期风格时创建。Catalog 把它们建模为文件节点，`init` 仅创建位置且不改写正文，strict 在两个规则文件同时存在时拒绝正文不一致。
 - `check --policy adoption --adoption-manifest ...` 已实现只读检查；无效、越界、重复或禁止路径清单稳定失败，检查不改写项目或清单。
 - 已更新需求、实施、测试、实现审查与最终验收文档；未连接数据库、缓存、消息队列、第三方 API 或非 local 环境。
 
 ## 门禁说明
 
-- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，五个文档 profile、30 项本地 `unittest` 与两个目标 Skill 快速校验均通过。
+- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，五个文档 profile、41 项本地 `unittest`、Python 编译、三类根 `CLAUDE.md` 唯一查询、两个目标 Skill 快速校验和 `git diff --check` 均通过。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 CYCLE-09 投影已仅通过 `task_plan_projection.py deactivate` 失活。
+- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；当前会话 CYCLE-12 已通过 `task_plan_projection.py deactivate` 失活，未影响其它会话投影。
 - 后续目录位置查询与旧项目渐进检查以 `package-structure-rules/scripts/placement_catalog.py` 和 `placement-catalog.yaml` 为唯一入口。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
@@ -40,7 +42,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-07-28T17:37:38.881570Z",
+  "registry_updated_at": "2026-07-29T16:10:51.776657Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -535,29 +537,29 @@
       ]
     },
     {
-      "projection_id": "SESSION/a007e029ef1093f43ba49e59c9fa108860f40b8447eca90ea8c5fb46ee36c36b",
+      "projection_id": "SESSION/abc65119291c075955a2ccdc04f61ecf1afd3c146a01e5aeda62462503906f5d",
       "session_id": "019f9dd1-31f3-7401-8575-eadf6b3ec55f",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "REQ-PSR-ADOPT-001/CYCLE-09",
+      "plan_key": "REQ-PSR-V2-001/CYCLE-12",
       "source_document": "doc/3-实施/2026-07-28_014412_代码位置目录规则V2_实施总览.md",
-      "plan_fingerprint": "d97c5f09b4bb91ee1952558b8d877fe6ade3faf48967d25be7277f80940facc3",
-      "updated_at": "2026-07-28T17:37:38.881432Z",
+      "plan_fingerprint": "9c8c23055976818bf245c24055432d626b0e169dd6a08a16d5a0adbbc659454e",
+      "updated_at": "2026-07-29T16:10:51.776523Z",
       "steps": [
         {
-          "id": "TASK-09-01",
-          "step": "[TASK-09-01] 定义旧项目收敛清单与渐进采纳契约",
+          "id": "TASK-12-01",
+          "step": "[TASK-12-01] 冻结三类项目的 CLAUDE.md 需求与实施追踪",
           "status": "completed"
         },
         {
-          "id": "TASK-09-02",
-          "step": "[TASK-09-02] 实现 adoption 只读检查与 CLI 接口",
+          "id": "TASK-12-02",
+          "step": "[TASK-12-02] 同步目录树、Catalog、CLI 与协作规则",
           "status": "completed"
         },
         {
-          "id": "TASK-09-03",
-          "step": "[TASK-09-03] 完成 fixture、文档、审查与验收闭环",
+          "id": "TASK-12-03",
+          "step": "[TASK-12-03] 完成真实测试、审查与验收收口",
           "status": "completed"
         }
       ]

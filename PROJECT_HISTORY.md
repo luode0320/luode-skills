@@ -163,3 +163,14 @@
 - 2026-07-28：代码位置目录规则 V2 的微业务 RPC 升级完成最终本地收口。需求、实施、测试、实现审查和最终验收文档 profile 均通过；`package-structure-rules` 与 `micro-business-architecture-rules` 的 `quick_validate.py` 均通过；当前会话 `PSR-RPC-003` 投影已失活。未连接外部服务，未执行 Git 历史写入。
 
 - 2026-07-29：完成代码位置目录规则 V2 的旧项目渐进采纳升级。新增 `adoption` 只读检查与固定收敛清单 `doc/1-架构/3-目录规则收敛清单.yaml`：已采纳 V2 路径可原地扩展，遗留源码只可维护快照，新业务与独立新逻辑必须进入 Catalog 唯一位置。30 项本地行为测试、Python 编译、两个 Skill 快速校验及五类工程文档严格 profile 均通过；未迁移业务项目、未连接外部服务，未执行 Git 历史写入。
+
+## 2026-07-29：后端根治理文件目录规则完成
+
+- 后端独立项目根固定纳入 `AGENTS.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`，并将 `PROJECT_STYLE.md` 设为条件文件；五项均以 Catalog 文件节点登记，`init` 只创建位置且不覆盖正文。
+- 规则目录树、Catalog、CLI、测试、需求、实施、审查和验收材料已同步。37 项本地行为测试与 Python 编译通过；未连接外部服务，未执行 Git 历史写入。
+
+## 2026-07-29：三类项目双平台规则文件目录规则完成
+
+- 前后端同仓、独立后端和独立前端项目根均固定纳入 `CLAUDE.md`，其位置由 Catalog 文件节点唯一查询；它与 `AGENTS.md` 同为必需提交文件，正文必须字节一致。
+- `init` 只创建五个必需根文件的位置，`check --policy strict` 只读拒绝 `AGENTS.md` 与 `CLAUDE.md` 的正文漂移；`bootstrap_agents.sh --target both` 以 `AGENTS.md` 为同步源，重复执行保持幂等。
+- 41 项本地行为测试、Python 编译、五类工程文档严格 profile、两个 Skill 快速校验和 `git diff --check` 均通过；未连接外部服务，未执行 Git 历史写入，Obsidian 固定 vault 仍未注册。
