@@ -57,6 +57,7 @@
 ├── .gitignore                             # [必需·提交] 忽略规则
 ├── .dockerignore                          # [条件·提交] 镜像排除规则
 ├── AGENTS.md                              # [必需·提交] 工作区协作规则
+├── CLAUDE.md                              # [必需·提交] Claude Code 工作区协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                     # [必需·提交] 当前状态
 ├── PROJECT_MEMORY.md                      # [必需·提交] 稳定决策
 ├── PROJECT_HISTORY.md                     # [必需·提交] 重要历史
@@ -64,7 +65,7 @@
 └── README.md                              # [必需·提交] 工作区入口
 ```
 
-工作区根禁止业务 `config/`、`data/`、`database/`、`swag/`、`schema/`、`resources/`、`scripts/`、`util/`、`utils/`、`common/`、`deploy/`。不建立 `integration/virtualization/`、`integration/doc/`、`integration/tests/`、`integration/scripts/`、`integration/fixtures/`。
+工作区根禁止业务 `config/`、`data/`、`database/`、`swag/`、`schema/`、`resources/`、`scripts/`、`util/`、`utils/`、`common/`、`deploy/`。不建立 `integration/virtualization/`、`integration/doc/`、`integration/tests/`、`integration/scripts/`、`integration/fixtures/`。工作区根的 `AGENTS.md` 与 `CLAUDE.md` 必须同时提交且正文完全一致。
 
 ## 后端独立项目
 
@@ -127,6 +128,7 @@
 │   ├── async/                               # [条件·提交] 异步协程与并发辅助
 │   ├── convert/                             # [条件·提交] 字符串与数字双向转换
 │   ├── http/                                # [条件·提交] 通用 HTTP Client
+│   ├── ip/                                  # [条件·提交] 请求 IP 提取、标准化、公私网判断与地址归属查询工具
 │   ├── json/                                # [条件·提交] JSON 序列化与反序列化技术工具封装
 │   ├── log/                                 # [条件·提交] 统一日志框架封装
 │   ├── cache/                               # [条件·提交] 缓存适配
@@ -233,10 +235,17 @@
 ├── .cache/                                  # [生成·忽略] 工具缓存
 ├── build.sh                                 # [必需·提交] 统一打包入口
 ├── docker-build.sh                          # [必需·提交] 镜像构建入口
+├── AGENTS.md                                # [必需·提交] 后端项目协作规则
+├── CLAUDE.md                                # [必需·提交] Claude Code 后端项目协作规则；正文与 AGENTS.md 一致
+├── PROJECT_CURRENT.md                       # [必需·提交] 当前任务、范围、状态与交接
+├── PROJECT_MEMORY.md                        # [必需·提交] 稳定决策与长期事实
+├── PROJECT_HISTORY.md                       # [必需·提交] 重要历史事件
+├── PROJECT_STYLE.md                         # [条件·提交] 后端长期代码风格
 └── README.md                                # [必需·提交] 项目入口
 ```
 
 源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。
+后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 
 ## 前端独立项目
 
@@ -360,6 +369,7 @@
 ├── .gitignore                                # [必需·提交] 构建产物与本地配置忽略规则
 ├── .dockerignore                             # [条件·提交] 镜像构建排除规则
 ├── AGENTS.md                                 # [必需·提交] 前端项目规则
+├── CLAUDE.md                                 # [必需·提交] Claude Code 前端项目协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                        # [必需·提交] 当前任务与交接状态
 ├── PROJECT_MEMORY.md                         # [必需·提交] 稳定决策与长期事实
 ├── PROJECT_HISTORY.md                        # [必需·提交] 重要历史事件
@@ -367,4 +377,4 @@
 └── README.md                                 # [必需·提交] 前端启动、构建与部署入口
 ```
 
-前端不建立 `src/config/` 或任意 `schema/`。`public/` 与 `src/assets/` 不得复制资源；React 只用 `hooks/`，Vue 只用 `composables/`。
+前端不建立 `src/config/` 或任意 `schema/`。`public/` 与 `src/assets/` 不得复制资源；React 只用 `hooks/`，Vue 只用 `composables/`。前端根的 `AGENTS.md` 与 `CLAUDE.md` 必须同时提交且正文完全一致。

@@ -214,11 +214,11 @@ def expand_init_path(canonical_path: str, args: argparse.Namespace) -> str | Non
 
 
 def command_init(catalog: dict[str, Any], args: argparse.Namespace) -> int:
-    """创建必需骨架与明确启用条目，绝不批量创建所有条件目录。
+    """创建必需骨架、根治理文件与明确启用条目，绝不批量创建所有条件目录。
 
     [参数] catalog 为位置 Catalog，args 为初始化参数。
     [返回] 成功返回 0，未知启用 ID 返回 2。
-    最近修改时间: 2026-07-28 21:26:06 拒绝旧 util 启用 ID，避免静默兼容。
+    最近修改时间: 2026-07-29 23:00:00 增加三类项目根治理文件的位置初始化。
     """
     target = Path(args.root).resolve()
     enabled = set(filter(None, (args.enable or "").split(",")))
@@ -228,24 +228,40 @@ def command_init(catalog: dict[str, Any], args: argparse.Namespace) -> int:
     if unknown_ids:
         print(json.dumps({"ok": False, "errors": [f"未知启用 ID: {item}" for item in unknown_ids]}, ensure_ascii=False))
         return 2
-    paths = list(catalog["skeletons"][args.project_kind])
+    directories = list(catalog["skeletons"][args.project_kind])
+    files: list[str] = []
     argument_errors: list[str] = []
     for entry in catalog["entries"]:
-        if entry["project_kind"] == args.project_kind and entry["id"] in enabled:
+        if entry["project_kind"] != args.project_kind:
+            continue
+        is_required_file = entry.get("node_kind") == "file" and entry["creation_policy"] == "required"
+        if entry["id"] in enabled or is_required_file:
             expanded = expand_init_path(entry["canonical_path"], args)
             if expanded is None:
                 if entry.get("requires_domain"):
                     argument_errors.append("backend.business-rpc 初始化必须提供合法的 --domain、--language；Java 另需 --base-package")
                 else:
-                    argument_errors.append(f"无法解析启用目录: {entry['id']}")
+                    argument_errors.append(f"无法解析启用路径: {entry['id']}")
                 continue
-            paths.append(expanded)
+            if entry.get("node_kind") == "file":
+                files.append(expanded)
+            else:
+                directories.append(expanded)
     if argument_errors:
         print(json.dumps({"ok": False, "errors": sorted(set(argument_errors))}, ensure_ascii=False, indent=2))
         return 2
-    for relative in sorted(set(paths)):
+    file_conflicts = [relative for relative in sorted(set(files)) if (target / relative).exists() and not (target / relative).is_file()]
+    if file_conflicts:
+        print(json.dumps({"ok": False, "errors": [f"必需根文件不能是目录: {item}" for item in file_conflicts]}, ensure_ascii=False, indent=2))
+        return 2
+    # 2. 先创建目录，再只 touch 目录规则拥有的文件位置；正文仍由各自 Owner 填充。
+    for relative in sorted(set(directories)):
         (target / relative).mkdir(parents=True, exist_ok=True)
-    print(json.dumps({"ok": True, "created": sorted(set(paths))}, ensure_ascii=False, indent=2))
+    for relative in sorted(set(files)):
+        file_path = target / relative
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch(exist_ok=True)
+    print(json.dumps({"ok": True, "created": sorted(set(directories) | set(files))}, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -334,6 +350,31 @@ def check_business_rpc_path(relative: str, is_file: bool, language: str) -> list
     return []
 
 
+def check_required_file_content_contracts(
+    catalog: dict[str, Any], root: Path, project_kind: str | None,
+) -> list[str]:
+    """校验同项目根受 Catalog 约束的文件正文保持一致。
+
+    [参数] catalog 为位置 Catalog，root 为待检查项目根，project_kind 为项目类型。
+    [返回] list[str]：存在且应当同内容的文件不一致时返回稳定错误。
+    最近修改时间: 2026-07-29 23:45:00 新增 AGENTS.md 与 CLAUDE.md 的只读一致性检查。
+    """
+    if project_kind is None:
+        return []
+    errors: list[str] = []
+    # 1. 仅校验当前项目类型、文件节点且显式声明内容契约的 Catalog 条目。
+    for entry in catalog["entries"]:
+        expected_path = entry.get("content_must_match")
+        if entry["project_kind"] != project_kind or entry.get("node_kind") != "file" or not expected_path:
+            continue
+        target = root / entry["canonical_path"]
+        expected = root / expected_path
+        # 2. 旧项目可以暂未补齐双文件；只有二者实际存在时才拒绝正文漂移。
+        if target.is_file() and expected.is_file() and target.read_bytes() != expected.read_bytes():
+            errors.append(f"规则文件内容不一致: {entry['canonical_path']} 必须与 {expected_path} 一致")
+    return errors
+
+
 def check_path(
     catalog: dict[str, Any], relative: str, is_file: bool, project_kind: str | None, language: str | None,
 ) -> list[str]:
@@ -341,7 +382,7 @@ def check_path(
 
     [参数] catalog 为位置 Catalog，relative 为项目相对路径，is_file 表示文件，project_kind 与 language 为检查上下文。
     [返回] 当前路径的严格策略错误列表。
-    最近修改时间: 2026-07-28 21:26:06 加入 utils 根文件与源码根 util 校验。
+    最近修改时间: 2026-07-29 23:45:00 保留路径边界校验；根规则文件正文契约由专用函数只读检查。
     """
     errors: list[str] = []
     # 1. 先应用 Catalog 的通用禁止路径和子目录边界。
@@ -574,7 +615,7 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
 
     [参数] catalog 为位置 Catalog，args 为检查参数。
     [返回] strict 违规或参数缺失返回 2，其余返回 0。
-    最近修改时间: 2026-07-29 00:25:50 新增 adoption 收敛清单与遗留快照的只读检查。
+    最近修改时间: 2026-07-29 23:45:00 新增 strict 下双平台规则文件正文一致性的只读检查。
     """
     root = Path(args.root).resolve()
     if not root.is_dir():
@@ -605,6 +646,9 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
+    # 4. 仅 strict 校验新项目根的双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
+    if args.policy == "strict":
+        errors.extend(check_required_file_content_contracts(catalog, root, args.project_kind))
     payload = {
         "ok": not errors or args.policy == "legacy",
         "policy": args.policy,

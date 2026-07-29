@@ -18,7 +18,9 @@
         "properties": {
           "language": {"enum": ["go", "java", "node", "python"]},
           "requires_domain": {"type": "boolean"},
-          "flat_files": {"type": "boolean"}
+            "flat_files": {"type": "boolean"},
+            "node_kind": {"enum": ["directory", "file"]},
+            "content_must_match": {"type": "string", "minLength": 1}
         },
         "allOf": [
           {
@@ -28,6 +30,14 @@
           {
             "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},
             "then": {"required": ["requires_domain", "flat_files"]}
+          },
+          {
+            "if": {"properties": {"node_kind": {"const": "file"}}, "required": ["node_kind"]},
+            "then": {"required": ["allowed_extensions"]}
+          },
+          {
+            "if": {"properties": {"category": {"const": "claude"}}, "required": ["category"]},
+            "then": {"required": ["node_kind", "content_must_match"]}
           }
         ]
       }

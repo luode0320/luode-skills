@@ -10,7 +10,7 @@ set -euo pipefail
 #   bootstrap_agents.sh --target both          # 同时创建/同步 AGENTS.md 与 CLAUDE.md
 #
 # 说明:
-#   - --target 只决定根目录"缺失时创建哪个"规则文件；
+#   - --target 只决定根目录"缺失时创建哪个"规则文件；显式 --target both 会以 AGENTS.md 覆盖同步根 CLAUDE.md；
 #   - 无论 target 为何，根目录与子目录中所有已存在的 AGENTS.md / CLAUDE.md 都会被同步。
 
 REPO_DIR="$(pwd)"
@@ -991,7 +991,13 @@ for name in AGENTS.md CLAUDE.md; do
   sync_agents_file "$REPO_DIR/$name"
 done
 
-# 5) 同步子目录中所有已存在的 AGENTS.md / CLAUDE.md
+# 5) 显式要求双平台规则时，AGENTS.md 是唯一正文源，避免 Codex 与 Claude Code 读取不同规则。
+if [[ "$TARGET" == "both" ]] && ! cmp -s "$REPO_DIR/AGENTS.md" "$REPO_DIR/CLAUDE.md"; then
+  cp "$REPO_DIR/AGENTS.md" "$REPO_DIR/CLAUDE.md"
+  echo "[INFO] 已以 AGENTS.md 同步根 CLAUDE.md"
+fi
+
+# 6) 同步子目录中所有已存在的 AGENTS.md / CLAUDE.md
 while IFS= read -r extra_file; do
   sync_agents_file "$extra_file"
 done < <(find "$REPO_DIR" -mindepth 2 \( -name AGENTS.md -o -name CLAUDE.md \) -type f | sort)

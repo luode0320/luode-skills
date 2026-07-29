@@ -7,6 +7,7 @@
 | 分类 | 二级技术目录 | 职责 |
 |---|---|---|
 | 时间与并发 | `utils/time/`、`utils/async/`、`utils/convert/`、`utils/http/` | 时间转换、协程与任务辅助、字符串数字转换、通用 HTTP Client |
+| IP 与地址归属 | `utils/ip/` | 请求 IP 提取、规范化、公私网判断，以及离线库或第三方 GeoIP 的国家/地区归属查询适配；不承载代理信任策略、风控或业务黑白名单。 |
 | 定时调度 | `utils/cron/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 |
 | 序列化 | `utils/json/` | JSON 序列化与反序列化技术工具封装 |
 | 日志 | `utils/log/` | 统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口 |

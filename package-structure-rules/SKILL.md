@@ -21,12 +21,13 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 
 1. 同仓根仅保存工作区资产、`integration/` 和 `doc/`；后端、前端业务资产分别留在其独立项目中。
 2. 后端根级唯一位置：`config/`、`data/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`。
-3. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
-4. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`。
-5. 后端语言源码根只承载 `router/`、`controller/`、`util/`、`business/<domain>/`；源码根 `util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
-6. `database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/` 或 `database/sql/index/`。
-7. 不建立根 `protocol/`、项目级 `schema/`、独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`。
-8. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
+3. 前后端同仓、独立后端、独立前端的项目根均固定提交 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在确有长期风格时创建并提交。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取；目录规则只负责其位置、初始化、查询和只读一致性检查，具体正文结构由项目规则、项目记忆与项目风格 Owner 管理。
+4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
+5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`。
+6. 后端语言源码根只承载 `router/`、`controller/`、`util/`、`business/<domain>/`；源码根 `util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
+7. `database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/` 或 `database/sql/index/`。
+8. 不建立根 `protocol/`、项目级 `schema/`、独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`。
+9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
 
 ## 使用方式
 
@@ -34,15 +35,18 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 
 ```bash
 python package-structure-rules/scripts/placement_catalog.py query --artifact utils --category discovery --technology polaris
+python package-structure-rules/scripts/placement_catalog.py query --artifact utils --category ip
 python package-structure-rules/scripts/placement_catalog.py query --artifact source-util --language go
 python package-structure-rules/scripts/placement_catalog.py query --artifact business-rpc
+python package-structure-rules/scripts/placement_catalog.py query --artifact project-governance --category agents
+python package-structure-rules/scripts/placement_catalog.py query --project-kind frontend --artifact project-governance --category claude
 python package-structure-rules/scripts/placement_catalog.py query --artifact database-migration --category field --operation create
 python package-structure-rules/scripts/placement_catalog.py render --all
 python package-structure-rules/scripts/placement_catalog.py check --root <项目根目录> --project-kind backend --language go --policy strict
 python package-structure-rules/scripts/placement_catalog.py check --root <旧项目根目录> --project-kind backend --language go --policy adoption --adoption-manifest doc/1-架构/3-目录规则收敛清单.yaml
 ```
 
-`check` 始终只读；后端 `strict` 必须同时传入 `--project-kind backend` 与 `--language`，以准确识别源码根 `util/`。`init` 只创建必需目录与 `--enable` 明确启用的条件目录，不移动、不删除、不重命名用户文件。
+`check` 始终只读；后端 `strict` 必须同时传入 `--project-kind backend` 与 `--language`，以准确识别源码根 `util/`。当 `AGENTS.md` 与 `CLAUDE.md` 同时存在时，strict 必须拒绝正文不一致；旧项目缺失其中之一时不因此自动迁移。`init` 创建必需目录和必需根文件，并仅在 `--enable backend.root.project-style` 时创建条件 `PROJECT_STYLE.md`；它不移动、不删除、不重命名用户文件，也不代替对应 Owner 填充文件正文。
 
 创建业务域 `rpc/` 时，`init` 必须显式传入 `--enable backend.business-rpc --domain <domain> --language <language>`；Java 另传 `--base-package <base-package>`。调用方只可导入目标域 `rpc/` 的公开函数，参数和返回值均为 JSON 字符串；返回值遵循根 `common/response.Response` 的 `code`、`status`、`message`、`data` 语义。
 

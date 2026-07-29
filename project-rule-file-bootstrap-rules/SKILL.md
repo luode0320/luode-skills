@@ -18,7 +18,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 2. 若两者都不存在，根据当前运行 AI 创建对应文件（Claude → `CLAUDE.md`，Codex → `AGENTS.md`）。
 3. 若两者都存在，使用与当前 AI 对应的文件，并在输出中标注另一个文件的存在。
 
-脚本平台传参：`scripts/bootstrap_agents.sh` 默认 `--target codex`。当前 AI 为 Claude Code 时必须显式追加 `--target claude`；两个规则文件都要同步时传 `--target both`。
+脚本平台传参：`scripts/bootstrap_agents.sh` 默认 `--target codex`。当前 AI 为 Claude Code 时必须显式追加 `--target claude`；两个规则文件都要同步时传 `--target both`，并以 `AGENTS.md` 为唯一正文源覆盖同步 `CLAUDE.md`。
 
 ## 目标
 
@@ -46,7 +46,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 
 1. 检测并创建当前 AI 对应的根目录规则文件。
 2. 同步根目录及子目录所有已存在的 `AGENTS.md` / `CLAUDE.md` 受管章节。
-3. 受管章节缺失时追加、已存在时原位更新；用户非受管内容必须保持不变。
+3. 受管章节缺失时追加、已存在时原位更新；用户非受管内容必须保持不变。仅当用户显式传入 `--target both` 时，`AGENTS.md` 是根目录双平台规则的唯一正文源，允许覆盖 `CLAUDE.md` 以消除内容漂移。
 4. 缺失 `.gitattributes` 或 `.editorconfig` 时创建最小可用版本；已存在时不得覆盖或反向调整。
 5. Godot 项目继续补齐 `Godot 项目工具配置` 与 `图像生成配置`，不得写入真实密钥。
 
@@ -70,7 +70,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 
 ## 统一执行步骤
 
-1. 调用唯一入口 `scripts/bootstrap_agents.sh`；Claude Code 使用 `--target claude`，需要同步双平台规则文件时使用 `--target both`。
+1. 调用唯一入口 `scripts/bootstrap_agents.sh`；Claude Code 使用 `--target claude`，需要同步双平台规则文件时使用 `--target both`，并在根目录以 `AGENTS.md` 覆盖同步 `CLAUDE.md`。
 2. 只要进入本 skill，就不能停留在“已读取但未落盘”；必须真实执行脚本并核对结果。
 3. 按 `rule-bootstrap` 核对规则文件、`.gitattributes`、`.editorconfig` 和全部受管章节，确认非受管内容未被覆盖。
 4. 按 `memory-bootstrap` 核对三个项目记忆文件、51,200 字节闸门、机器索引区和历史只追加保护。
