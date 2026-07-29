@@ -20,8 +20,8 @@ review_acceptance_gates:
     required_now: true
     completed_validation: ["TEST-PSR-UTILS-001", "TEST-PSR-RPC-001", "TEST-PSR-RPC-002", "TEST-PSR-RPC-003", "TEST-PSR-ADOPT-001"]
     substitute_validation: []
-    manual_follow_up: "N/A；原因：本地单元测试已直接执行 CLI、隔离检查与 CodeGraph 行为；证据：30 项 unittest 结果。"
-    pass_standard: 30 项测试全部通过，且 strict/adoption 检查前后 fixture 哈希一致。
+    manual_follow_up: "N/A；原因：本地单元测试已直接执行 CLI、隔离检查与 CodeGraph 行为；证据：31 项 unittest 结果。"
+    pass_standard: 31 项测试全部通过，且 strict/adoption 检查前后 fixture 哈希一致。
   - stage: browser_integration
     applicability: not_applicable
     reason: 本测试没有浏览器页面或前端联调入口。
@@ -46,7 +46,7 @@ review_acceptance_gates:
 
 # 代码位置目录规则 V2 测试
 
-结论：本地行为测试验证了根 `utils/`、源码根 `util/`、业务域 `rpc/` 与旧项目渐进采用的不同边界。影响：目录生成和只读检查可在不修改用户文件的前提下拒绝违规位置，旧项目可登记相符目录和冻结快照而不继续扩张遗留结构。范围：查询、渲染、初始化、严格检查、兼容告警、渐进采用、无写入验证、普通 YAML 清单、JSON 响应和 CodeGraph 导入审查。非范围：数据库、缓存、消息队列、第三方 API、浏览器页面和业务项目迁移。变化：新增 `adoption` 清单、已采纳目录、遗留快照、普通 YAML 与未登记源码的正反向断言。完成标准：30 项自动化断言全部通过且 fixture 哈希不变。术语说明：fixture 是测试创建的临时目录样本，哈希用于确认检查未改写样本。验证状态：本地 Python 测试与 CodeGraph 证据已执行通过。图片资产决策：N/A。原因：目录和 CLI 行为没有视觉验收对象。证据：所有结果由退出码、标准输出和文件哈希判断。
+结论：本地行为测试验证了根 `utils/`、源码根 `util/`、业务域 `rpc/` 与旧项目渐进采用的不同边界。影响：目录生成和只读检查可在不修改用户文件的前提下拒绝违规位置，旧项目可登记相符目录和冻结快照而不继续扩张遗留结构。范围：查询、渲染、初始化、严格检查、兼容告警、渐进采用、无写入验证、普通 YAML 清单、JSON 响应和 CodeGraph 导入审查。非范围：数据库、缓存、消息队列、第三方 API、浏览器页面和业务项目迁移。变化：新增 `adoption` 清单、已采纳目录、遗留快照、普通 YAML 与未登记源码的正反向断言。完成标准：31 项自动化断言全部通过且 fixture 哈希不变。术语说明：fixture 是测试创建的临时目录样本，哈希用于确认检查未改写样本。验证状态：本地 Python 测试与 CodeGraph 证据已执行通过。图片资产决策：N/A。原因：目录和 CLI 行为没有视觉验收对象。证据：所有结果由退出码、标准输出和文件哈希判断。
 
 ## 文档信息
 
@@ -61,7 +61,7 @@ review_acceptance_gates:
 
 | 分类 | 样本 | 预期结果 |
 |---|---|---|
-| 正向路径 | `utils/time/format.<ext>`、`utils/discovery/polaris/`、`utils/discovery/nacos/`。 | strict 通过或查询返回唯一位置。 |
+| 正向路径 | `utils/time/format.<ext>`、`utils/crontask/scheduler.<ext>`、`utils/json/codec.<ext>`、`utils/log/logger.<ext>`、`utils/discovery/polaris/`、`utils/discovery/nacos/`。 | strict 通过或查询返回唯一位置。 |
 | 四语言路径 | Go `internal/util/`、Java `src/main/java/<base-package>/util/`、Node.js `src/util/`、Python `src/<package>/util/`。 | `source-util --language` 返回一个规范路径。 |
 | 负向根文件 | `utils/<file>.<ext>`。 | strict 返回退出码 2。 |
 | 负向旧路径 | 根 `util/...`。 | strict 返回退出码 2，legacy 只警告。 |
@@ -69,7 +69,7 @@ review_acceptance_gates:
 | RPC 目录与初始化 | `business/<domain>/rpc/<operation>.<ext>`。 | Catalog 唯一返回，显式启用才创建且不允许子目录。 |
 | RPC 导入边界 | `orders` 导入 `users/rpc`；`users/service`、`users/entity`、`users/util`。 | 合规样本通过；三类私有层样本在确定性检查和 CodeGraph 审查中失败。 |
 | RPC 统一响应 | 成功、非法 JSON、校验失败、业务失败。 | 都可解析为 `code`、`status`、`message`、`data`。 |
-| 渐进采用正向 | 已登记 `util/legacy.go`、`utils/discovery/polaris/`、`database/repository/`。 | adoption 通过且检查前后哈希相同。 |
+| 渐进采用正向 | 已登记 `util/legacy.go`、`utils/discovery/polaris/`、`database/repository/`；改名后根级 `crontask/` 与业务域内部 `business/<domain>/crontask/`。 | adoption 通过且检查前后哈希相同。 |
 | 渐进采用负向 | 遗留根新增源码或目录、未登记 `service/` 源码、项目或语言不符、重复/嵌套/越界/禁止清单路径。 | adoption 返回退出码 2 和稳定原因。 |
 
 ## 测试命令与断言
@@ -95,16 +95,17 @@ python package-structure-rules/scripts/placement_catalog.py check --root <legacy
 | `AC-PSR-RPC-002` | 仅精确目标域 `rpc/` 导入通过，私有层导入失败。 | 三个负向 Go fixture 与 CodeGraph 导入节点。 | 通过。 |
 | `AC-PSR-RPC-003` | 四种 RPC 结果都可解析为统一响应字段。 | JSON 响应 fixture。 | 通过。 |
 | `AC-PSR-ADOPT-001` | 已采纳 V2 目录和登记遗留快照可原地通过。 | Catalog ID 与目录快照 fixture。 | 通过。 |
+| `AC-PSR-ADOPT-004` | `corntask` 拼写修正为 `crontask` 后，根级与业务域内部该目录仍被 adoption 接受。 | 根级 `crontask/` 与 `business/<domain>/crontask/` fixture。 | 通过。 |
 | `AC-PSR-ADOPT-002` | 遗留根新增源码文件、目录和未登记源码必须失败。 | `util/new.go`、`util/new/`、`service/order.go` fixture。 | 通过。 |
 | `AC-PSR-ADOPT-003` | 清单缺失、项目/语言不符、重复、嵌套、越界和禁止路径必须失败且不写入。 | 普通 YAML 正向 fixture、多个无效 YAML fixture 与哈希。 | 通过。 |
 
 ## 验证结论
 
-本轮执行 30 项 `unittest`，结果为 `OK`。根 `utils/time/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本，以及已采纳目录与遗留快照均通过检查；三个私有层跨域导入、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；CodeGraph 已在测试中同步索引并定位每个导入节点。
+本轮执行 31 项 `unittest`，结果为 `OK`。根 `utils/time/`、`utils/crontask/`、`utils/json/`、`utils/log/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本、改名后根级与业务域内部 `crontask/` 样本，以及已采纳目录与遗留快照均通过检查；三个私有层跨域导入、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；CodeGraph 已在测试中同步索引并定位每个导入节点。
 
 ## 完成标准
 
-1. 所有 30 项本地单元测试返回成功。
+1. 所有 31 项本地单元测试返回成功。
 2. CLI 查询能返回四语言源码根 `util/` 和两个服务发现工具包的唯一路径。
 3. strict 拒绝根 `utils/` 直接文件、旧根 `util/`、源码根 `util/` 子目录与业务域 `rpc/` 子目录。
 4. 检查前后哈希相同，证明 `check` 只读。

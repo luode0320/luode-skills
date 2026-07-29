@@ -161,6 +161,27 @@ class AdoptionCheckTests(unittest.TestCase):
             result = self.check_adoption(root)
             self.assertEqual(0, result.returncode, result.stdout)
 
+    def test_adoption_accepts_crontask_root_directory(self):
+        """确认 corntask 拼写修正为 crontask 后，adoption 策略仍接受该后端根级目录。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-29 覆盖 corntask 改名 crontask 后的根级目录与业务域内层回归。
+        """
+        # 1. 新增代码同时落入改名后的根级 crontask 与业务域内部 crontask，验证脚本常量已同步更新。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in (
+                "crontask/sync_order/main.go",
+                "internal/business/orders/crontask/cleanup_job.go",
+            ):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("package sample", encoding="utf-8")
+            write_manifest(root, backend_manifest())
+            result = self.check_adoption(root)
+            self.assertEqual(0, result.returncode, result.stdout)
+
     def test_adoption_rejects_new_legacy_source_files_and_directories_without_writing(self):
         """确认遗留根新增源码文件或目录会失败且不会改写 fixture。
 
