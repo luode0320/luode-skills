@@ -2,73 +2,45 @@
 
 ## 更新时间
 
-- 2026-07-26
+- 2026-07-29
 
-## 项目概览
+## 当前任务
 
-- 当前目标：完成 `BUG-RTP-20260726-001` 的“首次持久化即悬浮窗同步”周期 07。
-- 当前范围：`ensure-start` 首次投影、持久化后立即 `update_plan`、session 隔离、active/blocked/inactive 可见性、十分钟异常修复、规则文档、专项回归、审查与验收。
-- 非范围：Codex Desktop 产品源码、后台定时器、registry v4 schema、Goal 生命周期、子 Agent 主 UI 权限、非 local 服务和 Git 历史写入。
-- 当前状态：投影入口与规则文档已完成，专项投影回归 69/69 通过；实现审查、当前改动总审查、最终验收文档和 strict profile 已完成，真实 Desktop 首显证据尚未取得，最终状态保持 `LIMITED/HOST_BLOCKED`。
-- 活动会话数：保留 v4 registry 中其它会话投影；本轮仅维护当前会话投影，不代替其它会话失活或完成。
+- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC 与旧项目渐进采纳升级。
+- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则与旧项目 `adoption` 渐进采纳的唯一查询、只读检查、测试、审查和验收闭环。
+- 当前状态：`TASK-05-01` 至 `TASK-09-03` 已完成。CYCLE-09 已通过 30 项本地行为测试、五类文档严格校验、Python 编译和两个目标 Skill 快速校验；当前会话 CYCLE-09 投影已按专属脚本失活。
 
-## 当前任务：Plan Mode 计划出口 Bug
+## 范围与边界
 
-- 来源对象：`BUG-PLAN-OUTPUT-20260726-001`；目标：确保 Plan Mode 不再调用 `reasoning-summary-structure-rules` 生成总结，统一由 `implementation-planning-rules` 输出完整计划。
-- 当前范围：计划/总结 Skill 边界、命中总控、压缩恢复、双平台规则、脱敏回归、工程文档、审查与验收。
-- 当前状态：`TASK-PLAN-01..10` 已完成；`TASK-PLAN-11` 因当前宿主无法创建真实 Plan 会话保持 `in_progress`，最终验收为 `LIMITED/HOST_BLOCKED`。
-- 验证状态：专项契约测试 6/6、永久等待状态模型 10/10、六份工程文档 strict、六个 Skill quick_validate、字典生成和 `git diff --check` 均通过；真实 Desktop 用户可见消息未取得。
-- 非范围：产品源码、外部服务、Git 历史和其它会话 projection；Obsidian 仍因 `VAULT_NOT_REGISTERED` 阻断，不绕过桥接器。
-
-## 本轮结果与结论详细度切片
-
-- 来源对象：`REQ-SUMMARY-DETAIL-001`；目标是让 `reasoning-summary-structure-rules` 的结果区适中详细，既不退化为“已完成”等空泛结论，也不扩张为执行流水账。
-- 当前状态：已完成规则、模板、条件说明、公开示例和专项回归；简单任务默认 3 句，复杂、受限或有关键边界时按事实扩展至 4–5 句，核心始终覆盖问题、方法和结果/验证状态。
-- 验证状态：专项单元测试 9/9、Skill `quick_validate.py`、Python 编译、目标差异检查、六份工程文档 strict、实现审查和最终验收均通过；真实模型输出、Desktop UI 和外部服务不在本来源对象范围内。
-- 交接状态：当前会话 `019f9a43-800a-73b0-80bb-2a79bf2abd67` 的 `PLAN-SUMMARY-DETAIL-001` 投影已迁移为 `inactive`，三个最小任务均为 `completed`；其它会话 registry 项保持原状。
-
-## 基线与保护边界
-
-- 当前工作树存在大量其它会话和用户未提交改动；只做 scoped 增量修改，不执行 reset、checkout、commit 或 push。
-- Plan Mode 决策调用完全省略 `autoResolutionMs`；空答案、缺失答案和隐式超时只能留在 `WAITING_DECISION` 并串行重发同一未决选择框。
-- 未决期间不得输出冻结集合 `commentary`、`limited_plan`、`pending_summary`、`proposed_plan`、`final`、`summary`、`final_answer`、`task_complete`、`result_and_conclusion` 或中文“结果与结论”；部分答案只保存已答项并重发剩余问题，只有完整选择、明确代选授权、明确停止或明确宿主故障才离开等待。
-- 当前工作树存在用户既有未提交改动；只做 scoped 增量修改，不执行 reset、checkout、commit 或 push。
-- Obsidian 沉淀：阻断。doctor 返回 `VAULT_NOT_REGISTERED`，未绕过为直接文件读写。
+- 范围：`package-structure-rules`、`micro-business-architecture-rules`、必要相邻工具规则、V2 研发产物、Skill 字典和当前任务状态。
+- 非范围：业务项目迁移、自动移动、删除或重命名旧文件、真实数据库迁移、网络 RPC、外部服务、前端 `src/util/`、业务域私有 `util/` 和 Git 历史写入。
+- 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 已落盘首次持久化缺失 Bug README、周期 07 实施文档和验收增量，冻结 `REQ-RTP-010..013`、`RULE-RTP-016..022`、`AC-RTP-014..017`。
-- 已新增 `ensure-start`、显式 session 优先解析、payload 返回和完成收口，保留 v1-v4 读取兼容；投影专项测试 69/69 通过。
-- 已同步 `AGENTS.md`、`skill-hit-check-rules`、`autonomous-execution-rules`、`context-compression-rules` 与投影 Owner，统一“写盘成功后的下一动作立即 `update_plan`”口径。
-- 已落盘实现审查、当前改动总审查和周期 07 最终验收文档；审查与文档 strict profile 均 `valid=true`，最终验收为 `LIMITED/HOST_BLOCKED`，未发现 P0/P1。
-- 当前会话 `019f9cf5-ee26-75c0-a639-55a73500c7df` 的投影已绑定周期 07；任务 22-27 已完成，任务 28 正在进行，悬浮任务列表需在验证后继续刷新。
+- 根 `utils/` 只承载可独立复制的工具包和 SDK，禁止直接文件与项目包依赖；源码根 `util/` 只承载直接落盘的项目高关联工具函数，禁止子目录。
+- Catalog、CLI、四语言路径映射、strict/legacy 检查、完整目录树、公共工具示例和 Skill 字典已同步。
+- 每个微业务域按需提供扁平 `rpc/`；跨域只导入目标域精确 `rpc/`，请求和响应均为 JSON 字符串，统一采用 `Response{code,status,message,data}` 语义。
+- Catalog、CLI、微业务隔离脚本、CodeGraph fixture、目录树和引用契约已同步；本地行为回归 21/21 通过，`py_compile`、关键 query 与完整树渲染通过。
+- 旧项目使用 `doc/1-架构/3-目录规则收敛清单.yaml` 进行人工登记：已采纳 V2 目录可原地扩展，遗留源码仅可维护已登记快照，新业务和独立逻辑必须进入 Catalog 唯一 V2 路径。
+- `check --policy adoption --adoption-manifest ...` 已实现只读检查；无效、越界、重复或禁止路径清单稳定失败，检查不改写项目或清单。
+- 已更新需求、实施、测试、实现审查与最终验收文档；未连接数据库、缓存、消息队列、第三方 API 或非 local 环境。
 
-## 待完成
+## 门禁说明
 
-- 真实 Desktop `TEST-RTP-024` 首显证据仍缺失；周期 07 的本地实现、回归、Skill 合规、字典、审查和最终验收文档已收口为 `LIMITED/HOST_BLOCKED`，需保留周期状态 `in_progress` 直到宿主补验。
+- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，五个文档 profile、30 项本地 `unittest` 与两个目标 Skill 快速校验均通过。
 
-## 阻断
+## 验证与交接
 
-- 真实 Desktop 首个领域动作后的悬浮列表可见性尚未取得可回放证据；宿主自动化边界不允许在本线程直接操作 Codex Desktop，因此 `TEST-RTP-024` 只能保持 `LIMITED/HOST_BLOCKED`，不能以脚本或文本替代。
-- Obsidian 固定 vault 未注册，仅影响知识沉淀，不影响本地实现与验证。
-
-## 验证
-
-- 投影专项回归：69/69 通过；`py_compile` 通过；`task-plan-rehydration-rules`、`autonomous-execution-rules` 与 `context-compression-rules` 的 `quick_validate.py` 均通过。
-- 需求、验收、周期、Bug、实现审查、当前改动总审查和最终验收 profile 均 `valid=true`；Bug、审查和最终验收保持 `LIMITED`；字典、UTF-8 和 `git diff --check` 已完成复跑。
-- `task_plan_projection.py` 当前 session 已绑定周期 07，registry 保留其它会话投影；未写 Git 历史。
-- `PROJECT_CURRENT.md`：UTF-8，低于 51,200 字节，托管 registry 保真。
-
-## 下一执行点
-
-- 保留 `TEST-RTP-024` 的真实宿主补验边界；在补验前不把 CLI、静态规则或本地 payload 写成用户可见性通过，周期 07、Bug 和验收状态继续保持 `LIMITED/HOST_BLOCKED`。
+- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 CYCLE-09 投影已仅通过 `task_plan_projection.py deactivate` 失活。
+- 后续目录位置查询与旧项目渐进检查以 `package-structure-rules/scripts/placement_catalog.py` 和 `placement-catalog.yaml` 为唯一入口。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-07-26T09:22:20.684816Z",
+  "registry_updated_at": "2026-07-28T17:37:38.881570Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -559,6 +531,34 @@
           "id": "TASK-PLAN-11",
           "step": "[TASK-PLAN-11] 验证真实新 Plan 会话的用户可见出口",
           "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/a007e029ef1093f43ba49e59c9fa108860f40b8447eca90ea8c5fb46ee36c36b",
+      "session_id": "019f9dd1-31f3-7401-8575-eadf6b3ec55f",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-ADOPT-001/CYCLE-09",
+      "source_document": "doc/3-实施/2026-07-28_014412_代码位置目录规则V2_实施总览.md",
+      "plan_fingerprint": "d97c5f09b4bb91ee1952558b8d877fe6ade3faf48967d25be7277f80940facc3",
+      "updated_at": "2026-07-28T17:37:38.881432Z",
+      "steps": [
+        {
+          "id": "TASK-09-01",
+          "step": "[TASK-09-01] 定义旧项目收敛清单与渐进采纳契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-09-02",
+          "step": "[TASK-09-02] 实现 adoption 只读检查与 CLI 接口",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-09-03",
+          "step": "[TASK-09-03] 完成 fixture、文档、审查与验收闭环",
+          "status": "completed"
         }
       ]
     }

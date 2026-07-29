@@ -46,8 +46,7 @@
 - `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
-- `PROJECT_CURRENT.md` 中的唯一任务投影托管区由 `task-plan-rehydration-rules` 管理。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。当前回合处于 Plan Mode 时该 Skill 只作候选命中并明确退出，不读取投影、不调用 `update_plan`、不创建任务悬浮窗；只有 Plan Mode 已结束且当前回合能证明与活动投影属于同一来源对象时，才在任何领域动作前校验投影并调用 `update_plan` 重建悬浮任务列表。若托管投影缺失，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配或归属不确定时必须明确退出，禁止静默跳过或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
-- 长任务自动 Goal 采用跨会话 standing authorization：默认执行模式取得 `confirmed` 后，从首次真实执行动作累计主动执行时间，扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff`；未完成任务在当前会话无活动或阻断投影且时间严格大于 600 秒时，主 Agent 必须先调用只读 `probe-timeout`，仅在 `goal_check_required` 后按 `get_goal -> 复用匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行。Goal 摘要必须单行中文、不超过 80 字并脱敏，不得落盘；不匹配、工具不可用、失败或结果不明确时禁止重复创建，改用原 `ensure-timeout` 降级普通投影。Plan Mode、许可不足、任务已完成或计时丢失时不得创建 Goal；子 Agent 不得调用 Goal 或主悬浮窗工具。该授权不扩大编码、文件、外部副作用或 Git 权限。
+- `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
 
 ### Obsidian 知识流选择性默认触发（强制）
 
@@ -82,10 +81,11 @@
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
 - 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
-- 若本轮涉及创建、补齐或更新仓库级规则文件或项目记忆四件套，默认启用 `project-rule-file-bootstrap-rules`，再按 `rule-bootstrap` / `memory-bootstrap` 条件路由分别处理；该规则同样适用于其他项目仓库。
+- 若本轮涉及创建、补齐或更新仓库级规则文件，或同时涉及项目记忆四件套，默认额外启用 `project-rule-file-bootstrap-rules`，由其 `rule-bootstrap` / `memory-bootstrap` 条件路由统一自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
 - 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
+- 非 Plan Mode 的仓库实质任务，首条中间进度还必须输出 `闸门预告`：按 `skill-hit-check-rules` 的延迟触发 gate 注册表登记本轮将适用的收口 / 中段 / 测试前 / 失败时等延迟 gate（含 `reasoning-summary-structure-rules`），无适用项写 `无`，Plan Mode 置 `不适用(Plan Mode)`；收口时逐项复核 `闸门预告` 的声明与执行是否一致，不得只在回合末端凭自觉临时补触发延迟 gate。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。
 - 进入分析、侦察、需求、Bug、审查、测试、文档或编码等实质执行前，主 agent 必须自主判断是否存在可由 subagent 并行推进的独立问题、证据来源、文件集、模块边界或职责边界；不得只依赖固定 skill 映射表。
 - 是否值得启动 subagent，必须同时评估上下文重复读取成本与启动成本；若子任务为了完成目标需要重复读取主 agent 已掌握的大段共享上下文、重复扫描同一批核心文件，或主 agent 一次聚焦读取即可在短链路内完成，则判定为必须串行 / 本地优先，不得为了形式上的并行强行启动。
@@ -116,9 +116,9 @@
 ## 会话动态重命名规则
 
 - 当当前 Codex / Claude / agent 会话进入明确需求、Bug、实施、审查、测试、提交、规则更新，或用户提问后已经能稳定归纳出中文任务主题时，且会话标题为空泛、过时、泛称或不匹配当前任务时，必须自动命中 `thread-title-rules`。
-- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按真实工具能力更新当前会话标题；Codex App 优先调用统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败仅在真实存在 `set_thread_title` 时回退一次，成功后不得重复调用。其他宿主只按真实工具发现结果执行，不按模型名称推断能力。
+- `thread-title-rules` 负责生成 8-24 字中文简要标题，并按真实工具发现结果更新当前会话标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，首次 `INVALID_TITLE` 修正重试仍失败则直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在可直接作用于当前会话的 `set_thread_title` 时回退一次，MCP 成功后停止。其他宿主只按真实工具能力执行，不按模型名称推断能力。
 - 会话重命名不等待用户显式要求，也不等待最终总结；goal 创建、goal 恢复、上下文压缩续做、长任务阶段切换或执行阶段主题稳定时，都应在过程中尽早尝试重命名。
-- 但任务主题尚未稳定、标题已准确、工具不可用、可信当前会话上下文缺失、用户明确禁止，或只是最小任务内部小步骤推进时必须跳过并说明原因；禁止通过 `list_threads`、路径、时间或标题相似度猜测当前会话。
+- 但任务主题尚未稳定、标题已准确、工具不可用、无法可靠确定当前会话 ID、用户明确禁止，或只是最小任务内部小步骤推进时必须跳过，并说明原因。
 - `CLAUDE.md` 仅用于 Claude Code 仓库规则自举，不等同于 Claude Desktop 已具备自动会话改名能力。
 - 标题采用“任务对象 + 动作 / 症状 / 阶段”的中文简要写法，避免只写“提交 git”“开始实施”“继续做”“修复 bug”“更新文档”等泛化动作标题。
 - 禁止用正文伪造工具调用、raw directive 或猜测结果来宣称已经改名；所有标题变更必须来自真实工具返回。
@@ -135,7 +135,7 @@
 - 若当前会话刚发生“压缩上下文 / 自动压缩上下文 / 上下文太多”后的重组，默认强制命中 `context-compression-rules`。
 - 压缩后继续执行前，必须重新读取当前项目根目录规则文件（`AGENTS.md` / `CLAUDE.md`），恢复仓库级硬规则、必命中 skill 和阻断条件。
 - 若压缩后未重新读取规则文件，禁止直接进入任何需求、Bug、编码、测试或交付主任务。
-- 若压缩后发现规则文件或项目记忆四件套缺失、损坏或不完整，必须触发 `project-rule-file-bootstrap-rules`，按 `rule-bootstrap` / `memory-bootstrap` 条件路由补齐后再继续主任务。
+- 若压缩后发现规则文件或项目记忆四件套缺失、损坏或结构不完整，必须先触发 `project-rule-file-bootstrap-rules`，按 `rule-bootstrap` / `memory-bootstrap` 条件路由补齐后再继续主任务。
 
 ## 文件编码与写入规则
 
@@ -197,8 +197,6 @@
 - 必要的命中检查、阻断说明、执行证据和用户明确要求的解释不属于 optional commentary。
 
 ## Windows / WSL 执行规则
-
-**PowerShell 使用四级硬约束（能 bash 不 PowerShell、优先 PowerShell 7）：① 普通仓库命令（搜索 / 读写文件 / 规则检查 / 普通 `git status` / `git diff` / `git log` 盘点）能用 Git Bash / bash 完成的一律用 bash，禁止切到 PowerShell；② 执行类命令（编译 / 运行 / 测试 / 调试 / 会真实联网启动运行时的依赖安装）优先用 `wsl.exe --cd` 进 WSL，同样不落 PowerShell；③ 仅 PowerShell 专项场景（`.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化、用户明确要求）才允许 PowerShell；④ 进入 PS 专项必须优先 PowerShell 7（`pwsh -NoProfile`，`$PSVersionTable.PSVersion.Major -ge 7`），Windows PowerShell 5.1 仅在 pwsh7 缺失且升级被权限 / 网络 / 包管理器阻断时回退并记录原因，禁止写成默认入口。完整判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
 
 > 详细规则与命令模板见 `windows-wsl-execution-rules` 与 `windows-encoding-rules` skill。本节为写入规则文件的最小约束摘要。Windows 下普通仓库命令优先使用 Git Bash / bash；PowerShell 不作为普通仓库命令入口，只在 `.ps1`、Windows 专用 cmdlet、PowerShell profile / 编码初始化或用户明确要求时使用。代码位于 WSL 文件系统内且当前动作属于编译、运行、启动程序、测试、调试等执行类命令时，才优先进入 WSL；普通搜索、读写文件、规则检查、普通 git 盘点默认留在 Git Bash / bash。若当前动作已经明确进入 PowerShell 专项场景，还必须同时写入 PowerShell 保底模式：逻辑运算里的 cmdlet 加括号、脚本默认 ASCII-only、null check、变量路径优先 `Join-Path`、`ConvertTo-Json` 显式带 `-Depth`，以及 UTF-8 重定向防护。
 

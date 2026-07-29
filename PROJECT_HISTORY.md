@@ -158,3 +158,8 @@
 - 规则、模板、条件说明、公开示例和专项测试均已同步；空泛“已完成”、超过五句、复制完整测试清单、逐文件改动和执行流水账的候选均有拒绝边界，既有总结顺序、图形化条件和 `WAITING_DECISION` 闸门保持不变。
 - 专项回归 9/9、Skill quick_validate、Python 编译、目标差异检查、六份工程文档 strict、实现审查和最终验收均通过；真实模型输出、Desktop UI 和外部服务不在本来源对象范围内。
 - 当前会话结果详细度投影已在完成 payload 传递给 `update_plan` 后迁移为 `inactive`，三个任务均为 `completed`；未执行 Git 历史写入，Obsidian 沉淀因固定 vault `VAULT_NOT_REGISTERED` 继续阻断。
+- 2026-07-28：完成代码位置目录规则 V2 的微业务 RPC 升级。后端业务域新增按需扁平 `business/<domain>/rpc/`，跨域仅允许精确导入目标域 `rpc/`，请求与响应均为 JSON 字符串并遵循 `Response{code,status,message,data}` 语义。Catalog、CLI、严格检查、`micro_business.py check`、CodeGraph 导入审查与 Go fixture 已同步；本地 unittest 21/21 通过。固定 Obsidian vault 未注册，未进行 vault 沉淀；未执行 Git 历史写入。
+
+- 2026-07-28：代码位置目录规则 V2 的微业务 RPC 升级完成最终本地收口。需求、实施、测试、实现审查和最终验收文档 profile 均通过；`package-structure-rules` 与 `micro-business-architecture-rules` 的 `quick_validate.py` 均通过；当前会话 `PSR-RPC-003` 投影已失活。未连接外部服务，未执行 Git 历史写入。
+
+- 2026-07-29：完成代码位置目录规则 V2 的旧项目渐进采纳升级。新增 `adoption` 只读检查与固定收敛清单 `doc/1-架构/3-目录规则收敛清单.yaml`：已采纳 V2 路径可原地扩展，遗留源码只可维护快照，新业务与独立新逻辑必须进入 Catalog 唯一位置。30 项本地行为测试、Python 编译、两个 Skill 快速校验及五类工程文档严格 profile 均通过；未迁移业务项目、未连接外部服务，未执行 Git 历史写入。

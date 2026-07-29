@@ -229,13 +229,22 @@
 - 更新时间: 2026-07-09
 - 状态: 启用
 
-### 工具落点分流规则
-- 别名: util 归位, common/util 归位, util 与 common/util 区分
+### 后端工具落点分流规则
+- 别名: 后端 utils 归位, 源码根 util 归位, utils 与源码根 util 区分
 - 类型: 包结构/复用规则
-- 定义: `util` 仅存放与当前项目无关、脱离项目上下文仍成立的通用工具；`common/util` 仅存放可复用但依赖当前项目文件、路径、配置、命名约定或目录结构的工具。引用项目文件或项目约定的复用工具不要放进独立 `util`。
+- 定义: 后端中可脱离项目独立复制的工具包与 SDK 仅放根 `utils/<package>/`；根 `utils/` 不得有直接文件且不得依赖项目其他包。可引用项目其他包但不承载业务流程的高关联工具函数直接放入语言源码根 `util/<function>.<ext>`，不得创建子目录。业务域私有辅助继续放 `business/<domain>/util/`；前端工具目录不受此规则影响。
 - 来源: 对话确认、`common-util-rules`（公共资格与复用）、`package-structure-rules`（目录落点与依赖方向）
-- 适用范围: 通用工具、公共函数、复用代码、包归位
-- 更新时间: 2026-07-08
+- 适用范围: 后端通用工具、SDK、高关联工具函数、业务域私有辅助归位
+- 更新时间: 2026-07-28
+- 状态: 启用
+
+### 微业务跨域 JSON RPC 规则
+- 别名: 业务域 rpc, 微业务 JSON 通信, 目标域 rpc 公开入口
+- 类型: 包结构/业务隔离规则
+- 定义: 业务域仅在真实存在跨域调用时创建 `business/<domain>/rpc/`。调用方只能精确导入目标域 `rpc/` 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 `rpc/` 内解析、校验、调用私有层并返回 `Response{code,status,message,data}` JSON。不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`corntask/` 或 `util/`，也不得跨域传递异常、实体、仓储模型或可变业务状态。
+- 来源: 对话确认、`package-structure-rules`、`micro-business-architecture-rules`
+- 适用范围: 后端微业务目录、跨业务调用、CodeGraph 导入审查、JSON 响应边界
+- 更新时间: 2026-07-28
 - 状态: 启用
 
 ### 通用结束信号
@@ -667,6 +676,15 @@
 - 来源：`doc/2-需求/2026-07-22_223221_总控层Skill精简合并与单向路由.md`、`doc/5-tests/2026-07-22_223221/control-plane-streamlining/`。
 - 更新时间：2026-07-22。
 
+## 代码位置目录规则 V2
+
+- 稳定决策：`package-structure-rules` 是三类项目的代码位置、查找与引用唯一 Owner；人工目录树、JSON 兼容 YAML Catalog、CLI 和相邻 Skill 必须保持一致。
+- 稳定决策：后端技术工具、SDK 和服务注册发现统一位于项目根 `utils/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。语言源码根 `util/` 只直接存放可引用项目其他包的高关联工具函数，禁止子目录。
+- 稳定决策：`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/` 与 `database/sql/index/`，两者严格隔离。
+- 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
+- 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
+- 更新时间：2026-07-29。
+
 ## 机器索引区
 
 ```yaml
@@ -947,23 +965,58 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-09
-  - entity_id: rule.util-common-util-placement-split
-    name: "util 与 common/util 工具分流"
+  - entity_id: rule.backend-utils-source-util-placement
+    name: "后端 utils 与源码根 util 工具分流"
     type: "包结构规则"
     aliases:
-      - util 归位
-      - common/util 归位
-      - util 与 common/util 区分
-    definition: "util 仅存放与当前项目无关、脱离项目上下文仍成立的通用工具；common/util 仅存放可复用但依赖当前项目文件、路径、配置、命名约定或目录结构的工具。引用项目文件或项目约定的复用工具不要放进独立 util。"
-    scope: "通用工具、公共函数、复用代码、包归位"
+      - 后端 utils 归位
+      - 源码根 util 归位
+      - utils 与源码根 util 区分
+    definition: "可独立复制的后端工具包与 SDK 位于根 utils/<package>/，根 utils 不得直接存放文件且不得依赖项目其他包；可引用项目其他包的高关联工具函数直接位于语言源码根 util/<function>.<ext>，不得创建子目录。业务域 util 保留为域私有辅助能力。"
+    scope: "后端通用工具、SDK、高关联工具函数、业务域私有辅助归位"
     status: "active"
     evidence_ids:
       - evidence.skill.common-util-rules
       - evidence.skill.package-structure-rules
-      - evidence.dialog.util-common-util-placement
+      - evidence.dialog.backend-utils-source-util-placement
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-08
+    updated_at: 2026-07-28
+  - entity_id: rule.micro-business-json-rpc-boundary
+    name: "微业务跨域 JSON RPC 边界"
+    type: "包结构与业务隔离规则"
+    aliases:
+      - 业务域 rpc
+      - 微业务 JSON 通信
+      - 目标域 rpc 公开入口
+    definition: "业务域按需创建 business/<domain>/rpc。调用方只可精确导入目标域 rpc 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 rpc 内完成解析、校验、私有服务调用和 Response{code,status,message,data} 序列化。目标域 api、service、entity、base、constant、init、corntask、util 等均为私有层，不得跨域导入。"
+    scope: "后端微业务目录、跨业务调用、CodeGraph 导入审查、JSON 响应边界"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.skill.micro-business-architecture-rules
+      - evidence.dialog.micro-business-json-rpc-boundary
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-28
+  - entity_id: rule.legacy-project-directory-adoption
+    name: "旧项目目录规则渐进采纳"
+    type: "包结构兼容规则"
+    aliases:
+      - 旧项目渐进采纳
+      - 收敛清单
+      - adoption 检查
+      - legacy_source_roots
+    definition: "旧项目不自动迁移。人工维护 doc/1-架构/3-目录规则收敛清单.yaml：adopted_paths 只能精确登记已存在的 V2 Catalog 路径并继续遵守其约束；legacy_source_roots 只快照已存在的源码目录和文件，允许维护但禁止新增。新业务、新模块和独立新逻辑必须进入 V2 唯一位置；adoption 检查全程只读。"
+    scope: "旧项目目录兼容、V2 原地采纳、遗留源码维护边界与 CLI 检查"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.doc.psr-v2-adoption
+      - evidence.dialog.legacy-project-directory-adoption
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-29
   - entity_id: rule.thread-title-process-trigger
     name: "会话标题过程触发"
     type: "工作台规则"
@@ -1366,10 +1419,28 @@ evidence:
     source: "package-structure-rules/SKILL.md"
     path: "package-structure-rules/SKILL.md"
     note: "包结构、目录分层和子包归位规则来源"
-  - evidence_id: evidence.dialog.util-common-util-placement
+  - evidence_id: evidence.dialog.backend-utils-source-util-placement
     type: "dialog"
     source: "对话确认"
-    note: "当前对话确认 util 与 common/util 的分流口径"
+    note: "当前对话确认后端根 utils 与源码根 util 的分流口径"
+  - evidence_id: evidence.skill.micro-business-architecture-rules
+    type: "skill"
+    source: "micro-business-architecture-rules/SKILL.md"
+    path: "micro-business-architecture-rules/SKILL.md"
+    note: "微业务横向隔离、目标域 rpc 精确导入与 CodeGraph 审查来源"
+  - evidence_id: evidence.dialog.micro-business-json-rpc-boundary
+    type: "dialog"
+    source: "对话确认"
+    note: "当前对话冻结业务域 rpc 的 JSON 输入输出和私有层跨域导入禁令"
+  - evidence_id: evidence.doc.psr-v2-adoption
+    type: "doc"
+    source: "代码位置目录规则 V2 旧项目渐进采纳需求"
+    path: "doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md"
+    note: "冻结收敛清单、adoption 只读检查、遗留快照维护边界和本地验收。"
+  - evidence_id: evidence.dialog.legacy-project-directory-adoption
+    type: "dialog"
+    source: "对话确认"
+    note: "当前对话确认旧项目可人工登记相似目录沿用，新业务和独立新逻辑逐步采用 V2。"
   - evidence_id: evidence.skill.thread-title
     type: "skill"
     source: "thread-title-rules/SKILL.md"
@@ -1550,7 +1621,9 @@ lifecycle:
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
     - "rule.simple-check-inline-readability"
-    - "rule.util-common-util-placement-split"
+    - "rule.backend-utils-source-util-placement"
+    - "rule.micro-business-json-rpc-boundary"
+    - "rule.legacy-project-directory-adoption"
     - "rule.thread-title-process-trigger"
     - "rule.obsidian-knowledge-flow-selective-default"
     - "rule.git-obsidian-capture-link"
@@ -1670,16 +1743,28 @@ retrieval_hints:
       - "rule.simple-check-inline-readability"
     职责拆分颗粒度:
       - "rule.simple-check-inline-readability"
-    util 归位:
-      - "rule.util-common-util-placement-split"
-    common/util 归位:
-      - "rule.util-common-util-placement-split"
-    util 与 common/util 区分:
-      - "rule.util-common-util-placement-split"
-    项目无关工具:
-      - "rule.util-common-util-placement-split"
-    项目相关工具:
-      - "rule.util-common-util-placement-split"
+    后端 utils 归位:
+      - "rule.backend-utils-source-util-placement"
+    源码根 util 归位:
+      - "rule.backend-utils-source-util-placement"
+    utils 与源码根 util 区分:
+      - "rule.backend-utils-source-util-placement"
+    项目无关工具包:
+      - "rule.backend-utils-source-util-placement"
+    项目高关联工具函数:
+      - "rule.backend-utils-source-util-placement"
+    业务域 rpc:
+      - "rule.micro-business-json-rpc-boundary"
+    微业务 JSON 通信:
+      - "rule.micro-business-json-rpc-boundary"
+    目标域 rpc 公开入口:
+      - "rule.micro-business-json-rpc-boundary"
+    旧项目渐进采纳:
+      - "rule.legacy-project-directory-adoption"
+    收敛清单:
+      - "rule.legacy-project-directory-adoption"
+    adoption 检查:
+      - "rule.legacy-project-directory-adoption"
     code-generation-style-rules:
       - "rule.code-generation-style-contract"
     代码风格契约:
@@ -1773,12 +1858,20 @@ retrieval_hints:
       - "rule.simple-check-inline-readability"
     可读性:
       - "rule.simple-check-inline-readability"
-    工具落点分流:
-      - "rule.util-common-util-placement-split"
-    util / common/util:
-      - "rule.util-common-util-placement-split"
-    公共工具归位:
-      - "rule.util-common-util-placement-split"
+    后端工具落点分流:
+      - "rule.backend-utils-source-util-placement"
+    utils / 源码根 util:
+      - "rule.backend-utils-source-util-placement"
+    后端公共工具归位:
+      - "rule.backend-utils-source-util-placement"
+    微业务隔离:
+      - "rule.micro-business-json-rpc-boundary"
+    跨业务调用:
+      - "rule.micro-business-json-rpc-boundary"
+    旧项目目录兼容:
+      - "rule.legacy-project-directory-adoption"
+    遗留源码维护:
+      - "rule.legacy-project-directory-adoption"
     会话标题管理:
       - "rule.thread-title-process-trigger"
     goal 长任务:
@@ -1883,11 +1976,17 @@ retrieval_hints:
     code-readability-rules/references/function-structure-rules.md:
       - "rule.simple-check-inline-readability"
     common-util-rules/SKILL.md:
-      - "rule.util-common-util-placement-split"
+      - "rule.backend-utils-source-util-placement"
     package-structure-rules/SKILL.md:
-      - "rule.util-common-util-placement-split"
+      - "rule.backend-utils-source-util-placement"
+      - "rule.micro-business-json-rpc-boundary"
+      - "rule.legacy-project-directory-adoption"
+    doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md:
+      - "rule.legacy-project-directory-adoption"
+    micro-business-architecture-rules/SKILL.md:
+      - "rule.micro-business-json-rpc-boundary"
     编码skill.md:
-      - "rule.util-common-util-placement-split"
+      - "rule.backend-utils-source-util-placement"
     project-agents-bootstrap/SKILL.md:
       - "rule.code-generation-style-contract"
       - "rule.thread-title-process-trigger"
