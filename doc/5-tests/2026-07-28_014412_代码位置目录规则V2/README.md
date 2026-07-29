@@ -61,7 +61,7 @@ review_acceptance_gates:
 
 | 分类 | 样本 | 预期结果 |
 |---|---|---|
-| 正向路径 | `utils/time/format.<ext>`、`utils/crontask/scheduler.<ext>`、`utils/json/codec.<ext>`、`utils/log/logger.<ext>`、`utils/discovery/polaris/`、`utils/discovery/nacos/`。 | strict 通过或查询返回唯一位置。 |
+| 正向路径 | `utils/time/format.<ext>`、`utils/cron/scheduler.<ext>`、`utils/json/codec.<ext>`、`utils/log/logger.<ext>`、`utils/discovery/polaris/`、`utils/discovery/nacos/`。 | strict 通过或查询返回唯一位置。 |
 | 四语言路径 | Go `internal/util/`、Java `src/main/java/<base-package>/util/`、Node.js `src/util/`、Python `src/<package>/util/`。 | `source-util --language` 返回一个规范路径。 |
 | 负向根文件 | `utils/<file>.<ext>`。 | strict 返回退出码 2。 |
 | 负向旧路径 | 根 `util/...`。 | strict 返回退出码 2，legacy 只警告。 |
@@ -101,7 +101,7 @@ python package-structure-rules/scripts/placement_catalog.py check --root <legacy
 
 ## 验证结论
 
-本轮执行 31 项 `unittest`，结果为 `OK`。根 `utils/time/`、`utils/crontask/`、`utils/json/`、`utils/log/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本、改名后根级与业务域内部 `crontask/` 样本，以及已采纳目录与遗留快照均通过检查；三个私有层跨域导入、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；CodeGraph 已在测试中同步索引并定位每个导入节点。
+本轮执行 31 项 `unittest`，结果为 `OK`。根 `utils/time/`、`utils/cron/`、`utils/json/`、`utils/log/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本、改名后根级与业务域内部 `crontask/` 样本，以及已采纳目录与遗留快照均通过检查；三个私有层跨域导入、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；CodeGraph 已在测试中同步索引并定位每个导入节点。
 
 ## 完成标准
 

@@ -110,7 +110,7 @@ class InitCheckTests(unittest.TestCase):
             root = Path(directory)
             for package, filename in (
                 ("utils/time", "format.go"),
-                ("utils/crontask", "scheduler.go"),
+                ("utils/cron", "scheduler.go"),
                 ("utils/json", "codec.go"),
                 ("utils/log", "logger.go"),
                 ("utils/discovery/polaris", "register.go"),
