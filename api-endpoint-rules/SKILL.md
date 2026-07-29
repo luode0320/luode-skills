@@ -19,7 +19,7 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 - 防止把请求结构、响应格式和错误处理混进入口定义规则。
 - 确保接口路径名称语义清晰、类型清楚，通过路径区分操作类型（如 /orders/get、/orders/del、/orders/add）。
 
-## 强制规则：Go 路由注册写法（internal/router）
+## 强制规则：Go 路由注册写法（Catalog router）
 
 - 路由注册必须显式声明，不使用通用路由包装器（如 `registerPostRoutes`、route 列表驱动）隐藏具体接口声明。
 - 路由 path 必须在注册处直接硬编码，不使用路径常量引用（除全局根前缀如 `/api/walletPay` 外）。
@@ -47,12 +47,12 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 3. 确认所有接口强制使用 POST 请求，JSON 作为 body。
 4. 明确路径命名对象、资源语义和操作类型（通过路径区分 get/add/del/update 等）。
 5. 确认入口层只承担接入职责，不直接下沉复杂业务。
-6. 确认使用 `internal/controller`、`internal/router`，不使用 handler 包名。
+6. 先查询 `package-structure-rules` Catalog 的 `router`、`controller`，再使用返回的唯一源码位置；不使用 handler 包名。
 7. 若同一阶段存在多条路由注册，确认使用代码块 `{ ... }` 包裹注册区段，保证结构直观。
 
 ## 默认执行流程
 
-1. 先确认遵循 `package-structure-rules` 的约定：使用 `internal/controller`、`internal/router`，不使用 handler 包名。
+1. 先查询 `package-structure-rules` Catalog 的 `router` 与 `controller` 条目，不使用 handler 包名。
 2. 默认先读 `references/endpoint-responsibility.md`，判断入口层职责边界。
 3. 如果涉及路径命名和方法语义，再读 `references/path-and-method-semantics.md`。
 4. 如果涉及接口或典型反例，再读 `references/endpoint-examples.md`。
@@ -79,7 +79,7 @@ description: 当新增或修改 controller、router、路由声明、HTTP 方法
 
 ## 执行通过 / 驳回标准
 
-- 通过：能明确接口入口职责、路径命名语义清晰且包含操作类型、强制使用 POST 方法 + JSON body、使用 internal/controller/internal/router 而不使用 handler、明确不应放入入口层的逻辑边界；Go 路由函数中的批量路由注册已使用代码块 `{ ... }` 收口。
+- 通过：能明确接口入口职责、路径命名语义清晰且包含操作类型、强制使用 POST 方法 + JSON body、使用 Catalog 返回的 controller/router 而不使用 handler、明确不应放入入口层的逻辑边界；Go 路由函数中的批量路由注册已使用代码块 `{ ... }` 收口。
 - 驳回：路径命名含糊、使用了非 POST 请求类型、controller 承担过多业务逻辑、使用了 handler 包名、把请求 / 响应规则混作入口问题，或 Go 批量路由注册未使用代码块 `{ ... }`。
 
 ## 执行结果归档要求

@@ -23,11 +23,11 @@ if err != nil {
 }
 ```
 
-### 正例 3：请求结构体放在 internal/entity 包下（参考 package-structure-rules）
+### 正例 3：请求结构体放在 common/request 包下（参考 package-structure-rules）
 
 ```go
-// internal/entity/order.go
-package entity
+// common/request/order.go
+package request
 
 type ReqGetOrder struct {
     OrderID string `json:"orderId" binding:"required"` // 订单 ID

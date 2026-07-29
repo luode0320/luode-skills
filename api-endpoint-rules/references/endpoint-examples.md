@@ -14,20 +14,20 @@
 
 - controller 只接参数、调 service、返回结果。
 - 复杂规则放在 service 中处理。
-- 使用 `internal/controller`、`internal/router`，不使用 handler。
+- 使用 Catalog 返回的 `controller`、`router` 唯一位置，不使用 handler。
 
 ### 正例 3：完整目录结构参考 package-structure-rules
 
 ```
 项目根目录/
-├── internal/
-│   ├── router/       # 路由注册
-│   ├── controller/   # 控制器（不使用 handler）
-│   ├── service/      # 业务逻辑
-│   └── entity/       # API 结构体
+├── <source-root>/
+│   ├── router/       # Catalog 返回的路由位置
+│   ├── controller/   # Catalog 返回的控制器位置（不使用 handler）
+│   └── business/     # 业务域实现
 ├── common/
-│   ├── model/        # 数据库模型
-│   └── repository/   # 数据访问
+│   └── request/      # 请求 DTO
+├── database/
+│   └── repository/   # 数据库访问
 └── ...
 ```
 
@@ -68,7 +68,7 @@
 
 - `handler/` 目录
 - `internal/handler/` 目录
-- 结论：必须使用 `internal/controller`，不使用 handler。
+- 结论：必须使用 Catalog 返回的 `controller`，不使用 handler。
 
 ### 反例 5：动作堆砌路径，资源语义不清
 

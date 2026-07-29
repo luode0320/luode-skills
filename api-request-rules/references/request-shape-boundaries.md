@@ -18,7 +18,7 @@
 - `JSON body`
   所有请求参数（包括资源定位、筛选条件、分页、排序、主体输入载荷等）统一放在 JSON body 中。
 - `DTO`
-  适合作为请求层稳定输入模型，不直接暴露内部持久化模型。请求结构体建议放在 `internal/entity` 包下（参考 package-structure-rules）。
+  适合作为请求层稳定输入模型，不直接暴露内部持久化模型。请求结构体固定放在后端根 `common/request/`（参考 package-structure-rules Catalog）。
 
 ## Controller 参数绑定标准写法
 
@@ -35,5 +35,5 @@ if err != nil {
 
 - 所有参数统一放 JSON body。
 - DTO 服务于接口契约，不服务于偷懒复用内部结构。
-- 请求结构体建议放在 `internal/entity` 包下（参考 package-structure-rules）。
+- 请求结构体固定放在后端根 `common/request/`（参考 package-structure-rules Catalog）。
 - 统一使用 ShouldBindJSON 进行参数绑定，绑定失败时统一返回错误。

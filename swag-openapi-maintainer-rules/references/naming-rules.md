@@ -153,8 +153,8 @@ interfaces:
     summary_source: explicit
     file: supported_onramps_all_法币渠道列表.yaml
     generated: true
-    source_router_file: internal/router/supported.go
-    source_controller_file: internal/controller/supported.go
+    source_router_file: <Catalog router>/supported.go
+    source_controller_file: <Catalog controller>/supported.go
     source_symbols:
       - SupportedController.All
 ```

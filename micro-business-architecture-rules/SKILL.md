@@ -1,84 +1,62 @@
 ---
 name: micro-business-architecture-rules
-description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业务代码骨架），或用户提出「微业务 / 伪微服务 / 按业务分目录包 / 业务隔离 / 业务互不关联 / 公共接口包通信 / 新业务开新包 / 一个项目一个服务的伪微服务」等诉求，或项目已存在微业务标记时自动触发。负责把单项目单服务按业务垂直切分为互不关联的业务目录包，业务包之间禁止横向 import，跨业务只经公共接口包（contract）以接口形式通信；定义 Go 优先的目录布局、每业务包统一 README 与全局业务 / 接口契约索引 md 规则，并提供幂等脚本建业务包骨架、写微业务标记与校验跨业务非法依赖，让 AI 只读单个业务包上下文即可分析实现逻辑。目录 / 命名统一引用 `artifact-storage-rules`，分层落点交给 `package-structure-rules`，接口抽象服从 `code-readability-rules` 的反单实现接口判定；不要用它代替需求分析、实施规划、分层落点或实际编码。
+description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业务代码骨架），或用户提出「微业务 / 伪微服务 / 按业务分目录包 / 业务隔离 / 业务互不关联 / RPC 通信 / 新业务开新包 / 一个项目一个服务的伪微服务」等诉求，或项目已存在微业务标记时自动触发。负责守护单项目单服务中的业务垂直切分和跨业务导入隔离：调用方只能导入目标业务域 `rpc/` 的 JSON 字符串公开函数，禁止导入目标业务私有层；提供幂等脚手架、标记与确定性校验，并以 CodeGraph 导入节点作为审查证据。具体目录、JSON 响应语义和引用边界由 `package-structure-rules` 唯一拥有；不要用它代替需求分析、实施规划、分层落点或实际编码。
 ---
 
 # 微业务架构规则
 
 ## 目标
 
-- 把「微业务（伪微服务）」架构固化为可自动命中、可校验、可交接的规则。
-- 新项目开局即引导按「业务包隔离 + 公共接口包通信」组织代码。
-- 每个业务包自带统一 README，使 AI 只读单业务上下文即可分析与实现。
-- 新业务新开目录包，旧业务只在自己包内演进，互不影响、互不关联。
+- 把微业务（伪微服务）的业务域隔离固化为可自动命中、可校验、可交接的规则。
+- 让每个业务包自包含，调用方不能直接读取或引用其他业务域的私有代码、实体或状态。
+- 用进程内 JSON 字符串 RPC 模拟服务接口边界，不引入网络 RPC、HTTP、消息队列或独立部署。
 
-## 核心理念（为什么这么做）
+## 核心理念
 
-- AI 天然适合「微服务」式上下文：每次只聚焦一个业务就能把实现逻辑读清楚。
-- 真微服务（独立进程 / 独立部署 / 独立仓库）过重；微业务只在**一个项目、一个服务**内做伪微服务切分。
-- 不同业务放到不同目录包，各自互不影响、互不关联；需要交互时统一经一个公共接口包以接口形式通信。
+- 微业务仍是一个项目、一个服务进程；切分目标是降低业务上下文和依赖耦合，不是创建真实微服务。
+- 每个业务放在自己的 `business/<domain>/`；跨域仅导入目标域 `rpc/` 的公开函数，输入与输出都是 JSON 字符串。
+- 被调用域在自身 `rpc/` 内解析请求、调用本域私有服务、序列化统一响应；调用方不会获得目标域实体、仓储模型或语言异常。
 
 ## 自动触发信号
 
-- 用户提出「微业务 / 伪微服务 / 按业务拆目录包 / 业务互不关联 / 公共接口包通信 / 新业务新开包」等诉求。
-- 新会话首轮检测到新或空仓库（无 `internal/business/` 等业务根、且无微业务标记）。
-- 项目已存在微业务标记（`CLAUDE.md` 的 `## 微业务架构约束` 章节，或 `项目设计.md` 的微业务段）。
-- 用户要求「用微业务架构建项目 / 新增一个业务包 / 校验业务隔离」。
+- 用户提出微业务、伪微服务、业务隔离、跨业务通信、JSON RPC、按业务拆目录包或业务互不关联。
+- 新会话首轮检测到新或空业务项目，或项目已有微业务标记。
+- 用户要求新增业务包、创建业务域 RPC、校验业务隔离或审查跨业务导入。
 
 ## 进入后先做什么
 
-1. 先明确触发发生地：本 skill 的引导对象是**当前业务项目**，不是本 skill 的存放仓库（`luode-skills`）。
-2. 新会话首轮强制联动 `project-rule-file-bootstrap-rules`，确保规则文件（`CLAUDE.md` / `AGENTS.md`）已存在。
-3. 检测是否为新 / 空仓库，或是否已有微业务标记（判定标准见 `references/trigger-and-marker.md`）。
-4. 若为候选新项目：先**建议**采用微业务架构，经用户确认后再写标记；不得未经确认直接写入。
-5. 若已有标记：进入守护模式，按隔离与通信契约检查后续改动。
+1. 明确当前对象是业务项目，不是 `luode-skills` 规则仓库本身。
+2. 新会话首轮先联动 `project-rule-file-bootstrap-rules`，再依 `trigger-and-marker.md` 判断引导或守护模式。
+3. 需要目录、JSON 响应或引用边界时先查询 `package-structure-rules`；本 Skill 不复制其目录 Owner 职责。
+4. 需要隔离检查时读取 `isolation-and-communication.md`，使用 `micro_business.py check` 做确定性门禁，并在审查时用 CodeGraph 导入节点复核证据。
 
-## 默认执行流程
+## 核心原则
 
-1. 先读 `references/trigger-and-marker.md`，确认触发判定、标记写入与守护流程。
-2. 需要目录落点时读 `references/directory-layout.md`。
-3. 需要判断业务隔离与跨业务通信时读 `references/isolation-and-communication.md`。
-4. 需要产出或校验业务包 md 时读 `references/md-convention.md`。
-5. 判断与相邻 skill 边界时读 `references/boundaries.md`。
-6. 新建业务包用 `scripts/micro_business.py scaffold <业务名>`；写微业务标记用 `init`；校验隔离用 `check`。
-7. 结构结论按需弱回写 `doc/1-架构/3-模块职责.md`（路径遵循 `artifact-storage-rules`）。
+1. **业务垂直切分**：每个业务域是自包含目录包，私有实现只在本域中演进。
+2. **跨域最小导入**：业务域 A 只能导入业务域 B 的 `rpc/`；`api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`corntask/`、`util/` 均为目标域私有层。
+3. **JSON 通信契约**：公开 RPC 函数接收 JSON 字符串，返回 JSON 字符串；返回值遵循根 `common/response.Response` 的 `code`、`status`、`message`、`data` 语义。
+4. **失败不跨域抛出**：解析、校验与业务失败均序列化为统一响应，不能把目标域异常、实体或仓储模型泄漏给调用方。
+5. **按需公开**：没有真实跨业务调用者时不创建 `rpc/`；新业务仅在需要时显式启用该目录。
+6. **允许的公共例外**：根 `common/request`、`response`、`constant`、`error`、`validation` 和仅含非业务运行引用的 `global/` 可直接使用；`global/` 禁止承载业务实体、业务状态、业务列表或可变业务缓存。
 
-## 微业务核心原则（详见 references）
+## 与相邻 Skill 的边界
 
-1. **业务垂直切分**：每个业务是一个自包含目录包，内部含自己的入口 / 逻辑 / 模型 / 存储访问。
-2. **横向零依赖**：业务包 A 禁止直接 import 业务包 B 的任何内部路径。
-3. **受控通信**：跨业务调用只经公共接口包 `contract/`，由被调用方实现并注册，调用方依赖接口（依赖倒置）。
-4. **接口按需**：只为真实存在的跨业务调用点建接口；无外部调用者的业务包不预建接口（服从 `code-readability-rules`）。
-5. **新增即新包**：新业务新开目录包，旧业务包不被改动。
-6. **单业务可读**：每业务包统一 README + 全局索引，AI 读「全局索引 → 该业务包 README + 代码」即可分析，无需扫全仓。
+- `package-structure-rules`：唯一拥有 `business/<domain>/rpc/`、JSON 响应语义、目录查询、初始化、渲染和严格检查规则。
+- `codegraph-analysis-rules`：拥有导入节点、调用链和影响面检索；本 Skill 只把其结果作为跨域隔离审查证据。
+- `code-readability-rules`：拥有一般抽象取舍；本规则的 `rpc/` 是已冻结的跨域通信边界，不要求额外接口、注册或依赖注入层。
+- `artifact-storage-rules`：拥有研发文档产物路径；本 Skill 不另建测试或文档目录。
+- `architecture-doc-rules`：业务域与 RPC 关系可按需摘要回写项目架构文档。
 
-## 与相邻 skill 的边界
+## 执行入口
 
-- 不替代 `package-structure-rules` 定义技术分层（router / controller / service / repository）落点；本 skill 只补业务横向隔离 + `contract` 通信这一层。
-- 接口抽象服从 `code-readability-rules`：只为真实跨业务调用点建接口，禁止「一个业务一个接口」式单实现接口预建。
-- 目录 / 命名 / 文档产物路径统一引用 `artifact-storage-rules`，不自定义。
-- 结构结论可弱回写 `architecture-doc-rules` 的 `doc/1-架构/3-模块职责.md`。
-- 新会话首轮规则文件自举交给 `project-rule-file-bootstrap-rules`，本 skill 不侵入其脚本。
-- 与 `implementation-planning-rules` 的「垂直切片」区分：那是任务拆分语义，本 skill 是代码业务包切分。
+- 触发、标记和守护：`references/trigger-and-marker.md`。
+- 业务域目录与按需脚手架：`references/directory-layout.md`、`scripts/micro_business.py scaffold <domain> --with-rpc`。
+- 隔离、JSON 通信与 CodeGraph 审查：`references/isolation-and-communication.md`、`scripts/micro_business.py check`。
+- 业务包 README 与全局索引：`references/md-convention.md`。
 
-## references 读取规则
+## 通过标准
 
-- 默认先读 `references/trigger-and-marker.md`（触发判定、标记与守护）。
-- 需要目录布局时读 `references/directory-layout.md`。
-- 需要隔离与通信判断时读 `references/isolation-and-communication.md`。
-- 需要业务包 md 规范时读 `references/md-convention.md`。
-- 判断相邻 skill 边界时读 `references/boundaries.md`。
-
-## 执行结果归档要求
-
-- 业务包骨架与 README 落在目标项目代码目录（如 `internal/business/<域>/`），不落 `doc/`。
-- 全局业务包索引落 `internal/business/README.md`，公共接口契约清单落 `internal/contract/README.md`。
-- 微业务采用决策与业务清单入口可弱回写根目录 `项目设计.md` 与 `doc/1-架构/3-模块职责.md`。
-- 微业务标记 upsert 到目标项目 `CLAUDE.md` / `AGENTS.md` 的 `## 微业务架构约束` 章节。
-
-## 极致完整性与零决策硬闸门
-
-- 新增业务包必须同时产出该包 README，并更新全局业务索引；缺任一视为未收口。
-- 跨业务调用必须经 `contract/` 接口，禁止 `business/A` 直接 import `business/B`；违规必须由 `check` 报出并修复。
-- 未经用户确认不得写入微业务标记；即使判定为新仓库，也只先建议、不擅自写入。
-- 目录 / 命名不得绕开 `artifact-storage-rules`；接口不得违反 `code-readability-rules` 的反单实现接口判定。
+- `micro_business.py check` 只接受跨业务到目标 `rpc/` 的精确导入，并稳定拒绝目标域任何私有层导入。
+- CodeGraph 可定位合规 RPC 导入和每一种私有层违规导入，作为审查与验收证据。
+- 业务域 RPC 函数仅传递 JSON 字符串，统一响应可解析为 `code`、`status`、`message`、`data`。
+- 不创建真实网络通信、数据库迁移、业务仓库迁移或 Git 历史写入。

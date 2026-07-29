@@ -8,12 +8,18 @@
 
 退出码: 0 表示通过, 非 0 表示存在违规或执行错误。
 仅使用 Python 标准库, 无第三方依赖; 所有文件读写显式 UTF-8。
-最近修改时间: 2026-07-13
+最近修改时间: 2026-07-28
 """
 import argparse
 import re
 import sys
 from pathlib import Path
+
+# Windows 重定向到测试子进程时也必须保持 UTF-8，避免父进程无法稳定解析诊断信息。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 
 # 脚本自身位置, 用于定位同仓库的 templates 目录
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -21,7 +27,7 @@ SKILL_DIR = SCRIPT_DIR.parent
 README_TEMPLATE = SKILL_DIR / "templates" / "business-readme-template.md"
 
 # 业务包内默认子目录(分层落点沿用 package-structure-rules, 此处仅建目录占位)
-DEFAULT_SUBDIRS = ["handler", "logic", "model", "store"]
+DEFAULT_SUBDIRS = ["api", "service", "entity", "base", "constant", "init", "corntask", "util"]
 
 # 匹配 import 路径中的业务包路径段: .../business/<名字>
 BUSINESS_IMPORT_RE = re.compile(r'(?:^|/)business/([A-Za-z0-9_]+)')
@@ -68,13 +74,27 @@ def extract_import_paths(go_source):
     return paths
 
 
+def is_allowed_rpc_import(import_path, target_business):
+    """判断跨业务导入是否精确落在目标业务的 rpc 公开入口。
+
+    [参数] import_path：Go import 字符串；target_business：被调用业务包名。
+    [返回] bool：仅导入 `business/<target>/rpc` 时返回真。
+    最近修改时间: 2026-07-28 23:55:00 将跨业务白名单收敛为 JSON RPC 入口。
+    """
+    match = BUSINESS_IMPORT_RE.search(import_path)
+    if match is None or match.group(1) != target_business:
+        return False
+    # 1. 仅精确匹配 rpc 根，禁止进一步导入 rpc 子目录或任何私有层。
+    return import_path[match.end():].strip("/") == "rpc"
+
+
 def check_isolation(root, business_dir):
-    """校验业务包之间是否存在非法横向 import。
+    """校验跨业务导入只通过目标域的 rpc 公开入口发生。
 
     [参数] root: 项目根目录 Path
     [参数] business_dir: 业务根相对路径(默认 internal/business)
     [返回] 违规记录列表, 每项为 (业务包, 文件, 违规import, 被直连业务)
-    最近修改时间: 2026-07-13
+    最近修改时间: 2026-07-28 23:55:00 将跨业务白名单收敛为精确 rpc 导入。
     """
     business_root = root / business_dir
     packages = list_business_packages(business_root)
@@ -94,8 +114,8 @@ def check_isolation(root, business_dir):
                 if not match:
                     continue
                 other = match.group(1)
-                # 只有指向"另一个真实存在的业务包"才算跨业务直连违规
-                if other in package_set and other != pkg:
+                # 只有目标业务的 rpc 根是跨域公开入口，其余任何路径均为私有实现。
+                if other in package_set and other != pkg and not is_allowed_rpc_import(imp, other):
                     violations.append((pkg, str(go_file), imp, other))
     return violations
 
@@ -105,7 +125,7 @@ def render_readme(business_name):
 
     [参数] business_name: 业务包名
     [返回] 渲染后的 README 文本; 模板缺失时返回最小骨架
-    最近修改时间: 2026-07-13
+    最近修改时间: 2026-07-28 23:55:00 业务 README 模板已改为记录 JSON RPC 边界。
     """
     if README_TEMPLATE.is_file():
         text = README_TEMPLATE.read_text(encoding="utf-8")
@@ -120,16 +140,16 @@ def cmd_check(args):
 
     [参数] args: argparse 解析结果(含 root, business_dir)
     [返回] 退出码 0(通过) / 1(存在违规)
-    最近修改时间: 2026-07-13
+    最近修改时间: 2026-07-28 23:55:00 输出目标业务 rpc 的确定性修复路径。
     """
     root = Path(args.root).resolve()
     log(f"开始隔离校验: root={root}, business_dir={args.business_dir}")
     violations = check_isolation(root, args.business_dir)
     if violations:
-        log(f"发现 {len(violations)} 处跨业务非法 import(禁止 business 直连 business):")
+        log(f"发现 {len(violations)} 处跨业务非法 import(仅允许导入目标业务 rpc):")
         for pkg, go_file, imp, other in violations:
             log(f'  [违规] 业务包 {pkg} -> {other}: {go_file} 中 import "{imp}"')
-        log("修复: 跨业务调用改走 contract/<被调用业务> 接口(见 references/isolation-and-communication.md)")
+        log("修复: 跨业务调用改走 business/<被调用业务>/rpc 的 JSON 字符串公开函数(见 references/isolation-and-communication.md)")
         return 1
     log("隔离校验通过: 未发现跨业务非法 import")
     return 0
@@ -138,9 +158,9 @@ def cmd_check(args):
 def cmd_scaffold(args):
     """scaffold 子命令: 新建业务包骨架并套用 README 模板(幂等)。
 
-    [参数] args: argparse 解析结果(含 name, root, business_dir, with_contract)
+    [参数] args: argparse 解析结果(含 name, root, business_dir, with_rpc)
     [返回] 退出码 0
-    最近修改时间: 2026-07-13
+    最近修改时间: 2026-07-28 23:55:00 脚手架按需创建业务域 rpc，而非根 contract。
     """
     root = Path(args.root).resolve()
     business_root = root / args.business_dir
@@ -159,12 +179,12 @@ def cmd_scaffold(args):
         pkg_dir.mkdir(parents=True, exist_ok=True)
         readme.write_text(render_readme(args.name), encoding="utf-8")
         created.append(str(readme))
-    # 3. 按需创建公共接口包目录
-    if args.with_contract:
-        contract_dir = root / "internal" / "contract" / args.name
-        if not contract_dir.exists():
-            contract_dir.mkdir(parents=True, exist_ok=True)
-            created.append(str(contract_dir))
+    # 3. 仅在明确存在跨业务调用能力时创建当前业务域的公开 RPC 入口。
+    if args.with_rpc:
+        rpc_dir = pkg_dir / "rpc"
+        if not rpc_dir.exists():
+            rpc_dir.mkdir(parents=True, exist_ok=True)
+            created.append(str(rpc_dir))
     if created:
         log(f"已创建 {len(created)} 项:")
         for item in created:
@@ -179,15 +199,15 @@ def cmd_scaffold(args):
 MARKER_SECTION_HEADER = "微业务架构约束"
 MARKER_SECTION_BODY = """本项目采用微业务(伪微服务)架构, 由 `micro-business-architecture-rules` skill 守护。
 
-- 不同业务放在 `internal/business/<域>/` 下, 各自自包含; 业务包之间禁止直接 import(横向零依赖)。
-- 跨业务调用只经公共接口包 `internal/contract/<域>/` 以接口形式通信(依赖倒置)。
+- 不同业务放在 `internal/business/<域>/` 下, 各自自包含; 业务包之间仅允许导入目标域 `rpc/` 公开入口。
+- 跨业务调用的请求与响应均为 JSON 字符串; 目标域 `rpc/` 自行解析、调用本域服务并返回统一 Response JSON。
 - 新业务新开目录包, 旧业务只在自己包内演进, 互不影响。
-- 每个业务包必须有统一 README; 全局业务索引在 `internal/business/README.md`, 接口契约清单在 `internal/contract/README.md`。
+- 每个业务包必须有统一 README; 全局业务索引在 `internal/business/README.md`。
 - 新增业务用 `micro_business.py scaffold <业务名>`, 改动后用 `micro_business.py check` 校验隔离。"""
 
 # 微业务标记: 写入根目录 项目设计.md 的业务索引段标题与正文
 DESIGN_SECTION_HEADER = "微业务架构与业务包索引"
-DESIGN_SECTION_BODY = """本项目采用微业务架构。业务包索引见 `internal/business/README.md`, 公共接口契约清单见 `internal/contract/README.md`; 架构约束见规则文件的「微业务架构约束」章节。"""
+DESIGN_SECTION_BODY = """本项目采用微业务架构。业务包索引见 `internal/business/README.md`；跨业务调用仅导入目标业务 `rpc/` 的 JSON 字符串公开函数，架构约束见规则文件的「微业务架构约束」章节。"""
 
 
 def upsert_section(file_path, header, body):
@@ -265,7 +285,7 @@ def build_parser():
 
     [参数] 无
     [返回] argparse.ArgumentParser 实例
-    最近修改时间: 2026-07-13
+    最近修改时间: 2026-07-28 23:55:00 将按需 contract 脚手架参数替换为 --with-rpc。
     """
     parser = argparse.ArgumentParser(
         prog="micro_business",
@@ -278,7 +298,7 @@ def build_parser():
     p_scaffold.add_argument("name", help="业务包名(ASCII, 如 order)")
     p_scaffold.add_argument("--root", default=".", help="项目根目录(默认当前目录)")
     p_scaffold.add_argument("--business-dir", default="internal/business", help="业务根相对路径")
-    p_scaffold.add_argument("--with-contract", action="store_true", help="同时创建 internal/contract/<name> 目录")
+    p_scaffold.add_argument("--with-rpc", action="store_true", help="同时创建 internal/business/<name>/rpc 目录")
     p_scaffold.set_defaults(func=cmd_scaffold)
 
     # check 子命令

@@ -234,7 +234,16 @@
         "package-structure-rules/references/go-package-layout.md",
         "package-structure-rules/references/java-layer-layout.md",
         "package-structure-rules/references/node-python-module-layout.md",
-        "package-structure-rules/references/structure-general.md"
+        "package-structure-rules/references/structure-general.md",
+        "package-structure-rules/references/project-layout-v2.md",
+        "package-structure-rules/references/placement-catalog.yaml",
+        "package-structure-rules/references/placement-catalog.schema.json",
+        "package-structure-rules/references/lookup-and-reference-contract.md",
+        "package-structure-rules/references/configuration-layout.md",
+        "package-structure-rules/references/database-layout.md",
+        "package-structure-rules/references/backend-util-layout.md",
+        "package-structure-rules/references/frontend-project-layout.md",
+        "package-structure-rules/scripts/placement_catalog.py"
       ],
       "source_globs": [],
       "consumption": "static-only"

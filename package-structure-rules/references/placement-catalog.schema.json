@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "代码位置目录 Catalog",
+  "type": "object",
+  "required": ["version", "owner_skill", "project_kinds", "forbidden_paths", "allowed_children", "adoption_manifest", "entries", "skeletons"],
+  "properties": {
+    "version": {"const": 2},
+    "owner_skill": {"const": "package-structure-rules"},
+    "project_kinds": {"type": "array", "items": {"enum": ["fullstack", "backend", "frontend"]}},
+    "forbidden_paths": {"type": "array", "items": {"type": "string"}},
+    "allowed_children": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+    "adoption_manifest": {"$ref": "#/$defs/adoption_manifest_rules"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "project_kind", "artifact_kind", "content_type", "canonical_path", "purpose", "creation_policy", "tracked", "owner_skill"],
+        "properties": {
+          "language": {"enum": ["go", "java", "node", "python"]},
+          "requires_domain": {"type": "boolean"},
+          "flat_files": {"type": "boolean"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"artifact_kind": {"const": "source-util"}}, "required": ["artifact_kind"]},
+            "then": {"required": ["language"]}
+          },
+          {
+            "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},
+            "then": {"required": ["requires_domain", "flat_files"]}
+          }
+        ]
+      }
+    },
+    "skeletons": {"type": "object"}
+  },
+  "$defs": {
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?![\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+    },
+    "adoption_manifest_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "schema_ref", "required_fields", "path_rules"],
+      "properties": {
+        "version": {"const": 1},
+        "schema_ref": {"const": "#/$defs/adoption_manifest"},
+        "required_fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["manifest", "backend", "adopted_path", "legacy_source_root"],
+          "properties": {
+            "manifest": {"const": ["version", "project_kind", "adopted_paths", "legacy_source_roots"]},
+            "backend": {"const": ["language"]},
+            "adopted_path": {"const": ["path", "catalog_id", "responsibility"]},
+            "legacy_source_root": {"const": ["path", "responsibility", "existing_directories", "existing_files"]}
+          }
+        },
+        "path_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relative_only", "forbid_parent_segments", "unique_by", "adopted_paths_must_not_match_catalog_forbidden_paths"],
+          "properties": {
+            "relative_only": {"const": true},
+            "forbid_parent_segments": {"const": true},
+            "unique_by": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["adopted_paths", "legacy_source_roots"],
+              "properties": {
+                "adopted_paths": {"const": "path"},
+                "legacy_source_roots": {"const": "path"}
+              }
+            },
+            "adopted_paths_must_not_match_catalog_forbidden_paths": {"const": true}
+          }
+        }
+      }
+    },
+    "adoption_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "project_kind", "adopted_paths", "legacy_source_roots"],
+      "properties": {
+        "version": {"const": 1},
+        "project_kind": {"enum": ["fullstack", "backend", "frontend"]},
+        "language": {"enum": ["go", "java", "node", "python"]},
+        "adopted_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "catalog_id", "responsibility"],
+            "properties": {
+              "path": {"$ref": "#/$defs/relative_path"},
+              "catalog_id": {"type": "string", "minLength": 1},
+              "responsibility": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "legacy_source_roots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "responsibility", "existing_directories", "existing_files"],
+            "properties": {
+              "path": {"$ref": "#/$defs/relative_path"},
+              "responsibility": {"type": "string", "minLength": 1},
+              "existing_directories": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"$ref": "#/$defs/relative_path"}
+              },
+              "existing_files": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"$ref": "#/$defs/relative_path"}
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"project_kind": {"const": "backend"}}, "required": ["project_kind"]},
+          "then": {"required": ["language"]}
+        }
+      ]
+    }
+  }
+}

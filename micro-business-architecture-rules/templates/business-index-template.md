@@ -1,7 +1,7 @@
 <!--
 本文件含两份模板，使用者复制后填空：
 1. 「全局业务包索引」——复制 `# 业务包索引` 部分到 `internal/business/README.md`
-2. 「公共接口契约清单」——复制 `# 公共接口契约清单` 部分到 `internal/contract/README.md`
+2. 「跨业务 RPC 关系表」——复制 `# 跨业务 RPC 关系表` 部分到 `internal/business/README.md`
 两份模板以 `---` 分隔。占位符统一使用尖括号 `<...>` 形式，复制后按项目实际内容替换。
 -->
 
@@ -16,13 +16,13 @@
 
 ---
 
-# 公共接口契约清单
+# 跨业务 RPC 关系表
 
-> 逐条登记跨业务接口：明确谁暴露、谁实现、谁调用。业务包之间禁止横向直连，所有跨业务调用只经本包（`contract/`）以接口形式通信。
+> 逐条登记真实跨业务 RPC：明确谁调用谁的哪个 `rpc/` 函数。业务包之间禁止横向直连，所有跨业务调用只导入目标业务的 `rpc/`，请求与响应均为 JSON 字符串。
 
-| 接口 | 暴露方业务 | 实现方 | 调用方业务 | 用途 |
+| RPC 函数 | 目标业务 | 调用方业务 | 用途 |
 |---|---|---|---|---|
-| `<contract/user.AccountReader>` | `<user>` | `<business/user/logic>` | `<order>` | `<下单时校验用户账户状态与实名信息>` |
-| `<contract/order.OrderNotifier>` | `<order>` | `<business/order/logic>` | `<user>` | `<用户注销前检查是否存在未完结订单>` |
+| `<rpc/user.GetProfile(string) string>` | `<user>` | `<order>` | `<下单时查询用户资料>` |
+| `<rpc/order.GetSummary(string) string>` | `<order>` | `<user>` | `<用户中心查询订单摘要>` |
 
-> 维护提示：新增跨业务接口时必须在此登记；当某接口已无任何调用方业务时应删除该接口及本表对应行（服从 `code-readability-rules` 反单实现接口、反无用抽象判定）。
+> 维护提示：新增跨业务 RPC 时必须在此登记；当某个 RPC 已无任何调用方业务时可删除该公开函数、`rpc/` 空目录及本表对应行。不得把目标业务私有层登记为可调用能力。

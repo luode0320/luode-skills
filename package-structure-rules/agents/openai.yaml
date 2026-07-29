@@ -1,4 +1,11 @@
-interface:
-  display_name: "包结构与分层"
-  short_description: "判断 main.go、internal、根级入口层与业务分层目录的落点和依赖方向"
-  default_prompt: "使用 $package-structure-rules 判断当前代码应落在 `main.go`、`internal`、根级 `global/middleware/crontask`，还是 `router`、`controller`、`service`、`repository`、`model`、`entity` 等目录，并说明允许的依赖方向；Go 场景下请求/响应/第三方结果结构体优先归位到 `internal/entity/<domain>/`，避免散落在 `internal/service` 实现文件。"
+version: 2
+owner: package-structure-rules
+instruction: >-
+  先使用 placement_catalog.py query 查询唯一位置；再在返回目录内搜索既有实现；
+  不得创建 Catalog 未定义或 strict 禁止的目录。旧项目先读取人工维护的收敛清单，
+  已采纳目录继续遵守 Catalog，遗留快照只能维护已有源码。Swag 仅转交 swag-openapi-maintainer-rules。
+commands:
+  query: python package-structure-rules/scripts/placement_catalog.py query
+  render: python package-structure-rules/scripts/placement_catalog.py render --all
+  check: python package-structure-rules/scripts/placement_catalog.py check --policy strict
+  adoption: python package-structure-rules/scripts/placement_catalog.py check --policy adoption --adoption-manifest doc/1-架构/3-目录规则收敛清单.yaml
