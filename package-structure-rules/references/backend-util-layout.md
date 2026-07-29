@@ -7,7 +7,7 @@
 | 分类 | 二级技术目录 | 职责 |
 |---|---|---|
 | 时间与并发 | `utils/time/`、`utils/async/`、`utils/convert/`、`utils/http/` | 时间转换、协程与任务辅助、字符串数字转换、通用 HTTP Client |
-| 定时调度 | `utils/crontask/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 |
+| 定时调度 | `utils/cron/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 |
 | 序列化 | `utils/json/` | JSON 序列化与反序列化技术工具封装 |
 | 日志 | `utils/log/` | 统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口 |
 | 缓存 | `utils/cache/redis/`、`utils/cache/mongo/` | 缓存、Session、锁和临时文档型数据适配 |
@@ -21,3 +21,5 @@
 | 协议定义 | `utils/protobuf/` | Protobuf 与 gRPC 定义源 |
 
 禁止 `utils/graphql/`、`utils/asyncapi/`、`utils/avro/`、`utils/api/http/`。通用 HTTP 只能位于 `utils/http/`。后端项目根不得再建立旧的 `util/` 工具包目录。
+
+Go 项目中，以下目录内部 `package` 声明使用带 `Util` 后缀的别名，目录路径本身不变：`utils/time`→`timeUtil`、`utils/json`→`jsonUtil`、`utils/log`→`logUtil`、`utils/http`→`httpUtil`（这四个是为了避免与同名标准库包冲突）；`utils/cron`→`cronUtil`（`cron` 本身不与标准库冲突，只是为了和其余工具包保持统一的 `xxxUtil` 命名风格）。其余目录 package 名与目录名一致。详见 `code-style-consistency-rules/references/go-coding-rules.md`。

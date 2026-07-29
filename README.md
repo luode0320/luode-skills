@@ -888,3 +888,4 @@ claude-mem(记忆) :
 2026-07-29 15:19:26 feat: [最小计划分级] 新增非PlanMode中等改动最小计划路由
 2026-07-29 16:32:09 fix: [corntask拼写修正] 目录规则改名crontask并补充utils子目录
 2026-07-29 16:32:51 test: [crontask改名回归] 补充目录规则V2与微业务脚手架测试证据
+2026-07-29 17:00:33 fix: [utils子目录改名] crontask改为cron并补充Go包别名命名规则

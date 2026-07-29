@@ -123,7 +123,7 @@
 │   └── certificates/                        # [条件·提交] 公开证书与 CA
 ├── utils/                                   # [条件·提交] 可独立复制的技术工具包与 SDK 根；根目录只允许工具包子目录，禁止直接存放文件或依赖项目其他包
 │   ├── time/                                # [条件·提交] 时间与时区转换
-│   ├── crontask/                            # [条件·提交] Cron 调度库技术封装（如 robfig/cron），供业务侧 crontask/ 定时任务入口调用
+│   ├── cron/                                # [条件·提交] Cron 调度库技术封装（如 robfig/cron），供业务侧 crontask/ 定时任务入口调用
 │   ├── async/                               # [条件·提交] 异步协程与并发辅助
 │   ├── convert/                             # [条件·提交] 字符串与数字双向转换
 │   ├── http/                                # [条件·提交] 通用 HTTP Client
