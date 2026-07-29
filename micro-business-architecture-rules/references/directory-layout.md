@@ -16,7 +16,7 @@
         ├── base/             # 域私有基础结构
         ├── constant/         # 域私有常量
         ├── init/             # 域私有初始化
-        ├── corntask/         # 域私有定时任务实现
+        ├── crontask/         # 域私有定时任务实现
         ├── util/             # 域私有辅助
         └── rpc/              # [条件·提交] 跨域公开 JSON 字符串函数，文件直接落盘
             └── <operation>.<ext>
@@ -34,7 +34,7 @@
 | `business/A` | `business/B/rpc` | 允许 | B 对外公开的 JSON 字符串通信入口。 |
 | `business/A` | 根 `common/` 五类目录 | 允许 | 稳定公共请求、响应、常量、错误与校验结构。 |
 | `business/A` | 根 `global/` 的非业务运行引用 | 条件允许 | 仅配置、日志、数据库连接和技术客户端等已装配能力。 |
-| `business/A` | `business/B/{api,service,entity,base,constant,init,corntask,util}` | 禁止 | 目标业务私有实现，必须改走 B 的 `rpc/`。 |
+| `business/A` | `business/B/{api,service,entity,base,constant,init,crontask,util}` | 禁止 | 目标业务私有实现，必须改走 B 的 `rpc/`。 |
 | `global/` | 任意 `business/*` | 禁止 | 全局引用层不能成为业务状态或业务数据的隐式通道。 |
 
 ## Go 例子

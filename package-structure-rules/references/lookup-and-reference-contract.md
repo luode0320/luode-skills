@@ -24,7 +24,7 @@
 - 业务服务可依赖 `database/`、根 `common/`、根 `utils/`、源码根 `util/` 与本业务域代码。
 - 根 `utils/` 只依赖自身子包、语言标准库与第三方依赖；不得依赖源码根、业务域、`database/`、`common/`、`global/` 或 `middleware/`。
 - 源码根 `util/` 可依赖项目其他包，但不得承载业务流程；其实现文件必须直接放在该目录，禁止建立子目录。
-- 调用方业务域只能导入目标业务域 `business/<domain>/rpc/` 的公开入口；不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`corntask/` 或 `util/`。
+- 调用方业务域只能导入目标业务域 `business/<domain>/rpc/` 的公开入口；不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/` 或 `util/`。
 - 目标域 `rpc/` 的公开函数固定接收 JSON 字符串并返回 JSON 字符串；它在本域内完成反序列化、校验、业务服务调用和响应序列化。任何成功、JSON 解析、校验或业务失败都返回符合根 `common/response.Response` 语义的 `code`、`status`、`message`、`data`，不跨域传递语言异常、内部实体或仓储模型。
 - 根 `common/request/`、`common/response/`、`common/constant/`、`common/error/`、`common/validation/` 可作为稳定公共结构直接流通。根 `global/` 只能提供已装配的配置、日志、数据库连接和技术客户端等非业务运行引用，禁止保存、传递业务实体、业务列表、业务状态或可变业务缓存。
 - `database/`、根 `utils/`、根 `common/`、根 `global/`、根 `middleware/` 禁止反向依赖具体业务域。

@@ -7,6 +7,9 @@
 | 分类 | 二级技术目录 | 职责 |
 |---|---|---|
 | 时间与并发 | `utils/time/`、`utils/async/`、`utils/convert/`、`utils/http/` | 时间转换、协程与任务辅助、字符串数字转换、通用 HTTP Client |
+| 定时调度 | `utils/crontask/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 |
+| 序列化 | `utils/json/` | JSON 序列化与反序列化技术工具封装 |
+| 日志 | `utils/log/` | 统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口 |
 | 缓存 | `utils/cache/redis/`、`utils/cache/mongo/` | 缓存、Session、锁和临时文档型数据适配 |
 | 消息 | `utils/mq/kafka/`、`utils/mq/rabbitmq/`、`utils/mq/rocketmq/`、`utils/mq/nats/` | 消息队列客户端与编解码 |
 | 搜索 | `utils/search/elasticsearch/`、`utils/search/opensearch/`、`utils/search/meilisearch/` | 搜索服务客户端与查询适配 |

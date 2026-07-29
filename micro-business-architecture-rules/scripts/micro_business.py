@@ -27,7 +27,7 @@ SKILL_DIR = SCRIPT_DIR.parent
 README_TEMPLATE = SKILL_DIR / "templates" / "business-readme-template.md"
 
 # 业务包内默认子目录(分层落点沿用 package-structure-rules, 此处仅建目录占位)
-DEFAULT_SUBDIRS = ["api", "service", "entity", "base", "constant", "init", "corntask", "util"]
+DEFAULT_SUBDIRS = ["api", "service", "entity", "base", "constant", "init", "crontask", "util"]
 
 # 匹配 import 路径中的业务包路径段: .../business/<名字>
 BUSINESS_IMPORT_RE = re.compile(r'(?:^|/)business/([A-Za-z0-9_]+)')

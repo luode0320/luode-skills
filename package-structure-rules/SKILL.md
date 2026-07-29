@@ -20,10 +20,10 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 ## 核心边界
 
 1. 同仓根仅保存工作区资产、`integration/` 和 `doc/`；后端、前端业务资产分别留在其独立项目中。
-2. 后端根级唯一位置：`config/`、`data/`、`database/`、`utils/`、`common/`、`global/`、`corntask/`、`async/`、`middleware/`。
+2. 后端根级唯一位置：`config/`、`data/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`。
 3. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 4. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`。
-5. 后端语言源码根只承载 `router/`、`controller/`、`util/`、`business/<domain>/`；源码根 `util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`corntask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
+5. 后端语言源码根只承载 `router/`、`controller/`、`util/`、`business/<domain>/`；源码根 `util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
 6. `database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/` 或 `database/sql/index/`。
 7. 不建立根 `protocol/`、项目级 `schema/`、独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`。
 8. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。

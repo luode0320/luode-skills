@@ -241,7 +241,7 @@
 ### 微业务跨域 JSON RPC 规则
 - 别名: 业务域 rpc, 微业务 JSON 通信, 目标域 rpc 公开入口
 - 类型: 包结构/业务隔离规则
-- 定义: 业务域仅在真实存在跨域调用时创建 `business/<domain>/rpc/`。调用方只能精确导入目标域 `rpc/` 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 `rpc/` 内解析、校验、调用私有层并返回 `Response{code,status,message,data}` JSON。不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`corntask/` 或 `util/`，也不得跨域传递异常、实体、仓储模型或可变业务状态。
+- 定义: 业务域仅在真实存在跨域调用时创建 `business/<domain>/rpc/`。调用方只能精确导入目标域 `rpc/` 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 `rpc/` 内解析、校验、调用私有层并返回 `Response{code,status,message,data}` JSON。不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/` 或 `util/`，也不得跨域传递异常、实体、仓储模型或可变业务状态。
 - 来源: 对话确认、`package-structure-rules`、`micro-business-architecture-rules`
 - 适用范围: 后端微业务目录、跨业务调用、CodeGraph 导入审查、JSON 响应边界
 - 更新时间: 2026-07-28
@@ -998,7 +998,7 @@ entities:
       - 业务域 rpc
       - 微业务 JSON 通信
       - 目标域 rpc 公开入口
-    definition: "业务域按需创建 business/<domain>/rpc。调用方只可精确导入目标域 rpc 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 rpc 内完成解析、校验、私有服务调用和 Response{code,status,message,data} 序列化。目标域 api、service、entity、base、constant、init、corntask、util 等均为私有层，不得跨域导入。"
+    definition: "业务域按需创建 business/<domain>/rpc。调用方只可精确导入目标域 rpc 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 rpc 内完成解析、校验、私有服务调用和 Response{code,status,message,data} 序列化。目标域 api、service、entity、base、constant、init、crontask、util 等均为私有层，不得跨域导入。"
     scope: "后端微业务目录、跨业务调用、CodeGraph 导入审查、JSON 响应边界"
     status: "active"
     evidence_ids:

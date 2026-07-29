@@ -35,7 +35,7 @@ SOURCE_ROOTS = {
 }
 ADOPTION_MANIFEST_PATH = "doc/1-架构/3-目录规则收敛清单.yaml"
 ADOPTION_V2_SOURCE_ROOTS = {
-    "backend": {"cmd", "config", "data", "database", "swag", "resources", "utils", "common", "global", "corntask", "async", "middleware", "internal", "src", "scripts", "tools", "deploy", "doc"},
+    "backend": {"cmd", "config", "data", "database", "swag", "resources", "utils", "common", "global", "crontask", "async", "middleware", "internal", "src", "scripts", "tools", "deploy", "doc"},
     "frontend": {"config", "public", "src", "mocks", "scripts", "tools", "deploy", "doc", ".storybook"},
     "fullstack": {"backend", "frontend", "integration", "doc"},
 }
