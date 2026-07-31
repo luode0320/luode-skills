@@ -25,7 +25,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`。
 6. 后端语言源码根只承载 `router/`、`controller/`、`util/`、`business/<domain>/`；源码根 `util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
-7. `database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/` 或 `database/sql/index/`。
+7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
 

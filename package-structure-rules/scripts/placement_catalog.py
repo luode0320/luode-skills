@@ -82,12 +82,16 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
 
     [参数] catalog 为位置 Catalog，args 为解析后的查询参数。
     [返回] 符合全部已提供筛选条件的条目列表。
-    最近修改时间: 2026-07-28 21:26:06 扩展 source-util 的语言筛选条件。
+    最近修改时间: 2026-07-31 22:16:49 兼容公开文档中的 database 连字符 artifact 名称。
     """
-    # 1. 仅将调用方明确提供的维度参与 Catalog 匹配。
+    # 1. 仅为 database 的公开连字符名称补充内部下划线候选，保持其它 artifact 的既有名称不变。
+    artifact_kinds = {args.artifact} if args.artifact is not None else set()
+    if args.artifact is not None and args.artifact.startswith("database-"):
+        artifact_kinds.add(args.artifact.replace("-", "_"))
+
+    # 2. 仅将调用方明确提供的维度参与 Catalog 匹配。
     mappings = {
         "project_kind": args.project_kind,
-        "artifact_kind": args.artifact,
         "category": args.category,
         "technology": args.technology,
         "operation": args.operation,
@@ -95,7 +99,8 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
     }
     return [
         entry for entry in catalog["entries"]
-        if all(value is None or entry.get(field) == value for field, value in mappings.items())
+        if (not artifact_kinds or entry.get("artifact_kind") in artifact_kinds)
+        and all(value is None or entry.get(field) == value for field, value in mappings.items())
     ]
 
 
@@ -375,6 +380,51 @@ def check_required_file_content_contracts(
     return errors
 
 
+def check_database_storage_source_path(
+    catalog: dict[str, Any], relative: str, is_file: bool,
+) -> list[str]:
+    """校验数据存储连接和模型目录只承载生产源码。
+
+    [参数] catalog：目录事实源；relative：项目相对路径；is_file：当前路径是否为文件。
+    [返回] list[str]：数据存储源码扩展名不合规时的稳定错误。
+    最近修改时间: 2026-07-31 22:16:49 连接与模型覆盖多类数据存储服务。
+    """
+    errors: list[str] = []
+    # 1. 连接目录与三类模型目录共用 Catalog 声明的源码扩展名，避免在 CLI 重复硬编码技术分类。
+    for entry in catalog["entries"]:
+        if entry["artifact_kind"] not in {"database_connection", "database_model"}:
+            continue
+        canonical_path = entry["canonical_path"]
+        if not is_file or not relative.startswith(canonical_path + "/"):
+            continue
+        if Path(relative).suffix.lower() not in set(entry.get("allowed_extensions", [])):
+            errors.append(f"数据存储源码目录仅允许生产源码: {relative}")
+    return errors
+
+
+def check_database_sql_path(catalog: dict[str, Any], relative: str, is_file: bool) -> list[str]:
+    """校验每个独立 SQL 叶子目录只直接存放 .sql 文件。
+
+    [参数] catalog：目录事实源；relative：项目相对路径；is_file：当前路径是否为文件。
+    [返回] list[str]：SQL 扩展名或嵌套层级不合规时的稳定错误。
+    最近修改时间: 2026-07-31 22:16:49 新增字段 create、update、delete 独立 SQL 目录。
+    """
+    errors: list[str] = []
+    # 1. 只把 Catalog 声明的 SQL 叶子目录视为文件边界，字段分类根仍由 allowed_children 管理。
+    for entry in catalog["entries"]:
+        if entry["artifact_kind"] != "database_sql":
+            continue
+        canonical_path = entry["canonical_path"]
+        if relative == canonical_path or not relative.startswith(canonical_path + "/"):
+            continue
+        child = relative[len(canonical_path) + 1:]
+        if not is_file or "/" in child:
+            errors.append(f"独立 SQL 目录只允许直接 .sql 文件: {relative}")
+        elif Path(relative).suffix.lower() not in set(entry.get("allowed_extensions", [])):
+            errors.append(f"独立 SQL 目录只允许 .sql 文件: {relative}")
+    return errors
+
+
 def check_path(
     catalog: dict[str, Any], relative: str, is_file: bool, project_kind: str | None, language: str | None,
 ) -> list[str]:
@@ -400,6 +450,8 @@ def check_path(
         errors.append(f"自动迁移目录禁止 SQL 文件: {relative}")
     if is_file and is_under(relative, "database/sql") and suffix in SOURCE_EXTENSIONS:
         errors.append(f"独立 SQL 目录禁止生产源码: {relative}")
+    errors.extend(check_database_storage_source_path(catalog, relative, is_file))
+    errors.extend(check_database_sql_path(catalog, relative, is_file))
     # 2. 后端根 utils 只承载工具包子目录，源码根 util 则按语言限制直接文件。
     if project_kind == "backend" and is_file and Path(relative).parent.as_posix() == "utils":
         errors.append(f"根 utils 禁止直接文件: {relative}")
