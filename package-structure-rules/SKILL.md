@@ -20,7 +20,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 ## 核心边界
 
 1. 同仓根仅保存工作区资产、`integration/` 和 `doc/`；后端、前端业务资产分别留在其独立项目中。
-2. 后端根级唯一位置：`config/`、`data/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`。
+2. 后端根级唯一位置：`config/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`；不建立根 `data/`。
 3. 前后端同仓、独立后端、独立前端的项目根均固定提交 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在确有长期风格时创建并提交。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取；目录规则只负责其位置、初始化、查询和只读一致性检查，具体正文结构由项目规则、项目记忆与项目风格 Owner 管理。
 4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`。

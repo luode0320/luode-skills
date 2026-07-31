@@ -4,7 +4,7 @@
   "content_types": ["source_code", "sql_asset", "config_asset", "static_data", "resource_asset"],
   "project_kinds": ["fullstack", "backend", "frontend"],
   "forbidden_paths": [
-    "database/snapshot", "database/migration/sql", "database/migration/ddl", "database/migration/scripts",
+    "data", "database/snapshot", "database/migration/sql", "database/migration/ddl", "database/migration/scripts",
     "database/migration/field/add", "database/migration/field/drop", "database/migration/field/alter",
     "database/migration/index/add", "database/migration/index/drop", "database/migration/index/alter",
     "database/sql/dml", "database/sql/view", "database/sql/function", "database/sql/procedure",
