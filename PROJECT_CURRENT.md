@@ -6,9 +6,9 @@
 
 ## 当前任务
 
-- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC、旧项目渐进采纳、`utils/ip/`、根治理文件和后端数据存储目录升级。
-- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则、旧项目 `adoption`、数据存储连接、模型分类、独立字段 SQL 与公开 CLI 查询的唯一位置、只读检查、测试、审查和验收闭环。
-- 当前状态：`TASK-05-01` 至 `TASK-13-03` 已完成。CYCLE-13 已通过 48 项本地行为测试、Python 编译、公开 `database-*` 查询、文档校验、审查与最终验收；Java 模型映射已收敛到 `database/model/{db,redis,mongo}/`；本会话任务投影已失活收口。
+- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC、旧项目渐进采纳、`utils/ip/`、根治理文件、后端数据存储目录和后端根 `data/` 删除规则。
+- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则、旧项目 `adoption`、数据存储连接、模型分类、独立字段 SQL、后端根 data 删除与公开 CLI 查询的唯一位置、只读检查、测试、审查和验收闭环。
+- 当前状态：`TASK-05-01` 至 `TASK-14-02` 已完成。CYCLE-14 已删除后端根 `data/` 的目录、查询与初始化入口，并将其纳入 strict 禁止路径；50 项本地行为测试、Python 编译、关键负向 CLI 验证、无写入断言、六类文档严格 profile、Skill 校验、实现审查与最终验收均已通过。
 
 ## 范围与边界
 
@@ -28,14 +28,15 @@
 - `check --policy adoption --adoption-manifest ...` 已实现只读检查；无效、越界、重复或禁止路径清单稳定失败，检查不改写项目或清单。
 - `database/connection/` 已覆盖关系型数据库、Redis、Mongo 等数据存储连接；`database/model/` 只允许 `db/`、`redis/`、`mongo/`；独立字段 SQL 只进入 `database/sql/field/{create,update,delete}/` 且每个叶子目录只放 `.sql` 文件。
 - 公开 `database-connection`、`database-sql`、`database-migration` 查询名称已与 Catalog 内部字段兼容；未连接数据库、缓存、消息队列、第三方 API 或非 local 环境。
+- 后端根不再建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 
 ## 门禁说明
 
-- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，48 项本地 `unittest`、Python 编译、三条公开 `database-*` 查询和 `git diff --check` 均通过；文档与 Skill 校验将在最终状态更新前复跑。
+- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，50 项本地 `unittest`、Python 编译、根 data 负向 query/render/init/strict、无写入断言、六类文档严格 profile 和 `package-structure-rules` Skill 校验均已通过。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；当前会话 CYCLE-13 在最终门禁通过后使用 `task_plan_projection.py deactivate` 失活，且不影响其它会话投影。
+- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；当前会话 CYCLE-14 已在最终门禁通过后使用 `task_plan_projection.py deactivate` 失活，且不影响其它会话投影。
 - 后续目录位置查询与旧项目渐进检查以 `package-structure-rules/scripts/placement_catalog.py` 和 `placement-catalog.yaml` 为唯一入口。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
@@ -43,7 +44,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-07-31T14:39:51.741619Z",
+  "registry_updated_at": "2026-07-31T15:40:21.210748Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -538,29 +539,24 @@
       ]
     },
     {
-      "projection_id": "SESSION/444df4cee5780ee03eb74622ed45767f35e97e556c364555013921aa2c879530",
+      "projection_id": "SESSION/642f6c0ae9fc393c4cbff38f2b6317b945894cadd4888be5015994cf1f4fd8bc",
       "session_id": "019f9dd1-31f3-7401-8575-eadf6b3ec55f",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "REQ-PSR-V2-001/CYCLE-13",
-      "source_document": "doc/3-实施/2026-07-31_000000_代码位置目录规则V2_实施周期13_数据存储目录扩展.md",
-      "plan_fingerprint": "2e39812fa45e7561fe5cec51f834f5d50e7cb3366dc44053df3c954ca1bfd891",
-      "updated_at": "2026-07-31T14:39:51.741343Z",
+      "plan_key": "REQ-PSR-V2-001/CYCLE-14",
+      "source_document": "doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md",
+      "plan_fingerprint": "800d03cf7113c96d0020b18ce87bb222afe6209f499bf210ab845f6e3c633cbb",
+      "updated_at": "2026-07-31T15:40:21.210576Z",
       "steps": [
         {
-          "id": "TASK-13-01",
-          "step": "[TASK-13-01] 固化数据存储目录、Catalog 与唯一查询",
+          "id": "TASK-14-01",
+          "step": "[TASK-14-01] 删除后端 data 目录规则和 Catalog 条目",
           "status": "completed"
         },
         {
-          "id": "TASK-13-02",
-          "step": "[TASK-13-02] 实现 strict SQL 检查并完成真实行为测试",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-13-03",
-          "step": "[TASK-13-03] 完成文档、审查、验收与合规收口",
+          "id": "TASK-14-02",
+          "step": "[TASK-14-02] 完成严格检查、测试与文档收口",
           "status": "completed"
         }
       ]

@@ -682,9 +682,10 @@
 - 稳定决策：后端技术工具、SDK 和服务注册发现统一位于项目根 `utils/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。语言源码根 `util/` 只直接存放可引用项目其他包的高关联工具函数，禁止子目录。
 - 稳定决策：前后端同仓、独立后端和独立前端项目根都直接保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 是条件文件。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取。Catalog 将六项建模为 `.md` 文件节点，`init` 只创建五个必需文件位置，且仅在显式启用时创建 `PROJECT_STYLE.md`，不负责或覆盖各 Owner 的文件正文；strict 仅只读拒绝双文件正文漂移。
 - 稳定决策：`database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/`、`database/sql/index/` 与 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子目录只直接保存 `.sql` 文件，且与迁移源码严格隔离。
+- 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
-- 更新时间：2026-07-29。
+- 更新时间：2026-07-31。
 
 ## 非 Plan Mode 最小计划分级规则
 
@@ -1024,6 +1025,22 @@ entities:
     evidence_ids:
       - evidence.skill.package-structure-rules
       - evidence.dialog.backend-database-storage-layout
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-07-31
+  - entity_id: rule.backend-root-data-forbidden
+    name: "后端根 data 禁止路径"
+    type: "包结构禁止规则"
+    aliases:
+      - 后端根 data 删除
+      - backend data forbidden
+      - data/business data/project data/seed
+    definition: "后端项目根不建立 data、data/business、data/project 或 data/seed。Catalog 将 data 作为禁止路径，query、init 与 strict 必须失败关闭；该规则不影响前端 src/data、业务域数据或 doc/data。"
+    scope: "后端目录树、Catalog 查询、初始化、strict 检查与旧项目 adoption 边界"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.dialog.backend-root-data-deletion
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-31
@@ -1696,6 +1713,7 @@ lifecycle:
     - "rule.simple-check-inline-readability"
     - "rule.backend-utils-source-util-placement"
     - "rule.backend-database-storage-layout"
+    - "rule.backend-root-data-forbidden"
     - "rule.micro-business-json-rpc-boundary"
     - "rule.legacy-project-directory-adoption"
     - "rule.thread-title-process-trigger"
@@ -1936,6 +1954,8 @@ retrieval_hints:
       - "rule.backend-utils-source-util-placement"
     后端数据存储目录:
       - "rule.backend-database-storage-layout"
+    后端根 data 禁止路径:
+      - "rule.backend-root-data-forbidden"
     独立字段 SQL:
       - "rule.backend-database-storage-layout"
     utils / 源码根 util:

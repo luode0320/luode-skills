@@ -180,3 +180,8 @@
 - `database/connection/` 明确承载关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化；`database/model/` 固定只允许 `db/`、`redis/`、`mongo/` 三类模型叶子目录，Java 物理映射同步纠正到这三类目录。
 - 独立 SQL 新增 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子只接受直接 `.sql` 文件；自动迁移生产源码仍留在 `database/migration/` 并拒绝 SQL。
 - Catalog、CLI、目录树、引用契约、测试、审查与验收已同步。48 项本地行为测试、Python 编译、公开查询、六类文档 profile、Skill 校验和 `git diff --check` 通过；未连接或修改任何真实数据服务，未执行 Git 历史写入。
+
+## 2026-07-31：后端根 data 目录规则删除完成
+
+- 后端根不再定义 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将 `data` 固定为禁止路径，query、init 与 strict 均失败关闭。
+- 前端 `src/data/`、业务域数据和 `doc/data/` 未受影响。50 项本地行为测试、Python 编译、根 data 负向 CLI、无写入哈希、审查和验收文档同步通过；未连接外部服务，未执行 Git 历史写入。
