@@ -174,3 +174,9 @@
 - 前后端同仓、独立后端和独立前端项目根均固定纳入 `CLAUDE.md`，其位置由 Catalog 文件节点唯一查询；它与 `AGENTS.md` 同为必需提交文件，正文必须字节一致。
 - `init` 只创建五个必需根文件的位置，`check --policy strict` 只读拒绝 `AGENTS.md` 与 `CLAUDE.md` 的正文漂移；`bootstrap_agents.sh --target both` 以 `AGENTS.md` 为同步源，重复执行保持幂等。
 - 41 项本地行为测试、Python 编译、五类工程文档严格 profile、两个 Skill 快速校验和 `git diff --check` 均通过；未连接外部服务，未执行 Git 历史写入，Obsidian 固定 vault 仍未注册。
+
+## 2026-07-31：后端数据存储目录扩展完成
+
+- `database/connection/` 明确承载关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化；`database/model/` 固定只允许 `db/`、`redis/`、`mongo/` 三类模型叶子目录，Java 物理映射同步纠正到这三类目录。
+- 独立 SQL 新增 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子只接受直接 `.sql` 文件；自动迁移生产源码仍留在 `database/migration/` 并拒绝 SQL。
+- Catalog、CLI、目录树、引用契约、测试、审查与验收已同步。48 项本地行为测试、Python 编译、公开查询、六类文档 profile、Skill 校验和 `git diff --check` 通过；未连接或修改任何真实数据服务，未执行 Git 历史写入。
