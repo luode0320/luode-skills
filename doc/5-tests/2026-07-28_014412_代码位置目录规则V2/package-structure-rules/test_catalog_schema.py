@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 CATALOG = ROOT / "package-structure-rules" / "references" / "placement-catalog.yaml"
 SCHEMA = ROOT / "package-structure-rules" / "references" / "placement-catalog.schema.json"
+JAVA_LAYOUT = ROOT / "package-structure-rules" / "references" / "java-layer-layout.md"
 
 
 class CatalogSchemaTests(unittest.TestCase):
@@ -105,6 +106,53 @@ class CatalogSchemaTests(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
         paths = {entry["canonical_path"] for entry in entries if entry["artifact_kind"] == "database_migration"}
         self.assertEqual(8, len(paths))
+
+    def test_storage_connection_models_and_field_sql_entries_are_unique(self):
+        """确认多数据存储连接、模型与字段 SQL 都具有唯一 Catalog 位置。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 新增数据库连接、模型与字段 SQL 分类断言。
+        """
+        # 1. 先按 artifact、分类和操作核对每项职责只能映射到一个目录。
+        entries = self.catalog["entries"]
+        connection = [entry for entry in entries if entry["artifact_kind"] == "database_connection"]
+        self.assertEqual(1, len(connection))
+        self.assertEqual("database/connection", connection[0]["canonical_path"])
+
+        models = [entry for entry in entries if entry["artifact_kind"] == "database_model"]
+        self.assertEqual(
+            {"db": "database/model/db", "redis": "database/model/redis", "mongo": "database/model/mongo"},
+            {entry["category"]: entry["canonical_path"] for entry in models},
+        )
+        self.assertEqual(["db", "redis", "mongo"], self.catalog["allowed_children"]["database/model"])
+
+        sql_entries = [entry for entry in entries if entry["artifact_kind"] == "database_sql"]
+        self.assertEqual(
+            {
+                ("ddl", None): "database/sql/ddl",
+                ("index", None): "database/sql/index",
+                ("field", "create"): "database/sql/field/create",
+                ("field", "update"): "database/sql/field/update",
+                ("field", "delete"): "database/sql/field/delete",
+            },
+            {(entry["category"], entry.get("operation")): entry["canonical_path"] for entry in sql_entries},
+        )
+        self.assertEqual(["ddl", "index", "field"], self.catalog["allowed_children"]["database/sql"])
+        self.assertEqual(["create", "update", "delete"], self.catalog["allowed_children"]["database/sql/field"])
+        self.assertTrue(all(entry["allowed_extensions"] == [".sql"] for entry in sql_entries))
+
+    def test_java_layout_maps_each_storage_model_to_its_leaf_directory(self):
+        """确认 Java 物理位置映射不再建议直接向模型根放置文件。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:30:52 修复 Java 模型映射与 strict 规则漂移。
+        """
+        # 1. Java 文档必须列出三个可用叶子目录，避免 ORM 模型重新回退到被禁止的模型根。
+        content = JAVA_LAYOUT.read_text(encoding="utf-8")
+        for path in ("database/model/db/", "database/model/redis/", "database/model/mongo/"):
+            self.assertIn(path, content)
 
     def test_ip_utils_entry_has_a_unique_catalog_path(self):
         """确认 IP 技术工具包有且只有一个可查询的规范位置。

@@ -2,11 +2,11 @@
 schema_version: 1
 doc_id: "TEST-PSR-V2-001"
 doc_type: "test"
-source_ids: ["REQ-PSR-V2-001", "REQ-PSR-UTILS-001", "REQ-PSR-SOURCE-UTIL-002", "REQ-PSR-CLI-003", "REQ-PSR-BUSINESS-RPC-004", "REQ-PSR-ADOPT-001", "REQ-PSR-IP-001", "REQ-PSR-GOVERNANCE-001", "REQ-PSR-CLAUDE-001"]
+source_ids: ["REQ-PSR-V2-001", "REQ-PSR-UTILS-001", "REQ-PSR-SOURCE-UTIL-002", "REQ-PSR-CLI-003", "REQ-PSR-BUSINESS-RPC-004", "REQ-PSR-ADOPT-001", "REQ-PSR-IP-001", "REQ-PSR-GOVERNANCE-001", "REQ-PSR-CLAUDE-001", "REQ-PSR-DATABASE-002"]
 status: "accepted"
-version: "v1.5"
-current_slice: "TASK-12-03 双平台规则文件本地行为验证"
-updated_at: "2026-07-29"
+version: "v1.7"
+current_slice: "CYCLE-13 数据存储与独立 SQL 行为验证已通过"
+updated_at: "2026-07-31"
 template_version: 1
 reader_level: business_general
 writing_style: plain_chinese
@@ -18,10 +18,10 @@ review_acceptance_gates:
     basis: AC-PSR-UTILS-001 至 AC-PSR-UTILS-005、AC-PSR-RPC-001 至 AC-PSR-RPC-003、AC-PSR-ADOPT-001 至 AC-PSR-ADOPT-003、AC-PSR-IP-001 至 AC-PSR-IP-002、AC-PSR-GOVERNANCE-001 至 AC-PSR-GOVERNANCE-002、AC-PSR-CLAUDE-001 至 AC-PSR-CLAUDE-002。
     required_by_source: true
     required_now: true
-    completed_validation: ["TEST-PSR-UTILS-001", "TEST-PSR-RPC-001", "TEST-PSR-RPC-002", "TEST-PSR-RPC-003", "TEST-PSR-ADOPT-001", "TEST-PSR-IP-001", "TEST-PSR-GOVERNANCE-001", "TEST-PSR-CLAUDE-001"]
+    completed_validation: ["TEST-PSR-UTILS-001", "TEST-PSR-RPC-001", "TEST-PSR-RPC-002", "TEST-PSR-RPC-003", "TEST-PSR-ADOPT-001", "TEST-PSR-IP-001", "TEST-PSR-GOVERNANCE-001", "TEST-PSR-CLAUDE-001", "TEST-PSR-DATABASE-001", "TEST-PSR-DATABASE-002", "TEST-PSR-DATABASE-003"]
     substitute_validation: []
-    manual_follow_up: "N/A；原因：本地单元测试已直接执行 CLI、隔离检查、CodeGraph 行为与 Git Bash 双平台自举；证据：41 项 unittest 结果。"
-    pass_standard: 41 项测试全部通过，且 strict/adoption 检查前后 fixture 哈希一致。
+    manual_follow_up: "N/A；原因：本地单元测试已直接执行 CLI、隔离检查、CodeGraph 行为与 Git Bash 双平台自举；证据：48 项 unittest 结果。"
+    pass_standard: 48 项测试全部通过，且 strict/adoption 检查前后 fixture 哈希一致。
   - stage: browser_integration
     applicability: not_applicable
     reason: 本测试没有浏览器页面或前端联调入口。
@@ -46,13 +46,13 @@ review_acceptance_gates:
 
 # 代码位置目录规则 V2 测试
 
-结论：本地行为测试验证了根 `utils/`、其中 `utils/ip/`、源码根 `util/`、业务域 `rpc/`、旧项目渐进采用及三类项目的双平台规则文件边界。影响：目录生成和只读检查可在不修改用户文件的前提下拒绝违规位置，Codex 与 Claude Code 读取同一规则正文，旧项目可登记相符目录和冻结快照而不继续扩张遗留结构。范围：查询、渲染、初始化、严格检查、兼容告警、渐进采用、无写入验证、普通 YAML 清单、JSON 响应、CodeGraph 导入审查与 Git Bash 自举。非范围：数据库、缓存、消息队列、第三方 API、浏览器页面和业务项目迁移。变化：新增三类项目 `CLAUDE.md` 的唯一查询、必需初始化、正文漂移拒绝和 `--target both` 幂等同步断言。完成标准：41 项自动化断言全部通过且 fixture 哈希不变。术语说明：fixture 是测试创建的临时目录样本，哈希用于确认检查未改写样本。验证状态：本地 Python 测试与 CodeGraph 证据已执行通过。图片资产决策：N/A。原因：目录和 CLI 行为没有视觉验收对象。证据：所有结果由退出码、标准输出和文件哈希判断。
+结论：本地行为测试同时验证根 `utils/`、源码根 `util/`、业务域 `rpc/`、旧项目渐进采用、双平台规则文件，以及后端数据存储连接、模型分类和字段 SQL 目录。影响：目录生成和只读检查可在不修改用户文件的前提下拒绝数据库模型混放、非 `.sql` SQL 资产和嵌套 SQL 目录。范围：查询、渲染、初始化、严格检查、兼容告警、渐进采用、无写入验证、普通 YAML 清单、JSON 响应、CodeGraph 导入审查与 Git Bash 自举。非范围：真实数据库、Redis、Mongo、消息队列、第三方 API、浏览器页面和业务项目迁移。变化：新增数据存储连接、三类模型和字段创建、修改、删除 SQL 的 query/render/init/strict 断言，并验证公开 `database-*` 连字符 artifact 名称及 Java 模型叶子目录映射。完成标准：48 项自动化断言全部通过且 fixture 哈希不变。术语说明：fixture 是测试创建的临时目录样本，哈希用于确认检查未改写样本。验证状态：本地 Python 测试已执行通过。图片资产决策：N/A。原因：目录和 CLI 行为没有视觉验收对象。证据：所有结果由退出码、标准输出和文件哈希判断。
 
 ## 文档信息
 
 | 项目 | 内容 |
 |---|---|
-| 测试任务 | `TEST-PSR-UTILS-001`、`TEST-PSR-IP-001`、`TEST-PSR-RPC-001`、`TEST-PSR-RPC-002`、`TEST-PSR-RPC-003`、`TEST-PSR-ADOPT-001`、`TEST-PSR-CLAUDE-001`。 |
+| 测试任务 | `TEST-PSR-UTILS-001`、`TEST-PSR-IP-001`、`TEST-PSR-RPC-001`、`TEST-PSR-RPC-002`、`TEST-PSR-RPC-003`、`TEST-PSR-ADOPT-001`、`TEST-PSR-CLAUDE-001`、`TEST-PSR-DATABASE-001` 至 `TEST-PSR-DATABASE-003`。 |
 | 真实测试资产 | `package-structure-rules/test_catalog_schema.py`、`test_query_render.py`、`test_init_check.py`、`test_business_rpc.py`、`test_adoption_check.py` 与 `fixtures/micro-business-rpc/`。 |
 | 执行环境 | 本机 Windows Python 3.14（含 PyYAML）、临时 fixture、`F:\luode-skills` 规则仓库。 |
 | 外部连接 | N/A；原因：测试不读取外部配置且不发起网络连接；证据：测试仅调用本地 CLI。 |
@@ -68,6 +68,9 @@ review_acceptance_gates:
 | 负向根文件 | `utils/<file>.<ext>`。 | strict 返回退出码 2。 |
 | 负向旧路径 | 根 `util/...`。 | strict 返回退出码 2，legacy 只警告。 |
 | 负向嵌套 | `<source-root>/util/<child>/<file>.<ext>`。 | strict 返回退出码 2。 |
+| 数据存储连接与模型 | `database/connection/*.go`、`database/model/{db,redis,mongo}/*.go`。 | query 唯一、显式 init 按需创建、合法源码 strict 通过。 |
+| 独立字段 SQL | `database/sql/field/{create,update,delete}/*.sql`。 | query 唯一、叶子目录直接 `.sql` strict 通过。 |
+| 数据存储与 SQL 负向 | `database/model/direct.go`、模型 `.sql`、SQL `.md`、SQL 子目录、迁移 `.sql`。 | strict 返回退出码 2，错误可定位，检查前后哈希一致。 |
 | RPC 目录与初始化 | `business/<domain>/rpc/<operation>.<ext>`。 | Catalog 唯一返回，显式启用才创建且不允许子目录。 |
 | RPC 导入边界 | `orders` 导入 `users/rpc`；`users/service`、`users/entity`、`users/util`。 | 合规样本通过；三类私有层样本在确定性检查和 CodeGraph 审查中失败。 |
 | RPC 统一响应 | 成功、非法 JSON、校验失败、业务失败。 | 都可解析为 `code`、`status`、`message`、`data`。 |
@@ -112,17 +115,18 @@ python package-structure-rules/scripts/placement_catalog.py check --root <legacy
 
 ## 验证结论
 
-本轮执行 41 项 `unittest`，结果为 `OK`。根 `utils/time/`、`utils/cron/`、`utils/ip/`、`utils/json/`、`utils/log/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、三类项目 `CLAUDE.md`、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本、改名后根级与业务域内部 `crontask/` 样本，以及已采纳目录与遗留快照均通过检查；三个私有层跨域导入、规则正文漂移、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；`bootstrap_agents.sh --target both` 已证明以 `AGENTS.md` 同步 `CLAUDE.md` 且可重复执行；CodeGraph 已在测试中同步索引并定位每个导入节点。
+本轮执行 48 项 `unittest`，结果为 `OK`。根 `utils/time/`、`utils/cron/`、`utils/ip/`、`utils/json/`、`utils/log/` 和 `utils/discovery/{polaris,nacos}/` 的正向工具包样本、四语言源码根 `util/` 样本、三类项目 `CLAUDE.md`、普通 YAML 收敛清单、`orders -> users/rpc` 合规样本、改名后根级与业务域内部 `crontask/` 样本，以及已采纳目录与遗留快照均通过检查；数据存储连接、三类模型、字段 SQL、公开 `database-*` artifact 名称和 Java 模型叶子目录映射也均通过。三个私有层跨域导入、规则正文漂移、遗留新增源码/目录和无效收敛清单均得到可定位失败。严格检查、兼容检查与 adoption 检查均未改变 fixture 的目录树或文件哈希；`bootstrap_agents.sh --target both` 已证明以 `AGENTS.md` 同步 `CLAUDE.md` 且可重复执行；CodeGraph 已在测试中同步索引并定位每个导入节点。
 
 ## 完成标准
 
-1. 所有 41 项本地单元测试返回成功。
+1. 所有 48 项本地单元测试返回成功。
 2. CLI 查询能返回四语言源码根 `util/`、`utils/ip/` 和两个服务发现工具包的唯一路径。
 3. strict 拒绝根 `utils/` 直接文件、旧根 `util/`、源码根 `util/` 子目录与业务域 `rpc/` 子目录。
 4. 检查前后哈希相同，证明 `check` 只读。
 5. `micro_business.py check` 与 CodeGraph 同时证明调用方不导入目标域私有层。
 6. adoption 只放行人工登记的已采纳路径和遗留快照，拒绝新增遗留源码、目录和无效清单。
 7. 三类项目根的 `CLAUDE.md` 可唯一查询、初始化和渲染；双平台自举后正文与 `AGENTS.md` 一致。
+8. 数据存储连接、`db/`、`redis/`、`mongo/` 模型和字段 `create/update/delete` SQL 均唯一可查；模型根文件、模型 SQL、SQL 非 `.sql` 与嵌套 SQL 都被 strict 拒绝。
 
 ## 范围外说明
 
@@ -145,3 +149,4 @@ N/A；原因：本测试不验证真实数据库迁移、SDK 网络调用或浏�
 | `REQ-PSR-BUSINESS-RPC-004`、`RULE-PSR-RPC-005` | `AC-PSR-RPC-001`、`AC-PSR-RPC-002` | `test_business_rpc.py`、`fixtures/micro-business-rpc/` | Catalog、初始化、确定性隔离检查与 CodeGraph 导入节点断言。 |
 | `RULE-PSR-RPC-006` | `AC-PSR-RPC-003` | `test_business_rpc.py` | 成功和三类失败的 JSON `Response` 断言。 |
 | `REQ-PSR-ADOPT-001`、`RULE-PSR-ADOPT-001` | `AC-PSR-ADOPT-001` 至 `AC-PSR-ADOPT-003` | `test_adoption_check.py` | 已采纳目录、遗留快照、无效清单与无写入断言。 |
+| `REQ-PSR-DATABASE-002`、`RULE-PSR-DATABASE-003` | `AC-PSR-DATABASE-001` 至 `AC-PSR-DATABASE-003` | `test_catalog_schema.py`、`test_query_render.py`、`test_init_check.py` | 数据存储连接、模型分类、字段 SQL、严格负向与无写入断言。 |

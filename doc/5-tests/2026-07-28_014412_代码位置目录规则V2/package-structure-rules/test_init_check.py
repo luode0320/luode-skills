@@ -137,6 +137,27 @@ class InitCheckTests(unittest.TestCase):
             self.assertTrue((root / "utils" / "ip").is_dir())
             self.assertFalse((root / "utils" / "time").exists())
 
+    def test_init_creates_explicit_storage_paths_only(self):
+        """确认 init 仅创建显式启用的数据存储连接、模型和字段 SQL 目录。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 新增数据存储目录按需初始化断言。
+        """
+        # 1. 同时启用三个独立条目，确认其父目录按需创建且相邻能力不被批量生成。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run(
+                "init", "--project-kind", "backend", "--root", str(root), "--enable",
+                "backend.database.connection,backend.database.model.redis,backend.database.sql.field.create",
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((root / "database" / "connection").is_dir())
+            self.assertTrue((root / "database" / "model" / "redis").is_dir())
+            self.assertTrue((root / "database" / "sql" / "field" / "create").is_dir())
+            self.assertFalse((root / "database" / "model" / "db").exists())
+            self.assertFalse((root / "database" / "sql" / "field" / "update").exists())
+
     def test_strict_rejects_mixed_content_without_writing(self):
         """确认 strict 拒绝根 utils 文件、旧根 util 与源码根 util 子目录。
 
@@ -244,6 +265,67 @@ class InitCheckTests(unittest.TestCase):
                 (package_root / filename).write_text("package utils", encoding="utf-8")
             result = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
             self.assertEqual(0, result.returncode, result.stdout)
+
+    def test_strict_accepts_storage_sources_and_direct_sql_files(self):
+        """确认多数据存储源码与五类独立 SQL 叶子目录可通过 strict。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 新增数据存储与字段 SQL 正向 fixture。
+        """
+        # 1. 每种存储模型和每个 SQL 叶子目录只放入其允许的直接文件。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for directory_name, filename in (
+                ("database/connection", "postgres.go"),
+                ("database/connection", "redis.go"),
+                ("database/connection", "mongo.go"),
+                ("database/model/db", "user.go"),
+                ("database/model/redis", "session.go"),
+                ("database/model/mongo", "document.go"),
+                ("database/sql/ddl", "create_user.sql"),
+                ("database/sql/index", "user_email.sql"),
+                ("database/sql/field/create", "user_phone.sql"),
+                ("database/sql/field/update", "user_phone_length.sql"),
+                ("database/sql/field/delete", "user_legacy.sql"),
+            ):
+                path = root / directory_name
+                path.mkdir(parents=True, exist_ok=True)
+                (path / filename).write_text("content", encoding="utf-8")
+            result = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
+            self.assertEqual(0, result.returncode, result.stdout)
+
+    def test_strict_rejects_storage_model_and_sql_mixing_without_writing(self):
+        """确认 strict 拒绝模型根文件、非 SQL 文件和 SQL 嵌套目录且保持只读。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 新增数据存储目录负向 fixture 与哈希断言。
+        """
+        # 1. 混放模型根源码、模型 SQL、SQL 说明文件与 SQL 子目录，比较检查前后哈希。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "database" / "model").mkdir(parents=True)
+            (root / "database" / "model" / "direct.go").write_text("package model", encoding="utf-8")
+            redis_model = root / "database" / "model" / "redis"
+            redis_model.mkdir()
+            (redis_model / "bad.sql").write_text("select 1;", encoding="utf-8")
+            field_create = root / "database" / "sql" / "field" / "create"
+            field_create.mkdir(parents=True)
+            (field_create / "note.md").write_text("not sql", encoding="utf-8")
+            nested = field_create / "nested"
+            nested.mkdir()
+            (nested / "bad.sql").write_text("alter table users add bad int;", encoding="utf-8")
+            before = json.loads(run("hash", "--root", str(root)).stdout)["sha256"]
+            result = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
+            after = json.loads(run("hash", "--root", str(root)).stdout)["sha256"]
+            self.assertEqual(2, result.returncode)
+            self.assertEqual(before, after)
+            errors = "\n".join(json.loads(result.stdout)["errors"])
+            self.assertIn("非法子目录: database/model/direct.go", errors)
+            self.assertIn("数据存储源码目录仅允许生产源码", errors)
+            self.assertIn("独立 SQL 目录只允许 .sql 文件", errors)
+            self.assertIn("独立 SQL 目录只允许直接 .sql 文件", errors)
 
     def test_init_creates_explicit_business_rpc_only(self):
         """确认业务域 RPC 只有显式域名与语言上下文时才会创建。

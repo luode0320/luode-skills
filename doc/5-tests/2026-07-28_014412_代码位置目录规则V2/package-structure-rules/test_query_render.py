@@ -113,6 +113,56 @@ class QueryRenderTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual("database/migration/field/create", json.loads(result.stdout)["entry"]["canonical_path"])
 
+    def test_storage_connection_models_and_field_sql_have_unique_paths(self):
+        """确认数据存储连接、模型和字段 SQL 均可由 CLI 唯一查询。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 新增数据存储目录查询断言。
+        """
+        # 1. 逐项调用公开 query，避免 Catalog 新增条目只可静态读取而无法通过 CLI 使用。
+        cases = (
+            (("database_connection", None, None), "database/connection"),
+            (("database_model", "db", None), "database/model/db"),
+            (("database_model", "redis", None), "database/model/redis"),
+            (("database_model", "mongo", None), "database/model/mongo"),
+            (("database_sql", "field", "create"), "database/sql/field/create"),
+            (("database_sql", "field", "update"), "database/sql/field/update"),
+            (("database_sql", "field", "delete"), "database/sql/field/delete"),
+        )
+        for (artifact, category, operation), expected_path in cases:
+            arguments = ["query", "--artifact", artifact]
+            if category is not None:
+                arguments.extend(("--category", category))
+            if operation is not None:
+                arguments.extend(("--operation", operation))
+            result = run(*arguments)
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(expected_path, json.loads(result.stdout)["entry"]["canonical_path"])
+
+    def test_documented_database_artifact_aliases_have_unique_paths(self):
+        """确认公开文档的 database 连字符 artifact 名称可以直接查询。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 22:16:49 修复公开示例与 Catalog 内部 artifact 名称不一致。
+        """
+        # 1. 使用文档对外公开的名称，避免调用方需要了解 Catalog 内部下划线字段。
+        cases = (
+            (("database-connection", None, None), "database/connection"),
+            (("database-sql", "field", "delete"), "database/sql/field/delete"),
+            (("database-migration", "field", "create"), "database/migration/field/create"),
+        )
+        for (artifact, category, operation), expected_path in cases:
+            arguments = ["query", "--artifact", artifact]
+            if category is not None:
+                arguments.extend(("--category", category))
+            if operation is not None:
+                arguments.extend(("--operation", operation))
+            result = run(*arguments)
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(expected_path, json.loads(result.stdout)["entry"]["canonical_path"])
+
     def test_business_rpc_has_unique_logical_path(self):
         """确认业务域 RPC 查询只返回一个带源码根和业务域占位的目录。
 
@@ -135,7 +185,7 @@ class QueryRenderTests(unittest.TestCase):
         # 1. 渲染全部项目树，并核对关键节点和创建策略注释。
         result = run("render", "--all")
         self.assertEqual(0, result.returncode, result.stderr)
-        for value in ("<fullstack-workspace>/", "<backend-project>/", "<frontend-project>/", "utils/", "ip/", "请求 IP 提取、标准化、公私网判断与地址归属查询工具", "源码根 util", "polaris/", "nacos/", "security-headers/", "mocks/", "业务公开的 JSON 字符串通信函数", "AGENTS.md", "CLAUDE.md", "正文与 AGENTS.md 一致", "PROJECT_CURRENT.md", "PROJECT_STYLE.md", "[必需·提交]"):
+        for value in ("<fullstack-workspace>/", "<backend-project>/", "<frontend-project>/", "database/", "数据存储模型分类根", "新增字段 `.sql` 文件", "utils/", "ip/", "请求 IP 提取、标准化、公私网判断与地址归属查询工具", "源码根 util", "polaris/", "nacos/", "security-headers/", "mocks/", "业务公开的 JSON 字符串通信函数", "AGENTS.md", "CLAUDE.md", "正文与 AGENTS.md 一致", "PROJECT_CURRENT.md", "PROJECT_STYLE.md", "[必需·提交]"):
             self.assertIn(value, result.stdout)
 
 
