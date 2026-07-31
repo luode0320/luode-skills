@@ -158,12 +158,27 @@ class InitCheckTests(unittest.TestCase):
             self.assertFalse((root / "database" / "model" / "db").exists())
             self.assertFalse((root / "database" / "sql" / "field" / "update").exists())
 
+    def test_init_rejects_removed_backend_data_enable(self):
+        """确认 init 不再接受已删除的后端根 data 目录。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 删除后端无职责静态数据根目录。
+        """
+        # 1. 已删除条目只能稳定失败，不能悄悄创建根 data 或其他条件目录。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run("init", "--project-kind", "backend", "--root", str(root), "--enable", "backend.data")
+            self.assertEqual(2, result.returncode)
+            self.assertIn("未知启用 ID: backend.data", result.stdout)
+            self.assertFalse((root / "data").exists())
+
     def test_strict_rejects_mixed_content_without_writing(self):
         """确认 strict 拒绝根 utils 文件、旧根 util 与源码根 util 子目录。
 
         [参数] self 为 unittest 测试实例。
         [返回] 无。
-        最近修改时间: 2026-07-28 21:45:00 补齐 utils 与源码根 util 的负向 fixture。
+        最近修改时间: 2026-07-31 15:19:00 将后端根 data 纳入 strict 无写入断言。
         """
         # 1. 构造工具、源码根、迁移和 SQL 的正负混合样本。
         with tempfile.TemporaryDirectory() as directory:
@@ -181,6 +196,8 @@ class InitCheckTests(unittest.TestCase):
             (root / "database" / "migration" / "field" / "create" / "bad.sql").write_text("select 1;", encoding="utf-8")
             (root / "database" / "sql" / "ddl").mkdir(parents=True)
             (root / "database" / "sql" / "ddl" / "bad.go").write_text("package ddl", encoding="utf-8")
+            (root / "data").mkdir()
+            (root / "data" / "legacy.json").write_text("{}", encoding="utf-8")
             # 2. 比较检查前后哈希，证明 strict 只报告而不写入 fixture。
             before = json.loads(run("hash", "--root", str(root)).stdout)["sha256"]
             result = run("check", "--root", str(root), "--project-kind", "backend", "--language", "go", "--policy", "strict")
@@ -191,6 +208,7 @@ class InitCheckTests(unittest.TestCase):
             self.assertIn("根 utils 禁止直接文件", errors)
             self.assertIn("源码根 util 禁止子目录", errors)
             self.assertIn("禁止路径", errors)
+            self.assertIn("禁止路径: data", errors)
             self.assertIn("自动迁移目录禁止 SQL 文件", errors)
             self.assertIn("独立 SQL 目录禁止生产源码", errors)
 

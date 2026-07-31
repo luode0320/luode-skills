@@ -184,11 +184,11 @@ class CatalogSchemaTests(unittest.TestCase):
 
         [参数] self 为 unittest 测试实例。
         [返回] 无。
-        最近修改时间: 2026-07-28 21:45:00 适配后端根 utils 与源码根 util 分流。
+        最近修改时间: 2026-07-31 15:19:00 将后端根 data 纳入删除路径断言。
         """
         # 1. 从 Catalog 的禁止路径集合逐项确认删除目录不会重新被允许。
         forbidden = set(self.catalog["forbidden_paths"])
-        for path in ("util", "utils/graphql", "utils/asyncapi", "utils/avro", "utils/api/http", "common/event", "schema", "protocol"):
+        for path in ("data", "util", "utils/graphql", "utils/asyncapi", "utils/avro", "utils/api/http", "common/event", "schema", "protocol"):
             self.assertIn(path, forbidden)
 
     def test_source_util_entries_cover_each_backend_language(self):

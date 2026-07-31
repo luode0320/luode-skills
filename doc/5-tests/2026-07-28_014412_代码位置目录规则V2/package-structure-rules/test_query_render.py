@@ -175,6 +175,22 @@ class QueryRenderTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual("<source-root>/business/<domain>/rpc", json.loads(result.stdout)["entry"]["canonical_path"])
 
+    def test_removed_backend_data_has_no_catalog_path_or_tree_node(self):
+        """确认后端根 data 既不可查询，也不会被完整树渲染。
+
+        [参数] self：unittest 测试实例。
+        [返回] 无。
+        最近修改时间: 2026-07-31 删除后端无职责静态数据根目录。
+        """
+        # 1. 根 data 已被删除，Catalog 不得为它保留兼容条目。
+        query = run("query", "--artifact", "data")
+        self.assertEqual(2, query.returncode)
+
+        # 2. 前端和文档仍可拥有自己的 data 目录，故仅断言后端完整树不再包含根节点。
+        backend = run("render", "--project-kind", "backend")
+        self.assertEqual(0, backend.returncode, backend.stderr)
+        self.assertNotIn("├── data/", backend.stdout)
+
     def test_render_all_is_complete_and_annotated(self):
         """确认完整树同时展示根 utils 与源码根 util 的不同职责。
 
