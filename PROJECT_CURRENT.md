@@ -2,49 +2,42 @@
 
 ## 更新时间
 
-- 2026-07-31
+- 2026-08-01
 
 ## 当前任务
 
-- 来源对象：代码位置目录规则 V2 的 `utils`/源码根 `util`、微业务 JSON RPC、旧项目渐进采纳、`utils/ip/`、根治理文件、后端数据存储目录和后端根 `data/` 删除规则。
-- 当前目标：完成 `package-structure-rules` 中 V2 新项目规则、旧项目 `adoption`、数据存储连接、模型分类、独立字段 SQL、后端根 data 删除与公开 CLI 查询的唯一位置、只读检查、测试、审查和验收闭环。
-- 当前状态：`TASK-05-01` 至 `TASK-14-02` 已完成。CYCLE-14 已删除后端根 `data/` 的目录、查询与初始化入口，并将其纳入 strict 禁止路径；50 项本地行为测试、Python 编译、关键负向 CLI 验证、无写入断言、六类文档严格 profile、Skill 校验、实现审查与最终验收均已通过。
+- 来源对象：用户已确认的“研发流程收敛：实施计划、真实测试与 6-review 风格回归”计划。
+- 当前目标：删除五个退役 Skill，统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”，并完成路由、字典、文档和回归验证。
+- 当前状态：`TASK-FLOW-01` 至 `TASK-FLOW-05` 已完成。新流程已收敛为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”；五个退役 Skill 已删除，`doc/6-审查/`、`doc/7-验收/` 仅保留历史只读资料。
 
 ## 范围与边界
 
-- 范围：`package-structure-rules`、`micro-business-architecture-rules`、必要相邻工具规则、V2 研发产物、Skill 字典和当前任务状态。
-- 非范围：业务项目迁移、自动移动、删除或重命名旧文件、真实数据库迁移、网络 RPC、外部服务、前端 `src/util/`、业务域私有 `util/` 和 Git 历史写入。
+- 范围：流程规则、活动路由、文档 profile、字典、专项回归、项目四件套和根文档。
+- 非范围：业务项目代码、历史归档正文、数据库、外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 根 `utils/` 只承载可独立复制的工具包和 SDK，禁止直接文件与项目包依赖；源码根 `util/` 只承载直接落盘的项目高关联工具函数，禁止子目录。
-- Catalog、CLI、四语言路径映射、strict/legacy 检查、完整目录树、公共工具示例和 Skill 字典已同步。
-- 每个微业务域按需提供扁平 `rpc/`；跨域只导入目标域精确 `rpc/`，请求和响应均为 JSON 字符串，统一采用 `Response{code,status,message,data}` 语义。
-- Catalog、CLI、微业务隔离脚本、CodeGraph fixture、目录树和引用契约已同步；本地行为回归 21/21 通过，`py_compile`、关键 query 与完整树渲染通过。
-- 旧项目使用 `doc/1-架构/3-目录规则收敛清单.yaml` 进行人工登记：已采纳 V2 目录可原地扩展，遗留源码仅可维护已登记快照，新业务和独立逻辑必须进入 Catalog 唯一 V2 路径。
-- `utils/ip/` 已固定为 IP 提取、规范化、公私网判断与国家/地区归属查询的独立工具包；不承载代理信任、风控、业务黑白名单或业务地域策略。
-- 三类项目根固定保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在真实存在长期风格时创建。Catalog 把它们建模为文件节点，`init` 仅创建位置且不改写正文，strict 在两个规则文件同时存在时拒绝正文不一致。
-- `check --policy adoption --adoption-manifest ...` 已实现只读检查；无效、越界、重复或禁止路径清单稳定失败，检查不改写项目或清单。
-- `database/connection/` 已覆盖关系型数据库、Redis、Mongo 等数据存储连接；`database/model/` 只允许 `db/`、`redis/`、`mongo/`；独立字段 SQL 只进入 `database/sql/field/{create,update,delete}/` 且每个叶子目录只放 `.sql` 文件。
-- 公开 `database-connection`、`database-sql`、`database-migration` 查询名称已与 Catalog 内部字段兼容；未连接数据库、缓存、消息队列、第三方 API 或非 local 环境。
-- 后端根不再建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
+- 五个退役 Skill 目录及资产已删除，`implementation-planning-rules` 已吸收可测试完成条件，`code-style-consistency-rules` 成为唯一 `6-review` 入口。
+- `artifact-storage-rules` 已将 `doc/6-review/` 设为活动目录；`artifact-delivery-gate-rules` 已新增 `style_regression` profile，旧 review/acceptance profile 只读兼容。
+- 根文档、项目记忆、字典生成器和专项回归已迁移到新流程；实施总览、周期、真实测试和风格回归记录已落盘并建立 `IMPL/TEST/STYLE` 追踪。
+- 已完成本地最终验证：文档校验器 57 项单元测试、流程专项回归、实施总览/周期/`style_regression` 严格 profile、字典生成和 Git 差异检查均通过。
 
 ## 门禁说明
 
-- WSL `python3` 缺少 `yaml`，不能作为本轮文档校验入口；Windows Python 3.14 已提供 PyYAML，50 项本地 `unittest`、Python 编译、根 data 负向 query/render/init/strict、无写入断言、六类文档严格 profile 和 `package-structure-rules` Skill 校验均已通过。
+- Obsidian bridge 的固定 vault 未注册，沉淀操作保持阻断；本任务不使用文件系统绕过该边界。所有实现与验证仅使用本地仓库和 Windows Python。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；当前会话 CYCLE-14 已在最终门禁通过后使用 `task_plan_projection.py deactivate` 失活，且不影响其它会话投影。
-- 后续目录位置查询与旧项目渐进检查以 `package-structure-rules/scripts/placement_catalog.py` 和 `placement-catalog.yaml` 为唯一入口。
+- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 `FLOW-STREAMLINING-20260801` 已完成并已失活。
+- 最后执行点：最终验证、注释门禁、代码收口、Skill 合规和 `6-review` 风格回归均已完成；无待办或阻断。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-07-31T15:40:21.210748Z",
+  "registry_updated_at": "2026-07-31T18:04:17.414853Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -557,6 +550,44 @@
         {
           "id": "TASK-14-02",
           "step": "[TASK-14-02] 完成严格检查、测试与文档收口",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/519686f0e7a3f89af5c8621a38424498c6e750b9c71da6bc1ae1dde005566a8c",
+      "session_id": "019fb8f8-2434-7f30-ab1f-6928ccc5b93a",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "exact",
+      "state": "inactive",
+      "plan_key": "FLOW-STREAMLINING-20260801",
+      "source_document": "user-confirmed-plan:研发流程收敛：实施计划、真实测试与6-review风格回归",
+      "plan_fingerprint": "22f33b1cc9fc66bc0a57db166cc12c844787dd60bb7a3ff827f945c41bb661f5",
+      "updated_at": "2026-07-31T18:04:17.414692Z",
+      "steps": [
+        {
+          "id": "CYCLE-01",
+          "step": "契约收敛：实施计划、文档存储与 style_regression profile",
+          "status": "completed"
+        },
+        {
+          "id": "CYCLE-02",
+          "step": "6-review：代码风格、格式与目录归位回归",
+          "status": "completed"
+        },
+        {
+          "id": "CYCLE-03",
+          "step": "删除五个旧 Skill 并同步活跃路由",
+          "status": "completed"
+        },
+        {
+          "id": "CYCLE-04",
+          "step": "同步项目文档、记忆与历史归档边界",
+          "status": "completed"
+        },
+        {
+          "id": "CYCLE-05",
+          "step": "刷新字典并执行全链路回归与最终收口",
           "status": "completed"
         }
       ]

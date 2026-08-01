@@ -32,7 +32,7 @@
 
 ## 六域 Skill 精简与自动触发保护规则
 
-- 稳定决策：需求、实施、测试、Bug、审查、验收域精简时，用户习惯、自动触发、授权、安全、local、输出协议、暂停与停止边界均为保护语义；可以迁移位置，不得删除或弱化。
+- 稳定决策：需求、实施、测试、Bug 与 `6-review` 风格回归精简时，用户习惯、自动触发、授权、安全、local、输出协议、暂停与停止边界均为保护语义；可以迁移位置，不得删除或弱化。独立业务审查与后置验收不再是活动域。
 - 稳定决策：同生命周期收敛为单主入口加条件路由；主 Skill 保留触发摘要和职责边界，重复细则下沉 references。
 - 稳定决策：退役旧 Skill 前必须具备 source-target mapping、trigger contract、protected semantic IDs、active consumers、physical asset owner、baseline hashes、rollback locator 与正负 post-delete 证据；缺任一项保持 `hold`。
 - 稳定决策：`implementation-planning-rules` 保持 Plan Mode 唯一入口，只做正文去重和 references 化，不拆为竞争入口。
@@ -43,10 +43,10 @@
 
 ## 白话文档与附录分层规则
 
-- 需求、实施、审查、验收、Bug、测试、架构、交付和工作报告采用同一信息分层：H1 后单段正文固定说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
-- 审查或验收不适用时，必须说明原因和依据，但不构成任务阻断；只有需求明确要求该验证、当前必须完成且无可接受替代验证时，条件缺失才阻断。
-- 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 启用机器门禁；24 个受管模板由 `plain-language-template-registry.yaml` 统一登记并逐项测试；未修改历史文档不批量迁移，在新建或后续修改时迁移。
-- 审查、验收、功能验证、浏览器联调和第三方验证统一使用 `review-acceptance-gate-contract.md`：不适用不阻断，受限可继续但不能正式放行，明确必需且无替代验证才阻断。
+- 需求、实施、Bug、测试、`6-review`、架构、交付和工作报告采用同一信息分层：H1 后单段正文固定说明结论、影响、范围、非范围、变化、完成标准、术语说明和验证状态；文件、命令、稳定 ID、追踪矩阵和证据分别进入执行附录或追踪附录。
+- 新活动文档不再使用 `review_acceptance_gates`；完成条件写入实施计划，真实测试产生 `TEST` 证据，`6-review` 只产生 `STYLE: PASS/FIX_REQUIRED`。历史审查和验收文件保留该字段时只读兼容。
+- 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 启用机器门禁；受管模板由 `plain-language-template-registry.yaml` 统一登记并逐项测试；未修改历史文档不批量迁移。
+- 功能验证、浏览器联调和第三方验证按各自测试规则处理；后置审查和最终验收不再构成活动放行分支。
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
 - 更新时间：2026-07-14。
 
@@ -92,7 +92,7 @@
 ### 仓库定位
 - 别名: skill 仓库, 团队研发协作规则仓库
 - 类型: 项目事实
-- 定义: 本仓库用于沉淀面向团队研发协作的 Skill、references、脚本和入口文档，目标是让 AI 在需求、Bug、编码、审查、测试、交付流程中按任务内容自动命中规则。
+- 定义: 本仓库用于沉淀面向团队研发协作的 Skill、references、脚本和入口文档，目标是让 AI 在需求、Bug、编码、实施计划、真实测试、`6-review` 和交付流程中按任务内容自动命中规则。
 - 来源: `README.md`、`项目设计.md`
 - 适用范围: 全仓库
 - 更新时间: 2026-06-27
@@ -110,18 +110,18 @@
 ### 研发产物目录正式口径
 - 别名: doc 顶层目录规则
 - 类型: 目录规则
-- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前正式活动子目录按流程顺序编号为 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`。
+- 定义: 正式研发产物目录统一收口到 `doc/` 下；当前活动子目录按流程顺序编号为 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`；`doc/6-审查/` 与 `doc/7-验收/` 仅作为历史只读归档。
 - 来源: `artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 文档归档与规则引用
 - 更新时间: 2026-06-28
 - 状态: 启用
 
 ### 活动文档命名前缀
-- 别名: 来源对象标识, 实施需求标识, 审查时分秒, Bug 进入实施验收
+- 别名: 来源对象标识, 实施需求标识, 风格回归时分秒, Bug 进入实施计划
 - 类型: 命名规则
-- 定义: 需求、实施、Bug、测试、审查、验收等活动产物统一使用 `YYYY-MM-DD_HHmmss` 时间前缀。实施、审查、验收这类下游文档必须在时间后保留来源对象标识，来源可以是需求也可以是 Bug；来源对象标识不重复前置时间戳，优先使用来源中文主干或短 ID，必要时加 `需求-` 或 `Bug-` 类型前缀。典型格式为 `YYYY-MM-DD_HHmmss_<项目或来源集合标识>_需求与实施计划全量顺序实施方案.md`、`YYYY-MM-DD_HHmmss_<来源对象标识>_实施周期NN_周期说明.md`、`YYYY-MM-DD_HHmmss_<来源对象标识>_<审查中文主题>.md`、`YYYY-MM-DD_HHmmss_<来源对象标识>_最终验收.md`；禁止只写 `时间_阶段_说明.md`、`YYYY-MM-DD_主题.md` 或缺少来源标识的 `YYYY-MM-DD_HHmmss_主题.md`。
+- 定义: 需求、实施、Bug、测试和 6-review 活动产物统一使用 `YYYY-MM-DD_HHmmss` 时间前缀。实施与 6-review 等下游文档必须在时间后保留来源对象标识，来源可以是需求也可以是 Bug；历史审查/验收文件只读保留。禁止只写 `时间_阶段_说明.md`、`YYYY-MM-DD_主题.md` 或缺少来源标识的 `YYYY-MM-DD_HHmmss_主题.md`。
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`artifact-storage-rules/references/naming-templates.md`
-- 适用范围: 需求域、实施域、Bug 域、测试域、审查域、验收域
+- 适用范围: 需求域、实施域、Bug 域、测试域、6-review 风格回归域
 - 更新时间: 2026-06-29
 - 状态: 启用
 
@@ -173,7 +173,7 @@
 ### 需求域第一入口
 - 别名: 需求 skill 顺序, 需求前置入口
 - 类型: 流程规则
-- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 验收标准 -> 实施 -> 测试 -> 审查 -> 最终验收`。其中需求域主流程收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`acceptance-criteria-rules` 负责前置验收标准，`implementation-planning-rules` 负责独立实施域，`final-acceptance-rules` 负责后置最终验收。内部统一由 `requirement-intake-rules` 作为第一入口；粗略 idea 进入 `initial-discovery` 路由，主入口负责立即创建需求主文档，`requirement-intake-rules` 的 `gap-routing` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。需求、验收标准和实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
+- 定义: 当前对外统一流程为 `Idea/Discovery -> Intake -> 条件闸门 -> 实施计划（含 AC 完成条件） -> 实现 -> 真实测试 -> 6-review -> 交付总结`。其中需求域主流程仍收口到 `Idea/Discovery -> Intake`，条件步骤为 `Gap / Boundary / Splitting / Change`；`implementation-planning-rules` 负责把完成条件、异常边界、停止条件和测试映射冻结在实施计划中。内部统一由 `requirement-intake-rules` 作为第一入口；粗略 idea 进入 `initial-discovery` 路由，主入口负责立即创建需求主文档，`requirement-intake-rules` 的 `gap-routing` 只处理主动侦察后仍无法补齐的关键缺口。需求阶段只允许读仓库、读资料、整理文档；不允许把 agent 猜测写成需求答案，也不允许“先做了再补需求”。需求主文档未真实落盘前，禁止进入实施规划与正式编码。实施计划完成后仍不得自动开工，必须等用户明确“开始实施/开始执行”后才能进入正式编码。
 - 来源: `requirement-intake-rules/references/requirement-domain-shared-contract.md`、`编码skill.md`
 - 适用范围: 需求域
 - 更新时间: 2026-07-22
@@ -182,23 +182,23 @@
 ### 需求临时缺口文档规则
 - 别名: gap 临时文档, 缺口阻断文档
 - 类型: 流程规则
-- 定义: `requirement-intake-rules` 的 `gap-routing` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/2-需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入验收标准、实施或最终验收。
+- 定义: `requirement-intake-rules` 的 `gap-routing` 只处理 discovery 之后仍无法补齐的关键缺口；gap 阶段允许在 `doc/2-需求/` 下创建一份临时缺口文档，记录已侦察证据、待确认问题和阻断结论。用户确认并补齐后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，也不得继续进入实施计划。
 
-### 双层验收规则
-- 别名: 前置验收 + 最终验收, 验收双层机制, Bug 验收
+### 实施计划完成条件规则
+- 别名: AC 完成条件, 计划内验收口径, 真实测试映射
 - 类型: 流程规则
-- 定义: 验收统一归入“验收”大类，分为前置 `验收标准` 与后置 `最终验收` 两层，来源对象可以是需求也可以是 Bug。前置验收标准由 `acceptance-criteria-rules` 生成并落到 `doc/7-验收/YYYY-MM-DD_HHmmss_<来源对象标识>_验收标准.md`；后置最终验收由 `final-acceptance-rules` 生成并落到 `doc/7-验收/YYYY-MM-DD_HHmmss_<来源对象标识>_最终验收.md`。测试和审查未完成时，最终验收必须阻断。
-- 来源: `artifact-storage-rules/references/path-map.yaml`、`acceptance-criteria-rules`、`final-acceptance-rules`
-- 适用范围: 验收域
-- 更新时间: 2026-06-27
+- 定义: 完成标准不再单独生成验收 Skill 或验收文档；`AC-*` 继续写入实施总览、实施周期或任务卡，冻结成功条件、异常边界、范围外、停止条件、真实测试入口和证据映射。真实测试逐条引用 AC 并产生 `TEST` 证据，测试完成后由 `code-style-consistency-rules` 记录一次 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`。
+- 来源: `implementation-planning-rules`、`artifact-delivery-gate-rules`、`code-style-consistency-rules`
+- 适用范围: 实施域、测试域、6-review 风格回归
+- 更新时间: 2026-08-01
 - 状态: 启用
 
 ### 实施开工授权与自动推进
 - 别名: 开始实施确认, 开工授权, 最小任务自动推进, 长文本执行边界
 - 类型: 流程规则
-- 定义: 来源对象文档（需求或 Bug）、前置验收标准和实施总览/实施周期即使都已完成，也不构成自动开工授权；必须由用户在当前任务中明确说“开始实施”“开始实现”“开始执行”“直接做”“继续做完”或“按文档实现”，且当前任务已有执行计划、任务完成条件、任务停止 / 结束条件、最大推进边界和验证点，才允许从实施文档切入正式编码。实施规划阶段默认采用只读计划模式：禁止写代码、禁止边计划边试做，只允许读仓库、定依赖、列风险、拆任务、写实施文档。新项目、项目初期或多来源对象存在多份需求 / 实施文档时，必须先在 `doc/3-实施/` 维护“需求与实施计划全量顺序实施方案”，把需求主文档、验收标准、实施总览、实施周期和周期内最小任务按总顺序串起来，再进入单来源对象实施总览。计划正文开头必须先写“当前计划最终方案的简要说明”，用 1-3 句先交代推荐方案、主落点和为什么这么做；随后再写 agent 对当前问题的理解，至少交代问题 / 目标、本轮范围、非范围、当前优先闭环和关键假设 / 待确认点，再进入实施周期与最小任务拆分。实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界，必须写清周期顺序、期次定位、进入条件、收口条件和周期内最小任务顺序；真正执行单元是当前周期内的最小任务，并优先按“依赖图 + 垂直切片”组织，避免按前端 / 后端 / 数据库水平分层堆计划。单任务尽量单次专注完成，默认控制在约 5 个文件以内；明显超过则继续拆分。凡是代码生成、修改或重构类任务，都必须显式计划真实测试，写清入口、环境、样本 / 数据来源和通过标准，`build`、`lint`、静态检查不算真实测试；只有纯文档、纯注释、纯排版、纯静态资源改名 / 搬运或不会影响运行结果的场景才允许免测；若计划涉及代码生成、修改或重构，“现状与落点”必须给出代码落点目录树，不能只写文件名或普通条目。若用户在当前轮显式提出“怎么做 / 先给计划 / 先出方案 / 先列步骤 / 这个怎么改”这类计划型问题，也必须先命中实施规划规则；若前置条件未齐，则输出受限计划 / 阻断计划，而不是不触发。若运行环境要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层只负责渲染 / 协议，不能覆盖项目内计划结构；正文仍必须遵守 `implementation-planning-rules` 与模板字段，并在输出前执行 `implementation-planning-rules/references/plan-output-gate.md` 的字段矩阵。Plan Mode 计划正文若以 `Summary`、`Key Changes`、`Public Interfaces`、`Test Plan`、`Assumptions` 等通用工程计划小节作为主结构，或缺少当前计划最终方案简要说明、agent 理解、范围、非范围、当前优先闭环、关键假设、实施周期、阶段计划、最小任务、真实测试、完成条件、停止 / 结束条件、最大推进边界等核心字段，直接判定为无效计划，必须按模板重写，不得解释为简化版计划。受限计划不得作为实施授权；用户即使明确采纳，agent 也只能先补齐缺失前置条件并将其升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。若用户给出开工类指令但没有计划或任务停止 / 结束条件，必须先补本轮受限计划并停在计划收口处，不得直接实现或进入长文本无限执行。开工后按 `autonomous-execution-rules` 默认遵循“当前实施周期内最小任务A实现 -> 最小任务A真实测试 -> 最小任务A审查 -> 最小任务A验收 -> 最小任务B…… -> 当前实施周期收口 -> 下一实施周期”的自动串行闭环；每个最小任务都必须先完成自己的真实测试、审查、验收，才允许进入下一个任务；禁止先连续实现多个最小任务后统一测试、统一审查或统一验收。
+- 定义: 来源对象文档（需求或 Bug）和实施总览/实施周期即使都已完成，也不构成自动开工授权；必须由用户在当前任务中明确说“开始实施”“开始实现”“开始执行”“直接做”“继续做完”或“按文档实现”，且当前任务已有执行计划、AC 完成条件、任务停止 / 结束条件、最大推进边界和验证点，才允许从实施文档切入正式编码。实施规划阶段默认采用只读计划模式：禁止写代码、禁止边计划边试做，只允许读仓库、定依赖、列风险、拆任务、写实施文档。新项目、项目初期或多来源对象存在多份需求 / 实施文档时，必须先在 `doc/3-实施/` 维护“需求与实施计划全量顺序实施方案”，把需求主文档、实施总览、实施周期和周期内最小任务按总顺序串起来，再进入单来源对象实施总览。计划正文开头必须先写“当前计划最终方案的简要说明”，用 1-3 句先交代推荐方案、主落点和为什么这么做；随后再写 agent 对当前问题的理解，至少交代问题 / 目标、本轮范围、非范围、当前优先闭环和关键假设 / 待确认点，再进入实施周期与最小任务拆分。实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界，必须写清周期顺序、期次定位、进入条件、收口条件和周期内最小任务顺序；真正执行单元是当前周期内的最小任务，并优先按“依赖图 + 垂直切片”组织，避免按前端 / 后端 / 数据库水平分层堆计划。单任务尽量单次专注完成，默认控制在约 5 个文件以内；明显超过则继续拆分。凡是代码生成、修改或重构类任务，都必须显式计划真实测试，写清入口、环境、样本 / 数据来源和通过标准，`build`、`lint`、静态检查不算真实测试；只有纯文档、纯注释、纯排版、纯静态资源改名 / 搬运或不会影响运行结果的场景才允许免测；若计划涉及代码生成、修改或重构，“现状与落点”必须给出代码落点目录树，不能只写文件名或普通条目。若用户在当前轮显式提出“怎么做 / 先给计划 / 先出方案 / 先列步骤 / 这个怎么改”这类计划型问题，也必须先命中实施规划规则；若前置条件未齐，则输出受限计划 / 阻断计划，而不是不触发。若运行环境要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层只负责渲染 / 协议，不能覆盖项目内计划结构；正文仍必须遵守 `implementation-planning-rules` 与模板字段，并在输出前执行 `implementation-planning-rules/references/plan-output-gate.md` 的字段矩阵。Plan Mode 计划正文若以 `Summary`、`Key Changes`、`Public Interfaces`、`Test Plan`、`Assumptions` 等通用工程计划小节作为主结构，或缺少当前计划最终方案简要说明、agent 理解、范围、非范围、当前优先闭环、关键假设、实施周期、阶段计划、最小任务、真实测试、完成条件、停止 / 结束条件、最大推进边界等核心字段，直接判定为无效计划，必须按模板重写，不得解释为简化版计划。受限计划不得作为实施授权；用户即使明确采纳，agent 也只能先补齐缺失前置条件并将其升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。若用户给出开工类指令但没有计划或任务停止 / 结束条件，必须先补本轮受限计划并停在计划收口处，不得直接实现或进入长文本无限执行。开工后按 `autonomous-execution-rules` 默认遵循“当前实施周期内最小任务A实现 -> 最小任务A真实测试 -> 最小任务A 6-review -> 最小任务B…… -> 当前实施周期收口 -> 下一实施周期”的自动串行闭环；每个最小任务都必须先完成自己的真实测试和 6-review，才允许进入下一个任务；禁止先连续实现多个最小任务后统一测试。
 - 来源: `autonomous-execution-rules`、`implementation-planning-rules`、`team-development-rules/references/routing-rules.md`
-- 适用范围: 实施域、测试域、审查域、验收域
+- 适用范围: 实施域、测试域、6-review 风格回归域
 - 更新时间: 2026-07-05
 - 状态: 启用
 
@@ -301,21 +301,21 @@
 - 更新时间: 2026-07-25
 - 状态: 启用
 
-### 审查体系收口
-- 别名: 审查链路
+### 6-review 风格回归收口
+- 别名: 风格回归链路, 6-review
 - 类型: 流程规则
-- 定义: 默认审查链收口为 `implementation-review-rules`、`project-change-review-rules`、`artifact-delivery-gate-rules`、`skill-execution-compliance-gate-rules` / `code-change-finalization-gate-rules`；实现自审与当前改动总审查在收口前必须真实落盘到 `doc/6-审查/`，不再允许仅在最终回复中口头保留通过结论。
-- 来源: `README.md`、`项目设计.md`
-- 适用范围: 审查域
-- 更新时间: 2026-06-27
+- 定义: 活动质量回归只保留测试后的 `code-style-consistency-rules` `6-review`；检查格式、命名、注释、日志、可读性、目录归位和局部习惯，输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`。不判断业务正确性、需求覆盖或发布放行，结果记录到 `doc/6-review/`。
+- 来源: `README.md`、`项目设计.md`、`code-style-consistency-rules`
+- 适用范围: 6-review 风格回归、交付收口
+- 更新时间: 2026-08-01
 - 状态: 启用
 
-### Git 提交基础审查与验收闸门
-- 别名: 提交前审查检查, Git 基础验收, 提交不生成审查验收文档
+### Git 提交基础质量闸门
+- 别名: 提交前质量检查, Git 基础质量核查, 提交不生成活动流程文档
 - 类型: 流程规则
-- 定义: 执行 `git commit` 前，必须直接对当前 staged 改动完成基础审查与基础验收：格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性均须通过或明确“不适用 + 原因”。结论只写入 Git 提交证据；禁止仅因提交自动生成或要求 `doc/6-审查/`、`doc/7-验收/` 文档。只有用户显式发起总审查或正式最终验收，或非 Git 场景进入最终放行时，才执行对应 skill 的文档归档。
-- 来源: 当前对话确认、`git-collaboration-rules/SKILL.md`、`project-change-review-rules/SKILL.md`、`final-acceptance-rules/SKILL.md`
-- 适用范围: 提交流程、审查域
+- 定义: 执行 `git commit` 前，必须直接对当前 staged 改动完成基础质量核查：格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性均须通过或明确“不适用 + 原因”。结论只写入 Git 提交证据；不因提交自动生成活动审查/验收文档。活动风格结果统一由 `6-review` 记录。
+- 来源: 当前对话确认、`git-collaboration-rules/SKILL.md`、`code-style-consistency-rules`
+- 适用范围: 提交流程、6-review 风格回归
 - 更新时间: 2026-07-13
 - 状态: 启用
 
@@ -329,29 +329,29 @@
 - 状态: 启用
 
 ### Git 提交域隔离规则
-- 别名: 提交域隔离, 需求实施测试Bug审查验收单独提交, 代码实现单独提交
+- 别名: 提交域隔离, 需求实施测试6-review单独提交, 代码实现单独提交
 - 类型: 流程规则
-- 定义: `提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 六类流程产物各自单独提交；测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。根目录 `README.md` 改动日志可以跟随对应 commit 一起更新，但不单独构成提交域。
+- 定义: `提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 五类活动流程产物各自单独提交；历史审查/验收目录只读归档。测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。根目录 `README.md` 改动日志可以跟随对应 commit 一起更新，但不单独构成提交域。
 - 来源: 对话确认、`git-collaboration-rules/SKILL.md`、`git-collaboration-rules/scripts/pre_commit_gate.sh`
-- 适用范围: 提交流程、需求域、实施域、Bug 域、测试域、审查域、验收域
+- 适用范围: 提交流程、需求域、实施域、Bug 域、测试域、6-review 风格回归
 - 更新时间: 2026-07-08
 - 状态: 启用
 
 ### 文档落盘闸门
 - 别名: 归档闸门, 收口前落盘检查
 - 类型: 流程规则
-- 定义: 需求、实施、验收、Bug、测试、审查任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、正文内嵌 Mermaid 图示（需求域、Bug 域统一不另建 SVG 等配套图文件）、README、需求与实施计划全量顺序实施方案、实施总览/实施周期、验收文档和证据路径是否已经真实落盘到 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`；实施域还必须核对新项目 / 多来源对象总顺序、周期顺序、期次定位、周期内最小任务顺序和已执行最小任务的实现 / 真实测试 / 审查 / 验收状态，未落盘或缺闭环状态不得判定任务完成。
+- 定义: 需求、实施、Bug、测试和 6-review 任务在最终收口前必须联动 `artifact-delivery-gate-rules`，核对主文档、正文内嵌 Mermaid 图示、README、需求与实施计划全量顺序实施方案、实施总览/实施周期、6-review 文档和证据路径是否已经真实落盘到 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`；实施域还必须核对新项目 / 多来源对象总顺序、周期顺序、期次定位、周期内最小任务顺序和已执行最小任务的实现 / 真实测试 / 6-review 状态，未落盘或缺闭环状态不得判定任务完成。
 - 来源: `artifact-delivery-gate-rules`、`README.md`
-- 适用范围: 需求域、实施域、验收域、Bug 域、测试域、审查域
+- 适用范围: 需求域、实施域、Bug 域、测试域、6-review 风格回归
 - 更新时间: 2026-07-05
 - 状态: 启用
 
 ### 需求与实施文档极致完整性契约
 - 别名: 零决策文档交接, 极致完整性, 普通模型执行契约, 文档质量 profile
 - 类型: 文档质量规则
-- 定义: 需求、验收标准、实施总览、实施周期和最小任务文档采用“结构完整、条件字段显式、决策冻结、图文一致、双向追踪、机器校验”的共同契约。所有条件字段必须填写，或使用 `N/A + 原因 + 证据`；普通模型不得自行补业务、技术、测试、回滚或停止决策。稳定追踪链固定为 `SRC -> DEC -> REQ/RULE -> AC -> CYCLE -> TASK -> 文件/符号 -> TEST -> EVIDENCE`。需求按复杂度 L1-L4 展开；L2 及以上按语义强制流程图、时序图及必要状态/数据/依赖图；实施总览、周期和任务卡分别承载整体决策、周期顺序和零决策执行动作。
+- 定义: 需求、实施总览、实施周期和最小任务文档采用“结构完整、条件字段显式、决策冻结、图文一致、双向追踪、机器校验”的共同契约。所有条件字段必须填写，或使用 `N/A + 原因 + 证据`；实施计划持有 AC 完成条件、异常边界、停止条件和测试映射。普通模型不得自行补业务、技术、测试、回滚或停止决策。稳定追踪链固定为 `SRC -> DEC -> REQ/RULE -> AC -> CYCLE -> TASK -> 文件/符号 -> TEST -> EVIDENCE`。需求按复杂度 L1-L4 展开；L2 及以上按语义强制流程图、时序图及必要状态/数据/依赖图；实施总览、周期和任务卡分别承载整体决策、周期顺序和零决策执行动作。
 - 来源: `requirement-intake-rules/references/extreme-completeness-standard.md`、`implementation-planning-rules/references/implementation-overview-template.md`、`implementation-planning-rules/references/implementation-cycle-template.md`、`implementation-planning-rules/references/minimum-task-execution-contract.md`、`artifact-delivery-gate-rules/references/document-handoff-contract.md`
-- 适用范围: 需求域、验收域、实施域、交付闸门
+- 适用范围: 需求域、实施域、交付闸门
 - 更新时间: 2026-07-12
 - 状态: 启用
 
@@ -382,13 +382,13 @@
 - 更新时间: 2026-06-27
 - 状态: 启用
 
-### 提交级审查正式归档位置
-- 别名: commit review 归档口径, 提交级专项审查出口
-- 类型: 审查规则
-- 定义: `code-review-automation-rules` 的正式长期输出已统一收口到 `doc/6-审查/`，文件名遵循 `artifact-storage-rules` 中央模板；不再写入项目根目录固定文件名 `code_review_result.md` 一类平行入口。
-- 来源: `code-review-automation-rules`、`artifact-storage-rules/references/path-map.yaml`
-- 适用范围: 审查域
-- 更新时间: 2026-06-27
+### 历史审查与验收归档边界
+- 别名: 历史只读归档
+- 类型: 文档边界
+- 定义: `doc/6-审查/` 与 `doc/7-验收/` 的既有文件原文只读保留，历史链接可继续读取；活动流程不再新增、更新或依赖这些目录。
+- 来源: `artifact-storage-rules`、`code-style-consistency-rules`
+- 适用范围: 历史资料、6-review 活动边界
+- 更新时间: 2026-08-01
 - 状态: 启用
 
 ### 记忆与风格更新方式
@@ -565,8 +565,8 @@
 - 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
 - 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/6-审查/`，不再写项目根目录固定文件名。
 - 2026-06-28：明确“需求/验收标准/实施计划完成不等于自动开工”，必须等用户明确“开始实施/开始执行”后才能进入编码；一旦开工，后续按实施周期自动串行推进实现、测试、审查与验收闭环。
-- 2026-06-30：统一实施执行口径为“最小任务闭环优先于实施周期浏览”，并统一主执行链术语为“实现 -> 真实测试 -> 审查 -> 验收”。
-- 2026-06-29：将实施执行粒度从“实施周期闭环”细化为“最小任务闭环”；实施周期继续作为文档管理容器，真正执行顺序改为每个最小任务依次完成实现、真实测试、审查、验收后再进入下一个最小任务。
+- 2026-06-30：统一实施执行口径为“最小任务闭环优先于实施周期浏览”；2026-08-01 起主执行链更新为“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”。
+- 2026-06-29：将实施执行粒度从“实施周期闭环”细化为“最小任务闭环”；实施周期继续作为文档管理容器，当前执行顺序为每个最小任务依次满足实施计划完成条件、实现、真实测试和 6-review 后再进入下一个最小任务。
 - 2026-06-29：补充长文本执行边界；“开始实施/开始实现/开始执行/直接做/继续做完/按文档实现”等开工词必须有执行计划、任务完成条件、任务停止 / 结束条件和最大推进边界，缺少时先补受限计划并停在计划收口处，不得直接实现。
 - 2026-06-29：建立并行规划与真实启动闭环；2026-06-30 补充工具授权优先级；2026-07-22 收敛为 `parallel-task-dispatch-rules` 单一状态机，统一分类、授权、启动、观测、回收与关闭，不能只停留在文本规划。
 - 2026-06-29：新增 `generate_subagent_plan.py` 启动计划脚本，明确批量委派先生成计划 JSON，再由主 agent 读取计划并真实启动；子 agent 名称默认使用任务简要中文。
@@ -592,7 +592,7 @@
 - 2026-07-01：补充受限计划授权边界，明确受限计划不得作为实施授权；即使用户明确采纳，也必须先补齐前置条件并升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
 - 2026-07-03：补充 Plan Mode 包裹口径，明确运行环境若要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与模板结构。
 - 2026-07-04：补充 Plan Mode 硬失败口径，明确 `Summary / Key Changes / Public Interfaces / Test Plan / Assumptions` 等通用工程计划壳不能作为实施规划主结构，且计划输出前必须执行 `implementation-planning-rules/references/plan-output-gate.md` 字段矩阵；缺核心字段时必须按模板重写。
-- 2026-07-05：明确实施周期是第一期 / 第二期 / 第三期等大进度与顺序边界，执行必须先按周期推进，周期内每个最小任务都完成“实现 -> 真实测试 -> 审查 -> 验收”后才进入下一任务 / 下一周期；文档落盘和最终验收需记录周期收口与最小任务闭环证据。
+- 2026-07-05：明确实施周期是第一期 / 第二期 / 第三期等大进度与顺序边界；2026-08-01 起，周期内每个最小任务都满足“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”后才进入下一任务 / 下一周期，文档落盘记录周期收口与最小任务闭环证据。
 - 2026-07-13：完成 Obsidian Windows/WSL bridge-only 固定执行边界与 CYCLE-OBS-02 实机收口；唯一 vault 根为 `D:\obsidian_data`，WSL 通过 PowerShell interop，长正文和 append 必须以 CLI readback/hash 证明一致，未使用 vault 文件系统 fallback。
 - 2026-07-05：新增新项目 / 多来源对象的“需求与实施计划全量顺序实施方案”口径，要求先用项目级总表串起需求、验收标准、实施总览、实施周期和周期内最小任务，再进入单来源对象执行。
 - 2026-07-02：新增文件写入统一 UTF-8 口径，明确代码、文档、配置、脚本、测试资产和生成文本跨 Windows / WSL / Linux 默认 UTF-8，禁止 GBK / ANSI / 默认编码落盘，命令行写入后必须回读并检查 diff。
@@ -609,7 +609,7 @@
 - 2026-07-03：收紧 Swag OpenAPI 导入口径，明确单接口 YAML 导入 Apifox 时默认直入目标目录，不通过 `tags` 额外创建父目录；头部、请求参数、响应字段都必须有中文说明，源码注释不足时只允许受控推导。
 - 2026-07-03：补充单接口 Swag 文件命名规则，默认采用“路径名 + 中文简要说明”格式；中文说明优先取显式 `summary`，缺失时允许受控推导，仍无法稳定得到时回退纯路径文件名并在 manifest 记录 `summary_source: unresolved`。
 - 2026-07-03：补充单接口 Swag 中文简介清洗规则，明确文件名后缀必须去掉 `1.`、`11.`、`（1）`、`【1】` 等数字前缀和无业务意义特殊符号，只保留接口中文简介本体。
-- 2026-07-03：收紧审查链注释门禁，明确只要本轮存在代码改动，`project-change-review-rules` 与 `implementation-review-rules` 都必须按注释双 skill 完整核验方法注释、字段/结构体字面量注释、步骤注释、`[参数]` / `[返回]`、最近修改时间和改动原因；任一缺失默认按审查失败处理，不得降级为建议项。
+- 2026-08-01：历史审查链退役，注释、格式和目录归位改由测试后的 `6-review` 风格回归核对；缺失统一输出 `STYLE: FIX_REQUIRED`。
 - 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
 - 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
 - 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
@@ -642,7 +642,7 @@
 
 - 稳定统计口径：正式字典主规划有 84 个 skill，磁盘有 111 个带 `SKILL.md` 的目录，其中 27 个属于扩展种子，不纳入正式预算基线；默认文本包按 `SKILL.md` 与直接 references 文本字节数统计。
 - 稳定测试契约：通用入口覆盖 `size`、`mapping`、`trigger`、`pre-delete`、`post-delete` 五类模式；报告和矩阵路径不得越出仓库根目录，fixture 根不得越出当天测试时间戳目录；越界必须非零失败且不得删除真实 skill。
-- 当前状态：2026-07-17 已完成周期 01 的三个最小任务及其“实现 -> 真实测试 -> 审查 -> 验收”闭环；周期 01 已收口，周期 02 尚未进入，真实 skill、字典和 Git 历史保持未修改。
+- 当前状态：2026-07-17 已完成周期 01 的三个最小任务；2026-08-01 起闭环口径统一为“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”。周期 01 已收口，周期 02 尚未进入，真实 skill、字典和 Git 历史保持未修改。
 - 证据来源：需求、验收、实施总览、实施周期 01、测试 README、当前改动审查报告和 `validate_skill_split.py` 的本地验证结果。
 - Obsidian 沉淀：`知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md`，并已通过 bridge 更新 `知识库/INDEX.md` 导航入口。
 - 更新时间：2026-07-17。
@@ -651,9 +651,9 @@
 
 - 需求、验收、实施总览、实施周期和最小任务卡均采用 Markdown + YAML front matter；复杂度为 L2 及以上时，按语义提供 Mermaid 流程图和时序图，L3/L4 追加状态、数据、依赖或故障图。
 - 高推理模型冻结业务、技术、测试、回滚、停止和异常决策；普通模型只能按 `REQ -> AC -> PLAN -> CYCLE -> TASK -> TEST -> EVIDENCE` 追踪链执行，不得补默认值或猜测未决决策。
-- 每个最小任务必须唯一归属一个实施周期，并完成“实现/落盘 -> 真实测试或有证据的免测 -> 审查 -> 验收”闭环；缺少任一证据时不得把状态写为已完成。
+- 每个最小任务必须唯一归属一个实施周期，并完成“实施计划完成条件 -> 实现/落盘 -> 真实测试或有证据的免测 -> 6-review”闭环；缺少任一证据时不得把状态写为已完成。
 - `artifact-delivery-gate-rules` 是文档质量唯一机器门禁；profile、严格追踪、N/A 理由、失效链接、Mermaid 语法和 UTF-8 检查失败时必须回开上游文档。
-- 实施规划使用单来源实施总览和项目级全量顺序实施方案两层入口；周期状态、任务状态、项目当前状态、审查和最终验收必须同步，不能保留已被后续事实超越的旧入口状态。
+- 实施规划使用单来源实施总览和项目级全量顺序实施方案两层入口；周期状态、任务状态、项目当前状态、真实测试和 6-review 状态必须同步，不能保留已被后续事实超越的旧入口状态。
 
 ## Windows PowerShell 环境自动迭代规则
 
@@ -897,16 +897,16 @@ entities:
       - 周期最小任务闭环
       - 实施周期顺序
       - 最小任务全流程收口
-    definition: "实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界；执行必须先按周期推进，当前周期内每个最小任务都完成实现、真实测试、审查、验收后，才允许进入下一最小任务或下一周期。"
-    scope: "实施规划、连续执行、文档落盘、最终验收"
+    definition: "实施周期是项目第一期、第二期、第三期等大进度单位和顺序边界；执行必须先按周期推进，当前周期内每个最小任务都完成实施计划中的完成条件、实现、真实测试和测试后的 6-review 风格回归后，才允许进入下一最小任务或下一周期。"
+    scope: "实施规划、连续执行、文档落盘、真实测试、6-review 风格回归"
     status: "active"
     evidence_ids:
       - evidence.skill.implementation-planning
       - evidence.skill.autonomous-execution
-      - evidence.skill.final-acceptance
+      - evidence.skill.artifact-storage
     context_ids:
       - context.implementation-flow
-    updated_at: 2026-07-05
+    updated_at: 2026-08-01
   - entity_id: rule.implementation-sequence-master-plan
     name: "需求与实施计划全量顺序实施方案"
     type: "流程规则"
@@ -914,7 +914,7 @@ entities:
       - 实施顺序总表
       - 全量顺序实施方案
       - 新项目实施总顺序
-    definition: "新项目、项目初期或多来源对象存在多份需求 / 实施文档时，必须在 `doc/3-实施/` 维护项目级或来源集合级总顺序文档，串起需求主文档、验收标准、实施总览、实施周期和周期内最小任务；该文档只负责跨来源对象排序，不替代单来源对象实施总览。"
+    definition: "新项目、项目初期或多来源对象存在多份需求 / 实施文档时，必须在 `doc/3-实施/` 维护项目级或来源集合级总顺序文档，串起需求主文档、实施计划内的 AC 完成条件、实施总览、实施周期和周期内最小任务；该文档只负责跨来源对象排序，不替代单来源对象实施总览。"
     scope: "实施规划、文档落盘、连续执行入口"
     status: "active"
     evidence_ids:
@@ -1175,8 +1175,8 @@ entities:
       - 提交域隔离
       - 需求实施测试Bug审查验收单独提交
       - 代码实现单独提交
-    definition: "`提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/` 六类流程产物各自单独提交；测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。"
-    scope: "提交流程、需求/实施/Bug/测试/审查/验收归档"
+    definition: "`提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 五类活动流程产物各自单独提交；历史 `doc/6-审查/`、`doc/7-验收/` 只读归档，不因新流程创建。测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。"
+    scope: "提交流程、需求/实施/Bug/测试/6-review 归档"
     status: "active"
     evidence_ids:
       - evidence.skill.git-collaboration
@@ -1185,21 +1185,21 @@ entities:
       - context.git-collaboration
     updated_at: 2026-07-08
   - entity_id: rule.git-commit-review-acceptance-evidence
-    name: "Git 提交基础审查与验收闸门"
+    name: "Git 提交基础质量闸门"
     type: "流程规则"
     aliases:
-      - 提交前审查检查
-      - Git 基础验收
+      - 提交前质量检查
+      - Git 基础质量
       - 提交不生成审查验收文档
-    definition: "Git 提交必须直接对 staged 改动执行基础审查与基础验收，并在提交证据中记录格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性；不得因提交自动创建或要求 `doc/6-审查/`、`doc/7-验收/`。显式总审查、正式最终验收和非 Git 正式放行仍按各自规则归档。"
-    scope: "提交流程、基础审查、基础验收"
+    definition: "Git 提交必须直接对 staged 改动执行基础质量核查，并在提交证据中记录格式、注释、安全性、并发安全性、系统崩溃风险、边界条件和测试/功能验证适用性；不得因提交自动创建或要求 `doc/6-审查/`、`doc/7-验收/`。活动代码改动的风格结论只由真实测试后的 `doc/6-review/` 记录，业务正确性由真实测试负责。"
+    scope: "提交流程、基础质量、6-review 风格回归"
     status: "active"
     evidence_ids:
       - evidence.skill.git-collaboration
       - evidence.dialog.git-commit-no-review-acceptance-doc
     context_ids:
       - context.git-collaboration
-    updated_at: 2026-07-14
+    updated_at: 2026-08-01
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
     type: "统计口径"
@@ -1449,11 +1449,11 @@ evidence:
     source: "autonomous-execution-rules/SKILL.md"
     path: "autonomous-execution-rules/SKILL.md"
     note: "开始实施后的周期内最小任务连续执行来源"
-  - evidence_id: evidence.skill.final-acceptance
+  - evidence_id: evidence.skill.style-regression
     type: "skill"
-    source: "final-acceptance-rules/SKILL.md"
-    path: "final-acceptance-rules/SKILL.md"
-    note: "最终验收核对周期收口与最小任务闭环证据来源"
+    source: "code-style-consistency-rules/SKILL.md"
+    path: "code-style-consistency-rules/SKILL.md"
+    note: "测试后的唯一 6-review 风格回归入口"
   - evidence_id: evidence.skill.code-generation-style
     type: "skill"
     source: "code-generation-style-rules/SKILL.md"
@@ -2057,8 +2057,9 @@ retrieval_hints:
       - "rule.plan-mode-decision-wait-loop"
     autonomous-execution-rules/SKILL.md:
       - "rule.implementation-cycle-minimum-task"
-    final-acceptance-rules/SKILL.md:
+    code-style-consistency-rules/SKILL.md:
       - "rule.implementation-cycle-minimum-task"
+      - "rule.style-regression"
     code-generation-style-rules/SKILL.md:
       - "rule.code-generation-style-contract"
     comment-completion-gate-rules/SKILL.md:

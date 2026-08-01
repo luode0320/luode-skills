@@ -185,3 +185,9 @@
 
 - 后端根不再定义 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将 `data` 固定为禁止路径，query、init 与 strict 均失败关闭。
 - 前端 `src/data/`、业务域数据和 `doc/data/` 未受影响。50 项本地行为测试、Python 编译、根 data 负向 CLI、无写入哈希、审查和验收文档同步通过；未连接外部服务，未执行 Git 历史写入。
+
+## 2026-08-01：研发流程收敛为实施计划、真实测试与 6-review
+
+- 删除 `acceptance-criteria-rules`、`final-acceptance-rules`、`implementation-review-rules`、`project-change-review-rules` 和 `code-review-automation-rules`；活动流程统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”。
+- `doc/6-review/` 成为唯一活动风格回归目录，`code-style-consistency-rules` 只输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`；不承担业务正确性、需求覆盖或发布放行判断。
+- `doc/6-审查/` 与 `doc/7-验收/` 原地只读保留，未批量改写历史资料；本地专项回归、严格文档 profile、字典生成与差异检查均通过，未连接外部服务且未执行 Git 历史写入。
