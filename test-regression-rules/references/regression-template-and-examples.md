@@ -4,7 +4,7 @@
 
 ## 结论模板
 
-主结论写入 `doc/5-tests/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`，至少包含：
+主结论写入 `doc/5-tests/yyyy-MM-DD_HHmmss/README.md`，至少包含：
 
 - 改动类型：
 - 关联需求 / Bug：
@@ -19,8 +19,8 @@
 
 ## 正例
 
-- 修复订单超时 Bug 后，除了验证修复路径，还回归同类重试链路和主要下游通知流程，并在 README 中写明详细案例位于 `doc/5-tests/2026-03-28_180000/internal/service/order_timeout_regression.md`。
-- 修改公共鉴权中间件后，选取主要调用方、不同权限角色和关键异常路径做兼容验证，执行日志放到对应的 ASCII 镜像路径目录中。
+- 修复订单超时 Bug 后，除了验证修复路径，还回归同类重试链路和主要下游通知流程，并在 README 中写明详细案例位于 `doc/5-tests/2026-03-28_180000/evidence/order_timeout_regression.md`。
+- 修改公共鉴权中间件后，选取主要调用方、不同权限角色和关键异常路径做兼容验证，执行日志放到对应时间戳目录的 `evidence/` 中。
 - 调整页面公共组件后，回归主要使用页面和关键交互，不只验证当前页面本身。
 
 ## 反例

@@ -107,12 +107,19 @@
 ## 测试域
 
 - 测试任务根目录：`doc/5-tests/YYYY-MM-DD_HHmmss/`
-- 测试中文主说明：`doc/5-tests/YYYY-MM-DD_HHmmss/<测试任务中文主题>/README.md`
-- 真实测试资产：放在同一时间戳根目录下的 ASCII 真实代码路径镜像目录中
+- 测试中文主说明：`doc/5-tests/YYYY-MM-DD_HHmmss/README.md`
+- 活动测试代码根：`test/`
+- 单文件测试：`<源码相对路径>/<名称>.<ext> -> test/<源码相对路径>/<名称>_test.<ext>`
+- 目录级测试：`test/<被测源码目录>/<主题>_test.<ext>`，README 列出被测文件；fixture、mock、helper 位于同一镜像目录或 `test/shared/`。
+- Python 发现模式：`*_test.py`；禁止新建 `test_*.py`。
+- Go：`test/<源码相对路径>/<主题>_test.go`，包名为外部 `<target>_test`，仅导入导出 API；源码目录禁止 `*_test.go`。
+- 真实测试代码、mock、fixture 和 helper：放在根 `test/` 的 ASCII 真实代码路径镜像目录中
 
 补充要求：
 
-- `<测试任务中文主题>` 为动态目录名，应与该 `README.md` 将要描述的测试任务主题一致，禁止固定写成“测试任务中文简介”。
+- 测试主题写入同时间戳根目录的 `README.md` 标题；`evidence/` 与 `artifacts/` 只承载该轮非可执行证据和运行产物。
+- `doc/5-tests/` 的时间戳规则只适用于说明和证据；活动测试代码不得为了时间戳目录进入文档根。
+- 历史 `doc/5-tests/` 可执行资产按指纹只读；首次修改、改名或新增时先迁至 `test/`。
 - 会被 Go 工具链扫描或编译的路径必须保持 ASCII。
 - 中文说明默认只放在中文主说明目录，不进入编译路径。
 

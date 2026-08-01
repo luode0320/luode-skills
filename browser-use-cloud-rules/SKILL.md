@@ -78,6 +78,6 @@ python -X utf8 -B browser-use-cloud-rules/scripts/browser_use_cloud_preflight.py
 
 ## 验证
 
-- 单元测试：`python -X utf8 -B -m unittest discover -s browser-use-cloud-rules/tests -p "test_*.py"`。
+- 单元测试：`python -X utf8 -B -m unittest discover -s test/browser-use-cloud-rules -p "*_test.py"`。
 - Skill 校验：`python -X utf8 -B .system/skill-creator/scripts/quick_validate.py browser-use-cloud-rules`。
 - 测试只能使用 loopback local mock 和哨兵 key，不调用真实 Browser Use Cloud，不消费额度；必须覆盖两种收费动作的独立 schema、output schema 误判、三类任务结果清理、`strategy="session"`、最终 stopped 状态和实际费用回读。

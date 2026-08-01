@@ -132,12 +132,12 @@ fix: [订单结算] 修复订单创建时金额计算错误
 
 ✅ 结果：README 改动日志总是从末尾继续追加，执行动作稳定，不需要为了时间顺序回插历史位置。
 
-### 正例 6：Go 提交前先做 `*_test.go` 禁放扫描
+### 正例 6：Go 提交前先做 `*_test.go` 归位扫描
 
 提交前执行：
 
 ```powershell
-rg --files -g "*_test.go" | rg -v "^doc/5-tests/"
+rg --files -g "*_test.go" | rg -v "^test/" | rg -v "^doc/5-tests/"
 ```
 
 结果为空，再继续提交。
@@ -337,7 +337,7 @@ internal/service/order_service_test.go
 
 仍然执行提交。
 
-❌ 问题：违反测试落点基线，应先改 seam 并迁移到 `doc/5-tests/` 根目录体系后再提交。
+❌ 问题：违反测试落点基线，应先改 seam 并迁移到根 `test/` 镜像路径后再提交。
 
 ### 反例 7：Go 项目命中服务层根目录直落仍继续提交
 

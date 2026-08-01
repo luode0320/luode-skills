@@ -258,13 +258,13 @@ git commit -m "fix: [订单结算] 修复订单创建时金额计算错误\n\n�
 Go 项目在执行 `git commit` 前，必须执行：
 
 ```powershell
-rg --files -g "*_test.go" | rg -v "^doc/5-tests/"
+rg --files -g "*_test.go" | rg -v "^test/" | rg -v "^doc/5-tests/"
 ```
 
 判定规则：
 
 - 命中为空：通过，可继续提交。
-- 命中非空：阻断提交，先改 seam 并迁移到 `doc/5-tests/<时间戳>/` 后再提交。
+- 命中非空：阻断提交，先改 seam 并迁移到根 `test/` 镜像路径后再提交；历史 `doc/5-tests/` 可执行资产只读豁免，不作为活动测试代码根。
 
 这里的 `*_test.go` 只解决 Go 测试落点问题；提交域拆分时还要继续把 `*_test.*`、`*.spec.*`、`*.test.*` 视为测试提交，不与代码实现混提。
 

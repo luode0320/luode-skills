@@ -14,9 +14,9 @@
 
 ## 归档要求
 
-- 主 README 固定放在 `doc/5-tests/YYYY-MM-DD_HHmmss/<测试任务中文主题>/README.md`。
-- 详细说明、检查单、案例表和截图解读放在同一时间戳根目录的 ASCII 真实代码路径镜像目录。
-- 主 README 必须链接这些详细资料，避免产生孤立附件。
+- 主 README 固定放在 `doc/5-tests/YYYY-MM-DD_HHmmss/README.md`。
+- 详细说明、检查单、案例表、截图解读、日志和报告放在同一时间戳根目录的 `evidence/` 或 `artifacts/`，不得混入可执行测试代码。
+- 主 README 必须链接这些详细资料与根 `test/` 中的被测测试文件，避免产生孤立附件。
 - 不得将测试文档归档到 `testing/`、`analysis/`、仓库根目录或业务代码目录。
 
 完整规则见 [白话文档与附录分层契约](../../artifact-delivery-gate-rules/references/plain-language-document-contract.md)。

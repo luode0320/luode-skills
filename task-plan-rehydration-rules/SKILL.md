@@ -142,5 +142,5 @@ description: 当正式实施计划需要投影到 Codex Desktop 任务悬浮窗�
 - 超时升级当前会话投影：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py ensure-timeout --project-current PROJECT_CURRENT.md --started-at <UTC-ISO-8601> --observed-at <UTC-ISO-8601> --paused-seconds <seconds> --input synthesis_context.json --session-id <session-id>`
 - 迁移旧单投影 registry：`python3 -X utf8 -B task-plan-rehydration-rules/scripts/task_plan_projection.py migrate --project-current PROJECT_CURRENT.md --session-id <session-id>`
 - Python 入口按当前环境选择可用的 Python 3 命令；CLI 参数固定使用 `--project-current`，不得写成不存在的 `--file`。
-- 单元测试：`python -B task-plan-rehydration-rules/tests/test_task_plan_projection.py`
+- 单元测试：`python -X utf8 -B test/task-plan-rehydration-rules/task_plan_projection_test.py`
 - Skill 校验：`python -B .system/skill-creator/scripts/quick_validate.py task-plan-rehydration-rules`

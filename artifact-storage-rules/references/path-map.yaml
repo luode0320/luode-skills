@@ -7,6 +7,7 @@ roots:
   implementation_docs: "doc/3-实施"
   bug_records: "doc/4-bugs"
   test_assets: "doc/5-tests"
+  test_code: "test"
   review_records: "doc/6-review"
   historical_review_records: "doc/6-审查"
   historical_acceptance_docs: "doc/7-验收"
@@ -38,11 +39,11 @@ entry_files:
   implementation_cycle_doc_note: "实施周期文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_实施周期NN_中文主题”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_实施周期01_接口与配置落点.md。不得只写“时间_阶段_说明”，必须保留来源对象标识。"
   bug_root_readme: "README.md"
   test_task_readme: "README.md"
-  test_shared_readme: "README.md"
-  test_shared_readme_note: "doc/5-tests/ 根级共享 README（doc/5-tests/README.md），记录跨轮复用的测试通用信息：鉴权/登录方式、配置文件位置、启动脚本用法、服务地址与端口等；与各时间戳目录中文说明目录内的 README.md 区分——后者只描述单轮测试任务，前者承载跨轮共享基建信息。"
+  test_python_runner: "run_python_tests.py"
+  test_task_readme_note: "doc/5-tests/<时间戳>/README.md 只记录本轮测试目的、命令、被测文件、结论和证据路径；跨轮可执行 helper、fixture 与启动脚本统一归入 test/shared/。"
   test_startup_backend_script: "start-backend.sh"
   test_startup_frontend_script: "start-frontend.sh"
-  test_startup_script_note: "测试启动脚本参考项目 .vscode/launch.json（或等价启动配置）生成，落在 doc/5-tests/scripts/ 根级共享目录，跨轮复用；后端固定 start-backend.sh，前端固定 start-frontend.sh；同端存在多服务时追加 ASCII 后缀，如 start-backend-gateway.sh。脚本须输出关键过程日志，且只引用本地/测试配置，严禁连生产。"
+  test_startup_script_note: "测试启动脚本参考项目 .vscode/launch.json（或等价启动配置）生成，落在 test/shared/scripts/，跨轮复用；后端固定 start-backend.sh，前端固定 start-frontend.sh；同端存在多服务时追加 ASCII 后缀，如 start-backend-gateway.sh。脚本须输出关键过程日志，且只引用 local 配置，严禁连接非 local 环境。"
   review_doc: "{datetime}_{source_object_id}_6-review.md"
   review_index_readme: "README.md"
   project_design_doc: "项目设计.md"
@@ -57,12 +58,16 @@ root_files:
     - "系统设计.md"
     - "项目说明.md"
 directories:
+  test_code_root: "test"
+  test_code_root_note: "根 test/ 是唯一活动测试代码根；按被测源码目录镜像，Python 使用 <名称>_test.py，Go 使用 ASCII 外部黑盒包。"
   bug_root: "{datetime}_问题中文简介"
   test_task_root: "{datetime}"
-  test_shared_scripts_dir: "scripts"
-  test_shared_scripts_dir_note: "doc/5-tests/scripts/，存放跨轮复用的测试启动脚本（如 start-backend.sh、start-frontend.sh），属于 doc/5-tests/ 根级共享层，不随每轮时间戳目录创建。"
-  test_task_doc_dir: "{test_task_cn_title}"
-  test_task_doc_dir_note: "根据 README 将要描述的测试任务主题动态命名；禁止使用字面量“测试任务中文简介”"
+  test_shared_scripts_dir: "test/shared/scripts"
+  test_shared_scripts_dir_note: "test/shared/scripts/，存放跨轮复用的测试启动脚本（如 start-backend.sh、start-frontend.sh）；它们属于活动测试代码根，不随每轮 doc/5-tests/ 证据目录创建。"
+  test_shared_code_dir: "shared"
+  test_shared_code_dir_note: "test/shared/，仅存放活动测试可复用 helper、fixture 和位置校验逻辑。"
+  test_task_evidence_dir: "evidence"
+  test_task_artifacts_dir: "artifacts"
 bootstrap:
   recent_context_scan_roots:
     - "doc/1-架构"
@@ -112,8 +117,12 @@ policies:
   same_test_round_updates_same_root: true
   new_independent_test_round_creates_new_root: true
   test_shared_layer_reused_across_rounds: true
+  test_code_root_is_unique: true
+  test_code_mirrors_source_paths: true
+  historical_doc5_executables_are_read_only: true
   test_startup_scripts_reference_vscode_launch: true
-  test_shared_readme_holds_auth_and_config_location: true
+  test_task_readme_is_evidence_only: true
+  test_support_scripts_under_test_root: true
   style_regression_outputs_under_doc_review_root: true
   same_project_design_updates_same_doc: true
   project_design_doc_is_weak_reference: true

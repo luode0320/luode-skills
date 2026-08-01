@@ -42,6 +42,7 @@
 │   ├── 3-实施/                            # [必需·提交] 实施产物
 │   ├── 4-bugs/                            # [必需·提交] Bug 产物
 │   ├── 5-tests/                           # [必需·提交] 测试研发产物入口
+│   ├── 6-review/                          # [必需·提交] 测试后的风格回归记录
 │   ├── 6-审查/                            # [必需·提交] 审查产物
 │   ├── 7-验收/                            # [必需·提交] 验收产物
 │   └── data/                              # [条件·提交] Markdown 数据资产
@@ -64,6 +65,8 @@
 ├── PROJECT_STYLE.md                       # [条件·提交] 长期风格
 └── README.md                              # [必需·提交] 工作区入口
 ```
+
+工作区根 `test/` 是唯一活动测试代码目录，按被测源码目录镜像；`doc/5-tests/` 仅保存说明与证据，历史可执行资产只读保留。
 
 工作区根禁止业务 `config/`、`data/`、`database/`、`swag/`、`schema/`、`resources/`、`scripts/`、`util/`、`utils/`、`common/`、`deploy/`。不建立 `integration/virtualization/`、`integration/doc/`、`integration/tests/`、`integration/scripts/`、`integration/fixtures/`。工作区根的 `AGENTS.md` 与 `CLAUDE.md` 必须同时提交且正文完全一致。
 

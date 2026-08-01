@@ -113,9 +113,9 @@ if [[ "$LOG_TITLE" != "$TITLE" ]]; then
 fi
 
 # 4) Go 测试文件位置扫描：只检查本次提交涉及的新增/修改 *_test.go
-if staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^doc/5-tests/' >/dev/null; then
-  echo "BLOCK: staged *_test.go outside doc/5-tests/" >&2
-  staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^doc/5-tests/' >&2 || true
+if staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^test/' >/dev/null; then
+  echo "BLOCK: staged *_test.go must be under root test/" >&2
+  staged_name_only --diff-filter=AM | rg '_test\.go$' | rg -v '^test/' >&2 || true
   exit 15
 fi
 

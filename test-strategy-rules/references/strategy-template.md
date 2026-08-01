@@ -4,7 +4,7 @@
 
 ## 主摘要
 
-主摘要写入 `doc/5-tests/yyyy-MM-DD_HHmmss/<测试任务中文主题>/README.md`，建议至少包含：
+主摘要写入 `doc/5-tests/yyyy-MM-DD_HHmmss/README.md`，建议至少包含：
 
 1. 任务目标与改动范围。
 2. 当前时间戳测试任务目录，或建议拆分出的多个时间戳任务目录。

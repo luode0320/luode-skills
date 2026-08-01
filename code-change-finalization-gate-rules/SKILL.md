@@ -1,6 +1,6 @@
 ---
 name: code-change-finalization-gate-rules
-description: 只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、新增测试文件的当天时间戳目录一致性、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。
+description: 只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、根 `test/` 测试代码镜像与命名一致性、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。
 ---
 
 
@@ -15,7 +15,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
 - 注释链只消费 `comment-completion-gate-rules` 的 PASS/FAIL；该 PASS 必须包含其对 `comment-placement-granularity-rules` 的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
-- 核验新增测试文件的当天时间戳目录一致性、补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
+- 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留 README、日志、报告和非可执行证据；同时核验补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
 - Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和 seam 细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
 - 只产出专项闸门 PASS/FAIL 与证据；最终输出和后续内容统一由 `reasoning-summary-structure-rules` 渲染。
 
@@ -26,7 +26,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 
 ## 进入后先做什么
 
-1. 涉及 Go 测试资产时，先核验 `test-program-rules`（含《Go 测试编译路径（强制）》）与 test-asset-governance 的适用性结论和 PASS/FAIL；再检查新增测试文件是否全部位于同一个当天时间戳目录。
+1. 涉及 Go 测试资产时，先核验 `test-program-rules`（含《Go 测试编译路径（强制）》）与 test-asset-governance 的适用性结论和 PASS/FAIL；再检查新增测试文件是否全部位于根 `test/` 的 ASCII 镜像路径。
 2. 核验 `comment-completion-gate-rules` 的 PASS/FAIL 和可追溯证据；FAIL 或无证据直接不通过，不在本入口重复字段级注释检查。
 3. 补注释请求只核验 comment-completion 的优先范围结论，不复制函数头、方法块或补丁字段定义。
 4. 核验真实测试完成后是否执行 `6-review`，并消费其 `STYLE: PASS/FIX_REQUIRED` 结果。
@@ -55,7 +55,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 属于阻断级：
 
 - Go 测试资产适用但专职 Owner 未执行、为 FAIL 或缺少可追溯证据。
-- 新增测试文件跨天或未统一落到同一个当天时间戳目录。
+- 新增测试文件未统一落到根 `test/`、未镜像被测路径、Python 未使用 `*_test.py`，或 Go 测试不在 ASCII 外部黑盒包路径。
 - `comment-completion-gate-rules` 为 FAIL、缺少结果或缺少其适用性联动证据。
 - 真实测试完成后未执行 `6-review`，或结果为 `STYLE: FIX_REQUIRED`。
 - 核心运行路径没有真实验证，且未明确降级并提供人工验证交接。

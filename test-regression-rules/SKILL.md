@@ -1,6 +1,6 @@
 ---
 name: test-regression-rules
-description: 当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把回归结论统一写回中央约定的测试任务主说明 `README.md`，并把详细回归案例、执行证据和补充说明放到同一时间戳根目录下的 ASCII 真实代码路径镜像目录中；若该镜像路径会进入 Go 编译链路，还必须同步遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。
+description: 当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把回归结论写回测试任务 README，把可执行回归测试、mock、fixture 和 helper 放入根 `test/` 镜像目录，并把详细回归案例、执行证据和补充说明放到同时间戳 `doc/5-tests/` 的 `evidence/` 或 `artifacts/`；Go 测试还必须遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。
 ---
 
 # 回归验证规则
@@ -18,7 +18,7 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 - 约束回归范围判定、用例选取、结果留痕和待补测记录方式。
 - 聚焦 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整和接口兼容变化后的影响扩散。
 - 防止把“当前功能验证”与“历史能力回归”混成一件事。
-- 保证回归结论先通过中文 README 对外说明，再用 ASCII 镜像路径承载详细证据。
+- 保证回归结论先通过中文 README 对外说明；可执行回归测试放在根 `test/`，详细证据只进入 `doc/5-tests/<时间戳>/evidence/` 或 `artifacts/`。
 
 ## 自动触发信号
 
@@ -34,12 +34,12 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 2. 确认当前回归验证已经对应到中央约定的测试时间戳根目录；需要连接本地真实环境（数据库、缓存、消息队列、HTTP/RPC 上游等）做回归时，按 `test-strategy-rules` 的「本地环境配置发现与连接」去本地 `local` 配置文件读取连接信息，并遵守其隔离安全约束；不得改用 `test` / `prod` / `staging` 等非 local 环境连接。
 3. 梳理本次改动的直接影响点、共享依赖、上下游链路和主要兼容风险。
 4. 判断本轮回归属于局部回归、链路回归还是公共能力回归。
-5. 决定哪些内容写入中文 README，哪些详细案例、日志、截图和执行明细放入 ASCII 镜像路径。
+5. 决定哪些内容写入中文 README，哪些详细案例、日志、截图和执行明细放入 `evidence/` 或 `artifacts/`，并链接根 `test/` 回归测试文件。
 
 ## 默认执行流程
 
 1. 默认先读 `references/regression-scope-selection.md`，确定回归范围和用例选取方式。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径和同一轮回归是否继续复用同一根目录。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认根 `test/` 镜像、测试时间戳根目录、中文主说明 `README.md`、证据目录和同一轮回归是否继续复用同一证据根目录。
 3. 如果问题归属不清，可能混入功能验证或联调问题，再读 `references/regression-boundaries.md`。
 4. 输出回归结论、风险项和未覆盖说明时，再读 `references/regression-template-and-examples.md`。
 5. 给出回归通过、驳回或待补测结论，并明确是否需要回流编码域、Bug 域、联调域或测试策略域。
@@ -62,21 +62,21 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 
 ## 执行通过 / 驳回标准
 
-- 通过：本次改动涉及的旧能力、关联链路、共享依赖和兼容行为在已判定回归范围内未发现新的破坏性问题；中文 README 已能清楚说明结论，详细案例和证据已落入 ASCII 镜像路径并可追溯。
+- 通过：本次改动涉及的旧能力、关联链路、共享依赖和兼容行为在已判定回归范围内未发现新的破坏性问题；中文 README 已能清楚说明结论，根 `test/` 回归测试与证据路径均可追溯。
 - 驳回：本次改动引入了旧能力回退、兼容性破坏、公共链路异常，或关键回归范围未验证，无法证明“没有带坏别的地方”；回归留痕继续散落在错误目录中；或为了测试通过而在生产代码中新增测试专用方法、测试专用数据、测试专用结构体字段。
 
 ## 执行结果归档要求
 
 - 将回归结论统一记录到 `artifact-storage-rules` 约定的测试任务主说明 `README.md`。
 - README 至少包含改动类型、回归范围、选取用例、执行环境、结论、未覆盖项和遗留风险。
-- 详细回归案例、执行日志、截图、补充说明统一放到中央约定的测试时间戳根目录下的 ASCII 真实代码路径镜像目录中。
+- 详细回归案例、执行日志、截图、补充说明统一放到测试时间戳根目录下的 `evidence/` 或 `artifacts/`，不得与根 `test/` 的可执行代码混放。
 - 测试任务主说明位置、目录命名模板和同一轮回归的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果同一需求存在多轮独立回归验证，应分别创建多个时间戳根目录，而不是把所有回归轮次混在一个目录里。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对回归验证 README 与 ASCII 证据路径是否已经真实落盘；未落盘不得判定回归验证完成。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对回归验证 README、根 `test/` 测试文件与证据路径是否已经真实落盘；未落盘不得判定回归验证完成。
 
 ## references 读取规则
 
 - 默认先读 `references/regression-scope-selection.md`。
-- 在定位测试时间戳根目录、中文主说明 `README.md`、ASCII 镜像路径或判断是否继续沿用同一轮回归根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位根 `test/` 镜像、测试时间戳根目录、中文主说明 `README.md`、证据目录或判断是否继续沿用同一轮回归根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在功能验证、联调验证、回归验证边界不清时，再读 `references/regression-boundaries.md`。
 - 只有在需要回归结论模板和样例时，再读 `references/regression-template-and-examples.md`。
