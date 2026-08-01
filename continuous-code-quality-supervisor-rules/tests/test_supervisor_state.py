@@ -138,7 +138,7 @@ class SupervisorStateTests(unittest.TestCase):
 
         [参数] 无
         [返回] 无；断言失败时由 unittest 抛出异常
-        最近修改时间：2026-07-25 08:00:00；覆盖 API 路由和阶段 Skill 排除。
+        最近修改时间：2026-08-01；同步退役 Skill 的替代 Owner，并覆盖 API 路由排除。
         """
 
         # 1. 验证 API 四 Owner 同时命中且排除列表完全不进入结果。
@@ -180,7 +180,7 @@ class SupervisorStateTests(unittest.TestCase):
         self.assertIn("api-response-rules", owners)
         self.assertIn("api-swagger-rules", owners)
         excluded = {
-            "acceptance-criteria-rules",
+            "implementation-planning-rules",
             "agent-runtime-recovery-rules",
             "artifact-delivery-gate-rules",
             "artifact-storage-rules",
@@ -189,21 +189,21 @@ class SupervisorStateTests(unittest.TestCase):
             "browser-session-automation-rules",
             "code-change-finalization-gate-rules",
             "code-context-resync-rules",
-            "code-review-automation-rules",
+            "git-collaboration-rules",
             "codegraph-analysis-rules",
             "context-compression-rules",
             "delivery-summary-rules",
             "execution-failure-learning-rules",
-            "final-acceptance-rules",
+            "delivery-summary-rules",
             "frontend-design",
             "functional-validation-rules",
             "git-collaboration-rules",
-            "implementation-review-rules",
+            "code-style-consistency-rules",
             "implementation-planning-rules",
             "obsidian-knowledge-flow",
             "parallel-task-dispatch-rules",
             "project-local-skills-rules",
-            "project-change-review-rules",
+            "code-style-consistency-rules",
             "project-memory-rules",
             "project-style-rules",
             "skill-audit-rules",

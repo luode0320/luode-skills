@@ -26,6 +26,61 @@ LAYERED_OPENING = (
 )
 
 
+def style_regression_fixture(result: str = "PASS") -> str:
+    """构造不依赖历史 review_acceptance_gates 的 6-review 正负样例。
+
+    [参数] result: 预期写入样例的 STYLE 结果。
+    [返回] str：可被 style_regression profile 校验的 Markdown。
+    最近修改时间：2026-08-01；新增 STYLE 正负向校验样例。
+    """
+    # 1. 生成完整的最小 6-review 文档，供 PASS、FIX_REQUIRED 与非法状态复用。
+    return f"""---
+schema_version: 1
+template_version: 1
+doc_id: STYLE-DOC-001
+doc_type: style_regression
+source_ids: [SRC-STYLE-001]
+status: accepted
+version: v1.0
+current_slice: TASK-STYLE-001
+updated_at: 2026-08-01
+reader_level: business_general
+writing_style: plain_chinese
+appendix_policy: preserve_existing_or_one_terminal_appendix
+---
+# 6-review 风格回归
+结论：本次仅核对代码写法；影响：不代替功能测试；范围：当前改动；非范围：业务正确性和发布放行；变化：记录风格结果；完成标准：STYLE 结论可识别；术语说明：风格回归用于检查写法和位置；验证状态：真实测试证据已关联。
+
+## 文档信息
+关联任务：TASK-STYLE-001。
+
+## 检查范围
+检查格式、命名、目录位置、注释和复用；范围外不判断业务逻辑。
+
+## 真实测试前置证据
+TEST-STYLE-001 对应实施计划完成条件，证据为 EVD-TASK-STYLE-001-TEST-01。
+
+## 6-review 结论
+STYLE: {result}
+
+## 检查清单
+| 检查项 | 结果 |
+| --- | --- |
+| 格式与目录归位 | PASS |
+
+## 问题与修复
+N/A + 原因 + 证据：本样例只验证风格结果结构。
+
+图片资产决策：N/A + 原因 + 证据：本样例不需要图片。
+
+## 执行附录
+真实测试完成后执行格式检查。
+
+## 追踪附录
+关联 SRC-STYLE-001、TASK-STYLE-001、TEST-STYLE-001、EVD-TASK-STYLE-001-STYLE-01。
+"""
+
+
 class EngineeringDocumentValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.payload = validator.load_profiles(PROFILE_FILE)
@@ -353,12 +408,55 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         # 2. 断言总量下限不再报错。
         self.assertFalse(any("insufficient total diagrams" in error for error in errors))
 
-    # test_strict_trace_rejects_orphan_task 验证缺少 REVIEW 证据的孤立任务会被严格追踪拒绝。
-    # [参数] 无：在临时目录创建最小周期文档。
-    # [返回] None：断言严格追踪报告缺少 REVIEW 证据。
-    # 最近修改时间：2026-07-12 增加严格追踪负例，覆盖任务闭环不完整场景。
+    def test_style_regression_profile_accepts_pass_and_fix_required(self) -> None:
+        """6-review 结构允许 STYLE: PASS 和 STYLE: FIX_REQUIRED 两种结论。
+
+        [参数] 无
+        [返回] 无；断言失败时由 unittest 抛出异常。
+        最近修改时间：2026-08-01；覆盖活动风格回归的两种允许结果。
+        """
+        # 1. 逐个写入允许状态，并验证 profile 返回同一 STYLE 结果。
+        profile = self.payload["profiles"]["style_regression"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for style_result in ("PASS", "FIX_REQUIRED"):
+                with self.subTest(style_result=style_result):
+                    document = root / f"style-{style_result}.md"
+                    document.write_text(style_regression_fixture(style_result), encoding="utf-8")
+                    result = validator.validate_document(document, "style_regression", profile, self.payload, root)
+                    self.assertTrue(result["valid"], result["errors"])
+                    self.assertEqual(result["style_regression"]["result"], style_result)
+
+    def test_style_regression_profile_rejects_missing_or_unknown_result(self) -> None:
+        """6-review 缺少 STYLE 结果或使用未知状态时必须失败。
+
+        [参数] 无
+        [返回] 无；断言失败时由 unittest 抛出异常。
+        最近修改时间：2026-08-01；覆盖缺失与未知 STYLE 状态的负向断言。
+        """
+        # 1. 分别构造缺失结果和未知结果，断言校验器返回对应错误代码。
+        profile = self.payload["profiles"]["style_regression"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            missing = root / "style-missing.md"
+            missing.write_text(style_regression_fixture().replace("STYLE: PASS", "风格结论未填写"), encoding="utf-8")
+            missing_result = validator.validate_document(missing, "style_regression", profile, self.payload, root)
+            self.assertFalse(missing_result["valid"])
+            self.assertIn("style.result_missing", missing_result["error_codes"])
+
+            unknown = root / "style-unknown.md"
+            unknown.write_text(style_regression_fixture("BLOCKED"), encoding="utf-8")
+            unknown_result = validator.validate_document(unknown, "style_regression", profile, self.payload, root)
+            self.assertFalse(unknown_result["valid"])
+            self.assertIn("style.result_invalid", unknown_result["error_codes"])
+
     def test_strict_trace_rejects_orphan_task(self) -> None:
-        """验证缺少 REVIEW 证据的孤立任务会被严格追踪拒绝。"""
+        """验证缺少 STYLE 证据的孤立任务会被严格追踪拒绝。
+
+        [参数] 无
+        [返回] 无；断言严格追踪报告缺少 STYLE 证据。
+        最近修改时间：2026-08-01 02:10:52；流程收敛后将缺失证据断言由 REVIEW 改为 STYLE。
+        """
         # 1. 构造缺证据 fixture，执行严格追踪并断言阻断。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -369,21 +467,22 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
             errors: list[str] = []
             trace = validator.check_strict_trace(root, errors)
         self.assertEqual(trace["tasks"], ["T01-01"])
-        self.assertTrue(any("REVIEW" in error for error in errors))
+        self.assertTrue(any("STYLE" in error for error in errors))
 
-    # test_strict_trace_accepts_complete_task_chain 验证包含完整追踪链的任务可以通过。
-    # [参数] 无：在临时目录创建最小完整周期文档。
-    # [返回] None：断言严格追踪错误列表为空。
-    # 最近修改时间：2026-07-12 增加严格追踪正例，锁定完整任务证据契约。
     def test_strict_trace_accepts_complete_task_chain(self) -> None:
-        """验证包含完整 REQ/AC/CYCLE/TASK/TEST/EVIDENCE 链的任务可以通过。"""
+        """验证包含完整 REQ/AC/CYCLE/TASK/TEST/STYLE/EVIDENCE 链的任务可以通过。
+
+        [参数] 无
+        [返回] 无；断言严格追踪错误列表为空。
+        最近修改时间：2026-08-01 02:10:52；流程收敛后将完整闭环证据改为 STYLE。
+        """
         # 1. 构造完整 fixture，执行严格追踪并断言全部通过。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "实施周期01.md").write_text(
                 "REQ-1 AC-1 CYCLE-1 T01-01 TEST-1 EVIDENCE-1\n"
                 "T01-01 真实测试 停止 EVD-T01-01-IMPL-01 "
-                "EVD-T01-01-TEST-01 EVD-T01-01-REVIEW-01 EVD-T01-01-ACCEPT-01",
+                "EVD-T01-01-TEST-01 EVD-T01-01-STYLE-01",
                 encoding="utf-8",
             )
             errors: list[str] = []
@@ -506,15 +605,22 @@ review_acceptance_gates:
         self.assertFalse(result["task_blocker_closure"]["required"])
 
     def test_new_profile_document_requires_plain_language_fields(self) -> None:
-        """新建受管文档缺少白话字段时不能绕过契约。"""
+        """新建受管文档缺少白话字段时不能绕过契约。
+
+        [参数] 无
+        [返回] 无；断言白话字段仍为必填，退役 review_acceptance_gates 不再阻断。
+        最近修改时间：2026-08-01 02:10:52；移除新活动文档对 review_acceptance_gates 的断言。
+        """
+        # 1. 构造缺少白话字段的新文档，并执行受管 profile 校验。
         text = "---\nschema_version: 1\ndoc_id: DOC-1\ndoc_type: test\nsource_ids: [SRC-1]\nstatus: draft\nversion: v1\ncurrent_slice: current\nupdated_at: 2026-07-13\n---\n# 文档说明\n这是普通中文结论。\n\n## 文档信息\n说明。\n\n## 完成标准\n说明。\n"
         with tempfile.TemporaryDirectory() as directory:
             document = Path(directory) / "document.md"
             document.write_text(text, encoding="utf-8")
             result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        # 2. 白话字段仍阻断，已退役的 review_acceptance_gates 不再参与活动文档校验。
         self.assertFalse(result["valid"])
         self.assertTrue(any("reader_level" in error for error in result["errors"]))
-        self.assertTrue(any("review_acceptance_gates" in error for error in result["errors"]))
+        self.assertFalse(any("review_acceptance_gates" in error for error in result["errors"]))
 
     def test_unchanged_historical_document_keeps_legacy_contract(self) -> None:
         """未修改的历史文档不因新契约缺字段而被强制迁移。"""
@@ -681,12 +787,13 @@ review_acceptance_gates:
         validator.check_plain_language_contract(text, errors)
         self.assertEqual(errors, [])
 
-    # test_strict_trace_scopes_documents_by_target_source 验证严格追踪只读取目标来源对象文档。
-    # [参数] 无：在临时目录创建一组完整目标文档和一组缺证据的无关文档。
-    # [返回] None：断言无关来源对象不会污染目标严格追踪结果。
-    # 最近修改时间：2026-07-23；改动原因：覆盖按目标 source_ids 选域并防止旧来源硬编码回归。
     def test_strict_trace_scopes_documents_by_target_source(self) -> None:
-        """验证严格追踪只读取与目标文档共享根来源 ID 的文档。"""
+        """验证严格追踪只读取与目标文档共享根来源 ID 的文档。
+
+        [参数] 无
+        [返回] 无；断言无关来源对象不会污染目标严格追踪结果。
+        最近修改时间：2026-08-01 02:10:52；补充历史 REVIEW/ACCEPT 链的兼容模式断言。
+        """
         # 1. 构造目标完整周期和无关缺证据周期，确保两者 source_ids 不相交。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -711,6 +818,7 @@ review_acceptance_gates:
         self.assertEqual(errors, [])
         self.assertEqual(trace["documents"], 1)
         self.assertEqual(trace["tasks"], ["T01-01"])
+        self.assertEqual(trace["evidence_modes"]["T01-01"], "historical_compatibility")
 
     def test_plain_language_opening_rejects_unexplained_terminology(self) -> None:
         """术语说明不能只列技术词，必须声明无术语或给出中文解释。"""
@@ -863,9 +971,15 @@ review_acceptance_gates:
         self.assertEqual(validator.headings(text), ["正式标题", "正式章节"])
 
     def test_generic_document_profiles_accept_layered_document(self) -> None:
-        """所有新增文档类型 profile 都接受同一份分层文档。"""
+        """所有新增文档类型 profile 都接受同一份分层文档。
+
+        [参数] 无
+        [返回] 无；断言每个 profile 接受与其契约匹配的分层样例。
+        最近修改时间：2026-08-01 02:10:52；将 style_regression 纳入通用 profile 回归。
+        """
+        # 1. 构造通用分层文档，并为 style_regression 切换为其专用样例。
         text = self._layered_document("  []", technical="图片资产决策：N/A + 原因 + 证据：本次不需要视觉材料。")
-        profile_names = ("bug", "test", "review", "final_acceptance", "architecture", "delivery", "project_design", "work_report")
+        profile_names = ("bug", "test", "review", "final_acceptance", "style_regression", "architecture", "delivery", "project_design", "work_report")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             document = root / "layered.md"
@@ -873,7 +987,12 @@ review_acceptance_gates:
             for profile_name in profile_names:
                 with self.subTest(profile=profile_name):
                     profile = self.payload["profiles"][profile_name]
+                    document.write_text(
+                        style_regression_fixture() if profile_name == "style_regression" else text,
+                        encoding="utf-8",
+                    )
                     result = validator.validate_document(document, profile_name, profile, self.payload, root)
+                    # 2. 每个 profile 都必须接受符合自身契约的分层样例。
                     self.assertTrue(result["valid"], result["errors"])
 
 
