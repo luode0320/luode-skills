@@ -37,7 +37,7 @@
 - 需求文档落地时应在正文中同步补齐 Mermaid 流程图与时序图，不再另建配套图文件。
 - 需求正文中的图示应与正文、表格和口径保持一致。
 - 用户提供的需求截图与外部生成图片统一存放到 `doc/data/images/`，并按当前 Markdown 文件位置使用 `/` 分隔的相对路径直接引用展示。
-- 相对路径映射固定为：`doc/2-需求/*.md`、`doc/3-实施/*.md`、`doc/6-review/*.md` 使用 `../data/images/<file>`；历史 `doc/7-验收/*.md` 仅兼容读取；`doc/*.md` 使用 `data/images/<file>`；仓库根目录 Markdown 使用 `doc/data/images/<file>`。
+- 相对路径映射固定为：`doc/2-需求/*.md`、`doc/3-实施/*.md`、`doc/6-review/*.md` 使用 `../data/images/<file>`；历史 `doc/6-审查/*.md`、`doc/7-验收/*.md` 仅兼容读取；`doc/*.md` 使用 `data/images/<file>`；仓库根目录 Markdown 使用 `doc/data/images/<file>`。
 - 素材标识必须使用 ASCII kebab-case，例如 `req-shot-login`、`state-diagram`; 版本号统一由 `-v<number>` 后缀表示，返修递增版本号，避免空格和中文标点。
 - Markdown 图片禁止绝对路径、反斜杠、`file://`、Base64/data URI、HTML `<img>`、远程热链、路径越界和直接引用 `doc/data/<file>`；文档必须同时登记非空 alt 与 `IMG-*` 资产 ID。
 
@@ -126,7 +126,7 @@
 - `6-review` 仅用于真实测试后的结构归位、格式清理、语法检查、注释、日志、可读性和规则核对结论；结果固定为 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`。
 - 风格回归文档必须包含时分秒前缀，并在时间后保留来源对象标识（需求或 Bug），禁止使用缺少来源对象标识的命名。
 - 来源对象标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID；若仅看中文主干无法区分需求和 Bug，应写成 `需求-xxx` 或 `Bug-xxx`。
-- 若项目需要长期维护风格回归索引，优先收口到 `doc/6-review/README.md`；历史 `doc/6-review/README.md` 不再更新。
+- 每次 `6-review` 都必须按完整模板新增或更新对应风格回归记录；若项目需要长期维护索引，统一收口到活动 `doc/6-review/README.md`；历史 `doc/6-审查/README.md` 不再更新。
 
 ## doc 域
 

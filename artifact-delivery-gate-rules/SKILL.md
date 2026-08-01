@@ -53,14 +53,14 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 ## 默认执行流程
 
 1. 默认先读 `../artifact-storage-rules/references/path-map.yaml`。
-2. 再读 `../artifact-storage-rules/references/update-policy.md`，确认同一需求 / Bug / 测试轮次 / 审查主题应复用还是新建。
+2. 再读 `../artifact-storage-rules/references/update-policy.md`，确认同一需求 / Bug / 测试轮次 / `6-review` 来源对象应复用还是新建。
 3. 如需确认命名模板，再读 `../artifact-storage-rules/references/naming-templates.md`。
 4. 按当前任务类型逐项核对磁盘真实产物：
    - 需求域：`doc/2-需求/` 主文档（正文内应包含 Mermaid 流程图与时序图）、统一 `doc/data/images/` 资产引用及 `IMG-*` 清单。
    - 实施域：`doc/3-实施/` 下的实施总览文档，以及按需存在的实施周期文档；若当前属于新项目、项目初期或多来源对象统一排序场景，还必须存在“需求与实施计划全量顺序实施方案”，并记录需求 / 来源对象清单、实施完成条件、实施总览、实施周期、周期内最小任务摘要、跨需求总顺序、依赖、状态和阻断项；实施总览 / 实施周期文档中必须记录周期顺序、第一期 / 第二期 / 第三期等期次定位、当前 / 各周期最小任务清单、周期内最小任务顺序和周期收口条件。若本轮已经进入执行，还必须记录每个最小任务的实现、真实测试、`6-review` 风格回归状态或证据。
    - Bug 域：`doc/4-bugs/<根目录>/README.md`（正文内嵌 Mermaid 流程图与时序图，不另建独立图文件）。
    - 测试域：`doc/5-tests/<时间戳>/<测试任务中文主题>/README.md` 与同时间戳根目录下的 ASCII 镜像资产。
-   - `6-review` 域：`doc/6-review/YYYY-MM-DD_<风格回归中文主题>.md`，必要时同步 `doc/6-review/README.md` 索引；历史 `doc/6-审查/`、`doc/7-验收/` 仅只读。
+   - `6-review` 域：`doc/6-review/YYYY-MM-DD_HHmmss_<来源对象标识>_6-review.md`，每次真实测试后的风格回归都必须留档，必要时同步 `doc/6-review/README.md` 索引；历史 `doc/6-审查/`、`doc/7-验收/` 仅只读。
 5. 如发现本轮本应落盘却未落盘，直接判定当前任务不可收口，并回流对应主域 skill 补文档。
 6. 通过后再允许进入最终回复。
 
@@ -76,7 +76,7 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 - 当前无法判断本轮是否真的产生了应持久化文档。
 - 同一任务历史上已存在多个平行文档，无法直接判断该复用哪一个。
 - 测试任务准备写入历史时间戳目录，但没有同任务标识一致性证据或用户明确许可。
-- 审查主题需要补建 `doc/6-审查/` 或审查索引，但当前命名主题仍未确定。
+- 当前 `6-review` 记录无法确定来源对象标识，无法生成完整 `YYYY-MM-DD_HHmmss_<来源对象标识>_6-review.md` 文件名。
 
 ## 执行通过 / 驳回标准
 
@@ -86,7 +86,7 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 ## 执行结果归档要求
 
 - 本 skill 本身不单独新建额外平行文档；它负责阻断并推动对应主域文档补齐。
-- 若发现阻断，应将“缺失哪类文档、缺什么文件、应回流哪个主域 skill”写回当前主域记录或审查报告。
+- 若发现阻断，应将“缺失哪类文档、缺什么文件、应回流哪个主域 skill”写回当前主域记录或 `6-review` 风格回归记录。
 - 实施、真实测试或 `6-review` 产生真实阻断时，当前主域记录还必须写入 `BLK-*` 任务阻断收口，明确阻断阶段、依据、已尝试动作、影响、解决计划和恢复后重入点。
 - 若本轮属于 `6-review` 域且 `doc/6-review/README.md` 尚不存在，允许补建为风格回归索引入口，后续持续复用。
 

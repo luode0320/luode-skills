@@ -10,8 +10,22 @@ import os
 from glob import glob
 from pathlib import Path
 import re
+import sys
 import tempfile
 from typing import Any, Iterable
+
+
+# 共享静态 Owner 路由由 6-review 入口拥有；监督 Skill 只作为消费者。
+SHARED_ROUTER_DIR = Path(__file__).resolve().parents[2] / "code-style-consistency-rules" / "scripts"
+if str(SHARED_ROUTER_DIR) not in sys.path:
+    sys.path.insert(0, str(SHARED_ROUTER_DIR))
+
+from static_owner_router import (
+    BASE_OWNER_NAMES,
+    OWNER_NAMES,
+    owner_source_map_path,
+    route_owners,
+)
 
 
 STATE_VERSION = 1
@@ -27,60 +41,6 @@ SENSITIVE_KEYS = {
 }
 ALLOWED_SEVERITIES = {"P0", "P1", "P2", "P3"}
 ALLOWED_FINDING_STATUSES = {"open", "limited", "resolved", "suppressed"}
-OWNER_NAMES = {
-    "api-endpoint-rules",
-    "api-request-rules",
-    "api-response-rules",
-    "api-swagger-rules",
-    "chinese-comment-rules",
-    "code-generation-style-rules",
-    "code-minimal-change-rules",
-    "code-readability-rules",
-    "code-style-consistency-rules",
-    "comment-completion-gate-rules",
-    "comment-placement-granularity-rules",
-    "common-util-rules",
-    "database-query-rules",
-    "database-schema-rules",
-    "error-handling-rules",
-    "frontend-component-rules",
-    "frontend-ui-visual-rules",
-    "golang-patterns",
-    "logging-trace-rules",
-    "micro-business-architecture-rules",
-    "naming-rules",
-    "package-structure-rules",
-    "test-program-rules",
-    "time-util-rules",
-    "vercel-react-best-practices",
-    "vue-best-practices",
-    "vue-router-best-practices",
-    "windows-encoding-rules",
-}
-BASE_OWNER_NAMES = (
-    "code-generation-style-rules",
-    "code-minimal-change-rules",
-    "code-readability-rules",
-    "code-style-consistency-rules",
-    "naming-rules",
-    "comment-placement-granularity-rules",
-    "comment-completion-gate-rules",
-    "chinese-comment-rules",
-)
-
-DEFAULT_SOURCE_MAP = "owner-static-source-map.json"
-FRONTEND_SUFFIXES = (".vue", ".ts", ".tsx", ".js", ".jsx")
-REACT_SUFFIXES = (".tsx", ".jsx")
-TEST_FILE_PATTERN = re.compile(r"(?:^|[/_.-])(?:test|spec|fixture|mock|stub)s?(?:[/_.-]|$)|(?:_test|_mock|_stub)\.[a-z0-9]+$|\.(?:test|spec)\.[a-z0-9]+$")
-WINDOWS_SCRIPT_SUFFIXES = (".ps1", ".bat", ".cmd")
-ENCODING_FILES = {".gitattributes", ".editorconfig"}
-ENCODING_SIGNALS = {"windows-encoding", "chinese-text", "encoding", "bom", "eol", "mojibake", "redirect", "charset"}
-COMPONENT_SIGNALS = {"component", "components", "props", "emits", "events", "state", "effect", "watch", "computed", "composable", "hook", "lifecycle"}
-VISUAL_SIGNALS = {"frontend-visual", "ui", "css", "style", "styles", "layout", "aria", "responsive", "a11y", "class", "classname", "color"}
-REACT_SIGNALS = {"react", "nextjs", "next", "rsc", "hydration", "bundle", "react-performance"}
-VUE_ROUTER_SIGNALS = {"vue-router", "route", "routes", "router", "routers", "navigation-guard", "beforerouteenter", "onbeforerouteupdate"}
-MICRO_BUSINESS_SIGNALS = {"micro-business", "business-isolation", "cross-business-import", "contract-communication"}
-MICRO_BUSINESS_PATH_TERMS = {"business", "businesses", "contract", "contracts", "interfaces", "assembly", "module", "modules"}
 
 
 def utc_now() -> str:
@@ -241,98 +201,6 @@ def activation_status(goal_active: bool, intent: str, plan_mode: bool = False) -
     return "active", "trigger_matched"
 
 
-def route_owners(changed_files: Iterable[str], signals: Iterable[str] = ()) -> list[str]:
-    """按文件名和已确认语义信号返回允许 Owner 的稳定顺序。
-
-    [参数] changed_files：本次变更文件；signals：主流程已确认的语义信号
-    [返回] 去重后的允许 Owner 名称列表
-    最近修改时间：2026-07-25 18:40:00；收紧前端、测试、编码和微业务条件路由。
-    """
-
-    # 1. 规范化路径和语义信号，空改动不产生任何 Owner。
-    files = [str(item) for item in changed_files]
-    if not files:
-        return []
-    normalized_files = [item.replace("\\", "/").lower() for item in files]
-    signal_set = {str(item).strip().lower() for item in signals if str(item).strip()}
-    result = list(BASE_OWNER_NAMES)
-    path_parts = [{part for part in item.split("/") if part} for item in normalized_files]
-    path_tokens = [set(re.findall(r"[a-z0-9]+", item)) for item in normalized_files]
-
-    def has_path_term(*terms: str) -> bool:
-        """判断任一完整路径段或文件名 token 是否命中受控术语。"""
-
-        expected = set(terms)
-        return any(expected.intersection(parts) or expected.intersection(tokens) for parts, tokens in zip(path_parts, path_tokens))
-
-    def has_file_suffix(*suffixes: str) -> bool:
-        """按文件后缀判断是否存在目标文件。"""
-
-        return any(item.endswith(suffixes) for item in normalized_files)
-
-    def has_same_file_term_and_suffix(terms: set[str], suffixes: tuple[str, ...]) -> bool:
-        """判断同一文件是否同时命中路径术语和代码后缀。"""
-
-        return any(item.endswith(suffixes) and terms.intersection(parts.union(tokens)) for item, parts, tokens in zip(normalized_files, path_parts, path_tokens))
-
-    def add(*owners: str) -> None:
-        """按矩阵顺序追加未重复 Owner。"""
-
-        for owner in owners:
-            if owner not in result:
-                result.append(owner)
-
-    # 2. 使用路径特征和受控语义标签叠加位点 Owner，避免任意文本子串误触发。
-    if has_path_term("api", "controller", "controllers", "handler", "handlers", "openapi", "swagger") or signal_set.intersection(
-        {"http-api", "api-endpoint", "api-request", "api-response", "api-swagger"}
-    ):
-        add("api-endpoint-rules", "api-request-rules", "api-response-rules", "api-swagger-rules")
-    if has_path_term("migration", "migrations", "schema", "schemas") or signal_set.intersection({"database-schema", "schema"}):
-        add("database-schema-rules")
-    if has_file_suffix(".sql") or has_path_term("repository", "repositories", "repo", "dao", "mapper", "query", "queries") or signal_set.intersection(
-        {"database-query", "sql", "transaction", "lock"}
-    ):
-        add("database-query-rules")
-    if has_path_term("exception", "exceptions", "error", "errors") or signal_set.intersection({"error-handling", "retry"}):
-        add("error-handling-rules")
-    if has_path_term("logger", "logging", "tracing") or signal_set.intersection({"logging", "trace", "span"}):
-        add("logging-trace-rules")
-    if has_path_term("timezone", "scheduler", "cron") or signal_set.intersection({"time", "date", "time-window", "schedule"}):
-        add("time-util-rules")
-    if has_path_term("package", "module") or any(item.endswith("/main.go") or item == "main.go" for item in normalized_files) or "package-structure" in signal_set:
-        add("package-structure-rules")
-    if has_path_term("util", "utils", "common", "shared") or "common-util" in signal_set:
-        add("common-util-rules")
-    if has_file_suffix(".go", "go.mod", "go.sum", "go.work"):
-        add("golang-patterns")
-
-    vue_file = has_file_suffix(".vue")
-    frontend_code_file = has_file_suffix(*FRONTEND_SUFFIXES)
-    if vue_file or "vue" in signal_set:
-        add("vue-best-practices")
-    if signal_set.intersection(COMPONENT_SIGNALS) or has_same_file_term_and_suffix({"component", "components"}, FRONTEND_SUFFIXES):
-        add("frontend-component-rules")
-    if signal_set.intersection(VISUAL_SIGNALS) or has_file_suffix(".css", ".scss", ".less", ".html") or has_same_file_term_and_suffix({"style", "styles", "theme", "themes", "layout"}, FRONTEND_SUFFIXES):
-        add("frontend-ui-visual-rules")
-    if signal_set.intersection(VUE_ROUTER_SIGNALS) or has_same_file_term_and_suffix({"router", "routers", "route", "routes"}, FRONTEND_SUFFIXES):
-        if vue_file or frontend_code_file or "vue" in signal_set or "vue-router" in signal_set:
-            add("vue-best-practices", "vue-router-best-practices")
-    react_file = has_file_suffix(*REACT_SUFFIXES)
-    if react_file or signal_set.intersection(REACT_SIGNALS):
-        add("vercel-react-best-practices")
-        if react_file or signal_set.intersection(COMPONENT_SIGNALS):
-            add("frontend-component-rules")
-        if signal_set.intersection(VISUAL_SIGNALS):
-            add("frontend-ui-visual-rules")
-    if any(TEST_FILE_PATTERN.search(item) for item in normalized_files) or signal_set.intersection({"test-program", "fixture", "mock", "stub"}):
-        add("test-program-rules")
-    if has_file_suffix(*WINDOWS_SCRIPT_SUFFIXES) or any(Path(item).name in ENCODING_FILES for item in normalized_files) or signal_set.intersection(ENCODING_SIGNALS):
-        add("windows-encoding-rules")
-    if signal_set.intersection(MICRO_BUSINESS_SIGNALS) and (has_path_term(*MICRO_BUSINESS_PATH_TERMS) or signal_set.intersection({"cross-business-import", "contract-communication"})):
-        add("micro-business-architecture-rules")
-    return result
-
-
 def _limited_owner_finding(owner_skill: str, affected_file: str) -> dict[str, str]:
     """为缺失或名称不一致的 Owner 生成受限 finding。
 
@@ -357,9 +225,15 @@ def _limited_owner_finding(owner_skill: str, affected_file: str) -> dict[str, st
 
 
 def _source_map_path(repository_root: Path) -> Path:
-    """返回监督静态来源清单路径。"""
+    """返回由共享静态 Owner 路由拥有的来源映射路径。
 
-    return repository_root / "continuous-code-quality-supervisor-rules" / "references" / DEFAULT_SOURCE_MAP
+    [参数] repository_root：当前 Skill 仓库根目录。
+    [返回] 共享静态 Owner 来源映射的绝对路径。
+    最近修改时间：2026-08-01 00:00:00；改为委托 6-review 的唯一来源映射入口。
+    """
+
+    # 1. 不在监督目录复制来源映射常量或路径拼接逻辑。
+    return owner_source_map_path(repository_root)
 
 
 def _owner_source_candidates(repository_root: Path, owner_skill: str) -> list[Path]:

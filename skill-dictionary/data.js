@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-01 02:26:20",
+  "generated_at": "2026-08-01 18:06:52",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 565,
+    "references_total": 566,
     "agents_total": 83
   },
   "downloaded_seeds": {
@@ -1767,7 +1767,7 @@ window.SKILL_DICTIONARY = {
           "domain_order": 5,
           "item_order": 5,
           "auto_trigger": "当新增或修改任意代码文件、脚本文件、配置型代码或测试代码时触发；当用户以文字或截图指出某写法不对、这个风格不对、不能这么写、这样写不行时也必须触发。负责跟随项目现有写法，并在本轮已触发 `code-generation-style-rules` 时依据其产出的代码风格契约检查局部一致性，避免局部风格跳变和个人偏好入侵；测试完成后由本 skill 提供唯一活动 `6-review` 风格回归入口，输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`，只判断写法、位置、格式和既有习惯，不判断业务正确性、需求覆盖或发布放行；同时作为全局用户风格反例库的唯一 owner，把用户否定的写法规范化为反例、把用户期望的写法记为正例，经用户确认后写入 `references/user-style-feedback-library.md` 全局永久生效，供写码前加载规避；不要用它代替最小改动、可读性、注释规范、代码归位规则或代码生成风格契约入口。",
-          "core_responsibility": "跟随项目现有风格，不引入风格跳变；兼任全局用户风格反例库 owner，学习用户否定的写法。",
+          "core_responsibility": "跟随项目现有风格，不引入风格跳变；兼任全局用户风格反例库和共享静态 Owner 路由 owner。持续监控只能条件式消费该路由，不得复制来源映射或成为测试后 Gate。",
           "skill_path": "code-style-consistency-rules/SKILL.md",
           "directory_path": "code-style-consistency-rules",
           "directory": "code-style-consistency-rules",
@@ -1792,6 +1792,8 @@ window.SKILL_DICTIONARY = {
             "code-style-consistency-rules/references/consistency-examples.md",
             "code-style-consistency-rules/references/go-coding-rules.md",
             "code-style-consistency-rules/references/local-convention-detection.md",
+            "code-style-consistency-rules/references/static-owner-routing-contract.md",
+            "code-style-consistency-rules/references/static-owner-source-map.json",
             "code-style-consistency-rules/references/style-baseline.md",
             "code-style-consistency-rules/references/style-case-template.md",
             "code-style-consistency-rules/references/style-feedback-workflow.md",
@@ -3651,7 +3653,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
           "item_order": 12,
-          "auto_trigger": "仅当当前会话处于 Goal active 且用户当前消息明确表达“监控代码”时触发。负责每个监督周期读取最新 diff，按引用矩阵调用既有代码质量 Skill，记录可去重的 finding，并通知实际实施会话；不复制 Owner 正文，不自动改码、格式化、执行测试、做阶段审查、提交或交付。",
+          "auto_trigger": "仅当当前会话处于 Goal active 且用户当前消息明确表达“监控代码”时触发。负责每个监督周期读取最新 diff，复用 `code-style-consistency-rules` 拥有的共享静态 Owner 路由，记录可去重的 finding，并通知实际实施会话；不复制 Owner 正文、路由常量或来源映射，不自动改码、格式化、执行测试、做阶段审查、提交或交付。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "continuous-code-quality-supervisor-rules/SKILL.md",
           "directory_path": "continuous-code-quality-supervisor-rules",
@@ -3666,8 +3668,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "continuous-code-quality-supervisor-rules/references/finding-notification-contract.md",
             "continuous-code-quality-supervisor-rules/references/lifecycle-and-trigger-contract.md",
-            "continuous-code-quality-supervisor-rules/references/owner-routing-matrix.md",
-            "continuous-code-quality-supervisor-rules/references/owner-static-source-map.json"
+            "continuous-code-quality-supervisor-rules/references/owner-routing-matrix.md"
           ],
           "agents": [
             "continuous-code-quality-supervisor-rules/agents/openai.yaml"
@@ -6382,7 +6383,7 @@ window.SKILL_DICTIONARY = {
       "domain_order": 5,
       "item_order": 5,
       "auto_trigger": "当新增或修改任意代码文件、脚本文件、配置型代码或测试代码时触发；当用户以文字或截图指出某写法不对、这个风格不对、不能这么写、这样写不行时也必须触发。负责跟随项目现有写法，并在本轮已触发 `code-generation-style-rules` 时依据其产出的代码风格契约检查局部一致性，避免局部风格跳变和个人偏好入侵；测试完成后由本 skill 提供唯一活动 `6-review` 风格回归入口，输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`，只判断写法、位置、格式和既有习惯，不判断业务正确性、需求覆盖或发布放行；同时作为全局用户风格反例库的唯一 owner，把用户否定的写法规范化为反例、把用户期望的写法记为正例，经用户确认后写入 `references/user-style-feedback-library.md` 全局永久生效，供写码前加载规避；不要用它代替最小改动、可读性、注释规范、代码归位规则或代码生成风格契约入口。",
-      "core_responsibility": "跟随项目现有风格，不引入风格跳变；兼任全局用户风格反例库 owner，学习用户否定的写法。",
+      "core_responsibility": "跟随项目现有风格，不引入风格跳变；兼任全局用户风格反例库和共享静态 Owner 路由 owner。持续监控只能条件式消费该路由，不得复制来源映射或成为测试后 Gate。",
       "skill_path": "code-style-consistency-rules/SKILL.md",
       "directory_path": "code-style-consistency-rules",
       "directory": "code-style-consistency-rules",
@@ -6407,6 +6408,8 @@ window.SKILL_DICTIONARY = {
         "code-style-consistency-rules/references/consistency-examples.md",
         "code-style-consistency-rules/references/go-coding-rules.md",
         "code-style-consistency-rules/references/local-convention-detection.md",
+        "code-style-consistency-rules/references/static-owner-routing-contract.md",
+        "code-style-consistency-rules/references/static-owner-source-map.json",
         "code-style-consistency-rules/references/style-baseline.md",
         "code-style-consistency-rules/references/style-case-template.md",
         "code-style-consistency-rules/references/style-feedback-workflow.md",
@@ -8206,7 +8209,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
       "item_order": 12,
-      "auto_trigger": "仅当当前会话处于 Goal active 且用户当前消息明确表达“监控代码”时触发。负责每个监督周期读取最新 diff，按引用矩阵调用既有代码质量 Skill，记录可去重的 finding，并通知实际实施会话；不复制 Owner 正文，不自动改码、格式化、执行测试、做阶段审查、提交或交付。",
+      "auto_trigger": "仅当当前会话处于 Goal active 且用户当前消息明确表达“监控代码”时触发。负责每个监督周期读取最新 diff，复用 `code-style-consistency-rules` 拥有的共享静态 Owner 路由，记录可去重的 finding，并通知实际实施会话；不复制 Owner 正文、路由常量或来源映射，不自动改码、格式化、执行测试、做阶段审查、提交或交付。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "continuous-code-quality-supervisor-rules/SKILL.md",
       "directory_path": "continuous-code-quality-supervisor-rules",
@@ -8221,8 +8224,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "continuous-code-quality-supervisor-rules/references/finding-notification-contract.md",
         "continuous-code-quality-supervisor-rules/references/lifecycle-and-trigger-contract.md",
-        "continuous-code-quality-supervisor-rules/references/owner-routing-matrix.md",
-        "continuous-code-quality-supervisor-rules/references/owner-static-source-map.json"
+        "continuous-code-quality-supervisor-rules/references/owner-routing-matrix.md"
       ],
       "agents": [
         "continuous-code-quality-supervisor-rules/agents/openai.yaml"

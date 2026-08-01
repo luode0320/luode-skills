@@ -355,6 +355,7 @@ python skill-dictionary/generate_dictionary.py
 | Skill | 功能 |
 | --- | --- |
 | `code-style-consistency-rules` | 真实测试完成后的唯一 `6-review` 入口，检查格式、命名、注释、可读性、目录归位和局部风格一致性，输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`；不判断业务正确性。 |
+| `continuous-code-quality-supervisor-rules` | 仅在 Goal active 且用户明确要求“监控代码”时消费共享静态 Owner 路由，负责扫描、脱敏、finding 指纹、去重和通知；它不是测试后的 `6-review` Gate。 |
 
 ### 8. 测试域
 
@@ -403,12 +404,13 @@ python skill-dictionary/generate_dictionary.py
 一个典型研发任务，建议按下面的节奏理解这套 Skill：
 
 1. 如果是新会话且当前任务明显依赖近期项目动态，先进入 `recent-context-bootstrap-rules` 补最近 3 天前置上下文。
-2. 再进入需求链路，优先按“4 主步 + 4 条件步 + 双层验收”理解：主流程为 `Idea/Discovery -> Intake -> Acceptance Criteria -> Implementation`，条件步骤为 `Gap / Boundary / Splitting / Change`，后置收口为 `Test -> Review -> Final Acceptance`。
-3. 其中 `Gap / Boundary / Splitting / Change` 只按条件插入；如果任何一个条件步骤未完成，必须阻断进入 `Acceptance Criteria` 与 `Implementation`。
+2. 再进入需求或 Bug 链路；需求的 `Gap / Boundary / Splitting / Change` 只按条件插入，完成条件 `AC`、异常边界、停止条件和测试映射统一冻结在实施计划中。
+3. 如果任何必要条件步骤未完成，必须阻断进入实施计划与编码；不再新建独立验收标准文档或后置验收步骤。
 4. 如果是 Bug，转入 Bug 域，而不是混入普通需求流程。
 5. 进入编码时，同时受到编码基线域和代码位点域约束。
-6. 编码完成后，先过编码审查域，再进入测试域。
-7. 测试通过后，先完成审查与最终验收；最终验收通过后，再进入交付域整理提交和交付说明；正式评审与发布继续走团队流程。
+6. 编码完成后，按实施计划中的 `AC` 执行真实测试和回归，真实测试负责行为正确性。
+7. 测试通过后，仅由 `code-style-consistency-rules` 执行一次 `6-review` 风格回归；共享静态 Owner 路由由它唯一拥有，持续监控只在用户明确要求时可选消费，不能成为默认 Gate。
+8. `STYLE: PASS` 后进入交付域整理提交和交付说明；`STYLE: FIX_REQUIRED` 则修正风格后重新执行一次 `6-review`。
 
 ## 冲突处理建议
 
@@ -906,3 +908,4 @@ claude-mem(记忆) :
 2026-08-01 00:01:00 test: [Skill流程收敛] 补充风格回归测试与验证资产
 2026-08-01 00:02:00 docs: [Skill流程收敛] 更新实施周期与交付文档
 2026-08-01 00:03:00 chore: [项目状态同步] 更新技能流程收敛后的项目交接
+2026-08-01 01:00:00 feat: [6-review流程收敛] 完成Owner路由与静态来源调整
