@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from pathlib import Path
 
@@ -67,6 +68,21 @@ def retired_trigger_is_rejected(fixture: Path) -> bool:
     )
 
 
+# [参数] path_map_text：UTF-8 编码的路径映射 YAML 文本。
+# [返回] `recent_context_scan_roots` 中声明的仓库相对目录集合。
+# 最近修改时间：2026-08-01 00:00:00；以无第三方依赖方式验证活动与历史审查目录的预热覆盖。
+def recent_context_scan_roots(path_map_text: str) -> set[str]:
+    # 1. 只读取目标 YAML 列表块，避免其它同名目录意外满足断言。
+    matched = re.search(
+        r"^  recent_context_scan_roots:\n(?P<items>(?:    - [^\n]+\n?)*)",
+        path_map_text,
+        flags=re.MULTILINE,
+    )
+    if matched is None:
+        return set()
+    return set(re.findall(r'^    - "([^"]+)"$', matched.group("items"), flags=re.MULTILINE))
+
+
 # [参数] 无
 # [返回] 全部流程收敛断言通过时返回 0，否则返回 1。
 # 最近修改时间：2026-08-01 02:28:06；所有流程收敛断言必须共同决定退出状态。
@@ -80,6 +96,22 @@ def main() -> int:
     checks["legacy_archives_preserved"] = all(
         (ROOT / directory).is_dir() for directory in ("doc/6-审查", "doc/7-验收")
     )
+    checks["active_review_directory_present"] = (ROOT / "doc/6-review").is_dir()
+
+    path_map = (ROOT / "artifact-storage-rules/references/path-map.yaml").read_text(
+        encoding="utf-8"
+    )
+    checks["review_directory_roles_separated"] = all(
+        marker in path_map
+        for marker in (
+            'review_records: "doc/6-review"',
+            'historical_review_records: "doc/6-审查"',
+        )
+    )
+    checks["recent_context_scan_covers_active_and_historical_review"] = {
+        "doc/6-review",
+        "doc/6-审查",
+    }.issubset(recent_context_scan_roots(path_map))
 
     # 2. 验证活动文件不再保留退役路由。
     active_references = find_active_references()
@@ -93,6 +125,13 @@ def main() -> int:
     checks["six_review_route"] = all(
         marker in style_skill or marker in style_contract or marker in profile
         for marker in ("6-review", "STYLE: PASS", "style_regression")
+    )
+    checks["historical_review_not_active_output"] = all(
+        marker in style_skill or marker in style_contract
+        for marker in (
+            "活动记录写入 `doc/6-review/`",
+            "历史 `doc/6-审查/` 仅供读取，不得作为本轮归档目标或改写。",
+        )
     )
 
     with tempfile.TemporaryDirectory(prefix="flow-streamlining-") as temporary:
@@ -108,8 +147,12 @@ def main() -> int:
     required_checks = (
         "retired_skill_directories_absent",
         "legacy_archives_preserved",
+        "active_review_directory_present",
+        "review_directory_roles_separated",
+        "recent_context_scan_covers_active_and_historical_review",
         "active_reference_scan_zero",
         "six_review_route",
+        "historical_review_not_active_output",
         "retired_trigger_fixture_fails",
         "style_regression_document_present",
     )

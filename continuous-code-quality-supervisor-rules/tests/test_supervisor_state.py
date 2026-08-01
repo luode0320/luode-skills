@@ -138,7 +138,7 @@ class SupervisorStateTests(unittest.TestCase):
 
         [参数] 无
         [返回] 无；断言失败时由 unittest 抛出异常
-        最近修改时间：2026-08-01；同步退役 Skill 的替代 Owner，并覆盖 API 路由排除。
+        最近修改时间：2026-08-01 00:00:00；改用共享路由并覆盖 API 路由排除。
         """
 
         # 1. 验证 API 四 Owner 同时命中且排除列表完全不进入结果。
@@ -198,12 +198,10 @@ class SupervisorStateTests(unittest.TestCase):
             "frontend-design",
             "functional-validation-rules",
             "git-collaboration-rules",
-            "code-style-consistency-rules",
             "implementation-planning-rules",
             "obsidian-knowledge-flow",
             "parallel-task-dispatch-rules",
             "project-local-skills-rules",
-            "code-style-consistency-rules",
             "project-memory-rules",
             "project-style-rules",
             "skill-audit-rules",
@@ -379,7 +377,7 @@ class SupervisorStateTests(unittest.TestCase):
 
         [参数] 无
         [返回] 无；断言失败时由 unittest 抛出异常
-        最近修改时间：2026-07-25 19:05:00；覆盖 reference 刷新、缺失、越界、跨 Owner 和空 glob。
+        最近修改时间：2026-08-01 00:00:00；改用共享来源映射并覆盖不安全声明。
         """
 
         # 1. 构造最小 Owner 与 source map，确认 reference 改动会改变摘要。
@@ -389,10 +387,18 @@ class SupervisorStateTests(unittest.TestCase):
         (owner_dir / "SKILL.md").write_text("---\nname: code-readability-rules\n---\nbody\n", encoding="utf-8")
         ref_file = ref_dir / "readability-general.md"
         ref_file.write_text("first reference\n", encoding="utf-8")
-        map_dir = self.root / "continuous-code-quality-supervisor-rules" / "references"
+        map_dir = self.root / "code-style-consistency-rules" / "references"
         map_dir.mkdir(parents=True)
 
         def write_map(source_paths: list[str] | None = None, source_globs: list[str] | None = None) -> None:
+            """写入供当前测试使用的最小共享来源映射。
+
+            [参数] source_paths：显式来源路径；source_globs：通配来源路径。
+            [返回] 无。
+            最近修改时间：2026-08-01 00:00:00；将 fixture 写入共享来源映射目录。
+            """
+
+            # 1. 仅构造单一 Owner 的临时来源映射，隔离无关规则。
             payload = {
                 "version": 1,
                 "owners": {
@@ -406,7 +412,7 @@ class SupervisorStateTests(unittest.TestCase):
                     }
                 },
             }
-            (map_dir / "owner-static-source-map.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            (map_dir / "static-owner-source-map.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
         write_map()
         first = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")

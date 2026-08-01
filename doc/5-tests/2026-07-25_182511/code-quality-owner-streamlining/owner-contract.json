@@ -1,15 +1,25 @@
 {
   "text_assertions": [
     {
-      "file": "implementation-review-rules/references/shared-evidence-and-specialized-contracts.md",
+      "file": "code-style-consistency-rules/references/static-owner-routing-contract.md",
       "must_contain": [
-        "代码质量 Owner 结果消费契约"
+        "静态 Owner 路由的唯一来源",
+        "持续代码质量监督可复用完整 Owner 集合"
       ],
       "must_not_contain": [
-        "[参数]",
-        "[返回]",
-        "1/2/3",
-        "var (...)"
+        "通过业务测试",
+        "验收通过"
+      ]
+    },
+    {
+      "file": "continuous-code-quality-supervisor-rules/references/owner-routing-matrix.md",
+      "must_contain": [
+        "共享静态 Owner 路由契约",
+        "不得在本目录复制 Owner 常量"
+      ],
+      "must_not_contain": [
+        "owner-static-source-map.json",
+        "允许引用列表中的 28 个 Owner"
       ]
     },
     {

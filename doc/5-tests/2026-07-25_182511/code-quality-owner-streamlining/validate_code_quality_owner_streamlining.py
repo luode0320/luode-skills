@@ -8,10 +8,15 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[4]
-SCRIPTS = ROOT / "continuous-code-quality-supervisor-rules" / "scripts"
+SCRIPTS = ROOT / "code-style-consistency-rules" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from supervisor_state import BASE_OWNER_NAMES, OWNER_NAMES, route_owners  # noqa: E402
+from static_owner_router import (  # noqa: E402
+    BASE_OWNER_NAMES,
+    OWNER_NAMES,
+    owner_source_map_path,
+    route_owners,
+)
 
 HERE = Path(__file__).resolve().parent
 
@@ -30,15 +35,21 @@ def assert_true(condition: bool, message: str) -> None:
 
 
 def validate_inventory() -> None:
-    """验证 Owner 身份、基础顺序和 source map 完整性。"""
+    """验证 Owner 身份、基础顺序和共享来源映射完整性。
 
+    [参数] 无。
+    [返回] 无；断言失败时抛出异常。
+    最近修改时间：2026-08-01 00:00:00；改由共享路由读取唯一来源映射。
+    """
+
+    # 1. 校验共享路由声明的 Owner 集合、基础顺序和来源映射完全一致。
     inventory = load_json("inventory.json")
     expected = set(inventory["owners"])
     assert_true(set(OWNER_NAMES) == expected, "OWNER_NAMES 与 inventory 不一致")
     assert_true(list(BASE_OWNER_NAMES) == inventory["base_owners"], "BASE_OWNER_NAMES 顺序不一致")
-    source_map = json.loads((ROOT / "continuous-code-quality-supervisor-rules" / "references" / "owner-static-source-map.json").read_text(encoding="utf-8"))
+    source_map = json.loads(owner_source_map_path(ROOT).read_text(encoding="utf-8"))
     map_owners = set(source_map.get("owners", {}))
-    assert_true(map_owners == expected, "owner-static-source-map.json Owner 覆盖不完整")
+    assert_true(map_owners == expected, "static-owner-source-map.json Owner 覆盖不完整")
     for owner, entry in source_map["owners"].items():
         for key in ("source_paths", "source_globs"):
             assert_true(isinstance(entry.get(key, []), list), f"{owner}.{key} 不是列表")
