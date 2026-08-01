@@ -7,8 +7,8 @@
 ## 当前任务
 
 - 来源对象：用户已确认的“研发流程收敛：实施计划、真实测试与 6-review 风格回归”计划。
-- 当前目标：删除五个退役 Skill，统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”，并完成路由、字典、文档和回归验证。
-- 当前状态：`TASK-FLOW-01` 至 `TASK-FLOW-05` 已完成。新流程已收敛为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”；五个退役 Skill 已删除，`doc/6-审查/`、`doc/7-验收/` 仅保留历史只读资料。
+- 当前目标：删除五个退役 Skill，统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”，并完成共享静态 Owner 路由、字典、文档和回归验证。
+- 当前状态：`TASK-FLOW-01` 至 `TASK-FLOW-05` 与 `TASK-6ROUTE-01` 至 `TASK-6ROUTE-05` 均已完成并失活。新流程已收敛为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”；五个退役 Skill 已删除，`doc/6-审查/`、`doc/7-验收/` 仅保留历史只读资料。
 
 ## 范围与边界
 
@@ -19,9 +19,10 @@
 ## 已完成
 
 - 五个退役 Skill 目录及资产已删除，`implementation-planning-rules` 已吸收可测试完成条件，`code-style-consistency-rules` 成为唯一 `6-review` 入口。
+- `code-style-consistency-rules` 唯一拥有共享静态 Owner 路由和来源映射；`continuous-code-quality-supervisor-rules` 只在 Goal active 且用户明确要求“监控代码”时可选消费，保留扫描、脱敏、去重和通知，不成为 `6-review` Gate。
 - `artifact-storage-rules` 已将 `doc/6-review/` 设为活动目录；`artifact-delivery-gate-rules` 已新增 `style_regression` profile，旧 review/acceptance profile 只读兼容。
 - 根文档、项目记忆、字典生成器和专项回归已迁移到新流程；实施总览、周期、真实测试和风格回归记录已落盘并建立 `IMPL/TEST/STYLE` 追踪。
-- 已完成本地最终验证：文档校验器 57 项单元测试、流程专项回归、实施总览/周期/`style_regression` 严格 profile、字典生成和 Git 差异检查均通过。
+- 已完成本地验证：共享路由单元测试 `7/7`、监控消费者单元测试 `17/17`、共享 Owner 路由专项脚本通过；流程专项回归、文档校验器 57 项单元测试、五份严格 profile、字典生成和 Git 差异检查均已在本任务链路执行。
 
 ## 门禁说明
 
@@ -30,14 +31,14 @@
 ## 验证与交接
 
 - `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 `FLOW-STREAMLINING-20260801` 已完成并已失活。
-- 最后执行点：最终验证、注释门禁、代码收口、Skill 合规和 `6-review` 风格回归均已完成；无待办或阻断。
+- 最后执行点：共享 Owner 路由的实现、真实测试、活动文档、严格 profile、字典与 `6-review` 风格回归均已完成；当前任务投影已失活，未执行 Git 历史写入。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-07-31T18:04:17.414853Z",
+  "registry_updated_at": "2026-08-01T09:54:42.305312Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -555,39 +556,39 @@
       ]
     },
     {
-      "projection_id": "SESSION/519686f0e7a3f89af5c8621a38424498c6e750b9c71da6bc1ae1dde005566a8c",
+      "projection_id": "SESSION/6cecf83f71685e236fe2d9a26bef2ce8b22128a128407281672b206a81935f84",
       "session_id": "019fb8f8-2434-7f30-ab1f-6928ccc5b93a",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "FLOW-STREAMLINING-20260801",
-      "source_document": "user-confirmed-plan:研发流程收敛：实施计划、真实测试与6-review风格回归",
-      "plan_fingerprint": "22f33b1cc9fc66bc0a57db166cc12c844787dd60bb7a3ff827f945c41bb661f5",
-      "updated_at": "2026-07-31T18:04:17.414692Z",
+      "plan_key": "6R-OWNER-ROUTING-20260801",
+      "source_document": "user-confirmed-plan:6-review静态Owner路由复用",
+      "plan_fingerprint": "e93bfd85ccbd9eafd4adc4ab26939ede522215c44b2fc3344165cec225a5f4a2",
+      "updated_at": "2026-08-01T00:00:00Z",
       "steps": [
         {
-          "id": "CYCLE-01",
-          "step": "契约收敛：实施计划、文档存储与 style_regression profile",
+          "id": "TASK-6ROUTE-01",
+          "step": "冻结需求、实施计划与共享路由契约",
           "status": "completed"
         },
         {
-          "id": "CYCLE-02",
-          "step": "6-review：代码风格、格式与目录归位回归",
+          "id": "TASK-6ROUTE-02",
+          "step": "建立 6-review 共享静态 Owner 路由",
           "status": "completed"
         },
         {
-          "id": "CYCLE-03",
-          "step": "删除五个旧 Skill 并同步活跃路由",
+          "id": "TASK-6ROUTE-03",
+          "step": "迁移持续监控消费者并消除重复路由",
           "status": "completed"
         },
         {
-          "id": "CYCLE-04",
-          "step": "同步项目文档、记忆与历史归档边界",
+          "id": "TASK-6ROUTE-04",
+          "step": "同步入口文档、字典与项目记忆",
           "status": "completed"
         },
         {
-          "id": "CYCLE-05",
-          "step": "刷新字典并执行全链路回归与最终收口",
+          "id": "TASK-6ROUTE-05",
+          "step": "执行本地回归和 6-review 收口",
           "status": "completed"
         }
       ]

@@ -310,6 +310,15 @@
 - 更新时间: 2026-08-01
 - 状态: 启用
 
+### 共享静态 Owner 路由与可选监控消费者
+- 别名: 共享 Owner 路由, 静态来源映射, 监控代码消费者
+- 类型: Skill 治理规则
+- 定义: `code-style-consistency-rules/scripts/static_owner_router.py` 与 `references/static-owner-source-map.json` 是共享静态 Owner 路由的唯一 Owner。测试后的 `6-review` 从该路由选择风格子集；`continuous-code-quality-supervisor-rules` 仅在 Goal active 且用户明确要求“监控代码”时条件式消费完整路由，继续负责扫描、脱敏、finding 指纹、去重和通知。监督器不得复制 Owner 常量、条件路由或来源映射，且不构成 `6-review` Gate。
+- 来源: `code-style-consistency-rules/scripts/static_owner_router.py`、`code-style-consistency-rules/references/static-owner-routing-contract.md`、`continuous-code-quality-supervisor-rules/SKILL.md`
+- 适用范围: `6-review` 风格回归、条件式持续代码监控、共享路由维护
+- 更新时间: 2026-08-01
+- 状态: 启用
+
 ### Git 提交基础质量闸门
 - 别名: 提交前质量检查, Git 基础质量核查, 提交不生成活动流程文档
 - 类型: 流程规则
@@ -701,6 +710,21 @@
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.shared-static-owner-routing
+    name: "共享静态 Owner 路由与可选监控消费者"
+    type: "Skill 治理规则"
+    aliases:
+      - 共享 Owner 路由
+      - static_owner_router
+      - 监控代码消费者
+    definition: "code-style-consistency-rules 是静态 Owner 路由与来源映射的唯一 Owner；测试后的 6-review 消费风格子集。continuous-code-quality-supervisor-rules 仅在 Goal active 且用户明确要求监控代码时条件式消费完整集合，保留扫描、脱敏、finding 指纹、去重和通知，不得复制路由常量、条件或来源映射，也不是测试后的 Gate。"
+    scope: "6-review 风格回归、条件式持续代码监控、共享静态路由维护"
+    status: "active"
+    evidence_ids:
+      - evidence.shared-static-owner-routing
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-08-01
   - entity_id: rule.control-plane-single-direction-routing
     name: "总控层单向路由与合并规则"
     type: "Skill 治理规则"
@@ -1316,6 +1340,13 @@ entities:
       - context.implementation-flow
     updated_at: 2026-07-26
 relations:
+  - relation_id: rel.shared-static-owner-routing.consumed-by.continuous-supervisor
+    type: "consumed_by"
+    from: "rule.shared-static-owner-routing"
+    to: "continuous-code-quality-supervisor-rules"
+    evidence_ids:
+      - evidence.shared-static-owner-routing
+    status: "active"
   - relation_id: rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming
     type: "depends_on"
     from: "rule.old-directory-cleanup"
@@ -1332,6 +1363,11 @@ relations:
       - evidence.skill.git-collaboration
     status: "active"
 evidence:
+  - evidence_id: evidence.shared-static-owner-routing
+    type: "skill"
+    source: "6-review 共享静态 Owner 路由"
+    path: "code-style-consistency-rules/scripts/static_owner_router.py"
+    note: "唯一静态 Owner 路由和来源映射；持续监控仅条件式消费，7 项路由单测、17 项监控单测与专项脚本均通过。"
   - evidence_id: evidence.skill.swag-openapi-maintainer
     type: "skill"
     source: "swag-openapi-maintainer-rules/SKILL.md 与 references"
@@ -1700,6 +1736,7 @@ contexts:
     note: "适用于结果区问题、方法、结果/验证状态的 3 句核心契约，以及复杂、受限或有关键边界时的 4–5 句受控扩展"
 lifecycle:
   active:
+    - "rule.shared-static-owner-routing"
     - "rule.swag-upstream-openapi"
     - "rule.task-blocker-closure"
     - "rule.imagegen-error-case-evolution"

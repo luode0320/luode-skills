@@ -191,3 +191,9 @@
 - 删除 `acceptance-criteria-rules`、`final-acceptance-rules`、`implementation-review-rules`、`project-change-review-rules` 和 `code-review-automation-rules`；活动流程统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”。
 - `doc/6-review/` 成为唯一活动风格回归目录，`code-style-consistency-rules` 只输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`；不承担业务正确性、需求覆盖或发布放行判断。
 - `doc/6-审查/` 与 `doc/7-验收/` 原地只读保留，未批量改写历史资料；本地专项回归、严格文档 profile、字典生成与差异检查均通过，未连接外部服务且未执行 Git 历史写入。
+
+## 2026-08-01：6-review 共享静态 Owner 路由完成
+
+- `code-style-consistency-rules` 成为共享静态 Owner 路由与来源映射的唯一 Owner；测试后的 `6-review` 只消费风格子集。
+- `continuous-code-quality-supervisor-rules` 删除重复路由，只在 Goal active 且用户明确要求“监控代码”时可选消费完整路由，继续负责扫描、脱敏、finding 指纹、去重和通知；它不是 `6-review` Gate。
+- 本地共享路由单元测试 `7/7`、监控消费者单元测试 `17/17` 与跨域专项路由脚本通过；未改写历史 `doc/6-审查/`、`doc/7-验收/`，未连接外部服务或写入 Git 历史。
