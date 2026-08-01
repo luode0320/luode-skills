@@ -9,7 +9,11 @@ import tempfile
 import unittest
 
 
-SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+SCRIPTS_DIR = (
+    Path(__file__).resolve().parents[2]
+    / "continuous-code-quality-supervisor-rules"
+    / "scripts"
+)
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from supervisor_state import (  # noqa: E402

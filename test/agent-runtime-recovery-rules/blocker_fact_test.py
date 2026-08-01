@@ -7,7 +7,7 @@ from pathlib import Path
 import unittest
 
 
-SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "agent-runtime-recovery-rules" / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from recovery_engine import RecoveryEngine, RecoveryRequest  # noqa: E402

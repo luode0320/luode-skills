@@ -7,7 +7,7 @@ import sys
 import unittest
 
 
-SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "code-style-consistency-rules" / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from static_owner_router import (  # noqa: E402

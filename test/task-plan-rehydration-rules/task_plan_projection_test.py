@@ -17,8 +17,8 @@ from pathlib import Path
 from unittest import mock
 
 
-ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY_ROOT = ROOT.parent
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPOSITORY_ROOT / "task-plan-rehydration-rules"
 SCRIPT = ROOT / "scripts" / "task_plan_projection.py"
 SPEC = importlib.util.spec_from_file_location("task_plan_projection", SCRIPT)
 if SPEC is None or SPEC.loader is None:

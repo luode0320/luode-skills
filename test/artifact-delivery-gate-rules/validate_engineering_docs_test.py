@@ -10,13 +10,13 @@ from pathlib import Path
 import sys
 
 
-SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
+ROOT = Path(__file__).resolve().parents[2]
+SCRIPT_DIR = ROOT / "artifact-delivery-gate-rules" / "scripts"
 sys.path.insert(0, str(SCRIPT_DIR))
 
 import validate_engineering_docs as validator  # noqa: E402
 
 
-ROOT = Path(__file__).resolve().parents[2]
 PROFILE_FILE = ROOT / "artifact-delivery-gate-rules" / "references" / "document-quality-profiles.yaml"
 TEMPLATE_REGISTRY_FILE = ROOT / "artifact-delivery-gate-rules" / "references" / "plain-language-template-registry.yaml"
 LAYERED_OPENING = (

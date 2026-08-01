@@ -15,7 +15,12 @@ from pathlib import Path
 from typing import Any
 
 
-SCRIPT_PATH = Path(__file__).parents[1] / "scripts" / "browser_use_cloud_preflight.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "browser-use-cloud-rules"
+    / "scripts"
+    / "browser_use_cloud_preflight.py"
+)
 SPEC = importlib.util.spec_from_file_location("browser_use_cloud_preflight", SCRIPT_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError("无法加载预检脚本")
