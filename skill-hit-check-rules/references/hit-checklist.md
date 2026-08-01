@@ -37,7 +37,7 @@
 
 ## 代码改动收口场景补充
 
-- 本轮发生代码新增或修改并准备收口时，按 `deferred-gate-registry.md` 与首条 `闸门预告` **逐项复核已声明 vs 已执行**：至少 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`implementation-review-rules`、`code-change-finalization-gate-rules`，并按 `reasoning-summary-structure-rules` 输出最终总结（Plan Mode 除外）。
+- 本轮发生代码新增或修改并准备收口时，按 `deferred-gate-registry.md` 与首条 `闸门预告` **逐项复核已声明 vs 已执行**：至少 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`code-style-consistency-rules` 的 `6-review`、`code-change-finalization-gate-rules`，并按 `reasoning-summary-structure-rules` 输出最终总结（Plan Mode 除外）。
 - 具体注释字段、审查步骤、测试证据和 PASS / FAIL 由各 Owner 定义；`闸门预告` 登记过或注册表判定当前阶段必需的 gate 未执行时，先补执行再收口。
 
 ## 代码改动中段场景补充
@@ -59,7 +59,7 @@
 
 - Git 意图包括显式关键词 `git/commit/push/pull/rebase/merge/cherry-pick/stash/status/diff/log`，中文动作词“提交/推送/拉取/合并/变基/暂存”，以及“提交git/帮我提交/给我推上去/看下改动/同步到远端”等语义等价表达。
 - Git 意图只认当前轮；历史轮次的提交或推送要求不得继承。
-- 执行 Git 协作命中 `git-collaboration-rules`；提交级审查请求命中 `code-review-automation-rules`，二者不得混淆。
+- 执行 Git 协作命中 `git-collaboration-rules`；本轮不再存在独立提交级审查 Skill，提交动作仍只处理 Git 边界。
 - 不得要求用户额外补“测试已完成”后才触发 Git 路由，也不得由本入口直接实施提交步骤。
 
 ## 自主执行场景补充
@@ -78,5 +78,5 @@
 - 不确定时可标记候选命中并继续核验，不得跳过命中检查。
 - 不得把“只命中名称”当作已执行；必须完成 Owner Skill 的必要动作。
 - 不得在代码已改动后直到最终回复才首次补声明注释或收口 Skill。
-- 不得整轮实质任务到最终回复才首次意识到应命中任何延迟触发 gate（`reasoning-summary-structure-rules`、注释 gate、实现自审、最终收口 gate、合规 gate 等）；非 Plan Mode 时首条命中检查即须按 `deferred-gate-registry.md` 登记 `闸门预告`，收口逐项复核声明与执行是否一致。
+- 不得整轮实质任务到最终回复才首次意识到应命中任何延迟触发 gate（`reasoning-summary-structure-rules`、注释 gate、`6-review`、最终收口 gate、合规 gate 等）；非 Plan Mode 时首条命中检查即须按 `deferred-gate-registry.md` 登记 `闸门预告`，收口逐项复核声明与执行是否一致。
 - 不得遗漏用户明确的停止、安全、授权、清理、回滚和输出协议。

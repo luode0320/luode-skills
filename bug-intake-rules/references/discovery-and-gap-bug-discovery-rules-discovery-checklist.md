@@ -5,7 +5,7 @@
 - 现象与报错：用户原话、报错文案、异常堆栈、HTTP 状态码、接口返回体、页面提示。
 - 截图与资料：用户提供的页面截图、报错截图、控制台截图、网络请求截图、数据截图。
 - 长期记忆：`PROJECT_MEMORY.md`（历史同类问题、相关表、相关代码入口、本地配置位置）、`PROJECT_STYLE.md`。
-- 历史记录：`doc/4-bugs/`（同类 Bug 根目录）、`doc/2-需求/`、`doc/3-实施/`、`doc/6-审查/`。
+- 历史记录：`doc/4-bugs/`（同类 Bug 根目录）、`doc/2-需求/`、`doc/3-实施/`、`doc/6-review/`。
 - 代码入口：路由、controller、service、repository、model、frontend 页面、任务脚本、中间件、错误处理与日志埋点。
 - 调用链：联动 `codegraph-analysis-rules` 追上游调用方、下游被调用方、可疑分支与状态流转。
 - 日志与 trace：现有运行日志、错误日志、链路 trace、关键埋点输出。

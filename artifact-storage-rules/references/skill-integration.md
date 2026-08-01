@@ -17,11 +17,11 @@
 - 可以写“路径、命名和复用策略统一遵循 `artifact-storage-rules`”。
 - 可以写“如需具体模板，读取 `../artifact-storage-rules/references/path-map.yaml`”。
 - 可以写“根目录项目设计文档主入口统一遵循 `artifact-storage-rules` 中的 `项目设计.md` 规则”。
-- 不建议在各自 `SKILL.md` 中重复维护完整的 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/`、`doc/7-验收/`、`doc/`、`skill/` 模板说明。
+- 不建议在各自 `SKILL.md` 中重复维护完整的 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`、`doc/7-验收/`、`doc/`、`skill/` 模板说明。
 - 若本轮执行的是仓库内目录迁移，必须同步检查并更新仓库级 `AGENTS.md`、`README.md`、根目录 `项目设计.md`、`PROJECT_MEMORY.md`、`PROJECT_STYLE.md`；不要只移动文件。
 - 若用户没有明确要求保留兼容层，迁移完成后应删除旧目录与旧跳转文档，不保留新旧并行入口。
 - 图片路径迁移完成后，必须全仓检索并清理历史需求域图片目录、`doc/data/<file>` 等旧路径；仅保留 `doc/data/images/`，并用相对路径从当前 Markdown 位置引用。
-- 若当前结论属于实现自审、目录归位、格式清理、语法检查或注释核对，默认归档到 `doc/6-审查/`；根级 `review/` 不再作为正式入口，`analysis/` 只有在项目明确声明该目录时才允许作为正式入口。
+- 若当前结论属于测试后的代码风格回归、目录归位、格式清理、语法检查或注释核对，默认归档到 `doc/6-review/`；`doc/6-review/` 仅供历史读取，根级 `review/` 不再作为正式入口，`analysis/` 只有在项目明确声明该目录时才允许作为正式入口。
 
 ## 变更优先级
 

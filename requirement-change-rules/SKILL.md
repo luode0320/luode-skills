@@ -18,7 +18,7 @@ description: 当已确认或已进入实现的需求被补充、修正、插入�
 - 原实现不符合原需求、脱离本次变更仍是错误：转 Bug 域。
 - 变更导致范围或兼容归属不清：转 `requirement-boundary-rules`。
 - 变更导致需求显著增大或出现多个独立子系统：转 `requirement-splitting-rules`。
-- 变更影响前置验收：回开 `acceptance-criteria-rules`；影响实施、测试或审查：发出失效和重规划信号，交对应 Owner 处理。
+- 变更影响前置验收：回开 `implementation-planning-rules`；影响实施、测试或审查：发出失效和重规划信号，交对应 Owner 处理。
 
 ## 职责归位
 
@@ -50,5 +50,5 @@ description: 当已确认或已进入实现的需求被补充、修正、插入�
 - `CHG-*`、失效传播、授权、回开与重验：`references/impact-recheck.md`
 - 变更正反例：`references/change-decision-examples.md`
 - 实施总览、周期、文件/符号和测试闭环：`../implementation-planning-rules/SKILL.md`
-- 前置验收：`../acceptance-criteria-rules/SKILL.md`
+- 前置验收：`../implementation-planning-rules/SKILL.md`
 - 文档路径与最终落盘：`../artifact-storage-rules/references/path-map.yaml`、`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`

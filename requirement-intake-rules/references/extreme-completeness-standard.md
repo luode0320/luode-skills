@@ -110,4 +110,4 @@ flowchart LR
 5. Mermaid 图块闭合、语义匹配、节点与正文一致；链接、图片和附录引用存在，图片决策、`IMG-*` 清单、非空 alt、相对路径和实际文件一致。
 6. `unresolved_decisions` 中没有 P0/P1 未决项；若有，文档状态必须是 `blocked`，不得进入验收或实施。
 
-只有上述检查通过并完成用户确认，需求文档才允许交给 `acceptance-criteria-rules` 和 `implementation-planning-rules`。
+只有上述检查通过并完成用户确认，需求文档才允许交给 `implementation-planning-rules` 和 `implementation-planning-rules`。

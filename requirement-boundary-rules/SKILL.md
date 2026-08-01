@@ -18,7 +18,7 @@ description: 当需求边界不清、影响范围不明、兼容性不明确、�
 - 原实现不符合原需求、脱离当前需求仍客观存在：转 Bug 域。
 - 已确认需求新增条件、改变范围、默认值、优先级或交付物：转 `requirement-change-rules`。
 - 边界稳定但需求体量过大：转 `requirement-splitting-rules`。
-- 边界稳定后才允许进入 `acceptance-criteria-rules`，随后进入 `implementation-planning-rules`。
+- 边界稳定后才允许进入 `implementation-planning-rules`，由实施计划冻结 `AC-*` 完成条件。
 
 ## 最小执行流程
 

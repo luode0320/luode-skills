@@ -18,7 +18,7 @@ description: 当新增或修改前端页面、页面布局、主题样式、配�
 - 在编码落地前先判断风格方向，在编码完成前再做一轮 UI 自审。
 - 合并保留外部 UI/UX 设计种子的搜索能力，在需要时可直接在本 skill 内完成设计方向检索。
 - 将外部前端设计种子转化为适合你们团队长期维护的稳定规则。
-- 当前端视觉改动落到 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js`、`.html`、`.css`、`.scss`、`.less` 代码文件时，必须联动注释双 skill 与 `implementation-review-rules`；不得只看视觉效果就直接收口。
+- 当前端视觉改动落到 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js`、`.html`、`.css`、`.scss`、`.less` 代码文件时，必须联动注释双 skill 与 `code-style-consistency-rules`；不得只看视觉效果就直接收口。
 
 ## 自动触发信号
 
@@ -48,7 +48,7 @@ description: 当新增或修改前端页面、页面布局、主题样式、配�
 7. 如果当前任务涉及主题、配色、字体、图标和设计 token，再读 `references/color-typography-icon-rules.md`。
 8. 如果当前任务涉及表单、导航、图表、数据展示和空态，再读 `references/forms-nav-data-display-rules.md`。
 9. 完成前默认再读 `references/ui-delivery-checklist.md` 做一轮交付前 UI 自审。
-10. 若本轮修改前端代码文件，完成前必须确认 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`implementation-review-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
+10. 若本轮修改前端代码文件，完成前必须确认 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
 
 ## 权责边界与不负责事项
 

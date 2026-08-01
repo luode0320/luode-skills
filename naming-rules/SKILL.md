@@ -38,7 +38,7 @@ description: 当新增或修改变量、函数、类、模块、接口、字段�
 2. 如需继续展开，再读 `references/domain-term-alignment.md`，需要对齐仓库现有术语。
 3. 需要对照边界或正反例时，再读 `references/naming-examples.md`，需要对照命名正反例。
 4. 输出命名建议、驼峰风格结论、术语对齐结论和需要同步调整的命名项。
-5. 命名稳定后再继续编码或交给 `implementation-review-rules` 复核；若只是局部可读性问题，不要把所有结构问题都转成命名问题。
+5. 命名稳定后再继续编码或交给 `code-style-consistency-rules` 复核；若只是局部可读性问题，不要把所有结构问题都转成命名问题。
 
 ## 权责边界与不负责事项
 

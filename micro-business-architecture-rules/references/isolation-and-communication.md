@@ -55,7 +55,7 @@ func GetProfile(requestJSON string) string {
 1. 在包含 fixture 或目标项目的根执行 `codegraph sync <root>`。
 2. 对每个目标域执行 `codegraph query -p <root> --kind import --limit 1000 --json "<module>/business/<target>"`。
 3. 合规证据必须显示调用文件导入精确 `business/<target>/rpc`。
-4. 违规证据必须显示调用文件导入 `service`、`entity`、`util` 或其他私有路径；审查与验收均失败。
+4. 违规证据必须显示调用文件导入 `service`、`entity`、`util` 或其他私有路径；真实测试失败，且不得以 `6-review` 覆盖该行为问题。
 5. CodeGraph 只提供可追溯的导入证据；允许路径的确定性裁决仍由 `micro_business.py check` 负责。
 
 ## 公共例外和 global 边界

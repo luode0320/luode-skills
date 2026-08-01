@@ -51,7 +51,7 @@
 5. 先找到当前需求对应的需求主文档；如果还没有，就按 `artifact-storage-rules` 的路径与命名模板初始化同一份文档。
 6. 再按 `artifact-storage-rules` 的命名模板定位或创建当前需求对应的临时缺口文档。
 7. 输出待确认项、影响范围和建议确认顺序，并先回写到临时缺口文档中。
-8. 若关键缺口未清零，则明确阻断进入 `acceptance-criteria-rules`、`implementation-planning-rules` 与实现阶段，不允许“先做一版看看”。
+8. 若关键缺口未清零，则明确阻断进入 `implementation-planning-rules`、`implementation-planning-rules` 与实现阶段，不允许“先做一版看看”。
 
 ## 默认执行流程
 1. 默认先读 `missing-info-checklist.md`，检查缺失的是哪一类信息。
@@ -65,12 +65,12 @@
 9. 对附录缺口一并回写：正文出现了哪些核心指标、术语或逻辑主题，附录还缺哪些定义、口径、公式、优先级、例外或易混点。
 10. 若发现多个合理方向都说得通但还没收敛，应先要求用户确认方向，必要时回流 `requirement-intake-rules` 输出方案比选，而不是假设一种继续推进。
 11. 用户确认并补齐缺口后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，且需求状态保持未完善。
-12. 在关键缺口未补齐前，不进入 `acceptance-criteria-rules`、`implementation-planning-rules`、`final-acceptance-rules` 或编码阶段；但阻断前必须确认该缺口已经无法通过 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察解决。
+12. 在关键缺口未补齐前，不进入 `implementation-planning-rules`、`implementation-planning-rules`、`delivery-summary-rules` 或编码阶段；但阻断前必须确认该缺口已经无法通过 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察解决。
 13. 若发现已有实现、补丁或试做建立在未确认缺口之上，必须把该状态记录为偷跑风险，要求先补文档与缺口，再继续后续阶段。
 
 ## 权责边界与不负责事项
 - 只负责识别“缺了什么”，不负责判断“这是不是当前需求范围”，那属于 `requirement-boundary-rules`。
-- 不负责把验收标准完全写实，那属于 `acceptance-criteria-rules`。
+- 不负责把验收标准完全写实，那属于 `implementation-planning-rules`。
 - 不把所有普通不确定项都放大成阻断；只拦关键缺口。
 - 不把“多个合理方向尚未收敛”误判成已经可实现的稳定需求。
 - 不代替总控层做需求域与 Bug 域的分流裁决。

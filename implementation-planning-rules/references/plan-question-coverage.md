@@ -83,5 +83,5 @@
 - 需求语义缺口、业务规则、输入输出定义 -> `requirement-intake-rules` / `requirement-change-rules`。
 - 是否属于本次范围、兼容边界 -> `requirement-boundary-rules`。
 - 拆分优先级 -> `requirement-splitting-rules`。
-- 完成标准口径 -> `acceptance-criteria-rules`。
+- 完成标准口径 -> `implementation-planning-rules`。
 - 本协议只覆盖“进入实施规划后、实现层面的技术决策点”，不替代上述需求 / 边界 / 验收前置域。

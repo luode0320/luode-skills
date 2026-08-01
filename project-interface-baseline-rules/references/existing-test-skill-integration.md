@@ -14,20 +14,20 @@
 | `test-program-rules` | 测试脚本、测试程序和资产的组织规则 | 本 skill 的测试脚本、用例和数据必须遵循它的要求 |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录和文件命名规则 | 本 skill 的所有资产命名必须遵循它的要求 |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 散落测试资产的收拢规则 | 本 skill 的测试资产必须全部收拢到对应时间戳根目录，不得散落 |
-| `final-acceptance-rules` | 最终上线验收 | 本 skill 的门禁结论是它的正式输入之一，最终验收必须引用本 skill 的结论 |
-| `implementation-review-rules` | 实现完成后的代码审查 | 本 skill 在测试执行前必须确认其已通过，代码审查不通过不得执行门禁测试 |
-| `project-change-review-rules` | 最终上线前的改动总审查 | 本 skill 的结论是其输入之一，总审查必须参考测试门禁结论 |
+| `delivery-summary-rules` | 最终上线验收 | 本 skill 的门禁结论是它的正式输入之一，最终验收必须引用本 skill 的结论 |
+| `code-style-consistency-rules` | 实现完成后的代码审查 | 本 skill 在测试执行前必须确认其已通过，代码审查不通过不得执行门禁测试 |
+| `code-style-consistency-rules` | 最终上线前的改动总审查 | 本 skill 的结论是其输入之一，总审查必须参考测试门禁结论 |
 
 ## 联动执行流程
 
 推荐的完整上线前测试流程顺序：
 
-1. 代码实现完成，执行 `implementation-review-rules`，完成测试前静态自审。
+1. 代码实现完成，执行 `code-style-consistency-rules`，完成测试前静态自审。
 2. 执行 `functional-validation-rules`，确认当前改动功能验证通过。
 3. 执行 `test-regression-rules`，确认改动影响面回归验证通过。
 4. 执行 `project-interface-release-execution-rules`，完成上线前项目级核心接口测试并得到门禁结论。
-5. 执行 `project-change-review-rules`，参考测试门禁结论完成全量改动总审查。
-6. 执行 `final-acceptance-rules`，综合测试与审查结论给出最终验收结论。
+5. 执行 `code-style-consistency-rules`，参考测试门禁结论完成全量改动总审查。
+6. 执行 `delivery-summary-rules`，综合测试与审查结论给出最终验收结论。
 
 ## 数据流转规则
 
@@ -35,7 +35,7 @@
 2. 本 skill 的测试文档、测试报告和归档必须完全遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 和 `artifact-storage-rules` 的要求。
 3. 本 skill 的接口测试执行可以调用 `functional-validation-rules` 完成，结果直接复用，不需要重复测试。
 4. 本 skill 的回归相关测试可以调用 `test-regression-rules` 完成，结果直接复用。
-5. 本 skill 的最终结论必须输出成 `final-acceptance-rules` 可直接读取的格式，作为正式验收输入。
+5. 本 skill 的最终结论必须输出成 `delivery-summary-rules` 可直接读取的格式，作为正式验收输入。
 6. 本 skill 维护的项目接口基线可以被所有其他测试 skill 复用，避免重复梳理接口。
 7. 每次执行本 skill 前都必须先扫描并对账当前接口基线；若发现新增、删除或漂移信息，必须先回写基线再继续门禁测试。
 

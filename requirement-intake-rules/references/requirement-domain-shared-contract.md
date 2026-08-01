@@ -7,7 +7,7 @@
 - 新需求接入：`Idea -> requirement-intake-rules`。
 - 内部条件路由：`initial-discovery`、`gap-routing`。
 - 独立专项 Owner：`requirement-boundary-rules`、`requirement-splitting-rules`、`requirement-change-rules`；专项信号出现时继续自动触发，不得被 intake 抢占。
-- 下游移交：`acceptance-criteria-rules -> implementation-planning-rules -> Test -> Review -> final-acceptance-rules`。
+- 下游移交：`implementation-planning-rules（含 AC-* 完成条件） -> Test -> 6-review -> 交付总结`。
 
 `requirement-intake-rules` 是**新需求接入唯一自动触发入口和唯一需求主文档 Owner**，不是整个需求域唯一自动触发 Skill。
 
@@ -30,11 +30,10 @@
 
 ## 下游移交
 
-1. `acceptance-criteria-rules` 唯一负责前置验收字段和 `AC-*`。
-2. `implementation-planning-rules` 唯一负责实施总览、实施周期、文件/符号落点、真实测试命令、样本断言、清理、回滚和逐任务“实现 -> 测试 -> 审查 -> 验收”闭环。
+1. `implementation-planning-rules` 唯一负责实施总览、实施周期、文件/符号落点、`AC-*` 完成条件、异常/边界/停止条件、真实测试命令、样本断言、清理、回滚和逐任务“实现 -> 测试 -> 6-review”闭环。
 3. `requirement-splitting-rules` 只输出业务切片、业务依赖和当前优先闭环，作为实施规划输入；不得在需求拆分阶段自建实施周期或冻结代码落点。
 4. `requirement-change-rules` 只声明哪些需求、验收、计划、测试和审查结论失效，以及应回开什么 Owner；实施文档的结构和创建方式仍由 `implementation-planning-rules` 决定。
-5. 测试与审查完成后，`final-acceptance-rules` 才能最终放行。
+5. 真实测试与 `6-review` 完成后直接进入交付总结，不再生成独立验收或业务审查文档。
 
 ## 外部唯一 Owner
 
@@ -46,8 +45,7 @@
 | 业务切片、依赖 DAG 和 `SLICE-*` | `requirement-splitting-rules/references/splitting-dimensions.md` |
 | 变更分类、失效传播和 `CHG-*` | `requirement-change-rules/references/impact-recheck.md` |
 | 需求文档路径、命名、图片根目录和同文档更新 | `artifact-storage-rules` |
-| 前置验收字段和 `AC-*` | `acceptance-criteria-rules` |
-| 实施总览、周期、文件/符号与真实测试闭环 | `implementation-planning-rules` |
+| `AC-*`、实施总览、周期、文件/符号、异常/边界/停止条件与真实测试闭环 | `implementation-planning-rules` |
 | 最终落盘存在性与普通语言门禁 | `artifact-delivery-gate-rules` |
 
 根 `SKILL.md` 只保留触发、职责和移交；以上 Owner 的细则不得复制成竞争规则，也不得因引用化而跳过。
@@ -74,5 +72,5 @@
 - 多模块、多页面、多接口、多角色或多个独立子系统：自动触发 splitting。
 - 已确认需求出现新增条件、默认值、优先级、范围或交付物变化：自动触发 change。
 - 原实现不符合原需求：进入 Bug 域，不包装成 change。
-- 任一关键条件路由未收敛时，阻断进入 `acceptance-criteria-rules` 和 `implementation-planning-rules`。
-- 需求稳定后先建立前置验收，再进入只读实施规划；正式编码仍需满足当前有效开工授权和执行边界。
+- 任一关键条件路由未收敛时，阻断进入 `implementation-planning-rules`。
+- 需求稳定后直接进入只读实施规划，在计划内冻结 `AC-*` 完成条件；正式编码仍需满足当前有效开工授权和执行边界。

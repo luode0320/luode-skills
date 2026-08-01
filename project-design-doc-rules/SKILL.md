@@ -1,6 +1,6 @@
 ---
 name: project-design-doc-rules
-description: 当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / implementation-review-rules 的测试前归位判断。
+description: 当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / code-style-consistency-rules 的测试前归位判断。
 ---
 
 # 项目设计文档规则
@@ -49,7 +49,7 @@ description: 当用户要求分析整个项目、梳理项目架构/模块/目�
 - 只负责项目设计文档的读取、偏移判断、同步和补建，不代替 `artifact-storage-rules` 做路径命名总规则裁定。
 - 不代替 `recent-context-bootstrap-rules` 做新会话最近 3 天轻量预热。
 - 不代替 `project-timeline-rules` 输出长期项目演进历史。
-- 不代替 `package-structure-rules`、`implementation-review-rules`、`implementation-planning-rules` 去定义代码分层、文件落位或当前实施方案细节。
+- 不代替 `package-structure-rules`、`code-style-consistency-rules`、`implementation-planning-rules` 去定义代码分层、文件落位或当前实施方案细节。
 - 不允许用过期的项目设计文档反压真实代码、当前有效文档和最近 Git 变更。
 
 ## 需要暂停并确认的条件

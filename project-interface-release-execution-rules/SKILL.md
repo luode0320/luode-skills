@@ -20,7 +20,7 @@ description: 当需要做上线前项目级全接口测试、消费者视角的 
 - 依赖 `project-interface-baseline-rules` 提供的最新接口基线和依赖图，不重复做基线扫描。
 - 优先复用 `project-interface-release-execution-rules/scripts/` 的通用脚本工具箱；已有能力能覆盖时不得每轮重复生成同类脚本。
 - 自动由 agent 判定接口响应是否符合预期，替代人工逐一查看响应结果。
-- 输出标准化的测试报告，明确给出是否允许上线的结论，作为 `final-acceptance-rules` 的输入之一。
+- 输出标准化的测试报告，明确给出是否允许上线的结论，作为 `delivery-summary-rules` 的输入之一。
 - 强制所有测试资产落地到 `doc/5-tests/` 下的时间戳根目录，遵循现有测试域的归档规则。
 ## 自动触发信号
 - 上线前需要做全项目接口回归验证。

@@ -1,4 +1,4 @@
-version: 3
+version: 4
 task_blocker_closure:
   section: 任务阻断收口
   required_fields: [阻断记录 ID, 任务状态, 阻断阶段, 阻断依据与证据, 已尝试与停止边界, 影响, 解决计划, 恢复后重入点, 去重键]
@@ -55,6 +55,7 @@ profiles:
     min_tables: 3
     required_phrases: [unresolved_decisions, 追踪矩阵, N/A]
   acceptance:
+    compatibility: historical_only
     plain_language_contract: required
     required_frontmatter: [template_version]
     required_sections: [文档信息, 验收场景, 完成条件、停止条件与交付物]
@@ -136,6 +137,7 @@ profiles:
     min_tables: 0
     required_phrases: [N/A]
   review:
+    compatibility: historical_only
     plain_language_contract: required
     quality_scope: new_or_modified
     required_frontmatter: []
@@ -148,6 +150,7 @@ profiles:
     min_tables: 0
     required_phrases: [N/A]
   final_acceptance:
+    compatibility: historical_only
     plain_language_contract: required
     quality_scope: new_or_modified
     required_frontmatter: []
@@ -159,6 +162,17 @@ profiles:
     diagrams: {}
     min_tables: 0
     required_phrases: [N/A]
+  style_regression:
+    plain_language_contract: required
+    required_frontmatter: [template_version]
+    required_sections: [文档信息, 检查范围, 真实测试前置证据, 6-review 结论, 检查清单, 问题与修复]
+    required_any_sections:
+      - [完成标准, 6-review 结论]
+      - [范围外说明, 检查范围]
+    id_prefixes: [TASK, TEST, EVIDENCE]
+    diagrams: {}
+    min_tables: 1
+    required_phrases: [STYLE, 真实测试, N/A]
   architecture:
     plain_language_contract: required
     quality_scope: new_or_modified

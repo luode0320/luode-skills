@@ -30,7 +30,7 @@ classify_commit_domain() {
     doc/3-实施/*) printf 'implementation_doc\n'; return 0 ;;
     doc/4-bugs/*) printf 'bug\n'; return 0 ;;
     doc/5-tests/*) printf 'test\n'; return 0 ;;
-    doc/6-审查/*) printf 'review\n'; return 0 ;;
+    doc/6-review/*) printf 'review\n'; return 0 ;;
     doc/7-验收/*) printf 'acceptance\n'; return 0 ;;
   esac
 

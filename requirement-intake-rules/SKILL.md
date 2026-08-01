@@ -9,7 +9,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 
 - 只负责新需求接入、需求资料整理和唯一需求主文档维护。
 - 同一需求只维护一份主文档；`initial-discovery`、`gap-routing`、边界、拆分和变更结论都回写该文档，不创建竞争入口。
-- 正式需求主文档未真实落盘、关键条件路由未收敛、前置验收未建立或实施规划未完成时，不得进入正式编码。
+- 正式需求主文档未真实落盘、关键条件路由未收敛或实施规划未完成时，不得进入正式编码；完成条件由实施计划中的 `AC-*` 冻结。
 - 需求域路由、共享保护语义和下游移交统一执行 `references/requirement-domain-shared-contract.md`；根文件减重不代表任何规则、别名、local、安全、授权、暂停、停止或回滚语义失效。
 
 ## 自动触发与条件路由
@@ -21,7 +21,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
    - 范围、兼容、上下游或旧逻辑归属不清：`requirement-boundary-rules`。
    - 多模块、多页面、多接口、多角色、多独立子系统或无法形成单一闭环：`requirement-splitting-rules`。
    - 已确认需求新增条件、改变默认值、优先级、范围或交付物：`requirement-change-rules`。
-5. **邻域排除**：原实现不符合原需求时进入 Bug 域；实施前定义“做到什么算完成”时进入 `acceptance-criteria-rules`；Plan Mode 或编码前实施拆解进入 `implementation-planning-rules`。
+5. **邻域排除**：原实现不符合原需求时进入 Bug 域；实施计划直接定义“做到什么算完成”的 `AC-*` 条件；Plan Mode 或编码前实施拆解进入 `implementation-planning-rules`。
 
 ## 最小执行流程
 
@@ -30,7 +30,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 3. 需要主动侦察时执行 `references/initial-discovery-route.md` 及其条件 references；所有连接只允许使用 local 配置，禁止回退到 test、staging、pre、release、prod/production。
 4. 侦察后仍有方向级缺口时执行 `references/gap-routing.md`；禁止 Agent 猜测，缺口关闭后回填主文档并删除临时缺口文档。
 5. 需求过大、边界不清或已发生变更时，移交对应专项 Skill；专项 Skill 结论仍回写同一份主文档。
-6. 需求稳定后先移交 `acceptance-criteria-rules`，再由 `implementation-planning-rules` 形成实施总览、周期、文件/符号落点和真实测试闭环。
+6. 需求稳定后直接移交 `implementation-planning-rules`，在实施总览、周期或任务卡中形成 `AC-*`、文件/符号落点和真实测试闭环。
 7. 最终落盘、图片、路径和文档存在性由 `artifact-storage-rules` 与 `artifact-delivery-gate-rules` 核验；未落盘不得以最终回复代替。
 
 ## 保护闸门

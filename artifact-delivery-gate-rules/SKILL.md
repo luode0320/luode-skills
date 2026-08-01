@@ -1,6 +1,6 @@
 ---
 name: artifact-delivery-gate-rules
-description: 当需求、实施、验收、Bug、测试或审查任务准备最终收口，且本轮已经产生或应当产生持久化研发文档时自动触发。负责在最终完成前核对文档是否已经真实落盘到 `artifact-storage-rules` 约定的位置，检查主入口文件、必需配套文件和同任务复用关系是否完整；若文档仍停留在最终回复、临时说明或内存结论中，必须阻断收口并先补齐落盘。适用于需求主文档、实施文档、验收文档、Bug 根目录、测试任务 README 与审查报告，不代替需求分析、Bug 定位、测试执行、审核判断或最终验收本身。
+description: 当需求、实施、Bug、真实测试或 6-review 风格回归任务准备最终收口，且本轮已经产生或应当产生持久化研发文档时自动触发。负责在最终完成前核对文档是否已经真实落盘到 `artifact-storage-rules` 约定的位置，检查主入口文件、必需配套文件和同任务复用关系是否完整；若文档仍停留在最终回复、临时说明或内存结论中，必须阻断收口并先补齐落盘。适用于需求主文档、实施文档、Bug 根目录、测试任务 README 与 `doc/6-review` 风格回归记录；历史 `doc/6-审查` 与 `doc/7-验收` 仅只读兼容，不代替需求分析、Bug 定位或真实测试本身。
 ---
 
 # 研发文档落盘闸门规则
@@ -10,7 +10,7 @@ description: 当需求、实施、验收、Bug、测试或审查任务准备最�
 
 ## Skill 作用与适用场景
 
-- 作为需求、实施、验收、Bug、测试、审查六类文档的统一最终落盘闸门。
+- 作为需求、实施、Bug、真实测试和 `6-review` 五类活动文档的统一最终落盘闸门。
 - 对新项目、项目初期或多来源对象实施规划场景，额外核对 `doc/3-实施/` 下是否已创建或更新“需求与实施计划全量顺序实施方案”，防止只落了局部实施总览却缺项目级执行顺序总表。
 - 在最终回复前核对“该写的文档是否真的写到了磁盘”，避免只在消息里说结论、不保留正式产物。
 - 统一检查主入口文件、必需配套文件、引用关系和同任务复用关系是否完整。
@@ -19,36 +19,36 @@ description: 当需求、实施、验收、Bug、测试或审查任务准备最�
 
 ## 自动触发信号
 
-- 需求 / 实施 / 验收域任务准备结束，且本轮已生成或更新需求主文档、验收标准文档、最终验收文档或实施文档。
+- 需求 / 实施域任务准备结束，且本轮已生成或更新需求主文档或实施文档。
 - Bug 域任务准备结束，且本轮已生成或更新 Bug 根目录记录。
 - 测试域任务准备结束，且本轮已生成或更新测试任务 `README.md`、验证结论或回归结论。
-- 审查域任务准备结束，且本轮已执行实现自审、当前 diff 总审查、目录归位检查、格式清理检查、语法检查或规则核对。
+- `6-review` 域任务准备结束，且本轮已执行格式、目录归位、命名、注释、日志、可读性或规则核对。
 - 最终回复里准备引用需求、Bug、测试、审查结论，但尚未确认磁盘上是否存在对应正式文件。
-- 发现近期 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-审查/` 或 `doc/7-验收/` 长期未新增真实产物，需要在当前轮次阻断“再次只回消息”的收口方式。
+- 发现近期 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/` 或 `doc/6-review/` 长期未新增真实产物，需要在当前轮次阻断“再次只回消息”的收口方式。
 
 ## 进入后先做什么
 
 1. 先判断当前属于需求、实施、验收、Bug、测试还是审查文档落盘检查，可多类并存但必须逐类核对。
 2. 先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认当前文档根目录、主入口文件和同任务复用策略。
-3. 再根据任务类型核对必需产物：需求域核对主文档正文中的 Mermaid 图示和 `doc/data/images/` 图片资产引用，实施域核对需求与实施计划全量顺序实施方案（仅新项目 / 多来源对象场景）、实施总览/实施周期文档及周期 / 最小任务闭环记录，验收域核对验收标准或最终验收文档，Bug 域核对根目录 `README.md` 正文中的 Mermaid 流程图与时序图，测试域核对时间戳根目录与 `README.md`，审查域核对 `doc/6-审查/` 主文档。
+3. 再根据任务类型核对必需产物：需求域核对主文档正文中的 Mermaid 图示和 `doc/data/images/` 图片资产引用，实施域核对需求与实施计划全量顺序实施方案（仅新项目 / 多来源对象场景）、实施总览/实施周期文档及周期 / 最小任务闭环记录，Bug 域核对根目录 `README.md` 正文中的 Mermaid 流程图与时序图，测试域核对时间戳根目录与 `README.md`，`6-review` 域核对 `doc/6-review/` 主文档及 `STYLE: PASS/FIX_REQUIRED` 记录。
 4. 检查本轮结论是否已经真实写入磁盘文件，而不是只存在于最终回复草稿或中间说明中。
 5. 如果发现缺文件、缺目录、缺正文图示、缺 README、写错根目录或错误复用了历史目录，先阻断收口，再回流对应主域 skill 补齐。
 
 ## 极致完整性机器门禁
 
-当本轮产生或修改需求、验收或实施 Markdown 时，人工盘点之外必须运行：
+当本轮产生或修改需求、实施或 `6-review` Markdown 时，人工盘点之外必须运行：
 
 ```bash
-python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profile <requirement|acceptance|implementation_overview|implementation_cycle> --doc <文档路径> --root <仓库根目录>
+python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profile <requirement|implementation_overview|implementation_cycle|style_regression> --doc <文档路径> --root <仓库根目录>
 ```
 
 校验器至少检查 UTF-8、YAML front matter、稳定 ID、必填章节、空章节、占位/模糊词、N/A 理由、内部链接、Mermaid 代码块、图形类型数量和追踪矩阵入口。校验器失败时，交付闸门必须驳回；不得用最终回复中的“已检查”替代机器报告。
 
-- 需求文档按 `requirement` profile；验收标准按 `acceptance` profile；实施总览和周期分别按对应 profile。
+- 需求文档按 `requirement` profile；实施总览、周期和 `6-review` 风格记录分别按对应 profile。`acceptance`、`review`、`final_acceptance` 仅保留历史文档兼容。
 - 机器校验通过后，还必须做 Mermaid 真解析或记录解析器不可用的环境阻断；静态检查只能证明代码块结构，不能宣称语法解析通过。
-- 文档之间必须互相链接：需求/规则回指验收，验收回指实施周期，任务回指文件/符号、测试和证据。孤立或重复稳定 ID 阻断收口。
+- 文档之间必须互相链接：需求/规则回指实施完成条件，实施任务回指文件/符号、真实测试和 `6-review` 风格证据。孤立或重复稳定 ID 阻断收口。
 - 普通模型执行演练中的 `unresolved_decisions` 必须为零个 P0/P1；演练发现需要自行补决策时，回流需求或实施规划 skill。
-- 真实任务阻断必须遵守 `references/task-blocker-closure-contract.md`：当文档 `status: blocked`、审查结论为“阻断”或最终验收结论为“不通过/待重验”时，正文必须包含“任务阻断收口”、唯一 `BLK-*` 记录和可验证解决计划；`limited`、`not_applicable` 与正常通过不触发该章节。
+- 真实任务阻断必须遵守 `references/task-blocker-closure-contract.md`：当文档 `status: blocked`，或历史审查结论为“阻断”、历史最终验收结论为“不通过/待重验”时，正文必须包含“任务阻断收口”、唯一 `BLK-*` 记录和可验证解决计划；`STYLE: FIX_REQUIRED` 只要求修复后再次回归，不触发该章节。
 
 ## 默认执行流程
 
@@ -57,11 +57,10 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 3. 如需确认命名模板，再读 `../artifact-storage-rules/references/naming-templates.md`。
 4. 按当前任务类型逐项核对磁盘真实产物：
    - 需求域：`doc/2-需求/` 主文档（正文内应包含 Mermaid 流程图与时序图）、统一 `doc/data/images/` 资产引用及 `IMG-*` 清单。
-   - 实施域：`doc/3-实施/` 下的实施总览文档，以及按需存在的实施周期文档；若当前属于新项目、项目初期或多来源对象统一排序场景，还必须存在“需求与实施计划全量顺序实施方案”，并记录需求 / 来源对象清单、验收标准、实施总览、实施周期、周期内最小任务摘要、跨需求总顺序、依赖、状态和阻断项；实施总览 / 实施周期文档中必须记录周期顺序、第一期 / 第二期 / 第三期等期次定位、当前 / 各周期最小任务清单、周期内最小任务顺序和周期收口条件。若本轮已经进入执行，还必须记录每个最小任务的实现、真实测试、审查、验收状态或证据。
-   - 验收域：`doc/7-验收/` 下的验收标准文档、最终验收文档。
+   - 实施域：`doc/3-实施/` 下的实施总览文档，以及按需存在的实施周期文档；若当前属于新项目、项目初期或多来源对象统一排序场景，还必须存在“需求与实施计划全量顺序实施方案”，并记录需求 / 来源对象清单、实施完成条件、实施总览、实施周期、周期内最小任务摘要、跨需求总顺序、依赖、状态和阻断项；实施总览 / 实施周期文档中必须记录周期顺序、第一期 / 第二期 / 第三期等期次定位、当前 / 各周期最小任务清单、周期内最小任务顺序和周期收口条件。若本轮已经进入执行，还必须记录每个最小任务的实现、真实测试、`6-review` 风格回归状态或证据。
    - Bug 域：`doc/4-bugs/<根目录>/README.md`（正文内嵌 Mermaid 流程图与时序图，不另建独立图文件）。
    - 测试域：`doc/5-tests/<时间戳>/<测试任务中文主题>/README.md` 与同时间戳根目录下的 ASCII 镜像资产。
-   - 审查域：`doc/6-审查/YYYY-MM-DD_<审查中文主题>.md`，必要时同步 `doc/6-审查/README.md` 索引。
+   - `6-review` 域：`doc/6-review/YYYY-MM-DD_<风格回归中文主题>.md`，必要时同步 `doc/6-review/README.md` 索引；历史 `doc/6-审查/`、`doc/7-验收/` 仅只读。
 5. 如发现本轮本应落盘却未落盘，直接判定当前任务不可收口，并回流对应主域 skill 补文档。
 6. 通过后再允许进入最终回复。
 
@@ -81,22 +80,22 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 
 ## 执行通过 / 驳回标准
 
-- 通过：本轮需求 / 实施 / 验收 / Bug / 测试 / 审查结论已经真实落盘到中央约定目录；主入口文件、必需配套文件和引用关系完整；实施域产物已记录周期顺序、周期内最小任务顺序和已执行最小任务的闭环状态；新项目 / 多来源对象场景已落盘全量顺序实施方案并能回指各需求、验收标准、实施总览与实施周期；最终回复中的关键结论可追溯到真实磁盘文件。
-- 驳回：本轮本应落盘的文档仍不存在、只在最终回复中口头给出、写到了错误目录、缺失必需 README / 正文 Mermaid 图示 / 实施文档 / 验收文档 / 审查主文档，或新项目 / 多来源对象场景缺少”需求与实施计划全量顺序实施方案”，或实施文档缺少周期顺序、期次定位、周期内最小任务顺序、已执行最小任务闭环状态，或错误复用了不应继续写入的历史目录。
+- 通过：本轮需求 / 实施 / Bug / 真实测试 / `6-review` 记录已经真实落盘到中央约定目录；主入口文件、必需配套文件和引用关系完整；实施域产物已记录周期顺序、周期内最小任务顺序和已执行最小任务的实现、真实测试与风格回归状态；新项目 / 多来源对象场景已落盘全量顺序实施方案并能回指需求、实施完成条件、实施总览与实施周期；最终回复中的关键结论可追溯到真实磁盘文件。
+- 驳回：本轮本应落盘的文档仍不存在、只在最终回复中口头给出、写到了错误目录、缺失必需 README / 正文 Mermaid 图示 / 实施文档 / 测试记录 / `6-review` 主文档，或新项目 / 多来源对象场景缺少需求与实施计划全量顺序实施方案，或实施文档缺少周期顺序、期次定位、周期内最小任务顺序、已执行任务证据，或错误复用了不应继续写入的历史目录。
 
 ## 执行结果归档要求
 
 - 本 skill 本身不单独新建额外平行文档；它负责阻断并推动对应主域文档补齐。
 - 若发现阻断，应将“缺失哪类文档、缺什么文件、应回流哪个主域 skill”写回当前主域记录或审查报告。
-- 审查、验收或验证产生真实阻断时，当前主域记录还必须写入 `BLK-*` 任务阻断收口，明确阻断阶段、依据、已尝试动作、影响、解决计划和恢复后重入点。
-- 若本轮属于审查域且 `doc/6-审查/README.md` 尚不存在，允许补建为审查索引入口，后续持续复用。
+- 实施、真实测试或 `6-review` 产生真实阻断时，当前主域记录还必须写入 `BLK-*` 任务阻断收口，明确阻断阶段、依据、已尝试动作、影响、解决计划和恢复后重入点。
+- 若本轮属于 `6-review` 域且 `doc/6-review/README.md` 尚不存在，允许补建为风格回归索引入口，后续持续复用。
 
 ## references 读取规则
 
 - 默认先读 `../artifact-storage-rules/references/path-map.yaml`。
 - 只有在判断复用策略时，再读 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在判断命名模板或索引入口时，再读 `../artifact-storage-rules/references/naming-templates.md`。
-- 只要本轮涉及需求、验收或实施文档质量门禁，必须读取 `references/document-handoff-contract.md` 与 `references/document-quality-profiles.yaml`，并运行 `scripts/validate_engineering_docs.py`。
+- 只要本轮涉及需求、实施、真实测试或 `6-review` 文档质量门禁，必须读取 `references/document-handoff-contract.md` 与 `references/document-quality-profiles.yaml`，并运行 `scripts/validate_engineering_docs.py`。
 - 只要本轮产生任何研发文档，还必须读取 `references/plain-language-document-contract.md`，检查正文能独立被普通业务读者理解，执行与追踪细节均已进入附录。
-- 只要本轮包含审查、验收、功能验证、浏览器联调或第三方验证，还必须读取 `references/review-acceptance-gate-contract.md`，校验 `review_acceptance_gates` 并单独报告正式放行状态。
+- 只要本轮包含历史审查、历史验收、功能验证、浏览器联调或第三方验证资料兼容，还必须读取 `references/review-acceptance-gate-contract.md`，校验既有 `review_acceptance_gates`；新 `6-review` 文档不读取该字段。
 - 只要当前文档出现真实任务阻断，还必须读取 `references/task-blocker-closure-contract.md`，并由 `scripts/validate_engineering_docs.py` 校验阻断收口字段。

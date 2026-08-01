@@ -11,4 +11,4 @@ default_prompt: |
   7. 按照execution-gate规则给出最终门禁结论：PASS/FAIL/PARTIAL。
   8. 所有测试资产归档到doc/5-tests/下的时间戳根目录，中文说明放README，测试脚本、完整响应、对账结果和执行日志放ASCII镜像目录。
   9. 将测试结论、新发现的可复用参数和历史摘要回写project-interface-baseline-rules维护的基线资产。
-  10. 将本次测试结论同步给final-acceptance-rules作为最终验收输入。
+  10. 将本次测试结论同步给delivery-summary-rules作为最终验收输入。

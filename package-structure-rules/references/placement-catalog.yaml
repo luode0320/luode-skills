@@ -106,8 +106,8 @@
     {"id":"backend.swag","project_kind":"backend","artifact_kind":"swag","content_type":"resource_asset","canonical_path":"swag","purpose":"正式 HTTP OpenAPI/Swagger 输出","creation_policy":"conditional","tracked":true,"owner_skill":"swag-openapi-maintainer-rules"}
   ],
   "skeletons": {
-    "fullstack": [".vscode", "backend", "frontend", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-审查", "doc/7-验收"],
-    "backend": [".vscode", "config/yaml", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-审查", "doc/7-验收"],
-    "frontend": [".vscode", "config", "public", "src/app", "src/modules", "src/api", "src/styles/global", "src/assets", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-审查", "doc/7-验收"]
+    "fullstack": [".vscode", "backend", "frontend", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/7-验收"],
+    "backend": [".vscode", "config/yaml", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/7-验收"],
+    "frontend": [".vscode", "config", "public", "src/app", "src/modules", "src/api", "src/styles/global", "src/assets", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/7-验收"]
   }
 }

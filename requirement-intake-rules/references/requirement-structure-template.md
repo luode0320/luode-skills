@@ -6,7 +6,7 @@
 
 ## 白话正文与附录
 
-新建文档先按 [白话文档与附录分层契约](../../artifact-delivery-gate-rules/references/plain-language-document-contract.md) 在 H1 后写一段包含“结论、影响、范围、非范围、变化、完成标准、术语说明、验证状态”的普通中文开场；保留当前文档的标题、层级和顺序。本模板其余字段、表格、图形 ID 和追踪内容放在原有技术章节或文末连续附录。涉及审查、验收、浏览器或第三方条件时，读取 [审查与验收条件化门禁契约](../../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md)。
+新建文档先按 [白话文档与附录分层契约](../../artifact-delivery-gate-rules/references/plain-language-document-contract.md) 在 H1 后写一段包含“结论、影响、范围、非范围、变化、完成标准、术语说明、验证状态”的普通中文开场；保留当前文档的标题、层级和顺序。本模板其余字段、表格、图形 ID 和追踪内容放在原有技术章节或文末连续附录。浏览器或第三方条件直接写入实施计划的范围、完成条件、真实测试和停止条件；新文档不得新增历史 `review_acceptance_gates`。
 
 ## 建议结构
 

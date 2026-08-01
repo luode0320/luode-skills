@@ -19,13 +19,11 @@
 | `reasoning-summary-structure-rules` | 收口前 | 非 Plan Mode 的实质任务轮 | 强制 | 按其固定总结结构输出；恒为 `闸门预告` 成员 |
 | `comment-completion-gate-rules` | 中段改码 + 收口前 | 本轮有任意代码新增/修改 | 强制 | 改动位点注释补齐闸门，缺项不得收口 |
 | `comment-placement-granularity-rules` | 中段改码 | 本轮有任意代码新增/修改 | 强制 | 与上一条联动，判定注释落点与颗粒度 |
-| `implementation-review-rules` | 测试前 | 功能代码完成、准备测试前验证 | 强制 | 唯一自动测试前实现闸门 |
-| `code-change-finalization-gate-rules` | 收口前 | 本轮有代码/测试改动 | 强制 | 代码/测试改动默认最终收口闸门 |
+| `code-style-consistency-rules`（`6-review`） | 测试后 | 真实测试完成、准备风格回归 | 强制 | 唯一活动风格回归入口，只输出 STYLE |
 | `skill-execution-compliance-gate-rules` | 收口前 | 本轮命中多 skill / 有工具执行 / 改 skill 资产 | 强制 | 末端合规 PASS/FAIL |
 | `execution-failure-learning-rules` | 失败时 | 非预期工具/命令/API/环境失败 | 条件 | 失败才触发，首条登记「若失败则触发」 |
-| `project-change-review-rules` | 收口前 | 本轮有代码改动且准备最终收口 | 条件 | 当前改动总审查 |
+| `code-change-finalization-gate-rules` | 收口前 | 本轮有代码/测试改动且准备最终收口 | 强制 | 复核测试与 6-review 结果 |
 | `artifact-delivery-gate-rules` | 收口前 | 本轮产生或应产生持久化研发文档 | 条件 | 文档落盘闸门 |
-| `final-acceptance-rules` | 收口前 | 测试与审核均完成、准备最终放行 | 条件 | 最终验收放行 |
 | `test-regression-rules` | 测试前 | Bug 修复 / 公共模块 / 接口兼容性变化后 | 条件 | 回归风险验证 |
 | `functional-validation-rules` | 测试前 | 新功能或改动后功能待验证 | 条件 | 功能验证 |
 | `bug-validation-rules` | 改动后 | Bug 修复后验证是否真修好、有无副作用 | 条件 | 修复验证 |

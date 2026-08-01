@@ -13,7 +13,7 @@
 - `functional-validation-rules`
   - 做什么：验证功能行为、交互结果和输出是否满足需求。
   - 建议：可并行，当验证目标是独立模块或独立场景时。
-- `implementation-review-rules`
+- `code-style-consistency-rules`
   - 做什么：检查实现是否符合可读性、命名、结构、格式、语法/类型/引用和归位收口要求。
   - 建议：可并行，只要 review 范围不重叠且已指定统一收口线程。
 - `code-style-consistency-rules`
@@ -25,10 +25,10 @@
 - `skill-audit-rules`
   - 做什么：并发审计主任务是否漏触发 skill，以及已触发 skill 是否还有未执行完的规则。
   - 建议：可并行，只读审计，不改代码、不写文件，适合和主线程同时跑；只看当前轮次和主线程已声明 skill，不靠历史记忆。
-- `code-review-automation-rules`
+- `git-collaboration-rules`
   - 做什么：自动审查当前分支提交，输出致命/严重/中等/建议问题。
   - 建议：可并行，只读审查，适合和实现线程同时跑。
-- `project-change-review-rules`
+- `code-style-consistency-rules`
   - 做什么：对当前工作区 diff 做总审查，补抓边界、风险、遗漏和阻断项。
   - 建议：可并行，只读审查；若与主线程同时跑，必须指定单一收口线程统一汇总结论。
 - `bug-fix-proposal-rules#regression-risk`
@@ -46,7 +46,7 @@
 - `parallel-task-dispatch-rules`
   - 做什么：判断是否需要派发子代理，并定义子任务边界。
   - 建议：条件并行，它是分发器，不是执行器；应与本 skill 配合使用。
-- `acceptance-criteria-rules`
+- `implementation-planning-rules`
   - 做什么：把“做到什么算完成”写成可验证、可测试、可复核的标准。
   - 建议：条件并行，它更适合作为前置门槛，而不是和实现同线程混跑。
 

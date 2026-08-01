@@ -1,4 +1,4 @@
-version: 6
+version: 7
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
@@ -7,8 +7,9 @@ roots:
   implementation_docs: "doc/3-实施"
   bug_records: "doc/4-bugs"
   test_assets: "doc/5-tests"
-  review_records: "doc/6-审查"
-  acceptance_docs: "doc/7-验收"
+  review_records: "doc/6-review"
+  historical_review_records: "doc/6-review"
+  historical_acceptance_docs: "doc/7-验收"
   project_docs: "doc"
   project_local_skills: "skill"
 entry_files:
@@ -24,11 +25,11 @@ entry_files:
   requirement_gap_doc: "{requirement_doc_stem}.gap.md"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   requirement_gap_doc_note: "临时缺口文档必须复用对应需求文档同前缀，并在末尾追加“.gap.md”；例如：2026-04-16_141518_多业务复用Swap适配控制需求.gap.md。该文档仅在 gap 未关闭时存在，用户确认并回填主需求文档后必须删除。"
-  source_object_id_note: "来源对象标识用于回指进入实施、审查或验收阶段的上游对象，可以来自需求文档或 Bug 根目录；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加“需求-”或“Bug-”类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。"
-  acceptance_criteria_doc: "{datetime}_{source_object_id}_验收标准.md"
-  acceptance_criteria_doc_note: "前置验收标准文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_验收标准”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_验收标准.md"
-  final_acceptance_doc: "{datetime}_{source_object_id}_最终验收.md"
-  final_acceptance_doc_note: "最终验收文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_最终验收”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_最终验收.md"
+  source_object_id_note: "来源对象标识用于回指进入实施或 6-review 阶段的上游对象，可以来自需求文档或 Bug 根目录；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加“需求-”或“Bug-”类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。"
+  style_regression_doc: "{datetime}_{source_object_id}_6-review.md"
+  style_regression_doc_note: "真实测试后唯一活动风格回归记录必须使用 yyyy-MM-DD_HHmmss 时间前缀并保留来源对象标识；结果只能为 STYLE: PASS 或 STYLE: FIX_REQUIRED。"
+  historical_acceptance_criteria_doc: "{datetime}_{source_object_id}_验收标准.md"
+  historical_final_acceptance_doc: "{datetime}_{source_object_id}_最终验收.md"
   implementation_overview_doc: "{datetime}_{source_object_id}_实施总览.md"
   implementation_overview_doc_note: "实施总览文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_实施总览”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_实施总览.md"
   implementation_sequence_master_doc: "{datetime}_{project_or_source_set_id}_需求与实施计划全量顺序实施方案.md"
@@ -42,7 +43,7 @@ entry_files:
   test_startup_backend_script: "start-backend.sh"
   test_startup_frontend_script: "start-frontend.sh"
   test_startup_script_note: "测试启动脚本参考项目 .vscode/launch.json（或等价启动配置）生成，落在 doc/5-tests/scripts/ 根级共享目录，跨轮复用；后端固定 start-backend.sh，前端固定 start-frontend.sh；同端存在多服务时追加 ASCII 后缀，如 start-backend-gateway.sh。脚本须输出关键过程日志，且只引用本地/测试配置，严禁连生产。"
-  review_doc: "{datetime}_{source_object_id}_{review_cn_title}.md"
+  review_doc: "{datetime}_{source_object_id}_6-review.md"
   review_index_readme: "README.md"
   project_design_doc: "项目设计.md"
 naming:
@@ -69,7 +70,8 @@ bootstrap:
     - "doc/3-实施"
     - "doc/4-bugs"
     - "doc/5-tests"
-    - "doc/6-审查"
+    - "doc/6-review"
+    - "doc/6-review"
     - "doc/7-验收"
     - "doc"
     - "skill"
@@ -95,7 +97,8 @@ policies:
   same_project_or_source_set_sequence_master_updates_same_doc: true
   implementation_plan_separated_from_requirement_domain: true
   implementation_cycle_docs_allowed: true
-  final_acceptance_requires_test_and_review: true
+  style_regression_requires_real_test: true
+  historical_acceptance_profiles_read_only: true
   requirement_doc_embeds_mermaid_diagrams: true
   markdown_images_under_document_image_assets: true
   markdown_image_requires_relative_path: true
@@ -111,7 +114,7 @@ policies:
   test_shared_layer_reused_across_rounds: true
   test_startup_scripts_reference_vscode_launch: true
   test_shared_readme_holds_auth_and_config_location: true
-  review_outputs_under_doc_review_root: true
+  style_regression_outputs_under_doc_review_root: true
   same_project_design_updates_same_doc: true
   project_design_doc_is_weak_reference: true
   missing_project_design_doc_can_be_created_after_full_analysis: true

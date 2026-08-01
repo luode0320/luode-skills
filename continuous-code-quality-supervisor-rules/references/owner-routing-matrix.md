@@ -82,11 +82,11 @@
 
 ### 阶段审查、测试执行与 UI 主导
 
-`implementation-review-rules`、`project-change-review-rules`、`code-review-automation-rules`、`code-change-finalization-gate-rules`、`test-strategy-rules`、`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules`、`browser-session-automation-rules`、`project-interface-release-execution-rules`、`web-design-guidelines`、`frontend-design`。
+`code-style-consistency-rules`、`code-style-consistency-rules`、`git-collaboration-rules`、`code-change-finalization-gate-rules`、`test-strategy-rules`、`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules`、`browser-session-automation-rules`、`project-interface-release-execution-rules`、`web-design-guidelines`、`frontend-design`。
 
 ### 需求、Bug、实施与验收
 
-`requirement-boundary-rules`、`requirement-change-rules`、`requirement-intake-rules`、`requirement-splitting-rules`、`bug-fix-proposal-rules`、`bug-intake-rules`、`bug-reproduction-rules`、`bug-root-cause-rules`、`bug-validation-rules`、`implementation-planning-rules`、`acceptance-criteria-rules`、`final-acceptance-rules`。
+`requirement-boundary-rules`、`requirement-change-rules`、`requirement-intake-rules`、`requirement-splitting-rules`、`bug-fix-proposal-rules`、`bug-intake-rules`、`bug-reproduction-rules`、`bug-root-cause-rules`、`bug-validation-rules`、`implementation-planning-rules`、`implementation-planning-rules`、`delivery-summary-rules`。
 
 ### 交付、产物与 Git
 

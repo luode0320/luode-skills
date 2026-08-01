@@ -2,7 +2,7 @@
 
 ## 1. 目的与适用范围
 
-本契约是需求、验收标准、实施总览、实施周期和最小任务卡共同遵守的内容质量基线。它解决“文档看起来很详细，但普通模型仍需重新决定业务规则、技术方案或验证口径”的问题。
+本契约是需求、实施总览、实施周期、最小任务卡、真实测试和 `6-review` 风格回归共同遵守的内容质量基线。它解决“文档看起来很详细，但普通模型仍需重新决定业务规则、技术方案或验证口径”的问题。
 
 本契约只定义跨域共性：可追溯、无未决决策、结构完整、条件字段显式、图文一致、可机械验证和可交接。需求域与实施域的专属字段由各自 Skill 的完备性契约定义。
 
@@ -24,7 +24,7 @@
 ```yaml
 schema_version: 1
 doc_id: "唯一文档 ID"
-doc_type: "requirement|acceptance|implementation_overview|implementation_cycle|task"
+doc_type: "requirement|implementation_overview|implementation_cycle|task|test|style_regression"
 source_ids: ["来源对象 ID"]
 status: "draft|pending|confirmed|in_progress|blocked|accepted"
 version: "v1.0"
@@ -36,7 +36,7 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 
 当 `status: blocked` 时，正文必须按 [任务阻断收口契约](task-blocker-closure-contract.md) 增加“任务阻断收口”章节；该章节用于交接阻断依据、恢复计划和恢复后的验证入口，不能只在最终回复中口头说明。
 
-新建或迁移到白话分层结构的文档还必须包含 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 与 `review_acceptance_gates`。这些字段属于机器元数据，不进入正文。门禁字段和三态判定统一读取 [审查与验收条件化门禁契约](review-acceptance-gate-contract.md)。
+新建或迁移到白话分层结构的文档还必须包含 `reader_level: business_general`、`writing_style: plain_chinese` 与 `appendix_policy: preserve_existing_or_one_terminal_appendix`。这些字段属于机器元数据，不进入正文。历史文档保留 `review_acceptance_gates` 时，校验器只按 [历史审查与验收门禁兼容契约](review-acceptance-gate-contract.md) 读取，不得把它加入新流程。
 
 ## 4. 追踪契约
 
@@ -50,7 +50,8 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 | REQ/RULE | AC | 每条需求可验收 |
 | AC | CYCLE/TASK | 每条验收有实施承接 |
 | TASK | 文件/符号 | 每个动作有精确落点 |
-| TASK | TEST/EVIDENCE | 每个动作有真实验证和证据 |
+| TASK | TEST/EVIDENCE | 每个动作有真实验证和测试证据 |
+| TEST | STYLE/EVIDENCE | 每个通过的真实测试后都有一次风格回归，或明确 `N/A + 原因 + 证据` |
 
 任何孤立 ID、重复 ID、单向映射或覆盖率低于 100% 都是阻断项。
 
@@ -78,11 +79,11 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 ## 7. 内容完整性契约
 
 - 章节必须有内容，不能用空标题或“见上文”代替。
-- `pending` 仅表示前置验收或验证尚未收口；正文必须同时写明待执行验证入口和阻断边界。
+- `pending` 仅表示前置真实测试或风格回归尚未收口；正文必须同时写明待执行验证入口和阻断边界。
 - 禁止 `TBD`、`TODO`、`待补`、`后续再补`、`实现时再看`、`相关逻辑`、`适当处理` 等占位或模糊词。
 - `尽量`、`合理`、`正常`、`快速`、`友好` 等词必须被量化，或改为 `N/A + 原因 + 证据`。
 - 所有内部 Markdown 链接、图片引用和周期/任务回指必须可解析；失效链接阻断交付。
-- 需求、验收、实施总览、实施周期和任务卡必须互相引用，不得依赖聊天记录完成交接。
+- 需求、实施总览、实施周期、任务卡、真实测试和 `6-review` 记录必须互相引用，不得依赖聊天记录完成交接。
 
 ## 8. 放行顺序
 
@@ -91,4 +92,4 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 3. 追踪矩阵和引用关系校验。
 4. 图形块静态检查与 Mermaid 真解析。
 5. 普通模型执行演练，确认 `unresolved_decisions` 中 P0/P1 为零。
-6. 对应 Skill 自审、实现审查、验收和 Artifact Delivery Gate 全部通过。
+6. 实现、真实测试、一次 `6-review` 风格回归和 Artifact Delivery Gate 全部通过；`6-review` 只检查写法、位置、格式与风格，不替代业务测试。

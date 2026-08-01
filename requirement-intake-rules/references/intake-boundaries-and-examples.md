@@ -16,7 +16,7 @@
 - 需求过大、跨多个模块或多个实施阶段：转 `requirement-splitting-rules`。
 - 需求一次打包多个独立子系统或多个相对独立主线：先转 `requirement-splitting-rules`，再分别细化。
 - 编码中出现新条件或优先级变化：转 `requirement-change-rules`。
-- 需要把“做到什么算完成”写成可验证标准：转 `acceptance-criteria-rules`。
+- 需要把“做到什么算完成”写成可验证的 `AC-*` 条件：转 `implementation-planning-rules`。
 - 如果本质是历史行为错误或故障：转 Bug 域。
 
 ## 应先暂停的情况

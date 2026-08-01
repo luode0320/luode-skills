@@ -16,8 +16,8 @@ description: 当需求较大、涉及多个模块、接口、页面、步骤、�
 
 - `references/splitting-dimensions.md` 唯一定义业务切片字段、依赖 DAG、暂停和移交输入。
 - 本 Skill 不冻结代码文件/符号、不创建实施总览或周期、不定义真实测试命令、样本断言、清理和任务级回滚。
-- 上述实施字段不得删除：拆分完成后必须移交 `implementation-planning-rules`，由其把当前优先 `SLICE-*` 转成文件/符号、周期、任务和逐任务“实现 -> 真实测试 -> 审查 -> 验收”闭环。
-- 前置验收字段和 `AC-*` 由 `acceptance-criteria-rules` 负责；文档路径、图片和最终落盘分别由 `artifact-storage-rules`、`artifact-delivery-gate-rules` 负责。
+- 上述实施字段不得删除：拆分完成后必须移交 `implementation-planning-rules`，由其把当前优先 `SLICE-*` 转成文件/符号、周期、任务和逐任务“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”闭环。
+- 前置验收字段和 `AC-*` 由 `implementation-planning-rules` 负责；文档路径、图片和最终落盘分别由 `artifact-storage-rules`、`artifact-delivery-gate-rules` 负责。
 
 ## 最小执行流程
 
@@ -26,7 +26,7 @@ description: 当需求较大、涉及多个模块、接口、页面、步骤、�
 3. 多个独立子系统先做顶层拆分，不在同一轮把所有子系统细节写深。
 4. 读取 `references/splitting-sequence.md` 明确业务依赖和当前优先闭环；需要正反例时读取 `references/splitting-examples.md`。
 5. 将 `SLICE-*`、范围、业务输入输出、依赖、阻断条件和推荐顺序回写同一份需求主文档。
-6. 只把第一闭环或当前优先切片回流 intake/边界/变更继续收敛；稳定后先交 `acceptance-criteria-rules`，再交 `implementation-planning-rules`。
+6. 只把第一闭环或当前优先切片回流 intake/边界/变更继续收敛；稳定后先交 `implementation-planning-rules`，再交 `implementation-planning-rules`。
 
 ## 暂停、通过与驳回
 
@@ -43,5 +43,5 @@ description: 当需求较大、涉及多个模块、接口、页面、步骤、�
 - 业务顺序与当前优先闭环：`references/splitting-sequence.md`
 - 正反例：`references/splitting-examples.md`
 - 实施总览、周期、文件/符号与真实测试：`../implementation-planning-rules/SKILL.md`
-- 前置验收：`../acceptance-criteria-rules/SKILL.md`
+- 前置验收：`../implementation-planning-rules/SKILL.md`
 - 文档路径和落盘门禁：`../artifact-storage-rules/references/path-map.yaml`、`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`

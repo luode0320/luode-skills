@@ -52,6 +52,9 @@ PLAIN_LANGUAGE_SUMMARY_LABELS = (
 )
 PLAIN_LANGUAGE_NAMED_APPENDICES = ("执行附录", "追踪附录")
 PLAIN_LANGUAGE_NO_TERMINOLOGY_VALUES = {"无", "无技术术语需要解释"}
+STYLE_RESULT_PATTERN = re.compile(
+    r"(?mi)^\s*(?:[-*]\s*)?`?STYLE`?\s*[：:]\s*`?([A-Z_]+)`?\s*[。.]?\s*$"
+)
 APPENDIX_NUMBER_PREFIX_PATTERN = r"^(?:\d+(?:\.\d+)*[.)]?\s+)?"
 APPENDIX_HEADING_SUFFIX_PATTERN = r"(?:\s|[:：]|[（(]|$)"
 REVIEW_GATE_STAGES = {
@@ -317,6 +320,36 @@ def check_profile_content(
     actual_tables = markdown_table_count(text)
     if actual_tables < minimum_tables:
         errors.append(f"insufficient Markdown tables: expected {minimum_tables}, got {actual_tables}")
+
+
+def check_style_regression_result(text: str, errors: List[str]) -> Dict[str, Any]:
+    """校验 6-review 文档是否给出唯一的 STYLE 风格回归结论。
+
+    [参数] text: 待校验 Markdown 正文；errors: 累积校验错误列表。
+    [返回] dict：STYLE 结果、有效性和错误代码。
+    最近修改时间：2026-08-01；新增 style_regression 的唯一结果校验。
+    """
+    # 1. 从正文提取唯一 STYLE 结论，并拒绝缺失或未知状态。
+    matches = STYLE_RESULT_PATTERN.findall(text)
+    report: Dict[str, Any] = {
+        "required": True,
+        "result": None,
+        "valid": True,
+        "error_codes": [],
+    }
+    if len(matches) != 1:
+        errors.append("[style.result_missing] style_regression requires exactly one STYLE: PASS or STYLE: FIX_REQUIRED result")
+        report["valid"] = False
+        report["error_codes"].append("style.result_missing")
+        return report
+    result = matches[0]
+    if result not in {"PASS", "FIX_REQUIRED"}:
+        errors.append(f"[style.result_invalid] unsupported style regression result: {result}")
+        report["valid"] = False
+        report["error_codes"].append("style.result_invalid")
+        return report
+    report["result"] = result
+    return report
 
 
 def check_review_acceptance_gates(
@@ -765,11 +798,13 @@ def document_is_new_or_modified(path: Path, root: Path) -> bool:
 def check_plain_language_contract(
     text: str, errors: List[str], required: bool = False, allow_declared: bool = True
 ) -> Dict[str, Any]:
-    # [参数] text: 完整 Markdown 文本；errors: 累积的校验错误列表；required: 是否必须启用契约；
-    #       allow_declared: 是否允许 YAML 声明独立启用契约。
-    # [返回] 无：发现违反白话正文与附录分层的情况时直接写入 errors。
-    # 最近修改时间：2026-07-14 00:00:00 + 校验八项固定摘要、术语解释与双附录分层。
-    """校验启用白话契约的新文档的 H1 开场、附录策略和结构化门禁。"""
+    """校验启用白话契约的新文档的 H1 开场、附录策略和结构化门禁。
+
+    [参数] text: 完整 Markdown 文本；errors: 累积的校验错误列表；required: 是否必须启用契约；
+    allow_declared: 是否允许 YAML 声明独立启用契约。
+    [返回] dict：白话契约的有效性、阻断状态、放行状态、问题项和错误代码。
+    最近修改时间：2026-08-01 02:10:52；新活动文档不再因缺少 review_acceptance_gates 被拒绝。
+    """
     # 1. 仅对主动声明白话契约的新文档启用严格分层检查，历史文档保持兼容。
     metadata = frontmatter_metadata(text)
     # 1. 单元调用保留“声明即校验”；文件入口对未修改历史文档关闭声明触发，避免反向迁移。
@@ -808,10 +843,11 @@ def check_plain_language_contract(
     if re.search(r"\b(?:draft|pending|confirmed|in_progress|blocked|accepted)\b", body):
         errors.append("plain-language opening must not contain machine lifecycle states")
     check_appendix_policy(text, errors)
+    # 新流程不再创建 review_acceptance_gates；仅当历史文档显式保留该字段时兼容校验。
     return check_review_acceptance_gates(
         metadata,
         errors,
-        enforce=required or metadata.get("appendix_policy") == PLAIN_LANGUAGE_VALUES["appendix_policy"],
+        enforce="review_acceptance_gates" in metadata,
     )
 
 
@@ -1433,16 +1469,17 @@ def check_diagrams(text: str, profile: Dict[str, Any], errors: List[str]) -> Dic
     return counts
 
 
-# check_strict_trace 检查同一来源对象的跨文档追踪链和任务唯一归属，供周期收口时的严格模式使用。
-# [参数] root: 文档扫描根目录；errors: 累积严格模式错误列表；target_document: 当前校验目标文档。
-# [返回] dict：文档数量、任务 ID、证据 ID 和周期归属摘要。
-# 最近修改时间：2026-07-23；改动原因：按目标文档 source_ids 选域，移除旧需求 ID 硬编码。
 def check_strict_trace(
     root: Path,
     errors: List[str],
     target_document: Path | None = None,
 ) -> Dict[str, Any]:
-    """检查同一来源对象的跨文档追踪链和任务唯一归属。"""
+    """检查同一来源对象的跨文档追踪链和任务唯一归属。
+
+    [参数] root: 文档扫描根目录；errors: 累积严格模式错误列表；target_document: 当前校验目标文档。
+    [返回] dict：文档数量、任务 ID、证据 ID 和周期归属摘要。
+    最近修改时间：2026-08-01 02:10:52；活动任务改为 IMPL/TEST/STYLE，历史 REVIEW/ACCEPT 只读兼容。
+    """
     # 1. 优先使用目标文档的根来源 ID，避免严格模式混入其它历史来源对象。
     source_anchors: set[str] = set()
     if target_document is not None and target_document.exists():
@@ -1460,7 +1497,9 @@ def check_strict_trace(
     documents = []
     for path in all_documents:
         normalized_path = "/" + path.as_posix().replace("\\", "/") + "/"
-        if "/doc/5-tests/" in normalized_path or "/doc/6-审查/" in normalized_path:
+        # 新流程的 TEST/STYLE 证据可分别落在 doc/5-tests 与 doc/6-review；旧审查目录仅只读归档。
+        # doc/7-验收 保留在扫描范围内，以便历史 REVIEW/ACCEPT 证据继续可读。
+        if "/doc/6-审查/" in normalized_path:
             continue
         content = path.read_text(encoding="utf-8")
         if source_anchors:
@@ -1479,6 +1518,7 @@ def check_strict_trace(
     corpus = "\n".join(path.read_text(encoding="utf-8") for path in documents)
     cycle_documents = [path for path in documents if re.search(r"实施周期\d+", path.name)]
     tasks: set[str] = set()
+    evidence_modes: Dict[str, str] = {}
     # 3. 仅把任务清单表格首列或最小 fixture 中的唯一任务视为周期归属，避免正文回指造成重复归属。
     for path in cycle_documents:
         content = path.read_text(encoding="utf-8")
@@ -1505,7 +1545,8 @@ def check_strict_trace(
             owned = set(TASK_ID_PATTERN.findall(content))
         # 只记录任务清单中的归属，避免正文“下一任务/回指”污染周期边界。
         cycles.setdefault(cycle, set()).update(owned)
-    # 4. 逐任务检查唯一归属、真实测试/停止契约和 IMPL/TEST/REVIEW 证据。
+    # 4. 逐任务检查唯一归属、真实测试/停止契约和活动 IMPL/TEST/STYLE 证据。
+    #    已完整落盘的历史 IMPL/TEST/REVIEW/ACCEPT 链继续兼容，避免改写归档资料。
     for task in tasks:
         owners = [cycle for cycle, owned in cycles.items() if task in owned]
         if len(owners) != 1:
@@ -1513,10 +1554,34 @@ def check_strict_trace(
         task_contexts = [path.read_text(encoding="utf-8") for path in documents if task in path.read_text(encoding="utf-8")]
         if not any("真实测试" in context and "停止" in context for context in task_contexts):
             errors.append(f"task is missing executable test/stop contract: {task}")
-        required_suffixes = ("IMPL", "TEST", "REVIEW", "ACCEPT")
-        for suffix in required_suffixes:
-            if not re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus):
-                errors.append(f"task is missing evidence category {suffix}: {task}")
+        current_suffixes = ("IMPL", "TEST", "STYLE")
+        legacy_suffixes = ("IMPL", "TEST", "REVIEW", "ACCEPT")
+        has_current_chain = all(
+            re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus)
+            for suffix in current_suffixes
+        )
+        has_legacy_chain = all(
+            re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus)
+            for suffix in legacy_suffixes
+        )
+        task_has_legacy_marker = any(
+            re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus)
+            for suffix in ("REVIEW", "ACCEPT")
+        )
+        if has_current_chain:
+            evidence_modes[task] = "active"
+        elif has_legacy_chain:
+            evidence_modes[task] = "historical_compatibility"
+        elif task_has_legacy_marker:
+            evidence_modes[task] = "historical_compatibility"
+            for suffix in legacy_suffixes:
+                if not re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus):
+                    errors.append(f"task is missing historical evidence category {suffix}: {task}")
+        else:
+            evidence_modes[task] = "active"
+            for suffix in current_suffixes:
+                if not re.search(rf"EVD-{re.escape(task)}-{suffix}(?:-[A-Z0-9]+)*", corpus):
+                    errors.append(f"task is missing evidence category {suffix}: {task}")
     # 5. 检查跨域追踪链是否至少出现所有必要 ID 前缀。
     required_links = ("REQ", "AC", "CYCLE", "TASK", "TEST", "EVIDENCE")
     link_patterns = {
@@ -1535,23 +1600,27 @@ def check_strict_trace(
         "tasks": sorted(tasks),
         "evidence": evidence,
         "cycles": {cycle: sorted(owned) for cycle, owned in cycles.items()},
-        "required_evidence_categories": ["IMPL", "TEST", "REVIEW", "ACCEPT"],
+        "required_evidence_categories": ["IMPL", "TEST", "STYLE"],
+        "legacy_accepted_evidence_categories": ["IMPL", "TEST", "REVIEW", "ACCEPT"],
+        "evidence_modes": evidence_modes,
         "valid": not errors,
     }
 
 
-# validate_document 按指定质量 profile 汇总单份 Markdown 文档的结构、内容、链接和图形校验。
-# [参数] path: 待校验文档；profile_name: profile 名称；profile: profile 配置；profile_payload: 完整配置；root: 链接根目录。
-# [返回] dict：valid、文档标识、ID、图形计数、错误和警告。
-# 最近修改时间：2026-07-13 14:00:00 + 接入新旧文档分层策略并输出受限状态。
 def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], profile_payload: Dict[str, Any], root: Path) -> Dict[str, Any]:
-    """按指定质量 profile 汇总单份 Markdown 文档的结构、内容、链接和图形校验。"""
+    """按指定质量 profile 汇总单份 Markdown 文档的结构、内容、链接和图形校验。
+
+    [参数] path: 待校验文档；profile_name: profile 名称；profile: profile 配置；profile_payload: 完整配置；root: 链接根目录。
+    [返回] dict：valid、文档标识、ID、图形计数、错误和警告。
+    最近修改时间：2026-08-01 02:10:52；接入 style_regression 的 STYLE 结果报告并保留历史 profile 兼容。
+    """
     # 1. 读取 UTF-8 文档并准备错误、警告容器。
     errors: List[str] = []
     warnings: List[str] = []
     text, read_errors = read_document(path)
     errors.extend(read_errors)
     image_report: Dict[str, Any] = {"count": 0, "ids": [], "paths": [], "decision": None, "valid": True}
+    style_report: Dict[str, Any] = {"required": profile_name == "style_regression", "result": None, "valid": True, "error_codes": []}
     # 2. 对 UTF-8 文档执行 front matter、章节、ID、链接、图形和占位词校验。
     if not errors:
         # 补丁说明：把 profile 传入 YAML 头检查，确保专项必填字段不会被遗漏。
@@ -1578,6 +1647,8 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
         check_sections(text, profile, errors, enforce_profile=enforce_profile)
         ids = check_ids(text, profile, errors)
         check_profile_content(text, profile, errors, enforce_profile=enforce_profile)
+        if profile_name == "style_regression":
+            style_report = check_style_regression_result(text, errors)
         check_placeholders(text, profile_payload, errors)
         check_na_reasons(text, errors)
         check_links(text, root, path, errors)
@@ -1616,8 +1687,15 @@ def validate_document(path: Path, profile_name: str, profile: Dict[str, Any], pr
             "valid": not errors,
         },
         "gates": gate_report,
+        "style_regression": style_report,
         "task_blocker_closure": blocker_report,
-        "error_codes": list(dict.fromkeys(gate_report.get("error_codes", []) + blocker_report.get("error_codes", []))),
+        "error_codes": list(
+            dict.fromkeys(
+                gate_report.get("error_codes", [])
+                + style_report.get("error_codes", [])
+                + blocker_report.get("error_codes", [])
+            )
+        ),
     }
 
 

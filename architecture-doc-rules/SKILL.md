@@ -54,7 +54,7 @@ description: 当需要创建、更新、审查或解释 `doc/1-架构/` 下的�
 - 不负责根目录 `项目设计.md` 的主入口同步，那属于 `project-design-doc-rules`。
 - 不负责决定研发产物根目录和命名模板，那属于 `artifact-storage-rules`。
 - 不负责当前需求的实施总览或实施周期，那属于 `implementation-planning-rules`。
-- 不负责生产代码包结构归位和依赖方向审查，那属于 `package-structure-rules` 或 `implementation-review-rules`。
+- 不负责生产代码包结构归位和依赖方向审查，那属于 `package-structure-rules` 或 `code-style-consistency-rules`。
 - 不负责源码调用链事实发现；需要图谱分析时先使用 `codegraph-analysis-rules`。
 
 ## 需要暂停并确认的条件

@@ -50,7 +50,7 @@
 - `schema-rules.md` 负责第三方 OpenAPI 的 servers、鉴权和响应 schema 结构；本文件只提供真实来源和消费范围。
 - `description-rules.md` 负责中文字段说明来源与禁止编造边界；本文件只规定第三方说明必须回溯代码消费。
 - `test-program-rules` 负责先探测、再建模和离线测试程序结构；本文件不替代测试实现。
-- `code-readability-rules` 与 `implementation-review-rules` 负责 client/响应结构体代码的可读性和审查；本文件不要求修改业务代码。
+- `code-readability-rules` 与 `code-style-consistency-rules` 负责 client/响应结构体代码的可读性和审查；本文件不要求修改业务代码。
 - `api-request-rules` 约束本项目对外暴露接口的请求模型；上游请求属于出站调用发现，不能反向修改业务 DTO 契约。
 
 ## 发现完成标准

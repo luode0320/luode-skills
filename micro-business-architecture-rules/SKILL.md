@@ -57,6 +57,6 @@ description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业�
 ## 通过标准
 
 - `micro_business.py check` 只接受跨业务到目标 `rpc/` 的精确导入，并稳定拒绝目标域任何私有层导入。
-- CodeGraph 可定位合规 RPC 导入和每一种私有层违规导入，作为审查与验收证据。
+- CodeGraph 可定位合规 RPC 导入和每一种私有层违规导入，作为真实测试与 `6-review` 的追溯证据。
 - 业务域 RPC 函数仅传递 JSON 字符串，统一响应可解析为 `code`、`status`、`message`、`data`。
 - 不创建真实网络通信、数据库迁移、业务仓库迁移或 Git 历史写入。

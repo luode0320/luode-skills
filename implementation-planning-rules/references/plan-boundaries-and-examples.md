@@ -9,7 +9,7 @@
 
 ### 2. 不是验收标准
 
-- `acceptance-criteria-rules` 回答“做到什么算完成”。
+- `implementation-planning-rules` 回答“做到什么算完成”。
 - `implementation-planning-rules` 回答“为了做到它，当前编码前先按什么顺序落地”。
 
 ### 3. 不是测试策略

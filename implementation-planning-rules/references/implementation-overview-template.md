@@ -4,7 +4,7 @@
 
 ## 白话正文与附录
 
-文档已在 H1 后用固定摘要说明推荐方案、业务影响、范围、周期目标和完成结果，再保留当前文档原有标题、层级和顺序。文件树、任务表、命令和证据必须归入文末连续的执行附录与追踪附录。同时补齐 `reader_level`、`writing_style`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `review_acceptance_gates` 元数据。
+文档已在 H1 后用固定摘要说明推荐方案、业务影响、范围、周期目标和完成结果，再保留当前文档原有标题、层级和顺序。文件树、任务表、命令和证据必须归入文末连续的执行附录与追踪附录。同时补齐 `reader_level`、`writing_style`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 和 `style_regression` 元数据。
 
 ## 文档信息
 
@@ -23,7 +23,7 @@ updated_at: "YYYY-MM-DD HH:mm:ss"
 reader_level: business_general
 writing_style: plain_chinese
 appendix_policy: preserve_existing_or_one_terminal_appendix
-review_acceptance_gates: []
+style_regression: required_after_tests
 ```
 
 ## 当前计划最终方案简要说明
@@ -75,7 +75,7 @@ repo/
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `CYCLE-01` | 第一期 |  |  |  |  | `./..._实施周期01_...md` |
 
-周期必须按 `01 -> 02 -> ...` 顺序推进；前一周期没有实现、真实测试、审查、验收四项闭环，不得进入下一周期。
+周期必须按 `01 -> 02 -> ...` 顺序推进；前一周期没有实现、真实测试、`6-review` 风格回归三项闭环，不得进入下一周期。
 
 ```mermaid
 flowchart LR
@@ -100,15 +100,15 @@ flowchart LR
 | --- | --- | --- | ---: | --- | --- | --- | --- |
 | 1 | `TASK-01` |  |  | `minimum-task-execution-contract.md` | `TEST-01` |  |  |
 
-每个 `TASK-*` 只能归属一个 `CYCLE-*`，默认不超过 5 个文件；超出时必须拆分或记录不可拆分的证据。任务必须逐个完成“实现 -> 真实测试 -> 审查 -> 验收”。
+每个 `TASK-*` 只能归属一个 `CYCLE-*`，默认不超过 5 个文件；超出时必须拆分或记录不可拆分的证据。任务必须逐个完成“实现 -> 真实测试 -> 6-review 风格回归”，`AC-*` 完成条件直接在本表或周期文档中冻结。
 
-| 来源/验收 | 周期 | 任务 | 文件/符号 | 测试 | 证据 | 状态 |
+| 来源/完成条件 | 周期 | 任务 | 文件/符号 | 测试 | 风格回归 | 证据 | 状态 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `REQ-*` / `AC-*` | `CYCLE-01` | `TASK-01` | `path:Symbol` | `TEST-01` | `EVIDENCE-*` |  |
+| `REQ-*` / `AC-*` | `CYCLE-01` | `TASK-01` | `path:Symbol` | `TEST-01` | `STYLE-01` | `EVIDENCE-*` |  |
 
 ## 真实测试安排
 
-每个行为变更任务必须写独立测试入口、local 环境、样本/fixture、断言、失败预期、清理方式和证据位置。`build`、`lint`、静态检查、人工阅读不算真实测试。
+每个行为变更任务必须写独立测试入口、local 环境、样本/fixture、断言、失败预期、清理方式和证据位置；测试逐条引用本计划的 `AC-*` 完成条件。`build`、`lint`、静态检查、人工阅读不算真实测试。
 
 | 测试 ID | 任务 | 命令/入口 | local 环境 | 样本 | 断言 | 失败预期 | 清理 | 证据 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

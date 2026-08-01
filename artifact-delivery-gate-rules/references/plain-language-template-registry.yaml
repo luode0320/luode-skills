@@ -1,6 +1,6 @@
 version: 1
 scope: new_or_modified_managed_document_generation_entries
-template_count: 24
+template_count: 22
 summary_opening:
   placement: after_h1_before_first_h2
   paragraph_count: 1
@@ -25,11 +25,6 @@ templates:
     profile: requirement
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [discovery_questions_may_remain_in_business_body_but_must_not_replace_the_summary]
-  - template_id: TPL-PLAIN-AC-001
-    path: acceptance-criteria-rules/references/acceptance-template.md
-    profile: acceptance
-    layers: [h1_summary, execution_appendix, tracking_appendix]
-    exceptions: []
   - template_id: TPL-PLAIN-IMP-001
     path: implementation-planning-rules/references/plan-structure-template.md
     profile: implementation_overview
@@ -105,14 +100,9 @@ templates:
     profile: test
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [interface_test_results_md_is_a_technical_detail_file_and_keeps_its_block_format]
-  - template_id: TPL-PLAIN-REVIEW-001
-    path: project-change-review-rules/references/report-template.md
-    profile: review
-    layers: [h1_summary, execution_appendix, tracking_appendix]
-    exceptions: []
-  - template_id: TPL-PLAIN-FINAL-001
-    path: final-acceptance-rules/references/final-acceptance-template.md
-    profile: final_acceptance
+  - template_id: TPL-PLAIN-STYLE-001
+    path: artifact-delivery-gate-rules/references/style-regression-template.md
+    profile: style_regression
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-ARCH-001

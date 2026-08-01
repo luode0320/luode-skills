@@ -35,7 +35,7 @@
 8. 按 `references/execution-gate.md` 输出最终门禁结论：PASS / FAIL / PARTIAL，明确是否允许上线、阻断原因和风险项。
 9. 按 `references/output-artifacts.md` 将测试计划、接口清单、报告、结论、完整响应、执行日志、请求样本、依赖图、已解析参数和参数复用/失效记录归档到对应时间戳根目录。
 10. 将本次测试结论、新发现的可复用参数、失效参数、场景结论和历史摘要回写到 `project-interface-baseline-rules` 维护的 `doc/5-tests/基线/` 长期资产。
-11. 将最终结论同步到 `final-acceptance-rules`，作为最终验收的输入之一。
+11. 将最终结论同步到 `delivery-summary-rules`，作为最终验收的输入之一。
 ## 权责边界与不负责事项
 - 负责项目级上线前接口测试执行与放行，不负责接口事实基线的扫描、初始化或双索引同步，这些由 `project-interface-baseline-rules` 负责。
 - 不替代任务级 `functional-validation-rules` 的当前改动功能验证。
