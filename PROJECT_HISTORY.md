@@ -197,3 +197,9 @@
 - `code-style-consistency-rules` 成为共享静态 Owner 路由与来源映射的唯一 Owner；测试后的 `6-review` 只消费风格子集。
 - `continuous-code-quality-supervisor-rules` 删除重复路由，只在 Goal active 且用户明确要求“监控代码”时可选消费完整路由，继续负责扫描、脱敏、finding 指纹、去重和通知；它不是 `6-review` Gate。
 - 本地共享路由单元测试 `7/7`、监控消费者单元测试 `17/17` 与跨域专项路由脚本通过；未改写历史 `doc/6-审查/`、`doc/7-验收/`，未连接外部服务或写入 Git 历史。
+
+## 2026-08-01：根 test 目录统一完成
+
+- 活动测试代码统一迁入根 `test/` 镜像目录，七组原 `*/tests/` 活动测试已迁移为 `*_test.py`；`doc/5-tests/` 只保留 README、日志、报告、截图和非可执行证据。
+- 新增测试资产治理、历史 `doc/5-tests/` 可执行资产指纹清单、统一 Python 入口和 Go 根 `test/` 外部黑盒布局正负例；活动规则、Git 协作、Skill 合规、目录树、字典和项目文档已同步。
+- 字典生成成功，全量 Python 测试 `187/187`、测试资产治理 `9/9`、七类严格文档 profile、旧 Go 阻断表达扫描、`git diff --check` 与 `git diff --cached --check` 均通过；Obsidian 固定 vault 未注册，未执行 vault 沉淀或 Git 历史写入。

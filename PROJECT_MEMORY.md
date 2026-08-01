@@ -193,6 +193,15 @@
 - 更新时间: 2026-08-01
 - 状态: 启用
 
+### 根测试代码与测试证据双根规则
+- 别名: 根 test 目录, 测试资产镜像, doc/5-tests 证据根
+- 类型: 测试资产目录规则
+- 定义: 根 `test/` 是唯一活动测试代码根，测试程序、mock、fixture、helper 与启动脚本按被测源码或 Skill 目录镜像存放；Python 统一使用 `*_test.py`。`doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图与非可执行产物。历史 `doc/5-tests/` 中的可执行资产由指纹清单只读保护，首次修改、改名或新增时才迁至根 `test/`；Go 测试仅在根 `test/` 的 ASCII 外部黑盒包中运行，源码目录禁止 `*_test.go`。
+- 来源: `artifact-storage-rules/references/path-map.yaml`、`test/shared/layout_policy.py`、`doc/3-实施/2026-08-01_191658_根test目录统一_实施总览.md`
+- 适用范围: 新增测试、测试资产迁移、测试策略、测试程序、真实测试归档和 6-review 目录归位
+- 更新时间: 2026-08-01
+- 状态: 启用
+
 ### 实施开工授权与自动推进
 - 别名: 开始实施确认, 开工授权, 最小任务自动推进, 长文本执行边界
 - 类型: 流程规则
@@ -710,6 +719,21 @@
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.root-test-code-and-evidence-layout
+    name: "根测试代码与测试证据双根规则"
+    type: "测试资产目录规则"
+    aliases:
+      - 根 test 目录
+      - 测试资产镜像
+      - doc/5-tests 证据根
+    definition: "根 test/ 是唯一活动测试代码根，测试程序、mock、fixture、helper 和启动脚本按被测目录镜像，Python 文件使用 *_test.py。doc/5-tests/ 仅保存时间戳 README 和非可执行证据；历史可执行资产由指纹清单保护，首次修改才迁移。Go 测试使用根 test/ 的 ASCII 外部黑盒包，源码目录禁止 *_test.go。"
+    scope: "新增测试、活动测试迁移、真实测试归档、测试策略和 6-review 目录归位"
+    status: "active"
+    evidence_ids:
+      - evidence.root-test-code-and-evidence-layout
+    context_ids:
+      - context.test-asset-governance
+    updated_at: 2026-08-01
   - entity_id: rule.shared-static-owner-routing
     name: "共享静态 Owner 路由与可选监控消费者"
     type: "Skill 治理规则"
@@ -1340,6 +1364,13 @@ entities:
       - context.implementation-flow
     updated_at: 2026-07-26
 relations:
+  - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
+    type: "owned_by"
+    from: "rule.root-test-code-and-evidence-layout"
+    to: "artifact-storage-rules"
+    evidence_ids:
+      - evidence.root-test-code-and-evidence-layout
+    status: "active"
   - relation_id: rel.shared-static-owner-routing.consumed-by.continuous-supervisor
     type: "consumed_by"
     from: "rule.shared-static-owner-routing"
@@ -1363,6 +1394,11 @@ relations:
       - evidence.skill.git-collaboration
     status: "active"
 evidence:
+  - evidence_id: evidence.root-test-code-and-evidence-layout
+    type: "test"
+    source: "根 test 目录统一实施与真实测试"
+    path: "doc/5-tests/2026-08-01_191658_根test目录统一/README.md"
+    note: "七组活动测试迁移至根 test/；治理测试 9/9、全量 Python 测试 187/187、Go 临时黑盒模块和严格文档 profile 均通过，历史 doc/5-tests 可执行资产指纹未变化。"
   - evidence_id: evidence.shared-static-owner-routing
     type: "skill"
     source: "6-review 共享静态 Owner 路由"
@@ -1386,7 +1422,7 @@ evidence:
   - evidence_id: evidence.test.task-blocker-closure
     type: "test"
     source: "本地任务阻断收口验证"
-    path: "artifact-delivery-gate-rules/tests/test_validate_engineering_docs.py"
+    path: "test/artifact-delivery-gate-rules/validate_engineering_docs_test.py"
     note: "52 项文档门禁单元测试与运行时阻断事实测试证明状态边界和恢复事实可验证"
   - evidence_id: evidence.skill.imagegen
     type: "skill"
@@ -1674,6 +1710,10 @@ evidence:
     path: "doc/3-实施/2026-07-26_150000_BUG-RTP-20260726-001_首次持久化与立即刷新_实施周期07.md"
     note: "冻结 confirmed 后首次持久化、下一动作 update_plan、会话解析、UI_SYNC_BLOCKED 和十分钟异常修复边界。"
 contexts:
+  - context_id: context.test-asset-governance
+    type: "repository-convention"
+    name: "测试资产双根治理"
+    note: "适用于根 test/ 镜像、doc/5-tests/ 证据、历史可执行资产按需迁移、Python 命名和 Go 黑盒路径"
   - context_id: context.task-blocker-closure
     type: "task-scope"
     name: "任务阻断收口与恢复"

@@ -6,46 +6,46 @@
 
 ## 当前任务
 
-- 来源对象：用户已确认的“研发流程收敛：实施计划、真实测试与 6-review 风格回归”计划。
-- 当前目标：删除五个退役 Skill，统一为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”，并完成共享静态 Owner 路由、字典、文档和回归验证。
-- 当前状态：`TASK-FLOW-01` 至 `TASK-FLOW-05` 与 `TASK-6ROUTE-01` 至 `TASK-6ROUTE-05` 均已完成并失活。新流程已收敛为“实施计划（含 AC）-> 实现 -> 真实测试 -> 6-review -> 交付总结”；五个退役 Skill 已删除，`doc/6-审查/`、`doc/7-验收/` 仅保留历史只读资料。
+- 来源对象：用户已确认的“根 `test/` 目录统一实施计划”。
+- 当前目标：把活动测试代码统一迁至项目根 `test/` 镜像目录，`doc/5-tests/` 只保留 README、日志、报告、截图和非可执行证据。
+- 当前状态：`TASK-TEST-LAYOUT-01` 至 `TASK-TEST-LAYOUT-05` 均已完成。七组活动测试已迁入根 `test/`，新增测试治理、历史指纹清单、统一 Python 入口、Go 黑盒路径样例、活动规则消费者、字典和项目文档已同步；最终真实测试与 `6-review` 均为 PASS。
 
 ## 范围与边界
 
-- 范围：流程规则、活动路由、文档 profile、字典、专项回归、项目四件套和根文档。
-- 非范围：业务项目代码、历史归档正文、数据库、外部服务和 Git 历史写入。
+- 范围：测试资产契约、活动测试迁移、根 `test/` 目录树、活动规则消费者、文档 profile、字典、项目四件套和专项回归。
+- 非范围：业务项目代码、历史 `doc/5-tests/` 正文批量迁移、`doc/6-审查/` / `doc/7-验收/` 历史资料、数据库、外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 五个退役 Skill 目录及资产已删除，`implementation-planning-rules` 已吸收可测试完成条件，`code-style-consistency-rules` 成为唯一 `6-review` 入口。
-- `code-style-consistency-rules` 唯一拥有共享静态 Owner 路由和来源映射；`continuous-code-quality-supervisor-rules` 只在 Goal active 且用户明确要求“监控代码”时可选消费，保留扫描、脱敏、去重和通知，不成为 `6-review` Gate。
-- `artifact-storage-rules` 已将 `doc/6-review/` 设为活动目录；`artifact-delivery-gate-rules` 已新增 `style_regression` profile，旧 review/acceptance profile 只读兼容。
-- 根文档、项目记忆、字典生成器和专项回归已迁移到新流程；实施总览、周期、真实测试和风格回归记录已落盘并建立 `IMPL/TEST/STYLE` 追踪。
-- 已完成本地验证：共享路由单元测试 `7/7`、监控消费者单元测试 `17/17`、共享 Owner 路由专项脚本通过；流程专项回归、文档校验器 57 项单元测试、五份严格 profile、字典生成和 Git 差异检查均已在本任务链路执行。
+- 新增根 `test/` 治理：`test/shared/layout_policy.py`、`test/shared/legacy_doc5_tests_manifest.json`、`test/run_python_tests.py` 和 `test/test-asset-governance/*_test.py`。
+- 七组活动测试已从各 Skill 的 `tests/` 迁至 `test/<被测目录>/...`，Python 统一使用 `*_test.py`，历史 `doc/5-tests/` 可执行资产只读指纹校验通过。
+- `artifact-storage-rules`、`package-structure-rules`、`test-strategy-rules`、`test-program-rules`、功能 / 回归验证、Git 协作和 Skill 合规闸门已同步“根 `test/` 是代码根、`doc/5-tests/` 是证据根”的口径。
+- 根文档、`README.md`、`项目设计.md`、`编码skill.md`、`PROJECT_MEMORY.md`、字典与 `skill-dictionary/data.js` 已同步；本次需求、实施总览、三个实施周期、测试 README 和 `6-review` 记录已落盘。
+- 已完成本地验证：字典生成成功，全量 Python 入口 `187/187` 通过，测试资产治理 `9/9` 通过，七类严格文档 profile 均 PASS，旧 Go 阻断表达扫描为零，`git diff --check` 与 `git diff --cached --check` 均通过。
 
 ## 门禁说明
 
-- Obsidian bridge 的固定 vault 未注册，沉淀操作保持阻断；本任务不使用文件系统绕过该边界。所有实现与验证仅使用本地仓库和 Windows Python。
+- Obsidian bridge 的 `doctor` 与限定检索均返回 `VAULT_NOT_REGISTERED`，沉淀保持阻断；本任务不使用文件系统绕过该边界。所有实现与验证仅使用本地仓库、Windows Python、临时目录和本地 Git 只读检查。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 `FLOW-STREAMLINING-20260801` 已完成并已失活。
-- 最后执行点：共享 Owner 路由的实现、真实测试、活动文档、严格 profile、字典与 `6-review` 风格回归均已完成；当前任务投影已失活，未执行 Git 历史写入。
+- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 `TEST-LAYOUT-20260801` 已完成并已失活。
+- 最后执行点：根 `test/` 布局实现、真实测试、活动文档、严格 profile、字典与 `6-review` 风格回归均已完成；当前任务投影已失活，未执行 Git 历史写入。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-01T09:54:42.305312Z",
+  "registry_updated_at": "2026-08-01T11:33:00.030959Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
       "session_id": "019f9819-51c9-7380-8ff2-8b77ff9e7966",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
-      "state": "active",
+      "state": "inactive",
       "plan_key": "REQ-RT-20260712-001/CYCLE-RT-13..18",
       "source_document": "doc/3-实施/2026-07-12_190609_通用上线测试引擎_修订版全量实施计划.md",
       "plan_fingerprint": "115c7cfa1e9da5a7d5c68fde68d664219cf2349f3dc387d9c8c474fedeaf507c",
@@ -556,39 +556,39 @@
       ]
     },
     {
-      "projection_id": "SESSION/6cecf83f71685e236fe2d9a26bef2ce8b22128a128407281672b206a81935f84",
+      "projection_id": "SESSION/1dabf0c126d0a2cf9fc2896e6312dd759f9cdeee01ebc9631c9dbb9e86096df5",
       "session_id": "019fb8f8-2434-7f30-ab1f-6928ccc5b93a",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "6R-OWNER-ROUTING-20260801",
-      "source_document": "user-confirmed-plan:6-review静态Owner路由复用",
-      "plan_fingerprint": "e93bfd85ccbd9eafd4adc4ab26939ede522215c44b2fc3344165cec225a5f4a2",
-      "updated_at": "2026-08-01T00:00:00Z",
+      "plan_key": "TEST-LAYOUT-20260801",
+      "source_document": "user-confirmed-plan:root-test-layout-20260801",
+      "plan_fingerprint": "1964bbdc5c2793c8437a14ae3552b6c5c2b84f7911763b0574b99890a6bb1201",
+      "updated_at": "2026-08-01T12:25:00Z",
       "steps": [
         {
-          "id": "TASK-6ROUTE-01",
-          "step": "冻结需求、实施计划与共享路由契约",
+          "id": "TASK-TEST-LAYOUT-01",
+          "step": "冻结根 test 目录需求、实施文档和测试证据契约",
           "status": "completed"
         },
         {
-          "id": "TASK-6ROUTE-02",
-          "step": "建立 6-review 共享静态 Owner 路由",
+          "id": "TASK-TEST-LAYOUT-02",
+          "step": "更新测试资产规则并建立位置与命名校验",
           "status": "completed"
         },
         {
-          "id": "TASK-6ROUTE-03",
-          "step": "迁移持续监控消费者并消除重复路由",
+          "id": "TASK-TEST-LAYOUT-03",
+          "step": "迁移七组活动 tests 到根 test 目录",
           "status": "completed"
         },
         {
-          "id": "TASK-6ROUTE-04",
-          "step": "同步入口文档、字典与项目记忆",
+          "id": "TASK-TEST-LAYOUT-04",
+          "step": "同步活动消费者、目录树、字典和项目四件套",
           "status": "completed"
         },
         {
-          "id": "TASK-6ROUTE-05",
-          "step": "执行本地回归和 6-review 收口",
+          "id": "TASK-TEST-LAYOUT-05",
+          "step": "执行全链路真实测试并完成 6-review 收口",
           "status": "completed"
         }
       ]
