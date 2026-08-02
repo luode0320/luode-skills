@@ -1,16 +1,16 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-01 20:22:55",
+  "generated_at": "2026-08-02 13:52:24",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 70,
-    "implemented_total": 68,
+    "planned_total": 71,
+    "implemented_total": 69,
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 566,
-    "agents_total": 83
+    "references_total": 568,
+    "agents_total": 84
   },
   "downloaded_seeds": {
     "path": "downloaded-seeds",
@@ -805,10 +805,10 @@ window.SKILL_DICTIONARY = {
       "label": "记忆域",
       "description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "order": 2,
-      "implemented_count": 6,
+      "implemented_count": 7,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 6,
+      "total_count": 7,
       "items": [
         {
           "id": "recent-context-bootstrap-rules",
@@ -1034,6 +1034,44 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
+          "id": "session-handoff-rules",
+          "name": "session-handoff-rules",
+          "title": "会话交接规则",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "memory",
+          "domain_label": "记忆域",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_order": 2,
+          "item_order": 6,
+          "auto_trigger": "当用户表达“开新会话继续”“新会话中继续”“新会话继续”“会话太长”“归档旧会话”“迁移任务”“接续任务”“提取会话压缩信息”“唤起另一个会话”等，或要求把当前 Codex 任务交给新的本地任务时触发。提取当前目标、范围、已完成项、进行中、下一步、阻断、验证和关键决策，生成脱敏交接包，并在同一保存项目的 local 环境创建新任务继续；默认只提示人工归档旧任务，不自动归档。",
+          "core_responsibility": "负责提取目标、完成项、进行中、下一步、阻断和验证，生成脱敏交接包，并在同一保存项目的 `local` 环境创建新任务；v1 只提示人工归档旧任务，不自动归档。",
+          "skill_path": "session-handoff-rules/SKILL.md",
+          "directory_path": "session-handoff-rules",
+          "directory": "session-handoff-rules",
+          "sections": [
+            "目标",
+            "触发与边界",
+            "标准流程",
+            "新任务启动契约",
+            "停止条件",
+            "资源"
+          ],
+          "references": [
+            "session-handoff-rules/references/codex-thread-routing.md",
+            "session-handoff-rules/references/handoff-packet-contract.md"
+          ],
+          "agents": [
+            "session-handoff-rules/agents/openai.yaml"
+          ],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+          ]
+        },
+        {
           "id": "project-style-rules",
           "name": "project-style-rules",
           "title": "项目风格规则",
@@ -1043,7 +1081,7 @@ window.SKILL_DICTIONARY = {
           "domain_label": "记忆域",
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
-          "item_order": 6,
+          "item_order": 7,
           "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md / 更新项目规则md / 更新规则md / 更新md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap`〔规则文件〕与 `memory-bootstrap`〔记忆四件套骨架〕条件路由编排联动）。",
           "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
           "skill_path": "project-style-rules/SKILL.md",
@@ -5688,6 +5726,44 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
+      "id": "session-handoff-rules",
+      "name": "session-handoff-rules",
+      "title": "会话交接规则",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "memory",
+      "domain_label": "记忆域",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_order": 2,
+      "item_order": 6,
+      "auto_trigger": "当用户表达“开新会话继续”“新会话中继续”“新会话继续”“会话太长”“归档旧会话”“迁移任务”“接续任务”“提取会话压缩信息”“唤起另一个会话”等，或要求把当前 Codex 任务交给新的本地任务时触发。提取当前目标、范围、已完成项、进行中、下一步、阻断、验证和关键决策，生成脱敏交接包，并在同一保存项目的 local 环境创建新任务继续；默认只提示人工归档旧任务，不自动归档。",
+      "core_responsibility": "负责提取目标、完成项、进行中、下一步、阻断和验证，生成脱敏交接包，并在同一保存项目的 `local` 环境创建新任务；v1 只提示人工归档旧任务，不自动归档。",
+      "skill_path": "session-handoff-rules/SKILL.md",
+      "directory_path": "session-handoff-rules",
+      "directory": "session-handoff-rules",
+      "sections": [
+        "目标",
+        "触发与边界",
+        "标准流程",
+        "新任务启动契约",
+        "停止条件",
+        "资源"
+      ],
+      "references": [
+        "session-handoff-rules/references/codex-thread-routing.md",
+        "session-handoff-rules/references/handoff-packet-contract.md"
+      ],
+      "agents": [
+        "session-handoff-rules/agents/openai.yaml"
+      ],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+      ]
+    },
+    {
       "id": "project-style-rules",
       "name": "project-style-rules",
       "title": "项目风格规则",
@@ -5697,7 +5773,7 @@ window.SKILL_DICTIONARY = {
       "domain_label": "记忆域",
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
-      "item_order": 6,
+      "item_order": 7,
       "auto_trigger": "从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md / 更新项目规则md / 更新规则md / 更新md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap`〔规则文件〕与 `memory-bootstrap`〔记忆四件套骨架〕条件路由编排联动）。",
       "core_responsibility": "负责维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源，并在风格调整时回写原样例。",
       "skill_path": "project-style-rules/SKILL.md",

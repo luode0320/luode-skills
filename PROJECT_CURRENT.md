@@ -2,43 +2,43 @@
 
 ## 更新时间
 
-- 2026-08-01
+- 2026-08-02
 
 ## 当前任务
 
-- 来源对象：用户已确认的“根 `test/` 目录统一实施计划”。
-- 当前目标：把活动测试代码统一迁至项目根 `test/` 镜像目录，`doc/5-tests/` 只保留 README、日志、报告、截图和非可执行证据。
-- 当前状态：`TASK-TEST-LAYOUT-01` 至 `TASK-TEST-LAYOUT-05` 均已完成。七组活动测试已迁入根 `test/`，新增测试治理、历史指纹清单、统一 Python 入口、Go 黑盒路径样例、活动规则消费者、字典和项目文档已同步；最终真实测试与 `6-review` 均为 PASS。
+- 来源对象：用户已确认的独立 `session-handoff-rules` skill。
+- 当前目标：提取当前会话压缩信息，生成脱敏交接包，并在同一保存项目的 `local` 环境创建新 Codex 任务继续；默认只提示人工归档旧任务。
+- 当前状态：skill 本体、触发词、Codex App 路由、交接包契约、标准库校验脚本、契约测试、项目记忆和字典均已落盘；风格回归通过；同项目 local 新任务已取得真实任务标识，新任务启动契约核验已完成。
 
 ## 范围与边界
 
-- 范围：测试资产契约、活动测试迁移、根 `test/` 目录树、活动规则消费者、文档 profile、字典、项目四件套和专项回归。
-- 非范围：业务项目代码、历史 `doc/5-tests/` 正文批量迁移、`doc/6-审查/` / `doc/7-验收/` 历史资料、数据库、外部服务和 Git 历史写入。
+- 范围：`session-handoff-rules`、交接包 JSON 契约、脱敏 / 大小校验、`list_projects -> create_thread -> wait_threads` 路由、根 `test/` 契约测试、项目记忆和 skill 字典。
+- 非范围：再次创建新任务、自动调用 `set_thread_archived`、旧任务归档、业务项目代码、数据库、外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 新增根 `test/` 治理：`test/shared/layout_policy.py`、`test/shared/legacy_doc5_tests_manifest.json`、`test/run_python_tests.py` 和 `test/test-asset-governance/*_test.py`。
-- 七组活动测试已从各 Skill 的 `tests/` 迁至 `test/<被测目录>/...`，Python 统一使用 `*_test.py`，历史 `doc/5-tests/` 可执行资产只读指纹校验通过。
-- `artifact-storage-rules`、`package-structure-rules`、`test-strategy-rules`、`test-program-rules`、功能 / 回归验证、Git 协作和 Skill 合规闸门已同步“根 `test/` 是代码根、`doc/5-tests/` 是证据根”的口径。
-- 根文档、`README.md`、`项目设计.md`、`编码skill.md`、`PROJECT_MEMORY.md`、字典与 `skill-dictionary/data.js` 已同步；本次需求、实施总览、三个实施周期、测试 README 和 `6-review` 记录已落盘。
-- 已完成本地验证：字典生成成功，全量 Python 入口 `187/187` 通过，测试资产治理 `9/9` 通过，七类严格文档 profile 均 PASS，旧 Go 阻断表达扫描为零，`git diff --check` 与 `git diff --cached --check` 均通过。
+- 新增 `session-handoff-rules/SKILL.md`，覆盖九个触发词、事实抽取、脱敏、local 项目创建、等待和人工归档边界。
+- 新增 `references/handoff-packet-contract.md`、`references/codex-thread-routing.md` 与 `scripts/validate_handoff_packet.py`。
+- 新增 `test/session-handoff-rules/validate_handoff_packet_test.py`，覆盖有效包、`next_steps` 缺失、敏感字段和大小限制。
+- `编码skill.md`、`PROJECT_MEMORY.md`、`字典.md` 和 `skill-dictionary/data.js` 已同步；字典将新 skill 归入记忆域。
+- 已完成本地验证：quick validation 通过，交接包定向测试 `4/4` 通过，根 `test/` 全量 Python 入口 `191/191` 通过，`git diff --check` 通过。
 
 ## 门禁说明
 
-- Obsidian bridge 的 `doctor` 与限定检索均返回 `VAULT_NOT_REGISTERED`，沉淀保持阻断；本任务不使用文件系统绕过该边界。所有实现与验证仅使用本地仓库、Windows Python、临时目录和本地 Git 只读检查。
+- 本轮 `Obsidian:不适用`；任务只维护仓库内 skill、测试和字典，不读取或写入 vault。所有实现与验证仅使用本地仓库、Windows Python、临时目录和本地 Git 只读检查。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 且保留所有会话的 registry 投影；本会话 `TEST-LAYOUT-20260801` 已完成并已失活。
-- 最后执行点：根 `test/` 布局实现、真实测试、活动文档、严格 profile、字典与 `6-review` 风格回归均已完成；当前任务投影已失活，未执行 Git 历史写入。
+- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前新任务投影 `REQ-SH-START-20260802-001` 已完成、失活并同步收口。
+- 最后执行点：交接包已通过标准库校验，当前代码、项目文档和工作树边界已核对；`quick_validate`、定向契约测试 `4/4` 和根测试 `191/191` 已复验通过；本轮未再次创建任务、未调用归档工具、未执行 Git 历史写入。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-01T11:33:00.030959Z",
+  "registry_updated_at": "2026-08-02T05:01:42.198442Z",
   "projections": [
     {
       "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
@@ -134,7 +134,7 @@
         {
           "id": "C18-03",
           "step": "[C18-03] 完成字典、回归、审查与最终验收",
-          "status": "in_progress"
+          "status": "completed"
         }
       ]
     },
@@ -590,6 +590,105 @@
           "id": "TASK-TEST-LAYOUT-05",
           "step": "执行全链路真实测试并完成 6-review 收口",
           "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/c75f9770bc950c84196f26c76402d99a13989852dc296ef7954ff10b20d9eb52",
+      "session_id": "019fbe92-f266-7eb2-a426-2b4df1b29bae",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260802T040348Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-02T04:07:19.771974Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/af95daef0fde26ea931aa19b9451721e9ccdcbc5e3ff08cfb18c8d374403e914",
+      "session_id": "019fc0a5-45cb-7902-b1dc-d9e9f98d7284",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-SH-START-20260802-001",
+      "source_document": "session-handoff-rules/SKILL.md",
+      "plan_fingerprint": "06daabdb153e19ec7966882dcdcb964d84ed626a1200f5b627d8651c83950743",
+      "updated_at": "2026-08-02T04:21:17.828959Z",
+      "steps": [
+        {
+          "id": "TASK-SH-START-01",
+          "step": "[TASK-SH-START-01] 校验交接包并核对项目当前状态",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-SH-START-02",
+          "step": "[TASK-SH-START-02] 核验当前会话投影、中断点和未提交改动边界",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-SH-START-03",
+          "step": "[TASK-SH-START-03] 执行仍必要的后续步骤并更新验证证据",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/66543947614ef037fef0038b76ce599e4bf523e7023a0ed0102892074ad2c309",
+      "session_id": "019fc0b2-6e7b-7cc3-889c-1c45b5d6ad57",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "REQ-CUR-20260802-001/CYCLE-CUR-01",
+      "source_document": "doc/3-实施/2026-08-02_123351_PROJECT_CURRENT任务记录保留与过期清理_实施周期01_七天保留与自动清理.md",
+      "plan_fingerprint": "ff5724d2a374b7e931ab96f4a9eab93a0d44c350021b5228777a6a57a9600d67",
+      "updated_at": "2026-08-02T05:02:00Z",
+      "steps": [
+        {
+          "id": "TASK-CUR-01",
+          "step": "[TASK-CUR-01] 落盘需求变更与实施契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CUR-02",
+          "step": "[TASK-CUR-02] 实现 registry 自动清理并补齐行为测试",
+          "status": "in_progress"
+        },
+        {
+          "id": "TASK-CUR-03",
+          "step": "[TASK-CUR-03] 同步两个 Owner Skill 的行为规则",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-CUR-04",
+          "step": "[TASK-CUR-04] 同步 bootstrap 模板与生成规则",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-CUR-05",
+          "step": "[TASK-CUR-05] 迁移项目记忆并清理真实旧投影",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-CUR-06",
+          "step": "[TASK-CUR-06] 刷新字典、全量测试与最终风格收口",
+          "status": "pending"
         }
       ]
     }

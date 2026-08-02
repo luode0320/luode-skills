@@ -20,6 +20,17 @@
 - 更新时间：2026-07-26。
 
 
+## 会话交接与新任务接续规则
+
+- 稳定决策：`session-handoff-rules` 是会话迁移唯一 Owner；命中“开新会话继续”“新会话中继续”“新会话继续”“会话太长”“归档旧会话”“迁移任务”“接续任务”“提取会话压缩信息”“唤起另一个会话”等语义时，先提取当前目标、范围、已完成、进行中、下一步、阻断、验证和关键决策，再生成脱敏交接包。
+- 稳定决策：交接包使用 `codex-session-handoff` v1 JSON 契约，字段白名单、UTF-8、24,576 字节上限、`next_steps` 非空和敏感字段 / 绝对路径拒绝由 `session-handoff-rules/scripts/validate_handoff_packet.py` 校验；交接包不得保存 `session_id`、`thread_id`、prompt、完整日志或凭据。
+- 稳定决策：新任务必须先用 `codex_app__list_projects` 精确匹配当前保存项目，再用 `codex_app__create_thread` 的同项目 `environment: local` 创建；创建返回真实 `threadId` 后才可调用 `codex_app__wait_threads`，`clientThreadId` 只能报告 setup pending，不得当作真实线程 ID。
+- 稳定决策：新任务首轮必须重新命中 `skill-hit-check-rules`、读取项目四件套、按自身 `session_id` 校验或建立 projection，并核验进行中断点；交接不复制旧任务 UI 状态、执行授权或未知非幂等操作。
+- 稳定决策：v1 归档策略固定为 `manual_only`。新任务 ready 后只提示用户人工归档旧任务，不自动调用 `codex_app__set_thread_archived`；创建失败、项目不确定或 setup pending 时不改变旧任务状态。
+- 来源：`session-handoff-rules/SKILL.md`、`session-handoff-rules/references/handoff-packet-contract.md`、`session-handoff-rules/references/codex-thread-routing.md`、`session-handoff-rules/scripts/validate_handoff_packet.py`、本轮用户确认的触发词。
+- 更新时间：2026-08-02。
+
+
 ## Plan Mode 决策选择框永久等待规则
 
 - 稳定决策：Plan Mode 决策型 `request_user_input` 必须完全省略 `autoResolutionMs`；选择框未得到用户选择时保持 `WAITING_DECISION`，没有等待时间或重发次数上限，宿主空答案不代表取消、授权、默认选择或完成。
@@ -1342,6 +1353,32 @@ entities:
     context_ids:
       - context.task-plan-rehydration
     updated_at: 2026-07-25
+  - entity_id: rule.session-handoff
+    name: "会话交接与新任务接续"
+    type: "会话迁移规则"
+    aliases:
+      - 开新会话继续
+      - 新会话中继续
+      - 新会话继续
+      - 会话太长
+      - 归档旧会话
+      - 迁移任务
+      - 接续任务
+      - 提取会话压缩信息
+      - 唤起另一个会话
+      - session-handoff-rules
+    definition: "session-handoff-rules 负责提取当前会话和项目可核验的目标、范围、完成项、进行中断点、下一步、阻断、验证和关键决策，生成 UTF-8 脱敏交接包，并在同一保存项目的 local 环境创建新任务；v1 只提示人工归档旧任务，不自动改变旧任务状态。"
+    scope: "Codex 会话压缩交接、新任务接续、交接包脱敏与校验、同项目 local 任务创建和 setup pending 边界"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.session-handoff
+      - evidence.test.session-handoff
+      - evidence.review.session-handoff
+      - evidence.dialog.session-handoff-triggers
+    context_ids:
+      - context.session-handoff
+      - context.memory-domain
+    updated_at: 2026-08-02
   - entity_id: rule.plan-mode-decision-wait-loop
     name: "Plan Mode 决策选择框永久等待"
     type: "交互状态规则"
@@ -1392,6 +1429,14 @@ relations:
     evidence_ids:
       - evidence.skill.obsidian-knowledge-flow
       - evidence.skill.git-collaboration
+    status: "active"
+  - relation_id: rel.session-handoff.depends-on.task-plan-rehydration
+    type: "depends_on"
+    from: "rule.session-handoff"
+    to: "rule.task-plan-rehydration"
+    evidence_ids:
+      - evidence.skill.session-handoff
+      - evidence.skill.task-plan-rehydration
     status: "active"
 evidence:
   - evidence_id: evidence.root-test-code-and-evidence-layout
@@ -1709,6 +1754,25 @@ evidence:
     source: "Codex Desktop 任务悬浮窗首次持久化与立即刷新实施周期"
     path: "doc/3-实施/2026-07-26_150000_BUG-RTP-20260726-001_首次持久化与立即刷新_实施周期07.md"
     note: "冻结 confirmed 后首次持久化、下一动作 update_plan、会话解析、UI_SYNC_BLOCKED 和十分钟异常修复边界。"
+  - evidence_id: evidence.skill.session-handoff
+    type: "skill"
+    source: "session-handoff-rules/SKILL.md"
+    path: "session-handoff-rules/SKILL.md"
+    note: "会话交接触发词、事实抽取、脱敏、同项目 local 创建、等待和 manual_only 归档边界来源。"
+  - evidence_id: evidence.test.session-handoff
+    type: "test"
+    source: "会话交接包契约测试"
+    path: "test/session-handoff-rules/validate_handoff_packet_test.py"
+    note: "覆盖有效交接包、next_steps 非空、敏感字段拒绝和字节上限；本地四项断言通过。"
+  - evidence_id: evidence.review.session-handoff
+    type: "review"
+    source: "会话交接 skill 6-review"
+    path: "doc/6-review/2026-08-02_033000_会话交接skill_6-review.md"
+    note: "记录 UTF-8、目录归位、命名、注释和脚本可读性风格回归结论。"
+  - evidence_id: evidence.dialog.session-handoff-triggers
+    type: "dialog"
+    source: "本轮用户确认的会话交接触发词"
+    note: "冻结开新会话继续、新会话中继续、新会话继续、会话太长、归档旧会话、迁移任务、接续任务、提取会话压缩信息和唤起另一个会话。"
 contexts:
   - context_id: context.test-asset-governance
     type: "repository-convention"
@@ -1762,6 +1826,10 @@ contexts:
     type: "repository-convention"
     name: "记忆域"
     note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
+  - context_id: context.session-handoff
+    type: "task-scope"
+    name: "会话交接与新任务接续"
+    note: "适用于提取当前会话压缩信息、生成脱敏交接包、同项目 local 创建新任务和人工归档旧任务"
   - context_id: context.task-plan-rehydration
     type: "task-scope"
     name: "任务悬浮窗断点恢复"
@@ -1799,6 +1867,7 @@ lifecycle:
     - "rule.git-commit-domain-split"
     - "rule.git-commit-review-acceptance-evidence"
     - "rule.task-plan-rehydration"
+    - "rule.session-handoff"
     - "rule.plan-mode-decision-wait-loop"
     - "rule.reasoning-summary-detail"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
@@ -1808,6 +1877,30 @@ lifecycle:
   retired: []
 retrieval_hints:
   aliases:
+    开新会话继续:
+      - "rule.session-handoff"
+    新会话中继续:
+      - "rule.session-handoff"
+    新会话继续:
+      - "rule.session-handoff"
+    会话太长:
+      - "rule.session-handoff"
+    归档旧会话:
+      - "rule.session-handoff"
+    迁移任务:
+      - "rule.session-handoff"
+    接续任务:
+      - "rule.session-handoff"
+    提取会话压缩信息:
+      - "rule.session-handoff"
+    唤起另一个会话:
+      - "rule.session-handoff"
+    会话交接:
+      - "rule.session-handoff"
+    交接包:
+      - "rule.session-handoff"
+    新任务接续:
+      - "rule.session-handoff"
     任务投影:
       - "rule.task-plan-rehydration"
     悬浮任务列表恢复:
@@ -1977,6 +2070,12 @@ retrieval_hints:
     代码实现单独提交:
       - "rule.git-commit-domain-split"
   scopes:
+    会话交接:
+      - "rule.session-handoff"
+    新任务接续:
+      - "rule.session-handoff"
+    交接包脱敏:
+      - "rule.session-handoff"
     Imagegen Skill 维护:
       - "rule.imagegen-error-case-evolution"
     执行失败持续学习:
@@ -2069,6 +2168,24 @@ retrieval_hints:
     提交域隔离:
       - "rule.git-commit-domain-split"
   sources:
+    session-handoff-rules/SKILL.md:
+      - "rule.session-handoff"
+    session-handoff-rules/references/handoff-packet-contract.md:
+      - "rule.session-handoff"
+    session-handoff-rules/references/codex-thread-routing.md:
+      - "rule.session-handoff"
+    session-handoff-rules/scripts/validate_handoff_packet.py:
+      - "rule.session-handoff"
+    test/session-handoff-rules/validate_handoff_packet_test.py:
+      - "rule.session-handoff"
+    doc/6-review/2026-08-02_033000_会话交接skill_6-review.md:
+      - "rule.session-handoff"
+    编码skill.md:
+      - "rule.session-handoff"
+    字典.md:
+      - "rule.session-handoff"
+    skill-dictionary/data.js:
+      - "rule.session-handoff"
     task-plan-rehydration-rules/SKILL.md:
       - "rule.task-plan-rehydration"
     task-plan-rehydration-rules/references/task-plan-projection-contract.md:
