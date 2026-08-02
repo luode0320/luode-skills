@@ -6,39 +6,42 @@
 
 ## 当前任务
 
-- 来源对象：用户已确认的独立 `session-handoff-rules` skill。
-- 当前目标：提取当前会话压缩信息，生成脱敏交接包，并在同一保存项目的 `local` 环境创建新 Codex 任务继续；默认只提示人工归档旧任务。
-- 当前状态：skill 本体、触发词、Codex App 路由、交接包契约、标准库校验脚本、契约测试、项目记忆和字典均已落盘；风格回归通过；同项目 local 新任务已取得真实任务标识，新任务启动契约核验已完成。
+- 来源对象：用户确认的 `REQ-PSR-CONFIG-SECRET-001` 与 `CYCLE-PSR-19-001`。
+- 当前目标：调整独立后端 `config/embedded/` 与同仓后端 `backend/config/embedded/` 的私密配置边界，明确源码优先且默认不依赖环境变量，并完成规则、测试和文档收口。
+- 当前状态：需求、周期文档、Reference、Catalog、Schema、专项测试、文档门禁和 6-review 均已通过，CYCLE-19 完成。
 
 ## 范围与边界
 
-- 范围：`session-handoff-rules`、交接包 JSON 契约、脱敏 / 大小校验、`list_projects -> create_thread -> wait_threads` 路由、根 `test/` 契约测试、项目记忆和 skill 字典。
-- 非范围：再次创建新任务、自动调用 `set_thread_archived`、旧任务归档、业务项目代码、数据库、外部服务和 Git 历史写入。
+- 范围：配置 reference、目录树、Catalog/Schema、根 `test/package-structure-rules` 专项测试、CYCLE-19 需求/实施文档、`doc/6-review` 和项目四件套记忆。
+- 非范围：真实项目迁移、具体配置加载器、真实密钥读取、历史 `doc/6-审查`/`doc/7-验收` 删除、数据库/外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 新增 `session-handoff-rules/SKILL.md`，覆盖九个触发词、事实抽取、脱敏、local 项目创建、等待和人工归档边界。
-- 新增 `references/handoff-packet-contract.md`、`references/codex-thread-routing.md` 与 `scripts/validate_handoff_packet.py`。
-- 新增 `test/session-handoff-rules/validate_handoff_packet_test.py`，覆盖有效包、`next_steps` 缺失、敏感字段和大小限制。
-- `编码skill.md`、`PROJECT_MEMORY.md`、`字典.md` 和 `skill-dictionary/data.js` 已同步；字典将新 skill 归入记忆域。
-- 已完成本地验证：quick validation 通过，交接包定向测试 `4/4` 通过，根 `test/` 全量 Python 入口 `191/191` 通过，`git diff --check` 通过。
+- 已完成 CYCLE-15 入口基线修复：同仓 `backend/crontask/**/main.go` 与治理文件放行，`backend/internal|src/**/main.go` 仍拒绝；入口回归 `5/5` 通过。
+- 已更新三类人工目录树和 Catalog skeleton；活动目录固定为 `doc/1-架构/` 至 `doc/6-review/`，条件图片目录为 `doc/data/images/`。
+- 已新增 `test/package-structure-rules/project_layout_contract_test.py`、测试 README、CYCLE-16 实施周期文档和 `doc/6-review` 记录。
+- 已同步 V2 需求、实施总览、`PROJECT_MEMORY.md` 与 `PROJECT_HISTORY.md`，保留历史旧目录只读边界。
+- 已保留 CYCLE-17 环境命名行为测试 `6/6` 及既有目录/入口回归证据；本轮新增 embedded 私密策略断言并完成最终回归与文档门禁。
+- 已完成 CYCLE-18 三类项目根 `test/` 目录统一：根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过；未迁移真实项目。
+- 已完成 `TASK-TEST-MOCK-MIRROR-01` 测试资产规则补充：mock、stub、fake、fixture、helper 与测试程序统一放根 `test/`，源码关联模拟程序按源码相对路径镜像，跨源码复用进入 `test/shared/`，`doc/5-tests/` 仅保存非可执行证据；治理测试 `13/13`、根 Python 测试 `216/216`、六个 Skill 校验、测试文档 profile 与 `6-review STYLE: PASS` 均通过。
 
 ## 门禁说明
 
-- 本轮 `Obsidian:不适用`；任务只维护仓库内 skill、测试和字典，不读取或写入 vault。所有实现与验证仅使用本地仓库、Windows Python、临时目录和本地 Git 只读检查。
+- 本轮 `Obsidian:阻断`；固定 vault 未注册，未通过直接文件系统替代。所有实现与验证仅使用本地仓库、Windows Python、临时目录和 Git 只读检查。
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前新任务投影 `REQ-SH-START-20260802-001` 已完成、失活并同步收口。
-- 最后执行点：交接包已通过标准库校验，当前代码、项目文档和工作树边界已核对；`quick_validate`、定向契约测试 `4/4` 和根测试 `191/191` 已复验通过；本轮未再次创建任务、未调用归档工具、未执行 Git 历史写入。
+- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-TEST-ROOT-001/CYCLE-18` 已完成全部四个任务并按 session 精确失活。
+- 最后执行点：CYCLE-19 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、需求/实施总览/实施周期/test/style 文档 profile、`py_compile`、quick validation 和 `git diff --check` 均通过；本轮不执行 Git 历史写入。
+- 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-02T09:51:50.898982Z",
+  "registry_updated_at": "2026-08-02T15:22:43.633413Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -407,6 +410,128 @@
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
           "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/11e982a25f3f9f8877b17732cd8ab5dad88886e3d928d7b45c510944bb906d4e",
+      "session_id": "019fc1e8-65d8-72f3-b418-f982b3549904",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-TEST-ROOT-001/CYCLE-18",
+      "source_document": "doc/3-实施/2026-08-02_代码位置目录规则V2_实施周期18_三类项目根test目录统一.md",
+      "plan_fingerprint": "0080297ed57967a3c260a01262bd07fc5f652df40e9455228d6a3e9bbe93a04b",
+      "updated_at": "2026-08-02T14:33:35.627457Z",
+      "steps": [
+        {
+          "id": "TASK-18-01",
+          "step": "[TASK-18-01] 冻结需求变更与实施周期",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-18-02",
+          "step": "[TASK-18-02] 同步三类目录事实并扩展测试",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-18-03",
+          "step": "[TASK-18-03] 形成测试证据并执行 Skill 合规门禁",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-18-04",
+          "step": "[TASK-18-04] 同步项目状态并完成全量回归",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/888c992190f600a40d10d731669292b4c9f3254cf2a569c295170eb226ab43c4",
+      "session_id": "019fc22a-e719-7a60-a132-2ffab6668687",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-DOC-LAYOUT-001/CYCLE-16",
+      "source_document": "doc/3-实施/2026-08-02_192314_REQ-PSR-DOC-LAYOUT-001_实施周期16_三类项目doc目录收敛.md",
+      "plan_fingerprint": "8c904a10a611a1d3cc496d458d2c507bd1386d74b5ad53ae253bf46d08c513b9",
+      "updated_at": "2026-08-02T12:25:50.203460Z",
+      "steps": [
+        {
+          "id": "TASK-PSR-DOC-16-01",
+          "step": "[TASK-PSR-DOC-16-01] 修复CYCLE-15基线并冻结目录契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSR-DOC-16-02",
+          "step": "[TASK-PSR-DOC-16-02] 更新需求、实施与布局参考文档",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSR-DOC-16-03",
+          "step": "[TASK-PSR-DOC-16-03] 更新目录契约测试与测试证据",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSR-DOC-16-04",
+          "step": "[TASK-PSR-DOC-16-04] 完成6-review、记忆同步与全量验证",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/b4539921b46cc90f2362f6e7528d06a706a455fd37321067a00faebf42db013a",
+      "session_id": "019fc2c4-0c60-7943-9924-c4151c399098",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260802T144701Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-02T14:49:22.609324Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/7e7856c1e4dcdb18e65cacf98f8bd63a3d87cd3f1622cfb7a4feb1f189f72632",
+      "session_id": "019fc29a-d4f6-7080-8fbc-482ff5f20de3",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "active",
+      "plan_key": "SYNTH-FALLBACK/20260802T152243Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-02T15:22:43.632990Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "in_progress"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "pending"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "pending"
         }
       ]
     }

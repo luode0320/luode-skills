@@ -207,7 +207,7 @@
 ### 根测试代码与测试证据双根规则
 - 别名: 根 test 目录, 测试资产镜像, doc/5-tests 证据根
 - 类型: 测试资产目录规则
-- 定义: 根 `test/` 是唯一活动测试代码根，测试程序、mock、fixture、helper 与启动脚本按被测源码或 Skill 目录镜像存放；Python 统一使用 `*_test.py`。`doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图与非可执行产物。历史 `doc/5-tests/` 中的可执行资产由指纹清单只读保护，首次修改、改名或新增时才迁至根 `test/`；Go 测试仅在根 `test/` 的 ASCII 外部黑盒包中运行，源码目录禁止 `*_test.go`。
+- 定义: 根 `test/` 是唯一活动测试代码根，测试程序、mock、stub、fake、fixture、helper 与启动脚本按被测源码或 Skill 目录镜像存放；源码关联模拟程序必须与对应测试使用同一源码相对路径，只有跨源码复用的模拟能力才进入 `test/shared/`；Python 统一使用 `*_test.py`，模拟程序使用 `_mock`、`_stub` 或 `_fake` 后缀。`doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图与非可执行产物。历史 `doc/5-tests/` 中的可执行资产由指纹清单只读保护，首次修改、改名或新增时才迁至根 `test/`；Go 测试仅在根 `test/` 的 ASCII 外部黑盒包中运行，源码目录禁止 `*_test.go`。
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`test/shared/layout_policy.py`、`doc/3-实施/2026-08-01_191658_根test目录统一_实施总览.md`
 - 适用范围: 新增测试、测试资产迁移、测试策略、测试程序、真实测试归档和 6-review 目录归位
 - 更新时间: 2026-08-01
@@ -713,8 +713,11 @@
 - 稳定决策：`database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/`、`database/sql/index/` 与 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子目录只直接保存 `.sql` 文件，且与迁移源码严格隔离。
 - 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
+- 稳定决策：独立后端的默认二进制入口固定为根 `main.<ext>`，仅当存在额外 binary 时使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端对应固定为 `backend/main.<ext>` 与 `backend/cmd/<binary>/main.<ext>`。根 `cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 都是非法入口；Catalog 以动态 pattern 建模，`init` 显式启用时必须失败关闭且不得创建占位路径。
+- 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；两者均按需使用 `yaml/` 与 `embedded/` 子目录。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置使用 `embedded/config_local.go`、`embedded/config_test.go`、`embedded/config_prod.go`；环境集合可扩展，不要求所有环境齐全，也不要求 YAML 与 embedded 成对出现。禁止 `config_test_yaml.go` 等把格式名拼入文件名的旧式命名；`check` 只读，`init` 不生成动态环境配置文件。YAML 继续禁止秘密原值；backend/fullstack 的 embedded 源码允许直接包含 API key、密钥、密码等私密值，源码为主且默认不依赖环境变量，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。
+- 稳定决策：fullstack、backend、frontend 三类项目统一使用项目根 `test/` 作为活动测试代码唯一入口；独立后端使用根 `test/`，不建立 `backend/test/`；前后端同仓也不建立 `backend/test/` 或 `frontend/test/`。Catalog 的测试目录 Owner 为 `test-strategy-rules`，`doc/5-tests/` 只保存测试说明和非可执行证据，不能替代根 `test/`。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
-- 更新时间：2026-07-31。
+- 更新时间：2026-08-02。
 
 ## 非 Plan Mode 最小计划分级规则
 
@@ -724,6 +727,15 @@
 - 稳定决策：中等分级的最小计划默认不必写入 `artifact-storage-rules` 的正式实施文档；若执行中发现改动量超出预期（触达文件明显超过 5 个或触及公共模块），必须停下重新评估分级并按需升级为重量级。
 - 来源：对话确认、`implementation-planning-rules/SKILL.md`、`implementation-planning-rules/references/minimum-plan-grading.md`、`bug-fix-proposal-rules/references/confirm-before-coding.md`。
 - 更新时间：2026-07-29。
+
+## 三类项目 doc 目录收敛规则
+
+- 稳定决策：fullstack、backend、frontend 的活动研发目录统一为 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`；条件图片与截图统一放 `doc/data/images/`。
+- 稳定决策：`doc/6-审查/`、`doc/7-验收/` 只作为历史只读归档，不再进入人工活动骨架、Catalog skeleton 或新初始化结果。
+- 稳定决策：独立前端不建立根 `data/business/<domain>/`、`data/project/` 原始静态数据树；源码域 `src/modules/<domain>/data/` 和 `doc/data/images/` 不受影响。
+- 稳定决策：后端独立项目的 `doc/` 必须展开完整活动子树，注释使用“后端”；同仓目录使用工作区语义；`6-review` 说明为“测试后的风格回归记录”。
+- 来源：`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`、`doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md`、`doc/3-实施/2026-08-02_192314_REQ-PSR-DOC-LAYOUT-001_实施周期16_三类项目doc目录收敛.md`。
+- 更新时间：2026-08-02。
 
 ## 机器索引区
 
@@ -737,7 +749,7 @@ entities:
       - 根 test 目录
       - 测试资产镜像
       - doc/5-tests 证据根
-    definition: "根 test/ 是唯一活动测试代码根，测试程序、mock、fixture、helper 和启动脚本按被测目录镜像，Python 文件使用 *_test.py。doc/5-tests/ 仅保存时间戳 README 和非可执行证据；历史可执行资产由指纹清单保护，首次修改才迁移。Go 测试使用根 test/ 的 ASCII 外部黑盒包，源码目录禁止 *_test.go。"
+    definition: "根 test/ 是唯一活动测试代码根，测试程序、mock、stub、fake、fixture、helper 和启动脚本按被测目录镜像；源码关联模拟程序与对应测试使用同一源码相对路径，跨源码复用模拟能力才进入 test/shared/；Python 文件使用 *_test.py，模拟程序使用 _mock、_stub 或 _fake 后缀。doc/5-tests/ 仅保存时间戳 README 和非可执行证据；历史可执行资产由指纹清单保护，首次修改才迁移。Go 测试使用根 test/ 的 ASCII 外部黑盒包，源码目录禁止 *_test.go。"
     scope: "新增测试、活动测试迁移、真实测试归档、测试策略和 6-review 目录归位"
     status: "active"
     evidence_ids:
@@ -745,6 +757,21 @@ entities:
     context_ids:
       - context.test-asset-governance
     updated_at: 2026-08-01
+  - entity_id: rule.package-structure-three-project-test-root
+    name: "三类项目根测试目录落点"
+    type: "包结构目录规则"
+    aliases:
+      - 三类项目根 test
+      - 独立后端根 test
+      - fullstack backend frontend test
+    definition: "fullstack、backend、frontend 三类项目都把活动测试代码放在项目根 test/。独立后端不建立 backend/test/；前后端同仓不建立 backend/test/ 或 frontend/test/。Catalog 以 test-strategy-rules 为 Owner 建模唯一测试目录，doc/5-tests/ 只保存说明和非可执行证据。"
+    scope: "package-structure-rules 的人工目录树、Catalog、query、render、init 和根测试契约"
+    status: "active"
+    evidence_ids:
+      - evidence.package-structure-three-project-test-root
+    context_ids:
+      - context.test-asset-governance
+    updated_at: 2026-08-02
   - entity_id: rule.shared-static-owner-routing
     name: "共享静态 Owner 路由与可选监控消费者"
     type: "Skill 治理规则"
@@ -1444,6 +1471,11 @@ evidence:
     source: "根 test 目录统一实施与真实测试"
     path: "doc/5-tests/2026-08-01_191658_根test目录统一/README.md"
     note: "七组活动测试迁移至根 test/；治理测试 9/9、全量 Python 测试 187/187、Go 临时黑盒模块和严格文档 profile 均通过，历史 doc/5-tests 可执行资产指纹未变化。"
+  - evidence_id: evidence.package-structure-three-project-test-root
+    type: "test"
+    source: "代码位置目录规则 V2 CYCLE-18 三类项目根 test 目录统一"
+    path: "doc/5-tests/2026-08-02_235000_三类项目根test目录统一/README.md"
+    note: "三类 Catalog、人工目录树、query、render 和 init 的根 test 契约测试 4/4 通过；入口回归 5/5、配置回归 7/7、根 Python 测试 212/212、文档 profile 和 Skill 校验通过。"
   - evidence_id: evidence.shared-static-owner-routing
     type: "skill"
     source: "6-review 共享静态 Owner 路由"
@@ -1777,7 +1809,7 @@ contexts:
   - context_id: context.test-asset-governance
     type: "repository-convention"
     name: "测试资产双根治理"
-    note: "适用于根 test/ 镜像、doc/5-tests/ 证据、历史可执行资产按需迁移、Python 命名和 Go 黑盒路径"
+    note: "适用于根 test/ 镜像、源码关联 mock/stub/fake、doc/5-tests/ 证据、历史可执行资产按需迁移、Python 命名和 Go 黑盒路径"
   - context_id: context.task-blocker-closure
     type: "task-scope"
     name: "任务阻断收口与恢复"

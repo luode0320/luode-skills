@@ -203,3 +203,35 @@
 - 活动测试代码统一迁入根 `test/` 镜像目录，七组原 `*/tests/` 活动测试已迁移为 `*_test.py`；`doc/5-tests/` 只保留 README、日志、报告、截图和非可执行证据。
 - 新增测试资产治理、历史 `doc/5-tests/` 可执行资产指纹清单、统一 Python 入口和 Go 根 `test/` 外部黑盒布局正负例；活动规则、Git 协作、Skill 合规、目录树、字典和项目文档已同步。
 - 字典生成成功，全量 Python 测试 `187/187`、测试资产治理 `9/9`、七类严格文档 profile、旧 Go 阻断表达扫描、`git diff --check` 与 `git diff --cached --check` 均通过；Obsidian 固定 vault 未注册，未执行 vault 沉淀或 Git 历史写入。
+
+## 2026-08-02：三类项目 doc 目录收敛
+
+- fullstack、backend、frontend 的活动研发目录统一为 `doc/1-架构/` 至 `doc/6-review/`，条件图片目录统一为 `doc/data/images/`；`doc/6-审查/`、`doc/7-验收/` 保留为历史只读，不再进入活动骨架。
+- 独立前端删除根 `data/business/project` 目录事实，后端独立项目补齐完整 `doc/` 子树；新增根目录契约测试和测试 README，CYCLE-15 同仓入口误判以最小分支修复并回归通过。
+- 本地目录专项测试 `2/2`、入口回归 `5/5`；本轮未执行 Git 历史写入，Obsidian 固定 vault 未注册。
+- 最终收口复验：实施总览、实施周期和 `6-review` profile 均返回 `valid: true`，根 Python 测试 `203/203` 通过，`git diff --check` 无错误；当前会话投影随后按 session 精确失活，未执行 Git 历史写入。
+- 继续回合复核发现 CYCLE-16 周期文档和项目当前状态残留旧的 `in_progress/pending/待执行` 文案；已按现有验证证据同步为 `accepted/completed`，未扩大用户范围或执行 Git 历史写入。
+
+## 2026-08-02：环境配置文件命名收敛完成
+
+- 独立后端配置固定在 `config/`，同仓后端配置固定在 `backend/config/`；`yaml/` 使用 `config_<env>.yaml|yml`，Go `embedded/` 使用 `config_<env>.go`，明确 `local/test/prod` 常见环境示例、可扩展环境和 YAML/embedded 可不配对。
+- `check` 保持只读，`init` 不生成动态环境配置文件；旧式 `config_test_yaml.go` 拒绝，秘密原值不进入提交资产。配置专项 `6/6`、目录 `2/2`、入口 `5/5`、根 Python `209/209`、文档 profile、Python 编译、Skill quick validation、CodeGraph sync 与 `git diff --check` 均通过。
+- 当前会话投影 `REQ-PSR-CONFIG-ENV-001/CYCLE-17` 的五个任务已完成并按 session 精确失活；Obsidian 固定 vault 未注册，本轮未执行 vault 沉淀或 Git 历史写入。
+
+## 2026-08-02：embedded 私密配置边界收敛启动
+
+- 用户确认独立后端 `config/embedded/` 与同仓后端 `backend/config/embedded/` 允许源码直接配置 API key、密钥、密码等私密信息，源码配置为主且默认不依赖环境变量。
+- YAML 仍禁止秘密原值；允许源码内秘密不扩大到 Agent 输出、日志、README、错误、测试报告或知识库，所有证据继续使用脱敏占位符。
+- 已新增 `REQ-PSR-CONFIG-SECRET-001`、CYCLE-19、Catalog/Schema 策略字段和专项断言；本轮未执行 Git 历史写入，未连接外部服务。
+
+## 2026-08-02：embedded 私密配置边界收敛完成
+
+- 独立后端 `config/embedded/` 与同仓后端 `backend/config/embedded/` 已明确允许源码直接配置私密值，源码优先且默认不依赖环境变量；YAML 与外部输出继续禁止秘密原值。
+- 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、五类工程文档 profile、Skill quick validation、Python 编译和 `git diff --check` 均通过。
+- CYCLE-19 需求、实施、测试、`6-review` 与项目记忆已完成脱敏收口；未连接外部服务、未执行 Git 历史写入，Obsidian 固定 vault 未注册。
+
+## 2026-08-02：三类项目根 test 目录统一完成
+
+- fullstack、backend、frontend 的活动测试代码统一落在项目根 `test/`；独立后端不建立 `backend/test/`，前后端同仓不建立 `backend/test/` 或 `frontend/test/`；`doc/5-tests/` 继续只保存说明和非可执行证据。
+- Catalog、人工目录树、skeleton、query、render、init 和根目录契约测试已同步；根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过。
+- 本周期未迁移真实项目、未连接外部服务、未执行 Git 历史写入；Obsidian 固定 vault 未注册，沉淀按 bridge 规则阻断。
