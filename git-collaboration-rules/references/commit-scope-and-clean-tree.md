@@ -4,10 +4,11 @@
 
 ### 提交域隔离
 
-- `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`、`doc/7-验收/` 各自属于独立流程产物域，不得混入同一 commit。
-- 测试文件至少包括 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`，归入测试提交，不与代码实现混提。
-- 代码实现和运行配置作为实现域，不与流程文档域或测试域混提。
-- 每次暂存前先冻结当前 commit 的文件清单；发现跨域时拆分，不为追求一次提交强行混提。
+- 同一任务的流程文档统一归入 `docs` 提交域，包含 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`、`doc/7-验收/` 以及项目状态同步文件。
+- 项目状态同步文件至少包括 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`、`PROJECT_STYLE.md`、`编码skill.md`、`字典.md`、`skill-dictionary/data.js`；它们默认跟随同一任务的 `docs` 提交，不再额外拆 `chore`。
+- 可执行测试文件至少包括根 `test/**`、`*_test.*`、`*.spec.*`、`*.test.*`，归入 `test` 提交，不与代码实现或 `docs` 提交混提；`doc/5-tests/**` 只保存测试说明、日志、报告、截图和非可执行证据，归入 `docs` 提交。
+- 代码实现和运行配置作为实现域，不与 `docs` 域或 `test` 域混提。
+- 每次暂存前先冻结当前 commit 的文件清单；发现 `docs`、`test`、实现域跨域时拆分，不为追求一次提交强行混提。
 
 ### 清空目标
 

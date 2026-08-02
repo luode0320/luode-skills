@@ -5,37 +5,37 @@ TITLE="${1:-}"
 
 # [参数] $1: 内部提交域标识
 # [返回] 输出对应的中文域名，未知时回退原始标识
-# 最近修改时间: 2026-07-08 11:57:00 为提交域隔离门禁补充可读的错误输出标签
+# 最近修改时间: 2026-08-02 16:35:00 收敛提交域标签以匹配 docs/test/实现三类边界
 domain_label() {
+  # 1. 将内部提交域标识转换为门禁输出标签，保持阻断信息可读。
   case "${1:-}" in
-    requirement) printf '需求' ;;
-    implementation_doc) printf '实施' ;;
-    bug) printf 'Bug' ;;
+    docs) printf '同任务文档/项目状态' ;;
     test) printf '测试' ;;
-    review) printf '审查' ;;
-    acceptance) printf '验收' ;;
     implementation) printf '代码实现/运行配置' ;;
     *) printf '%s' "${1:-unknown}" ;;
   esac
 }
 
 # [参数] $1: staged 文件路径
-# [返回] 输出该文件所属的提交流程域；README.md 返回空值以跳过域判定
-# 最近修改时间: 2026-07-08 11:57:00 新增提交流程域分类，阻断代码实现与文档/测试混提
+# [返回] 输出该文件所属的提交域；README.md 返回空值以跳过域判定
+# 最近修改时间: 2026-08-02 16:35:00 合并同一任务流程文档与项目状态提交域
 classify_commit_domain() {
   local path="${1:-}"
+  # 1. 先识别流程文档和项目状态文件，统一归入 docs 域。
   case "$path" in
     README.md) printf '\n'; return 0 ;;
-    doc/2-需求/*) printf 'requirement\n'; return 0 ;;
-    doc/3-实施/*) printf 'implementation_doc\n'; return 0 ;;
-    doc/4-bugs/*) printf 'bug\n'; return 0 ;;
-    doc/5-tests/*) printf 'test\n'; return 0 ;;
-    doc/6-review/*) printf 'review\n'; return 0 ;;
-    doc/7-验收/*) printf 'acceptance\n'; return 0 ;;
+    PROJECT_CURRENT.md|PROJECT_MEMORY.md|PROJECT_HISTORY.md|PROJECT_STYLE.md) printf 'docs\n'; return 0 ;;
+    编码skill.md|字典.md|skill-dictionary/data.js) printf 'docs\n'; return 0 ;;
   esac
 
+  # 2. 再识别根 test 目录和测试命名文件，保持可执行测试独立。
   case "$path" in
-    *_test.*|test_*.*|*.spec.*|*.test.*) printf 'test\n'; return 0 ;;
+    test/*|*_test.*|test_*.*|*.spec.*|*.test.*) printf 'test\n'; return 0 ;;
+  esac
+
+  # 3. 其余流程文档归入 docs，剩余文件保留为实现域。
+  case "$path" in
+    doc/2-需求/*|doc/3-实施/*|doc/4-bugs/*|doc/5-tests/*|doc/6-review/*|doc/7-验收/*) printf 'docs\n'; return 0 ;;
   esac
 
   printf 'implementation\n'
@@ -126,7 +126,7 @@ if staged_name_only | rg '^internal/service/[^/]+\.go$' >/dev/null; then
   exit 16
 fi
 
-# 6) staged 提交域隔离扫描：流程文档域、测试域与代码实现域分开提交
+# 6) staged 提交域隔离扫描：同任务文档/项目状态、测试与代码实现分开提交
 declare -A DOMAIN_FILES=()
 declare -A DOMAIN_SEEN=()
 ARTIFACT_DOMAINS=()
@@ -147,13 +147,13 @@ while IFS= read -r staged_path; do
 done < <(staged_name_only)
 
 if (( HAS_IMPLEMENTATION )) && ((${#ARTIFACT_DOMAINS[@]} > 0)); then
-  echo "BLOCK: staged implementation files mixed with doc/test commit domains" >&2
+  echo "BLOCK: staged implementation files mixed with docs/test commit domains" >&2
   print_domain_details implementation "${ARTIFACT_DOMAINS[@]}"
   exit 17
 fi
 
 if ((${#ARTIFACT_DOMAINS[@]} > 1)); then
-  echo "BLOCK: staged files span multiple doc/test commit domains" >&2
+  echo "BLOCK: staged files span multiple docs/test commit domains" >&2
   print_domain_details "${ARTIFACT_DOMAINS[@]}"
   exit 17
 fi
