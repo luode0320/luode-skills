@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Handoff"
+  short_description: "Extract session state and continue in a new local Codex task"
+  default_prompt: "Use $session-handoff-rules to extract the current task state and continue it in a new local task."
