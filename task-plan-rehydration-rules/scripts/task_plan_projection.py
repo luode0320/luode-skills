@@ -12,7 +12,7 @@ import sys
 import tempfile
 import time
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -29,6 +29,7 @@ LEGACY_SESSION_ID = "legacy/default"
 LOCK_RETRIES = 40
 LOCK_WAIT_SECONDS = 0.05
 TIMEOUT_SECONDS = 600.0
+INACTIVE_PROJECTION_RETENTION_SECONDS = 604_800
 SESSION_ENV_NAME = "CODEX_THREAD_ID"
 EXPLANATION = "悬浮任务列表已从 PROJECT_CURRENT 重建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_EXACT = "悬浮任务列表已根据当前会话与项目文档正式补建；进行中步骤必须先核验中断点"
@@ -842,6 +843,38 @@ def _projection_file_lock(path: Path):
                 pass
 
 
+def _prune_expired_inactive_projections(
+    registry: Mapping[str, Any],
+    *,
+    current_session_id: str,
+    observed_at: datetime | None = None,
+) -> dict[str, Any]:
+    """删除超过保留窗口的非当前会话完成投影。
+
+    [参数] registry: 已校验的 v4 注册表；current_session_id: 当前会话；observed_at: 可注入的 UTC 当前时间。
+    [返回] dict：仅移除过期完成投影后的 registry 副本。
+    最近修改时间：2026-08-02 12:33:51；改动原因：限制 PROJECT_CURRENT 只保留近期完成投影。
+    """
+    # 1. 先复制并校验当前会话，避免清理逻辑修改调用方传入对象。
+    sid = _require_session_id(current_session_id)
+    now = observed_at or datetime.now(timezone.utc)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ProjectionContractError("observed_at must be timezone-aware")
+    cutoff = now.astimezone(timezone.utc) - timedelta(seconds=INACTIVE_PROJECTION_RETENTION_SECONDS)
+    updated_registry = dict(registry)
+    retained = []
+    for item in registry["projections"]:
+        entry = dict(item)
+        if entry["session_id"] == sid or entry["state"] != "inactive":
+            retained.append(entry)
+            continue
+        completed_at = _parse_utc_timestamp("updated_at", entry["updated_at"])
+        if completed_at >= cutoff:
+            retained.append(entry)
+    updated_registry["projections"] = retained
+    return updated_registry
+
+
 def _upsert_projection_while_locked(
     target: Path,
     document: str,
@@ -870,8 +903,14 @@ def _upsert_projection_while_locked(
     if not replaced:
         updated_registry["projections"].append(entry)
 
-    # 2. 先校验完整候选 registry 和文件大小，再执行唯一一次原子替换。
-    updated_registry["registry_updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    # 2. 统一清理过期完成投影，再校验完整候选 registry 和文件大小。
+    now = datetime.now(timezone.utc)
+    updated_registry = _prune_expired_inactive_projections(
+        updated_registry,
+        current_session_id=session_id,
+        observed_at=now,
+    )
+    updated_registry["registry_updated_at"] = now.isoformat().replace("+00:00", "Z")
     updated_registry = validate_registry(updated_registry)
     newline = "\r\n" if "\r\n" in document else "\n"
     block = render_registry_block(updated_registry, newline)
