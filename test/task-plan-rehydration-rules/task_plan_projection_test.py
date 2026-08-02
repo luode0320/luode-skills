@@ -13,6 +13,7 @@ import tempfile
 import threading
 import time
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -145,9 +146,10 @@ class TaskPlanProjectionTests(unittest.TestCase):
         statuses: tuple[str, ...] = ("completed", "in_progress", "pending"),
         *,
         state: str = "active",
+        updated_at: str = "2026-07-23T00:00:00Z",
     ) -> dict[str, object]:
         """构造带会话归属的 v4 注册表投影条目。"""
-        projection_value = self._sample(statuses, state=state)
+        projection_value = self._sample(statuses, state=state, updated_at=updated_at)
         # 用会话前缀区分步骤，payload 断言可以发现跨会话串线。
         normalized_session = re.sub(r"[^A-Za-z0-9]+", "-", session_id).strip("-").upper() or "SESSION"
         for index, step in enumerate(projection_value["steps"], 1):
@@ -176,9 +178,10 @@ class TaskPlanProjectionTests(unittest.TestCase):
         statuses: tuple[str, ...] = ("completed", "in_progress", "pending"),
         *,
         state: str = "active",
+        updated_at: str = "2026-07-23T00:00:00Z",
     ) -> dict[str, object]:
         """构造供 write/upsert API 接收的带会话区分步骤的 v3 投影。"""
-        entry = self._sample_v4_entry(session_id, statuses, state=state)
+        entry = self._sample_v4_entry(session_id, statuses, state=state, updated_at=updated_at)
         return {
             "version": 3,
             "projection_origin": entry["projection_origin"],
@@ -1428,6 +1431,102 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(loaded_a["steps"][-1]["status"], "in_progress")
             self.assertEqual(loaded_b["steps"][1]["status"], "in_progress")
             self.assertNotEqual(loaded_a["steps"][0]["id"], loaded_b["steps"][0]["id"])
+
+    def test_prunes_only_expired_inactive_non_current_session(self) -> None:
+        """验证七天清理只删除非当前会话的过期完成投影。"""
+        # 1. 构造严格边界、近期、当前会话、活动和阻断五类保护样本。
+        observed_at = datetime(2026, 8, 2, tzinfo=timezone.utc)
+        cutoff = observed_at - timedelta(seconds=projection.INACTIVE_PROJECTION_RETENTION_SECONDS)
+        old_inactive = self._sample_v4_entry(
+            "old-inactive",
+            ("completed", "completed"),
+            state="inactive",
+            updated_at=(cutoff - timedelta(seconds=1)).isoformat().replace("+00:00", "Z"),
+        )
+        boundary_inactive = self._sample_v4_entry(
+            "boundary-inactive",
+            ("completed", "completed"),
+            state="inactive",
+            updated_at=cutoff.isoformat().replace("+00:00", "Z"),
+        )
+        recent_inactive = self._sample_v4_entry(
+            "recent-inactive",
+            ("completed", "completed"),
+            state="inactive",
+            updated_at=(cutoff + timedelta(seconds=1)).isoformat().replace("+00:00", "Z"),
+        )
+        current_inactive = self._sample_v4_entry(
+            "current-session",
+            ("completed", "completed"),
+            state="inactive",
+            updated_at=(cutoff - timedelta(days=3)).isoformat().replace("+00:00", "Z"),
+        )
+        old_active = self._sample_v4_entry(
+            "old-active",
+            updated_at=(cutoff - timedelta(days=3)).isoformat().replace("+00:00", "Z"),
+        )
+        blocked_goal = self._goal_sample(("completed", "pending", "pending"), state="blocked", synthesis_mode="goal_blocked")
+        blocked_goal["updated_at"] = (cutoff - timedelta(days=3)).isoformat().replace("+00:00", "Z")
+        old_blocked = projection._projection_entry_from_projection(blocked_goal, "old-blocked")
+        registry = projection._new_registry(
+            [old_inactive, boundary_inactive, recent_inactive, current_inactive, old_active, old_blocked]
+        )
+
+        # 2. 当前会话和非完成状态必须保留，只有旧的其它会话完成投影被清理。
+        pruned = projection._prune_expired_inactive_projections(
+            registry,
+            current_session_id="current-session",
+            observed_at=observed_at,
+        )
+        self.assertEqual(
+            {item["session_id"] for item in pruned["projections"]},
+            {"boundary-inactive", "recent-inactive", "current-session", "old-active", "old-blocked"},
+        )
+
+    def test_upsert_prunes_expired_inactive_entries_and_preserves_atomic_failure(self) -> None:
+        """验证真实写入路径清理旧完成投影，原子写失败时原文件不变。"""
+        # 1. 先直接写入一个带旧完成投影的 registry，再用任意当前会话写入触发清理。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            now = datetime.now(timezone.utc)
+            old_at = (now - timedelta(seconds=projection.INACTIVE_PROJECTION_RETENTION_SECONDS + 60)).isoformat().replace("+00:00", "Z")
+            recent_at = (now - timedelta(seconds=60)).isoformat().replace("+00:00", "Z")
+            registry = projection._new_registry(
+                [
+                    self._sample_v4_entry("old-inactive", ("completed", "completed"), state="inactive", updated_at=old_at),
+                    self._sample_v4_entry("recent-inactive", ("completed", "completed"), state="inactive", updated_at=recent_at),
+                    self._sample_v4_entry("old-active", updated_at=old_at),
+                ]
+            )
+            path.write_text(
+                "# 项目当前状态\n\n用户正文。\n" + projection.render_registry_block(registry) + "\n",
+                encoding="utf-8",
+            )
+
+            projection.upsert_projection(path, self._sample_v4_projection("writer-session"), session_id="writer-session")
+            remaining = {item["session_id"] for item in projection.load_registry(path)["projections"]}
+            self.assertEqual(remaining, {"recent-inactive", "old-active", "writer-session"})
+
+        # 2. 原子替换失败时，即使候选 registry 会删除旧完成投影，磁盘原文也必须保持不变。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = self._write_current(root)
+            registry = projection._new_registry(
+                [
+                    self._sample_v4_entry("old-inactive", ("completed", "completed"), state="inactive", updated_at=old_at),
+                    self._sample_v4_entry("recent-inactive", ("completed", "completed"), state="inactive", updated_at=recent_at),
+                ]
+            )
+            path.write_text(
+                "# 项目当前状态\n\n用户正文。\n" + projection.render_registry_block(registry) + "\n",
+                encoding="utf-8",
+            )
+            before = path.read_bytes()
+            with mock.patch.object(projection, "_write_text_atomic", side_effect=projection.ProjectionIOError("boom")):
+                with self.assertRaises(projection.ProjectionIOError):
+                    projection.upsert_projection(path, self._sample_v4_projection("writer-session"), session_id="writer-session")
+            self.assertEqual(path.read_bytes(), before)
 
     def test_payload_and_deactivate_are_scoped_to_session(self) -> None:
         """验证 payload 与失活只操作指定会话投影。"""
