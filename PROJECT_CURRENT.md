@@ -38,106 +38,8 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-02T05:01:42.198442Z",
+  "registry_updated_at": "2026-08-02T09:51:50.898982Z",
   "projections": [
-    {
-      "projection_id": "SESSION/53bbdc7515365d913192a90ec514e04314175256f1b1987074ac04697dda7366",
-      "session_id": "019f9819-51c9-7380-8ff2-8b77ff9e7966",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-RT-20260712-001/CYCLE-RT-13..18",
-      "source_document": "doc/3-实施/2026-07-12_190609_通用上线测试引擎_修订版全量实施计划.md",
-      "plan_fingerprint": "115c7cfa1e9da5a7d5c68fde68d664219cf2349f3dc387d9c8c474fedeaf507c",
-      "updated_at": "2026-07-25T06:50:26Z",
-      "steps": [
-        {
-          "id": "C13-01",
-          "step": "[C13-01] 加载 external-scenario/1.0 并跑通 HTTP JSON 读场景",
-          "status": "completed"
-        },
-        {
-          "id": "C13-02",
-          "step": "[C13-02] 实现候选生成、验证与生命周期迁移",
-          "status": "completed"
-        },
-        {
-          "id": "C14-01",
-          "step": "[C14-01] 实现 form/multipart 上传读回与清理",
-          "status": "completed"
-        },
-        {
-          "id": "C14-02",
-          "step": "[C14-02] 实现下载头与内容摘要验证",
-          "status": "completed"
-        },
-        {
-          "id": "C14-03",
-          "step": "[C14-03] 实现 SSE 关联、断流与重连场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-01",
-          "step": "[C15-01] 实现原生 WebSocket 场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-02",
-          "step": "[C15-02] 实现 Socket.IO namespace/event/ack 场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-03",
-          "step": "[C15-03] 实现 HTTP 到实时事件再到 HTTP 读回",
-          "status": "completed"
-        },
-        {
-          "id": "C16-01",
-          "step": "[C16-01] 实现外部结果优先与受控只读探针",
-          "status": "completed"
-        },
-        {
-          "id": "C16-02",
-          "step": "[C16-02] 实现清理、临时命名空间与污染阻断",
-          "status": "completed"
-        },
-        {
-          "id": "C16-03",
-          "step": "[C16-03] 实现跨协议确定性 oracle",
-          "status": "completed"
-        },
-        {
-          "id": "C17-01",
-          "step": "[C17-01] 拆分接口结果与场景结果报告",
-          "status": "completed"
-        },
-        {
-          "id": "C17-02",
-          "step": "[C17-02] 实现 shadow 双轨对账",
-          "status": "completed"
-        },
-        {
-          "id": "C17-03",
-          "step": "[C17-03] 实现场景硬门禁切换",
-          "status": "completed"
-        },
-        {
-          "id": "C18-01",
-          "step": "[C18-01] 实现旧资产与 CLI 兼容迁移",
-          "status": "completed"
-        },
-        {
-          "id": "C18-02",
-          "step": "[C18-02] 实现隔离工具环境与 doctor",
-          "status": "completed"
-        },
-        {
-          "id": "C18-03",
-          "step": "[C18-03] 完成字典、回归、审查与最终验收",
-          "status": "completed"
-        }
-      ]
-    },
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
       "session_id": "019f9816-ff13-7072-8560-1e7662073134",
@@ -168,190 +70,6 @@
           "id": "TASK-RTP-13",
           "step": "[TASK-RTP-13] 完成字典回归审查与验收",
           "status": "in_progress"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/c2bcdd2ae69ca02ea8bb2c5245216040be065b9bed627279ea8e46cc319828d1",
-      "session_id": "019f9550-ec83-7fe1-a9c2-e76721253920",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-RT-20260712-001/CYCLE-RT-13..18",
-      "source_document": "doc/3-实施/2026-07-12_190609_通用上线测试引擎_修订版全量实施计划.md",
-      "plan_fingerprint": "115c7cfa1e9da5a7d5c68fde68d664219cf2349f3dc387d9c8c474fedeaf507c",
-      "updated_at": "2026-07-25T16:00:12.390563Z",
-      "steps": [
-        {
-          "id": "C13-01",
-          "step": "[C13-01] 加载 external-scenario/1.0 并跑通 HTTP JSON 读场景",
-          "status": "completed"
-        },
-        {
-          "id": "C13-02",
-          "step": "[C13-02] 实现候选生成、验证与生命周期迁移",
-          "status": "completed"
-        },
-        {
-          "id": "C14-01",
-          "step": "[C14-01] 实现 form/multipart 上传读回与清理",
-          "status": "completed"
-        },
-        {
-          "id": "C14-02",
-          "step": "[C14-02] 实现下载头与内容摘要验证",
-          "status": "completed"
-        },
-        {
-          "id": "C14-03",
-          "step": "[C14-03] 实现 SSE 关联、断流与重连场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-01",
-          "step": "[C15-01] 实现原生 WebSocket 场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-02",
-          "step": "[C15-02] 实现 Socket.IO namespace/event/ack 场景",
-          "status": "completed"
-        },
-        {
-          "id": "C15-03",
-          "step": "[C15-03] 实现 HTTP 到实时事件再到 HTTP 读回",
-          "status": "completed"
-        },
-        {
-          "id": "C16-01",
-          "step": "[C16-01] 实现外部结果优先与受控只读探针",
-          "status": "completed"
-        },
-        {
-          "id": "C16-02",
-          "step": "[C16-02] 实现清理、临时命名空间与污染阻断",
-          "status": "completed"
-        },
-        {
-          "id": "C16-03",
-          "step": "[C16-03] 实现跨协议确定性 oracle",
-          "status": "completed"
-        },
-        {
-          "id": "C17-01",
-          "step": "[C17-01] 拆分接口结果与场景结果报告",
-          "status": "completed"
-        },
-        {
-          "id": "C17-02",
-          "step": "[C17-02] 实现 shadow 双轨对账",
-          "status": "completed"
-        },
-        {
-          "id": "C17-03",
-          "step": "[C17-03] 实现场景硬门禁切换",
-          "status": "completed"
-        },
-        {
-          "id": "C18-01",
-          "step": "[C18-01] 实现旧资产与 CLI 兼容迁移",
-          "status": "completed"
-        },
-        {
-          "id": "C18-02",
-          "step": "[C18-02] 实现隔离工具环境与 doctor",
-          "status": "completed"
-        },
-        {
-          "id": "C18-03",
-          "step": "[C18-03] 完成字典、回归、审查与最终验收",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/e0641079a9b3807614bb7bea657755435440b1b8a87869e3e169419fef60eb93",
-      "session_id": "019f98be-5f55-7c40-9dcb-0d31788ff83c",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
-      "state": "inactive",
-      "plan_key": "CYCLEDOC-RTP-05",
-      "source_document": "doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md",
-      "plan_fingerprint": "78fe389ec6fcf8820370aaee55972c5702eb014a1f1277bc848630786471950f",
-      "updated_at": "2026-07-25T10:44:00.535000Z",
-      "steps": [
-        {
-          "id": "TASK-RTP-10",
-          "step": "[TASK-RTP-10] 冻结超时需求、验收、总览和周期追踪",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-11",
-          "step": "[TASK-RTP-11] 让唯一 Owner 与相邻执行路由表达一致的超时规则",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-12",
-          "step": "[TASK-RTP-12] 实现可验证且无 schema 漂移的 `ensure-timeout` CLI",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-13",
-          "step": "[TASK-RTP-13] 补齐测试、生成资产、项目状态和合规证据",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/3973c62658af29715b77501632a92f3b40cba5d0771b4b64bb71c98ceb451c21",
-      "session_id": "019f98d4-9fd6-73c2-ad35-acf08ad74ac1",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
-      "state": "inactive",
-      "plan_key": "CYCLEDOC-RTP-06",
-      "source_document": "doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md",
-      "plan_fingerprint": "73134d0acf46d2ec23f4a9f874465450559529584a17f518ed4ef77f38f252f9",
-      "updated_at": "2026-07-25T13:57:52.005254Z",
-      "steps": [
-        {
-          "id": "TASK-RTP-14",
-          "step": "[TASK-RTP-14] 冻结需求变更和验收",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-15",
-          "step": "[TASK-RTP-15] 冻结 Cycle 06 执行契约",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-16",
-          "step": "[TASK-RTP-16] 新增无写入 `probe-timeout`",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-17",
-          "step": "[TASK-RTP-17] 冻结 Goal 编排和失败降级",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-18",
-          "step": "[TASK-RTP-18] 同步连续执行与 standing authorization",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-19",
-          "step": "[TASK-RTP-19] 同步全局规则和项目记忆",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-20",
-          "step": "[TASK-RTP-20] 完成字典与自动回归",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-RTP-21",
-          "step": "[TASK-RTP-21] 完成真实 Desktop 审查验收",
-          "status": "completed"
         }
       ]
     },
@@ -433,34 +151,6 @@
           "id": "TASK-RTP-28",
           "step": "[TASK-RTP-28] 字典、审查与真实验收",
           "status": "in_progress"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/71df5f38455c3a5ee4c8ff567163229e45ab77d8eb0f40c258f8fcb2cdf9f5df",
-      "session_id": "019f9a43-800a-73b0-80bb-2a79bf2abd67",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
-      "state": "inactive",
-      "plan_key": "PLAN-SUMMARY-DETAIL-001",
-      "source_document": "doc/3-实施/2026-07-26_073000_reasoning-summary-structure-rules_结果与结论详细度_实施总览.md",
-      "plan_fingerprint": "f9311cab0a07ace29835d15029ec024e9318472089444a4878792abba65661fe",
-      "updated_at": "2026-07-26T08:25:07.435729Z",
-      "steps": [
-        {
-          "id": "TASK-SUMMARY-DETAIL-01",
-          "step": "[TASK-SUMMARY-DETAIL-01] `CYCLE-SUMMARY-DETAIL-01`",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-SUMMARY-DETAIL-02",
-          "step": "[TASK-SUMMARY-DETAIL-02] `CYCLE-SUMMARY-DETAIL-02`",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-SUMMARY-DETAIL-03",
-          "step": "[TASK-SUMMARY-DETAIL-03] `CYCLE-SUMMARY-DETAIL-03`",
-          "status": "completed"
         }
       ]
     },
@@ -689,6 +379,34 @@
           "id": "TASK-CUR-06",
           "step": "[TASK-CUR-06] 刷新字典、全量测试与最终风格收口",
           "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/25c4de2884dde3fc1ae8e23c37876448d2016cbab5fed677ab2ff3019cfca232",
+      "session_id": "019fc15c-b869-7933-84b6-c40268b0ce3f",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "active",
+      "plan_key": "SYNTH-FALLBACK/20260802T092611Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-02T09:51:32.192Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "in_progress"
         }
       ]
     }

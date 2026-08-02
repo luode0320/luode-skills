@@ -358,12 +358,12 @@
 - 状态: 启用
 
 ### Git 提交域隔离规则
-- 别名: 提交域隔离, 需求实施测试6-review单独提交, 代码实现单独提交
+- 别名: 提交域隔离, 同一任务文档合并提交, docs/test/实现分离
 - 类型: 流程规则
-- 定义: `提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 五类活动流程产物各自单独提交；历史审查/验收目录只读归档。测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。根目录 `README.md` 改动日志可以跟随对应 commit 一起更新，但不单独构成提交域。
+- 定义: `提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。同一任务的需求、实施、Bug、测试说明、6-review、验收和项目状态同步文件统一归入一笔 `docs` 提交；`doc/5-tests/**` 只保存说明、日志、报告、截图和非可执行证据。根 `test/**`、`*_test.*`、`*.spec.*`、`*.test.*` 等可执行测试独立归入 `test` 提交；代码实现 / 运行配置独立归入 `feat` 或 `fix` 提交，不与 `docs` 或 `test` 混提。历史 `doc/6-审查/`、`doc/7-验收/` 只读兼容，根目录 `README.md` 改动日志可以跟随对应 commit 一起更新，但不单独构成提交域。
 - 来源: 对话确认、`git-collaboration-rules/SKILL.md`、`git-collaboration-rules/scripts/pre_commit_gate.sh`
 - 适用范围: 提交流程、需求域、实施域、Bug 域、测试域、6-review 风格回归
-- 更新时间: 2026-07-08
+- 更新时间: 2026-08-02
 - 状态: 启用
 
 ### 文档落盘闸门
@@ -1232,9 +1232,9 @@ entities:
     type: "流程规则"
     aliases:
       - 提交域隔离
-      - 需求实施测试Bug审查验收单独提交
-      - 代码实现单独提交
-    definition: "`提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 五类活动流程产物各自单独提交；历史 `doc/6-审查/`、`doc/7-验收/` 只读归档，不因新流程创建。测试文件（至少 `doc/5-tests/**`、`*_test.*`、`*.spec.*`、`*.test.*`）归入测试提交；代码实现 / 运行配置单独提交，不与上述流程文档域或测试文件混提。"
+      - 同一任务文档合并提交
+      - docs/test/实现分离
+    definition: "`提交git` 允许拆成多次提交清空工作区，但每个 commit 默认只承载一个提交域。同一任务的需求、实施、Bug、测试说明、6-review、验收和项目状态同步文件统一归入一笔 `docs` 提交；`doc/5-tests/**` 只保存说明、日志、报告、截图和非可执行证据。根 `test/**`、`*_test.*`、`*.spec.*`、`*.test.*` 等可执行测试独立归入 `test` 提交；代码实现 / 运行配置独立归入 `feat` 或 `fix` 提交，不与 `docs` 或 `test` 混提。历史 `doc/6-审查/`、`doc/7-验收/` 只读兼容，不因新流程创建。"
     scope: "提交流程、需求/实施/Bug/测试/6-review 归档"
     status: "active"
     evidence_ids:
@@ -1242,7 +1242,7 @@ entities:
       - evidence.dialog.git-commit-domain-split
     context_ids:
       - context.git-collaboration
-    updated_at: 2026-07-08
+    updated_at: 2026-08-02
   - entity_id: rule.git-commit-review-acceptance-evidence
     name: "Git 提交基础质量闸门"
     type: "流程规则"
@@ -1689,7 +1689,7 @@ evidence:
   - evidence_id: evidence.dialog.git-commit-domain-split
     type: "dialog"
     source: "对话确认"
-    note: "用户要求需求、实施、测试、Bug、审查、验收与代码实现按提交域拆分，不再混在同一个 commit 里"
+    note: "用户确认同一任务的需求、实施、Bug、测试说明、6-review、验收和项目状态同步合并为 docs 提交，测试与实现仍独立"
   - evidence_id: evidence.dialog.git-commit-no-review-acceptance-doc
     type: "dialog"
     source: "对话确认"
@@ -2065,7 +2065,7 @@ retrieval_hints:
       - "rule.git-obsidian-capture-link"
     提交域隔离:
       - "rule.git-commit-domain-split"
-    需求实施测试Bug审查验收单独提交:
+    同一任务文档合并提交:
       - "rule.git-commit-domain-split"
     代码实现单独提交:
       - "rule.git-commit-domain-split"
@@ -2166,6 +2166,10 @@ retrieval_hints:
     Obsidian 记忆沉淀:
       - "rule.git-obsidian-capture-link"
     提交域隔离:
+      - "rule.git-commit-domain-split"
+    同一任务文档合并提交:
+      - "rule.git-commit-domain-split"
+    可执行测试独立提交:
       - "rule.git-commit-domain-split"
   sources:
     session-handoff-rules/SKILL.md:
