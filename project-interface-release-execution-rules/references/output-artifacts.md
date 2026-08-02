@@ -10,7 +10,7 @@
   - 门禁结论
   - 阻断原因与风险项
 
-## ASCII 镜像目录
+## `doc/5-tests/` 非可执行证据目录
 - `release-test-plan.yaml`
 - `interface-test-results.md`
 - `interface-sync-report.yaml`
@@ -34,7 +34,15 @@
 - `artifacts/reusable-param-events.yaml`
 - `artifacts/baseline-update-summary.yaml`
 - `artifacts/logs/execute.log`
-- `scripts/` 下的测试脚本或调用样本
+
+说明：上述时间戳目录只保存说明、响应、报告、日志、对账结果、截图和其他非可执行证据。可执行测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本不属于本目录。
+
+## 根 `test/` 源码镜像
+
+- `test/<被测源码目录镜像>/...`：源码关联的可执行接口测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本
+- `test/shared/...`：仅跨源码复用的可执行测试辅助资产
+
+测试资产不得写入业务源码目录、`doc/5-tests/` 或任意其他 `*/tests/` 目录。每轮 `doc/5-tests/` 证据应通过路径或清单引用根 `test/` 中实际执行的脚本和模拟程序。
 
 ## 产物要求
 - 请求参数和简要响应必须为 JSON 字符串。

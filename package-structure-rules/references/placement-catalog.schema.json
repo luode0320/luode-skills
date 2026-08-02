@@ -18,9 +18,20 @@
         "properties": {
           "language": {"enum": ["go", "java", "node", "python"]},
           "requires_domain": {"type": "boolean"},
-            "flat_files": {"type": "boolean"},
-            "node_kind": {"enum": ["directory", "file"]},
-            "content_must_match": {"type": "string", "minLength": 1}
+          "flat_files": {"type": "boolean"},
+          "node_kind": {"enum": ["directory", "file", "pattern"]},
+          "path_pattern": {"type": "string", "minLength": 1},
+          "dynamic": {"type": "boolean"},
+          "init_policy": {"enum": ["catalog", "forbidden"]},
+          "file_name_pattern": {"type": "string", "minLength": 1},
+          "go_file_name_pattern": {"type": "string", "minLength": 1},
+          "environment_name_pattern": {"type": "string", "minLength": 1},
+          "standard_environments": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "secret_policy": {"enum": ["forbid_plain_secret", "allow_plain_secret"]},
+          "source_policy": {"enum": ["external_config_primary", "embedded_source_primary"]},
+          "environment_variable_policy": {"enum": ["allowed_reference", "not_default"]},
+          "direct_files": {"type": "boolean"},
+          "content_must_match": {"type": "string", "minLength": 1}
         },
         "allOf": [
           {
@@ -30,6 +41,10 @@
           {
             "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},
             "then": {"required": ["requires_domain", "flat_files"]}
+          },
+          {
+            "if": {"properties": {"node_kind": {"const": "pattern"}}, "required": ["node_kind"]},
+            "then": {"required": ["path_pattern", "dynamic", "init_policy"]}
           },
           {
             "if": {"properties": {"node_kind": {"const": "file"}}, "required": ["node_kind"]},

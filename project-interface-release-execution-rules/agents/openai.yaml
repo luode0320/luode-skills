@@ -9,6 +9,6 @@ default_prompt: |
   5. 按照agent-response-judgement规则自动判定每个接口是否通过，给出判定理由。
   6. 按照report-format要求生成测试报告，禁止使用Markdown表格，接口明细用块状格式。
   7. 按照execution-gate规则给出最终门禁结论：PASS/FAIL/PARTIAL。
-  8. 可执行测试脚本、mock、fixture 和 helper 归入根 test/ 镜像目录；doc/5-tests/ 下的时间戳根目录只保留 README、完整响应、对账结果、执行日志和其他非可执行证据。
+  8. 可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造统一归入根 test/；源码关联资产按被测源码路径镜像，跨源码复用资产才进入 test/shared/。doc/5-tests/ 下的时间戳根目录只保留 README、完整响应、对账结果、执行日志和其他非可执行证据。
   9. 将测试结论、新发现的可复用参数和历史摘要回写project-interface-baseline-rules维护的基线资产。
   10. 将本次测试结论同步给delivery-summary-rules作为最终验收输入。

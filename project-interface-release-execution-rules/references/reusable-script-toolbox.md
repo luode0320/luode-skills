@@ -8,11 +8,13 @@
 
 1. 已有脚本能覆盖时，必须复用。
 2. 只有通用脚本缺少稳定能力时，才允许扩展脚本。
-3. 项目专属适配只能写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试任务目录，不得写死进通用脚本。
+3. 项目专属的非可执行适配配置只能写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试任务的证据目录；项目专属可执行脚本、mock、stub、fake、fixture、helper 和数据构造必须写入根 `test/` 的被测源码镜像（跨源码复用才进入 `test/shared/`），不得写死进通用脚本。
 4. 连续两次复用的项目适配逻辑，应抽象为通用脚本参数或插件点。
 5. 禁止每轮重复生成扫描、对账、参数解析、执行、判定和报告类脚本。
 
 ## 当前通用入口
+
+本 skill 自带的 `scripts/` 仅承载 Skill-owned 的通用执行内核和兼容入口，属于规则实现，不是项目本次测试资产；既有入口继续保留在此处。项目专属的可执行接口测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本必须遵循根 `test/` 源码镜像规则。
 
 当前已存在的通用入口为 `generate_release_test_plan.py`。agent 每次上线测试前必须先执行 `--help` 检查已有子命令，已有子命令能覆盖时不得重新生成同类脚本。脚本是兼容入口：发现 `scripts/release_test_engine/` 时，旧命令会以 `compat_command` 委派到新内核；新内核暂不可用时才执行旧资产逻辑或返回结构化 `PENDING/UNSUPPORTED_ENGINE`，不得静默伪造通过。
 
@@ -55,7 +57,7 @@
 
 ## 项目适配配置
 
-项目差异写入 `doc/5-tests/基线/script-adapter.yaml`：
+项目差异的非可执行配置写入 `doc/5-tests/基线/script-adapter.yaml`：
 
 ```yaml
 base_url_source: local_config

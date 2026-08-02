@@ -1,4 +1,4 @@
 interface:
   display_name: "测试策略与资产治理"
   short_description: "制定测试策略，并通过 test-asset-governance 统一承接测试文档、命名、根布局和散落资产规则"
-  default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略；若涉及测试 README、验证说明、报告、命名、时间戳任务根目录、中文 README、ASCII 代码镜像或散落测试资产，进入 test-asset-governance 路由并读取 references/test-asset-governance.md；策略摘要统一写回 artifact-storage-rules 约定的测试任务 README。"
+  default_prompt: "使用 $test-strategy-rules 为当前任务制定测试策略；若涉及测试 README、验证说明、报告、命名、时间戳任务根目录、中文 README、ASCII 代码镜像、mock/stub/fake 或散落测试资产，进入 test-asset-governance 路由并读取 references/test-asset-governance.md；源码关联测试与模拟程序统一放根 test/ 的源码镜像，策略摘要统一写回 artifact-storage-rules 约定的测试任务 README。"

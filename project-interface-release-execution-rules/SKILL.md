@@ -1,6 +1,6 @@
 ---
 name: project-interface-release-execution-rules
-description: 当需要做上线前项目级全接口测试、消费者视角的 HTTP/SSE/原生 WebSocket/Socket.IO 外部整体性测试、替代人工接口回归验证或生成发布门禁结论时触发。负责在接口基线就绪后执行接口与 verified 消费者场景、确定性断言、受控 local 探针、清理、双轨对账和硬切门禁；是统一执行内核 `scripts/release_test_engine/` 的唯一行为 owner，所有测试资产强制落地到 `doc/5-tests/` 对应时间戳根目录，禁止用候选场景、fixture 结果或非 local 配置伪造通过。
+description: 当需要做上线前项目级全接口测试、消费者视角的 HTTP/SSE/原生 WebSocket/Socket.IO 外部整体性测试、替代人工接口回归验证或生成发布门禁结论时触发。负责在接口基线就绪后执行接口与 verified 消费者场景、确定性断言、受控 local 探针、清理、双轨对账和硬切门禁；是统一执行内核 `scripts/release_test_engine/` 的唯一行为 owner。可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造统一归入根 `test/`，源码关联资产按被测源码路径镜像；`doc/5-tests/` 仅保存说明与非可执行证据，禁止用候选场景、fixture 结果或非 local 配置伪造通过。
 ---
 
 # 项目上线接口测试执行与放行规则
@@ -21,7 +21,7 @@ description: 当需要做上线前项目级全接口测试、消费者视角的 
 - 优先复用 `project-interface-release-execution-rules/scripts/` 的通用脚本工具箱；已有能力能覆盖时不得每轮重复生成同类脚本。
 - 自动由 agent 判定接口响应是否符合预期，替代人工逐一查看响应结果。
 - 输出标准化的测试报告，明确给出是否允许上线的结论，作为 `delivery-summary-rules` 的输入之一。
-- 强制所有测试资产落地到 `doc/5-tests/` 下的时间戳根目录，遵循现有测试域的归档规则。
+- 测试代码与可执行测试资产必须遵循测试域双根规则：可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造统一落在根 `test/`；源码关联资产按被测源码目录镜像，跨源码复用资产才进入 `test/shared/`。`doc/5-tests/` 下的时间戳根目录只保留 `README.md`、响应样本、报告、日志、对账结果、截图及其他非可执行证据。
 ## 自动触发信号
 - 上线前需要做全项目接口回归验证。
 - 需要替代人工做接口测试和响应判断。

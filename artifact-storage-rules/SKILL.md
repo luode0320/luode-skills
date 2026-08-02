@@ -58,9 +58,9 @@ description: 当需要定义、调整或解释项目中 `doc/1-架构/`、`doc/2
 
 ## 测试代码与证据双根（强制）
 
-- 根 `test/` 是唯一活动测试代码根：测试程序、mock、fixture、helper 与数据构造按被测源码目录镜像存放；Python 文件统一为 `<名称>_test.py`。
-- `doc/5-tests/` 只承载时间戳任务的 `README.md`、日志、报告、截图、非可执行运行产物和证据；它不是新测试代码的落点。
-- 单文件测试固定为 `src/order/service.py -> test/src/order/service_test.py`；目录级测试可镜像到被测模块目录，并在任务 README 写明被测文件。
+- 根 `test/` 是唯一活动测试代码根：测试程序、mock、stub、fake、fixture、helper 与数据构造均属于可执行测试资产；源码关联资产必须按被测源码目录镜像存放，只有跨源码复用且不对应单一源码模块的资产才能进入 `test/shared/`。
+- `doc/5-tests/` 只承载时间戳任务的 `README.md`、日志、报告、截图、非可执行运行产物和证据；任何新测试程序或 mock/stub/fake 都不得写入该目录。
+- 单文件测试固定为 `src/order/service.py -> test/src/order/service_test.py`；同一被测文件的模拟程序示例为 `src/order/service.py -> test/src/order/service_mock.py`（stub/fake 同理）；目录级测试可镜像到被测模块目录，并在任务 README 写明被测文件。
 - 既有 `doc/5-tests/` 可执行资产是只读历史包：首次需要修改、改名或新增时，必须迁至根 `test/`；活动校验以指纹清单拒绝静默变化。
 - Go 测试只可位于根 `test/` 的 ASCII 路径中，使用外部 `<target>_test` 包并调用导出 API；源码目录禁止 `*_test.go`。
 - 当前时间戳目录复用规则只适用于 `doc/5-tests/` 的说明和证据，不适用于活动测试代码路径。

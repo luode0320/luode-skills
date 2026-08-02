@@ -1,6 +1,6 @@
 ---
 name: functional-validation-rules
-description: 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和完成条件时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把功能验证结论写回测试任务 README，把可执行测试代码、mock、fixture 和 helper 放入根 `test/` 镜像目录，并把详细执行证据放到同时间戳 `doc/5-tests/` 的 `evidence/` 或 `artifacts/`；Go 测试还必须遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码。不要用它代替 test-strategy-rules、test-strategy-rules 的 test-asset-governance 条件路由或 test-regression-rules。
+description: 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和完成条件时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把功能验证结论写回测试任务 README，把可执行测试代码、mock、stub、fake、fixture 和 helper 放入根 `test/` 的源码镜像目录，并把详细执行证据放到同时间戳 `doc/5-tests/` 的 `evidence/` 或 `artifacts/`；模拟程序与对应测试使用同一源码相对路径，`doc/5-tests/` 仅保存非可执行证据；Go 测试还必须遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码。不要用它代替 test-strategy-rules、test-strategy-rules 的 test-asset-governance 条件路由或 test-regression-rules。
 ---
 
 # 功能验证规则
@@ -14,6 +14,12 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 
 - 功能验证默认必须优先执行真实运行验证：接口用本地服务实际请求，页面用浏览器真实交互，导出 / 查询 / 提交等用户路径用真实入口触发；仅 `build`、lint、静态搜索、读代码或审查结论不能单独作为“功能已验证通过”的证据。
 - 若当前本地环境、登录授权、样本数据或依赖服务不足，无法执行真实运行验证，结论必须标记为“未完成真实验证 / 待人工验证”，并给出人工验证步骤、阻断原因和已完成的静态检查；不得把“仅静态验证”包装成“接口可用 / 功能可用”。
+
+## 活动测试资产落点（强制）
+
+- 功能验证使用的测试程序、mock、stub、fake、fixture 和 helper 都属于活动资产，必须位于根 `test/` 的源码相对路径镜像目录；例如被测 `internal/service/history_client.go` 对应 `test/internal/service/`。
+- mock、stub、fake 等模拟程序必须与对应功能测试使用同一镜像目录；只有跨多个源码路径稳定复用的模拟能力才可放入 `test/shared/`。
+- `doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图、脱敏响应样例等非可执行证据，不得放置或复制任何测试程序、mock、stub、fake、fixture 或 helper。
 
 ## Skill 作用与适用场景
 
@@ -36,7 +42,7 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 1. 先确认当前需求、当前修改和验收标准是否已经明确。
 2. 明确本轮只验证当前变更本身，不主动扩张到全量历史回归。
 3. 提取当前功能验证对象：接口、页面、交互链路、输入输出、异常分支。
-4. 确认测试资源、测试文档和执行环境已经具备基本验证条件；需要连接本地真实环境（数据库、缓存、消息队列、HTTP/RPC 上游等）时，按 `test-strategy-rules` 的「本地环境配置发现与连接」去本地 `local` 配置文件读取连接信息，并遵守其隔离安全约束；不得回退使用 `test` / `prod` / `staging` 等非 local 环境配置。
+4. 确认测试资源、测试文档和执行环境已经具备基本验证条件，并核对测试程序、mock、stub、fake、fixture 和 helper 是否位于对应源码相对路径镜像；需要连接本地真实环境（数据库、缓存、消息队列、HTTP/RPC 上游等）时，按 `test-strategy-rules` 的「本地环境配置发现与连接」去本地 `local` 配置文件读取连接信息，并遵守其隔离安全约束；不得回退使用 `test` / `prod` / `staging` 等非 local 环境配置。
 5. 为每个功能验证对象标记验证方式：`真实运行验证`、`仅静态验证`、`未验证`；命中 `仅静态验证` 或 `未验证` 时必须同步写明原因和人工验证交接动作。
 6. 决定哪些结论写入中文 README，哪些详细执行步骤、截图和明细放入 `evidence/` 或 `artifacts/`，并在 README 链接根 `test/` 的测试文件。
 
@@ -65,7 +71,7 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 
 ## 执行通过 / 驳回标准
 
-- 通过：当前需求或当前修改涉及的功能点、输入输出、交互行为和异常处理均符合当前完成条件；核心接口 / 页面 / 导出 / 查询 / 提交路径已完成真实运行验证；中文 README 已写明结论，根 `test/` 测试文件与证据路径均可追溯。
+- 通过：当前需求或当前修改涉及的功能点、输入输出、交互行为和异常处理均符合当前完成条件；核心接口 / 页面 / 导出 / 查询 / 提交路径已完成真实运行验证；中文 README 已写明结论，根 `test/` 测试文件、同源码镜像的 mock/stub/fake 及证据路径均可追溯。
 - 待确认：核心路径因本地环境、授权、样本数据或依赖服务不足未完成真实运行验证，但已明确静态检查结果、阻断原因和人工验证步骤；不得写成“已验证通过”。
 - 驳回：当前变更存在与需求或验收标准不符的功能问题；结论无法回溯到明确的测试资产与证据；功能验证留痕继续散落在错误目录中；核心路径仅做 `build` / lint / 静态搜索却声称功能可用；或为了测试通过向生产代码新增测试专用方法、测试专用数据、测试专用结构体字段。
 
@@ -74,7 +80,7 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 - 将功能验证结论记录到 `artifact-storage-rules` 约定的测试任务主说明 `README.md`。
 - README 至少包含验证对象、验证范围、执行环境、验证方式（真实运行验证 / 仅静态验证 / 未验证）、步骤摘要、结果结论、未通过项、人工验证交接项和下一步建议。
 - 真实阻断时，README 必须包含共享契约的完整“任务阻断收口”；解决计划必须写清责任方、完成判据和功能重验入口。`limited`、`not_applicable`、仅静态验证及待人工验证在具备替代交接时不创建 `BLK-*`。
-- 详细执行步骤、截图、接口返回样例、补充案例和原始日志统一放到测试时间戳根目录下的 `evidence/` 或 `artifacts/`；不得与根 `test/` 的可执行测试代码混放。
+- 详细执行步骤、截图、接口返回样例、补充案例和原始日志统一放到测试时间戳根目录下的 `evidence/` 或 `artifacts/`；这些目录只保存非可执行证据，不得与根 `test/` 的可执行测试代码或模拟程序混放。
 - 测试任务主说明位置、目录命名模板和同一轮验证的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果结论为待确认，必须说明卡点属于需求澄清、实现修复、联调排障还是回归补测。
 - 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对功能验证 README、根 `test/` 测试文件与证据路径是否已经真实落盘；未落盘不得判定功能验证完成。

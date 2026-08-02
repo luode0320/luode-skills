@@ -1,4 +1,4 @@
-version: 7
+version: 8
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
@@ -6,7 +6,7 @@ roots:
   document_image_assets: "doc/data/images"
   implementation_docs: "doc/3-实施"
   bug_records: "doc/4-bugs"
-  test_assets: "doc/5-tests"
+  test_evidence: "doc/5-tests"
   test_code: "test"
   review_records: "doc/6-review"
   historical_review_records: "doc/6-审查"
@@ -40,7 +40,7 @@ entry_files:
   bug_root_readme: "README.md"
   test_task_readme: "README.md"
   test_python_runner: "run_python_tests.py"
-  test_task_readme_note: "doc/5-tests/<时间戳>/README.md 只记录本轮测试目的、命令、被测文件、结论和证据路径；跨轮可执行 helper、fixture 与启动脚本统一归入 test/shared/。"
+  test_task_readme_note: "doc/5-tests/<时间戳>/README.md 只记录本轮测试目的、命令、被测文件、结论和证据路径；测试程序及源码关联 mock/stub/fake 必须归入 test/ 的源码镜像，只有跨源码复用的 helper、fixture、模拟程序与启动脚本才统一归入 test/shared/。"
   test_startup_backend_script: "start-backend.sh"
   test_startup_frontend_script: "start-frontend.sh"
   test_startup_script_note: "测试启动脚本参考项目 .vscode/launch.json（或等价启动配置）生成，落在 test/shared/scripts/，跨轮复用；后端固定 start-backend.sh，前端固定 start-frontend.sh；同端存在多服务时追加 ASCII 后缀，如 start-backend-gateway.sh。脚本须输出关键过程日志，且只引用 local 配置，严禁连接非 local 环境。"
@@ -59,13 +59,13 @@ root_files:
     - "项目说明.md"
 directories:
   test_code_root: "test"
-  test_code_root_note: "根 test/ 是唯一活动测试代码根；按被测源码目录镜像，Python 使用 <名称>_test.py，Go 使用 ASCII 外部黑盒包。"
+  test_code_root_note: "根 test/ 是唯一活动测试代码根；测试程序与 mock/stub/fake 等模拟程序按被测源码目录镜像，Python 测试使用 <名称>_test.py，模拟程序使用 <名称>_mock.py、<名称>_stub.py 或 <名称>_fake.py，Go 使用 ASCII 外部黑盒包。"
   bug_root: "{datetime}_问题中文简介"
   test_task_root: "{datetime}"
   test_shared_scripts_dir: "test/shared/scripts"
   test_shared_scripts_dir_note: "test/shared/scripts/，存放跨轮复用的测试启动脚本（如 start-backend.sh、start-frontend.sh）；它们属于活动测试代码根，不随每轮 doc/5-tests/ 证据目录创建。"
   test_shared_code_dir: "shared"
-  test_shared_code_dir_note: "test/shared/，仅存放活动测试可复用 helper、fixture 和位置校验逻辑。"
+  test_shared_code_dir_note: "test/shared/，仅存放跨源码复用的活动测试 helper、fixture、模拟程序与位置校验逻辑；源码关联 mock/stub/fake 不得绕过镜像规则放入此处。"
   test_task_evidence_dir: "evidence"
   test_task_artifacts_dir: "artifacts"
 bootstrap:
@@ -119,6 +119,9 @@ policies:
   test_shared_layer_reused_across_rounds: true
   test_code_root_is_unique: true
   test_code_mirrors_source_paths: true
+  test_mock_stub_fake_under_test_root: true
+  test_mock_stub_fake_mirror_source_paths: true
+  doc5_tests_non_executable_only: true
   historical_doc5_executables_are_read_only: true
   test_startup_scripts_reference_vscode_launch: true
   test_task_readme_is_evidence_only: true

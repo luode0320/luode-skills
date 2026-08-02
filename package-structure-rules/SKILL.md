@@ -28,6 +28,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、业务源码内独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`；仓库根 `test/` 是唯一活动测试代码根，不属于生产包结构。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
+10. 二进制入口按项目类型固定：独立后端默认使用根 `main.<ext>`，额外二进制使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端默认使用 `backend/main.<ext>`，额外二进制使用 `backend/cmd/<binary>/main.<ext>`。`cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 均不是合法入口；`init` 不创建动态入口 pattern。
 
 ## 使用方式
 
@@ -41,6 +42,8 @@ python package-structure-rules/scripts/placement_catalog.py query --artifact bus
 python package-structure-rules/scripts/placement_catalog.py query --artifact project-governance --category agents
 python package-structure-rules/scripts/placement_catalog.py query --project-kind frontend --artifact project-governance --category claude
 python package-structure-rules/scripts/placement_catalog.py query --artifact database-migration --category field --operation create
+python package-structure-rules/scripts/placement_catalog.py query --artifact binary-entrypoint --category primary
+python package-structure-rules/scripts/placement_catalog.py query --project-kind fullstack --artifact binary-entrypoint --category additional
 python package-structure-rules/scripts/placement_catalog.py render --all
 python package-structure-rules/scripts/placement_catalog.py check --root <项目根目录> --project-kind backend --language go --policy strict
 python package-structure-rules/scripts/placement_catalog.py check --root <旧项目根目录> --project-kind backend --language go --policy adoption --adoption-manifest doc/1-架构/3-目录规则收敛清单.yaml
@@ -49,6 +52,8 @@ python package-structure-rules/scripts/placement_catalog.py check --root <旧项
 `check` 始终只读；后端 `strict` 必须同时传入 `--project-kind backend` 与 `--language`，以准确识别源码根 `util/`。当 `AGENTS.md` 与 `CLAUDE.md` 同时存在时，strict 必须拒绝正文不一致；旧项目缺失其中之一时不因此自动迁移。`init` 创建必需目录和必需根文件，并仅在 `--enable backend.root.project-style` 时创建条件 `PROJECT_STYLE.md`；它不移动、不删除、不重命名用户文件，也不代替对应 Owner 填充文件正文。
 
 创建业务域 `rpc/` 时，`init` 必须显式传入 `--enable backend.business-rpc --domain <domain> --language <language>`；Java 另传 `--base-package <base-package>`。调用方只可导入目标域 `rpc/` 的公开函数，参数和返回值均为 JSON 字符串；返回值遵循根 `common/response.Response` 的 `code`、`status`、`message`、`data` 语义。
+
+二进制入口是人工实现的动态 pattern，不属于 `init` 可创建的静态骨架。查询只返回 pattern 事实；显式启用任一 `binary-entrypoint` 条目必须失败关闭，不得创建 `main.<ext>`、`<binary>` 或其它占位路径。
 
 ## 旧项目渐进采纳
 

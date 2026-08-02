@@ -20,6 +20,7 @@
 
 ## 引用方向
 
+- 二进制启动装配只从对应入口文件开始：独立后端默认入口为根 `main.<ext>`，额外入口为 `cmd/<binary>/main.<ext>`；同仓后端入口为 `backend/main.<ext>` 或 `backend/cmd/<binary>/main.<ext>`。入口目录不承载可复用业务包，复用逻辑必须回到源码根、业务域或公共技术目录的规范位置。
 - 路由与控制器可依赖业务层、根 `common/`、根 `middleware/`、根 `utils/` 与源码根 `util/` 的公开入口。
 - 业务服务可依赖 `database/`、根 `common/`、根 `utils/`、源码根 `util/` 与本业务域代码。
 - 根 `utils/` 只依赖自身子包、语言标准库与第三方依赖；不得依赖源码根、业务域、`database/`、`common/`、`global/` 或 `middleware/`。

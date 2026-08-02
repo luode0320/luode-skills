@@ -2,8 +2,8 @@
 
 ## 双根结论
 
-- 根 `test/` 是唯一活动测试代码根。测试程序、mock、fixture、helper 和数据构造按被测源码路径镜像存放。
-- `doc/5-tests/` 是唯一活动测试说明与证据根。时间戳目录内只保存 `README.md`、日志、报告、截图和非可执行运行产物。
+- 根 `test/` 是唯一活动测试代码根。测试程序、mock、stub、fake、fixture、helper 和数据构造均为活动测试资产；源码关联资产按被测源码路径镜像存放，只有跨源码复用资产才进入 `test/shared/`。
+- `doc/5-tests/` 是唯一活动测试说明与证据根。时间戳目录内只保存 `README.md`、日志、报告、截图和非可执行运行产物，不得新增测试程序或 mock/stub/fake。
 - 历史 `doc/5-tests/` 中已有可执行资产按指纹只读保留；首次修改、改名或新增时迁至根 `test/`，不批量迁移历史包。
 
 ## 位置与命名
@@ -11,7 +11,7 @@
 - 单文件源码：`src/order/service.py -> test/src/order/service_test.py`。
 - 目录级测试：`code-style-consistency-rules/ -> test/code-style-consistency-rules/static_owner_router_test.py`；任务 README 必须列出被测文件。
 - Python 测试统一使用 `*_test.py`；禁止新增 `test_*.py`。
-- mock、fixture 和 helper 位于相同镜像目录或 `test/shared/`。不能在生产源码、仓库根、`doc/5-tests/` 或 `*/tests/` 新增活动测试代码。
+- mock、stub、fake、fixture 和 helper 位于相同源码镜像目录；只有跨源码复用时才进入 `test/shared/`。不能在生产源码、仓库根、`doc/5-tests/` 或 `*/tests/` 新增活动测试代码。
 - Go 测试必须位于根 `test/` 的 ASCII 路径，以外部 `<target>_test` 包导入目标模块；源码目录禁止 `*_test.go`。白盒需求先补导出 seam，不保留同包例外。
 
 ## 说明与证据

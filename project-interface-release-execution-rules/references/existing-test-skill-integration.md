@@ -9,11 +9,11 @@
 | `test-strategy-rules` | 任务级测试的策略规划、优先级和覆盖范围 | 本 skill 是项目级上线测试门禁，不替代任务级测试策略；两者可并行，但上线门禁前必须先有清晰策略 |
 | `functional-validation-rules` | 任务级的当前改动功能验证 | 本 skill 可调用它执行单接口功能验证，结果纳入项目级门禁报告；本 skill 不替代单接口功能语义验证细节 |
 | `test-regression-rules` | 任务级的改动影响面回归验证 | 本 skill 关注项目级核心接口的上线前门禁回归，两者覆盖范围不同，可并行并复用结果 |
-| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录的创建和结构规范 | 本 skill 必须遵循它的要求，所有测试资产落地到 `doc/5-tests/` 的时间戳根目录 |
-| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试文档的结构和归档规则 | 本 skill 的报告必须遵循它的要求，中文说明目录只放主 `README.md`，其他内容放 ASCII 镜像目录 |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录的创建和结构规范 | 本 skill 必须遵循测试双根规则：可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造统一落在根 `test/`，源码关联资产按被测源码路径镜像；`doc/5-tests/` 时间戳目录只保存说明和非可执行证据 |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试文档的结构和归档规则 | 本 skill 的报告必须遵循它的要求，`doc/5-tests/` 时间戳目录只保存主 `README.md`、响应、报告、日志、对账结果和其他非可执行证据 |
 | `test-program-rules` | 测试脚本、测试程序和资产的组织规则 | 本 skill 的测试脚本、用例和数据必须遵循它的要求 |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录和文件命名规则 | 本 skill 的所有资产命名必须遵循它的要求 |
-| `test-strategy-rules 的 test-asset-governance 条件路由` | 散落测试资产的收拢规则 | 本 skill 的测试资产必须全部收拢到对应时间戳根目录，不得散落 |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 散落测试资产的收拢规则 | 本 skill 的活动测试代码和可执行资产必须收拢到根 `test/` 的源码镜像（跨源码复用资产进入 `test/shared/`）；测试说明和非可执行证据收拢到对应 `doc/5-tests/` 时间戳目录，不得散落 |
 | `delivery-summary-rules` | 最终上线验收 | 本 skill 的门禁结论是它的正式输入之一，最终验收必须引用本 skill 的结论 |
 | `code-style-consistency-rules` | 实现完成后的代码审查 | 本 skill 在测试执行前必须确认其已通过，代码审查不通过不得执行门禁测试 |
 | `code-style-consistency-rules` | 最终上线前的改动总审查 | 本 skill 的结论是其输入之一，总审查必须参考测试门禁结论 |
@@ -31,9 +31,9 @@
 
 ## 数据流转规则
 
-1. 本 skill 的测试目录创建和结构必须完全遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 的要求，不得自定义目录结构。
+1. 本 skill 的测试目录创建和结构必须完全遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 的双根要求，不得自定义目录结构；可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造位于根 `test/` 源码镜像，`doc/5-tests/` 仅承载说明与非可执行证据。
 2. 本 skill 的测试文档、测试报告和归档必须完全遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 和 `artifact-storage-rules` 的要求。
-3. 本 skill 的接口测试执行可以调用 `functional-validation-rules` 完成，结果直接复用，不需要重复测试。
+3. 本 skill 的接口测试执行可以调用 `functional-validation-rules` 完成，结果直接复用，不需要重复测试；调用所需的可执行脚本与模拟程序仍遵循根 `test/` 源码镜像规则。
 4. 本 skill 的回归相关测试可以调用 `test-regression-rules` 完成，结果直接复用。
 5. 本 skill 的最终结论必须输出成 `delivery-summary-rules` 可直接读取的格式，作为正式验收输入。
 6. 本 skill 维护的项目接口基线可以被所有其他测试 skill 复用，避免重复梳理接口。

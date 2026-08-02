@@ -29,7 +29,15 @@
 │   ├── settings.json                      # [条件·提交] 团队设置
 │   └── extensions.json                    # [条件·提交] 推荐扩展
 ├── backend/                               # [必需·提交] 完整独立后端项目
+│   ├── main.<ext>                          # [条件·提交] 同仓后端默认二进制入口
+│   ├── cmd/                                # [条件·提交] 同仓后端额外二进制入口
+│   │   └── <binary>/                       # [条件·提交] 单个额外二进制目录
+│   │       └── main.<ext>                  # [条件·提交] 同仓后端额外入口
+│   └── config/                              # [必需·提交] 同仓后端唯一配置根
+│       ├── yaml/                            # [必需·提交] 按环境拆分的外部 YAML
+│       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── frontend/                              # [必需·提交] 完整独立前端项目
+├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
 ├── integration/                           # [条件·提交] 仅限前后端联调资产
 │   ├── contracts/                         # [条件·提交] 联调契约根
 │   │   ├── http/                          # [条件·提交] HTTP 契约
@@ -43,8 +51,6 @@
 │   ├── 4-bugs/                            # [必需·提交] Bug 产物
 │   ├── 5-tests/                           # [必需·提交] 测试研发产物入口
 │   ├── 6-review/                          # [必需·提交] 测试后的风格回归记录
-│   ├── 6-审查/                            # [必需·提交] 审查产物
-│   ├── 7-验收/                            # [必需·提交] 验收产物
 │   └── data/                              # [条件·提交] Markdown 数据资产
 │       └── images/                        # [条件·提交] 文档图片与截图
 ├── build.sh                               # [必需·提交] 聚合打包入口
@@ -68,6 +74,8 @@
 
 工作区根 `test/` 是唯一活动测试代码目录，按被测源码目录镜像；`doc/5-tests/` 仅保存说明与证据，历史可执行资产只读保留。
 
+同仓后端的二进制入口只放在 `backend/`：默认入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`；工作区根不放 `main.<ext>`，也不建立根 `cmd/` 作为后端入口。
+
 工作区根禁止业务 `config/`、`data/`、`database/`、`swag/`、`schema/`、`resources/`、`scripts/`、`util/`、`utils/`、`common/`、`deploy/`。不建立 `integration/virtualization/`、`integration/doc/`、`integration/tests/`、`integration/scripts/`、`integration/fixtures/`。工作区根的 `AGENTS.md` 与 `CLAUDE.md` 必须同时提交且正文完全一致。
 
 ## 后端独立项目
@@ -87,12 +95,16 @@
 │   ├── tasks.json                           # [必需·提交] 本地任务配置
 │   ├── settings.json                        # [条件·提交] 团队设置
 │   └── extensions.json                      # [条件·提交] 推荐扩展
-├── cmd/                                     # [条件·提交] 多二进制入口
-│   └── <binary>/                            # [条件·提交] 单个二进制目录
-│       └── main.<ext>                       # [条件·提交] 二进制入口
+├── main.<ext>                               # [条件·提交] 独立后端默认二进制入口
+├── cmd/                                     # [条件·提交] 仅用于额外二进制入口
+│   └── <binary>/                            # [条件·提交] 单个额外二进制目录
+│       └── main.<ext>                       # [条件·提交] 额外二进制入口
 ├── config/                                  # [必需·提交] 唯一配置根
-│   ├── yaml/                                # [必需·提交] 外部 YAML；禁止秘密原值
-│   └── embedded/                            # [条件·提交] 源码内 YAML 字符串
+│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；禁止秘密原值
+│   │   └── config_<env>.yaml                 # [条件·提交] 兼容 `.yml`；标准环境为 local、test、prod
+│   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
+│       └── config_<env>.<ext>                # [条件·提交] Go 使用 config_<env>.go；允许源码私密配置，源码优先且默认不依赖环境变量
+├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
 │   ├── model/                               # [条件·提交] 数据存储模型分类根；根目录禁止直接文件
@@ -228,6 +240,14 @@
 │   ├── kubernetes/                          # [条件·提交] Kubernetes Manifest
 │   └── proxy/                               # [条件·提交] 代理配置
 ├── doc/                                     # [必需·提交] 研发产物根
+│   ├── 1-架构/                              # [必需·提交] 后端架构、边界与真实目录树
+│   ├── 2-需求/                              # [必需·提交] 后端需求产物
+│   ├── 3-实施/                              # [必需·提交] 后端实施总览、周期与最小任务
+│   ├── 4-bugs/                              # [必需·提交] 后端 Bug 与诊断产物
+│   ├── 5-tests/                             # [必需·提交] 测试规则与研发产物入口
+│   ├── 6-review/                            # [必需·提交] 测试后的风格回归记录
+│   └── data/                                # [条件·提交] Markdown 引用的数据资产
+│       └── images/                          # [条件·提交] 文档图片与截图
 ├── var/                                     # [运行·忽略] 运行期可变数据
 │   ├── tmp/                                 # [运行·忽略] 临时文件
 │   ├── cache/                               # [运行·忽略] 本地缓存
@@ -251,6 +271,13 @@
 
 源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
+`main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
+
+独立后端配置使用 `config/yaml/` 与 `config/embedded/`，按 `config_<env>` 拆分环境；Go 示例为 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，以及 `config_prod.go`、`config_test.go`、`config_local.go`。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展；只检查已有文件，不要求三种环境齐全，也不要求 YAML 与 embedded 按环境配对。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。
+
+前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
+
+三类项目的活动测试程序、mock、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
 
 ## 前端独立项目
 
@@ -272,10 +299,7 @@
 ├── config/                                  # [必需·提交] 唯一配置根
 │   ├── yaml/                                # [条件·提交] 外部 YAML
 │   └── embedded/                            # [条件·提交] 源码内 YAML 字符串
-├── data/                                    # [条件·提交] 原始静态数据
-│   ├── business/                            # [条件·提交] 业务数据
-│   │   └── <domain>/                        # [条件·提交] 单域数据
-│   └── project/                             # [条件·提交] 项目数据
+├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── public/                                  # [必需·提交] 原样复制并按 URL 访问的公开文件
 ├── src/                                     # [必需·提交] 生产源码根
 │   ├── app/                                 # [必需·提交] 启动和根装配
@@ -356,8 +380,7 @@
 │   ├── 3-实施/                               # [必需·提交] 前端实施总览、周期与最小任务
 │   ├── 4-bugs/                               # [必需·提交] 前端 Bug 与诊断产物
 │   ├── 5-tests/                              # [必需·提交] 测试规则与研发产物入口
-│   ├── 6-审查/                               # [必需·提交] 前端审查产物
-│   ├── 7-验收/                               # [必需·提交] 前端验收标准与最终验收
+│   ├── 6-review/                             # [必需·提交] 测试后的风格回归记录
 │   └── data/                                 # [条件·提交] Markdown 引用的数据资产
 │       └── images/                           # [条件·提交] 文档图片与截图
 ├── dist/                                     # [生成·忽略] 生产构建输出

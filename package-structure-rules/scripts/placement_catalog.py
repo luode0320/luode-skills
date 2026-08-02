@@ -28,6 +28,13 @@ SOURCE_UTIL_EXTENSIONS = {
     "node": {".ts", ".js"},
     "python": {".py"},
 }
+ENTRYPOINT_EXTENSIONS = {
+    "go": {".go"},
+    "java": {".java"},
+    "node": {".ts", ".js"},
+    "python": {".py"},
+}
+ALL_ENTRYPOINT_EXTENSIONS = set().union(*ENTRYPOINT_EXTENSIONS.values())
 SOURCE_ROOTS = {
     "go": "internal",
     "node": "src",
@@ -241,6 +248,10 @@ def command_init(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             continue
         is_required_file = entry.get("node_kind") == "file" and entry["creation_policy"] == "required"
         if entry["id"] in enabled or is_required_file:
+            if entry.get("node_kind") == "pattern":
+                # 动态入口需要人工提供语言和 binary 名称，禁止 init 误建字面量占位路径。
+                argument_errors.append(f"{entry['id']} 是动态入口 pattern，init 不创建入口文件或占位路径")
+                continue
             expanded = expand_init_path(entry["canonical_path"], args)
             if expanded is None:
                 if entry.get("requires_domain"):
@@ -355,6 +366,170 @@ def check_business_rpc_path(relative: str, is_file: bool, language: str) -> list
     return []
 
 
+def entrypoint_extensions(language: str | None) -> set[str]:
+    """返回当前检查上下文允许的二进制入口扩展名。
+
+    [参数] language：后端语言；fullstack 未指定语言时可为空。
+    [返回] set[str]：允许的入口文件扩展名集合。
+    最近修改时间: 2026-08-02 新增二进制入口 pattern 的语言扩展约束。
+    """
+    # 1. fullstack 未指定语言时保留全部受支持扩展，后端严格检查则使用单一语言集合。
+    if language is None:
+        return ALL_ENTRYPOINT_EXTENSIONS
+    return ENTRYPOINT_EXTENSIONS[language]
+
+
+def valid_binary_name(value: str) -> bool:
+    """判断额外二进制目录名是否为单个安全路径片段。
+
+    [参数] value：`cmd/` 下的 binary 目录名。
+    [返回] bool：目录名非空且不含路径穿越时为真。
+    最近修改时间: 2026-08-02 新增 cmd 二进制目录层级检查。
+    """
+    # 1. 只接受单个安全目录片段，避免 cmd 层级混入空名称或路径穿越。
+    return re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", value) is not None
+
+
+def is_entrypoint_filename(value: str, extensions: set[str]) -> bool:
+    """判断文件名是否为当前语言允许的 `main.<ext>` 入口。
+
+    [参数] value：文件名；extensions：当前检查上下文允许的扩展名。
+    [返回] bool：文件名为 main 且扩展名符合语言约束时为真。
+    最近修改时间: 2026-08-02 新增入口文件名匹配。
+    """
+    # 1. 文件名和扩展名必须同时满足，不能把任意 main 文件当作当前语言入口。
+    path = Path(value)
+    return path.stem == "main" and path.suffix.lower() in extensions
+
+
+def check_binary_entrypoint_path(
+    relative: str, is_file: bool, project_kind: str | None, language: str | None,
+) -> list[str]:
+    """校验独立后端和同仓后端的主/额外二进制入口路径。
+
+    [参数] relative：项目根相对路径；is_file：当前路径是否为文件；project_kind：项目类型；language：后端语言。
+    [返回] list[str]：不符合入口 pattern 的稳定错误列表。
+    最近修改时间: 2026-08-02 新增根主入口与 cmd 额外入口的统一检查。
+    """
+    # 1. 前端没有本轮二进制入口契约，直接保持现有目录检查语义。
+    if project_kind not in {"backend", "fullstack"}:
+        return []
+    parts = relative.split("/")
+    extensions = entrypoint_extensions(language)
+    valid = False
+
+    # 2. 独立后端只识别根 main、cmd 及语言源码根中的入口候选，避免误伤普通业务目录的 main 文件。
+    if project_kind == "backend":
+        if len(parts) == 1 and is_file:
+            if is_entrypoint_filename(parts[0], extensions):
+                return []
+            if Path(parts[0]).stem == "main" and Path(parts[0]).suffix.lower() in ALL_ENTRYPOINT_EXTENSIONS:
+                return [f"二进制入口路径非法: {relative}"]
+            return []
+        elif parts[0] == "cmd":
+            if len(parts) == 1 and not is_file:
+                return []
+            if len(parts) == 2 and not is_file and valid_binary_name(parts[1]):
+                return []
+            valid = len(parts) == 3 and is_file and valid_binary_name(parts[1]) and is_entrypoint_filename(parts[2], extensions)
+        elif parts[0] in {"internal", "src"} and is_file and Path(parts[-1]).stem == "main" and Path(parts[-1]).suffix.lower() in ALL_ENTRYPOINT_EXTENSIONS:
+            return [f"二进制入口路径非法: {relative}"]
+        else:
+            return []
+    # 3. 同仓项目仅让 backend 子项目承载后端入口，工作区根和根 cmd 一律不作为后端入口。
+    else:
+        if len(parts) == 1 and not is_file and parts[0] == "backend":
+            return []
+        if len(parts) == 2 and is_file and parts[0] == "backend":
+            if not is_entrypoint_filename(parts[1], extensions):
+                return []
+            valid = is_entrypoint_filename(parts[1], extensions)
+        elif parts[:2] == ["backend", "cmd"]:
+            if len(parts) == 2 and not is_file:
+                return []
+            if len(parts) == 3 and not is_file and valid_binary_name(parts[2]):
+                return []
+            valid = len(parts) == 4 and is_file and valid_binary_name(parts[2]) and is_entrypoint_filename(parts[3], extensions)
+        elif parts[0] == "backend" and len(parts) >= 3 and parts[1] in {"internal", "src"} and is_file and is_entrypoint_filename(parts[-1], extensions):
+            return [f"二进制入口路径非法: {relative}"]
+        elif parts[0] == "cmd" or (parts[0] != "backend" and is_file and is_entrypoint_filename(parts[-1], extensions)):
+            return [f"二进制入口路径非法: {relative}"]
+        else:
+            return []
+
+    return [] if valid else [f"二进制入口路径非法: {relative}"]
+
+
+def configuration_root(project_kind: str | None) -> str | None:
+    """返回当前项目类型唯一的后端配置根。
+
+    [参数] project_kind：项目类型。
+    [返回] str | None：后端配置根路径；前端项目返回 None。
+    最近修改时间: 2026-08-02 21:30:00 收敛独立后端与同仓后端配置根。
+    """
+    # 1. 只映射两类后端项目，避免前端项目误触发配置目录校验。
+    return {"backend": "config", "fullstack": "backend/config"}.get(project_kind)
+
+
+def check_environment_config_path(
+    catalog: dict[str, Any], relative: str, is_file: bool, project_kind: str | None, language: str | None,
+) -> list[str]:
+    """校验后端环境配置的目录、文件名和语言扩展名边界。
+
+    [参数] catalog：配置 Catalog；relative：项目根相对路径；is_file：当前路径是否为文件；project_kind：项目类型；language：后端语言。
+    [返回] list[str]：不符合配置位置或命名契约的稳定错误列表。
+    最近修改时间: 2026-08-02 21:30:00 新增按环境拆分 YAML 与 embedded 文件检查。
+    """
+    # 1. 非后端项目不参与环境配置目录检查，保留前端既有语义。
+    if project_kind not in {"backend", "fullstack"}:
+        return []
+
+    errors: list[str] = []
+    root = configuration_root(project_kind)
+    assert root is not None
+    wrong_roots = {"backend": ["backend/config"], "fullstack": ["config"]}[project_kind]
+    if any(is_under(relative, wrong_root) for wrong_root in wrong_roots):
+        return [f"后端配置必须位于 {root}/: {relative}"]
+    if not is_under(relative, root) or relative == root:
+        return []
+
+    child = relative[len(root) + 1:]
+    category, separator, filename = child.partition("/")
+    if category not in {"yaml", "embedded"}:
+        return [f"配置目录只允许 yaml/ 或 embedded/: {relative}"]
+    if not separator:
+        return []
+    if not is_file or "/" in filename:
+        return [f"环境配置文件必须直接位于 {root}/{category}/: {relative}"]
+
+    entries = [
+        entry for entry in catalog["entries"]
+        if entry["project_kind"] == project_kind
+        and entry.get("artifact_kind") == "config"
+        and entry.get("category") == category
+    ]
+    if len(entries) != 1:
+        return [f"配置 Catalog 条目不唯一: {project_kind}/{category}"]
+    entry = entries[0]
+    suffix = Path(filename).suffix.lower()
+    allowed_extensions = set(entry.get("allowed_extensions", []))
+    if language is not None and category == "embedded":
+        allowed_extensions &= SOURCE_UTIL_EXTENSIONS[language]
+    if suffix not in allowed_extensions:
+        return [f"环境配置文件扩展名不符合规则: {relative}"]
+
+    environment_pattern = entry.get("environment_name_pattern", r"[a-z][a-z0-9_]*")
+    if category == "yaml":
+        filename_pattern = rf"config_{environment_pattern}\.(yaml|yml)"
+        if re.fullmatch(filename_pattern, filename) is None:
+            return [f"YAML 环境配置文件名必须符合 config_<env>.yaml|yml: {relative}"]
+    elif suffix == ".go":
+        filename_pattern = rf"config_{environment_pattern}\.go"
+        if filename.endswith("_yaml.go") or re.fullmatch(filename_pattern, filename) is None:
+            return [f"Go embedded 环境配置文件名必须符合 config_<env>.go: {relative}"]
+    return []
+
+
 def check_required_file_content_contracts(
     catalog: dict[str, Any], root: Path, project_kind: str | None,
 ) -> list[str]:
@@ -458,6 +633,9 @@ def check_path(
     if project_kind == "backend" and language is not None:
         errors.extend(check_source_util_path(relative, is_file, language))
         errors.extend(check_business_rpc_path(relative, is_file, language))
+    # 3. 配置与二进制入口属于本轮新增边界，集中追加专用校验并保持原有错误顺序。
+    errors.extend(check_environment_config_path(catalog, relative, is_file, project_kind, language))
+    errors.extend(check_binary_entrypoint_path(relative, is_file, project_kind, language))
     return errors
 
 
@@ -642,7 +820,7 @@ def check_adoption_path(
 
     [参数] catalog：目录事实源；state：已验证收敛清单；relative：项目相对路径；path：实际文件系统路径；project_kind 与 language：检查上下文。
     [返回] list[str]：当前路径的全部违规原因。
-    最近修改时间: 2026-07-29 00:25:50 新增旧项目渐进采纳的只读路径分流。
+    最近修改时间: 2026-08-02 23:00:00 放行 Catalog 合法的动态根二进制入口。
     """
     legacy_root = adoption_legacy_root(relative, state["legacy"])
     if legacy_root is not None:
@@ -657,7 +835,9 @@ def check_adoption_path(
     # 2. 已采纳和新建路径严格检查；顶层不在 V2 树的源码必须先人工登记为遗留根。
     errors = check_path(catalog, relative, path.is_file(), project_kind, language)
     if path.is_file() and Path(relative).suffix.lower() in state["source_extensions"]:
-        if relative.split("/", 1)[0] not in ADOPTION_V2_SOURCE_ROOTS[project_kind]:
+        # 1. 独立后端根入口是 Catalog 的动态合法路径，不属于静态源码根目录。
+        is_dynamic_binary_entrypoint = not check_binary_entrypoint_path(relative, True, project_kind, language)
+        if relative.split("/", 1)[0] not in ADOPTION_V2_SOURCE_ROOTS[project_kind] and not is_dynamic_binary_entrypoint:
             errors.append(f"未登记的遗留源码路径: {relative}")
     return errors
 

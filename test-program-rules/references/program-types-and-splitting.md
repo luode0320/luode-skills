@@ -2,15 +2,15 @@
 
 ## 真实路径镜像基线
 
-- 所有活动测试代码落在根 `test/`，按被测源码目录镜像；源码 `internal/service/history_client.go` 的测试为 `test/internal/service/history_client_test.go`。
-- 单文件测试用 `<名称>_test.<ext>`；目录级测试以被测模块目录镜像并在 README 列出被测文件。
-- mock、stub、fake、fixture、数据构造和共享 helper 与测试同目录，或放入 `test/shared/`；不要放入 `doc/5-tests/`。
-- `doc/5-tests/YYYY-MM-DD_HHmmss_<任务主题>/README.md` 仅保留目的、命令、样本和结论，`evidence/` 与 `artifacts/` 承接证据和非可执行产物。
+- 所有活动测试资产落在根 `test/`，按被测源码目录镜像；源码 `internal/service/history_client.go` 的测试为 `test/internal/service/history_client_test.go`，其源码专属模拟程序为同目录下的 `history_client_mock.*`、`history_client_stub.*` 或 `history_client_fake.*`。
+- 单文件测试用 `<名称>_test.<ext>`；目录级测试以被测模块目录镜像并在 README 列出被测文件；mock、stub、fake、fixture、数据构造和 helper 默认使用同一源码镜像目录。
+- `test/shared/` 仅用于不归属于单一源码路径、且已被多个测试域稳定复用的共享模拟或辅助能力；源码专属 mock、stub、fake 不得放入共享目录。
+- `doc/5-tests/YYYY-MM-DD_HHmmss_<任务主题>/README.md` 仅保留目的、命令、样本和结论，`evidence/` 与 `artifacts/` 承接日志、报告、截图、脱敏响应等非可执行产物；不得放置测试程序或模拟程序。
 
 ## 程序职责
 
 - 正式测试程序：承载断言和验证流程。
-- 模拟程序：提供 mock、stub、fake、假服务和假依赖。
+- 模拟程序：提供 mock、stub、fake、假服务和假依赖；它们与正式测试程序一样属于根 `test/` 的源码路径镜像活动资产。
 - 响应探测脚本：获取第三方接口真实响应样例，作为结构体建模依据。
 - 数据构造与初始化/清理脚本：准备和清理 local 环境的测试前置条件。
 - 共享测试辅助代码：只抽取稳定重复的断言、构造器、客户端或装配逻辑。

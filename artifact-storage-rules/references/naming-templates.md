@@ -110,10 +110,11 @@
 - 测试中文主说明：`doc/5-tests/YYYY-MM-DD_HHmmss/README.md`
 - 活动测试代码根：`test/`
 - 单文件测试：`<源码相对路径>/<名称>.<ext> -> test/<源码相对路径>/<名称>_test.<ext>`
-- 目录级测试：`test/<被测源码目录>/<主题>_test.<ext>`，README 列出被测文件；fixture、mock、helper 位于同一镜像目录或 `test/shared/`。
+- 源码关联模拟程序：`<源码相对路径>/<名称>.<ext> -> test/<源码相对路径>/<名称>_{mock|stub|fake}.<ext>`；必须与被测源码路径镜像。
+- 目录级测试：`test/<被测源码目录>/<主题>_test.<ext>`，README 列出被测文件；源码关联 fixture、mock、stub、fake、helper 位于同一镜像目录，只有跨源码复用资产才进入 `test/shared/`。
 - Python 发现模式：`*_test.py`；禁止新建 `test_*.py`。
 - Go：`test/<源码相对路径>/<主题>_test.go`，包名为外部 `<target>_test`，仅导入导出 API；源码目录禁止 `*_test.go`。
-- 真实测试代码、mock、fixture 和 helper：放在根 `test/` 的 ASCII 真实代码路径镜像目录中
+- 真实测试代码、mock、stub、fake、fixture 和 helper：放在根 `test/` 的 ASCII 真实代码路径镜像目录中；`doc/5-tests/` 只放说明和非可执行证据
 
 补充要求：
 

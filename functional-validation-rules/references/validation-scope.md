@@ -21,8 +21,8 @@
 ## 留痕要求
 
 - 功能验证主结论统一写入 `doc/5-tests/yyyy-MM-DD_HHmmss/README.md`。
-- 活动测试代码、fixture、mock 和 helper 只放在根 `test/` 的镜像目录。
-- 详细步骤、样例、截图、日志和执行证据放入同一时间戳根目录的 `evidence/` 或 `artifacts/`。
+- 活动测试代码、mock、stub、fake、fixture 和 helper 只放在根 `test/` 的源码相对路径镜像目录；模拟程序与对应测试使用同一镜像目录，跨源码共享能力才放 `test/shared/`。
+- 详细步骤、样例、截图、日志和执行证据放入同一时间戳根目录的 `evidence/` 或 `artifacts/`；这些目录仅保存非可执行证据，不放测试程序或模拟程序。
 
 ## 检查清单
 
