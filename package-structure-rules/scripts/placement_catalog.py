@@ -89,7 +89,7 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
 
     [参数] catalog 为位置 Catalog，args 为解析后的查询参数。
     [返回] 符合全部已提供筛选条件的条目列表。
-    最近修改时间: 2026-07-31 22:16:49 兼容公开文档中的 database 连字符 artifact 名称。
+    最近修改时间: 2026-08-03 18:30:00 为 database-migration 无分类查询优先返回根目录条目。
     """
     # 1. 仅为 database 的公开连字符名称补充内部下划线候选，保持其它 artifact 的既有名称不变。
     artifact_kinds = {args.artifact} if args.artifact is not None else set()
@@ -104,11 +104,17 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
         "operation": args.operation,
         "language": args.language,
     }
-    return [
+    entries = [
         entry for entry in catalog["entries"]
         if (not artifact_kinds or entry.get("artifact_kind") in artifact_kinds)
         and all(value is None or entry.get(field) == value for field, value in mappings.items())
     ]
+    # 3. database-migration 根目录承载通用迁移入口；未指定分类和操作时优先返回根条目，避免与 field/index 子条目产生多结果。
+    if args.artifact in {"database-migration", "database_migration"} and args.category is None and args.operation is None:
+        root_entries = [entry for entry in entries if entry.get("canonical_path") == "database/migration"]
+        if root_entries:
+            return root_entries
+    return entries
 
 
 def command_query(catalog: dict[str, Any], args: argparse.Namespace) -> int:
@@ -558,6 +564,37 @@ def check_required_file_content_contracts(
     return errors
 
 
+def check_required_root_files(
+    catalog: dict[str, Any], root: Path, project_kind: str | None,
+) -> list[str]:
+    """校验 Catalog 声明的必需项目根文件实际存在。
+
+    [参数] catalog 为位置 Catalog，root 为待检查项目根，project_kind 为项目类型。
+    [返回] list[str]：必需根文件缺失或被目录占用时返回稳定错误。
+    最近修改时间: 2026-08-04 新增三类项目根 Dockerfile 的 strict 存在性检查。
+    """
+    if project_kind is None:
+        return []
+    errors: list[str] = []
+    # 1. 仅检查 Catalog 中标记为 dockerfile 的必需文件，保留其它治理文件的既有渐进采纳语义。
+    for entry in catalog["entries"]:
+        if (
+            entry["project_kind"] != project_kind
+            or entry.get("artifact_kind") != "project-governance"
+            or entry.get("category") != "dockerfile"
+            or entry.get("node_kind") != "file"
+            or entry.get("creation_policy") != "required"
+        ):
+            continue
+        relative = entry["canonical_path"]
+        target = root / relative
+        if target.is_dir():
+            errors.append(f"必需根文件不能是目录: {relative}")
+        elif not target.is_file():
+            errors.append(f"缺少必需根文件: {relative}")
+    return errors
+
+
 def check_database_storage_source_path(
     catalog: dict[str, Any], relative: str, is_file: bool,
 ) -> list[str]:
@@ -850,7 +887,7 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
 
     [参数] catalog 为位置 Catalog，args 为检查参数。
     [返回] strict 违规或参数缺失返回 2，其余返回 0。
-    最近修改时间: 2026-07-29 23:45:00 新增 strict 下双平台规则文件正文一致性的只读检查。
+    最近修改时间: 2026-08-04 00:46:50 新增 strict 下三类项目根 Dockerfile 的只读存在性检查。
     """
     root = Path(args.root).resolve()
     if not root.is_dir():
@@ -881,8 +918,9 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
-    # 4. 仅 strict 校验新项目根的双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
+    # 4. strict 校验新项目根 Dockerfile 和双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
     if args.policy == "strict":
+        errors.extend(check_required_root_files(catalog, root, args.project_kind))
         errors.extend(check_required_file_content_contracts(catalog, root, args.project_kind))
     payload = {
         "ok": not errors or args.policy == "legacy",

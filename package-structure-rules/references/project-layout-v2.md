@@ -63,6 +63,7 @@
 ├── .gitattributes                         # [必需·提交] 文本与换行规则
 ├── .gitignore                             # [必需·提交] 忽略规则
 ├── .dockerignore                          # [条件·提交] 镜像排除规则
+├── Dockerfile                              # [必需·提交] 工作区统一镜像定义
 ├── AGENTS.md                              # [必需·提交] 工作区协作规则
 ├── CLAUDE.md                              # [必需·提交] Claude Code 工作区协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                     # [必需·提交] 当前状态
@@ -260,6 +261,7 @@
 ├── .cache/                                  # [生成·忽略] 工具缓存
 ├── build.sh                                 # [必需·提交] 统一打包入口
 ├── docker-build.sh                          # [必需·提交] 镜像构建入口
+├── Dockerfile                                # [必需·提交] 后端镜像定义
 ├── AGENTS.md                                # [必需·提交] 后端项目协作规则
 ├── CLAUDE.md                                # [必需·提交] Claude Code 后端项目协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                       # [必需·提交] 当前任务、范围、状态与交接
@@ -389,7 +391,7 @@
 ├── .cache/                                   # [生成·忽略] 工具缓存
 ├── build.sh                                  # [必需·提交] 前端统一打包入口
 ├── docker-build.sh                           # [条件·提交] 前端 Docker 镜像构建入口
-├── Dockerfile                                # [条件·提交] 前端镜像定义
+├── Dockerfile                                # [必需·提交] 前端镜像定义
 ├── package.json                              # [必需·提交] 前端依赖与脚本入口
 ├── .gitlab-ci.yml                            # [条件·提交] GitLab 流水线主入口
 ├── .editorconfig                             # [必需·提交] UTF-8 与基础格式规则

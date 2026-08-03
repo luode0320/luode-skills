@@ -1,6 +1,6 @@
 # 前端项目位置规则
 
-前端独立项目根的业务资产必须保留在自身 `config/`、`data/`、`src/`、`scripts/`、`deploy/`、`doc/` 中，不能提升至同仓工作区根。
+前端独立项目根的业务资产必须保留在自身 `config/`、`data/`、`src/`、`scripts/`、`deploy/`、`doc/` 中，不能提升至同仓工作区根；项目根必须直接保存并提交 `Dockerfile`。
 
 - `src/app/` 负责启动和全局装配；`src/modules/<domain>/` 负责业务域；跨域复用的组件进入 `src/components/`。
 - `src/api/` 是项目级传输基建，域内 API 调用进入 `src/modules/<domain>/api/`。
