@@ -936,3 +936,4 @@ claude-mem(记忆) :
 2026-08-03 18:27:08 feat: [embedded配置文件名格式后置] Go内嵌配置改为config_env_yaml.go
 2026-08-03 18:27:53 docs: [项目记忆同步] 更新embedded配置命名稳定决策
 2026-08-03 18:28:24 docs: [目录规则V2 embedded配置文件名格式后置] 归档CYCLE-20测试证据
+2026-08-03 18:29:21 test: [embedded配置文件名格式后置] 补充config_env_yaml.go回归断言

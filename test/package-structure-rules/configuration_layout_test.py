@@ -71,7 +71,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置 Catalog 与 Schema 契约。
-        最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+        最近修改时间: 2026-08-03 17:48:21 Go embedded 命名契约改为 config_<env>_yaml.go。
         """
         # 1. 先验证 backend/fullstack 的四类 config query 都暴露完整策略字段。
         cases = (
@@ -96,7 +96,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
                     self.assertEqual("forbid_plain_secret", entry["secret_policy"])
                     self.assertEqual("allowed_reference", entry["environment_variable_policy"])
                 else:
-                    self.assertEqual("config_<env>.go", entry["go_file_name_pattern"])
+                    self.assertEqual("config_<env>_yaml.go", entry["go_file_name_pattern"])
                     self.assertEqual("allow_plain_secret", entry["secret_policy"])
                     self.assertEqual("embedded_source_primary", entry["source_policy"])
                     self.assertEqual("not_default", entry["environment_variable_policy"])
@@ -150,8 +150,9 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言目录渲染和 reference 示例。
-        最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+        最近修改时间: 2026-08-03 17:48:21 embedded 示例文件名同步为格式名后置形式。
         """
+        # 1. 先核对两类项目的目录树渲染：embedded 占位改为格式名后置，外部 YAML 占位保持原样。
         for project_kind in ("backend", "fullstack"):
             with self.subTest(project_kind=project_kind):
                 result = run_cli("render", "--project-kind", project_kind)
@@ -161,12 +162,13 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertIn("embedded/", result.stdout)
                 if project_kind == "backend":
                     self.assertIn("config_<env>.yaml", result.stdout)
-                    self.assertIn("config_<env>.<ext>", result.stdout)
+                    self.assertIn("config_<env>_yaml.<ext>", result.stdout)
 
+        # 2. 再核对 reference 正文保留具体环境示例，确保文档与 Catalog 命名口径不漂移。
         layout = CONFIGURATION_LAYOUT.read_text(encoding="utf-8")
         for filename in (
             "config_prod.yaml", "config_test.yaml", "config_local.yaml",
-            "config_prod.go", "config_test.go", "config_local.go",
+            "config_prod_yaml.go", "config_test_yaml.go", "config_local_yaml.go",
         ):
             self.assertIn(filename, layout)
 
@@ -175,11 +177,12 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言合法环境配置样本通过 strict。
-        最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+        最近修改时间: 2026-08-03 17:48:21 Go embedded 合法样本改为格式名后置命名。
         """
+        # 1. Go embedded 必须带 _yaml 后缀；`.java` 样本保持原名，锚定“只有 Go 强制文件名契约”。
         cases = (
-            ("backend", ("config/yaml/config_prod.yaml", "config/yaml/config_pre_prod.yml", "config/embedded/config_local.go"), "go"),
-            ("fullstack", ("backend/config/yaml/config_test.yaml", "backend/config/embedded/config_dev.go"), "go"),
+            ("backend", ("config/yaml/config_prod.yaml", "config/yaml/config_pre_prod.yml", "config/embedded/config_local_yaml.go"), "go"),
+            ("fullstack", ("backend/config/yaml/config_test.yaml", "backend/config/embedded/config_dev_yaml.go"), "go"),
             ("backend", ("config/embedded/config_local.java",), "java"),
         )
         for project_kind, paths, language in cases:
@@ -197,13 +200,16 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言非法配置样本失败关闭且不写入。
-        最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+        最近修改时间: 2026-08-03 17:48:21 非法样本改为缺少 _yaml 后缀与环境名以 _yaml 结尾两类。
         """
+        # 1. 旧命名 config_test.go 与双格式名 config_test_yaml_yaml.go 都必须失败关闭；
+        #    嵌套用例同步带 _yaml，确保它只因层级非法而失败。
         cases = (
             ("backend", "go", "config/yaml/config_PROD.yaml", "环境配置文件名"),
             ("backend", "go", "config/yaml/config_prod.json", "环境配置文件扩展名"),
-            ("backend", "go", "config/embedded/config_test_yaml.go", "Go embedded"),
-            ("backend", "go", "config/embedded/nested/config_local.go", "直接位于"),
+            ("backend", "go", "config/embedded/config_test.go", "Go embedded"),
+            ("backend", "go", "config/embedded/config_test_yaml_yaml.go", "Go embedded"),
+            ("backend", "go", "config/embedded/nested/config_local_yaml.go", "直接位于"),
             ("backend", "go", "backend/config/yaml/config_local.yaml", "后端配置必须位于"),
             ("fullstack", "go", "config/yaml/config_local.yaml", "后端配置必须位于"),
         )
