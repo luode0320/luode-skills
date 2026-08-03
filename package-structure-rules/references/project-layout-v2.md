@@ -103,7 +103,7 @@
 │   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；禁止秘密原值
 │   │   └── config_<env>.yaml                 # [条件·提交] 兼容 `.yml`；标准环境为 local、test、prod
 │   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
-│       └── config_<env>.<ext>                # [条件·提交] Go 使用 config_<env>.go；允许源码私密配置，源码优先且默认不依赖环境变量
+│       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
@@ -273,7 +273,7 @@
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
-独立后端配置使用 `config/yaml/` 与 `config/embedded/`，按 `config_<env>` 拆分环境；Go 示例为 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，以及 `config_prod.go`、`config_test.go`、`config_local.go`。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展；只检查已有文件，不要求三种环境齐全，也不要求 YAML 与 embedded 按环境配对。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。
+独立后端配置使用 `config/yaml/` 与 `config/embedded/`，按 `config_<env>` 拆分环境；Go 示例为 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，以及 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`。embedded 源码文件的格式名必须后置，因为 `config_test.go` 会被 Go 当成测试文件；外部 YAML 不参与编译，因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全，也不要求 YAML 与 embedded 按环境配对。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 

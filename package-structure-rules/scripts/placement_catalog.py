@@ -478,7 +478,7 @@ def check_environment_config_path(
 
     [参数] catalog：配置 Catalog；relative：项目根相对路径；is_file：当前路径是否为文件；project_kind：项目类型；language：后端语言。
     [返回] list[str]：不符合配置位置或命名契约的稳定错误列表。
-    最近修改时间: 2026-08-02 21:30:00 新增按环境拆分 YAML 与 embedded 文件检查。
+    最近修改时间: 2026-08-03 17:48:21 Go embedded 文件名改为格式名后置的 config_<env>_yaml.go。
     """
     # 1. 非后端项目不参与环境配置目录检查，保留前端既有语义。
     if project_kind not in {"backend", "fullstack"}:
@@ -524,9 +524,12 @@ def check_environment_config_path(
         if re.fullmatch(filename_pattern, filename) is None:
             return [f"YAML 环境配置文件名必须符合 config_<env>.yaml|yml: {relative}"]
     elif suffix == ".go":
-        filename_pattern = rf"config_{environment_pattern}\.go"
-        if filename.endswith("_yaml.go") or re.fullmatch(filename_pattern, filename) is None:
-            return [f"Go embedded 环境配置文件名必须符合 config_<env>.go: {relative}"]
+        # 1. 要求格式名后置：config_test.go 会被 Go 当成测试文件并排除出 go build，因此必须写成 config_test_yaml.go。
+        #    环境名允许下划线，所以额外排除以 _yaml 结尾的环境名，避免 config_test_yaml_yaml.go 无法唯一切分环境名与格式名。
+        filename_pattern = rf"config_{environment_pattern}_yaml\.go"
+        environment = filename[len("config_"):-len("_yaml.go")]
+        if environment.endswith("_yaml") or re.fullmatch(filename_pattern, filename) is None:
+            return [f"Go embedded 环境配置文件名必须符合 config_<env>_yaml.go: {relative}"]
     return []
 
 
