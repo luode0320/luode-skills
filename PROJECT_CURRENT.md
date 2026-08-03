@@ -2,18 +2,18 @@
 
 ## 更新时间
 
-- 2026-08-03
+- 2026-08-04
 
 ## 当前任务
 
-- 来源对象：用户确认的 `REQ-PSR-CONFIG-ENV-002` 与 `CYCLE-PSR-20-001`，修订 `REQ-PSR-CONFIG-ENV-001` 的配置文件命名结论。
-- 当前目标：把源码内嵌配置文件名从 `config_<env>.go` 收敛为格式名后置的 `config_<env>_yaml.go`，规避 Go 把 `config_test.go` 当测试文件的语言冲突，并完成规则、检查工具、测试和文档收口。
-- 当前状态：需求、周期文档、Reference、Catalog、CLI、根测试、长期记忆、四份文档门禁和 6-review 均已通过，CYCLE-20 完成；改动停在已改动未提交状态。
+- 来源对象：用户确认的 `REQ-PSR-DOCKERFILE-ROOT-001` 与 `CYCLE-PSR-21-001`，补充三类项目根 Dockerfile 必需规则。
+- 当前目标：让前后端同仓、独立后端、独立前端的项目根统一存在并提交 `Dockerfile`，同步 Skill、Reference、Catalog、CLI、测试、稳定记忆和 6-review。
+- 当前状态：规则、目录树、Catalog、CLI、专项测试和 6-review 已完成；专项回归 `17/17` 通过；改动停在已改动未提交状态。
 
 ## 范围与边界
 
-- 范围：`configuration-layout.md`、`project-layout-v2.md`、`placement-catalog.yaml`、`placement_catalog.py`、`test/package-structure-rules/configuration_layout_test.py`、`PROJECT_MEMORY.md` 与 CYCLE-20 需求/实施/测试/6-review 文档。
-- 非范围：外部 YAML 命名、配置根位置、秘密原值边界、二进制入口、非 Go 语言 embedded 文件名校验、`placement-catalog.schema.json`、`AGENTS.md`/`CLAUDE.md`/`test-strategy-rules`、真实项目迁移和 Git 历史写入。
+- 范围：`package-structure-rules/SKILL.md`、`references/placement-catalog.yaml`、`references/project-layout-v2.md`、`references/structure-general.md`、`references/frontend-project-layout.md`、`scripts/placement_catalog.py`、三类项目布局回归测试、`PROJECT_MEMORY.md`、`PROJECT_CURRENT.md` 和活动 `doc/6-review`。
+- 非范围：Dockerfile 正文和镜像构建逻辑、已有 Docker Compose/部署规则、旧项目自动迁移、`placement-catalog.schema.json`、业务代码、真实项目迁移和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
@@ -27,6 +27,7 @@
 - 已完成 `TASK-TEST-MOCK-MIRROR-01` 测试资产规则补充：mock、stub、fake、fixture、helper 与测试程序统一放根 `test/`，源码关联模拟程序按源码相对路径镜像，跨源码复用进入 `test/shared/`，`doc/5-tests/` 仅保存非可执行证据；治理测试 `13/13`、根 Python 测试 `216/216`、六个 Skill 校验、测试文档 profile 与 `6-review STYLE: PASS` 均通过。
 
 - 已完成 CYCLE-20 embedded 配置文件名格式后置：内嵌配置改为 `config_<env>_yaml.<ext>`，Go 强制；旧命名 `config_<env>.go` 与重复格式名 `config_<env>_yaml_yaml.go` 均失败关闭；外部 YAML 保持 `config_<env>.yaml` 不变；配置回归 `7/7`、目录规则全量回归 `16/16`、四份文档 profile 与 `6-review STYLE: PASS` 均通过；未迁移真实项目，未写入 Git 历史。
+- 已完成 CYCLE-PSR-21-001 根 Dockerfile 补充：三类项目 Catalog、目录树、Skill 文档和 CLI 已统一；`init` 创建根 `Dockerfile`，`strict` 检查缺失/目录冲突，`adoption` 保持渐进采纳；专项回归 `17/17` 和 `6-review STYLE: PASS` 通过；未迁移真实项目，未写入 Git 历史。
 
 ## 门禁说明
 
@@ -44,7 +45,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-02T15:22:43.633413Z",
+  "registry_updated_at": "2026-08-03T16:46:12.883328Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -535,6 +536,34 @@
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
           "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/ce8a40b539a85948274cd7e1d61a1276da3693651797ac1297a193ca83c5255a",
+      "session_id": "019fc873-d578-7bb1-8e84-ce0a8737553e",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-DOCKERFILE-ROOT-001/CYCLE-PSR-21-001",
+      "source_document": "package-structure-rules/SKILL.md",
+      "plan_fingerprint": "323946326c027f215eb1bce239e3559aa5333bff300553466b0fdb8e7709ee90",
+      "updated_at": "2026-08-04T01:30:00Z",
+      "steps": [
+        {
+          "id": "TASK-PSR-DOCKERFILE-01",
+          "step": "[TASK-PSR-DOCKERFILE-01] 冻结三类项目根 Dockerfile 规则与影响面",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSR-DOCKERFILE-02",
+          "step": "[TASK-PSR-DOCKERFILE-02] 同步 Skill、Catalog、目录树、CLI 与回归测试",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSR-DOCKERFILE-03",
+          "step": "[TASK-PSR-DOCKERFILE-03] 完成真实验证、合规检查与 6-review 收口",
+          "status": "completed"
         }
       ]
     }

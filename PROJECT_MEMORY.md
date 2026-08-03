@@ -716,8 +716,9 @@
 - 稳定决策：独立后端的默认二进制入口固定为根 `main.<ext>`，仅当存在额外 binary 时使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端对应固定为 `backend/main.<ext>` 与 `backend/cmd/<binary>/main.<ext>`。根 `cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 都是非法入口；Catalog 以动态 pattern 建模，`init` 显式启用时必须失败关闭且不得创建占位路径。
 - 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；两者均按需使用 `yaml/` 与 `embedded/` 子目录。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置格式名必须后置，使用 `embedded/config_local_yaml.go`、`embedded/config_test_yaml.go`、`embedded/config_prod_yaml.go`；环境集合可扩展，不要求所有环境齐全，也不要求 YAML 与 embedded 成对出现。格式名后置的原因是 `config_test.go` 会被 Go 当成测试文件并排除出 `go build`，因此 `embedded/config_<env>.go` 属于非法旧命名；环境名同样不得以 `_yaml` 结尾。外部 YAML 不参与编译，保持 `config_<env>.yaml`，不加 `_yaml` 后缀。文件名契约只对 `.go` 强制，其他语言的 embedded 仍只校验源码扩展名；`check` 只读，`init` 不生成动态环境配置文件。YAML 继续禁止秘密原值；backend/fullstack 的 embedded 源码允许直接包含 API key、密钥、密码等私密值，源码为主且默认不依赖环境变量，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。
 - 稳定决策：fullstack、backend、frontend 三类项目统一使用项目根 `test/` 作为活动测试代码唯一入口；独立后端使用根 `test/`，不建立 `backend/test/`；前后端同仓也不建立 `backend/test/` 或 `frontend/test/`。Catalog 的测试目录 Owner 为 `test-strategy-rules`，`doc/5-tests/` 只保存测试说明和非可执行证据，不能替代根 `test/`。
+- 稳定决策：前后端同仓、独立后端、独立前端三类项目根都必须直接保存并提交 `Dockerfile`。Catalog 以 `project-governance/dockerfile` 的必需文件条目建模，`init` 自动创建空文件位置；`strict` 只读拒绝缺失或被目录占用，`adoption` 保持旧项目渐进采纳，不强制补迁移文件。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
-- 更新时间：2026-08-02。
+- 更新时间：2026-08-04。
 
 ## 非 Plan Mode 最小计划分级规则
 
