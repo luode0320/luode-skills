@@ -939,3 +939,4 @@ claude-mem(记忆) :
 2026-08-03 18:29:21 test: [embedded配置文件名格式后置] 补充config_env_yaml.go回归断言
 2026-08-03 18:29:57 docs: [目录规则V2 embedded配置文件名格式后置] 归档CYCLE-20审查与状态收口
 2026-08-04 02:00:00 docs: [根Dockerfile规则] 同步Skill、目录Catalog与项目状态
+2026-08-04 02:00:20 test: [根Dockerfile规则] 补充三类项目布局回归

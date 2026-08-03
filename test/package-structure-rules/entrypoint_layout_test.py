@@ -60,7 +60,7 @@ class BinaryEntrypointTests(unittest.TestCase):
 
         [参数] self：unittest 测试实例。
         [返回] None：断言失败时由 unittest 报告。
-        最近修改时间: 2026-08-02 补齐二进制入口测试元信息。
+        最近修改时间: 2026-08-04 为 strict 合法入口 fixture 补齐根 Dockerfile。
         """
         # 1. 查询四种入口 pattern，并验证 Catalog 和 Schema 的动态节点契约。
         cases = (
@@ -101,12 +101,12 @@ class BinaryEntrypointTests(unittest.TestCase):
 
         [参数] self：unittest 测试实例。
         [返回] None：断言失败时由 unittest 报告。
-        最近修改时间: 2026-08-02 补齐二进制入口测试元信息。
+        最近修改时间: 2026-08-04 为 strict 合法入口 fixture 补齐根 Dockerfile。
         """
         # 1. 在临时项目中写入合法路径，确认 strict 仅接受四种规范入口。
         cases = (
-            ("backend", ("main.go", "cmd/api/main.go")),
-            ("fullstack", ("backend/main.go", "backend/cmd/worker/main.go", "backend/crontask/sync_order/main.go", "backend/AGENTS.md", "backend/CLAUDE.md")),
+            ("backend", ("Dockerfile", "main.go", "cmd/api/main.go")),
+            ("fullstack", ("Dockerfile", "backend/main.go", "backend/cmd/worker/main.go", "backend/crontask/sync_order/main.go", "backend/AGENTS.md", "backend/CLAUDE.md")),
         )
         for project_kind, paths in cases:
             with self.subTest(project_kind=project_kind), tempfile.TemporaryDirectory() as directory:

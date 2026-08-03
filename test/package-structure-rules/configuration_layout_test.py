@@ -55,8 +55,13 @@ def write_files(root: Path, paths: tuple[str, ...]) -> None:
 
     [参数] root：临时测试目录；paths：待创建的项目相对路径。
     [返回] None：仅创建测试 fixture。
-    最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+    最近修改时间: 2026-08-04 为 strict fixture 补齐根 Dockerfile。
     """
+    # 1. 配置 strict fixture 同时满足三类项目的必需根 Dockerfile 基线。
+    dockerfile = root / "Dockerfile"
+    dockerfile.parent.mkdir(parents=True, exist_ok=True)
+    dockerfile.write_text("# test fixture\n", encoding="utf-8")
+    # 2. 再写入当前用例要求验证的配置样本，保持负向样本只因目标规则失败。
     for relative in paths:
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
