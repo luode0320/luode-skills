@@ -938,3 +938,4 @@ claude-mem(记忆) :
 2026-08-03 18:28:24 docs: [目录规则V2 embedded配置文件名格式后置] 归档CYCLE-20测试证据
 2026-08-03 18:29:21 test: [embedded配置文件名格式后置] 补充config_env_yaml.go回归断言
 2026-08-03 18:29:57 docs: [目录规则V2 embedded配置文件名格式后置] 归档CYCLE-20审查与状态收口
+2026-08-04 20:33:16 docs: [总结知识引用清单_Obsidian引用可视化] 归档CYCLE-21需求
