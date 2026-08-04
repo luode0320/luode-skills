@@ -503,7 +503,7 @@ def check_environment_config_path(
 
     [参数] catalog：配置 Catalog；relative：项目根相对路径；is_file：当前路径是否为文件；project_kind：项目类型；language：后端语言。
     [返回] list[str]：不符合配置位置或命名契约的稳定错误列表。
-    最近修改时间: 2026-08-03 17:48:21 Go embedded 文件名改为格式名后置的 config_<env>_yaml.go。
+    最近修改时间: 2026-08-05 新增 config 根 load/model 源码文件放行与稳定失败文案。
     """
     # 1. 非后端项目不参与环境配置目录检查，保留前端既有语义。
     if project_kind not in {"backend", "fullstack"}:
@@ -519,6 +519,17 @@ def check_environment_config_path(
         return []
 
     child = relative[len(root) + 1:]
+    # 2. config 根直接源码文件只放行当前语言的 load.<ext> / model.<ext> 两个命名；扩展名映射与二进制入口一致。
+    if is_file and "/" not in child:
+        extensions = entrypoint_extensions(language)
+        stem = Path(child).stem
+        suffix = Path(child).suffix.lower()
+        if stem in {"load", "model"} and suffix in extensions:
+            return []
+        if stem in {"load", "model"}:
+            return [f"配置根源码文件扩展名不符合规则: {relative}"]
+        return [f"配置根源码文件必须为 load.<ext> 或 model.<ext>: {relative}"]
+
     category, separator, filename = child.partition("/")
     if category not in {"yaml", "embedded"}:
         return [f"配置目录只允许 yaml/ 或 embedded/: {relative}"]
@@ -666,7 +677,7 @@ def check_path(
 
     [参数] catalog 为位置 Catalog，relative 为项目相对路径，is_file 表示文件，project_kind 与 language 为检查上下文。
     [返回] 当前路径的严格策略错误列表。
-    最近修改时间: 2026-07-29 23:45:00 保留路径边界校验；根规则文件正文契约由专用函数只读检查。
+    最近修改时间: 2026-08-05 config 根直接源码文件交由配置专项校验唯一裁决，不再命中子目录边界。
     """
     errors: list[str] = []
     # 1. 先应用 Catalog 的通用禁止路径和子目录边界。
@@ -677,6 +688,9 @@ def check_path(
     for parent, children in catalog["allowed_children"].items():
         if relative.startswith(parent + "/"):
             first_child = relative[len(parent) + 1:].split("/", 1)[0]
+            # 1.1 config 根直接源码文件由 check_environment_config_path 唯一裁决 load/model 命名与扩展名。
+            if is_file and parent in {"config", "backend/config"} and "/" not in relative[len(parent) + 1:]:
+                continue
             if first_child not in children:
                 errors.append(f"非法子目录: {relative} 不属于 {parent}")
     suffix = Path(relative).suffix.lower()
