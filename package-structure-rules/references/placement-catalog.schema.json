@@ -35,8 +35,8 @@
         },
         "allOf": [
           {
-            "if": {"properties": {"artifact_kind": {"const": "source-util"}}, "required": ["artifact_kind"]},
-            "then": {"required": ["language"]}
+            "if": {"properties": {"artifact_kind": {"const": "common-util"}}, "required": ["artifact_kind"]},
+            "then": {"required": ["flat_files"]}
           },
           {
             "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},

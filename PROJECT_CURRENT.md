@@ -6,14 +6,14 @@
 
 ## 当前任务
 
-- 来源对象：用户确认的 `REQ-PSR-DOCKERFILE-ROOT-001` 与 `CYCLE-PSR-21-001`，补充三类项目根 Dockerfile 必需规则。
-- 当前目标：让前后端同仓、独立后端、独立前端的项目根统一存在并提交 `Dockerfile`，同步 Skill、Reference、Catalog、CLI、测试、稳定记忆和 6-review。
-- 当前状态：规则、目录树、Catalog、CLI、专项测试和 6-review 已完成；专项回归 `17/17` 通过；改动停在已改动未提交状态。
+- 来源对象：用户确认的 `REQ-PSR-COMMON-UTIL-001` 与 `CYCLE-PSR-22-001`，将独立后端项目关联工具统一放入 `common/util/`。
+- 当前目标：同步 `package-structure-rules` 的规则文档、Catalog、Schema、CLI、相邻 `common-util-rules`、活动测试和四件套记忆；根 `utils/<package>/` 继续承载项目无关工具包。
+- 当前状态：`common/util` 目标已完成审计；规则、Catalog、CLI、专项测试、文档 profile、6-review 与合规核对均通过；改动停在已改动未提交状态。
 
 ## 范围与边界
 
-- 范围：`package-structure-rules/SKILL.md`、`references/placement-catalog.yaml`、`references/project-layout-v2.md`、`references/structure-general.md`、`references/frontend-project-layout.md`、`scripts/placement_catalog.py`、三类项目布局回归测试、`PROJECT_MEMORY.md`、`PROJECT_CURRENT.md` 和活动 `doc/6-review`。
-- 非范围：Dockerfile 正文和镜像构建逻辑、已有 Docker Compose/部署规则、旧项目自动迁移、`placement-catalog.schema.json`、业务代码、真实项目迁移和 Git 历史写入。
+- 范围：`package-structure-rules` 的 SKILL、目录树、工具布局 reference、Catalog、Schema、CLI，`common-util-rules` 相邻 reference，活动 `test/package-structure-rules/backend_common_util_layout_test.py`，需求/实施/测试/6-review 文档及项目四件套。
+- 非范围：真实业务项目迁移、旧项目自动搬移、根 `utils/<package>/` 职责、前端工具目录、业务代码、外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
@@ -27,16 +27,18 @@
 - 已完成 `TASK-TEST-MOCK-MIRROR-01` 测试资产规则补充：mock、stub、fake、fixture、helper 与测试程序统一放根 `test/`，源码关联模拟程序按源码相对路径镜像，跨源码复用进入 `test/shared/`，`doc/5-tests/` 仅保存非可执行证据；治理测试 `13/13`、根 Python 测试 `216/216`、六个 Skill 校验、测试文档 profile 与 `6-review STYLE: PASS` 均通过。
 
 - 已完成 CYCLE-20 embedded 配置文件名格式后置：内嵌配置改为 `config_<env>_yaml.<ext>`，Go 强制；旧命名 `config_<env>.go` 与重复格式名 `config_<env>_yaml_yaml.go` 均失败关闭；外部 YAML 保持 `config_<env>.yaml` 不变；配置回归 `7/7`、目录规则全量回归 `16/16`、四份文档 profile 与 `6-review STYLE: PASS` 均通过；未迁移真实项目，未写入 Git 历史。
+- 本轮已完成 `common/util` 规则文字与相邻 reference 同步；Catalog、Schema、CLI、活动测试和文档证据已落盘，专项测试 `5/5`、package-structure-rules 四文件回归 `22/22`、需求/实施/测试/风格 profile、Skill 校验与 `git diff --check` 均已通过。
 - 已完成 CYCLE-PSR-21-001 根 Dockerfile 补充：三类项目 Catalog、目录树、Skill 文档和 CLI 已统一；`init` 创建根 `Dockerfile`，`strict` 检查缺失/目录冲突，`adoption` 保持渐进采纳；专项回归 `17/17` 和 `6-review STYLE: PASS` 通过；未迁移真实项目，未写入 Git 历史。
 
 ## 门禁说明
 
-- 本轮 `Obsidian:阻断`；固定 vault 未注册，未通过直接文件系统替代。所有实现与验证仅使用本地仓库、Windows Python、临时目录和 Git 只读检查。
+- 本轮 `Obsidian:不适用`；任务不依赖跨项目知识检索，也未形成需要沉淀的长期知识。所有实现与验证仅使用本地仓库、Windows Python、临时目录和 Git 只读检查。
 
 ## 验证与交接
 
 - `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-TEST-ROOT-001/CYCLE-18` 已完成全部四个任务并按 session 精确失活。
-- 最后执行点：CYCLE-19 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、需求/实施总览/实施周期/test/style 文档 profile、`py_compile`、quick validation 和 `git diff --check` 均通过；本轮不执行 Git 历史写入。
+- 最后执行点：`placement_catalog.py` 与专项测试已通过 `py_compile`；`query --artifact common-util` 与兼容别名 `query --artifact source-util --language go` 均返回 `common/util`；专项测试 `5/5`、四文件回归 `22/22`、需求/实施/测试/风格 profile、Skill 校验、UTF-8/NUL 与 `git diff --check` 均通过。本轮不执行 Git 历史写入。
+- CYCLE-PSR-22-001 完成审计通过：专项 5/5、活动回归 22/22、四个文档 profile PASS、Skill valid、STYLE: PASS。
 - 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
 - 本轮 CYCLE-20 最后执行点：内嵌配置 query（backend/fullstack 各一次）、render 目录树、外部 YAML 未漂移核对、配置回归 `7/7`、package-structure-rules 全量回归 `16/16`、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS；六个改动文件 UTF-8 与 LF 未漂移；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 
@@ -45,7 +47,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-03T16:46:12.883328Z",
+  "registry_updated_at": "2026-08-04T15:13:43.497261Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -563,6 +565,34 @@
         {
           "id": "TASK-PSR-DOCKERFILE-03",
           "step": "[TASK-PSR-DOCKERFILE-03] 完成真实验证、合规检查与 6-review 收口",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/fc89c5fe952152bdea64934fc0a22cb93e6807e72c4ec74fdfd74c8f3d285450",
+      "session_id": "019fc879-c989-7391-961e-35383e84f8c0",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "exact",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-COMMON-UTIL-001/CYCLE-PSR-22-001",
+      "source_document": "doc/3-实施/2026-08-04_代码位置目录规则V2_实施周期22_common-util落点.md",
+      "plan_fingerprint": "3435448165f60f1b84c680f496fd544673d834af3406743d8669ee3915c1f043",
+      "updated_at": "2026-08-04T15:13:43Z",
+      "steps": [
+        {
+          "id": "T22-01",
+          "step": "[T22-01] Catalog/Schema/规则引用统一 common/util",
+          "status": "completed"
+        },
+        {
+          "id": "T22-02",
+          "step": "[T22-02] CLI 边界与活动行为测试",
+          "status": "completed"
+        },
+        {
+          "id": "T22-03",
+          "step": "[T22-03] 文档/四件套/6-review 收口",
           "status": "completed"
         }
       ]

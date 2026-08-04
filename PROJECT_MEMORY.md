@@ -250,12 +250,12 @@
 - 状态: 启用
 
 ### 后端工具落点分流规则
-- 别名: 后端 utils 归位, 源码根 util 归位, IP 工具包归位, utils 与源码根 util 区分
+- 别名: 后端 utils 归位, common/util 归位, IP 工具包归位, utils 与 common/util 区分
 - 类型: 包结构/复用规则
-- 定义: 后端中可脱离项目独立复制的工具包与 SDK 仅放根 `utils/<package>/`；根 `utils/` 不得有直接文件且不得依赖项目其他包。请求 IP 提取、规范化、公私网判断和国家/地区归属查询适配固定在 `utils/ip/`，不承载代理信任、风控、业务黑白名单或业务地域策略。可引用项目其他包但不承载业务流程的高关联工具函数直接放入语言源码根 `util/<function>.<ext>`，不得创建子目录。业务域私有辅助继续放 `business/<domain>/util/`；前端工具目录不受此规则影响。
+- 定义: 后端中可脱离项目独立复制的工具包与 SDK 仅放根 `utils/<package>/`；根 `utils/` 不得有直接文件且不得依赖项目其他包。请求 IP 提取、规范化、公私网判断和国家/地区归属查询适配固定在 `utils/ip/`，不承载代理信任、风控、业务黑白名单或业务地域策略。可引用项目其他包但不承载业务流程的高关联工具函数统一放独立后端根 `common/util/<function>.<ext>`，不得创建子目录；源码根 `util/` 为废弃位置，新代码不得进入。业务域私有辅助继续放 `business/<domain>/util/`；前端工具目录不受此规则影响。
 - 来源: 对话确认、`common-util-rules`（公共资格与复用）、`package-structure-rules`（目录落点与依赖方向）
 - 适用范围: 后端通用工具、SDK、高关联工具函数、业务域私有辅助归位
-- 更新时间: 2026-07-29
+- 更新时间: 2026-08-04
 - 状态: 启用
 
 ### 微业务跨域 JSON RPC 规则
@@ -708,7 +708,7 @@
 ## 代码位置目录规则 V2
 
 - 稳定决策：`package-structure-rules` 是三类项目的代码位置、查找与引用唯一 Owner；人工目录树、JSON 兼容 YAML Catalog、CLI 和相邻 Skill 必须保持一致。
-- 稳定决策：后端技术工具、SDK 和服务注册发现统一位于项目根 `utils/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。语言源码根 `util/` 只直接存放可引用项目其他包的高关联工具函数，禁止子目录。
+- 稳定决策：后端项目无关、可独立复制的技术工具、SDK 和服务注册发现统一位于项目根 `utils/<package>/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。需要引用项目其他包但不承载业务流程的高关联工具统一位于独立后端 `common/util/`，直接存放当前语言文件且禁止子目录；源码根 `util/` 为废弃位置。
 - 稳定决策：前后端同仓、独立后端和独立前端项目根都直接保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 是条件文件。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取。Catalog 将六项建模为 `.md` 文件节点，`init` 只创建五个必需文件位置，且仅在显式启用时创建 `PROJECT_STYLE.md`，不负责或覆盖各 Owner 的文件正文；strict 仅只读拒绝双文件正文漂移。
 - 稳定决策：`database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/`、`database/sql/index/` 与 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子目录只直接保存 `.sql` 文件，且与迁移源码严格隔离。
 - 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
@@ -1063,24 +1063,24 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-09
-  - entity_id: rule.backend-utils-source-util-placement
-    name: "后端 utils 与源码根 util 工具分流"
+  - entity_id: rule.backend-utils-common-util-placement
+    name: "后端 utils 与 common/util 工具分流"
     type: "包结构规则"
     aliases:
       - 后端 utils 归位
-      - 源码根 util 归位
+      - common/util 归位
       - IP 工具包归位
-      - utils 与源码根 util 区分
-    definition: "可独立复制的后端工具包与 SDK 位于根 utils/<package>/，根 utils 不得直接存放文件且不得依赖项目其他包；IP 提取、规范化、公私网判断和国家/地区归属查询适配固定于 utils/ip/，不承载代理信任或业务策略；可引用项目其他包的高关联工具函数直接位于语言源码根 util/<function>.<ext>，不得创建子目录。业务域 util 保留为域私有辅助能力。"
+      - utils 与 common/util 区分
+    definition: "可独立复制的后端工具包与 SDK 位于根 utils/<package>/，根 utils 不得直接存放文件且不得依赖项目其他包；IP 提取、规范化、公私网判断和国家/地区归属查询适配固定于 utils/ip/，不承载代理信任或业务策略；可引用项目其他包的高关联工具函数直接位于独立后端 common/util/<function>.<ext>，不得创建子目录。源码根 util 为废弃位置，业务域 util 保留为域私有辅助能力。"
     scope: "后端通用工具、SDK、高关联工具函数、业务域私有辅助归位"
     status: "active"
     evidence_ids:
       - evidence.skill.common-util-rules
       - evidence.skill.package-structure-rules
-      - evidence.dialog.backend-utils-source-util-placement
+      - evidence.dialog.backend-utils-common-util-placement
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-29
+    updated_at: 2026-08-04
   - entity_id: rule.backend-root-governance-files
     name: "后端根治理文件位置"
     type: "项目治理目录规则"
@@ -1647,7 +1647,7 @@ evidence:
     source: "package-structure-rules/SKILL.md"
     path: "package-structure-rules/SKILL.md"
     note: "包结构、目录分层和子包归位规则来源"
-  - evidence_id: evidence.dialog.backend-utils-source-util-placement
+  - evidence_id: evidence.dialog.backend-utils-common-util-placement
     type: "dialog"
     source: "对话确认"
     note: "当前对话确认后端根 utils 与源码根 util 的分流口径"
@@ -1889,7 +1889,7 @@ lifecycle:
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
     - "rule.simple-check-inline-readability"
-    - "rule.backend-utils-source-util-placement"
+   - "rule.backend-utils-common-util-placement"
     - "rule.backend-database-storage-layout"
     - "rule.backend-root-data-forbidden"
     - "rule.micro-business-json-rpc-boundary"
@@ -2039,15 +2039,15 @@ retrieval_hints:
     职责拆分颗粒度:
       - "rule.simple-check-inline-readability"
     后端 utils 归位:
-      - "rule.backend-utils-source-util-placement"
-    源码根 util 归位:
-      - "rule.backend-utils-source-util-placement"
-    utils 与源码根 util 区分:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
+    common/util 归位:
+      - "rule.backend-utils-common-util-placement"
+    utils 与 common/util 区分:
+      - "rule.backend-utils-common-util-placement"
     项目无关工具包:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     项目高关联工具函数:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     业务域 rpc:
       - "rule.micro-business-json-rpc-boundary"
     微业务 JSON 通信:
@@ -2160,17 +2160,17 @@ retrieval_hints:
     可读性:
       - "rule.simple-check-inline-readability"
     后端工具落点分流:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     后端数据存储目录:
       - "rule.backend-database-storage-layout"
     后端根 data 禁止路径:
       - "rule.backend-root-data-forbidden"
     独立字段 SQL:
       - "rule.backend-database-storage-layout"
-    utils / 源码根 util:
-      - "rule.backend-utils-source-util-placement"
+    utils / common/util:
+      - "rule.backend-utils-common-util-placement"
     后端公共工具归位:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     微业务隔离:
       - "rule.micro-business-json-rpc-boundary"
     跨业务调用:
@@ -2306,9 +2306,9 @@ retrieval_hints:
     code-readability-rules/references/function-structure-rules.md:
       - "rule.simple-check-inline-readability"
     common-util-rules/SKILL.md:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     package-structure-rules/SKILL.md:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
       - "rule.micro-business-json-rpc-boundary"
       - "rule.legacy-project-directory-adoption"
     doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md:
@@ -2316,7 +2316,7 @@ retrieval_hints:
     micro-business-architecture-rules/SKILL.md:
       - "rule.micro-business-json-rpc-boundary"
     编码skill.md:
-      - "rule.backend-utils-source-util-placement"
+      - "rule.backend-utils-common-util-placement"
     project-agents-bootstrap/SKILL.md:
       - "rule.code-generation-style-contract"
       - "rule.thread-title-process-trigger"

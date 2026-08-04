@@ -1,8 +1,10 @@
-# 后端根 utils 与源码根 util 规则
+# 后端根 utils 与 common/util 规则
 
 后端根 `utils/` 是可独立复制的技术工具包、SDK 与无业务状态能力唯一根；不得再使用 `infrastructure/`。`utils/` 根只能包含工具包子目录，不得直接存放代码、配置或其他文件；工具包的代码文件必须位于至少一层子目录中。`utils/` 的实现不得依赖项目其他包，只可依赖自身工具包、语言标准库和第三方依赖。
 
-语言源码根的 `util/` 与根 `utils/` 职责不同：它直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录，不承载业务流程。业务域 `business/<domain>/util/` 仍只存放该业务域私有辅助能力。
+`common/util/` 与根 `utils/` 职责不同：它直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录，不承载业务流程。业务域 `business/<domain>/util/` 仍只存放该业务域私有辅助能力；源码根 `util/` 不再建立。
+
+项目无关、可独立复制的工具包或 SDK 进入根 `utils/<package>/`；需要引用项目配置、公共结构或其他项目包的工具函数进入 `common/util/<function>.<ext>`。
 
 | 分类 | 二级技术目录 | 职责 |
 |---|---|---|
@@ -21,6 +23,6 @@
 | 服务发现 | `utils/discovery/polaris/`、`utils/discovery/nacos/` | 腾讯北极星、阿里 Nacos 注册与发现 |
 | 协议定义 | `utils/protobuf/` | Protobuf 与 gRPC 定义源 |
 
-禁止 `utils/graphql/`、`utils/asyncapi/`、`utils/avro/`、`utils/api/http/`。通用 HTTP 只能位于 `utils/http/`。后端项目根不得再建立旧的 `util/` 工具包目录。
+禁止 `utils/graphql/`、`utils/asyncapi/`、`utils/avro/`、`utils/api/http/`。通用 HTTP 只能位于 `utils/http/`。后端项目根和语言源码根均不得再建立旧的 `util/` 工具包目录；旧项目只能通过 adoption 的 legacy 快照渐进迁移。
 
 Go 项目中，以下目录内部 `package` 声明使用带 `Util` 后缀的别名，目录路径本身不变：`utils/time`→`timeUtil`、`utils/json`→`jsonUtil`、`utils/log`→`logUtil`、`utils/http`→`httpUtil`（这四个是为了避免与同名标准库包冲突）；`utils/cron`→`cronUtil`（`cron` 本身不与标准库冲突，只是为了和其余工具包保持统一的 `xxxUtil` 命名风格）。其余目录 package 名与目录名一致。详见 `code-style-consistency-rules/references/go-coding-rules.md`。

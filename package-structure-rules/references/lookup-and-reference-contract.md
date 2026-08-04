@@ -21,10 +21,10 @@
 ## 引用方向
 
 - 二进制启动装配只从对应入口文件开始：独立后端默认入口为根 `main.<ext>`，额外入口为 `cmd/<binary>/main.<ext>`；同仓后端入口为 `backend/main.<ext>` 或 `backend/cmd/<binary>/main.<ext>`。入口目录不承载可复用业务包，复用逻辑必须回到源码根、业务域或公共技术目录的规范位置。
-- 路由与控制器可依赖业务层、根 `common/`、根 `middleware/`、根 `utils/` 与源码根 `util/` 的公开入口。
-- 业务服务可依赖 `database/`、根 `common/`、根 `utils/`、源码根 `util/` 与本业务域代码。
+- 路由与控制器可依赖业务层、根 `common/`、根 `middleware/`、根 `utils/` 与 `common/util/` 的公开入口。
+- 业务服务可依赖 `database/`、根 `common/`、根 `utils/`、`common/util/` 与本业务域代码。
 - 根 `utils/` 只依赖自身子包、语言标准库与第三方依赖；不得依赖源码根、业务域、`database/`、`common/`、`global/` 或 `middleware/`。
-- 源码根 `util/` 可依赖项目其他包，但不得承载业务流程；其实现文件必须直接放在该目录，禁止建立子目录。
+- `common/util/` 可依赖项目其他包，但不得承载业务流程；其实现文件必须直接放在该目录，禁止建立子目录。源码根 `util/` 是废弃位置，新代码不得进入。
 - 调用方业务域只能导入目标业务域 `business/<domain>/rpc/` 的公开入口；不得导入目标域的 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/` 或 `util/`。
 - 目标域 `rpc/` 的公开函数固定接收 JSON 字符串并返回 JSON 字符串；它在本域内完成反序列化、校验、业务服务调用和响应序列化。任何成功、JSON 解析、校验或业务失败都返回符合根 `common/response.Response` 语义的 `code`、`status`、`message`、`data`，不跨域传递语言异常、内部实体或仓储模型。
 - 根 `common/request/`、`common/response/`、`common/constant/`、`common/error/`、`common/validation/` 可作为稳定公共结构直接流通。根 `global/` 只能提供已装配的配置、日志、数据库连接和技术客户端等非业务运行引用，禁止保存、传递业务实体、业务列表、业务状态或可变业务缓存。

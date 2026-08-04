@@ -235,3 +235,4 @@
 - fullstack、backend、frontend 的活动测试代码统一落在项目根 `test/`；独立后端不建立 `backend/test/`，前后端同仓不建立 `backend/test/` 或 `frontend/test/`；`doc/5-tests/` 继续只保存说明和非可执行证据。
 - Catalog、人工目录树、skeleton、query、render、init 和根目录契约测试已同步；根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过。
 - 本周期未迁移真实项目、未连接外部服务、未执行 Git 历史写入；Obsidian 固定 vault 未注册，沉淀按 bridge 规则阻断。
+- 2026-08-04：用户确认独立后端项目关联工具统一落在 `common/util/`，与根 `utils/<package>/` 的项目无关工具包职责分离；已同步 `package-structure-rules` 的目录树、Catalog、Schema、CLI、相邻 `common-util-rules` 和活动测试，旧源码根 `util/` 保留为 adoption legacy 迁移边界，当前改动未提交。
