@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-02 23:38:26",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-08-04 20:23:44",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -765,7 +765,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 18,
-          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `obsidian-knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实 bridge 调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
           "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
           "directory_path": "reasoning-summary-structure-rules",
@@ -5472,7 +5472,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 18,
-      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `obsidian-knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实 bridge 调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
       "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
       "directory_path": "reasoning-summary-structure-rules",
