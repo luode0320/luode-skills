@@ -235,3 +235,10 @@
 - fullstack、backend、frontend 的活动测试代码统一落在项目根 `test/`；独立后端不建立 `backend/test/`，前后端同仓不建立 `backend/test/` 或 `frontend/test/`；`doc/5-tests/` 继续只保存说明和非可执行证据。
 - Catalog、人工目录树、skeleton、query、render、init 和根目录契约测试已同步；根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过。
 - 本周期未迁移真实项目、未连接外部服务、未执行 Git 历史写入；Obsidian 固定 vault 未注册，沉淀按 bridge 规则阻断。
+
+## 2026-08-04：总结知识引用清单落地
+
+- 最终总结新增条件小节「知识引用」，用「本轮引用」与「本轮沉淀」两张表逐条列出本轮读过与写过的 Obsidian 笔记；原先「方案与根因」和「结果与结论」的两处单行摘要口径作废。
+- `obsidian-knowledge-flow` 新增引用台账契约：每次 read/create/append 返回 verified=true 后立即登记六字段，只有真实 read 成功的笔记可入引用表，笔记名禁用 CLI 回显文本。
+- 契约测试 20 项全绿、字典刷新退出码 0、四份研发文档 profile 全部 PASS、`6-review STYLE: PASS`；固定 vault 已恢复可用，实机 read 与 create 均 verified=true。
+- 本周期未改桥接脚本与笔记字段定义，未执行 Git 历史写入；根测试启动器与两个既有测试的失败已用干净基线复跑证明与本轮无关。

@@ -2,18 +2,18 @@
 
 ## 更新时间
 
-- 2026-08-03
+- 2026-08-04
 
 ## 当前任务
 
-- 来源对象：用户确认的 `REQ-PSR-CONFIG-ENV-002` 与 `CYCLE-PSR-20-001`，修订 `REQ-PSR-CONFIG-ENV-001` 的配置文件命名结论。
-- 当前目标：把源码内嵌配置文件名从 `config_<env>.go` 收敛为格式名后置的 `config_<env>_yaml.go`，规避 Go 把 `config_test.go` 当测试文件的语言冲突，并完成规则、检查工具、测试和文档收口。
-- 当前状态：需求、周期文档、Reference、Catalog、CLI、根测试、长期记忆、四份文档门禁和 6-review 均已通过，CYCLE-20 完成；改动停在已改动未提交状态。
+- 来源对象：用户确认的 `REQ-RSR-OBS-CITATION-001` 与 `CYCLE-RSR-21-001`，让最终总结说清本轮引用了知识库里的哪些知识。
+- 当前目标：在最终总结末尾新增条件小节「知识引用」，并在 Obsidian 技能侧建立引用台账，使引用清单来自真实 bridge 调用证据而非回忆。
+- 当前状态：需求、周期文档、两个技能的规则文本、模板、正反例、契约测试、字典生成物、四份文档门禁和 6-review 均已通过，CYCLE-21 完成；改动停在已改动未提交状态。
 
 ## 范围与边界
 
-- 范围：`configuration-layout.md`、`project-layout-v2.md`、`placement-catalog.yaml`、`placement_catalog.py`、`test/package-structure-rules/configuration_layout_test.py`、`PROJECT_MEMORY.md` 与 CYCLE-20 需求/实施/测试/6-review 文档。
-- 非范围：外部 YAML 命名、配置根位置、秘密原值边界、二进制入口、非 Go 语言 embedded 文件名校验、`placement-catalog.schema.json`、`AGENTS.md`/`CLAUDE.md`/`test-strategy-rules`、真实项目迁移和 Git 历史写入。
+- 范围：`reasoning-summary-structure-rules` 的 `SKILL.md`、`agents/openai.yaml` 与三份 reference，`obsidian-knowledge-flow` 的 `SKILL.md` 与 `capture-retrieve-distill.md`，新增 `test/reasoning-summary-structure-rules/obsidian_citation_contract_test.py`，字典生成物，记忆三件套与 CYCLE-21 需求/实施/测试/6-review 文档。
+- 非范围：`obsidian_cli_bridge.py`、bridge 允许命令清单、`note-schema.md`、`execution-case-notes.md`、`skill-hit-check-rules` 的四态口径、计划模式出口、CLI 回显中文乱码修复、根测试启动器既有故障和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
@@ -26,17 +26,20 @@
 - 已完成 CYCLE-18 三类项目根 `test/` 目录统一：根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过；未迁移真实项目。
 - 已完成 `TASK-TEST-MOCK-MIRROR-01` 测试资产规则补充：mock、stub、fake、fixture、helper 与测试程序统一放根 `test/`，源码关联模拟程序按源码相对路径镜像，跨源码复用进入 `test/shared/`，`doc/5-tests/` 仅保存非可执行证据；治理测试 `13/13`、根 Python 测试 `216/216`、六个 Skill 校验、测试文档 profile 与 `6-review STYLE: PASS` 均通过。
 
+- 已完成 CYCLE-21 总结知识引用清单：最终总结新增条件小节「知识引用」并按引用台账分流末尾顺序；`obsidian-knowledge-flow` 新增六字段引用台账契约，要求成功返回后立即登记、未 `read` 不得入表、笔记名禁用 CLI 回显；契约测试 `20/20`、字典刷新退出码 0、四份文档 profile 与 `6-review STYLE: PASS` 均通过；未改桥接脚本，未执行 Git 历史写入。
+
 - 已完成 CYCLE-20 embedded 配置文件名格式后置：内嵌配置改为 `config_<env>_yaml.<ext>`，Go 强制；旧命名 `config_<env>.go` 与重复格式名 `config_<env>_yaml_yaml.go` 均失败关闭；外部 YAML 保持 `config_<env>.yaml` 不变；配置回归 `7/7`、目录规则全量回归 `16/16`、四份文档 profile 与 `6-review STYLE: PASS` 均通过；未迁移真实项目，未写入 Git 历史。
 
 ## 门禁说明
 
-- 本轮 `Obsidian:阻断`；固定 vault 未注册，未通过直接文件系统替代。所有实现与验证仅使用本地仓库、Windows Python、临时目录和 Git 只读检查。
+- 本轮 `Obsidian:检索 + 沉淀`；固定 vault `D:\obsidian_data` 已注册可用，`doctor`、`read 知识库/INDEX.md` 与一次 `create` 均返回 `verified=true`，全部 vault 操作只经公开 bridge。实机验证只覆盖「台账非空」分支，「台账为空整节省略」由契约测试锁定，未宣称实机验证。
 
 ## 验证与交接
 
 - `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-TEST-ROOT-001/CYCLE-18` 已完成全部四个任务并按 session 精确失活。
 - 最后执行点：CYCLE-19 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、需求/实施总览/实施周期/test/style 文档 profile、`py_compile`、quick validation 和 `git diff --check` 均通过；本轮不执行 Git 历史写入。
 - 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
+- 本轮 CYCLE-21 最后执行点：契约测试 `20/20`、字典生成脚本退出码 0（`implemented_total 69`、`planned_missing 2` 与基线一致）、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS、机器索引区 YAML 解析 41 个实体、知识库实机 `read` 与 `create` 均 `verified=true`；八个改动文件与两份新增测试/文档均 UTF-8 且 LF 未漂移；根测试启动器与 `validate_engineering_docs_test.py`、`asset_location_test.py` 的失败已用干净基线复跑证明为既有故障；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 本轮 CYCLE-20 最后执行点：内嵌配置 query（backend/fullstack 各一次）、render 目录树、外部 YAML 未漂移核对、配置回归 `7/7`、package-structure-rules 全量回归 `16/16`、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS；六个改动文件 UTF-8 与 LF 未漂移；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 
 <!-- BEGIN TASK PLAN PROJECTION -->

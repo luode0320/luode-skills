@@ -737,11 +737,37 @@
 - 来源：`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`、`doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md`、`doc/3-实施/2026-08-02_192314_REQ-PSR-DOC-LAYOUT-001_实施周期16_三类项目doc目录收敛.md`。
 - 更新时间：2026-08-02。
 
+## 总结知识引用清单规则
+
+- 稳定决策：`reasoning-summary-structure-rules` 的最终总结新增条件小节 `## 📚 知识引用`，用「本轮引用」三列表与「本轮沉淀」四列表承载 Obsidian 事实；原先分散在「方案与根因」和「结果与结论」的两处单行摘要口径已作废。
+- 稳定决策：无真实阻断时末尾顺序按引用台账分流——台账非空由知识引用收尾、改动点紧邻其前；台账为空由改动点收尾；真实阻断时两者都在阻断收口之前。
+- 稳定决策：`obsidian-knowledge-flow` 每次 `read`、`create`、`append` 返回 `verified=true` 后必须立即登记引用台账（笔记名、所在目录、本轮用途、`status`、操作、readback 六字段）；台账是会话内事实，不写入 vault、不落盘项目文件。
+- 稳定决策：只有真实 `read` 成功的笔记可进引用表，`search` 命中未读取的一律不得入表；引用小节每一行都必须能回指一次返回成功的 bridge 调用。
+- 稳定决策：笔记名一律取自发起 bridge 调用时所用 path 的文件名部分，禁止使用 CLI 回显文本——官方 CLI 在 Windows 下回显中文会乱码。
+- 事实更新：固定 vault `D:\obsidian_data` 已注册可用，`doctor`、`read` 与 `create` 均返回 `verified=true`；此前记录的 `Obsidian:阻断` 结论已过期。
+- 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`obsidian-knowledge-flow/references/capture-retrieve-distill.md`、`doc/2-需求/2026-08-04_总结知识引用清单_Obsidian引用可视化.md`、`doc/3-实施/2026-08-04_总结知识引用清单_实施周期21_Obsidian引用可视化.md`。
+- 更新时间：2026-08-04。
+
 ## 机器索引区
 
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.summary-knowledge-citation-section
+    name: "总结知识引用小节与引用台账"
+    type: "总结结构与知识库规则"
+    aliases:
+      - 知识引用小节
+      - 引用台账
+      - Obsidian 引用清单
+    definition: "最终总结在无真实阻断时按引用台账分流收尾：台账非空输出 ## 知识引用 作为最后一节，用「本轮引用」三列表（序号、笔记、本轮用途）与「本轮沉淀」四列表（序号、笔记、操作、readback）承载，改动点紧邻其前；台账为空整节省略且由改动点收尾。obsidian-knowledge-flow 每次 read/create/append 返回 verified=true 后立即登记六字段台账；只有真实 read 成功的笔记可入引用表，search 命中未读取的不得入表；笔记名取自本地发起的 path 文件名，禁用 CLI 回显文本；笔记 status 为 stale/deprecated/retired/conflicted 时在用途列标注。"
+    scope: "最终总结渲染、Obsidian 检索与沉淀登记、总结条件字段判定与驳回标准"
+    status: "active"
+    evidence_ids:
+      - evidence.summary-knowledge-citation-section
+    context_ids:
+      - context.obsidian-knowledge-flow
+    updated_at: 2026-08-04
   - entity_id: rule.root-test-code-and-evidence-layout
     name: "根测试代码与测试证据双根规则"
     type: "测试资产目录规则"
