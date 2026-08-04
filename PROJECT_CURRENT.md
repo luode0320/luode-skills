@@ -2,33 +2,28 @@
 
 ## 更新时间
 
-- 2026-08-04
+- 2026-08-05
 
 ## 当前任务
 
-- 来源对象：用户确认的 `REQ-PSR-COMMON-UTIL-001` 与 `CYCLE-PSR-22-001`，将独立后端项目关联工具统一放入 `common/util/`。
-- 当前目标：同步 `package-structure-rules` 的规则文档、Catalog、Schema、CLI、相邻 `common-util-rules`、活动测试和四件套记忆；根 `utils/<package>/` 继续承载项目无关工具包。
-- 当前状态：`common/util` 目标已完成审计；规则、Catalog、CLI、专项测试、文档 profile、6-review 与合规核对均通过；改动停在已改动未提交状态。
+- 来源对象：`REQ-PSR-CONFIG-SOURCE-001` / `CYCLE-PSR-23`（用户确认 config/ 根新增 `load.<ext>` 与 `model.<ext>` 两个条件提交源码文件）。
+- 当前目标：让独立后端 `config/` 与同仓后端 `backend/config/` 根直接存放 `load.<ext>`（配置加载与解析）与 `model.<ext>`（配置结构定义）成为唯一合法落点；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
+- 当前状态：CYCLE-PSR-23 四个任务全部闭环；Catalog/Schema/CLI/测试/文档/四件套一致，改动停在已改动未提交状态。
 
 ## 范围与边界
 
-- 范围：`package-structure-rules` 的 SKILL、目录树、工具布局 reference、Catalog、Schema、CLI，`common-util-rules` 相邻 reference，活动 `test/package-structure-rules/backend_common_util_layout_test.py`，需求/实施/测试/6-review 文档及项目四件套。
-- 非范围：真实业务项目迁移、旧项目自动搬移、根 `utils/<package>/` 职责、前端工具目录、业务代码、外部服务和 Git 历史写入。
+- 范围：`package-structure-rules` 的 SKILL 核心边界、`project-layout-v2.md`、`placement-catalog.yaml`、`placement-catalog.schema.json`、`configuration-layout.md`、`scripts/placement_catalog.py`、活动 `test/package-structure-rules/configuration_layout_test.py`，需求/实施/测试/6-review 文档及项目四件套。
+- 非范围：`common/util/`（CYCLE-PSR-22 已收口）、前端 `config/`、`config/yaml/` 与 `config/embedded/` 命名与秘密边界、真实业务项目迁移、外部服务和 Git 历史写入。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
 
-- 已完成 CYCLE-15 入口基线修复：同仓 `backend/crontask/**/main.go` 与治理文件放行，`backend/internal|src/**/main.go` 仍拒绝；入口回归 `5/5` 通过。
-- 已更新三类人工目录树和 Catalog skeleton；活动目录固定为 `doc/1-架构/` 至 `doc/6-review/`，条件图片目录为 `doc/data/images/`。
-- 已新增 `test/package-structure-rules/project_layout_contract_test.py`、测试 README、CYCLE-16 实施周期文档和 `doc/6-review` 记录。
-- 已同步 V2 需求、实施总览、`PROJECT_MEMORY.md` 与 `PROJECT_HISTORY.md`，保留历史旧目录只读边界。
-- 已保留 CYCLE-17 环境命名行为测试 `6/6` 及既有目录/入口回归证据；本轮新增 embedded 私密策略断言并完成最终回归与文档门禁。
-- 已完成 CYCLE-18 三类项目根 `test/` 目录统一：根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过；未迁移真实项目。
-- 已完成 `TASK-TEST-MOCK-MIRROR-01` 测试资产规则补充：mock、stub、fake、fixture、helper 与测试程序统一放根 `test/`，源码关联模拟程序按源码相对路径镜像，跨源码复用进入 `test/shared/`，`doc/5-tests/` 仅保存非可执行证据；治理测试 `13/13`、根 Python 测试 `216/216`、六个 Skill 校验、测试文档 profile 与 `6-review STYLE: PASS` 均通过。
-
-- 已完成 CYCLE-20 embedded 配置文件名格式后置：内嵌配置改为 `config_<env>_yaml.<ext>`，Go 强制；旧命名 `config_<env>.go` 与重复格式名 `config_<env>_yaml_yaml.go` 均失败关闭；外部 YAML 保持 `config_<env>.yaml` 不变；配置回归 `7/7`、目录规则全量回归 `16/16`、四份文档 profile 与 `6-review STYLE: PASS` 均通过；未迁移真实项目，未写入 Git 历史。
-- 本轮已完成 `common/util` 规则文字与相邻 reference 同步；Catalog、Schema、CLI、活动测试和文档证据已落盘，专项测试 `5/5`、package-structure-rules 四文件回归 `22/22`、需求/实施/测试/风格 profile、Skill 校验与 `git diff --check` 均已通过。
-- 已完成 CYCLE-PSR-21-001 根 Dockerfile 补充：三类项目 Catalog、目录树、Skill 文档和 CLI 已统一；`init` 创建根 `Dockerfile`，`strict` 检查缺失/目录冲突，`adoption` 保持渐进采纳；专项回归 `17/17` 和 `6-review STYLE: PASS` 通过；未迁移真实项目，未写入 Git 历史。
+- 已落盘需求文档 `REQ-PSR-CONFIG-SOURCE-001`（含 SRC→DEC→RULE→AC→CYCLE/TASK→TEST→EVIDENCE 追踪矩阵与两张 Mermaid 图），requirement profile PASS。
+- Catalog 新增 4 个 pattern 条目（backend/fullstack × loader/model），Schema 补 loader/model allOf 守卫；两棵后端目录树新增 `load.<ext>`/`model.<ext>`（[条件·提交]）。
+- CLI `check_environment_config_path` 扩展：config/ 根直接文件仅放行当前语言 `load.<ext>`/`model.<ext>`，其余根文件/错误扩展名/子目录失败关闭；`config/loader/` 等禁止路径保持拒绝。
+- `configuration-layout.md` 路径表、合法/非法示例与职责句更新；SKILL.md 核心边界第 2 条追加 config 根说明（未改 description、未新增 `##`，免字典重建）。
+- 专项测试 `11/11`、package-structure-rules 四文件回归 `26/26` 通过；四份文档 profile（requirement/implementation_cycle/test/style_regression）与 `6-review STYLE: PASS` 通过。
+- 实施周期文档、测试 README（TEST-PSR-CONFIG-SOURCE-001）与 6-review 记录已落盘；项目四件套已同步。
 
 ## 门禁说明
 
@@ -36,18 +31,15 @@
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-TEST-ROOT-001/CYCLE-18` 已完成全部四个任务并按 session 精确失活。
-- 最后执行点：`placement_catalog.py` 与专项测试已通过 `py_compile`；`query --artifact common-util` 与兼容别名 `query --artifact source-util --language go` 均返回 `common/util`；专项测试 `5/5`、四文件回归 `22/22`、需求/实施/测试/风格 profile、Skill 校验、UTF-8/NUL 与 `git diff --check` 均通过。本轮不执行 Git 历史写入。
-- CYCLE-PSR-22-001 完成审计通过：专项 5/5、活动回归 22/22、四个文档 profile PASS、Skill valid、STYLE: PASS。
-- 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
-- 本轮 CYCLE-20 最后执行点：内嵌配置 query（backend/fullstack 各一次）、render 目录树、外部 YAML 未漂移核对、配置回归 `7/7`、package-structure-rules 全量回归 `16/16`、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS；六个改动文件 UTF-8 与 LF 未漂移；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
+- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 四个任务已完成并按 session 精确失活。
+- 最后执行点：`python -X utf8 -m unittest discover -s test/package-structure-rules -p configuration_layout_test.py -v`（11/11）与四文件全量回归（26/26）通过；`validate_engineering_docs.py` 对需求/实施/测试/6-review 四份文档 profile 均 PASS；`git diff --check` 与目标文件 UTF-8 回读通过；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-04T15:13:43.497261Z",
+  "registry_updated_at": "2026-08-04T17:05:28.451758Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -570,29 +562,62 @@
       ]
     },
     {
-      "projection_id": "SESSION/fc89c5fe952152bdea64934fc0a22cb93e6807e72c4ec74fdfd74c8f3d285450",
+      "projection_id": "SESSION/d5e4959605f05ad9cf3a031d1ea1e856bb33e0867581ad3abaaa35165e945101",
       "session_id": "019fc879-c989-7391-961e-35383e84f8c0",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "REQ-PSR-COMMON-UTIL-001/CYCLE-PSR-22-001",
-      "source_document": "doc/3-实施/2026-08-04_代码位置目录规则V2_实施周期22_common-util落点.md",
-      "plan_fingerprint": "3435448165f60f1b84c680f496fd544673d834af3406743d8669ee3915c1f043",
-      "updated_at": "2026-08-04T15:13:43Z",
+      "plan_key": "REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23",
+      "source_document": "doc/3-实施/2026-08-04_代码位置目录规则V2_实施周期23_config根加载与结构文件.md",
+      "plan_fingerprint": "aec19943cb10dcb5fc80f6d034bdf3405040dd035b73ede37bce936c9c6c1c97",
+      "updated_at": "2026-08-05T00:40:00Z",
       "steps": [
         {
-          "id": "T22-01",
-          "step": "[T22-01] Catalog/Schema/规则引用统一 common/util",
+          "id": "T23-01",
+          "step": "[T23-01] 冻结 config/ 根 load/model 规则基线：需求文档、目录树、Catalog、Schema、契约测试",
           "status": "completed"
         },
         {
-          "id": "T22-02",
-          "step": "[T22-02] CLI 边界与活动行为测试",
+          "id": "T23-02",
+          "step": "[T23-02] 实现 CLI strict 行为并同步配置文档：脚本、configuration-layout.md、SKILL.md、行为测试",
           "status": "completed"
         },
         {
-          "id": "T22-03",
-          "step": "[T22-03] 文档/四件套/6-review 收口",
+          "id": "T23-03",
+          "step": "[T23-03] 落盘周期文档与测试证据：实施周期文档、测试 README、6-review 记录",
+          "status": "completed"
+        },
+        {
+          "id": "T23-04",
+          "step": "[T23-04] 同步项目四件套并跑完全部门禁，给出收口结论",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/d72d6abe2bd789925ff8e1b18008df0827fa5739775adddfdd750a521695c8ab",
+      "session_id": "019fcd92-1235-7dc3-9e28-1c3a1b95ecc5",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260804T170000Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-04T17:10:00Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
           "status": "completed"
         }
       ]
