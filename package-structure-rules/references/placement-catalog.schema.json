@@ -28,10 +28,11 @@
           "environment_name_pattern": {"type": "string", "minLength": 1},
           "standard_environments": {"type": "array", "items": {"type": "string", "minLength": 1}},
           "secret_policy": {"enum": ["forbid_plain_secret", "allow_plain_secret"]},
-          "source_policy": {"enum": ["external_config_primary", "embedded_source_primary"]},
+          "source_policy": {"enum": ["embedded_source_fallback", "external_config_primary", "embedded_source_primary"]},
           "environment_variable_policy": {"enum": ["allowed_reference", "not_default"]},
           "direct_files": {"type": "boolean"},
-          "content_must_match": {"type": "string", "minLength": 1}
+          "content_must_match": {"type": "string", "minLength": 1},
+          "environment_source_policy": {"type": "string", "minLength": 1}
         },
         "allOf": [
           {
