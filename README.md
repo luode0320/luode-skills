@@ -955,3 +955,4 @@ claude-mem(记忆) :
 2026-08-05 22:04:53 feat: [PROJECT_HISTORY保留最近20条] 同步记忆规则与bootstrap资产
 2026-08-05 22:05:30 docs: [PROJECT_HISTORY保留最近20条] 归档项目状态同步与6-review
 2026-08-06 00:10:00 feat: [配置来源安全边界] 明确 embedded 主来源与 YAML 回退来源
+2026-08-06 00:11:00 test: [配置来源安全边界] 补充配置来源与秘密边界回归
