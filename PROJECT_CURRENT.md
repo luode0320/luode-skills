@@ -8,12 +8,12 @@
 
 - 来源对象：`REQ-PSR-CONFIG-SOURCE-001` / `CYCLE-PSR-23`（用户确认 config/ 根新增 `load.<ext>` 与 `model.<ext>` 两个条件提交源码文件）。
 - 当前目标：让独立后端 `config/` 与同仓后端 `backend/config/` 根直接存放 `load.<ext>`（配置加载与解析）与 `model.<ext>`（配置结构定义）成为唯一合法落点；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
-- 当前状态：CYCLE-PSR-23 四个任务全部闭环；Catalog/Schema/CLI/测试/文档/四件套一致，改动停在已改动未提交状态。
+- 当前状态：CYCLE-PSR-23 四个任务全部闭环；本轮补齐 embedded 主来源、YAML 回退来源与秘密边界，Catalog/Schema/reference/SKILL/测试/证据/四件套一致，改动停在已改动未提交状态。
 
 ## 范围与边界
 
 - 范围：`package-structure-rules` 的 SKILL 核心边界、`project-layout-v2.md`、`placement-catalog.yaml`、`placement-catalog.schema.json`、`configuration-layout.md`、`scripts/placement_catalog.py`、活动 `test/package-structure-rules/configuration_layout_test.py`，需求/实施/测试/6-review 文档及项目四件套。
-- 非范围：`common/util/`（CYCLE-PSR-22 已收口）、前端 `config/`、`config/yaml/` 与 `config/embedded/` 命名与秘密边界、真实业务项目迁移、外部服务和 Git 历史写入。
+- 非范围：`common/util/`（CYCLE-PSR-22 已收口）、前端 `config/`、真实业务项目迁移、外部服务和 Git 历史写入；本轮只补齐 `config/yaml/` 与 `config/embedded/` 的来源优先级和秘密边界表达，不修改真实 loader 实现。
 - 保护边界：工作树保留用户和其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push。
 
 ## 已完成
@@ -43,19 +43,21 @@
 
 ## 验证与交接
 
-- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 四个任务已完成并按 session 精确失活。
+- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；上一会话的 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 投影已精确失活；本会话依据无跨会话归属的恢复规则生成 fallback 投影，收口后按 session 精确失活。
 - 最后执行点：CYCLE-19 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、需求/实施总览/实施周期/test/style 文档 profile、`py_compile`、quick validation 和 `git diff --check` 均通过；本轮不执行 Git 历史写入。
 - 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
 - 本轮 CYCLE-21 最后执行点：契约测试 `20/20`、字典生成脚本退出码 0（`implemented_total 69`、`planned_missing 2` 与基线一致）、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS、机器索引区 YAML 解析 41 个实体、知识库实机 `read` 与 `create` 均 `verified=true`；八个改动文件与两份新增测试/文档均 UTF-8 且 LF 未漂移；根测试启动器与 `validate_engineering_docs_test.py`、`asset_location_test.py` 的失败已用干净基线复跑证明为既有故障；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 本轮 CYCLE-20 最后执行点：内嵌配置 query（backend/fullstack 各一次）、render 目录树、外部 YAML 未漂移核对、配置回归 `7/7`、package-structure-rules 全量回归 `16/16`、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS；六个改动文件 UTF-8 与 LF 未漂移；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 本轮 CYCLE-PSR-23 最后执行点：`python -X utf8 -m unittest discover -s test/package-structure-rules -p configuration_layout_test.py -v`（11/11）与四文件全量回归（26/26）通过；`validate_engineering_docs.py` 对需求/实施/测试/6-review 四份文档 profile 均 PASS；`git diff --check` 与目标文件 UTF-8 回读通过；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
+- 协同收口 CYCLE-11：为 `F:\binance-wangge-go` 的配置环境来源迁移同步 `package-structure-rules` 的 loader Catalog、Schema、reference 与契约测试；本仓库专项测试 11/11、Catalog adoption/strict 和两仓库文档差异检查通过，相关规则改动仍保持已改动未提交。
+- 本轮补齐配置来源安全边界：同一环境优先使用 `embedded/`，缺失时回退 `yaml/`；YAML 禁止秘密原值，embedded 允许源码私密值。配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 与 `git diff --check` 均通过；测试 README 与 `STYLE: PASS` 已落盘。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-05T13:30:39.210444Z",
+  "registry_updated_at": "2026-08-05T16:56:41.757785Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -683,6 +685,34 @@
           "id": "HIST-TRIM-07",
           "step": "收口：6-review、字典重跑、门禁与最终总结",
           "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/67fcdd7775c377286fdcd4e1ac4ebd2998b1ff7284654f09aee98a7dc1f9f322",
+      "session_id": "019fd2a8-2757-7763-944f-358b20518f0b",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260805T165628Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-05T16:56:41.757561Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
         }
       ]
     }

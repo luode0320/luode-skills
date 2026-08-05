@@ -4,6 +4,8 @@
 
 ## 事件
 
+- 2026-08-06：用户明确配置安全边界：`embedded/` 是同一环境的主来源，`yaml/` 仅作回退来源；YAML 禁止秘密原值，embedded 允许源码私密值。已同步 Catalog、Schema、reference、Skill、活动测试、测试 README、`6-review` 与项目四件套；配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 和差异检查通过，未执行 Git 历史写入。
+- 2026-08-06：协同完成 Binance CYCLE-11 环境来源识别契约；`package-structure-rules` 的 loader Catalog、Schema、reference 与配置专项测试同步 `-env > APP_ENV > ENV > local`，11/11 通过，未执行 Git 历史写入。
 - 2026-08-05：完成 CYCLE-PSR-23 config 根加载与结构文件规则。独立后端 `config/load.<ext>` 与 `config/model.<ext>`（同仓后端 `backend/config/...`）成为唯一配置加载/结构落点，Catalog 新增 4 个 pattern 条目并补 Schema 守卫，CLI strict 对 config/ 根两个命名放行、其余拒绝；专项测试 `11/11`、四文件回归 `26/26`、需求/实施/测试/风格四份文档 profile 与 Skill 合规门禁均通过，工作树保持已改动未提交。
 - 2026-08-05：最终总结新增条件小节「知识引用」，用「本轮引用」与「本轮沉淀」两张表逐条列出本轮读过与写过的 Obsidian 笔记；原先「方案与根因」和「结果与结论」的两处单行摘要口径作废。
 - 2026-08-05：`obsidian-knowledge-flow` 新增引用台账契约：每次 read/create/append 返回 verified=true 后立即登记六字段，只有真实 read 成功的笔记可入引用表，笔记名禁用 CLI 回显文本。
@@ -23,4 +25,3 @@
 - 2026-08-02：`check` 保持只读，`init` 不生成动态环境配置文件；旧式 `config_test_yaml.go` 拒绝，秘密原值不进入提交资产。配置专项 `6/6`、目录 `2/2`、入口 `5/5`、根 Python `209/209`、文档 profile、Python 编译、Skill quick validation、CodeGraph sync 与 `git diff --check` 均通过。
 - 2026-08-02：当前会话投影 `REQ-PSR-CONFIG-ENV-001/CYCLE-17` 的五个任务已完成并按 session 精确失活；Obsidian 固定 vault 未注册，本轮未执行 vault 沉淀或 Git 历史写入。
 - 2026-08-02：用户确认独立后端 `config/embedded/` 与同仓后端 `backend/config/embedded/` 允许源码直接配置 API key、密钥、密码等私密信息，源码配置为主且默认不依赖环境变量。
-- 2026-08-02：YAML 仍禁止秘密原值；允许源码内秘密不扩大到 Agent 输出、日志、README、错误、测试报告或知识库，所有证据继续使用脱敏占位符。

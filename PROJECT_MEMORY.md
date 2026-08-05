@@ -58,6 +58,13 @@
 - 新活动文档不再使用 `review_acceptance_gates`；完成条件写入实施计划，真实测试产生 `TEST` 证据，`6-review` 只产生 `STYLE: PASS/FIX_REQUIRED`。历史审查和验收文件保留该字段时只读兼容。
 - 新文档以 `reader_level: business_general`、`writing_style: plain_chinese`、`appendix_policy: preserve_existing_or_one_terminal_appendix` 启用机器门禁；受管模板由 `plain-language-template-registry.yaml` 统一登记并逐项测试；未修改历史文档不批量迁移。
 - 功能验证、浏览器联调和第三方验证按各自测试规则处理；后置审查和最终验收不再构成活动放行分支。
+
+## 配置环境来源契约
+
+- 稳定决策：`package-structure-rules` 的 loader 条目必须记录统一环境来源优先级 `-env > APP_ENV > ENV > local`；reference 正文、Catalog、Schema 和活动契约测试必须保持同一表达。该契约只描述配置 loader 的来源识别，不改变 embedded/YAML 秘密边界或真实项目迁移授权。
+- 稳定决策：同一环境的配置加载优先使用 `embedded/`；对应 embedded 配置缺失时才回退到 `yaml/`。YAML 条目禁止秘密原值并标记为 `embedded_source_fallback`，embedded 条目允许源码私密值并标记为 `embedded_source_primary`；该安全模型不把源码私密值回显到 Agent 输出、日志、README、错误或测试报告。
+- 来源：`F:\binance-wangge-go` CYCLE-11 环境来源识别实施周期、`package-structure-rules` Catalog/Schema/reference 改动和配置契约测试。
+- 更新时间：2026-08-06。
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
 - 更新时间：2026-07-14。
 
