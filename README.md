@@ -952,3 +952,5 @@ claude-mem(记忆) :
 2026-08-05 01:15:00 feat: [配置根加载与结构文件] 放行配置加载与结构定义落点
 2026-08-05 01:16:30 test: [配置根加载与结构文件] 补充配置根加载与结构回归
 2026-08-05 09:51:17 merge: [分支合并] 合并origin/main，解决PROJECT_CURRENT/HISTORY/README三处冲突
+2026-08-05 22:04:53 feat: [PROJECT_HISTORY保留最近20条] 同步记忆规则与bootstrap资产
+2026-08-05 22:05:30 docs: [PROJECT_HISTORY保留最近20条] 归档项目状态同步与6-review

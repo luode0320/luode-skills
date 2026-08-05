@@ -495,10 +495,10 @@
 ### Obsidian 知识流选择性默认触发链
 - 别名: obsidian-knowledge-flow, Obsidian 知识流, 选择性默认触发, 知识库检索沉淀
 - 类型: 流程规则
-- 定义: 项目启动先按“父目录平台规则 -> `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取项目本地四件套；`PROJECT_CURRENT.md` 覆盖维护当前状态且不超过 51,200 字节，`PROJECT_MEMORY.md` 只承载稳定规则与关键决策，`PROJECT_HISTORY.md` 只追加且普通启动不读。Obsidian 仍固定使用 `D:\obsidian_data` 及其 `知识库/` 工作区，仅当问题依赖跨项目历史、vault 知识或既有笔记时判定为 `检索` 并通过 CLI 检索 / 读取；仅当收口形成可复用知识时判定为 `沉淀` 并先通过 CLI 检索已有承接笔记。执行失败案例统一落到 `知识库/20-Knowledge/execution-failure-cases/<owner>/`，保留脱敏正反例、验证证据和追加式状态事件；只有 active 且 scope 精确匹配时自动复用。普通任务记录 `不适用`，CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback；项目本地 Markdown 与 vault 链路不得混用。
+- 定义: 项目启动先按“父目录平台规则 -> `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`”读取项目本地四件套；`PROJECT_CURRENT.md` 覆盖维护当前状态且不超过 51,200 字节，`PROJECT_MEMORY.md` 只承载稳定规则与关键决策，`PROJECT_HISTORY.md` 追加关键事件并只保留最近 20 条（自动裁剪、按日期倒序）且普通启动不读。Obsidian 仍固定使用 `D:\obsidian_data` 及其 `知识库/` 工作区，仅当问题依赖跨项目历史、vault 知识或既有笔记时判定为 `检索` 并通过 CLI 检索 / 读取；仅当收口形成可复用知识时判定为 `沉淀` 并先通过 CLI 检索已有承接笔记。执行失败案例统一落到 `知识库/20-Knowledge/execution-failure-cases/<owner>/`，保留脱敏正反例、验证证据和追加式状态事件；只有 active 且 scope 精确匹配时自动复用。普通任务记录 `不适用`，CLI 或 vault 不可用时记录 `阻断`，不得直接文件读写 vault 作为 fallback；项目本地 Markdown 与 vault 链路不得混用。
 - 来源: `AGENTS.md`、`CLAUDE.md`、`skill-hit-check-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`、`编码skill.md`
 - 适用范围: 记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀
-- 更新时间: 2026-07-14
+- 更新时间: 2026-08-05
 - 状态: 启用
 
 ### Obsidian Windows/WSL bridge 固定执行边界
@@ -513,10 +513,10 @@
 ### 项目四件套记忆闭环
 - 别名: PROJECT_CURRENT, PROJECT_MEMORY, PROJECT_HISTORY, 项目本地记忆四件套
 - 类型: 项目上下文规则
-- 定义: 父目录 `AGENTS.md` / `CLAUDE.md` 只保存跨项目通用规则；项目根目录 `PROJECT_CURRENT.md` 保存当前任务交接信息并覆盖维护，`PROJECT_MEMORY.md` 保存稳定项目规则、关键决策和少量长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。新项目、新任务、新会话或上下文压缩恢复时，固定先读取父目录当前平台规则，再读取 current 和 memory；history 只在历史追问、状态不足或真实卡点时窄读。项目本地文件使用标准工具，Obsidian vault 仍只通过 CLI 选择性检索和沉淀。
+- 定义: 父目录 `AGENTS.md` / `CLAUDE.md` 只保存跨项目通用规则；项目根目录 `PROJECT_CURRENT.md` 保存当前任务交接信息并覆盖维护，`PROJECT_MEMORY.md` 保存稳定项目规则、关键决策和少量长期事实，`PROJECT_HISTORY.md` 追加关键历史事件并只保留最近 20 条（自动裁剪、按日期倒序）。新项目、新任务、新会话或上下文压缩恢复时，固定先读取父目录当前平台规则，再读取 current 和 memory；history 只在历史追问、状态不足或真实卡点时窄读。项目本地文件使用标准工具，Obsidian vault 仍只通过 CLI 选择性检索和沉淀。
 - 来源: 用户本轮确认、`obsidian-knowledge-flow`、`project-memory-rules`、`project-agents-bootstrap`
 - 适用范围: 项目启动、上下文交接、记忆更新、Obsidian 边界
-- 更新时间: 2026-07-11
+- 更新时间: 2026-08-05
 - 状态: 启用
 
 ### Git 协作联动 Obsidian 沉淀
@@ -648,6 +648,7 @@
 - 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
 - 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
 - 2026-07-08：新增 Git 协作联动 Obsidian 沉淀规则，明确提交 / 推送 / PR 收口形成可复用事实时先检索并沉淀，但沉淀不构成提交授权。
+- 2026-08-05：`PROJECT_HISTORY.md` 由“只追加”改为“追加并只保留最近 20 条”（按日期倒序、新事件置顶、追加后自动裁剪、被裁事件不归档）；同步 `project-memory-rules`、bootstrap 资产、`AGENTS.md` / `CLAUDE.md` 与机器索引口径。
 
 ### 上线接口测试门禁规则
 - 别名: project-release-test-rules（历史名，已拆分）, project-interface-baseline-rules, project-interface-release-execution-rules, 上线测试门禁
@@ -698,7 +699,7 @@
 
 - 稳定决策：`skill-hit-check-rules` 是每轮唯一首入口；它只确认联动，不复制 Git、失败恢复、并行或 Skill 资产 Owner 的执行细则。
 - 稳定决策：`parallel-task-dispatch-rules` 是并行分类与子代理生命周期的唯一 Owner，一次状态机完成串行/条件并行/可并行判定、上下文成本、互斥写集、系统能力与授权、真实启动、主路径继续、结果回收、关闭和回退；计划、启动、完成、关闭数量必须可核对。
-- 稳定决策：`project-rule-file-bootstrap-rules` 是项目自举唯一 Owner，内部保留 `rule-bootstrap` 与 `memory-bootstrap`；规则文件非受管内容、UTF-8、`PROJECT_CURRENT.md` 51,200 字节、机器索引和 `PROJECT_HISTORY.md` 只追加均为保护语义。
+- 稳定决策：`project-rule-file-bootstrap-rules` 是项目自举唯一 Owner，内部保留 `rule-bootstrap` 与 `memory-bootstrap`；规则文件非受管内容、UTF-8、`PROJECT_CURRENT.md` 51,200 字节、机器索引和 `PROJECT_HISTORY.md` 追加后只保留最近 20 条（自动裁剪）均为保护语义。
 - 稳定决策：压缩恢复先执行共享 `context-recovery-contract`；只有 `recent_context_state=missing` 才条件调用 `recent-context-bootstrap-rules`，新会话预热、压缩恢复和明确历史回忆三个入口保持独立。
 - 稳定决策：注释细则由注释 Owner 定义，上层审查和收口只消费 PASS/FAIL、缺口与证据；执行合规和代码收口只产生状态，不重复定义最终 Markdown；`reasoning-summary-structure-rules` 唯一渲染阻断、合法后续和无下一步收口。
 - 稳定决策：退役总控 Skill 前必须有 protected semantic mapping、trigger fixtures、active consumer 清零、physical asset owner、baseline tree、rollback locator、生命周期证据和 post-delete PASS；失败候选保持 HOLD，不为目标数量强删。
@@ -1233,7 +1234,7 @@ entities:
       - Obsidian 知识流
       - 选择性默认触发
       - 知识库检索沉淀
-    definition: "项目启动先按父目录平台规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md 读取本地上下文；current 覆盖维护且不超过 51,200 字节，memory 只承载稳定规则与关键决策，history 只追加且普通启动不读。Obsidian 固定使用 D:\\obsidian_data 及其 知识库/ 工作区，仅在跨项目历史或既有 vault 知识依赖时通过 CLI 检索 / 读取，仅在收口形成可复用知识时先检索再沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。项目本地 Markdown 与 vault 链路不得混用。"
+    definition: "项目启动先按父目录平台规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md 读取本地上下文；current 覆盖维护且不超过 51,200 字节，memory 只承载稳定规则与关键决策，history 追加关键事件并只保留最近 20 条（自动裁剪、按日期倒序）且普通启动不读。Obsidian 固定使用 D:\\obsidian_data 及其 知识库/ 工作区，仅在跨项目历史或既有 vault 知识依赖时通过 CLI 检索 / 读取，仅在收口形成可复用知识时先检索再沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。项目本地 Markdown 与 vault 链路不得混用。"
     scope: "记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀"
     status: "active"
     evidence_ids:

@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-05 09:50:29",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-08-05 21:40:42",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {

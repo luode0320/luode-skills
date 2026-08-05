@@ -55,7 +55,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-04T17:05:28.451758Z",
+  "registry_updated_at": "2026-08-05T13:30:39.210444Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -635,6 +635,54 @@
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
           "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/4b4ea24606e84270711ee349830994a08f0283b2c03af14a346d77ccd63a1228",
+      "session_id": "019fd202-ca94-7883-a45c-5d6fbae853b2",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "PLAN/PROJECT_HISTORY-RETAIN-20",
+      "source_document": "USER-APPROVED-PLAN/PROJECT_HISTORY-RETAIN-20",
+      "plan_fingerprint": "8e7a120f4afcce26ebec65344ee2974455c33ad3aeee45a31e99cb516fcf8c21",
+      "updated_at": "2026-08-05T13:30:35.469553Z",
+      "steps": [
+        {
+          "id": "HIST-TRIM-01",
+          "step": "裁剪 PROJECT_HISTORY.md 至最近 20 条（临时副本先行验证后写回）",
+          "status": "in_progress"
+        },
+        {
+          "id": "HIST-TRIM-02",
+          "step": "同步 project-memory-rules/SKILL.md 历史事件保留窗口规则",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-03",
+          "step": "同步 bootstrap 资产（bootstrap_agents.sh、自举 SKILL、四件套模板）",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-04",
+          "step": "同步 AGENTS.md 与 CLAUDE.md 四件套 HISTORY 口径",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-05",
+          "step": "更新 PROJECT_MEMORY.md 的 HISTORY 描述（人类区+机器索引区）",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-06",
+          "step": "执行 TC-1 至 TC-5 脚本化验证",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-07",
+          "step": "收口：6-review、字典重跑、门禁与最终总结",
+          "status": "pending"
         }
       ]
     }
