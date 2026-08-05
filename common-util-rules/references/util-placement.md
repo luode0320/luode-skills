@@ -11,11 +11,11 @@
 - 需要公共化时，先说明复用范围、输入输出语义、调用边界和不得继续扩张的边界。
 - 命中“最近修改时间超过 7 天且多处复用”的通用代码时，优先新增兼容入口，不直接修改旧行为。
 - 可脱离项目独立复制的工具包与 SDK 由 Catalog 定位到根 `utils/<package>/`；根 `utils/` 自身禁止文件，且不得依赖项目其他包。
-- 需要引用项目其他包、但不承载业务流程的高关联工具函数由 Catalog 定位到源码根 `util/<function>.<ext>`；该目录禁止子目录。
+- 需要引用项目其他包、但不承载业务流程的高关联工具函数由 Catalog 定位到独立后端根 `common/util/<function>.<ext>`；该目录禁止子目录。
 
 ## 转交 `package-structure-rules` 的条件
 
-- 需要决定根 `utils/`、源码根 `util/`、`common`、`global`、`middleware`、`shared`、`helpers` 等目录落点。
+- 需要决定根 `utils/`、独立后端 `common/util/`、`common`、`global`、`middleware`、`shared`、`helpers` 等目录落点。
 - 需要判断公共根目录是否应拆二级子目录、是否允许新增目录或是否存在根目录堆文件。
 - 需要判断公共层能否依赖业务层、跨层依赖方向、模块边界或目录命名。
 - 涉及业务源码层、请求结构或数据库层归位时，必须查询 `package-structure-rules` Catalog；本 Skill 只判断是否具备公共复用资格。

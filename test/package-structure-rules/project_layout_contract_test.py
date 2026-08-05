@@ -31,6 +31,62 @@ def run_cli(*arguments: str) -> subprocess.CompletedProcess[str]:
 class ProjectLayoutContractTests(unittest.TestCase):
     """覆盖 fullstack、backend、frontend 的活动 doc 骨架。"""
 
+    def test_catalog_query_and_strict_require_root_dockerfile(self):
+        """确认三类项目均查询到根 Dockerfile，strict 强制存在而 adoption 保持兼容。
+
+        [参数] self：unittest 测试实例。
+        [返回] None：断言失败时由 unittest 报告。
+        最近修改时间: 2026-08-04 新增三类项目根 Dockerfile 契约。
+        """
+        # 1. Catalog 必须共同表达三类项目的根 Dockerfile 要求。
+        catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+        entries = [
+            entry for entry in catalog["entries"]
+            if entry.get("artifact_kind") == "project-governance" and entry.get("category") == "dockerfile"
+        ]
+        self.assertEqual(3, len(entries))
+        self.assertEqual({"fullstack", "backend", "frontend"}, {entry["project_kind"] for entry in entries})
+        self.assertTrue(all(entry["canonical_path"] == "Dockerfile" for entry in entries))
+        self.assertTrue(all(entry["creation_policy"] == "required" for entry in entries))
+        # 2. 逐类验证 query、strict 和 adoption 的策略分流。
+        for project_kind in ("fullstack", "backend", "frontend"):
+            with self.subTest(project_kind=project_kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                # 2.1 query 必须返回当前项目类型唯一的根 Dockerfile 条目。
+                queried = run_cli(
+                    "query", "--project-kind", project_kind,
+                    "--artifact", "project-governance", "--category", "dockerfile",
+                )
+                self.assertEqual(0, queried.returncode, queried.stdout)
+                self.assertEqual("Dockerfile", json.loads(queried.stdout)["entry"]["canonical_path"])
+                # 2.2 strict 必须拒绝缺失根 Dockerfile 的新项目。
+                arguments = [
+                    "check", "--root", str(root), "--project-kind", project_kind,
+                ]
+                if project_kind in {"fullstack", "backend"}:
+                    arguments.extend(("--language", "go"))
+                arguments.extend(("--policy", "strict"))
+                strict = run_cli(*arguments)
+                self.assertEqual(2, strict.returncode, strict.stdout)
+                self.assertIn("缺少必需根文件: Dockerfile", strict.stdout)
+
+                # 2.3 adoption 必须保留旧项目缺失 Dockerfile 的渐进采纳兼容。
+                manifest = root / "doc" / "1-架构" / "3-目录规则收敛清单.yaml"
+                manifest.parent.mkdir(parents=True)
+                payload = {
+                    "version": 1,
+                    "project_kind": project_kind,
+                    "adopted_paths": [],
+                    "legacy_source_roots": [],
+                }
+                if project_kind == "backend":
+                    payload["language"] = "go"
+                manifest.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+                arguments[-1] = "adoption"
+                arguments.extend(("--adoption-manifest", "doc/1-架构/3-目录规则收敛清单.yaml"))
+                adoption = run_cli(*arguments)
+                self.assertEqual(0, adoption.returncode, adoption.stdout)
+
     def test_catalog_query_defines_one_root_test_entry_per_project_kind(self):
         """确认三类项目均只有一个由测试策略 Skill 负责的根 test 条目。
 
@@ -56,7 +112,7 @@ class ProjectLayoutContractTests(unittest.TestCase):
 
         [参数] self：unittest 测试实例。
         [返回] None：断言失败时由 unittest 报告。
-        最近修改时间: 2026-08-02 补充根 test 的 render 与 init 契约。
+        最近修改时间: 2026-08-04 补充根 Dockerfile 的 render 与 init 契约。
         """
         # 1. 逐类确认目录渲染、初始化和竞争测试根边界。
         for project_kind in ("fullstack", "backend", "frontend"):
@@ -67,6 +123,7 @@ class ProjectLayoutContractTests(unittest.TestCase):
                 initialized = run_cli("init", "--project-kind", project_kind, "--root", directory)
                 self.assertEqual(0, initialized.returncode, initialized.stdout)
                 self.assertTrue((Path(directory) / "test").is_dir())
+                self.assertTrue((Path(directory) / "Dockerfile").is_file())
                 self.assertFalse((Path(directory) / "backend/test").exists())
                 self.assertFalse((Path(directory) / "frontend/test").exists())
 
@@ -105,7 +162,7 @@ class ProjectLayoutContractTests(unittest.TestCase):
 
         [参数] self：unittest 测试实例。
         [返回] None：断言失败时由 unittest 报告。
-        最近修改时间: 2026-08-02 将根 test 纳入 init 骨架断言。
+        最近修改时间: 2026-08-04 将根 Dockerfile 纳入三类 init 骨架断言。
         """
         # 1. 验证三类 init 创建根 test 和活动 doc 树，并排除历史目录。
         expected = {
@@ -125,6 +182,7 @@ class ProjectLayoutContractTests(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stdout)
                 for relative in expected:
                     self.assertTrue((root / relative).is_dir(), (project_kind, relative))
+                self.assertTrue((root / "Dockerfile").is_file(), project_kind)
                 self.assertFalse((root / "doc/6-审查").exists())
                 self.assertFalse((root / "doc/7-验收").exists())
                 if project_kind == "frontend":

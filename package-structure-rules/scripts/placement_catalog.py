@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "references" / "placement-catalog.yaml"
 LAYOUT_PATH = ROOT / "references" / "project-layout-v2.md"
 SOURCE_EXTENSIONS = {".go", ".java", ".ts", ".js", ".py"}
-SOURCE_UTIL_EXTENSIONS = {
+COMMON_UTIL_EXTENSIONS = {
     "go": {".go"},
     "java": {".java"},
     "node": {".ts", ".js"},
@@ -89,7 +89,7 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
 
     [参数] catalog 为位置 Catalog，args 为解析后的查询参数。
     [返回] 符合全部已提供筛选条件的条目列表。
-    最近修改时间: 2026-07-31 22:16:49 兼容公开文档中的 database 连字符 artifact 名称。
+    最近修改时间: 2026-08-04 12:00:00 增加 source-util 到 common-util 的兼容查询路由。
     """
     # 1. 仅为 database 的公开连字符名称补充内部下划线候选，保持其它 artifact 的既有名称不变。
     artifact_kinds = {args.artifact} if args.artifact is not None else set()
@@ -104,11 +104,21 @@ def query_entries(catalog: dict[str, Any], args: argparse.Namespace) -> list[dic
         "operation": args.operation,
         "language": args.language,
     }
-    return [
+    # 3. source-util 是历史查询别名，统一路由到 backend.common.util；旧语言参数只保留兼容，不参与匹配。
+    if args.artifact == "source-util":
+        artifact_kinds = {"common-util"}
+        mappings["language"] = None
+    entries = [
         entry for entry in catalog["entries"]
         if (not artifact_kinds or entry.get("artifact_kind") in artifact_kinds)
         and all(value is None or entry.get(field) == value for field, value in mappings.items())
     ]
+    # 4. database-migration 根目录承载通用迁移入口；未指定分类和操作时优先返回根条目，避免与 field/index 子条目产生多结果。
+    if args.artifact in {"database-migration", "database_migration"} and args.category is None and args.operation is None:
+        root_entries = [entry for entry in entries if entry.get("canonical_path") == "database/migration"]
+        if root_entries:
+            return root_entries
+    return entries
 
 
 def command_query(catalog: dict[str, Any], args: argparse.Namespace) -> int:
@@ -116,12 +126,9 @@ def command_query(catalog: dict[str, Any], args: argparse.Namespace) -> int:
 
     [参数] catalog 为位置 Catalog，args 为解析后的查询参数。
     [返回] 成功返回 0，查询条件不唯一返回 2。
-    最近修改时间: 2026-07-28 21:26:06 要求 source-util 查询显式指定语言。
+    最近修改时间: 2026-08-04 12:00:00 将 source-util 保留为 common-util 的兼容查询别名。
     """
-    # 1. source-util 的四种语言位置不同，缺少语言时不能返回不确定结果。
-    if args.artifact == "source-util" and args.language is None:
-        print(json.dumps({"ok": False, "errors": ["source-util 查询必须指定 --language"]}, ensure_ascii=False))
-        return 2
+    # 1. 通过兼容别名或 canonical artifact 查询唯一条目。
     entries = query_entries(catalog, args)
     if len(entries) != 1:
         print(json.dumps({"ok": False, "matches": len(entries), "entries": entries}, ensure_ascii=False, indent=2))
@@ -281,12 +288,12 @@ def command_init(catalog: dict[str, Any], args: argparse.Namespace) -> int:
     return 0
 
 
-def source_util_root(relative: str, language: str) -> str | None:
-    """识别指定语言的源码根 util 目录。
+def deprecated_source_util_root(relative: str, language: str) -> str | None:
+    """识别需要拒绝的新项目源码根 util 遗留路径。
 
     [参数] relative 为项目相对路径，language 为后端语言。
     [返回] 命中时返回源码根 util 路径，未命中返回 None。
-    最近修改时间: 2026-07-28 21:26:06 新增四种语言的源码根 util 识别。
+    最近修改时间: 2026-08-04 12:00:00 将源码根 util 改为严格拒绝的旧位置识别。
     """
     parts = relative.split("/")
     # 1. Go、Node.js 与 Python 有固定源码根路径。
@@ -304,25 +311,43 @@ def source_util_root(relative: str, language: str) -> str | None:
     return None
 
 
-def check_source_util_path(relative: str, is_file: bool, language: str) -> list[str]:
-    """校验源码根 util 只能直接存放指定语言代码文件。
+def check_common_util_path(relative: str, is_file: bool, project_kind: str, language: str | None) -> list[str]:
+    """校验 backend common/util 只能直接存放当前语言代码文件。
 
-    [参数] relative 为项目相对路径，is_file 表示文件，language 为后端语言。
-    [返回] 当前路径的源码根 util 严格策略错误列表。
-    最近修改时间: 2026-07-28 21:26:06 新增源码根 util 的文件与子目录边界。
+    [参数] relative 为项目相对路径，is_file 表示文件，project_kind 为项目类型，language 为后端语言。
+    [返回] 当前路径的 common/util 严格策略错误列表。
+    最近修改时间: 2026-08-04 12:00:00 新增 common/util 的项目类型、文件与子目录边界。
     """
-    # 1. 先定位源码根 util；未命中或目录本身不产生错误。
-    root = source_util_root(relative, language)
-    if root is None or relative == root:
+    # 1. 先确认当前路径是否位于独立后端公共工具根。
+    root = "common/util"
+    if not is_under(relative, root) or relative == root:
         return []
+    # 2. 非独立后端不得复用该根级目录。
+    if project_kind != "backend":
+        return [f"common/util 仅允许独立后端项目: {relative}"]
+    if language is None:
+        return []
+    # 3. 独立后端只允许当前语言源码直接落盘。
     child = relative[len(root) + 1:]
-    # 2. 子目录与非指定语言文件均违反源码根 util 的扁平边界。
     if "/" in child or not is_file:
-        return [f"源码根 util 禁止子目录: {relative}"]
-    if Path(relative).suffix.lower() not in SOURCE_UTIL_EXTENSIONS[language]:
-        return [f"源码根 util 仅允许 {language} 代码文件: {relative}"]
+        return [f"common/util 禁止子目录: {relative}"]
+    if Path(relative).suffix.lower() not in COMMON_UTIL_EXTENSIONS[language]:
+        return [f"common/util 仅允许 {language} 代码文件: {relative}"]
     return []
 
+
+def check_deprecated_source_util_path(relative: str, is_file: bool, language: str) -> list[str]:
+    """拒绝源码根 util 旧路径；adoption 快照由上层单独放行。
+
+    [参数] relative 为项目相对路径，is_file 表示文件，language 为后端语言。
+    [返回] 源码根 util 旧路径错误列表。
+    最近修改时间: 2026-08-04 12:00:00 新增旧源码根严格拒绝并保留 adoption 放行边界。
+    """
+    # 1. 旧源码根仅在 strict 路径中报错，adoption 由上层先行短路。
+    root = deprecated_source_util_root(relative, language)
+    if root is None:
+        return []
+    return [f"源码根 util 已废弃，请迁移到 common/util: {relative}"]
 
 def business_rpc_root(relative: str, language: str) -> str | None:
     """识别当前语言源码根下某个业务域的 rpc 目录。
@@ -361,7 +386,7 @@ def check_business_rpc_path(relative: str, is_file: bool, language: str) -> list
     # 1. RPC 目录是公开函数入口，禁止继续按技术或操作创建子目录。
     if "/" in child or not is_file:
         return [f"业务域 rpc 禁止子目录: {relative}"]
-    if Path(relative).suffix.lower() not in SOURCE_UTIL_EXTENSIONS[language]:
+    if Path(relative).suffix.lower() not in COMMON_UTIL_EXTENSIONS[language]:
         return [f"业务域 rpc 仅允许 {language} 代码文件: {relative}"]
     return []
 
@@ -478,7 +503,7 @@ def check_environment_config_path(
 
     [参数] catalog：配置 Catalog；relative：项目根相对路径；is_file：当前路径是否为文件；project_kind：项目类型；language：后端语言。
     [返回] list[str]：不符合配置位置或命名契约的稳定错误列表。
-    最近修改时间: 2026-08-03 17:48:21 Go embedded 文件名改为格式名后置的 config_<env>_yaml.go。
+    最近修改时间: 2026-08-05 新增 config 根 load/model 源码文件放行与稳定失败文案。
     """
     # 1. 非后端项目不参与环境配置目录检查，保留前端既有语义。
     if project_kind not in {"backend", "fullstack"}:
@@ -494,6 +519,17 @@ def check_environment_config_path(
         return []
 
     child = relative[len(root) + 1:]
+    # 2. config 根直接源码文件只放行当前语言的 load.<ext> / model.<ext> 两个命名；扩展名映射与二进制入口一致。
+    if is_file and "/" not in child:
+        extensions = entrypoint_extensions(language)
+        stem = Path(child).stem
+        suffix = Path(child).suffix.lower()
+        if stem in {"load", "model"} and suffix in extensions:
+            return []
+        if stem in {"load", "model"}:
+            return [f"配置根源码文件扩展名不符合规则: {relative}"]
+        return [f"配置根源码文件必须为 load.<ext> 或 model.<ext>: {relative}"]
+
     category, separator, filename = child.partition("/")
     if category not in {"yaml", "embedded"}:
         return [f"配置目录只允许 yaml/ 或 embedded/: {relative}"]
@@ -514,7 +550,7 @@ def check_environment_config_path(
     suffix = Path(filename).suffix.lower()
     allowed_extensions = set(entry.get("allowed_extensions", []))
     if language is not None and category == "embedded":
-        allowed_extensions &= SOURCE_UTIL_EXTENSIONS[language]
+        allowed_extensions &= COMMON_UTIL_EXTENSIONS[language]
     if suffix not in allowed_extensions:
         return [f"环境配置文件扩展名不符合规则: {relative}"]
 
@@ -555,6 +591,37 @@ def check_required_file_content_contracts(
         # 2. 旧项目可以暂未补齐双文件；只有二者实际存在时才拒绝正文漂移。
         if target.is_file() and expected.is_file() and target.read_bytes() != expected.read_bytes():
             errors.append(f"规则文件内容不一致: {entry['canonical_path']} 必须与 {expected_path} 一致")
+    return errors
+
+
+def check_required_root_files(
+    catalog: dict[str, Any], root: Path, project_kind: str | None,
+) -> list[str]:
+    """校验 Catalog 声明的必需项目根文件实际存在。
+
+    [参数] catalog 为位置 Catalog，root 为待检查项目根，project_kind 为项目类型。
+    [返回] list[str]：必需根文件缺失或被目录占用时返回稳定错误。
+    最近修改时间: 2026-08-04 新增三类项目根 Dockerfile 的 strict 存在性检查。
+    """
+    if project_kind is None:
+        return []
+    errors: list[str] = []
+    # 1. 仅检查 Catalog 中标记为 dockerfile 的必需文件，保留其它治理文件的既有渐进采纳语义。
+    for entry in catalog["entries"]:
+        if (
+            entry["project_kind"] != project_kind
+            or entry.get("artifact_kind") != "project-governance"
+            or entry.get("category") != "dockerfile"
+            or entry.get("node_kind") != "file"
+            or entry.get("creation_policy") != "required"
+        ):
+            continue
+        relative = entry["canonical_path"]
+        target = root / relative
+        if target.is_dir():
+            errors.append(f"必需根文件不能是目录: {relative}")
+        elif not target.is_file():
+            errors.append(f"缺少必需根文件: {relative}")
     return errors
 
 
@@ -610,7 +677,7 @@ def check_path(
 
     [参数] catalog 为位置 Catalog，relative 为项目相对路径，is_file 表示文件，project_kind 与 language 为检查上下文。
     [返回] 当前路径的严格策略错误列表。
-    最近修改时间: 2026-07-29 23:45:00 保留路径边界校验；根规则文件正文契约由专用函数只读检查。
+    最近修改时间: 2026-08-05 config 根直接源码文件交由配置专项校验唯一裁决，不再命中子目录边界。
     """
     errors: list[str] = []
     # 1. 先应用 Catalog 的通用禁止路径和子目录边界。
@@ -621,6 +688,9 @@ def check_path(
     for parent, children in catalog["allowed_children"].items():
         if relative.startswith(parent + "/"):
             first_child = relative[len(parent) + 1:].split("/", 1)[0]
+            # 1.1 config 根直接源码文件由 check_environment_config_path 唯一裁决 load/model 命名与扩展名。
+            if is_file and parent in {"config", "backend/config"} and "/" not in relative[len(parent) + 1:]:
+                continue
             if first_child not in children:
                 errors.append(f"非法子目录: {relative} 不属于 {parent}")
     suffix = Path(relative).suffix.lower()
@@ -630,11 +700,13 @@ def check_path(
         errors.append(f"独立 SQL 目录禁止生产源码: {relative}")
     errors.extend(check_database_storage_source_path(catalog, relative, is_file))
     errors.extend(check_database_sql_path(catalog, relative, is_file))
-    # 2. 后端根 utils 只承载工具包子目录，源码根 util 则按语言限制直接文件。
+    # 2. 后端根 utils 只承载工具包子目录，common/util 与源码根旧 util 分别执行边界校验。
     if project_kind == "backend" and is_file and Path(relative).parent.as_posix() == "utils":
         errors.append(f"根 utils 禁止直接文件: {relative}")
+    if project_kind is not None:
+        errors.extend(check_common_util_path(relative, is_file, project_kind, language))
     if project_kind == "backend" and language is not None:
-        errors.extend(check_source_util_path(relative, is_file, language))
+        errors.extend(check_deprecated_source_util_path(relative, is_file, language))
         errors.extend(check_business_rpc_path(relative, is_file, language))
     # 3. 配置与二进制入口属于本轮新增边界，集中追加专用校验并保持原有错误顺序。
     errors.extend(check_environment_config_path(catalog, relative, is_file, project_kind, language))
@@ -749,7 +821,7 @@ def load_adoption_manifest(
 
     # 4. 遗留根必须记录当时存在的目录和源码文件；目录或文件缺失时拒绝伪造快照。
     legacy: dict[str, dict[str, set[str]]] = {}
-    source_extensions = SOURCE_UTIL_EXTENSIONS.get(args.language, SOURCE_EXTENSIONS)
+    source_extensions = COMMON_UTIL_EXTENSIONS.get(args.language, SOURCE_EXTENSIONS)
     for index, item in enumerate(legacy_roots):
         label = f"legacy_source_roots[{index}]"
         required = {"path", "responsibility", "existing_directories", "existing_files"}
@@ -850,7 +922,7 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
 
     [参数] catalog 为位置 Catalog，args 为检查参数。
     [返回] strict 违规或参数缺失返回 2，其余返回 0。
-    最近修改时间: 2026-07-29 23:45:00 新增 strict 下双平台规则文件正文一致性的只读检查。
+    最近修改时间: 2026-08-04 00:46:50 新增 strict 下三类项目根 Dockerfile 的只读存在性检查。
     """
     root = Path(args.root).resolve()
     if not root.is_dir():
@@ -881,8 +953,9 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
-    # 4. 仅 strict 校验新项目根的双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
+    # 4. strict 校验新项目根 Dockerfile 和双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
     if args.policy == "strict":
+        errors.extend(check_required_root_files(catalog, root, args.project_kind))
         errors.extend(check_required_file_content_contracts(catalog, root, args.project_kind))
     payload = {
         "ok": not errors or args.policy == "legacy",

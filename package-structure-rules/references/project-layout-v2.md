@@ -34,7 +34,9 @@
 │   │   └── <binary>/                       # [条件·提交] 单个额外二进制目录
 │   │       └── main.<ext>                  # [条件·提交] 同仓后端额外入口
 │   └── config/                              # [必需·提交] 同仓后端唯一配置根
-│       ├── yaml/                            # [必需·提交] 按环境拆分的外部 YAML
+│       ├── load.<ext>                        # [条件·提交] 配置加载与解析入口
+│       ├── model.<ext>                       # [条件·提交] 配置结构定义
+│       ├── yaml/                            # [必需·提交] 按环境拆分的外部 YAML；只存放配置数据
 │       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── frontend/                              # [必需·提交] 完整独立前端项目
 ├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
@@ -63,6 +65,7 @@
 ├── .gitattributes                         # [必需·提交] 文本与换行规则
 ├── .gitignore                             # [必需·提交] 忽略规则
 ├── .dockerignore                          # [条件·提交] 镜像排除规则
+├── Dockerfile                              # [必需·提交] 工作区统一镜像定义
 ├── AGENTS.md                              # [必需·提交] 工作区协作规则
 ├── CLAUDE.md                              # [必需·提交] Claude Code 工作区协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                     # [必需·提交] 当前状态
@@ -100,9 +103,11 @@
 │   └── <binary>/                            # [条件·提交] 单个额外二进制目录
 │       └── main.<ext>                       # [条件·提交] 额外二进制入口
 ├── config/                                  # [必需·提交] 唯一配置根
-│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；禁止秘密原值
+│   ├── load.<ext>                            # [条件·提交] 配置加载与解析入口
+│   ├── model.<ext>                           # [条件·提交] 配置结构定义
+│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；禁止秘密原值；只存放配置数据
 │   │   └── config_<env>.yaml                 # [条件·提交] 兼容 `.yml`；标准环境为 local、test、prod
-│   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
+│   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量；只存放配置数据
 │       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
@@ -194,7 +199,8 @@
 │   ├── response/                            # [条件·提交] 响应 DTO
 │   ├── constant/                            # [条件·提交] 稳定常量和枚举
 │   ├── error/                               # [条件·提交] 错误类型与错误码
-│   └── validation/                          # [条件·提交] 通用校验
+│   ├── validation/                          # [条件·提交] 通用校验
+│   └── util/                                # [条件·提交] 可依赖项目其他包的高关联工具函数；代码文件直接放此目录，禁止子目录
 ├── global/                                  # [条件·提交] 已装配共享引用
 │   └── <capability>/                        # [条件·提交] 单项共享引用
 ├── crontask/                                # [条件·提交] Cron 入口
@@ -217,7 +223,6 @@
 ├── <source-root>/                           # [必需·提交] 当前语言唯一源码根
 │   ├── router/                              # [条件·提交] 路由装配
 │   ├── controller/                          # [条件·提交] 输入与响应映射
-│   ├── util/                                # [条件·提交] 可依赖项目其他包的高关联工具函数；代码文件直接放此目录，禁止子目录
 │   └── business/                            # [必需·提交] 业务域根
 │       └── <domain>/                        # [必需·提交] 单业务域
 │           ├── api/                         # [条件·提交] 域内 API 调用
@@ -227,7 +232,7 @@
 │           ├── constant/                    # [条件·提交] 域常量
 │           ├── init/                        # [条件·提交] 域初始化
 │           ├── crontask/                    # [条件·提交] 域定时任务实现
-│           ├── util/                        # [条件·提交] 域私有辅助；不属于根 utils/ 或源码根 util/
+│           ├── util/                        # [条件·提交] 域私有辅助；不属于根 utils/ 或 common/util/
 │           └── rpc/                         # [条件·提交] 对其他微业务公开的 JSON 字符串通信函数；代码文件直接落盘，禁止子目录
 ├── scripts/                                 # [条件·提交] 工程脚本
 │   ├── dev/                                 # [条件·提交] 本地开发脚本
@@ -260,6 +265,7 @@
 ├── .cache/                                  # [生成·忽略] 工具缓存
 ├── build.sh                                 # [必需·提交] 统一打包入口
 ├── docker-build.sh                          # [必需·提交] 镜像构建入口
+├── Dockerfile                                # [必需·提交] 后端镜像定义
 ├── AGENTS.md                                # [必需·提交] 后端项目协作规则
 ├── CLAUDE.md                                # [必需·提交] Claude Code 后端项目协作规则；正文与 AGENTS.md 一致
 ├── PROJECT_CURRENT.md                       # [必需·提交] 当前任务、范围、状态与交接
@@ -273,7 +279,7 @@
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
-独立后端配置使用 `config/yaml/` 与 `config/embedded/`，按 `config_<env>` 拆分环境；Go 示例为 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，以及 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`。embedded 源码文件的格式名必须后置，因为 `config_test.go` 会被 Go 当成测试文件；外部 YAML 不参与编译，因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全，也不要求 YAML 与 embedded 按环境配对。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。
+独立后端配置使用 `config/yaml/` 与 `config/embedded/`，按 `config_<env>` 拆分环境；Go 示例为 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，以及 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`。embedded 源码文件的格式名必须后置，因为 `config_test.go` 会被 Go 当成测试文件；外部 YAML 不参与编译，因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全，也不要求 YAML 与 embedded 按环境配对。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据；配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担。
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 
@@ -389,7 +395,7 @@
 ├── .cache/                                   # [生成·忽略] 工具缓存
 ├── build.sh                                  # [必需·提交] 前端统一打包入口
 ├── docker-build.sh                           # [条件·提交] 前端 Docker 镜像构建入口
-├── Dockerfile                                # [条件·提交] 前端镜像定义
+├── Dockerfile                                # [必需·提交] 前端镜像定义
 ├── package.json                              # [必需·提交] 前端依赖与脚本入口
 ├── .gitlab-ci.yml                            # [条件·提交] GitLab 流水线主入口
 ├── .editorconfig                             # [必需·提交] UTF-8 与基础格式规则

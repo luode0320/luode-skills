@@ -4,6 +4,8 @@
 
 ## 事件
 
+- 2026-08-05：完成 CYCLE-PSR-23 config 根加载与结构文件规则。独立后端 `config/load.<ext>` 与 `config/model.<ext>`（同仓后端 `backend/config/...`）成为唯一配置加载/结构落点，Catalog 新增 4 个 pattern 条目并补 Schema 守卫，CLI strict 对 config/ 根两个命名放行、其余拒绝；专项测试 `11/11`、四文件回归 `26/26`、需求/实施/测试/风格四份文档 profile 与 Skill 合规门禁均通过，工作树保持已改动未提交。
+
 - 2026-07-14：完成任务阻断收口与恢复计划。新增唯一 `BLK-*` 共享契约并接入审查、验收、功能验证、Bug 验证、执行失败、运行时恢复和最终总结；真实阻断在最终结尾输出状态、证据、已尝试动作、停止边界、影响、至多三步解决计划和重入点，`limited`/`not_applicable`/P2/P3 不误报。文档门禁 52 项、运行时阻断事实 3 项、七份文档 profile、Python 编译、JSON schema 解析和字典生成均通过；Obsidian 沉淀因固定 vault 未注册而阻断，未执行 Git 历史写入。
 
 - 2026-07-13：完成 Windows PowerShell 环境可靠性升级。RequiredOnly、可选工具降级、精确包源、JSON 状态、WhatIf、profile/Terminal 事务、hash 回滚、Git Bash/WSL 分流和 UTF-8 BOM 兼容均已收口；PowerShell 5.1 与 PowerShell 7 的九项隔离回归、相关文档 profile、两个 Skill quick validator 和字典生成均通过，未执行 Git 历史写入。
@@ -235,6 +237,7 @@
 - fullstack、backend、frontend 的活动测试代码统一落在项目根 `test/`；独立后端不建立 `backend/test/`，前后端同仓不建立 `backend/test/` 或 `frontend/test/`；`doc/5-tests/` 继续只保存说明和非可执行证据。
 - Catalog、人工目录树、skeleton、query、render、init 和根目录契约测试已同步；根目录专项 `4/4`、入口回归 `5/5`、配置回归 `7/7`、根 Python 测试 `212/212`、测试 README profile、Skill 校验和 `6-review STYLE: PASS` 均通过。
 - 本周期未迁移真实项目、未连接外部服务、未执行 Git 历史写入；Obsidian 固定 vault 未注册，沉淀按 bridge 规则阻断。
+- 2026-08-04：用户确认独立后端项目关联工具统一落在 `common/util/`，与根 `utils/<package>/` 的项目无关工具包职责分离；已同步 `package-structure-rules` 的目录树、Catalog、Schema、CLI、相邻 `common-util-rules` 和活动测试，旧源码根 `util/` 保留为 adoption legacy 迁移边界，当前改动未提交。
 
 ## 2026-08-04：总结知识引用清单落地
 

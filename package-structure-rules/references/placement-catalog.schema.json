@@ -35,8 +35,8 @@
         },
         "allOf": [
           {
-            "if": {"properties": {"artifact_kind": {"const": "source-util"}}, "required": ["artifact_kind"]},
-            "then": {"required": ["language"]}
+            "if": {"properties": {"artifact_kind": {"const": "common-util"}}, "required": ["artifact_kind"]},
+            "then": {"required": ["flat_files"]}
           },
           {
             "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},
@@ -45,6 +45,10 @@
           {
             "if": {"properties": {"node_kind": {"const": "pattern"}}, "required": ["node_kind"]},
             "then": {"required": ["path_pattern", "dynamic", "init_policy"]}
+          },
+          {
+            "if": {"properties": {"category": {"enum": ["loader", "model"]}}, "required": ["category"]},
+            "then": {"required": ["node_kind", "path_pattern", "dynamic", "init_policy", "allowed_extensions"]}
           },
           {
             "if": {"properties": {"node_kind": {"const": "file"}}, "required": ["node_kind"]},

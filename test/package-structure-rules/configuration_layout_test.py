@@ -55,8 +55,13 @@ def write_files(root: Path, paths: tuple[str, ...]) -> None:
 
     [参数] root：临时测试目录；paths：待创建的项目相对路径。
     [返回] None：仅创建测试 fixture。
-    最近修改时间: 2026-08-02 21:30:00 补齐配置行为测试函数头元信息。
+    最近修改时间: 2026-08-04 为 strict fixture 补齐根 Dockerfile。
     """
+    # 1. 配置 strict fixture 同时满足三类项目的必需根 Dockerfile 基线。
+    dockerfile = root / "Dockerfile"
+    dockerfile.parent.mkdir(parents=True, exist_ok=True)
+    dockerfile.write_text("# test fixture\n", encoding="utf-8")
+    # 2. 再写入当前用例要求验证的配置样本，保持负向样本只因目标规则失败。
     for relative in paths:
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -104,8 +109,11 @@ class ConfigurationLayoutTests(unittest.TestCase):
         # 2. 再核对 Catalog 与 Schema 的策略字段定义。
         catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
-        config_entries = [entry for entry in catalog["entries"] if entry.get("artifact_kind") == "config"]
-        self.assertEqual(4, len(config_entries))
+        environment_entries = [
+            entry for entry in catalog["entries"]
+            if entry.get("artifact_kind") == "config" and entry.get("category") in {"yaml", "embedded"}
+        ]
+        self.assertEqual(4, len(environment_entries))
         properties = schema["properties"]["entries"]["items"]["properties"]
         for field in (
             "file_name_pattern", "go_file_name_pattern", "environment_name_pattern",
@@ -113,6 +121,60 @@ class ConfigurationLayoutTests(unittest.TestCase):
             "source_policy", "environment_variable_policy",
         ):
             self.assertIn(field, properties)
+
+    def test_catalog_query_and_schema_expose_config_source_patterns(self):
+        """确认 config/ 根 load/model 四条 pattern 唯一查询且 Schema 有守卫。
+
+        [参数] 无。
+        [返回] None：断言配置根源码 pattern 的 Catalog 与 Schema 契约。
+        最近修改时间: 2026-08-04 新增 config 根 load/model 落点契约。
+        """
+        # 1. 先验证 backend/fullstack × loader/model 四类 query 唯一命中规范路径。
+        cases = (
+            ("backend", "loader", "config/load.<ext>"),
+            ("backend", "model", "config/model.<ext>"),
+            ("fullstack", "loader", "backend/config/load.<ext>"),
+            ("fullstack", "model", "backend/config/model.<ext>"),
+        )
+        for project_kind, category, expected_path in cases:
+            with self.subTest(project_kind=project_kind, category=category):
+                result = run_cli(
+                    "query", "--project-kind", project_kind, "--artifact", "config", "--category", category,
+                )
+                self.assertEqual(0, result.returncode, result.stdout)
+                entry = json.loads(result.stdout)["entry"]
+                self.assertEqual(expected_path, entry["canonical_path"])
+                self.assertEqual("pattern", entry["node_kind"])
+                self.assertTrue(entry["dynamic"])
+                self.assertEqual("forbidden", entry["init_policy"])
+                self.assertEqual("conditional", entry["creation_policy"])
+
+        # 2. 再核对两棵树渲染均暴露 load.<ext> 与 model.<ext> 占位契约。
+        for project_kind in ("backend", "fullstack"):
+            with self.subTest(project_kind=project_kind, mode="render"):
+                rendered = run_cli("render", "--project-kind", project_kind)
+                self.assertEqual(0, rendered.returncode, rendered.stderr)
+                self.assertIn("load.<ext>", rendered.stdout)
+                self.assertIn("model.<ext>", rendered.stdout)
+
+        # 3. 最后核对 Catalog 计数与 Schema 对 loader/model 的 pattern 守卫。
+        catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+        schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+        source_entries = [
+            entry for entry in catalog["entries"]
+            if entry.get("artifact_kind") == "config" and entry.get("category") in {"loader", "model"}
+        ]
+        self.assertEqual(4, len(source_entries))
+        self.assertTrue(all(entry["node_kind"] == "pattern" for entry in source_entries))
+        source_rule = next(
+            rule for rule in schema["properties"]["entries"]["items"]["allOf"]
+            if rule["if"].get("properties", {}).get("category", {}).get("enum") is not None
+            and set(rule["if"]["properties"]["category"]["enum"]) == {"loader", "model"}
+        )
+        self.assertEqual(
+            ["node_kind", "path_pattern", "dynamic", "init_policy", "allowed_extensions"],
+            source_rule["then"]["required"],
+        )
 
     def test_embedded_secret_boundary_is_distinct_from_yaml_boundary(self):
         """确认 embedded 允许源码私密配置，但 YAML 和外部输出仍保持禁止边界。
@@ -289,6 +351,93 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertFalse(list(root.rglob("config_*.yaml")))
                 self.assertFalse(list(root.rglob("config_*.yml")))
                 self.assertFalse(list(root.rglob("config_*.go")))
+
+    def test_strict_accepts_config_root_source_files(self):
+        """确认四语言 config/ 根 load/model 文件通过 strict 且检查只读。
+
+        [参数] 无。
+        [返回] None：断言 load.<ext>/model.<ext> 正向放行和 directory_hash 不变。
+        最近修改时间: 2026-08-05 新增 config 根 load/model 正向行为断言。
+        """
+        # 1. backend/fullstack 与四语言样本均只由目标文件构成，check 应放行且不写目录。
+        cases = (
+            ("backend", "go", ("config/load.go", "config/model.go")),
+            ("fullstack", "go", ("backend/config/load.go", "backend/config/model.go")),
+            ("backend", "java", ("config/load.java", "config/model.java")),
+            ("backend", "node", ("config/load.ts", "config/model.ts")),
+            ("backend", "python", ("config/load.py", "config/model.py")),
+        )
+        for project_kind, language, paths in cases:
+            with self.subTest(project_kind=project_kind, language=language), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                write_files(root, paths)
+                before = directory_hash(root)
+                result = run_cli(
+                    "check", "--root", str(root), "--project-kind", project_kind,
+                    "--language", language, "--policy", "strict",
+                )
+                self.assertEqual(0, result.returncode, result.stdout)
+                self.assertEqual(before, directory_hash(root))
+
+    def test_strict_rejects_invalid_config_root_source_files(self):
+        """确认非法 config/ 根文件、错误扩展名、子目录和禁止路径失败关闭。
+
+        [参数] 无。
+        [返回] None：断言负向样本退出码 2、稳定文案和只读摘要。
+        最近修改时间: 2026-08-05 新增 config 根 load/model 反向行为断言。
+        """
+        # 1. 负向样本只因目标规则失败，且 check 前后 fixture 哈希保持一致。
+        cases = (
+            ("backend", "go", "config/helper.go", "配置根源码文件必须为 load.<ext> 或 model.<ext>"),
+            ("backend", "go", "config/load.yaml", "配置根源码文件扩展名不符合规则"),
+            ("backend", "go", "config/load.java", "配置根源码文件扩展名不符合规则"),
+            ("backend", "go", "config/load/load.go", "配置目录只允许 yaml/ 或 embedded/"),
+            ("backend", "go", "config/foo/", "配置目录只允许 yaml/ 或 embedded/"),
+            ("backend", "go", "config/loader/load.go", "禁止路径"),
+            ("fullstack", "go", "backend/config/helper.go", "配置根源码文件必须为 load.<ext> 或 model.<ext>"),
+        )
+        for project_kind, language, relative, expected in cases:
+            with self.subTest(project_kind=project_kind, relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                if relative.endswith("/"):
+                    (root / relative).mkdir(parents=True, exist_ok=True)
+                else:
+                    write_files(root, (relative,))
+                before = directory_hash(root)
+                result = run_cli(
+                    "check", "--root", str(root), "--project-kind", project_kind,
+                    "--language", language, "--policy", "strict",
+                )
+                self.assertEqual(2, result.returncode, result.stdout)
+                self.assertIn(expected, result.stdout)
+                self.assertEqual(before, directory_hash(root))
+
+    def test_init_never_creates_config_source_patterns(self):
+        """确认 init 不创建 config 根 load/model 占位文件。
+
+        [参数] 无。
+        [返回] None：断言默认与显式启用都不生成 pattern 占位。
+        最近修改时间: 2026-08-05 新增 config 根 load/model pattern 的 init 边界。
+        """
+        # 1. 默认 init 只创建骨架目录，不生成任何 load.<ext>/model.<ext> 文件。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run_cli("init", "--project-kind", "backend", "--root", str(root), "--language", "go")
+            self.assertEqual(0, result.returncode, result.stdout)
+            self.assertFalse(list(root.rglob("load.*")))
+            self.assertFalse(list(root.rglob("model.*")))
+
+        # 2. 显式启用 pattern 条目必须失败关闭，且不创建占位文件。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = run_cli(
+                "init", "--project-kind", "backend", "--root", str(root),
+                "--enable", "backend.config.loader,backend.config.model", "--language", "go",
+            )
+            self.assertEqual(2, result.returncode, result.stdout)
+            self.assertIn("动态入口 pattern", result.stdout)
+            self.assertFalse((root / "config" / "load.<ext>").exists())
+            self.assertFalse((root / "config" / "model.<ext>").exists())
 
 
 if __name__ == "__main__":
