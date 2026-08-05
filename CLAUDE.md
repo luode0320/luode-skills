@@ -42,7 +42,7 @@
 - 缺失的三个项目记忆文件必须先创建最小 UTF-8 模板；固定读取顺序为 `PROJECT_CURRENT.md` -> `PROJECT_MEMORY.md`。
 - `PROJECT_CURRENT.md` 保存当前目标、范围、状态、已完成、待办、阻断、验证和交接点，采用覆盖式维护，UTF-8 字节数不得超过 51,200。
 - `PROJECT_MEMORY.md` 只保存稳定项目规则、关键决策和少量长期事实，继续保留底部机器索引区（联动 `project-memory-rules`）。
-- `PROJECT_HISTORY.md` 只追加关键历史事件，普通启动默认不读，只有历史追问、当前状态不足或真实卡点时窄读。
+- `PROJECT_HISTORY.md` 追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪），普通启动默认不读，只有历史追问、当前状态不足或真实卡点时窄读。
 - `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
