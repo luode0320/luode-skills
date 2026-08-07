@@ -30,6 +30,9 @@ IMAGE_PATTERN = re.compile(r"!\[([^\]]*)\]\(\s*([^)]*?)\s*\)")
 EMPTY_IMAGE_PATTERN = re.compile(r"!\[[^\]]*\]\(\s*\)")
 IMAGE_ID_PATTERN = re.compile(r"\bIMG-[A-Z0-9]+(?:-[A-Z0-9]+)*\b")
 FRONTMATTER_PATTERN = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
+MERMAID_LABEL_PATTERN = re.compile(r'"([^"]*)"')
+# 排除合法的 <br/> / <br> 换行标签，命中即视为会被误判为畸形 HTML 标签的裸 "<"。
+MERMAID_RAW_ANGLE_BRACKET_PATTERN = re.compile(r"<(?!br\s*/?>)", re.IGNORECASE)
 ASSET_FILENAME_PATTERN = re.compile(
     r"^(?P<stem>.+)\.(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)-v(?P<version>\d+)"
     r"(?P<extension>\.png|\.jpg|\.jpeg|\.webp)$"
@@ -888,7 +891,7 @@ def check_diagram_annotations(text: str, errors: List[str], require_context: boo
 # check_mermaid_syntax 对 Mermaid 做无需浏览器的语法前置检查，尽早拒绝明显损坏的图块。
 # [参数] block: 单个 Mermaid 图块；index: 图块序号。
 # [返回] list[str]：图块语法错误列表。
-# 最近修改时间：2026-07-12 新增轻量 Mermaid 校验，避免生成空图或断边图进入交付文档。
+# 最近修改时间：2026-08-07 新增标签内裸露比较运算符检测，避免生成后无法渲染的图块。
 def check_mermaid_syntax(block: str, index: int) -> List[str]:
     """对 Mermaid 做无需浏览器的语法前置检查，尽早拒绝明显损坏的图块。"""
     # 1. 清理空行并识别图类型。
@@ -910,6 +913,13 @@ def check_mermaid_syntax(block: str, index: int) -> List[str]:
         errors.append(f"Mermaid flowchart has no edge at block {index}")
     if diagram_type == "sequenceDiagram" and body and not re.search(r"->>|-->>|->", body):
         errors.append(f"Mermaid sequence has no message at block {index}")
+    # 4. 校验双引号标签内是否裸写比较运算符（如 SQL 的 <>），这类字符会被当作畸形 HTML 标签导致整图解析失败。
+    for label in MERMAID_LABEL_PATTERN.findall(body):
+        if MERMAID_RAW_ANGLE_BRACKET_PATTERN.search(label):
+            errors.append(
+                f'Mermaid label has unescaped "<" at block {index}: "{label}" '
+                '(use &lt;/&gt; or textual operators like != instead)'
+            )
     return errors
 
 
