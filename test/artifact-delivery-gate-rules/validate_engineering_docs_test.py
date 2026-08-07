@@ -378,6 +378,41 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         )
         self.assertTrue(any("unbalanced Mermaid delimiter" in error for error in errors))
 
+    # test_mermaid_syntax_rejects_raw_angle_bracket_label 验证标签内裸写 SQL <> 会被前置语法检查拒绝。
+    # [参数] 无：使用一个双引号标签内含 "walletId <> 0" 的 flowchart 样本。
+    # [返回] None：断言错误列表包含裸露 "<" 提示。
+    # 最近修改时间：2026-08-07 新增 Mermaid 标签裸露比较运算符负例，防止无法渲染的图块绕过文档门禁。
+    def test_mermaid_syntax_rejects_raw_angle_bracket_label(self) -> None:
+        """验证标签内裸写 SQL <> 会被前置语法检查拒绝。"""
+        # 1. 执行图块检查并断言返回明确错误。
+        errors: list[str] = []
+        validator.check_diagram_annotations(
+            '```mermaid\nflowchart LR\n  A --> B["AND walletId <> 0"]\n```',
+            errors,
+        )
+        self.assertTrue(any('unescaped "<"' in error for error in errors))
+
+    # test_mermaid_syntax_accepts_escaped_angle_bracket_label 验证转义后的比较运算符不再触发误判。
+    # [参数] 无：使用与负例同语义但转义为 &lt;&gt; 的样本，以及一个仅含裸 ">" 的常见样本。
+    # [返回] None：断言两个样本均无 "<" 相关错误，确认未误伤合法写法。
+    # 最近修改时间：2026-08-07 新增 Mermaid 标签转义正例，锁定修复后的可渲染口径。
+    def test_mermaid_syntax_accepts_escaped_angle_bracket_label(self) -> None:
+        """验证转义后的比较运算符不再触发误判，且裸 ">" 不被误伤。"""
+        # 1. 转义写法应通过检查。
+        errors: list[str] = []
+        validator.check_diagram_annotations(
+            '```mermaid\nflowchart LR\n  A --> B["AND walletId &lt;&gt; 0"]\n```',
+            errors,
+        )
+        self.assertFalse(any('unescaped "<"' in error for error in errors))
+        # 2. 仅含裸 ">" 的常见写法（如 "utime > 游标"）不应被误判。
+        errors_gt_only: list[str] = []
+        validator.check_diagram_annotations(
+            '```mermaid\nflowchart LR\n  A --> B["utime > 游标"]\n```',
+            errors_gt_only,
+        )
+        self.assertFalse(any('unescaped "<"' in error for error in errors_gt_only))
+
     # test_min_diagrams_rejects_insufficient_total 验证图表总量低于 min_diagrams 时会被门禁拒绝。
     # [参数] 无：构造只含 1 张流程图但要求总量 >=3 的样本。
     # [返回] None：断言错误列表包含总量不足提示。
