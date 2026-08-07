@@ -186,5 +186,55 @@ class TestAssetLocation(unittest.TestCase):
         self.assertIn("doc5_tests_non_executable_only: true", path_map)
 
 
+    def test_runtime_mock_is_not_treated_as_scattered_test_asset(self) -> None:
+        """根 mock/ 下的运行时 Mock 不被误判为散落测试资产。
+
+        [参数] self：测试实例。
+        [返回] 无。
+        最近修改时间：2026-08-08；改动原因：运行时 Mock 与测试 Mock 分离，根 mock/ 是运行时 Mock 唯一合法目录。
+        """
+        # 1. 在隔离仓库中构造根 mock/ 运行时 Mock，确认根 test/ 布局校验不报错。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "test").mkdir()
+            mock_file = root / "mock" / "internal" / "business" / "scalp" / "api" / "gateway.go"
+            mock_file.parent.mkdir(parents=True)
+            mock_file.write_text("//go:build mock\n\npackage mock_api\n", encoding="utf-8")
+            errors = validate_root_test_layout(root)
+            self.assertEqual(errors, [])
+
+    def test_runtime_mock_policy_is_explicit_in_rules(self) -> None:
+        """相关 Skill 必须显式声明根 mock/ 运行时 Mock 落点。
+
+        [参数] self：测试实例。
+        [返回] 无。
+        最近修改时间：2026-08-08；改动原因：固化运行时 Mock 目录规则跨 Skill 一致性。
+        """
+        # 所有相关 Skill 必须包含 `mock/` 引用
+        mock_docs = (
+            ROOT / "artifact-storage-rules" / "SKILL.md",
+            ROOT / "test-strategy-rules" / "SKILL.md",
+            ROOT / "test-program-rules" / "SKILL.md",
+            ROOT / "package-structure-rules" / "SKILL.md",
+            ROOT / "AGENTS.md",
+            ROOT / "CLAUDE.md",
+        )
+        for document in mock_docs:
+            content = document.read_text(encoding="utf-8")
+            with self.subTest(document=document.relative_to(ROOT).as_posix()):
+                self.assertIn("mock/", content)
+        # 定义构建标签的 Skill 必须额外包含 //go:build mock
+        tag_docs = (
+            ROOT / "test-program-rules" / "SKILL.md",
+            ROOT / "package-structure-rules" / "SKILL.md",
+            ROOT / "AGENTS.md",
+            ROOT / "CLAUDE.md",
+        )
+        for document in tag_docs:
+            content = document.read_text(encoding="utf-8")
+            with self.subTest(document=document.relative_to(ROOT).as_posix()):
+                self.assertIn("//go:build mock", content)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
