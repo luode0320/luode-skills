@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-07 10:09:27",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-08-08 02:06:07",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 569,
+    "references_total": 570,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -93,6 +93,7 @@ window.SKILL_DICTIONARY = {
             "Markdown 图片资产契约",
             "测试目录复用优先级（写死边界）",
             "测试代码与证据双根（强制）",
+            "运行时 Mock 资产",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -2736,7 +2737,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "策略、资源、功能验证、浏览器联动与回归",
           "domain_order": 8,
           "item_order": 1,
-          "auto_trigger": "当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。",
+          "auto_trigger": "当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。",
           "core_responsibility": "统一测试优先级、测试类型组合、覆盖范围，以及活动测试代码与证据文档的双根布局。",
           "skill_path": "test-strategy-rules/SKILL.md",
           "directory_path": "test-strategy-rules",
@@ -4387,14 +4388,14 @@ window.SKILL_DICTIONARY = {
           "domain_description": "已入库但未并入主规划的参考 skill",
           "domain_order": 10,
           "item_order": 26,
-          "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。",
+          "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。",
           "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
           "skill_path": "test-program-rules/SKILL.md",
           "directory_path": "test-program-rules",
           "directory": "test-program-rules",
           "sections": [
             "活动模拟程序落点（强制）",
-            "测试隔离红线（强制）",
+            "运行时 Mock 落点（强制）",
             "Skill 作用与适用场景",
             "自动触发信号",
             "进入后先做什么",
@@ -4410,7 +4411,8 @@ window.SKILL_DICTIONARY = {
           "references": [
             "test-program-rules/references/program-boundaries.md",
             "test-program-rules/references/program-examples.md",
-            "test-program-rules/references/program-types-and-splitting.md"
+            "test-program-rules/references/program-types-and-splitting.md",
+            "test-program-rules/references/runtime-mock-pattern.md"
           ],
           "agents": [
             "test-program-rules/agents/openai.yaml"
@@ -4803,6 +4805,7 @@ window.SKILL_DICTIONARY = {
         "Markdown 图片资产契约",
         "测试目录复用优先级（写死边界）",
         "测试代码与证据双根（强制）",
+        "运行时 Mock 资产",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -7362,7 +7365,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "策略、资源、功能验证、浏览器联动与回归",
       "domain_order": 8,
       "item_order": 1,
-      "auto_trigger": "当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。",
+      "auto_trigger": "当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。",
       "core_responsibility": "统一测试优先级、测试类型组合、覆盖范围，以及活动测试代码与证据文档的双根布局。",
       "skill_path": "test-strategy-rules/SKILL.md",
       "directory_path": "test-strategy-rules",
@@ -8989,14 +8992,14 @@ window.SKILL_DICTIONARY = {
       "domain_description": "已入库但未并入主规划的参考 skill",
       "domain_order": 10,
       "item_order": 26,
-      "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。",
+      "auto_trigger": "当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。",
       "core_responsibility": "当前已在仓库中，但尚未并入主规划域表。",
       "skill_path": "test-program-rules/SKILL.md",
       "directory_path": "test-program-rules",
       "directory": "test-program-rules",
       "sections": [
         "活动模拟程序落点（强制）",
-        "测试隔离红线（强制）",
+        "运行时 Mock 落点（强制）",
         "Skill 作用与适用场景",
         "自动触发信号",
         "进入后先做什么",
@@ -9012,7 +9015,8 @@ window.SKILL_DICTIONARY = {
       "references": [
         "test-program-rules/references/program-boundaries.md",
         "test-program-rules/references/program-examples.md",
-        "test-program-rules/references/program-types-and-splitting.md"
+        "test-program-rules/references/program-types-and-splitting.md",
+        "test-program-rules/references/runtime-mock-pattern.md"
       ],
       "agents": [
         "test-program-rules/agents/openai.yaml"

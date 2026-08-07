@@ -220,6 +220,16 @@
 - 更新时间: 2026-08-01
 - 状态: 启用
 
+
+### 运行时 Mock 目录规则
+- 别名: 运行时 Mock, 根 mock 目录, mock 构建标签
+- 类型: 目录规则
+- 定义: 根 `mock/` 是运行时 Mock 的唯一合法目录，与根 `test/` 对等，按被测源码相对路径镜像；文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`；运行时 Mock 编译进主二进制，替代不可用上游，与测试 Mock 职责分离、互不替代。`go run -tags mock .` 启用。
+- 来源: `test-program-rules/references/runtime-mock-pattern.md`、`package-structure-rules/references/project-layout-v2.md`
+- 适用范围: 后端运行时 Mock 落点、Go 构建标签、本地开发调试
+- 更新时间: 2026-08-08
+- 状态: 启用
+
 ### 实施开工授权与自动推进
 - 别名: 开始实施确认, 开工授权, 最小任务自动推进, 长文本执行边界
 - 类型: 流程规则
@@ -839,6 +849,17 @@ entities:
     context_ids:
       - context.test-asset-governance
     updated_at: 2026-08-01
+  - entity_id: rule.runtime-mock-location
+    name: "运行时 Mock 目录规则"
+    type: "目录规则"
+    aliases:
+      - 根 mock 目录
+      - 运行时 Mock
+      - mock 构建标签
+    definition: "根 mock/ 是运行时 Mock 的唯一合法目录，与根 test/ 对等，按被测源码相对路径镜像；文件必须以 //go:build mock 开头，包名约定 mock_<源包名>；运行时 Mock 编译进主二进制，替代不可用上游，与测试 Mock 职责分离、互不替代。go run -tags mock . 启用。"
+    scope: "后端运行时 Mock 落点、Go 构建标签、本地开发调试"
+    status: "active"
+    updated_at: 2026-08-08
   - entity_id: rule.package-structure-three-project-test-root
     name: "三类项目根测试目录落点"
     type: "包结构目录规则"
@@ -2422,6 +2443,27 @@ retrieval_hints:
       - "rule.git-commit-domain-split"
     git-collaboration-rules/scripts/pre_commit_gate.sh:
       - "rule.git-commit-domain-split"
+    artifact-storage-rules/references/naming-templates.md:
+      - "rule.runtime-mock-location"
+    test-program-rules/SKILL.md:
+      - "rule.runtime-mock-location"
+    test-program-rules/references/runtime-mock-pattern.md:
+      - "rule.runtime-mock-location"
+    test-strategy-rules/SKILL.md:
+      - "rule.runtime-mock-location"
+    test-strategy-rules/references/test-asset-governance.md:
+      - "rule.runtime-mock-location"
+    package-structure-rules/SKILL.md:
+      - "rule.runtime-mock-location"
+    package-structure-rules/references/project-layout-v2.md:
+      - "rule.runtime-mock-location"
+    package-structure-rules/references/placement-catalog.yaml:
+      - "rule.runtime-mock-location"
+    AGENTS.md:
+      - "rule.runtime-mock-location"
+    CLAUDE.md:
+      - "rule.runtime-mock-location"
+
 extensions:
   external_refs:
     - type: migration-sample

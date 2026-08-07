@@ -1,8 +1,14 @@
+- 2026-08-08：实施计划落盘：实施总览 IMP-RUNTIME-MOCK-20260808 和周期文档 CYCLE-RUNTIME-MOCK-01 已创建，implementation_overview 与 implementation_cycle profile 均 alid: true。所有 6 个最小任务 T01-T06 均已完成闭环。改动停在已改动未提交状态。
+
+- 2026-08-08：需求文档 REQ-RUNTIME-MOCK-20260808-01 的 Mermaid 图前注释修复（图形目的 + 关联 ID），requirement profile 校验 PASS。改动停在已改动未提交状态。
+
 # 项目历史事件
 
 > 本文件追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；普通启动默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
 
 ## 事件
+
+- 2026-08-08：完成运行时 Mock 与测试 Mock 分离规则。根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护。已同步 `test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，Catalog 新增 2 个 mock 条目，人工目录树更新，`AGENTS.md`/`CLAUDE.md` 及 `PROJECT_MEMORY.md` 已同步，新增 `runtime-mock-pattern.md` 参考文档，完整测试覆盖 `13/13` 通过，package-structure-rules 全量回归 `26/26` 通过，根 Python 测试 `287/289` 通过（2 个既有失败与本次无关）。改动停在已改动未提交状态，未执行 Git 历史写入。
 
 - 2026-08-06：用户明确配置安全边界：`embedded/` 是同一环境的主来源，`yaml/` 仅作回退来源；YAML 禁止秘密原值，embedded 允许源码私密值。已同步 Catalog、Schema、reference、Skill、活动测试、测试 README、`6-review` 与项目四件套；配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 和差异检查通过，未执行 Git 历史写入。
 - 2026-08-06：协同完成 Binance CYCLE-11 环境来源识别契约；`package-structure-rules` 的 loader Catalog、Schema、reference 与配置专项测试同步 `-env > APP_ENV > ENV > local`，11/11 通过，未执行 Git 历史写入。

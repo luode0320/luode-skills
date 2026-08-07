@@ -6,17 +6,40 @@
 
 ## 当前任务
 
+- 来源对象：运行时 Mock 与测试 Mock 分离规则补充。
+- 当前目标：根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护；与测试 Mock 职责分离，互不替代。
+- 当前状态：已完成为根 mock/ 方案，已同步所有相关 SKILL.md、references、Catalog、目录树、四件套、测试与验证；实施总览与周期文档已落盘并通过文档门禁（implementation_overview + implementation_cycle profile 均 alid: true）；改动停在已改动未提交状态。
+
 - 来源对象：用户截图反馈「Go 函数内 `var (...)` 分组声明写法不对」并追问「这个习惯要更新到哪个 skill 的规则中」，经 Plan Mode 确认方案（计划文件 `C:\Users\luode\.claude\plans\var-bestgap-int64-typed-narwhal.md`）；走 `code-style-consistency-rules` 既有 `style-feedback-workflow.md` 维护路径，未新建 `doc/2-需求/` 正式需求文档。
 - 当前目标：把「Go 函数/方法内局部变量必须逐行 `var` 单独声明、行尾中文注释按列对齐」这条习惯，补进 `code-style-consistency-rules` 中真正会在**写码前**被加载的两个入口，解决「规则已存在于 SKILL.md 正文与正反例文件却拦不住代码生成」的生效层级问题。
 - 当前状态：4 个 Markdown 文件改动（36 增 2 删）已落地并回读校验；`STYLE-CASE-GO-003` 已作为 active 条目写入全局反例库，`go-coding-rules.md` 已追加对应 bullet；实测确认未触及 `description` 与 `##` 标题，免重跑字典脚本；Obsidian 已沉淀 1 篇知识笔记并追加 INDEX 入口；改动停在已改动未提交状态，等待用户决定是否提交。
 
 ## 范围与边界
 
+- 范围：`test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，placement-catalog.yaml 新增 2 个 mock 条目，人工目录树更新，AGENTS.md/CLAUDE.md 与 PROJECT_MEMORY.md 同步，新增 runtime-mock-pattern.md 参考文档，asset_location_test.py 新增 2 个契约测试。
+- 非范围：不迁移现有业务项目的 mock 文件（提供迁移指南），不改动前端 `mocks/` 规则，不修改 `placement_catalog.py` 实现逻辑，不执行 Git 历史写入。
+
 - 范围：修改 `code-style-consistency-rules/references/user-style-feedback-library.md`（新增 STYLE-CASE-GO-003 active 条目 + 变更记录）、`code-style-consistency-rules/references/go-coding-rules.md`（追加 1 条 bullet）、`code-style-consistency-rules/SKILL.md`（§ Go 局部变量声明风格约定补 1 条注释对齐 bullet）、`code-style-consistency-rules/references/consistency-examples.md`（正例 4 / 反例 5 校准）。
 - 非范围：新建 skill；修改 `code-generation-style-rules`（其 `pre-coding-checklist.md:10` 已加载库 active 条目，无需改动即自动生效）；修改任何项目的 `PROJECT_STYLE.md`（跨项目通用偏好按 `project-style-rules/SKILL.md:51` 入全局反例库）；改动截图来源的那个 Go 项目源码；推翻「本约定只约束函数/方法内局部变量、不动包级 `var (...)`」的原边界；`common/util/`（CYCLE-PSR-22 已收口）、config 来源优先级与秘密边界（CYCLE-PSR-23 已收口）。
 - 保护边界：工作树保留其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push；纯 Markdown 规则改动，靠指纹回读、UTF-8 校验、规则可达性 grep、静态 Owner 路由实跑和加载链路走查五类自查替代可执行测试。
 
 ## 已完成
+
+- 已完成运行时 Mock 与测试 Mock 分离规则补充：根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护。
+- 已同步 `test-program-rules/SKILL.md`：description 追加运行时 Mock 定义，新增「运行时 Mock 落点（强制）」小节。
+- 已同步 `artifact-storage-rules/SKILL.md`：新增「运行时 Mock 资产」小节，明确根 `mock/` 不纳入 `test/` 或 `doc/5-tests/`。
+- 已同步 `test-strategy-rules/SKILL.md` 及 `test-asset-governance.md`：将 mock 范围限定为测试 Mock，运行时 Mock 不归本域治理。
+- 已同步 `package-structure-rules/SKILL.md`：核心边界新增根 `mock/` 条目。
+- 已更新 `project-layout-v2.md`：后端与同仓后端目录树新增根 `mock/`，.vscode 说明新增 mock 调试配置示例。
+- 已更新 `placement-catalog.yaml`：新增 2 个条目标识（backend.mock.runtime、fullstack.mock.runtime），`build_tag: mock`。
+- 已更新 `naming-templates.md`：新增「运行时 Mock 域」命名模板。
+- 已新增 `runtime-mock-pattern.md`：完整示例、构建标签、包名约定、迁移指南。
+- 已同步 `AGENTS.md`/`CLAUDE.md`：新增根 `mock/` 运行时 Mock 简明规则。
+- 已同步 `PROJECT_MEMORY.md`：人类区与机器索引区新增运行时 Mock 规则。
+- 已新增契约测试：`asset_location_test.py` 新增 2 个测试用例（根 mock/ 不被误判 + 跨 Skill 规则一致性），全部通过。
+- 已通过全量回归：package-structure-rules 测试 `26/26`，asset-location 专项 `13/13`，根 Python 测试 `287/289`（2 个既有失败与本次无关）。
+- 字典生成脚本刷新，`implemented_total` 保持 69。
+- 已更新 `PROJECT_HISTORY.md` 追加本轮事件。
 
 - 已完成 CYCLE-15 入口基线修复：同仓 `backend/crontask/**/main.go` 与治理文件放行，`backend/internal|src/**/main.go` 仍拒绝；入口回归 `5/5` 通过。
 - 已更新三类人工目录树和 Catalog skeleton；活动目录固定为 `doc/1-架构/` 至 `doc/6-review/`，条件图片目录为 `doc/data/images/`。
@@ -45,10 +68,27 @@
 
 ## 门禁说明
 
+- 本轮 `Obsidian:不适用`；任务属于仓库规则修订，不依赖跨项目知识检索，也未形成需沉淀的 vault 知识。
+- 本轮不执行 Git 历史写入，改动停在已改动未提交状态。
+- 新增 `test-program-rules/SKILL.md` 的"运行时 Mock 落点（强制）"小节（## 级标题），已重跑字典生成脚本，退出码 0。
+- 6-review 文档 profile 已通过（`valid: true, STYLE: PASS`）。
+
+- 本轮 `Obsidian:不适用`；任务属于仓库规则修订，不依赖跨项目知识检索，也未形成需沉淀的 vault 知识。
+- 本轮不执行 Git 历史写入，改动停在已改动未提交状态。
+- 新增 `test-program-rules/SKILL.md` 的"运行时 Mock 落点（强制）"小节（## 级标题），需在收口前重跑字典生成脚本，已完成。
+
 - 本轮（2026-08-06 风格规则落点补齐）`Obsidian:检索 + 沉淀`；固定 vault `D:\obsidian_data` doctor `verified=true`，检索 5 次确认无既有承接笔记后判定为「补充」（非取代，不触发三档处置），`create` 与 `append` 均 `verified=true` 且逐字节回读一致。未触及 `description`/`##` 标题，字典脚本免重跑已用 `git diff | grep '^[+-](## |description:)'` 实测取证。
 - 上一轮 `Obsidian:检索 + 沉淀 + 迭代处置`；固定 vault `D:\obsidian_data` 可用，八个新命令全部实机验证 `verified=true`，并用真实笔记演练了「标记取代」档处置（新增 1 篇、旧笔记标 `superseded` 并双向接替）。巡检实跑零写入，前后 `files`=65、`orphans`=41 不变。「归档退场」与「删除」两档已在一次性测试笔记上验证链路，未在生产笔记上执行。
 
 ## 验证与交接
+
+- 本轮最后执行点：asset_location_test.py `13/13`、package-structure-rules 全量回归 `26/26`、根 Python 测试 `287/289`、字典生成脚本退出码 0、`git diff --check` 通过、6-review 文档 profile `valid: true`；目标文件 UTF-8 回读通过。
+- 2 个既有失败（`test_missing_section_is_rejected`、`test_requirement_fixture_passes`）与本次改动无关，为 `F:\luode-skills` 路径引用丢失的独立问题。
+- 未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
+
+- 本轮最后执行点：asset_location_test.py `13/13`、package-structure-rules 全量回归 `26/26`、根 Python 测试 `287/289`、字典生成脚本退出码 0、`git diff --check` 通过；目标文件 UTF-8 回读通过。
+- 2 个既有失败（`test_missing_section_is_rejected`、`test_requirement_fixture_passes`）与本次改动无关，为 `F:\luode-skills` 路径引用丢失的独立问题。
+- 未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 
 - 本轮风格规则落点补齐最后执行点：4 个文件改动前后 `md5sum`/`wc -c` 全部变化且符合预期（反例库 2588→3590 字节、go-coding-rules 1514→1799 字节）；`file` 确认四文件均 UTF-8、`git diff` 无 mojibake 与换行漂移；`grep` 确认 `STYLE-CASE-GO-003` 在库内可达、新 bullet 在 go-coding-rules 内可达；`static_owner_router.route_owners(['a.go'])` 实跑返回含 `code-generation-style-rules` 与 `code-style-consistency-rules`，来源映射 JSON 解析正常且三个 reference 均已登记；实读 `code-generation-style-rules/references/pre-coding-checklist.md:10` 确认写码前加载链路闭合；Obsidian `create`/`append` 回读一致。未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 四个任务已完成并按 session 精确失活；上一会话的该投影已精确失活；另一会话依据无跨会话归属的恢复规则生成 fallback 投影，收口后按 session 精确失活。
