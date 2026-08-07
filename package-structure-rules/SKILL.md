@@ -27,7 +27,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 6. 后端语言源码根只承载 `router/`、`controller/`、`business/<domain>/`；项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
 7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、业务源码内独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`；仓库根 `test/` 是唯一活动测试代码根，不属于生产包结构。
-8.1 根 `mock/` 是运行时 Mock 的唯一合法目录（`[条件·提交]`），与根 `test/` 对等，按被测源码相对路径镜像；文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`；根 `mock/` 可正常导入 `internal/...`，不受 `internal` 可见性限制。
+8.1 根 `mock/` 是运行时 Mock 的唯一合法目录（`[条件·提交]`），与根 `test/` 对等，按被测源码相对路径镜像；文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`；`mock/` 下的包可正常导入 `internal/...`；但 module 根（如 `main.go`）不能直接导入 `mock/internal/...`，必须通过 `mock/assembly` 等 `mock/` 下的装配包转发，否则 Go `internal` 可见性规则会拒绝编译。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
 10. 二进制入口按项目类型固定：独立后端默认使用根 `main.<ext>`，额外二进制使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端默认使用 `backend/main.<ext>`，额外二进制使用 `backend/cmd/<binary>/main.<ext>`。`cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 均不是合法入口；`init` 不创建动态入口 pattern。
 

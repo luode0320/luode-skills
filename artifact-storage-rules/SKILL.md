@@ -75,6 +75,31 @@ description: 当需要定义、调整或解释项目中 `doc/1-架构/`、`doc/2
 - 运行时 Mock 文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`。
 - 运行时 Mock 的构建标签传递：`go run -tags mock .`、`go build -tags mock .`。
 - 运行时 Mock 的目录归属、命名和构建约束由 `test-program-rules` 的「运行时 Mock 落点（强制）」定义，本 skill 只负责存放位置。
+
+### 实战用法
+
+- 运行时 Mock 与测试 Mock 共存时，目录结构表现为：
+
+```text
+mock/                          # 运行时 Mock 根
+└── internal/
+    └── business/
+        └── scalp/
+            └── api/
+                └── gateway.go  # //go:build mock
+test/                          # 测试 Mock 根
+└── internal/
+    └── business/
+        └── scalp/
+            └── api/
+                ├── gateway_test.go  # 测试代码
+                └── gateway_mock.go  # 测试 Mock
+```
+
+- 运行时 Mock 文件不使用 `*_test.go` 后缀，不会被 `go test` 扫描。
+- 运行时 Mock 的 `mock/` 目录不得出现在 `go list ./...` 的正常输出中，验证方式：`go list ./... | findstr /V mock` 应等于 `go list -tags mock ./... | findstr /V mock` 的差异仅为 mock 包。
+- 运行时 Mock 的构建产物（二进制）无需单独配置，因为 `-tags mock` 只在开发阶段使用。
+
 ## 自动触发信号
 
 - 需要决定需求文档、Bug 记录、测试资源、项目说明文档、项目专属 skill 资产或根目录项目设计文档应该保存到哪个根目录或主入口。
