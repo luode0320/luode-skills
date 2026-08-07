@@ -20,7 +20,36 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 
-ALLOWED_COMMANDS = frozenset({"doctor", "search", "search-context", "read", "create", "append", "open", "project-context"})
+ALLOWED_COMMANDS = frozenset(
+    {
+        "doctor",
+        "search",
+        "search-context",
+        "read",
+        "create",
+        "append",
+        "open",
+        "project-context",
+        # 迭代治理只读组：读属性、读整篇属性、查反向链接、枚举文件、枚举孤儿。
+        "property-read",
+        "properties",
+        "backlinks",
+        "files",
+        "orphans",
+        # 迭代治理写操作组：写属性、移动、删除；删除固定进回收站，不透传永久删除。
+        "property-set",
+        "move",
+        "delete",
+    }
+)
+# 需要校验 vault 内相对路径的命令；orphans 与 doctor 不接受路径。
+PATH_COMMANDS = frozenset(
+    {"read", "create", "append", "open", "property-read", "properties", "backlinks", "property-set", "move", "delete"}
+)
+# 会改变笔记位置或存在性的命令；执行案例笔记必须拒绝这两类操作。
+RELOCATING_COMMANDS = frozenset({"move", "delete"})
+# 官方 CLI 支持的属性类型；写属性缺省按文本处理。
+PROPERTY_TYPES = frozenset({"text", "list", "number", "checkbox", "date", "datetime"})
 KNOWLEDGE_PREFIX = "知识库"
 EXECUTION_CASE_PREFIX = "知识库/20-Knowledge/execution-failure-cases"
 EXECUTION_CASE_SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
@@ -272,8 +301,39 @@ def build_request(command: str, **values: Any) -> dict[str, Any]:
         "chunk_chars": 1800,
     }
     # 1. 检索只按 query；只有路径型操作才校验固定知识目录。
-    if command in {"read", "create", "append", "open"}:
+    if command in PATH_COMMANDS:
         request["path"] = validate_knowledge_path(values.get("path", ""))
+    # 2. 移动与删除会改变笔记位置或存在性，执行案例笔记只允许追加式更新。
+    if command in RELOCATING_COMMANDS and request["path"].startswith(f"{EXECUTION_CASE_PREFIX}/"):
+        raise BridgeError(
+            "EXECUTION_CASE_IMMUTABLE",
+            "execution case notes are append-only and cannot be moved or deleted",
+        )
+    if command in {"property-read", "property-set"}:
+        name = values.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise BridgeError("INVALID_ARGUMENT", "property operations require a non-empty name")
+        request["property_name"] = name.strip()
+    if command == "property-set":
+        value = values.get("value")
+        if not isinstance(value, str) or not value.strip():
+            raise BridgeError("INVALID_ARGUMENT", "property-set requires a non-empty value")
+        request["property_value"] = value
+        property_type = values.get("property_type") or "text"
+        if property_type not in PROPERTY_TYPES:
+            raise BridgeError("INVALID_ARGUMENT", f"property type is not allowed: {property_type}")
+        request["property_type"] = property_type
+    if command == "move":
+        target = validate_knowledge_path(values.get("to", ""))
+        if target == request["path"]:
+            raise BridgeError("INVALID_ARGUMENT", "move target must differ from the source path")
+        if target.startswith(f"{EXECUTION_CASE_PREFIX}/"):
+            raise BridgeError("EXECUTION_CASE_IMMUTABLE", "execution case directory cannot receive moved notes")
+        request["to"] = target
+    if command == "files":
+        folder = values.get("folder")
+        if folder is not None:
+            request["folder"] = validate_knowledge_path(folder)
     if command in {"create", "append"}:
         content = values.get("content")
         if not isinstance(content, str):
@@ -394,6 +454,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--content-file", type=Path)
     parser.add_argument("--query")
     parser.add_argument("--limit", type=int, default=10)
+    parser.add_argument("--name")
+    parser.add_argument("--value")
+    parser.add_argument("--type", dest="property_type", choices=sorted(PROPERTY_TYPES))
+    parser.add_argument("--to")
+    parser.add_argument("--folder")
     parser.add_argument("--project-path")
     parser.add_argument("--root", dest="project_path")
     parser.add_argument("--distro")
@@ -409,7 +474,7 @@ def exit_code_for(code: str) -> int:
     最近修改时间: 2026-07-13 补齐调用方可判定的错误退出语义。
     """
     # 1. 参数、宿主、应用、vault、CLI 与读回失败必须保持可区分。
-    if code in {"INVALID_ARGUMENT", "PATH_OUTSIDE_KNOWLEDGE", "LEGACY_NESTED_VAULT_MODEL"}:
+    if code in {"INVALID_ARGUMENT", "PATH_OUTSIDE_KNOWLEDGE", "LEGACY_NESTED_VAULT_MODEL", "EXECUTION_CASE_IMMUTABLE"}:
         return 2
     if code in {"UNSUPPORTED_HOST", "WSL_INTEROP_UNAVAILABLE", "POWERSHELL_UNAVAILABLE", "WSLPATH_CONVERSION_FAILED"}:
         return 3
@@ -429,9 +494,14 @@ def main() -> int:
     [返回] 成功为 0，失败为 2。
     最近修改时间: 2026-07-13 14:59:17 补齐 project-context v1 envelope 与跨宿主响应归一。
     """
+    # 1. adapter 已按 UTF-8 落盘响应；stdout 若沿用系统 locale 会把 files/orphans 的中文路径
+    #    降级成不可回传的替代字符，因此在任何输出前把出口固定为 UTF-8。
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     args = parse_args()
     try:
-        # 1. 先在 Python 侧阻断非法输入，再创建任何 adapter 临时请求。
+        # 2. 先在 Python 侧阻断非法输入，再创建任何 adapter 临时请求。
         content = None
         if args.content_file is not None:
             try:
@@ -444,6 +514,11 @@ def main() -> int:
             content=content,
             query=args.query,
             limit=args.limit,
+            name=args.name,
+            value=args.value,
+            property_type=args.property_type,
+            to=args.to,
+            folder=args.folder,
             project_path=args.project_path,
             distro=args.distro or os.environ.get("WSL_DISTRO_NAME"),
         )

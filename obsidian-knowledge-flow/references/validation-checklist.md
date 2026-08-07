@@ -93,6 +93,22 @@
    - 输入：包含 API key、token、绝对路径、完整响应和非 local 连接信息的失败记录；以及 doctor/search/read/create/append 失败。
    - 预期：敏感值被拒绝或替换为稳定占位符；非 local 证据不能升 active；bridge 失败时不写 vault、不使用文件系统 fallback，并返回固定 root、错误码和恢复动作。
 
+## 迭代治理能力验证
+
+12. 只读组与中文路径可回传（`TEST-OBS-017`）：
+    - 输入：对固定 vault 依次执行 `property-read`、`properties`、`backlinks`、`files`、`orphans`。
+    - 预期：五个命令均 `ok=true`、`verified=true`；枚举返回的中文路径能直接回传给 `property-read` 与 `backlinks` 并命中同一笔记；`properties` 返回完整 frontmatter JSON。
+    - 追加场景：`property-read` 缺少 `--name` 返回 `INVALID_ARGUMENT`；`files --folder` 越界返回 `PATH_OUTSIDE_KNOWLEDGE`；`orphans` 不接受路径参数。
+
+13. 写操作组与 readback（`TEST-OBS-018`）：
+    - 输入：在 `知识库/90-Archive/_system-tests/` 建一次性笔记，依次执行 `property-set`、`move`、`delete`。
+    - 预期：`property-set` 回读属性值逐字相等；`move` 后新路径可读且旧路径不可读；`delete` 返回移入回收站且原路径不可读；三者均 `verified=true`。
+    - 追加场景：`move` 目标目录不存在时返回 `CLI_FAILED` 且原文件无损；`delete` 不透传 `permanent`，文件可在 Windows 回收站中找到；`property-set` 不破坏其余 frontmatter 字段与中文值。
+
+14. 执行案例目录保护（`TEST-OBS-019`）：
+    - 输入：对 `知识库/20-Knowledge/execution-failure-cases/` 下的路径请求 `move` 或 `delete`，以及把该目录作为 `move` 目标。
+    - 预期：bridge 直接返回 `EXECUTION_CASE_IMMUTABLE`，退出码为 2，不触达 CLI；执行案例仍只能通过 `append` 追加状态事件。
+
 ## 仓库验证
 
 在 skill 仓库中修改本 skill 后：
@@ -113,3 +129,6 @@
 | Unicode 10KB 分块 | TEST-OBS-010 |
 | distill、INDEX、脱敏和路由 | TEST-OBS-014/015 |
 | references bridge-only、禁止词与 TEST 映射扫描 | TEST-OBS-016 |
+| 迭代治理只读组与中文路径可回传 | TEST-OBS-017 |
+| 写属性、移动、删除与三类 readback | TEST-OBS-018 |
+| 执行案例目录禁止 move/delete | TEST-OBS-019 |

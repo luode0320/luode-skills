@@ -32,7 +32,34 @@
    - 外部摘要
 3. 如果新来源明显更强，更新笔记，设置 `status: active`，并在带日期的证据/更新章节中记录被替换说法。
 4. 如果没有来源明显胜出，设置 `status: conflicted`，保留两种说法，并写清未解决问题。
-5. 如果旧笔记不再活跃但仍有历史价值，标记为 `deprecated` 或 `retired`，不要删除。
+5. 如果旧笔记已被新方案取代，按下面的「分级处置」决定它的去向；知识库是可迭代更新的，不是只增量堆积。
+
+## 分级处置
+
+同一件事换了实现方案后，旧笔记不再是当前口径。按它**剩余的价值**分三档处置，三档都必须先完成前置检查。
+
+| 档次 | 适用条件 | 动作 | 规则 ID |
+| --- | --- | --- | --- |
+| 标记取代 | 已被取代，但仍有历史参考价值（记录了为什么当初这么做、踩过什么坑） | `property-set status=superseded`，再 `property-set superseded_by=[[新笔记]] --type list`；笔记留在原位继续可检索 | `RULE-OBS-SUPERSEDE-001` |
+| 归档退场 | 完全失效，且 `backlinks` 为 0 | `property-set status=archived`，再 `move` 到 `知识库/90-Archive/`；退出日常检索范围但仍可追溯 | `RULE-OBS-SUPERSEDE-002` |
+| 删除 | 内容错误或有害（写错的结论、失效的危险操作、会误导后续判断的说法） | `delete` 进回收站，并在新笔记里记录"曾有过什么错误说法"，避免同一个坑再踩一次 | `RULE-OBS-SUPERSEDE-003` |
+
+### 处置前置检查（强制）
+
+- 三档处置前都必须先 `backlinks` 查引用数（`RULE-OBS-SUPERSEDE-004`）。
+- 引用数不为 0 时**不得** `move` 或 `delete`，只能降级为「标记取代」；否则会留下断链的 wikilink。
+- 新笔记必须同时 `property-set supersedes=[[旧笔记]] --type list`，与旧笔记的 `superseded_by` 构成双向关系（`RULE-OBS-SUPERSEDE-005`）；只写一侧视为治理未闭环。
+- 判断"是否有历史参考价值"的口径：笔记里是否含当时的取舍理由、失败证据或环境约束。只有结论、没有理由的旧笔记归入「归档退场」。
+
+### 执行案例笔记排除范围
+
+执行失败案例笔记（`知识库/20-Knowledge/execution-failure-cases/` 下）**不适用**本节三档处置：N/A + 原因：该类笔记用追加式状态事件表达取代，覆盖或删除会破坏历史证据链 + 证据：[execution-case-notes.md](execution-case-notes.md) 规定 `append` 是唯一更新方式。它们的取代通过追加 `superseded` 状态事件表达，bridge 也会直接拒绝对该目录的 `move` 与 `delete`。
+
+### 自动化边界
+
+- 三档处置均由 agent 在判定为取代后**自动执行**，不逐次等用户确认：`delete` 默认进回收站可恢复，且三档都有 `backlinks` 前置检查兜底。
+- 每次处置都必须在最终总结的「知识引用」小节如实登记，操作列写明 `property-set` / `move` / `delete`，readback 列写明验证结果；未登记的处置视为未闭环。
+- 处置失败（readback 不匹配、目标目录不存在、bridge 阻断）时停止该档处置并报告，不改用文件系统绕过。
 
 ## 过期触发条件
 

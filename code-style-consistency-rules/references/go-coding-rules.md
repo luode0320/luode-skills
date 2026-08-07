@@ -17,3 +17,4 @@
 - Go 常量和枚举禁止使用 `iota`，必须显式写出每个常量值；可视化和长期维护优先于少写几行代码。
 - 根 `utils/` 下的工具包目录名与 Go 标准库包名冲突时（如 `time`、`json` 对应 `encoding/json`、`log`、`http` 对应 `net/http`），目录名保持不变，但该目录内 `.go` 文件的 `package` 声明必须使用带 `Util` 后缀的别名（`package timeUtil`、`package jsonUtil`、`package logUtil`、`package httpUtil`），避免调用方同时导入标准库和本工具包时出现标识符冲突。
 - `utils/cron` 不与标准库冲突，但为了和上述几个工具包保持统一的 `xxxUtil` 内部命名风格，同样使用别名 `package cronUtil`；其余目录（如 `async`、`convert`）package 名与目录名保持一致，不强制加 `Util` 后缀。
+- Go 函数或方法内部禁止使用 `var (...)` 分组声明局部变量，必须逐行单独 `var` 声明（如 `var bestGap int64`）；多条相邻声明的行尾中文注释按列对齐。本条只约束函数/方法内局部变量，不改动包级 `var (...)` 历史写法。

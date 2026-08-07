@@ -50,8 +50,9 @@
    - 全文和上下文行。
 5. 回答前读取最匹配的笔记。一次典型检索读取 3-7 篇笔记；只有证据不足时才扩大范围。
 6. 每篇 `read` 返回 `verified=true` 后立即按 [引用台账](#引用台账) 登记条目；`search` 命中但未读取的笔记不登记。
-7. 回答时明确区分“检索到的事实”“当前推断”和“缺失证据”。
-8. 检索笔记对答案有实质支撑时，引用本地笔记路径。
+7. 读到 `status` 为 `superseded` 或 `archived` 的笔记时，不得把它当作当前事实（`RULE-OBS-DETECT-002`）：顺着 `superseded_by` 跳到接替笔记，以接替笔记为当前口径；旧笔记只能作为历史上下文，并在引用表的用途列标注状态。
+8. 回答时明确区分“检索到的事实”“当前推断”和“缺失证据”。
+9. 检索笔记对答案有实质支撑时，引用本地笔记路径。
 
 执行前预检增加以下顺序：先 `doctor`，再以 `case_key` 和错误特征精确 `search`，随后用 `read` 读取匹配案例的最新状态事件和正例。只有 `active` 且 environment、tool_major、input_fingerprint、scope 全部匹配才可自动采用；candidate 或模糊匹配只能作为诊断线索。
 
@@ -66,11 +67,17 @@
    - 用户偏好、工作流约束、命名规则、输出格式。
    - 决策、取舍、长期流程、定义、术语和别名。
    - 来源链接、仓库路径、调试经验、失败原因和恢复路径。
+   - 本轮 `project-memory-rules`/`project-style-rules` 标记为跨项目候选（`bridge_candidate: true` / `跨项目候选: 是`）的条目。
+   这类候选条目的初判标准、落点和去重统一见 [project-memory-bridge.md](project-memory-bridge.md)，本文件不重复定义。
 2. 排除不应捕获的信息：
    - 纯闲聊、情绪性表达、一次性过程语句。
    - 未确认猜测、临时中间方案、已被推翻的旧说法。
    - secret、API key、密码、私有 token 或凭据原值。
-3. 先通过 bridge 检索现有笔记，按标题、别名、标签和 wikilink 判断是否已有承接位置。
+3. 先通过 bridge 检索现有笔记，按标题、别名、标签和 wikilink 判断是否已有承接位置，然后**必须显式判定三态之一**，不得跳过（`RULE-OBS-DETECT-001`）：
+   - `补充`：新信息与既有笔记不矛盾，只是增加细节 -> `append` 到既有笔记，旧笔记保持 `active`。
+   - `矛盾未裁决`：新旧说法冲突且没有权威证据可裁决 -> `property-set status=conflicted`，保留两种说法并写清未解决问题。
+   - `取代`：新方案已经替换旧方案，旧笔记不再是当前口径 -> **必须在同一轮内**按 [conflict-staleness.md](conflict-staleness.md) 的「分级处置」处理旧笔记，不允许只写新笔记就收工。
+   判为 `取代` 却只新增笔记、不处置旧笔记，是本 skill 明确禁止的行为：它正是知识库记忆混乱的来源。
 4. 对每条可长期保存的信息分类：
    - 会话上下文 -> `知识库/10-Sessions/`
    - 稳定概念、规则、决策、流程、偏好 -> `知识库/20-Knowledge/`
@@ -109,6 +116,29 @@
 - 长任务要支持可恢复的批次执行；某批失败时保留已完成批次证据，并从失败批次重新运行，不把半成品声明为全量完成。
 - 自动恢复只允许 bridge 已定义的一次有限策略；同一批次仍失败时保留脱敏错误和已完成批次，转人工恢复，不得无限重试。
 
+## 迭代更新流程
+
+判定为 `取代` 后，按以下顺序完成一次迭代更新。目标是让知识库任何时刻只有一条当前有效结论，旧结论可追溯但不参与检索裁决。
+
+1. `backlinks` 查旧笔记引用数，作为分级前置证据。
+2. 按 [conflict-staleness.md](conflict-staleness.md) 的三档判据选定档次：标记取代、归档退场或删除。
+3. 写入新笔记（`create` 或 `append`），在正文里说明取代了什么、为什么换方案。
+4. 双向写入接替关系：新笔记 `property-set supersedes=[[旧笔记]] --type list`，旧笔记 `property-set superseded_by=[[新笔记]] --type list`。只写一侧视为治理未闭环。
+5. 执行选定档次的动作，并确认每步 readback 通过。
+6. 把每次 `property-set`、`move`、`delete` 登记进引用台账，收口时在最终总结的知识引用小节如实报告。
+
+删除档还要额外在新笔记里保留一句"曾有过什么错误说法"，避免同一个坑再踩一次。
+
+## 知识库巡检流程
+
+写入前判定只能防止新增积压，已经堆在库里的冲突、过期和孤儿笔记需要单独巡检。巡检是**手动入口**，不进自动流程。
+
+1. 运行只读巡检：`python obsidian-knowledge-flow/scripts/audit_vault_knowledge.py --json`。
+2. 脚本只调用 bridge 只读命令，输出四类候选：同主题候选冲突组、`status` 非 `active`、孤儿笔记、标了 `superseded` 但缺 `superseded_by`。
+3. 脚本**不做任何写入**，也不替你判断哪篇该废弃；它只给出路径、当前状态、引用数和判定原因。
+4. 逐条人工或 agent 复核后，对确认取代的按「分级处置」执行，并同样登记进引用台账。
+5. 候选不等于结论：同主题相似只是线索，必须读过笔记内容才能判定是补充、矛盾还是取代。
+
 ## 引用台账
 
 台账是本轮会话内部维护的一份清单，记录"读过哪篇、写过哪篇"，供 `reasoning-summary-structure-rules` 在收口时渲染最终总结的知识引用小节。它是本轮会话内事实，不写入 vault、不落盘到项目文件、不进入 `PROJECT_CURRENT.md`。
@@ -121,13 +151,14 @@
 | 所在目录 | vault 相对路径的目录部分 | 仅在同名笔记存在、需要消歧时填写 |
 | 本轮用途 | 这篇笔记支撑了本轮哪个结论或判断 | 一句话；不摘录笔记正文 |
 | status | 笔记 frontmatter 的 `status` | `stale`、`deprecated`、`retired`、`conflicted` 必须保留原值，供总结侧标注 |
-| 操作 | `read` / `create` / `append` | 一篇笔记在同一轮被多次操作时按操作分别登记 |
+| 操作 | `read` / `properties` / `property-read` / `create` / `append` / `property-set` / `move` / `delete` | 一篇笔记在同一轮被多次操作时按操作分别登记；分级处置的三类写操作必须逐次登记 |
 | readback | 写入类必须为 `verified=true` | 读取类留空 |
 
 登记规则：
 
 - 每次 `read`、`create` 或 `append` 返回 `verified=true` 后**立即登记**，不得延后到收口阶段再凭回忆补记。
-- 只有真实 `read` 成功的笔记可进「本轮引用」；`search` / `search-context` 命中但未读取的笔记**一律不得入表**，它们只是候选线索。
+- 只有真实读取成功的笔记可进「本轮引用」，读取包括 `read`、`properties` 与 `property-read`；`search` / `search-context` 命中但未读取的笔记**一律不得入表**，它们只是候选线索。
+- `property-set`、`move`、`delete` 登记为「本轮沉淀」，与 `create` / `append` 同表，操作列写明实际动作。
 - `create` 与 `append` 登记为「本轮沉淀」，没有 `verified=true` readback 的写入不得登记，也不得宣称成功。
 - 笔记名与所在目录都以本地发起的 path 字符串为准，不使用 CLI 回显文本。
 - `status` 缺失时留空，不得推测；无法从 frontmatter 读到 `status` 就不标注状态。

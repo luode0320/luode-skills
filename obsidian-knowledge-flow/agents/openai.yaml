@@ -7,3 +7,9 @@ interface:
     或真实卡点时窄读。项目本地 Markdown 与 Obsidian vault 不混用；只有判定为 `Obsidian:检索`
     或 `Obsidian:沉淀` 时，才调用 `obsidian_cli_bridge.py` 操作固定 vault `D:\obsidian_data` 内的 `知识库/`。
     Windows 由 bridge 调用官方 Windows CLI，WSL 由 bridge 自动使用 Windows interop；不得自行决定 shell、CLI 路径或 vault selector。只有 bridge doctor 失败才输出 `Obsidian:阻断`，不得用文件系统读写 vault 作为替代。
+    写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一：判为取代时，先 `backlinks` 查引用数，再按分级处置把旧笔记
+    `property-set status=superseded` 并标 `superseded_by`、或 `status=archived` 后 `move` 到 `知识库/90-Archive/`、
+    或 `delete` 进回收站（引用数不为 0 时只能标记取代），同时给新笔记写 `supersedes` 形成双向关系；只写新笔记不处置旧笔记是禁止行为。
+    检索命中 `superseded` 或 `archived` 笔记时顺着 `superseded_by` 跳到接替笔记，旧笔记只作历史上下文。
+    执行案例笔记不适用分级处置，仍只能 `append` 追加状态事件。清理已积压冲突用只读巡检 `audit_vault_knowledge.py --json`，
+    它只出候选不做写入；每次 `property-set`、`move`、`delete` 都要登记引用台账并在最终总结的知识引用小节如实报告。

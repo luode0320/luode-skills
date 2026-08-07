@@ -93,6 +93,12 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 - [memory-retrieval-patterns.md](references/memory-retrieval-patterns.md)
 - [memory-conflict-and-staleness.md](references/memory-conflict-and-staleness.md)
 
+## 跨项目沉淀判断（可选）
+
+写入 `entities[]` 时，若该条目同时满足 `references/project-knowledge-source-contract.md`「跨项目桥接（可选）」一节引用的标准（详见 `obsidian-knowledge-flow/references/project-memory-bridge.md`），可为该实体追加可选字段 `bridge_candidate: true`；不满足则不标记，缺省视为 `false`。
+
+这一步只做本地文本判断，不调用 Obsidian bridge，不影响本地写入流程本身。实际的检索、去重、创建或追加统一交给 `obsidian-knowledge-flow` 在会话收口阶段处理；本 Skill 不直接调用 bridge。
+
 ## 人类阅读区同步规则
 
 - 人类阅读区保留中文主题结构，负责表达稳定事实，不直接承载全部机器字段。

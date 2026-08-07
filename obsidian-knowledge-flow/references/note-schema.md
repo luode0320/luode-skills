@@ -18,6 +18,8 @@ source_sessions: []
 source_refs: []
 related: []
 entities: []
+supersedes: []
+superseded_by: []
 topics: []
 confidence: medium
 project_id: windows://d/path/to/project
@@ -53,6 +55,8 @@ path_aliases: []
 - `source_refs`: 外部来源笔记或 URL。
 - `related`: 指向相关笔记的 wikilink。
 - `entities`: 指向实体笔记的 wikilink。
+- `supersedes`: 本笔记取代了哪些旧笔记的 wikilink 列表。用 `property:set --type list` 维护。
+- `superseded_by`: 本笔记被哪些新笔记取代的 wikilink 列表。**该字段非空时 `status` 不得为 `active`**，必须同时改为 `superseded` 或 `archived`；两者必须双向写入，只写一侧视为治理未闭环。
 - `topics`: 主题关键词或 MOC 链接。
 - `confidence`: `low`、`medium` 或 `high`。
 - `project_id`: 项目实体的 canonical ID；Windows 项目使用 `windows://<drive>/<normalized-path>`，WSL 项目使用 `wsl://<distro>/<absolute-linux-path>`。同一实体不得因为 Linux、UNC 或 Git Bash 路径别名重复创建。

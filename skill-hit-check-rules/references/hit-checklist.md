@@ -22,6 +22,11 @@
 - 用户给出“更新md / 更新项目规则md / 更新规则md / 根据 skill 更新项目 md / 补充仓库级规则”等聚合指令，或表达同步、补齐仓库级规则文件与项目 md 的意图时，必须命中 `project-rule-file-bootstrap-rules`，并按其 `rule-bootstrap`（规则文件 `AGENTS.md` / `CLAUDE.md`、`.gitattributes`、`.editorconfig`）与 `memory-bootstrap`（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md` 骨架）两个条件路由同时验收，不得只完成一组文件就收口。
 - 该聚合指令下 `PROJECT_STYLE.md` 联动 `project-style-rules`、四件套事实内容联动 `project-memory-rules`；具体路由、脚本入口和逐文件结果由上述 Owner 定义，本入口只负责不漏触发和三方联动确认。
 
+## 项目记忆/风格跨项目候选场景补充
+
+- 本轮 `project-memory-rules`/`project-style-rules` 写入条目时标记了 `bridge_candidate: true` 或 `跨项目候选: 是` 时，收口阶段的 Obsidian 判断不得停留在 `不适用`，至少需要按 `capture-retrieve-distill.md` 走一次沉淀判断（检索去重后决定是否创建/追加）。
+- 具体标准、落点和去重仍由 `obsidian-knowledge-flow` 的 `references/project-memory-bridge.md` 定义，本清单只负责不漏判断信号，不复制其执行细节。
+
 ## 任务投影恢复场景补充
 
 - 新会话、上下文恢复或当前消息包含任意“继续”或恢复意图时，首条命中列表必须包含 `task-plan-rehydration-rules`，不得等领域动作开始后再补命中。至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义自然语言表达；不能因为消息没有出现“任务”“计划”或只含一个短词就漏触发。

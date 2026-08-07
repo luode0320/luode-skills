@@ -23,3 +23,9 @@
 - 新增或修改 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`、`PROJECT_STYLE.md` 时必须显式使用 UTF-8。
 - 写入后必须回读关键段落并检查差异，确认中文未乱码、换行未发生无关批量漂移。
 - 不得使用依赖 shell 默认编码的写入方式；Windows 命令行场景继续遵守仓库级 UTF-8 规则。
+
+## 跨项目桥接（可选）
+
+- `project-memory-rules` 与 `project-style-rules` 都可以选择性地为满足条件的条目标记 `bridge_candidate: true` / `跨项目候选: 是`，代表这条内容判断为跨项目可复用。
+- 判断标准、标记字段、复核流程、落点目录和去重规则统一以 `obsidian-knowledge-flow/references/project-memory-bridge.md` 为唯一事实源，本契约不重复定义细节。
+- 标记本身不调用 Obsidian bridge，不改变 `PROJECT_MEMORY.md`/`PROJECT_STYLE.md` 的本地写入流程；实际检索、去重、创建、追加统一交给 `obsidian-knowledge-flow` 在会话收口阶段处理。

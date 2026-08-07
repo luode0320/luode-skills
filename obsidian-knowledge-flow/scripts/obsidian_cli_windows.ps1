@@ -12,7 +12,20 @@ $ErrorActionPreference = 'Stop'
 
 $FixedVaultRoot = 'D:\obsidian_data'
 $FixedKnowledgePrefix = ([char]0x77e5).ToString() + ([char]0x8bc6).ToString() + ([char]0x5e93).ToString() + '/'
-$AllowedOperations = @('doctor', 'search', 'search_context', 'read', 'create', 'append', 'open')
+$AllowedOperations = @(
+    'doctor', 'search', 'search_context', 'read', 'create', 'append', 'open',
+    # 迭代治理只读组
+    'property_read', 'properties', 'backlinks', 'files', 'orphans',
+    # 迭代治理写操作组；delete 固定进回收站，不透传 permanent
+    'property_set', 'move', 'delete'
+)
+# 只读组直接回传 CLI 输出，不需要写入回读
+$ReadOnlyOperations = @('property_read', 'properties', 'backlinks', 'files', 'orphans')
+# 需要校验 vault 相对路径的操作；orphans 与 files 的 folder 单独处理
+$PathOperations = @(
+    'read', 'create', 'append', 'open',
+    'property_read', 'properties', 'backlinks', 'property_set', 'move', 'delete'
+)
 
 function Get-RequestValue {
     param(
@@ -407,9 +420,24 @@ function Assert-Request {
     if (($chunkChars -isnot [int] -and $chunkChars -isnot [long]) -or $chunkChars -lt 1 -or $chunkChars -gt 1800) {
         Throw-AdapterError 'INVALID_ARGUMENT' 'chunk_chars is outside the supported range.'
     }
-    if ($operation -in @('read', 'create', 'append', 'open')) {
+    if ($operation -in $PathOperations) {
         $normalizedPath = Test-KnowledgePath ([string](Get-RequestValue $Request 'path'))
         $Request.PSObject.Properties['path'].Value = $normalizedPath
+    }
+    # 1. move 的目标路径与 files 的枚举目录同样受固定知识前缀约束。
+    if ($operation -eq 'move') {
+        $normalizedTarget = Test-KnowledgePath ([string](Get-RequestValue $Request 'to'))
+        $Request.PSObject.Properties['to'].Value = $normalizedTarget
+    }
+    if ($operation -eq 'files' -and $null -ne (Get-RequestValue $Request 'folder')) {
+        $normalizedFolder = Test-KnowledgePath ([string](Get-RequestValue $Request 'folder'))
+        $Request.PSObject.Properties['folder'].Value = $normalizedFolder
+    }
+    if ($operation -in @('property_read', 'property_set') -and [string]::IsNullOrWhiteSpace([string](Get-RequestValue $Request 'property_name'))) {
+        Throw-AdapterError 'INVALID_ARGUMENT' 'property operations require a property name.'
+    }
+    if ($operation -eq 'property_set' -and [string]::IsNullOrWhiteSpace([string](Get-RequestValue $Request 'property_value'))) {
+        Throw-AdapterError 'INVALID_ARGUMENT' 'property_set requires a property value.'
     }
     if ($operation -in @('search', 'search_context')) {
         if ([string]::IsNullOrWhiteSpace([string](Get-RequestValue $Request 'query'))) {
@@ -495,6 +523,67 @@ function Invoke-VaultOperation {
         $fileArgument = 'file=' + [string](Get-RequestValue $Request 'path')
         $result = Invoke-ObsidianCli $CliPath ($base + @($operation, $fileArgument)) $timeoutSeconds
         if (-not (Test-CliOperationSuccess $result)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian read command failed.' }
+        return [pscustomobject]@{ Output = $result.StdOut; Verified = $true }
+    }
+    if ($operation -in $ReadOnlyOperations) {
+        # 1. 与 read/open 不同，这五个命令实测均接受 path=；orphans 不接受任何路径参数。
+        $arguments = switch ($operation) {
+            'property_read' { @('property:read', ('path=' + [string](Get-RequestValue $Request 'path')), ('name=' + [string](Get-RequestValue $Request 'property_name'))) }
+            'properties' { @('properties', ('path=' + [string](Get-RequestValue $Request 'path')), 'format=json') }
+            'backlinks' { @('backlinks', ('path=' + [string](Get-RequestValue $Request 'path')), 'total') }
+            'files' {
+                $folder = Get-RequestValue $Request 'folder'
+                if ([string]::IsNullOrWhiteSpace([string]$folder)) { @('files') } else { @('files', ('folder=' + [string]$folder)) }
+            }
+            'orphans' { @('orphans') }
+        }
+        $result = Invoke-ObsidianCli $CliPath ($base + $arguments) $timeoutSeconds
+        if (-not (Test-CliOperationSuccess $result)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian read-only command failed.' }
+        return [pscustomobject]@{ Output = $result.StdOut; Verified = $true }
+    }
+    if ($operation -eq 'property_set') {
+        $propertyName = [string](Get-RequestValue $Request 'property_name')
+        $propertyValue = [string](Get-RequestValue $Request 'property_value')
+        $arguments = @(
+            'property:set',
+            ('path=' + [string](Get-RequestValue $Request 'path')),
+            ('name=' + $propertyName),
+            ('value=' + $propertyValue),
+            ('type=' + [string](Get-RequestValue $Request 'property_type' 'text'))
+        )
+        $result = Invoke-ObsidianCli $CliPath ($base + $arguments) $timeoutSeconds
+        # 1. 写属性不返回用户正文，退出码为零的 Error 载荷同样视为失败。
+        if (-not (Test-CliOperationSuccess $result $true)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian property:set command failed.' }
+        # 2. 回读同一属性并逐字比对，证明值确实落盘。
+        $readback = Invoke-ObsidianCli $CliPath ($base + @('property:read', ('path=' + [string](Get-RequestValue $Request 'path')), ('name=' + $propertyName))) $timeoutSeconds
+        if (-not (Test-CliOperationSuccess $readback)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian property readback failed.' }
+        if ((Normalize-ReadbackText $readback.StdOut).Trim() -ne (Normalize-ReadbackText $propertyValue).Trim()) {
+            Throw-AdapterError 'READBACK_MISMATCH' ('Property ' + $propertyName + ' readback does not match the written value.')
+        }
+        return [pscustomobject]@{ Output = $result.StdOut; Verified = $true }
+    }
+    if ($operation -eq 'move') {
+        $sourcePath = [string](Get-RequestValue $Request 'path')
+        $targetPath = [string](Get-RequestValue $Request 'to')
+        $result = Invoke-ObsidianCli $CliPath ($base + @('move', ('path=' + $sourcePath), ('to=' + $targetPath))) $timeoutSeconds
+        # 1. 目标目录不存在时 CLI 以退出码零返回 ENOENT 载荷，原文件保持无损。
+        if (-not (Test-CliOperationSuccess $result $true)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian move command failed; the target folder must already exist.' }
+        # 2. 回读两端：新路径必须可读，旧路径必须已不可读。
+        #    存在性探测必须用严格模式，因为 properties 对不存在的文件以退出码零返回 Error 载荷。
+        $targetProbe = Invoke-ObsidianCli $CliPath ($base + @('properties', ('path=' + $targetPath), 'format=json')) $timeoutSeconds
+        if (-not (Test-CliOperationSuccess $targetProbe $true)) { Throw-AdapterError 'READBACK_MISMATCH' 'The moved note is not readable at the target path.' }
+        $sourceProbe = Invoke-ObsidianCli $CliPath ($base + @('properties', ('path=' + $sourcePath), 'format=json')) $timeoutSeconds
+        if (Test-CliOperationSuccess $sourceProbe $true) { Throw-AdapterError 'READBACK_MISMATCH' 'The source note is still readable after the move.' }
+        return [pscustomobject]@{ Output = $result.StdOut; Verified = $true }
+    }
+    if ($operation -eq 'delete') {
+        $deletePath = [string](Get-RequestValue $Request 'path')
+        # 1. 固定省略 permanent，删除只进回收站以保留可恢复性。
+        $result = Invoke-ObsidianCli $CliPath ($base + @('delete', ('path=' + $deletePath))) $timeoutSeconds
+        if (-not (Test-CliOperationSuccess $result $true)) { Throw-AdapterError 'CLI_FAILED' 'The Obsidian delete command failed.' }
+        # 2. 回读原路径，必须已不可读；同样使用严格模式识别 Error 载荷。
+        $probe = Invoke-ObsidianCli $CliPath ($base + @('properties', ('path=' + $deletePath), 'format=json')) $timeoutSeconds
+        if (Test-CliOperationSuccess $probe $true) { Throw-AdapterError 'READBACK_MISMATCH' 'The deleted note is still readable.' }
         return [pscustomobject]@{ Output = $result.StdOut; Verified = $true }
     }
 

@@ -1,6 +1,6 @@
 ---
 name: obsidian-knowledge-flow
-description: 将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。
+description: 将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；知识库可迭代更新而非只增量堆积：写入前必须判定新信息是补充、矛盾未裁决还是取代旧结论，判为取代时按分级处置把旧笔记改为已取代、归档到 `90-Archive/` 或删除进回收站，并双向写入 `supersedes` / `superseded_by`，检索时顺着接替关系以最新笔记为当前口径；已积压的冲突、过期与孤儿笔记用只读巡检脚本 `audit_vault_knowledge.py` 捞成候选清单；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。
 ---
 
 # Obsidian 知识流
@@ -12,6 +12,7 @@ description: 将固定根目录的 Obsidian vault 作为跨项目知识库管理
 - `retrieve`: 在会话开始、上下文恢复或回答依赖历史知识的问题前，先从 vault 检索相关笔记。
 - `capture`: 在会话总结或阶段收口时，把有复用价值的会话信息保存为 Markdown 笔记。
 - `distill`: 把会话中的稳定事实、决策、流程、定义和偏好沉淀为长期知识。
+- `iterate`: 写入前先判定新信息是补充、矛盾未裁决还是取代旧结论；判为取代时按分级处置改状态、归档或删除旧笔记，并双向写入接替关系。知识库因此可迭代更新，而不是只增量堆积。
 - `learn`: 把已确认的非预期执行失败转成一篇追加式、脱敏的执行案例笔记；笔记同时保存反例、正例、验证证据和状态事件，供后续精确检索。
 
 Windows 和 WSL 都只通过公开 bridge 调用官方 Windows Obsidian CLI：`python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py <operation> --json`。bridge doctor 失败、应用无法启动、目标 vault 未注册或命令无法限定到解析出的 vault 根目录时，才必须阻断；WSL 的 PATH 中没有原生 `obsidian` 不单独构成阻断。不得退回到直接文件系统读写笔记来伪装成功。
@@ -67,6 +68,7 @@ Windows 和 WSL 都只通过公开 bridge 调用官方 Windows Obsidian CLI：`p
    - 处理执行失败正反例、去重、状态事件和自动学习时读 [execution-case-notes.md](references/execution-case-notes.md)。
    - 处理冲突、过期笔记或敏感信息时读 [conflict-staleness.md](references/conflict-staleness.md)。
    - 做行为验证时读 [validation-checklist.md](references/validation-checklist.md)。
+   - 处理 project-memory-rules / project-style-rules 跨项目候选沉淀时读 [project-memory-bridge.md](references/project-memory-bridge.md)。
 4. vault 写入前必须先通过 bridge 检索。优先更新或链接现有笔记，避免创建重复笔记。
 5. 保护用户手写内容。只做窄范围编辑，保持 frontmatter 合法，不批量重写无关段落。
 6. 写入长期笔记后，补齐必要的 backlinks、MOC 和 `知识库/INDEX.md` 入口，让 Obsidian 知识图谱和 CLI 检索都能找到新知识。
@@ -79,10 +81,13 @@ bridge、vault 注册、路径、超时或读写入口出现非预期失败时�
 
 - 只有未来检索确实有价值时，才把原始会话上下文写入 `知识库/10-Sessions/`。
 - 稳定事实、决策、流程、定义、偏好和可复用模式沉淀到 `知识库/20-Knowledge/`。
+- `project-memory-rules`/`project-style-rules` 标记为跨项目候选（`bridge_candidate: true` / `跨项目候选: 是`）的条目，按 [project-memory-bridge.md](references/project-memory-bridge.md) 的标准和去重规则选择性沉淀到 `知识库/20-Knowledge/project-rules/` 或 `知识库/20-Knowledge/code-style/`；不得整份同步或镜像 `PROJECT_MEMORY.md`/`PROJECT_STYLE.md`。
 - 人、项目、仓库、工具、术语、产品、组织和反复出现的概念，创建或更新 `知识库/40-Entities/` 笔记。
 - 只有多个相关笔记已经形成主题网络，或明显能提升检索效率时，才创建或更新 `知识库/30-MOCs/`。
 - 不确定材料放入 `知识库/00-Inbox/`，不要把未确认内容伪装成长期知识。
+- 写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一。判为 `取代` 时，必须在同一轮内按 [conflict-staleness.md](references/conflict-staleness.md) 的分级处置改旧笔记状态、归档或删除，并与新笔记双向写入接替关系；只写新笔记不处置旧笔记是禁止行为。三档处置前都要先查 `backlinks`，引用不为 0 时只能标记取代。
 - 每次 `create` 或 `append` 返回 `verified=true` 后立即登记引用台账的沉淀条目；没有 readback 证据的写入不登记，也不得宣称成功。
+- 清理已积压的历史冲突使用只读巡检入口 `python obsidian-knowledge-flow/scripts/audit_vault_knowledge.py --json`；它只输出候选，不做任何写入，处置仍走分级处置与 bridge。
 - 不捕获纯闲聊、临时过程话术、未确认猜测、一次性中间草稿或对未来没有检索价值的信息。
 - 除非用户明确要求且内容已脱敏或限定访问范围，否则不要捕获 secret、API key、密码、私有 token 或凭据。
 - 非预期执行失败只有在根因已确认且同输入、同成功标准的 local 复验通过后才进入 `learn`；预期负向测试、用户取消、权限阻断和业务 Bug 不创建可复用案例。
@@ -95,6 +100,7 @@ bridge、vault 注册、路径、超时或读写入口出现非预期失败时�
 - 每次 `read` 返回 `verified=true` 后立即登记引用台账条目：笔记名、所在目录（仅重名时）、本轮用途、`status`、操作、readback 六个字段。笔记名取自本地发起调用时所用的 path 字符串，不使用 CLI 回显文本；`search` 命中但未读取的笔记不得入表。台账字段与登记时机见 [capture-retrieve-distill.md](references/capture-retrieve-distill.md) 的「引用台账」。
 - 回答依赖检索结果时，引用本地笔记路径作为证据。
 - `stale`、`deprecated`、`retired`、`conflicted` 状态的笔记只能作为谨慎上下文，不作为当前启用事实。
+- `superseded` 与 `archived` 状态的笔记一律不作为当前事实：顺着 `superseded_by` 跳到接替笔记，以接替笔记为当前口径，旧笔记只作历史上下文并在引用表标注状态。
 - 执行案例必须读取最新的状态事件；候选或模糊匹配只能作为诊断线索，只有 `active` 且环境、工具版本、输入摘要和 scope 精确匹配时才允许自动采用正例。
 
 ## 命令行约定

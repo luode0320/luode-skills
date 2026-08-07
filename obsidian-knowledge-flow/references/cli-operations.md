@@ -36,6 +36,59 @@ python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py append --path "知
 python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py open --path "知识库/20-Knowledge/topic/note.md" --json
 ```
 
+### 项目身份解析
+
+`project-context` 是白名单内唯一不触达官方 CLI 的操作：它只把项目路径规范化成稳定的项目身份，用于笔记 frontmatter 的项目字段，不读写 vault。
+
+```bash
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py project-context --project-path "D:\luode\luode-skills" --json
+```
+
+### 迭代治理只读组
+
+以下五个命令用于冲突巡检与处置前取证，全部只读。实测均接受 `path=`，与 `read`/`open` 只认 `file=` 的历史差异无关。
+
+```bash
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py property-read --path "知识库/20-Knowledge/topic/note.md" --name status --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py properties --path "知识库/20-Knowledge/topic/note.md" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py backlinks --path "知识库/20-Knowledge/topic/note.md" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py files --folder "知识库/20-Knowledge" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py orphans --json
+```
+
+- `properties` 返回整篇 frontmatter 的 JSON，是读取 `status`、`title`、`superseded_by` 等字段的首选通道；逐个 `property-read` 在字段缺失时会返回 `Error: Property "<名>" not found.`，属于合法业务结果而非失败。
+- `backlinks` 返回引用计数，是三档处置的前置取证；`files` 可省略 `--folder` 表示全库枚举；`orphans` 不接受任何路径参数。
+- 枚举命令返回的中文路径可直接回传给其他命令：bridge 已把 stdout 固定为 UTF-8，不再依赖系统 locale。
+
+### 迭代治理写操作组
+
+以下三个命令用于分级处置，每个都带回读验证。
+
+```bash
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py property-set --path "知识库/20-Knowledge/topic/note.md" --name status --value superseded --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py property-set --path "知识库/20-Knowledge/topic/note.md" --name superseded_by --value "[[新笔记标题]]" --type list --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py move --path "知识库/20-Knowledge/topic/note.md" --to "知识库/90-Archive/note.md" --json
+python obsidian-knowledge-flow/scripts/obsidian_cli_bridge.py delete --path "知识库/20-Knowledge/topic/note.md" --json
+```
+
+三类写操作的 readback 判据：
+
+| 操作 | readback 判据 | 不符时的错误码 |
+| --- | --- | --- |
+| `property-set` | 回读该属性并与写入值逐字比对，必须相等 | `READBACK_MISMATCH` |
+| `move` | 新路径必须可读，旧路径必须不可读 | `READBACK_MISMATCH` |
+| `delete` | 原路径必须不可读 | `READBACK_MISMATCH` |
+
+存在性探测必须使用严格模式：`properties` 对不存在的文件以退出码零返回 `Error:` 载荷，只有严格模式才会把它判为不可读。
+
+写操作硬边界：
+
+- `delete` 一律进回收站，bridge 不接受也不透传 `permanent`；已实测删除后文件可在 Windows 回收站中找到。
+- `move` 的目标目录必须已存在；目标目录缺失时 CLI 以退出码零返回 `ENOENT` 载荷，原文件保持无损。
+- `move` 的 `--to` 既可以是完整目标路径，也可以只给目录，后者保留原文件名。
+- 执行案例笔记受追加式契约保护：`知识库/20-Knowledge/execution-failure-cases/` 下的路径禁止 `move` 与 `delete`，也不得作为 `move` 目标，bridge 直接返回 `EXECUTION_CASE_IMMUTABLE`。
+- `property-set` 只改目标属性，实测其余 frontmatter 字段、顺序与中文值全部保留。
+
 ### Windows/WSL 调用模板
 
 - Windows Agent：在 Windows shell 中直接运行上面的 `python ... bridge.py` 命令；bridge 选择 Windows direct transport。
@@ -73,3 +126,6 @@ bridge 阻断时，说明必须包含：
 | 自动启动、10KB 中文和超时边界 | TEST-OBS-006/010 |
 | distill、INDEX 与脱敏 | TEST-OBS-014/015 |
 | references bridge-only 规则与禁止词扫描 | TEST-OBS-016 |
+| 迭代治理只读组与中文路径可回传 | TEST-OBS-017 |
+| 写属性、移动、删除与三类 readback | TEST-OBS-018 |
+| 执行案例目录禁止 move/delete | TEST-OBS-019 |
