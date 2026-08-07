@@ -749,11 +749,58 @@
 - 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`obsidian-knowledge-flow/references/capture-retrieve-distill.md`、`doc/2-需求/2026-08-04_总结知识引用清单_Obsidian引用可视化.md`、`doc/3-实施/2026-08-04_总结知识引用清单_实施周期21_Obsidian引用可视化.md`。
 - 更新时间：2026-08-04。
 
+## 知识库可迭代更新规则
+
+- 稳定决策：Obsidian 知识库从只增量补充改为可迭代更新。写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一；判为取代必须在同一轮内处置旧笔记，只写新笔记不处置旧笔记是禁止行为。
+- 稳定决策：取代按旧笔记剩余价值分三档——仍有历史参考价值改 `status: superseded` 并标 `superseded_by`；完全失效且反向链接为 0 改 `status: archived` 后 `move` 到 `知识库/90-Archive/`；内容错误或有害 `delete` 进回收站并在新笔记记录旧错误说法。
+- 稳定决策：三档处置前必须先查 `backlinks`，引用数不为 0 时不得 `move` 或 `delete`，只能降级为标记取代；接替关系必须双向写入 `supersedes` 与 `superseded_by`，只写一侧视为治理未闭环。
+- 稳定决策：`superseded` 与 `archived` 状态的笔记不得作为当前事实，检索命中时顺着 `superseded_by` 跳到接替笔记；执行失败案例笔记不适用三档处置，仍只能 `append` 追加状态事件，bridge 层直接拒绝对该目录的 `move` 与 `delete`。
+- 稳定决策：三档处置由 agent 自动执行（`delete` 进回收站可恢复），但每次 `property-set`、`move`、`delete` 都必须在最终总结的知识引用小节如实登记。
+- 稳定决策：bridge 白名单从 8 个扩到 16 个，新增 `property-read`、`properties`、`property-set`、`move`、`delete`、`backlinks`、`files`、`orphans`；八个新命令全部使用 `path=`，`delete` 固定进回收站不透传 `permanent`，`move` 的目标目录必须已存在。
+- 关键事实：官方 CLI 在 stdout 被重定向时输出的是正确 UTF-8 字节；此前"CLI 回显中文乱码"的判断是错误归因，真实根因是 bridge 自身 stdout 沿用系统 locale，已在 `main()` 用 `reconfigure(encoding="utf-8")` 根因修复。
+- 关键事实：存在性探测必须用严格模式，因为 `properties` 对不存在的文件以退出码零返回 `Error:` 载荷。
+- 关键事实：读取笔记元信息优先用 `properties --json`，比解析 `read` 全文更省更稳；部分笔记没有 frontmatter，会返回 `No frontmatter found.`，拿不到状态字段。
+- 来源：`obsidian-knowledge-flow/references/conflict-staleness.md`、`references/capture-retrieve-distill.md`、`references/note-schema.md`、`scripts/obsidian_cli_bridge.py`、`scripts/audit_vault_knowledge.py`、`doc/2-需求/2026-08-05_知识库可迭代更新_冲突取代与废弃治理.md`。
+- 更新时间：2026-08-05。
+
+## PROJECT_MEMORY / PROJECT_STYLE 到 Obsidian 的选择性沉淀桥接规则
+
+- 稳定决策：`PROJECT_MEMORY.md`/`PROJECT_STYLE.md` 与 Obsidian vault 的"本地上下文 vs 跨项目知识库"边界不变；新增的是一条"单条可复用事实"选择性桥梁，不是整份文件同步或镜像备份，核心标准定义在 `obsidian-knowledge-flow/references/project-memory-bridge.md`。
+- 稳定决策：判断是否跨项目可复用采用两层分工——初判层由 `project-memory-rules`/`project-style-rules` 在写入条目的同一步骤完成，标准是"通用性删除测试"（去掉项目名、具体表名/字段名、具体服务名等专属信息后条目是否仍然成立）叠加类型白名单、适用范围显式标注为通用、状态为启用四条，全部满足才追加可选字段 `bridge_candidate: true` / `跨项目候选: 是`；这一步不调用 bridge，不产生 vault 副作用。
+- 稳定决策：复核与落地层由 `obsidian-knowledge-flow` 在既有"总结阶段捕获流程"（会话总结、阶段收口或最终回复前）完成，把候选条目作为新增信息来源纳入既有扫描，套用既有排除规则二次核验后，选择性沉淀到 `知识库/20-Knowledge/project-rules/`（来自 project-memory-rules）或 `知识库/20-Knowledge/code-style/`（来自 project-style-rules）；不新增 Obsidian 四态之外的第五种状态，只是"沉淀"分支下的新增信息来源。
+- 稳定决策：去重固定为"先 `search`、命中则 `append`、未命中才 `create`"，vault 侧笔记只保留脱敏后的通用表述与 `source_refs` 来源引用，不摘录项目原文；`skill-hit-check-rules` 的命中清单同步补充识别信号，避免候选标记被漏判为"不适用"。
+- 来源：`obsidian-knowledge-flow/references/project-memory-bridge.md`、`obsidian-knowledge-flow/SKILL.md`、`obsidian-knowledge-flow/references/capture-retrieve-distill.md`、`obsidian-knowledge-flow/references/vault-layout.md`、`project-memory-rules/SKILL.md`、`project-memory-rules/references/project-knowledge-source-contract.md`、`project-style-rules/SKILL.md`、`skill-hit-check-rules/references/hit-checklist.md`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\project-memory-md-project-style-md-obsi-fancy-wand.md`）。
+- 更新时间：2026-08-05。
+
+## 代码风格规则生效层级规则
+
+- 稳定决策：一条代码风格规则写进 `code-style-consistency-rules/SKILL.md` 正文并不等于生效；能否拦住代码生成取决于它是否落在**写码前**会被加载的入口。四个落点的实际效力分层为：`references/user-style-feedback-library.md`（`code-generation-style-rules` 写码前强制加载 active 条目，最强）> `references/go-coding-rules.md`（Go 改动默认补读）> `SKILL.md` 正文（skill 加载后、写码后一致性检查，弱）> `references/consistency-examples.md`（「只有在对照正反例时」才读，拦不住生成）。
+- 稳定决策：往 `code-style-consistency-rules` 增补风格约束时，必须先问「这条会在写码前被读到吗」。只写 SKILL.md 正文和正反例文件等于把规则放在事后复盘层；跨项目通用偏好一律走 `style-feedback-workflow.md` 的 candidate→用户确认→active 流程写入全局反例库，项目专属一次性约定才走 `PROJECT_STYLE.md`（边界依据 `project-style-rules/SKILL.md:51`）。
+- 证据：2026-08-06 实测，「Go 函数内禁止 `var (...)` 分组声明」原本已存在于 `SKILL.md:40-44` 与 `consistency-examples.md` 正例 4 / 反例 5，模型仍写出分组声明；根因即两个写码前加载入口均缺该规则。修复后新增 `STYLE-CASE-GO-003` active 条目与 `go-coding-rules.md` bullet，并补齐「行尾中文注释按列对齐」这一层原表述未覆盖的约束。
+- 来源：`code-style-consistency-rules/references/user-style-feedback-library.md`、`code-style-consistency-rules/references/go-coding-rules.md`、`code-style-consistency-rules/references/style-feedback-workflow.md`、`code-generation-style-rules/references/pre-coding-checklist.md`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\var-bestgap-int64-typed-narwhal.md`）。
+- 更新时间：2026-08-06。
+
 ## 机器索引区
 
 ```yaml
 version: 1
 entities:
+  - entity_id: rule.obsidian-iterative-knowledge-governance
+    name: "知识库可迭代更新与分级处置"
+    type: "知识库治理规则"
+    aliases:
+      - 三档处置
+      - 知识库迭代更新
+      - superseded_by 接替关系
+      - 知识库巡检
+    definition: "写入 Obsidian 知识库前必须显式判定补充、矛盾未裁决或取代三态之一；判为取代须在同一轮内按剩余价值分三档处置旧笔记：有历史参考价值改 status=superseded 并标 superseded_by，完全失效且 backlinks 为 0 改 status=archived 后 move 到 知识库/90-Archive/，内容错误或有害 delete 进回收站。三档前必须先查 backlinks，引用不为 0 只能标记取代；接替关系双向写入 supersedes 与 superseded_by，superseded_by 非空时 status 不得为 active。superseded 与 archived 不作当前事实，检索时顺 superseded_by 跳到接替笔记。执行失败案例笔记不适用三档处置，bridge 拒绝对该目录 move/delete。三档由 agent 自动执行但必须在总结的知识引用小节登记。bridge 白名单扩到 16 个命令，八个新命令均用 path=，delete 不透传 permanent，move 目标目录须已存在。已积压冲突用只读脚本 audit_vault_knowledge.py 出候选，脚本零写入。"
+    scope: "Obsidian 知识库写入、检索、冲突处置与积压巡检"
+    status: "active"
+    evidence_ids:
+      - evidence.obsidian-iterative-knowledge-governance
+    context_ids:
+      - context.obsidian-knowledge-flow
+    updated_at: 2026-08-05
   - entity_id: rule.summary-knowledge-citation-section
     name: "总结知识引用小节与引用台账"
     type: "总结结构与知识库规则"
@@ -1915,13 +1962,14 @@ lifecycle:
     - "rule.implementation-sequence-master-plan"
     - "rule.code-generation-style-contract"
     - "rule.simple-check-inline-readability"
-   - "rule.backend-utils-common-util-placement"
+    - "rule.backend-utils-common-util-placement"
     - "rule.backend-database-storage-layout"
     - "rule.backend-root-data-forbidden"
     - "rule.micro-business-json-rpc-boundary"
     - "rule.legacy-project-directory-adoption"
     - "rule.thread-title-process-trigger"
     - "rule.obsidian-knowledge-flow-selective-default"
+    - "rule.obsidian-iterative-knowledge-governance"
     - "rule.git-obsidian-capture-link"
     - "rule.git-commit-domain-split"
     - "rule.git-commit-review-acceptance-evidence"
