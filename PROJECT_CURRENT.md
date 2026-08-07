@@ -13,7 +13,7 @@
 ## 范围与边界
 
 - 范围：修改 `code-style-consistency-rules/references/user-style-feedback-library.md`（新增 STYLE-CASE-GO-003 active 条目 + 变更记录）、`code-style-consistency-rules/references/go-coding-rules.md`（追加 1 条 bullet）、`code-style-consistency-rules/SKILL.md`（§ Go 局部变量声明风格约定补 1 条注释对齐 bullet）、`code-style-consistency-rules/references/consistency-examples.md`（正例 4 / 反例 5 校准）。
-- 非范围：新建 skill；修改 `code-generation-style-rules`（其 `pre-coding-checklist.md:10` 已加载库 active 条目，无需改动即自动生效）；修改任何项目的 `PROJECT_STYLE.md`（跨项目通用偏好按 `project-style-rules/SKILL.md:51` 入全局反例库）；改动截图来源的那个 Go 项目源码；推翻「本约定只约束函数/方法内局部变量、不动包级 `var (...)`」的原边界。
+- 非范围：新建 skill；修改 `code-generation-style-rules`（其 `pre-coding-checklist.md:10` 已加载库 active 条目，无需改动即自动生效）；修改任何项目的 `PROJECT_STYLE.md`（跨项目通用偏好按 `project-style-rules/SKILL.md:51` 入全局反例库）；改动截图来源的那个 Go 项目源码；推翻「本约定只约束函数/方法内局部变量、不动包级 `var (...)`」的原边界；`common/util/`（CYCLE-PSR-22 已收口）、config 来源优先级与秘密边界（CYCLE-PSR-23 已收口）。
 - 保护边界：工作树保留其它会话的既有未提交改动；不执行 reset、checkout、commit 或 push；纯 Markdown 规则改动，靠指纹回读、UTF-8 校验、规则可达性 grep、静态 Owner 路由实跑和加载链路走查五类自查替代可执行测试。
 
 ## 已完成
@@ -51,7 +51,7 @@
 ## 验证与交接
 
 - 本轮风格规则落点补齐最后执行点：4 个文件改动前后 `md5sum`/`wc -c` 全部变化且符合预期（反例库 2588→3590 字节、go-coding-rules 1514→1799 字节）；`file` 确认四文件均 UTF-8、`git diff` 无 mojibake 与换行漂移；`grep` 确认 `STYLE-CASE-GO-003` 在库内可达、新 bullet 在 go-coding-rules 内可达；`static_owner_router.route_owners(['a.go'])` 实跑返回含 `code-generation-style-rules` 与 `code-style-consistency-rules`，来源映射 JSON 解析正常且三个 reference 均已登记；实读 `code-generation-style-rules/references/pre-coding-checklist.md:10` 确认写码前加载链路闭合；Obsidian `create`/`append` 回读一致。未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
-- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 四个任务已完成并按 session 精确失活。
+- `PROJECT_CURRENT.md` 为 UTF-8 并保留所有会话的 registry 投影；当前会话投影 `REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23` 四个任务已完成并按 session 精确失活；上一会话的该投影已精确失活；另一会话依据无跨会话归属的恢复规则生成 fallback 投影，收口后按 session 精确失活。
 - 最后执行点：CYCLE-19 配置专项 `7/7`、package-structure-rules 子目录回归 `16/16`、根 `test/` 子目录逐项回归 `212/212`、需求/实施总览/实施周期/test/style 文档 profile、`py_compile`、quick validation 和 `git diff --check` 均通过；本轮不执行 Git 历史写入。
 - 本轮 mock 规则最后执行点：治理专项 `13/13`、根 Python 测试 `216/216`、历史 `doc/5-tests` 可执行资产指纹校验无错误、目标文件 UTF-8/NUL 检查通过；未执行 Git 历史写入。
 - 本轮 CYCLE-22/23 最后执行点：桥接契约测试 `29/29`、巡检契约测试 `11/11`、总结契约测试 `20/20`；八命令实机验证全部 `verified=true`（含 `Moved to trash` 已在 Windows 回收站枚举确认）；巡检实跑 64 秒且前后 `files`=65、`orphans`=41 不变；字典退出码 0 且 `planned_missing 2` 与基线一致；requirement/implementation_overview/implementation_cycle×2/test/style_regression 六档 profile 均 PASS；机器索引区修复既有缩进后首次可完整解析（42 实体）；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
@@ -59,13 +59,15 @@
 - 本轮 CYCLE-20 最后执行点：内嵌配置 query（backend/fullstack 各一次）、render 目录树、外部 YAML 未漂移核对、配置回归 `7/7`、package-structure-rules 全量回归 `16/16`、requirement/implementation_cycle/test/style_regression 四份文档 profile 均 PASS；六个改动文件 UTF-8 与 LF 未漂移；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 本轮 CYCLE-PSR-23 最后执行点：`python -X utf8 -m unittest discover -s test/package-structure-rules -p configuration_layout_test.py -v`（11/11）与四文件全量回归（26/26）通过；`validate_engineering_docs.py` 对需求/实施/测试/6-review 四份文档 profile 均 PASS；`git diff --check` 与目标文件 UTF-8 回读通过；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 本轮 `CYCLE-OBS-24-001` 最后执行点：`git status --short` 确认本轮只影响计划内 8 个文件；`grep bridge_candidate/跨项目候选/project-memory-bridge` 交叉核对四个目录用词一致、互相可达；`git diff --check` 通过、8 个文件均为合法 UTF-8；`project-memory-rules/SKILL.md` 与 `project-style-rules/SKILL.md` 新增 `##` 标题后已重跑 `skill-dictionary/generate_dictionary.py`（退出码 0），`data.js`/`字典.md` 差异仅覆盖新增 reference 路径、新增标题名和既有未提交 description 的追平，无意外扩散；纯规则文档改动，免可执行测试，理由为不影响运行时行为，靠上述自查替代；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
+- 协同收口 CYCLE-11：为 `F:\binance-wangge-go` 的配置环境来源迁移同步 `package-structure-rules` 的 loader Catalog、Schema、reference 与契约测试；本仓库专项测试 11/11、Catalog adoption/strict 和两仓库文档差异检查通过，相关规则改动仍保持已改动未提交。
+- 本轮补齐配置来源安全边界：同一环境优先使用 `embedded/`，缺失时回退 `yaml/`；YAML 禁止秘密原值，embedded 允许源码私密值。配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 与 `git diff --check` 均通过；测试 README 与 `STYLE: PASS` 已落盘。
 
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-04T17:05:28.451758Z",
+  "registry_updated_at": "2026-08-05T16:56:41.757785Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -630,6 +632,82 @@
       "source_document": "",
       "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
       "updated_at": "2026-08-04T17:10:00Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/4b4ea24606e84270711ee349830994a08f0283b2c03af14a346d77ccd63a1228",
+      "session_id": "019fd202-ca94-7883-a45c-5d6fbae853b2",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "PLAN/PROJECT_HISTORY-RETAIN-20",
+      "source_document": "USER-APPROVED-PLAN/PROJECT_HISTORY-RETAIN-20",
+      "plan_fingerprint": "8e7a120f4afcce26ebec65344ee2974455c33ad3aeee45a31e99cb516fcf8c21",
+      "updated_at": "2026-08-05T13:30:35.469553Z",
+      "steps": [
+        {
+          "id": "HIST-TRIM-01",
+          "step": "裁剪 PROJECT_HISTORY.md 至最近 20 条（临时副本先行验证后写回）",
+          "status": "in_progress"
+        },
+        {
+          "id": "HIST-TRIM-02",
+          "step": "同步 project-memory-rules/SKILL.md 历史事件保留窗口规则",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-03",
+          "step": "同步 bootstrap 资产（bootstrap_agents.sh、自举 SKILL、四件套模板）",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-04",
+          "step": "同步 AGENTS.md 与 CLAUDE.md 四件套 HISTORY 口径",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-05",
+          "step": "更新 PROJECT_MEMORY.md 的 HISTORY 描述（人类区+机器索引区）",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-06",
+          "step": "执行 TC-1 至 TC-5 脚本化验证",
+          "status": "pending"
+        },
+        {
+          "id": "HIST-TRIM-07",
+          "step": "收口：6-review、字典重跑、门禁与最终总结",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/67fcdd7775c377286fdcd4e1ac4ebd2998b1ff7284654f09aee98a7dc1f9f322",
+      "session_id": "019fd2a8-2757-7763-944f-358b20518f0b",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260805T165628Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-05T16:56:41.757561Z",
       "steps": [
         {
           "id": "RECOVERY-01",

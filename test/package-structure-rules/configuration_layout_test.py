@@ -76,7 +76,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置 Catalog 与 Schema 契约。
-        最近修改时间: 2026-08-03 17:48:21 Go embedded 命名契约改为 config_<env>_yaml.go。
+        最近修改时间: 2026-08-06 00:00:00 同步 embedded 主来源与 YAML 回退策略。
         """
         # 1. 先验证 backend/fullstack 的四类 config query 都暴露完整策略字段。
         cases = (
@@ -99,6 +99,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 if category == "yaml":
                     self.assertEqual("config_<env>.yaml|config_<env>.yml", entry["file_name_pattern"])
                     self.assertEqual("forbid_plain_secret", entry["secret_policy"])
+                    self.assertEqual("embedded_source_fallback", entry["source_policy"])
                     self.assertEqual("allowed_reference", entry["environment_variable_policy"])
                 else:
                     self.assertEqual("config_<env>_yaml.go", entry["go_file_name_pattern"])
@@ -121,13 +122,17 @@ class ConfigurationLayoutTests(unittest.TestCase):
             "source_policy", "environment_variable_policy",
         ):
             self.assertIn(field, properties)
+        self.assertEqual(
+            ["embedded_source_fallback", "external_config_primary", "embedded_source_primary"],
+            properties["source_policy"]["enum"],
+        )
 
     def test_catalog_query_and_schema_expose_config_source_patterns(self):
         """确认 config/ 根 load/model 四条 pattern 唯一查询且 Schema 有守卫。
 
         [参数] 无。
         [返回] None：断言配置根源码 pattern 的 Catalog 与 Schema 契约。
-        最近修改时间: 2026-08-04 新增 config 根 load/model 落点契约。
+        最近修改时间: 2026-08-06 00:00:00 补充 loader 的 embedded 优先语义断言。
         """
         # 1. 先验证 backend/fullstack × loader/model 四类 query 唯一命中规范路径。
         cases = (
@@ -148,6 +153,10 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertTrue(entry["dynamic"])
                 self.assertEqual("forbidden", entry["init_policy"])
                 self.assertEqual("conditional", entry["creation_policy"])
+                if category == "loader":
+                    self.assertEqual("-env > APP_ENV > ENV > local", entry["environment_source_policy"])
+                    self.assertIn("优先使用", entry["purpose"])
+                    self.assertIn("回退", entry["purpose"])
 
         # 2. 再核对两棵树渲染均暴露 load.<ext> 与 model.<ext> 占位契约。
         for project_kind in ("backend", "fullstack"):
@@ -175,6 +184,14 @@ class ConfigurationLayoutTests(unittest.TestCase):
             ["node_kind", "path_pattern", "dynamic", "init_policy", "allowed_extensions"],
             source_rule["then"]["required"],
         )
+        self.assertIn("environment_source_policy", schema["properties"]["entries"]["items"]["properties"])
+
+        # 4. 最后确认人工 reference 正文也描述同一三来源契约。
+        layout = CONFIGURATION_LAYOUT.read_text(encoding="utf-8")
+        self.assertIn("-env", layout)
+        self.assertIn("APP_ENV", layout)
+        self.assertIn("ENV", layout)
+        self.assertIn("-env > APP_ENV > ENV > local", layout)
 
     def test_embedded_secret_boundary_is_distinct_from_yaml_boundary(self):
         """确认 embedded 允许源码私密配置，但 YAML 和外部输出仍保持禁止边界。

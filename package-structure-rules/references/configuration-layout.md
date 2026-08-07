@@ -4,11 +4,11 @@
 
 | 路径 | 内容 | 安全边界 |
 |---|---|---|
-| 独立后端 `config/load.<ext>` | 配置加载与解析入口：读取 `config/yaml/` 与 `config/embedded/` 配置并解析为配置结构；例如 Go 使用 `config/load.go` | 与普通源码相同；不得输出 embedded 私密配置原值 |
+| 独立后端 `config/load.<ext>` | 配置加载与解析入口：按选定环境优先使用 `config/embedded/`，对应配置不存在时才回退读取 `config/yaml/`，并解析为配置结构；环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`；例如 Go 使用 `config/load.go` | 与普通源码相同；不得输出 embedded 私密配置原值 |
 | 独立后端 `config/model.<ext>` | 配置结构定义：声明配置加载与解析结果对应的类型/结构；例如 Go 使用 `config/model.go` | 与普通源码相同；不得输出 embedded 私密配置原值 |
 | 独立后端 `config/yaml/` | 按环境拆分的外部 YAML 配置，例如 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml` | 禁止真实密钥、密码、token、私钥原值；允许占位符或环境变量引用 |
 | 独立后端 `config/embedded/` | 按环境拆分、包含 YAML 字符串的源码文件；Go 例如 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go` | 允许直接写入 API key、密钥、密码等私密信息；源码配置是主来源，默认不依赖环境变量。不得写入 Agent 输出、日志、README、错误或测试报告 |
-| 同仓后端 `backend/config/load.<ext>` | 与独立后端相同的配置加载与解析入口职责 | 与独立后端相同 |
+| 同仓后端 `backend/config/load.<ext>` | 与独立后端相同的配置加载与解析入口职责：按选定环境优先使用 `backend/config/embedded/`，对应配置不存在时才回退读取 `backend/config/yaml/`；环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local` | 与独立后端相同 |
 | 同仓后端 `backend/config/model.<ext>` | 与独立后端相同的配置结构定义职责 | 与独立后端相同 |
 | 同仓后端 `backend/config/yaml/` | 与独立后端相同的环境 YAML 命名规则 | 与独立后端相同 |
 | 同仓后端 `backend/config/embedded/` | 与独立后端相同的 embedded 命名规则 | 与独立后端相同 |
@@ -37,7 +37,11 @@ config/
 
 `local`、`test`、`prod` 仅定义标准名称，不表示每个项目必须同时提交三种环境文件。目录检查只检查项目中已经存在的文件，不创建或补齐缺失环境；例如只有 `config_local.yaml` 和 `config_prod_yaml.go` 也可以通过命名检查。`yaml/` 与 `embedded/` 的环境文件不要求一一配对，文件存在性和命名分别判断，不因缺少对应环境的另一种格式而失败。
 
-配置加载、默认值和结构定义只能位于对应项目配置根及其允许的语言源码中，即独立后端 `config/load.<ext>` 与 `config/model.<ext>`、同仓后端 `backend/config/load.<ext>` 与 `backend/config/model.<ext>`；`config/yaml/` 与 `config/embedded/` 只存放配置数据，不承载加载与结构定义逻辑。环境拆分不产生第二套配置根。禁止创建 `config/examples/`、`config/schema/`、`config/loader/`、`config/defaults/`。
+配置加载、默认值和结构定义只能位于对应项目配置根及其允许的语言源码中，即独立后端 `config/load.<ext>` 与 `config/model.<ext>`、同仓后端 `backend/config/load.<ext>` 与 `backend/config/model.<ext>`；`config/yaml/` 与 `config/embedded/` 只存放配置数据，不承载加载与结构定义逻辑。加载器对同一环境按 `embedded` 主来源、YAML 回退来源处理；环境拆分不产生第二套配置根。禁止创建 `config/examples/`、`config/schema/`、`config/loader/`、`config/defaults/`。
+
+## 环境识别契约
+
+`load.<ext>` 的环境识别按以下优先级返回第一个非空值：命令行 `-env=<value>`（空值视为未设置）> `APP_ENV` > `ENV` > 默认 `local`。环境确定后，加载器优先使用对应的 `embedded` 配置；只有对应 `embedded` 配置不存在时，才使用 `yaml` 配置。`-env` 只支持 `-env=<value>` 等号形式；未知环境沿用 `EmbeddedConfigError` 非空 + `Validate` 的拒绝启动语义。VSCode 调试启动默认使用 `args: ["-env=local"]`，不依赖 `env.APP_ENV`。
 
 ## 合法与非法示例
 
