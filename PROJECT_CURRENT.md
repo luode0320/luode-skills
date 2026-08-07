@@ -6,14 +6,9 @@
 
 ## 当前任务
 
-- 来源对象：运行时 Mock 与测试 Mock 分离规则补充。
-- 当前目标：根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护；与测试 Mock 职责分离，互不替代。
-- 当前状态：已完成为根 mock/ 方案，已同步所有相关 SKILL.md、references、Catalog、目录树、四件套、测试与验证；实施总览与周期文档已落盘并通过文档门禁（implementation_overview + implementation_cycle profile 均 alid: true）；改动停在已改动未提交状态。
-
-- 来源对象：用户截图反馈「Go 函数内 `var (...)` 分组声明写法不对」并追问「这个习惯要更新到哪个 skill 的规则中」，经 Plan Mode 确认方案（计划文件 `C:\Users\luode\.claude\plans\var-bestgap-int64-typed-narwhal.md`）；走 `code-style-consistency-rules` 既有 `style-feedback-workflow.md` 维护路径，未新建 `doc/2-需求/` 正式需求文档。
-- 当前目标：把「Go 函数/方法内局部变量必须逐行 `var` 单独声明、行尾中文注释按列对齐」这条习惯，补进 `code-style-consistency-rules` 中真正会在**写码前**被加载的两个入口，解决「规则已存在于 SKILL.md 正文与正反例文件却拦不住代码生成」的生效层级问题。
-- 当前状态：4 个 Markdown 文件改动（36 增 2 删）已落地并回读校验；`STYLE-CASE-GO-003` 已作为 active 条目写入全局反例库，`go-coding-rules.md` 已追加对应 bullet；实测确认未触及 `description` 与 `##` 标题，免重跑字典脚本；Obsidian 已沉淀 1 篇知识笔记并追加 INDEX 入口；改动停在已改动未提交状态，等待用户决定是否提交。
-
+- 来源对象：运行时 Mock 与测试 Mock 分离规则补充·第二轮优化。
+- 当前目标：完成 Mock 框架/包设计（DI 工厂模式、构建标签装配模板、Go internal 可见性解决方案）、Skill 实战内容补充、.vscode/launch.json mock 调试任务模板、F:\binance-wangge-go 真实项目迁移验证。
+- 当前状态：6 个周期全部完成。CYCLE-02 Mock 框架设计（runtime-mock-pattern.md 扩展 + mock-factory-pattern.md 新增）、CYCLE-03 Skill 实战补充（test-program-rules、artifact-storage-rules、package-structure-rules 新增实战用法）、CYCLE-04 .vscode 模板参考（vscode-mock-launch.md 新增）、CYCLE-05 真实项目迁移（F:\binance-wangge-go 迁移到根 mock/，构建标签工厂装配，mock/assembly 装配层，launch.json 新增 mock 模式）、CYCLE-06 全量收口（13/13 + 26/26 + 289/289 + go build 双模式 + 字典生成 + 6-review 均通过）。改动停在已改动未提交状态。
 ## 范围与边界
 
 - 范围：`test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，placement-catalog.yaml 新增 2 个 mock 条目，人工目录树更新，AGENTS.md/CLAUDE.md 与 PROJECT_MEMORY.md 同步，新增 runtime-mock-pattern.md 参考文档，asset_location_test.py 新增 2 个契约测试。

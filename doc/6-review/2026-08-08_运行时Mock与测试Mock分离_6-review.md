@@ -15,7 +15,7 @@ appendix_policy: preserve_existing_or_one_terminal_appendix
 
 # 6-review 风格回归：运行时 Mock 与测试 Mock 分离
 
-结论：本轮新增根 `mock/` 作为运行时 Mock 唯一合法目录，与根 `test/` 对等，`//go:build mock` 构建标签保护；影响：运行时 Mock 与测试 Mock 职责分离，互不替代，本地开发通过 `go run -tags mock .` 启用；范围：`test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，placement-catalog.yaml 新增 2 个 mock 条目标识，人工目录树更新，AGENTS.md/CLAUDE.md 与 PROJECT_MEMORY.md 同步，新增 runtime-mock-pattern.md 参考文档，asset_location_test.py 新增 2 个契约测试；非范围：不迁移现有业务项目的 mock 文件（提供迁移指南），不改动前端 `mocks/` 规则，不修改 `placement_catalog.py` 实现逻辑；变化：新增 1 个 reference 文件，修改 10 个规则/配置/记忆文件，新增 2 个测试用例，Catalog 新增 2 个条目标识；完成标准：`STYLE: PASS`；术语说明：运行时 Mock 是本地开发编译进主二进制、替代不可用上游的模拟实现；测试 Mock 是仅 `*_test.go` 使用的模拟实现；验证状态：asset_location_test.py `13/13`、package-structure-rules 全量回归 `26/26`、根 Python 测试 `287/289`（2 个既有失败与本次改动无关）、字典生成正常。
+结论：本轮完成运行时 Mock 完整方案交付。第一轮完成规则定义、目录树和契约测试。第二轮补充 Mock 框架与包设计、构建标签装配、内部可见性解决方案、Skill 实战内容补充、开发工具调试任务模板和真实项目迁移验证。影响：运行时 Mock 方案从"有规则"升级为"有框架、有模板、有实战、有迁移验证"的完整方案。范围：两轮共覆盖规则定义、框架设计、目录树、参考文档、测试、记忆文件、真实项目迁移等多个方面。非范围：不改动前端 mocks 规则，不修改目录 Catalog 实现逻辑，不执行 Git 历史写入。变化：新增参考文档，修改规则说明、记忆文件和配置文件，真实项目新增与修改若干文件。完成标准：全部测试、构建、字典生成和文档门禁均通过。术语说明：运行时 Mock 是本地开发编译进主二进制、替代不可用真实上游的模拟实现；测试 Mock 是仅测试链使用的模拟实现。验证状态：资产位置测试、包结构回归、根测试、生产构建、Mock 构建、项目测试和字典生成均通过，仅有少量既有失败与本次改动无关。
 
 ## 文档信息
 

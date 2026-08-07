@@ -581,6 +581,10 @@
 - 更新时间: 2026-07-26
 - 状态: 启用
 
+
+- 构造/装配：`mock/` 下的包可正常导入 `internal/...`；但 module 根（如 `main.go`）不能直接导入 `mock/internal/...`，必须通过 `mock/assembly` 装配层转发，否则 Go internal 可见性规则拒绝编译。
+- 工厂模式：推荐 `main_real.go`（`//go:build !mock`，生产实现）+ `main_mock.go`（`//go:build mock`，调用 `mock/assembly`）双文件装配；多工厂场景使用 `internal/factory/` 统一装配。
+- 真实项目 F:\binance-wangge-go 已迁移：`internal/business/scalp/api/mock_gateway.go` 保留测试 Mock（`MockGateway`、`NewMockGateway`），运行时 Mock 迁至 `mock/internal/business/scalp/api/gateway_mock.go`（包名 `mock_api`），`main_real.go`/`main_mock.go` 双文件工厂，`.vscode/launch.json` 新增 mock 调试模式。
 ## 术语表
 
 ### doc 顶层混合命名
