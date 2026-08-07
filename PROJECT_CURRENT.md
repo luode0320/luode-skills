@@ -7,7 +7,6 @@
 - 当前目标：完成最近5个同项目会话快照的全量收口，包括bootstrap模板、规则文件、PROJECT_CURRENT迁移、测试和文档门禁
 - 当前状态：CYCLE-01 和 CYCLE-02 文档门禁 PASS；TASK-08/09/10 已完成，TASK-11 全量测试与收口已通过；skill 字典刷新退出码 0；投影落盘并同步 update_plan；改动停在已改动未提交状态。
 
-
 - 2026-08-09
 - 来源对象：REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001
 - 当前目标：落实“允许凭据有意持久化、禁止过程性输出回显”的规则与测试边界。
@@ -91,6 +90,7 @@
 - 专项测试 `11/11`、package-structure-rules 四文件回归 `26/26` 通过；四份文档 profile（requirement/implementation_cycle/test/style_regression）与 `6-review STYLE: PASS` 通过。
 - 实施周期文档、测试 README（TEST-PSR-CONFIG-SOURCE-001）与 6-review 记录已落盘；项目四件套已同步。
 
+- 已完成 Mermaid 生成规则空白点修复：`reasoning-summary-structure-rules/SKILL.md`、`implementation-planning-rules/references/visualization-standard.md` 新增"标签内比较运算符必须转义 `&lt;`/`&gt;` 或替换文字表达，禁止裸写"规则；`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py` 的 `check_mermaid_syntax()` 同步新增机械检测；`test/artifact-delivery-gate-rules/validate_engineering_docs_test.py` 补充正负例，59 项用例中新增 2 项通过，另 2 项既有失败经 `git stash` 交叉验证为改动前既存的仓库缺陷（历史验收文档缺失断链），与本次改动无关；未执行 Git 历史写入。
 - 已完成 `CYCLE-OBS-24-001` PROJECT_MEMORY/PROJECT_STYLE 到 Obsidian 选择性沉淀桥接：新增 `obsidian-knowledge-flow/references/project-memory-bridge.md` 定义初判标准（通用性删除测试、类型白名单、适用范围、稳定性门槛）、标记字段（`bridge_candidate`/`跨项目候选`）、落点（`知识库/20-Knowledge/project-rules/`、`code-style/`）与去重规则；同步修改 `obsidian-knowledge-flow/SKILL.md`、`capture-retrieve-distill.md`、`vault-layout.md`、`project-memory-rules/references/project-knowledge-source-contract.md`、`project-memory-rules/SKILL.md`、`project-style-rules/SKILL.md`、`skill-hit-check-rules/references/hit-checklist.md` 共 7 个文件；不整份同步或镜像项目本地文件，不新增 Obsidian 第五态。改动全部用真实并行子 agent 执行并逐文件回读校验。
 
 ## 门禁说明
@@ -135,7 +135,6 @@
 - 本轮 `CYCLE-OBS-24-001` 最后执行点：`git status --short` 确认本轮只影响计划内 8 个文件；`grep bridge_candidate/跨项目候选/project-memory-bridge` 交叉核对四个目录用词一致、互相可达；`git diff --check` 通过、8 个文件均为合法 UTF-8；`project-memory-rules/SKILL.md` 与 `project-style-rules/SKILL.md` 新增 `##` 标题后已重跑 `skill-dictionary/generate_dictionary.py`（退出码 0），`data.js`/`字典.md` 差异仅覆盖新增 reference 路径、新增标题名和既有未提交 description 的追平，无意外扩散；纯规则文档改动，免可执行测试，理由为不影响运行时行为，靠上述自查替代；未执行 Git 历史写入，交接点为「已改动未提交，等待用户决定是否提交」。
 - 协同收口 CYCLE-11：为 `F:\binance-wangge-go` 的配置环境来源迁移同步 `package-structure-rules` 的 loader Catalog、Schema、reference 与契约测试；本仓库专项测试 11/11、Catalog adoption/strict 和两仓库文档差异检查通过，相关规则改动仍保持已改动未提交。
 - 本轮补齐配置来源安全边界：同一环境优先使用 `embedded/`，缺失时回退 `yaml/`；YAML 禁止秘密原值，embedded 允许源码私密值。配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 与 `git diff --check` 均通过；测试 README 与 `STYLE: PASS` 已落盘。
-
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 
