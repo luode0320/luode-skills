@@ -105,6 +105,8 @@
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 活动质量回归只保留测试后的 `code-style-consistency-rules` `6-review`；不再自动触发业务审查或最终验收。
 - 根 `test/` 是唯一活动测试代码根：测试程序、mock、fixture、helper 与测试启动脚本按被测源码目录镜像；`doc/5-tests/<时间戳>/` 只保留 README、日志、报告、截图和非可执行证据，历史可执行资产首次修改时才迁出。
+
+- 根 `mock/` 是运行时 Mock 的唯一合法目录，与根 `test/` 对等，按被测源码相对路径镜像；文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`；`go run -tags mock .` 启用。运行时 Mock 与测试 Mock 职责分离，互不替代。
 - 默认执行模式中，当前会话缺少活动或阻断投影且主动执行时间严格超过 600 秒时，先调用只读 `probe-timeout`；仅返回 `goal_check_required` 才由主 Agent 先调用 `get_goal`，确认无匹配活动 Goal 后最多调用一次 `create_goal`，失败或不明确时才用 `ensure-timeout` 降级普通投影。Plan Mode 不读取、写入或刷新投影，不调用 `update_plan`，也不创建悬浮任务列表；创建 Goal 的摘要必须脱敏且不超过 80 个 Unicode 字符。
 - 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-evolution-rules` 或功能测试；未授权不得晋级 active。
 - `6-review` 只检查代码风格、格式、位置、注释、日志、可读性和目录归位；不判断业务正确性、需求覆盖或发布放行。

@@ -1,6 +1,6 @@
 ---
 name: test-program-rules
-description: 当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。
+description: 当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。
 ---
 
 # 测试程序规则
@@ -17,7 +17,18 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 - `test/shared/` 只允许放不归属于单一源码路径、且已被多个测试域稳定复用的通用模拟能力；源码专属模拟程序不得借共享目录绕开镜像关系。
 - `doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图、脱敏响应样例等非可执行证据；禁止新增或复制 mock、stub、fake、fixture、测试脚本和 helper。
 
-## 测试隔离红线（强制）
+## 运行时 Mock 落点（强制）
+
+> 运行时 Mock 与测试 Mock 是两类不同资产：测试 Mock 仅在 `*_test.go` 链路使用；运行时 Mock 是本地开发编译进主二进制、替代不可用上游的模拟实现。本节只管辖运行时 Mock。
+
+- 运行时 Mock 统一放在根 `mock/`，按被测源码相对路径镜像：源码 `internal/business/scalp/api/gateway.go` 的运行时 Mock 位于 `mock/internal/business/scalp/api/gateway.go`。
+- `mock/` 下所有文件必须以 `//go:build mock` 构建标签开头，包名约定为 `mock_<源包名>`（如 `mock_api`、`mock_service`）；正常构建（不带 `mock` 标签）完全排除这些文件。
+- 运行时 Mock 不属测试资产，不得进入根 `test/`、`doc/5-tests/` 或业务源码目录；它与测试 Mock 职责分离、互不替代。
+- 构建标签传递：`go run -tags mock .`、`go build -tags mock .`、`.vscode/launch.json` 的 `buildFlags: "-tags=mock ..."`。
+- 根 `mock/` 与根 `test/` 对等，均按被测源码相对路径镜像；前端项目保留既有根 `mocks/`（复数）不强制改名。
+
+
+
 
 > 本节遵循 `test-strategy-rules` 的《测试隔离红线（强制）》单一权威来源：严禁为测试污染生产代码（新增测试专用方法/数据/结构体字段）、测试能力一律走测试目录内脚本/mock/fixture/seam、发现污染立即阻断回退、自动化测试只用 `local` 环境（禁连 `test`/`prod`/`staging` 等非 local 服务）。本 skill 不重复展开，仅承接测试程序侧的落地。
 

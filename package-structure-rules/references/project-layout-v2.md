@@ -26,6 +26,8 @@
 ├── .vscode/                               # [必需·提交] VSCodex 启动和任务配置
 │   ├── launch.json                        # [必需·提交] 联合调试配置
 │   ├── tasks.json                         # [必需·提交] dev、build、docker-build 任务
+
+同仓后端运行时 Mock 模式：`launch.json` 至少包含 normal 与 mock 两套配置；mock 配置必须在 `buildFlags` 增加 `-tags=mock`（例如 `-tags=mock -mod=vendor`），并通过 `args` 传 `-env=local`。
 │   ├── settings.json                      # [条件·提交] 团队设置
 │   └── extensions.json                    # [条件·提交] 推荐扩展
 ├── backend/                               # [必需·提交] 完整独立后端项目
@@ -40,6 +42,7 @@
 │       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── frontend/                              # [必需·提交] 完整独立前端项目
 ├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
+├── mock/                                   # [条件·提交] 运行时 Mock 根，按被测源码相对路径镜像；//go:build mock 构建标签；与根 	est/ 对等
 ├── integration/                           # [条件·提交] 仅限前后端联调资产
 │   ├── contracts/                         # [条件·提交] 联调契约根
 │   │   ├── http/                          # [条件·提交] HTTP 契约
@@ -96,6 +99,8 @@
 ├── .vscode/                                 # [必需·提交] 启动、调试和任务配置
 │   ├── launch.json                          # [必需·提交] 本地调试配置
 │   ├── tasks.json                           # [必需·提交] 本地任务配置
+
+运行时 Mock 模式：`launch.json` 至少包含 normal 与 mock 两套配置；mock 配置必须在 `buildFlags` 增加 `-tags=mock`（例如 `-tags=mock -mod=vendor`），并通过 `args` 传 `-env=local`。
 │   ├── settings.json                        # [条件·提交] 团队设置
 │   └── extensions.json                      # [条件·提交] 推荐扩展
 ├── main.<ext>                               # [条件·提交] 独立后端默认二进制入口
@@ -110,6 +115,7 @@
 │   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量；只存放配置数据
 │       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
+├── mock/                                     # [条件·提交] 运行时 Mock 根，按被测源码相对路径镜像；//go:build mock 构建标签；与根 	est/ 对等
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
 │   ├── model/                               # [条件·提交] 数据存储模型分类根；根目录禁止直接文件
@@ -283,7 +289,7 @@
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 
-三类项目的活动测试程序、mock、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
+三类项目的活动测试程序、测试 Mock、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
 
 ## 前端独立项目
 

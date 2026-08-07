@@ -1,6 +1,6 @@
 ---
 name: test-strategy-rules
-description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
+description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳证据目录，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
 ---
 
 # 测试策略规则

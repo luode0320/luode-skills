@@ -106,6 +106,14 @@
 
 ## 测试域
 
+## 运行时 Mock 域
+
+- 运行时 Mock 文件：`<源码相对路径>/<名称>.<ext> -> mock/<源码相对路径>/<名称>_{mock|stub|fake}.<ext>`；必须与被测源码路径镜像。
+- 说明：运行时 Mock 文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`；运行时 Mock 与测试 Mock 互不替代，`test/` 镜像目录仍承载测试 Mock。
+- 前端既有 `mocks/`（复数）保持不变，后端 `mock/`（单数）与其理念一致。
+
+
+
 - 测试任务根目录：`doc/5-tests/YYYY-MM-DD_HHmmss/`
 - 测试中文主说明：`doc/5-tests/YYYY-MM-DD_HHmmss/README.md`
 - 活动测试代码根：`test/`
