@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-05 09:50:29",
+  "generated_at": "2026-08-07 09:58:38",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 568,
+    "references_total": 569,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -906,7 +906,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
           "item_order": 3,
-          "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
+          "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；知识库可迭代更新而非只增量堆积：写入前必须判定新信息是补充、矛盾未裁决还是取代旧结论，判为取代时按分级处置把旧笔记改为已取代、归档到 `90-Archive/` 或删除进回收站，并双向写入 `supersedes` / `superseded_by`，检索时顺着接替关系以最新笔记为当前口径；已积压的冲突、过期与孤儿笔记用只读巡检脚本 `audit_vault_knowledge.py` 捞成候选清单；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
           "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
           "skill_path": "obsidian-knowledge-flow/SKILL.md",
           "directory_path": "obsidian-knowledge-flow",
@@ -928,6 +928,7 @@ window.SKILL_DICTIONARY = {
             "obsidian-knowledge-flow/references/conflict-staleness.md",
             "obsidian-knowledge-flow/references/execution-case-notes.md",
             "obsidian-knowledge-flow/references/note-schema.md",
+            "obsidian-knowledge-flow/references/project-memory-bridge.md",
             "obsidian-knowledge-flow/references/project-memory-layout.md",
             "obsidian-knowledge-flow/references/validation-checklist.md",
             "obsidian-knowledge-flow/references/vault-layout.md"
@@ -1009,6 +1010,7 @@ window.SKILL_DICTIONARY = {
             "写入规则",
             "来源优先级",
             "机器索引区结构",
+            "跨项目沉淀判断（可选）",
             "人类阅读区同步规则",
             "生命周期与冲突处理",
             "记忆条目结构"
@@ -1093,7 +1095,8 @@ window.SKILL_DICTIONARY = {
             "默认流程",
             "写入规则",
             "来源优先级",
-            "风格条目结构"
+            "风格条目结构",
+            "跨项目沉淀判断（可选）"
           ],
           "references": [
             "project-style-rules/references/project-style-template.md"
@@ -5601,7 +5604,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
       "item_order": 3,
-      "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
+      "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；知识库可迭代更新而非只增量堆积：写入前必须判定新信息是补充、矛盾未裁决还是取代旧结论，判为取代时按分级处置把旧笔记改为已取代、归档到 `90-Archive/` 或删除进回收站，并双向写入 `supersedes` / `superseded_by`，检索时顺着接替关系以最新笔记为当前口径；已积压的冲突、过期与孤儿笔记用只读巡检脚本 `audit_vault_knowledge.py` 捞成候选清单；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
       "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
       "skill_path": "obsidian-knowledge-flow/SKILL.md",
       "directory_path": "obsidian-knowledge-flow",
@@ -5623,6 +5626,7 @@ window.SKILL_DICTIONARY = {
         "obsidian-knowledge-flow/references/conflict-staleness.md",
         "obsidian-knowledge-flow/references/execution-case-notes.md",
         "obsidian-knowledge-flow/references/note-schema.md",
+        "obsidian-knowledge-flow/references/project-memory-bridge.md",
         "obsidian-knowledge-flow/references/project-memory-layout.md",
         "obsidian-knowledge-flow/references/validation-checklist.md",
         "obsidian-knowledge-flow/references/vault-layout.md"
@@ -5704,6 +5708,7 @@ window.SKILL_DICTIONARY = {
         "写入规则",
         "来源优先级",
         "机器索引区结构",
+        "跨项目沉淀判断（可选）",
         "人类阅读区同步规则",
         "生命周期与冲突处理",
         "记忆条目结构"
@@ -5788,7 +5793,8 @@ window.SKILL_DICTIONARY = {
         "默认流程",
         "写入规则",
         "来源优先级",
-        "风格条目结构"
+        "风格条目结构",
+        "跨项目沉淀判断（可选）"
       ],
       "references": [
         "project-style-rules/references/project-style-template.md"
