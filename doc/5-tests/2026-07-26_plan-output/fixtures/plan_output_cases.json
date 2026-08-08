@@ -61,5 +61,117 @@
     "hit_skills": [
       "reasoning-summary-structure-rules"
     ]
+  },
+  "plan_ready_detailed": {
+    "mode": "plan",
+    "status": "ready",
+    "visible_messages": [
+      "<proposed_plan>\n当前计划最终方案简要说明\nAgent 对当前问题的理解\n本轮范围\n非范围\n当前优先闭环\n关键假设 / 待确认点\n实施周期总览\n阶段计划\n最小任务清单\n真实测试安排\n任务完成、停止与最大推进边界\n</proposed_plan>"
+    ],
+    "required_plan_sections": [
+      "当前计划最终方案简要说明",
+      "Agent 对当前问题的理解",
+      "本轮范围",
+      "非范围",
+      "当前优先闭环",
+      "关键假设 / 待确认点",
+      "实施周期总览",
+      "阶段计划",
+      "最小任务清单",
+      "真实测试安排",
+      "任务完成、停止与最大推进边界"
+    ],
+    "zero_decision_fields": {
+      "文件/符号": "plan-structure-template.md:14-15, plan-output-gate.md:172-177",
+      "操作": "删除压缩口子，新增思考细节落盘强制",
+      "禁止触碰": "相邻 skill 文件、非目标参考文件",
+      "精确测试命令": "grep -n思考细节",
+      "断言": "旧条款不存在、新条款存在",
+      "清理": "N/A - 测试不涉及持久化数据",
+      "回滚": "只删除新增行，不触碰其他改动",
+      "完成条件": "两个文件修改完成，grep 验证通过",
+      "停止条件": "旧条款未删除、新条款未写入、grep 验证失败"
+    },
+    "hit_skills": [
+      "skill-hit-check-rules",
+      "implementation-planning-rules"
+    ]
+  },
+  "plan_ready_skeleton_only": {
+    "mode": "plan",
+    "status": "ready",
+    "visible_messages": [
+      "<proposed_plan>\n当前计划最终方案简要说明\nAgent 对当前问题的理解\n本轮范围\n非范围\n当前优先闭环\n关键假设 / 待确认点\n实施周期总览\n阶段计划\n最小任务清单\n真实测试安排\n任务完成、停止与最大推进边界\n</proposed_plan>"
+    ],
+    "required_plan_sections": [
+      "当前计划最终方案简要说明",
+      "Agent 对当前问题的理解",
+      "本轮范围",
+      "非范围",
+      "当前优先闭环",
+      "关键假设 / 待确认点",
+      "实施周期总览",
+      "阶段计划",
+      "最小任务清单",
+      "真实测试安排",
+      "任务完成、停止与最大推进边界"
+    ],
+    "zero_decision_fields": {},
+    "hit_skills": [
+      "skill-hit-check-rules",
+      "implementation-planning-rules"
+    ]
+  },
+  "plan_ready_concise_plan": {
+    "mode": "plan",
+    "status": "ready",
+    "visible_messages": [
+      "<proposed_plan>\n## Summary\n修复计划输出省略细节的问题\n## Key Changes\n1. 改模板\n2. 改闸门\n3. 改测试\n## Test Plan\n运行 unittest\n</proposed_plan>"
+    ],
+    "required_plan_sections": [
+      "Summary",
+      "Key Changes",
+      "Test Plan"
+    ],
+    "zero_decision_fields": {},
+    "hit_skills": [
+      "skill-hit-check-rules",
+      "implementation-planning-rules"
+    ]
+  },
+  "plan_ready_placeholder": {
+    "mode": "plan",
+    "status": "ready",
+    "visible_messages": [
+      "<proposed_plan>\n当前计划最终方案简要说明\nAgent 对当前问题的理解\n本轮范围\n非范围\n当前优先闭环\n关键假设 / 待确认点\n实施周期总览\n阶段计划\n最小任务清单\n真实测试安排\n任务完成、停止与最大推进边界\n</proposed_plan>"
+    ],
+    "required_plan_sections": [
+      "当前计划最终方案简要说明",
+      "Agent 对当前问题的理解",
+      "本轮范围",
+      "非范围",
+      "当前优先闭环",
+      "关键假设 / 待确认点",
+      "实施周期总览",
+      "阶段计划",
+      "最小任务清单",
+      "真实测试安排",
+      "任务完成、停止与最大推进边界"
+    ],
+    "zero_decision_fields": {
+      "文件/符号": "见上文",
+      "操作": "修改相关模块",
+      "禁止触碰": "若干文件",
+      "精确测试命令": "后续再定",
+      "断言": "TBD",
+      "清理": "实现时再看",
+      "回滚": "后续补充",
+      "完成条件": "按需完成",
+      "停止条件": "后续再定"
+    },
+    "hit_skills": [
+      "skill-hit-check-rules",
+      "implementation-planning-rules"
+    ]
   }
 }

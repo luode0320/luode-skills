@@ -86,6 +86,56 @@ class PlanOutputContractTests(unittest.TestCase):
         self.assertIn("命中列表不得包含 `reasoning-summary-structure-rules`", hit_check)
         self.assertIn("`Plan Mode` 不持久化活动 projection", compression)
 
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 02:00:00，验证正例包含完整零决策字段。
+    def test_plan_ready_detailed_fields(self) -> None:
+        case = self.cases["plan_ready_detailed"]
+        # 1. 校验正例包含所有零决策字段，内容密度足以指导后续编码。
+        zero_fields = case["zero_decision_fields"]
+        required_fields = [
+            "文件/符号", "操作", "禁止触碰", "精确测试命令",
+            "断言", "清理", "回滚", "完成条件", "停止条件",
+        ]
+        for field in required_fields:
+            self.assertIn(field, zero_fields, f"正例缺少零决策字段: {field}")
+            self.assertTrue(zero_fields[field].strip(), f"正例零决策字段为空: {field}")
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 02:00:00，验证骨架例被拒绝。
+    def test_plan_ready_skeleton_fails(self) -> None:
+        case = self.cases["plan_ready_skeleton_only"]
+        # 1. 骨架例只有章节标题，缺少零决策字段，必须被闸门拒绝。
+        zero_fields = case["zero_decision_fields"]
+        required_fields = [
+            "文件/符号", "操作", "禁止触碰", "精确测试命令",
+            "断言", "清理", "回滚", "完成条件", "停止条件",
+        ]
+        missing = [field for field in required_fields if field not in zero_fields]
+        self.assertTrue(missing, "骨架例应缺少零决策字段")
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 02:00:00，验证 concise 例被拒绝。
+    def test_plan_ready_concise_fails(self) -> None:
+        case = self.cases["plan_ready_concise_plan"]
+        # 1. concise 例使用 Summary/Key Changes/Test Plan 通用壳，缺少仓库模板字段，必须被拒绝。
+        visible = "\n".join(case["visible_messages"])
+        self.assertIn("Summary", visible)
+        self.assertIn("Key Changes", visible)
+        self.assertIn("Test Plan", visible)
+        self.assertNotIn("最小任务清单", visible)
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 02:00:00，验证占位词例被拒绝。
+    def test_plan_ready_placeholder_fails(self) -> None:
+        case = self.cases["plan_ready_placeholder"]
+        # 1. 占位例含"见上文""后续再定""若干文件"等占位词，必须被闸门拒绝。
+        zero_fields = case["zero_decision_fields"]
+        placeholder_terms = ["见上文", "后续再定", "若干文件", "TBD", "TODO", "实现时再看"]
+        found_placeholder = []
+        for field, value in zero_fields.items():
+            for term in placeholder_terms:
+                if term in value:
+                    found_placeholder.append((field, term))
+        self.assertTrue(found_placeholder, "占位例应包含占位词")
+        self.assertIn("见上文", zero_fields["文件/符号"])
+        self.assertIn("若干文件", zero_fields["禁止触碰"])
+
 
 if __name__ == "__main__":
     unittest.main()
