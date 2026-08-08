@@ -2,13 +2,13 @@
 
 ## 更新时间
 
-- 2026-08-08
+- 2026-08-09
 
 ## 当前任务
 
-- 来源对象：REQ-PSR-MOCK-UPGRADE-001 运行时 Mock 目录树 Skill 升级
-- 当前目标：按已落盘实施计划完成 Go 运行时 Mock 目录、selector、assembly、Catalog、CLI 检查和测试收口，并完成计划完成度复核
-- 当前状态：完成。新增 `runtime-mock-layout-go.md` 契约，Catalog 10 条 Mock 分类，CLI `check_runtime_mock_structure`，测试 36/36 通过，普通/mock 双构建通过，文档门禁与 6-review PASS。复核补齐 owner_skill/fullstack 断言并修复 SKILL guide 代码围栏。改动停在已改动未提交状态。
+- 来源对象：REQ-PLAN-DETAIL-COMPLETE-001 计划输出完整性升级
+- 当前目标：按已落盘实施计划完成全链路规则修复：模板压缩口子删除、闸门内容密度 hard-fail、自审清单对齐、平台规则完整度优先、测试 fixture 升级、记忆同步、全量回归收口
+- 当前状态：完成。TASK-PD-01..07 全部闭环，注册测试 10/10 通过，文档 profile 三份 PASS，git diff --check 通过，所有 6 条 AC 验证通过。改动停在已改动未提交状态。
 
 ## 已完成
 
@@ -21,6 +21,13 @@
 - 复核补齐：契约测试新增 `owner_skill` 统一、fullstack 不扩散和 Schema 必填断言；`SKILL.md` guide 示例代码围栏恢复为两个独立围栏
 
 ## 验证与交接
+
+- 计划输出回归测试 10/10 通过（含 5 既有 + 4 新增内容密度测试）
+- 文档 profile：implementation_overview PASS、implementation_cycle PASS、implementation_master PASS
+- git diff --check 无错误
+- 字典生成退出码 0
+- 6 条 AC 全部验证通过
+- 改动停在已改动未提交状态
 
 - `guide --category runtime-mock --language go` 返回 10 条配方
 - package-structure-rules 全量回归 36/36 通过
@@ -96,6 +103,13 @@
 - 上一轮 `Obsidian:检索 + 沉淀 + 迭代处置`；固定 vault `D:\obsidian_data` 可用，八个新命令全部实机验证 `verified=true`，并用真实笔记演练了「标记取代」档处置（新增 1 篇、旧笔记标 `superseded` 并双向接替）。巡检实跑零写入，前后 `files`=65、`orphans`=41 不变。「归档退场」与「删除」两档已在一次性测试笔记上验证链路，未在生产笔记上执行。
 
 ## 验证与交接
+
+- 计划输出回归测试 10/10 通过（含 5 既有 + 4 新增内容密度测试）
+- 文档 profile：implementation_overview PASS、implementation_cycle PASS、implementation_master PASS
+- git diff --check 无错误
+- 字典生成退出码 0
+- 6 条 AC 全部验证通过
+- 改动停在已改动未提交状态
 
 - 本轮最后执行点：asset_location_test.py `13/13`、package-structure-rules 全量回归 `26/26`、根 Python 测试 `287/289`、字典生成脚本退出码 0、`git diff --check` 通过、6-review 文档 profile `valid: true`；目标文件 UTF-8 回读通过。
 - 2 个既有失败（`test_missing_section_is_rejected`、`test_requirement_fixture_passes`）与本次改动无关，为 `F:\luode-skills` 路径引用丢失的独立问题。

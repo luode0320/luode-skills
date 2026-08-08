@@ -10,6 +10,16 @@
 # 项目长期记忆
 
 
+## 计划输出完整性规则
+
+- 稳定决策：`implementation-planning-rules` 的正式实施计划必须零决策完整落盘；plan-structure-template.md 禁止在最终输出时压缩或省略思考阶段已形成的任何落点、文件/符号、命令、断言、回滚和完成条件。
+- 稳定决策：宿主外层包裹（如 `<proposed_plan>`）的简洁/3-5小节要求仅影响包裹层，不得删减计划正文中的任务字段、细节或零决策事项；仓库模板完整度优先于宿主简洁要求。
+- 稳定决策：plan-output-gate.md 硬失败结构包含内容密度 hard-fail：最小任务缺少零决策字段（文件/符号、操作、禁止触碰、精确测试命令、断言、清理、回滚、完成条件、停止条件中任一项）或出现"见上文""后续再定""若干文件""TBD""TODO""实现时再看"等占位词时直接不合格。
+- 稳定决策：正式实施计划的主章节仅包含章节标题、各任务缺少可执行具体字段内容即为无效计划；代码变更类计划必须给出代码落点目录树（text 代码块）。
+- 来源：`implementation-planning-rules/references/plan-structure-template.md`、`plan-output-gate.md`、`plan-review-checklist.md`、`minimum-task-execution-contract.md`、`AGENTS.md`、`CLAUDE.md`、`doc/3-实施/2026-08-09_REQ-PLAN-DETAIL-COMPLETE-001/实施总览.md`。
+- 更新时间：2026-08-09。
+
+
 ## 运行时 Mock 目录树规则
 
 - 稳定决策：`package-structure-rules` 是 Go 运行时 Mock 目录与装配的唯一 Owner；根 `mock/` 按 `internal/` 相对路径镜像，`mock/assembly/` 是唯一装配桥，包名固定为 `assembly`。
