@@ -42,6 +42,8 @@
     "config/defaults",
     "src/config",
     "internal/config",
+    "test/config",
+    "mock/config",
     "infrastructure",
     "runtime",
     "workflow",
@@ -239,8 +241,8 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "config/yaml",
-      "purpose": "按部署环境拆分的外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值",
-      "creation_policy": "required",
+      "purpose": "按部署环境拆分的外部 YAML 配置；与 embedded/ 互斥二选一；禁止真实秘密原值",
+      "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
         ".yaml",
@@ -256,7 +258,7 @@
       "direct_files": true,
       "owner_skill": "package-structure-rules",
       "secret_policy": "forbid_plain_secret",
-      "source_policy": "embedded_source_fallback",
+      "source_policy": "yaml_mutually_exclusive",
       "environment_variable_policy": "allowed_reference",
       "search_entry": "config/yaml"
     },
@@ -267,7 +269,7 @@
       "content_type": "source_code",
       "category": "embedded",
       "canonical_path": "config/embedded",
-      "purpose": "按部署环境拆分的源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
+      "purpose": "按部署环境拆分的源码内 YAML 字符串配置；与 yaml/ 互斥二选一，推荐优先使用；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
@@ -288,7 +290,7 @@
       "direct_files": true,
       "owner_skill": "package-structure-rules",
       "secret_policy": "allow_plain_secret",
-      "source_policy": "embedded_source_primary",
+      "source_policy": "embedded_mutually_exclusive",
       "environment_variable_policy": "not_default",
       "search_entry": "config/embedded"
     },
@@ -299,8 +301,8 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "backend/config/yaml",
-      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值",
-      "creation_policy": "required",
+      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；与 embedded/ 互斥二选一；禁止真实秘密原值",
+      "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
         ".yaml",
@@ -316,7 +318,7 @@
       "direct_files": true,
       "owner_skill": "package-structure-rules",
       "secret_policy": "forbid_plain_secret",
-      "source_policy": "embedded_source_fallback",
+      "source_policy": "yaml_mutually_exclusive",
       "environment_variable_policy": "allowed_reference",
       "search_entry": "backend/config/yaml"
     },
@@ -327,7 +329,7 @@
       "content_type": "source_code",
       "category": "embedded",
       "canonical_path": "backend/config/embedded",
-      "purpose": "按部署环境拆分的同仓后端源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
+      "purpose": "按部署环境拆分的同仓后端源码内 YAML 字符串配置；与 yaml/ 互斥二选一，推荐优先使用；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
@@ -348,7 +350,7 @@
       "direct_files": true,
       "owner_skill": "package-structure-rules",
       "secret_policy": "allow_plain_secret",
-      "source_policy": "embedded_source_primary",
+      "source_policy": "embedded_mutually_exclusive",
       "environment_variable_policy": "not_default",
       "search_entry": "backend/config/embedded"
     },

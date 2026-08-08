@@ -790,6 +790,31 @@ def configuration_root(project_kind: str | None) -> str | None:
     return {"backend": "config", "fullstack": "backend/config"}.get(project_kind)
 
 
+def check_environment_config_mutual_exclusion(
+    root: Path, project_kind: str | None,
+) -> list[str]:
+    """校验 config 互斥与禁止 test/mock 下独立配置。
+
+    [参数] root：待检查项目根；project_kind：项目类型。
+    [返回] list[str]：配置模式冲突或非法配置根的错误列表。
+    最近修改时间: 2026-08-09 新增 config/embedded/ 与 config/yaml/ 互斥 check；新增 test/config 与 mock/config 禁止。
+    """
+    if project_kind not in {"backend", "fullstack"}:
+        return []
+    errors: list[str] = []
+    config_root = configuration_root(project_kind)
+    assert config_root is not None
+    yaml_dir = root / config_root / "yaml"
+    embedded_dir = root / config_root / "embedded"
+    if yaml_dir.exists() and embedded_dir.exists():
+        errors.append(f"{config_root}/yaml/ 与 {config_root}/embedded/ 互斥，只能二选一，推荐优先使用 {config_root}/embedded/")
+    # test/ 与 mock/ 不承载独立配置，所有配置统一使用 config/ 下的 test 环境
+    for illegal in ["test/config", "mock/config"]:
+        if (root / illegal).exists():
+            errors.append(f"禁止 {illegal}/：test/ 与 mock/ 不承载独立配置，测试和 Mock 配置统一使用 config/ 下的 test 环境")
+    return errors
+
+
 def check_environment_config_path(
     catalog: dict[str, Any], relative: str, is_file: bool, project_kind: str | None, language: str | None,
 ) -> list[str]:
@@ -1250,7 +1275,10 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
-    # 3.1 运行时 Mock 结构检查依赖全目录事实（selector 配对、镜像与标签），单独在扫描后执行。
+    # 3.1 配置模式互斥检查依赖全目录事实，单独在扫描后执行。
+    if args.policy == "strict":
+        errors.extend(check_environment_config_mutual_exclusion(root, args.project_kind))
+    # 3.2 运行时 Mock 结构检查依赖全目录事实（selector 配对、镜像与标签），单独在扫描后执行。
     if args.project_kind in {"backend", "fullstack"} and args.language == "go":
         errors.extend(check_runtime_mock_structure(catalog, root, args.project_kind, args.language, adoption_state))
     # 4. strict 校验新项目根 Dockerfile 和双平台规则正文；adoption 不借此强迫旧项目补迁移文件。

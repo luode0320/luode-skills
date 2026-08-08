@@ -156,9 +156,9 @@
           },
           "source_policy": {
             "enum": [
-              "embedded_source_fallback",
+              "yaml_mutually_exclusive",
               "external_config_primary",
-              "embedded_source_primary"
+              "embedded_mutually_exclusive"
             ]
           },
           "environment_variable_policy": {
