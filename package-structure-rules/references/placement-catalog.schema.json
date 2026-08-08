@@ -2,67 +2,422 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "代码位置目录 Catalog",
   "type": "object",
-  "required": ["version", "owner_skill", "project_kinds", "forbidden_paths", "allowed_children", "adoption_manifest", "entries", "skeletons"],
+  "required": [
+    "version",
+    "owner_skill",
+    "project_kinds",
+    "forbidden_paths",
+    "allowed_children",
+    "adoption_manifest",
+    "entries",
+    "skeletons"
+  ],
   "properties": {
-    "version": {"const": 2},
-    "owner_skill": {"const": "package-structure-rules"},
-    "project_kinds": {"type": "array", "items": {"enum": ["fullstack", "backend", "frontend"]}},
-    "forbidden_paths": {"type": "array", "items": {"type": "string"}},
-    "allowed_children": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
-    "adoption_manifest": {"$ref": "#/$defs/adoption_manifest_rules"},
+    "version": {
+      "const": 2
+    },
+    "owner_skill": {
+      "const": "package-structure-rules"
+    },
+    "project_kinds": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "fullstack",
+          "backend",
+          "frontend"
+        ]
+      }
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_children": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "adoption_manifest": {
+      "$ref": "#/$defs/adoption_manifest_rules"
+    },
     "entries": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "project_kind", "artifact_kind", "content_type", "canonical_path", "purpose", "creation_policy", "tracked", "owner_skill"],
+        "required": [
+          "id",
+          "project_kind",
+          "artifact_kind",
+          "content_type",
+          "canonical_path",
+          "purpose",
+          "creation_policy",
+          "tracked",
+          "owner_skill"
+        ],
         "properties": {
-          "language": {"enum": ["go", "java", "node", "python"]},
-          "requires_domain": {"type": "boolean"},
-          "flat_files": {"type": "boolean"},
-          "node_kind": {"enum": ["directory", "file", "pattern"]},
-          "path_pattern": {"type": "string", "minLength": 1},
-          "dynamic": {"type": "boolean"},
-          "init_policy": {"enum": ["catalog", "forbidden"]},
-          "file_name_pattern": {"type": "string", "minLength": 1},
-          "go_file_name_pattern": {"type": "string", "minLength": 1},
-          "environment_name_pattern": {"type": "string", "minLength": 1},
-          "standard_environments": {"type": "array", "items": {"type": "string", "minLength": 1}},
-          "secret_policy": {"enum": ["forbid_plain_secret", "allow_plain_secret"]},
-          "source_policy": {"enum": ["embedded_source_fallback", "external_config_primary", "embedded_source_primary"]},
-          "environment_variable_policy": {"enum": ["allowed_reference", "not_default"]},
-          "direct_files": {"type": "boolean"},
-          "content_must_match": {"type": "string", "minLength": 1},
-          "environment_source_policy": {"type": "string", "minLength": 1}
+          "language": {
+            "enum": [
+              "go",
+              "java",
+              "node",
+              "python"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "paired_with": {
+            "type": "string",
+            "minLength": 1,
+            "description": "selector 必须成对存在的配对条目 ID"
+          },
+          "required_build_tag": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Mock selector、Mock 实现和 assembly 必需的构建标签，如 mock"
+          },
+          "required_exclude_build_tag": {
+            "type": "string",
+            "minLength": 1,
+            "description": "real selector 必需的排除构建标签，如 !mock"
+          },
+          "mirror_source_root": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Mock 镜像的源码根，Go 后端固定为 internal 或 backend/internal"
+          },
+          "forbidden_direct_imports": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "入口禁止直接导入的 Mock 实现路径"
+          },
+          "requires_domain": {
+            "type": "boolean"
+          },
+          "flat_files": {
+            "type": "boolean"
+          },
+          "node_kind": {
+            "enum": [
+              "directory",
+              "file",
+              "pattern"
+            ]
+          },
+          "path_pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dynamic": {
+            "type": "boolean"
+          },
+          "init_policy": {
+            "enum": [
+              "catalog",
+              "forbidden"
+            ]
+          },
+          "file_name_pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "go_file_name_pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "environment_name_pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "standard_environments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "secret_policy": {
+            "enum": [
+              "forbid_plain_secret",
+              "allow_plain_secret"
+            ]
+          },
+          "source_policy": {
+            "enum": [
+              "embedded_source_fallback",
+              "external_config_primary",
+              "embedded_source_primary"
+            ]
+          },
+          "environment_variable_policy": {
+            "enum": [
+              "allowed_reference",
+              "not_default"
+            ]
+          },
+          "direct_files": {
+            "type": "boolean"
+          },
+          "content_must_match": {
+            "type": "string",
+            "minLength": 1
+          },
+          "environment_source_policy": {
+            "type": "string",
+            "minLength": 1
+          },
+          "related_skills": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "关联 skill 完整名称列表，如 time-util-rules、common-util-rules"
+          },
+          "usage_recipes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "用法 recipe 标识列表，如 usage-recipes-go.md#time"
+          },
+          "package_alias": {
+            "type": "string",
+            "description": "Go import 包别名，如 timeUtil、jsonUtil"
+          },
+          "example_scope": {
+            "type": "string",
+            "description": "示例范围说明，如 utils/time/"
+          }
         },
         "allOf": [
           {
-            "if": {"properties": {"artifact_kind": {"const": "common-util"}}, "required": ["artifact_kind"]},
-            "then": {"required": ["flat_files"]}
+            "if": {
+              "properties": {
+                "artifact_kind": {
+                  "const": "common-util"
+                }
+              },
+              "required": [
+                "artifact_kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "flat_files"
+              ]
+            }
           },
           {
-            "if": {"properties": {"artifact_kind": {"const": "business-rpc"}}, "required": ["artifact_kind"]},
-            "then": {"required": ["requires_domain", "flat_files"]}
+            "if": {
+              "properties": {
+                "artifact_kind": {
+                  "const": "business-rpc"
+                }
+              },
+              "required": [
+                "artifact_kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "requires_domain",
+                "flat_files"
+              ]
+            }
           },
           {
-            "if": {"properties": {"node_kind": {"const": "pattern"}}, "required": ["node_kind"]},
-            "then": {"required": ["path_pattern", "dynamic", "init_policy"]}
+            "if": {
+              "properties": {
+                "node_kind": {
+                  "const": "pattern"
+                }
+              },
+              "required": [
+                "node_kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "path_pattern",
+                "dynamic",
+                "init_policy"
+              ]
+            }
           },
           {
-            "if": {"properties": {"category": {"enum": ["loader", "model"]}}, "required": ["category"]},
-            "then": {"required": ["node_kind", "path_pattern", "dynamic", "init_policy", "allowed_extensions"]}
+            "if": {
+              "properties": {
+                "category": {
+                  "enum": [
+                    "loader",
+                    "model"
+                  ]
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "node_kind",
+                "path_pattern",
+                "dynamic",
+                "init_policy",
+                "allowed_extensions"
+              ]
+            }
           },
           {
-            "if": {"properties": {"node_kind": {"const": "file"}}, "required": ["node_kind"]},
-            "then": {"required": ["allowed_extensions"]}
+            "if": {
+              "properties": {
+                "node_kind": {
+                  "const": "file"
+                }
+              },
+              "required": [
+                "node_kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "allowed_extensions"
+              ]
+            }
           },
           {
-            "if": {"properties": {"category": {"const": "claude"}}, "required": ["category"]},
-            "then": {"required": ["node_kind", "content_must_match"]}
+            "if": {
+              "properties": {
+                "category": {
+                  "const": "claude"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "node_kind",
+                "content_must_match"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "category": {
+                  "enum": [
+                    "selector-mock",
+                    "selector-real",
+                    "assembly",
+                    "implementation",
+                    "root"
+                  ]
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "init_policy"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "category": {
+                  "const": "selector-mock"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "paired_with",
+                "required_build_tag"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "category": {
+                  "const": "selector-real"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "paired_with",
+                "required_exclude_build_tag"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "category": {
+                  "const": "assembly"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "required_build_tag"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "category": {
+                  "const": "implementation"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "then": {
+              "required": [
+                "mirror_source_root",
+                "required_build_tag",
+                "forbidden_direct_imports"
+              ]
+            }
           }
         ]
       }
     },
-    "skeletons": {"type": "object"}
+    "skeletons": {
+      "type": "object"
+    }
   },
   "$defs": {
     "relative_path": {
@@ -73,38 +428,94 @@
     "adoption_manifest_rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "schema_ref", "required_fields", "path_rules"],
+      "required": [
+        "version",
+        "schema_ref",
+        "required_fields",
+        "path_rules"
+      ],
       "properties": {
-        "version": {"const": 1},
-        "schema_ref": {"const": "#/$defs/adoption_manifest"},
+        "version": {
+          "const": 1
+        },
+        "schema_ref": {
+          "const": "#/$defs/adoption_manifest"
+        },
         "required_fields": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["manifest", "backend", "adopted_path", "legacy_source_root"],
+          "required": [
+            "manifest",
+            "backend",
+            "adopted_path",
+            "legacy_source_root"
+          ],
           "properties": {
-            "manifest": {"const": ["version", "project_kind", "adopted_paths", "legacy_source_roots"]},
-            "backend": {"const": ["language"]},
-            "adopted_path": {"const": ["path", "catalog_id", "responsibility"]},
-            "legacy_source_root": {"const": ["path", "responsibility", "existing_directories", "existing_files"]}
+            "manifest": {
+              "const": [
+                "version",
+                "project_kind",
+                "adopted_paths",
+                "legacy_source_roots"
+              ]
+            },
+            "backend": {
+              "const": [
+                "language"
+              ]
+            },
+            "adopted_path": {
+              "const": [
+                "path",
+                "catalog_id",
+                "responsibility"
+              ]
+            },
+            "legacy_source_root": {
+              "const": [
+                "path",
+                "responsibility",
+                "existing_directories",
+                "existing_files"
+              ]
+            }
           }
         },
         "path_rules": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["relative_only", "forbid_parent_segments", "unique_by", "adopted_paths_must_not_match_catalog_forbidden_paths"],
+          "required": [
+            "relative_only",
+            "forbid_parent_segments",
+            "unique_by",
+            "adopted_paths_must_not_match_catalog_forbidden_paths"
+          ],
           "properties": {
-            "relative_only": {"const": true},
-            "forbid_parent_segments": {"const": true},
+            "relative_only": {
+              "const": true
+            },
+            "forbid_parent_segments": {
+              "const": true
+            },
             "unique_by": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["adopted_paths", "legacy_source_roots"],
+              "required": [
+                "adopted_paths",
+                "legacy_source_roots"
+              ],
               "properties": {
-                "adopted_paths": {"const": "path"},
-                "legacy_source_roots": {"const": "path"}
+                "adopted_paths": {
+                  "const": "path"
+                },
+                "legacy_source_roots": {
+                  "const": "path"
+                }
               }
             },
-            "adopted_paths_must_not_match_catalog_forbidden_paths": {"const": true}
+            "adopted_paths_must_not_match_catalog_forbidden_paths": {
+              "const": true
+            }
           }
         }
       }
@@ -112,22 +523,54 @@
     "adoption_manifest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "project_kind", "adopted_paths", "legacy_source_roots"],
+      "required": [
+        "version",
+        "project_kind",
+        "adopted_paths",
+        "legacy_source_roots"
+      ],
       "properties": {
-        "version": {"const": 1},
-        "project_kind": {"enum": ["fullstack", "backend", "frontend"]},
-        "language": {"enum": ["go", "java", "node", "python"]},
+        "version": {
+          "const": 1
+        },
+        "project_kind": {
+          "enum": [
+            "fullstack",
+            "backend",
+            "frontend"
+          ]
+        },
+        "language": {
+          "enum": [
+            "go",
+            "java",
+            "node",
+            "python"
+          ]
+        },
         "adopted_paths": {
           "type": "array",
           "uniqueItems": true,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["path", "catalog_id", "responsibility"],
+            "required": [
+              "path",
+              "catalog_id",
+              "responsibility"
+            ],
             "properties": {
-              "path": {"$ref": "#/$defs/relative_path"},
-              "catalog_id": {"type": "string", "minLength": 1},
-              "responsibility": {"type": "string", "minLength": 1}
+              "path": {
+                "$ref": "#/$defs/relative_path"
+              },
+              "catalog_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "responsibility": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
@@ -137,19 +580,33 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["path", "responsibility", "existing_directories", "existing_files"],
+            "required": [
+              "path",
+              "responsibility",
+              "existing_directories",
+              "existing_files"
+            ],
             "properties": {
-              "path": {"$ref": "#/$defs/relative_path"},
-              "responsibility": {"type": "string", "minLength": 1},
+              "path": {
+                "$ref": "#/$defs/relative_path"
+              },
+              "responsibility": {
+                "type": "string",
+                "minLength": 1
+              },
               "existing_directories": {
                 "type": "array",
                 "uniqueItems": true,
-                "items": {"$ref": "#/$defs/relative_path"}
+                "items": {
+                  "$ref": "#/$defs/relative_path"
+                }
               },
               "existing_files": {
                 "type": "array",
                 "uniqueItems": true,
-                "items": {"$ref": "#/$defs/relative_path"}
+                "items": {
+                  "$ref": "#/$defs/relative_path"
+                }
               }
             }
           }
@@ -157,8 +614,21 @@
       },
       "allOf": [
         {
-          "if": {"properties": {"project_kind": {"const": "backend"}}, "required": ["project_kind"]},
-          "then": {"required": ["language"]}
+          "if": {
+            "properties": {
+              "project_kind": {
+                "const": "backend"
+              }
+            },
+            "required": [
+              "project_kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "language"
+            ]
+          }
         }
       ]
     }

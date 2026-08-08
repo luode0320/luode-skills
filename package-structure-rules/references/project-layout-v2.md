@@ -42,7 +42,9 @@
 │       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── frontend/                              # [必需·提交] 完整独立前端项目
 ├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
-├── mock/                                   # [条件·提交] 运行时 Mock 根，按被测源码相对路径镜像；//go:build mock 构建标签；与根 	est/ 对等
+├── mock/                                   # [条件·提交] 运行时 Mock 根，按 internal 相对路径镜像；//go:build mock；详见 runtime-mock-layout-go.md
+│   ├── assembly/                           # [条件·提交] Mock 装配桥；package assembly
+│   └── <internal-relative>/                # [条件·提交] Mock 实现；package mock_<源包名>
 ├── integration/                           # [条件·提交] 仅限前后端联调资产
 │   ├── contracts/                         # [条件·提交] 联调契约根
 │   │   ├── http/                          # [条件·提交] HTTP 契约
@@ -115,7 +117,9 @@
 │   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；允许源码私密配置，源码优先且默认不依赖环境变量；只存放配置数据
 │       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
-├── mock/                                     # [条件·提交] 运行时 Mock 根，按被测源码相对路径镜像；//go:build mock 构建标签；与根 	est/ 对等
+├── mock/                                     # [条件·提交] 运行时 Mock 根，按 internal 相对路径镜像；//go:build mock；详见 runtime-mock-layout-go.md
+│   ├── assembly/                             # [条件·提交] Mock 装配桥；package assembly
+│   └── <internal-relative>/                  # [条件·提交] Mock 实现；package mock_<源包名>
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
 │   ├── model/                               # [条件·提交] 数据存储模型分类根；根目录禁止直接文件

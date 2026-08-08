@@ -40,11 +40,17 @@ SOURCE_ROOTS = {
     "node": "src",
     "python": "src/<package>",
 }
+GO_BUILD_TAG_RE = re.compile(r"^//go:build\s+(.+)$", re.MULTILINE)
+GO_PACKAGE_RE = re.compile(r"^\s*package\s+([A-Za-z_][A-Za-z0-9_]*)\s*$", re.MULTILINE)
+GO_IMPORT_BLOCK_RE = re.compile(r"import\s*\(([^)]*)\)", re.DOTALL)
+GO_IMPORT_SINGLE_RE = re.compile(r'^\s*import(?:\s+[A-Za-z_][A-Za-z0-9_.]*)?\s+"([^"]+)"', re.MULTILINE)
+GO_IMPORT_QUOTED_RE = re.compile(r'"([^"]+)"')
+NEW_FUNC_RE = re.compile(r"\bfunc\s+(new[A-Za-z0-9_]+)\s*\(")
 ADOPTION_MANIFEST_PATH = "doc/1-架构/3-目录规则收敛清单.yaml"
 ADOPTION_V2_SOURCE_ROOTS = {
-    "backend": {"cmd", "config", "data", "database", "swag", "resources", "utils", "common", "global", "crontask", "async", "middleware", "internal", "src", "scripts", "tools", "deploy", "doc"},
+    "backend": {"cmd", "config", "data", "database", "swag", "resources", "utils", "common", "global", "crontask", "async", "middleware", "internal", "src", "scripts", "tools", "deploy", "doc", "mock"},
     "frontend": {"config", "public", "src", "mocks", "scripts", "tools", "deploy", "doc", ".storybook"},
-    "fullstack": {"backend", "frontend", "integration", "doc"},
+    "fullstack": {"backend", "frontend", "integration", "doc", "mock"},
 }
 
 # Windows 控制台默认代码页可能不是 UTF-8；CLI 的机器输出必须稳定为 UTF-8。
@@ -136,6 +142,80 @@ def command_query(catalog: dict[str, Any], args: argparse.Namespace) -> int:
     print(json.dumps({"ok": True, "entry": entries[0]}, ensure_ascii=False, indent=2))
     return 0
 
+
+
+def command_guide(catalog: dict[str, Any], args: argparse.Namespace) -> int:
+    """按分类或技术查询目录用法，返回关联 skill、recipe 和包别名。
+
+    [参数] catalog 为位置 Catalog，args 为解析后的查询参数。
+    [返回] 成功返回 0，无匹配返回 2。
+    """
+    category_aliases = {
+        "time": "time",
+        "convert": "conversion",
+        "conversion": "conversion",
+        "cache": "cache",
+        "mq": "mq",
+        "message": "mq",
+        "search": "search",
+        "storage": "storage",
+        "rpc": "rpc",
+        "api": "api",
+        "auth": "auth",
+        "secret": "secret",
+        "notification": "notification",
+        "payment": "payment",
+        "discovery": "discovery",
+        "ip": "ip",
+        "json": "serialization",
+        "serialization": "serialization",
+        "log": "logging",
+        "logging": "logging",
+        "cron": "scheduler",
+        "scheduler": "scheduler",
+        "async": "async",
+        "http": "http",
+        "protobuf": "protobuf",
+        "all": "all",
+    }
+    category_value = category_aliases.get(args.category, args.category) if args.category else "all"
+    entries = catalog["entries"]
+    result = []
+    # runtime-mock 是跨 backend/fullstack 的完整使用配方，其余类别保持后端工具包语义。
+    project_kinds = ("backend", "fullstack") if category_value == "runtime-mock" else ("backend",)
+    for entry in entries:
+        if entry["project_kind"] not in project_kinds:
+            continue
+        if category_value == "runtime-mock" and entry.get("artifact_kind") != "mock":
+            continue
+        if args.language and entry.get("language") and entry["language"] != args.language:
+            continue
+        if category_value and category_value not in {"all", "runtime-mock"}:
+            cat = entry.get("category", "")
+            if cat != category_value:
+                continue
+        if args.technology:
+            if entry.get("technology") != args.technology:
+                continue
+        if "canonical_path" not in entry:
+            continue
+        result.append({
+            "project_kind": entry["project_kind"],
+            "category": entry.get("category", ""),
+            "canonical_path": entry["canonical_path"],
+            "purpose": entry.get("purpose", ""),
+            "owner_skill": entry.get("owner_skill", ""),
+            "related_skills": entry.get("related_skills", []),
+            "usage_recipes": entry.get("usage_recipes", []),
+            "package_alias": entry.get("package_alias", ""),
+            "example_scope": entry.get("example_scope", ""),
+        })
+    if not result:
+        print(json.dumps({"ok": False, "usage": [], "message": "未找到匹配的目录用法"}, ensure_ascii=False))
+        return 2
+    result.sort(key=lambda x: x["canonical_path"])
+    print(json.dumps({"ok": True, "usage": result}, ensure_ascii=False, indent=2))
+    return 0
 
 def tree_lines(kind: str) -> list[str]:
     """从与 Catalog 绑定的完整目录文档提取单个项目树，禁止脚本维护简写树。
@@ -483,6 +563,220 @@ def check_binary_entrypoint_path(
             return []
 
     return [] if valid else [f"二进制入口路径非法: {relative}"]
+
+
+def legal_main_entrypoint_relative(relative: str, project_kind: str, language: str) -> bool:
+    """判断相对路径是否为当前项目类型合法的 Go 主入口。"""
+    return Path(relative).name == "main.go" and not check_binary_entrypoint_path(relative, True, project_kind, language)
+
+
+def selector_relative_from_main(main_relative: str, selector_name: str) -> str:
+    """返回与主入口同级的 selector 文件相对路径。"""
+    return (Path(main_relative).parent / selector_name).as_posix()
+
+
+def is_legal_mock_selector(relative: str, project_kind: str, language: str) -> bool:
+    """判断相对路径是否为合法入口的 mock/real selector。"""
+    name = Path(relative).name
+    if name not in {"main_mock.go", "main_real.go"}:
+        return False
+    main_relative = selector_relative_from_main(relative, "main.go")
+    return legal_main_entrypoint_relative(main_relative, project_kind, language)
+
+
+def go_build_tag(text: str) -> str | None:
+    """提取 Go 文件第一个 //go:build 表达式。"""
+    match = GO_BUILD_TAG_RE.search(text)
+    return match.group(1).strip() if match else None
+
+
+def go_package_name(text: str) -> str | None:
+    """提取 Go 文件的 package 名。"""
+    match = GO_PACKAGE_RE.search(text)
+    return match.group(1) if match else None
+
+
+def selector_functions(text: str) -> set[str]:
+    """提取 selector 文件中 newXxx() 函数名集合。"""
+    return set(NEW_FUNC_RE.findall(text))
+
+
+def go_import_paths(text: str) -> set[str]:
+    """提取 Go import 路径集合，覆盖单行与 import 块。"""
+    paths = set(GO_IMPORT_SINGLE_RE.findall(text))
+    for block in GO_IMPORT_BLOCK_RE.findall(text):
+        paths.update(GO_IMPORT_QUOTED_RE.findall(block))
+    return paths
+
+
+def module_name(root: Path) -> str | None:
+    """从 go.mod 提取 module 路径，缺失时返回 None。"""
+    go_mod = root / "go.mod"
+    if not go_mod.is_file():
+        return None
+    for line in go_mod.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^\s*module\s+(\S+)\s*$", line)
+        if match:
+            return match.group(1)
+    return None
+
+
+def import_targets_mock_implementation(import_path: str, module: str | None) -> bool:
+    """判断 import 路径是否直接指向 mock 实现包（assembly 除外）。"""
+    if module:
+        prefix = module.rstrip("/") + "/mock/"
+        if import_path.startswith(prefix):
+            suffix = import_path[len(prefix):]
+            return bool(suffix) and not suffix.startswith("assembly")
+        return False
+    parts = import_path.split("/")
+    for index, part in enumerate(parts):
+        if part == "mock" and index + 1 < len(parts):
+            suffix = parts[index + 1:]
+            return bool(suffix) and suffix != ["assembly"]
+    return False
+
+
+def mock_source_relative(relative: str, source_root: str) -> str | None:
+    """将 mock/ 下实现路径映射为源码根相对路径；assembly 返回 None。"""
+    if not relative.startswith("mock/") or relative.startswith("mock/assembly/"):
+        return None
+    suffix = relative[len("mock/"):]
+    return f"{source_root}/{suffix}"
+
+
+def runtime_mock_in_legacy(adoption_state: dict[str, Any]) -> bool:
+    """判断收敛清单是否已把 mock 根或 selector 冻结为遗留快照。"""
+    for legacy_root, snapshot in adoption_state.get("legacy", {}).items():
+        if legacy_root == "mock" or legacy_root.startswith("mock/"):
+            return True
+        for file_path in snapshot.get("files", set()):
+            if Path(file_path).name in {"main_mock.go", "main_real.go"}:
+                return True
+    return False
+
+
+def check_runtime_mock_structure(
+    catalog: dict[str, Any], root: Path, project_kind: str, language: str,
+    adoption_state: dict[str, Any] | None = None,
+) -> list[str]:
+    """只读检查 Go 运行时 Mock 的目录、selector、标签、包名与导入边界。
+
+    [参数] catalog：目录事实源；root：项目根；project_kind：项目类型；language：后端语言；adoption_state：已验收收敛清单。
+    [返回] list[str]：违规结构的稳定错误列表。
+    最近修改时间: 2026-08-08 新增运行时 Mock 结构专项检查。
+    """
+    if project_kind not in {"backend", "fullstack"} or language != "go":
+        return []
+    if adoption_state is not None and runtime_mock_in_legacy(adoption_state):
+        return []
+
+    source_root = {"backend": "internal", "fullstack": "backend/internal"}[project_kind]
+    module = module_name(root)
+    errors: list[str] = []
+    all_go = sorted(root.rglob("*.go"))
+    legal_main = {
+        normalize_path(path.relative_to(root))
+        for path in all_go
+        if legal_main_entrypoint_relative(normalize_path(path.relative_to(root)), project_kind, language)
+    }
+    selector_pairs: list[tuple[str, str, str]] = []
+    mock_root = root / "mock"
+    has_mock_files = mock_root.is_dir() and any(mock_root.rglob("*.go"))
+
+    # 1. 合法主入口必须成对提供 mock/real selector。
+    for main_relative in sorted(legal_main):
+        mock_relative = selector_relative_from_main(main_relative, "main_mock.go")
+        real_relative = selector_relative_from_main(main_relative, "main_real.go")
+        mock_exists = (root / mock_relative).is_file()
+        real_exists = (root / real_relative).is_file()
+        if mock_exists != real_exists:
+            missing = real_relative if mock_exists else mock_relative
+            errors.append(f"Mock selector 缺失: {missing}")
+        if mock_exists and real_exists:
+            selector_pairs.append((main_relative, mock_relative, real_relative))
+        elif has_mock_files and main_relative in {
+            "main.go",
+            "backend/main.go",
+        }:
+            errors.append(f"启用运行时 Mock 的入口缺少 selector: {main_relative}")
+
+    # 2. selector 必须位于合法入口同级，并携带正确构建标签；入口不得直接导入实现包。
+    for path in all_go:
+        relative = normalize_path(path.relative_to(root))
+        name = path.name
+        if name not in {"main_mock.go", "main_real.go"}:
+            continue
+        main_relative = selector_relative_from_main(relative, "main.go")
+        if main_relative not in legal_main:
+            errors.append(f"Mock selector 必须与合法入口 main.go 同级: {relative}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        expected_tag = "mock" if name == "main_mock.go" else "!mock"
+        if go_build_tag(text) != expected_tag:
+            errors.append(f"selector 构建标签错误: {relative} 必须为 //go:build {expected_tag}")
+        for import_path in go_import_paths(text):
+            if import_targets_mock_implementation(import_path, module):
+                errors.append(f"入口禁止直接导入 Mock 实现: {relative} -> {import_path}")
+
+    # 3. 两份 selector 的 newXxx() 名称集合必须一致。
+    for main_relative, mock_relative, real_relative in selector_pairs:
+        mock_path = root / mock_relative
+        real_path = root / real_relative
+        if not mock_path.is_file() or not real_path.is_file():
+            continue
+        mock_functions = selector_functions(mock_path.read_text(encoding="utf-8"))
+        real_functions = selector_functions(real_path.read_text(encoding="utf-8"))
+        if mock_functions != real_functions:
+            errors.append(f"Mock selector 函数集合不一致: {mock_relative} / {real_relative}")
+
+    # 4. mock/ 下实现必须镜像源码根、包名正确且带 mock 标签。
+    if mock_root.is_dir():
+        for path in sorted(mock_root.rglob("*.go")):
+            relative = normalize_path(path.relative_to(root))
+            text = path.read_text(encoding="utf-8")
+            if go_build_tag(text) != "mock":
+                errors.append(f"Mock 文件必须使用 //go:build mock: {relative}")
+            package_name = go_package_name(text)
+            if relative.startswith("mock/assembly/"):
+                if package_name != "assembly":
+                    errors.append(f"Mock assembly 包名必须为 assembly: {relative}")
+                continue
+            source_relative = mock_source_relative(relative, source_root)
+            if source_relative is None:
+                continue
+            source_dir = root / Path(source_relative).parent
+            source_files = sorted(source_dir.glob("*.go")) if source_dir.is_dir() else []
+            if not source_files:
+                errors.append(f"Mock 镜像源缺失: {relative} -> {source_dir.as_posix()}")
+                continue
+            source_package = next(
+                (go_package_name(source_file.read_text(encoding="utf-8")) for source_file in source_files),
+                None,
+            )
+            expected_package = f"mock_{source_package}" if source_package else None
+            if package_name is None or expected_package is None or package_name != expected_package:
+                errors.append(f"Mock 包名必须为 mock_<源包名>: {relative}")
+
+    # 5. 生产入口 main.go / main_real.go 不得导入运行时 Mock。
+    for main_relative in sorted(legal_main):
+        for path_relative in (main_relative, selector_relative_from_main(main_relative, "main_real.go")):
+            path = root / path_relative
+            if not path.is_file():
+                continue
+            for import_path in go_import_paths(path.read_text(encoding="utf-8")):
+                if import_targets_mock_implementation(import_path, module):
+                    errors.append(f"生产代码禁止导入运行时 Mock: {path_relative} -> {import_path}")
+
+    # 6. 源码根内禁止出现 mock_ 包，运行时 Mock 只能放在 mock/。
+    source_root_path = root / source_root
+    if source_root_path.is_dir():
+        for path in sorted(source_root_path.rglob("*.go")):
+            package_name = go_package_name(path.read_text(encoding="utf-8"))
+            if package_name and package_name.startswith("mock_"):
+                relative = normalize_path(path.relative_to(root))
+                errors.append(f"运行时 Mock 禁止放入 {source_root}: {relative}")
+    return errors
 
 
 def configuration_root(project_kind: str | None) -> str | None:
@@ -911,7 +1205,10 @@ def check_adoption_path(
     errors = check_path(catalog, relative, path.is_file(), project_kind, language)
     if path.is_file() and Path(relative).suffix.lower() in state["source_extensions"]:
         # 1. 独立后端根入口是 Catalog 的动态合法路径，不属于静态源码根目录。
-        is_dynamic_binary_entrypoint = not check_binary_entrypoint_path(relative, True, project_kind, language)
+        is_dynamic_binary_entrypoint = (
+            not check_binary_entrypoint_path(relative, True, project_kind, language)
+            or is_legal_mock_selector(relative, project_kind, language)
+        )
         if relative.split("/", 1)[0] not in ADOPTION_V2_SOURCE_ROOTS[project_kind] and not is_dynamic_binary_entrypoint:
             errors.append(f"未登记的遗留源码路径: {relative}")
     return errors
@@ -953,6 +1250,9 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
+    # 3.1 运行时 Mock 结构检查依赖全目录事实（selector 配对、镜像与标签），单独在扫描后执行。
+    if args.project_kind in {"backend", "fullstack"} and args.language == "go":
+        errors.extend(check_runtime_mock_structure(catalog, root, args.project_kind, args.language, adoption_state))
     # 4. strict 校验新项目根 Dockerfile 和双平台规则正文；adoption 不借此强迫旧项目补迁移文件。
     if args.policy == "strict":
         errors.extend(check_required_root_files(catalog, root, args.project_kind))
@@ -1018,6 +1318,10 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--project-kind", choices=["fullstack", "backend", "frontend"])
     check.add_argument("--language", choices=["go", "java", "node", "python"])
     check.add_argument("--adoption-manifest")
+    guide = subparsers.add_parser("guide")
+    guide.add_argument("--category", default="all")
+    guide.add_argument("--technology")
+    guide.add_argument("--language", choices=["go", "java", "node", "python"])
     digest = subparsers.add_parser("hash")
     digest.add_argument("--root", required=True)
     return parser
@@ -1042,6 +1346,8 @@ def main() -> int:
         return command_init(catalog, args)
     if args.command == "check":
         return command_check(catalog, args)
+    if args.command == "guide":
+        return command_guide(catalog, args)
     return command_hash(args)
 
 

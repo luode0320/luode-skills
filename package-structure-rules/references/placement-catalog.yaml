@@ -1,45 +1,168 @@
 {
   "version": 2,
   "owner_skill": "package-structure-rules",
-  "content_types": ["source_code", "sql_asset", "config_asset", "static_data", "resource_asset"],
-  "project_kinds": ["fullstack", "backend", "frontend"],
+  "content_types": [
+    "source_code",
+    "sql_asset",
+    "config_asset",
+    "static_data",
+    "resource_asset"
+  ],
+  "project_kinds": [
+    "fullstack",
+    "backend",
+    "frontend"
+  ],
   "forbidden_paths": [
-    "data", "database/snapshot", "database/migration/sql", "database/migration/ddl", "database/migration/scripts",
-    "database/migration/field/add", "database/migration/field/drop", "database/migration/field/alter",
-    "database/migration/index/add", "database/migration/index/drop", "database/migration/index/alter",
-    "database/sql/dml", "database/sql/view", "database/sql/function", "database/sql/procedure",
-    "database/sql/trigger", "database/sql/partition", "database/sql/permission", "database/sql/seed",
-    "database/sql/maintenance", "protocol", "schema", "config/examples", "config/schema", "config/loader",
-    "config/defaults", "src/config", "internal/config", "infrastructure", "runtime", "workflow", "rules",
-    "command", "plugin", "governance", "contract", "common/event", "common/command", "common/query",
-    "util", "utils/graphql", "utils/asyncapi", "utils/avro", "utils/api/http", "scripts/test", "scripts/codegen",
-    "scripts/database", "scripts/maintenance", "scripts/ci", "scripts/security", "scripts/release",
-    "deploy/helm", "deploy/terraform", "deploy/ansible", "deploy/serverless", "deploy/systemd",
-    "deploy/observability", "deploy/secrets", "deploy/static-hosting", "deploy/cdn", "third_party",
-    "supply-chain", "coverage", "integration/virtualization", "integration/doc", "integration/tests",
-    "integration/scripts", "integration/fixtures"
+    "data",
+    "database/snapshot",
+    "database/migration/sql",
+    "database/migration/ddl",
+    "database/migration/scripts",
+    "database/migration/field/add",
+    "database/migration/field/drop",
+    "database/migration/field/alter",
+    "database/migration/index/add",
+    "database/migration/index/drop",
+    "database/migration/index/alter",
+    "database/sql/dml",
+    "database/sql/view",
+    "database/sql/function",
+    "database/sql/procedure",
+    "database/sql/trigger",
+    "database/sql/partition",
+    "database/sql/permission",
+    "database/sql/seed",
+    "database/sql/maintenance",
+    "protocol",
+    "schema",
+    "config/examples",
+    "config/schema",
+    "config/loader",
+    "config/defaults",
+    "src/config",
+    "internal/config",
+    "infrastructure",
+    "runtime",
+    "workflow",
+    "rules",
+    "command",
+    "plugin",
+    "governance",
+    "contract",
+    "common/event",
+    "common/command",
+    "common/query",
+    "util",
+    "utils/graphql",
+    "utils/asyncapi",
+    "utils/avro",
+    "utils/api/http",
+    "scripts/test",
+    "scripts/codegen",
+    "scripts/database",
+    "scripts/maintenance",
+    "scripts/ci",
+    "scripts/security",
+    "scripts/release",
+    "deploy/helm",
+    "deploy/terraform",
+    "deploy/ansible",
+    "deploy/serverless",
+    "deploy/systemd",
+    "deploy/observability",
+    "deploy/secrets",
+    "deploy/static-hosting",
+    "deploy/cdn",
+    "third_party",
+    "supply-chain",
+    "coverage",
+    "integration/virtualization",
+    "integration/doc",
+    "integration/tests",
+    "integration/scripts",
+    "integration/fixtures"
   ],
   "allowed_children": {
-    "config": ["yaml", "embedded"],
-    "backend/config": ["yaml", "embedded"],
-    "database/model": ["db", "redis", "mongo"],
-    "database/sql": ["ddl", "index", "field"],
-    "database/sql/field": ["create", "update", "delete"],
-    "scripts": ["dev", "build"],
-    "deploy": ["docker", "compose", "kubernetes", "proxy"],
-    "common": ["request", "response", "constant", "error", "validation", "util"],
-    "integration": ["contracts", "compose"],
-    "integration/contracts": ["http", "event", "rpc"],
-    "utils/discovery": ["polaris", "nacos"]
+    "config": [
+      "yaml",
+      "embedded"
+    ],
+    "backend/config": [
+      "yaml",
+      "embedded"
+    ],
+    "database/model": [
+      "db",
+      "redis",
+      "mongo"
+    ],
+    "database/sql": [
+      "ddl",
+      "index",
+      "field"
+    ],
+    "database/sql/field": [
+      "create",
+      "update",
+      "delete"
+    ],
+    "scripts": [
+      "dev",
+      "build"
+    ],
+    "deploy": [
+      "docker",
+      "compose",
+      "kubernetes",
+      "proxy"
+    ],
+    "common": [
+      "request",
+      "response",
+      "constant",
+      "error",
+      "validation",
+      "util"
+    ],
+    "integration": [
+      "contracts",
+      "compose"
+    ],
+    "integration/contracts": [
+      "http",
+      "event",
+      "rpc"
+    ],
+    "utils/discovery": [
+      "polaris",
+      "nacos"
+    ]
   },
   "adoption_manifest": {
     "version": 1,
     "schema_ref": "#/$defs/adoption_manifest",
     "required_fields": {
-      "manifest": ["version", "project_kind", "adopted_paths", "legacy_source_roots"],
-      "backend": ["language"],
-      "adopted_path": ["path", "catalog_id", "responsibility"],
-      "legacy_source_root": ["path", "responsibility", "existing_directories", "existing_files"]
+      "manifest": [
+        "version",
+        "project_kind",
+        "adopted_paths",
+        "legacy_source_roots"
+      ],
+      "backend": [
+        "language"
+      ],
+      "adopted_path": [
+        "path",
+        "catalog_id",
+        "responsibility"
+      ],
+      "legacy_source_root": [
+        "path",
+        "responsibility",
+        "existing_directories",
+        "existing_files"
+      ]
     },
     "path_rules": {
       "relative_only": true,
@@ -52,80 +175,2479 @@
     }
   },
   "entries": [
-    {"id":"backend.router","project_kind":"backend","artifact_kind":"router","content_type":"source_code","canonical_path":"<source-root>/router","purpose":"后端路由注册、分组与入口装配","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules","search_entry":"router"},
-    {"id":"backend.controller","project_kind":"backend","artifact_kind":"controller","content_type":"source_code","canonical_path":"<source-root>/controller","purpose":"输入转换、业务调用与响应映射","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules","search_entry":"controller"},
-    {"id":"backend.common.request","project_kind":"backend","artifact_kind":"request","content_type":"source_code","canonical_path":"common/request","purpose":"项目级请求 DTO 与输入协议","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules","search_entry":"request"},
-    {"id":"backend.config.yaml","project_kind":"backend","artifact_kind":"config","content_type":"config_asset","category":"yaml","canonical_path":"config/yaml","purpose":"按部署环境拆分的外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值","creation_policy":"required","tracked":true,"allowed_extensions":[".yaml",".yml"],"file_name_pattern":"config_<env>.yaml|config_<env>.yml","environment_name_pattern":"[a-z][a-z0-9_]*","standard_environments":["local","test","prod"],"direct_files":true,"owner_skill":"package-structure-rules","secret_policy":"forbid_plain_secret","source_policy":"embedded_source_fallback","environment_variable_policy":"allowed_reference","search_entry":"config/yaml"},
-    {"id":"backend.config.embedded","project_kind":"backend","artifact_kind":"config","content_type":"source_code","category":"embedded","canonical_path":"config/embedded","purpose":"按部署环境拆分的源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"file_name_pattern":"config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名","go_file_name_pattern":"config_<env>_yaml.go","environment_name_pattern":"[a-z][a-z0-9_]*","standard_environments":["local","test","prod"],"direct_files":true,"owner_skill":"package-structure-rules","secret_policy":"allow_plain_secret","source_policy":"embedded_source_primary","environment_variable_policy":"not_default","search_entry":"config/embedded"},
-    {"id":"fullstack.config.yaml","project_kind":"fullstack","artifact_kind":"config","content_type":"config_asset","category":"yaml","canonical_path":"backend/config/yaml","purpose":"按部署环境拆分的同仓后端外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值","creation_policy":"required","tracked":true,"allowed_extensions":[".yaml",".yml"],"file_name_pattern":"config_<env>.yaml|config_<env>.yml","environment_name_pattern":"[a-z][a-z0-9_]*","standard_environments":["local","test","prod"],"direct_files":true,"owner_skill":"package-structure-rules","secret_policy":"forbid_plain_secret","source_policy":"embedded_source_fallback","environment_variable_policy":"allowed_reference","search_entry":"backend/config/yaml"},
-    {"id":"fullstack.config.embedded","project_kind":"fullstack","artifact_kind":"config","content_type":"source_code","category":"embedded","canonical_path":"backend/config/embedded","purpose":"按部署环境拆分的同仓后端源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"file_name_pattern":"config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名","go_file_name_pattern":"config_<env>_yaml.go","environment_name_pattern":"[a-z][a-z0-9_]*","standard_environments":["local","test","prod"],"direct_files":true,"owner_skill":"package-structure-rules","secret_policy":"allow_plain_secret","source_policy":"embedded_source_primary","environment_variable_policy":"not_default","search_entry":"backend/config/embedded"},
-    {"id":"backend.config.loader","project_kind":"backend","artifact_kind":"config","category":"loader","content_type":"source_code","canonical_path":"config/load.<ext>","path_pattern":"config/load.<ext>","purpose":"配置加载与解析入口：按选定环境优先使用 config/embedded，对应配置不存在时回退 config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","environment_source_policy":"-env > APP_ENV > ENV > local","search_entry":"config/load.<ext>"},
-    {"id":"backend.config.model","project_kind":"backend","artifact_kind":"config","category":"model","content_type":"source_code","canonical_path":"config/model.<ext>","path_pattern":"config/model.<ext>","purpose":"配置结构定义：声明配置加载与解析结果对应的类型/结构","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"config/model.<ext>"},
-    {"id":"fullstack.config.loader","project_kind":"fullstack","artifact_kind":"config","category":"loader","content_type":"source_code","canonical_path":"backend/config/load.<ext>","path_pattern":"backend/config/load.<ext>","purpose":"同仓后端配置加载与解析入口：按选定环境优先使用 backend/config/embedded，对应配置不存在时回退 backend/config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","environment_source_policy":"-env > APP_ENV > ENV > local","search_entry":"backend/config/load.<ext>"},
-    {"id":"fullstack.config.model","project_kind":"fullstack","artifact_kind":"config","category":"model","content_type":"source_code","canonical_path":"backend/config/model.<ext>","path_pattern":"backend/config/model.<ext>","purpose":"同仓后端配置结构定义：声明配置加载与解析结果对应的类型/结构","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"backend/config/model.<ext>"},
-    {"id":"fullstack.test","project_kind":"fullstack","artifact_kind":"test","content_type":"source_code","canonical_path":"test","purpose":"前后端同仓项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper","creation_policy":"required","tracked":true,"node_kind":"directory","owner_skill":"test-strategy-rules","search_entry":"test"},
-    {"id":"backend.database.connection","project_kind":"backend","artifact_kind":"database_connection","content_type":"source_code","canonical_path":"database/connection","purpose":"关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules","search_entry":"database/connection"},
-    {"id":"backend.database.model.db","project_kind":"backend","artifact_kind":"database_model","content_type":"source_code","category":"db","canonical_path":"database/model/db","purpose":"关系型数据库表映射、ORM 与持久化模型","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules","search_entry":"database/model/db"},
-    {"id":"backend.database.model.redis","project_kind":"backend","artifact_kind":"database_model","content_type":"source_code","category":"redis","canonical_path":"database/model/redis","purpose":"Redis Key、Hash、缓存值等数据模型","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules","search_entry":"database/model/redis"},
-    {"id":"backend.database.model.mongo","project_kind":"backend","artifact_kind":"database_model","content_type":"source_code","category":"mongo","canonical_path":"database/model/mongo","purpose":"Mongo 集合与文档模型","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules","search_entry":"database/model/mongo"},
-    {"id":"backend.database.sql.ddl","project_kind":"backend","artifact_kind":"database_sql","content_type":"sql_asset","category":"ddl","canonical_path":"database/sql/ddl","purpose":"独立建表、改表与约束 SQL 文件","creation_policy":"conditional","tracked":true,"allowed_extensions":[".sql"],"forbidden_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.sql.index","project_kind":"backend","artifact_kind":"database_sql","content_type":"sql_asset","category":"index","canonical_path":"database/sql/index","purpose":"独立索引 SQL 文件","creation_policy":"conditional","tracked":true,"allowed_extensions":[".sql"],"forbidden_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.sql.field.create","project_kind":"backend","artifact_kind":"database_sql","content_type":"sql_asset","category":"field","operation":"create","canonical_path":"database/sql/field/create","purpose":"独立新增字段 SQL 文件","creation_policy":"conditional","tracked":true,"allowed_extensions":[".sql"],"forbidden_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.sql.field.update","project_kind":"backend","artifact_kind":"database_sql","content_type":"sql_asset","category":"field","operation":"update","canonical_path":"database/sql/field/update","purpose":"独立修改字段 SQL 文件","creation_policy":"conditional","tracked":true,"allowed_extensions":[".sql"],"forbidden_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.sql.field.delete","project_kind":"backend","artifact_kind":"database_sql","content_type":"sql_asset","category":"field","operation":"delete","canonical_path":"database/sql/field/delete","purpose":"独立删除字段 SQL 文件","creation_policy":"conditional","tracked":true,"allowed_extensions":[".sql"],"forbidden_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.repository","project_kind":"backend","artifact_kind":"database-repository","content_type":"source_code","canonical_path":"database/repository","purpose":"仅访问数据库的仓储实现","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules","search_entry":"database/repository"},
-    {"id":"backend.database.migration","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","canonical_path":"database/migration","purpose":"自动迁移生产源码根目录；承载迁移注册、排序、执行上下文和公共入口","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules","search_entry":"database/migration"},
-    {"id":"backend.database.migration.field.create","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"field","operation":"create","canonical_path":"database/migration/field/create","purpose":"自动创建缺失字段的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.field.read","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"field","operation":"read","canonical_path":"database/migration/field/read","purpose":"读取字段结构元数据的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.field.update","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"field","operation":"update","canonical_path":"database/migration/field/update","purpose":"更新字段定义与约束的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.field.delete","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"field","operation":"delete","canonical_path":"database/migration/field/delete","purpose":"受控删除字段的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.index.create","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"index","operation":"create","canonical_path":"database/migration/index/create","purpose":"自动创建缺失索引的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.index.read","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"index","operation":"read","canonical_path":"database/migration/index/read","purpose":"读取索引结构元数据的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.index.update","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"index","operation":"update","canonical_path":"database/migration/index/update","purpose":"更新、重建或重命名索引的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.database.migration.index.delete","project_kind":"backend","artifact_kind":"database_migration","content_type":"source_code","category":"index","operation":"delete","canonical_path":"database/migration/index/delete","purpose":"受控删除索引的生产程序","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"forbidden_extensions":[".sql"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.discovery.polaris","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"discovery","technology":"polaris","canonical_path":"utils/discovery/polaris","purpose":"腾讯云北极星服务注册与发现工具","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.discovery.nacos","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"discovery","technology":"nacos","canonical_path":"utils/discovery/nacos","purpose":"阿里 Nacos 服务注册与发现工具","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.time","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"time","canonical_path":"utils/time","purpose":"时间与时区转换、常用时间格式化的技术工具封装","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.cron","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"scheduler","canonical_path":"utils/cron","purpose":"Cron 调度库技术封装（如 robfig/cron），供业务侧 crontask/ 定时任务入口统一调用","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.ip","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"ip","canonical_path":"utils/ip","purpose":"请求 IP 提取、标准化、公私网判断与国家/地区地址归属查询工具；不得承载代理信任策略、风控或业务黑白名单","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.json","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"serialization","canonical_path":"utils/json","purpose":"JSON 序列化与反序列化技术工具封装","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.utils.log","project_kind":"backend","artifact_kind":"utils","content_type":"source_code","category":"logging","canonical_path":"utils/log","purpose":"统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"owner_skill":"package-structure-rules"},
-    {"id":"backend.test","project_kind":"backend","artifact_kind":"test","content_type":"source_code","canonical_path":"test","purpose":"独立后端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper","creation_policy":"required","tracked":true,"node_kind":"directory","owner_skill":"test-strategy-rules","search_entry":"test"},
-    {"id":"backend.binary-entrypoint.primary","project_kind":"backend","artifact_kind":"binary-entrypoint","category":"primary","content_type":"source_code","canonical_path":"main.<ext>","path_pattern":"main.<ext>","purpose":"独立后端默认二进制入口；直接位于项目根","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"main.<ext>"},
-    {"id":"backend.binary-entrypoint.additional","project_kind":"backend","artifact_kind":"binary-entrypoint","category":"additional","content_type":"source_code","canonical_path":"cmd/<binary>/main.<ext>","path_pattern":"cmd/<binary>/main.<ext>","purpose":"独立后端额外二进制入口；每个 binary 使用独立目录","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"cmd/<binary>/main.<ext>"},
-    {"id":"fullstack.binary-entrypoint.primary","project_kind":"fullstack","artifact_kind":"binary-entrypoint","category":"primary","content_type":"source_code","canonical_path":"backend/main.<ext>","path_pattern":"backend/main.<ext>","purpose":"同仓后端默认二进制入口；统一位于 backend/","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"backend/main.<ext>"},
-    {"id":"fullstack.binary-entrypoint.additional","project_kind":"fullstack","artifact_kind":"binary-entrypoint","category":"additional","content_type":"source_code","canonical_path":"backend/cmd/<binary>/main.<ext>","path_pattern":"backend/cmd/<binary>/main.<ext>","purpose":"同仓后端额外二进制入口；统一位于 backend/cmd/","creation_policy":"conditional","init_policy":"forbidden","dynamic":true,"tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"node_kind":"pattern","owner_skill":"package-structure-rules","search_entry":"backend/cmd/<binary>/main.<ext>"},
-    {"id":"backend.common.util","project_kind":"backend","artifact_kind":"common-util","content_type":"source_code","canonical_path":"common/util","purpose":"可依赖项目其他包但不承载业务流程的高关联工具函数；代码文件直接落盘，禁止子目录","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"flat_files":true,"owner_skill":"package-structure-rules","search_entry":"common/util"},
-    {"id":"backend.business-rpc","project_kind":"backend","artifact_kind":"business-rpc","content_type":"source_code","canonical_path":"<source-root>/business/<domain>/rpc","purpose":"供其他微业务调用的 JSON 字符串公开通信函数","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go",".java",".ts",".js",".py"],"requires_domain":true,"flat_files":true,"owner_skill":"package-structure-rules"},
-    {"id":"frontend.test","project_kind":"frontend","artifact_kind":"test","content_type":"source_code","canonical_path":"test","purpose":"独立前端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper","creation_policy":"required","tracked":true,"node_kind":"directory","owner_skill":"test-strategy-rules","search_entry":"test"},
-    {"id":"fullstack.root.agents","project_kind":"fullstack","artifact_kind":"project-governance","category":"agents","content_type":"resource_asset","canonical_path":"AGENTS.md","purpose":"工作区 Codex 项目协作规则","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"AGENTS.md"},
-    {"id":"fullstack.root.claude","project_kind":"fullstack","artifact_kind":"project-governance","category":"claude","content_type":"resource_asset","canonical_path":"CLAUDE.md","purpose":"工作区 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","content_must_match":"AGENTS.md","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"CLAUDE.md"},
-    {"id":"fullstack.root.project-current","project_kind":"fullstack","artifact_kind":"project-governance","category":"current","content_type":"resource_asset","canonical_path":"PROJECT_CURRENT.md","purpose":"工作区当前任务、范围、状态与交接","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_CURRENT.md"},
-    {"id":"fullstack.root.project-memory","project_kind":"fullstack","artifact_kind":"project-governance","category":"memory","content_type":"resource_asset","canonical_path":"PROJECT_MEMORY.md","purpose":"工作区稳定决策与长期事实","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_MEMORY.md"},
-    {"id":"fullstack.root.project-history","project_kind":"fullstack","artifact_kind":"project-governance","category":"history","content_type":"resource_asset","canonical_path":"PROJECT_HISTORY.md","purpose":"工作区重要历史事件","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_HISTORY.md"},
-    {"id":"fullstack.root.project-style","project_kind":"fullstack","artifact_kind":"project-governance","category":"style","content_type":"resource_asset","canonical_path":"PROJECT_STYLE.md","purpose":"工作区长期协作风格","creation_policy":"conditional","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-style-rules","search_entry":"PROJECT_STYLE.md"},
-    {"id":"fullstack.root.dockerfile","project_kind":"fullstack","artifact_kind":"project-governance","category":"dockerfile","content_type":"resource_asset","canonical_path":"Dockerfile","purpose":"工作区统一 Docker 镜像定义","creation_policy":"required","tracked":true,"allowed_extensions":[],"node_kind":"file","owner_skill":"package-structure-rules","search_entry":"Dockerfile"},
-    {"id":"backend.root.agents","project_kind":"backend","artifact_kind":"project-governance","category":"agents","content_type":"resource_asset","canonical_path":"AGENTS.md","purpose":"后端 Codex 项目协作规则","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"AGENTS.md"},
-    {"id":"backend.root.claude","project_kind":"backend","artifact_kind":"project-governance","category":"claude","content_type":"resource_asset","canonical_path":"CLAUDE.md","purpose":"后端 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","content_must_match":"AGENTS.md","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"CLAUDE.md"},
-    {"id":"backend.root.project-current","project_kind":"backend","artifact_kind":"project-governance","category":"current","content_type":"resource_asset","canonical_path":"PROJECT_CURRENT.md","purpose":"当前任务、范围、状态与交接","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_CURRENT.md"},
-    {"id":"backend.root.project-memory","project_kind":"backend","artifact_kind":"project-governance","category":"memory","content_type":"resource_asset","canonical_path":"PROJECT_MEMORY.md","purpose":"稳定决策与长期事实","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_MEMORY.md"},
-    {"id":"backend.root.project-history","project_kind":"backend","artifact_kind":"project-governance","category":"history","content_type":"resource_asset","canonical_path":"PROJECT_HISTORY.md","purpose":"重要历史事件","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_HISTORY.md"},
-    {"id":"backend.root.project-style","project_kind":"backend","artifact_kind":"project-governance","category":"style","content_type":"resource_asset","canonical_path":"PROJECT_STYLE.md","purpose":"后端长期代码风格","creation_policy":"conditional","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-style-rules","search_entry":"PROJECT_STYLE.md"},
-    {"id":"backend.root.dockerfile","project_kind":"backend","artifact_kind":"project-governance","category":"dockerfile","content_type":"resource_asset","canonical_path":"Dockerfile","purpose":"后端 Docker 镜像定义","creation_policy":"required","tracked":true,"allowed_extensions":[],"node_kind":"file","owner_skill":"package-structure-rules","search_entry":"Dockerfile"},
-    {"id":"frontend.root.agents","project_kind":"frontend","artifact_kind":"project-governance","category":"agents","content_type":"resource_asset","canonical_path":"AGENTS.md","purpose":"前端 Codex 项目协作规则","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"AGENTS.md"},
-    {"id":"frontend.root.claude","project_kind":"frontend","artifact_kind":"project-governance","category":"claude","content_type":"resource_asset","canonical_path":"CLAUDE.md","purpose":"前端 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","content_must_match":"AGENTS.md","owner_skill":"project-rule-file-bootstrap-rules","search_entry":"CLAUDE.md"},
-    {"id":"frontend.root.project-current","project_kind":"frontend","artifact_kind":"project-governance","category":"current","content_type":"resource_asset","canonical_path":"PROJECT_CURRENT.md","purpose":"前端当前任务、范围、状态与交接","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_CURRENT.md"},
-    {"id":"frontend.root.project-memory","project_kind":"frontend","artifact_kind":"project-governance","category":"memory","content_type":"resource_asset","canonical_path":"PROJECT_MEMORY.md","purpose":"前端稳定决策与长期事实","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_MEMORY.md"},
-    {"id":"frontend.root.project-history","project_kind":"frontend","artifact_kind":"project-governance","category":"history","content_type":"resource_asset","canonical_path":"PROJECT_HISTORY.md","purpose":"前端重要历史事件","creation_policy":"required","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-memory-rules","search_entry":"PROJECT_HISTORY.md"},
-    {"id":"frontend.root.project-style","project_kind":"frontend","artifact_kind":"project-governance","category":"style","content_type":"resource_asset","canonical_path":"PROJECT_STYLE.md","purpose":"前端长期代码风格","creation_policy":"conditional","tracked":true,"allowed_extensions":[".md"],"node_kind":"file","owner_skill":"project-style-rules","search_entry":"PROJECT_STYLE.md"},
-    {"id":"frontend.root.dockerfile","project_kind":"frontend","artifact_kind":"project-governance","category":"dockerfile","content_type":"resource_asset","canonical_path":"Dockerfile","purpose":"前端 Docker 镜像定义","creation_policy":"required","tracked":true,"allowed_extensions":[],"node_kind":"file","owner_skill":"package-structure-rules","search_entry":"Dockerfile"},
-    {"id":"backend.swag","project_kind":"backend","artifact_kind":"swag","content_type":"resource_asset","canonical_path":"swag","purpose":"正式 HTTP OpenAPI/Swagger 输出","creation_policy":"conditional","tracked":true,"owner_skill":"swag-openapi-maintainer-rules"},
-    {"id":"backend.mock.runtime","project_kind":"backend","artifact_kind":"mock","content_type":"source_code","canonical_path":"mock","purpose":"独立后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go"],"owner_skill":"test-program-rules","search_entry":"mock","build_tag":"mock"},
-    {"id":"fullstack.mock.runtime","project_kind":"fullstack","artifact_kind":"mock","content_type":"source_code","canonical_path":"mock","purpose":"同仓后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护","creation_policy":"conditional","tracked":true,"allowed_extensions":[".go"],"owner_skill":"test-program-rules","search_entry":"mock","build_tag":"mock"}
+    {
+      "id": "backend.router",
+      "project_kind": "backend",
+      "artifact_kind": "router",
+      "content_type": "source_code",
+      "canonical_path": "<source-root>/router",
+      "purpose": "后端路由注册、分组与入口装配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "router"
+    },
+    {
+      "id": "backend.controller",
+      "project_kind": "backend",
+      "artifact_kind": "controller",
+      "content_type": "source_code",
+      "canonical_path": "<source-root>/controller",
+      "purpose": "输入转换、业务调用与响应映射",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "controller"
+    },
+    {
+      "id": "backend.common.request",
+      "project_kind": "backend",
+      "artifact_kind": "request",
+      "content_type": "source_code",
+      "canonical_path": "common/request",
+      "purpose": "项目级请求 DTO 与输入协议",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "request"
+    },
+    {
+      "id": "backend.config.yaml",
+      "project_kind": "backend",
+      "artifact_kind": "config",
+      "content_type": "config_asset",
+      "category": "yaml",
+      "canonical_path": "config/yaml",
+      "purpose": "按部署环境拆分的外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".yaml",
+        ".yml"
+      ],
+      "file_name_pattern": "config_<env>.yaml|config_<env>.yml",
+      "environment_name_pattern": "[a-z][a-z0-9_]*",
+      "standard_environments": [
+        "local",
+        "test",
+        "prod"
+      ],
+      "direct_files": true,
+      "owner_skill": "package-structure-rules",
+      "secret_policy": "forbid_plain_secret",
+      "source_policy": "embedded_source_fallback",
+      "environment_variable_policy": "allowed_reference",
+      "search_entry": "config/yaml"
+    },
+    {
+      "id": "backend.config.embedded",
+      "project_kind": "backend",
+      "artifact_kind": "config",
+      "content_type": "source_code",
+      "category": "embedded",
+      "canonical_path": "config/embedded",
+      "purpose": "按部署环境拆分的源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "file_name_pattern": "config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名",
+      "go_file_name_pattern": "config_<env>_yaml.go",
+      "environment_name_pattern": "[a-z][a-z0-9_]*",
+      "standard_environments": [
+        "local",
+        "test",
+        "prod"
+      ],
+      "direct_files": true,
+      "owner_skill": "package-structure-rules",
+      "secret_policy": "allow_plain_secret",
+      "source_policy": "embedded_source_primary",
+      "environment_variable_policy": "not_default",
+      "search_entry": "config/embedded"
+    },
+    {
+      "id": "fullstack.config.yaml",
+      "project_kind": "fullstack",
+      "artifact_kind": "config",
+      "content_type": "config_asset",
+      "category": "yaml",
+      "canonical_path": "backend/config/yaml",
+      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；作为 embedded 缺失时的回退来源；禁止真实秘密原值",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".yaml",
+        ".yml"
+      ],
+      "file_name_pattern": "config_<env>.yaml|config_<env>.yml",
+      "environment_name_pattern": "[a-z][a-z0-9_]*",
+      "standard_environments": [
+        "local",
+        "test",
+        "prod"
+      ],
+      "direct_files": true,
+      "owner_skill": "package-structure-rules",
+      "secret_policy": "forbid_plain_secret",
+      "source_policy": "embedded_source_fallback",
+      "environment_variable_policy": "allowed_reference",
+      "search_entry": "backend/config/yaml"
+    },
+    {
+      "id": "fullstack.config.embedded",
+      "project_kind": "fullstack",
+      "artifact_kind": "config",
+      "content_type": "source_code",
+      "category": "embedded",
+      "canonical_path": "backend/config/embedded",
+      "purpose": "按部署环境拆分的同仓后端源码内 YAML 字符串配置；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "file_name_pattern": "config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名",
+      "go_file_name_pattern": "config_<env>_yaml.go",
+      "environment_name_pattern": "[a-z][a-z0-9_]*",
+      "standard_environments": [
+        "local",
+        "test",
+        "prod"
+      ],
+      "direct_files": true,
+      "owner_skill": "package-structure-rules",
+      "secret_policy": "allow_plain_secret",
+      "source_policy": "embedded_source_primary",
+      "environment_variable_policy": "not_default",
+      "search_entry": "backend/config/embedded"
+    },
+    {
+      "id": "backend.config.loader",
+      "project_kind": "backend",
+      "artifact_kind": "config",
+      "category": "loader",
+      "content_type": "source_code",
+      "canonical_path": "config/load.<ext>",
+      "path_pattern": "config/load.<ext>",
+      "purpose": "配置加载与解析入口：按选定环境优先使用 config/embedded，对应配置不存在时回退 config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "environment_source_policy": "-env > APP_ENV > ENV > local",
+      "search_entry": "config/load.<ext>"
+    },
+    {
+      "id": "backend.config.model",
+      "project_kind": "backend",
+      "artifact_kind": "config",
+      "category": "model",
+      "content_type": "source_code",
+      "canonical_path": "config/model.<ext>",
+      "path_pattern": "config/model.<ext>",
+      "purpose": "配置结构定义：声明配置加载与解析结果对应的类型/结构",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "config/model.<ext>"
+    },
+    {
+      "id": "fullstack.config.loader",
+      "project_kind": "fullstack",
+      "artifact_kind": "config",
+      "category": "loader",
+      "content_type": "source_code",
+      "canonical_path": "backend/config/load.<ext>",
+      "path_pattern": "backend/config/load.<ext>",
+      "purpose": "同仓后端配置加载与解析入口：按选定环境优先使用 backend/config/embedded，对应配置不存在时回退 backend/config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "environment_source_policy": "-env > APP_ENV > ENV > local",
+      "search_entry": "backend/config/load.<ext>"
+    },
+    {
+      "id": "fullstack.config.model",
+      "project_kind": "fullstack",
+      "artifact_kind": "config",
+      "category": "model",
+      "content_type": "source_code",
+      "canonical_path": "backend/config/model.<ext>",
+      "path_pattern": "backend/config/model.<ext>",
+      "purpose": "同仓后端配置结构定义：声明配置加载与解析结果对应的类型/结构",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "backend/config/model.<ext>"
+    },
+    {
+      "id": "fullstack.test",
+      "project_kind": "fullstack",
+      "artifact_kind": "test",
+      "content_type": "source_code",
+      "canonical_path": "test",
+      "purpose": "前后端同仓项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "creation_policy": "required",
+      "tracked": true,
+      "node_kind": "directory",
+      "owner_skill": "test-strategy-rules",
+      "search_entry": "test"
+    },
+    {
+      "id": "backend.database.connection",
+      "project_kind": "backend",
+      "artifact_kind": "database_connection",
+      "content_type": "source_code",
+      "canonical_path": "database/connection",
+      "purpose": "关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/connection"
+    },
+    {
+      "id": "backend.database.model.db",
+      "project_kind": "backend",
+      "artifact_kind": "database_model",
+      "content_type": "source_code",
+      "category": "db",
+      "canonical_path": "database/model/db",
+      "purpose": "关系型数据库表映射、ORM 与持久化模型",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/model/db"
+    },
+    {
+      "id": "backend.database.model.redis",
+      "project_kind": "backend",
+      "artifact_kind": "database_model",
+      "content_type": "source_code",
+      "category": "redis",
+      "canonical_path": "database/model/redis",
+      "purpose": "Redis Key、Hash、缓存值等数据模型",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/model/redis"
+    },
+    {
+      "id": "backend.database.model.mongo",
+      "project_kind": "backend",
+      "artifact_kind": "database_model",
+      "content_type": "source_code",
+      "category": "mongo",
+      "canonical_path": "database/model/mongo",
+      "purpose": "Mongo 集合与文档模型",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/model/mongo"
+    },
+    {
+      "id": "backend.database.sql.ddl",
+      "project_kind": "backend",
+      "artifact_kind": "database_sql",
+      "content_type": "sql_asset",
+      "category": "ddl",
+      "canonical_path": "database/sql/ddl",
+      "purpose": "独立建表、改表与约束 SQL 文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".sql"
+      ],
+      "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.sql.index",
+      "project_kind": "backend",
+      "artifact_kind": "database_sql",
+      "content_type": "sql_asset",
+      "category": "index",
+      "canonical_path": "database/sql/index",
+      "purpose": "独立索引 SQL 文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".sql"
+      ],
+      "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.sql.field.create",
+      "project_kind": "backend",
+      "artifact_kind": "database_sql",
+      "content_type": "sql_asset",
+      "category": "field",
+      "operation": "create",
+      "canonical_path": "database/sql/field/create",
+      "purpose": "独立新增字段 SQL 文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".sql"
+      ],
+      "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.sql.field.update",
+      "project_kind": "backend",
+      "artifact_kind": "database_sql",
+      "content_type": "sql_asset",
+      "category": "field",
+      "operation": "update",
+      "canonical_path": "database/sql/field/update",
+      "purpose": "独立修改字段 SQL 文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".sql"
+      ],
+      "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.sql.field.delete",
+      "project_kind": "backend",
+      "artifact_kind": "database_sql",
+      "content_type": "sql_asset",
+      "category": "field",
+      "operation": "delete",
+      "canonical_path": "database/sql/field/delete",
+      "purpose": "独立删除字段 SQL 文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".sql"
+      ],
+      "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.repository",
+      "project_kind": "backend",
+      "artifact_kind": "database-repository",
+      "content_type": "source_code",
+      "canonical_path": "database/repository",
+      "purpose": "仅访问数据库的仓储实现",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/repository"
+    },
+    {
+      "id": "backend.database.migration",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "canonical_path": "database/migration",
+      "purpose": "自动迁移生产源码根目录；承载迁移注册、排序、执行上下文和公共入口",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "database/migration"
+    },
+    {
+      "id": "backend.database.migration.field.create",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "field",
+      "operation": "create",
+      "canonical_path": "database/migration/field/create",
+      "purpose": "自动创建缺失字段的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.field.read",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "field",
+      "operation": "read",
+      "canonical_path": "database/migration/field/read",
+      "purpose": "读取字段结构元数据的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.field.update",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "field",
+      "operation": "update",
+      "canonical_path": "database/migration/field/update",
+      "purpose": "更新字段定义与约束的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.field.delete",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "field",
+      "operation": "delete",
+      "canonical_path": "database/migration/field/delete",
+      "purpose": "受控删除字段的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.index.create",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "index",
+      "operation": "create",
+      "canonical_path": "database/migration/index/create",
+      "purpose": "自动创建缺失索引的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.index.read",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "index",
+      "operation": "read",
+      "canonical_path": "database/migration/index/read",
+      "purpose": "读取索引结构元数据的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.index.update",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "index",
+      "operation": "update",
+      "canonical_path": "database/migration/index/update",
+      "purpose": "更新、重建或重命名索引的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.migration.index.delete",
+      "project_kind": "backend",
+      "artifact_kind": "database_migration",
+      "content_type": "source_code",
+      "category": "index",
+      "operation": "delete",
+      "canonical_path": "database/migration/index/delete",
+      "purpose": "受控删除索引的生产程序",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "forbidden_extensions": [
+        ".sql"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.utils.discovery.polaris",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "discovery",
+      "technology": "polaris",
+      "canonical_path": "utils/discovery/polaris",
+      "purpose": "腾讯云北极星服务注册与发现工具",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [],
+      "package_alias": "",
+      "example_scope": "utils/discovery/polaris/"
+    },
+    {
+      "id": "backend.utils.discovery.nacos",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "discovery",
+      "technology": "nacos",
+      "canonical_path": "utils/discovery/nacos",
+      "purpose": "阿里 Nacos 服务注册与发现工具",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [],
+      "package_alias": "",
+      "example_scope": "utils/discovery/nacos/"
+    },
+    {
+      "id": "backend.utils.time",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "time",
+      "canonical_path": "utils/time",
+      "purpose": "时间与时区转换、常用时间格式化的技术工具封装",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "time-util-rules",
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#time"
+      ],
+      "package_alias": "timeUtil",
+      "example_scope": "utils/time/"
+    },
+    {
+      "id": "backend.utils.cron",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "scheduler",
+      "canonical_path": "utils/cron",
+      "purpose": "Cron 调度库技术封装（如 robfig/cron），供业务侧 crontask/ 定时任务入口统一调用",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [],
+      "package_alias": "cronUtil",
+      "example_scope": "utils/cron/"
+    },
+    {
+      "id": "backend.utils.ip",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "ip",
+      "canonical_path": "utils/ip",
+      "purpose": "请求 IP 提取、标准化、公私网判断与国家/地区地址归属查询工具；不得承载代理信任策略、风控或业务黑白名单",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [],
+      "package_alias": "",
+      "example_scope": "utils/ip/"
+    },
+    {
+      "id": "backend.utils.json",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "serialization",
+      "canonical_path": "utils/json",
+      "purpose": "JSON 序列化与反序列化技术工具封装",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#json"
+      ],
+      "package_alias": "jsonUtil",
+      "example_scope": "utils/json/"
+    },
+    {
+      "id": "backend.utils.log",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "category": "logging",
+      "canonical_path": "utils/log",
+      "purpose": "统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#log"
+      ],
+      "package_alias": "logUtil",
+      "example_scope": "utils/log/"
+    },
+    {
+      "id": "backend.test",
+      "project_kind": "backend",
+      "artifact_kind": "test",
+      "content_type": "source_code",
+      "canonical_path": "test",
+      "purpose": "独立后端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "creation_policy": "required",
+      "tracked": true,
+      "node_kind": "directory",
+      "owner_skill": "test-strategy-rules",
+      "search_entry": "test"
+    },
+    {
+      "id": "backend.binary-entrypoint.primary",
+      "project_kind": "backend",
+      "artifact_kind": "binary-entrypoint",
+      "category": "primary",
+      "content_type": "source_code",
+      "canonical_path": "main.<ext>",
+      "path_pattern": "main.<ext>",
+      "purpose": "独立后端默认二进制入口；直接位于项目根",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "main.<ext>"
+    },
+    {
+      "id": "backend.binary-entrypoint.additional",
+      "project_kind": "backend",
+      "artifact_kind": "binary-entrypoint",
+      "category": "additional",
+      "content_type": "source_code",
+      "canonical_path": "cmd/<binary>/main.<ext>",
+      "path_pattern": "cmd/<binary>/main.<ext>",
+      "purpose": "独立后端额外二进制入口；每个 binary 使用独立目录",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "cmd/<binary>/main.<ext>"
+    },
+    {
+      "id": "fullstack.binary-entrypoint.primary",
+      "project_kind": "fullstack",
+      "artifact_kind": "binary-entrypoint",
+      "category": "primary",
+      "content_type": "source_code",
+      "canonical_path": "backend/main.<ext>",
+      "path_pattern": "backend/main.<ext>",
+      "purpose": "同仓后端默认二进制入口；统一位于 backend/",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "backend/main.<ext>"
+    },
+    {
+      "id": "fullstack.binary-entrypoint.additional",
+      "project_kind": "fullstack",
+      "artifact_kind": "binary-entrypoint",
+      "category": "additional",
+      "content_type": "source_code",
+      "canonical_path": "backend/cmd/<binary>/main.<ext>",
+      "path_pattern": "backend/cmd/<binary>/main.<ext>",
+      "purpose": "同仓后端额外二进制入口；统一位于 backend/cmd/",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "dynamic": true,
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "node_kind": "pattern",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "backend/cmd/<binary>/main.<ext>"
+    },
+    {
+      "id": "backend.common.util",
+      "project_kind": "backend",
+      "artifact_kind": "common-util",
+      "content_type": "source_code",
+      "canonical_path": "common/util",
+      "purpose": "可依赖项目其他包但不承载业务流程的高关联工具函数；代码文件直接落盘，禁止子目录",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "flat_files": true,
+      "owner_skill": "package-structure-rules",
+      "search_entry": "common/util"
+    },
+    {
+      "id": "backend.business-rpc",
+      "project_kind": "backend",
+      "artifact_kind": "business-rpc",
+      "content_type": "source_code",
+      "canonical_path": "<source-root>/business/<domain>/rpc",
+      "purpose": "供其他微业务调用的 JSON 字符串公开通信函数",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "requires_domain": true,
+      "flat_files": true,
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "frontend.test",
+      "project_kind": "frontend",
+      "artifact_kind": "test",
+      "content_type": "source_code",
+      "canonical_path": "test",
+      "purpose": "独立前端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "creation_policy": "required",
+      "tracked": true,
+      "node_kind": "directory",
+      "owner_skill": "test-strategy-rules",
+      "search_entry": "test"
+    },
+    {
+      "id": "fullstack.root.agents",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "agents",
+      "content_type": "resource_asset",
+      "canonical_path": "AGENTS.md",
+      "purpose": "工作区 Codex 项目协作规则",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "AGENTS.md"
+    },
+    {
+      "id": "fullstack.root.claude",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "claude",
+      "content_type": "resource_asset",
+      "canonical_path": "CLAUDE.md",
+      "purpose": "工作区 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "content_must_match": "AGENTS.md",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "CLAUDE.md"
+    },
+    {
+      "id": "fullstack.root.project-current",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "current",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_CURRENT.md",
+      "purpose": "工作区当前任务、范围、状态与交接",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_CURRENT.md"
+    },
+    {
+      "id": "fullstack.root.project-memory",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "memory",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_MEMORY.md",
+      "purpose": "工作区稳定决策与长期事实",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_MEMORY.md"
+    },
+    {
+      "id": "fullstack.root.project-history",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "history",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_HISTORY.md",
+      "purpose": "工作区重要历史事件",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_HISTORY.md"
+    },
+    {
+      "id": "fullstack.root.project-style",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "style",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_STYLE.md",
+      "purpose": "工作区长期协作风格",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-style-rules",
+      "search_entry": "PROJECT_STYLE.md"
+    },
+    {
+      "id": "fullstack.root.dockerfile",
+      "project_kind": "fullstack",
+      "artifact_kind": "project-governance",
+      "category": "dockerfile",
+      "content_type": "resource_asset",
+      "canonical_path": "Dockerfile",
+      "purpose": "工作区统一 Docker 镜像定义",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [],
+      "node_kind": "file",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "Dockerfile"
+    },
+    {
+      "id": "backend.root.agents",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "agents",
+      "content_type": "resource_asset",
+      "canonical_path": "AGENTS.md",
+      "purpose": "后端 Codex 项目协作规则",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "AGENTS.md"
+    },
+    {
+      "id": "backend.root.claude",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "claude",
+      "content_type": "resource_asset",
+      "canonical_path": "CLAUDE.md",
+      "purpose": "后端 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "content_must_match": "AGENTS.md",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "CLAUDE.md"
+    },
+    {
+      "id": "backend.root.project-current",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "current",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_CURRENT.md",
+      "purpose": "当前任务、范围、状态与交接",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_CURRENT.md"
+    },
+    {
+      "id": "backend.root.project-memory",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "memory",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_MEMORY.md",
+      "purpose": "稳定决策与长期事实",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_MEMORY.md"
+    },
+    {
+      "id": "backend.root.project-history",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "history",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_HISTORY.md",
+      "purpose": "重要历史事件",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_HISTORY.md"
+    },
+    {
+      "id": "backend.root.project-style",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "style",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_STYLE.md",
+      "purpose": "后端长期代码风格",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-style-rules",
+      "search_entry": "PROJECT_STYLE.md"
+    },
+    {
+      "id": "backend.root.dockerfile",
+      "project_kind": "backend",
+      "artifact_kind": "project-governance",
+      "category": "dockerfile",
+      "content_type": "resource_asset",
+      "canonical_path": "Dockerfile",
+      "purpose": "后端 Docker 镜像定义",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [],
+      "node_kind": "file",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "Dockerfile"
+    },
+    {
+      "id": "frontend.root.agents",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "agents",
+      "content_type": "resource_asset",
+      "canonical_path": "AGENTS.md",
+      "purpose": "前端 Codex 项目协作规则",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "AGENTS.md"
+    },
+    {
+      "id": "frontend.root.claude",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "claude",
+      "content_type": "resource_asset",
+      "canonical_path": "CLAUDE.md",
+      "purpose": "前端 Claude Code 项目协作规则；正文必须与 AGENTS.md 一致",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "content_must_match": "AGENTS.md",
+      "owner_skill": "project-rule-file-bootstrap-rules",
+      "search_entry": "CLAUDE.md"
+    },
+    {
+      "id": "frontend.root.project-current",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "current",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_CURRENT.md",
+      "purpose": "前端当前任务、范围、状态与交接",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_CURRENT.md"
+    },
+    {
+      "id": "frontend.root.project-memory",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "memory",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_MEMORY.md",
+      "purpose": "前端稳定决策与长期事实",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_MEMORY.md"
+    },
+    {
+      "id": "frontend.root.project-history",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "history",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_HISTORY.md",
+      "purpose": "前端重要历史事件",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-memory-rules",
+      "search_entry": "PROJECT_HISTORY.md"
+    },
+    {
+      "id": "frontend.root.project-style",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "style",
+      "content_type": "resource_asset",
+      "canonical_path": "PROJECT_STYLE.md",
+      "purpose": "前端长期代码风格",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".md"
+      ],
+      "node_kind": "file",
+      "owner_skill": "project-style-rules",
+      "search_entry": "PROJECT_STYLE.md"
+    },
+    {
+      "id": "frontend.root.dockerfile",
+      "project_kind": "frontend",
+      "artifact_kind": "project-governance",
+      "category": "dockerfile",
+      "content_type": "resource_asset",
+      "canonical_path": "Dockerfile",
+      "purpose": "前端 Docker 镜像定义",
+      "creation_policy": "required",
+      "tracked": true,
+      "allowed_extensions": [],
+      "node_kind": "file",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "Dockerfile"
+    },
+    {
+      "id": "backend.swag",
+      "project_kind": "backend",
+      "artifact_kind": "swag",
+      "content_type": "resource_asset",
+      "canonical_path": "swag",
+      "purpose": "正式 HTTP OpenAPI/Swagger 输出",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "owner_skill": "swag-openapi-maintainer-rules"
+    },
+    {
+      "id": "backend.mock.runtime",
+      "project_kind": "backend",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "root",
+      "canonical_path": "mock",
+      "purpose": "独立后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock",
+      "build_tag": "mock",
+      "mirror_source_root": "internal",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#核心边界"
+      ]
+    },
+    {
+      "id": "backend.mock.selector-mock",
+      "project_kind": "backend",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "selector-mock",
+      "canonical_path": "main_mock.go",
+      "path_pattern": "main_mock.go|cmd/<binary>/main_mock.go",
+      "purpose": "独立后端 mock selector；与 main_real.go 成对声明同名 newXxx()，使用 //go:build mock",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "paired_with": "backend.mock.selector-real",
+      "required_build_tag": "mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "main_mock.go",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#入口选择器"
+      ]
+    },
+    {
+      "id": "backend.mock.selector-real",
+      "project_kind": "backend",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "selector-real",
+      "canonical_path": "main_real.go",
+      "path_pattern": "main_real.go|cmd/<binary>/main_real.go",
+      "purpose": "独立后端 real selector；与 main_mock.go 成对声明同名 newXxx()，使用 //go:build !mock",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "paired_with": "backend.mock.selector-mock",
+      "required_exclude_build_tag": "!mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "main_real.go",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#入口选择器"
+      ]
+    },
+    {
+      "id": "backend.mock.assembly",
+      "project_kind": "backend",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "assembly",
+      "canonical_path": "mock/assembly",
+      "purpose": "独立后端 Mock 装配桥；唯一允许直接导入 Mock 实现的包，package assembly",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "directory",
+      "required_build_tag": "mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock/assembly",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#assembly-装配桥"
+      ]
+    },
+    {
+      "id": "backend.mock.implementation",
+      "project_kind": "backend",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "implementation",
+      "canonical_path": "mock/<internal-relative-path>",
+      "path_pattern": "mock/<internal-relative-path>",
+      "purpose": "独立后端 Mock 实现镜像；按 internal 相对路径放置，package mock_<源包名>",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "mirror_source_root": "internal",
+      "required_build_tag": "mock",
+      "forbidden_direct_imports": [
+        "mock/*"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock/<internal-relative-path>",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#镜像与包名"
+      ]
+    },
+    {
+      "id": "fullstack.mock.runtime",
+      "project_kind": "fullstack",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "root",
+      "canonical_path": "mock",
+      "purpose": "同仓后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock",
+      "build_tag": "mock",
+      "mirror_source_root": "backend/internal",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#核心边界"
+      ]
+    },
+    {
+      "id": "fullstack.mock.selector-mock",
+      "project_kind": "fullstack",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "selector-mock",
+      "canonical_path": "backend/main_mock.go",
+      "path_pattern": "backend/main_mock.go|backend/cmd/<binary>/main_mock.go",
+      "purpose": "同仓后端 mock selector；与 main_real.go 成对声明同名 newXxx()，使用 //go:build mock",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "paired_with": "fullstack.mock.selector-real",
+      "required_build_tag": "mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "backend/main_mock.go",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#入口选择器"
+      ]
+    },
+    {
+      "id": "fullstack.mock.selector-real",
+      "project_kind": "fullstack",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "selector-real",
+      "canonical_path": "backend/main_real.go",
+      "path_pattern": "backend/main_real.go|backend/cmd/<binary>/main_real.go",
+      "purpose": "同仓后端 real selector；与 main_mock.go 成对声明同名 newXxx()，使用 //go:build !mock",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "paired_with": "fullstack.mock.selector-mock",
+      "required_exclude_build_tag": "!mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "backend/main_real.go",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#入口选择器"
+      ]
+    },
+    {
+      "id": "fullstack.mock.assembly",
+      "project_kind": "fullstack",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "assembly",
+      "canonical_path": "mock/assembly",
+      "purpose": "同仓后端 Mock 装配桥；唯一允许直接导入 Mock 实现的包，package assembly",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "directory",
+      "required_build_tag": "mock",
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock/assembly",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#assembly-装配桥"
+      ]
+    },
+    {
+      "id": "fullstack.mock.implementation",
+      "project_kind": "fullstack",
+      "artifact_kind": "mock",
+      "content_type": "source_code",
+      "category": "implementation",
+      "canonical_path": "mock/<internal-relative-path>",
+      "path_pattern": "mock/<internal-relative-path>",
+      "purpose": "同仓后端 Mock 实现镜像；按 backend/internal 相对路径放置，package mock_<源包名>",
+      "creation_policy": "conditional",
+      "init_policy": "forbidden",
+      "tracked": true,
+      "node_kind": "pattern",
+      "dynamic": true,
+      "mirror_source_root": "backend/internal",
+      "required_build_tag": "mock",
+      "forbidden_direct_imports": [
+        "mock/*"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "mock/<internal-relative-path>",
+      "related_skills": [
+        "test-program-rules"
+      ],
+      "usage_recipes": [
+        "runtime-mock-layout-go.md#镜像与包名"
+      ]
+    },
+    {
+      "id": "backend.utils.convert",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/convert",
+      "purpose": "字符串与数字双向转换工具，如 ParseInt64、FormatInt64",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "conversion",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#convert"
+      ],
+      "example_scope": "utils/convert/"
+    },
+    {
+      "id": "backend.utils.cache.redis",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/cache/redis",
+      "purpose": "Redis 缓存适配与客户端封装，供业务侧缓存、Session、锁调用",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "cache",
+      "technology": "redis",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#cache-redis"
+      ],
+      "example_scope": "utils/cache/redis/"
+    },
+    {
+      "id": "backend.utils.cache.mongo",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/cache/mongo",
+      "purpose": "MongoDB 缓存适配与临时文档型数据适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "cache",
+      "technology": "mongo",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/cache/mongo/"
+    },
+    {
+      "id": "backend.utils.http",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/http",
+      "purpose": "通用 HTTP Client 封装，提供 Get/Post/Put/Delete 与超时控制",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "http",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "usage_recipes": [
+        "usage-recipes-go.md#http"
+      ],
+      "package_alias": "httpUtil",
+      "example_scope": "utils/http/"
+    },
+    {
+      "id": "backend.utils.async",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/async",
+      "purpose": "异步协程与并发辅助工具，如 WaitGroup 封装、协程池",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "async",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/async/"
+    },
+    {
+      "id": "backend.utils.mq.kafka",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/mq/kafka",
+      "purpose": "Kafka 消息队列客户端与编解码",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "mq",
+      "technology": "kafka",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/mq/kafka/"
+    },
+    {
+      "id": "backend.utils.mq.rabbitmq",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/mq/rabbitmq",
+      "purpose": "RabbitMQ 消息队列客户端与编解码",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "mq",
+      "technology": "rabbitmq",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/mq/rabbitmq/"
+    },
+    {
+      "id": "backend.utils.mq.rocketmq",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/mq/rocketmq",
+      "purpose": "RocketMQ 消息队列客户端与编解码",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "mq",
+      "technology": "rocketmq",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/mq/rocketmq/"
+    },
+    {
+      "id": "backend.utils.mq.nats",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/mq/nats",
+      "purpose": "NATS 消息队列客户端与编解码",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "mq",
+      "technology": "nats",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/mq/nats/"
+    },
+    {
+      "id": "backend.utils.search.elasticsearch",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/search/elasticsearch",
+      "purpose": "Elasticsearch 搜索服务客户端与查询适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "search",
+      "technology": "elasticsearch",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/search/elasticsearch/"
+    },
+    {
+      "id": "backend.utils.search.opensearch",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/search/opensearch",
+      "purpose": "OpenSearch 搜索服务客户端与查询适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "search",
+      "technology": "opensearch",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/search/opensearch/"
+    },
+    {
+      "id": "backend.utils.search.meilisearch",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/search/meilisearch",
+      "purpose": "Meilisearch 搜索服务客户端与查询适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "search",
+      "technology": "meilisearch",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/search/meilisearch/"
+    },
+    {
+      "id": "backend.utils.storage.oss",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/storage/oss",
+      "purpose": "对象存储适配（OSS/S3 等）",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "storage",
+      "technology": "oss",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/storage/oss/"
+    },
+    {
+      "id": "backend.utils.storage.file",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/storage/file",
+      "purpose": "本地文件系统存储适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "storage",
+      "technology": "file",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/storage/file/"
+    },
+    {
+      "id": "backend.utils.rpc.grpc",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/rpc/grpc",
+      "purpose": "gRPC 客户端与服务器适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "rpc",
+      "technology": "grpc",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/rpc/grpc/"
+    },
+    {
+      "id": "backend.utils.rpc.thrift",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/rpc/thrift",
+      "purpose": "Thrift RPC 协议适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "rpc",
+      "technology": "thrift",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/rpc/thrift/"
+    },
+    {
+      "id": "backend.utils.api.binance",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/api/binance",
+      "purpose": "Binance 第三方业务 API 客户端",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "api",
+      "technology": "binance",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/api/binance/"
+    },
+    {
+      "id": "backend.utils.api.wechat",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/api/wechat",
+      "purpose": "微信非支付 API 客户端",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "api",
+      "technology": "wechat",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/api/wechat/"
+    },
+    {
+      "id": "backend.utils.auth.oauth",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/auth/oauth",
+      "purpose": "OAuth 外部认证适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "auth",
+      "technology": "oauth",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/auth/oauth/"
+    },
+    {
+      "id": "backend.utils.auth.oidc",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/auth/oidc",
+      "purpose": "OIDC 外部认证适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "auth",
+      "technology": "oidc",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/auth/oidc/"
+    },
+    {
+      "id": "backend.utils.auth.ldap",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/auth/ldap",
+      "purpose": "LDAP 外部认证适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "auth",
+      "technology": "ldap",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/auth/ldap/"
+    },
+    {
+      "id": "backend.utils.secret.kms",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/secret/kms",
+      "purpose": "KMS 密钥管理服务适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "secret",
+      "technology": "kms",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/secret/kms/"
+    },
+    {
+      "id": "backend.utils.secret.vault",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/secret/vault",
+      "purpose": "HashiCorp Vault 密钥服务适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "secret",
+      "technology": "vault",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/secret/vault/"
+    },
+    {
+      "id": "backend.utils.notification.email",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/notification/email",
+      "purpose": "邮件通知通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "notification",
+      "technology": "email",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/notification/email/"
+    },
+    {
+      "id": "backend.utils.notification.sms",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/notification/sms",
+      "purpose": "短信通知通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "notification",
+      "technology": "sms",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/notification/sms/"
+    },
+    {
+      "id": "backend.utils.notification.telegram",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/notification/telegram",
+      "purpose": "Telegram 通知通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "notification",
+      "technology": "telegram",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/notification/telegram/"
+    },
+    {
+      "id": "backend.utils.notification.webhook",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/notification/webhook",
+      "purpose": "Webhook 通知通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "notification",
+      "technology": "webhook",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/notification/webhook/"
+    },
+    {
+      "id": "backend.utils.payment.alipay",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/payment/alipay",
+      "purpose": "支付宝支付通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "payment",
+      "technology": "alipay",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/payment/alipay/"
+    },
+    {
+      "id": "backend.utils.payment.wechatpay",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/payment/wechatpay",
+      "purpose": "微信支付通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "payment",
+      "technology": "wechatpay",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/payment/wechatpay/"
+    },
+    {
+      "id": "backend.utils.payment.stripe",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/payment/stripe",
+      "purpose": "Stripe 支付通道适配",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "payment",
+      "technology": "stripe",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/payment/stripe/"
+    },
+    {
+      "id": "backend.utils.protobuf",
+      "project_kind": "backend",
+      "artifact_kind": "utils",
+      "content_type": "source_code",
+      "canonical_path": "utils/protobuf",
+      "purpose": "Protobuf 与 gRPC 定义源",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "category": "protobuf",
+      "related_skills": [
+        "common-util-rules"
+      ],
+      "example_scope": "utils/protobuf/"
+    }
   ],
   "skeletons": {
-    "fullstack": [".vscode", "backend", "backend/config/yaml", "frontend", "test", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/data/images"],
-    "backend": [".vscode", "config/yaml", "test", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/data/images"],
-    "frontend": [".vscode", "config", "public", "src/app", "src/modules", "src/api", "src/styles/global", "src/assets", "test", "doc/1-架构", "doc/2-需求", "doc/3-实施", "doc/4-bugs", "doc/5-tests", "doc/6-review", "doc/data/images"]
+    "fullstack": [
+      ".vscode",
+      "backend",
+      "backend/config/yaml",
+      "frontend",
+      "test",
+      "doc/1-架构",
+      "doc/2-需求",
+      "doc/3-实施",
+      "doc/4-bugs",
+      "doc/5-tests",
+      "doc/6-review",
+      "doc/data/images"
+    ],
+    "backend": [
+      ".vscode",
+      "config/yaml",
+      "test",
+      "doc/1-架构",
+      "doc/2-需求",
+      "doc/3-实施",
+      "doc/4-bugs",
+      "doc/5-tests",
+      "doc/6-review",
+      "doc/data/images"
+    ],
+    "frontend": [
+      ".vscode",
+      "config",
+      "public",
+      "src/app",
+      "src/modules",
+      "src/api",
+      "src/styles/global",
+      "src/assets",
+      "test",
+      "doc/1-架构",
+      "doc/2-需求",
+      "doc/3-实施",
+      "doc/4-bugs",
+      "doc/5-tests",
+      "doc/6-review",
+      "doc/data/images"
+    ]
   }
 }

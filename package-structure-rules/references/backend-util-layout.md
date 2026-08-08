@@ -6,22 +6,22 @@
 
 项目无关、可独立复制的工具包或 SDK 进入根 `utils/<package>/`；需要引用项目配置、公共结构或其他项目包的工具函数进入 `common/util/<function>.<ext>`。
 
-| 分类 | 二级技术目录 | 职责 |
-|---|---|---|
-| 时间与并发 | `utils/time/`、`utils/async/`、`utils/convert/`、`utils/http/` | 时间转换、协程与任务辅助、字符串数字转换、通用 HTTP Client |
-| IP 与地址归属 | `utils/ip/` | 请求 IP 提取、规范化、公私网判断，以及离线库或第三方 GeoIP 的国家/地区归属查询适配；不承载代理信任策略、风控或业务黑白名单。 |
-| 定时调度 | `utils/cron/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 |
-| 序列化 | `utils/json/` | JSON 序列化与反序列化技术工具封装 |
-| 日志 | `utils/log/` | 统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口 |
-| 缓存 | `utils/cache/redis/`、`utils/cache/mongo/` | 缓存、Session、锁和临时文档型数据适配 |
-| 消息 | `utils/mq/kafka/`、`utils/mq/rabbitmq/`、`utils/mq/rocketmq/`、`utils/mq/nats/` | 消息队列客户端与编解码 |
-| 搜索 | `utils/search/elasticsearch/`、`utils/search/opensearch/`、`utils/search/meilisearch/` | 搜索服务客户端与查询适配 |
-| 存储 | `utils/storage/oss/`、`utils/storage/file/` | 对象存储与文件系统适配 |
-| 远程调用 | `utils/rpc/grpc/`、`utils/rpc/thrift/`、`utils/api/<provider>/` | RPC 与第三方业务 API 客户端 |
-| 身份和秘密 | `utils/auth/oauth/`、`utils/auth/oidc/`、`utils/auth/ldap/`、`utils/secret/kms/`、`utils/secret/vault/` | 外部认证和密钥服务接入 |
-| 通知和支付 | `utils/notification/*/`、`utils/payment/*/` | 渠道 SDK 与协议转换 |
-| 服务发现 | `utils/discovery/polaris/`、`utils/discovery/nacos/` | 腾讯北极星、阿里 Nacos 注册与发现 |
-| 协议定义 | `utils/protobuf/` | Protobuf 与 gRPC 定义源 |
+| 分类 | 二级技术目录 | 职责 | Catalog ID |
+|---|---|---|---|
+| 时间与并发 | `utils/time/`、`utils/async/`、`utils/convert/`、`utils/http/` | 时间转换、协程与任务辅助、字符串数字转换、通用 HTTP Client | `backend.utils.time`、`backend.utils.async`、`backend.utils.convert`、`backend.utils.http` |
+| IP 与地址归属 | `utils/ip/` | 请求 IP 提取、规范化、公私网判断，以及离线库或第三方 GeoIP 的国家/地区归属查询适配；不承载代理信任策略、风控或业务黑白名单。 | `backend.utils.ip` |
+| 定时调度 | `utils/cron/` | Cron 调度库技术封装（如 robfig/cron），供业务侧 `crontask/` 定时任务入口调用 | `backend.utils.cron` |
+| 序列化 | `utils/json/` | JSON 序列化与反序列化技术工具封装 | `backend.utils.json` |
+| 日志 | `utils/log/` | 统一日志框架封装（如 zap/logrus），提供项目唯一日志调用入口 | `backend.utils.log` |
+| 缓存 | `utils/cache/redis/`、`utils/cache/mongo/` | 缓存、Session、锁和临时文档型数据适配 | `backend.utils.cache.redis`、`backend.utils.cache.mongo` |
+| 消息 | `utils/mq/kafka/`、`utils/mq/rabbitmq/`、`utils/mq/rocketmq/`、`utils/mq/nats/` | 消息队列客户端与编解码 | `backend.utils.mq.kafka`、`backend.utils.mq.rabbitmq`、`backend.utils.mq.rocketmq`、`backend.utils.mq.nats` |
+| 搜索 | `utils/search/elasticsearch/`、`utils/search/opensearch/`、`utils/search/meilisearch/` | 搜索服务客户端与查询适配 | `backend.utils.search.elasticsearch`、`backend.utils.search.opensearch`、`backend.utils.search.meilisearch` |
+| 存储 | `utils/storage/oss/`、`utils/storage/file/` | 对象存储与文件系统适配 | `backend.utils.storage.oss`、`backend.utils.storage.file` |
+| 远程调用 | `utils/rpc/grpc/`、`utils/rpc/thrift/`、`utils/api/<provider>/` | RPC 与第三方业务 API 客户端 | `backend.utils.rpc.grpc`、`backend.utils.rpc.thrift`、`backend.utils.api.*` |
+| 身份和秘密 | `utils/auth/oauth/`、`utils/auth/oidc/`、`utils/auth/ldap/`、`utils/secret/kms/`、`utils/secret/vault/` | 外部认证和密钥服务接入 | `backend.utils.auth.oauth`、`backend.utils.auth.oidc`、`backend.utils.auth.ldap`、`backend.utils.secret.kms`、`backend.utils.secret.vault` |
+| 通知和支付 | `utils/notification/*/`、`utils/payment/*/` | 渠道 SDK 与协议转换 | `backend.utils.notification.*`、`backend.utils.payment.*` |
+| 服务发现 | `utils/discovery/polaris/`、`utils/discovery/nacos/` | 腾讯北极星、阿里 Nacos 注册与发现 | `backend.utils.discovery.polaris`、`backend.utils.discovery.nacos` |
+| 协议定义 | `utils/protobuf/` | Protobuf 与 gRPC 定义源 | `backend.utils.protobuf` |
 
 禁止 `utils/graphql/`、`utils/asyncapi/`、`utils/avro/`、`utils/api/http/`。通用 HTTP 只能位于 `utils/http/`。后端项目根和语言源码根均不得再建立旧的 `util/` 工具包目录；旧项目只能通过 adoption 的 legacy 快照渐进迁移。
 
