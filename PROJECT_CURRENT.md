@@ -2,17 +2,37 @@
 
 ## 更新时间
 
-- 2026-08-06
+- 2026-08-08
 
 ## 当前任务
 
-- 来源对象：运行时 Mock 与测试 Mock 分离规则补充·第二轮优化。
-- 当前目标：完成 Mock 框架/包设计（DI 工厂模式、构建标签装配模板、Go internal 可见性解决方案）、Skill 实战内容补充、.vscode/launch.json mock 调试任务模板、F:\binance-wangge-go 真实项目迁移验证。
-- 当前状态：6 个周期全部完成。CYCLE-02 Mock 框架设计（runtime-mock-pattern.md 扩展 + mock-factory-pattern.md 新增）、CYCLE-03 Skill 实战补充（test-program-rules、artifact-storage-rules、package-structure-rules 新增实战用法）、CYCLE-04 .vscode 模板参考（vscode-mock-launch.md 新增）、CYCLE-05 真实项目迁移（F:\binance-wangge-go 迁移到根 mock/，构建标签工厂装配，mock/assembly 装配层，launch.json 新增 mock 模式）、CYCLE-06 全量收口（13/13 + 26/26 + 289/289 + go build 双模式 + 字典生成 + 6-review 均通过）。改动停在已改动未提交状态。
+- 来源对象：REQ-PSR-MOCK-UPGRADE-001 运行时 Mock 目录树 Skill 升级
+- 当前目标：按已落盘实施计划完成 Go 运行时 Mock 目录、selector、assembly、Catalog、CLI 检查和测试收口，并完成计划完成度复核
+- 当前状态：完成。新增 `runtime-mock-layout-go.md` 契约，Catalog 10 条 Mock 分类，CLI `check_runtime_mock_structure`，测试 36/36 通过，普通/mock 双构建通过，文档门禁与 6-review PASS。复核补齐 owner_skill/fullstack 断言并修复 SKILL guide 代码围栏。改动停在已改动未提交状态。
+
+## 已完成
+
+- 已新增 `runtime-mock-layout-go.md`：目录树、入口选择器、assembly、镜像、包名、构建命令和反例
+- 已扩展 `placement-catalog.yaml`/`placement-catalog.schema.json`：backend/fullstack 各 5 类 Mock 条目及元数据约束
+- 已实现 `placement_catalog.py` 的 `check_runtime_mock_structure` 只读检查，覆盖 selector 配对、build tag、函数集合、镜像、包名和导入边界
+- 已新增 `runtime_mock_layout_test.py`，package-structure-rules 全量回归 36/36 通过
+- 已同步 `project-layout-v2.md`、`SKILL.md`、Skill 字典和 `F:\binance-wangge-go\doc\1-架构\2-目录树.md`
+- 已落盘需求、实施周期、测试 README 和 6-review 文档，门禁全部 PASS
+- 复核补齐：契约测试新增 `owner_skill` 统一、fullstack 不扩散和 Schema 必填断言；`SKILL.md` guide 示例代码围栏恢复为两个独立围栏
+
+## 验证与交接
+
+- `guide --category runtime-mock --language go` 返回 10 条配方
+- package-structure-rules 全量回归 36/36 通过
+- `F:\binance-wangge-go` 普通/mock 双构建通过
+- 字典生成退出码 0，`git diff --check` 无错误
+- adoption 检查仍只报 2 条既有 `test/` 遗留快照阻断，按计划不扩大豁免
+- 复核后 `runtime_mock_layout_test.py` 5/5、package-structure-rules 全量 36/36、四份文档 profile 均 PASS
+- 未执行 Git 历史写入，交接点为已改动未提交
 ## 范围与边界
 
-- 范围：`test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，placement-catalog.yaml 新增 2 个 mock 条目，人工目录树更新，AGENTS.md/CLAUDE.md 与 PROJECT_MEMORY.md 同步，新增 runtime-mock-pattern.md 参考文档，asset_location_test.py 新增 2 个契约测试。
-- 非范围：不迁移现有业务项目的 mock 文件（提供迁移指南），不改动前端 `mocks/` 规则，不修改 `placement_catalog.py` 实现逻辑，不执行 Git 历史写入。
+- 范围：`package-structure-rules` 的 reference、Catalog、Schema、CLI、SKILL、字典与测试；`F:\binance-wangge-go\doc\1-架构\2-目录树.md` 同步。
+- 非范围：前端 `mocks/`、Java/Node/Python Mock、测试专用 Mock、业务 Mock 行为设计、真实业务 Mock 迁移和 Git 历史写入。
 
 - 范围：修改 `code-style-consistency-rules/references/user-style-feedback-library.md`（新增 STYLE-CASE-GO-003 active 条目 + 变更记录）、`code-style-consistency-rules/references/go-coding-rules.md`（追加 1 条 bullet）、`code-style-consistency-rules/SKILL.md`（§ Go 局部变量声明风格约定补 1 条注释对齐 bullet）、`code-style-consistency-rules/references/consistency-examples.md`（正例 4 / 反例 5 校准）。
 - 非范围：新建 skill；修改 `code-generation-style-rules`（其 `pre-coding-checklist.md:10` 已加载库 active 条目，无需改动即自动生效）；修改任何项目的 `PROJECT_STYLE.md`（跨项目通用偏好按 `project-style-rules/SKILL.md:51` 入全局反例库）；改动截图来源的那个 Go 项目源码；推翻「本约定只约束函数/方法内局部变量、不动包级 `var (...)`」的原边界；`common/util/`（CYCLE-PSR-22 已收口）、config 来源优先级与秘密边界（CYCLE-PSR-23 已收口）。
@@ -102,7 +122,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-05T16:56:41.757785Z",
+  "registry_updated_at": "2026-08-08T05:41:17.679908Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -283,29 +303,6 @@
           "id": "TASK-PLAN-11",
           "step": "[TASK-PLAN-11] 验证真实新 Plan 会话的用户可见出口",
           "status": "in_progress"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/642f6c0ae9fc393c4cbff38f2b6317b945894cadd4888be5015994cf1f4fd8bc",
-      "session_id": "019f9dd1-31f3-7401-8575-eadf6b3ec55f",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PSR-V2-001/CYCLE-14",
-      "source_document": "doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md",
-      "plan_fingerprint": "800d03cf7113c96d0020b18ce87bb222afe6209f499bf210ab845f6e3c633cbb",
-      "updated_at": "2026-07-31T15:40:21.210576Z",
-      "steps": [
-        {
-          "id": "TASK-14-01",
-          "step": "[TASK-14-01] 删除后端 data 目录规则和 Catalog 条目",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-14-02",
-          "step": "[TASK-14-02] 完成严格检查、测试与文档收口",
-          "status": "completed"
         }
       ]
     },
@@ -757,6 +754,34 @@
         {
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/1684f9032fad47b8dd237ef48d435b47ed88f49f97d376c258ac03c1912552a2",
+      "session_id": "019fdf93-0ff3-7a80-9f93-dc789306885e",
+      "projection_origin": "goal",
+      "synthesis_mode": "goal_default",
+      "state": "inactive",
+      "plan_key": "GOAL/ACTIVE",
+      "source_document": "",
+      "plan_fingerprint": "5b774896c213e42babcc2e02e58cfeb185a1f34f338b9917fd6a6ad17eaeec9c",
+      "updated_at": "2026-08-08T05:41:17.671536Z",
+      "steps": [
+        {
+          "id": "GOAL-01",
+          "step": "[GOAL-01] 确认当前闭环",
+          "status": "completed"
+        },
+        {
+          "id": "GOAL-02",
+          "step": "[GOAL-02] 执行并更新进度",
+          "status": "completed"
+        },
+        {
+          "id": "GOAL-03",
+          "step": "[GOAL-03] 验证并完成 Goal",
           "status": "completed"
         }
       ]

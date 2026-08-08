@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-08 02:58:13",
+  "generated_at": "2026-08-08 13:39:35",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 572,
+    "references_total": 575,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -2106,6 +2106,7 @@ window.SKILL_DICTIONARY = {
             "package-structure-rules/references/backend-util-layout.md",
             "package-structure-rules/references/configuration-layout.md",
             "package-structure-rules/references/database-layout.md",
+            "package-structure-rules/references/directory-usage-routing.md",
             "package-structure-rules/references/frontend-project-layout.md",
             "package-structure-rules/references/go-package-layout.md",
             "package-structure-rules/references/java-layer-layout.md",
@@ -2114,7 +2115,9 @@ window.SKILL_DICTIONARY = {
             "package-structure-rules/references/placement-catalog.schema.json",
             "package-structure-rules/references/placement-catalog.yaml",
             "package-structure-rules/references/project-layout-v2.md",
+            "package-structure-rules/references/runtime-mock-layout-go.md",
             "package-structure-rules/references/structure-general.md",
+            "package-structure-rules/references/usage-recipes-go.md",
             "package-structure-rules/references/vscode-mock-launch.md"
           ],
           "agents": [
@@ -6761,6 +6764,7 @@ window.SKILL_DICTIONARY = {
         "package-structure-rules/references/backend-util-layout.md",
         "package-structure-rules/references/configuration-layout.md",
         "package-structure-rules/references/database-layout.md",
+        "package-structure-rules/references/directory-usage-routing.md",
         "package-structure-rules/references/frontend-project-layout.md",
         "package-structure-rules/references/go-package-layout.md",
         "package-structure-rules/references/java-layer-layout.md",
@@ -6769,7 +6773,9 @@ window.SKILL_DICTIONARY = {
         "package-structure-rules/references/placement-catalog.schema.json",
         "package-structure-rules/references/placement-catalog.yaml",
         "package-structure-rules/references/project-layout-v2.md",
+        "package-structure-rules/references/runtime-mock-layout-go.md",
         "package-structure-rules/references/structure-general.md",
+        "package-structure-rules/references/usage-recipes-go.md",
         "package-structure-rules/references/vscode-mock-launch.md"
       ],
       "agents": [

@@ -1,5 +1,23 @@
+## 目录用法索引规则
+
+- 稳定决策：package-structure-rules 是目录用法索引的唯一 Owner，通过 Catalog 条目的 related_skills、usage_recipes、package_alias、example_scope 字段关联专业 skill 和 recipe 示例。
+- 稳定决策：guide 子命令按 --category、--technology、--language 查询目录用法，支持 category 别名映射（如 json -> serialization、log -> logging、convert/conversion、message/mq、scheduler/cron）。
+- 稳定决策：Go recipe 示例统一存放在 package-structure-rules/references/usage-recipes-go.md，首批覆盖 convert、time、cache/redis、json、log、http；Java/Node/Python 后续按需扩展。
+- 稳定决策：新增 recipe 时按流程更新 usage-recipes-go.md、Catalog 条目的 usage_recipes 字段、directory-usage-routing.md 索引表，并运行 guide 子命令验证。
+- 来源：package-structure-rules/SKILL.md、package-structure-rules/references/placement-catalog.yaml、package-structure-rules/scripts/placement_catalog.py、package-structure-rules/references/directory-usage-routing.md、package-structure-rules/references/usage-recipes-go.md。
+- 更新时间：2026-08-08。
+
 # 项目长期记忆
 
+
+## 运行时 Mock 目录树规则
+
+- 稳定决策：`package-structure-rules` 是 Go 运行时 Mock 目录与装配的唯一 Owner；根 `mock/` 按 `internal/` 相对路径镜像，`mock/assembly/` 是唯一装配桥，包名固定为 `assembly`。
+- 稳定决策：入口必须按需配对 `main_mock.go`（`//go:build mock`）与 `main_real.go`（`//go:build !mock`），两份 selector 声明同名 `newXxx()`；`main.go` 只调用 selector，入口不得直接导入 Mock 实现包。
+- 稳定决策：Mock 实现文件必须 `//go:build mock` 且包名 `mock_<源包名>`；Catalog 以 `required_build_tag`、`required_exclude_build_tag`、`mirror_source_root`、`forbidden_direct_imports` 和 `init_policy: forbidden` 固化机器约束，`guide --category runtime-mock --language go` 返回 10 条配方。
+- 稳定决策：CLI 的 `check_runtime_mock_structure` 只读检查 selector 配对、构建标签、函数集合、镜像、包名和入口导入边界；违规退出码 2；adoption 不扩大既有 `test/` 遗留快照豁免。
+- 来源：`package-structure-rules/references/runtime-mock-layout-go.md`、`placement-catalog.yaml`、`placement-catalog.schema.json`、`package-structure-rules/scripts/placement_catalog.py`、`test/package-structure-rules/runtime_mock_layout_test.py`、`doc/3-实施/2026-08-08_REQ-PSR-MOCK-UPGRADE_实施周期01_运行时Mock升级.md`。
+- 更新时间：2026-08-08。
 
 ## Codex Desktop 任务投影断点恢复规则
 
@@ -860,8 +878,10 @@ entities:
       - 根 mock 目录
       - 运行时 Mock
       - mock 构建标签
-    definition: "根 mock/ 是运行时 Mock 的唯一合法目录，与根 test/ 对等，按被测源码相对路径镜像；文件必须以 //go:build mock 开头，包名约定 mock_<源包名>；运行时 Mock 编译进主二进制，替代不可用上游，与测试 Mock 职责分离、互不替代。go run -tags mock . 启用。"
-    scope: "后端运行时 Mock 落点、Go 构建标签、本地开发调试"
+      - selector 配对
+      - runtime-mock 目录树
+    definition: "根 mock/ 是运行时 Mock 的唯一合法目录，与根 test/ 对等，按 internal/ 相对路径镜像；入口按需配对 main_mock.go（//go:build mock）与 main_real.go（//go:build !mock），两份 selector 声明同名 newXxx()；mock/assembly/ 是唯一装配桥且包名固定 assembly，Mock 实现包名 mock_<源包名>；目录检查只读，adoption 不扩大既有 test/ 遗留快照豁免。"
+    scope: "后端运行时 Mock 落点、Go 构建标签、入口 selector、assembly 装配、Catalog 查询与 CLI 只读检查"
     status: "active"
     updated_at: 2026-08-08
   - entity_id: rule.package-structure-three-project-test-root
@@ -2000,6 +2020,7 @@ lifecycle:
     - "rule.backend-root-data-forbidden"
     - "rule.micro-business-json-rpc-boundary"
     - "rule.legacy-project-directory-adoption"
+    - "rule.runtime-mock-location"
     - "rule.thread-title-process-trigger"
     - "rule.obsidian-knowledge-flow-selective-default"
     - "rule.obsidian-iterative-knowledge-governance"
@@ -2462,6 +2483,12 @@ retrieval_hints:
     package-structure-rules/references/project-layout-v2.md:
       - "rule.runtime-mock-location"
     package-structure-rules/references/placement-catalog.yaml:
+      - "rule.runtime-mock-location"
+    package-structure-rules/references/runtime-mock-layout-go.md:
+      - "rule.runtime-mock-location"
+    package-structure-rules/scripts/placement_catalog.py:
+      - "rule.runtime-mock-location"
+    test/package-structure-rules/runtime_mock_layout_test.py:
       - "rule.runtime-mock-location"
     AGENTS.md:
       - "rule.runtime-mock-location"
