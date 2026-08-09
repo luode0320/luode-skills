@@ -74,6 +74,21 @@ class PreCommitGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 17, result.stdout + result.stderr)
         self.assertIn("BLOCK: staged files span multiple docs/test commit domains", result.stderr)
 
+    def test_persisted_sentinel_does_not_block_or_echo(self) -> None:
+        """代码、配置和普通文档中的 sentinel 不得被提交域门禁阻断或回显。"""
+        sentinel = "fixture-secret"
+        result = self.run_gate(
+            title="feat: [凭据边界] 更新持久化规则",
+            files={
+                "config/local.yaml": f"token: {sentinel}\\n",
+                "src/config.py": f"TOKEN = '{sentinel}'\\n",
+                "docs/config.md": f"token: {sentinel}\\n",
+            },
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn(sentinel, result.stdout + result.stderr)
+
     def test_docs_and_implementation_must_split(self) -> None:
         """验证 docs 域不能与实现域混提。
 

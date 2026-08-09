@@ -558,6 +558,7 @@ review_acceptance_gates:
 - 解决计划: 1. 责任方: 验收 owner；前置条件: 本地环境可用；动作: 补齐验收验证；完成判据: 验收通过；验证入口: python tests。
 - 恢复后重入点: 重新执行最终验收。
 - 去重键: blocker.required_validation_missing + EVD-DOC-001
+- 用户授权操作: 请直接回复：`同意授权`；授权仅作用于最近一条、唯一有效、仍未解除的 `BLK-*` 记录。
 """
 
     def test_review_acceptance_gate_not_applicable_is_non_blocking(self) -> None:
@@ -724,6 +725,21 @@ review_acceptance_gates:
             result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
         self.assertTrue(result["valid"], result["errors"])
         self.assertEqual(result["task_blocker_closure"]["records"], ["BLK-DOC-001"])
+
+    def test_task_blocker_closure_rejects_missing_authorization_action(self) -> None:
+        """缺失用户授权操作字段的真实阻断文档必须被拒绝。"""
+        closure = self._task_blocker_closure().replace(
+            "- 用户授权操作: 请直接回复：`同意授权`；授权仅作用于最近一条、唯一有效、仍未解除的 `BLK-*` 记录。\n",
+            "",
+        )
+        text = self._layered_document("  []", status="blocked", technical=closure)
+        with tempfile.TemporaryDirectory() as directory:
+            document = Path(directory) / "blocked.md"
+            document.write_text(text, encoding="utf-8")
+            result = validator.validate_document(document, "test", self.payload["profiles"]["test"], self.payload, Path(directory))
+        self.assertFalse(result["valid"])
+        self.assertIn("blocker.closure_invalid", result["error_codes"])
+        self.assertTrue(any("用户授权操作" in error for error in result["errors"]))
 
     def test_limited_not_applicable_and_normal_documents_do_not_require_task_blocker_closure(self) -> None:
         """受限、不适用和正常通过不应被误报为任务阻断。"""

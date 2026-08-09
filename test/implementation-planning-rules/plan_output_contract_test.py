@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_PATH = Path(__file__).with_name("fixtures") / "plan_output_cases.json"
 WAIT_LOOP_TEST = REPO_ROOT / "doc" / "5-tests" / "2026-07-26_040607" / "plan_mode_wait_loop" / "test_plan_mode_wait_loop.py"
 
@@ -135,6 +135,62 @@ class PlanOutputContractTests(unittest.TestCase):
         self.assertTrue(found_placeholder, "占位例应包含占位词")
         self.assertIn("见上文", zero_fields["文件/符号"])
         self.assertIn("若干文件", zero_fields["禁止触碰"])
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 03:00:00，验证新会话交接字段完整。
+    def test_portable_plan_external_reference_is_reproducible(self) -> None:
+        case = self.cases["plan_ready_portable_with_external_reference"]
+        handoff = case["handoff"]
+        # 1. 正例必须冻结新会话入口、主项目地址、基线和外部引用完整字段。
+        self.assertTrue(handoff["main_project_address"])
+        self.assertTrue(handoff["baseline"])
+        self.assertTrue(handoff["first_action"])
+        self.assertTrue(handoff["local_environment"])
+        reference = handoff["external_code_references"][0]
+        for field in (
+            "id", "project_name", "address", "version", "relative_path", "symbol",
+            "purpose", "license_boundary", "reachability_check", "task_test_evidence_ref",
+        ):
+            self.assertTrue(reference[field], f"外部引用正例缺少字段: {field}")
+        self.assertTrue(reference["address"].startswith(("F:/", "https://", "http://")))
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 03:00:00，验证外部项目地址缺失时阻断。
+    def test_external_reference_without_address_is_rejected(self) -> None:
+        case = self.cases["plan_ready_external_reference_missing_address"]
+        reference = case["handoff"]["external_code_references"][0]
+        # 1. 外部代码引用没有可复现地址，必须保持失败状态，不得让新会话自行搜索项目。
+        self.assertEqual(reference["address"], "")
+        self.assertFalse(reference["address"].startswith(("F:/", "https://", "http://")))
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 19:02:00，验证闸门矩阵含跨会话字段。
+    def test_plan_output_gate_matrix_has_cross_session_rows(self) -> None:
+        gate = (REPO_ROOT / "implementation-planning-rules" / "references" / "plan-output-gate.md").read_text(encoding="utf-8")
+        # 1. 正式计划必填字段矩阵必须包含跨会话独立执行清单和外部项目引用两行。
+        self.assertIn("跨会话独立执行清单", gate)
+        self.assertIn("外部项目代码引用（`EXT-*`）", gate)
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 19:02:00，验证阶段字段未残留跨会话字段。
+    def test_structure_template_stage_has_no_cross_session_leak(self) -> None:
+        template = (REPO_ROOT / "implementation-planning-rules" / "references" / "plan-structure-template.md").read_text(encoding="utf-8")
+        # 1. 阶段字段不得再残留跨会话前置检查与外部项目引用 ID，避免字段错位。
+        self.assertNotIn("  - 跨会话前置检查：", template)
+        self.assertNotIn("  - 外部项目代码引用 ID：", template)
+        self.assertIn("跨会话独立执行与外部项目代码引用清单", template)
+
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 19:02:00，验证模板与 Agent 提示词已同步。
+    def test_templates_and_agent_prompt_synced_with_cross_session_contract(self) -> None:
+        overview = (REPO_ROOT / "implementation-planning-rules" / "references" / "implementation-overview-template.md").read_text(encoding="utf-8")
+        cycle = (REPO_ROOT / "implementation-planning-rules" / "references" / "implementation-cycle-template.md").read_text(encoding="utf-8")
+        entry = (REPO_ROOT / "implementation-planning-rules" / "references" / "plan-entry-checklist.md").read_text(encoding="utf-8")
+        agent = (REPO_ROOT / "implementation-planning-rules" / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        # 1. 总览、周期、入口清单和 Agent 提示词必须全部承载跨会话独立执行与 EXT-* 契约。
+        self.assertIn("跨会话独立执行与外部项目代码引用清单", overview)
+        self.assertIn("`EXT-001`", overview)
+        self.assertIn("跨会话执行入口与外部项目代码引用", cycle)
+        self.assertIn("`EXT-001`", cycle)
+        self.assertIn("跨会话独立执行字段", entry)
+        self.assertIn("`EXT-*`", entry)
+        self.assertIn("跨会话独立执行契约", agent)
+        self.assertIn("EXT-*", agent)
 
 
 if __name__ == "__main__":

@@ -89,6 +89,7 @@ TASK_BLOCKER_REQUIRED_FIELDS = (
     "解决计划",
     "恢复后重入点",
     "去重键",
+    "用户授权操作",
 )
 
 
@@ -560,6 +561,11 @@ def check_task_blocker_closure(
             errors.append(f"[blocker.closure_invalid] {section_name} missing non-empty field: {field}")
             report["valid"] = False
             report["error_codes"].append("blocker.closure_invalid")
+    authorization_value = field_values.get("用户授权操作", "")
+    if authorization_value and not re.search(r"同意授权|暂不授权", authorization_value):
+        errors.append(f"[blocker.closure_invalid] {section_name} 用户授权操作 must offer 同意授权 or 暂不授权")
+        report["valid"] = False
+        report["error_codes"].append("blocker.closure_invalid")
     blocker_records = sorted(set(TASK_BLOCKER_RECORD_PATTERN.findall(field_values.get("阻断记录 ID", ""))))
     report["records"] = blocker_records
     if len(blocker_records) != 1:

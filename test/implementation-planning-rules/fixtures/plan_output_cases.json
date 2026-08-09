@@ -173,5 +173,53 @@
       "skill-hit-check-rules",
       "implementation-planning-rules"
     ]
+  },
+  "plan_ready_portable_with_external_reference": {
+    "mode": "plan",
+    "status": "ready",
+    "handoff": {
+      "main_project_address": "F:/luode-skills",
+      "baseline": "abc123",
+      "first_action": "读取计划并核对代码基线",
+      "local_environment": "config_local",
+      "external_code_references": [
+        {
+          "id": "EXT-001",
+          "project_name": "示例外部项目",
+          "address": "F:/other-project",
+          "version": "abc123",
+          "relative_path": "internal/example/service.go",
+          "symbol": "NewService",
+          "purpose": "对照服务构造约束",
+          "license_boundary": "仅按许可证允许范围对照，不复制未授权代码",
+          "reachability_check": "Test-EXT-001",
+          "task_test_evidence_ref": "TASK-01 -> TEST-EXT-001 -> EVIDENCE-EXT-001"
+        }
+      ]
+    }
+  },
+  "plan_ready_external_reference_missing_address": {
+    "mode": "plan",
+    "status": "ready",
+    "handoff": {
+      "main_project_address": "F:/luode-skills",
+      "baseline": "abc123",
+      "first_action": "读取计划并核对代码基线",
+      "local_environment": "config_local",
+      "external_code_references": [
+        {
+          "id": "EXT-001",
+          "project_name": "示例外部项目",
+          "address": "",
+          "version": "abc123",
+          "relative_path": "internal/example/service.go",
+          "symbol": "NewService",
+          "purpose": "对照服务构造约束",
+          "license_boundary": "仅按许可证允许范围对照",
+          "reachability_check": "Test-EXT-001",
+          "task_test_evidence_ref": "TASK-01 -> TEST-EXT-001 -> EVIDENCE-EXT-001"
+        }
+      ]
+    }
   }
 }
