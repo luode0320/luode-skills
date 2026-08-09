@@ -1,6 +1,6 @@
 ---
 name: tapd-addcomment
-description: TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。通过 Python 脚本调用，方便 AI 直接写评论。当用户给出 `tapd.cn` 链接并要求评论 / 回复时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并提示用户配置 env。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。通过 Python 脚本调用，方便 AI 直接写评论。当用户给出 `tapd.cn` 链接并要求评论 / 回复时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并提示用户在项目代码/配置或环境变量中配置。
 allowed-tools: Bash,Read
 ---
 
@@ -10,7 +10,7 @@ allowed-tools: Bash,Read
 
 ## 环境变量
 
-调用前确保以下环境变量已配置：
+凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖。调用前确保以下环境变量已配置：
 
 | 变量 | 必须 | 用途 |
 |------|------|------|

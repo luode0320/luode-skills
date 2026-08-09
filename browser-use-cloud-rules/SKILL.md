@@ -1,6 +1,6 @@
 ---
 name: browser-use-cloud-rules
-description: 当浏览器任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身浏览或服务商提供的合规验证码处理能力，或用户明确点名 Browser Use Cloud 时触发。作为 Browser Use Cloud 执行、安全、费用确认和 session 生命周期的唯一 Owner，负责检查 `BROWSER_USE_API_KEY`、Billing 余额、运行时 MCP 工具 schema 的硬费用上限、逐次 `run_session` / `send_task` 确认、默认无 profile/录制/保活，以及任务结束后的停止与费用回读。普通网页检索、真实 Chrome 登录态、应用内 Browser、DevTools 调试、本地 agent-browser、HAR/视觉 diff/trace 不使用本 Skill；不得用 Cloud 绕过权限、安全策略或真实浏览器连接失败。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。当浏览器任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身浏览或服务商提供的合规验证码处理能力，或用户明确点名 Browser Use Cloud 时触发。作为 Browser Use Cloud 执行、安全、费用确认和 session 生命周期的唯一 Owner，负责检查 `BROWSER_USE_API_KEY`、Billing 余额、运行时 MCP 工具 schema 的硬费用上限、逐次 `run_session` / `send_task` 确认、默认无 profile/录制/保活，以及任务结束后的停止与费用回读。普通网页检索、真实 Chrome 登录态、应用内 Browser、DevTools 调试、本地 agent-browser、HAR/视觉 diff/trace 不使用本 Skill；不得用 Cloud 绕过权限、安全策略或真实浏览器连接失败。
 ---
 
 # Browser Use Cloud 安全路由规则
@@ -16,13 +16,13 @@ description: 当浏览器任务明确需要 Browser Use Cloud 的云端自主长
 
 1. 冻结任务摘要、目标域名、读写动作、业务副作用和预期完成条件。
 2. 读取 [routing-and-safety.md](references/routing-and-safety.md)，复核 Cloud 正向条件、禁止替代场景和 MCP 配置边界。
-3. 检查当前进程环境变量 `BROWSER_USE_API_KEY`，只报告存在或缺失，不读取其它凭据来源。
+3. 检查 `BROWSER_USE_API_KEY` 的可用性；默认凭据来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖。只报告存在或缺失，不读取其它凭据来源。
 4. 从当前 Browser Use Cloud MCP 工具描述取得本次收费动作的真实 JSON schema：创建任务读取 `run_session`，追加任务读取 `send_task`；不得根据 REST 文档猜测 MCP 已支持同名参数。
 5. 运行 `scripts/browser_use_cloud_preflight.py` 查询 Billing 并检查当前动作的可写 input schema。只有 `ready_for_confirmation` 可进入普通费用确认。
 
 密钥缺失时固定输出：
 
-> Browser Use Cloud 已命中，但本机未检测到 `BROWSER_USE_API_KEY`。请从 Browser Use Cloud 设置页取得 key，在本机用户环境变量中配置后重启 Codex；不要在聊天中粘贴 key。
+> Browser Use Cloud 已命中，但未检测到 `BROWSER_USE_API_KEY`。请从 Browser Use Cloud 设置页取得 key，在项目代码/配置或本机用户环境变量中配置后重启；不要在聊天中粘贴 key。
 
 ## 预检命令
 

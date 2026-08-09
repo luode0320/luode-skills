@@ -9,7 +9,7 @@
 3. 已存在同名 skill 目录时不得覆盖，先对比差异再决定是否更新。
 4. 下载或解包失败时，退回官方仓库页面 `https://cnb.cool/tapd.cn/skills/tapd-skills` 按当前说明处理，不得沿用第三方转述。
 
-**环境变量配置（项目级 Codex 配置补齐）：**
+**凭据来源配置（项目代码/配置默认，环境变量仅作运行时覆盖）：**
 
 按 `references/config-bootstrap.md` 的检查顺序（`./codex/config.toml` -> `./.codex/config.toml`，都缺失时创建后者），在项目级配置中补齐 TAPD 环境变量。Codex 项目级配置没有独立 env 段时，写入 `[shell_environment_policy.set]`；若用户在其他宿主（如 Claude Code）使用 JSON `env` 段，保持同一组 key：
 
@@ -22,12 +22,12 @@ TAPD_SITE_URL = "https://www.tapd.cn"
 ```
 
 - `TAPD_API_ENDPOINT`、`TAPD_SITE_URL` 使用上述默认值即可。
-- `TAPD_TOKEN`、`TAPD_WORKSPACE_IDS` 属于用户私密配置，**必须留空并提示用户自行填写**；agent 不得代填、不得把任何真值写进仓库或示例。
+- `TAPD_TOKEN`、`TAPD_WORKSPACE_IDS` 允许写入项目代码/项目配置/普通维护文档并随 Git 提交；默认来源为项目代码/项目配置，环境变量可作为运行时覆盖。agent 不得代填，任何输出 / 日志 / 提交不得回显 Token 明文。
 - Token 获取入口：TAPD 开放平台 `https://www.tapd.cn/open_platform/open_api_redirect`（登录后获取个人 API Token）；`TAPD_WORKSPACE_IDS` 为项目 ID 列表，逗号分隔，取自 TAPD 项目 URL。
 - 配置写入后必须回读确认 UTF-8 未乱码；`TAPD_TOKEN` 仍为空时视为“已安装未激活”，提示用户填写后重启会话生效，不得阻断其他任务。
 
 **使用路由：**
 
 - TAPD 需求 / 缺陷 / 任务 / 迭代 / Wiki / 评论 / 工时等操作，优先由 `tapd-openapi` skill 接管；写评论场景可直接用 `tapd-addcomment`；终端批量脚本场景用 `tapd-cli`（需 Node.js 18+）。
-- 用户消息出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动触发 `tapd-openapi`（按需联动 `tapd-addcomment` / `tapd-cli`），优先走 OpenAPI 而不是浏览器打开页面；执行前必须按 `tapd-openapi` 的「环境预检」检查 env，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并输出配置指引。
+- 用户消息出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动触发 `tapd-openapi`（按需联动 `tapd-addcomment` / `tapd-cli`），优先走 OpenAPI 而不是浏览器打开页面；执行前必须按 `tapd-openapi` 的「凭据预检」检查项目代码/配置或环境变量，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并输出配置指引。
 - `TAPD_TOKEN` 泄露防护：任何输出、日志、提交中不得回显 Token 明文。

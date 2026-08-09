@@ -48,7 +48,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 2. 同步根目录及子目录所有已存在的 `AGENTS.md` / `CLAUDE.md` 受管章节。
 3. 受管章节缺失时追加、已存在时原位更新；用户非受管内容必须保持不变。仅当用户显式传入 `--target both` 时，`AGENTS.md` 是根目录双平台规则的唯一正文源，允许覆盖 `CLAUDE.md` 以消除内容漂移。
 4. 缺失 `.gitattributes` 或 `.editorconfig` 时创建最小可用版本；已存在时不得覆盖或反向调整。
-5. Godot 项目继续补齐 `Godot 项目工具配置` 与 `图像生成配置`，不得写入真实密钥。
+5. Godot 项目继续补齐 `Godot 项目工具配置` 与 `图像生成配置`，凭据允许写入；默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显原值。
 
 受管章节索引见 [`references/规则文件模板/agents-md-sections-index.md`](references/规则文件模板/agents-md-sections-index.md)，确切写入文字以 `scripts/bootstrap_agents.sh` 对应 heredoc 变量为唯一权威源。
 

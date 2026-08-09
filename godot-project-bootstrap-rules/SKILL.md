@@ -44,13 +44,8 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 ## 图像配置硬规则
 
 - 规则文件（`AGENTS.md` / `CLAUDE.md`）里只允许写图像通道的读取约定、`baseurl`、模型名、优先级和回退规则。
-- 规则文件（`AGENTS.md` / `CLAUDE.md`）里不得明文写真实 `OPENAI_API_KEY`。
-- 真实密钥必须来自：
-  - 当前进程环境变量
-  - `~/.codex/auth.json`（仅 Codex 环境存在该机制）
-  - `~/.codex/config.toml`（仅 Codex 环境存在该机制）
-  - 项目已经接好的运行时环境变量或运行时配置
-  - Claude Code 环境：当前没有已确认的等价全局密钥文件机制（不假设存在 `~/.claude/auth.json` 等路径）；必须回退到"当前进程环境变量"或"项目已经接好的运行时环境变量或运行时配置"，若都不可用则明确提示用户在项目规则文件（`CLAUDE.md`）或本机环境变量中补充声明
+- 规则文件（`AGENTS.md` / `CLAUDE.md`）允许明文写入真实凭据原值；禁止在日志、错误信息、测试报告与证据、终端输出、Agent 回复、会话交接、执行失败案例和自动知识摘要等过程性输出中回显。
+- 默认凭据来源为项目代码/项目配置/普通维护文档；环境变量作为运行时覆盖或适配层来源，不再作为治理层唯一默认来源。
 - 项目如需专用图像通道，优先让项目维护者在本机环境里配置真实密钥，再在规则文件（`AGENTS.md` / `CLAUDE.md`）中声明读取位置，例如 `env:PROJECT_IMAGE_OPENAI_API_KEY`。
 - 图像生成配置必须同时声明主通道与回退规则。
 - 主通道优先使用 `baseurl=https://api.openai.com/v1` 和最新可用的 `gpt-image` 模型，例如 `gpt-image-1`。

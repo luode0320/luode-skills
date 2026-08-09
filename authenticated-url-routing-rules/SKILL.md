@@ -112,7 +112,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ## 安全边界
 
 - 不要求用户粘贴 cookie、token、localStorage、sessionStorage 或账号密码。
-- 不要求用户在聊天中粘贴 `BROWSER_USE_API_KEY`；Cloud 只从本机环境变量读取，默认不选择 Cloud profile，也不上传 Cookie、本地 Chrome profile 或登录状态。
+- 不要求用户在聊天中粘贴 `BROWSER_USE_API_KEY`；Cloud 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；默认不选择 Cloud profile，也不上传 Cookie、本地 Chrome profile 或登录状态。
 - 不把认证 state、profile、截图、HAR、导出文件等敏感临时产物提交到仓库。
 - 如果必须临时保存 state 文件，必须说明其敏感性，放入忽略路径或任务后删除。
 - 不在未确认范围的情况下跨域跳转到无关站点。

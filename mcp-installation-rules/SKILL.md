@@ -75,7 +75,7 @@ description: 当用户要求分析项目、检查是否需要安装 MCP、决定
 > MCP 分支安装细节已下沉到 references，按需读取：
 >
 > - 代码图谱 MCP（CodeGraph + codebase-memory-mcp）的配合规则、安装与配置详见 `references/codegraph-mcp.md`。
-> - TAPD 技能包（tapd-skills）安装方式、环境变量配置与使用路由详见 `references/tapd-skills-install.md`；强约束：`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 必须留空由用户自行填写，agent 不得代填，任何输出 / 日志 / 提交不得回显 Token 明文，TAPD 相关技能名称统一归一为“TAPD 技能包”。
+> - TAPD 技能包（tapd-skills）安装方式、环境变量配置与使用路由详见 `references/tapd-skills-install.md`；强约束：`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 默认来源为项目代码/项目配置/普通维护文档，运行时可适配到环境变量；agent 不得代填，任何输出 / 日志 / 提交不得回显 Token 明文，TAPD 相关技能名称统一归一为"TAPD 技能包"。
 > - 平台判定与 Claude Code MCP 配置分支详见 `references/claude-code-branch.md`；强约束：`./codex/config.toml` / `./.codex/config.toml` 仅指 Codex CLI 项目级配置，Claude Code 不通用，不得混用同一份配置文件语义。
 > - Chrome DevTools MCP 安装流程详见 `references/chrome-devtools-codex.md`；强约束：该流程专属 Codex CLI 环境，`codex mcp add / list / get` 在 Claude Code 环境不存在，不得照搬。
 

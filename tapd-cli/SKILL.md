@@ -1,6 +1,6 @@
 ---
 name: tapd-cli
-description: TAPD OpenAPI 命令行工具。将 TAPD 平台的全量 OpenAPI 封装为 tapd-cli 命令，适用于终端脚本、自动化管线和 AI Agent调用。当用户给出 `tapd.cn` 链接且需要批量 / 终端化操作时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并提示用户配置 env。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD OpenAPI 命令行工具。将 TAPD 平台的全量 OpenAPI 封装为 tapd-cli 命令，适用于终端脚本、自动化管线和 AI Agent调用。当用户给出 `tapd.cn` 链接且需要批量 / 终端化操作时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并提示用户在项目代码/配置或环境变量中配置。
 allowed-tools: Bash,Read,Glob,Grep
 ---
 

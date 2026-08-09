@@ -15,7 +15,7 @@ Provide a stable system-level way to run image generation without re-explaining:
 
 The system-level bridge should prefer existing Codex local auth:
 
-- current process env vars should stay highest priority
+- project code/config is the default credential source; env vars are the runtime override layer
 - if the project `AGENTS.md` declares fallback image config, prefer that fallback `api` / `baseurl` before shared Codex local auth
 - otherwise, use the project-local image channel declared in the repo `AGENTS.md` before shared Codex local auth
 - `~/.codex/auth.json` -> 当前 Codex auth bridge 的图像 API key
@@ -27,9 +27,9 @@ Only fall back to reading those files when env vars are absent.
 
 Recommended priority:
 
-1. current process environment variables
-2. project `AGENTS.md` fallback image config
-3. project `AGENTS.md` image config
+1. project `AGENTS.md` image config (default source)
+2. current process environment variables (runtime override)
+3. project `AGENTS.md` fallback image config
 4. `~/.codex/auth.json` + `~/.codex/config.toml`
 
 Recommended project `AGENTS.md` format:
@@ -37,13 +37,13 @@ Recommended project `AGENTS.md` format:
 ```text
 ## 图像生成配置
 
-- `AGENTS.md` 里只允许写图像通道的读取位置、`baseurl`、模型名、优先级和回退规则；不得明文写真实密钥。
-- `api` 字段推荐写成 `env:IMAGEGEN_API_KEY`、`env:OPENAI_API_KEY`、`codex-auth:active_provider_api_key` 这类读取约定，而不是明文密钥。
+- `AGENTS.md` 里只允许写图像通道的读取位置、`baseurl`、模型名、优先级和回退规则；允许明文写真实凭据原值；禁止在过程性输出中回显。
+- `api` 字段推荐写成 `env:IMAGEGEN_API_KEY`、`env:OPENAI_API_KEY`、`codex-auth:active_provider_api_key` 这类读取约定（推荐写法，也允许直接写明文）。
 - `baseurl` 字段推荐写成 `env:IMAGEGEN_BASE_URL`、`env:OPENAI_BASE_URL`、`codex-config:active_provider_base_url` 这类读取约定。
 - `model` 字段用于声明当前项目默认图像模型；如果调用时没有显式传 `--model`，脚本会优先使用这里的模型。
 - 如果用户在 `AGENTS.md` 里明确配置了 `回退规则：回退配置` 下的 `api` / `baseurl`，则在当前进程环境变量之后优先使用这组回退配置；这是用户主动声明的项目图像通道，应先于共享 Codex local 配置。
 - 当项目未声明回退配置，或回退配置解析不出有效值时，再使用本项目 `AGENTS.md` 中声明的常规项目级图像通道。
-- `imagegen` 的配置优先级默认是：当前进程环境变量 > 本项目 `AGENTS.md` 回退配置 > 本项目 `AGENTS.md` 图像配置 > 当前 Codex provider 配置与 auth bridge。
+- `imagegen` 的配置优先级默认是：项目 `AGENTS.md` 图像配置（默认来源）> 项目 `AGENTS.md` 回退配置 > 当前进程环境变量（运行时覆盖）> 当前 Codex provider 配置与 auth bridge。
 - 该项目级图像配置只用于图像生成相关流程，不用于覆盖普通文本模型配置。
 - 如果项目级图像通道也不可用，必须明确告知当前图像入口仍不可用，并提示继续补充新的图像通道，而不是假装已生成成功。
 - 图像配置格式固定如下，供 `imagegen` skill 自动读取：
@@ -53,7 +53,7 @@ api: codex-auth:active_provider_api_key
 baseurl: codex-config:active_provider_base_url
 model: gpt-image-2
 fallback_model: gpt-image-1.5
-priority: env > project-fallback > project-agents > codex-current-provider
+priority: project-agents (default) > project-fallback > env (runtime override) > codex-current-provider
 回退规则：回退配置
 api: ''
 baseurl: ''
