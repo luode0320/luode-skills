@@ -3,12 +3,12 @@
 ## 更新时间
 
 - 2026-08-09
-
-## 当前任务
-
+- 来源对象：BUG-PSR-CONFIG-TEST-001 test/config/ 规则误判修正
+- 当前目标：修正 package-structure-rules 中 test/config/ 和 mock/config/ 的 blanket ban，改为「允许作为测试配置加载/解析的目录，但禁止作为配置数据源」
+- 当前状态：完成。5 个文件改动全部闭环，`test/config/` 配置加载测试通过 strict 检查，mock/config 空目录通过 strict 检查，py_compile 通过。既有 8 个失败（Catalog source_policy 字段未同步）与本次改动无关。改动停在已改动未提交状态。
 - 来源对象：REQ-PLAN-DETAIL-COMPLETE-001 计划输出完整性升级
 - 当前目标：按已落盘实施计划完成全链路规则修复：模板压缩口子删除、闸门内容密度 hard-fail、自审清单对齐、平台规则完整度优先、测试 fixture 升级、记忆同步、全量回归收口
-- 当前状态：完成。TASK-PD-01..07 全部闭环，注册测试 10/10 通过，文档 profile 三份 PASS，git diff --check 通过，所有 6 条 AC 验证通过。改动停在已改动未提交状态。
+## 已完成
 
 ## 已完成
 
@@ -48,6 +48,7 @@
 ## 已完成
 
 - 已完成运行时 Mock 与测试 Mock 分离规则补充：根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护。
+- 已完成 BUG-PSR-CONFIG-TEST-001 test/config/ 规则误判修正：对比之前 36/36 全量回归，本次 5 文件改动后回归测试与基线一致（8 既有失败与本次无关）。5 个文件：placement-catalog.yaml（移除 forbidden_paths 条目）、placement_catalog.py（删除 blanket ban 检查）、configuration-layout.md（区分配置数据源与配置加载测试）、project-layout-v2.md（同步口径）、SKILL.md（核心边界同步）。实机验证 `test/config/config_load_test.go` 通过 strict 检查。
 - 已同步 `test-program-rules/SKILL.md`：description 追加运行时 Mock 定义，新增「运行时 Mock 落点（强制）」小节。
 - 已同步 `artifact-storage-rules/SKILL.md`：新增「运行时 Mock 资产」小节，明确根 `mock/` 不纳入 `test/` 或 `doc/5-tests/`。
 - 已同步 `test-strategy-rules/SKILL.md` 及 `test-asset-governance.md`：将 mock 范围限定为测试 Mock，运行时 Mock 不归本域治理。

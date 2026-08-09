@@ -2,7 +2,7 @@
 
 项目只有一套配置根：独立后端使用根级 `config/`；前后端同仓时，后端配置统一使用 `backend/config/`。不得在 `src/config/`、`internal/config/`、工作区根 `config/` 或其他位置重复定义同一套后端配置。
 
-`test/` 与 `mock/` 目录均不承载独立的 `config/` 配置目录。测试和 Mock 所需的配置统一使用项目 `config/` 下的 `test` 环境（例如 `config/embedded/config_test_yaml.go` 或 `config/yaml/config_test.yaml`），不得在 `test/config/` 或 `mock/config/` 下另建配置根。
+`test/` 与 `mock/` 目录不承载独立配置数据源。测试和 Mock 所需的运行时配置数据统一使用项目 `config/` 下的 `test` 环境（例如 `config/embedded/config_test_yaml.go` 或 `config/yaml/config_test.yaml`）。但 `test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录（如 `test/config/config_load_test.go`），这不属于配置数据源，而是测试代码的一部分，不受该禁止约束。
 
 ## 配置模式选择（二选一，互斥）
 

@@ -793,11 +793,11 @@ def configuration_root(project_kind: str | None) -> str | None:
 def check_environment_config_mutual_exclusion(
     root: Path, project_kind: str | None,
 ) -> list[str]:
-    """校验 config 互斥与禁止 test/mock 下独立配置。
+    """校验 config 互斥。
 
     [参数] root：待检查项目根；project_kind：项目类型。
     [返回] list[str]：配置模式冲突或非法配置根的错误列表。
-    最近修改时间: 2026-08-09 新增 config/embedded/ 与 config/yaml/ 互斥 check；新增 test/config 与 mock/config 禁止。
+    最近修改时间: 2026-08-09 新增 config/embedded/ 与 config/yaml/ 互斥 check。
     """
     if project_kind not in {"backend", "fullstack"}:
         return []
@@ -808,10 +808,6 @@ def check_environment_config_mutual_exclusion(
     embedded_dir = root / config_root / "embedded"
     if yaml_dir.exists() and embedded_dir.exists():
         errors.append(f"{config_root}/yaml/ 与 {config_root}/embedded/ 互斥，只能二选一，推荐优先使用 {config_root}/embedded/")
-    # test/ 与 mock/ 不承载独立配置，所有配置统一使用 config/ 下的 test 环境
-    for illegal in ["test/config", "mock/config"]:
-        if (root / illegal).exists():
-            errors.append(f"禁止 {illegal}/：test/ 与 mock/ 不承载独立配置，测试和 Mock 配置统一使用 config/ 下的 test 环境")
     return errors
 
 

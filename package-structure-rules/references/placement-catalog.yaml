@@ -42,8 +42,6 @@
     "config/defaults",
     "src/config",
     "internal/config",
-    "test/config",
-    "mock/config",
     "infrastructure",
     "runtime",
     "workflow",
