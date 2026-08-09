@@ -2,6 +2,12 @@
 
 ## 更新时间
 
+- 2026-08-10
+- 来源对象：CYCLE-CUR-RECENT-02 / PROJECT_CURRENT 最近会话记忆
+- 当前目标：完成最近5个同项目会话快照的全量收口，包括bootstrap模板、规则文件、PROJECT_CURRENT迁移、测试和文档门禁
+- 当前状态：CYCLE-01 和 CYCLE-02 文档门禁 PASS；TASK-08/09/10 已完成，TASK-11 全量测试与收口已通过；skill 字典刷新退出码 0；投影落盘并同步 update_plan；改动停在已改动未提交状态。
+
+
 - 2026-08-09
 - 来源对象：REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001
 - 当前目标：落实“允许凭据有意持久化、禁止过程性输出回显”的规则与测试边界。
@@ -130,12 +136,24 @@
 - 协同收口 CYCLE-11：为 `F:\binance-wangge-go` 的配置环境来源迁移同步 `package-structure-rules` 的 loader Catalog、Schema、reference 与契约测试；本仓库专项测试 11/11、Catalog adoption/strict 和两仓库文档差异检查通过，相关规则改动仍保持已改动未提交。
 - 本轮补齐配置来源安全边界：同一环境优先使用 `embedded/`，缺失时回退 `yaml/`；YAML 禁止秘密原值，embedded 允许源码私密值。配置专项 `11/11`、目录回归 `26/26`、test/style 文档 profile 与 `git diff --check` 均通过；测试 README 与 `STYLE: PASS` 已落盘。
 
+
+<!-- BEGIN RECENT PROJECT SESSIONS -->
+
+## 最近 5 个同项目会话
+
+> 只读回忆索引：标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实。
+
+- 2026-08-10 14:00:00 +08:00 [活动中] PROJECTCURRENT最近会话记忆：在PROJECTCURRENT.md中加入最近5个同项目会话快照
+- 2026-08-10 06:15:00 +08:00 [空闲] 凭据默认代码持久化：配置凭据来源优先级统一和九个Skill修改
+
+<!-- END RECENT PROJECT SESSIONS -->
+
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-09T15:26:29.576332Z",
+  "registry_updated_at": "2026-08-09T18:14:45.467384Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -815,6 +833,39 @@
         {
           "id": "TASK-BLK-AUTH-VERIFY-03",
           "step": "[TASK-BLK-AUTH-VERIFY-03] 执行文档与技能收口门禁",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/45441d798a044a6f6638da86bd1cb5f8bb82e0335d0eba9762c9dd12db1c52e9",
+      "session_id": "019fe755-ac2c-7383-903c-70d2d8bd85f6",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "CUR-RECENT/CYCLE-02",
+      "source_document": "doc/3-实施/2026-08-10_PROJECT_CURRENT最近会话记忆_实施周期02_bootstrap模板与全量收口.md",
+      "plan_fingerprint": "82dc32f43380a5b2b377d6d7d0133139de36a4da6bcfe482fb8c561a30ea6ea9",
+      "updated_at": "2026-08-10T14:30:00Z",
+      "steps": [
+        {
+          "id": "TASK-CUR-RECENT-08",
+          "step": "修改 bootstrap 模板与测试",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CUR-RECENT-09",
+          "step": "更新 AGENTS.md/CLAUDE.md 触发规则",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CUR-RECENT-10",
+          "step": "迁移 PROJECT_CURRENT.md 加入最近会话托管区",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CUR-RECENT-11",
+          "step": "全量测试 + 字典刷新 + 文档门禁 + 6-review",
           "status": "completed"
         }
       ]

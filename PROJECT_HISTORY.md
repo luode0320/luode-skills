@@ -11,6 +11,7 @@
 
 ## 事件
 
+- 2026-08-10：完成 PROJECT_CURRENT 最近 5 个同项目会话快照功能全量收口（CYCLE-CUR-RECENT-02）。新增快照脚本与契约（周期01），修改 bootstrap 模板、AGENTS.md/CLAUDE.md 触发规则、PROJECT_CURRENT.md 迁移（周期02）；快照 26/26 与 bootstrap 1/1 测试通过，投影 validate 通过，字典刷新退出码 0，周期01/02 文档门禁 PASS，6-review STYLE: PASS；改动停在已改动未提交状态。
 - 2026-08-09：完成 `REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001` 的规则与测试同步，确立“允许有意持久化凭据、禁止过程性输出回显”口径；未执行 Git 提交或推送。
 
 - 2026-08-09：完成计划输出完整性与跨会话独立执行升级（REQ-PLAN-DETAIL-COMPLETE-002/CYCLE-PD-02）。新增 `cross-session-plan-execution-contract.md`，同步模板、闸门、自审、入口清单与 Agent 提示词的跨会话与 `EXT-*` 契约，修正阶段字段错位与正式字段矩阵；测试资产从 `doc/5-tests/2026-07-26_plan-output/` 迁至根 `test/implementation-planning-rules/` 并扩展到 15 项；落盘需求、实施总览、实施周期、测试 README 与 6-review 五份文档，四档严格 profile 全 PASS；字典生成退出码 0 且与基线一致，`git diff --check` 无错误，临时投影输入已清理；改动停在已改动未提交状态。
