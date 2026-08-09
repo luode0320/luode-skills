@@ -306,6 +306,172 @@ func (c *Client) Post(ctx context.Context, url string, body []byte, headers map[
 - 第三方 API 客户端（如 Binance、微信）进入 `utils/api/<provider>/`，复用 `httpUtil` 但不得绕过其超时/错误处理。
 - 关联 `common-util-rules`：已有公共封装时禁止重复实现。
 
+
+## decimal：Decimal 高精度数值类型
+
+- 目录位置：`utils/decimal/`
+- Go import：`<module>/utils/decimal`
+- 包别名：`decimalUtil`（避免与 `decimal` 标准库名冲突，与其余工具包保持统一 `xxxUtil` 命名风格）
+- 关联 skill：`common-util-rules`、`database-query-rules`、`database-schema-rules`
+- 关联 recipe 索引：`#decimal`
+
+### 典型用法
+
+```go
+package decimalUtil
+
+import (
+	"database/sql/driver"
+	"fmt"
+
+	"github.com/shopspring/decimal"
+)
+
+// Decimal 自定义 Decimal 类型，用于 GORM 映射和金额运算。
+type Decimal struct {
+	decimal.Decimal
+}
+
+// Scan 实现 sql.Scanner 接口，从数据库读取数据并转换为 Decimal。
+func (d *Decimal) Scan(value interface{}) error {
+	if value == nil {
+		d.Decimal = decimal.NewFromInt(0)
+		return nil
+	}
+	switch v := value.(type) {
+	case float64:
+		d.Decimal = decimal.NewFromFloat(v)
+	case int64:
+		d.Decimal = decimal.NewFromInt(v)
+	case string:
+		dec, err := decimal.NewFromString(v)
+		if err != nil {
+			return err
+		}
+		d.Decimal = dec
+	case []byte:
+		dec, err := decimal.NewFromString(string(v))
+		if err != nil {
+			return err
+		}
+		d.Decimal = dec
+	default:
+		return fmt.Errorf("cannot scan %%T into Decimal", value)
+	}
+	return nil
+}
+
+// Value 实现 driver.Valuer 接口，将 Decimal 转为字符串写入数据库。
+func (d Decimal) Value() (driver.Value, error) {
+	return d.Decimal.String(), nil
+}
+
+// ToFloat64 转换为 float64 类型。
+func (d Decimal) ToFloat64() float64 {
+	return d.Decimal.InexactFloat64()
+}
+
+// Add 返回当前值与另一值的和。
+func (d Decimal) Add(other Decimal) Decimal {
+	return Decimal{d.Decimal.Add(other.Decimal)}
+}
+
+// Sub 返回当前值减去另一值的差。
+func (d Decimal) Sub(other Decimal) Decimal {
+	return Decimal{d.Decimal.Sub(other.Decimal)}
+}
+
+// Mul 返回当前值与另一值的积。
+func (d Decimal) Mul(other Decimal) Decimal {
+	return Decimal{d.Decimal.Mul(other.Decimal)}
+}
+
+// Div 返回当前值除以另一值的商。
+func (d Decimal) Div(other Decimal) Decimal {
+	return Decimal{d.Decimal.Div(other.Decimal)}
+}
+
+// Cmp 比较两个 Decimal 值。返回 -1（d < other）、0（d == other）或 1（d > other）。
+func (d Decimal) Cmp(other Decimal) int {
+	return d.Decimal.Cmp(other.Decimal)
+}
+
+// Equals 判断两个 Decimal 值是否相等。
+func (d Decimal) Equals(other Decimal) bool {
+	return d.Decimal.Equal(other.Decimal)
+}
+
+// IsZero 判断当前值是否为零。
+func (d Decimal) IsZero() bool {
+	return d.Decimal.IsZero()
+}
+
+// IsPositive 判断当前值是否为正数。
+func (d Decimal) IsPositive() bool {
+	return d.Decimal.IsPositive()
+}
+
+// IsNegative 判断当前值是否为负数。
+func (d Decimal) IsNegative() bool {
+	return d.Decimal.IsNegative()
+}
+
+// Abs 返回当前值的绝对值。
+func (d Decimal) Abs() Decimal {
+	return Decimal{d.Decimal.Abs()}
+}
+
+// Round 四舍五入到指定小数位数。
+func (d Decimal) Round(places int32) Decimal {
+	return Decimal{d.Decimal.Round(places)}
+}
+
+// Max 返回两个 Decimal 值中的最大值。
+func Max(a, b Decimal) Decimal {
+	if a.Cmp(b) >= 0 {
+		return a
+	}
+	return b
+}
+
+// Min 返回两个 Decimal 值中的最小值。
+func Min(a, b Decimal) Decimal {
+	if a.Cmp(b) <= 0 {
+		return a
+	}
+	return b
+}
+
+// NewDecimalFromFloat64 从 float64 创建 Decimal。
+func NewDecimalFromFloat64(f float64) Decimal {
+	return Decimal{decimal.NewFromFloat(f)}
+}
+
+// NewDecimalFromString 从字符串解析创建 Decimal。
+func NewDecimalFromString(s string) (Decimal, error) {
+	d, err := decimal.NewFromString(s)
+	return Decimal{d}, err
+}
+
+// NewDecimalFromInt64 从 int64 创建 Decimal。
+func NewDecimalFromInt64(i int64) Decimal {
+	return Decimal{decimal.NewFromInt(i)}
+}
+
+// NewDecimalFromDecimal 从 shopspring Decimal 创建 Decimal。
+func NewDecimalFromDecimal(d decimal.Decimal) Decimal {
+	return Decimal{d}
+}
+```
+
+### 注意事项
+
+- Go 中 `utils/decimal/` 的 package 声明使用 `decimalUtil` 别名，避免与 `decimal` 标准库名冲突。
+- 业务模型字段应使用 `decimalUtil.Decimal` 类型，配合 GORM 的 `type:decimal(...)` 标签实现数据库映射。
+- 金额计算必须使用 `decimalUtil.Decimal`，禁止使用 `float64` 直接进行金额运算。
+- 创建 Decimal 的首选入口是 `NewDecimalFromString`（字符串解析，推荐用于外部输入）和 `NewDecimalFromInt64`（整数，推荐用于内部计算）。
+- 关联 `database-query-rules` 的本地连接红线与 `database-schema-rules` 的字段映射规则。
+
 ## recipe 持续扩展示例框架
 
 新增 recipe 的流程：

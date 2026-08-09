@@ -112,7 +112,7 @@
 ├── config/                                  # [必需·提交] 唯一配置根
 │   ├── load.<ext>                            # [条件·提交] 配置加载与解析入口；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local
 │   ├── model.<ext>                           # [条件·提交] 配置结构定义
-│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；禁止秘密原值；只存放配置数据
+│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；允许有意持久化凭据原值；只存放配置数据
 │   │   └── config_<env>.yaml                 # [条件·提交] 兼容 `.yml`；标准环境为 local、test、prod
 │   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用；允许源码私密配置，默认不依赖环境变量；只存放配置数据
 │       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
@@ -159,6 +159,7 @@
 │   ├── cron/                                # [条件·提交] Cron 调度库技术封装（如 robfig/cron），供业务侧 crontask/ 定时任务入口调用
 │   ├── async/                               # [条件·提交] 异步协程与并发辅助
 │   ├── convert/                             # [条件·提交] 字符串与数字双向转换
+│   ├── decimal/                             # [条件·提交] Decimal 高精度数值类型封装，数据库扫描与金额运算
 │   ├── http/                                # [条件·提交] 通用 HTTP Client
 │   ├── ip/                                  # [条件·提交] 请求 IP 提取、标准化、公私网判断与地址归属查询工具
 │   ├── json/                                # [条件·提交] JSON 序列化与反序列化技术工具封装
@@ -289,7 +290,7 @@
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
-独立后端配置使用 `config/embedded/` 或 `config/yaml/`（两者互斥，只能二选一，推荐优先使用 `config/embedded/`），按 `config_<env>` 拆分环境。`embedded/` 模式：Go 使用 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`，格式名必须后置因为 `config_test.go` 会被 Go 当成测试文件。`yaml/` 模式：外部 YAML 使用 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，不参与编译因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全。外部 YAML 禁止秘密原值；embedded 源码允许直接包含 API key、密钥、密码等私密信息，源码配置是主来源且默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据，且严格互斥不可并存；`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
+独立后端配置使用 `config/embedded/` 或 `config/yaml/`（两者互斥，只能二选一，推荐优先使用 `config/embedded/`），按 `config_<env>` 拆分环境。`embedded/` 模式：Go 使用 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`，格式名必须后置因为 `config_test.go` 会被 Go 当成测试文件。`yaml/` 模式：外部 YAML 使用 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，不参与编译因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全。外部 YAML 与 embedded 源码均允许有意持久化 API key、密钥、密码等私密信息，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据，且严格互斥不可并存；`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 

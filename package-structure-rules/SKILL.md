@@ -61,6 +61,8 @@ python package-structure-rules/scripts/placement_catalog.py guide --category jso
 python package-structure-rules/scripts/placement_catalog.py guide --category log --language go
 python package-structure-rules/scripts/placement_catalog.py guide --category http --language go
 python package-structure-rules/scripts/placement_catalog.py guide --category runtime-mock --language go
+
+python package-structure-rules/scripts/placement_catalog.py guide --category decimal --language go
 python package-structure-rules/scripts/placement_catalog.py guide --category all --language go
 ```
 

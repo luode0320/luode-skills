@@ -13,7 +13,7 @@
 | 独立后端 `config/load.<ext>` | 配置加载与解析入口：读取所选配置模式（`config/embedded/` 或 `config/yaml/`）的对应环境文件，并解析为配置结构；环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`；例如 Go 使用 `config/load.go` | 与普通源码相同；不得输出 embedded 私密配置原值 |
 | 独立后端 `config/model.<ext>` | 配置结构定义：声明配置加载与解析结果对应的类型/结构；例如 Go 使用 `config/model.go` | 与普通源码相同；不得输出 embedded 私密配置原值 |
 | 独立后端 `config/embedded/` | **（推荐）** 按环境拆分、包含 YAML 字符串的源码文件；Go 例如 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go` | 允许直接写入 API key、密钥、密码等私密信息；源码配置是主来源，默认不依赖环境变量。不得写入 Agent 输出、日志、README、错误或测试报告 |
-| 独立后端 `config/yaml/` | 按环境拆分的外部 YAML 配置，例如 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml` | 禁止真实密钥、密码、token、私钥原值；允许占位符或环境变量引用 |
+| 独立后端 `config/yaml/` | 按环境拆分的外部 YAML 配置，例如 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml` | 允许有意持久化真实密钥、密码、token、私钥原值；不得写入 Agent 输出、日志、README、错误或测试报告 |
 | 同仓后端 `backend/config/load.<ext>` | 与独立后端相同的配置加载与解析入口职责，读取所选配置模式对应环境文件 | 与独立后端相同 |
 | 同仓后端 `backend/config/model.<ext>` | 与独立后端相同的配置结构定义职责 | 与独立后端相同 |
 | 同仓后端 `backend/config/embedded/` | **（推荐）** 与独立后端相同的 embedded 命名规则，只存放配置数据 | 与独立后端相同 |
@@ -90,7 +90,7 @@ config/
 - `config/embedded/config.yaml.go`：不符合 `config_<env>_yaml.<源码扩展名>` 形式。
 - `src/config/config_prod.yaml`、`internal/config/config_local.yaml`、同仓工作区根 `config/yaml/config_test.yaml`：配置根位置错误。
 - **`config/embedded/` 与 `config/yaml/` 同时存在**：违反互斥约束，必须只保留一种配置模式。
-- 在 YAML 中直接写入真实密码、token、私钥或连接串：违反秘密原值边界；embedded 源码按本规则允许这些私密信息，但仍禁止向 Agent 输出、日志、README、错误或测试报告泄露。
+- 在 YAML 或 embedded 中有意持久化真实密码、token、私钥或连接串是允许的；仍禁止向 Agent 输出、日志、README、错误或测试报告泄露。
 
 ## 二进制入口边界
 

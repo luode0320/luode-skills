@@ -98,7 +98,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertTrue(entry["direct_files"])
                 if category == "yaml":
                     self.assertEqual("config_<env>.yaml|config_<env>.yml", entry["file_name_pattern"])
-                    self.assertEqual("forbid_plain_secret", entry["secret_policy"])
+                    self.assertEqual("allow_plain_secret", entry["secret_policy"])
                     self.assertEqual("embedded_source_fallback", entry["source_policy"])
                     self.assertEqual("allowed_reference", entry["environment_variable_policy"])
                 else:
@@ -205,9 +205,9 @@ class ConfigurationLayoutTests(unittest.TestCase):
         self.assertIn("允许直接写入 API key、密钥、密码等私密信息", layout)
         self.assertIn("源码配置是主来源，默认不依赖环境变量", layout)
         self.assertIn("不得写入 Agent 输出、日志、README、错误或测试报告", layout)
-        self.assertIn("在 YAML 中直接写入真实密码、token、私钥或连接串：违反秘密原值边界", layout)
+        self.assertIn("在 YAML 或 embedded 中有意持久化真实密码、token、私钥或连接串是允许的", layout)
 
-        # 2. 对照 Catalog 条目确认两类 embedded 放行、两类 YAML 禁止。
+        # 2. 对照 Catalog 条目确认 YAML 与 embedded 均允许有意持久化。
         catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
         embedded = [
             entry for entry in catalog["entries"]
@@ -222,7 +222,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
         self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in embedded))
         self.assertTrue(all(entry["source_policy"] == "embedded_source_primary" for entry in embedded))
         self.assertTrue(all(entry["environment_variable_policy"] == "not_default" for entry in embedded))
-        self.assertTrue(all(entry["secret_policy"] == "forbid_plain_secret" for entry in yaml_entries))
+        self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in yaml_entries))
 
     def test_render_contains_environment_examples(self):
         """确认 render 暴露占位契约，reference 正文保留具体环境示例。

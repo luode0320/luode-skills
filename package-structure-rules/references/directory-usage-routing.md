@@ -15,7 +15,8 @@
 | --- | --- | --- |
 | `utils/time/` | `time-util-rules`、`common-util-rules` | `usage-recipes-go.md#time` |
 | `utils/convert/` | `common-util-rules` | `usage-recipes-go.md#convert` |
-| `utils/cache/redis/` | `common-util-rules` | `usage-recipes-go.md#cache-redis` |
+
+| `utils/decimal/` | `common-util-rules`、`database-query-rules`、`database-schema-rules` | `usage-recipes-go.md#decimal` || `utils/cache/redis/` | `common-util-rules` | `usage-recipes-go.md#cache-redis` |
 | `utils/cache/mongo/` | `common-util-rules` | 暂无 |
 | `utils/http/` | `common-util-rules` | `usage-recipes-go.md#http` |
 | `utils/async/` | `common-util-rules` | 暂无 |

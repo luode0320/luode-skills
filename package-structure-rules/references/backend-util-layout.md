@@ -21,8 +21,9 @@
 | 身份和秘密 | `utils/auth/oauth/`、`utils/auth/oidc/`、`utils/auth/ldap/`、`utils/secret/kms/`、`utils/secret/vault/` | 外部认证和密钥服务接入 | `backend.utils.auth.oauth`、`backend.utils.auth.oidc`、`backend.utils.auth.ldap`、`backend.utils.secret.kms`、`backend.utils.secret.vault` |
 | 通知和支付 | `utils/notification/*/`、`utils/payment/*/` | 渠道 SDK 与协议转换 | `backend.utils.notification.*`、`backend.utils.payment.*` |
 | 服务发现 | `utils/discovery/polaris/`、`utils/discovery/nacos/` | 腾讯北极星、阿里 Nacos 注册与发现 | `backend.utils.discovery.polaris`、`backend.utils.discovery.nacos` |
-| 协议定义 | `utils/protobuf/` | Protobuf 与 gRPC 定义源 | `backend.utils.protobuf` |
+| 协议定义 | `utils/protobuf/`
+| Decimal 高精度数值 | `utils/decimal/` | Decimal 高精度数值类型封装，提供数据库扫描、金额运算与精度控制 | `backend.utils.decimal` || Protobuf 与 gRPC 定义源 | `backend.utils.protobuf` |
 
 禁止 `utils/graphql/`、`utils/asyncapi/`、`utils/avro/`、`utils/api/http/`。通用 HTTP 只能位于 `utils/http/`。后端项目根和语言源码根均不得再建立旧的 `util/` 工具包目录；旧项目只能通过 adoption 的 legacy 快照渐进迁移。
 
-Go 项目中，以下目录内部 `package` 声明使用带 `Util` 后缀的别名，目录路径本身不变：`utils/time`→`timeUtil`、`utils/json`→`jsonUtil`、`utils/log`→`logUtil`、`utils/http`→`httpUtil`（这四个是为了避免与同名标准库包冲突）；`utils/cron`→`cronUtil`（`cron` 本身不与标准库冲突，只是为了和其余工具包保持统一的 `xxxUtil` 命名风格）。其余目录 package 名与目录名一致。详见 `code-style-consistency-rules/references/go-coding-rules.md`。
+Go 项目中，以下目录内部 `package` 声明使用带 `Util` 后缀的别名，目录路径本身不变：`utils/time`→`timeUtil`、`utils/json`→`jsonUtil`、`utils/log`→`logUtil`、`utils/http`→`httpUtil`（这四个是为了避免与同名标准库包冲突）；`utils/cron`→`cronUtil`（`cron` 本身不与标准库冲突，只是为了和其余工具包保持统一的 `xxxUtil` 命名风格）；`utils/decimal`→`decimalUtil`（`decimal` 不与标准库冲突，但与其余工具包保持统一 `xxxUtil` 命名风格）。其余目录 package 名与目录名一致。详见 `code-style-consistency-rules/references/go-coding-rules.md`。

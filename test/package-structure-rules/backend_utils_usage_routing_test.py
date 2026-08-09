@@ -117,6 +117,58 @@ class BackendUtilsUsageRoutingTests(unittest.TestCase):
         unmatched = [p for p in sorted(layout_utils) if p not in catalog_paths and "*" not in p and "<" not in p]
         self.assertEqual([], unmatched, f"以下 layout 目录在 Catalog 中无匹配: {unmatched}")
 
+    def test_guide_returns_decimal_recipe(self):
+        """guide --category decimal --language go 返回 decimalUtil 别名。
+
+        [参数] self：测试实例。
+        [返回] None：断言失败时由 unittest 报告。
+        """
+        # 1. 查询 decimal 类别，校验返回 utils/decimal 条目。
+        result = run_cli("guide", "--category", "decimal", "--language", "go")
+        self.assertEqual(0, result.returncode, result.stdout)
+        data = json.loads(result.stdout)
+        self.assertTrue(data["ok"])
+        self.assertEqual(1, len(data["usage"]))
+        decimal_entry = data["usage"][0]
+        self.assertEqual("utils/decimal", decimal_entry["canonical_path"])
+        self.assertEqual("decimalUtil", decimal_entry["package_alias"])
+        self.assertIn("usage-recipes-go.md#decimal", decimal_entry["usage_recipes"])
+        self.assertIn("database-query-rules", decimal_entry["related_skills"])
+        self.assertIn("database-schema-rules", decimal_entry["related_skills"])
+
+    def test_project_layout_contains_decimal_directory(self):
+        """project-layout-v2.md 后端目录树包含 utils/decimal。
+
+        [参数] self：测试实例。
+        [返回] None：断言失败时由 unittest 报告。
+        """
+        # 1. 读取项目目录树，确认 utils/decimal 已收录。
+        layout = (ROOT / "package-structure-rules" / "references" / "project-layout-v2.md").read_text(encoding="utf-8")
+        self.assertRegex(layout, r"decimal/.*Decimal 高精度数值类型封装")
+        self.assertIn("Decimal 高精度数值类型", layout)
+
+    def test_usage_recipe_contains_decimal_section(self):
+        """usage-recipes-go.md 包含 decimal recipe 小节。
+
+        [参数] self：测试实例。
+        [返回] None：断言失败时由 unittest 报告。
+        """
+        # 1. 读取 recipe 文档，确认 decimal 小节存在且含 decimalUtil 别名。
+        recipes = (ROOT / "package-structure-rules" / "references" / "usage-recipes-go.md").read_text(encoding="utf-8")
+        self.assertIn("## decimal：Decimal 高精度数值类型", recipes)
+        self.assertIn("decimalUtil", recipes)
+        self.assertIn("NewDecimalFromString", recipes)
+
+    def test_directory_routing_contains_decimal_index(self):
+        """directory-usage-routing.md 包含 utils/decimal 索引。
+
+        [参数] self：测试实例。
+        [返回] None：断言失败时由 unittest 报告。
+        """
+        # 1. 读取用法索引，确认 utils/decimal 已登记。
+        routing = (ROOT / "package-structure-rules" / "references" / "directory-usage-routing.md").read_text(encoding="utf-8")
+        self.assertIn("utils/decimal", routing)
+        self.assertIn("usage-recipes-go.md#decimal", routing)
 
 if __name__ == "__main__":
     unittest.main()
