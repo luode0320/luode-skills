@@ -9,6 +9,18 @@
 
 # 项目长期记忆
 
+## 凭据持久化与输出脱敏
+
+- 稳定决策：真实凭据原值可有意持久化于代码、配置、普通维护文档和对应 Git 提交；日志、错误、测试报告与证据、终端输出、Agent 回复、会话交接和自动知识摘要不得回显原值。
+- 稳定决策：配置 Catalog 的 YAML 与 embedded 条目均使用 `allow_plain_secret`；`source_policy`、Schema、CLI 参数和返回结构不因该决策改变。
+## Decimal 目录规则
+
+- 稳定决策：`utils/decimal/` 是 Decimal 高精度数值类型封装唯一目录，Catalog ID `backend.utils.decimal`，Go 包别名 `decimalUtil`。
+- 稳定决策：Decimal 能力覆盖 sql.Scanner、driver.Valuer、ToFloat64、String、Add/Sub/Mul/Div、Cmp/Equals、IsZero/IsPositive/IsNegative、Abs/Round/Max/Min 与四个构造函数（NewDecimalFromFloat64、NewDecimalFromString、NewDecimalFromInt64、NewDecimalFromDecimal）。
+- 稳定决策：关联 skill 为 `common-util-rules`、`database-query-rules`、`database-schema-rules`，recipe 索引为 `usage-recipes-go.md#decimal`。
+- 来源：`package-structure-rules/references/placement-catalog.yaml`、`package-structure-rules/references/usage-recipes-go.md`、`package-structure-rules/references/backend-util-layout.md`、`package-structure-rules/references/directory-usage-routing.md`、`package-structure-rules/references/project-layout-v2.md`。
+- 更新时间：2026-08-09。
+
 
 ## 计划输出完整性规则
 
@@ -16,7 +28,9 @@
 - 稳定决策：宿主外层包裹（如 `<proposed_plan>`）的简洁/3-5小节要求仅影响包裹层，不得删减计划正文中的任务字段、细节或零决策事项；仓库模板完整度优先于宿主简洁要求。
 - 稳定决策：plan-output-gate.md 硬失败结构包含内容密度 hard-fail：最小任务缺少零决策字段（文件/符号、操作、禁止触碰、精确测试命令、断言、清理、回滚、完成条件、停止条件中任一项）或出现"见上文""后续再定""若干文件""TBD""TODO""实现时再看"等占位词时直接不合格。
 - 稳定决策：正式实施计划的主章节仅包含章节标题、各任务缺少可执行具体字段内容即为无效计划；代码变更类计划必须给出代码落点目录树（text 代码块）。
-- 来源：`implementation-planning-rules/references/plan-structure-template.md`、`plan-output-gate.md`、`plan-review-checklist.md`、`minimum-task-execution-contract.md`、`AGENTS.md`、`CLAUDE.md`、`doc/3-实施/2026-08-09_REQ-PLAN-DETAIL-COMPLETE-001/实施总览.md`。
+- 稳定决策：正式计划必须跨会话自包含：冻结主项目地址、仓库类型、代码基线、新会话接手第一步、当前周期/任务、local 环境入口和中断点核验顺序；计划不得依赖思考过程、悬浮窗或隐含工作目录。
+- 稳定决策：引用其他项目代码必须逐项提供 `EXT-*`、可复现地址、版本/提交、项目根相对路径、文件/符号、用途、许可证/复制边界、可达性失败停止条件和验证回指；无外部引用必须写 `N/A + 原因 + 证据`。
+- 来源：`implementation-planning-rules/references/plan-structure-template.md`、`plan-output-gate.md`、`plan-review-checklist.md`、`minimum-task-execution-contract.md`、`implementation-overview-template.md`、`implementation-cycle-template.md`、`plan-entry-checklist.md`、`cross-session-plan-execution-contract.md`、`agents/openai.yaml`、`AGENTS.md`、`CLAUDE.md`、`test/implementation-planning-rules/plan_output_contract_test.py`、`doc/3-实施/2026-08-09_190217_REQ-PLAN-DETAIL-COMPLETE-002_实施总览.md`。
 - 更新时间：2026-08-09。
 
 
@@ -98,13 +112,14 @@
 
 ## 任务阻断收口与恢复规则
 
-- 真实阻断唯一使用 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的 `BLK-*` 记录，至少包含任务状态、阻断阶段、依据与证据、已尝试动作与停止边界、影响、至多三步解决计划、恢复后重入点和去重键。
+- 真实阻断唯一使用 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的 `BLK-*` 记录，至少包含任务状态、阻断阶段、依据与证据、已尝试动作与停止边界、影响、至多三步解决计划、恢复后重入点、去重键和必填字段“用户授权操作”。
+- 稳定决策：真实阻断收口必须展示“用户授权操作”，用户只需回复“同意授权”即可授权执行最近一条、唯一有效、仍未解除的 `BLK-*` 记录列明的恢复动作，回复“暂不授权”保持阻断；授权后必须执行原恢复步骤并通过原验证入口，验证失败保持阻断；授权不构成跨任务、跨会话或未来任意写入的通用许可。
 - 审查、验收、功能验证、Bug 验证、执行失败和运行时恢复只生产或校验阻断事实；`reasoning-summary-structure-rules` 是唯一面向用户渲染“任务阻断收口”的 owner，避免多处输出冲突计划。
 - 仅 `blocked` 与 `manual_handoff` 触发任务阻断收口。`limited`、`not_applicable`、P2/P3、用户取消和预期负向测试不得生成 `BLK-*` 或写成任务已阻断。
 - 阻断计划最多三步；每步必须包含责任方、前置条件、动作、完成判据和验证入口。恢复后从原测试、复审、重验或健康检查的重入点继续。
 - 文档校验的正文 `N/A` 规则忽略 fenced code、示例与 Mermaid 内容，避免图中“不适用”分支被误判；正文声明仍必须给出原因或证据。
-- 来源：`artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`、`reasoning-summary-structure-rules/SKILL.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
-- 更新时间：2026-07-14。
+- 来源：`artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`、`reasoning-summary-structure-rules/SKILL.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`、`doc/2-需求/2026-08-09_214745_REQ-BLK-AUTH-001_任务阻断授权操作提示.md`、`test/artifact-delivery-gate-rules/blocker_authorization_contract_test.py`。
+- 更新时间：2026-08-09。
 
 ## Windows PowerShell 环境可靠性规则
 
@@ -996,7 +1011,9 @@ entities:
       - BLK-* 阻断记录
       - 任务已阻断
       - 解决计划与重入点
-    definition: "真实阻断只以共享 BLK-* 契约记录，生产者只提供结构化事实，reasoning-summary-structure-rules 唯一渲染用户可见收口。记录必须包含状态、阶段、证据、已尝试动作、停止边界、影响、至多三步恢复计划、重入点和去重键；limited、not_applicable、P2/P3、用户取消与预期负向测试不触发。"
+      - 同意授权
+      - 暂不授权
+    definition: "真实阻断只以共享 BLK-* 契约记录，生产者只提供结构化事实，reasoning-summary-structure-rules 唯一渲染用户可见收口。记录必须包含状态、阶段、证据、已尝试动作、停止边界、影响、至多三步恢复计划、重入点、去重键和必填字段'用户授权操作'；用户回复'同意授权'可授权最近一条唯一有效未解除记录的恢复动作，'暂不授权'保持阻断，授权后走原验证入口且失败保持阻断；limited、not_applicable、P2/P3、用户取消与预期负向测试不触发。"
     scope: "审查、验收、功能验证、Bug 验证、执行失败、运行时恢复、最终总结与文档门禁"
     status: "active"
     evidence_ids:
@@ -1004,7 +1021,7 @@ entities:
       - evidence.test.task-blocker-closure
     context_ids:
       - context.task-blocker-closure
-    updated_at: 2026-07-14
+    updated_at: 2026-08-09
   - entity_id: rule.authenticated-url-routing
     name: "URL 认证浏览器默认路由"
     type: "浏览器路由规则"
@@ -1632,7 +1649,7 @@ evidence:
     type: "doc"
     source: "任务阻断收口共享契约"
     path: "artifact-delivery-gate-rules/references/task-blocker-closure-contract.md"
-    note: "唯一 BLK-* 字段、生产者边界、最终渲染 owner 和非阻断排除规则来源"
+    note: "唯一 BLK-* 字段（含必填'用户授权操作'）、生产者边界、最终渲染 owner 和非阻断排除规则来源"
   - evidence_id: evidence.test.task-blocker-closure
     type: "test"
     source: "本地任务阻断收口验证"
@@ -2129,6 +2146,12 @@ retrieval_hints:
     任务已阻断:
       - "rule.task-blocker-closure"
     BLK-*:
+      - "rule.task-blocker-closure"
+    同意授权:
+      - "rule.task-blocker-closure"
+    暂不授权:
+      - "rule.task-blocker-closure"
+    任务阻断授权:
       - "rule.task-blocker-closure"
     imagegen:
       - "rule.imagegen-error-case-evolution"

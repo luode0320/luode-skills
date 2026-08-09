@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-09 02:30:55",
+  "generated_at": "2026-08-09 23:24:10",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 575,
+    "references_total": 576,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -571,6 +571,7 @@ window.SKILL_DICTIONARY = {
             "-1.0 新会话首轮保障（强制）",
             "-1.1 Git 意图识别（强制）",
             "-1.1.1 Git 仅限当前轮次（新增，强制）",
+            "-1.1.2 阻断授权意图识别（新增，强制）",
             "-1.2 Git 判定优先级（强制）",
             "-1.3 新会话首轮联动（强制）",
             "0. 首条消息格式（强制）",
@@ -1259,7 +1260,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
           "domain_order": 3,
           "item_order": 4,
-          "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发；当新项目启动、项目初期存在多个需求 / 多份实施总览 / 多个实施周期，需要先建立“需求与实施计划全量顺序实施方案”或实施顺序总表时也触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。非 Plan Mode 下即使任务够不上上述重量级触发条件，只要预计触达 2-5 个文件或存在分支 / 方案选择等中等改动特征，且不属于 Bug 域既有管线，也必须按 `minimum-plan-grading` 路由先给出一段最小计划、再默认直接执行，不必等待用户逐条确认；Bug 域的同等义务固定交给 `bug-fix-proposal-rules`，本句不重复接管。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；在多来源对象场景下还负责创建或更新项目级 / 集合级全量顺序实施方案，作为跨需求执行顺序总表。不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
+          "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发；当新项目启动、项目初期存在多个需求 / 多份实施总览 / 多个实施周期，需要先建立“需求与实施计划全量顺序实施方案”或实施顺序总表时也触发。正式计划还必须满足跨会话独立执行契约；只要引用其他项目代码，必须逐项给出可复现的外部项目地址、版本、项目根相对路径、文件/符号、用途和验证回指。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。非 Plan Mode 下即使任务够不上上述重量级触发条件，只要预计触达 2-5 个文件或存在分支 / 方案选择等中等改动特征，且不属于 Bug 域既有管线，也必须按 `minimum-plan-grading` 路由先给出一段最小计划、再默认直接执行，不必等待用户逐条确认；Bug 域的同等义务固定交给 `bug-fix-proposal-rules`，本句不重复接管。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；在多来源对象场景下还负责创建或更新项目级 / 集合级全量顺序实施方案，作为跨需求执行顺序总表。不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
           "core_responsibility": "多来源对象先建“需求与实施计划全量顺序实施方案”，再把已确认需求转成可执行实施总览与实施周期，并明确周期顺序、期次定位、周期内最小任务顺序、AC 完成条件和测试映射。",
           "skill_path": "implementation-planning-rules/SKILL.md",
           "directory_path": "implementation-planning-rules",
@@ -1272,6 +1273,7 @@ window.SKILL_DICTIONARY = {
             "references 读取规则"
           ],
           "references": [
+            "implementation-planning-rules/references/cross-session-plan-execution-contract.md",
             "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
             "implementation-planning-rules/references/full-sequence-master-plan.md",
             "implementation-planning-rules/references/implementation-cycle-template.md",
@@ -5289,6 +5291,7 @@ window.SKILL_DICTIONARY = {
         "-1.0 新会话首轮保障（强制）",
         "-1.1 Git 意图识别（强制）",
         "-1.1.1 Git 仅限当前轮次（新增，强制）",
+        "-1.1.2 阻断授权意图识别（新增，强制）",
         "-1.2 Git 判定优先级（强制）",
         "-1.3 新会话首轮联动（强制）",
         "0. 首条消息格式（强制）",
@@ -5953,7 +5956,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "idea 主动侦察、需求接入、侦察后缺口识别、边界确认、验收前置",
       "domain_order": 3,
       "item_order": 4,
-      "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发；当新项目启动、项目初期存在多个需求 / 多份实施总览 / 多个实施周期，需要先建立“需求与实施计划全量顺序实施方案”或实施顺序总表时也触发。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。非 Plan Mode 下即使任务够不上上述重量级触发条件，只要预计触达 2-5 个文件或存在分支 / 方案选择等中等改动特征，且不属于 Bug 域既有管线，也必须按 `minimum-plan-grading` 路由先给出一段最小计划、再默认直接执行，不必等待用户逐条确认；Bug 域的同等义务固定交给 `bug-fix-proposal-rules`，本句不重复接管。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；在多来源对象场景下还负责创建或更新项目级 / 集合级全量顺序实施方案，作为跨需求执行顺序总表。不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
+      "auto_trigger": "当来源对象（需求或 Bug）的条件闸门已收敛且前置验收标准已稳定，正式编码前仍需要先把当前优先闭环的文件落点、模块职责、实施周期、阶段步骤、验证步骤和阻断项拆清时触发；当新项目启动、项目初期存在多个需求 / 多份实施总览 / 多个实施周期，需要先建立“需求与实施计划全量顺序实施方案”或实施顺序总表时也触发。正式计划还必须满足跨会话独立执行契约；只要引用其他项目代码，必须逐项给出可复现的外部项目地址、版本、项目根相对路径、文件/符号、用途和验证回指。若用户准备采纳上一轮建议、方案、修复路线或实施思路并开始执行，但当前还没有正式执行计划，也必须先触发本 skill 把建议收口成可执行实施方案。若当前上下文处于 `Plan Mode`，无论用户问什么，都必须先命中本 skill 作为第一层计划外壳，再按需回流到计划前置 skill 链路中的需求侦察、需求接入、缺口、边界、拆分或其他域；其中 `Plan Mode` 只提升计划链路优先级，不改变这些前置 skill 的职责边界。若运行环境要求使用专用计划包裹输出，包裹层只作为渲染协议，计划正文仍必须遵守本 skill 与模板定义的结构、字段和约束。若用户本轮核心问题本身是在问“这件事怎么做 / 怎么改 / 先给计划 / 先出方案 / 先列步骤”，也必须先命中本 skill；若前置条件尚未齐备，则输出受限计划或阻断计划，而不是不触发。非 Plan Mode 下即使任务够不上上述重量级触发条件，只要预计触达 2-5 个文件或存在分支 / 方案选择等中等改动特征，且不属于 Bug 域既有管线，也必须按 `minimum-plan-grading` 路由先给出一段最小计划、再默认直接执行，不必等待用户逐条确认；Bug 域的同等义务固定交给 `bug-fix-proposal-rules`，本句不重复接管。负责把已确认来源对象或已拆分出的当前优先子项转成可执行实施方案，并将结果单独保存到 `artifact-storage-rules` 约定的实施总览/实施周期文档中；在多来源对象场景下还负责创建或更新项目级 / 集合级全量顺序实施方案，作为跨需求执行顺序总表。不要用它代替需求拆分、Bug 定位、验收标准编写、实际编码、测试执行或最终验收。",
       "core_responsibility": "多来源对象先建“需求与实施计划全量顺序实施方案”，再把已确认需求转成可执行实施总览与实施周期，并明确周期顺序、期次定位、周期内最小任务顺序、AC 完成条件和测试映射。",
       "skill_path": "implementation-planning-rules/SKILL.md",
       "directory_path": "implementation-planning-rules",
@@ -5966,6 +5969,7 @@ window.SKILL_DICTIONARY = {
         "references 读取规则"
       ],
       "references": [
+        "implementation-planning-rules/references/cross-session-plan-execution-contract.md",
         "implementation-planning-rules/references/examples/minimum-task-closure-example.md",
         "implementation-planning-rules/references/full-sequence-master-plan.md",
         "implementation-planning-rules/references/implementation-cycle-template.md",
@@ -9377,7 +9381,7 @@ window.SKILL_DICTIONARY = {
       "id": "doc:CLAUDE",
       "name": "CLAUDE",
       "file_name": "CLAUDE.md",
-      "title": "AGENTS.md / CLAUDE.md",
+      "title": "AGENTS.md",
       "kind": "其他文档",
       "path": "CLAUDE.md",
       "is_plan_doc": false

@@ -11,6 +11,12 @@
 
 ## 事件
 
+- 2026-08-09：完成 `REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001` 的规则与测试同步，确立“允许有意持久化凭据、禁止过程性输出回显”口径；未执行 Git 提交或推送。
+
+- 2026-08-09：完成计划输出完整性与跨会话独立执行升级（REQ-PLAN-DETAIL-COMPLETE-002/CYCLE-PD-02）。新增 `cross-session-plan-execution-contract.md`，同步模板、闸门、自审、入口清单与 Agent 提示词的跨会话与 `EXT-*` 契约，修正阶段字段错位与正式字段矩阵；测试资产从 `doc/5-tests/2026-07-26_plan-output/` 迁至根 `test/implementation-planning-rules/` 并扩展到 15 项；落盘需求、实施总览、实施周期、测试 README 与 6-review 五份文档，四档严格 profile 全 PASS；字典生成退出码 0 且与基线一致，`git diff --check` 无错误，临时投影输入已清理；改动停在已改动未提交状态。
+
+- 2026-08-09：完成 Decimal 目录规则收录到 package-structure-rules。Catalog 新增 `backend.utils.decimal` 条目，`utils/decimal/` 加入后端目录树，guide 查询返回 decimalUtil 别名，参考文档（backend-util-layout.md、project-layout-v2.md、directory-usage-routing.md、usage-recipes-go.md）同步更新，guide 专项测试 5/5 通过，全量回归 36 测试 28/28 通过（8 个既有配置 `source_policy` 字段未同步失败与本次无关）。改动停在已改动未提交状态。
+
 - 2026-08-08：完成 REQ-PSR-MOCK-UPGRADE-001 计划完成度复核。补齐 `owner_skill` 统一、fullstack 不扩散与 Schema 必填断言，修复 `package-structure-rules/SKILL.md` guide 示例代码围栏；`runtime_mock_layout_test.py` 5/5、全量回归 36/36、普通/mock 双构建、字典与四份文档 profile 均通过，adoption 仍只报 2 条既有阻断。改动停在已改动未提交状态。
 
 - 2026-08-08：完成运行时 Mock 与测试 Mock 分离规则。根 `mock/` 作为运行时 Mock 唯一合法目录，按被测源码相对路径镜像，`//go:build mock` 构建标签保护。已同步 `test-program-rules`、`artifact-storage-rules`、`test-strategy-rules`、`package-structure-rules` 的 SKILL.md 与 references，Catalog 新增 2 个 mock 条目，人工目录树更新，`AGENTS.md`/`CLAUDE.md` 及 `PROJECT_MEMORY.md` 已同步，新增 `runtime-mock-pattern.md` 参考文档，完整测试覆盖 `13/13` 通过，package-structure-rules 全量回归 `26/26` 通过，根 Python 测试 `287/289` 通过（2 个既有失败与本次无关）。改动停在已改动未提交状态，未执行 Git 历史写入。

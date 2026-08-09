@@ -3,11 +3,9 @@
 ## 更新时间
 
 - 2026-08-09
-- 来源对象：BUG-PSR-CONFIG-TEST-001 test/config/ 规则误判修正
-- 当前目标：修正 package-structure-rules 中 test/config/ 和 mock/config/ 的 blanket ban，改为「允许作为测试配置加载/解析的目录，但禁止作为配置数据源」
-- 当前状态：完成。5 个文件改动全部闭环，`test/config/` 配置加载测试通过 strict 检查，mock/config 空目录通过 strict 检查，py_compile 通过。既有 8 个失败（Catalog source_policy 字段未同步）与本次改动无关。改动停在已改动未提交状态。
-- 来源对象：REQ-PLAN-DETAIL-COMPLETE-001 计划输出完整性升级
-- 当前目标：按已落盘实施计划完成全链路规则修复：模板压缩口子删除、闸门内容密度 hard-fail、自审清单对齐、平台规则完整度优先、测试 fixture 升级、记忆同步、全量回归收口
+- 来源对象：REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001
+- 当前目标：落实“允许凭据有意持久化、禁止过程性输出回显”的规则与测试边界。
+- 当前状态：实现与专项验证已完成；bootstrap、Git gate、四条 Catalog query 和五档工程文档 profile 通过。配置回归保留 8 项既有 `source_policy`/互斥目录断言失败，未新增同类失败；改动停在已改动未提交状态。
 ## 已完成
 
 ## 已完成
@@ -137,7 +135,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-08T05:41:17.679908Z",
+  "registry_updated_at": "2026-08-09T15:26:29.576332Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -322,100 +320,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/1dabf0c126d0a2cf9fc2896e6312dd759f9cdeee01ebc9631c9dbb9e86096df5",
-      "session_id": "019fb8f8-2434-7f30-ab1f-6928ccc5b93a",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "TEST-LAYOUT-20260801",
-      "source_document": "user-confirmed-plan:root-test-layout-20260801",
-      "plan_fingerprint": "1964bbdc5c2793c8437a14ae3552b6c5c2b84f7911763b0574b99890a6bb1201",
-      "updated_at": "2026-08-01T12:25:00Z",
-      "steps": [
-        {
-          "id": "TASK-TEST-LAYOUT-01",
-          "step": "冻结根 test 目录需求、实施文档和测试证据契约",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-TEST-LAYOUT-02",
-          "step": "更新测试资产规则并建立位置与命名校验",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-TEST-LAYOUT-03",
-          "step": "迁移七组活动 tests 到根 test 目录",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-TEST-LAYOUT-04",
-          "step": "同步活动消费者、目录树、字典和项目四件套",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-TEST-LAYOUT-05",
-          "step": "执行全链路真实测试并完成 6-review 收口",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/c75f9770bc950c84196f26c76402d99a13989852dc296ef7954ff10b20d9eb52",
-      "session_id": "019fbe92-f266-7eb2-a426-2b4df1b29bae",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260802T040348Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-02T04:07:19.771974Z",
-      "steps": [
-        {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/af95daef0fde26ea931aa19b9451721e9ccdcbc5e3ff08cfb18c8d374403e914",
-      "session_id": "019fc0a5-45cb-7902-b1dc-d9e9f98d7284",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-SH-START-20260802-001",
-      "source_document": "session-handoff-rules/SKILL.md",
-      "plan_fingerprint": "06daabdb153e19ec7966882dcdcb964d84ed626a1200f5b627d8651c83950743",
-      "updated_at": "2026-08-02T04:21:17.828959Z",
-      "steps": [
-        {
-          "id": "TASK-SH-START-01",
-          "step": "[TASK-SH-START-01] 校验交接包并核对项目当前状态",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-SH-START-02",
-          "step": "[TASK-SH-START-02] 核验当前会话投影、中断点和未提交改动边界",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-SH-START-03",
-          "step": "[TASK-SH-START-03] 执行仍必要的后续步骤并更新验证证据",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/66543947614ef037fef0038b76ce599e4bf523e7023a0ed0102892074ad2c309",
       "session_id": "019fc0b2-6e7b-7cc3-889c-1c45b5d6ad57",
       "projection_origin": "persisted",
@@ -483,100 +387,6 @@
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
           "status": "in_progress"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/11e982a25f3f9f8877b17732cd8ab5dad88886e3d928d7b45c510944bb906d4e",
-      "session_id": "019fc1e8-65d8-72f3-b418-f982b3549904",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PSR-TEST-ROOT-001/CYCLE-18",
-      "source_document": "doc/3-实施/2026-08-02_代码位置目录规则V2_实施周期18_三类项目根test目录统一.md",
-      "plan_fingerprint": "0080297ed57967a3c260a01262bd07fc5f652df40e9455228d6a3e9bbe93a04b",
-      "updated_at": "2026-08-02T14:33:35.627457Z",
-      "steps": [
-        {
-          "id": "TASK-18-01",
-          "step": "[TASK-18-01] 冻结需求变更与实施周期",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-18-02",
-          "step": "[TASK-18-02] 同步三类目录事实并扩展测试",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-18-03",
-          "step": "[TASK-18-03] 形成测试证据并执行 Skill 合规门禁",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-18-04",
-          "step": "[TASK-18-04] 同步项目状态并完成全量回归",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/888c992190f600a40d10d731669292b4c9f3254cf2a569c295170eb226ab43c4",
-      "session_id": "019fc22a-e719-7a60-a132-2ffab6668687",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PSR-DOC-LAYOUT-001/CYCLE-16",
-      "source_document": "doc/3-实施/2026-08-02_192314_REQ-PSR-DOC-LAYOUT-001_实施周期16_三类项目doc目录收敛.md",
-      "plan_fingerprint": "8c904a10a611a1d3cc496d458d2c507bd1386d74b5ad53ae253bf46d08c513b9",
-      "updated_at": "2026-08-02T12:25:50.203460Z",
-      "steps": [
-        {
-          "id": "TASK-PSR-DOC-16-01",
-          "step": "[TASK-PSR-DOC-16-01] 修复CYCLE-15基线并冻结目录契约",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-PSR-DOC-16-02",
-          "step": "[TASK-PSR-DOC-16-02] 更新需求、实施与布局参考文档",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-PSR-DOC-16-03",
-          "step": "[TASK-PSR-DOC-16-03] 更新目录契约测试与测试证据",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-PSR-DOC-16-04",
-          "step": "[TASK-PSR-DOC-16-04] 完成6-review、记忆同步与全量验证",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/b4539921b46cc90f2362f6e7528d06a706a455fd37321067a00faebf42db013a",
-      "session_id": "019fc2c4-0c60-7943-9924-c4151c399098",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260802T144701Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-02T14:49:22.609324Z",
-      "steps": [
-        {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
         }
       ]
     },
@@ -797,6 +607,214 @@
         {
           "id": "GOAL-03",
           "step": "[GOAL-03] 验证并完成 Goal",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/c618d38c593b79dfbfb63f4ee266c5d655e35e2cb0a47f61facdd8a302e0993c",
+      "session_id": "019fe5fe-715d-79b1-b155-14a616416ce3",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PLAN-DETAIL-COMPLETE-002",
+      "source_document": "implementation-planning-rules/SKILL.md",
+      "plan_fingerprint": "2aec7e936fa3067c4fb26c1e0967572596d7797bb9ea4968b3720c4558635f5a",
+      "updated_at": "2026-08-09T11:47:11.462050Z",
+      "steps": [
+        {
+          "id": "TASK-PLAN-DETAIL-08",
+          "step": "[TASK-PLAN-DETAIL-08] 补齐跨会话计划独立执行与跨项目引用地址契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PLAN-DETAIL-09",
+          "step": "[TASK-PLAN-DETAIL-09] 更新模板闸门与回归 fixture",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PLAN-DETAIL-10",
+          "step": "[TASK-PLAN-DETAIL-10] 执行校验并同步项目记忆",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/af82ad8a03af6a66bc8539186e39235ec87c09c9a149432ef644dc8a3dc19a68",
+      "session_id": "019fe5f1-42b2-7563-b87c-729a62994630",
+      "projection_origin": "goal",
+      "synthesis_mode": "goal_default",
+      "state": "inactive",
+      "plan_key": "GOAL/ACTIVE",
+      "source_document": "",
+      "plan_fingerprint": "5b774896c213e42babcc2e02e58cfeb185a1f34f338b9917fd6a6ad17eaeec9c",
+      "updated_at": "2026-08-09T11:05:22.470773Z",
+      "steps": [
+        {
+          "id": "GOAL-01",
+          "step": "[GOAL-01] 确认当前闭环",
+          "status": "completed"
+        },
+        {
+          "id": "GOAL-02",
+          "step": "[GOAL-02] 执行并更新进度",
+          "status": "completed"
+        },
+        {
+          "id": "GOAL-03",
+          "step": "[GOAL-03] 验证并完成 Goal",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/537f6932c420869dec560315f20fdd9ff95179daf4d9826e212806796702dba7",
+      "session_id": "019fe6b4-14db-7661-b64c-b4fbe7adaba2",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "REQ-BLK-AUTH-001/CYCLE-BLK-01",
+      "source_document": "doc/3-实施/2026-08-09_214745_REQ-BLK-AUTH-001_实施周期01_阻断授权契约与收口.md",
+      "plan_fingerprint": "a06bc4c8b665babdcb8f65c548a7054cc8efd8c5373750ec15668d2987d302ff",
+      "updated_at": "2026-08-09T14:12:00Z",
+      "steps": [
+        {
+          "id": "TASK-BLK-01",
+          "step": "[TASK-BLK-01] 落盘需求与实施计划",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-02",
+          "step": "[TASK-BLK-02] 阻断契约与校验器贯通",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-03",
+          "step": "[TASK-BLK-03] 渲染与路由规则同步",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-04",
+          "step": "[TASK-BLK-04] 授权契约测试",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-05",
+          "step": "[TASK-BLK-05] 收口门禁与记忆同步",
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/49846cebdc91be4c143cc9328dcab05b60989dfde9428698a351dc55c41135cc",
+      "session_id": "019fe6be-0287-70b2-b227-d5eb47787c4c",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "REQ-PSR-CONFIG-SECRET-002/CYCLE-PSR-24-001",
+      "source_document": "doc/3-实施/2026-08-09_215249_REQ-PSR-CONFIG-SECRET-001_实施周期24_凭据持久化与输出脱敏.md",
+      "plan_fingerprint": "8d1d349c54abb4b89e63cd05138029112dbe1844bb25633c069350b64c3b064b",
+      "updated_at": "2026-08-09T14:20:00Z",
+      "steps": [
+        {
+          "id": "TASK-24-01",
+          "step": "[TASK-24-01] 需求变更冻结",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-02",
+          "step": "[TASK-24-02] 全局生成源与规则文件",
+          "status": "in_progress"
+        },
+        {
+          "id": "TASK-24-03",
+          "step": "[TASK-24-03] 当前规则与 Git",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-24-04",
+          "step": "[TASK-24-04] 配置与测试策略",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-24-05",
+          "step": "[TASK-24-05] 文档证据",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-24-06",
+          "step": "[TASK-24-06] 项目记忆与最终门禁",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/71a83fcb8fe2e801c3580e188a55c4a32067e2f517fb46f54379ef04f5acc4b5",
+      "session_id": "019fe711-eaad-70d0-97df-77b159c42769",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSR-CONFIG-SECRET-002/CYCLE-PSR-24-001",
+      "source_document": "doc/3-实施/2026-08-09_215249_REQ-PSR-CONFIG-SECRET-001_实施周期24_凭据持久化与输出脱敏.md",
+      "plan_fingerprint": "8d1d349c54abb4b89e63cd05138029112dbe1844bb25633c069350b64c3b064b",
+      "updated_at": "2026-08-09T15:23:17.104961Z",
+      "steps": [
+        {
+          "id": "TASK-24-01",
+          "step": "[TASK-24-01] 需求变更冻结",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-02",
+          "step": "[TASK-24-02] 全局生成源与规则文件",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-03",
+          "step": "[TASK-24-03] 当前规则与 Git",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-04",
+          "step": "[TASK-24-04] 配置与测试策略",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-05",
+          "step": "[TASK-24-05] 文档证据",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-24-06",
+          "step": "[TASK-24-06] 项目记忆与最终门禁",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/7ac76b45d1071b8c7600d3f593f556ed52a8ed57e9bf603d292a68f3720a61eb",
+      "session_id": "019fe712-4644-7001-8f12-599422f5d98a",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-BLK-AUTH-001/CYCLE-BLK-01-VERIFY",
+      "source_document": "doc/3-实施/2026-08-09_214745_REQ-BLK-AUTH-001_实施周期01_阻断授权契约与收口.md",
+      "plan_fingerprint": "02dddec64d927d4d7dc5c36bd3092c51cf392b98414c9c0ef1ca08709689c7fe",
+      "updated_at": "2026-08-09T15:26:29.576141Z",
+      "steps": [
+        {
+          "id": "TASK-BLK-AUTH-VERIFY-01",
+          "step": "[TASK-BLK-AUTH-VERIFY-01] 核对既有需求、实施与规则改动",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-AUTH-VERIFY-02",
+          "step": "[TASK-BLK-AUTH-VERIFY-02] 执行授权契约与回归测试",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-BLK-AUTH-VERIFY-03",
+          "step": "[TASK-BLK-AUTH-VERIFY-03] 执行文档与技能收口门禁",
           "status": "completed"
         }
       ]
