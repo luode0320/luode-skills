@@ -203,3 +203,30 @@ Plan Mode Owner 互斥：当前处于 Plan Mode 时，`reasoning-summary-structu
 - 存在真实不确定的实现层决策维度却未向用户弹窗，或正文缺少“决策维度覆盖表”的计划会被拒绝。
 - 对“已弹窗但用户未选择”的决策点按推荐项 / 默认写入正式计划会被拒绝。
 - 存在未决决策点时，只输出受限 / 挂起说明（附非空“待用户选择清单”）会被判合格；此时输出正式实施计划会被拒绝。
+
+## 载荷质量门禁（新增，强制）
+
+在 `request_user_input` 调用前，必须通过 `validate_option_payload` 校验：
+
+- 单次调用包含 1-3 个问题。
+- 每问包含 2-3 个选项。
+- 所有文本字段非空。
+- 选项使用真实 `{label, description}` 结构。
+- 标签去重且拒绝占位标签。
+- 描述去重且拒绝无决策差异的选项。
+- 无效载荷不得调用工具，不得进入 `WAITING_DECISION`。
+- 合法载荷才允许调用工具并进入 `WAITING_DECISION`。
+
+```mermaid
+flowchart TD
+  S["候选载荷"] --> V{"校验通过?"}
+  V -->|否| R["内部重建"]
+  R --> V2{"再次校验"}
+  V2 -->|否| RECON["只读侦察重新生成"]
+  RECON --> V3{"再次校验"}
+  V3 -->|否| OPEN["退出多选，转开放式问题"]
+  V -->|是| CALL["调用 request_user_input"]
+  V2 -->|是| CALL
+  V3 -->|是| CALL
+  CALL --> WAIT["WAITING_DECISION"]
+```
