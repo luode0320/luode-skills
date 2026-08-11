@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-10 02:16:18",
+  "generated_at": "2026-08-11 02:12:04",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 577,
+    "references_total": 575,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -93,7 +93,6 @@ window.SKILL_DICTIONARY = {
             "Markdown 图片资产契约",
             "测试目录复用优先级（写死边界）",
             "测试代码与证据双根（强制）",
-            "运行时 Mock 资产",
             "自动触发信号",
             "进入后先做什么",
             "默认执行流程",
@@ -2119,10 +2118,8 @@ window.SKILL_DICTIONARY = {
             "package-structure-rules/references/placement-catalog.schema.json",
             "package-structure-rules/references/placement-catalog.yaml",
             "package-structure-rules/references/project-layout-v2.md",
-            "package-structure-rules/references/runtime-mock-layout-go.md",
             "package-structure-rules/references/structure-general.md",
-            "package-structure-rules/references/usage-recipes-go.md",
-            "package-structure-rules/references/vscode-mock-launch.md"
+            "package-structure-rules/references/usage-recipes-go.md"
           ],
           "agents": [
             "package-structure-rules/agents/openai.yaml"
@@ -4403,8 +4400,6 @@ window.SKILL_DICTIONARY = {
           "directory": "test-program-rules",
           "sections": [
             "活动模拟程序落点（强制）",
-            "运行时 Mock 落点（强制）",
-            "运行时 Mock 实战用法（推荐）",
             "Skill 作用与适用场景",
             "自动触发信号",
             "进入后先做什么",
@@ -4815,7 +4810,6 @@ window.SKILL_DICTIONARY = {
         "Markdown 图片资产契约",
         "测试目录复用优先级（写死边界）",
         "测试代码与证据双根（强制）",
-        "运行时 Mock 资产",
         "自动触发信号",
         "进入后先做什么",
         "默认执行流程",
@@ -6781,10 +6775,8 @@ window.SKILL_DICTIONARY = {
         "package-structure-rules/references/placement-catalog.schema.json",
         "package-structure-rules/references/placement-catalog.yaml",
         "package-structure-rules/references/project-layout-v2.md",
-        "package-structure-rules/references/runtime-mock-layout-go.md",
         "package-structure-rules/references/structure-general.md",
-        "package-structure-rules/references/usage-recipes-go.md",
-        "package-structure-rules/references/vscode-mock-launch.md"
+        "package-structure-rules/references/usage-recipes-go.md"
       ],
       "agents": [
         "package-structure-rules/agents/openai.yaml"
@@ -9017,8 +9009,6 @@ window.SKILL_DICTIONARY = {
       "directory": "test-program-rules",
       "sections": [
         "活动模拟程序落点（强制）",
-        "运行时 Mock 落点（强制）",
-        "运行时 Mock 实战用法（推荐）",
         "Skill 作用与适用场景",
         "自动触发信号",
         "进入后先做什么",

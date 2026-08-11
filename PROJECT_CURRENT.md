@@ -873,3 +873,8 @@
 }
 ```
 <!-- END TASK PLAN PROJECTION -->
+
+- 2026-08-11
+- 来源对象：CYCLE-MOCK-REMOVE-01
+- 当前目标：删除技能仓库中所有 Mock 相关资产
+- 当前状态：全部 Mock 删除已完成。删除 10 条 Catalog 条目、Schema Mock 条件、placement_catalog.py 中 200+ 行 Mock 代码、2 个参考文档、runtime_mock_layout_test.py 完整测试文件、layout_policy.py 中 2 个模拟函数、asset_location_test.py 中 6 个 Mock 测试、7 个 SKILL.md 的 Mock 规则段落、project-layout-v2.md 的 Mock 目录行、PROJECT_MEMORY.md 的 Mock 规则。guide --category runtime-mock --language go 退出码 2 无匹配。字典刷新退出码 0。改动停在已改动未提交状态。
