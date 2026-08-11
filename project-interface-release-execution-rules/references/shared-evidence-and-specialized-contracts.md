@@ -19,17 +19,17 @@
 ## 进入后先做什么
 1. 确认 `project-interface-baseline-rules` 是否已提供最新接口基线；若基线过期或不存在，先转交对方刷新，不自行扫描。
 2. 确认本次上线的改动范围、影响模块，按 `references/test-selection-policy.md` 筛选本次必测接口集合。
-3. 按 `test-strategy-rules 的 test-asset-governance 条件路由` 创建或复用本次测试的双根布局：根 `test/` 源码镜像用于可执行测试资产，`doc/5-tests/` 时间戳目录用于中文说明和非可执行证据。
+3. 按 `test-strategy-rules 的 test-asset-governance 条件路由` 创建或复用本次测试的双根布局：根 `test/` 源码镜像用于可执行测试资产，`doc/5-tests/` 的扁平 md 用于中文主报告，`test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 用于机器产物。
 4. 明确本地测试环境、鉴权信息、依赖数据要求，准备测试前置条件；连接信息必须来自 `local` 配置，若接口依赖外部服务，只能使用本地代理、本地 mock 或本地启动配置中的代理设置（如 `httpConfig.proxy`），不得直连 test / prod / staging 服务。
 5. 按 `references/test-data-construction-rules.md` 与基线提供的依赖图解析每个必测接口的请求参数，优先复用已验证参数，失效后持续更新。
 6. 按 `references/agent-response-judgement.md` 定义判定规则，确保 agent 可以独立判断接口是否通过。
 7. 按 `references/report-format.md` 和 `references/output-artifacts.md` 定义输出格式与产物清单。
 ## 默认执行流程
-1. 调用 `test-strategy-rules 的 test-asset-governance 条件路由` 创建本次项目级接口测试的双根布局：根 `test/` 下按被测源码路径镜像存放真实可执行测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本（跨源码复用资产进入 `test/shared/`）；`doc/5-tests/` 下的时间戳目录包含主 `README.md`、原始响应和其他非可执行证据。
+1. 调用 `test-strategy-rules 的 test-asset-governance 条件路由` 创建本次项目级接口测试的双根布局：根 `test/` 下按被测源码路径镜像存放真实可执行测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本（跨源码复用资产进入 `test/shared/`）；`doc/5-tests/` 下只产出一份扁平中文主报告 md；原始响应等机器产物落在 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/`。
 2. 按 `references/test-selection-policy.md` 筛选本次必测接口、可选测接口、跳过接口，明确每个接口的选择/跳过理由。
 3. 使用基线提供的 provider / consumer 依赖图构建本轮场景执行顺序。
 4. 为每个必测接口准备测试用例：优先从 `reusable-params.yaml` 取已验证参数；复验失败后，按参数来源规则从 provider 接口、本地 local 数据库、缓存、OpenAPI 示例、fixture 或规则重新解析；不得用不存在的数据测试并接受失败为通过。
-5. 执行接口测试，记录每个接口的请求参数（JSON 字符串）、简要响应（JSON 字符串，脱敏）、完整响应（落盘到 `doc/5-tests/` 时间戳证据目录）和参数依赖追踪；执行脚本及 mock/stub/fake/fixture/helper 仍从根 `test/` 源码镜像加载。
+5. 执行接口测试，记录每个接口的请求参数（JSON 字符串）、简要响应（JSON 字符串，脱敏）、完整响应（落盘到 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/`）和参数依赖追踪；执行脚本及 mock/stub/fake/fixture/helper 仍从根 `test/` 源码镜像加载。
 6. 按 `references/agent-response-judgement.md` 由 agent 独立判断每个接口是否通过，给出判定理由，不依赖人工判断。
 7. 按 `references/report-format.md` 生成接口测试明细报告，每个接口使用块状格式，不使用 Markdown 表格。
 8. 按 `references/execution-gate.md` 输出最终门禁结论：PASS / FAIL / PARTIAL，明确是否允许上线、阻断原因和风险项。
@@ -54,8 +54,8 @@
 - 通过：未知必填参数已按来源规则解析或明确标记；可复用参数已按风险复验；所有必测 P0 接口全部通过或给出合规阻断归类；P1 接口无阻断级失败；风险项已明确说明；报告与测试资产符合格式要求；结论清晰可决策。
 - 驳回：存在 P0 接口失败；未知必填参数凭空构造；历史参数失效后仍继续复用；依赖接口失败却误判目标接口失败；报告不符合格式要求（例如接口明细使用 Markdown 表格）；请求参数或简要响应不是 JSON 字符串；agent 未给出独立判定理由；结论不清晰；缺少关键证据文件。
 ## 执行结果归档要求
-- 测试主结论写入 `doc/5-tests/YYYY-MM-DD_HHmmss_上线前项目接口测试/README.md`，包含：测试范围、必测接口总数、通过数、失败数、待确认数、门禁结论、风险项、阻断原因（如果有）。
-- 接口测试明细报告写入 `doc/5-tests/` 时间戳证据目录下的 `interface-test-results.md`，每个接口按块状格式输出，不使用 Markdown 表格。
-- 双索引同步报告写入 `doc/5-tests/` 时间戳证据目录下的 `interface-sync-report.yaml`，字段结构由 `project-interface-baseline-rules` 定义。
-- 每个接口的完整响应、简要响应、请求样本、依赖数据和执行日志归档到 `doc/5-tests/` 时间戳目录，按模块或接口路径组织；实际执行的测试脚本、mock、stub、fake、fixture、helper 和数据构造保留在根 `test/` 源码镜像，并在证据清单中引用。
-- 所有归档遵循 `artifact-storage-rules` 和 `test-strategy-rules 的 test-asset-governance 条件路由` 的双根要求：中文说明目录只放主 `README.md`，`doc/5-tests/` 其余内容仅为非可执行证据；可执行测试资产统一位于根 `test/` 源码镜像。
+- 测试主结论写入 `doc/5-tests/YYYY-MM-DD_HHmmss_上线前项目接口测试.md`，包含：测试范围、必测接口总数、通过数、失败数、待确认数、门禁结论、风险项、阻断原因（如果有）。
+- 接口测试明细报告写入 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 下的 `interface-test-results.md`，每个接口按块状格式输出，不使用 Markdown 表格。
+- 双索引同步报告写入 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 下的 `interface-sync-report.yaml`，字段结构由 `project-interface-baseline-rules` 定义。
+- 每个接口的完整响应、简要响应、请求样本、依赖数据和执行日志归档到 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/`，按模块或接口路径组织；实际执行的测试脚本、mock、stub、fake、fixture、helper 和数据构造保留在根 `test/` 源码镜像，并在证据清单中引用。
+- 所有归档遵循 `artifact-storage-rules` 和 `test-strategy-rules 的 test-asset-governance 条件路由` 的双根要求：`doc/5-tests/` 只放一份扁平中文主报告 md，机器产物统一落在 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/`；可执行测试资产统一位于根 `test/` 源码镜像。

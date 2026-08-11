@@ -1,4 +1,4 @@
-version: 8
+version: 9
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
@@ -26,7 +26,7 @@ entry_files:
   requirement_gap_doc: "{requirement_doc_stem}.gap.md"
   requirement_doc_note: "需求文档命名必须使用 yyyy-MM-DD_HHmmss_中文简介标题.md；中文简介标题为动态主题，禁止使用固定字面量“需求中文说明”"
   requirement_gap_doc_note: "临时缺口文档必须复用对应需求文档同前缀，并在末尾追加“.gap.md”；例如：2026-04-16_141518_多业务复用Swap适配控制需求.gap.md。该文档仅在 gap 未关闭时存在，用户确认并回填主需求文档后必须删除。"
-  source_object_id_note: "来源对象标识用于回指进入实施或 6-review 阶段的上游对象，可以来自需求文档或 Bug 根目录；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加“需求-”或“Bug-”类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。"
+  source_object_id_note: "来源对象标识用于回指进入实施或 6-review 阶段的上游对象，可以来自需求文档或 Bug 主文档；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加“需求-”或“Bug-”类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。"
   style_regression_doc: "{datetime}_{source_object_id}_6-review.md"
   style_regression_doc_note: "真实测试后唯一活动风格回归记录必须使用 yyyy-MM-DD_HHmmss 时间前缀并保留来源对象标识；结果只能为 STYLE: PASS 或 STYLE: FIX_REQUIRED。"
   historical_acceptance_criteria_doc: "{datetime}_{source_object_id}_验收标准.md"
@@ -37,10 +37,11 @@ entry_files:
   implementation_sequence_master_doc_note: "新项目、项目初期或多来源对象需要统一排序时，必须在 doc/3-实施/ 下创建或更新“需求与实施计划全量顺序实施方案”；文件名使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留项目或来源集合标识，例如：2026-04-16_141518_交易后台重构_需求与实施计划全量顺序实施方案.md。该文档是跨需求/跨来源对象总顺序表，不替代单来源对象实施总览。"
   implementation_cycle_doc: "{datetime}_{source_object_id}_实施周期{cycle_no}_{cycle_cn_title}.md"
   implementation_cycle_doc_note: "实施周期文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_实施周期NN_中文主题”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_实施周期01_接口与配置落点.md。不得只写“时间_阶段_说明”，必须保留来源对象标识。"
-  bug_root_readme: "README.md"
-  test_task_readme: "README.md"
+  bug_doc: "{datetime}_{bug_cn_title}.md"
+  bug_doc_note: "Bug 主文档是 doc/4-bugs/ 下的单个扁平 md，不建时间戳子目录，也不再使用 README.md 作为入口；例如：doc/4-bugs/2026-08-11_101500_订单退款状态错乱.md。同一 Bug 的复现、根因、诊断、修复建议和验证结论全部续写进这一份 md。"
+  test_doc: "{datetime}_{test_cn_title}.md"
+  test_doc_note: "测试主文档是 doc/5-tests/ 下的单个扁平 md，不建时间戳子目录，也不建 evidence/、artifacts/ 子目录；例如：doc/5-tests/2026-08-11_101500_订单创建回归.md。测试目的、命令、被测文件、样本、结论、日志和报告片段全部内联进这一份 md，截图按 doc/data/images/ 规则引用。测试程序及源码关联 mock/stub/fake 仍归入 test/ 的源码镜像，只有跨源码复用的 helper、fixture、模拟程序与启动脚本才统一归入 test/shared/。"
   test_python_runner: "run_python_tests.py"
-  test_task_readme_note: "doc/5-tests/<时间戳>/README.md 只记录本轮测试目的、命令、被测文件、结论和证据路径；测试程序及源码关联 mock/stub/fake 必须归入 test/ 的源码镜像，只有跨源码复用的 helper、fixture、模拟程序与启动脚本才统一归入 test/shared/。"
   test_startup_backend_script: "start-backend.sh"
   test_startup_frontend_script: "start-frontend.sh"
   test_startup_script_note: "测试启动脚本参考项目 .vscode/launch.json（或等价启动配置）生成，落在 test/shared/scripts/，跨轮复用；后端固定 start-backend.sh，前端固定 start-frontend.sh；同端存在多服务时追加 ASCII 后缀，如 start-backend-gateway.sh。脚本须输出关键过程日志，且只引用 local 配置，严禁连接非 local 环境。"
@@ -60,14 +61,14 @@ root_files:
 directories:
   test_code_root: "test"
   test_code_root_note: "根 test/ 是唯一活动测试代码根；测试程序与 mock/stub/fake 等模拟程序按被测源码目录镜像，Python 测试使用 <名称>_test.py，模拟程序使用 <名称>_mock.py、<名称>_stub.py 或 <名称>_fake.py，Go 使用 ASCII 外部黑盒包。"
-  bug_root: "{datetime}_问题中文简介"
-  test_task_root: "{datetime}"
   test_shared_scripts_dir: "test/shared/scripts"
-  test_shared_scripts_dir_note: "test/shared/scripts/，存放跨轮复用的测试启动脚本（如 start-backend.sh、start-frontend.sh）；它们属于活动测试代码根，不随每轮 doc/5-tests/ 证据目录创建。"
+  test_shared_scripts_dir_note: "test/shared/scripts/，存放跨轮复用的测试启动脚本（如 start-backend.sh、start-frontend.sh）；它们属于活动测试代码根，不随每轮测试主文档创建。"
   test_shared_code_dir: "shared"
   test_shared_code_dir_note: "test/shared/，仅存放跨源码复用的活动测试 helper、fixture、模拟程序与位置校验逻辑；源码关联 mock/stub/fake 不得绕过镜像规则放入此处。"
-  test_task_evidence_dir: "evidence"
-  test_task_artifacts_dir: "artifacts"
+  test_baseline_dir: "doc/5-tests/基线"
+  test_baseline_dir_note: "doc/5-tests/ 下唯一豁免扁平化的子目录，承载 project-interface-baseline-rules 的长期机器数据资产（interface-inventory.yaml、dependency-graph.yaml、execution-history.yaml 等）；它是跨轮复用的数据资产库而非任务文档，不适用扁平 md 约定。"
+  release_test_artifacts_root: "test/release-artifacts"
+  release_test_artifacts_root_note: "上线接口测试引擎每轮的机器产物根，按 test/release-artifacts/{datetime}_release-interface-test/ 组织；这些 YAML/JSON/日志会被后续命令回读，无法内联进 md，因此移出 doc/ 落在活动测试根内，路径保持 ASCII。中文主报告仍是 doc/5-tests/ 下的扁平 md。"
 bootstrap:
   recent_context_scan_roots:
     - "doc/1-架构"
@@ -112,10 +113,13 @@ policies:
   markdown_image_forbids_remote_and_data_uri: true
   markdown_image_forbids_path_traversal: true
   document_data_keeps_images_subdirectory_only: true
-  same_bug_updates_same_root: true
+  same_bug_updates_same_doc: true
   bug_doc_embeds_diagrams_in_markdown: true
-  same_test_round_updates_same_root: true
-  new_independent_test_round_creates_new_root: true
+  same_test_round_updates_same_doc: true
+  new_independent_test_round_creates_new_doc: true
+  bug_and_test_docs_are_flat_files: true
+  historical_subdirectory_artifacts_read_only: true
+  test_baseline_dir_exempt_from_flattening: true
   test_shared_layer_reused_across_rounds: true
   test_code_root_is_unique: true
   test_code_mirrors_source_paths: true
@@ -124,7 +128,8 @@ policies:
   doc5_tests_non_executable_only: true
   historical_doc5_executables_are_read_only: true
   test_startup_scripts_reference_vscode_launch: true
-  test_task_readme_is_evidence_only: true
+  test_doc_is_evidence_only: true
+  release_test_machine_artifacts_outside_doc: true
   test_support_scripts_under_test_root: true
   style_regression_outputs_under_doc_review_root: true
   same_project_design_updates_same_doc: true

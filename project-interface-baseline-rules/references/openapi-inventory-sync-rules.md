@@ -110,7 +110,7 @@ python project-interface-release-execution-rules/scripts/generate_release_test_p
   --manifest swag/.swag-manifest.yaml \
   --inventory doc/5-tests/基线/interface-inventory.yaml \
   --reusable-params doc/5-tests/基线/reusable-params.yaml \
-  --output doc/5-tests/<时间戳>_上线前项目接口测试/ascii-artifacts/interface-sync-report.yaml
+  --output test/release-artifacts/<时间戳>_release-interface-test/interface-sync-report.yaml
 ```
 
 如果脚本报告 `requires_dual_refresh: true`，必须先执行 `swag-openapi-maintainer-rules` 刷新 `swag/`，再重新运行本同步命令。

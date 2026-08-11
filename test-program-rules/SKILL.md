@@ -1,6 +1,6 @@
 ---
 name: test-program-rules
-description: 当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把 README、日志、报告和非可执行产物放入 `doc/5-tests/`，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。
+description: 当新增或修改测试程序、模拟程序、验证脚本、数据构造脚本、测试辅助代码（mock、stub、fake、fixture）时触发；当 Go 测试路径进入编译链路、出现源码目录 `*_test.go`、中文可编译路径或白盒同包测试诉求时，也由本 skill 统一处理。负责测试程序职责拆分、辅助代码边界、长期保留策略，以及 Go 测试可编译路径必须保持 ASCII、源码目录禁放 `*_test.go`、白盒诉求改 seam 的强制约束；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为落点真相，把真实测试代码、脚本、mock、stub、fake、fixture 放入根 `test/` 的 ASCII 源码镜像目录，模拟程序与对应测试使用同一源码相对路径，把测试主文档以及内联其中的日志、报告和非可执行产物放入 `doc/5-tests/` 的扁平 md，且该目录不承载任何可执行测试或模拟程序；第三方 API 文档缺失响应模型时，必须先用测试脚本探测真实响应，再反推结构体定义；强制禁止为了测试目的污染生产代码（新增测试专用方法、测试专用数据、测试专用结构体字段等）。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。运行时 Mock（本地开发编译进主二进制、替代不可用上游的模拟实现）不属测试资产，由根 `mock/` 独立管理，不得进入 `test/` 或业务源码目录。测试脚本建议输出关键过程日志便于定位失败，但过程日志完整性默认为自查项、非放行硬阻断。不要用它代替 `test-strategy-rules`、功能验证规则或回归验证规则。
 ---
 
 # 测试程序规则
@@ -8,14 +8,14 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 只在“测试程序本身应该怎么拆、怎么组织职责”这个问题上使用这个 skill。
 如果当前争议是测试目录放哪里、目录散落到错误位置、测试名称怎么起或补测试文档，请统一转交 `test-strategy-rules 的 test-asset-governance 条件路由`。
 
-**重要：本 skill 只处理真实测试代码。测试代码、mock、stub、fake、fixture 和 helper 都是活动测试资产，统一放根 `test/` 的 ASCII 源码镜像目录；每个源文件的模拟程序必须与测试程序使用同一相对源码路径镜像，只有跨源码复用的模拟能力才放 `test/shared/`。中文说明、截图、日志和报告只放 `doc/5-tests/` 的时间戳任务目录，该目录不得承载任何可执行测试或模拟程序。**
+**重要：本 skill 只处理真实测试代码。测试代码、mock、stub、fake、fixture 和 helper 都是活动测试资产，统一放根 `test/` 的 ASCII 源码镜像目录；每个源文件的模拟程序必须与测试程序使用同一相对源码路径镜像，只有跨源码复用的模拟能力才放 `test/shared/`。中文说明、截图、日志和报告只放 `doc/5-tests/` 的时间戳测试主文档，该目录不得承载任何可执行测试或模拟程序。**
 
 ## 活动模拟程序落点（强制）
 
 - 源码 `internal/service/history_client.go` 的活动测试资产统一落在 `test/internal/service/`：例如 `history_client_test.go`、`history_client_mock.go`、`history_client_stub.go`、`history_client_fake.go` 或对应 fixture 文件。
 - mock server、stub、fake、假依赖和模拟响应程序均按上述规则进入根 `test/` 的源码相对路径镜像；不能因为“只是模拟程序”而放到 `doc/5-tests/`、仓库根目录或业务源码目录。
 - `test/shared/` 只允许放不归属于单一源码路径、且已被多个测试域稳定复用的通用模拟能力；源码专属模拟程序不得借共享目录绕开镜像关系。
-- `doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图、脱敏响应样例等非可执行证据；禁止新增或复制 mock、stub、fake、fixture、测试脚本和 helper。
+- `doc/5-tests/` 每轮只保存一份扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文；禁止新增或复制 mock、stub、fake、fixture、测试脚本和 helper。
 
 ## Skill 作用与适用场景
 
@@ -32,7 +32,7 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 
 - 新增或修改测试程序、mock server、stub、fake、数据构造脚本、初始化脚本、清理脚本。
 - 需要决定某段验证逻辑应该进入正式测试代码、共享测试辅助代码还是一次性调试资产。
-- 发现测试程序准备放到 `testing/`、`doc/5-tests/`、仓库根目录、业务目录、中文说明目录或其他非根 `test/` 位置。
+- 发现测试程序准备放到 `testing/`、`doc/5-tests/`、仓库根目录、业务目录、中文测试主文档或其他非根 `test/` 位置。
 - 发现 Go 测试目录准备使用中文路径，可能直接导致工具链失败。
 - 发现 Go 白盒单测诉求，准备在源码目录创建同包 `*_test.go`。
 - 发现一个测试脚本同时承担环境初始化、数据构造、执行、断言、报告生成等多种职责。
@@ -42,7 +42,7 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 ## 进入后先做什么
 
 1. 先确认测试资产落点和命名已经遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 与 `test-strategy-rules 的 test-asset-governance 条件路由`；若资产原本散落，还需先完成 `test-strategy-rules 的 test-asset-governance 条件路由` 的迁移。
-2. 确认当前真实测试资产位于根 `test/` 的 ASCII 真实代码路径镜像目录中，而不是 `doc/5-tests/` 或中文说明目录中。
+2. 确认当前真实测试资产位于根 `test/` 的 ASCII 真实代码路径镜像目录中，而不是 `doc/5-tests/` 或中文测试主文档中。
 3. 找出当前测试程序对应的真实代码路径，例如源文件是 `internal/service/history_client.go`，则测试资产默认镜像到 `test/internal/service/`。
 4. 区分当前对象属于正式测试文件、mock / stub / fake、数据构造脚本、初始化脚本、清理脚本还是共享测试辅助代码，并核对其是否与被测源码使用同一镜像目录。
 5. 判断当前代码是长期保留的正式测试资产，还是只用于临时定位问题的调试资产。
@@ -53,7 +53,7 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 ## 默认执行流程
 
 1. 默认先读 `references/program-types-and-splitting.md`，确认测试程序类型和拆分原则。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认根 `test/` ASCII 镜像路径、时间戳主说明 `README.md` 和证据目录的复用边界。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认根 `test/` ASCII 镜像路径、时间戳测试主文档的复用边界。
 3. 如果发现测试程序与生产代码、调试代码或文档职责混用，再读 `references/program-boundaries.md`。
 4. 对 Go 项目必须应用白盒/黑盒/集成测试同一落点矩阵：无论类型都不得在源码目录落地 `*_test.go`；白盒诉求改 seam。
 5. 如果需要判断当前拆分方式是否合理，再读 `references/program-examples.md` 对照正反例。
@@ -82,22 +82,22 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 
 ## 执行通过 / 驳回标准
 
-- 通过：正式测试程序、mock、stub、fake、数据构造脚本和辅助代码职责清晰，且都落在根 `test/` 的 ASCII 真实代码路径镜像目录中；源码专属模拟程序与测试程序保持同一镜像目录，跨源码共享模拟能力才进入 `test/shared/`；会被 Go 编译的目录保持 ASCII；Go 白盒/黑盒/集成都未在源码目录落地 `*_test.go`；（建议）测试脚本输出关键过程日志便于定位失败；第三方 API 文档缺失响应模型时，已通过探测脚本获取真实响应并形成结构化建模依据；没有把测试逻辑或可执行模拟程序混入生产目录、`doc/5-tests/` 或中文说明目录。
-- 驳回：测试程序继续散落在业务目录、仓库根目录、中文说明目录或随意目录中；把中文引入 Go 可编译路径；通过源码目录 `*_test.go` 处理白盒诉求而不补 seam；临时调试脚本长期滞留并伪装成正式测试资产；第三方 API 响应结构不明时直接跳过探测脚本、盲写 map 解析；或为测试目的向生产代码新增测试专用方法、测试专用数据、测试专用结构体字段。
+- 通过：正式测试程序、mock、stub、fake、数据构造脚本和辅助代码职责清晰，且都落在根 `test/` 的 ASCII 真实代码路径镜像目录中；源码专属模拟程序与测试程序保持同一镜像目录，跨源码共享模拟能力才进入 `test/shared/`；会被 Go 编译的目录保持 ASCII；Go 白盒/黑盒/集成都未在源码目录落地 `*_test.go`；（建议）测试脚本输出关键过程日志便于定位失败；第三方 API 文档缺失响应模型时，已通过探测脚本获取真实响应并形成结构化建模依据；没有把测试逻辑或可执行模拟程序混入生产目录、`doc/5-tests/` 或中文测试主文档。
+- 驳回：测试程序继续散落在业务目录、仓库根目录、中文测试主文档或随意目录中；把中文引入 Go 可编译路径；通过源码目录 `*_test.go` 处理白盒诉求而不补 seam；临时调试脚本长期滞留并伪装成正式测试资产；第三方 API 响应结构不明时直接跳过探测脚本、盲写 map 解析；或为测试目的向生产代码新增测试专用方法、测试专用数据、测试专用结构体字段。
 
 ## 执行结果归档要求
 
-- 将测试程序拆分结论记录到 `artifact-storage-rules` 约定的测试任务主说明 `README.md` 中。
-- 在 README 中写清真实测试资产所在的 ASCII 镜像路径。
-- mock、stub、fake、fixture、测试脚本和 helper 都归位到根 `test/` 的 ASCII 真实代码路径镜像目录，并与被测源码保持同一相对路径；截图、日志、报告和脱敏样例等非可执行证据归档在 `doc/5-tests/` 的当前时间戳目录。
-- 测试任务主说明位置、目录命名模板和同一轮测试的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 同一需求的多轮独立验证应分别创建多个 `doc/5-tests/` 时间戳证据目录；活动测试代码继续在根 `test/` 维护，不复制为多份时间戳脚本。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对测试程序拆分结论、ASCII 镜像路径和相关资产落点是否已经真实记录到测试任务 `README.md` 并归位到对应目录；未落盘不得判定测试程序整理完成。
+- 将测试程序拆分结论记录到 `artifact-storage-rules` 约定的测试主文档中。
+- 在测试主文档中写清真实测试资产所在的 ASCII 镜像路径。
+- mock、stub、fake、fixture、测试脚本和 helper 都归位到根 `test/` 的 ASCII 真实代码路径镜像目录，并与被测源码保持同一相对路径；截图、日志、报告和脱敏样例等非可执行证据归档在 `doc/5-tests/` 的当前时间戳测试主文档。
+- 测试主文档位置、命名模板和同一轮测试的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 同一需求的多轮独立验证应分别创建多个 `doc/5-tests/` 时间戳测试主文档；活动测试代码继续在根 `test/` 维护，不复制为多份时间戳脚本。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对测试程序拆分结论、ASCII 镜像路径和相关资产落点是否已经真实记录到测试主文档并归位到对应目录；未落盘不得判定测试程序整理完成。
 
 ## references 读取规则
 
 - 默认先读 `references/program-types-and-splitting.md`。
-- 在定位根 `test/` 镜像、时间戳主说明 `README.md` 或判断是否继续沿用同一轮证据目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位根 `test/` 镜像、时间戳测试主文档或判断是否继续沿用同一份测试主文档时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在职责边界混淆时，再读 `references/program-boundaries.md`。
 - 只有在需要正反例时，再读 `references/program-examples.md`。
 
@@ -143,5 +143,5 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 ### 四、失败样本的回放要求
 
 - 任意 `UNEXPECTED_FAIL` 样本必须输出"可重放"信息：完整请求参数（脱敏后）、目标 URL、目标接口标识、调用时间。
-- 重放信息落到 `artifacts/<时间戳>/repro/` 目录，便于后续手工复现或脚本回放。
+- 重放信息以代码围栏内联进当前测试主文档的失败样本小节，便于后续手工复现或脚本回放。
 - 多个 `UNEXPECTED_FAIL` 样本时，按样本执行时间顺序输出，便于定位时间窗口内的环境变化。

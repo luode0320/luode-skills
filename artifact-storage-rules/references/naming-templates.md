@@ -26,7 +26,7 @@
 
 - `<需求中文简介标题>` 必须使用本次需求的中文简介标题，禁止固定写成“需求中文说明”。
 - 需求、实施、Bug、测试和 `6-review` 等活动文档或任务目录的时间前缀统一使用 `YYYY-MM-DD_HHmmss`，不得退化成只有日期的 `YYYY-MM-DD`。
-- 来源对象标识用于回指进入实施或 `6-review` 阶段的上游对象，可以来自需求文档，也可以来自 Bug 根目录；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加 `需求-` 或 `Bug-` 类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。
+- 来源对象标识用于回指进入实施或 `6-review` 阶段的上游对象，可以来自需求文档，也可以来自 Bug 主文档；该标识不重复文件名前置时间戳，优先使用来源中文主干或短 ID，必要时加 `需求-` 或 `Bug-` 类型前缀，命名中必须能看出来源是哪个需求或哪个 Bug。
 - `6-review` 文件名必须使用 `YYYY-MM-DD_HHmmss` 时间前缀，并在时间后保留来源对象标识，追加“_6-review”。
 - 需求与实施计划全量顺序实施方案必须使用 `YYYY-MM-DD_HHmmss` 时间前缀，并在时间后保留项目或来源集合标识，再追加“_需求与实施计划全量顺序实施方案”；该文档只在新项目、项目初期或多来源对象统一排序时使用，不替代单来源对象实施总览。
 - 实施总览文件名必须使用 `YYYY-MM-DD_HHmmss` 时间前缀，并在时间后保留来源对象标识，再追加“_实施总览”。
@@ -37,7 +37,7 @@
 - 需求文档落地时应在正文中同步补齐 Mermaid 流程图与时序图，不再另建配套图文件。
 - 需求正文中的图示应与正文、表格和口径保持一致。
 - 用户提供的需求截图与外部生成图片统一存放到 `doc/data/images/`，并按当前 Markdown 文件位置使用 `/` 分隔的相对路径直接引用展示。
-- 相对路径映射固定为：`doc/2-需求/*.md`、`doc/3-实施/*.md`、`doc/6-review/*.md` 使用 `../data/images/<file>`；历史 `doc/6-审查/*.md`、`doc/7-验收/*.md` 仅兼容读取；`doc/*.md` 使用 `data/images/<file>`；仓库根目录 Markdown 使用 `doc/data/images/<file>`。
+- 相对路径映射固定为：`doc/2-需求/*.md`、`doc/3-实施/*.md`、`doc/4-bugs/*.md`、`doc/5-tests/*.md`、`doc/6-review/*.md` 使用 `../data/images/<file>`；历史 `doc/6-审查/*.md`、`doc/7-验收/*.md` 仅兼容读取；`doc/*.md` 使用 `data/images/<file>`；仓库根目录 Markdown 使用 `doc/data/images/<file>`。
 - 素材标识必须使用 ASCII kebab-case，例如 `req-shot-login`、`state-diagram`; 版本号统一由 `-v<number>` 后缀表示，返修递增版本号，避免空格和中文标点。
 - Markdown 图片禁止绝对路径、反斜杠、`file://`、Base64/data URI、HTML `<img>`、远程热链、路径越界和直接引用 `doc/data/<file>`；文档必须同时登记非空 alt 与 `IMG-*` 资产 ID。
 
@@ -95,14 +95,15 @@
 
 ## Bug 域
 
-- Bug 根目录：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/`
-- Bug 主入口文件：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/README.md`
+- Bug 主文档：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介.md`
 
 补充要求：
 
-- 同一个 Bug 的后续复现、定位、诊断、方案和验证都沿用同一根目录。
-- `README.md` 作为唯一主入口文件，流程图与时序图统一用 Mermaid 语法直接写入正文，不另建独立 `flow.svg`/`sequence.svg` 等图文件，与需求域"正文内嵌 Mermaid 图示、不另建配套图文件"的约定保持一致。
-- 其他附件和细节记录围绕该根目录组织。
+- Bug 域只产出扁平 md，不建时间戳子目录，也不使用 `README.md` 作为入口；命名结构与 `doc/2-需求/`、`doc/6-review/` 完全同构。
+- 同一个 Bug 的后续复现、定位、诊断、方案和验证都续写进同一份 md，不新建平行文档。
+- 流程图与时序图统一用 Mermaid 语法直接写入正文，不另建独立 `flow.svg`/`sequence.svg` 等图文件，与需求域"正文内嵌 Mermaid 图示、不另建配套图文件"的约定保持一致。
+- 日志、报错原文、SQL 和命令输出等证据以代码围栏内联进该 md；截图按 `doc/data/images/` 规则引用，相对路径为 `../data/images/<file>`。
+- 历史 `doc/4-bugs/<时间戳目录>/README.md` 形态只读归档，允许继续阅读，不新增、不改写、不批量迁移。
 
 ## 测试域
 
@@ -114,9 +115,10 @@
 
 
 
-- 测试任务根目录：`doc/5-tests/YYYY-MM-DD_HHmmss/`
-- 测试中文主说明：`doc/5-tests/YYYY-MM-DD_HHmmss/README.md`
+- 测试主文档：`doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md`
+- 长期接口基线库（唯一豁免子目录）：`doc/5-tests/基线/`
 - 活动测试代码根：`test/`
+- 上线接口测试机器产物根：`test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/`
 - 单文件测试：`<源码相对路径>/<名称>.<ext> -> test/<源码相对路径>/<名称>_test.<ext>`
 - 源码关联模拟程序：`<源码相对路径>/<名称>.<ext> -> test/<源码相对路径>/<名称>_{mock|stub|fake}.<ext>`；必须与被测源码路径镜像。
 - 目录级测试：`test/<被测源码目录>/<主题>_test.<ext>`，README 列出被测文件；源码关联 fixture、mock、stub、fake、helper 位于同一镜像目录，只有跨源码复用资产才进入 `test/shared/`。
@@ -126,11 +128,15 @@
 
 补充要求：
 
-- 测试主题写入同时间戳根目录的 `README.md` 标题；`evidence/` 与 `artifacts/` 只承载该轮非可执行证据和运行产物。
-- `doc/5-tests/` 的时间戳规则只适用于说明和证据；活动测试代码不得为了时间戳目录进入文档根。
-- 历史 `doc/5-tests/` 可执行资产按指纹只读；首次修改、改名或新增时先迁至 `test/`。
+- 测试域只产出扁平 md，不建时间戳子目录，也不建 `evidence/`、`artifacts/` 子目录；命名结构与 `doc/2-需求/`、`doc/6-review/` 完全同构。
+- `<测试任务中文主题>` 必须是本轮测试的中文主题，能从文件名直接看出测了什么，禁止只写时间戳。
+- 测试目的、运行命令、被测文件、样本、结论、日志片段和报告结果全部内联进同一份 md；日志与命令输出用代码围栏，截图按 `doc/data/images/` 规则以 `../data/images/<file>` 引用。
+- `doc/5-tests/基线/` 是唯一豁免扁平化的子目录，承载跨轮复用的机器可读接口基线数据资产，不是任务文档。
+- 上线接口测试引擎的机器产物（`release-test-plan.yaml`、`inventory-reconcile.yaml`、`execute.log`、原始响应等）会被后续命令回读，无法内联，统一落在 `test/release-artifacts/` 下；`doc/5-tests/` 只保留中文主报告 md。
+- `doc/5-tests/` 的时间戳规则只适用于说明和证据；活动测试代码不得为了时间戳进入文档根。
+- 历史 `doc/5-tests/<时间戳目录>/` 形态只读归档，其中可执行资产按指纹只读；首次修改、改名或新增时先迁至 `test/`，不批量迁移历史包。
 - 会被 Go 工具链扫描或编译的路径必须保持 ASCII。
-- 中文说明默认只放在中文主说明目录，不进入编译路径。
+- 中文说明只出现在 `doc/5-tests/` 的扁平 md 中，不进入编译路径。
 
 ## `6-review` 风格回归域
 

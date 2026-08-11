@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -30,6 +31,24 @@ from .scenario_report import (
     write_evidence_manifest,
 )
 from .storage import BaselineStore
+
+
+def _relative_hint(target: Path, base: Path) -> str:
+    """计算中文主报告指向机器产物根的可点击前缀。
+
+    [参数] target: 机器产物根目录；base: 中文主报告所在目录。
+    [返回] str：以 `/` 分隔并以 `/` 结尾的相对前缀，同目录返回空串；跨盘无法相对化时回落绝对 POSIX 路径。
+    最近修改时间：2026-08-11；改动原因：主报告与机器产物分根后需要稳定的跨目录指引。
+    """
+    # 1. 同目录时不加前缀，保持旧报告里 `runtime-matrix.yaml` 这类裸文件名的写法。
+    if target.resolve() == base.resolve():
+        return ""
+    # 2. Windows 跨盘符无法相对化，此时直接给绝对路径而不是抛错中断报告生成。
+    try:
+        relative = Path(os.path.relpath(target.resolve(), base.resolve()))
+    except ValueError:
+        return target.resolve().as_posix().rstrip("/") + "/"
+    return relative.as_posix().rstrip("/") + "/"
 
 
 def _json_contract(value: Any) -> str:
@@ -255,7 +274,7 @@ def write_report(
     interfaces: Iterable[Mapping[str, Any]] = (),
     dependency_graph: Mapping[str, Any] | None = None,
     environment: str = "local",
-    canonical_layout: bool = False,
+    doc_report_path: str | Path | None = None,
     parameter_summary: Mapping[str, Any] | None = None,
     sync_metadata: Mapping[str, Any] | None = None,
     baseline_summary: Mapping[str, Any] | None = None,
@@ -268,9 +287,9 @@ def write_report(
 ) -> dict[str, Any]:
     """生成兼容接口报告、独立场景报告和脱敏证据清单。
 
-    [参数] output_dir: 归档根目录；results: 接口判定结果；gate: 接口门禁；scenario_results: 真实场景结果；其余为接口、依赖和外部场景资产。
+    [参数] output_dir: 机器产物归档根目录；doc_report_path: 中文主报告 md 落点，缺省时回落到产物根内的 README.md；results: 接口判定结果；gate: 接口门禁；scenario_results: 真实场景结果；其余为接口、依赖和外部场景资产。
     [返回] 关键归档文件路径映射。
-    最近修改时间：2026-07-25 23:18:15，manifest 非 PASS 回流最终门禁并在 mkdir 前校验输出路径。
+    最近修改时间：2026-08-11，机器产物移出 doc/ 并与中文主报告 md 分离归档。
     """
 
     # 1. 所有调用方输入先生成脱敏副本，后续统计、渲染和归档禁止再读取原始对象。
@@ -302,9 +321,12 @@ def write_report(
     gate = dict(_redact(dict(gate)))
     dependency_graph = _redact(dependency_graph) if dependency_graph else None
     baseline_summary = _redact(baseline_summary) if baseline_summary else None
-    artifact_root = root / "ascii-artifacts" if canonical_layout else root
-    _ensure_report_output_path(artifact_root)
-    artifact_root.mkdir(parents=True, exist_ok=True)
+    # 1.4 机器产物直接落在传入的产物根，不再嵌一层 ascii-artifacts。
+    artifact_root = root
+    # 1.5 中文主报告默认留在产物根，调用方给出 doc 落点时改写到 doc/5-tests/ 的扁平 md。
+    report_path = Path(doc_report_path) if doc_report_path else artifact_root / "README.md"
+    _ensure_report_output_path(report_path.parent)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_items = [_report_item(item) for item in items]
     # 1.3 接口与场景分别归档；旧调用方不传场景时只得到明确的未配置集合。
     scenario_items = [_scenario_report_item(_redact(item)) for item in raw_scenario_items]
@@ -418,6 +440,8 @@ def write_report(
     pending = int(gate.get("pending", 0))
     blocked_lines = [f"- {item.get('operation_id', 'unknown')}：{item.get('reason', '')}" for item in items if item.get("status") != "PASS"] or ["- 无"]
     status_counts = _status_counts(items)
+    # 6.1 中文主报告与机器产物可能不同根，指引统一按主报告所在目录换算相对路径。
+    artifact_hint = _relative_hint(artifact_root, report_path.parent)
     readme = [
         "# 上线前项目接口测试报告", "", "## 基本信息",
         f"- 测试时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", f"- 测试环境：{environment} 本地环境",
@@ -425,15 +449,15 @@ def write_report(
         "", "## 风险等级统计",
         *[f"- {risk} 级接口：总数 {values['total']}，通过 {values['passed']}，不通过 {values['failed']}，待确认 {values['pending']}，跳过 {values['skipped']}" for risk, values in risks.items()],
         "", "## 接口基线扫描摘要", "- 扫描模式：全量建基线 / 增量扫描", f"- 扫描时间：{generated_at}", f"- 扫描接口数：{len(interface_map)}", "- 新增/删除/变更接口数：0 / 0 / 0",
-        "", "## 对账结果", f"- 当前代码接口数：{sync['code_count']}", f"- swag manifest 接口数：{sync['manifest_count']}", f"- interface inventory 接口数：{sync['inventory_count']}", f"- 缺失 manifest：{'是' if sync['missing_manifest'] else '否'}", f"- 缺失 inventory：{'是' if sync['missing_inventory'] else '否'}", f"- schema 漂移接口数：{sync['schema_drift_count']}", "- 详见：ascii-artifacts/interface-sync-report.yaml",
-        "", "## Runtime 能力矩阵", "- 详见：runtime-matrix.yaml",
+        "", "## 对账结果", f"- 当前代码接口数：{sync['code_count']}", f"- swag manifest 接口数：{sync['manifest_count']}", f"- interface inventory 接口数：{sync['inventory_count']}", f"- 缺失 manifest：{'是' if sync['missing_manifest'] else '否'}", f"- 缺失 inventory：{'是' if sync['missing_inventory'] else '否'}", f"- schema 漂移接口数：{sync['schema_drift_count']}", f"- 详见：{artifact_hint}interface-sync-report.yaml",
+        "", "## Runtime 能力矩阵", f"- 详见：{artifact_hint}runtime-matrix.yaml",
         "", "## 最终门禁结论", f"### 结论等级：{gate.get('gate', 'PENDING')}", f"- 是否允许上线：{'是' if gate.get('allow_release') else '否'}",
         "", "## 阻断项列表", *blocked_lines,
         "", "## 参数复用与失效摘要", f"- 本轮参数总数：{parameters.get('total', 0)}", f"- 已解析参数数：{parameters.get('resolved', 0)}", f"- 未解析参数数：{parameters.get('unresolved', 0)}", f"- 本轮复用参数数：{parameters.get('reused', 0)}", f"- 复验成功参数数：{parameters.get('revalidated', 0)}", f"- 新增 candidate 参数数：{parameters.get('candidate', 0)}", f"- 标记 stale 参数数：{parameters.get('stale', 0)}", f"- 标记 invalid 参数数：{parameters.get('invalid', 0)}", f"- 标记 quarantined 参数数：{parameters.get('quarantined', 0)}", f"- 状态计数：{json.dumps(status_counts, ensure_ascii=False, sort_keys=True)}",
     ]
-    readme_path = Path(_write_text(root / "README.md", "\n".join(readme) + "\n"))
+    readme_path = Path(_write_text(report_path, "\n".join(readme) + "\n"))
     # 7. 清单只记录相对路径、摘要哈希和脱敏状态，不把原始请求响应复制进索引。
-    additional_files = [("output-root/README.md", readme_path)] if canonical_layout else []
+    additional_files = [("doc-report.md", readme_path)] if doc_report_path else []
     evidence_path = Path(write_evidence_manifest(artifact_root, run_id, sensitive_values=sensitive_values, additional_files=additional_files))
     evidence_status = str(json.loads(evidence_path.read_text(encoding="utf-8"))["status"])
     final_gate = _evidence_gate(gate, evidence_status)

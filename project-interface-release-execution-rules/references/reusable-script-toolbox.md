@@ -23,7 +23,7 @@
 | `bootstrap-inventory` | 冷启动扫描项目接口，生成初版接口基线 |
 | `reconcile-inventory` | 扫描当前接口事实并与已有基线对账 |
 | `generate-plan` | 基于接口基线生成测试计划 |
-| `init-release-test-task` | 初始化当轮上线测试任务目录骨架 |
+| `init-release-test-task` | 初始化当轮中文主报告 md 与 `test/release-artifacts/` 机器产物骨架 |
 | `init-baseline-assets` | 初始化 `doc/5-tests/基线/` 长期资产库 |
 | `build-dependency-graph` | 根据接口基线和参数来源构建依赖图 |
 | `validate-reusable-params` | 校验可复用参数状态、TTL、失效原因和复验结果 |

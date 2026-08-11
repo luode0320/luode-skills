@@ -10,7 +10,7 @@
 
 1. 测试概览（主 `README.md` 中展示）
 2. 基线扫描、双索引同步与对账摘要（主 `README.md` 中展示）
-3. 接口测试明细（`doc/5-tests/` 时间戳证据目录的 `interface-test-results.md` 中展示）
+3. 接口测试明细（`test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 的 `interface-test-results.md` 中展示）
 4. 门禁结论（主 `README.md` 中展示）
 
 ---
@@ -65,7 +65,7 @@
 - 是否需要双刷新：是 / 否
 - schema 漂移接口数：N
 - 受影响可复用参数数：N
-- 同步报告：ascii-artifacts/interface-sync-report.yaml
+- 同步报告：test/release-artifacts/&lt;时间戳&gt;_release-interface-test/interface-sync-report.yaml
 ```
 
 ---
@@ -233,7 +233,7 @@ adapter 指纹     <sha256>
 
 ## 执行附录
 
-- local 环境、执行步骤、精确命令、接口样本、完整日志、SQL、接口报文、原始响应、清理和回滚：放入当前测试任务的 `doc/5-tests/` 时间戳证据目录；可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造保留在根 `test/` 源码镜像，并由报告引用。
+- local 环境、执行步骤、精确命令、接口样本、完整日志、SQL、接口报文、原始响应、清理和回滚：放入 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 的机器产物根；可执行测试脚本、mock、stub、fake、fixture、helper 和数据构造保留在根 `test/` 源码镜像，并由报告引用。
 - `interface-test-results.md` 继续保持本模板规定的块状接口明细格式，不因附录分层改为表格。
 
 ## 追踪附录

@@ -9,7 +9,7 @@
 | `test-strategy-rules` | 任务级测试的策略规划、优先级和覆盖范围 | 本 skill 是项目级上线测试门禁，不替代任务级测试策略；两者可并行，但上线门禁前必须先有清晰策略 |
 | `functional-validation-rules` | 任务级的当前改动功能验证 | 本 skill 可调用它执行单接口功能验证，结果纳入项目级门禁报告；本 skill 不替代单接口功能语义验证细节 |
 | `test-regression-rules` | 任务级的改动影响面回归验证 | 本 skill 关注项目级核心接口的上线前门禁回归，两者覆盖范围不同，可并行并复用结果 |
-| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录的创建和结构规范 | 本 skill 必须遵循它的要求，所有测试资产落地到 `doc/5-tests/` 的时间戳根目录 |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录的创建和结构规范 | 本 skill 必须遵循它的要求，中文主报告落地到 `doc/5-tests/` 的扁平 md，机器产物落地到 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试文档的结构和归档规则 | 本 skill 的报告必须遵循它的要求，中文说明目录只放主 `README.md`，其他内容放 ASCII 镜像目录 |
 | `test-program-rules` | 测试脚本、测试程序和资产的组织规则 | 本 skill 的测试脚本、用例和数据必须遵循它的要求 |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录和文件命名规则 | 本 skill 的所有资产命名必须遵循它的要求 |

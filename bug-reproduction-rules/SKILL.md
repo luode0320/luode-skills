@@ -1,6 +1,6 @@
 ---
 name: bug-reproduction-rules
-description: 当问题需要构造步骤、确定触发条件、判断是否稳定发生、确认出现频率或复现环境时触发。负责输出复现路径、稳定性判断、符合 `artifact-storage-rules` 约定的 Bug 根目录记录和无法复现时的结论处理；不要用它代替根因分析。
+description: 当问题需要构造步骤、确定触发条件、判断是否稳定发生、确认出现频率或复现环境时触发。负责输出复现路径、稳定性判断、符合 `artifact-storage-rules` 约定的 Bug 主文档记录和无法复现时的结论处理；不要用它代替根因分析。
 ---
 
 # Bug 复现规则
@@ -13,7 +13,7 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 - 构造最小复现路径和触发步骤。
 - 判断问题是稳定复现、条件复现还是偶发现象。
 - 明确复现环境、输入数据、账号和前置状态。
-- 将复现结论统一沉淀到当前 Bug 根目录，并与测试目录建立关联。
+- 将复现结论统一沉淀到当前 Bug 主文档，并与测试目录建立关联。
 - 为后续范围界定、根因定位和验证闭环提供统一样本。
 
 ## 自动触发信号
@@ -26,7 +26,7 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 ## 进入后先做什么
 
 1. 先确认复现目标是重现现象、重现日志还是重现状态变化。
-2. 为当前 Bug 确认统一的根目录，继续沿用 `artifact-storage-rules` 约定的当前 Bug 根目录。
+2. 为当前 Bug 确认统一的主文档，继续沿用 `artifact-storage-rules` 约定的当前 Bug 主文档。
 3. 梳理环境、账号、数据、输入和前置操作。
 4. 若复现需要连接本地真实环境（数据库、缓存、消息队列、HTTP/RPC 上游等），按 `test-strategy-rules` 的「本地环境配置发现与连接」去本地配置文件读取连接信息，并遵守其隔离安全约束；不得回退使用 test / prod / staging 等非 local 环境。
 5. 尝试收敛出最小步骤，而不是堆一长串无关动作。
@@ -63,16 +63,16 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 
 ## 执行结果归档要求
 
-- 将复现步骤、环境、输入数据和结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 根目录中。
-- 当前 Bug 根目录必须包含 `README.md`，至少写明前置条件、操作步骤、结果表现和稳定性判断。
-- 如果本轮复现使用了脚本、模拟数据或验证程序，应按 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 放入对应测试任务目录；若资产原本散落在错误位置，还需先按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢，并在当前 Bug 根目录中记录对应测试目录路径。
+- 将复现步骤、环境、输入数据和结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- 当前 Bug 主文档至少写明前置条件、操作步骤、结果表现和稳定性判断。
+- 如果本轮复现使用了脚本、模拟数据或验证程序，应按 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 放入对应测试主文档；若资产原本散落在错误位置，还需先按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢，并在当前 Bug 主文档中记录对应测试目录路径。
 - 如果暂未复现，应记录已尝试路径和缺失条件，避免重复试错。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对当前 Bug 根目录和关联测试目录中的复现记录、脚本路径与未复现结论是否已经真实落盘；未落盘不得判定复现分析完成。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对当前 Bug 主文档和关联测试目录中的复现记录、脚本路径与未复现结论是否已经真实落盘；未落盘不得判定复现分析完成。
 
 ## references 读取规则
 
 - 默认先读 `references/reproduction-template.md`。
-- 在决定当前 Bug 根目录、测试目录映射和复用策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在决定当前 Bug 主文档、测试目录映射和复用策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 判断稳定性和触发条件 时，再读 `references/stability-checks.md`。
 - 只有在 对照复现正反例或处理未复现结论 时，再读 `references/reproduction-examples.md`。
 - 输出 Bug 复现记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文说明能否复现和对用户的影响，步骤、环境、数据和命令进入执行附录。

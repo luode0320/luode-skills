@@ -10,7 +10,7 @@
   - 门禁结论
   - 阻断原因与风险项
 
-## `doc/5-tests/` 非可执行证据目录
+## `doc/5-tests/` 中文主报告与机器产物根
 - `release-test-plan.yaml`
 - `interface-test-results.md`
 - `interface-sync-report.yaml`
@@ -42,7 +42,7 @@
 - `test/<被测源码目录镜像>/...`：源码关联的可执行接口测试脚本、mock、stub、fake、fixture、helper、数据构造和调用样本
 - `test/shared/...`：仅跨源码复用的可执行测试辅助资产
 
-测试资产不得写入业务源码目录、`doc/5-tests/` 或任意其他 `*/tests/` 目录。每轮 `doc/5-tests/` 证据应通过路径或清单引用根 `test/` 中实际执行的脚本和模拟程序。
+测试资产不得写入业务源码目录、`doc/5-tests/` 或任意其他 `*/tests/` 目录。每轮中文主报告应通过路径或清单引用 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` 的机器产物，以及根 `test/` 中实际执行的脚本和模拟程序。
 
 ## 产物要求
 - 请求参数和简要响应必须为 JSON 字符串。

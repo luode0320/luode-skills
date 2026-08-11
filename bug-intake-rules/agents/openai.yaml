@@ -1,4 +1,4 @@
 interface:
   display_name: "Bug 问题接入与诊断"
   short_description: "标准化 Bug 入口，并按 discovery-and-gap 或 runtime-diagnostics 条件路由补齐证据"
-  default_prompt: "使用 $bug-intake-rules 先建立当前 Bug 根目录和 README；如果用户只给一句话、截图或信息缺口，进入 discovery-and-gap 主动侦察，严格只使用 local 配置且仅只读查询；如果静态定位不足需要断言、临时 debug 日志或运行时观察，进入 runtime-diagnostics，明确假设、观察点、退出条件、清理和证据回流。不得把临时诊断资产当作正式业务逻辑，也不得替代复现、根因定位、修复建议、回归风险或修复后验证。"
+  default_prompt: "使用 $bug-intake-rules 先建立当前 Bug 主文档；如果用户只给一句话、截图或信息缺口，进入 discovery-and-gap 主动侦察，严格只使用 local 配置且仅只读查询；如果静态定位不足需要断言、临时 debug 日志或运行时观察，进入 runtime-diagnostics，明确假设、观察点、退出条件、清理和证据回流。不得把临时诊断资产当作正式业务逻辑，也不得替代复现、根因定位、修复建议、回归风险或修复后验证。"

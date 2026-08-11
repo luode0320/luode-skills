@@ -1,6 +1,6 @@
 ---
 name: bug-validation-rules
-description: 当 Bug 修复后需要验证是否真的修好、是否引入副作用、是否需要补测试样例、是否已经满足关闭条件时触发。负责修复后验证闭环、Bug 根目录结论记录和未覆盖说明；不要把它代替功能实现验证或全量回归策略。
+description: 当 Bug 修复后需要验证是否真的修好、是否引入副作用、是否需要补测试样例、是否已经满足关闭条件时触发。负责修复后验证闭环、Bug 主文档结论记录和未覆盖说明；不要把它代替功能实现验证或全量回归策略。
 ---
 
 # Bug 修复验证规则
@@ -13,7 +13,7 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 - 确认原问题现象是否消失，修复目标是否达成。
 - 检查修复后是否引入新的可见副作用。
 - 决定是否需要补测试、补样例或保留待补测说明。
-- 将验证结论、剩余风险和关闭建议统一沉淀到当前 Bug 根目录。
+- 将验证结论、剩余风险和关闭建议统一沉淀到当前 Bug 主文档。
 - 形成 Bug 关闭前的验证结论和留痕。
 
 ## 自动触发信号
@@ -22,25 +22,25 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 - 需要判断这个问题是否能标记为已修复。
 - 团队要求说明修复依据、验证方式和剩余风险。
 - 修复涉及多个条件分支，需要确认主现象和关联现象都被覆盖。
-- 需要把验证结论与前序根因、修复建议记录继续写入同一个 Bug 根目录。
+- 需要把验证结论与前序根因、修复建议记录继续写入同一份 Bug 主文档。
 
 ## 进入后先做什么
 
 1. 先对照原始 Bug 现象、复现路径和修复目标。
-2. 为当前 Bug 确认统一的根目录，并确认关联测试任务目录是否已按 `test-strategy-rules 的 test-asset-governance 条件路由` 建立；若测试资产原本散落，还需确认已按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢。
+2. 为当前 Bug 确认统一的主文档，并确认关联测试主文档是否已按 `test-strategy-rules 的 test-asset-governance 条件路由` 建立；若测试资产原本散落，还需确认已按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢。
 3. 确认修复后主现象是否消失、异常路径是否符合预期。
 4. 检查是否出现新的明显副作用或未覆盖分支。
-5. 形成通过、驳回或待补测结论；只有 Bug 的关闭所必需验证无法继续且没有替代验证、或修复后出现必须回改的真实问题时，才按 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 在 Bug 根目录创建或引用去重的 `BLK-*`，写明修复计划和重验入口。
+5. 形成通过、驳回或待补测结论；只有 Bug 的关闭所必需验证无法继续且没有替代验证、或修复后出现必须回改的真实问题时，才按 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 在 Bug 主文档创建或引用去重的 `BLK-*`，写明修复计划和重验入口。
 6. 若验证依赖自动化测试或本地环境连接，默认按本地测试处理：只能使用 `local` 环境信息，禁止改动 `test` 配置，禁止连接 `test` / `prod` / `staging` 环境数据库、缓存、消息队列、HTTP/RPC 上游或其他非 local 服务。
 
 ## 默认执行流程
 
 1. 默认先读 `references/validation-checklist.md`，先确认修复验证至少应覆盖哪些内容。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 根目录、入口 `README.md` 和同一 Bug 持续复用同一根目录的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
 3. 如需继续展开，再读 `references/validation-boundaries.md`，需要区分修复验证与功能验证 / 回归验证边界。
 4. 需要对照边界或正反例时，再读 `references/validation-template.md`，需要输出统一修复验证结论模板。
 5. 输出修复验证结论、未覆盖说明、关联测试目录和关闭建议。
-6. 将本轮验证结论写回当前 Bug 根目录。
+6. 将本轮验证结论写回当前 Bug 主文档。
 7. 若发现兼容性和旧能力风险，继续转 `test-regression-rules`；若验证未通过，则回流编码域或 `bug-fix-proposal-rules`。
 
 ## 权责边界与不负责事项
@@ -57,27 +57,27 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 - 修复后主现象虽然消失，但出现新的明显异常。
 - 关键验证条件、环境或样本暂时不具备。
 - 需要关闭问题，但当前只能给出部分验证结论。
-- 当前 Bug 还没有建立统一的 Bug 根目录，或验证记录准备再次散落到其他目录。
+- 当前 Bug 还没有建立统一的 Bug 主文档，或验证记录准备再次散落到其他目录。
 
 ## 执行通过 / 驳回标准
 
-- 通过：能够说明原问题是否已消失、验证覆盖了哪些关键路径、是否存在副作用和未覆盖项，以及是否具备关闭条件；相关结论统一落在当前 Bug 根目录下。
-- 驳回：只说“本地看起来好了”，没有对照原问题、没有记录验证路径和剩余风险，或没有把验证结论继续写回当前 Bug 根目录。
+- 通过：能够说明原问题是否已消失、验证覆盖了哪些关键路径、是否存在副作用和未覆盖项，以及是否具备关闭条件；相关结论统一落在当前 Bug 主文档下。
+- 驳回：只说“本地看起来好了”，没有对照原问题、没有记录验证路径和剩余风险，或没有把验证结论继续写回当前 Bug 主文档。
 
 ## 执行结果归档要求
 
-- 将修复验证结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 根目录中。
-- 当前 Bug 根目录必须包含 `README.md`，至少写明验证环境、验证路径、通过项、未通过项、未覆盖说明和关闭建议。
-- Bug 根目录、入口 `README.md` 和同一 Bug 根目录复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 如果本轮验证依赖测试脚本、测试数据或测试报告，应继续放在中央约定的测试任务目录中，并在当前 Bug 根目录中记录对应测试目录路径。
+- 将修复验证结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- 当前 Bug 主文档至少写明验证环境、验证路径、通过项、未通过项、未覆盖说明和关闭建议。
+- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 如果本轮验证依赖测试脚本、测试数据或测试报告，应继续放在中央约定的测试主文档中，并在当前 Bug 主文档中记录对应测试目录路径。
 - 如果结论为待补测或带风险关闭，必须写明缺口和后续动作。
-- 真实阻断时，Bug 根目录必须包含共享契约的完整“任务阻断收口”，其中解决计划必须包含责任方、完成判据和 Bug 重验入口；`limited`、`not_applicable`、普通待补测和 P2/P3 风险不得创建 `BLK-*`。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对本轮 Bug 验证结论是否已经真实写回当前 Bug 根目录；未落盘不得判定 Bug 修复验证完成。
+- 真实阻断时，Bug 主文档必须包含共享契约的完整“任务阻断收口”，其中解决计划必须包含责任方、完成判据和 Bug 重验入口；`limited`、`not_applicable`、普通待补测和 P2/P3 风险不得创建 `BLK-*`。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules` 核对本轮 Bug 验证结论是否已经真实写回当前 Bug 主文档；未落盘不得判定 Bug 修复验证完成。
 
 ## references 读取规则
 
 - 默认先读 `references/validation-checklist.md`。
-- 在定位当前 Bug 根目录、入口 `README.md` 或判断是否继续复用同一根目录时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 判断与相邻测试 skill 的边界 时，再读 `references/validation-boundaries.md`。
 - 只有在 套用验证结论模板或对照样例 时，再读 `references/validation-template.md`。
 - 输出 Bug 验证结论前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先写修复是否有效和是否可放行，命令、样本和证据进入附录。

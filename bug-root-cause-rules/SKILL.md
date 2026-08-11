@@ -1,6 +1,6 @@
 ---
 name: bug-root-cause-rules
-description: 当开始分析代码、追调用链、看现有日志、查 trace、结合上下游行为定位 Bug 根因时触发。负责通过静态证据收敛根因、统一记录到 Bug 根目录并区分实现问题与设计问题；不要用它代替运行时调试或修复方案制定 skill。
+description: 当开始分析代码、追调用链、看现有日志、查 trace、结合上下游行为定位 Bug 根因时触发。负责通过静态证据收敛根因、统一记录到 Bug 主文档并区分实现问题与设计问题；不要用它代替运行时调试或修复方案制定 skill。
 ---
 
 # Bug 根因定位规则
@@ -11,7 +11,7 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 ## Skill 作用与适用场景
 
 - 通过代码、日志、trace、调用链和上下游行为静态收敛根因。
-- 将静态定位路径、证据链和根因结论统一沉淀到当前 Bug 根目录。
+- 将静态定位路径、证据链和根因结论统一沉淀到当前 Bug 主文档。
 - 区分实现问题、状态问题、依赖问题和设计问题。
 - 给出根因结论或明确承认证据不足。
 - 避免在证据不足时强行下结论。
@@ -22,12 +22,12 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 - 已拿到日志、报错、trace、调用链或关键上下游线索。
 - 需要判断异常是在哪一层、哪个分支、哪次状态转换中产生。
 - 需要在不进入运行时调试的前提下先尝试静态定位。
-- 需要把静态定位过程和结论继续记录到同一个 Bug 根目录中。
+- 需要把静态定位过程和结论继续记录到同一份 Bug 主文档中。
 
 ## 进入后先做什么
 
 1. 先锁定异常现象对应的代码入口和业务链路。
-2. 为当前 Bug 确认统一的根目录，具体路径、目录名和入口文件统一遵循 `artifact-storage-rules`。
+2. 为当前 Bug 确认统一的主文档，具体路径、目录名和入口文件统一遵循 `artifact-storage-rules`。
 3. 再梳理日志、trace、调用链与关键状态路径。
 4. 找出最可能的异常点、错误分支或错误状态转换。
 5. 判断当前证据是否足以形成根因结论；若证据不足（缺代码线索、日志或数据印证），先回流 `bug-intake-rules` 的 `discovery-and-gap` 条件路由主动侦察取证，再回到静态定位。
@@ -35,11 +35,11 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 ## 默认执行流程
 
 1. 默认先读 `references/static-analysis-path.md`，按静态定位路径逐步收敛。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 根目录、入口 `README.md` 和同一 Bug 持续复用同一根目录的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
 3. 如果需要判断根因结论是否成立，再读 `references/root-cause-evidence.md`。
 4. 如果需要判断是否已经到达静态定位极限，再读 `references/when-to-stop-static-analysis.md`。
 5. 输出根因结论、证据链或“证据不足需升级运行时诊断”的结论。
-6. 将本轮静态定位路径、关键证据和结论写回当前 Bug 根目录。
+6. 将本轮静态定位路径、关键证据和结论写回当前 Bug 主文档。
 7. 未形成稳定证据前，不把猜测当根因。
 
 ## 权责边界与不负责事项
@@ -55,25 +55,25 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 - 多个根因假设都成立，静态证据无法排除。
 - 当前链路太长，静态分析已经无法继续有效收敛。
 - 继续静态分析只会重复阅读代码，无法带来新的证据。
-- 当前 Bug 还没有建立统一的 Bug 根目录，导致根因记录可能再次分散。
+- 当前 Bug 还没有建立统一的 Bug 主文档，导致根因记录可能再次分散。
 
 ## 执行通过 / 驳回标准
 
-- 通过：能够给出清晰根因结论和对应证据链，或明确说明静态证据不足并建议升级运行时诊断；相关记录统一落在当前 Bug 根目录下。
-- 驳回：只有主观怀疑，没有证据链；在证据不足时硬性下结论；或根因记录没有继续沉淀到当前 Bug 根目录。
+- 通过：能够给出清晰根因结论和对应证据链，或明确说明静态证据不足并建议升级运行时诊断；相关记录统一落在当前 Bug 主文档下。
+- 驳回：只有主观怀疑，没有证据链；在证据不足时硬性下结论；或根因记录没有继续沉淀到当前 Bug 主文档。
 
 ## 执行结果归档要求
 
-- 将静态定位路径、关键证据、根因结论或证据不足结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 根目录中。
-- 当前 Bug 根目录必须包含 `README.md`，至少写明问题现象、分析入口、关键链路、证据点和当前判断；仅当静态定位尚未闭环、需转运行时诊断或需进入修复方案时，补写必要后续动作。
-- Bug 根目录、入口 `README.md` 和同一 Bug 根目录复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 如果已确认需要升级到运行时诊断，应明确记录为什么静态定位无法继续收敛，并继续沿用同一个 Bug 根目录。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对静态定位路径、证据链和根因结论是否已经真实写回当前 Bug 根目录；未落盘不得判定根因定位完成。
+- 将静态定位路径、关键证据、根因结论或证据不足结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- 当前 Bug 主文档至少写明问题现象、分析入口、关键链路、证据点和当前判断；仅当静态定位尚未闭环、需转运行时诊断或需进入修复方案时，补写必要后续动作。
+- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 如果已确认需要升级到运行时诊断，应明确记录为什么静态定位无法继续收敛，并继续沿用同一份 Bug 主文档。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对静态定位路径、证据链和根因结论是否已经真实写回当前 Bug 主文档；未落盘不得判定根因定位完成。
 
 ## references 读取规则
 
 - 默认先读 `references/static-analysis-path.md`。
-- 在定位当前 Bug 根目录、入口 `README.md` 或判断是否继续复用同一根目录时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估根因证据是否成立时，再读 `references/root-cause-evidence.md`。
 - 只有在判断是否该停止静态分析时，再读 `references/when-to-stop-static-analysis.md`。
 - 回写根因记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先解释已知结论和用户影响，调用链、日志、文件位置和证据进入附录。

@@ -80,7 +80,7 @@ description: 当研发任务已经进入需求、Bug、编码、审查、测试�
 ## 执行结果归档要求
 
 - 如果 gap 属于阻断级、会影响多个任务重复命中，或需要后续正式修改 skill，默认在 `artifact-storage-rules` 约定的项目文档根目录中留存一份 skill 完善建议。
-- 如果当前已有需求主文档、Bug 根目录或测试主说明，也应在对应主记录中简要写明“当前任务因哪个 skill 缺口被阻断 / 被提醒回补”。
+- 如果当前已有需求主文档、Bug 主文档或测试主说明，也应在对应主记录中简要写明“当前任务因哪个 skill 缺口被阻断 / 被提醒回补”。
 - 归档内容至少包含当前任务、目标 skill、缺口类型、阻断级别、建议修改文件、建议修改内容、验收方式和恢复执行点。
 - 项目文档根目录和当前主任务记录的复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 

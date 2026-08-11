@@ -409,7 +409,7 @@ doc/6-review/2026-07-08_101500_稳定币费率修复_6-review.md
 ```text
 src/modules/order/create-order.ts
 src/modules/order/create-order.spec.ts
-doc/5-tests/2026-07-08_102300_订单创建回归/测试记录.md
+doc/5-tests/2026-07-08_102300_订单创建回归.md
 ```
 
 仍然尝试一次提交。

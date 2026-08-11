@@ -15,7 +15,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
 - 注释链只消费 `comment-completion-gate-rules` 的 PASS/FAIL；该 PASS 必须包含其对 `comment-placement-granularity-rules` 的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
-- 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留 README、日志、报告和非可执行证据；同时核验补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
+- 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留扁平测试主文档、日志、报告和非可执行证据内联在其正文；同时核验补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
 - Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和 seam 细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
 - 只产出专项闸门 PASS/FAIL 与证据；最终输出和后续内容统一由 `reasoning-summary-structure-rules` 渲染。
 

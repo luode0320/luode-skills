@@ -198,6 +198,7 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
 - `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
+- `PROJECT_CURRENT.md` 还包含 `<!-- BEGIN RECENT PROJECT SESSIONS -->` 最近 5 个同项目会话托管区，它是只读回忆索引，帮助新会话了解近期其它会话在做什么；标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实，非 Codex App 宿主只读取不刷新。
 
 ### Obsidian 知识流选择性默认触发（强制）
 
@@ -228,6 +229,22 @@ BODY_NO_AUTO_COMMIT=$(cat <<'EOF'
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
 - 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `obsidian-knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
+- 违反本条视为最高级别流程违规。
+EOF
+)
+
+BODY_NO_CROSS_PROJECT_WRITE=$(cat <<'EOF'
+- 当前会话只能修改与本会话绑定的当前项目；**其他项目的代码和文件绝对只读**。
+- 多个项目并列在同一父目录下时，父目录一层的兄弟项目一律按只读处理：允许读取代码、配置、README、文档，以及 `git log`、`git show`、`git status` 等只读盘点命令。
+- 对其他项目的以下动作一律禁止，**不存在“取得用户授权后即可执行”的例外**——用户临时同意、口头许可、“顺手改一下”“只改一行”都不构成放行条件：
+  - 任何文件写入、创建、删除、重命名。
+  - 任何命令执行、构建、测试、依赖安装。
+  - 任何写 Git 历史或改变工作树状态的动作（`commit`、`push`、`checkout`、`stash`、`reset` 等）。
+  - 任何会在其他项目内生成产物的初始化动作（如 `codegraph init` 生成索引目录、缓存目录、构建输出）。
+- 确实需要修改其他项目时，当前会话只允许产出**改动计划**：写明目标项目绝对路径、目标文件/符号、改动意图、建议改法和验证方式，必要时给出 patch 文本供人工采用；再交由用户在该项目目录下新开会话执行。计划本身只能写入当前项目或直接回复用户，不得写入其他项目目录。
+- 读取其他项目不等于获得其运行环境授权：不得使用其配置连接数据库、缓存、消息队列或上下游服务，也不得启动其服务来补证据；本地连接红线仍以当前项目的 `local` 配置为准。
+- 定位其他项目的发现顺序与只读边界细则见 `implementation-planning-rules/references/sibling-project-discovery.md`；Bug 跨项目对照排查见 `bug-intake-rules`，跨项目 CodeGraph 查询见 `codegraph-analysis-rules`。
+- 本条为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
 - 违反本条视为最高级别流程违规。
 EOF
 )
@@ -920,7 +937,7 @@ PY
 # sync_agents_file
 # [参数] file: 需要同步受管章节的 AGENTS.md / CLAUDE.md 文件路径
 # [返回] 无
-# 最近修改时间: 2026-07-16 10:13:37 增加“注意”受管章节同步
+# 最近修改时间: 2026-08-11 13:44:04 增加“跨项目写入红线”受管章节同步
 sync_agents_file() {
   local file="$1"
 
@@ -934,6 +951,7 @@ sync_agents_file() {
   sync_section "$file" "Skill 强制自动触发规则（最高优先级）" "$BODY_SKILL_AUTO"
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"
+  sync_section "$file" "跨项目写入红线（最高优先级，强制）" "$BODY_NO_CROSS_PROJECT_WRITE"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
   sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"
   sync_section "$file" "Karpathy 风格硬闸门" "$BODY_KARPATHY_HARD_GATES"

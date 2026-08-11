@@ -983,3 +983,4 @@ claude-mem(记忆) :
 2026-08-11 10:46:10 docs: [字典同步] 登记新增reference文件sibling-project-discovery.md
 2026-08-11 14:56:42 docs: [Bug与测试文档扁平化] 归档6-review
 2026-08-11 14:57:30 test: [Bug与测试文档扁平化] 新增发布测试布局回归并同步资产治理测试
+2026-08-11 14:58:05 feat: [Bug与测试文档扁平化] path-map升级v9并同步全部消费Skill

@@ -1,6 +1,6 @@
 ---
 name: bug-fix-proposal-rules
-description: 当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发；公共方法、共享模块、接口、数据库、缓存、兼容性、异常语义或历史能力变化的高影响修复自动进入 `#regression-risk` 条件路由。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 根目录；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。
+description: 当问题已定位，需要形成修改建议、风险评估、备选方案并判断是否应等待用户确认时触发；公共方法、共享模块、接口、数据库、缓存、兼容性、异常语义或历史能力变化的高影响修复自动进入 `#regression-risk` 条件路由。负责把 Bug 域稳定交接到编码域，并统一记录到 Bug 主文档；修复方案必须针对根因、从源头消除问题，拒绝打补丁式修复（表层特判绕过、try-catch 吞异常、对坏数据兜底而不修源头、堆叠 if 特判等）。不要用它代替根因定位或直接实施编码修复。
 ---
 
 # Bug 修复建议规则
@@ -13,7 +13,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 - 把定位结果整理成可执行的修改建议。
 - 评估修改范围、风险点、回归影响和备选方案。
 - 判断当前问题是否必须先等用户确认，还是可以直接进入编码。
-- 将修复建议、风险评估和确认结论统一沉淀到当前 Bug 根目录。
+- 将修复建议、风险评估和确认结论统一沉淀到当前 Bug 主文档。
 - 作为 Bug 域到编码域的稳定交接层。
 
 ## 自动触发信号
@@ -22,12 +22,12 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 - 修改方案可能影响公共模块、共享逻辑、数据库行为或兼容性。
 - 需要比较多个修复方向的风险和代价。
 - 需要明确哪些情况应先给建议、等确认后再编码。
-- 需要把修复建议继续记录到同一个 Bug 根目录中，避免和前序定位记录分散。
+- 需要把修复建议继续记录到同一份 Bug 主文档中，避免和前序定位记录分散。
 
 ## 进入后先做什么
 
 1. 先确认根因结论是否足够稳定。
-2. 为当前 Bug 确认统一的根目录，具体路径、目录名和入口文件统一遵循 `artifact-storage-rules`。
+2. 为当前 Bug 确认统一的主文档，具体路径、目录名和入口文件统一遵循 `artifact-storage-rules`。
 3. 列出至少一个主修复方案和必要的影响面。
 4. 如果存在明显替代路线，也列出备选方案。
 5. 判断当前方案是否必须先经用户确认。
@@ -35,11 +35,11 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 ## 默认执行流程
 
 1. 默认先读 `references/fix-proposal-template.md`，按统一模板组织修复建议。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 根目录、入口 `README.md` 和同一 Bug 持续复用同一根目录的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
 3. 如果需要判断风险和影响范围，再读 `references/risk-assessment-checklist.md`。
 4. 如果需要判断何时必须等确认、何时可以直接编码，再读 `references/confirm-before-coding.md`。
 5. 输出主方案、备选方案、风险点、影响范围、验证方式和确认建议。
-6. 将本轮修复建议和确认结论写回当前 Bug 根目录。
+6. 将本轮修复建议和确认结论写回当前 Bug 主文档。
 7. 在确认条件未满足前，不直接进入编码实施。
 
 ## 条件路由：regression-risk
@@ -50,7 +50,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 2. 阅读 `references/regression-risk/risk-dimensions.md`，识别接口兼容、数据行为、共享逻辑与业务流程风险。
 3. 阅读 `references/regression-risk/risk-ranking-and-scope.md`，按影响范围、历史兼容和可验证性给出高、中、低风险等级与分级依据。
 4. 必要时用 `references/regression-risk/risk-examples.md` 校准风险，避免把所有可能性都误列为高风险。
-5. 将改动点、影响对象、风险等级、分级依据、高风险验证重点、已知风险与补救安排写入同一 Bug 根目录；旧能力回归交给 `test-regression-rules`，修复关闭交给 `bug-validation-rules`。
+5. 将改动点、影响对象、风险等级、分级依据、高风险验证重点、已知风险与补救安排写入同一份 Bug 主文档；旧能力回归交给 `test-regression-rules`，修复关闭交给 `bug-validation-rules`。
 
 若影响范围证据不足、高风险路径没有 local 验证条件，或方案尚未确定，则暂停并补齐证据；风险分析不替代根因定位、修复决策或实际回归验证。
 
@@ -58,7 +58,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 
 修复必须针对根因，从源头消除问题，而不是在表层"贴补丁"让症状消失。
 
-**以下属于打补丁式修复，默认禁止（除非有充分理由并在 Bug 根目录记录）：**
+**以下属于打补丁式修复，默认禁止（除非有充分理由并在 Bug 主文档记录）：**
 
 - 在调用方 / 上层加 `if` 特判绕过异常，而不修产生问题的源头
 - 用 `try-catch` 吞掉异常或错误返回，让问题"看起来好了"，但根因还在
@@ -92,25 +92,25 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 - 方案会影响数据库结构、接口契约或已有流程。
 - 存在两个以上方案且代价差异明显，需要用户决策。
 - 根因修复需要较大重构（超出当前 Bug 范围），不能用打补丁绕过、又不宜直接大改时，先提方案等确认。
-- 当前 Bug 还没有建立统一的 Bug 根目录，导致修复建议与前序定位记录可能再次分散。
+- 当前 Bug 还没有建立统一的 Bug 主文档，导致修复建议与前序定位记录可能再次分散。
 
 ## 执行通过 / 驳回标准
 
-- 通过：能明确给出主方案、影响范围、风险点、验证方式，以及是否需要确认；方案针对根因、能从源头消除问题并说明同类问题不会从别处复现；相关结论统一落在当前 Bug 根目录下。
-- 驳回：方案仍停留在口号层，如“改一下这里看看”，完全不说明风险、范围和验证方法；或属于打补丁式修复（表层特判绕过、吞异常、对坏数据兜底而不修源头、堆叠 if 特判）却未说明为何不修根因；或没有把修复建议继续写回当前 Bug 根目录。
+- 通过：能明确给出主方案、影响范围、风险点、验证方式，以及是否需要确认；方案针对根因、能从源头消除问题并说明同类问题不会从别处复现；相关结论统一落在当前 Bug 主文档下。
+- 驳回：方案仍停留在口号层，如“改一下这里看看”，完全不说明风险、范围和验证方法；或属于打补丁式修复（表层特判绕过、吞异常、对坏数据兜底而不修源头、堆叠 if 特判）却未说明为何不修根因；或没有把修复建议继续写回当前 Bug 主文档。
 
 ## 执行结果归档要求
 
-- 将修复建议、影响范围、风险评估、确认结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 根目录中。
-- 当前 Bug 根目录必须包含 `README.md`，至少写明根因摘要、主方案、备选方案、风险点、验证方式和确认结论；仅当仍存在未完成的修复、验证或确认动作时，补写必要后续动作。
-- Bug 根目录、入口 `README.md` 和同一 Bug 根目录复用策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 如果明确结论是“可直接进入编码”，也要保留该判断依据，并继续沿用同一个 Bug 根目录进入后续修复与验证。
-- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对主方案、备选方案、风险评估和确认结论是否已经真实写回当前 Bug 根目录；未落盘不得判定修复建议阶段完成。
+- 将修复建议、影响范围、风险评估、确认结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- 当前 Bug 主文档至少写明根因摘要、主方案、备选方案、风险点、验证方式和确认结论；仅当仍存在未完成的修复、验证或确认动作时，补写必要后续动作。
+- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 如果明确结论是“可直接进入编码”，也要保留该判断依据，并继续沿用同一份 Bug 主文档进入后续修复与验证。
+- 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对主方案、备选方案、风险评估和确认结论是否已经真实写回当前 Bug 主文档；未落盘不得判定修复建议阶段完成。
 
 ## references 读取规则
 
 - 默认先读 `references/fix-proposal-template.md`。
-- 在定位当前 Bug 根目录、入口 `README.md` 或判断是否继续复用同一根目录时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估影响范围和风险时，再读 `references/risk-assessment-checklist.md`。
 - 只有在判断是否必须先确认时，再读 `references/confirm-before-coding.md`。
 - 输出修复建议前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先交代推荐修复、风险和完成结果，技术方案比较和证据进入附录。

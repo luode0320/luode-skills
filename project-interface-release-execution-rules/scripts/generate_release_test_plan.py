@@ -780,10 +780,14 @@ def filter_test_interfaces(inventory: List[Dict], changed_modules: List[str], in
     }
 
 
-def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
-    task_root.mkdir(parents=True, exist_ok=True)
-    chinese_dir = task_root / title
-    ascii_dir = task_root / "ascii-artifacts"
+def ensure_release_task_root(artifacts_root: Path, doc_path: Path) -> Dict[str, str]:
+    """初始化上线接口测试的双落点骨架：doc 中文主报告 + 根 test 机器产物。
+
+    [参数] artifacts_root：机器产物根（`test/release-artifacts/<时间戳>_release-interface-test`）；doc_path：`doc/5-tests/` 下的扁平中文主报告 md。
+    [返回] Dict[str, str]：中文主报告与各机器产物的绝对路径映射。
+    最近修改时间：2026-08-11；改动原因：doc/5-tests 收敛为扁平 md，机器产物移出 doc/。
+    """
+    ascii_dir = artifacts_root
     artifacts_dir = ascii_dir / "artifacts"
     logs_dir = artifacts_dir / "logs"
     raw_request_dir = artifacts_dir / "raw-request"
@@ -798,8 +802,8 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
     results_path = ascii_dir / "interface-test-results.md"
     execute_log_path = logs_dir / "execute.log"
 
+    doc_path.parent.mkdir(parents=True, exist_ok=True)
     for directory in (
-        chinese_dir,
         ascii_dir,
         artifacts_dir,
         logs_dir,
@@ -812,16 +816,16 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
     ):
         directory.mkdir(parents=True, exist_ok=True)
 
-    readme_path = chinese_dir / "README.md"
-    if not readme_path.exists():
-        readme_path.write_text(
+    if not doc_path.exists():
+        doc_path.write_text(
             "\n".join(
                 [
                     "# 上线前项目接口测试",
                     "",
                     "## 说明",
                     f"- 创建时间：{utc_now_str()}",
-                    "- 当前目录用于承接项目级上线接口测试门禁。",
+                    "- 本文件是本轮上线接口测试的唯一中文主报告，结论、样本和证据全部内联在正文。",
+                    f"- 机器产物根：`{ascii_dir.as_posix()}`，其中的 YAML/JSON/日志会被后续命令回读，不内联进本文件。",
                     "- 若本次为冷启动，请在此记录扫描来源、对账结果与待确认项。",
                 ]
             ),
@@ -913,9 +917,8 @@ def ensure_release_task_root(task_root: Path, title: str) -> Dict[str, str]:
         execute_log_path.write_text("", encoding="utf-8")
 
     return {
-        "task_root": str(task_root),
-        "readme": str(readme_path),
-        "ascii_dir": str(ascii_dir),
+        "artifacts_root": str(artifacts_root),
+        "doc": str(doc_path),
         "logs_dir": str(logs_dir),
         "dependency_trace_dir": str(dependency_trace_dir),
         "resolved_params_dir": str(resolved_params_dir),
@@ -1320,8 +1323,9 @@ def command_generate_plan(args: argparse.Namespace) -> None:
 def command_init_release_test_task(args: argparse.Namespace) -> None:
     if _delegate_legacy_command("init-release-test-task", args):
         return
-    task_root = Path(args.task_root).resolve()
-    result = ensure_release_task_root(task_root, args.title)
+    artifacts_root = Path(args.artifacts_root).resolve()
+    doc_path = Path(args.doc).resolve()
+    result = ensure_release_task_root(artifacts_root, doc_path)
     print_json({"mode": "init-release-test-task", **result})
 
 
@@ -1796,9 +1800,9 @@ def build_parser(*, include_external_scenarios: bool = False) -> argparse.Argume
     generate_parser.add_argument("--output", default="release-test-plan.yaml", help="输出测试计划文件路径")
     generate_parser.set_defaults(func=command_generate_plan)
 
-    init_parser = subparsers.add_parser("init-release-test-task", help="初始化上线前接口测试任务目录骨架")
-    init_parser.add_argument("--task-root", required=True, help="测试任务时间戳根目录路径")
-    init_parser.add_argument("--title", default="上线前项目接口测试", help="中文说明目录名")
+    init_parser = subparsers.add_parser("init-release-test-task", help="初始化上线前接口测试的中文主报告与机器产物骨架")
+    init_parser.add_argument("--artifacts-root", required=True, help="机器产物根路径，例如 test/release-artifacts/2026-08-11_101500_release-interface-test")
+    init_parser.add_argument("--doc", required=True, help="中文主报告路径，例如 doc/5-tests/2026-08-11_101500_上线前项目接口测试.md")
     init_parser.set_defaults(func=command_init_release_test_task)
 
     baseline_parser = subparsers.add_parser("init-baseline-assets", help="初始化项目上线测试长期基线资产库")

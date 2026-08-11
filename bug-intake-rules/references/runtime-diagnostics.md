@@ -10,7 +10,7 @@
 
 ## 路由与产物
 
-1. 先阅读 [公共契约](bug-lifecycle-common-contract.md)：只使用 local 配置，诊断以只读为先，临时资产必须可清理并归档到同一 Bug 根目录。
+1. 先阅读 [公共契约](bug-lifecycle-common-contract.md)：只使用 local 配置，诊断以只读为先，临时资产必须可清理并归档到同一份 Bug 主文档。
 2. 按 [进入条件](runtime-diagnostics-bug-runtime-debug-rules-runtime-entry-conditions.md) 明确假设、观察点与退出条件，再选择 [观察手段](runtime-diagnostics-bug-runtime-debug-rules-runtime-observation-methods.md)。
 3. 临时断言遵循 [断言进入条件](runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-entry-conditions.md) 与 [放置规则](runtime-diagnostics-bug-assertion-diagnostic-rules-assertion-placement.md)；临时日志遵循 [日志放置规则](runtime-diagnostics-bug-debug-log-rules-debug-log-placement.md) 与 [清理规则](runtime-diagnostics-bug-debug-log-rules-debug-log-cleanup.md)。
 4. 按 [退出与交接](runtime-diagnostics-bug-runtime-debug-rules-runtime-exit-and-handoff.md) 记录观察证据、已缩小范围与清理结果，并回流 `bug-root-cause-rules` 或后续生命周期入口。

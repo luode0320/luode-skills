@@ -240,8 +240,12 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
     root = Path(options.get("project_root", ".")).resolve()
     output_dir = options.get("output_dir", output_dir)
     default_output = "output_dir" not in options and str(output_dir) == "doc/5-tests"
+    # 默认布局下中文主报告是 doc/5-tests/ 的扁平 md，机器产物移出 doc/ 落到根 test/release-artifacts/。
+    doc_report_path: Path | None = None
     if default_output:
-        output_dir = Path(output_dir) / f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_上线前项目接口测试"
+        stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        doc_report_path = root / "doc" / "5-tests" / f"{stamp}_上线前项目接口测试.md"
+        output_dir = root / "test" / "release-artifacts" / f"{stamp}_release-interface-test"
     environment = str(options.get("environment", environment))
     baseline_path = options.get("baseline_path", baseline_path)
     baseline_root = options.get("baseline_root", baseline_root)
@@ -474,7 +478,7 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
         interfaces=[item.to_dict() for item in discovery.interfaces],
         dependency_graph=graph,
         environment=environment,
-        canonical_layout=default_output,
+        doc_report_path=doc_report_path,
         baseline_summary={
             "updated": baseline_projection is not None,
             "projection_status": "PASS" if baseline_projection is not None else "not_requested",
@@ -498,7 +502,7 @@ def run_pipeline(project_root: str | Path | Mapping[str, Any], *, output_dir: st
         # 4.1 只有正式报告完成脱敏复核后才投影 baseline，避免先写入可放行的错误结论。
         baseline_projection = project_execution_to_baseline(baseline_path, run_id, gate, interfaces=[item.to_dict() for item in discovery.interfaces], dependency_graph=graph, results=judged)
         artifacts = write_report(
-            output_dir, judged, gate, run_id=run_id, interfaces=[item.to_dict() for item in discovery.interfaces], dependency_graph=graph, environment=environment, canonical_layout=default_output,
+            output_dir, judged, gate, run_id=run_id, interfaces=[item.to_dict() for item in discovery.interfaces], dependency_graph=graph, environment=environment, doc_report_path=doc_report_path,
             baseline_summary={"updated": True, "projection_status": "PASS", "path": str(baseline_path), "event_count": len(baseline_projection.get("events", [])), "latest_gate": baseline_projection.get("latest_gate", {})},
             sync_metadata=sync_metadata, runtime_matrix={"strict_fixture": strict_fixture, "strict_contracts": strict_contracts, "interfaces": [item.to_dict() for item in discovery.interfaces]}, scenario_results=scenario_results, dual_gate_diff=dual_gate_diff,
         )

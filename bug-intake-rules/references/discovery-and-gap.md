@@ -10,7 +10,7 @@
 
 ## 路由与产物
 
-1. 先阅读 [公共契约](bug-lifecycle-common-contract.md)，确认只使用 local 配置、只读侦察、同一 Bug 根目录归档与停止边界。
+1. 先阅读 [公共契约](bug-lifecycle-common-contract.md)，确认只使用 local 配置、只读侦察、同一份 Bug 主文档归档与停止边界。
 2. 按 [侦察清单](discovery-and-gap-bug-discovery-rules-discovery-checklist.md) 收集可验证事实；数据证据按 [只读取证规则](discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md) 执行。
 3. 用 [领域路由](discovery-and-gap-bug-discovery-rules-bug-domain-routing.md) 决定交给复现、根因、运行时诊断或用户补充；输出采用 [结论模板](discovery-and-gap-bug-discovery-rules-output-template.md)。
 4. 只有主动侦察后仍缺少不可替代信息时，才使用 [缺口信号](discovery-and-gap-bug-gap-rules-blocking-signals.md) 和 [缺口清单](discovery-and-gap-bug-gap-rules-gap-checklist.md) 向用户提出最小问题。

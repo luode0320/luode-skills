@@ -3,9 +3,9 @@
 ## 真实路径镜像基线
 
 - 所有活动测试资产落在根 `test/`，按被测源码目录镜像；源码 `internal/service/history_client.go` 的测试为 `test/internal/service/history_client_test.go`，其源码专属模拟程序为同目录下的 `history_client_mock.*`、`history_client_stub.*` 或 `history_client_fake.*`。
-- 单文件测试用 `<名称>_test.<ext>`；目录级测试以被测模块目录镜像并在 README 列出被测文件；mock、stub、fake、fixture、数据构造和 helper 默认使用同一源码镜像目录。
+- 单文件测试用 `<名称>_test.<ext>`；目录级测试以被测模块目录镜像并在测试主文档列出被测文件；mock、stub、fake、fixture、数据构造和 helper 默认使用同一源码镜像目录。
 - `test/shared/` 仅用于不归属于单一源码路径、且已被多个测试域稳定复用的共享模拟或辅助能力；源码专属 mock、stub、fake 不得放入共享目录。
-- `doc/5-tests/YYYY-MM-DD_HHmmss_<任务主题>/README.md` 仅保留目的、命令、样本和结论，`evidence/` 与 `artifacts/` 承接日志、报告、截图、脱敏响应等非可执行产物；不得放置测试程序或模拟程序。
+- `doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md` 仅保留目的、命令、样本和结论，日志、报告、截图和脱敏响应等非可执行产物以代码围栏内联进同一份正文；不得放置测试程序或模拟程序。
 
 ## 程序职责
 

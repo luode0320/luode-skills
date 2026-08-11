@@ -15,7 +15,7 @@
 
 ## 不属于测试程序域
 
-- 中文说明目录中的 `README.md`
+- `doc/5-tests/` 中的扁平测试主文档
 - 一次性排障脚本、临时打印日志、临时断言、手工定位代码
 - 联调阶段为排查环境问题写的短期验证脚本
 - 生产代码里的通用工具、业务服务、正式运行时逻辑
@@ -28,6 +28,6 @@
 - 测试辅助逻辑不得直接塞进生产 `utils`、`common`、`service` 目录。
 - 正式测试程序、mock、stub、fake、模拟程序和验证脚本必须跟随 `test-strategy-rules 的 test-asset-governance 条件路由`，统一落在根 `test/` 的 ASCII 真实代码路径镜像中；模拟程序必须与对应测试程序保持同一源码相对路径，跨源码共享能力才可进入 `test/shared/`；若涉及 Go 可编译路径，还必须同步遵循本 skill《Go 测试编译路径（强制）》节。
 - Go 白盒诉求也必须遵循同一落点规则；不得通过源码目录同包 `*_test.go` 绕开。
-- `doc/5-tests/` 的时间戳说明目录只保留 README、证据和非可执行产物，不承载任何真实测试代码、mock、stub、fake、fixture 或模拟服务程序。
+- `doc/5-tests/` 的时间戳测试主文档只保留扁平测试主文档，证据和非可执行产物内联进正文，不承载任何真实测试代码、mock、stub、fake、fixture 或模拟服务程序。
 - 如果本质是目录归属错误，应回流 `test-strategy-rules 的 test-asset-governance 条件路由`、`test-strategy-rules 的 test-asset-governance 条件路由` 或 `code-style-consistency-rules`。
 - 第三方 API 响应结构未知时，先通过探测脚本取样并沉淀证据；若仍不明确，暂停并向用户索要响应结构说明。
