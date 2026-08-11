@@ -7,3 +7,5 @@
 - `src/common/` 放项目级结构；业务域模型进入 `src/modules/<domain>/model/`。
 - React 仅创建 `hooks/`，Vue 仅创建 `composables/`；`pages/` 与 `views/` 只选一套。
 - `public/` 放原样公开文件，`src/assets/` 放参与打包的资源，两者不得重复同一资产。
+
+- src/ 与 src/modules/<domain>/ 同样按「统一规范 + 受控扩展」处理：未在目录树中列出的目录允许存在，新增须用户确认，且不得代替规范目录职责。public/ 与 src/assets/ 不重复、hooks//composables/ 二选一、pages//iews/ 二选一等既有红线不变。

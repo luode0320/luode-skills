@@ -27,6 +27,7 @@
 - Go、Java、Node.js、Python 的 `<source-root>` 物理位置和 `init` 参数由 `placement_catalog.py query --artifact business-rpc` 返回。
 - 根 `contract/` 不再是微业务通信目录，也不应作为迁移兼容层继续创建。
 
+> 域内九类是统一规范子目录，允许其他域私有目录存在，新增须用户确认，且不得代替规范目录职责。
 ## 依赖方向
 
 | 起点 | 终点 | 结论 | 原因 |
@@ -34,7 +35,7 @@
 | `business/A` | `business/B/rpc` | 允许 | B 对外公开的 JSON 字符串通信入口。 |
 | `business/A` | 根 `common/` 五类目录 | 允许 | 稳定公共请求、响应、常量、错误与校验结构。 |
 | `business/A` | 根 `global/` 的非业务运行引用 | 条件允许 | 仅配置、日志、数据库连接和技术客户端等已装配能力。 |
-| `business/A` | `business/B/{api,service,entity,base,constant,init,crontask,util}` | 禁止 | 目标业务私有实现，必须改走 B 的 `rpc/`。 |
+| `business/A` | `business/B/` 下除 `rpc/` 外的任何目录（含规范外扩展目录） | 禁止 | 目标业务私有层，必须改走 B 的 `rpc/`。 |
 | `global/` | 任意 `business/*` | 禁止 | 全局引用层不能成为业务状态或业务数据的隐式通道。 |
 
 ## Go 例子

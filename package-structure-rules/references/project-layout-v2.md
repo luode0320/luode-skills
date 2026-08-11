@@ -2,6 +2,19 @@
 
 目录标记：`[必需·提交]`、`[条件·提交]`、`[生成·忽略]`、`[运行·忽略]`。条件目录仅在项目真实启用对应能力时创建。
 
+## 统一规范目录与扩展目录
+
+1. **规范目录的含义**：目录树列出的目录名称、职责与落点是统一规范。凡命中这些语义的代码必须落到对应规范目录，不得新建同义别名目录（如 `svc/`、`ctrl/`、`handler/`、`biz/`、`dao/`）绕开规范。
+2. **目录树是规范集合，不是白名单穷举**：`<source-root>/`、`business/<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录；存量规范外目录不判违规，也不强制迁移。
+3. **新增规范外目录的确认闸门（强制）**：agent 新增任何不属于目录树规范的目录前，必须先向用户说明目录名、职责、为什么无法落到规范目录，并取得**当前轮显式同意**；未取得同意时只能落到规范目录或停下来询问，不得以"看起来更合理""顺手建一个"为由自行创建。
+4. **扩展目录准入四条**（同意后仍须全部满足）：
+   - 不落在 `forbidden_paths`（根 `data/`、`schema/`、`protocol/`、源码根 `util/`、`infrastructure/` 等）；
+   - 不位于 `allowed_children` 已声明父目录下（`config/`、`database/model/`、`database/sql/`、`common/`、`scripts/`、`deploy/`、`integration/`、`utils/discovery/` 的子目录集合仍封闭）；
+   - 不与任何规范目录职责重复，也不是规范目录的同义别名；
+   - 创建后按 `architecture-doc-rules` 更新 `doc/1-架构/2-目录树.md`。
+5. **扩展目录不获得引用特权**：跨业务域导入仍只允许目标域 `rpc/`；业务域内除 `rpc/` 外的**任何**目录（含扩展目录）都是私有层。
+6. **Catalog 边界**：`placement_catalog.py query` 只对规范目录返回唯一位置；扩展目录不进入 Catalog、不由 `init` 创建、`check` 也不为其背书。
+
 ## 旧项目渐进采纳
 
 本目录树是新项目和新独立逻辑的 V2 目标结构；旧项目通过 `doc/1-架构/3-目录规则收敛清单.yaml` 逐步采纳，不自动迁移用户目录或文件。
@@ -288,6 +301,8 @@
 
 三类项目的活动测试程序、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
 
+`<source-root>/`、`business/<domain>/` 和后端项目根未在目录树中列出的其他目录按「统一规范目录与扩展目录」规则处理（见上节）。
+
 ## 前端独立项目
 
 ```text
@@ -411,3 +426,5 @@
 ```
 
 前端不建立 `src/config/` 或任意 `schema/`。`public/` 与 `src/assets/` 不得复制资源；React 只用 `hooks/`，Vue 只用 `composables/`。前端根的 `AGENTS.md` 与 `CLAUDE.md` 必须同时提交且正文完全一致。
+
+前端 `src/` 与 `src/modules/<domain>/` 未在目录树中列出的其他目录按「统一规范目录与扩展目录」规则处理（见上节）。

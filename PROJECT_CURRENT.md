@@ -3,19 +3,9 @@
 ## 更新时间
 
 - 2026-08-11
-- 来源对象：REQ-FLATDOC-20260811-001 / CYCLE-FLATDOC-01..05
-- 当前目标：把 doc/4-bugs 与 doc/5-tests 的产物形态统一为扁平 md，与 doc/2-需求、doc/6-review 同构
-- 当前状态：五个周期全部完成。path-map.yaml 升到 v9，Bug 域 30 个文件与测试域 26 个文件术语收敛，上线接口测试引擎机器产物移出 doc/ 落到 test/release-artifacts/。新增 8 个用例全通过；根 test/ 逐目录全量回归改动前后失败数一致（4 个目录的失败均为既有问题）；历史零污染核验为空；字典刷新退出码 0；6-review 文档 style_regression profile valid: true，STYLE: PASS。改动停在已改动未提交状态。
-
-- 2026-08-10
-- 来源对象：CYCLE-CUR-RECENT-02 / PROJECT_CURRENT 最近会话记忆
-- 当前目标：完成最近5个同项目会话快照的全量收口，包括bootstrap模板、规则文件、PROJECT_CURRENT迁移、测试和文档门禁
-- 当前状态：CYCLE-01 和 CYCLE-02 文档门禁 PASS；TASK-08/09/10 已完成，TASK-11 全量测试与收口已通过；skill 字典刷新退出码 0；投影落盘并同步 update_plan；改动停在已改动未提交状态。
-
-- 2026-08-09
-- 来源对象：REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001
-- 当前目标：落实“允许凭据有意持久化、禁止过程性输出回显”的规则与测试边界。
-- 当前状态：实现与专项验证已完成；bootstrap、Git gate、四条 Catalog query 和五档工程文档 profile 通过。配置回归保留 8 项既有 `source_policy`/互斥目录断言失败，未新增同类失败；改动停在已改动未提交状态。
+- 来源对象：REQ-TREE-OPEN-EXT-001 / CYCLE-TREE-OPEN-EXT-01
+- 当前目标：目录树规范从「封闭枚举」改为「统一规范 + 受控扩展」
+- 当前状态：CYCLE-01 全部 5 个最小任务完成。package-structure-rules 与 micro-business-architecture-rules 共 9 个文件封闭枚举改为开集表述，project-layout-v2.md 新增「统一规范目录与扩展目录」统一定义；grep 封闭枚举残留为空，字典 diff 仅时间戳，UTF-8 无乱码。改动停在已改动未提交状态。
 ## 已完成
 
 ## 已完成

@@ -6,6 +6,7 @@
 - 2026-08-08：需求文档 REQ-PSR-MOCK-UPGRADE-001 的 Mermaid 图前注释修复（图形目的 + 关联 ID），requirement profile 校验 PASS。改动停在已改动未提交状态。
 
 # 项目历史事件
+- 2026-08-11：完成目录树规范语义纠偏（CYCLE-TREE-OPEN-EXT-01）。package-structure-rules 与 micro-business-architecture-rules 共 9 个文件的封闭枚举改为开集表述，project-layout-v2.md 新增「统一规范目录与扩展目录」统一定义；grep 封闭枚举残留为空，字典 diff 仅时间戳，UTF-8 无乱码；改动停在已改动未提交状态。
 
 > 本文件追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；普通启动默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
 

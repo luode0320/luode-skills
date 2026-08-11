@@ -21,14 +21,16 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 
 1. 同仓根仅保存工作区资产、`integration/` 和 `doc/`；后端、前端业务资产分别留在其独立项目中。
 2. 后端根级唯一位置：`config/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`；不建立根 `data/`。后端 `config/` 根直接存放 `load.<ext>`（配置加载与解析）与 `model.<ext>`（配置结构定义），`config/embedded/` 与 `config/yaml/` 只存放配置数据，且两者互斥——只能二选一，优先使用 `config/embedded/`。`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
+后端项目根未列举且不在禁止清单的中性目录允许存在，新增需用户确认。
 3. 前后端同仓、独立后端、独立前端的项目根均固定提交 `Dockerfile`、`AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在确有长期风格时创建并提交。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取；目录规则只负责其位置、初始化、查询和只读一致性检查，具体正文结构由项目规则、项目记忆与项目风格 Owner 管理。
 4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`、`util/`；`common/util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录，不承载业务流程。
-6. 后端语言源码根只承载 `router/`、`controller/`、`business/<domain>/`；项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域内部只使用 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。
+6. 后端语言源码根的统一规范目录是 `router/`、`controller/`、`business/<domain>/`；未列出且不在禁止清单的其他目录允许存在，新增须用户确认，且不得作为规范目录的别名。项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域内部统一规范目录为 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。业务域内未列出的其他目录允许存在，新增须用户确认。业务域内除 `rpc/` 外的**任何**目录（含扩展目录）都是私有层。
 7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、业务源码内独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`；仓库根 `test/` 是唯一活动测试代码根，不属于生产包结构。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
 10. 二进制入口按项目类型固定：独立后端默认使用根 `main.<ext>`，额外二进制使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端默认使用 `backend/main.<ext>`，额外二进制使用 `backend/cmd/<binary>/main.<ext>`。`cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 均不是合法入口；`init` 不创建动态入口 pattern。
+11. 目录树是规范集合，不是白名单穷举：`<source-root>/`、`business/<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录，新增须用户明确确认，并满足扩展目录准入四条（见 `project-layout-v2.md` 统一规范目录与扩展目录节）。`forbidden_paths`、`allowed_children` 已声明父目录、`rpc/` 扁平约束和跨域导入边界四项继续硬性禁止。
 
 ## 使用方式
 
