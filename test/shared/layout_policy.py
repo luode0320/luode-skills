@@ -123,46 +123,6 @@ def validate_test_file_location(root: Path, source_path: Path, test_path: Path) 
     return [f"测试文件必须位于 {expected.relative_to(root).as_posix()}，实际为 {actual.relative_to(root).as_posix()}"]
 
 
-def expected_simulation_path(root: Path, source_path: Path, kind: str = "mock") -> Path:
-    """根据被测源码路径计算模拟程序的源码镜像位置。
-
-    [参数] root：仓库根目录；source_path：被测源码路径；kind：模拟类型。
-    [返回] Path：`test/<源码目录>/<名称>_<kind>.<后缀>` 目标路径。
-    最近修改时间：2026-08-02 23:33:30；改动原因：把 mock/stub/fake 的源码镜像契约变为可测试规则。
-    """
-    # 1. 先拒绝未知模拟类型，避免生成无法被规则识别的文件名。
-    if kind not in {"mock", "stub", "fake"}:
-        raise ValueError("模拟程序类型必须为 mock、stub 或 fake")
-    # 2. 按被测源码的相对目录和后缀生成根 test 镜像路径。
-    source = source_path if source_path.is_absolute() else root / source_path
-    relative = source.resolve().relative_to(root.resolve())
-    return root / "test" / relative.parent / f"{relative.stem}_{kind}{relative.suffix}"
-
-
-def validate_simulation_file_location(
-    root: Path,
-    source_path: Path,
-    simulation_path: Path,
-    kind: str = "mock",
-) -> list[str]:
-    """校验 mock/stub/fake 是否镜像对应被测源码路径。
-
-    [参数] root：仓库根目录；source_path：被测源码路径；simulation_path：实际模拟程序路径；kind：模拟类型。
-    [返回] list：位置或命名错误，空列表表示通过。
-    最近修改时间：2026-08-02 23:33:30；改动原因：防止模拟程序遗漏根 test/ 源码镜像规则。
-    """
-    # 1. 计算当前模拟类型对应的唯一合法镜像路径。
-    expected = expected_simulation_path(root, source_path, kind)
-    actual = simulation_path if simulation_path.is_absolute() else root / simulation_path
-    # 2. 比较实际路径并返回可定位的违规信息。
-    if actual.resolve() == expected.resolve():
-        return []
-    return [
-        f"模拟程序必须位于 {expected.relative_to(root).as_posix()}，"
-        f"实际为 {actual.relative_to(root).as_posix()}"
-    ]
-
-
 def validate_root_test_layout(root: Path) -> list[str]:
     """检查活动 Python/Go 测试是否只使用根 `test/` 目录。
 
