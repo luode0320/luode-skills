@@ -83,6 +83,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 
 - 默认先读 `references/plan-entry-checklist.md`。
 - 只要计划要交给新会话执行，或计划包含跨项目代码引用，必须先读 `references/cross-session-plan-execution-contract.md`。
+- 只要需要引用其他项目但只知道项目名、不知道项目路径，必须先读 `references/sibling-project-discovery.md` 按发现顺序定位，再回到 `EXT-*` 契约登记。
 - 在决定实施总览/实施周期文档的根目录、命名模板和同文档更新策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 输出或更新结构化实施文档 时，再读 `references/plan-structure-template.md`。
 - 只要实施文档需要交给普通模型继续执行，或用户要求“极致详细 / 极致完整 / 完善实施文档”，必须同时读取 `references/implementation-overview-template.md`、`references/implementation-cycle-template.md`、`references/minimum-task-execution-contract.md` 和 `references/visualization-standard.md`。

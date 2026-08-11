@@ -44,6 +44,13 @@ description: 当需要分析代码库结构、符号关系、调用链、被调�
 2. 局部文本搜索：`rg` / `find` 兜底
 3. 单文件细节确认：直接 `read`
 
+跨项目查询的额外约束：
+
+- `.codegraph/` 索引是 per-project 的，查询兄弟项目的符号、调用链或影响面时，必须先切到**目标项目根**再查，不得在当前项目索引里找兄弟项目符号。
+- 目标项目只知道名字、不知道路径时，按 `../implementation-planning-rules/references/sibling-project-discovery.md` 的发现顺序定位。
+- 在兄弟项目执行 `codegraph init` 会生成 `.codegraph/`，属于写入动作，必须先取得用户显式授权；本 skill 的“任何仓库都默认强制初始化”只适用于当前项目，不适用于兄弟项目。
+- 未获授权时，对兄弟项目回退到 `rg` / `read` 等只读手段，不假装 CodeGraph 已经参与。
+
 ## CodeGraph 初始化规则
 
 - 任何仓库都默认先确保 CodeGraph 已安装并初始化，不需要用户确认。

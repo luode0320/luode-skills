@@ -89,6 +89,7 @@ description: 当用户描述报错、异常行为、结果不符、线上问题�
 
 - 默认先读 `references/bug-description-template.md`；命中 `discovery-and-gap` 或 `runtime-diagnostics` 时追加读取对应条件路由 reference。
 - 在决定 Bug 根目录、入口文件和同 Bug 复用策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 只有在需要把其他项目作为对照样本排查、但只知道项目名不知道路径时，再读 `../implementation-planning-rules/references/sibling-project-discovery.md`。
 - 只有在检查基础字段是否齐全时，再读 `references/minimum-intake-fields.md`。
 - 只有在对照好坏描述样例时，再读 `references/intake-examples.md`。
 - 输出 Bug 入口文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先写现象、影响和期望，环境、日志、复现数据和证据进入附录。

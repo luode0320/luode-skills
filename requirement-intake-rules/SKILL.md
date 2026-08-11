@@ -52,6 +52,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 - 主动侦察：`references/initial-discovery-route.md`
 - 侦察清单：`references/initial-discovery-checklist.md`
 - 侦察证据和记忆：`references/initial-discovery-evidence-and-memory.md`
+- 只知道项目名、需要定位其他项目时：`../implementation-planning-rules/references/sibling-project-discovery.md`
 - 侦察输出：`references/initial-discovery-output-template.md`
 - 关键缺口：`references/gap-routing.md`
 - 缺口清单：`references/missing-info-checklist.md`
