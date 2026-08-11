@@ -52,7 +52,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 其中：
 
 - `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
-- `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、根 `test/`、活动 `doc/6-review/` 以及历史只读 `doc/6-审查/`、`doc/7-验收/` 的跨域共享入口、命名模板和复用策略；根 `test/` 是唯一活动测试代码根，`doc/5-tests/` 只保存每轮 README、日志、报告、截图和非可执行证据
+- `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、根 `test/`、活动 `doc/6-review/` 以及历史只读 `doc/6-审查/`、`doc/7-验收/` 的跨域共享入口、命名模板和复用策略；根 `test/` 是唯一活动测试代码根，`doc/4-bugs/` 与 `doc/5-tests/` 每轮只保存一份扁平 md，日志、报告、截图和非可执行证据内联在正文
 - Markdown 图片资产统一进入 `doc/data/images/`；需求、实施、6-review 和通用文档必须按当前 Markdown 位置使用 `/` 分隔相对路径，并登记 `IMG-*`、用途、来源、版本、关联 ID、引用章节、敏感状态和版权状态。真实图片必须经 `imagegen` 生成，交付门禁负责签名、命名、路径、清单和孤儿校验；`doc/data/` 根不提供兼容图片入口
 - 活动文档时间前缀统一使用 `YYYY-MM-DD_HHmmss`；实施、测试和 `6-review` 文档必须在时间后保留来源对象标识，历史审查/验收文档只读保留，避免 `YYYY-MM-DD_主题.md` 或 `时间_阶段_说明.md` 这类不可追溯命名
 - `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
@@ -362,7 +362,7 @@ python skill-dictionary/generate_dictionary.py
 | Skill                         | 功能                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------ |
 | `test-strategy-rules`         | 先决定测试层级、测试重点和覆盖策略。                                           |
-| `test-strategy-rules 的 test-asset-governance 条件路由` | 统一根 `test/` 镜像、`doc/5-tests/` 时间戳证据目录和命名。                    |
+| `test-strategy-rules 的 test-asset-governance 条件路由` | 统一根 `test/` 镜像、`doc/5-tests/` 扁平测试主文档和命名。                    |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 统一识别并迁移散落在根 `test/` 之外的活动测试资产。                           |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 统一测试目录和测试文件命名。                                                   |
 | `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分；含 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。 |
@@ -981,3 +981,4 @@ claude-mem(记忆) :
 2026-08-11 00:31:00 docs: [Mock治理删除] 归档实施周期、测试证据与项目状态同步
 2026-08-11 10:45:31 feat: [同级项目发现约定] 新增跨项目定位规则并接入5个Skill
 2026-08-11 10:46:10 docs: [字典同步] 登记新增reference文件sibling-project-discovery.md
+2026-08-11 14:56:42 docs: [Bug与测试文档扁平化] 归档6-review
