@@ -2,6 +2,11 @@
 
 ## 更新时间
 
+- 2026-08-11
+- 来源对象：REQ-FLATDOC-20260811-001 / CYCLE-FLATDOC-01..05
+- 当前目标：把 doc/4-bugs 与 doc/5-tests 的产物形态统一为扁平 md，与 doc/2-需求、doc/6-review 同构
+- 当前状态：五个周期全部完成。path-map.yaml 升到 v9，Bug 域 30 个文件与测试域 26 个文件术语收敛，上线接口测试引擎机器产物移出 doc/ 落到 test/release-artifacts/。新增 8 个用例全通过；根 test/ 逐目录全量回归改动前后失败数一致（4 个目录的失败均为既有问题）；历史零污染核验为空；字典刷新退出码 0；6-review 文档 style_regression profile valid: true，STYLE: PASS。改动停在已改动未提交状态。
+
 - 2026-08-10
 - 来源对象：CYCLE-CUR-RECENT-02 / PROJECT_CURRENT 最近会话记忆
 - 当前目标：完成最近5个同项目会话快照的全量收口，包括bootstrap模板、规则文件、PROJECT_CURRENT迁移、测试和文档门禁

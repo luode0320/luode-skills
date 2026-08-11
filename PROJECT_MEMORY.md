@@ -248,7 +248,7 @@
 ### 根测试代码与测试证据双根规则
 - 别名: 根 test 目录, 测试资产镜像, doc/5-tests 证据根
 - 类型: 测试资产目录规则
-- 定义: 根 `test/` 是唯一活动测试代码根，测试程序、mock、stub、fake、fixture、helper 与启动脚本按被测源码或 Skill 目录镜像存放；源码关联模拟程序必须与对应测试使用同一源码相对路径，只有跨源码复用的模拟能力才进入 `test/shared/`；Python 统一使用 `*_test.py`，模拟程序使用 `_mock`、`_stub` 或 `_fake` 后缀。`doc/5-tests/<时间戳>/` 只保存 README、日志、报告、截图与非可执行产物。历史 `doc/5-tests/` 中的可执行资产由指纹清单只读保护，首次修改、改名或新增时才迁至根 `test/`；Go 测试仅在根 `test/` 的 ASCII 外部黑盒包中运行，源码目录禁止 `*_test.go`。
+- 定义: 根 `test/` 是唯一活动测试代码根，测试程序、mock、stub、fake、fixture、helper 与启动脚本按被测源码或 Skill 目录镜像存放；源码关联模拟程序必须与对应测试使用同一源码相对路径，只有跨源码复用的模拟能力才进入 `test/shared/`；Python 统一使用 `*_test.py`，模拟程序使用 `_mock`、`_stub` 或 `_fake` 后缀。`doc/5-tests/` 每轮只保存一份扁平测试主文档 `YYYY-MM-DD_HHmmss_<测试任务中文主题>.md`，日志、报告、截图与非可执行产物内联在正文；`doc/5-tests/基线/` 是唯一豁免子目录，上线接口测试机器产物落在 `test/release-artifacts/`。历史 `doc/5-tests/` 子目录及其中的可执行资产由指纹清单只读保护，首次修改、改名或新增时才迁至根 `test/`；Go 测试仅在根 `test/` 的 ASCII 外部黑盒包中运行，源码目录禁止 `*_test.go`。
 - 来源: `artifact-storage-rules/references/path-map.yaml`、`test/shared/layout_policy.py`、`doc/3-实施/2026-08-01_191658_根test目录统一_实施总览.md`
 - 适用范围: 新增测试、测试资产迁移、测试策略、测试程序、真实测试归档和 6-review 目录归位
 - 更新时间: 2026-08-01

@@ -11,6 +11,8 @@
 
 ## 事件
 
+- 2026-08-11：完成 doc/4-bugs 与 doc/5-tests 文档扁平化（REQ-FLATDOC-20260811-001）。Bug 主文档改为 `doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介.md`，测试主文档改为 `doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md` 且证据内联，取消 evidence/artifacts 子目录；`doc/5-tests/基线/` 登记为唯一豁免，上线接口测试机器产物移到 `test/release-artifacts/`；历史子目录一律只读保留不迁移。path-map.yaml v8→v9，共改 83 个文件，新增 8 个活动测试全通过，全量回归无新增失败，6-review STYLE: PASS。改动停在已改动未提交状态。
+
 - 2026-08-10：完成 PROJECT_CURRENT 最近 5 个同项目会话快照功能全量收口（CYCLE-CUR-RECENT-02）。新增快照脚本与契约（周期01），修改 bootstrap 模板、AGENTS.md/CLAUDE.md 触发规则、PROJECT_CURRENT.md 迁移（周期02）；快照 26/26 与 bootstrap 1/1 测试通过，投影 validate 通过，字典刷新退出码 0，周期01/02 文档门禁 PASS，6-review STYLE: PASS；改动停在已改动未提交状态。
 - 2026-08-09：完成 `REQ-PSR-CONFIG-SECRET-002 / CYCLE-PSR-24-001` 的规则与测试同步，确立“允许有意持久化凭据、禁止过程性输出回显”口径；未执行 Git 提交或推送。
 
