@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-11 02:12:04",
-  "repo_root": "F:\\luode-skills",
+  "generated_at": "2026-08-11 10:46:22",
+  "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 575,
+    "references_total": 576,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -1288,6 +1288,7 @@ window.SKILL_DICTIONARY = {
             "implementation-planning-rules/references/plan-question-coverage.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
             "implementation-planning-rules/references/plan-structure-template.md",
+            "implementation-planning-rules/references/sibling-project-discovery.md",
             "implementation-planning-rules/references/source-notes.md",
             "implementation-planning-rules/references/task-granularity-and-order.md",
             "implementation-planning-rules/references/visualization-standard.md"
@@ -5981,6 +5982,7 @@ window.SKILL_DICTIONARY = {
         "implementation-planning-rules/references/plan-question-coverage.md",
         "implementation-planning-rules/references/plan-review-checklist.md",
         "implementation-planning-rules/references/plan-structure-template.md",
+        "implementation-planning-rules/references/sibling-project-discovery.md",
         "implementation-planning-rules/references/source-notes.md",
         "implementation-planning-rules/references/task-granularity-and-order.md",
         "implementation-planning-rules/references/visualization-standard.md"
