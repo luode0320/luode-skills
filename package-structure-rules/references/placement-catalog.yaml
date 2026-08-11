@@ -456,7 +456,7 @@
       "artifact_kind": "test",
       "content_type": "source_code",
       "canonical_path": "test",
-      "purpose": "前后端同仓项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "purpose": "前后端同仓项目唯一活动测试代码根；承载按源码目录镜像的测试程序、fixture 与 helper",
       "creation_policy": "required",
       "tracked": true,
       "node_kind": "directory",
@@ -1082,7 +1082,7 @@
       "artifact_kind": "test",
       "content_type": "source_code",
       "canonical_path": "test",
-      "purpose": "独立后端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "purpose": "独立后端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、fixture 与 helper",
       "creation_policy": "required",
       "tracked": true,
       "node_kind": "directory",
@@ -1231,7 +1231,7 @@
       "artifact_kind": "test",
       "content_type": "source_code",
       "canonical_path": "test",
-      "purpose": "独立前端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、mock、fixture 与 helper",
+      "purpose": "独立前端项目唯一活动测试代码根；承载按源码目录镜像的测试程序、fixture 与 helper",
       "creation_policy": "required",
       "tracked": true,
       "node_kind": "directory",
@@ -1602,256 +1602,6 @@
       "creation_policy": "conditional",
       "tracked": true,
       "owner_skill": "swag-openapi-maintainer-rules"
-    },
-    {
-      "id": "backend.mock.runtime",
-      "project_kind": "backend",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "root",
-      "canonical_path": "mock",
-      "purpose": "独立后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "allowed_extensions": [
-        ".go"
-      ],
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock",
-      "build_tag": "mock",
-      "mirror_source_root": "internal",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#核心边界"
-      ]
-    },
-    {
-      "id": "backend.mock.selector-mock",
-      "project_kind": "backend",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "selector-mock",
-      "canonical_path": "main_mock.go",
-      "path_pattern": "main_mock.go|cmd/<binary>/main_mock.go",
-      "purpose": "独立后端 mock selector；与 main_real.go 成对声明同名 newXxx()，使用 //go:build mock",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "paired_with": "backend.mock.selector-real",
-      "required_build_tag": "mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "main_mock.go",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#入口选择器"
-      ]
-    },
-    {
-      "id": "backend.mock.selector-real",
-      "project_kind": "backend",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "selector-real",
-      "canonical_path": "main_real.go",
-      "path_pattern": "main_real.go|cmd/<binary>/main_real.go",
-      "purpose": "独立后端 real selector；与 main_mock.go 成对声明同名 newXxx()，使用 //go:build !mock",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "paired_with": "backend.mock.selector-mock",
-      "required_exclude_build_tag": "!mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "main_real.go",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#入口选择器"
-      ]
-    },
-    {
-      "id": "backend.mock.assembly",
-      "project_kind": "backend",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "assembly",
-      "canonical_path": "mock/assembly",
-      "purpose": "独立后端 Mock 装配桥；唯一允许直接导入 Mock 实现的包，package assembly",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "directory",
-      "required_build_tag": "mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock/assembly",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#assembly-装配桥"
-      ]
-    },
-    {
-      "id": "backend.mock.implementation",
-      "project_kind": "backend",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "implementation",
-      "canonical_path": "mock/<internal-relative-path>",
-      "path_pattern": "mock/<internal-relative-path>",
-      "purpose": "独立后端 Mock 实现镜像；按 internal 相对路径放置，package mock_<源包名>",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "mirror_source_root": "internal",
-      "required_build_tag": "mock",
-      "forbidden_direct_imports": [
-        "mock/*"
-      ],
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock/<internal-relative-path>",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#镜像与包名"
-      ]
-    },
-    {
-      "id": "fullstack.mock.runtime",
-      "project_kind": "fullstack",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "root",
-      "canonical_path": "mock",
-      "purpose": "同仓后端运行时 Mock 根；按被测源码相对路径镜像，build tag mock 保护",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "allowed_extensions": [
-        ".go"
-      ],
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock",
-      "build_tag": "mock",
-      "mirror_source_root": "backend/internal",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#核心边界"
-      ]
-    },
-    {
-      "id": "fullstack.mock.selector-mock",
-      "project_kind": "fullstack",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "selector-mock",
-      "canonical_path": "backend/main_mock.go",
-      "path_pattern": "backend/main_mock.go|backend/cmd/<binary>/main_mock.go",
-      "purpose": "同仓后端 mock selector；与 main_real.go 成对声明同名 newXxx()，使用 //go:build mock",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "paired_with": "fullstack.mock.selector-real",
-      "required_build_tag": "mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "backend/main_mock.go",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#入口选择器"
-      ]
-    },
-    {
-      "id": "fullstack.mock.selector-real",
-      "project_kind": "fullstack",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "selector-real",
-      "canonical_path": "backend/main_real.go",
-      "path_pattern": "backend/main_real.go|backend/cmd/<binary>/main_real.go",
-      "purpose": "同仓后端 real selector；与 main_mock.go 成对声明同名 newXxx()，使用 //go:build !mock",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "paired_with": "fullstack.mock.selector-mock",
-      "required_exclude_build_tag": "!mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "backend/main_real.go",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#入口选择器"
-      ]
-    },
-    {
-      "id": "fullstack.mock.assembly",
-      "project_kind": "fullstack",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "assembly",
-      "canonical_path": "mock/assembly",
-      "purpose": "同仓后端 Mock 装配桥；唯一允许直接导入 Mock 实现的包，package assembly",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "directory",
-      "required_build_tag": "mock",
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock/assembly",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#assembly-装配桥"
-      ]
-    },
-    {
-      "id": "fullstack.mock.implementation",
-      "project_kind": "fullstack",
-      "artifact_kind": "mock",
-      "content_type": "source_code",
-      "category": "implementation",
-      "canonical_path": "mock/<internal-relative-path>",
-      "path_pattern": "mock/<internal-relative-path>",
-      "purpose": "同仓后端 Mock 实现镜像；按 backend/internal 相对路径放置，package mock_<源包名>",
-      "creation_policy": "conditional",
-      "init_policy": "forbidden",
-      "tracked": true,
-      "node_kind": "pattern",
-      "dynamic": true,
-      "mirror_source_root": "backend/internal",
-      "required_build_tag": "mock",
-      "forbidden_direct_imports": [
-        "mock/*"
-      ],
-      "owner_skill": "package-structure-rules",
-      "search_entry": "mock/<internal-relative-path>",
-      "related_skills": [
-        "test-program-rules"
-      ],
-      "usage_recipes": [
-        "runtime-mock-layout-go.md#镜像与包名"
-      ]
     },
     {
       "id": "backend.utils.convert",

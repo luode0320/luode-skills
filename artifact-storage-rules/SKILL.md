@@ -66,40 +66,6 @@ description: 当需要定义、调整或解释项目中 `doc/1-架构/`、`doc/2
 - 当前时间戳目录复用规则只适用于 `doc/5-tests/` 的说明和证据，不适用于活动测试代码路径。
 
 
-## 运行时 Mock 资产
-
-运行时 Mock 是本地开发时编译进主二进制、替代不可用真实上游的模拟实现，与测试 Mock 职责分离。
-
-- 根 `mock/` 是运行时 Mock 的唯一合法目录，与根 `test/` 对等，按被测源码相对路径镜像。
-- 运行时 Mock 不纳入 `test/`、`doc/5-tests/` 或业务源码目录；`doc/5-tests/` 禁止承载运行时 Mock。
-- 运行时 Mock 文件必须以 `//go:build mock` 开头，包名约定 `mock_<源包名>`。
-- 运行时 Mock 的构建标签传递：`go run -tags mock .`、`go build -tags mock .`。
-- 运行时 Mock 的目录归属、命名和构建约束由 `test-program-rules` 的「运行时 Mock 落点（强制）」定义，本 skill 只负责存放位置。
-
-### 实战用法
-
-- 运行时 Mock 与测试 Mock 共存时，目录结构表现为：
-
-```text
-mock/                          # 运行时 Mock 根
-└── internal/
-    └── business/
-        └── scalp/
-            └── api/
-                └── gateway.go  # //go:build mock
-test/                          # 测试 Mock 根
-└── internal/
-    └── business/
-        └── scalp/
-            └── api/
-                ├── gateway_test.go  # 测试代码
-                └── gateway_mock.go  # 测试 Mock
-```
-
-- 运行时 Mock 文件不使用 `*_test.go` 后缀，不会被 `go test` 扫描。
-- 运行时 Mock 的 `mock/` 目录不得出现在 `go list ./...` 的正常输出中，验证方式：`go list ./... | findstr /V mock` 应等于 `go list -tags mock ./... | findstr /V mock` 的差异仅为 mock 包。
-- 运行时 Mock 的构建产物（二进制）无需单独配置，因为 `-tags mock` 只在开发阶段使用。
-
 ## 自动触发信号
 
 - 需要决定需求文档、Bug 记录、测试资源、项目说明文档、项目专属 skill 资产或根目录项目设计文档应该保存到哪个根目录或主入口。

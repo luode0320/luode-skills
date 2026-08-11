@@ -75,34 +75,6 @@
             "type": "string",
             "minLength": 1
           },
-          "paired_with": {
-            "type": "string",
-            "minLength": 1,
-            "description": "selector 必须成对存在的配对条目 ID"
-          },
-          "required_build_tag": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Mock selector、Mock 实现和 assembly 必需的构建标签，如 mock"
-          },
-          "required_exclude_build_tag": {
-            "type": "string",
-            "minLength": 1,
-            "description": "real selector 必需的排除构建标签，如 !mock"
-          },
-          "mirror_source_root": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Mock 镜像的源码根，Go 后端固定为 internal 或 backend/internal"
-          },
-          "forbidden_direct_imports": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1
-            },
-            "description": "入口禁止直接导入的 Mock 实现路径"
-          },
           "requires_domain": {
             "type": "boolean"
           },
@@ -314,101 +286,6 @@
               "required": [
                 "node_kind",
                 "content_must_match"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "category": {
-                  "enum": [
-                    "selector-mock",
-                    "selector-real",
-                    "assembly",
-                    "implementation",
-                    "root"
-                  ]
-                }
-              },
-              "required": [
-                "category"
-              ]
-            },
-            "then": {
-              "required": [
-                "init_policy"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "category": {
-                  "const": "selector-mock"
-                }
-              },
-              "required": [
-                "category"
-              ]
-            },
-            "then": {
-              "required": [
-                "paired_with",
-                "required_build_tag"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "category": {
-                  "const": "selector-real"
-                }
-              },
-              "required": [
-                "category"
-              ]
-            },
-            "then": {
-              "required": [
-                "paired_with",
-                "required_exclude_build_tag"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "category": {
-                  "const": "assembly"
-                }
-              },
-              "required": [
-                "category"
-              ]
-            },
-            "then": {
-              "required": [
-                "required_build_tag"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "category": {
-                  "const": "implementation"
-                }
-              },
-              "required": [
-                "category"
-              ]
-            },
-            "then": {
-              "required": [
-                "mirror_source_root",
-                "required_build_tag",
-                "forbidden_direct_imports"
               ]
             }
           }

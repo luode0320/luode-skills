@@ -27,7 +27,6 @@
 │   ├── launch.json                        # [必需·提交] 联合调试配置
 │   ├── tasks.json                         # [必需·提交] dev、build、docker-build 任务
 
-同仓后端运行时 Mock 模式：`launch.json` 至少包含 normal 与 mock 两套配置；mock 配置必须在 `buildFlags` 增加 `-tags=mock`（例如 `-tags=mock -mod=vendor`），并通过 `args` 传 `-env=local`。
 │   ├── settings.json                      # [条件·提交] 团队设置
 │   └── extensions.json                    # [条件·提交] 推荐扩展
 ├── backend/                               # [必需·提交] 完整独立后端项目
@@ -42,9 +41,6 @@
 │       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用；允许源码私密配置，默认不依赖环境变量
 ├── frontend/                              # [必需·提交] 完整独立前端项目
 ├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
-├── mock/                                   # [条件·提交] 运行时 Mock 根，按 internal 相对路径镜像；//go:build mock；详见 runtime-mock-layout-go.md
-│   ├── assembly/                           # [条件·提交] Mock 装配桥；package assembly
-│   └── <internal-relative>/                # [条件·提交] Mock 实现；package mock_<源包名>
 ├── integration/                           # [条件·提交] 仅限前后端联调资产
 │   ├── contracts/                         # [条件·提交] 联调契约根
 │   │   ├── http/                          # [条件·提交] HTTP 契约
@@ -102,7 +98,6 @@
 │   ├── launch.json                          # [必需·提交] 本地调试配置
 │   ├── tasks.json                           # [必需·提交] 本地任务配置
 
-运行时 Mock 模式：`launch.json` 至少包含 normal 与 mock 两套配置；mock 配置必须在 `buildFlags` 增加 `-tags=mock`（例如 `-tags=mock -mod=vendor`），并通过 `args` 传 `-env=local`。
 │   ├── settings.json                        # [条件·提交] 团队设置
 │   └── extensions.json                      # [条件·提交] 推荐扩展
 ├── main.<ext>                               # [条件·提交] 独立后端默认二进制入口
@@ -117,9 +112,6 @@
 │   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用；允许源码私密配置，默认不依赖环境变量；只存放配置数据
 │       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
-├── mock/                                     # [条件·提交] 运行时 Mock 根，按 internal 相对路径镜像；//go:build mock；详见 runtime-mock-layout-go.md
-│   ├── assembly/                             # [条件·提交] Mock 装配桥；package assembly
-│   └── <internal-relative>/                  # [条件·提交] Mock 实现；package mock_<源包名>
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
 │   ├── model/                               # [条件·提交] 数据存储模型分类根；根目录禁止直接文件
@@ -290,11 +282,11 @@
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
-独立后端配置使用 `config/embedded/` 或 `config/yaml/`（两者互斥，只能二选一，推荐优先使用 `config/embedded/`），按 `config_<env>` 拆分环境。`embedded/` 模式：Go 使用 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`，格式名必须后置因为 `config_test.go` 会被 Go 当成测试文件。`yaml/` 模式：外部 YAML 使用 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，不参与编译因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全。外部 YAML 与 embedded 源码均允许有意持久化 API key、密钥、密码等私密信息，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据，且严格互斥不可并存；`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
+独立后端配置使用 `config/embedded/` 或 `config/yaml/`（两者互斥，只能二选一，推荐优先使用 `config/embedded/`），按 `config_<env>` 拆分环境。`embedded/` 模式：Go 使用 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`，格式名必须后置因为 `config_test.go` 会被 Go 当成测试文件。`yaml/` 模式：外部 YAML 使用 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，不参与编译因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全。外部 YAML 与 embedded 源码均允许有意持久化 API key、密钥、密码等私密信息，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据，且严格互斥不可并存；`test/` 目录不承载配置数据源，测试所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 
-三类项目的活动测试程序、测试 Mock、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
+三类项目的活动测试程序、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
 
 ## 前端独立项目
 
@@ -376,10 +368,6 @@
 │   ├── pwa/                                  # [条件·提交] PWA
 │   └── generated/                            # [生成·忽略] 生成代码
 │       └── api/                              # [生成·忽略] OpenAPI 生成客户端
-├── mocks/                                    # [条件·提交] 开发 Mock
-│   ├── handlers/                             # [条件·提交] Mock 请求处理器
-│   ├── fixtures/                             # [条件·提交] Mock 固定样本
-│   └── server/                               # [条件·提交] Mock Server 入口
 ├── scripts/                                  # [条件·提交] 工程脚本
 │   ├── dev/                                  # [条件·提交] 本地开发脚本
 │   └── build/                                # [条件·提交] 构建脚本
