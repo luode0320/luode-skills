@@ -8,6 +8,8 @@ import sys
 import tempfile
 import unittest
 
+import yaml
+
 
 SHARED_DIR = Path(__file__).resolve().parents[1] / "shared"
 sys.path.insert(0, str(SHARED_DIR))
@@ -23,6 +25,24 @@ from layout_policy import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "test" / "shared" / "legacy_doc5_tests_manifest.json"
+PATH_MAP = ROOT / "artifact-storage-rules" / "references" / "path-map.yaml"
+BUG_DOMAIN_SKILLS = (
+    "bug-intake-rules",
+    "bug-fix-proposal-rules",
+    "bug-reproduction-rules",
+    "bug-root-cause-rules",
+    "bug-validation-rules",
+)
+TEST_DOMAIN_SKILLS = (
+    "test-strategy-rules",
+    "test-program-rules",
+    "test-regression-rules",
+    "functional-validation-rules",
+)
+# 历史归档只读，规则文本允许提到旧目录形态；这一行是唯一豁免。
+TEST_DOMAIN_LEGACY_ALLOWLIST = frozenset({
+    "test-strategy-rules/references/test-asset-governance.md:25",
+})
 
 
 class TestAssetLocation(unittest.TestCase):
@@ -98,6 +118,89 @@ class TestAssetLocation(unittest.TestCase):
             with self.subTest(document=document.relative_to(ROOT).as_posix()):
                 self.assertIn("根 `test/`", content)
                 self.assertIn("`doc/5-tests/`", content)
+
+    def test_path_map_declares_flat_bug_and_test_docs(self) -> None:
+        """路径真相源必须声明扁平 md，并移除全部任务子目录键位。"""
+        # 1. 单一真相源必须可解析，否则下游 skill 无法引用统一模板。
+        path_map = yaml.safe_load(PATH_MAP.read_text(encoding="utf-8"))
+        entry_files = path_map["entry_files"]
+        directories = path_map["directories"]
+        policies = path_map["policies"]
+
+        # 2. 旧的任务子目录与 README 入口键位必须彻底消失，避免新旧两套模板并存。
+        for removed in ("bug_root_readme", "test_task_readme", "test_task_readme_note"):
+            self.assertNotIn(removed, entry_files)
+        for removed in ("bug_root", "test_task_root", "test_task_evidence_dir", "test_task_artifacts_dir"):
+            self.assertNotIn(removed, directories)
+
+        # 3. 新的扁平模板、豁免目录和策略开关必须同时到位。
+        self.assertEqual(entry_files["bug_doc"], "{datetime}_{bug_cn_title}.md")
+        self.assertEqual(entry_files["test_doc"], "{datetime}_{test_cn_title}.md")
+        self.assertEqual(directories["test_baseline_dir"], "doc/5-tests/基线")
+        self.assertEqual(directories["release_test_artifacts_root"], "test/release-artifacts")
+        for policy in (
+            "bug_and_test_docs_are_flat_files",
+            "historical_subdirectory_artifacts_read_only",
+            "test_baseline_dir_exempt_from_flattening",
+            "release_test_machine_artifacts_outside_doc",
+            "same_bug_updates_same_doc",
+            "same_test_round_updates_same_doc",
+            "new_independent_test_round_creates_new_doc",
+        ):
+            self.assertTrue(policies[policy], policy)
+        for removed in (
+            "same_bug_updates_same_root",
+            "same_test_round_updates_same_root",
+            "new_independent_test_round_creates_new_root",
+            "test_task_readme_is_evidence_only",
+        ):
+            self.assertNotIn(removed, policies)
+
+    def test_bug_domain_rules_drop_subdirectory_terminology(self) -> None:
+        """Bug 域规则必须统一到扁平主文档口径，不残留根目录与 README 入口。"""
+        # 1. 逐个 skill 扫描，命中即报出精确文件行，便于定位漏改。
+        offenders: list[str] = []
+        for skill in BUG_DOMAIN_SKILLS:
+            for path in sorted((ROOT / skill).rglob("*")):
+                if not path.is_file() or path.suffix not in {".md", ".yaml"}:
+                    continue
+                relative = path.relative_to(ROOT).as_posix()
+                for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                    if "Bug 根目录" in line or "doc/4-bugs/` 根目录" in line:
+                        offenders.append(f"{relative}:{number}")
+        self.assertEqual(offenders, [])
+
+    def test_test_domain_rules_drop_subdirectory_terminology(self) -> None:
+        """测试域规则必须统一到扁平测试主文档，不残留任务子目录与证据子目录。"""
+        # 1. 同时拦截旧路径模板与 evidence/artifacts 子目录表述。
+        forbidden = ("doc/5-tests/<时间戳>", "/README.md", "`evidence/`", "`artifacts/`", "时间戳目录")
+        offenders: list[str] = []
+        for skill in TEST_DOMAIN_SKILLS:
+            for path in sorted((ROOT / skill).rglob("*")):
+                if not path.is_file() or path.suffix not in {".md", ".yaml"}:
+                    continue
+                relative = path.relative_to(ROOT).as_posix()
+                for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                    anchor = f"{relative}:{number}"
+                    if anchor in TEST_DOMAIN_LEGACY_ALLOWLIST:
+                        continue
+                    if any(token in line for token in forbidden):
+                        offenders.append(anchor)
+        self.assertEqual(offenders, [])
+
+    def test_test_naming_template_is_flat_markdown(self) -> None:
+        """测试命名模板必须是扁平 md，并保留基线目录豁免。"""
+        naming = (ROOT / "artifact-storage-rules" / "references" / "naming-templates.md").read_text(encoding="utf-8")
+        self.assertIn("doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md", naming)
+        self.assertNotIn("doc/5-tests/YYYY-MM-DD_HHmmss/README.md", naming)
+        self.assertIn("doc/5-tests/基线/", naming)
+
+    def test_bug_naming_template_is_flat_markdown(self) -> None:
+        """Bug 命名模板必须是扁平 md，且不再声明 README 主入口。"""
+        naming = (ROOT / "artifact-storage-rules" / "references" / "naming-templates.md").read_text(encoding="utf-8")
+        self.assertIn("doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介.md", naming)
+        self.assertNotIn("doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介/", naming)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
