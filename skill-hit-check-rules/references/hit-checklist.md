@@ -4,7 +4,7 @@
 
 1. 只基于当前轮用户消息和当前运行环境匹配所有 Skill 的 `description` 与条件路由。
 2. 先输出固定命中字段，再执行任何领域动作。
-3. 记录 Git、并行、Obsidian、Skill 资产、新会话自举与失败恢复的联动摘要。
+3. 记录 Git、并行、知识库、Skill 资产、新会话自举与失败恢复的联动摘要。
 4. 将执行权交给对应 Owner Skill；本清单不复制其具体执行步骤。
 
 ## 注释场景补充
@@ -24,8 +24,8 @@
 
 ## 项目记忆/风格跨项目候选场景补充
 
-- 本轮 `project-memory-rules`/`project-style-rules` 写入条目时标记了 `bridge_candidate: true` 或 `跨项目候选: 是` 时，收口阶段的 Obsidian 判断不得停留在 `不适用`，至少需要按 `capture-retrieve-distill.md` 走一次沉淀判断（检索去重后决定是否创建/追加）。
-- 具体标准、落点和去重仍由 `obsidian-knowledge-flow` 的 `references/project-memory-bridge.md` 定义，本清单只负责不漏判断信号，不复制其执行细节。
+- 本轮 `project-memory-rules`/`project-style-rules` 写入条目时标记了 `bridge_candidate: true` 或 `跨项目候选: 是` 时，收口阶段的知识库判断不得停留在 `不适用`，至少需要按 `capture-retrieve-distill.md` 走一次沉淀判断（检索去重后决定是否创建/追加）。
+- 具体标准、落点和去重仍由 `knowledge-flow` 的 `references/project-memory-sync.md` 定义，本清单只负责不漏判断信号，不复制其执行细节。
 
 ## 任务投影恢复场景补充
 
@@ -56,7 +56,7 @@
 - 可以多 Skill 同时命中；`skill-hit-check-rules` 是总控入口，不算业务 Owner。
 - 仓库任务默认联动 `parallel-task-dispatch-rules`，由其统一判断串行、条件并行、真实启动、回收和回退；用户禁止或环境不支持时必须真实回退，不能伪报并行。
 - 非 Plan Mode 的仓库实质任务按 `deferred-gate-registry.md` + 当前任务类型，在首条 `闸门预告` 字段登记本轮将适用的延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员），强制项列入 `命中技能`。`闸门预告` 是预测：中段按真实改动对账修正，收口按其逐项复核声明与执行是否一致。Plan Mode 下延迟 gate 判定 `NOT_APPLICABLE`、`reasoning-summary-structure-rules` 不得命中，`闸门预告` 置 `不适用(Plan Mode)`。
-- 仓库任务执行 Obsidian 选择性判断：依赖历史知识或用户长期偏好时为 `检索`，形成可复用知识时为 `沉淀`，无价值时为 `不适用`，CLI 或 vault 不可用且影响动作时为 `阻断`。仅 `检索` 或 `沉淀` 联动 `obsidian-knowledge-flow`。
+- 仓库任务执行知识库选择性判断：依赖历史知识或用户长期偏好时为 `检索`，形成可复用知识时为 `沉淀`，无价值时为 `不适用`，知识库目录不存在或不可读、路径不合法、写入后回读不一致且影响动作时为 `阻断`。仅 `检索` 或 `沉淀` 联动 `knowledge-flow`。所有知识库读写必须限定在知识库根目录内操作，写入后回读校验。
 - Skill 资产新增或修改时联动 `skill-execution-compliance-gate-rules`；description 或触发条件变化追加 `skill-evolution-rules`；多 Skill、职责边界或收口风险追加 `skill-audit-rules`。
 - 非预期执行失败联动 `execution-failure-learning-rules`；预期负向测试、用户取消、权限阻断和业务 Bug 分别交给其专属 Owner。
 

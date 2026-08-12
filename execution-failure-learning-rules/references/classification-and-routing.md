@@ -37,7 +37,7 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 | 已配置 MCP 的运行期超时、EOF、断开或不可用 | `agent-runtime-recovery-rules` | `mcp_runtime_transport`；能力探测、单飞锁、预算、重连/重载/重启和恢复后健康验证 |
 | 已启用插件运行期失活、崩溃或无响应 | `agent-runtime-recovery-rules` | `plugin_runtime_unhealthy`；仅按 adapter 声明的 reload/restart 能力执行 |
 | 智能体宿主进程异常、重启或任务续接 | `agent-runtime-recovery-rules` | `agent_host_unhealthy`；检查点、宿主生命周期能力和恢复后续接验证 |
-| Obsidian CLI/vault 知识流 | `obsidian-knowledge-flow` | CLI-only、vault 根目录、路径与超时 |
+| 知识库文件读写、知识流 | `knowledge-flow` | 固定根目录可达性、裸相对路径合法性、UTF-8 与写入后回读 |
 | CodeGraph 索引、图分析 | `codegraph-analysis-rules` | 安装、索引新鲜度和项目范围 |
 | Git 状态、提交、推送或恢复 | `git-collaboration-rules` | 当前轮授权、工作树与远端边界 |
 | 功能/回归/策略验证 | `functional-validation-rules` | local 环境、样本、成功标准与副作用 |

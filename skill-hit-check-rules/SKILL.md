@@ -1,6 +1,6 @@
 ---
 name: skill-hit-check-rules
-description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。
+description: 【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行知识库知识流选择性默认判断，输出 `知识库:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。
 ---
 
 # Skill 命中检查规则（最小闭环版）
@@ -11,7 +11,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 - 首条中间进度固定包含：
   - `命中检查:<通过/阻断>; Git规则:<通过/不适用/阻断>`
   - `命中技能:<skill1,skill2,...>`
-  - 仓库任务追加 `Obsidian:<检索/沉淀/不适用/阻断>`
+  - 仓库任务追加 `知识库:<检索/沉淀/不适用/阻断>`
   - 命中 `parallel-task-dispatch-rules` 时追加 `并行技能:<skill.../无>`
   - 非 Plan Mode 的仓库实质任务追加 `闸门预告:<checkpoint→gate;... / 无 / 不适用(Plan Mode)>`（按 `references/deferred-gate-registry.md` 登记本轮延迟 gate）
 - 固定字段的 Markdown 形态以 `references/output-format.md` 为准；缺少必填字段即阻断领域执行。
@@ -30,7 +30,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 ## -1. 触发确认（强制）
 
 - 每轮都命中本 skill；自动触发不依赖用户点名，也不因任务简单而跳过。
-- 仓库任务联动 `parallel-task-dispatch-rules` 并执行 Obsidian 选择性判断；非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 登记本轮延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员）。
+- 仓库任务联动 `parallel-task-dispatch-rules` 并执行知识库选择性判断；非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 登记本轮延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员）。
 - 当前轮存在 Git 意图时联动 `git-collaboration-rules`；只识别当前轮，不继承历史授权。
 - 修改 Skill 资产时联动 `skill-execution-compliance-gate-rules`，并按职责边界追加 `skill-evolution-rules`、`skill-audit-rules`。
 - 联动条件、用户习惯、负向边界和漏触发防护统一见 `references/hit-checklist.md`；本入口不复制各 Owner 的执行细则。
@@ -71,13 +71,13 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 ## 0. 首条消息格式（强制）
 
 - 使用 `templates/hit-check-template.md`，并遵守 `references/output-format.md`。
-- 标题、字段、Git、Obsidian 与并行行必须使用普通 Markdown，不得放进代码围栏、缩进代码块或 HTML。
+- 标题、字段、Git、知识库与并行行必须使用普通 Markdown，不得放进代码围栏、缩进代码块或 HTML。
 
 ## 1. 最小流程
 
 1. 基于当前轮请求匹配所有可用 Skill 的 `description` 与条件路由。
 2. 输出固定首条字段。
-3. 执行 Git、并行、Obsidian、Skill 资产及新会话自举的联动摘要判断。
+3. 执行 Git、并行、知识库、Skill 资产及新会话自举的联动摘要判断。
 4. 将执行权交给对应 Owner Skill；本入口不复制领域流程。
 
 ## 1.1 首条闸门（强制阻断）
@@ -103,8 +103,8 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 ## 3. 通过标准
 
 - 每轮先完成固定命中字段，且真实执行所有已命中 Skill 的必要步骤。
-- Git、并行、Obsidian、Skill 资产和失败恢复均已正确联动，没有在本入口复制 Owner 细则。
-- 最终回复保留 `命中检查:通过`；仓库任务保留 Obsidian 状态；Git 场景保留 `Git规则:通过`。
+- Git、并行、知识库、Skill 资产和失败恢复均已正确联动，没有在本入口复制 Owner 细则。
+- 最终回复保留 `命中检查:通过`；仓库任务保留知识库状态；Git 场景保留 `Git规则:通过`。
 
 ## 4. 执行文件
 

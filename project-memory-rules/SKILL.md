@@ -30,6 +30,8 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 - 中文可读、按主题组织。
 - 用于总结核心事实、长期规则和重要映射关系。
 - 是机器索引区的渲染视图，不是唯一事实源。
+- **禁止承载历史流水**：按日期罗列「某天做了什么」的条目属于 `PROJECT_HISTORY.md`，完整变更历史以 git 提交为准。若确需过渡性变更记录，最多保留最近 10 条，超出即删除。缺少上限会让它无限增长——实测曾堆到 75 条共 19KB，成为人类区最大一节，而本文件是每次会话启动必读。
+- **跨项目通用判据不留全文**：判据本身写入知识库，本文件只留一行结论加指针（`跨项目判据见知识库笔记 <标题>；本仓库落地入口为 <命令或文件>`）。两处各写一遍会导致口径漂移并持续推高启动读取体积；判断标准与抽象化改写要求见 `knowledge-flow/references/project-memory-sync.md`。
 
 2. 机器索引区
 - 固定标题：`## 机器索引区`
@@ -120,9 +122,9 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 ## 跨项目沉淀判断（可选）
 
-写入 `entities[]` 时，若该条目同时满足 `references/project-knowledge-source-contract.md`「跨项目桥接（可选）」一节引用的标准（详见 `obsidian-knowledge-flow/references/project-memory-bridge.md`），可为该实体追加可选字段 `bridge_candidate: true`；不满足则不标记，缺省视为 `false`。
+写入 `entities[]` 时，若该条目同时满足 `references/project-knowledge-source-contract.md`「跨项目桥接（可选）」一节引用的标准（详见 `knowledge-flow/references/project-memory-sync.md`），可为该实体追加可选字段 `bridge_candidate: true`；不满足则不标记，缺省视为 `false`。
 
-这一步只做本地文本判断，不调用 Obsidian bridge，不影响本地写入流程本身。实际的检索、去重、创建或追加统一交给 `obsidian-knowledge-flow` 在会话收口阶段处理；本 Skill 不直接调用 bridge。
+这一步只做本地文本判断，不写入知识库，不影响本地写入流程本身。实际的检索、去重、创建或追加统一交给 `knowledge-flow` 在会话收口阶段处理；本 Skill 不直接读写知识库目录。
 
 ## 人类阅读区同步规则
 

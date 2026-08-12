@@ -200,15 +200,15 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 - `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
 - `PROJECT_CURRENT.md` 还包含 `<!-- BEGIN RECENT PROJECT SESSIONS -->` 最近 5 个同项目会话托管区，它是只读回忆索引，帮助新会话了解近期其它会话在做什么；标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实，非 Codex App 宿主只读取不刷新。
 
-### Obsidian 知识流选择性默认触发（强制）
+### 知识库知识流选择性默认触发（强制）
 
-- 每轮仓库任务都必须先做一次轻量 Obsidian 判断，并在首条中间进度或等价命中检查证据中输出 `Obsidian:<检索/沉淀/不适用/阻断>`。
-- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / Obsidian / 知识库 / 当时怎么说”等信号时，判定为 `Obsidian:检索`，必须命中 `obsidian-knowledge-flow` 并通过 Obsidian CLI 检索 / 读取笔记。
-- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `Obsidian:沉淀`，必须命中 `obsidian-knowledge-flow` 并先通过 CLI 检索已有笔记，再决定捕获或沉淀。
-- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `Obsidian:不适用`，不得为了形式调用 Obsidian CLI。
-- Obsidian vault 的检索、读取、创建、追加和沉淀只能通过 `obsidian` CLI 完成；CLI 不可用、vault 未注册、目标根目录不一致或命令无法限定到目标 vault 时，判定为 `Obsidian:阻断`，不得用 `rg`、`Get-Content`、`Set-Content` 或直接文件读写冒充 vault 操作。
-- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `Obsidian:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
-- 本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区统一落在该 vault 下的 `知识库/` 目录；既然这个映射已经约定，就不要再通过环境变量、`.obsidian-kb-root` 或其它候选路径重复 probing。
+- 每轮仓库任务都必须先做一次轻量知识库判断，并在首条中间进度或等价命中检查证据中输出 `知识库:<检索/沉淀/不适用/阻断>`。
+- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / 知识库 / 当时怎么说”等信号时，判定为 `知识库:检索`，必须命中 `knowledge-flow` 并通过标准文件工具检索 / 读取笔记。
+- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `知识库:沉淀`，必须命中 `knowledge-flow` 并先检索已有笔记，再决定捕获或沉淀。
+- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `知识库:不适用`，不得为了形式读写知识库。
+- 知识库笔记的检索、读取、创建、追加和沉淀统一使用标准文件工具，写入后必须回读校验；知识库根目录不存在或不可读、笔记路径不合法、写入后回读不一致时，判定为 `知识库:阻断`，不得把失败的写入当成已沉淀。
+- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `知识库:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
+- 本仓库固定使用 `D:\谷歌云盘\知识库\` 作为知识库根目录，由 Google Drive 客户端负责多端同步；笔记路径一律是相对该根的裸相对路径（如 `20-Knowledge/topic/note.md`），禁止再加 `知识库/` 前缀，否则会生成嵌套目录。既然这个映射已经约定，就不要再通过环境变量或其它候选路径重复 probing。
 EOF
 )
 
@@ -228,7 +228,7 @@ BODY_NO_AUTO_COMMIT=$(cat <<'EOF'
 - 任何情况下都不得以「我以为你想提交」「按惯例提交」「顺手提交」为由自动提交。
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
-- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `obsidian-knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
+- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
 - 违反本条视为最高级别流程违规。
 EOF
 )
@@ -251,10 +251,10 @@ EOF
 
 BODY_SKILL_HIT=$(cat <<'EOF'
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
-- 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
+- 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，或同时涉及项目记忆四件套，默认额外启用 `project-rule-file-bootstrap-rules`，由其 `rule-bootstrap` / `memory-bootstrap` 条件路由统一自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
-- 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
+- 首条中间进度还必须输出知识库选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 非 Plan Mode 的仓库实质任务，首条中间进度还必须输出 `闸门预告`：按 `skill-hit-check-rules` 的延迟触发 gate 注册表登记本轮将适用的收口 / 中段 / 测试前 / 失败时等延迟 gate（含 `reasoning-summary-structure-rules`），无适用项写 `无`，Plan Mode 置 `不适用(Plan Mode)`；收口时逐项复核 `闸门预告` 的声明与执行是否一致，不得只在回合末端凭自觉临时补触发延迟 gate。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。

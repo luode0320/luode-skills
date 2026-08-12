@@ -32,5 +32,5 @@
 
 ## 维护约定
 
-- 本表只登记 B 类延迟 gate；A 类首条即声明 skill（`parallel-task-dispatch-rules`/`git-collaboration-rules`/`obsidian-knowledge-flow`/`task-plan-rehydration-rules`）与 C 类领域 skill 不入表。
+- 本表只登记 B 类延迟 gate；A 类首条即声明 skill（`parallel-task-dispatch-rules`/`git-collaboration-rules`/`knowledge-flow`/`task-plan-rehydration-rules`）与 C 类领域 skill 不入表。
 - 新增或调整 gate 触发时机时只改本表，`hit-checklist.md` 各「场景补充」引用本表、不复制清单，避免双维护。

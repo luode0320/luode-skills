@@ -32,7 +32,7 @@ description: 当用户表达“开新会话继续”“新会话中继续”“�
 
 新任务收到交接包后必须按以下顺序执行：
 
-1. 输出本轮 `skill-hit-check-rules` 固定字段，并声明 `Obsidian` 判断和并行判断。
+1. 输出本轮 `skill-hit-check-rules` 固定字段，并声明 `知识库` 判断和并行判断。
 2. 读取父目录规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`；按当前新 `session_id` 精确校验 projection，不跨会话复制或覆盖旧 projection。
 3. 用标准库脚本再次校验交接包，核对项目实际文件、测试证据和进行中断点；与交接包冲突时以当前代码和当前项目文档为准，并报告冲突。
 4. 建立或恢复当前新任务自己的 projection，成功持久化后立即调用 `update_plan`；UI 同步失败时进入 `UI_SYNC_BLOCKED`，禁止继续领域写入。

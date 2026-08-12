@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""渲染并校验执行失败知识案例，不直接读写 Obsidian vault。"""
+"""渲染并校验执行失败知识案例，只产出 Markdown 文本，不直接读写知识库。"""
 
 from __future__ import annotations
 
@@ -71,7 +71,7 @@ def sanitize(value: str) -> str:
 
     [参数] value: 待写入案例的文本。
     [返回] 删除凭据和私有路径后的文本。
-    最近修改时间: 2026-07-14 增加 Obsidian 执行案例脱敏渲染。
+    最近修改时间: 2026-07-14 增加执行案例脱敏渲染。
     """
     result = value
     for pattern in SECRET_PATTERNS:
@@ -180,7 +180,7 @@ def yaml_scalar(value: str) -> str:
 
 
 def render(payload: dict[str, Any]) -> str:
-    """生成可通过 bridge create/append 写入的案例 Markdown。
+    """生成可通过文件系统写入的案例 Markdown。
 
     [参数] payload: 已通过 validate 的案例对象。
     [返回] UTF-8 Markdown 文本。
@@ -196,7 +196,8 @@ def render(payload: dict[str, Any]) -> str:
     today = text_value(payload, "updated")
     key = case_key(payload)
     owner = values["owner_skill"]
-    case_path = f"知识库/20-Knowledge/execution-failure-cases/{owner}/{values['case_id']}.md"
+    # 笔记路径为相对知识库根的裸相对路径，不带 知识库/ 前缀，避免生成嵌套目录。
+    case_path = f"20-Knowledge/execution-failure-cases/{owner}/{values['case_id']}.md"
     source_refs = json.dumps([values["source"]], ensure_ascii=False)
     confidence = payload.get("confidence", "medium")
     mode = payload.get("mode", "learn")
@@ -224,8 +225,8 @@ def render(payload: dict[str, Any]) -> str:
         "project_root_wsl: null",
         "path_aliases: []",
         f"knowledge_kind: execution_case",
-        "storage: obsidian",
-        f"obsidian_path: {yaml_scalar(case_path)}",
+        "storage: knowledge-base",
+        f"note_path: {yaml_scalar(case_path)}",
         f"seed_source: {yaml_scalar(values['source'])}",
         f"case_key: {yaml_scalar(key)}",
         f"case_state: {yaml_scalar(state)}",
@@ -278,7 +279,7 @@ def render(payload: dict[str, Any]) -> str:
         f"- status: {state}",
         "- event: created",
         "- 原因：案例由受控渲染器生成。",
-        "- 证据：后续状态只能通过 bridge append 追加。",
+        "- 证据：后续状态只能通过文件追加。",
         f"- 验证时间：{today}",
         f"- scope: {values['scope']}",
         "",
@@ -288,7 +289,7 @@ def render(payload: dict[str, Any]) -> str:
 
 def parse_args() -> argparse.Namespace:
     """解析命令行参数。"""
-    parser = argparse.ArgumentParser(description="render a sanitized Obsidian execution case")
+    parser = argparse.ArgumentParser(description="render a sanitized knowledge-base execution case")
     parser.add_argument("--input", required=True, type=Path, help="UTF-8 JSON case input")
     parser.add_argument("--output", required=True, type=Path, help="UTF-8 Markdown output")
     return parser.parse_args()

@@ -38,7 +38,7 @@
 
 新任务 prompt 必须包含以下最小要求：
 
-1. 第一条响应先执行 `skill-hit-check-rules`，输出命中技能、Obsidian 判断、并行判断和适用闸门。
+1. 第一条响应先执行 `skill-hit-check-rules`，输出命中技能、知识库判断、并行判断和适用闸门。
 2. 读取父目录规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`；需要历史时再窄读 `PROJECT_HISTORY.md`。
 3. 用新任务自己的 `session_id` 校验或建立 projection。不能复制旧任务的 `update_plan` payload，也不能覆盖其它会话 projection。
 4. 再次运行交接包校验；以当前代码和项目文档核对 `completed`、`in_progress`、`next_steps` 与 `validation`。

@@ -59,6 +59,6 @@
 
 ### 状态、记忆、宿主与环境准备
 
-`task-plan-rehydration-rules`、`obsidian-knowledge-flow`、`project-memory-rules`、`thread-title-rules`、`context-compression-rules`、`agent-runtime-recovery-rules`、`project-rule-file-bootstrap-rules`、`recent-context-bootstrap-rules`、`history-recall-rules`、`authenticated-url-routing-rules`、`windows-powershell-environment-rules`、`windows-wsl-execution-rules`。
+`task-plan-rehydration-rules`、`knowledge-flow`、`project-memory-rules`、`thread-title-rules`、`context-compression-rules`、`agent-runtime-recovery-rules`、`project-rule-file-bootstrap-rules`、`recent-context-bootstrap-rules`、`history-recall-rules`、`authenticated-url-routing-rules`、`windows-powershell-environment-rules`、`windows-wsl-execution-rules`。
 
 排除列表中的 Skill 仍可由主流程按其自身触发条件调用；本监督 Skill 永不把它们当作质量 Owner。

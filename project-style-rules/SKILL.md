@@ -78,6 +78,6 @@ description: 从对话和代码中自动提取、规范化、合并并增量更�
 
 ## 跨项目沉淀判断（可选）
 
-写入风格条目时，若该条目同时满足 `../project-memory-rules/references/project-knowledge-source-contract.md`「跨项目桥接（可选）」一节引用的标准（详见 `../obsidian-knowledge-flow/references/project-memory-bridge.md`），可为该条目追加可选字段 `跨项目候选: 是`；不满足则不标记，缺省视为“否”。
+写入风格条目时，若该条目同时满足 `../project-memory-rules/references/project-knowledge-source-contract.md`「跨项目桥接（可选）」一节引用的标准（详见 `../knowledge-flow/references/project-memory-sync.md`），可为该条目追加可选字段 `跨项目候选: 是`；不满足则不标记，缺省视为“否”。
 
-这一步只做本地文本判断，不调用 Obsidian bridge，不影响 `PROJECT_STYLE.md` 的本地写入流程本身。实际的检索、去重、创建或追加统一交给 `obsidian-knowledge-flow` 在会话收口阶段处理；本 Skill 不直接调用 bridge。
+这一步只做本地文本判断，不写入知识库，不影响 `PROJECT_STYLE.md` 的本地写入流程本身。实际的检索、去重、创建或追加统一交给 `knowledge-flow` 在会话收口阶段处理；本 Skill 不直接读写知识库目录。
