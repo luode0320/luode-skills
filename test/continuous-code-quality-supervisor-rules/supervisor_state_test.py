@@ -203,7 +203,7 @@ class SupervisorStateTests(unittest.TestCase):
             "functional-validation-rules",
             "git-collaboration-rules",
             "implementation-planning-rules",
-            "obsidian-knowledge-flow",
+            "knowledge-flow",
             "parallel-task-dispatch-rules",
             "project-local-skills-rules",
             "project-memory-rules",

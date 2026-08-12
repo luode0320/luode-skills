@@ -7,16 +7,16 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-OBSIDIAN_SKILL = ROOT / "obsidian-knowledge-flow" / "SKILL.md"
-OBSIDIAN_FLOW = ROOT / "obsidian-knowledge-flow" / "references" / "capture-retrieve-distill.md"
+KNOWLEDGE_SKILL = ROOT / "knowledge-flow" / "SKILL.md"
+KNOWLEDGE_FLOW = ROOT / "knowledge-flow" / "references" / "capture-retrieve-distill.md"
 SUMMARY_SKILL = ROOT / "reasoning-summary-structure-rules" / "SKILL.md"
 SUMMARY_AGENT = ROOT / "reasoning-summary-structure-rules" / "agents" / "openai.yaml"
 SUMMARY_TEMPLATE = ROOT / "reasoning-summary-structure-rules" / "references" / "summary-structure-template.md"
 SUMMARY_CONDITIONS = ROOT / "reasoning-summary-structure-rules" / "references" / "conditional-sections-rules.md"
 SUMMARY_EXAMPLES = ROOT / "reasoning-summary-structure-rules" / "references" / "output-examples.md"
 ALL_RULE_FILES = (
-    OBSIDIAN_SKILL,
-    OBSIDIAN_FLOW,
+    KNOWLEDGE_SKILL,
+    KNOWLEDGE_FLOW,
     SUMMARY_SKILL,
     SUMMARY_AGENT,
     SUMMARY_TEMPLATE,
@@ -51,7 +51,7 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-class ObsidianLedgerContractTest(unittest.TestCase):
+class KnowledgeLedgerContractTest(unittest.TestCase):
     """台账组：校验引用台账的字段、登记时机与三条硬约束。"""
 
     def test_ledger_section_defines_six_fields(self) -> None:
@@ -61,7 +61,7 @@ class ObsidianLedgerContractTest(unittest.TestCase):
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
-        content = read_text(OBSIDIAN_FLOW)
+        content = read_text(KNOWLEDGE_FLOW)
         self.assertIn("## 引用台账", content)
         for field in LEDGER_FIELDS:
             self.assertIn(field, content, f"引用台账缺少字段 {field}")
@@ -73,7 +73,7 @@ class ObsidianLedgerContractTest(unittest.TestCase):
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
-        content = read_text(OBSIDIAN_FLOW)
+        content = read_text(KNOWLEDGE_FLOW)
         self.assertIn("立即登记", content)
         self.assertIn("不得延后到收口阶段", content)
 
@@ -84,30 +84,30 @@ class ObsidianLedgerContractTest(unittest.TestCase):
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
-        content = read_text(OBSIDIAN_FLOW)
+        content = read_text(KNOWLEDGE_FLOW)
         self.assertIn("一律不得入表", content)
         self.assertIn("候选线索", content)
 
-    def test_ledger_forbids_cli_echo_as_note_name(self) -> None:
-        """笔记名必须取自本地 path 字符串，不使用 CLI 回显文本。
+    def test_ledger_note_name_comes_from_relative_path(self) -> None:
+        """笔记名必须取自读写笔记时所用的相对路径，同名才括注目录。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。
-        最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
+        最近修改时间: 2026-08-12 CLI 回显乱码归因已废除，改断言相对路径来源。
         """
-        content = read_text(OBSIDIAN_FLOW)
-        self.assertIn("不使用 CLI 回显文本", content)
-        self.assertIn("回显中文会乱码", content)
+        content = read_text(KNOWLEDGE_FLOW)
+        self.assertIn("取自读写笔记时所用的相对路径", content)
+        self.assertIn("存在同名笔记时才括注所在目录", content)
 
     def test_ledger_is_session_scoped(self) -> None:
-        """台账是本轮会话内事实，不写入 vault、不落盘项目文件。
+        """台账是本轮会话内事实，不写入知识库、不落盘项目文件。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
-        content = read_text(OBSIDIAN_FLOW)
-        self.assertIn("不写入 vault", content)
+        content = read_text(KNOWLEDGE_FLOW)
+        self.assertIn("不写入知识库", content)
         self.assertIn("不落盘到项目文件", content)
 
     def test_skill_entry_points_reference_ledger(self) -> None:
@@ -117,10 +117,10 @@ class ObsidianLedgerContractTest(unittest.TestCase):
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
-        content = read_text(OBSIDIAN_SKILL)
+        content = read_text(KNOWLEDGE_SKILL)
         self.assertEqual(content.count("引用台账"), 3, "检索规则、捕获规则与 reference 指引各需一处台账入口")
-        self.assertIn("不使用 CLI 回显文本", content)
-        self.assertIn("`search` 命中但未读取的笔记不得入表", content)
+        self.assertIn("取自读写笔记时所用的相对路径", content)
+        self.assertIn("检索命中但未读取的笔记不得入表", content)
 
 
 class CitationOrderContractTest(unittest.TestCase):
@@ -153,14 +153,14 @@ class CitationOrderContractTest(unittest.TestCase):
         self.assertIn("改动点与知识引用（如有）必须置于其前", content)
 
     def test_self_check_requires_traceable_citation_rows(self) -> None:
-        """发送前自检必须要求每行引用可回指真实 bridge 调用。
+        """发送前自检必须要求每行引用可回指真实的文件读/写调用。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。
         最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
         """
         content = read_text(SUMMARY_SKILL)
-        self.assertIn("回指本轮一次返回 `verified=true` 的 bridge 调用", content)
+        self.assertIn("回指本轮一次成功返回的文件读/写调用", content)
         self.assertIn("台账为空时是否已整节省略", content)
 
     def test_condition_gate_and_verdict_cover_citation(self) -> None:
@@ -215,7 +215,7 @@ class RetiredPhraseContractTest(unittest.TestCase):
             for phrase in RETIRED_PHRASES:
                 self.assertNotIn(phrase, content, f"{path.name} 仍残留旧口径：{phrase}")
 
-    def test_result_section_no_longer_hosts_obsidian_line(self) -> None:
+    def test_result_section_no_longer_hosts_knowledge_line(self) -> None:
         """结果与结论不再承载 Obsidian 摘要行，也不占用句数上限。
 
         [参数] 无。
@@ -300,7 +300,7 @@ class CitationExampleContractTest(unittest.TestCase):
         content = read_text(SUMMARY_EXAMPLES)
         self.assertIn("## 反例（search 命中未 read 却列入知识引用）", content)
         self.assertIn("候选线索，不得入表", content)
-        self.assertIn("笔记名取自 CLI 回显", content)
+        self.assertIn("笔记名中文已乱码", content)
 
 
 class RuleFileEncodingTest(unittest.TestCase):
