@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-11 18:10:02",
+  "generated_at": "2026-08-12 18:19:40",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 34,
     "doc_total": 10,
-    "references_total": 576,
+    "references_total": 575,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -558,7 +558,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 13,
-          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。",
+          "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行知识库知识流选择性默认判断，输出 `知识库:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。",
           "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
           "skill_path": "skill-hit-check-rules/SKILL.md",
           "directory_path": "skill-hit-check-rules",
@@ -766,7 +766,7 @@ window.SKILL_DICTIONARY = {
           "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
           "domain_order": 1,
           "item_order": 18,
-          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `obsidian-knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实 bridge 调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+          "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实的文件读/写调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
           "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
           "skill_path": "reasoning-summary-structure-rules/SKILL.md",
           "directory_path": "reasoning-summary-structure-rules",
@@ -897,9 +897,9 @@ window.SKILL_DICTIONARY = {
           ]
         },
         {
-          "id": "obsidian-knowledge-flow",
-          "name": "obsidian-knowledge-flow",
-          "title": "Obsidian 知识流",
+          "id": "knowledge-flow",
+          "name": "knowledge-flow",
+          "title": "知识库知识流",
           "status": "implemented",
           "status_label": "已实现",
           "domain_id": "memory",
@@ -907,11 +907,11 @@ window.SKILL_DICTIONARY = {
           "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
           "domain_order": 2,
           "item_order": 3,
-          "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；知识库可迭代更新而非只增量堆积：写入前必须判定新信息是补充、矛盾未裁决还是取代旧结论，判为取代时按分级处置把旧笔记改为已取代、归档到 `90-Archive/` 或删除进回收站，并双向写入 `supersedes` / `superseded_by`，检索时顺着接替关系以最新笔记为当前口径；已积压的冲突、过期与孤儿笔记用只读巡检脚本 `audit_vault_knowledge.py` 捞成候选清单；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
-          "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
-          "skill_path": "obsidian-knowledge-flow/SKILL.md",
-          "directory_path": "obsidian-knowledge-flow",
-          "directory": "obsidian-knowledge-flow",
+          "auto_trigger": "将固定根目录的 Google Drive 知识库作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、PROJECT_CURRENT.md、PROJECT_MEMORY.md 和 PROJECT_HISTORY.md 负责项目本地启动上下文，知识库仍采用选择性默认触发。每轮先判断知识库四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有笔记时才通过标准文件工具检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过标准文件工具沉淀；知识库可迭代更新而非只增量堆积。适用于知识库、Markdown 知识管理、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和文件系统笔记操作场景。",
+          "core_responsibility": "负责输出 `知识库:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才用标准文件工具读取、捕获或沉淀笔记，知识库目录不可达、路径不合法或写入后回读不一致时阻断。",
+          "skill_path": "knowledge-flow/SKILL.md",
+          "directory_path": "knowledge-flow",
+          "directory": "knowledge-flow",
           "sections": [
             "目标",
             "项目本地四件套边界",
@@ -920,22 +920,21 @@ window.SKILL_DICTIONARY = {
             "工作流程",
             "捕获规则",
             "检索规则",
-            "命令行约定"
+            "文件系统约定"
           ],
           "references": [
-            "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-            "obsidian-knowledge-flow/references/cli-failure-casebook.md",
-            "obsidian-knowledge-flow/references/cli-operations.md",
-            "obsidian-knowledge-flow/references/conflict-staleness.md",
-            "obsidian-knowledge-flow/references/execution-case-notes.md",
-            "obsidian-knowledge-flow/references/note-schema.md",
-            "obsidian-knowledge-flow/references/project-memory-bridge.md",
-            "obsidian-knowledge-flow/references/project-memory-layout.md",
-            "obsidian-knowledge-flow/references/validation-checklist.md",
-            "obsidian-knowledge-flow/references/vault-layout.md"
+            "knowledge-flow/references/capture-retrieve-distill.md",
+            "knowledge-flow/references/conflict-staleness.md",
+            "knowledge-flow/references/execution-case-notes.md",
+            "knowledge-flow/references/file-operations.md",
+            "knowledge-flow/references/knowledge-layout.md",
+            "knowledge-flow/references/note-schema.md",
+            "knowledge-flow/references/project-memory-layout.md",
+            "knowledge-flow/references/project-memory-sync.md",
+            "knowledge-flow/references/validation-checklist.md"
           ],
           "agents": [
-            "obsidian-knowledge-flow/agents/openai.yaml"
+            "knowledge-flow/agents/openai.yaml"
           ],
           "has_license": false,
           "focus_points": [
@@ -5276,7 +5275,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 13,
-      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行 Obsidian 知识流选择性默认判断，输出 `Obsidian:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `obsidian-knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。",
+      "auto_trigger": "【强制总控】每轮用户新消息（含新会话第一条）都必须先做命中检查并在首条中间进度输出。凡涉及 Git 协作动作（含显式关键词与隐式语义，如“提交git/帮我提交/commit一下/推送代码/看下状态”），必须联动命中 git-collaboration-rules。凡处理本仓库任务，最低还必须联动命中 `parallel-task-dispatch-rules`，并在非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 字段登记本轮所有延迟触发 gate（含 `reasoning-summary-structure-rules`）；同时执行知识库知识流选择性默认判断，输出 `知识库:检索/沉淀/不适用/阻断`；当判断为 `检索` 或 `沉淀` 时必须同时命中 `knowledge-flow`。继续类消息命中恢复 Owner 后，必须按当前 `session_id` 从 PROJECT_CURRENT v4 registry 精确恢复对应 projection；无匹配时还要支持“由只读子代理收集证据，再补建绑定当前会话的 exact 或 fallback 悬浮任务列表”的执行前路由。首条中间进度最小必填包含 `命中检查`、`命中技能`，若本轮命中 `parallel-task-dispatch-rules` 还必须追加 `并行技能`；非 Plan Mode 的仓库实质任务还必须追加 `闸门预告`（按延迟触发 gate 注册表登记本轮将适用的延迟 gate）。",
       "core_responsibility": "在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。",
       "skill_path": "skill-hit-check-rules/SKILL.md",
       "directory_path": "skill-hit-check-rules",
@@ -5484,7 +5483,7 @@ window.SKILL_DICTIONARY = {
       "domain_description": "流程分流、冲突裁决、阶段阻断与全局基础约定",
       "domain_order": 1,
       "item_order": 18,
-      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `obsidian-knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实 bridge 调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
+      "auto_trigger": "当进入本轮最终推理总结或结束输出阶段时自动触发；并在首条命中检查阶段即由 `skill-hit-check-rules` 按延迟触发 gate 注册表预声明为本轮收口 Owner（非 Plan Mode 的实质任务轮必须预声明并在 `闸门预告` 字段登记，Plan Mode 除外）。负责强制检查总结结构完整性，并按内容优先输出 Mermaid 图形化总览：存在流程、依赖、状态、执行链、跨角色交互或量化结果时，先选择流程图、时序图、状态图、执行/依赖图或适用图表，再输出 Skill 执行证据、当前问题、解决方案与根因、验证结果和结论；简单单点任务不强制造图。图前必须写图形目的和关联 ID，图形必须来自本轮真实事实且与正文术语一致。若本轮有改动必须包含本次改动点。若 `knowledge-flow` 的引用台账非空，必须在总结末尾输出「知识引用」小节，用「本轮引用」与「本轮沉淀」两张表逐条列出读过与写过的笔记及其用途，每行都要能回指一次真实的文件读/写调用；台账为空时整节省略。真实 `blocked` 或 `manual_handoff` 时，本 skill 是唯一面向用户渲染“任务阻断收口”的 owner，且该区块必须作为最终状态区。最终总结采用统一严谨的 markdown 排版并与推理过程视觉分界。默认禁止“下一步状态/建议”区块；只有不存在真实阻断且存在原执行计划内未完成必需项，或用户明确要求提供后续建议时，才允许出现后续内容。原始用户目标完成、用户明确要求结束，或仅剩可选优化时强制无下一步。Plan Mode 下不触发；Plan Mode 的正式、受限和阻断计划统一由 `implementation-planning-rules` 负责。不要用它代替需求分析、Bug 定位、实现修改或测试执行。",
       "core_responsibility": "作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。",
       "skill_path": "reasoning-summary-structure-rules/SKILL.md",
       "directory_path": "reasoning-summary-structure-rules",
@@ -5603,9 +5602,9 @@ window.SKILL_DICTIONARY = {
       ]
     },
     {
-      "id": "obsidian-knowledge-flow",
-      "name": "obsidian-knowledge-flow",
-      "title": "Obsidian 知识流",
+      "id": "knowledge-flow",
+      "name": "knowledge-flow",
+      "title": "知识库知识流",
       "status": "implemented",
       "status_label": "已实现",
       "domain_id": "memory",
@@ -5613,11 +5612,11 @@ window.SKILL_DICTIONARY = {
       "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "domain_order": 2,
       "item_order": 3,
-      "auto_trigger": "将固定根目录的 Obsidian vault 作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 和 `PROJECT_HISTORY.md` 负责项目本地启动上下文，Obsidian 仍采用选择性默认触发。每轮先判断 Obsidian 四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有 vault 笔记时才通过公开 bridge 检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过公开 bridge 沉淀；知识库可迭代更新而非只增量堆积：写入前必须判定新信息是补充、矛盾未裁决还是取代旧结论，判为取代时按分级处置把旧笔记改为已取代、归档到 `90-Archive/` 或删除进回收站，并双向写入 `supersedes` / `superseded_by`，检索时顺着接替关系以最新笔记为当前口径；已积压的冲突、过期与孤儿笔记用只读巡检脚本 `audit_vault_knowledge.py` 捞成候选清单；执行命令、CLI、API、浏览器、安装器、生成器或测试入口出现非预期失败时，自动检索并在同输入 local 验证后追加脱敏的正反例与 candidate/active/stale 状态事件；bridge 再调用官方 Windows CLI。适用于 Obsidian、vault、Markdown 知识库、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和 CLI 笔记操作场景。",
-      "core_responsibility": "负责输出 `Obsidian:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才通过 Obsidian CLI 读取、捕获或沉淀笔记，CLI / vault 不可用时阻断且不得直接读写 vault 文件。",
-      "skill_path": "obsidian-knowledge-flow/SKILL.md",
-      "directory_path": "obsidian-knowledge-flow",
-      "directory": "obsidian-knowledge-flow",
+      "auto_trigger": "将固定根目录的 Google Drive 知识库作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、PROJECT_CURRENT.md、PROJECT_MEMORY.md 和 PROJECT_HISTORY.md 负责项目本地启动上下文，知识库仍采用选择性默认触发。每轮先判断知识库四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有笔记时才通过标准文件工具检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过标准文件工具沉淀；知识库可迭代更新而非只增量堆积。适用于知识库、Markdown 知识管理、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和文件系统笔记操作场景。",
+      "core_responsibility": "负责输出 `知识库:<检索/沉淀/不适用/阻断>` 判定；只有 `检索` 或 `沉淀` 才用标准文件工具读取、捕获或沉淀笔记，知识库目录不可达、路径不合法或写入后回读不一致时阻断。",
+      "skill_path": "knowledge-flow/SKILL.md",
+      "directory_path": "knowledge-flow",
+      "directory": "knowledge-flow",
       "sections": [
         "目标",
         "项目本地四件套边界",
@@ -5626,22 +5625,21 @@ window.SKILL_DICTIONARY = {
         "工作流程",
         "捕获规则",
         "检索规则",
-        "命令行约定"
+        "文件系统约定"
       ],
       "references": [
-        "obsidian-knowledge-flow/references/capture-retrieve-distill.md",
-        "obsidian-knowledge-flow/references/cli-failure-casebook.md",
-        "obsidian-knowledge-flow/references/cli-operations.md",
-        "obsidian-knowledge-flow/references/conflict-staleness.md",
-        "obsidian-knowledge-flow/references/execution-case-notes.md",
-        "obsidian-knowledge-flow/references/note-schema.md",
-        "obsidian-knowledge-flow/references/project-memory-bridge.md",
-        "obsidian-knowledge-flow/references/project-memory-layout.md",
-        "obsidian-knowledge-flow/references/validation-checklist.md",
-        "obsidian-knowledge-flow/references/vault-layout.md"
+        "knowledge-flow/references/capture-retrieve-distill.md",
+        "knowledge-flow/references/conflict-staleness.md",
+        "knowledge-flow/references/execution-case-notes.md",
+        "knowledge-flow/references/file-operations.md",
+        "knowledge-flow/references/knowledge-layout.md",
+        "knowledge-flow/references/note-schema.md",
+        "knowledge-flow/references/project-memory-layout.md",
+        "knowledge-flow/references/project-memory-sync.md",
+        "knowledge-flow/references/validation-checklist.md"
       ],
       "agents": [
-        "obsidian-knowledge-flow/agents/openai.yaml"
+        "knowledge-flow/agents/openai.yaml"
       ],
       "has_license": false,
       "focus_points": [
