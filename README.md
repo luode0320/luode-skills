@@ -992,3 +992,4 @@ claude-mem(记忆) :
 2026-08-12 18:16:43 test: [知识库迁移] 新增知识库索引与EOL健康测试并迁移引用测试
 2026-08-12 18:17:28 feat: [知识库迁移] obsidian-knowledge-flow重命名为knowledge-flow并脱离CLI桥接
 2026-08-12 18:19:29 docs: [字典同步] 刷新knowledge-flow重命名相关Skill描述
+2026-08-12 18:20:12 docs: [项目治理同步] 归档知识库迁移全系列的规则记忆与索引

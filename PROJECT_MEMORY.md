@@ -45,7 +45,7 @@
 - 稳定决策：十分钟只作缺失 projection 的异常修复闸门。任务已真实执行但当前会话缺少活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后主动执行时间严格大于 600 秒时，才先调用只读 `probe-timeout`，随后补建并立即同步；不再把十分钟作为正常任务首次显示悬浮窗的入口。
 - 稳定决策：`probe-timeout` 不创建锁文件、临时文件、projection 或 payload；`goal_check_required` 后只允许主 Agent 按 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行，子 Agent 不得调用 Goal 或主悬浮窗工具。
 - 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
-- 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或 Obsidian。
+- 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或知识库。
 - 稳定决策：超时升级只在工具返回、阶段进度或回合结束前等可执行检查点运行，不承诺后台第 601 秒自动唤醒；计时起止与暂停秒数不进入 projection schema 或项目长期状态，计时上下文丢失后重新计时而不是推算。
 - 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将三步写为 `inactive`，失活后禁止重放。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
@@ -279,85 +279,10 @@
 
 ## 变更记录
 
-- 2026-06-27：初始化根目录长期记忆文档，补齐 doc 顶层目录口径、审查链收口和长期规则回写约束。
-- 2026-06-27：新增需求主动侦察链路，明确老板式 idea 先由 agent 查项目、数据、代码、上下游和补充路径，再形成需求设计并回写可复用侦察线索。
-- 2026-06-27：曾将独立 Discovery Skill 设为需求域第一入口；当前稳定口径已迁移为 `requirement-intake-rules#initial-discovery`，四个需求 Owner 保持独立，通过条件路由与 reference 收敛职责重叠。
-- 2026-06-27：新增统一文档落盘闸门，明确需求、Bug、测试、审查收口前必须先核对正式文档已真实落盘；同时取消审查域“轻量通过可不落盘”的旧口径。
-- 2026-06-27：补充“中间链路也必须过文档落盘闸门”的长期口径，并明确提交级专项审查正式归档到 `doc/6-审查/`，不再写项目根目录固定文件名。
-- 2026-06-28：明确“需求/验收标准/实施计划完成不等于自动开工”，必须等用户明确“开始实施/开始执行”后才能进入编码；一旦开工，后续按实施周期自动串行推进实现、测试、审查与验收闭环。
-- 2026-06-30：统一实施执行口径为“最小任务闭环优先于实施周期浏览”；2026-08-01 起主执行链更新为“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”。
-- 2026-06-29：将实施执行粒度从“实施周期闭环”细化为“最小任务闭环”；实施周期继续作为文档管理容器，当前执行顺序为每个最小任务依次满足实施计划完成条件、实现、真实测试和 6-review 后再进入下一个最小任务。
-- 2026-06-29：补充长文本执行边界；“开始实施/开始实现/开始执行/直接做/继续做完/按文档实现”等开工词必须有执行计划、任务完成条件、任务停止 / 结束条件和最大推进边界，缺少时先补受限计划并停在计划收口处，不得直接实现。
-- 2026-06-29：建立并行规划与真实启动闭环；2026-06-30 补充工具授权优先级；2026-07-22 收敛为 `parallel-task-dispatch-rules` 单一状态机，统一分类、授权、启动、观测、回收与关闭，不能只停留在文本规划。
-- 2026-06-29：新增 `generate_subagent_plan.py` 启动计划脚本，明确批量委派先生成计划 JSON，再由主 agent 读取计划并真实启动；子 agent 名称默认使用任务简要中文。
-- 2026-06-29：补充子 agent 生命周期口径，明确中文任务名属于主 agent 逻辑名，平台 UI 昵称由启动工具返回；结果收回后仍必须调用 `close_agent` 完成回收。
-- 2026-06-30：扩展并行识别口径，明确并行不再依赖固定 skill 映射白名单；主 agent 在项目分析、找 Bug、需求完善侦察、证据收集等任务中必须自主识别可委派的只读 sidecar 子任务并优先尝试真实 subagent 并行。
-- 2026-06-30：修正 subagent 自动启动口径，明确自动的是委派判定；真实启动必须服从当前工具元数据和授权策略。若工具要求用户显式授权，先检查当前轮授权与项目级完全授权；仅两者均不存在时，才回退本地执行并记录实际启动数为 0。
-- 2026-06-30：根据用户确认启用 subagent 完全授权模式；项目级 standing authorization 视为满足工具显式授权条件，不再因缺少逐次 subagent 指令而回退本地执行。
-- 2026-07-25：补充子 agent 三段生命周期扫描、关闭后复查和数量对账规则；`interrupt_agent`、完成通知和停止采样不计关闭，平台无真实关闭工具时仅告警并阻止下一批。
-- 2026-06-28：将正式活动文档目录迁移为 `doc/1-架构/` 到 `doc/7-验收/` 的编号顺序，并新增 `architecture-doc-rules` 承接长期架构专题文档。
-- 2026-06-28：固定架构域四个中文主入口，补齐目录树、模块职责、主要业务链路示例，并明确单条业务链路的新增与更新策略。
-- 2026-06-28：架构域文件改为固定顺序编号，基础入口占用 `1-4`，业务链路从 `5` 开始按最大编号加一，历史编号不复用、不重排。
-- 2026-06-29：新增通用结束信号口径，明确“结束即停”不只适用于 Codex goal，也适用于 Claude Code、浏览器 agent、子 agent 等长文本收口场景。
-- 2026-06-29：统一活动文档命名前缀为 `YYYY-MM-DD_HHmmss`，并要求实施、审查、验收等下游文档保留来源对象标识；来源可以是需求或 Bug，避免只看见阶段或审查主题而看不出来源对象。
-- 2026-06-29：收紧无下一步收口口径，最终后续内容只允许原执行计划内未完成必需项、阻断项、用户显式要求的建议/backlog，其他可选优化不得默认输出。
-- 2026-06-30：新增普通 Markdown 输出规则，明确自然语言结构化输出不得包进 ` ```text ` 等代码围栏，应使用 Markdown 段落、列表、表格或引用块。
-- 2026-06-30：收紧需求阶段口径，明确“一次只推进一个关键问题”只允许基于真实缺口，不允许夹带 agent 猜测；需求主文档未真实落盘前，禁止进入实施规划与正式编码。
-- 2026-06-30：收紧实施规划口径，明确计划阶段只读、最小任务优先按依赖图与垂直切片组织、单任务默认控制在约 5 个文件以内，且每个最小任务都必须先完成真实测试、审查、验收闭环后再进入下一个任务。
-- 2026-07-01：历史上曾收紧为 PowerShell UTF-8 后承接普通命令；2026-07-02 已按新确认口径替换为 Windows 下普通仓库命令优先 Git Bash / bash，PowerShell 仅用于专项场景，执行类动作才进入 WSL。
-- 2026-07-01：恢复 README 改动日志时间戳格式为 yyyy-MM-dd HH:mm:ss 提交标题；新增提交前审查闸门，pre_commit_gate.sh 校验 doc/6-审查/ 下审查文档的审查结论、是否允许提交、阻断问题；两个审查 skill 归档时统一写入判定字段。
-- 2026-07-01：新增本地连接调试测试红线，明确需求、Bug、测试、运行时调试、启动联调和浏览器验证只能连接 local 本地数据库与本地服务，禁止连接 test / prod / staging 等非 local 环境。
-- 2026-07-12：新增 `windows-powershell-environment-rules` 并完成 Windows PowerShell 7.6.3 默认入口、UTF-8 profile、Windows CLI 工具 manifest、Terminal JSONC 幂等/回滚和 WSL 原生工具隔离验证；7z/tlrc 因管理员权限保留阻断。
-- 2026-07-01：补充计划型提问入口，明确用户只要显式索要“怎么做/先给计划/先出方案/先列步骤”，就必须先命中实施规划规则；若前置条件未齐，也要输出受限计划 / 阻断计划，而不是表现成计划规则未触发。
-- 2026-07-01：补充受限计划授权边界，明确受限计划不得作为实施授权；即使用户明确采纳，也必须先补齐前置条件并升级为正式执行计划，未升级前禁止进入编码、改码、重构、测试实施或其他执行动作。
-- 2026-07-03：补充 Plan Mode 包裹口径，明确运行环境若要求用 `<proposed_plan>` 等专用计划包裹输出，包裹层不改变项目内计划格式；计划正文仍必须遵守 `implementation-planning-rules` 与模板结构。
-- 2026-07-04：补充 Plan Mode 硬失败口径，明确 `Summary / Key Changes / Public Interfaces / Test Plan / Assumptions` 等通用工程计划壳不能作为实施规划主结构，且计划输出前必须执行 `implementation-planning-rules/references/plan-output-gate.md` 字段矩阵；缺核心字段时必须按模板重写。
-- 2026-07-05：明确实施周期是第一期 / 第二期 / 第三期等大进度与顺序边界；2026-08-01 起，周期内每个最小任务都满足“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”后才进入下一任务 / 下一周期，文档落盘记录周期收口与最小任务闭环证据。
-- 2026-07-13：完成 Obsidian Windows/WSL bridge-only 固定执行边界与 CYCLE-OBS-02 实机收口；唯一 vault 根为 `D:\obsidian_data`，WSL 通过 PowerShell interop，长正文和 append 必须以 CLI readback/hash 证明一致，未使用 vault 文件系统 fallback。
-- 2026-07-05：新增新项目 / 多来源对象的“需求与实施计划全量顺序实施方案”口径，要求先用项目级总表串起需求、验收标准、实施总览、实施周期和周期内最小任务，再进入单来源对象执行。
-- 2026-07-02：新增文件写入统一 UTF-8 口径，明确代码、文档、配置、脚本、测试资产和生成文本跨 Windows / WSL / Linux 默认 UTF-8，禁止 GBK / ANSI / 默认编码落盘，命令行写入后必须回读并检查 diff。
-- 2026-07-02：新增会话自动重命名规则，明确任务主题稳定且标题泛化、过时或不匹配时自动命中 `thread-title-rules`，调用真实线程重命名工具改为 8-24 字中文简要；标题已准确、工具不可用或用户禁止时跳过。
-- 2026-07-03：补充会话自动重命名平台能力矩阵，明确 Codex 优先用 `set_thread_title`，Claude Code 仅在存在真实改名工具时执行，Claude Desktop 默认显式跳过，`CLAUDE.md` 不等同于 Desktop 已具备自动改名能力。
-- 2026-07-02：新增 URL 认证浏览器默认路由，明确用户提供 URL 时默认优先通过 Chrome Plugin 复用用户真实 Chrome 登录态，避免隔离浏览器或 `web` 丢失权限；补充 Chrome 安全策略拒绝正文读取时只报告阻断事实并 handoff，不做绕过；执行中已确认解决的问题必须继续回灌到 skill。
-- 2026-07-12：收敛浏览器工具路由：用户真实 Chrome profile 只由 Chrome Plugin 接管；公开或 local 页面按 Chrome DevTools MCP 与 `agent-browser` 能力路由；`agent-browser` 保留为隔离 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎等条件能力，不再作为前后端联调默认强制工具。
-- 2026-07-26：新增 Browser Use Cloud 条件路由，只接云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码专属场景；逐次收费动作执行 key、Billing、硬费用上限和人工确认，结束后销毁遗留 session 并回读实际费用，免费层也不例外。
-- 2026-07-26：完成 `REQ-SUMMARY-DETAIL-001` 结果与结论详细度切片；简单任务结果区固定 3 句，复杂、受限或有关键边界时按事实扩展至 4–5 句，始终覆盖问题、方法和结果/验证状态，禁止空泛状态词和流水账；专项回归 9/9、Skill 校验、工程文档 strict、审查与最终验收通过，未执行 Git 历史写入。
-- 2026-07-02：补充项目内文件引用路径规则，明确 Windows 桌面访问 WSL 项目时，所有面向用户的项目内文件引用都用 `\\wsl.localhost\...`，`/home/...` 仅保留给 WSL 命令与日志上下文。
-- 2026-07-02：更新上线接口测试门禁规则，新增项目基线资产库、参数依赖解析、可复用参数生命周期、失效持续更新和通用脚本复用优先口径。
-- 2026-07-02：新增 Swag OpenAPI 全量维护规则，明确 `swag/` 为唯一正式输出目录，单接口完整 YAML、总 YAML 与 `.swag-manifest.yaml` 持续维护。
-- 2026-07-02：补充上线测试与 Swag OpenAPI 双索引同步规则，明确 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 理论上都不应缺失；任一缺失或三方接口集合不一致时，从当前代码刷新 swag 与测试基线两边。
-- 2026-07-03：收紧 Swag OpenAPI 导入口径，明确单接口 YAML 导入 Apifox 时默认直入目标目录，不通过 `tags` 额外创建父目录；头部、请求参数、响应字段都必须有中文说明，源码注释不足时只允许受控推导。
-- 2026-07-03：补充单接口 Swag 文件命名规则，默认采用“路径名 + 中文简要说明”格式；中文说明优先取显式 `summary`，缺失时允许受控推导，仍无法稳定得到时回退纯路径文件名并在 manifest 记录 `summary_source: unresolved`。
-- 2026-07-03：补充单接口 Swag 中文简介清洗规则，明确文件名后缀必须去掉 `1.`、`11.`、`（1）`、`【1】` 等数字前缀和无业务意义特殊符号，只保留接口中文简介本体。
-- 2026-08-01：历史审查链退役，注释、格式和目录归位改由测试后的 `6-review` 风格回归核对；缺失统一输出 `STYLE: FIX_REQUIRED`。
-- 2026-07-03：补充会话自动重命名执行细节，明确 Codex 下若首屏未直接暴露 `set_thread_title` / `list_threads`，必须先通过 `tool_search` 发现线程工具，再识别当前会话并执行改名；未做工具发现不得直接记为“工具不可用”。
-- 2026-07-05：会话自动重命名补充“阶段+提问”策略，要求用户提问、goal 创建 / 恢复、上下文压缩续做和长任务阶段切换时在过程中尽早判断标题，不等最终总结；标题已准确或仅小步骤推进时跳过。
-- 2026-07-05：新增代码生成风格入口链路，明确新增、修改或重构代码前必须由 `code-generation-style-rules` 读取 `PROJECT_STYLE.md` 与局部样例，形成本轮代码风格契约。
-- 2026-07-16：按用户要求升级注释双 skill，明确超过 5 行有效代码的函数/方法体、闭包体和连续控制流代码块必须在块内就近补顶层步骤注释，嵌套超长代码块单独判断。
-- 2026-07-17：完成 Skill 体积治理与职责拆分周期 01。确认 84/111/27 统计口径、冻结候选矩阵并完成五类通用测试入口；当前改动总审查通过，TASK-SPLIT-01-03 验收通过，周期 01 收口但不进入周期 02，真实 skill、字典和 Git 历史保持未修改。
-- 2026-07-08：新增工具落点分流 util/common/util 规则，明确项目无关工具归 `util`，引用项目文件、路径、配置或约定的复用工具归 `common/util`。
-- 2026-07-06：修正“项目内文件引用路径”规则的表述边界。用户反馈实际输出中仍出现 `/home/...` 裸路径，排查发现 `windows-wsl-execution-rules/SKILL.md`、`path-mapping.md`、`recommended-workflow.md`、`command-templates.md` 和本文件的“Windows / WSL 执行边界”词条，都把这条规则的表述挂在“agent 在 Windows”分支下；当 agent 实际直接运行在 WSL 内（情况一）时容易被误读为不适用。已改写为独立于 agent 运行位置的规则，并在“Windows / WSL 执行边界”词条中拆出交叉引用，避免两条规则的适用条件混读。
-- 2026-07-06：新增“WSL 工具 PATH interop 误用排查”词条。用户反馈在 WSL 内执行命令时被解析成 Windows 打包的 `rg`，报 permission denied；补充根因（`appendWindowsPath` 导致 PATH fallthrough）、排查命令（`command -v`）、修复优先级（原生装包优先，不默认改 `/etc/wsl.conf`），并新增“新会话首次进入 WSL 项目时一次性自检”的建议（经用户确认，力度介于纯文档和自动化脚本之间）。
-- 2026-07-08：新增 Git 协作联动 Obsidian 沉淀规则，明确提交 / 推送 / PR 收口形成可复用事实时先检索并沉淀，但沉淀不构成提交授权。
-- 2026-08-05：`PROJECT_HISTORY.md` 由“只追加”改为“追加并只保留最近 20 条”（按日期倒序、新事件置顶、追加后自动裁剪、被裁事件不归档）；同步 `project-memory-rules`、bootstrap 资产、`AGENTS.md` / `CLAUDE.md` 与机器索引口径。
+- 规则变更的完整历史以 git 提交历史为准；关键事件追加到 `PROJECT_HISTORY.md`（保留最近 20 条）；当前生效口径以对应 skill 的 `SKILL.md` 与 `AGENTS.md` 为事实源。
+- 本小节只保留最近 10 条尚未沉降到上述三处的过渡性记录，超出即删除，不做无限堆积。历史上本节曾堆积 75 条日期流水共 19KB，违反本文件「只保存稳定规则、关键决策和少量长期事实」的职责定义，且因缺少上限而持续增长；2026-08-12 已清空，逐条核对其当前口径均已被 skill 文件或 `AGENTS.md` 承接。
+- 2026-08-12：变更记录清空并加保留上限；跨项目通用判据迁往知识库，本文件只留本仓库落地口径与指针。
 
-### 上线接口测试门禁规则
-- 别名: project-release-test-rules（历史名，已拆分）, project-interface-baseline-rules, project-interface-release-execution-rules, 上线测试门禁
-- 类型: 测试域核心规则
-- 定义: 上线前项目级全接口测试门禁，替代人工接口回归验证，输出上线准入结论。每个业务项目必须在 `doc/5-tests/基线/` 长期维护接口清单、参数来源、依赖图、可复用参数、场景目录、脚本适配、执行历史和变更日志；同时将 `swag/.swag-manifest.yaml` 与 `doc/5-tests/基线/interface-inventory.yaml` 作为当前代码接口事实的双索引，任一缺失、陈旧或接口集合不一致时，先刷新 swag 与测试基线两边。若目标接口参数无法直接确定，agent 必须按 `reusable_param -> upstream_api -> local_database -> local_cache -> openapi_example -> fixture -> rule` 解析，并把来源写入依赖追踪；已测试通过的参数可持续复用，但必须有 `candidate/reusable/stale/invalid/quarantined/retired` 生命周期、复验、失效归因和持续回写机制。已有通用脚本能力优先复用，缺能力时扩展 `project-interface-release-execution-rules/scripts/generate_release_test_plan.py` 的通用子命令，不为每次上线重复生成一次性脚本。
-- 来源: `project-interface-baseline-rules/SKILL.md`、`project-interface-baseline-rules/references/baseline-asset-rules.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
-- 适用范围: 全项目上线前接口测试、回归验证、上线准入判定
-- 更新时间: 2026-07-02
-- 状态: 启用
-
-### Swag OpenAPI 全量维护规则
-- 别名: swag-openapi-maintainer-rules, 更新 swag, OpenAPI YAML 资产
-- 类型: API 文档资产规则
-- 定义: 当用户要求生成、补齐、刷新、维护项目 swag，导出 Apifox / OpenAPI / Swagger YAML，或补齐上游/第三方出站接口文档时，触发 `swag-openapi-maintainer-rules`。自有接口继续从真实路由、controller、请求 DTO、响应 DTO、统一响应包装和鉴权中间件读取，维护根 `swag/` 的自有接口全量文档；上游接口从 client、请求构造、base URL 和响应消费代码读取，按 B1 独立落在 `swag/<vendor-slug>/`。上游 manifest 固定使用 `source_type: upstream`、`upstream`、`base_url`、`coverage: partial`、`source_client_file`、`source_symbols` 和 `discovery_confidence`；根 `openapi.yaml` 不聚合上游。每个接口仍使用可独立导入 Apifox 的完整 YAML、单接口无默认 tags、路径名加中文简要说明和中文字段描述；上游只记录本项目实际消费字段，官方资料只能离线受控补充，不能联网抓取或编造字段。根与上游清理按目录隔离，manifest 的 `file` 必须是裸文件名。自有接口若存在上线测试基线，刷新 swag 后继续同步或提示同步 `doc/5-tests/基线/interface-inventory.yaml`；上游子集不自动并入自有基线。
-- 来源: `swag-openapi-maintainer-rules/SKILL.md`
-- 适用范围: 自有 HTTP API 与主动调用的上游/第三方出站接口文档导出、Swagger/OpenAPI 资产维护、Apifox YAML 导入
-- 更新时间: 2026-07-14
-- 状态: 启用
 
 ## Skill 体积治理与职责拆分
 
@@ -365,7 +290,7 @@
 - 稳定测试契约：通用入口覆盖 `size`、`mapping`、`trigger`、`pre-delete`、`post-delete` 五类模式；报告和矩阵路径不得越出仓库根目录，fixture 根不得越出当天测试时间戳目录；越界必须非零失败且不得删除真实 skill。
 - 当前状态：2026-07-17 已完成周期 01 的三个最小任务；2026-08-01 起闭环口径统一为“实施计划完成条件 -> 实现 -> 真实测试 -> 6-review”。周期 01 已收口，周期 02 尚未进入，真实 skill、字典和 Git 历史保持未修改。
 - 证据来源：需求、验收、实施总览、实施周期 01、测试 README、当前改动审查报告和 `validate_skill_split.py` 的本地验证结果。
-- Obsidian 沉淀：`知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md`，并已通过 bridge 更新 `知识库/INDEX.md` 导航入口。
+- 知识库沉淀：`20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md`，并已更新 `INDEX.md` 导航入口。
 - 更新时间：2026-07-17。
 
 ## 需求与实施文档极致完备化规则
@@ -432,45 +357,73 @@
 
 ## 总结知识引用清单规则
 
-- 稳定决策：`reasoning-summary-structure-rules` 的最终总结新增条件小节 `## 📚 知识引用`，用「本轮引用」三列表与「本轮沉淀」四列表承载 Obsidian 事实；原先分散在「方案与根因」和「结果与结论」的两处单行摘要口径已作废。
+- 稳定决策：`reasoning-summary-structure-rules` 的最终总结新增条件小节 `## 📚 知识引用`，用「本轮引用」三列表与「本轮沉淀」四列表承载知识库事实；原先分散在「方案与根因」和「结果与结论」的两处单行摘要口径已作废。
 - 稳定决策：无真实阻断时末尾顺序按引用台账分流——台账非空由知识引用收尾、改动点紧邻其前；台账为空由改动点收尾；真实阻断时两者都在阻断收口之前。
-- 稳定决策：`obsidian-knowledge-flow` 每次 `read`、`create`、`append` 返回 `verified=true` 后必须立即登记引用台账（笔记名、所在目录、本轮用途、`status`、操作、readback 六字段）；台账是会话内事实，不写入 vault、不落盘项目文件。
-- 稳定决策：只有真实 `read` 成功的笔记可进引用表，`search` 命中未读取的一律不得入表；引用小节每一行都必须能回指一次返回成功的 bridge 调用。
-- 稳定决策：笔记名一律取自发起 bridge 调用时所用 path 的文件名部分，禁止使用 CLI 回显文本——官方 CLI 在 Windows 下回显中文会乱码。
-- 事实更新：固定 vault `D:\obsidian_data` 已注册可用，`doctor`、`read` 与 `create` 均返回 `verified=true`；此前记录的 `Obsidian:阻断` 结论已过期。
-- 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`obsidian-knowledge-flow/references/capture-retrieve-distill.md`、`doc/2-需求/2026-08-04_总结知识引用清单_Obsidian引用可视化.md`、`doc/3-实施/2026-08-04_总结知识引用清单_实施周期21_Obsidian引用可视化.md`。
+- 稳定决策：`knowledge-flow` 每次读取、创建、追加笔记成功后必须立即登记引用台账（笔记名、所在目录、本轮用途、`status`、操作、回读结果六字段）；台账是会话内事实，不写入知识库、不落盘项目文件。
+- 稳定决策：只有真实读取成功的笔记可进引用表，检索命中未读取的一律不得入表；引用小节每一行都必须能回指一次成功返回的文件读/写调用。
+- 稳定决策：笔记名一律取自读写笔记时所用相对路径的文件名部分。（原附带的「禁止使用 CLI 回显文本，因官方 CLI 回显中文乱码」理由已于 2026-08-12 随 CLI 链路废除而失效）
+- 事实更新：知识库根目录已迁至 `D:\谷歌云盘\知识库\`，读写均通过标准文件工具直接完成，不再依赖任何 CLI 前置注册。
+- 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`knowledge-flow/references/capture-retrieve-distill.md`、`doc/2-需求/2026-08-04_总结知识引用清单_Obsidian引用可视化.md`、`doc/3-实施/2026-08-04_总结知识引用清单_实施周期21_Obsidian引用可视化.md`。
 - 更新时间：2026-08-04。
 
 ## 知识库可迭代更新规则
 
-- 稳定决策：Obsidian 知识库从只增量补充改为可迭代更新。写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一；判为取代必须在同一轮内处置旧笔记，只写新笔记不处置旧笔记是禁止行为。
-- 稳定决策：取代按旧笔记剩余价值分三档——仍有历史参考价值改 `status: superseded` 并标 `superseded_by`；完全失效且反向链接为 0 改 `status: archived` 后 `move` 到 `知识库/90-Archive/`；内容错误或有害 `delete` 进回收站并在新笔记记录旧错误说法。
-- 稳定决策：三档处置前必须先查 `backlinks`，引用数不为 0 时不得 `move` 或 `delete`，只能降级为标记取代；接替关系必须双向写入 `supersedes` 与 `superseded_by`，只写一侧视为治理未闭环。
-- 稳定决策：`superseded` 与 `archived` 状态的笔记不得作为当前事实，检索命中时顺着 `superseded_by` 跳到接替笔记；执行失败案例笔记不适用三档处置，仍只能 `append` 追加状态事件，bridge 层直接拒绝对该目录的 `move` 与 `delete`。
-- 稳定决策：三档处置由 agent 自动执行（`delete` 进回收站可恢复），但每次 `property-set`、`move`、`delete` 都必须在最终总结的知识引用小节如实登记。
-- 稳定决策：bridge 白名单从 8 个扩到 16 个，新增 `property-read`、`properties`、`property-set`、`move`、`delete`、`backlinks`、`files`、`orphans`；八个新命令全部使用 `path=`，`delete` 固定进回收站不透传 `permanent`，`move` 的目标目录必须已存在。
-- 关键事实：官方 CLI 在 stdout 被重定向时输出的是正确 UTF-8 字节；此前"CLI 回显中文乱码"的判断是错误归因，真实根因是 bridge 自身 stdout 沿用系统 locale，已在 `main()` 用 `reconfigure(encoding="utf-8")` 根因修复。
-- 关键事实：存在性探测必须用严格模式，因为 `properties` 对不存在的文件以退出码零返回 `Error:` 载荷。
-- 关键事实：读取笔记元信息优先用 `properties --json`，比解析 `read` 全文更省更稳；部分笔记没有 frontmatter，会返回 `No frontmatter found.`，拿不到状态字段。
-- 来源：`obsidian-knowledge-flow/references/conflict-staleness.md`、`references/capture-retrieve-distill.md`、`references/note-schema.md`、`scripts/obsidian_cli_bridge.py`、`scripts/audit_vault_knowledge.py`、`doc/2-需求/2026-08-05_知识库可迭代更新_冲突取代与废弃治理.md`。
+- 稳定决策：知识库从只增量补充改为可迭代更新。写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一；判为取代必须在同一轮内处置旧笔记，只写新笔记不处置旧笔记是禁止行为。
+- 稳定决策：取代按旧笔记剩余价值分三档——仍有历史参考价值改 `status: superseded` 并标 `superseded_by`；完全失效且反向链接为 0 改 `status: archived` 后移动到 `90-Archive/`；内容错误或有害 `delete` 进回收站并在新笔记记录旧错误说法。
+- 稳定决策：三档处置前必须先用 Grep 扫 `[[笔记名]]` 统计反向链接，引用数不为 0 时不得移动或删除，只能降级为标记取代；接替关系必须双向写入 `supersedes` 与 `superseded_by`，只写一侧视为治理未闭环。
+- 稳定决策：`superseded` 与 `archived` 状态的笔记不得作为当前事实，检索命中时顺着 `superseded_by` 跳到接替笔记；执行失败案例笔记不适用三档处置，仍只能追加状态事件，禁止对该目录做移动与删除。
+- 稳定决策：三档处置由 agent 自动执行，但每次改属性、移动、删除都必须在最终总结的知识引用小节如实登记。
+- 已取代（2026-08-12）：原 bridge 16 命令白名单（`property-read`/`properties`/`property-set`/`move`/`delete`/`backlinks`/`files`/`orphans` 等）随 CLI 链路整体废除，改由标准文件工具完成；frontmatter 属性用 YAML 解析读写，反向链接与孤儿笔记用 Grep 扫 `[[wikilink]]` 统计。
+- 已取代（2026-08-12）：CLI stdout 编码归因与 bridge `reconfigure(encoding="utf-8")` 修复随 bridge 脚本删除而失效；当前所有笔记读写显式指定 UTF-8。
+- 已取代（2026-08-12）：`properties` 严格模式探测口径随 CLI 废除失效；文件存在性直接由文件系统判断。
+- 关键事实：读取笔记元信息直接解析文件头部的 YAML frontmatter；部分笔记没有 frontmatter，取不到状态字段时按无状态处理。
+- 来源：`knowledge-flow/references/conflict-staleness.md`、`references/capture-retrieve-distill.md`、`references/note-schema.md`、`scripts/audit_vault_knowledge.py`、`doc/2-需求/2026-08-05_知识库可迭代更新_冲突取代与废弃治理.md`。
 - 更新时间：2026-08-05。
 
-## PROJECT_MEMORY / PROJECT_STYLE 到 Obsidian 的选择性沉淀桥接规则
+## PROJECT_MEMORY / PROJECT_STYLE 到知识库的选择性沉淀规则
 
-- 稳定决策：`PROJECT_MEMORY.md`/`PROJECT_STYLE.md` 与 Obsidian vault 的"本地上下文 vs 跨项目知识库"边界不变；新增的是一条"单条可复用事实"选择性桥梁，不是整份文件同步或镜像备份，核心标准定义在 `obsidian-knowledge-flow/references/project-memory-bridge.md`。
-- 稳定决策：判断是否跨项目可复用采用两层分工——初判层由 `project-memory-rules`/`project-style-rules` 在写入条目的同一步骤完成，标准是"通用性删除测试"（去掉项目名、具体表名/字段名、具体服务名等专属信息后条目是否仍然成立）叠加类型白名单、适用范围显式标注为通用、状态为启用四条，全部满足才追加可选字段 `bridge_candidate: true` / `跨项目候选: 是`；这一步不调用 bridge，不产生 vault 副作用。
-- 稳定决策：复核与落地层由 `obsidian-knowledge-flow` 在既有"总结阶段捕获流程"（会话总结、阶段收口或最终回复前）完成，把候选条目作为新增信息来源纳入既有扫描，套用既有排除规则二次核验后，选择性沉淀到 `知识库/20-Knowledge/project-rules/`（来自 project-memory-rules）或 `知识库/20-Knowledge/code-style/`（来自 project-style-rules）；不新增 Obsidian 四态之外的第五种状态，只是"沉淀"分支下的新增信息来源。
-- 稳定决策：去重固定为"先 `search`、命中则 `append`、未命中才 `create`"，vault 侧笔记只保留脱敏后的通用表述与 `source_refs` 来源引用，不摘录项目原文；`skill-hit-check-rules` 的命中清单同步补充识别信号，避免候选标记被漏判为"不适用"。
-- 来源：`obsidian-knowledge-flow/references/project-memory-bridge.md`、`obsidian-knowledge-flow/SKILL.md`、`obsidian-knowledge-flow/references/capture-retrieve-distill.md`、`obsidian-knowledge-flow/references/vault-layout.md`、`project-memory-rules/SKILL.md`、`project-memory-rules/references/project-knowledge-source-contract.md`、`project-style-rules/SKILL.md`、`skill-hit-check-rules/references/hit-checklist.md`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\project-memory-md-project-style-md-obsi-fancy-wand.md`）。
+- 稳定决策：`PROJECT_MEMORY.md`/`PROJECT_STYLE.md` 与知识库的"本地上下文 vs 跨项目知识库"边界不变；新增的是一条"单条可复用事实"选择性通道，不是整份文件同步或镜像备份，核心标准定义在 `knowledge-flow/references/project-memory-sync.md`。
+- 稳定决策：判断是否跨项目可复用采用两层分工——初判层由 `project-memory-rules`/`project-style-rules` 在写入条目的同一步骤完成，标准是"通用性删除测试"（去掉项目名、具体表名/字段名、具体服务名等专属信息后条目是否仍然成立）叠加类型白名单、适用范围显式标注为通用、状态为启用四条，全部满足才追加可选字段 `bridge_candidate: true` / `跨项目候选: 是`；这一步不写入知识库，不产生知识库副作用。
+- 稳定决策：复核与落地层由 `knowledge-flow` 在既有"总结阶段捕获流程"（会话总结、阶段收口或最终回复前）完成，把候选条目作为新增信息来源纳入既有扫描，套用既有排除规则二次核验后，选择性沉淀到 `20-Knowledge/project-rules/`（来自 project-memory-rules）或 `20-Knowledge/code-style/`（来自 project-style-rules）；不新增知识库四态之外的第五种状态，只是"沉淀"分支下的新增信息来源。
+- 稳定决策：去重固定为"先检索、命中则追加、未命中才新建"，知识库侧笔记只保留脱敏后的通用表述与 `source_refs` 来源引用，不摘录项目原文；`skill-hit-check-rules` 的命中清单同步补充识别信号，避免候选标记被漏判为"不适用"。
+- 来源：`knowledge-flow/references/project-memory-sync.md`、`knowledge-flow/SKILL.md`、`knowledge-flow/references/capture-retrieve-distill.md`、`knowledge-flow/references/knowledge-layout.md`、`project-memory-rules/SKILL.md`、`project-memory-rules/references/project-knowledge-source-contract.md`、`project-style-rules/SKILL.md`、`skill-hit-check-rules/references/hit-checklist.md`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\project-memory-md-project-style-md-obsi-fancy-wand.md`）。
 - 更新时间：2026-08-05。
+
+## 知识库承载体迁移与路径前缀规则
+
+- 稳定决策：知识库承载体从 Obsidian vault `D:\obsidian_data` 迁移到 Google Drive 同步目录 `D:\谷歌云盘\知识库\`，多端同步交给 Google Drive 客户端。选择这条路线的原因是 Obsidian 的同步不如谷歌云硬盘方便，且知识库退化成普通 Markdown 文件夹后不再依赖 Obsidian 应用运行。
+- 稳定决策：CLI 桥接层整体废除。`obsidian_cli_bridge.py`、`obsidian_cli_windows.ps1`、`distill_vault.py` 已删除，所有笔记的检索、读取、创建、追加、移动、删除统一改用标准文件工具，写入后回读校验取代原 `verified=true` 判据。原「不得用 `rg`/`Get-Content`/`Set-Content` 冒充 vault 操作」这条禁令方向已完全反转——文件工具现在是唯一正确通道。
+- 稳定决策：笔记路径基准是**相对知识库根的裸相对路径**（如 `20-Knowledge/topic/note.md`），**禁止再加 `知识库/` 前缀**。根目录本身已经是 `知识库`，前缀叠加会生成嵌套目录 `D:\谷歌云盘\知识库\知识库\`。这正是 2026-08-12 发现嵌套目录的根因，且该错误约定在 Obsidian 时代就已存在（原 `D:\obsidian_data\知识库\知识库\` 同样是它的产物）。知识库现有 `INDEX.md` 的 wikilink 一直用的就是裸相对路径，是正确写法的既有证据。
+- 稳定决策：`obsidian-knowledge-flow` skill 更名 `knowledge-flow`；每轮首条中间进度的状态字段由 `Obsidian:<检索/沉淀/不适用/阻断>` 改为 `知识库:<检索/沉淀/不适用/阻断>`。四态语义保留，只有 `阻断` 判据改为「知识库目录不存在或不可读 / 路径不合法 / 写入后回读不一致」。
+- 关键事实：知识库内容治理同步完成——嵌套层 1 篇实质笔记合并回 `20-Knowledge/研发流程/`，4 篇已作废 Obsidian CLI 笔记与 Obsidian 默认欢迎页删除，2 处散落文件归位到标准布局，`INDEX.md` 死链与过期措辞清理，笔记总数 65→59，全库 wikilink 无新增死链。blog-data 系列笔记里的 "Obsidian vault" 是源 vault 的真实来源事实，按历史事实保留不改。
+- 来源：`knowledge-flow/SKILL.md`、`knowledge-flow/references/file-operations.md`、`knowledge-flow/references/knowledge-layout.md`、`AGENTS.md`、`CLAUDE.md`、`project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\d-mellow-hippo.md`）。
+- 更新时间：2026-08-12。
+
+## 知识库检索准召与主题收敛规则
+
+- 跨项目判据见知识库笔记 `知识库检索失效的三种模式与修法`（手写导航覆盖率必然衰减、分类目录自由生长会散落同一主题、纯结构化索引会漏检正文、索引新鲜度要自动处理）。
+- 本仓库落地：检索第一跳固定为 `python knowledge-flow/scripts/knowledge_index.py query --keyword "<词>"`，覆盖全库，按六类结构化字段加正文匹配并返回命中原因；索引 `_index.json` 是可再生成物，过期自动重建。
+- 本仓库落地：`20-Knowledge` 固定 7 个中文主题（项目、代码规则、工程实践、研发流程、AI协作、数据清洗、开发环境）加 3 个契约固定落点（`execution-failure-cases`、`project-rules`、`code-style`，保留英文因被其它 skill 硬编码引用）；有常驻断言锁定「实际目录 ⊆ 声明清单」。
+- 本仓库落地：笔记路径一律为相对知识库根的裸相对路径，禁止带 `知识库/` 前缀（会生成嵌套目录）。
+- 更新时间：2026-08-12（判据已迁知识库，此处只留本仓库落地口径）。
+
+
+## 知识库沉淀触发与契约强制规则
+
+- 跨项目判据见知识库笔记 `知识库沉淀失效的三种模式与修法`（触发条件不能是主观描述、契约要有机器强制、下游机制零使用往往是上游输入不可信、BOM 会让头部判定静默失效等）。
+- 本仓库落地：沉淀触发硬信号清单在 `knowledge-flow/references/capture-retrieve-distill.md` 的「沉淀触发硬信号」；判断依据写进状态字段（如 `知识库:沉淀（命中信号2 推翻旧归因）`），只要求写明依据、不要求每轮必须有沉淀。
+- 本仓库落地：头部合规入口是 `python knowledge-flow/scripts/knowledge_index.py check`，校验活动区必填六字段与状态枚举，不合规返回非零退出码可当闸门；`90-Archive/` 按只读归档豁免。
+- 本仓库落地：冲突候选归组条件为「(同主题 且 共享标签 ≥2) 或 标题相似度 ≥ 0.72」，下限常量 `MIN_SHARED_TAGS` 有断言锁定；标题相似度是跨主题例外通道。
+- 更新时间：2026-08-12（判据已迁知识库，此处只留本仓库落地口径）。
+
 
 ## 代码风格规则生效层级规则
 
-- 稳定决策：一条代码风格规则写进 `code-style-consistency-rules/SKILL.md` 正文并不等于生效；能否拦住代码生成取决于它是否落在**写码前**会被加载的入口。四个落点的实际效力分层为：`references/user-style-feedback-library.md`（`code-generation-style-rules` 写码前强制加载 active 条目，最强）> `references/go-coding-rules.md`（Go 改动默认补读）> `SKILL.md` 正文（skill 加载后、写码后一致性检查，弱）> `references/consistency-examples.md`（「只有在对照正反例时」才读，拦不住生成）。
-- 稳定决策：往 `code-style-consistency-rules` 增补风格约束时，必须先问「这条会在写码前被读到吗」。只写 SKILL.md 正文和正反例文件等于把规则放在事后复盘层；跨项目通用偏好一律走 `style-feedback-workflow.md` 的 candidate→用户确认→active 流程写入全局反例库，项目专属一次性约定才走 `PROJECT_STYLE.md`（边界依据 `project-style-rules/SKILL.md:51`）。
-- 证据：2026-08-06 实测，「Go 函数内禁止 `var (...)` 分组声明」原本已存在于 `SKILL.md:40-44` 与 `consistency-examples.md` 正例 4 / 反例 5，模型仍写出分组声明；根因即两个写码前加载入口均缺该规则。修复后新增 `STYLE-CASE-GO-003` active 条目与 `go-coding-rules.md` bullet，并补齐「行尾中文注释按列对齐」这一层原表述未覆盖的约束。
-- 来源：`code-style-consistency-rules/references/user-style-feedback-library.md`、`code-style-consistency-rules/references/go-coding-rules.md`、`code-style-consistency-rules/references/style-feedback-workflow.md`、`code-generation-style-rules/references/pre-coding-checklist.md`、用户在 Plan Mode 确认的方案（`C:\Users\luode\.claude\plans\var-bestgap-int64-typed-narwhal.md`）。
-- 更新时间：2026-08-06。
+- 跨项目判据见知识库笔记 `规则与共用定义的落点决定其有效性`（规则要落在动作前会被读取的入口才生效，四层落点效力分层）。
+- 本仓库落地：写码前强制加载入口是 `code-style-consistency-rules/references/user-style-feedback-library.md` 的 active 条目；Go 改动默认补读 `references/go-coding-rules.md`。只写 `SKILL.md` 正文或 `consistency-examples.md` 等于放在事后复盘层，拦不住生成。
+- 本仓库分流：跨项目通用偏好走 `style-feedback-workflow.md` 的 candidate→用户确认→active 流程写入全局反例库；项目专属一次性约定才走 `PROJECT_STYLE.md`（边界依据 `project-style-rules/SKILL.md:51`）。
+- 更新时间：2026-08-12（判据已迁知识库，此处只留本仓库落地口径）。
+
 
 ## 机器索引区
 
@@ -485,14 +438,14 @@ entities:
       - 知识库迭代更新
       - superseded_by 接替关系
       - 知识库巡检
-    definition: "写入 Obsidian 知识库前必须显式判定补充、矛盾未裁决或取代三态之一；判为取代须在同一轮内按剩余价值分三档处置旧笔记：有历史参考价值改 status=superseded 并标 superseded_by，完全失效且 backlinks 为 0 改 status=archived 后 move 到 知识库/90-Archive/，内容错误或有害 delete 进回收站。三档前必须先查 backlinks，引用不为 0 只能标记取代；接替关系双向写入 supersedes 与 superseded_by，superseded_by 非空时 status 不得为 active。superseded 与 archived 不作当前事实，检索时顺 superseded_by 跳到接替笔记。执行失败案例笔记不适用三档处置，bridge 拒绝对该目录 move/delete。三档由 agent 自动执行但必须在总结的知识引用小节登记。bridge 白名单扩到 16 个命令，八个新命令均用 path=，delete 不透传 permanent，move 目标目录须已存在。已积压冲突用只读脚本 audit_vault_knowledge.py 出候选，脚本零写入。"
-    scope: "Obsidian 知识库写入、检索、冲突处置与积压巡检"
+    definition: "写入知识库前必须显式判定补充、矛盾未裁决或取代三态之一；判为取代须在同一轮内按剩余价值分三档处置旧笔记：有历史参考价值改 status=superseded 并标 superseded_by，完全失效且反向链接为 0 改 status=archived 后移动到 90-Archive/，内容错误或有害则删除。三档前必须先用 Grep 扫 [[笔记名]] 统计反向链接，引用不为 0 只能标记取代；接替关系双向写入 supersedes 与 superseded_by，superseded_by 非空时 status 不得为 active。superseded 与 archived 不作当前事实，检索时顺 superseded_by 跳到接替笔记。执行失败案例笔记不适用三档处置，禁止对该目录做移动与删除。三档由 agent 自动执行但必须在总结的知识引用小节登记。已积压冲突用只读脚本 audit_vault_knowledge.py 出候选，脚本零写入。2026-08-12 起承载体为 D:\\谷歌云盘\\知识库\\，读写改用标准文件工具，原 bridge 16 命令白名单已废除。"
+    scope: "知识库写入、检索、冲突处置与积压巡检"
     status: "active"
     evidence_ids:
       - evidence.obsidian-iterative-knowledge-governance
     context_ids:
       - context.obsidian-knowledge-flow
-    updated_at: 2026-08-05
+    updated_at: 2026-08-12
   - entity_id: rule.summary-knowledge-citation-section
     name: "总结知识引用小节与引用台账"
     type: "总结结构与知识库规则"
@@ -500,14 +453,14 @@ entities:
       - 知识引用小节
       - 引用台账
       - Obsidian 引用清单
-    definition: "最终总结在无真实阻断时按引用台账分流收尾：台账非空输出 ## 知识引用 作为最后一节，用「本轮引用」三列表（序号、笔记、本轮用途）与「本轮沉淀」四列表（序号、笔记、操作、readback）承载，改动点紧邻其前；台账为空整节省略且由改动点收尾。obsidian-knowledge-flow 每次 read/create/append 返回 verified=true 后立即登记六字段台账；只有真实 read 成功的笔记可入引用表，search 命中未读取的不得入表；笔记名取自本地发起的 path 文件名，禁用 CLI 回显文本；笔记 status 为 stale/deprecated/retired/conflicted 时在用途列标注。"
-    scope: "最终总结渲染、Obsidian 检索与沉淀登记、总结条件字段判定与驳回标准"
+    definition: "最终总结在无真实阻断时按引用台账分流收尾：台账非空输出 ## 知识引用 作为最后一节，用「本轮引用」三列表（序号、笔记、本轮用途）与「本轮沉淀」四列表（序号、笔记、操作、readback）承载，改动点紧邻其前；台账为空整节省略且由改动点收尾。knowledge-flow 每次读取/创建/追加笔记成功后立即登记六字段台账；只有真实读取成功的笔记可入引用表，检索命中未读取的不得入表；笔记名取自读写笔记时所用相对路径的文件名部分；笔记 status 为 stale/deprecated/retired/conflicted 时在用途列标注。"
+    scope: "最终总结渲染、知识库检索与沉淀登记、总结条件字段判定与驳回标准"
     status: "active"
     evidence_ids:
       - evidence.summary-knowledge-citation-section
     context_ids:
       - context.obsidian-knowledge-flow
-    updated_at: 2026-08-04
+    updated_at: 2026-08-12
   - entity_id: rule.root-test-code-and-evidence-layout
     name: "根测试代码与测试证据双根规则"
     type: "测试资产目录规则"
@@ -619,15 +572,15 @@ entities:
       - execution-failure-learning-rules
       - 执行失败案例演进
       - prevent recover learn
-    definition: "高风险工具调用前进入 prevent 预检，非预期失败进入 recover 分类、查库和同输入同成功标准复验，验证通过后才进入 learn。案例正文只归属于唯一 owner Skill；无维护授权保持 candidate，冲突标记 conflicted，业务 Bug、Skill 缺口和跨项目知识分别回流 bug-*、skill-evolution-rules 与 obsidian-knowledge-flow。"
-    scope: "imagegen、Windows/WSL、浏览器、认证 URL、MCP/插件安装、Obsidian CLI 及后续注册的高风险执行域"
+    definition: "高风险工具调用前进入 prevent 预检，非预期失败进入 recover 分类、查库和同输入同成功标准复验，验证通过后才进入 learn。案例正文只归属于唯一 owner Skill；无维护授权保持 candidate，冲突标记 conflicted，业务 Bug、Skill 缺口和跨项目知识分别回流 bug-*、skill-evolution-rules 与 knowledge-flow。"
+    scope: "imagegen、Windows/WSL、浏览器、认证 URL、MCP/插件安装、知识库文件读写及后续注册的高风险执行域"
     status: "active"
     evidence_ids:
       - evidence.skill.execution-failure-learning
       - evidence.test.execution-failure-learning
     context_ids:
       - context.execution-failure-learning
-    updated_at: 2026-07-12
+    updated_at: 2026-08-12
   - entity_id: rule.task-blocker-closure
     name: "任务阻断收口与恢复"
     type: "流程规则"
@@ -977,15 +930,15 @@ entities:
       - context.thread-title-management
     updated_at: 2026-07-05
   - entity_id: rule.obsidian-knowledge-flow-selective-default
-    name: "Obsidian 知识流选择性默认触发链"
+    name: "知识库知识流选择性默认触发链"
     type: "流程规则"
     aliases:
-      - obsidian-knowledge-flow
-      - Obsidian 知识流
+      - knowledge-flow
+      - 知识库知识流
       - 选择性默认触发
       - 知识库检索沉淀
-    definition: "项目启动先按父目录平台规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md 读取本地上下文；current 覆盖维护且不超过 51,200 字节，memory 只承载稳定规则与关键决策，history 追加关键事件并只保留最近 20 条（自动裁剪、按日期倒序）且普通启动不读。Obsidian 固定使用 D:\\obsidian_data 及其 知识库/ 工作区，仅在跨项目历史或既有 vault 知识依赖时通过 CLI 检索 / 读取，仅在收口形成可复用知识时先检索再沉淀；普通任务不为形式调用 CLI，CLI / vault 不可用时阻断且不得直接读写 vault 文件。项目本地 Markdown 与 vault 链路不得混用。"
-    scope: "记忆域、命中检查、阶段收口、最终总结、Obsidian vault 知识检索与沉淀"
+    definition: "项目启动先按父目录平台规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md 读取本地上下文；current 覆盖维护且不超过 51,200 字节，memory 只承载稳定规则与关键决策，history 追加关键事件并只保留最近 20 条（自动裁剪、按日期倒序）且普通启动不读。知识库固定使用 D:\\谷歌云盘\\知识库\\，笔记路径为相对该根的裸相对路径且禁止再加 知识库/ 前缀，仅在跨项目历史或既有知识库内容依赖时通过标准文件工具检索 / 读取，仅在收口形成可复用知识时先检索再沉淀；普通任务不为形式读写知识库，目录不可达 / 路径不合法 / 写入后回读不一致时阻断。项目本地 Markdown 与知识库落点不得混用。"
+    scope: "记忆域、命中检查、阶段收口、最终总结、知识库检索与沉淀"
     status: "active"
     evidence_ids:
       - evidence.skill.obsidian-knowledge-flow
@@ -995,33 +948,35 @@ entities:
     context_ids:
       - context.obsidian-knowledge-flow
       - context.memory-domain
-    updated_at: 2026-07-11
+    updated_at: 2026-08-12
   - entity_id: rule.obsidian-windows-wsl-bridge-boundary
-    name: "Obsidian Windows/WSL bridge 固定执行边界"
+    name: "Obsidian Windows/WSL bridge 固定执行边界（已取代）"
     type: "跨宿主执行规则"
     aliases:
       - obsidian_cli_bridge
       - Windows/WSL CLI bridge
       - bridge-only vault
-    definition: "Windows 与 WSL 的 Obsidian 检索、创建、追加、读取和 INDEX 更新统一经 obsidian_cli_bridge.py，最终由 Windows 官方 CLI 操作唯一 vault 根 D:\\obsidian_data；知识库/ 只是 vault 内路径前缀，selector 按注册根动态唯一解析。WSL 仅通过 PowerShell interop，不安装原生 Linux CLI，不使用 vault 文件系统 fallback；写入必须 verified=true readback，应用恢复最多隐藏启动一次并有限重试。"
-    scope: "Windows/WSL 知识流、bridge transport、长正文分块与读回验证"
-    status: "active"
+    definition: "【2026-08-12 整体取代，仅作历史脉络保留】原口径：Windows 与 WSL 的 Obsidian 检索、创建、追加、读取和 INDEX 更新统一经 obsidian_cli_bridge.py，最终由 Windows 官方 CLI 操作唯一 vault 根 D:\\obsidian_data，WSL 仅通过 PowerShell interop，写入必须 verified=true readback。该 bridge 与 PowerShell 适配器脚本已删除，跨宿主 transport、selector 解析、应用恢复与分块读回等约束一并作废；现由 knowledge-flow 用标准文件工具直接读写 D:\\谷歌云盘\\知识库\\，写后回读校验取代 readback。"
+    scope: "（历史）Windows/WSL 知识流、bridge transport、长正文分块与读回验证"
+    status: "superseded"
     evidence_ids:
       - evidence.skill.obsidian-knowledge-flow
       - evidence.doc.repo-rules
     context_ids:
       - context.obsidian-knowledge-flow
       - context.memory-domain
-    updated_at: 2026-07-13
+    superseded_by:
+      - rule.knowledge-base-migration-path-prefix
+    updated_at: 2026-08-12
   - entity_id: rule.git-obsidian-capture-link
-    name: "Git 协作联动 Obsidian 沉淀"
+    name: "Git 协作联动知识库沉淀"
     type: "流程规则"
     aliases:
       - 提交前知识捕获
       - Git 收口沉淀
-      - commit 联动 Obsidian
-    definition: "当本仓库出现提交、推送、PR 收口或交付说明准备，且本轮形成可复用事实、决策、流程、定义、偏好、来源或调试经验时，优先命中 `obsidian-knowledge-flow` 做 `Obsidian:沉淀` 判定；沉淀只负责知识捕获，不构成 `git commit` / `git push` 授权。"
-    scope: "提交流程、交付收口、Obsidian 记忆沉淀"
+      - commit 联动知识库
+    definition: "当本仓库出现提交、推送、PR 收口或交付说明准备，且本轮形成可复用事实、决策、流程、定义、偏好、来源或调试经验时，优先命中 `knowledge-flow` 做 `知识库:沉淀` 判定；沉淀只负责知识捕获，不构成 `git commit` / `git push` 授权。"
+    scope: "提交流程、交付收口、知识库记忆沉淀"
     status: "active"
     evidence_ids:
       - evidence.skill.obsidian-knowledge-flow
@@ -1031,7 +986,27 @@ entities:
       - context.obsidian-knowledge-flow
       - context.git-collaboration
       - context.memory-domain
-    updated_at: 2026-07-08
+    updated_at: 2026-08-12
+  - entity_id: rule.knowledge-base-migration-path-prefix
+    name: "知识库承载体迁移与裸相对路径基准"
+    type: "知识库治理规则"
+    aliases:
+      - 谷歌云盘知识库
+      - 裸相对路径
+      - 禁止知识库前缀
+      - 嵌套知识库目录
+    definition: "知识库承载体从 Obsidian vault D:\\obsidian_data 迁移到 Google Drive 同步目录 D:\\谷歌云盘\\知识库\\，多端同步交给 Google Drive 客户端。CLI 桥接层整体废除，obsidian_cli_bridge.py / obsidian_cli_windows.ps1 / distill_vault.py 已删除，所有笔记读写改用标准文件工具，写入后回读校验取代原 verified=true 判据，原「不得用文件系统操作冒充 vault 操作」禁令方向已完全反转。笔记路径基准是相对知识库根的裸相对路径（如 20-Knowledge/topic/note.md），禁止再加 知识库/ 前缀——根本身已经是 知识库，前缀叠加会生成嵌套目录 D:\\谷歌云盘\\知识库\\知识库\\，该错误约定在 Obsidian 时代即已存在。skill obsidian-knowledge-flow 更名 knowledge-flow；每轮状态字段由 Obsidian:<...> 改为 知识库:<...>，四态语义保留，阻断判据改为目录不可达 / 路径不合法 / 写入后回读不一致。"
+    scope: "知识库根目录、笔记路径基准、读写通道、状态字段命名与 skill 命名"
+    status: "active"
+    supersedes:
+      - rule.obsidian-windows-wsl-bridge-boundary
+    evidence_ids:
+      - evidence.skill.obsidian-knowledge-flow
+      - evidence.doc.repo-rules
+    context_ids:
+      - context.obsidian-knowledge-flow
+      - context.memory-domain
+    updated_at: 2026-08-12
   - entity_id: rule.git-commit-domain-split
     name: "Git 提交域隔离规则"
     type: "流程规则"
@@ -1469,8 +1444,8 @@ evidence:
     note: "用户确认采用“阶段+提问”策略，要求提问、goal 创建 / 恢复和长任务阶段切换时在过程中尝试改名"
   - evidence_id: evidence.skill.obsidian-knowledge-flow
     type: "skill"
-    source: "obsidian-knowledge-flow/SKILL.md"
-    path: "obsidian-knowledge-flow/SKILL.md"
+    source: "knowledge-flow/SKILL.md"
+    path: "knowledge-flow/SKILL.md"
     note: "Obsidian 知识流选择性默认判断、CLI 检索、捕获和沉淀规则来源"
   - evidence_id: evidence.skill.git-collaboration
     type: "skill"
@@ -1542,7 +1517,7 @@ evidence:
   - evidence_id: evidence.obsidian.skill-split-plan-20260717
     type: "knowledge"
     source: "Obsidian 知识流阶段收口沉淀"
-    path: "知识库/20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md"
+    path: "20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md"
     note: "通过固定 vault bridge create/readback 沉淀统计口径、候选顺序、五类验证契约和当前周期状态，并通过 bridge append/readback 更新 INDEX。"
   - evidence_id: evidence.skill.task-plan-rehydration
     type: "skill"
@@ -1626,7 +1601,7 @@ contexts:
     note: "适用于用户提问、goal 长任务、上下文续做和阶段切换时的会话标题更新"
   - context_id: context.obsidian-knowledge-flow
     type: "task-scope"
-    name: "Obsidian 知识流"
+    name: "知识库知识流"
     note: "适用于历史知识依赖、知识库检索、阶段收口沉淀和最终总结捕获判断"
   - context_id: context.git-collaboration
     type: "task-scope"

@@ -163,33 +163,33 @@
 - 更新时间: 2026-06-30
 - 状态: 启用
 
-### Obsidian 判断可见输出样式
-- 别名: Obsidian 知识流判断, obsidian-knowledge-flow 输出, 选择性默认判断
+### 知识库判断可见输出样式
+- 别名: 知识库知识流判断, knowledge-flow 输出, 选择性默认判断
 - 类型: 工具风格
-- 示例: `Obsidian:不适用`、`Obsidian:检索`、`Obsidian:沉淀`、`Obsidian:阻断`
-- 说明: 仓库任务的首条命中检查或等价执行证据中，应以单行字段展示 Obsidian 选择性默认判断。`不适用` 表示无需调用 CLI；`检索` / `沉淀` 表示必须联动 `obsidian-knowledge-flow` 并通过 CLI 操作 vault；`阻断` 表示 CLI 或 vault 前置失败，不能直接文件读写 fallback。
-- 来源: `skill-hit-check-rules/SKILL.md`、`obsidian-knowledge-flow/SKILL.md`、`AGENTS.md`
-- 适用范围: `skill-hit-check-rules` 首条中间进度、Obsidian 知识流执行证据、最终收口条件行
-- 更新时间: 2026-07-07
+- 示例: `知识库:不适用`、`知识库:检索`、`知识库:沉淀`、`知识库:阻断`
+- 说明: 仓库任务的首条命中检查或等价执行证据中，应以单行字段展示知识库选择性默认判断。`不适用` 表示无需读写知识库；`检索` / `沉淀` 表示必须联动 `knowledge-flow` 并通过标准文件工具操作知识库；`阻断` 表示知识库目录不可达、路径不合法或写入后回读不一致。
+- 来源: `skill-hit-check-rules/SKILL.md`、`knowledge-flow/SKILL.md`、`AGENTS.md`
+- 适用范围: `skill-hit-check-rules` 首条中间进度、知识库知识流执行证据、最终收口条件行
+- 更新时间: 2026-08-12
 - 状态: 启用
 
-### 项目四件套与 Obsidian 分层写法
-- 别名: 项目本地四件套, current/memory/history 分层, vault 链路隔离
+### 项目四件套与知识库分层写法
+- 别名: 项目本地四件套, current/memory/history 分层, 知识库链路隔离
 - 类型: 文档与工具风格
-- 示例: `父目录规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md`、`PROJECT_HISTORY.md 仅按需窄读`、`项目 Markdown 用标准工具，vault 用 Obsidian CLI`
-- 说明: 项目启动上下文统一按父目录平台规则、当前状态、稳定记忆的顺序读取；当前状态覆盖维护，稳定规则合并维护，历史事件只追加。Obsidian vault 只承接跨项目知识检索与可复用知识沉淀，不把项目本地记忆文件当作 vault 笔记，也不为普通任务强制调用 CLI。
-- 来源: 用户本轮确认、`obsidian-knowledge-flow`、`project-memory-rules`
-- 适用范围: 项目规则、项目记忆文档、Obsidian 知识流
-- 更新时间: 2026-07-11
+- 示例: `父目录规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md`、`PROJECT_HISTORY.md 仅按需窄读`、`项目 Markdown 与知识库笔记都用标准文件工具，但落点严格分离`
+- 说明: 项目启动上下文统一按父目录平台规则、当前状态、稳定记忆的顺序读取；当前状态覆盖维护，稳定规则合并维护，历史事件只追加。知识库只承接跨项目知识检索与可复用知识沉淀，不把项目本地记忆文件当作知识库笔记，也不为普通任务强制读写知识库。
+- 来源: 用户本轮确认、`knowledge-flow`、`project-memory-rules`
+- 适用范围: 项目规则、项目记忆文档、知识库知识流
+- 更新时间: 2026-08-12
 - 状态: 启用
 
 ### Git 收口联动沉淀写法
-- 别名: 提交前知识沉淀, Git 联动 Obsidian
+- 别名: 提交前知识沉淀, Git 联动知识库
 - 类型: 流程风格
-- 示例: `Git 收口: 若本轮产出可复用事实，先走 Obsidian:沉淀；沉淀不等于提交授权。`
-- 说明: 在 commit / push / PR 收口或交付说明准备时，如果本轮形成可复用事实或决策，优先先做 `obsidian-knowledge-flow` 的沉淀判断，再继续 Git 协作口径；知识沉淀和提交授权分开表达，避免把“可沉淀”误读成“可提交”。
+- 示例: `Git 收口: 若本轮产出可复用事实，先走 知识库:沉淀；沉淀不等于提交授权。`
+- 说明: 在 commit / push / PR 收口或交付说明准备时，如果本轮形成可复用事实或决策，优先先做 `knowledge-flow` 的沉淀判断，再继续 Git 协作口径；知识沉淀和提交授权分开表达，避免把“可沉淀”误读成“可提交”。
 - 来源: 对话确认、`git-collaboration-rules`
-- 适用范围: 提交流程、交付收口、Obsidian 知识流
+- 适用范围: 提交流程、交付收口、知识库知识流
 - 更新时间: 2026-07-08
 - 状态: 启用
 
@@ -355,7 +355,8 @@
 - 2026-06-29：补充子 agent 状态公告风格，要求同时写逻辑中文名、平台昵称与回收状态，避免把平台英文昵称误判成命名失败。
 - 2026-06-30：补充子 agent 完全授权写法，明确项目级 standing authorization 满足工具显式授权条件。
 - 2026-06-30：补充命中检查可见输出样式，明确使用普通 Markdown 标题和行内代码字段行，禁止代码块包裹。
-- 2026-07-07：补充 Obsidian 判断可见输出样式，固定 `Obsidian:不适用 / 检索 / 沉淀 / 阻断` 的选择性默认字段。
+- 2026-07-07：补充 Obsidian 判断可见输出样式，固定 `Obsidian:不适用 / 检索 / 沉淀 / 阻断` 的选择性默认字段。（已于 2026-08-12 取代）
+- 2026-08-12：知识库承载体迁到 Google Drive 后，上述字段整体改名为 `知识库:不适用 / 检索 / 沉淀 / 阻断`；同时把「项目四件套与知识库分层写法」「Git 收口联动沉淀写法」两个条目里的 vault / CLI 表述改为知识库 + 标准文件工具。`Obsidian:` 字段名与 CLI 通道口径全部作废。
 - 2026-06-30：补充普通说明不用代码围栏风格，明确自然语言结构化输出改用 Markdown 列表、表格或引用块，` ```text ` 不再作为普通回复模板。
 - 2026-07-01：历史上曾收紧为 PowerShell UTF-8 后承接普通命令；2026-07-02 已按新确认口径替换为 Windows 下普通仓库命令优先 Git Bash / bash，PowerShell 仅用于专项场景，执行类命令再进 WSL。
 - 2026-07-02：新增文件写入显式 UTF-8 风格，明确 PowerShell、Python、Node 等写文件命令必须显式 UTF-8，禁止 GBK / ANSI / 默认编码落盘。
