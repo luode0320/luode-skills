@@ -2,31 +2,31 @@
 
 ## 更新时间
 
-- 2026-08-12
-- 来源对象：知识库死链闸门与落点瘦身（计划 `C:/Users/luode/.claude/plans/skill-polymorphic-barto.md`）
-- 当前目标：清掉「规则声明了但落点从未创建」这类诱导型缺陷，并给核心导航机制双链补上此前四类校验都漏掉的死链检测
-- 当前状态：三个周期全部完成。布局声明由 9 个目录收敛到真实存在的 4 个（删 `00-Inbox`、`10-Sessions`、`40-Entities`、`Attachments`、`Templates`）；`type` 枚举由 6 类收窄为实际在用的 3 类；`entities` 契约由 wikilink 改纯文本、实体导航交给项目地图 MOC；18 处存量死链按类清零；`check` 新增第四类校验并用注入探针验证真会失败。99 项测试全绿，`check` 退出码 0，6-review `STYLE: PASS` 且 profile 校验通过。改动停在已改动未提交状态。
-- 关键量化：布局声明 9 → 4 个目录；死链 18 处 12 个目标 → 0 处；全库双链 160 → 148 条，`check` 已检 147 条（差额 1 条为被排除规则正确剔除的文档示例）；巡检冲突、孤儿、非当前有效状态、不可读四项仍全为 0。
-- 无需回滚兜底：本轮未删除任何笔记，只改链接写法与规则文本。
+- 2026-08-13
+- 来源对象：长任务自动循环 skill 创建（REQ-LRL-001 / CYCLE-LRL-01）
+- 当前目标：新建 `long-run-loop-rules` skill，采用「主 agent 控制器 + worker 子 agent」线程接力模式，让 AI 持续工作到任务真正完成
+- 当前状态：全部 5 个最小任务完成。skill 核心文件（SKILL.md + 3 references + 3 scripts）由前一会话创建，本会话收尾验证三个脚本语法与功能 smoke test、修复 loop_controller.py start 命令未传参数被 None 覆盖默认值缺陷、deferred-gate-registry 追加登记、刷新字典（seed_total 34→35）、落盘需求与实施总览文档。改动停在已改动未提交状态。
+- 关键量化：新增 1 个 skill 目录（7 个文件）；修改 3 个文件（deferred-gate-registry.md、data.js、字典.md）；落盘 2 份文档；字典 seed_total 34→35。
+- 无需回滚兜底：本轮仅新增与修复脚本，未删除任何既有文件；字典生成可重复执行。
 
 ## 本轮已完成
 
-- 断源：`knowledge-layout.md` 目录树与落点规则删去五个从未创建的落点并写明删除原因；`SKILL.md`、`project-memory-sync.md`、`file-operations.md` 同步移除引用，不确定材料改由 `confidence` 字段承接
-- 契约对齐：`note-schema.md` 的 `type` 枚举收窄为 `knowledge / moc / source`，`entities` 改纯文本标签，双链约定新增「目标必须真实存在」「实体不写 wikilink」「仓库文件用反引号」三条
-- 清存量：18 处死链按五类修复——实体占位 8 处改指项目地图 MOC、skill 与仓库文件名 5 处改反引号、项目记忆文件 2 处改反引号、概念标签 2 处去双链、文档示例 1 处保留由排除规则处理
-- 加闸门：`knowledge_index.py` 新增 `build_alias_map()`、`strip_code_spans()`、`check_dead_links()` 三个函数，接替校验改用共用别名映射并删掉内联的第二份实现，`check` 合并第三份报告
+- 脚本验证：三个脚本 py_compile 通过；check_completion_marker 含/不含/regex 三输入正确；loop_controller 全流程跑通；detect_dead_loop 正反例正确
+- 缺陷修复：loop_controller.py start 命令改为仅显式传入参数才覆盖默认值，修复未传参数被 None 覆盖 checkpoint_interval/max_runtime_minutes 的缺陷
+- 集成登记：deferred-gate-registry.md 追加 long-run-loop-rules 中段推进条件登记
+- 字典刷新：generate_dictionary.py 退出码 0，long-run-loop-rules 以扩展种子入库
+- 触发条件扩展：新增「路径 B：用户显式 goal 意图」——用户提出 goal 或使用 `/goal` 命令即触发（即使平台无 Goal 目标模式，无 `create_goal` 工具也触发并降级到可用循环机制），同步更新 SKILL.md（description + 触发条件 + 通过标准 + 不适用场景）、deferred-gate-registry.md、需求文档 DEC-LRL-006 并重新刷新字典
 
 ## 验证与交接
 
-- 测试入口：`python test/knowledge-flow/<文件名>.py` 逐文件执行；另跑 `test/shared/asset_eol_health_test.py` 与 `test/reasoning-summary-structure-rules/knowledge_citation_contract_test.py`
-- 全量启动器 `python test/run_python_tests.py` 仍报 `Start directory is not importable` 指向 `test/artifact-delivery-gate-rules`，属既有缺陷且已有独立后台任务处理，按计划降级为逐文件执行
-- 端到端校验：`python knowledge-flow/scripts/knowledge_index.py check`（退出码须为 0，`dead_link_count` 须为 0）与 `python knowledge-flow/scripts/audit_vault_knowledge.py --json`（四类候选须全为 0）
-- 6-review 归档：`doc/6-review/2026-08-12_知识库死链闸门与落点瘦身_6-review.md`
+- 脚本 smoke test：managed Python 3.13 直接运行三个脚本，断言全部通过
+- 字典生成：退出码 0，data.js 与字典.md 均含 long-run-loop-rules
+- 落盘：doc/2-需求/2026-08-13_REQ-LRL-001_长任务自动循环skill创建.md 与 doc/3-实施/2026-08-13_长任务自动循环skill创建_实施总览.md
 
 ## 范围与边界
 
-- 本轮未动：检索链路与索引新鲜度、沉淀触发信号清单、三态判定硬信号、`PROJECT_MEMORY.md` 机器索引区、`execution-failure-cases/` 的 candidate 晋级管线（需用户当轮维护授权，属设计使然）、`90-Archive/` 空目录（分级处置归档档位的落点，会真实产生笔记）
-- 明确未做的后续项：`confidence` 字段当前 37 篇 high、12 篇 medium、12 篇缺失，本轮把「不确定材料」承接职责交给它但未新增填充率校验
+- 本轮未动：autonomous-execution-rules L1 内部续跑、parallel-task-dispatch-rules 线程生命周期语义、continuous-code-quality-supervisor-rules 监控模式
+- 明确未做的后续项：控制器运行时行为（真实 Goal 环境下的 create_thread/wait_threads 循环）留待真实 Goal 环境验证
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
