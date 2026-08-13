@@ -994,3 +994,4 @@ claude-mem(记忆) :
 2026-08-12 18:19:29 docs: [字典同步] 刷新knowledge-flow重命名相关Skill描述
 2026-08-12 18:20:12 docs: [项目治理同步] 归档知识库迁移全系列的规则记忆与索引
 2026-08-12 18:20:54 feat: [知识库迁移] AGENTS/CLAUDE同步Obsidian到知识库口径
+2026-08-13 10:22:30 feat: [common/msg国际化消息目录新增] 放行common/dto、page、msg三个规范目录

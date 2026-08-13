@@ -46,6 +46,9 @@
 | `common/constant/` | `common-util-rules` | 暂无 |
 | `common/error/` | `error-handling-rules` | 暂无 |
 | `common/validation/` | `package-structure-rules` | 暂无 |
+| `common/dto/` | `package-structure-rules` | 暂无 |
+| `common/page/` | `package-structure-rules` | 暂无 |
+| `common/msg/` | `package-structure-rules`、`error-handling-rules` | 暂无 |
 | `common/util/` | `common-util-rules`、`package-structure-rules` | 暂无 |
 
 ### `database/` 数据存储

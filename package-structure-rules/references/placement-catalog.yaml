@@ -123,7 +123,10 @@
       "constant",
       "error",
       "validation",
-      "util"
+      "util",
+      "dto",
+      "page",
+      "msg"
     ],
     "integration": [
       "contracts",
@@ -2381,6 +2384,101 @@
       ],
       "package_alias": "decimalUtil",
       "example_scope": "utils/decimal/"
+    },
+    {
+      "id": "backend.common.constant",
+      "project_kind": "backend",
+      "artifact_kind": "constant",
+      "content_type": "source_code",
+      "canonical_path": "common/constant",
+      "purpose": "项目级稳定常量与枚举",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "constant"
+    },
+    {
+      "id": "backend.common.response",
+      "project_kind": "backend",
+      "artifact_kind": "response",
+      "content_type": "source_code",
+      "canonical_path": "common/response",
+      "purpose": "项目级响应 DTO 与输出协议",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "response"
+    },
+    {
+      "id": "backend.common.dto",
+      "project_kind": "backend",
+      "artifact_kind": "dto",
+      "content_type": "source_code",
+      "canonical_path": "common/dto",
+      "purpose": "项目级跨域共享领域模型与数据传输对象",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "dto"
+    },
+    {
+      "id": "backend.common.page",
+      "project_kind": "backend",
+      "artifact_kind": "page",
+      "content_type": "source_code",
+      "canonical_path": "common/page",
+      "purpose": "项目级分页请求与响应协议",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "page"
+    },
+    {
+      "id": "backend.common.msg",
+      "project_kind": "backend",
+      "artifact_kind": "msg",
+      "content_type": "source_code",
+      "canonical_path": "common/msg",
+      "purpose": "项目级国际化消息码定义、语言解析与消息渲染源码；文案数据落在 resources/i18n/",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "msg"
     }
   ],
   "skeletons": {

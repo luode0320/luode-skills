@@ -27,7 +27,7 @@
 - `common/util/` 可依赖项目其他包，但不得承载业务流程；其实现文件必须直接放在该目录，禁止建立子目录。源码根 `util/` 是废弃位置，新代码不得进入。
 - 调用方业务域只能导入目标业务域 `business/<domain>/rpc/` 的公开入口；除目标域 `rpc/` 外的**任何**目录（含规范外扩展目录）都是私有层，一律禁止导入。
 - 目标域 `rpc/` 的公开函数固定接收 JSON 字符串并返回 JSON 字符串；它在本域内完成反序列化、校验、业务服务调用和响应序列化。任何成功、JSON 解析、校验或业务失败都返回符合根 `common/response.Response` 语义的 `code`、`status`、`message`、`data`，不跨域传递语言异常、内部实体或仓储模型。
-- 根 `common/request/`、`common/response/`、`common/constant/`、`common/error/`、`common/validation/` 可作为稳定公共结构直接流通。根 `global/` 只能提供已装配的配置、日志、数据库连接和技术客户端等非业务运行引用，禁止保存、传递业务实体、业务列表、业务状态或可变业务缓存。
+- 根 `common/request/`、`common/response/`、`common/constant/`、`common/error/`、`common/validation/`、`common/dto/`、`common/page/`、`common/msg/` 可作为稳定公共结构直接流通。`common/msg/` 只允许依赖 `common/constant/`、`common/error/` 等稳定结构与 `resources/i18n/` 资源加载，禁止反向依赖具体业务域，也不承载业务流程。根 `global/` 只能提供已装配的配置、日志、数据库连接和技术客户端等非业务运行引用，禁止保存、传递业务实体、业务列表、业务状态或可变业务缓存。
 - `database/`、根 `utils/`、根 `common/`、根 `global/`、根 `middleware/` 禁止反向依赖具体业务域。
 - `database/connection/` 只提供数据存储连接与客户端初始化，`database/model/{db,redis,mongo}/` 只承载相应存储模型；二者不得承载业务流程。独立字段 SQL 只能使用 `database/sql/field/{create,update,delete}/` 的直接 `.sql` 文件，自动迁移源码仍只在 `database/migration/`。
 - `database/repository/` 不得调用迁移程序；自动迁移只允许启动装配、迁移命令和数据库初始化链路调用。
