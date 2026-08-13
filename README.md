@@ -996,3 +996,4 @@ claude-mem(记忆) :
 2026-08-12 18:20:54 feat: [知识库迁移] AGENTS/CLAUDE同步Obsidian到知识库口径
 2026-08-13 10:22:30 feat: [common/msg国际化消息目录新增] 放行common/dto、page、msg三个规范目录
 2026-08-13 10:23:03 test: [common/msg国际化消息目录新增] 补充common/msg布局回归测试
+2026-08-13 10:23:29 docs: [common/msg国际化消息目录新增] 归档6-review
