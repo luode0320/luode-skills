@@ -29,6 +29,7 @@
 | `bug-validation-rules` | 改动后 | Bug 修复后验证是否真修好、有无副作用 | 条件 | 修复验证 |
 | `code-context-resync-rules` | 中段改码 | 继续修改已有代码且疑似文件内容漂移 | 条件 | 改前重读文件防脏写 |
 | `autonomous-execution-rules` | 中段推进 | 多步任务尚未闭环且有必需下一步 | 条件 | 自动继续边界 |
+| `long-run-loop-rules` | 中段推进 | Goal 处于 active 且 objective 含完成标记，或用户显式提出 goal / 使用 `/goal` 命令（即使平台无 Goal 目标模式） | 条件 | 循环控制器：创建 worker 检测完成标记，未完成则跨线程接力续跑，达上限/死循环则标记 blocked |
 
 ## 维护约定
 

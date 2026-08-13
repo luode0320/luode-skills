@@ -3784,16 +3784,17 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
 - `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
+- `PROJECT_CURRENT.md` 还包含 `<!-- BEGIN RECENT PROJECT SESSIONS -->` 最近 5 个同项目会话托管区，它是只读回忆索引，帮助新会话了解近期其它会话在做什么；标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实，非 Codex App 宿主只读取不刷新。
 
-### Obsidian 知识流选择性默认触发（强制）
+### 知识库知识流选择性默认触发（强制）
 
-- 每轮仓库任务都必须先做一次轻量 Obsidian 判断，并在首条中间进度或等价命中检查证据中输出 `Obsidian:<检索/沉淀/不适用/阻断>`。
-- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / Obsidian / 知识库 / 当时怎么说”等信号时，判定为 `Obsidian:检索`，必须命中 `obsidian-knowledge-flow` 并通过 Obsidian CLI 检索 / 读取笔记。
-- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `Obsidian:沉淀`，必须命中 `obsidian-knowledge-flow` 并先通过 CLI 检索已有笔记，再决定捕获或沉淀。
-- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `Obsidian:不适用`，不得为了形式调用 Obsidian CLI。
-- Obsidian vault 的检索、读取、创建、追加和沉淀只能通过 `obsidian` CLI 完成；CLI 不可用、vault 未注册、目标根目录不一致或命令无法限定到目标 vault 时，判定为 `Obsidian:阻断`，不得用 `rg`、`Get-Content`、`Set-Content` 或直接文件读写冒充 vault 操作。
-- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `Obsidian:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
-- 本仓库固定使用 `D:\obsidian_data` 作为 Obsidian 根目录，实际知识工作区统一落在该 vault 下的 `知识库/` 目录；既然这个映射已经约定，就不要再通过环境变量、`.obsidian-kb-root` 或其它候选路径重复 probing。
+- 每轮仓库任务都必须先做一次轻量知识库判断，并在首条中间进度或等价命中检查证据中输出 `知识库:<检索/沉淀/不适用/阻断>`。
+- 当用户问题依赖历史决策、知识库内容、用户偏好、重复实体、长期项目事实，或出现“上次 / 之前 / 我们约定 / 知识库 / 当时怎么说”等信号时，判定为 `知识库:检索`，必须命中 `knowledge-flow` 并通过标准文件工具检索 / 读取笔记。
+- 当会话总结、阶段收口或最终回复前形成未来可复用的事实、决策、流程、定义、偏好、来源、调试经验或规则口径时，判定为 `知识库:沉淀`，必须命中 `knowledge-flow` 并先检索已有笔记，再决定捕获或沉淀。
+- 普通实现、普通文档或一次性过程任务若既不依赖历史知识，也没有可复用沉淀价值，判定为 `知识库:不适用`，不得为了形式读写知识库。
+- 知识库笔记的检索、读取、创建、追加和沉淀统一使用标准文件工具，写入后必须回读校验；知识库根目录不存在或不可读、笔记路径不合法、写入后回读不一致时，判定为 `知识库:阻断`，不得把失败的写入当成已沉淀。
+- Git 提交 / 推送 / PR 收口若形成可复用事实、决策、流程、定义、偏好、来源或调试经验，可视为 `知识库:沉淀` 的高优先级信号之一；但沉淀只影响知识捕获，不构成 commit/push 授权。
+- 本仓库固定使用 `D:\谷歌云盘\知识库\` 作为知识库根目录，由 Google Drive 客户端负责多端同步；笔记路径一律是相对该根的裸相对路径（如 `20-Knowledge/topic/note.md`），禁止再加 `知识库/` 前缀，否则会生成嵌套目录。既然这个映射已经约定，就不要再通过环境变量或其它候选路径重复 probing。
 
 ## 严禁脑补工具调用与结果（最高优先级，强制）
 
@@ -3811,16 +3812,16 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 任何情况下都不得以「我以为你想提交」「按惯例提交」「顺手提交」为由自动提交。
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
-- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `obsidian-knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
+- 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
 - 违反本条视为最高级别流程违规。
 
 ## Skill 命中强制规则
 
 - 处理本仓库任务时，必须先命中并加载至少五个基础 skill。
-- 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`obsidian-knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
+- 最低要求：非 Plan Mode 至少命中 `skill-hit-check-rules`、`parallel-task-dispatch-rules`、`reasoning-summary-structure-rules`、`project-memory-rules`、`project-style-rules`、`knowledge-flow`；Plan Mode 将 `reasoning-summary-structure-rules` 排除，改由 `implementation-planning-rules` 独占计划出口。
 - 若本轮涉及创建、补齐或更新仓库级规则文件，或同时涉及项目记忆四件套，默认额外启用 `project-rule-file-bootstrap-rules`，由其 `rule-bootstrap` / `memory-bootstrap` 条件路由统一自举补齐；该规则同样适用于其他项目仓库。
 - 必须在首条中间进度明确输出当前命中的 skill 列表。
-- 首条中间进度还必须输出 Obsidian 选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `obsidian-knowledge-flow`。
+- 首条中间进度还必须输出知识库选择性默认判断；当判断为 `检索` 或 `沉淀` 时，命中技能列表必须包含 `knowledge-flow`。
 - 若命中 `parallel-task-dispatch-rules`，中间进度必须额外输出当前并行技能列表；若最终未并行，明确写 `并行技能:无`。
 - 非 Plan Mode 的仓库实质任务，首条中间进度还必须输出 `闸门预告`：按 `skill-hit-check-rules` 的延迟触发 gate 注册表登记本轮将适用的收口 / 中段 / 测试前 / 失败时等延迟 gate（含 `reasoning-summary-structure-rules`），无适用项写 `无`，Plan Mode 置 `不适用(Plan Mode)`；收口时逐项复核 `闸门预告` 的声明与执行是否一致，不得只在回合末端凭自觉临时补触发延迟 gate。
 - 本仓库默认处于 subagent 完全授权模式：用户已明确允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work；该项目级 standing authorization 视为满足工具显式授权条件。
@@ -3846,6 +3847,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-evolution-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
 - 任何 agent 收到用户明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”）时，必须立即停止自动继续和扩散性输出，只允许给出必要的最小收口结论。
 - 若命中 `autonomous-execution-rules`，自动继续只允许用于“完成原始用户目标仍必需的动作”；不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
+- 若命中 `long-run-loop-rules`（Goal 处于 active 且 objective 含完成标记，或用户显式提出 goal / 使用 `/goal` 命令，即使平台无 Goal 目标模式），由循环控制器创建 worker 检测完成标记，未完成则跨线程接力续跑，达上限或死循环则标记 blocked；同样不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
 - 当原始用户目标已经完成或用户已给出明确结束指令，且不存在完成原始目标仍必需的动作时，必须停止连续执行并直接结束；不得输出“下一步状态”“下一步建议”“等待用户新指令”“无需继续动作”等任何可能触发循环 loop 的占位区块或扩散性文案，除非用户明确要求后续建议。
 - 若当前运行环境存在 goal / plan / task 等显式状态收口机制，且原始用户目标已经完成或已满足该机制的阻断条件，必须在最终收口前真实执行对应收口动作；只写完成文案不算真正结束运行时状态。Codex goal 仅是其中一种特例。
 
@@ -4020,3 +4022,18 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 - 允许将真实 API key、token、密码、私钥、连接串原值有意持久化到代码、配置、普通维护文档和对应 Git 提交。
 - 禁止在日志、错误信息、测试报告与证据、终端输出、Agent 回复、会话交接、执行失败案例和自动知识摘要等过程性输出中回显凭据原值。
+
+## 跨项目写入红线（最高优先级，强制）
+
+- 当前会话只能修改与本会话绑定的当前项目；**其他项目的代码和文件绝对只读**。
+- 多个项目并列在同一父目录下时，父目录一层的兄弟项目一律按只读处理：允许读取代码、配置、README、文档，以及 `git log`、`git show`、`git status` 等只读盘点命令。
+- 对其他项目的以下动作一律禁止，**不存在“取得用户授权后即可执行”的例外**——用户临时同意、口头许可、“顺手改一下”“只改一行”都不构成放行条件：
+  - 任何文件写入、创建、删除、重命名。
+  - 任何命令执行、构建、测试、依赖安装。
+  - 任何写 Git 历史或改变工作树状态的动作（`commit`、`push`、`checkout`、`stash`、`reset` 等）。
+  - 任何会在其他项目内生成产物的初始化动作（如 `codegraph init` 生成索引目录、缓存目录、构建输出）。
+- 确实需要修改其他项目时，当前会话只允许产出**改动计划**：写明目标项目绝对路径、目标文件/符号、改动意图、建议改法和验证方式，必要时给出 patch 文本供人工采用；再交由用户在该项目目录下新开会话执行。计划本身只能写入当前项目或直接回复用户，不得写入其他项目目录。
+- 读取其他项目不等于获得其运行环境授权：不得使用其配置连接数据库、缓存、消息队列或上下游服务，也不得启动其服务来补证据；本地连接红线仍以当前项目的 `local` 配置为准。
+- 定位其他项目的发现顺序与只读边界细则见 `implementation-planning-rules/references/sibling-project-discovery.md`；Bug 跨项目对照排查见 `bug-intake-rules`，跨项目 CodeGraph 查询见 `codegraph-analysis-rules`。
+- 本条为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
+- 违反本条视为最高级别流程违规。
