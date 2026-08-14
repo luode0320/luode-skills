@@ -76,7 +76,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置 Catalog 与 Schema 契约。
-        最近修改时间: 2026-08-06 00:00:00 同步 embedded 主来源与 YAML 回退策略。
+                最近修改时间: 2026-08-13 00:00:00 同步 embedded/YAML 二选一互斥策略。
         """
         # 1. 先验证 backend/fullstack 的四类 config query 都暴露完整策略字段。
         cases = (
@@ -99,12 +99,12 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 if category == "yaml":
                     self.assertEqual("config_<env>.yaml|config_<env>.yml", entry["file_name_pattern"])
                     self.assertEqual("allow_plain_secret", entry["secret_policy"])
-                    self.assertEqual("embedded_source_fallback", entry["source_policy"])
+                    self.assertEqual("yaml_mutually_exclusive", entry["source_policy"])
                     self.assertEqual("allowed_reference", entry["environment_variable_policy"])
                 else:
                     self.assertEqual("config_<env>_yaml.go", entry["go_file_name_pattern"])
                     self.assertEqual("allow_plain_secret", entry["secret_policy"])
-                    self.assertEqual("embedded_source_primary", entry["source_policy"])
+                    self.assertEqual("embedded_mutually_exclusive", entry["source_policy"])
                     self.assertEqual("not_default", entry["environment_variable_policy"])
 
         # 2. 再核对 Catalog 与 Schema 的策略字段定义。
@@ -123,7 +123,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
         ):
             self.assertIn(field, properties)
         self.assertEqual(
-            ["embedded_source_fallback", "external_config_primary", "embedded_source_primary"],
+            ["yaml_mutually_exclusive", "external_config_primary", "embedded_mutually_exclusive"],
             properties["source_policy"]["enum"],
         )
 
@@ -132,7 +132,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置根源码 pattern 的 Catalog 与 Schema 契约。
-        最近修改时间: 2026-08-06 00:00:00 补充 loader 的 embedded 优先语义断言。
+                最近修改时间: 2026-08-13 00:00:00 补充 loader 的环境来源断言。
         """
         # 1. 先验证 backend/fullstack × loader/model 四类 query 唯一命中规范路径。
         cases = (
@@ -198,7 +198,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置 reference 文字与机器策略一致。
-        最近修改时间: 2026-08-02 21:30:00 新增 embedded 私密配置边界回归。
+        最近修改时间: 2026-08-13 00:00:00 新增 embedded 私密配置边界回归。
         """
         # 1. 对照 reference 正文确认 embedded/YAML 和外部输出边界。
         layout = CONFIGURATION_LAYOUT.read_text(encoding="utf-8")
@@ -220,7 +220,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
         self.assertEqual(2, len(embedded))
         self.assertEqual(2, len(yaml_entries))
         self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in embedded))
-        self.assertTrue(all(entry["source_policy"] == "embedded_source_primary" for entry in embedded))
+        self.assertTrue(all(entry["source_policy"] == "embedded_mutually_exclusive" for entry in embedded))
         self.assertTrue(all(entry["environment_variable_policy"] == "not_default" for entry in embedded))
         self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in yaml_entries))
 
@@ -256,12 +256,14 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言合法环境配置样本通过 strict。
-        最近修改时间: 2026-08-03 17:48:21 Go embedded 合法样本改为格式名后置命名。
+        最近修改时间: 2026-08-13 00:00:00 Go embedded 合法样本改为格式名后置命名，并拆分互斥模式样本。
         """
         # 1. Go embedded 必须带 _yaml 后缀；`.java` 样本保持原名，锚定“只有 Go 强制文件名契约”。
         cases = (
-            ("backend", ("config/yaml/config_prod.yaml", "config/yaml/config_pre_prod.yml", "config/embedded/config_local_yaml.go"), "go"),
-            ("fullstack", ("backend/config/yaml/config_test.yaml", "backend/config/embedded/config_dev_yaml.go"), "go"),
+            ("backend", ("config/yaml/config_prod.yaml", "config/yaml/config_pre_prod.yml"), "go"),
+            ("backend", ("config/embedded/config_local_yaml.go", "config/embedded/config_test_yaml.go"), "go"),
+            ("fullstack", ("backend/config/yaml/config_test.yaml",), "go"),
+            ("fullstack", ("backend/config/embedded/config_dev_yaml.go",), "go"),
             ("backend", ("config/embedded/config_local.java",), "java"),
         )
         for project_kind, paths, language in cases:

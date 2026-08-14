@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-13 11:55:04",
+  "generated_at": "2026-08-13 19:14:09",
   "repo_root": "D:\\luode\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 2,
     "seed_total": 35,
     "doc_total": 10,
-    "references_total": 578,
+    "references_total": 583,
     "agents_total": 84
   },
   "downloaded_seeds": {
@@ -1161,7 +1161,8 @@ window.SKILL_DICTIONARY = {
             "requirement-intake-rules/references/pause-triggers.md",
             "requirement-intake-rules/references/requirement-domain-shared-contract.md",
             "requirement-intake-rules/references/requirement-gap-examples.md",
-            "requirement-intake-rules/references/requirement-structure-template.md"
+            "requirement-intake-rules/references/requirement-structure-template.md",
+            "requirement-intake-rules/references/workbuddy-quality-gate.md"
           ],
           "agents": [
             "requirement-intake-rules/agents/openai.yaml"
@@ -1287,10 +1288,12 @@ window.SKILL_DICTIONARY = {
             "implementation-planning-rules/references/plan-question-coverage.md",
             "implementation-planning-rules/references/plan-review-checklist.md",
             "implementation-planning-rules/references/plan-structure-template.md",
+            "implementation-planning-rules/references/pre-implementation-code-exploration.md",
             "implementation-planning-rules/references/sibling-project-discovery.md",
             "implementation-planning-rules/references/source-notes.md",
             "implementation-planning-rules/references/task-granularity-and-order.md",
-            "implementation-planning-rules/references/visualization-standard.md"
+            "implementation-planning-rules/references/visualization-standard.md",
+            "implementation-planning-rules/references/workbuddy-absorption-map.md"
           ],
           "agents": [
             "implementation-planning-rules/agents/openai.yaml"
@@ -1537,6 +1540,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "bug-fix-proposal-rules/references/confirm-before-coding.md",
             "bug-fix-proposal-rules/references/fix-proposal-template.md",
+            "bug-fix-proposal-rules/references/fix-risk-grading-and-confirmation.md",
             "bug-fix-proposal-rules/references/regression-risk.md",
             "bug-fix-proposal-rules/references/regression-risk/risk-dimensions.md",
             "bug-fix-proposal-rules/references/regression-risk/risk-examples.md",
@@ -2767,6 +2771,7 @@ window.SKILL_DICTIONARY = {
           "references": [
             "test-strategy-rules/references/doc-minimums.md",
             "test-strategy-rules/references/priority-model.md",
+            "test-strategy-rules/references/risk-based-test-conclusion.md",
             "test-strategy-rules/references/strategy-dimensions.md",
             "test-strategy-rules/references/strategy-template.md",
             "test-strategy-rules/references/test-asset-governance.md"
@@ -5897,7 +5902,8 @@ window.SKILL_DICTIONARY = {
         "requirement-intake-rules/references/pause-triggers.md",
         "requirement-intake-rules/references/requirement-domain-shared-contract.md",
         "requirement-intake-rules/references/requirement-gap-examples.md",
-        "requirement-intake-rules/references/requirement-structure-template.md"
+        "requirement-intake-rules/references/requirement-structure-template.md",
+        "requirement-intake-rules/references/workbuddy-quality-gate.md"
       ],
       "agents": [
         "requirement-intake-rules/agents/openai.yaml"
@@ -6023,10 +6029,12 @@ window.SKILL_DICTIONARY = {
         "implementation-planning-rules/references/plan-question-coverage.md",
         "implementation-planning-rules/references/plan-review-checklist.md",
         "implementation-planning-rules/references/plan-structure-template.md",
+        "implementation-planning-rules/references/pre-implementation-code-exploration.md",
         "implementation-planning-rules/references/sibling-project-discovery.md",
         "implementation-planning-rules/references/source-notes.md",
         "implementation-planning-rules/references/task-granularity-and-order.md",
-        "implementation-planning-rules/references/visualization-standard.md"
+        "implementation-planning-rules/references/visualization-standard.md",
+        "implementation-planning-rules/references/workbuddy-absorption-map.md"
       ],
       "agents": [
         "implementation-planning-rules/agents/openai.yaml"
@@ -6261,6 +6269,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "bug-fix-proposal-rules/references/confirm-before-coding.md",
         "bug-fix-proposal-rules/references/fix-proposal-template.md",
+        "bug-fix-proposal-rules/references/fix-risk-grading-and-confirmation.md",
         "bug-fix-proposal-rules/references/regression-risk.md",
         "bug-fix-proposal-rules/references/regression-risk/risk-dimensions.md",
         "bug-fix-proposal-rules/references/regression-risk/risk-examples.md",
@@ -7443,6 +7452,7 @@ window.SKILL_DICTIONARY = {
       "references": [
         "test-strategy-rules/references/doc-minimums.md",
         "test-strategy-rules/references/priority-model.md",
+        "test-strategy-rules/references/risk-based-test-conclusion.md",
         "test-strategy-rules/references/strategy-dimensions.md",
         "test-strategy-rules/references/strategy-template.md",
         "test-strategy-rules/references/test-asset-governance.md"

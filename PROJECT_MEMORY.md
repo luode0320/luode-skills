@@ -95,11 +95,18 @@
 ## 配置环境来源契约
 
 - 稳定决策：`package-structure-rules` 的 loader 条目必须记录统一环境来源优先级 `-env > APP_ENV > ENV > local`；reference 正文、Catalog、Schema 和活动契约测试必须保持同一表达。该契约只描述配置 loader 的来源识别，不改变 embedded/YAML 秘密边界或真实项目迁移授权。
-- 稳定决策：同一环境的配置加载优先使用 `embedded/`；对应 embedded 配置缺失时才回退到 `yaml/`。YAML 条目禁止秘密原值并标记为 `embedded_source_fallback`，embedded 条目允许源码私密值并标记为 `embedded_source_primary`；该安全模型不把源码私密值回显到 Agent 输出、日志、README、错误或测试报告。
-- 来源：`F:\binance-wangge-go` CYCLE-11 环境来源识别实施周期、`package-structure-rules` Catalog/Schema/reference 改动和配置契约测试。
-- 更新时间：2026-08-06。
+- 稳定决策：`config/embedded/` 与 `config/yaml/` 是二选一互斥的配置模式，一个项目只能选择其中一种，不可并存，推荐优先使用 `config/embedded/`。YAML 条目标记为 `yaml_mutually_exclusive`，embedded 条目标记为 `embedded_mutually_exclusive`；两种模式都允许有意持久化真实密钥、密码、token、私钥原值，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。该模型取代旧的“embedded 主来源、YAML 回退并存”口径。
+- 来源：`package-structure-rules/references/configuration-layout.md`、`package-structure-rules` Catalog/Schema 改动和配置契约测试。
+- 更新时间：2026-08-13。
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
 - 更新时间：2026-07-14。
+
+## WorkBuddy 官方市场规则吸收整理补充
+
+- 稳定决策：吸收官方市场同类 skill 时以「整理补充」为原则，不是无限制累加，也不是整套复制。本地规则已经更完整的方向只做归纳；官方真正更优的少量动作才吸收进既有 skill 的 `references/`；不新建同类 skill，不复制官方工作流、问答链或目录结构。
+- 稳定决策：需求域吸收官方 100 分质量门，落为 `requirement-intake-rules/references/workbuddy-quality-gate.md`；实施域吸收「编码前先探索代码库」，落为 `implementation-planning-rules/references/pre-implementation-code-exploration.md`；Bug 域吸收「修复前先分级风险并确认」，落为 `bug-fix-proposal-rules/references/fix-risk-grading-and-confirmation.md`；测试域吸收「风险分层后给出明确测试结论」，落为 `test-strategy-rules/references/risk-based-test-conclusion.md`。
+- 来源：`implementation-planning-rules/references/workbuddy-absorption-map.md`、四个 skill 的 references、`doc/2-需求/2026-08-13_110000_WorkBuddy官方市场规则吸收整理补充.md`。
+- 更新时间：2026-08-13。
 
 ## 任务阻断收口与恢复规则
 
@@ -331,7 +338,7 @@
 - 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
 - 稳定决策：独立后端的默认二进制入口固定为根 `main.<ext>`，仅当存在额外 binary 时使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端对应固定为 `backend/main.<ext>` 与 `backend/cmd/<binary>/main.<ext>`。根 `cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 都是非法入口；Catalog 以动态 pattern 建模，`init` 显式启用时必须失败关闭且不得创建占位路径。
-- 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；两者均按需使用 `yaml/` 与 `embedded/` 子目录。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置格式名必须后置，使用 `embedded/config_local_yaml.go`、`embedded/config_test_yaml.go`、`embedded/config_prod_yaml.go`；环境集合可扩展，不要求所有环境齐全，也不要求 YAML 与 embedded 成对出现。格式名后置的原因是 `config_test.go` 会被 Go 当成测试文件并排除出 `go build`，因此 `embedded/config_<env>.go` 属于非法旧命名；环境名同样不得以 `_yaml` 结尾。外部 YAML 不参与编译，保持 `config_<env>.yaml`，不加 `_yaml` 后缀。文件名契约只对 `.go` 强制，其他语言的 embedded 仍只校验源码扩展名；`check` 只读，`init` 不生成动态环境配置文件。YAML 继续禁止秘密原值；backend/fullstack 的 embedded 源码允许直接包含 API key、密钥、密码等私密值，源码为主且默认不依赖环境变量，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。config/ 根允许直接存放 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件，条件提交且 `init` 不创建；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
+- 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；`config/yaml/` 与 `config/embedded/` 是二选一互斥的配置模式，一个项目只能选择其中一种，不可并存，推荐优先使用 embedded。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置格式名必须后置，使用 `embedded/config_local_yaml.go`、`embedded/config_test_yaml.go`、`embedded/config_prod_yaml.go`；环境集合可扩展，不要求所有环境齐全。格式名后置的原因是 `config_test.go` 会被 Go 当成测试文件并排除出 `go build`，因此 `embedded/config_<env>.go` 属于非法旧命名；环境名同样不得以 `_yaml` 结尾。外部 YAML 不参与编译，保持 `config_<env>.yaml`，不加 `_yaml` 后缀。文件名契约只对 `.go` 强制，其他语言的 embedded 仍只校验源码扩展名；`check` 只读，`init` 不生成动态环境配置文件。YAML 与 embedded 都允许有意持久化真实密钥、密码、token、私钥原值，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。config/ 根允许直接存放 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件，条件提交且 `init` 不创建；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
 - 稳定决策：fullstack、backend、frontend 三类项目统一使用项目根 `test/` 作为活动测试代码唯一入口；独立后端使用根 `test/`，不建立 `backend/test/`；前后端同仓也不建立 `backend/test/` 或 `frontend/test/`。Catalog 的测试目录 Owner 为 `test-strategy-rules`，`doc/5-tests/` 只保存测试说明和非可执行证据，不能替代根 `test/`。
 - 稳定决策：前后端同仓、独立后端、独立前端三类项目根都必须直接保存并提交 `Dockerfile`。Catalog 以 `project-governance/dockerfile` 的必需文件条目建模，`init` 自动创建空文件位置；`strict` 只读拒绝缺失或被目录占用，`adoption` 保持旧项目渐进采纳，不强制补迁移文件。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
@@ -430,7 +437,7 @@
 ```yaml
 version: 1
 entities:
-  - entity_id: rule.obsidian-iterative-knowledge-governance
+  - entity_id: rule.knowledge-iterative-governance
     name: "知识库可迭代更新与分级处置"
     type: "知识库治理规则"
     aliases:
@@ -442,9 +449,9 @@ entities:
     scope: "知识库写入、检索、冲突处置与积压巡检"
     status: "active"
     evidence_ids:
-      - evidence.obsidian-iterative-knowledge-governance
+      - evidence.knowledge-iterative-governance
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
     updated_at: 2026-08-12
   - entity_id: rule.summary-knowledge-citation-section
     name: "总结知识引用小节与引用台账"
@@ -452,14 +459,14 @@ entities:
     aliases:
       - 知识引用小节
       - 引用台账
-      - Obsidian 引用清单
+      - 知识库引用清单
     definition: "最终总结在无真实阻断时按引用台账分流收尾：台账非空输出 ## 知识引用 作为最后一节，用「本轮引用」三列表（序号、笔记、本轮用途）与「本轮沉淀」四列表（序号、笔记、操作、readback）承载，改动点紧邻其前；台账为空整节省略且由改动点收尾。knowledge-flow 每次读取/创建/追加笔记成功后立即登记六字段台账；只有真实读取成功的笔记可入引用表，检索命中未读取的不得入表；笔记名取自读写笔记时所用相对路径的文件名部分；笔记 status 为 stale/deprecated/retired/conflicted 时在用途列标注。"
     scope: "最终总结渲染、知识库检索与沉淀登记、总结条件字段判定与驳回标准"
     status: "active"
     evidence_ids:
       - evidence.summary-knowledge-citation-section
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
     updated_at: 2026-08-12
   - entity_id: rule.root-test-code-and-evidence-layout
     name: "根测试代码与测试证据双根规则"
@@ -929,7 +936,7 @@ entities:
     context_ids:
       - context.thread-title-management
     updated_at: 2026-07-05
-  - entity_id: rule.obsidian-knowledge-flow-selective-default
+  - entity_id: rule.knowledge-flow-selective-default
     name: "知识库知识流选择性默认触发链"
     type: "流程规则"
     aliases:
@@ -941,16 +948,16 @@ entities:
     scope: "记忆域、命中检查、阶段收口、最终总结、知识库检索与沉淀"
     status: "active"
     evidence_ids:
-      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.knowledge-flow
       - evidence.skill.skill-hit-check
       - evidence.doc.repo-rules
       - evidence.doc.skill-plan
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
       - context.memory-domain
     updated_at: 2026-08-12
-  - entity_id: rule.obsidian-windows-wsl-bridge-boundary
-    name: "Obsidian Windows/WSL bridge 固定执行边界（已取代）"
+  - entity_id: rule.legacy-windows-wsl-bridge-boundary
+    name: "知识库 Windows/WSL bridge 固定执行边界（已取代）"
     type: "跨宿主执行规则"
     aliases:
       - obsidian_cli_bridge
@@ -960,15 +967,15 @@ entities:
     scope: "（历史）Windows/WSL 知识流、bridge transport、长正文分块与读回验证"
     status: "superseded"
     evidence_ids:
-      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.knowledge-flow
       - evidence.doc.repo-rules
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
       - context.memory-domain
     superseded_by:
       - rule.knowledge-base-migration-path-prefix
     updated_at: 2026-08-12
-  - entity_id: rule.git-obsidian-capture-link
+  - entity_id: rule.git-knowledge-capture-link
     name: "Git 协作联动知识库沉淀"
     type: "流程规则"
     aliases:
@@ -979,11 +986,11 @@ entities:
     scope: "提交流程、交付收口、知识库记忆沉淀"
     status: "active"
     evidence_ids:
-      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.knowledge-flow
       - evidence.skill.git-collaboration
-      - evidence.dialog.git-obsidian-capture-link
+      - evidence.dialog.git-knowledge-capture-link
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
       - context.git-collaboration
       - context.memory-domain
     updated_at: 2026-08-12
@@ -995,16 +1002,16 @@ entities:
       - 裸相对路径
       - 禁止知识库前缀
       - 嵌套知识库目录
-    definition: "知识库承载体从 Obsidian vault D:\\obsidian_data 迁移到 Google Drive 同步目录 D:\\谷歌云盘\\知识库\\，多端同步交给 Google Drive 客户端。CLI 桥接层整体废除，obsidian_cli_bridge.py / obsidian_cli_windows.ps1 / distill_vault.py 已删除，所有笔记读写改用标准文件工具，写入后回读校验取代原 verified=true 判据，原「不得用文件系统操作冒充 vault 操作」禁令方向已完全反转。笔记路径基准是相对知识库根的裸相对路径（如 20-Knowledge/topic/note.md），禁止再加 知识库/ 前缀——根本身已经是 知识库，前缀叠加会生成嵌套目录 D:\\谷歌云盘\\知识库\\知识库\\，该错误约定在 Obsidian 时代即已存在。skill obsidian-knowledge-flow 更名 knowledge-flow；每轮状态字段由 Obsidian:<...> 改为 知识库:<...>，四态语义保留，阻断判据改为目录不可达 / 路径不合法 / 写入后回读不一致。"
+    definition: "知识库承载体从 Obsidian vault D:\\obsidian_data 迁移到 Google Drive 同步目录 D:\\谷歌云盘\\知识库\\，多端同步交给 Google Drive 客户端。CLI 桥接层整体废除，obsidian_cli_bridge.py / obsidian_cli_windows.ps1 / distill_vault.py 已删除，所有笔记读写改用标准文件工具，写入后回读校验取代原 verified=true 判据，原「不得用文件系统操作冒充 vault 操作」禁令方向已完全反转。笔记路径基准是相对知识库根的裸相对路径（如 20-Knowledge/topic/note.md），禁止再加 知识库/ 前缀——根本身已经是 知识库，前缀叠加会生成嵌套目录 D:\\谷歌云盘\\知识库\\知识库\\，该错误约定在 Obsidian 时代即已存在。skill 由旧命名更名 knowledge-flow；每轮状态字段由 Obsidian:<...> 改为 知识库:<...>，四态语义保留，阻断判据改为目录不可达 / 路径不合法 / 写入后回读不一致。"
     scope: "知识库根目录、笔记路径基准、读写通道、状态字段命名与 skill 命名"
     status: "active"
     supersedes:
-      - rule.obsidian-windows-wsl-bridge-boundary
+      - rule.legacy-windows-wsl-bridge-boundary
     evidence_ids:
-      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.knowledge-flow
       - evidence.doc.repo-rules
     context_ids:
-      - context.obsidian-knowledge-flow
+      - context.knowledge-flow
       - context.memory-domain
     updated_at: 2026-08-12
   - entity_id: rule.git-commit-domain-split
@@ -1088,7 +1095,7 @@ entities:
       - evidence.review.skill-split-current-diff-20260717
       - evidence.accept.skill-split-task-01-03-20260717
       - evidence.doc.skill-split-cycle-01-close-20260717
-      - evidence.obsidian.skill-split-plan-20260717
+      - evidence.knowledge.skill-split-plan-20260717
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
@@ -1106,7 +1113,7 @@ entities:
       - evidence.review.skill-split-current-diff-20260717
       - evidence.accept.skill-split-task-01-03-20260717
       - evidence.doc.skill-split-cycle-01-close-20260717
-      - evidence.obsidian.skill-split-plan-20260717
+      - evidence.knowledge.skill-split-plan-20260717
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
@@ -1180,6 +1187,22 @@ entities:
       - context.plan-mode-wait-loop
       - context.implementation-flow
     updated_at: 2026-07-26
+  - entity_id: rule.workbuddy-market-skill-absorption
+    name: "WorkBuddy 官方市场 skill 吸收整理补充"
+    type: "Skill 治理规则"
+    aliases:
+      - WorkBuddy 规则吸收
+      - skill 吸收裁决
+      - 需求实施 Bug 测试四域吸收
+    definition: "吸收官方市场同类 skill 时以整理补充为原则，不是无限制累加或整套复制；本地规则已更完整的方向只做归纳，官方真正更优的少量动作才吸收进既有 skill 的 references/；不新建同类 skill。四域落点：需求域 100 分质量门、实施域编码前代码库探索、Bug 域修复前风险分级与确认、测试域风险分层明确结论。对应 SKILL.md 只补 references 引用，不扩触发条件。"
+    scope: "WorkBuddy 官方市场同类 skill 对照、需求域、实施域、Bug 域、测试域规则吸收与整理"
+    status: "active"
+    evidence_ids:
+      - evidence.doc.workbuddy-absorption-map
+      - evidence.test.workbuddy-absorption
+    context_ids:
+      - context.implementation-flow
+    updated_at: 2026-08-13
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -1202,12 +1225,12 @@ relations:
     evidence_ids:
       - evidence.skill.artifact-storage
     status: "active"
-  - relation_id: rel.git-obsidian-capture-link.depends-on.obsidian-knowledge-flow
+  - relation_id: rel.git-knowledge-capture-link.depends-on.knowledge-flow
     type: "depends_on"
-    from: "rule.git-obsidian-capture-link"
-    to: "rule.obsidian-knowledge-flow-selective-default"
+    from: "rule.git-knowledge-capture-link"
+    to: "rule.knowledge-flow-selective-default"
     evidence_ids:
-      - evidence.skill.obsidian-knowledge-flow
+      - evidence.skill.knowledge-flow
       - evidence.skill.git-collaboration
     status: "active"
   - relation_id: rel.session-handoff.depends-on.task-plan-rehydration
@@ -1442,11 +1465,11 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "用户确认采用“阶段+提问”策略，要求提问、goal 创建 / 恢复和长任务阶段切换时在过程中尝试改名"
-  - evidence_id: evidence.skill.obsidian-knowledge-flow
+  - evidence_id: evidence.skill.knowledge-flow
     type: "skill"
     source: "knowledge-flow/SKILL.md"
     path: "knowledge-flow/SKILL.md"
-    note: "Obsidian 知识流选择性默认判断、CLI 检索、捕获和沉淀规则来源"
+    note: "知识库知识流选择性默认判断、CLI 检索、捕获和沉淀规则来源"
   - evidence_id: evidence.skill.git-collaboration
     type: "skill"
     source: "git-collaboration-rules/SKILL.md"
@@ -1456,21 +1479,21 @@ evidence:
     type: "skill"
     source: "skill-hit-check-rules/SKILL.md"
     path: "skill-hit-check-rules/SKILL.md"
-    note: "首条命中检查输出 Obsidian 判断并联动 obsidian-knowledge-flow 的规则来源"
+    note: "首条命中检查输出 知识库判断并联动 knowledge-flow 的规则来源"
   - evidence_id: evidence.doc.repo-rules
     type: "doc"
     source: "AGENTS.md / CLAUDE.md"
     path: "AGENTS.md"
-    note: "仓库级 Obsidian 选择性默认触发硬规则来源"
+    note: "仓库级知识库选择性默认触发硬规则来源"
   - evidence_id: evidence.doc.skill-plan
     type: "doc"
     source: "编码skill.md"
     path: "编码skill.md"
-    note: "主规划记忆域将 obsidian-knowledge-flow 纳入正式触发链的来源"
-  - evidence_id: evidence.dialog.git-obsidian-capture-link
+    note: "主规划记忆域将 knowledge-flow 纳入正式触发链的来源"
+  - evidence_id: evidence.dialog.git-knowledge-capture-link
     type: "dialog"
     source: "对话确认"
-    note: "用户要求将 Git 提交流程与 Obsidian 沉淀机制联动到项目规则中"
+    note: "用户要求将 Git 提交流程与知识库沉淀机制联动到项目规则中"
   - evidence_id: evidence.dialog.git-commit-domain-split
     type: "dialog"
     source: "对话确认"
@@ -1514,9 +1537,9 @@ evidence:
     source: "Skill 体积治理与职责拆分周期 01 收口同步"
     path: "doc/3-实施/2026-07-16_114619_Skill体积治理与拆分_实施周期01_预算与候选冻结.md"
     note: "周期文档、测试 README、需求/验收/实施门禁和 PROJECT_CURRENT 已同步完成状态，周期 02 保持未进入。"
-  - evidence_id: evidence.obsidian.skill-split-plan-20260717
+  - evidence_id: evidence.knowledge.skill-split-plan-20260717
     type: "knowledge"
-    source: "Obsidian 知识流阶段收口沉淀"
+    source: "知识库知识流阶段收口沉淀"
     path: "20-Knowledge/codex-skills/skill-体积治理与职责拆分计划.md"
     note: "通过固定 vault bridge create/readback 沉淀统计口径、候选顺序、五类验证契约和当前周期状态，并通过 bridge append/readback 更新 INDEX。"
   - evidence_id: evidence.skill.task-plan-rehydration
@@ -1599,7 +1622,7 @@ contexts:
     type: "workspace-convention"
     name: "会话标题管理"
     note: "适用于用户提问、goal 长任务、上下文续做和阶段切换时的会话标题更新"
-  - context_id: context.obsidian-knowledge-flow
+  - context_id: context.knowledge-flow
     type: "task-scope"
     name: "知识库知识流"
     note: "适用于历史知识依赖、知识库检索、阶段收口沉淀和最终总结捕获判断"
@@ -1610,7 +1633,7 @@ contexts:
   - context_id: context.memory-domain
     type: "repository-convention"
     name: "记忆域"
-    note: "适用于近期上下文、历史回忆、Obsidian 知识流和长期项目记忆"
+    note: "适用于近期上下文、历史回忆、知识库知识流和长期项目记忆"
   - context_id: context.session-handoff
     type: "task-scope"
     name: "会话交接与新任务接续"
@@ -1647,15 +1670,16 @@ lifecycle:
     - "rule.micro-business-json-rpc-boundary"
     - "rule.legacy-project-directory-adoption"
     - "rule.thread-title-process-trigger"
-    - "rule.obsidian-knowledge-flow-selective-default"
-    - "rule.obsidian-iterative-knowledge-governance"
-    - "rule.git-obsidian-capture-link"
+    - "rule.knowledge-flow-selective-default"
+    - "rule.knowledge-iterative-governance"
+    - "rule.git-knowledge-capture-link"
     - "rule.git-commit-domain-split"
     - "rule.git-commit-review-acceptance-evidence"
     - "rule.task-plan-rehydration"
     - "rule.session-handoff"
     - "rule.plan-mode-decision-wait-loop"
     - "rule.reasoning-summary-detail"
+    - "rule.workbuddy-market-skill-absorption"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -1839,22 +1863,22 @@ retrieval_hints:
       - "rule.thread-title-process-trigger"
     goal 中途改名:
       - "rule.thread-title-process-trigger"
-    obsidian-knowledge-flow:
-      - "rule.obsidian-knowledge-flow-selective-default"
-    Obsidian 知识流:
-      - "rule.obsidian-knowledge-flow-selective-default"
+    knowledge-flow:
+      - "rule.knowledge-flow-selective-default"
+    知识库知识流:
+      - "rule.knowledge-flow-selective-default"
     选择性默认触发:
-      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.knowledge-flow-selective-default"
     知识库检索沉淀:
-      - "rule.obsidian-knowledge-flow-selective-default"
-    Git 协作联动 Obsidian 沉淀:
-      - "rule.git-obsidian-capture-link"
+      - "rule.knowledge-flow-selective-default"
+    Git 协作联动知识库沉淀:
+      - "rule.git-knowledge-capture-link"
     提交前知识捕获:
-      - "rule.git-obsidian-capture-link"
+      - "rule.git-knowledge-capture-link"
     Git 收口沉淀:
-      - "rule.git-obsidian-capture-link"
-    commit 联动 Obsidian:
-      - "rule.git-obsidian-capture-link"
+      - "rule.git-knowledge-capture-link"
+    commit 联动知识库:
+      - "rule.git-knowledge-capture-link"
     提交域隔离:
       - "rule.git-commit-domain-split"
     同一任务文档合并提交:
@@ -1942,21 +1966,21 @@ retrieval_hints:
       - "rule.thread-title-process-trigger"
     goal 长任务:
       - "rule.thread-title-process-trigger"
-    记忆域:
-      - "rule.obsidian-knowledge-flow-selective-default"
-    Obsidian:
-      - "rule.obsidian-knowledge-flow-selective-default"
+    知识库记忆域:
+      - "rule.knowledge-flow-selective-default"
+    知识库:
+      - "rule.knowledge-flow-selective-default"
     知识库检索:
-      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.knowledge-flow-selective-default"
     阶段收口:
-      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.knowledge-flow-selective-default"
     提交流程:
-      - "rule.git-obsidian-capture-link"
+      - "rule.git-knowledge-capture-link"
       - "rule.git-commit-domain-split"
     交付收口:
-      - "rule.git-obsidian-capture-link"
-    Obsidian 记忆沉淀:
-      - "rule.git-obsidian-capture-link"
+      - "rule.git-knowledge-capture-link"
+    知识库记忆沉淀:
+      - "rule.git-knowledge-capture-link"
     提交域隔离:
       - "rule.git-commit-domain-split"
     同一任务文档合并提交:
@@ -2081,21 +2105,21 @@ retrieval_hints:
       - "rule.thread-title-process-trigger"
     thread-title-rules/SKILL.md:
       - "rule.thread-title-process-trigger"
-    obsidian-knowledge-flow/SKILL.md:
-      - "rule.obsidian-knowledge-flow-selective-default"
+    knowledge-flow/SKILL.md:
+      - "rule.knowledge-flow-selective-default"
     skill-hit-check-rules/SKILL.md:
-      - "rule.obsidian-knowledge-flow-selective-default"
+      - "rule.knowledge-flow-selective-default"
     AGENTS.md:
-      - "rule.obsidian-knowledge-flow-selective-default"
-      - "rule.git-obsidian-capture-link"
+      - "rule.knowledge-flow-selective-default"
+      - "rule.git-knowledge-capture-link"
     CLAUDE.md:
-      - "rule.obsidian-knowledge-flow-selective-default"
-      - "rule.git-obsidian-capture-link"
+      - "rule.knowledge-flow-selective-default"
+      - "rule.git-knowledge-capture-link"
     编码skill.md:
-      - "rule.obsidian-knowledge-flow-selective-default"
-      - "rule.git-obsidian-capture-link"
+      - "rule.knowledge-flow-selective-default"
+      - "rule.git-knowledge-capture-link"
     git-collaboration-rules/SKILL.md:
-      - "rule.git-obsidian-capture-link"
+      - "rule.git-knowledge-capture-link"
       - "rule.git-commit-domain-split"
     git-collaboration-rules/scripts/pre_commit_gate.sh:
       - "rule.git-commit-domain-split"

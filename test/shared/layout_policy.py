@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 EXECUTABLE_SUFFIXES = frozenset({".bat", ".cmd", ".go", ".js", ".ps1", ".py", ".sh", ".ts"})
-SPECIAL_TEST_DIRECTORIES = frozenset({"shared", "test-asset-governance"})
+SPECIAL_TEST_DIRECTORIES = frozenset({"shared", "test-asset-governance", "credential-policy"})
 
 
 def repository_root() -> Path:
@@ -16,7 +16,7 @@ def repository_root() -> Path:
 
     [参数] 无。
     [返回] Path：`test/shared/` 上两级的项目根目录。
-    最近修改时间：2026-08-01；改动原因：统一根测试目录的相对路径计算。
+    最近修改时间：2026-08-13；改动原因：统一根测试目录的相对路径计算，并补充跨 Skill 契约测试目录豁免。
     """
     return Path(__file__).resolve().parents[2]
 

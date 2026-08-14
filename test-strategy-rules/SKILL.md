@@ -177,3 +177,5 @@ description: 当准备进入测试阶段需要确定测试策略、优先级、�
 - 接口测试是验证"接口在真实分布下是否按预期工作"的主要手段，不能用单元测试或代码审查代替。
 - 联调测试中遇到写接口时，同样适用 4 级样本矩阵。
 - 回归测试中遇到写接口时，至少保证 `historical_succeeded` + `current_listing_available` 2 类样本。
+
+- 基于风险的测试结论分层：`references/risk-based-test-conclusion.md`

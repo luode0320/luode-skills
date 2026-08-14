@@ -95,3 +95,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - 只有在 判断与相邻 skill 的边界或对照正反例 时，再读 `references/plan-boundaries-and-examples.md`。
 - 只有在 维护本 skill 来源或后续继续吸收外部种子 时，再读 `references/source-notes.md`。
 - 只要当前处于非 Plan Mode，且任务够不上重量级触发条件、又不属于 Bug 域既有管线时，必须读 `references/minimum-plan-grading.md` 判定改动量分级并确定是否需要先给出最小计划。
+
+- 吸收外部规则精华与官方市场裁决：`references/workbuddy-absorption-map.md`
+
+- 实施前代码库探索与批准闸门：`references/pre-implementation-code-exploration.md`

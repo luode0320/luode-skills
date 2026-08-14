@@ -45,7 +45,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-09T18:14:45.467384Z",
+  "registry_updated_at": "2026-08-13T11:11:25.728840Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -329,95 +329,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/ce8a40b539a85948274cd7e1d61a1276da3693651797ac1297a193ca83c5255a",
-      "session_id": "019fc873-d578-7bb1-8e84-ce0a8737553e",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PSR-DOCKERFILE-ROOT-001/CYCLE-PSR-21-001",
-      "source_document": "package-structure-rules/SKILL.md",
-      "plan_fingerprint": "323946326c027f215eb1bce239e3559aa5333bff300553466b0fdb8e7709ee90",
-      "updated_at": "2026-08-04T01:30:00Z",
-      "steps": [
-        {
-          "id": "TASK-PSR-DOCKERFILE-01",
-          "step": "[TASK-PSR-DOCKERFILE-01] 冻结三类项目根 Dockerfile 规则与影响面",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-PSR-DOCKERFILE-02",
-          "step": "[TASK-PSR-DOCKERFILE-02] 同步 Skill、Catalog、目录树、CLI 与回归测试",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-PSR-DOCKERFILE-03",
-          "step": "[TASK-PSR-DOCKERFILE-03] 完成真实验证、合规检查与 6-review 收口",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/d5e4959605f05ad9cf3a031d1ea1e856bb33e0867581ad3abaaa35165e945101",
-      "session_id": "019fc879-c989-7391-961e-35383e84f8c0",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PSR-CONFIG-SOURCE-001/CYCLE-PSR-23",
-      "source_document": "doc/3-实施/2026-08-04_代码位置目录规则V2_实施周期23_config根加载与结构文件.md",
-      "plan_fingerprint": "aec19943cb10dcb5fc80f6d034bdf3405040dd035b73ede37bce936c9c6c1c97",
-      "updated_at": "2026-08-05T00:40:00Z",
-      "steps": [
-        {
-          "id": "T23-01",
-          "step": "[T23-01] 冻结 config/ 根 load/model 规则基线：需求文档、目录树、Catalog、Schema、契约测试",
-          "status": "completed"
-        },
-        {
-          "id": "T23-02",
-          "step": "[T23-02] 实现 CLI strict 行为并同步配置文档：脚本、configuration-layout.md、SKILL.md、行为测试",
-          "status": "completed"
-        },
-        {
-          "id": "T23-03",
-          "step": "[T23-03] 落盘周期文档与测试证据：实施周期文档、测试 README、6-review 记录",
-          "status": "completed"
-        },
-        {
-          "id": "T23-04",
-          "step": "[T23-04] 同步项目四件套并跑完全部门禁，给出收口结论",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/d72d6abe2bd789925ff8e1b18008df0827fa5739775adddfdd750a521695c8ab",
-      "session_id": "019fcd92-1235-7dc3-9e28-1c3a1b95ecc5",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260804T170000Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-04T17:10:00Z",
-      "steps": [
-        {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/4b4ea24606e84270711ee349830994a08f0283b2c03af14a346d77ccd63a1228",
       "session_id": "019fd202-ca94-7883-a45c-5d6fbae853b2",
       "projection_origin": "persisted",
@@ -462,34 +373,6 @@
           "id": "HIST-TRIM-07",
           "step": "收口：6-review、字典重跑、门禁与最终总结",
           "status": "pending"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/67fcdd7775c377286fdcd4e1ac4ebd2998b1ff7284654f09aee98a7dc1f9f322",
-      "session_id": "019fd2a8-2757-7763-944f-358b20518f0b",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260805T165628Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-05T16:56:41.757561Z",
-      "steps": [
-        {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
         }
       ]
     },
@@ -761,6 +644,49 @@
           "status": "completed"
         }
       ]
+    },
+    {
+      "projection_id": "SESSION/fc9a8f46f012a28012ad0f4e29ef16c564ed19a75d0b4b8f18d1b1152a4f6326",
+      "session_id": "019ffa96-b272-7473-833f-beac968e92ed",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-WBA-20260813-001/CYCLE-ABS-03",
+      "source_document": "doc/3-实施/2026-08-13_110000_WorkBuddy官方市场规则吸收整理补充_实施总览.md",
+      "plan_fingerprint": "6a9a99372eba4c03cc06a77ef636db9e6d5e9d59c4947566eb3db094f7f04d6a",
+      "updated_at": "2026-08-13T11:11:25.728840Z",
+      "steps": [
+        {
+          "id": "TASK-WBA-01",
+          "step": "[TASK-WBA-01] 落盘吸收裁决表",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-WBA-02",
+          "step": "[TASK-WBA-02] 需求域 100 分质量门",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-WBA-03",
+          "step": "[TASK-WBA-03] 实施域代码库探索",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-WBA-04",
+          "step": "[TASK-WBA-04] Bug 域风险分级",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-WBA-05",
+          "step": "[TASK-WBA-05] 测试域分层结论",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-WBA-06",
+          "step": "[TASK-WBA-06] 全量测试、6-review、字典与记忆",
+          "status": "completed"
+        }
+      ]
     }
   ]
 }
@@ -771,3 +697,12 @@
 - 来源对象：CYCLE-MOCK-REMOVE-01
 - 当前目标：删除技能仓库中所有 Mock 相关资产
 - 当前状态：全部 Mock 删除已完成。删除 10 条 Catalog 条目、Schema Mock 条件、placement_catalog.py 中 200+ 行 Mock 代码、2 个参考文档、runtime_mock_layout_test.py 完整测试文件、layout_policy.py 中 2 个模拟函数、asset_location_test.py 中 6 个 Mock 测试、7 个 SKILL.md 的 Mock 规则段落、project-layout-v2.md 的 Mock 目录行、PROJECT_MEMORY.md 的 Mock 规则。guide --category runtime-mock --language go 退出码 2 无匹配。字典刷新退出码 0。改动停在已改动未提交状态。
+
+## 2026-08-13 WorkBuddy 官方市场规则吸收整理补充
+
+- 来源对象：REQ-WBA-20260813-001 / CYCLE-ABS-01..03
+- 当前目标：分析本地 skill 对需求、实施、Bug、测试的规则，对照 WorkBuddy 官方市场同类 skill 取精华去糟粕；吸收是整理补充，不是无限制累加。
+- 当前状态：六个任务全部完成。五份工程文档已落盘并通过 profile 校验；四个 skill 新增五个 reference 并补齐 SKILL.md 引用；全量测试 396 项通过（1 项跳过），修复三处既有测试基线；字典 seed_total 35；测试主文档与 6-review 文档已落盘；知识库沉淀 1 篇并双向关联；PROJECT_MEMORY.md 已同步吸收裁决与配置互斥契约。改动停在已改动未提交状态。
+- 关键量化：新增 5 个 reference、2 份收口文档、1 篇知识库笔记；修改 4 个 SKILL.md、3 个测试文件、`test/shared/layout_policy.py`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
+- 验证与交接：全量测试 `python -B test/run_python_tests.py` 退出码 0；`validate_engineering_docs.py` 七份文档 PASS；`generate_dictionary.py` 退出码 0；`knowledge_index.py check` 0 违规。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。

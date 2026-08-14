@@ -115,3 +115,5 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 - 只有在判断是否必须先确认时，再读 `references/confirm-before-coding.md`。
 - 输出修复建议前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先交代推荐修复、风险和完成结果，技术方案比较和证据进入附录。
 - 若修复方案涉及审查、验收、浏览器或第三方条件，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
+
+- Bug 修复风险分级与确认：`references/fix-risk-grading-and-confirmation.md`

@@ -87,15 +87,25 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
         self.template_registry = validator.yaml.safe_load(TEMPLATE_REGISTRY_FILE.read_text(encoding="utf-8"))
 
     def test_requirement_fixture_passes(self) -> None:
-        document = ROOT / "doc" / "2-需求" / "2026-07-12_033322_需求与实施文档极致完备化.md"
+        document = ROOT / "doc" / "2-需求" / "2026-08-13_110000_WorkBuddy官方市场规则吸收整理补充.md"
         profile = self.payload["profiles"]["requirement"]
         result = validator.validate_document(document, "requirement", profile, self.payload, ROOT)
         self.assertTrue(result["valid"], result["errors"])
 
     def test_missing_section_is_rejected(self) -> None:
-        source = ROOT / "doc" / "7-验收" / "2026-07-12_033322_需求与实施文档极致完备化_验收标准.md"
-        text = source.read_text(encoding="utf-8").replace("## 4. 验收场景", "## 4. 删除的验收场景", 1)
         with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "acceptance.md"
+            source.write_text(
+                "# 验收标准\n\n"
+                "结论：本次验收范围已明确；影响：业务读者可据此验收；范围：当前交付物；"
+                "非范围：不在本文列出的工作；变化：记录验收结果；完成标准：验收结论可判断；"
+                "术语说明：无；验证状态：规则核对完成。\n\n"
+                "## 文档信息\n\n关联任务：TASK-ACCEPT-001。\n\n"
+                "## 验收场景\n\n验收对象与预期结果。\n\n"
+                "## 完成条件、停止条件与交付物\n\n通过标准、失败标准与范围外说明。\n",
+                encoding="utf-8",
+            )
+            text = source.read_text(encoding="utf-8").replace("## 验收场景", "## 删除的验收场景", 1)
             document = Path(directory) / "negative.md"
             document.write_text(text, encoding="utf-8")
             profile = self.payload["profiles"]["acceptance"]

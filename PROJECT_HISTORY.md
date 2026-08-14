@@ -4,6 +4,8 @@
 
 ## 事件
 
+- 2026-08-13：完成 WorkBuddy 官方市场规则吸收整理补充（REQ-WBA-20260813-001/CYCLE-ABS-01..03）。以「整理补充」为原则吸收四个 skill 的五个 reference，不复制官方工作流、不新建同类 skill；需求域 100 分质量门、实施域编码前代码库探索、Bug 域修复前风险分级、测试域风险分层明确结论。全量测试 396 项通过（1 项跳过），修复三处既有测试基线（文档校验 fixture、配置互斥口径、credential-policy 镜像豁免），七份工程文档 profile 校验 PASS，字典 seed_total 35，知识库沉淀 1 篇并双向关联。改动停在已改动未提交状态。
+
 - 2026-08-13：完成 long-run-loop-rules 触发条件扩展（REQ-LRL-001 增量）。针对 WorkBuddy 等无 Goal 目标模式的 agent 永远无法命中触发的问题，新增「路径 B：用户显式 goal 意图」触发——用户提出 goal 或使用 `/goal` 命令即触发，即使平台无 `create_goal` 工具也触发并降级到可用循环机制（无线程工具则降级为 L1 内部续跑）。同步更新 SKILL.md（description、触发条件、通过标准、不适用场景）、deferred-gate-registry.md 的 predicate、需求文档 DEC-LRL-006，重新刷新字典。改动停在已改动未提交状态。
 
 - 2026-08-13：完成长任务自动循环 skill 创建收尾（REQ-LRL-001/CYCLE-LRL-01）。前一会话已创建 `long-run-loop-rules` 核心文件（SKILL.md + 3 references + 3 scripts）；本会话收尾：验证三个脚本语法与功能 smoke test，修复 `loop_controller.py` start 命令未传参数被 None 覆盖默认值（checkpoint_interval/max_runtime_minutes 丢失）的缺陷，在 `deferred-gate-registry.md` 追加中段推进登记，刷新字典（seed_total 34→35，作为扩展种子入库，与 autonomous-execution-rules 的 L1 递进一致），落盘需求与实施总览文档。改动停在已改动未提交状态。
