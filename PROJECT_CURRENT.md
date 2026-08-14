@@ -2,31 +2,32 @@
 
 ## 更新时间
 
-- 2026-08-13
-- 来源对象：长任务自动循环 skill 创建（REQ-LRL-001 / CYCLE-LRL-01）
-- 当前目标：新建 `long-run-loop-rules` skill，采用「主 agent 控制器 + worker 子 agent」线程接力模式，让 AI 持续工作到任务真正完成
-- 当前状态：全部 5 个最小任务完成。skill 核心文件（SKILL.md + 3 references + 3 scripts）由前一会话创建，本会话收尾验证三个脚本语法与功能 smoke test、修复 loop_controller.py start 命令未传参数被 None 覆盖默认值缺陷、deferred-gate-registry 追加登记、刷新字典（seed_total 34→35）、落盘需求与实施总览文档。改动停在已改动未提交状态。
-- 关键量化：新增 1 个 skill 目录（7 个文件）；修改 3 个文件（deferred-gate-registry.md、data.js、字典.md）；落盘 2 份文档；字典 seed_total 34→35。
-- 无需回滚兜底：本轮仅新增与修复脚本，未删除任何既有文件；字典生成可重复执行。
+- 2026-08-14
+- 来源对象：PowerShell 控制继续优化（REQ-PSCTL-20260814-001 / CYCLE-PSCTL-01）
+- 当前目标：根据截图与 workbuddy 参考继续优化 PowerShell 控制，将标准调用前缀沉淀为唯一真源模板，并补齐三个 Windows skill 的衔接
+- 当前状态：全部 7 个最小任务完成。标准调用前缀模板写入 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md`，三份 SKILL.md 补齐交叉引用，项目记忆与 skill 字典同步，知识库沉淀 1 篇开发环境笔记，需求/实施/测试/6-review 文档全部落盘并通过机器校验。改动停在已改动未提交状态。
+- 关键量化：修改 1 份 reference、3 份 SKILL.md、2 份项目记忆文件、2 份字典文件；落盘 5 份工程文档；知识库新增 1 篇笔记。
+- 无需回滚兜底：本轮仅新增规则章节与引用，未删除既有文件；字典生成与文档校验可重复执行。
 
 ## 本轮已完成
 
-- 脚本验证：三个脚本 py_compile 通过；check_completion_marker 含/不含/regex 三输入正确；loop_controller 全流程跑通；detect_dead_loop 正反例正确
-- 缺陷修复：loop_controller.py start 命令改为仅显式传入参数才覆盖默认值，修复未传参数被 None 覆盖 checkpoint_interval/max_runtime_minutes 的缺陷
-- 集成登记：deferred-gate-registry.md 追加 long-run-loop-rules 中段推进条件登记
-- 字典刷新：generate_dictionary.py 退出码 0，long-run-loop-rules 以扩展种子入库
-- 触发条件扩展：新增「路径 B：用户显式 goal 意图」——用户提出 goal 或使用 `/goal` 命令即触发（即使平台无 Goal 目标模式，无 `create_goal` 工具也触发并降级到可用循环机制），同步更新 SKILL.md（description + 触发条件 + 通过标准 + 不适用场景）、deferred-gate-registry.md、需求文档 DEC-LRL-006 并重新刷新字典
+- 规则落盘：`powershell-fallback-patterns.md` 新增 5.1 / 7 双轨标准调用前缀模板
+- 三 skill 衔接：`windows-wsl-execution-rules`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 均引用唯一真源
+- 记忆与字典：`PROJECT_MEMORY.md` 同步稳定决策，`generate_dictionary.py` 退出码 0，`implemented_total: 69`、`seed_total: 35`
+- 知识沉淀：知识库新建 `PowerShell命令调用标准前缀.md`，补齐既有笔记元数据与反向链接
+- 文档收口：需求、实施总览、实施周期、测试主文档、6-review 五份文档全部落盘并通过机器校验
 
 ## 验证与交接
 
-- 脚本 smoke test：managed Python 3.13 直接运行三个脚本，断言全部通过
-- 字典生成：退出码 0，data.js 与字典.md 均含 long-run-loop-rules
-- 落盘：doc/2-需求/2026-08-13_REQ-LRL-001_长任务自动循环skill创建.md 与 doc/3-实施/2026-08-13_长任务自动循环skill创建_实施总览.md
+- 工程文档：四份 profile 校验均返回 `valid: true / PASS`，退出码 0
+- 引用断言：三份 SKILL.md 的 `powershell-fallback-patterns.md#powershell-命令前缀模板` 引用命中 3 处；reference 内 5.1 / 7 前缀命中 3 处
+- 全量测试：`Ran 386 tests`，`FAILED (failures=4, errors=1, skipped=1)`；5 项均为既有历史基线/知识库/CRLF 问题，与本次改动无关
+- 知识库：`knowledge_index.py check` 退出码 0、违规 0，新笔记可被 `query` 命中
 
 ## 范围与边界
 
-- 本轮未动：autonomous-execution-rules L1 内部续跑、parallel-task-dispatch-rules 线程生命周期语义、continuous-code-quality-supervisor-rules 监控模式
-- 明确未做的后续项：控制器运行时行为（真实 Goal 环境下的 create_thread/wait_threads 循环）留待真实 Goal 环境验证
+- 本轮未动：PowerShell 脚本实现、`tool-manifest.yaml`、workbuddy 端 skill、其它 skill 目录
+- 明确未做的后续项：无；`TASK-PSCTL-01` 至 `TASK-PSCTL-07` 全部完成，投影已失活
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
@@ -45,7 +46,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-13T11:11:25.728840Z",
+  "registry_updated_at": "2026-08-14T14:51:07.138280Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -684,6 +685,54 @@
         {
           "id": "TASK-WBA-06",
           "step": "[TASK-WBA-06] 全量测试、6-review、字典与记忆",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/dee15fd6a8d6e8d4de27be57922cb7df0853b84c75d125f929b86078dcd93726",
+      "session_id": "01a000ad-a07f-70d2-aa18-11b13e04e87b",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PSCTL-20260814/CYCLE-PSCTL-01",
+      "source_document": "doc/3-实施/2026-08-14_powershell控制继续优化_实施总览.md",
+      "plan_fingerprint": "834ee1ad29857be6c3941662709d8aad2a6d75f6488d91c3d1fc5a3062f3cc85",
+      "updated_at": "2026-08-14T14:51:07.137952Z",
+      "steps": [
+        {
+          "id": "TASK-PSCTL-01",
+          "step": "[TASK-PSCTL-01] 落盘需求与实施总览文档",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-02",
+          "step": "[TASK-PSCTL-02] 在 powershell-fallback-patterns.md 新增标准调用前缀模板",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-03",
+          "step": "[TASK-PSCTL-03] 在 windows-wsl-execution-rules/SKILL.md 暴露前缀引用",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-04",
+          "step": "[TASK-PSCTL-04] 在 windows-encoding-rules/SKILL.md 补充调用前缀与交叉引用",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-05",
+          "step": "[TASK-PSCTL-05] 在 windows-powershell-environment-rules/SKILL.md 补充入口拦截指针",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-06",
+          "step": "[TASK-PSCTL-06] 同步 PROJECT_MEMORY 并刷新 skill 字典",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-PSCTL-07",
+          "step": "[TASK-PSCTL-07] 真实测试与 6-review 收口",
           "status": "completed"
         }
       ]

@@ -1,6 +1,6 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-13 19:14:09",
-  "repo_root": "D:\\luode\\luode-skills",
+  "generated_at": "2026-08-14 22:41:28",
+  "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
@@ -2058,6 +2058,7 @@ window.SKILL_DICTIONARY = {
             "Windows 防错基线",
             "推荐执行流程",
             "落盘命令模板",
+            "调用 PowerShell 命令时的标准化前缀",
             "通过 / 驳回标准",
             "边界"
           ],
@@ -6775,6 +6776,7 @@ window.SKILL_DICTIONARY = {
         "Windows 防错基线",
         "推荐执行流程",
         "落盘命令模板",
+        "调用 PowerShell 命令时的标准化前缀",
         "通过 / 驳回标准",
         "边界"
       ],

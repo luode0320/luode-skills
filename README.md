@@ -999,3 +999,5 @@ claude-mem(记忆) :
 2026-08-13 10:23:29 docs: [common/msg国际化消息目录新增] 归档6-review
 2026-08-13 15:55:34 docs: [长任务自动循环skill创建] 归档需求实施文档与项目状态
 2026-08-13 15:57:00 feat: [长任务自动循环skill创建] 新增long-run-loop-rules循环控制器skill
+2026-08-14 23:08:31 feat: [PowerShell控制继续优化] 新增标准调用前缀模板并接入三个Windows skill
+2026-08-14 23:08:31 docs: [PowerShell控制继续优化] 归档需求实施测试与6-review文档

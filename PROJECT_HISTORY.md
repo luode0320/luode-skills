@@ -4,6 +4,8 @@
 
 ## 事件
 
+- 2026-08-14：完成 PowerShell 控制继续优化（REQ-PSCTL-20260814-001/CYCLE-PSCTL-01）。以 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md` 为唯一真源新增「PowerShell 命令前缀模板」，在 `windows-wsl-execution-rules`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 补齐交叉引用；5.1 路径先设 UTF-8 输出编码，7 路径继续优先 `pwsh`。同步 PROJECT_MEMORY 与 skill 字典（implemented_total 69、seed_total 35），落盘需求、实施总览、实施周期、测试主文档与 6-review 五份文档，四份工程文档 profile 校验 PASS，知识库新建 1 篇开发环境笔记并补双向关联；全量测试 386 项中 5 项既有失败与本次无关。改动停在已改动未提交状态。
+
 - 2026-08-13：完成 WorkBuddy 官方市场规则吸收整理补充（REQ-WBA-20260813-001/CYCLE-ABS-01..03）。以「整理补充」为原则吸收四个 skill 的五个 reference，不复制官方工作流、不新建同类 skill；需求域 100 分质量门、实施域编码前代码库探索、Bug 域修复前风险分级、测试域风险分层明确结论。全量测试 396 项通过（1 项跳过），修复三处既有测试基线（文档校验 fixture、配置互斥口径、credential-policy 镜像豁免），七份工程文档 profile 校验 PASS，字典 seed_total 35，知识库沉淀 1 篇并双向关联。改动停在已改动未提交状态。
 
 - 2026-08-13：完成 long-run-loop-rules 触发条件扩展（REQ-LRL-001 增量）。针对 WorkBuddy 等无 Goal 目标模式的 agent 永远无法命中触发的问题，新增「路径 B：用户显式 goal 意图」触发——用户提出 goal 或使用 `/goal` 命令即触发，即使平台无 `create_goal` 工具也触发并降级到可用循环机制（无线程工具则降级为 L1 内部续跑）。同步更新 SKILL.md（description、触发条件、通过标准、不适用场景）、deferred-gate-registry.md 的 predicate、需求文档 DEC-LRL-006，重新刷新字典。改动停在已改动未提交状态。
@@ -41,7 +43,3 @@
 - 2026-08-08: [package-structure-rules 目录用法入口升级] Schema 扩展 4 字段，Catalog 101 条，guide 子命令，六类 Go recipe，5 契约测试全通过
 
 - 2026-08-08：实施计划落盘：实施总览 IMP-RUNTIME-MOCK-20260808 和周期文档 CYCLE-RUNTIME-MOCK-01 已创建，implementation_overview 与 implementation_cycle profile 均 valid: true。所有 4 个最小任务 TASK-1 至 TASK-4 均已完成闭环。改动停在已改动未提交状态。
-
-- 2026-08-08：需求文档 REQ-PSR-MOCK-UPGRADE-001 的 Mermaid 图前注释修复（图形目的 + 关联 ID），requirement profile 校验 PASS。改动停在已改动未提交状态。
-
-- 2026-08-08：完成 REQ-PSR-MOCK-UPGRADE-001 计划完成度复核。补齐 `owner_skill` 统一、fullstack 不扩散与 Schema 必填断言，修复 `package-structure-rules/SKILL.md` guide 示例代码围栏；`runtime_mock_layout_test.py` 5/5、全量回归 36/36、普通/mock 双构建、字典与四份文档 profile 均通过，adoption 仍只报 2 条既有阻断。改动停在已改动未提交状态。
