@@ -1,9 +1,0 @@
-{
-  "fixtures": [
-    {"id": "TRIGGER-BS-RISK-POS", "input": "修复公共接口的异常语义，担心缓存和兼容性回归", "expected": "bug-fix-proposal-rules#regression-risk"},
-    {"id": "TRIGGER-BS-RISK-LOCAL", "input": "修复局部空指针，未触及复用模块或接口", "expected": "bug-fix-proposal-rules"},
-    {"id": "TRIGGER-BS-VALIDATION-NEG", "input": "修复后是否可以关闭当前 Bug", "expected": "bug-validation-rules"},
-    {"id": "TRIGGER-BS-TEST-NEG", "input": "执行普通旧能力回归测试", "expected": "test-regression-rules"},
-    {"id": "TRIGGER-BS-OLD-SELECTOR-NEG", "input": "$bug-regression-risk-rules", "expected": "retired"}
-  ]
-}
