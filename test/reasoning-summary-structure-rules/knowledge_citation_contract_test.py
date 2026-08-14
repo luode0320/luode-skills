@@ -1,4 +1,4 @@
-"""验证最终总结的知识引用小节与 Obsidian 引用台账的规则文本契约。"""
+"""验证最终总结的知识引用小节与知识库引用台账的规则文本契约。"""
 
 from __future__ import annotations
 
@@ -30,14 +30,14 @@ CITE_TABLE_HEADER = "| # | 笔记 | 本轮用途 |"
 DISTILL_TABLE_HEADER = "| # | 笔记 | 操作 | readback |"
 # 被本轮取代的旧口径：单行摘要与单开小节禁令，不允许在任何规则文件里残留
 RETIRED_PHRASES = (
-    "不得新增独立 Obsidian 小节",
+    "不得新增独立知识库小节",
     "在本节用一行简短说明检索情况",
     "在本节用一行简短说明沉淀结果",
-    "真实 Obsidian 沉淀行计入 5 句上限",
-    "真实 Obsidian 沉淀行计入最多 5 句上限",
+    "真实知识库沉淀行计入 5 句上限",
+    "真实知识库沉淀行计入最多 5 句上限",
     "只在「方案与根因」补一行检索摘要",
-    "Obsidian 检索（仅真实触发时）",
-    "Obsidian 沉淀（仅真实触发时",
+    "知识库检索（仅真实触发时）",
+    "知识库沉淀（仅真实触发时",
 )
 
 
@@ -216,7 +216,7 @@ class RetiredPhraseContractTest(unittest.TestCase):
                 self.assertNotIn(phrase, content, f"{path.name} 仍残留旧口径：{phrase}")
 
     def test_result_section_no_longer_hosts_knowledge_line(self) -> None:
-        """结果与结论不再承载 Obsidian 摘要行，也不占用句数上限。
+        """结果与结论不再承载知识库摘要行，也不占用句数上限。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。

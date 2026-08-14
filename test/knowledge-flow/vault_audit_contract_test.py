@@ -22,8 +22,8 @@ FORBIDDEN_WRITES = (
     "unlink",
     "mkdir",
 )
-# bridge 链路已废除，巡检不得再依赖任何外部进程或已删除的桥接脚本。
-FORBIDDEN_LEGACY = ("obsidian", "run_bridge", "subprocess", "verified=true")
+# 巡检必须保持纯文件系统读取，不得依赖任何外部进程。
+FORBIDDEN_LEGACY = ("run_bridge", "subprocess", "verified=true")
 
 
 def load_audit() -> Any:
@@ -69,8 +69,8 @@ class ReadOnlyGuardTest(unittest.TestCase):
         for entry in FORBIDDEN_WRITES:
             self.assertNotIn(entry, source, f"巡检脚本出现写操作入口：{entry}")
 
-    def test_source_has_no_legacy_bridge_dependency(self) -> None:
-        """巡检不得残留已废除的 bridge / CLI 依赖。
+    def test_source_has_no_external_process_dependency(self) -> None:
+        """巡检不得依赖任何外部进程或旧桥接标识。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。

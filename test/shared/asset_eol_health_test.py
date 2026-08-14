@@ -8,7 +8,7 @@ CRLF 的 agents 配置则让 git 归一化内容与工作树字节长期不一�
 控制字符断言的由来：`knowledge-flow/agents/openai.yaml` 曾把 `\\audit_...` 当 Python 转义写入，
 `audit` 首字母被吞成 BEL（`\\x07`），整份配置语义静默漂移。
 
-与 `test/knowledge-flow/legacy_reference_scan_test.py` 的 `AssetHealthTest` 是范围互补：
+与 `test/knowledge-flow/path_prefix_contract_test.py` 中的资产健康检查是范围互补：
 那里守 knowledge-flow 域内的定点文件，这里守全仓库面上的同类回归。
 """
 
