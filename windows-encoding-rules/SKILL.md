@@ -135,6 +135,24 @@ Get-Content -Encoding UTF8 README.md -Tail 5
 git diff -- README.md
 ```
 
+## 调用 PowerShell 命令时的标准化前缀
+
+当必须调用 PowerShell 命令（不是先进入交互式终端）时，显式使用以下前缀，避免用户 profile、执行策略和 5.1 默认 ANSI 造成中文乱码。
+
+5.1 兼容回退前缀（必须先在命令体设置 UTF-8 输出编码）：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [Console]::OutputEncoding; <你的命令>"
+```
+
+PowerShell 7 前缀（默认路径）：
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "<你的命令>"
+```
+
+该模板的完整原因、引号嵌套规则和临时脚本建议见 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板`。编码 skill 不重复维护语法保底规则，只保证在 PowerShell 专项场景中先按上述前缀执行。
+
 ## 通过 / 驳回标准
 
 - 通过：中文在终端可读、文件回读正常、`git diff` 无异常乱码片段。

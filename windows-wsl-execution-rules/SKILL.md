@@ -49,6 +49,7 @@ description: 当项目代码位于 WSL 文件系统内（如 `/home/user/project
 5. 拼变量路径优先用 `Join-Path`；带空格的可执行文件路径要加引号，并配合 `&` 调用运算符
 6. `ConvertTo-Json` 默认显式带 `-Depth`
 7. PowerShell 专项写文件、导日志和重定向时继续遵守 UTF-8 防护，必要时联动 `windows-encoding-rules`
+8. 任何一次调用 PowerShell 命令（不是先进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先设置 `[Console]::OutputEncoding`。可直接复制的 5.1 / 7 双轨前缀见 `references/powershell-fallback-patterns.md#powershell-命令前缀模板`
 
 ### 运行时选择与 5.1 回退
 

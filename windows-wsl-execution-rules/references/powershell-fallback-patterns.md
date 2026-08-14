@@ -18,6 +18,47 @@
 4. 调用环境入口时读取 JSON `status`：`ready` 或 `degraded` 可以继续当前 PowerShell 专项动作；`blocked`、`busy`、`failed` 或 `rollback_refused` 必须停止。`SessionEnsure` 默认只检查 `RequiredOnly`，不能因为扩展工具缺失而强行改走 5.1。
 5. Windows CLI 在 Git Bash 中不可见时，先让环境 Skill 从 `git.exe` 安装根目录的 `bin\\bash.exe` 并以 `uname -s` 的 `MINGW|MSYS` 验证；不得用裸 `bash.exe`。若实际命中 `wsl.exe`、Linux `127` 或 `/mnt/*.exe`，保持本 skill owner，不调用 Windows 包安装恢复。
 
+## PowerShell 命令前缀模板
+
+任何一次调用 PowerShell 命令（不是先进入交互式终端）都必须显式使用：
+
+```text
+<powershell 可执行文件> -NoProfile -ExecutionPolicy Bypass -Command "<命令>"
+```
+
+原因：
+
+- `-NoProfile`：避免用户 profile 里的旧编码或别名影响本次调用。
+- `-ExecutionPolicy Bypass`：避免本地脚本或 inline 命令被执行策略拦截。
+- `-Command`：明确本次是执行一段命令而不是进入交互会话。
+
+### 5.1 兼容回退前缀（Windows PowerShell）
+
+当 PowerShell 7 缺失或安装被阻断而回退到 5.1 时，命令体必须先设置 UTF-8 输出编码：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [Console]::OutputEncoding; <你的命令>"
+```
+
+不要写成 `powershell -Command "<命令>"` 或省略编码初始化，否则 5.1 默认 ANSI 会把中文输出变成乱码。
+
+### PowerShell 7 前缀（默认路径）
+
+PowerShell 7 优先使用 `pwsh`，同样显式带 `-NoProfile -ExecutionPolicy Bypass`：
+
+```powershell
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "<你的命令>"
+```
+
+如果命令需要输出中文到文件，继续在命令体前面设置 `$OutputEncoding`，并遵循 `windows-encoding-rules` 的显式 `-Encoding UTF8` 写入约束。
+
+### 引号嵌套与变量
+
+- 外层固定使用双引号包住 `-Command` 参数。
+- 命令体内部优先使用单引号，例如 `$PSVersionTable.PSVersion.ToString()`。
+- 命令体内部必须使用双引号时，先落成变量再拼接，避免转义失控。
+- 复杂命令先写入临时 `.ps1` 再用 `& <path>` 调用，不要硬塞进 `-Command`。
+
 ## 语法保底规则
 
 ### 1. 逻辑运算里的 cmdlet 必须加括号

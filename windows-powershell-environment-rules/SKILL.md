@@ -32,6 +32,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 - `SessionEnsure` 和 `Doctor` 默认使用 `RequiredOnly`；显式 `Apply` 默认使用 `Extended`。需要更小或更大的范围时，调用方必须明确传入 `-Policy RequiredOnly|Core|Extended`。
 - 默认输出是 JSON。调用方必须读取 `status`、`canContinue`、`requiredReady`、`restartRequired`、`results`、`issues` 和 `changes`，不得只看命令是否返回了文本。
 - `-WhatIf` 只能产生计划中的 `changes`，不得写状态、profile、Terminal、journal 或调用包管理器安装。
+- 任何一次针对 shell 的 inline PowerShell 调用（不是进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先设置 `[Console]::OutputEncoding`。可复制的 5.1 / 7 双轨前缀见 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板`。
 
 ## 执行流程
 
