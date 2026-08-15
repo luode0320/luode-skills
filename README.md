@@ -1001,3 +1001,4 @@ claude-mem(记忆) :
 2026-08-13 15:57:00 feat: [长任务自动循环skill创建] 新增long-run-loop-rules循环控制器skill
 2026-08-14 23:08:31 feat: [PowerShell控制继续优化] 新增标准调用前缀模板并接入三个Windows skill
 2026-08-14 23:08:31 docs: [PowerShell控制继续优化] 归档需求实施测试与6-review文档
+2026-08-15 14:49:51 feat: [镜像直传部署skill新增] docker-direct-deploy镜像直传workflow生成
