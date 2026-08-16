@@ -1004,3 +1004,4 @@ claude-mem(记忆) :
 2026-08-15 14:49:51 feat: [镜像直传部署skill新增] docker-direct-deploy镜像直传workflow生成
 2026-08-15 14:50:03 docs: [字典同步] 刷新docker-direct-deploy相关Skill描述
 2026-08-16 21:54:03 feat: [VS Code全栈调试skill新增] vscode-fullstack-debug前后端一键启动配置
+2026-08-16 21:54:40 docs: [字典同步] 刷新vscode-fullstack-debug相关Skill描述
