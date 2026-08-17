@@ -19,7 +19,7 @@
 
 - 源码目录绝对不允许 `*_test.go`。
 - 所有 Go 测试在根 `test/` ASCII 路径中，使用外部 `<target>_test` 包，只调用导出 API。
-- 白盒需求先补可外部测试的 seam；黑盒和集成测试同样进入根 `test/`，不存在同包例外。
+- 白盒需求不得靠改生产代码换取可测性：按 `../../test-strategy-rules/references/production-test-pollution.md` 的三级替代出路降级（黑盒验证 → 端到端行为断言 → 记为待补测风险）；黑盒和集成测试同样进入根 `test/`，不存在同包例外。
 
 ## 拆分检查
 

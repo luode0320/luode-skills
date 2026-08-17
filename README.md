@@ -366,7 +366,7 @@ python skill-dictionary/generate_dictionary.py
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 统一根 `test/` 镜像、`doc/5-tests/` 扁平测试主文档和命名。                    |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 统一识别并迁移散落在根 `test/` 之外的活动测试资产。                           |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 统一测试目录和测试文件命名。                                                   |
-| `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分；含 Go 测试可编译路径、源码目录禁放 `*_test.go` 和 seam 方案。 |
+| `test-program-rules`          | 统一测试程序、验证脚本和辅助测试代码的职责拆分；含 Go 测试可编译路径、源码目录禁放 `*_test.go` 和白盒诉求三级降级方案。 |
 | `test-strategy-rules 的 test-asset-governance 条件路由`              | 统一测试说明文档的结构和描述方式。                                             |
 | `agent-browser`               | 提供条件式浏览器自动化能力，重点覆盖隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎场景；普通 Chrome 状态与常规调试按统一浏览器路由处理。 |
 | `browser-use-cloud-rules`     | 仅接 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身和合规验证码场景；每次 `run_session` / `send_task` 前提醒本机配置 `BROWSER_USE_API_KEY`，检查 Billing、当前动作硬费用上限并取得当次确认，完成后停止遗留 session 并回读实际费用。 |

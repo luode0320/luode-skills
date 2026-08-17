@@ -265,7 +265,23 @@ rg --files -g "*_test.go" | rg -v "^test/" | rg -v "^doc/5-tests/"
 判定规则：
 
 - 命中为空：通过，可继续提交。
-- 命中非空：阻断提交，先改 seam 并迁移到根 `test/` 镜像路径后再提交；历史 `doc/5-tests/` 可执行资产只读豁免，不作为活动测试代码根。
+- 命中非空：阻断提交，先按 `test-program-rules` 的三级替代出路降级白盒诉求，并迁移到根 `test/` 镜像路径后再提交；历史 `doc/5-tests/` 可执行资产只读豁免，不作为活动测试代码根。
+
+## 生产代码测试污染扫描
+
+本次提交包含生产代码改动时，`git commit` 前必须执行：
+
+```bash
+python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
+```
+
+判定规则：
+
+- `POLLUTION: PASS`（退出码 0）：通过，可继续提交。
+- `POLLUTION: FAIL`（退出码 1）：阻断提交。命中符号是为测试而加的，先迁移到根 `test/` 镜像路径；确属反射调用、配置驱动注册、对外导出 API 或待接线新功能的，在项目根 `.test-pollution-allowlist` 登记路径、符号与理由后再提交。
+- `SUSPECT` 与 `ORPHAN` 为提示级，不阻断提交，交 `6-review` 判断。
+
+判据、豁免语义和治理步骤由 `test-strategy-rules` 唯一定义，本节只固定提交前的执行时机与阻断口径。
 
 这里的 `*_test.go` 只解决 Go 测试落点问题；提交域拆分时还要继续把根 `test/**`、`*_test.*`、`*.spec.*`、`*.test.*` 视为 `test` 提交，不与代码实现或 `docs` 提交混提。`doc/5-tests/**` 只作为测试说明 / 证据文档跟随 `docs` 提交。
 

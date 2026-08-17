@@ -22,12 +22,22 @@
 - 测试说明文档和测试报告
 - 在响应结构未知时直接写进生产代码的 `map[string]any` 猜测解析逻辑
 
+## 属于测试污染，必须迁出生产代码
+
+- 生产文件中仅被 `test/` 调用的函数与方法
+- 生产文件中仅供测试消费的常量数组、切片、map 等静态样本
+- 只在测试里读写、生产逻辑不消费的结构体字段
+- `if isTest`、`env == "test"`、`Getenv("*TEST*")` 等仅测试可达分支
+- 与生产构造器重复、只供测试调用的第二入口
+
+判定与治理见 `../../test-strategy-rules/references/production-test-pollution.md`，扫描入口为 `test-strategy-rules/scripts/scan_test_pollution.py`。
+
 ## 处理原则
 
 - 临时排障代码不直接升级为正式测试程序，除非已经补齐职责、命名和归档。
 - 测试辅助逻辑不得直接塞进生产 `utils`、`common`、`service` 目录。
 - 正式测试程序、mock、stub、fake、模拟程序和验证脚本必须跟随 `test-strategy-rules 的 test-asset-governance 条件路由`，统一落在根 `test/` 的 ASCII 真实代码路径镜像中；模拟程序必须与对应测试程序保持同一源码相对路径，跨源码共享能力才可进入 `test/shared/`；若涉及 Go 可编译路径，还必须同步遵循本 skill《Go 测试编译路径（强制）》节。
-- Go 白盒诉求也必须遵循同一落点规则；不得通过源码目录同包 `*_test.go` 绕开。
+- Go 白盒诉求也必须遵循同一落点规则；不得通过源码目录同包 `*_test.go` 绕开，也不得通过在生产代码新增测试专用入口绕开。
 - `doc/5-tests/` 的时间戳测试主文档只保留扁平测试主文档，证据和非可执行产物内联进正文，不承载任何真实测试代码、mock、stub、fake、fixture 或模拟服务程序。
 - 如果本质是目录归属错误，应回流 `test-strategy-rules 的 test-asset-governance 条件路由`、`test-strategy-rules 的 test-asset-governance 条件路由` 或 `code-style-consistency-rules`。
 - 第三方 API 响应结构未知时，先通过探测脚本取样并沉淀证据；若仍不明确，暂停并向用户索要响应结构说明。

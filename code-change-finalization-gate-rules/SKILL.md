@@ -1,6 +1,6 @@
 ---
 name: code-change-finalization-gate-rules
-description: 只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、根 `test/` 测试代码镜像与命名一致性、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。
+description: 只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释双 skill（`comment-placement-granularity-rules` 与 `comment-completion-gate-rules`）终检、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给“已完成/已验证可用”结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。
 ---
 
 
@@ -16,7 +16,8 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
 - 注释链只消费 `comment-completion-gate-rules` 的 PASS/FAIL；该 PASS 必须包含其对 `comment-placement-granularity-rules` 的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
 - 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留扁平测试主文档、日志、报告和非可执行证据内联在其正文；同时核验补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
-- Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和 seam 细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
+- Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和白盒降级细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
+- 本轮存在生产代码新增或修改时，消费 `test-strategy-rules` 的生产代码测试污染扫描结论 `POLLUTION: PASS/FAIL`；判据、豁免语义和治理步骤由该 Owner 唯一定义，本闸门只校验其已真实执行且结论为放行。
 - 只产出专项闸门 PASS/FAIL 与证据；最终输出和后续内容统一由 `reasoning-summary-structure-rules` 渲染。
 
 ## 自动触发信号
@@ -27,19 +28,21 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 ## 进入后先做什么
 
 1. 涉及 Go 测试资产时，先核验 `test-program-rules`（含《Go 测试编译路径（强制）》）与 test-asset-governance 的适用性结论和 PASS/FAIL；再检查新增测试文件是否全部位于根 `test/` 的 ASCII 镜像路径。
-2. 核验 `comment-completion-gate-rules` 的 PASS/FAIL 和可追溯证据；FAIL 或无证据直接不通过，不在本入口重复字段级注释检查。
-3. 补注释请求只核验 comment-completion 的优先范围结论，不复制函数头、方法块或补丁字段定义。
-4. 核验真实测试完成后是否执行 `6-review`，并消费其 `STYLE: PASS/FIX_REQUIRED` 结果。
-5. 核验核心接口、页面、导出、查询、提交或任务入口的真实运行验证状态；仅有静态证据时必须降级。
-6. 若出现用户手改与旧上下文冲突，核验 `code-context-resync-rules` 已执行且最终 diff 未回退用户内容。
+2. 本轮涉及生产代码改动时，核验 `test-strategy-rules` 的污染扫描已执行且结论为 `POLLUTION: PASS`；FAIL 且未登记豁免直接不通过。
+3. 核验 `comment-completion-gate-rules` 的 PASS/FAIL 和可追溯证据；FAIL 或无证据直接不通过，不在本入口重复字段级注释检查。
+4. 补注释请求只核验 comment-completion 的优先范围结论，不复制函数头、方法块或补丁字段定义。
+5. 核验真实测试完成后是否执行 `6-review`，并消费其 `STYLE: PASS/FIX_REQUIRED` 结果。
+6. 核验核心接口、页面、导出、查询、提交或任务入口的真实运行验证状态；仅有静态证据时必须降级。
+7. 若出现用户手改与旧上下文冲突，核验 `code-context-resync-rules` 已执行且最终 diff 未回退用户内容。
 
 ## 默认执行流程
 
 1. 确认本轮存在代码/测试改动并冻结最终 diff 范围。
 2. 执行测试目录一致性检查；涉及 `internal/router` 时执行 router 专项检查。
-3. 收集 comment-completion PASS/FAIL、`6-review` 风格结果、真实运行证据和用户手改保护证据。
-4. 对真实运行证据不足的路径明确标记“仅静态验证”或“未完成真实验证”，并提供可执行的人工验证交接；不得宣称功能可用。
-5. 形成专项闸门 PASS/FAIL；最终用户结构读取 `reasoning-summary-structure-rules`，本 skill 不生成独立后续或阻断模板。
+3. 涉及生产代码改动时执行生产代码测试污染扫描，收集 `POLLUTION: PASS/FAIL` 与命中明细。
+4. 收集 comment-completion PASS/FAIL、`6-review` 风格结果、真实运行证据和用户手改保护证据。
+5. 对真实运行证据不足的路径明确标记“仅静态验证”或“未完成真实验证”，并提供可执行的人工验证交接；不得宣称功能可用。
+6. 形成专项闸门 PASS/FAIL；最终用户结构读取 `reasoning-summary-structure-rules`，本 skill 不生成独立后续或阻断模板。
 
 ## 提交前闸门检查（internal/router）
 
@@ -55,6 +58,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 属于阻断级：
 
 - Go 测试资产适用但专职 Owner 未执行、为 FAIL 或缺少可追溯证据。
+- 本轮改动生产代码，但生产代码测试污染扫描未执行、为 `POLLUTION: FAIL` 且未登记豁免，或命中项的豁免理由明显不成立。
 - 新增测试文件未统一落到根 `test/`、未镜像被测路径、Python 未使用 `*_test.py`，或 Go 测试不在 ASCII 外部黑盒包路径。
 - `comment-completion-gate-rules` 为 FAIL、缺少结果或缺少其适用性联动证据。
 - 真实测试完成后未执行 `6-review`，或结果为 `STYLE: FIX_REQUIRED`。
