@@ -1010,3 +1010,4 @@ claude-mem(记忆) :
 2026-08-17 08:32:08 feat: [谷歌云盘junction挂载skill新增] gdrive-junction-mount与vscode调试skill迭代
 2026-08-17 08:32:47 docs: [字典同步] 刷新gdrive-junction-mount与vscode调试Skill描述
 2026-08-18 00:49:54 feat: [WSL桥skill替换] 删除windows-wsl-execution-rules并接入wsl-windows-bridge
+2026-08-18 00:52:00 feat: [规则skill吸收迭代] 新增skill-absorption-rules并吸收grill-me与tdd精华

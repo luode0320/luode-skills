@@ -50,6 +50,12 @@
 - 本轮首次发生代码改动时，下一条中间进度按 `deferred-gate-registry.md` 把新触发的代码域延迟 gate（注释 gate、实现自审、最终收口 gate 等）补进 `闸门预告` 并复检，不等待最终回复（`闸门预告` 是预测，此处按真实改动对账修正）。
 - 长链路出现阶段切换时再次复检；中段复检与最终复检不可相互替代。
 
+## 外部 Skill 吸收场景补充
+
+- 用户表达"吸收/借鉴/融合/采纳 某个 skill 的精华到我们的 skill""这个 skill 能不能吸收""把 XX skill 的思路用起来""优化我们的 skill 让它更强大""把外部精华沉淀成规则"等意图时，必须命中 `skill-absorption-rules`，按"获取原文 -> 三态裁决 -> 落点简化 -> 8维评分棘轮验证 -> 登记"闭环执行。
+- 提供外部 skill 的 URL / GitHub / 市场页面 / SKILL.md 原文时，先由 `skill-absorption-rules` 抓取并拆解；本入口不复制其裁决步骤。
+- 与 `skill-evolution-rules`（内部 gap 演进）、`skill-audit-rules`（多 skill 职责审计）按职责边界联动；外部种子场景由 `skill-absorption-rules` 总承接。
+
 ## 判定原则
 
 - 以触发条件为准，不以“任务简单”“已经知道怎么做”或“用户没点名”为由跳过。

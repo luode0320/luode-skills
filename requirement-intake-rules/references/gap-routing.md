@@ -43,30 +43,18 @@
 - 需求主文档正文已经引用核心指标、关键术语或核心逻辑，但附录未补齐对应解释，导致读者无法确认口径、边界或判定条件。
 - 用户提供了需求截图或外部图片素材，但未归档到唯一目录 `doc/data/images/` 或未在主文档中以 `../data/images/<file>` 相对路径引用展示。
 
-## 进入后先做什么
-1. 先判断当前需求是否已经具备最小实现信息。
-2. 列出缺失项，而不是直接假设；对能通过项目、数据库、代码、上下游、历史资料、GitHub、相关网站、官方 API 文档或用户补充线索获得的信息，先转 `requirement-intake-rules` 的 `initial-discovery` 路由，不要直接追问用户。
-3. 判断缺失项属于可继续推进的小不确定，还是必须阻断的关键缺口。
-4. 检查当前需求文档是否仍存在占位词、矛盾、双重解读或未收敛的关键方向。
-5. 先找到当前需求对应的需求主文档；如果还没有，就按 `artifact-storage-rules` 的路径与命名模板初始化同一份文档。
-6. 再按 `artifact-storage-rules` 的命名模板定位或创建当前需求对应的临时缺口文档。
-7. 输出待确认项、影响范围和建议确认顺序，并先回写到临时缺口文档中。
-8. 若关键缺口未清零，则明确阻断进入 `implementation-planning-rules`、`implementation-planning-rules` 与实现阶段，不允许“先做一版看看”。
-
-## 默认执行流程
-1. 默认先读 `missing-info-checklist.md`，检查缺失的是哪一类信息。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认需求主文档、临时缺口文档根目录、入口文件模板和复用策略。
-3. 如果需要判断是否必须暂停，再读 `pause-triggers.md`。
-4. 如果需要对照类似场景的处理方式，再读 `requirement-gap-examples.md`。
-5. 找到当前需求对应的需求主文档和临时缺口文档，并在临时缺口文档中更新缺失项清单、已侦察证据、阻断结论、继续推进条件、建议确认问题和仍未收口的歧义点。
-6. 如果该需求还没有主文档，则按 `artifact-storage-rules` 的中央目录与入口模板先创建主文档，再创建临时缺口文档。
-7. 对图形化缺口一并回写：缺哪张图、哪处图文冲突、需要补哪些图表或矩阵。
-8. 对图片资产缺口一并回写：是否遗漏 `doc/data/images/` 归档、是否缺图片决策/`IMG-*` 清单/非空 alt、引用路径是否可访问，是否存在直接 `doc/data/` 或历史需求域图片路径。
-9. 对附录缺口一并回写：正文出现了哪些核心指标、术语或逻辑主题，附录还缺哪些定义、口径、公式、优先级、例外或易混点。
-10. 若发现多个合理方向都说得通但还没收敛，应先要求用户确认方向，必要时回流 `requirement-intake-rules` 输出方案比选，而不是假设一种继续推进。
-11. 用户确认并补齐缺口后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，且需求状态保持未完善。
-12. 在关键缺口未补齐前，不进入 `implementation-planning-rules`、`implementation-planning-rules`、`delivery-summary-rules` 或编码阶段；但阻断前必须确认该缺口已经无法通过 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察解决。
-13. 若发现已有实现、补丁或试做建立在未确认缺口之上，必须把该状态记录为偷跑风险，要求先补文档与缺口，再继续后续阶段。
+## 执行流程
+1. 默认先读 `missing-info-checklist.md`，检查缺失的是哪一类信息；同时读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认需求主文档、临时缺口文档根目录、入口文件模板和复用策略。
+2. 需要判断是否必须暂停时再读 `pause-triggers.md`；需要对照类似场景的处理方式时再读 `requirement-gap-examples.md`。
+3. 先判断当前需求是否已经具备最小实现信息；列出缺失项，而不是直接假设；对能通过项目、数据库、代码、上下游、历史资料、GitHub、相关网站、官方 API 文档或用户补充线索获得的信息，先转 `requirement-intake-rules` 的 `initial-discovery` 路由，不要直接追问用户。
+4. 判断缺失项属于可继续推进的小不确定，还是必须阻断的关键缺口；检查当前需求文档是否仍存在占位词、矛盾、双重解读或未收敛的关键方向。
+5. 找到当前需求对应的需求主文档和临时缺口文档（没有则按 `artifact-storage-rules` 的中央目录与入口模板先创建主文档，再创建临时缺口文档），并在临时缺口文档中更新缺失项清单、已侦察证据、阻断结论、继续推进条件、建议确认问题和仍未收口的歧义点。
+6. 对图形化缺口、图片资产缺口（`doc/data/images/` 归档、`IMG-*`、非空 alt、引用路径可访问性）与附录缺口一并回写。
+7. 输出待确认项、影响范围和建议确认顺序；向用户提问时按 `adversarial-gap-interview.md` 组织：一次一个真实缺口、每个问题附推荐答案、对主要决策做魔鬼代言人反方批评、决策树依赖优先（先核心后细节）。
+8. 若发现多个合理方向都说得通但还没收敛，应先要求用户确认方向，必要时回流 `requirement-intake-rules` 输出方案比选，而不是假设一种继续推进。
+9. 用户确认并补齐缺口后，必须先把稳定结论回填主需求文档，再删除临时缺口文档；未确认前不得删除，且需求状态保持未完善。
+10. 在关键缺口未补齐前，不进入 `implementation-planning-rules`、`delivery-summary-rules` 或编码阶段，不允许"先做一版看看"；但阻断前必须确认该缺口已经无法通过 `initial-discovery` 路由主动侦察解决。
+11. 若发现已有实现、补丁或试做建立在未确认缺口之上，必须把该状态记录为偷跑风险，要求先补文档与缺口，再继续后续阶段。
 
 ## 权责边界与不负责事项
 - 只负责识别“缺了什么”，不负责判断“这是不是当前需求范围”，那属于 `requirement-boundary-rules`。
@@ -115,6 +103,7 @@
 
 ## references 读取规则
 - 默认先读 `missing-info-checklist.md`。
+- 向用户输出待确认问题、推荐答案或做反方批评前，先读 `adversarial-gap-interview.md`。
 - 在定位当前需求主文档、创建初始文档或判断是否继续更新同一文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在判断是否必须暂停时，再读 `pause-triggers.md`。
 - 只有在需要对照正反例时，再读 `requirement-gap-examples.md`。
