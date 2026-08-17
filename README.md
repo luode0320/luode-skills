@@ -1012,3 +1012,4 @@ claude-mem(记忆) :
 2026-08-18 00:49:54 feat: [WSL桥skill替换] 删除windows-wsl-execution-rules并接入wsl-windows-bridge
 2026-08-18 00:52:00 feat: [规则skill吸收迭代] 新增skill-absorption-rules并吸收grill-me与tdd精华
 2026-08-18 00:53:00 feat: [tapd-openapi扩展] 新增纯标准库客户端与工作流发布待办模块
+2026-08-18 00:54:00 feat: [skillhub批量安装] 新增10个外部skill与迁移标记
