@@ -1,11 +1,11 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-08-16 21:53:49",
+  "generated_at": "2026-08-17 08:31:55",
   "repo_root": "F:\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 71,
-    "implemented_total": 69,
+    "planned_total": 72,
+    "implemented_total": 70,
     "planned_missing": 2,
     "seed_total": 37,
     "doc_total": 10,
@@ -806,10 +806,10 @@ window.SKILL_DICTIONARY = {
       "label": "记忆域",
       "description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
       "order": 2,
-      "implemented_count": 7,
+      "implemented_count": 8,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 7,
+      "total_count": 8,
       "items": [
         {
           "id": "recent-context-bootstrap-rules",
@@ -1111,6 +1111,43 @@ window.SKILL_DICTIONARY = {
             "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
             "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
             "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+          ]
+        },
+        {
+          "id": "gdrive-junction-mount",
+          "name": "gdrive-junction-mount",
+          "title": "谷歌云盘目录挂载（NTFS Junction）",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "memory",
+          "domain_label": "记忆域",
+          "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+          "domain_order": 2,
+          "item_order": 8,
+          "auto_trigger": ">-",
+          "core_responsibility": "负责用 NTFS junction 把真实数据迁入云盘目录、原路径挂载指向它，覆盖首次挂载、更新挂载、回滚、完整性校验与中文路径坑（cmd mklink 中文乱码、占用排查），不负责云端备份策略设计。",
+          "skill_path": "gdrive-junction-mount/SKILL.md",
+          "directory_path": "gdrive-junction-mount",
+          "directory": "gdrive-junction-mount",
+          "sections": [
+            "目的与适用范围",
+            "核心概念与方向（为什么）",
+            "前置检查（每轮必做）",
+            "首次挂载流程",
+            "更新挂载（重新指向另一个云盘目录）",
+            "回滚（恢复为真实目录）",
+            "已落地实例（本机参考）",
+            "常见坑速查",
+            "边界与不负责事项"
+          ],
+          "references": [],
+          "agents": [],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。",
+            "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
           ]
         }
       ]
@@ -5932,6 +5969,43 @@ window.SKILL_DICTIONARY = {
         "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
         "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
         "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。"
+      ]
+    },
+    {
+      "id": "gdrive-junction-mount",
+      "name": "gdrive-junction-mount",
+      "title": "谷歌云盘目录挂载（NTFS Junction）",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "memory",
+      "domain_label": "记忆域",
+      "domain_description": "新会话近期预热、跨会话历史检索、项目演进回顾、长期上下文补全",
+      "domain_order": 2,
+      "item_order": 8,
+      "auto_trigger": ">-",
+      "core_responsibility": "负责用 NTFS junction 把真实数据迁入云盘目录、原路径挂载指向它，覆盖首次挂载、更新挂载、回滚、完整性校验与中文路径坑（cmd mklink 中文乱码、占用排查），不负责云端备份策略设计。",
+      "skill_path": "gdrive-junction-mount/SKILL.md",
+      "directory_path": "gdrive-junction-mount",
+      "directory": "gdrive-junction-mount",
+      "sections": [
+        "目的与适用范围",
+        "核心概念与方向（为什么）",
+        "前置检查（每轮必做）",
+        "首次挂载流程",
+        "更新挂载（重新指向另一个云盘目录）",
+        "回滚（恢复为真实目录）",
+        "已落地实例（本机参考）",
+        "常见坑速查",
+        "边界与不负责事项"
+      ],
+      "references": [],
+      "agents": [],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看它是否只补近期或历史上下文，不越权代替当前需求、Bug、编码或交付判断。",
+        "当前没有 references，可考虑补最小示例或边界文档以降低后续维护成本。"
       ]
     },
     {
