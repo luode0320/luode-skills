@@ -1,0 +1,17 @@
+#!/bin/bash
+# win-cmd: execute CMD commands on Windows from WSL
+# Usage: win-cmd "echo %USERNAME% & ver"
+WIN_CMD="${WIN_CMD:-/mnt/c/Windows/System32/cmd.exe}"
+
+if [ ! -f "$WIN_CMD" ]; then
+    echo "ERROR: cmd.exe not found at $WIN_CMD" >&2
+    echo "Set WIN_CMD or run setup.sh first." >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: win-cmd <cmd-command>" >&2
+    exit 1
+fi
+
+exec "$WIN_CMD" /C "$*"

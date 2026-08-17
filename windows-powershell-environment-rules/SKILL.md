@@ -5,7 +5,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 
 # Windows PowerShell 环境准备规则
 
-本 skill 只管理 Windows 用户级 PowerShell 专项环境。普通仓库命令继续使用 Git Bash / bash，编译、运行、测试和调试继续按 `windows-wsl-execution-rules` 路由到 WSL。
+本 skill 只管理 Windows 用户级 PowerShell 专项环境。普通仓库命令继续使用 Git Bash / bash，编译、运行、测试和调试继续按 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要路由到 WSL。
 
 先看结果再决定是否继续：`ready` 表示当前要求都满足，`degraded` 表示必需条件已满足但有可选限制，两者都可以继续；只有 `blocked`、`busy`、`failed` 或 `rollback_refused` 才不能把当前操作当成已准备好。
 
@@ -23,7 +23,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 
 ## 默认边界
 
-**PowerShell 专项调用默认优先 PowerShell 7（`pwsh`），Windows PowerShell 5.1 仅在 pwsh7 缺失且升级被阻断时回退；能用 bash / WSL 完成的普通仓库与执行类命令一律不走 PowerShell。完整判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+**PowerShell 专项调用默认优先 PowerShell 7（`pwsh`），Windows PowerShell 5.1 仅在 pwsh7 缺失且升级被阻断时回退；能用 bash / WSL 完成的普通仓库与执行类命令一律不走 PowerShell。完整判定以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。**
 
 - “默认 PowerShell”只表示 Windows Terminal 默认 profile 和 agent 的 PowerShell 专项调用优先使用 `pwsh.exe -NoLogo`。
 - 永不替换、重命名或覆盖系统 `powershell.exe`，保留 Windows PowerShell 5.1 作为旧脚本回退。
@@ -32,7 +32,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 - `SessionEnsure` 和 `Doctor` 默认使用 `RequiredOnly`；显式 `Apply` 默认使用 `Extended`。需要更小或更大的范围时，调用方必须明确传入 `-Policy RequiredOnly|Core|Extended`。
 - 默认输出是 JSON。调用方必须读取 `status`、`canContinue`、`requiredReady`、`restartRequired`、`results`、`issues` 和 `changes`，不得只看命令是否返回了文本。
 - `-WhatIf` 只能产生计划中的 `changes`，不得写状态、profile、Terminal、journal 或调用包管理器安装。
-- 任何一次针对 shell 的 inline PowerShell 调用（不是进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先设置 `[Console]::OutputEncoding`。可复制的 5.1 / 7 双轨前缀见 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板`。
+- 任何一次针对 shell 的 inline PowerShell 调用（不是进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先设置 `[Console]::OutputEncoding`。可复制的 5.1 / 7 双轨前缀以 `windows-encoding-rules/SKILL.md` 内联前缀为唯一真源（原 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md` 随旧 skill 删除而撤销）。
 
 ## 执行流程
 
@@ -53,7 +53,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 
 ## WSL 隔离
 
-Windows 侧 `rg.exe`、`fd.exe` 或其他工具安装成功，不代表 WSL 工具合规。Git Bash 可见性只能从已解析的 `git.exe` 安装根目录定位 `bin\\bash.exe`，并以 `uname -s` 的 `MINGW` 或 `MSYS` 结果确认；不得用裸 `bash.exe` 把 WSL launcher 误认成 Git Bash。进入 WSL 项目后仍必须用 `command -v` 检查原生路径；Linux `127`、`wsl.exe` 和 `/mnt/*.exe` 互操作问题交给 `windows-wsl-execution-rules`。
+Windows 侧 `rg.exe`、`fd.exe` 或其他工具安装成功，不代表 WSL 工具合规。Git Bash 可见性只能从已解析的 `git.exe` 安装根目录定位 `bin\\bash.exe`，并以 `uname -s` 的 `MINGW` 或 `MSYS` 结果确认；不得用裸 `bash.exe` 把 WSL launcher 误认成 Git Bash。进入 WSL 项目后仍必须用 `command -v` 检查原生路径；Linux `127`、`wsl.exe` 和 `/mnt/*.exe` 互操作问题交给 `wsl-windows-bridge`（WSL↔Windows 工具桥，原 `windows-wsl-execution-rules` 已删除）。
 
 ## 验收标准
 

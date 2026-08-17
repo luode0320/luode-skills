@@ -1,0 +1,28 @@
+#!/bin/bash
+# win-run-py: run a .py script on Windows Python with timestamped logging
+# Usage: win-run-py <script.py> [args...]
+# Logs appended to $WIN_SCRIPTS/logs/YYYYMMDD.log
+WIN_PYTHON="${WIN_PYTHON:-/mnt/d/app/anaconda/python.exe}"
+WIN_SCRIPTS="${WIN_SCRIPTS:-/mnt/d/app/scripts}"
+
+if [ ! -f "$WIN_PYTHON" ]; then
+    echo "ERROR: Windows Python not found at $WIN_PYTHON" >&2
+    echo "Set WIN_PYTHON or run setup.sh first." >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: win-run-py <script.py> [args...]" >&2
+    exit 1
+fi
+
+LOG_DIR="$WIN_SCRIPTS/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/$(date +%Y%m%d).log"
+
+{
+    echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) win-run-py $* ==="
+} >> "$LOG_FILE"
+
+"$WIN_PYTHON" "$@" 2>&1 | tee -a "$LOG_FILE"
+exit "${PIPESTATUS[0]}"

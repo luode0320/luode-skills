@@ -38,7 +38,7 @@ description: 当需要分析代码库结构、符号关系、调用链、被调�
 
 ## 默认优先级
 
-**这些兜底命令能用 bash 就不用 PowerShell；必须走 PowerShell 时优先 PowerShell 7，5.1 仅阻断回退。完整判定以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+**这些兜底命令能用 bash 就不用 PowerShell；必须走 PowerShell 时优先 PowerShell 7，5.1 仅阻断回退。完整判定以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。**
 
 1. 项目结构、符号关系、调用链、影响面：CodeGraph 优先
 2. 局部文本搜索：`rg` / `find` 兜底

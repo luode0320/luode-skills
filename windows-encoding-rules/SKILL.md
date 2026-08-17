@@ -32,7 +32,7 @@ description: 当任务运行在 Windows（Git Bash / bash、PowerShell 或 CMD�
 
 ## Windows 防错基线
 
-**能用 bash 就不用 PowerShell：普通仓库命令一律优先 Git Bash / bash，只有 PowerShell 专项场景才进入 PowerShell，且专项场景优先 PowerShell 7、5.1 仅阻断回退。判定口径以 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）` 为准。**
+**能用 bash 就不用 PowerShell：普通仓库命令一律优先 Git Bash / bash，只有 PowerShell 专项场景才进入 PowerShell，且专项场景优先 PowerShell 7、5.1 仅阻断回退。判定口径以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。**
 
 - 普通仓库命令优先使用 Git Bash / bash，并让 Git 与脚本工具遵守 UTF-8 / 换行约束：
 ```bash
@@ -151,7 +151,7 @@ PowerShell 7 前缀（默认路径）：
 pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "<你的命令>"
 ```
 
-该模板的完整原因、引号嵌套规则和临时脚本建议见 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板`。编码 skill 不重复维护语法保底规则，只保证在 PowerShell 专项场景中先按上述前缀执行。
+该模板的完整原因、引号嵌套规则和临时脚本建议以本文件上文「PowerShell 前缀」段落为唯一真源（原 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板` 随旧 skill 删除而撤销）。编码 skill 不重复维护语法保底规则，只保证在 PowerShell 专项场景中先按上述前缀执行。
 
 ## 通过 / 驳回标准
 

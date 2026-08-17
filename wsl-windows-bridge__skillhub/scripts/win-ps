@@ -1,0 +1,17 @@
+#!/bin/bash
+# win-ps: execute PowerShell commands on Windows from WSL
+# Usage: win-ps "Get-Process python | Select-Object Name,Id | Format-Table"
+WIN_PS="${WIN_PS:-/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe}"
+
+if [ ! -f "$WIN_PS" ]; then
+    echo "ERROR: PowerShell not found at $WIN_PS" >&2
+    echo "Set WIN_PS or run setup.sh first." >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: win-ps <powershell-command>" >&2
+    exit 1
+fi
+
+exec "$WIN_PS" -NoProfile -ExecutionPolicy Bypass -Command "$*"

@@ -1,0 +1,12 @@
+#!/bin/bash
+# win-python: invoke Windows Python (Anaconda or any) from WSL
+# Usage: win-python [-c "code"] [script.py] [args...]
+WIN_PYTHON="${WIN_PYTHON:-/mnt/d/app/anaconda/python.exe}"
+
+if [ ! -f "$WIN_PYTHON" ]; then
+    echo "ERROR: Windows Python not found at $WIN_PYTHON" >&2
+    echo "Set WIN_PYTHON or run setup.sh first." >&2
+    exit 1
+fi
+
+exec "$WIN_PYTHON" "$@"

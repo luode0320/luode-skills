@@ -1,0 +1,33 @@
+#!/bin/bash
+# win-path: convert paths between WSL (/mnt/...) and Windows (D:\\...) style
+# Usage:
+#   win-path /mnt/d/app          -> D:\app        (WSL -> Windows)
+#   win-path --to-wsl D:\\app    -> /mnt/d/app    (Windows -> WSL)
+#   win-path --to-wsl "D:/app"   -> /mnt/d/app
+mode="win"
+
+case "${1:-}" in
+    --to-wsl|-u)
+        mode="wsl"
+        shift
+        ;;
+    --help|-h)
+        echo "Usage: win-path [--to-wsl] <path> [<path>...]" >&2
+        echo "  default: WSL path -> Windows path (wslpath -w)" >&2
+        echo "  --to-wsl: Windows path -> WSL path (wslpath -u)" >&2
+        exit 0
+        ;;
+esac
+
+if [ $# -eq 0 ]; then
+    echo "Usage: win-path [--to-wsl] <path>" >&2
+    exit 1
+fi
+
+for p in "$@"; do
+    if [ "$mode" = "win" ]; then
+        wslpath -w "$p" 2>/dev/null || echo "$p"
+    else
+        wslpath -u "$p" 2>/dev/null || echo "$p"
+    fi
+done

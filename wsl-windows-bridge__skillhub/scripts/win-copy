@@ -1,0 +1,27 @@
+#!/bin/bash
+# win-copy: copy files between WSL and Windows
+# Usage: win-copy <source> <dest>
+#   Paths may be WSL-style (/mnt/d/...) or Windows-style (D:\\...).
+#   Windows-style paths are converted automatically via wslpath.
+usage() {
+    echo "Usage: win-copy <source> <dest>" >&2
+    echo "  Paths may be WSL (/mnt/...) or Windows (D:\\...) style." >&2
+    exit 1
+}
+
+[ $# -ne 2 ] && usage
+
+SRC="$1"
+DST="$2"
+
+# Convert Windows-style paths to WSL-style when wslpath is available
+if command -v wslpath >/dev/null 2>&1; then
+    case "$SRC" in
+        [A-Za-z]:\\*|[A-Za-z]:/*) SRC=$(wslpath -u "$SRC") ;;
+    esac
+    case "$DST" in
+        [A-Za-z]:\\*|[A-Za-z]:/*) DST=$(wslpath -u "$DST") ;;
+    esac
+fi
+
+cp -v "$SRC" "$DST"

@@ -5,7 +5,7 @@
 ## 路由
 
 - PowerShell `CommandNotFoundException`、Windows 命令解析失败、Windows 包安装/版本探针失败，以及 Git Bash 对 Windows CLI 的可见性失败：归属 `windows-powershell-environment-rules`。
-- WSL 原生 shell、`wsl.exe` 路由、`/mnt/*.exe` 互操作、Linux exit code `127`：归属 `windows-wsl-execution-rules`；先做 `command -v` 路径隔离。
+- WSL 原生 shell、`wsl.exe` 路由、`/mnt/*.exe` 互操作、Linux exit code `127`：归属 `wsl-windows-bridge`（原 `windows-wsl-execution-rules` 已删除）；先做 `command -v` 路径隔离。
 - 业务行为错误：转交 `bug-*`；错误映射/重试设计：转交 `error-handling-rules`。
 
 ## 状态

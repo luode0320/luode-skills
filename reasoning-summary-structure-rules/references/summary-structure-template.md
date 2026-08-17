@@ -216,7 +216,7 @@ stateDiagram-v2
 - 不再单列“函数注释核对”节点（由 `code-change-finalization-gate-rules` / `comment-completion-gate-rules` 闸门内部完成）。
 - 状态用徽章：通过 ✅、警告 ⚠️、失败 ❌、阻断 ⛔；核心结论用 `>` 引用块突出。
 - 多项对照（需求对照、多文件改动、状态对照）优先用 markdown 表格，不堆长串冒号列表。
-- 总结中出现的项目内文件路径必须按 `windows-wsl-execution-rules` 的用户可访问路径规则输出：项目在 WSL 且用户从 Windows 桌面 / GUI 客户端访问时，一律使用 `\\wsl.localhost\<distro>\...`，不得输出 `/home/...`。
+- 总结中出现的项目内文件路径必须按用户可访问路径规则输出（原 `windows-wsl-execution-rules` 已删除，规则由 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要承接）：项目在 WSL 且用户从 Windows 桌面 / GUI 客户端访问时，一律使用 `\\wsl.localhost\<distro>\...`，不得输出 `/home/...`。
 - 每一节至少 1 条可复核信息。
 - `knowledge-flow` 的检索与沉淀事实统一由「知识引用」小节的两张表承载：真实读取成功的笔记进「本轮引用」，真实写入（新建 / 追加 / 移动 / 删除 / 改属性）且回读校验通过的笔记进「本轮沉淀」；两张表都只列台账条目，不输出笔记正文或片段，也不在其它小节重复同一事实。
 - 引用台账为空时整节省略，不输出空表或占位行；`search` 命中但未读取的笔记不得入表。

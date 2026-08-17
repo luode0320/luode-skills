@@ -25,7 +25,7 @@
 - 以 manifest command 的实际解析路径与版本探针为准，不以包管理器退出码为准；包管理器退出 `0` 但探针失败仍是失败。
 - 每个包源都有自己的精确包 ID。不能把 Winget ID 传给 Scoop 或 Chocolatey；当前来源无映射时记录限制并停止该工具恢复。
 - Git Bash 必须从 `git.exe` 对应安装根目录的 `bin\\bash.exe` 找到，并以 `uname -s` 的 `MINGW` 或 `MSYS` 确认。`wsl.exe` 或裸 `bash.exe` 不能作为 Git Bash 证据。
-- WSL 工具必须另行用 `command -v` 验证，不能复用 Windows 侧结果；Linux `127`、`/mnt/*.exe` 或 WSL launcher 问题转交 `windows-wsl-execution-rules`。
+- WSL 工具必须另行用 `command -v` 验证，不能复用 Windows 侧结果；Linux `127`、`/mnt/*.exe` 或 WSL launcher 问题转交 `wsl-windows-bridge`（原 `windows-wsl-execution-rules` 已删除）。
 - 用户级 `discovered-tools.json` 与 `failure-cases.json` 必须 UTF-8、原子替换、去重并限制记录长度；失败摘要必须脱敏，不写 token、密码、密钥或完整绝对路径。
 - 已验证的动态工具只为精确恢复保存证据；`check_only` 条目不能自动安装，任何 discovered 条目都不能自动加入后续 `SessionEnsure` 的策略。
 - canonical `references/tool-manifest.yaml` 不允许运行时自动修改。动态发现结果先进入用户状态文件，经过人工审查后再显式维护 manifest。
