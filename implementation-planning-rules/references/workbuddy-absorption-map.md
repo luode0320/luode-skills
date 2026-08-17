@@ -28,6 +28,13 @@
 | 同一来源 | Ousterhout 反方（探索性/架构性工作先设计，防战术编程） | 本地无平衡机制 | 合并 | 同上 |
 | 同一来源 | 测试隔离红线、根 `test/` ASCII 镜像、真实运行验证 | 本地 `test-strategy-rules` / `test-program-rules` / `functional-validation-rules` 全覆盖且更强 | 保留本地 | 无新增 |
 | 同一来源 | TDD 免除收口测试、单测替代功能验证 | 本地 P0：真实测试与 6-review 不可免除 | 不吸收 | 无 |
+| `codebuddy-plugins-official/godot-mcp`（anengyuki/Godot-mcp，MIT，市场缓存只读） | 三场景分流（make/new/modify + 环境探测 4 标志） | 本地 `godot-project-bootstrap-rules` 只做项目自举，无编辑器操作方法论 | 合并 | `godot-project-bootstrap-rules/references/godot-mcp-operations.md` |
+| 同一来源 | 工作区目录契约（active-game.json + godot-editor 平铺） | 本地无 | 合并 | 同上 |
+| 同一来源 | build_godot_scene 声明式场景构建（一次传完整树） | 本地无 | 合并 | 同上 |
+| 同一来源 | Godot 4 路径与类型约定（res://、Vector2/Color 数组、弧度） | 本地无 | 合并 | 同上 |
+| 同一来源 | 部署 5 步 + Debug 三工具（get_debug_errors/get_script_errors/get_editor_output） | 本地无 | 合并 | 同上 |
+| 同一来源 | 项目自举、MCP 注册、图像配置模板 | 本地 `godot-project-bootstrap-rules` 主文件已覆盖 | 保留本地 | 无新增 |
+| 同一来源 | MCP server / addons GDScript 插件本体 | 属于安装资产，由 `mcp-installation-rules` 处理，不复制进规则体系 | 不吸收 | 无 |
 | 同一文件 | 实施前先只读扫描代码库，形成上下文报告后再进入需求确认 | 本地实施规划有目录树与落点契约，但没有显式“先探索、总结发现、批准后编码” | 合并 | `implementation-planning-rules/references/pre-implementation-code-exploration.md` |
 | 同一文件 | 需求达到 90 分后必须停下等用户显式批准再实施 | 本地已有需求稳定后移交实施规划，但批准闸门不显式 | 合并 | 需求质量门参考与实施规划规则 |
 | `feature-dev/commands/feature-dev.md` | 深入理解代码库、识别未定义细节、设计后再实现 | 本地实施规划已覆盖零决策、落点与周期，但“先探索再设计”不显式 | 合并 | `pre-implementation-code-exploration.md` |

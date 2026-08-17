@@ -1015,3 +1015,4 @@ claude-mem(记忆) :
 2026-08-18 00:54:00 feat: [skillhub批量安装] 新增10个外部skill与迁移标记
 2026-08-18 00:55:00 docs: [WSL桥重构收尾] 归档项目状态字典与历史工程文档
 2026-08-18 00:56:00 feat: [skillhub批量安装] 新增6个crypto分析类外部skill
+2026-08-18 01:00:04 feat: [godot-mcp精华吸收] 新增godot-mcp-operations并登记吸收映射

@@ -70,6 +70,7 @@ description: 当仓库命中 `project.godot`、`.gd`、`.tscn`、`addons/`、`ex
 - 不替代 `mcp-installation-rules` 做 MCP 安装来源分析；这里只负责把 Godot 项目的完整准备流串起来。
 - 不替代 `imagegen` 做实际图片生成；这里只保证项目的图像配置入口存在且格式可读。
 - 不替代 `project-rule-file-bootstrap-rules` 做通用仓库规则补齐；这里只追加 Godot 项目的专项模板。
+- 项目就绪后通过 MCP 操作编辑器（三场景分流 / build_godot_scene / 部署 / 调试）：`references/godot-mcp-operations.md`（吸收自 godot-mcp 插件）。
 
 ## 通过标准
 
