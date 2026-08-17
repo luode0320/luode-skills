@@ -294,6 +294,7 @@ python skill-dictionary/generate_dictionary.py
 | `project-timeline-rules` | 按项目维度整理历史演进时间线，输出项目阶段变化与决策轨迹。 |
 | `project-memory-rules` | 自动抽取对话与代码中的项目事实，持续维护根目录 `PROJECT_MEMORY.md` 作为唯一长期记忆主文件，并在文件内联动“人类阅读区 + 机器索引区”。 |
 | `project-style-rules` | 自动抽取对话与代码中的项目代码风格示例，持续维护根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。 |
+| `gdrive-junction-mount` | Windows 下用 NTFS junction 把本地目录（zcode 记忆、知识库、博客等）挂载到谷歌云盘同步目录，覆盖首次挂载、更新挂载、回滚、完整性校验与中文路径坑。 |
 
 ### 3. 需求域
 
@@ -1006,3 +1007,4 @@ claude-mem(记忆) :
 2026-08-16 21:54:03 feat: [VS Code全栈调试skill新增] vscode-fullstack-debug前后端一键启动配置
 2026-08-16 21:54:40 docs: [字典同步] 刷新vscode-fullstack-debug相关Skill描述
 2026-08-16 21:55:00 chore: [系统标记同步] 更新.codex-system-skills.marker哈希
+2026-08-17 08:32:08 feat: [谷歌云盘junction挂载skill新增] gdrive-junction-mount与vscode调试skill迭代

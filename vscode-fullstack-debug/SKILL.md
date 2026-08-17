@@ -31,19 +31,20 @@ new-api（后端在仓库根、用 `env` 注入 `SQLITE_PATH` 等）的差异—
 
 前端配置有两种形态，用途不同：
 
-- **要调试前端代码（断点、检查器）** → 用 `type: "chrome"` + `runtimeExecutable` 指向 dev server 启动器，
-  调试器会自动拉起 dev server 并附加浏览器。Vite 项目：
+- **要调试前端代码（断点、检查器）** → 用 `type: "pwa-chrome"` + `preLaunchTask`：
+  先用一个后台任务把 dev server 拉起来，再让调试器打开浏览器附加调试。Vite 项目：
   ```jsonc
   {
     "name": "启动前端 (vite dev)",
-    "type": "chrome",
+    "type": "pwa-chrome",
     "request": "launch",
     "url": "http://localhost:<端口>",
     "webRoot": "${workspaceFolder}/<前端目录>/src",
-    "runtimeExecutable": "vite",
-    "cwd": "${workspaceFolder}/<前端目录>"
+    "preLaunchTask": "启动前端 (npm run dev)"
   }
   ```
+  对应的 tasks.json 后台任务必须带 `problemMatcher`（监听 dev server 的"就绪"输出，如 Vite 的
+  `ready in` / `Local:`）作为就绪信号，否则 preLaunchTask 会在服务还没起来时就结束、浏览器打开后 404。
 - **只想在 Debug 视图一起拉起 dev server，不调前端** → 用 `type: "node-terminal"`：
   ```jsonc
   {
@@ -55,8 +56,8 @@ new-api（后端在仓库根、用 `env` 注入 `SQLITE_PATH` 等）的差异—
   }
   ```
 
-选择依据：用户提到"断点调前端/调试前端代码"→ 用 chrome 方式；只是"一键启动/看效果"→ node-terminal 更轻、不依赖 Chrome 扩展。
-不确定时选 chrome + runtimeExecutable（web-xiaoshuo 已验证可行，能真正断点调 .vue）。
+选择依据：用户提到"断点调前端/调试前端代码"→ 用 pwa-chrome + preLaunchTask；只是"一键启动/看效果"→
+node-terminal 更轻（纯终端面板）。pwa-chrome 是 VS Code 内置类型，无需安装 Debugger for Chrome 扩展。
 
 ## 用 compounds 实现"一键启动"
 
@@ -100,7 +101,17 @@ Go 配置保持用户已有的调试参数（mode、args、env、buildFlags 等�
       "command": "npm run dev",
       "options": { "cwd": "${workspaceFolder}/<前端目录>" },
       "isBackground": true,
-      "problemMatcher": [],
+      // 前端任务务必带就绪检测：被 launch.json 的 preLaunchTask 复用时，
+      // 空 problemMatcher 会让 preLaunchTask 在 dev server 未就绪时就结束。
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "ready in|Local:"
+        }
+      },
       "presentation": { "group": "dev", "panel": "dedicated" }
     },
     {
@@ -119,6 +130,10 @@ Go 配置保持用户已有的调试参数（mode、args、env、buildFlags 等�
   并检查 compound 引用的 `name` 都存在。可以用：
   `node -e "JSON.parse(require('fs').readFileSync('.vscode/launch.json','utf8')); console.log('ok')"`
 - **端口/代理要一致**：前端 dev server 端口、代理目标（`/api` → 后端端口）必须与后端实际端口对齐，否则一键启动后接口 404。
+- **不要用 `runtimeExecutable` 去"启动 dev server"**：在 `pwa-chrome`/`chrome` 配置里，`runtimeExecutable`
+  的语义是**浏览器通道名或可执行文件路径**（`stable`、`canary`，或 `chrome.exe` 绝对路径），不是"要运行的命令"。
+  写成 `"runtimeExecutable": "vite"` 会报「找不到 Chrome 版本 vite」，因为调试器把它当成了浏览器。
+  想让调试器自动拉起 dev server，正确做法是 `pwa-chrome` + `preLaunchTask`（见上文模板）。
 - **`chrome` 类型需要 Debugger for Chrome 扩展**（`msjsdiag.debugger-for-chrome`）；改用内置的 `pwa-chrome` 类型则无需装扩展。
 - **`.vscode/` 可能在 `.gitignore` 里被忽略**：检查 `git check-ignore .vscode/tasks.json`。被忽略时改动只在本机生效，
   要向用户说明；用户想共享则需从 `.gitignore` 移除 `.vscode/`。
