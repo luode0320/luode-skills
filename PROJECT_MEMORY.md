@@ -122,11 +122,11 @@
 ## Windows PowerShell 环境可靠性规则
 
 - `windows-powershell-environment-rules` 的会话默认策略是 `RequiredOnly`：`ready` 和 `degraded` 可以继续，只有 `blocked`、`busy`、`failed`、`rollback_refused` 不能作为已准备好结论。
-- 包恢复只接受 manifest 或调用方提供的精确 source/package ID；未知命令不搜索猜包。Git Bash 只能从 Git 安装根目录的 `bin\\bash.exe` 加 `MINGW|MSYS` 身份识别，WSL 原生命令仍交给 `windows-wsl-execution-rules`。
+- 包恢复只接受 manifest 或调用方提供的精确 source/package ID；未知命令不搜索猜包。Git Bash 只能从 Git 安装根目录的 `bin\\bash.exe` 加 `MINGW|MSYS` 身份识别，WSL 原生命令不再由 `windows-wsl-execution-rules` 承接（该 skill 已删除，由 `wsl-windows-bridge` 提供 WSL↔Windows 工具桥）。
 - profile 与 Terminal 的 Apply/Rollback 由事务、备份和 after hash 保护；WhatIf 不写用户状态，hash 漂移时必须拒绝覆盖。含中文的 PowerShell 5.1 脚本使用 UTF-8 BOM，避免被默认 ANSI 解码。
 - 验证固定为临时目录 fixture：PowerShell 5.1 与 PowerShell 7 都要通过 TEST-PSENV-001 至 TEST-PSENV-009；不连接网络、不安装软件、不改真实用户配置。
-- 稳定决策：任何一次调用 PowerShell 命令（不是进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先在命令体设置 `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`，7 路径继续优先 `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command`。标准调用前缀唯一真源是 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板`，`windows-encoding-rules` 与 `windows-powershell-environment-rules` 只做交叉引用。
-- 来源：`windows-powershell-environment-rules/SKILL.md`、`references/runtime-state-contract.md`、`windows-wsl-execution-rules/references/powershell-fallback-patterns.md`、`windows-encoding-rules/SKILL.md`、`doc/2-需求/2026-08-14_223800_PowerShell控制继续优化.md`、`doc/3-实施/2026-08-14_223800_PowerShell控制继续优化_实施总览.md`、`doc/3-实施/2026-08-14_223800_PowerShell控制继续优化_实施周期01_标准调用前缀与三skill衔接.md`。
+- 稳定决策：任何一次调用 PowerShell 命令（不是进入交互式终端）都必须显式使用 `-NoProfile -ExecutionPolicy Bypass -Command`；5.1 回退路径还要先在命令体设置 `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`，7 路径继续优先 `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command`。标准调用前缀唯一真源随 `windows-wsl-execution-rules` 删除而撤销，现以 `windows-encoding-rules/SKILL.md` 内联前缀为唯一真源，`windows-encoding-rules` 与 `windows-powershell-environment-rules` 只做交叉引用。
+- 来源：`windows-powershell-environment-rules/SKILL.md`、`references/runtime-state-contract.md`、`windows-encoding-rules/SKILL.md`、`doc/2-需求/2026-08-14_223800_PowerShell控制继续优化.md`、`doc/3-实施/2026-08-14_223800_PowerShell控制继续优化_实施总览.md`、`doc/3-实施/2026-08-14_223800_PowerShell控制继续优化_实施周期01_标准调用前缀与三skill衔接.md`。
 - 更新时间：2026-08-14。
 
 ## 统一智能体运行期自恢复规则

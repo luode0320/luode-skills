@@ -5,14 +5,14 @@
 - 2026-08-14
 - 来源对象：PowerShell 控制继续优化（REQ-PSCTL-20260814-001 / CYCLE-PSCTL-01）
 - 当前目标：根据截图与 workbuddy 参考继续优化 PowerShell 控制，将标准调用前缀沉淀为唯一真源模板，并补齐三个 Windows skill 的衔接
-- 当前状态：全部 7 个最小任务完成。标准调用前缀模板写入 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md`，三份 SKILL.md 补齐交叉引用，项目记忆与 skill 字典同步，知识库沉淀 1 篇开发环境笔记，需求/实施/测试/6-review 文档全部落盘并通过机器校验。改动停在已改动未提交状态。
+- 当前状态：全部 7 个最小任务完成。标准调用前缀模板写入 `wsl-windows-bridge`（原 `windows-wsl-execution-rules` 已删除），三份 SKILL.md 补齐交叉引用，项目记忆与 skill 字典同步，知识库沉淀 1 篇开发环境笔记，需求/实施/测试/6-review 文档全部落盘并通过机器校验。改动停在已改动未提交状态。
 - 关键量化：修改 1 份 reference、3 份 SKILL.md、2 份项目记忆文件、2 份字典文件；落盘 5 份工程文档；知识库新增 1 篇笔记。
 - 无需回滚兜底：本轮仅新增规则章节与引用，未删除既有文件；字典生成与文档校验可重复执行。
 
 ## 本轮已完成
 
 - 规则落盘：`powershell-fallback-patterns.md` 新增 5.1 / 7 双轨标准调用前缀模板
-- 三 skill 衔接：`windows-wsl-execution-rules`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 均引用唯一真源
+- 三 skill 衔接：`wsl-windows-bridge`（承接原 windows-wsl-execution-rules）、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 均引用唯一真源
 - 记忆与字典：`PROJECT_MEMORY.md` 同步稳定决策，`generate_dictionary.py` 退出码 0，`implemented_total: 69`、`seed_total: 35`
 - 知识沉淀：知识库新建 `PowerShell命令调用标准前缀.md`，补齐既有笔记元数据与反向链接
 - 文档收口：需求、实施总览、实施周期、测试主文档、6-review 五份文档全部落盘并通过机器校验
@@ -712,7 +712,7 @@
         },
         {
           "id": "TASK-PSCTL-03",
-          "step": "[TASK-PSCTL-03] 在 windows-wsl-execution-rules/SKILL.md 暴露前缀引用",
+          "step": "[TASK-PSCTL-03] 在 wsl-windows-bridge（原 windows-wsl-execution-rules）SKILL.md 暴露前缀引用",
           "status": "completed"
         },
         {

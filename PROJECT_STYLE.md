@@ -228,7 +228,7 @@
 - 类型: 工具风格
 - 示例: `普通命令: 在 Git Bash / bash 下经 //wsl.localhost/<distro>/home/<user>/<project> 或等价 Windows 可访问路径执行 rg、git status、读写文件；执行类命令: wsl.exe --cd /home/<user>/<project> go test ./...；PowerShell: 仅用于 .ps1、Windows 专用 cmdlet、profile / 编码初始化或用户明确要求`
 - 说明: Windows + WSL 规则文案要先写清“普通命令”和“执行类命令”的分层。Windows 下搜索、读写文件、规则检查、普通 git 盘点默认优先使用 Git Bash / bash；只有编译、运行、启动程序、测试、调试和执行类依赖安装才切到 `wsl.exe --cd`；PowerShell 只作为 Windows 专项入口保留。同时明确纯 Windows 项目或本轮不执行程序时不要误触发 WSL；面向用户展示的项目内文件引用必须另按用户访问环境输出，不沿用执行命令里的 `/home/...`。
-- 来源: 用户本轮确认、`windows-wsl-execution-rules/SKILL.md`、`windows-encoding-rules/SKILL.md`、`AGENTS.md`
+- 来源: 用户本轮确认、`wsl-windows-bridge/SKILL.md`、`windows-encoding-rules/SKILL.md`、`AGENTS.md`
 - 适用范围: `AGENTS.md`、环境规则 skill、命令模板、推荐工作流文档
 - 更新时间: 2026-07-02
 - 状态: 启用
@@ -238,7 +238,7 @@
 - 类型: 工具风格
 - 示例: `主路由: 普通仓库命令优先 Git Bash / bash；执行类命令优先 wsl.exe --cd；PowerShell: 仅在专项场景进入，进入后再遵守逻辑运算括号、ASCII-only、null check、Join-Path、ConvertTo-Json -Depth`
 - 说明: 编写 Windows 环境规则时，先写清 shell 选择主路由，再补 PowerShell 专项兜底；不要把 PowerShell 语法细节直接写成默认入口，也不要把“能用 PowerShell 完成”误写成“推荐用 PowerShell 完成”。PowerShell 保底内容优先沉到 reference 或专项段落，避免主 skill 被 PowerShell 技巧淹没。
-- 来源: 本轮对话确认、`windows-wsl-execution-rules/SKILL.md`、社区 skill `powershell-windows`
+- 来源: 本轮对话确认、`wsl-windows-bridge/SKILL.md`、社区 skill `powershell-windows`
 - 适用范围: Windows 环境 skill、references、命令模板、仓库级规则文案
 - 更新时间: 2026-07-10
 - 状态: 启用
@@ -248,7 +248,7 @@
 - 类型: 工具风格
 - 示例: `command -v rg`
 - 说明: 怀疑 WSL 内命令误用 Windows 版工具（如报 `permission denied`）时，先用 `command -v <tool>` 校验实际路径，落在 `/mnt/` 下即为 Windows 版，不要直接假设是 Linux 权限问题就 `chmod`/`sudo`。新会话第一次在某 WSL 项目执行命令时，也可用 `command -v rg fd fzf 2>/dev/null` 之类的组合做一次性自检。
-- 来源: 对话确认、`windows-wsl-execution-rules/references/tool-path-interop.md`
+- 来源: 对话确认、`wsl-windows-bridge/SKILL.md`
 - 适用范围: WSL 执行环境命令诊断
 - 更新时间: 2026-07-06
 - 状态: 启用
@@ -258,7 +258,7 @@
 - 类型: 输出风格
 - 示例: `推荐: \\wsl.localhost\Ubuntu-24.04\home\luode\code\ellipal_admin\doc\6-review\a.md；禁止: /home/luode/code/ellipal_admin/doc/6-review/a.md`
 - 说明: 凡回复中引用项目内文件，都按用户当前客户端可打开的路径输出。项目在 Windows 本地盘就输出 Windows 本地路径；项目在 WSL 且用户从 Windows / Codex Desktop / Claude Desktop 访问时，Markdown 链接、普通文本路径、审查证据路径、截图说明和最终总结中的项目内文件路径都使用 `\\wsl.localhost\<distro>\home\<user>\<project>\...`。`/home/<user>/<project>` 只用于命令参数、WSL shell 上下文和日志原文。
-- 来源: 用户本轮确认、`windows-wsl-execution-rules/references/path-mapping.md`
+- 来源: 用户本轮确认、`wsl-windows-bridge/SKILL.md`
 - 适用范围: 最终回复、中间进度、审查报告、证据路径、截图说明、Markdown 链接和普通文本文件路径
 - 更新时间: 2026-07-02
 - 状态: 启用
@@ -390,4 +390,4 @@
 - 2026-08-02：更新 Git 提交域写法，明确同一任务流程文档合并为 `docs`，可执行测试与实现继续独立提交。
 - 2026-07-15：补充代码生成风格的局部一致性与接口实现对照规则；统一局部上下文只做必要模板替换，接口实现优先参考既有实现，风格契约记录局部证据、参考实现和最小新增内容。
 - 2026-07-16：新增长代码块内步骤注释风格，明确超过 5 行有效代码的代码块必须在块内就近补顶层步骤编号，嵌套超长代码块单独检查。
-- 2026-07-22：新增 PowerShell 使用优先级风格，明确 Windows 下命令入口优先 Git Bash / bash，仅 PowerShell 专项场景才用 PowerShell，且专项场景优先 PowerShell 7（`pwsh`）、Windows PowerShell 5.1 仅阻断回退；canonical 判定见 `windows-wsl-execution-rules` 的 `## PowerShell 使用优先级阶梯（硬约束）`。
+- 2026-07-22：新增 PowerShell 使用优先级风格，明确 Windows 下命令入口优先 Git Bash / bash，仅 PowerShell 专项场景才用 PowerShell，且专项场景优先 PowerShell 7（`pwsh`）、Windows PowerShell 5.1 仅阻断回退；canonical 判定随 `windows-wsl-execution-rules` 删除而撤销，现以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。

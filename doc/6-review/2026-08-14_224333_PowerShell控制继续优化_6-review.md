@@ -59,7 +59,7 @@ STYLE: PASS
 
 | 检查项 | 结论 | 依据 |
 | --- | --- | --- |
-| reference 落点 | PASS | 前缀模板只写入 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md` |
+| reference 落点 | PASS | 前缀模板只写入 `wsl-windows-bridge/references/powershell-fallback-patterns.md` |
 | SKILL.md 引用 | PASS | 三份 SKILL.md 均引用 `powershell-fallback-patterns.md` 且无重复章节 |
 | 最小改动 | PASS | 只新增前缀模板与三处引用，未修改脚本实现 |
 | 文件编码 | PASS | 新增与修改文件 UTF-8，中文无乱码 |
@@ -79,8 +79,8 @@ STYLE: PASS
 
 ### 关键改动
 
-- `windows-wsl-execution-rules/references/powershell-fallback-patterns.md`
-- `windows-wsl-execution-rules/SKILL.md`
+- `wsl-windows-bridge/references/powershell-fallback-patterns.md`
+- `wsl-windows-bridge/SKILL.md`
 - `windows-encoding-rules/SKILL.md`
 - `windows-powershell-environment-rules/SKILL.md`
 - `PROJECT_MEMORY.md`

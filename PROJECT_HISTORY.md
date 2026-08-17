@@ -4,7 +4,9 @@
 
 ## 事件
 
-- 2026-08-14：完成 PowerShell 控制继续优化（REQ-PSCTL-20260814-001/CYCLE-PSCTL-01）。以 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md` 为唯一真源新增「PowerShell 命令前缀模板」，在 `windows-wsl-execution-rules`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 补齐交叉引用；5.1 路径先设 UTF-8 输出编码，7 路径继续优先 `pwsh`。同步 PROJECT_MEMORY 与 skill 字典（implemented_total 69、seed_total 35），落盘需求、实施总览、实施周期、测试主文档与 6-review 五份文档，四份工程文档 profile 校验 PASS，知识库新建 1 篇开发环境笔记并补双向关联；全量测试 386 项中 5 项既有失败与本次无关。改动停在已改动未提交状态。
+- 2026-08-17：删除 `windows-wsl-execution-rules` skill，所有引用改指 `wsl-windows-bridge`（WSL↔Windows 工具桥，补齐 6 个 win-* wrapper 与 setup.sh 修复）；PowerShell 前缀唯一真源随删除撤销，改为 `windows-encoding-rules/SKILL.md` 内联前缀。更新 AGENTS/CLAUDE/PROJECT_*/字典/其余 skill 引用与 5 份历史文档。改动停在已改动未提交状态。
+
+- 2026-08-14：完成 PowerShell 控制继续优化（REQ-PSCTL-20260814-001/CYCLE-PSCTL-01）。以 `wsl-windows-bridge`（原 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md`）为唯一真源新增「PowerShell 命令前缀模板」，在 `wsl-windows-bridge`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 补齐交叉引用；5.1 路径先设 UTF-8 输出编码，7 路径继续优先 `pwsh`。同步 PROJECT_MEMORY 与 skill 字典（implemented_total 69、seed_total 35），落盘需求、实施总览、实施周期、测试主文档与 6-review 五份文档，四份工程文档 profile 校验 PASS，知识库新建 1 篇开发环境笔记并补双向关联；全量测试 386 项中 5 项既有失败与本次无关。改动停在已改动未提交状态。
 
 - 2026-08-13：完成 WorkBuddy 官方市场规则吸收整理补充（REQ-WBA-20260813-001/CYCLE-ABS-01..03）。以「整理补充」为原则吸收四个 skill 的五个 reference，不复制官方工作流、不新建同类 skill；需求域 100 分质量门、实施域编码前代码库探索、Bug 域修复前风险分级、测试域风险分层明确结论。全量测试 396 项通过（1 项跳过），修复三处既有测试基线（文档校验 fixture、配置互斥口径、credential-policy 镜像豁免），七份工程文档 profile 校验 PASS，字典 seed_total 35，知识库沉淀 1 篇并双向关联。改动停在已改动未提交状态。
 
