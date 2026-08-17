@@ -44,6 +44,8 @@ allowed-tools: Bash,Read,Glob,Grep
 | `TAPD_NPC_ROLE` | NPC 登录名（写评论时作为 `author`） |
 | `TAPD_USER_NAME` | 触发用户名 |
 | `TAPD_CONTEXT` | 上下文链接/描述（若有） |
+| `BOT_URL` | 企业微信群机器人 webhook（可选，仅发送群消息时） |
+| `CURRENT_USER_NICK` | 当前用户昵称（可选，用于待办/工时等查询） |
 
 ## 调用方式
 
@@ -72,7 +74,7 @@ cat ./references/{模块}/{文件名}.md
 
 ## 关键规则
 
-1. **优先 python3**（标准库 + requests）；禁止含 `#` 注释的多行 shell 赋值脚本
+1. **优先 python3**（标准库 + requests）；禁止含 `#` 注释的多行 shell 赋值脚本；`tapd_client_stdlib.py`（纯标准库零依赖）可直接调 `projects/stories/bugs/iterations/releases/get/post` 子命令
 2. **评论必须 HTML**：`description` 用 `<p>内容</p>` 格式，Markdown 不会渲染；GET `/comments` 是查询，POST 是写入，**不可混用**
 3. **写评论带齐参数**（高频操作，直接复制使用）：
 ```bash
@@ -89,6 +91,10 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
 
 4. **生成文件必须上传**：`POST /files/upload_attachment`，用户无法访问本地文件系统
 5. **实体链接**：`$TAPD_SITE_URL/tapd_fe/{项目ID}/{module}/{action}/{ID}`（需求→story/detail、缺陷→bug/detail、任务→task/detail、迭代→iteration/card）
+6. **短 ID 转长 ID**：stories/tasks/bugs 的 id、comments 的 entry_id、`get_scm_copy_keywords` 的 object_id 等，调用前必须先转长 ID（云前缀 `11`、私有化前缀 `10`，格式 `{prefix}{workspace_id}{id.zfill(9)}`），详见 `references/id-conversion.md`
+7. **请求标记**：TAPD 请求在 URL 追加 `?s=mcp`（已有 query 用 `&s=mcp`），Header 加 `Via: mcp`，与本地 Bearer 认证兼容
+8. **认证二选一**：默认 `Authorization: Bearer $TAPD_TOKEN`；无 Token 时才用 Basic（`TAPD_API_USER` + `TAPD_API_PASSWORD` 的 base64），详见 `references/id-conversion.md`
+9. **自定义字段前置**：使用 `custom_field_*` 前必须先调对应实体的 `custom_fields_settings` 获取配置；任务状态仅 open/progressing/done，需求状态走工作流接口
 
 ## 失败处理
 
@@ -276,6 +282,34 @@ python3 ./scripts/search_wiki.py search 关键词   # 搜索（多词取交集�
 |------|------|------|------|
 | GET | `/users/info` | 获取当前用户信息 | `users/getuserinfo.md` |
 | GET | `/open_user_app/workspace_list` | 获取可访问的项目列表 | `users/listworkspaces.md` |
+| GET | `/users/todo/{user_nick}/{entity_type}` | 获取用户待办（story/bug/task） | `todo.md` |
+
+### 十一、workflows（工作流）
+
+| 方法 | 路径 | 功能 | 文档 |
+|------|------|------|------|
+| GET | `/workflows/all_transitions` | 工作流流转规则 | `workflows.md` |
+| GET | `/workflows/status_map` | 状态中英文映射 | `workflows.md` |
+| GET | `/workflows/last_steps` | 工作流结束状态 | `workflows.md` |
+| GET | `/workitem_types` | 工作项类型列表 | `workflows.md` |
+
+### 十二、releases（发布计划）
+
+| 方法 | 路径 | 功能 | 文档 |
+|------|------|------|------|
+| GET | `/releases` | 查询发布计划列表 | `releases.md` |
+
+### 十三、svn_commits（SCM 提交关键字）
+
+| 方法 | 路径 | 功能 | 文档 |
+|------|------|------|------|
+| GET | `/svn_commits/get_scm_copy_keywords` | 获取提交关键字（object_id 需长 ID） | `scm-keywords.md` |
+
+### 十四、企业微信通知（非 TAPD API）
+
+| 方法 | 路径 | 功能 | 文档 |
+|------|------|------|------|
+| POST | `${BOT_URL}` | 发送企业微信群消息（msgtype: markdown/markdown_v2） | `wecom-notify.md` |
 
 ---
 
@@ -286,3 +320,4 @@ python3 ./scripts/search_wiki.py search 关键词   # 搜索（多词取交集�
 | `references/tcases/scripts/parse_xmind_tcases.py` | XMind → 测试用例 JSON |
 | `references/tcases/scripts/parse_excel_tcases.py` | Excel → 测试用例 JSON |
 | `scripts/search_wiki.py` | Wiki 全文搜索 |
+| `scripts/tapd_client_stdlib.py` | 纯标准库 TAPD 客户端（projects/stories/bugs/iterations/releases/get/post，吸收自外部） |
