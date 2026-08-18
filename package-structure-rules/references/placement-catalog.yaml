@@ -183,10 +183,11 @@
       "project_kind": "backend",
       "artifact_kind": "router",
       "content_type": "source_code",
-      "canonical_path": "<source-root>/router",
-      "purpose": "后端路由注册、分组与入口装配",
+      "canonical_path": "<source-root>/<domain>/router/<v?>",
+      "purpose": "路由装配目录；版本目录内承载随版本变化的路由注册、分组与入口装配，包名用 v?router 别名引用",
       "creation_policy": "conditional",
       "tracked": true,
+      "requires_domain": true,
       "allowed_extensions": [
         ".go",
         ".java",
@@ -202,10 +203,11 @@
       "project_kind": "backend",
       "artifact_kind": "controller",
       "content_type": "source_code",
-      "canonical_path": "<source-root>/controller",
-      "purpose": "输入转换、业务调用与响应映射",
+      "canonical_path": "<source-root>/<domain>/controller/<v?>",
+      "purpose": "输入与响应映射目录；版本目录内承载随版本变化的输入转换、业务调用与响应映射，包名用 v?controller 别名引用",
       "creation_policy": "conditional",
       "tracked": true,
+      "requires_domain": true,
       "allowed_extensions": [
         ".go",
         ".java",
@@ -215,6 +217,46 @@
       ],
       "owner_skill": "package-structure-rules",
       "search_entry": "controller"
+    },
+    {
+      "id": "backend.entity",
+      "project_kind": "backend",
+      "artifact_kind": "entity",
+      "content_type": "source_code",
+      "canonical_path": "<source-root>/<domain>/entity/<v?>",
+      "purpose": "领域实体目录；版本目录内承载随版本变化的领域实体定义，包名用 v?entity 别名引用",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "requires_domain": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "entity"
+    },
+    {
+      "id": "backend.service",
+      "project_kind": "backend",
+      "artifact_kind": "service",
+      "content_type": "source_code",
+      "canonical_path": "<source-root>/<domain>/service/<v?>",
+      "purpose": "业务流程目录；版本目录内承载随版本变化的业务流程编排，包名用 v?service 别名引用",
+      "creation_policy": "required",
+      "tracked": true,
+      "requires_domain": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "service"
     },
     {
       "id": "backend.common.request",
@@ -1207,26 +1249,6 @@
       "flat_files": true,
       "owner_skill": "package-structure-rules",
       "search_entry": "common/util"
-    },
-    {
-      "id": "backend.business-rpc",
-      "project_kind": "backend",
-      "artifact_kind": "business-rpc",
-      "content_type": "source_code",
-      "canonical_path": "<source-root>/business/<domain>/rpc",
-      "purpose": "供其他微业务调用的 JSON 字符串公开通信函数",
-      "creation_policy": "conditional",
-      "tracked": true,
-      "allowed_extensions": [
-        ".go",
-        ".java",
-        ".ts",
-        ".js",
-        ".py"
-      ],
-      "requires_domain": true,
-      "flat_files": true,
-      "owner_skill": "package-structure-rules"
     },
     {
       "id": "frontend.test",

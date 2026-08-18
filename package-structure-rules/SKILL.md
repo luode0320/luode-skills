@@ -25,12 +25,12 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 3. 前后端同仓、独立后端、独立前端的项目根均固定提交 `Dockerfile`、`AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在确有长期风格时创建并提交。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取；目录规则只负责其位置、初始化、查询和只读一致性检查，具体正文结构由项目规则、项目记忆与项目风格 Owner 管理。
 4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`、`util/`、`dto/`、`page/`、`msg/`；`common/util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录，不承载业务流程。`common/msg/` 只存放国际化消息码定义、语言解析与消息渲染源码，多语言文案数据文件仍唯一落在 `resources/i18n/`。
-6. 后端语言源码根的统一规范目录是 `router/`、`controller/`、`business/<domain>/`；未列出且不在禁止清单的其他目录允许存在，新增须用户确认，且不得作为规范目录的别名。项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域内部统一规范目录为 `api/`、`service/`、`entity/`、`base/`、`constant/`、`init/`、`crontask/`、`util/`、`rpc/`；其中 `rpc/` 是其他微业务唯一可导入的 JSON 字符串公开通信入口，业务域 `util/` 保留为域私有辅助能力。业务域内未列出的其他目录允许存在，新增须用户确认。业务域内除 `rpc/` 外的**任何**目录（含扩展目录）都是私有层。
+6. 后端语言源码根直连业务域 `<domain>/`，业务相关逻辑通过 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录完全隔离，其余为跨版本通用业务逻辑；未列出且不在禁止清单的其他目录允许存在，新增须用户确认，且不得作为规范目录的别名。项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域级通用目录为 `api/`、`base/`、`constant/`、`util/` 与单文件 `init.<ext>`（域初始化入口，全量注册本域所有版本路由）；版本化目录各自内嵌 `<v?>/`（版本从 `v1` 递增），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用。业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外），跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。业务域内未列出的其他目录允许存在，新增须用户确认。
 7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、业务源码内独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`；仓库根 `test/` 是唯一活动测试代码根，不属于生产包结构。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。
 10. 二进制入口按项目类型固定：独立后端默认使用根 `main.<ext>`，额外二进制使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端默认使用 `backend/main.<ext>`，额外二进制使用 `backend/cmd/<binary>/main.<ext>`。`cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 均不是合法入口；`init` 不创建动态入口 pattern。
-11. 目录树是规范集合，不是白名单穷举：`<source-root>/`、`business/<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录，新增须用户明确确认，并满足扩展目录准入四条（见 `project-layout-v2.md` 统一规范目录与扩展目录节）。`forbidden_paths`、`allowed_children` 已声明父目录、`rpc/` 扁平约束和跨域导入边界四项继续硬性禁止。
+11. 目录树是规范集合，不是白名单穷举：`<source-root>/`、`<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录，新增须用户明确确认，并满足扩展目录准入四条（见 `project-layout-v2.md` 统一规范目录与扩展目录节）。`forbidden_paths`、`allowed_children` 已声明父目录和跨域导入边界继续硬性禁止。
 
 ## 使用方式
 
@@ -40,7 +40,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 python package-structure-rules/scripts/placement_catalog.py query --artifact utils --category discovery --technology polaris
 python package-structure-rules/scripts/placement_catalog.py query --artifact utils --category ip
 python package-structure-rules/scripts/placement_catalog.py query --artifact common-util
-python package-structure-rules/scripts/placement_catalog.py query --artifact business-rpc
+python package-structure-rules/scripts/placement_catalog.py query --artifact router
 python package-structure-rules/scripts/placement_catalog.py query --artifact project-governance --category agents
 python package-structure-rules/scripts/placement_catalog.py query --project-kind frontend --artifact project-governance --category claude
 python package-structure-rules/scripts/placement_catalog.py query --artifact database-migration --category field --operation create
@@ -67,9 +67,9 @@ python package-structure-rules/scripts/placement_catalog.py guide --category all
 
 guide 返回结构化 JSON，包含目录、用途、owner_skill、related_skills、usage_recipes、package_alias 和 example_scope。category 支持别名映射：json -> serialization、log -> logging、convert/conversion、message/mq、scheduler/cron。
 
-`check` 始终只读；后端 `strict` 必须同时传入 `--project-kind backend` 与 `--language`，以校验 `common/util/` 和业务 RPC 的语言扩展名。strict 必须拒绝三类项目根缺失 `Dockerfile`，当 `AGENTS.md` 与 `CLAUDE.md` 同时存在时还必须拒绝正文不一致；旧项目的 `adoption` 不因缺失 Dockerfile 或治理文件而自动迁移。`init` 创建必需目录和必需根文件，并仅在 `--enable backend.root.project-style` 时创建条件 `PROJECT_STYLE.md`；它不移动、不删除、不重命名用户文件，也不代替对应 Owner 填充文件正文。
+`check` 始终只读；后端 `strict` 必须同时传入 `--project-kind backend` 与 `--language`，以校验 `common/util/` 的语言扩展名。strict 必须拒绝三类项目根缺失 `Dockerfile`，当 `AGENTS.md` 与 `CLAUDE.md` 同时存在时还必须拒绝正文不一致；旧项目的 `adoption` 不因缺失 Dockerfile 或治理文件而自动迁移。`init` 创建必需目录和必需根文件，并仅在 `--enable backend.root.project-style` 时创建条件 `PROJECT_STYLE.md`；它不移动、不删除、不重命名用户文件，也不代替对应 Owner 填充文件正文。
 
-创建业务域 `rpc/` 时，`init` 必须显式传入 `--enable backend.business-rpc --domain <domain> --language <language>`；Java 另传 `--base-package <base-package>`。调用方只可导入目标域 `rpc/` 的公开函数，参数和返回值均为 JSON 字符串；返回值遵循根 `common/response.Response` 的 `code`、`status`、`message`、`data` 语义。
+创建版本化目录内的 `router/<v?>/`、`controller/<v?>/` 时，`init` 必须显式传入 `--enable backend.router --domain <domain> --language <language>`（Java 另传 `--base-package <base-package>`）；版本占位符 `<v?>` 默认解析为 `v1`，新增版本由 `micro-business-architecture-rules` 的 scaffold 递增。
 
 二进制入口是人工实现的动态 pattern，不属于 `init` 可创建的静态骨架。查询只返回 pattern 事实；显式启用任一 `binary-entrypoint` 条目必须失败关闭，不得创建 `main.<ext>`、`<binary>` 或其它占位路径。
 

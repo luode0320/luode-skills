@@ -196,24 +196,6 @@
           {
             "if": {
               "properties": {
-                "artifact_kind": {
-                  "const": "business-rpc"
-                }
-              },
-              "required": [
-                "artifact_kind"
-              ]
-            },
-            "then": {
-              "required": [
-                "requires_domain",
-                "flat_files"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
                 "node_kind": {
                   "const": "pattern"
                 }

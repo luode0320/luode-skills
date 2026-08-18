@@ -249,7 +249,7 @@ def normalized_base_package(base_package: str | None) -> str | None:
 
     [参数] base_package：点号或斜杠分隔的 Java 基础包名。
     [返回] str | None：合法时返回斜杠分隔路径，否则返回 None。
-    最近修改时间: 2026-07-28 23:55:00 为业务域 RPC 初始化解析 Java 源码根。
+    最近修改时间: 2026-07-28 23:55:00 为业务域版本目录 init 解析 Java 源码根。
     """
     if base_package is None:
         return None
@@ -265,7 +265,7 @@ def source_root_for_init(language: str | None, base_package: str | None) -> str 
 
     [参数] language：后端语言；base_package：Java 基础包名。
     [返回] str | None：可解析的源码根，缺失必需上下文时返回 None。
-    最近修改时间: 2026-07-28 23:55:00 为业务域 RPC 初始化补齐四语言物理路径。
+    最近修改时间: 2026-07-28 23:55:00 为业务域版本目录 init 补齐四语言物理路径。
     """
     if language == "java":
         normalized = normalized_base_package(base_package)
@@ -278,17 +278,17 @@ def valid_domain(domain: str | None) -> bool:
 
     [参数] domain：调用方传入的业务域名称。
     [返回] bool：名称可安全用于单个目录片段时返回真。
-    最近修改时间: 2026-07-28 23:55:00 新增业务域 RPC 初始化的目录名保护。
+    最近修改时间: 2026-07-28 23:55:00 新增业务域版本目录 init 的目录名保护。
     """
     return domain is not None and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", domain) is not None
 
 
 def expand_init_path(canonical_path: str, args: argparse.Namespace) -> str | None:
-    """将带源码根和业务域占位符的 Catalog 路径解析为真实目录。
+    """将带源码根、业务域和版本占位符的 Catalog 路径解析为真实目录。
 
     [参数] canonical_path：Catalog 规范路径；args：init 参数。
     [返回] str | None：完整上下文下的可创建路径，否则返回 None。
-    最近修改时间: 2026-07-28 23:55:00 支持业务域 RPC 的显式初始化。
+    最近修改时间: 2026-08-18 14:41:00 版本目录占位符默认解析为 v1，router/controller 下沉到版本目录。
     """
     expanded = canonical_path
     if "<source-root>" in expanded:
@@ -300,6 +300,9 @@ def expand_init_path(canonical_path: str, args: argparse.Namespace) -> str | Non
         if not valid_domain(args.domain):
             return None
         expanded = expanded.replace("<domain>", args.domain)
+    # 1. 版本目录占位符默认创建首个版本 v1，新增版本由 micro-business 的 scaffold 递增。
+    if "<v?>" in expanded:
+        expanded = expanded.replace("<v?>", "v1")
     return expanded
 
 
@@ -333,7 +336,7 @@ def command_init(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             expanded = expand_init_path(entry["canonical_path"], args)
             if expanded is None:
                 if entry.get("requires_domain"):
-                    argument_errors.append("backend.business-rpc 初始化必须提供合法的 --domain、--language；Java 另需 --base-package")
+                    argument_errors.append(f"{entry['id']} 初始化必须提供合法的 --domain、--language；Java 另需 --base-package")
                 else:
                     argument_errors.append(f"无法解析启用路径: {entry['id']}")
                 continue
@@ -374,11 +377,11 @@ def deprecated_source_util_root(relative: str, language: str) -> str | None:
         return "src/util"
     if language == "python" and len(parts) >= 3 and parts[0] == "src" and parts[2] == "util":
         return "/".join(parts[:3])
-    # 2. Java 基础包允许多段路径，但业务域 util 不属于源码根 util。
-    if language == "java" and parts[:3] == ["src", "main", "java"]:
-        for index, part in enumerate(parts[3:], start=3):
-            if part == "util" and not any(segment in {"router", "controller", "business"} for segment in parts[3:index]):
-                return "/".join(parts[:index + 1])
+    # 2. Java 源码根为 src/main/java/<base_package>；业务域直连源码根后，源码根 util 不再能借
+    #    router/controller/business 关键词与业务域 util 区分。缺少 --base-package 时无法判定基础包
+    #    深度，故仅保守识别 util 紧邻 src/main/java 之后的明确废弃位置，避免误伤业务域 util。
+    if language == "java" and parts == ["src", "main", "java", "util"]:
+        return "src/main/java/util"
     return None
 
 
@@ -419,48 +422,6 @@ def check_deprecated_source_util_path(relative: str, is_file: bool, language: st
     if root is None:
         return []
     return [f"源码根 util 已废弃，请迁移到 common/util: {relative}"]
-
-def business_rpc_root(relative: str, language: str) -> str | None:
-    """识别当前语言源码根下某个业务域的 rpc 目录。
-
-    [参数] relative：项目相对路径；language：后端语言。
-    [返回] str | None：命中时返回业务域 rpc 根，未命中时返回 None。
-    最近修改时间: 2026-07-28 23:55:00 新增跨微业务 RPC 目录识别。
-    """
-    parts = relative.split("/")
-    # 1. 先按固定源码根识别 Go、Node.js 与 Python 的业务域 rpc。
-    if language == "go" and len(parts) >= 4 and parts[:2] == ["internal", "business"] and parts[3] == "rpc":
-        return "/".join(parts[:4])
-    if language == "node" and len(parts) >= 4 and parts[:2] == ["src", "business"] and parts[3] == "rpc":
-        return "/".join(parts[:4])
-    if language == "python" and len(parts) >= 5 and parts[0] == "src" and parts[2] == "business" and parts[4] == "rpc":
-        return "/".join(parts[:5])
-    # 2. Java 的基础包深度不固定，定位 `business/<domain>/rpc` 作为源码根后的尾部结构。
-    if language == "java" and parts[:3] == ["src", "main", "java"]:
-        for index, part in enumerate(parts[3:], start=3):
-            if part == "business" and len(parts) > index + 2 and parts[index + 2] == "rpc":
-                return "/".join(parts[:index + 3])
-    return None
-
-
-def check_business_rpc_path(relative: str, is_file: bool, language: str) -> list[str]:
-    """校验业务域 rpc 只直接存放当前语言的公开函数文件。
-
-    [参数] relative：项目相对路径；is_file：当前路径是否为文件；language：后端语言。
-    [返回] list[str]：不符合扁平 JSON RPC 入口规则的错误列表。
-    最近修改时间: 2026-07-28 23:55:00 新增业务域 RPC 的扁平文件边界。
-    """
-    root = business_rpc_root(relative, language)
-    if root is None or relative == root:
-        return []
-    child = relative[len(root) + 1:]
-    # 1. RPC 目录是公开函数入口，禁止继续按技术或操作创建子目录。
-    if "/" in child or not is_file:
-        return [f"业务域 rpc 禁止子目录: {relative}"]
-    if Path(relative).suffix.lower() not in COMMON_UTIL_EXTENSIONS[language]:
-        return [f"业务域 rpc 仅允许 {language} 代码文件: {relative}"]
-    return []
-
 
 def entrypoint_extensions(language: str | None) -> set[str]:
     """返回当前检查上下文允许的二进制入口扩展名。
@@ -804,7 +765,6 @@ def check_path(
         errors.extend(check_common_util_path(relative, is_file, project_kind, language))
     if project_kind == "backend" and language is not None:
         errors.extend(check_deprecated_source_util_path(relative, is_file, language))
-        errors.extend(check_business_rpc_path(relative, is_file, language))
     # 3. 配置与二进制入口属于本轮新增边界，集中追加专用校验并保持原有错误顺序。
     errors.extend(check_environment_config_path(catalog, relative, is_file, project_kind, language))
     errors.extend(check_binary_entrypoint_path(relative, is_file, project_kind, language))

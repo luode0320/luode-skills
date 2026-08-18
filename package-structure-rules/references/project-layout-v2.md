@@ -5,14 +5,14 @@
 ## 统一规范目录与扩展目录
 
 1. **规范目录的含义**：目录树列出的目录名称、职责与落点是统一规范。凡命中这些语义的代码必须落到对应规范目录，不得新建同义别名目录（如 `svc/`、`ctrl/`、`handler/`、`biz/`、`dao/`）绕开规范。
-2. **目录树是规范集合，不是白名单穷举**：`<source-root>/`、`business/<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录；存量规范外目录不判违规，也不强制迁移。
+2. **目录树是规范集合，不是白名单穷举**：`<source-root>/`、`<domain>/`、后端项目根、前端 `src/`、`src/modules/<domain>/` 允许存在规范外目录；存量规范外目录不判违规，也不强制迁移。
 3. **新增规范外目录的确认闸门（强制）**：agent 新增任何不属于目录树规范的目录前，必须先向用户说明目录名、职责、为什么无法落到规范目录，并取得**当前轮显式同意**；未取得同意时只能落到规范目录或停下来询问，不得以"看起来更合理""顺手建一个"为由自行创建。
 4. **扩展目录准入四条**（同意后仍须全部满足）：
    - 不落在 `forbidden_paths`（根 `data/`、`schema/`、`protocol/`、源码根 `util/`、`infrastructure/` 等）；
    - 不位于 `allowed_children` 已声明父目录下（`config/`、`database/model/`、`database/sql/`、`common/`、`scripts/`、`deploy/`、`integration/`、`utils/discovery/` 的子目录集合仍封闭）；
    - 不与任何规范目录职责重复，也不是规范目录的同义别名；
    - 创建后按 `architecture-doc-rules` 更新 `doc/1-架构/2-目录树.md`。
-5. **扩展目录不获得引用特权**：跨业务域导入仍只允许目标域 `rpc/`；业务域内除 `rpc/` 外的**任何**目录（含扩展目录）都是私有层。
+5. **扩展目录不获得引用特权**：业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外）；跨域共享结构仅走根 `common/`（request/response/constant/error/validation）与 `global/` 非业务运行引用。
 6. **Catalog 边界**：`placement_catalog.py query` 只对规范目录返回唯一位置；扩展目录不进入 Catalog、不由 `init` 创建、`check` 也不为其背书。
 
 ## 旧项目渐进采纳
@@ -240,19 +240,20 @@
 │   ├── compression/                         # [条件·提交] 压缩
 │   └── security-headers/                    # [条件·提交] 安全响应头
 ├── <source-root>/                           # [必需·提交] 当前语言唯一源码根
-│   ├── router/                              # [条件·提交] 路由装配
-│   ├── controller/                          # [条件·提交] 输入与响应映射
-│   └── business/                            # [必需·提交] 业务域根
-│       └── <domain>/                        # [必需·提交] 单业务域
-│           ├── api/                         # [条件·提交] 域内 API 调用
-│           ├── service/                     # [必需·提交] 业务流程
-│           ├── entity/                      # [条件·提交] 领域实体
-│           ├── base/                        # [条件·提交] 业务基础结构
-│           ├── constant/                    # [条件·提交] 域常量
-│           ├── init/                        # [条件·提交] 域初始化
-│           ├── crontask/                    # [条件·提交] 域定时任务实现
-│           ├── util/                        # [条件·提交] 域私有辅助；不属于根 utils/ 或 common/util/
-│           └── rpc/                         # [条件·提交] 对其他微业务公开的 JSON 字符串通信函数；代码文件直接落盘，禁止子目录
+│   └── <domain>/                            # [必需·提交] 单业务域；业务相关逻辑完全通过各版本目录 <v?> 隔离，其余为跨版本通用业务逻辑
+│       ├── init.<ext>                       # [条件·提交] 域初始化入口文件；全量注册本域所有版本路由，/v1、/v2 前缀区分
+│       ├── api/                             # [条件·提交] 域内 API 调用
+│       ├── base/                            # [条件·提交] 业务基础结构
+│       ├── constant/                        # [条件·提交] 域常量
+│       ├── util/                            # [条件·提交] 域私有辅助；不属于根 utils/ 或 common/util/
+│       ├── router/                          # [条件·提交] 路由装配目录；版本目录承载随版本变化的路由注册
+│       │   └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?router 别名引用
+│       ├── controller/                      # [条件·提交] 输入与响应映射目录；版本目录承载随版本变化的转换逻辑
+│       │   └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?controller 别名引用
+│       ├── entity/                          # [条件·提交] 领域实体目录；不同版本的实体会变化
+│       │   └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?entity 别名引用
+│       └── service/                         # [必需·提交] 业务流程目录；版本目录承载随版本变化的业务流程
+│           └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?service 别名引用
 ├── scripts/                                 # [条件·提交] 工程脚本
 │   ├── dev/                                 # [条件·提交] 本地开发脚本
 │   └── build/                               # [条件·提交] 构建脚本
@@ -294,7 +295,7 @@
 └── README.md                                # [必需·提交] 项目入口
 ```
 
-源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。
+源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。业务域直连源码根，业务相关逻辑在各版本目录 `<v?>` 隔离；域级入口为单文件 `init.<ext>`（`<ext>` 为当前语言扩展名，如 Go 的 `init.go`），全量注册本域各版本路由，`/v1`、`/v2` 前缀区分，多版本并存对外。版本目录挂在 `router/`、`controller/`、`entity/`、`service/` 各自之下（`router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/`），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用区分版本。
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
@@ -304,7 +305,7 @@
 
 三类项目的活动测试程序、fixture、helper 和测试启动脚本统一放在项目根 `test/`，按被测源码目录镜像；`doc/5-tests/` 只保存说明与证据。前后端同仓不建立 `backend/test/` 或 `frontend/test/`，独立后端也不建立 `backend/test/`。
 
-`<source-root>/`、`business/<domain>/` 和后端项目根未在目录树中列出的其他目录按「统一规范目录与扩展目录」规则处理（见上节）。
+`<source-root>/`、`<domain>/`、`<v?>/` 和后端项目根未在目录树中列出的其他目录按「统一规范目录与扩展目录」规则处理（见上节）。
 
 ## 前端独立项目
 
