@@ -3,12 +3,13 @@
 """微业务架构脚手架与隔离校验脚本。
 
 子命令:
-  scaffold <业务名>  新建一个业务目录包骨架并套用统一 README 模板(幂等)
-  check              校验业务包之间是否存在非法横向 import(跨业务直连)
+  scaffold <业务名>  新建业务域骨架(域级通用目录 + entity/router/controller/service 各自内嵌 <v?>/ 版本化目录 + init.go)并套用 README 模板(幂等)
+  check              校验业务域之间是否存在非法横向 import(跨业务域直连)
+  check --detect-new 候选新项目机器判定(无业务域且无标记 / 已有标记 / 有业务域无标记)
 
 退出码: 0 表示通过, 非 0 表示存在违规或执行错误。
 仅使用 Python 标准库, 无第三方依赖; 所有文件读写显式 UTF-8。
-最近修改时间: 2026-07-28
+最近修改时间: 2026-08-18
 """
 import argparse
 import re
@@ -26,11 +27,15 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 README_TEMPLATE = SKILL_DIR / "templates" / "business-readme-template.md"
 
-# 业务包内默认子目录(分层落点沿用 package-structure-rules, 此处仅建目录占位)
-DEFAULT_SUBDIRS = ["api", "service", "entity", "base", "constant", "init", "crontask", "util"]
+# 业务域直连源码根(Go 下为 internal/)；域级通用目录跨版本共享，版本化目录各自内嵌 <v?>/
+DOMAIN_LEVEL_DIRS = ["api", "base", "constant", "util"]
+VERSIONABLE_DIRS = ["entity", "router", "controller", "service"]
+DEFAULT_VERSION = "v1"
+# 域初始化入口为单文件(Go 落地为 init.go)，不再建立 init/ 目录
+INIT_FILENAME = "init.go"
 
-# 匹配 import 路径中的业务包路径段: .../business/<名字>
-BUSINESS_IMPORT_RE = re.compile(r'(?:^|/)business/([A-Za-z0-9_]+)')
+# 匹配 import 路径中的业务域路径段: .../internal/<名字>（Go 源码根直连业务域）
+BUSINESS_IMPORT_RE = re.compile(r'(?:^|/)internal/([A-Za-z0-9_]+)')
 
 
 def log(message):
@@ -44,15 +49,15 @@ def log(message):
 
 
 def list_business_packages(business_root):
-    """列出业务根目录下的业务包名集合。
+    """列出源码根目录下的业务域名集合。
 
-    [参数] business_root: 业务根目录 Path(如 <root>/internal/business)
-    [返回] 业务包名列表(一级子目录名, 不含 README.md 等文件)
-    最近修改时间: 2026-07-13
+    [参数] business_root: 源码根目录 Path(如 <root>/internal)
+    [返回] 业务域名列表(一级子目录名, 不含 README.md 等文件)
+    最近修改时间: 2026-08-18 14:41:00 业务域直连源码根，不再经 business 中间层。
     """
     if not business_root.is_dir():
         return []
-    # 只取一级子目录作为业务包, 忽略 README.md 等散文件
+    # 只取一级子目录作为业务域, 忽略 README.md 等散文件
     names = [child.name for child in sorted(business_root.iterdir()) if child.is_dir()]
     return names
 
@@ -74,39 +79,25 @@ def extract_import_paths(go_source):
     return paths
 
 
-def is_allowed_rpc_import(import_path, target_business):
-    """判断跨业务导入是否精确落在目标业务的 rpc 公开入口。
-
-    [参数] import_path：Go import 字符串；target_business：被调用业务包名。
-    [返回] bool：仅导入 `business/<target>/rpc` 时返回真。
-    最近修改时间: 2026-07-28 23:55:00 将跨业务白名单收敛为 JSON RPC 入口。
-    """
-    match = BUSINESS_IMPORT_RE.search(import_path)
-    if match is None or match.group(1) != target_business:
-        return False
-    # 1. 仅精确匹配 rpc 根，禁止进一步导入 rpc 子目录或任何私有层。
-    return import_path[match.end():].strip("/") == "rpc"
-
-
 def check_isolation(root, business_dir):
-    """校验跨业务导入只通过目标域的 rpc 公开入口发生。
+    """校验业务域之间禁止任何直接 import（无 rpc 例外）。
 
     [参数] root: 项目根目录 Path
-    [参数] business_dir: 业务根相对路径(默认 internal/business)
-    [返回] 违规记录列表, 每项为 (业务包, 文件, 违规import, 被直连业务)
-    最近修改时间: 2026-07-28 23:55:00 将跨业务白名单收敛为精确 rpc 导入。
+    [参数] business_dir: 源码根相对路径(默认 internal，业务域直连其下)
+    [返回] 违规记录列表, 每项为 (业务域, 文件, 违规import, 被直连业务域)
+    最近修改时间: 2026-08-18 14:41:00 跨域导入改为完全禁止直连，无 rpc 白名单例外。
     """
-    business_root = root / business_dir
-    packages = list_business_packages(business_root)
+    source_root = root / business_dir
+    packages = list_business_packages(source_root)
     if not packages:
-        log(f"未发现业务包目录: {business_root}")
+        log(f"未发现业务域目录: {source_root}")
         return []
     package_set = set(packages)
-    log(f"发现业务包: {', '.join(packages)}")
+    log(f"发现业务域: {', '.join(packages)}")
     violations = []
-    # 逐个业务包扫描其 .go 文件的 import
+    # 逐个业务域扫描其 .go 文件的 import
     for pkg in packages:
-        pkg_dir = business_root / pkg
+        pkg_dir = source_root / pkg
         for go_file in sorted(pkg_dir.rglob("*.go")):
             text = go_file.read_text(encoding="utf-8")
             for imp in extract_import_paths(text):
@@ -114,84 +105,137 @@ def check_isolation(root, business_dir):
                 if not match:
                     continue
                 other = match.group(1)
-                # 只有目标业务的 rpc 根是跨域公开入口，其余任何路径均为私有实现。
-                if other in package_set and other != pkg and not is_allowed_rpc_import(imp, other):
+                # 业务域之间禁止直连：任何 import 其他业务域的路径均为违规。
+                if other in package_set and other != pkg:
                     violations.append((pkg, str(go_file), imp, other))
     return violations
+
+
+def has_marker(root):
+    """判断目标项目是否已写入微业务标记。
+
+    [参数] root: 项目根目录 Path
+    [返回] True 当 CLAUDE.md/AGENTS.md 存在「微业务架构约束」章节或 项目设计.md 存在业务域索引段
+    最近修改时间: 2026-08-18 供 --detect-new 判定与触发口径保持一致。
+    """
+    for rule_file in ["CLAUDE.md", "AGENTS.md"]:
+        target = root / rule_file
+        if target.is_file() and f"## {MARKER_SECTION_HEADER}" in target.read_text(encoding="utf-8"):
+            return True
+    design = root / "项目设计.md"
+    if design.is_file() and f"## {DESIGN_SECTION_HEADER}" in design.read_text(encoding="utf-8"):
+        return True
+    return False
+
+
+def detect_new_project(root, business_dir):
+    """机器判定当前仓库是否为「候选新项目」。
+
+    [参数] root: 项目根目录 Path
+    [参数] business_dir: 源码根相对路径(默认 internal)
+    [返回] (判定结果, 业务域列表)；判定结果取值:
+        candidate_new  无业务域且无标记(含初始化阶段) -> 建议采用
+        guard          已有标记 -> 进入守护模式
+        skip           有业务域但无标记 -> 不引导
+    最近修改时间: 2026-08-18 补上 trigger-and-marker.md 早已引用但脚本缺失的 --detect-new 机器判定。
+    """
+    source_root = root / business_dir
+    packages = list_business_packages(source_root)
+    if has_marker(root):
+        return "guard", packages
+    if not packages:
+        return "candidate_new", packages
+    return "skip", packages
 
 
 def render_readme(business_name):
     """读取统一 README 模板并填入业务名。
 
-    [参数] business_name: 业务包名
+    [参数] business_name: 业务域名
     [返回] 渲染后的 README 文本; 模板缺失时返回最小骨架
-    最近修改时间: 2026-07-28 23:55:00 业务 README 模板已改为记录 JSON RPC 边界。
+    最近修改时间: 2026-08-18 业务 README 模板已改为记录版本化目录结构。
     """
     if README_TEMPLATE.is_file():
         text = README_TEMPLATE.read_text(encoding="utf-8")
         # 只替换业务名占位, 其余占位符保留供人工填空
         return text.replace("<业务名>", business_name)
     # 模板缺失时的最小兜底骨架
-    return f"# {business_name} 业务包\n\n<按 micro-business md 规范补全>\n"
+    return f"# {business_name} 业务域\n\n<按 micro-business md 规范补全>\n"
 
 
 def cmd_check(args):
-    """check 子命令: 校验业务包间是否存在非法横向 import。
+    """check 子命令: 校验业务域间是否存在非法横向 import；--detect-new 时改为候选新项目判定。
 
-    [参数] args: argparse 解析结果(含 root, business_dir)
-    [返回] 退出码 0(通过) / 1(存在违规)
-    最近修改时间: 2026-07-28 23:55:00 输出目标业务 rpc 的确定性修复路径。
+    [参数] args: argparse 解析结果(含 root, business_dir, detect_new)
+    [返回] 退出码 0(通过/判定完成) / 1(存在违规)
+    最近修改时间: 2026-08-18 14:41:00 输出业务域禁止直连的确定性修复路径；新增 --detect-new 判定分支。
     """
     root = Path(args.root).resolve()
+    if args.detect_new:
+        result, packages = detect_new_project(root, args.business_dir)
+        log(f"候选新项目判定: root={root}, business_dir={args.business_dir} -> {result}")
+        if result == "candidate_new":
+            log("结论: 候选新项目(无业务域且无标记, 或处于初始化阶段), 建议先向用户说明微业务架构收益并征得确认")
+        elif result == "guard":
+            log("结论: 已有微业务标记, 进入守护模式(改动后 check 校验跨域隔离)")
+        else:
+            log(f"结论: 存在业务域但无标记({', '.join(packages)}), 不引导也不写标记")
+        return 0
     log(f"开始隔离校验: root={root}, business_dir={args.business_dir}")
     violations = check_isolation(root, args.business_dir)
     if violations:
-        log(f"发现 {len(violations)} 处跨业务非法 import(仅允许导入目标业务 rpc):")
+        log(f"发现 {len(violations)} 处跨业务域非法 import(业务域之间禁止直连):")
         for pkg, go_file, imp, other in violations:
-            log(f'  [违规] 业务包 {pkg} -> {other}: {go_file} 中 import "{imp}"')
-        log("修复: 跨业务调用改走 business/<被调用业务>/rpc 的 JSON 字符串公开函数(见 references/isolation-and-communication.md)")
+            log(f'  [违规] 业务域 {pkg} -> {other}: {go_file} 中 import "{imp}"')
+        log("修复: 跨业务域共享结构仅走根 common/ 与 global/ 非业务运行引用(见 references/isolation-and-communication.md)")
         return 1
-    log("隔离校验通过: 未发现跨业务非法 import")
+    log("隔离校验通过: 未发现跨业务域非法 import")
     return 0
 
 
 def cmd_scaffold(args):
-    """scaffold 子命令: 新建业务包骨架并套用 README 模板(幂等)。
+    """scaffold 子命令: 新建业务域骨架(域级通用目录 + 版本化目录 + init.go)并套用 README 模板(幂等)。
 
-    [参数] args: argparse 解析结果(含 name, root, business_dir, with_rpc)
+    [参数] args: argparse 解析结果(含 name, root, business_dir, version)
     [返回] 退出码 0
-    最近修改时间: 2026-07-28 23:55:00 脚手架按需创建业务域 rpc，而非根 contract。
+    最近修改时间: 2026-08-18 版本化目录下沉到 entity/router/controller/service 各自内部, 移除 crontask 与 rpc。
     """
     root = Path(args.root).resolve()
-    business_root = root / args.business_dir
-    pkg_dir = business_root / args.name
-    log(f"开始创建业务包骨架: {pkg_dir}")
+    source_root = root / args.business_dir
+    pkg_dir = source_root / args.name
+    log(f"开始创建业务域骨架: {pkg_dir} (版本 {args.version})")
     created = []
-    # 1. 创建业务包及子目录(已存在则跳过, 保证幂等)
-    for sub in DEFAULT_SUBDIRS:
+    # 1. 创建域级通用目录(跨版本共享, 已存在则跳过, 保证幂等)
+    for sub in DOMAIN_LEVEL_DIRS:
         sub_dir = pkg_dir / sub
         if not sub_dir.exists():
             sub_dir.mkdir(parents=True, exist_ok=True)
             created.append(str(sub_dir))
-    # 2. 写业务包 README(已存在则不覆盖, 保证幂等且不破坏已有内容)
+    # 2. 创建版本化目录: entity/router/controller/service 各自内嵌 <v?>/ 目录
+    for sub in VERSIONABLE_DIRS:
+        sub_dir = pkg_dir / sub / args.version
+        if not sub_dir.exists():
+            sub_dir.mkdir(parents=True, exist_ok=True)
+            created.append(str(sub_dir))
+    # 3. 创建域初始化入口单文件 init.go(已存在则跳过)
+    init_file = pkg_dir / INIT_FILENAME
+    if not init_file.exists():
+        init_file.parent.mkdir(parents=True, exist_ok=True)
+        init_file.touch()
+        created.append(str(init_file))
+    # 4. 写业务域 README(已存在则不覆盖, 保证幂等且不破坏已有内容)
     readme = pkg_dir / "README.md"
     if not readme.exists():
         pkg_dir.mkdir(parents=True, exist_ok=True)
         readme.write_text(render_readme(args.name), encoding="utf-8")
         created.append(str(readme))
-    # 3. 仅在明确存在跨业务调用能力时创建当前业务域的公开 RPC 入口。
-    if args.with_rpc:
-        rpc_dir = pkg_dir / "rpc"
-        if not rpc_dir.exists():
-            rpc_dir.mkdir(parents=True, exist_ok=True)
-            created.append(str(rpc_dir))
     if created:
         log(f"已创建 {len(created)} 项:")
         for item in created:
             log(f"  + {item}")
     else:
         log("目标已存在, 未新增任何内容(幂等)")
-    log(f"提示: 记得在 {business_root / 'README.md'} 的业务包索引中登记 {args.name}")
+    log(f"提示: 记得在 {source_root / 'README.md'} 的业务域索引中登记 {args.name}")
     return 0
 
 
@@ -199,15 +243,16 @@ def cmd_scaffold(args):
 MARKER_SECTION_HEADER = "微业务架构约束"
 MARKER_SECTION_BODY = """本项目采用微业务(伪微服务)架构, 由 `micro-business-architecture-rules` skill 守护。
 
-- 不同业务放在 `internal/business/<域>/` 下, 各自自包含; 业务包之间仅允许导入目标域 `rpc/` 公开入口。
-- 跨业务调用的请求与响应均为 JSON 字符串; 目标域 `rpc/` 自行解析、调用本域服务并返回统一 Response JSON。
-- 新业务新开目录包, 旧业务只在自己包内演进, 互不影响。
-- 每个业务包必须有统一 README; 全局业务索引在 `internal/business/README.md`。
-- 新增业务用 `micro_business.py scaffold <业务名>`, 改动后用 `micro_business.py check` 校验隔离。"""
+- 不同业务域直连源码根 `internal/<域>/` 下, 各自自包含; 业务域之间禁止直接 import 对方任何目录。
+- 业务相关逻辑通过版本化目录 `internal/<域>/router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 隔离, 包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用; 其余为跨版本通用业务逻辑。
+- 域级入口为单文件 `internal/<域>/init.go`, 全量注册本域所有版本路由, `/v1`、`/v2` 前缀区分。
+- 新业务新开域目录, 旧版本与新版本并存对外, 不因新增版本而下线。
+- 每个业务域必须有统一 README; 全局业务索引在 `internal/README.md`。
+- 新增业务域用 `micro_business.py scaffold <业务名>`, 改动后用 `micro_business.py check` 校验隔离。"""
 
 # 微业务标记: 写入根目录 项目设计.md 的业务索引段标题与正文
-DESIGN_SECTION_HEADER = "微业务架构与业务包索引"
-DESIGN_SECTION_BODY = """本项目采用微业务架构。业务包索引见 `internal/business/README.md`；跨业务调用仅导入目标业务 `rpc/` 的 JSON 字符串公开函数，架构约束见规则文件的「微业务架构约束」章节。"""
+DESIGN_SECTION_HEADER = "微业务架构与业务域索引"
+DESIGN_SECTION_BODY = """本项目采用微业务架构。业务域索引见 `internal/README.md`；业务域之间禁止直接 import，共享结构仅走根 `common/` 与 `global/`，架构约束见规则文件的「微业务架构约束」章节。"""
 
 
 def upsert_section(file_path, header, body):
@@ -275,7 +320,7 @@ def cmd_init(args):
         log(f"  {rule_file}: 微业务架构约束章节 -> {result}")
     # 2. upsert 项目设计.md 的业务索引段
     result = upsert_section(root / "项目设计.md", DESIGN_SECTION_HEADER, DESIGN_SECTION_BODY)
-    log(f"  项目设计.md: 微业务架构与业务包索引段 -> {result}")
+    log(f"  项目设计.md: 微业务架构与业务域索引段 -> {result}")
     log("微业务标记写入完成(幂等, 重复运行不重复堆叠)")
     return 0
 
@@ -285,7 +330,7 @@ def build_parser():
 
     [参数] 无
     [返回] argparse.ArgumentParser 实例
-    最近修改时间: 2026-07-28 23:55:00 将按需 contract 脚手架参数替换为 --with-rpc。
+    最近修改时间: 2026-08-18 14:41:00 移除 --with-rpc，新增 --version 版本目录参数。
     """
     parser = argparse.ArgumentParser(
         prog="micro_business",
@@ -294,17 +339,18 @@ def build_parser():
     sub = parser.add_subparsers(dest="command", required=True)
 
     # scaffold 子命令
-    p_scaffold = sub.add_parser("scaffold", help="新建业务包骨架(幂等)")
-    p_scaffold.add_argument("name", help="业务包名(ASCII, 如 order)")
+    p_scaffold = sub.add_parser("scaffold", help="新建业务域骨架(幂等)")
+    p_scaffold.add_argument("name", help="业务域名(ASCII, 如 order)")
     p_scaffold.add_argument("--root", default=".", help="项目根目录(默认当前目录)")
-    p_scaffold.add_argument("--business-dir", default="internal/business", help="业务根相对路径")
-    p_scaffold.add_argument("--with-rpc", action="store_true", help="同时创建 internal/business/<name>/rpc 目录")
+    p_scaffold.add_argument("--business-dir", default="internal", help="源码根相对路径(业务域直连其下)")
+    p_scaffold.add_argument("--version", default=DEFAULT_VERSION, help="版本化目录内嵌的版本名(默认 v1)")
     p_scaffold.set_defaults(func=cmd_scaffold)
 
     # check 子命令
-    p_check = sub.add_parser("check", help="校验业务包间是否存在非法横向 import")
+    p_check = sub.add_parser("check", help="校验业务域间是否存在非法横向 import")
     p_check.add_argument("--root", default=".", help="项目根目录(默认当前目录)")
-    p_check.add_argument("--business-dir", default="internal/business", help="业务根相对路径")
+    p_check.add_argument("--business-dir", default="internal", help="源码根相对路径(业务域直连其下)")
+    p_check.add_argument("--detect-new", action="store_true", help="改为候选新项目机器判定(不校验隔离)")
     p_check.set_defaults(func=cmd_check)
 
     # init 子命令

@@ -1019,3 +1019,4 @@ claude-mem(记忆) :
 2026-08-18 01:13:55 feat: [skillhub批量安装] 新增github与github-pages-auto-deploy两个外部skill
 2026-08-18 02:19:00 feat: [skillhub批量安装] 新增loop迭代执行外部skill
 2026-08-18 16:37:29 docs: [目录树多版本改造去rpc] 归档需求实施测试与6-review文档并同步项目状态字典
+2026-08-18 16:41:11 feat: [微业务架构规则] 重构版本化目录隔离并移除rpc公开入口
