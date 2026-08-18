@@ -1,6 +1,6 @@
 ---
 name: thread-title-rules
-description: 【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按当前宿主真实工具发现结果执行：优先调用统一 MCP 工具 `rename_current_thread`；该工具本轮未暴露且当前宿主具备自举条件时，默认经 parallel-task-dispatch-rules 委派子代理完成 provisioning（检测派只读子 agent 运行 `mcp/bootstrap.mjs --check`、写 config 的注册派单一安装子 agent 运行 `mcp/bootstrap.mjs` 幂等完成本机安装与注册并提示重载，细则见 provisioning-delegation.md），再按能力回退或跳过；工具首次调用返回非 `INVALID_TITLE` 失败且真实存在 `set_thread_title` 时执行一次原生回退；`INVALID_TITLE` 修正重试仍失败则直接跳过；两者均不可用、无法可靠确定当前会话、标题已准确或用户明确禁止时显式跳过。不得通过线程列表猜测当前会话，不等待用户显式要求，也不等到最终总结；不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。
+description: 【强制自动触发】当当前会话收到明确提问、需求、Bug、实施、审查、测试、提交、规则更新或其他可命名请求，或进入 goal 创建 / goal 恢复 / 上下文压缩续做 / 长任务阶段切换等过程节点，且可稳定归纳出中文任务主题时触发。负责自动生成 8-24 字中文简要标题，并按当前宿主真实工具发现结果执行：优先调用统一 MCP 工具 `rename_current_thread`；该工具本轮未暴露且宿主为 WorkBuddy Desktop 时，按「WorkBuddy 宿主适配」经 `workbuddy/rename-session.py` 写入原生会话表（`workbuddy.db` 的 sessions.custom_title 用户改名槽，带整库备份、原子保护、回读校验，失败可降级为截断首条用户消息，细则见 workbuddy-host-contract.md）；宿主为 Codex 且具备自举条件时，默认经 parallel-task-dispatch-rules 委派子代理完成 provisioning（检测派只读子 agent 运行 `mcp/bootstrap.mjs --check`、写 config 的注册派单一安装子 agent 运行 `mcp/bootstrap.mjs` 幂等完成本机安装与注册并提示重载，细则见 provisioning-delegation.md），再按能力回退或跳过；工具首次调用返回非 `INVALID_TITLE` 失败且真实存在 `set_thread_title` 时执行一次原生回退；`INVALID_TITLE` 修正重试仍失败则直接跳过；两者均不可用、无法可靠确定当前会话、标题已准确或用户明确禁止时显式跳过。不得通过线程列表猜测当前会话，不等待用户显式要求，也不等到最终总结；不要用它代替需求分析、Bug 定位、实施规划、测试验证或提交动作。
 ---
 
 # 会话标题规则
@@ -44,6 +44,7 @@ description: 【强制自动触发】当当前会话收到明确提问、需求�
 5. 标题应稳定到足以复用，不为每个小步骤频繁改名。
 6. 如果输入是提问，也要改写成结论式主题，不直接写成问句。
 7. 对 goal 或长任务过程中的改名，优先表达当前主目标或阶段主题，避免写成“goal执行”“继续执行”“自动续做”这类泛化状态。
+8. 标题由当前会话模型生成；生成结果为空、明显泛化（如“新会话”“继续”“处理中”）或包含不安全内容时，忽略该结果、本轮不再写入，保留原标题。
 
 ## 平台能力矩阵
 
@@ -60,12 +61,25 @@ description: 【强制自动触发】当当前会话收到明确提问、需求�
 | 两者均不存在且无法自举 | 显式跳过 |
 | MCP 缺少当前线程上下文 | 禁止通过 `list_threads`、路径、时间或标题相似度猜测；只有原生工具可直接作用于当前会话时才回退 |
 | 模型或宿主完全不支持工具调用 | 显式跳过，不宣称跨模型支持 |
+| WorkBuddy Desktop（`CODEBUDDY_HOST=workbuddy-desktop`）且未暴露 `rename_current_thread` | 走「WorkBuddy 宿主适配」：`workbuddy/rename-session.py --check` 只读探测 → 提取会话 ID → 写 `custom_title` 用户改名槽 → 回读校验；失败按适配节降级或跳过 |
 
 平台边界：
 
 1. Codex App 第一版使用 `rename_current_thread` MCP 适配器，`set_thread_title` 只作兼容回退。
 2. Claude Code、Claude Desktop 和其他 agent 仅按真实工具发现结果执行，不因 GPT、Claude 或其他模型名称推断能力。
 3. 第一版 MCP 适配器只声明支持 Codex App；模型无关不等于宿主无关。
+4. WorkBuddy Desktop 不暴露 MCP rename 工具，使用原生 `sessions` 表 `custom_title` 用户改名槽（见「WorkBuddy 宿主适配」）；`title` 是主进程独占的自动摘要槽，agent 写入会被回写覆盖、禁止作为改名目标。
+
+## WorkBuddy 宿主适配
+
+WorkBuddy Desktop（`CODEBUDDY_HOST=workbuddy-desktop`）未暴露 `rename_current_thread` / `set_thread_title`，统一 MCP 工具静默不可用；但 WorkBuddy 原生在 `~/.workbuddy/workbuddy.db` 的 `sessions` 表持久化会话标题，其中 `title` 是主进程独占的自动摘要槽（外部写入会被回写覆盖，已实测），`custom_title` 是用户改名槽（主进程不覆盖、写入可存活），UI 显示优先级 `custom_title` > `title`。因此本地主动改名写 `custom_title`。完整契约以 [workbuddy-host-contract.md](references/workbuddy-host-contract.md) 为准，本节只给执行要点。
+
+1. 当前会话 ID 只取可信宿主元数据：`CODEBUDDY_MCP_CONFIG` 中 `X-WorkBuddy-Session-Id` 请求头（JSON 解析失败时用 UUID 正则兜底），或调用方显式 `--session-id`；禁止列表 / 路径 / 时间 / 标题相似度猜测。**该环境变量含 Bearer token，禁止打印全文或 token 原值**。
+2. 默认写 `custom_title` 用户改名槽（等同 UI「重命名」修改任务名，主进程不覆盖）；`title` 是主进程独占的自动摘要槽，只作诊断读取、禁止作为改名目标。
+3. 执行：先 `python thread-title-rules/workbuddy/rename-session.py --check` 只读探测（宿主、会话 ID、当前标题），**写入前先在中间进度输出软检查点**（`当前标题「X」空泛/过时，拟改写为「Y」`），再 `--title "新标题"` 写入；脚本自动完成整库备份（`workbuddy.db.bak-<毫秒时间戳>`，WAL 安全）、`--expect-old` 原子保护（写入前重查，标题被他人修改则拒绝覆盖）、UPDATE 后 SELECT 回读校验（`verified:true` 才视为成功）。脚本幂等（毫秒级备份时间戳，同秒重复运行不冲突），可重复运行。
+4. 成功输出：`会话标题: 已通过 WorkBuddy 原生存储重命名为「标题」`；`title_changed_since_read` / `session_not_found` / `session_id_unavailable` 均显式跳过并说明，不强制覆盖、不猜测其他会话。
+5. 失败降级：仅当能可靠取得当前会话首条用户消息文本时，允许降级为截断后的首条消息（≤40 字、去除换行）写入同一 `title` 槽位；无法可靠取得时禁止编造，直接显式跳过。
+6. 边界：只写单行单字段；不删行、不碰其他表、不做 UI 模拟；App 运行中写入依赖 SQLite 多进程并发（WAL），UI 可能不实时刷新，重开会话 / 下次会话列表刷新后可见；Codex MCP 工具已暴露时优先走 MCP，绝不双写。
 
 ## 自举安装与注册
 
@@ -89,7 +103,7 @@ description: 【强制自动触发】当当前会话收到明确提问、需求�
 
 边界：
 
-- 自举只做“安装依赖 + 写 Codex 全局配置注册”，不修改仓库文件、不改 SQLite / rollout、不 UI 模拟点击。
+- 自举只做“安装依赖 + 写 Codex 全局配置注册”，不修改仓库文件、不改 SQLite / rollout、不 UI 模拟点击（此处 SQLite 指 Codex 自身存储；WorkBuddy 宿主的会话表写入属「WorkBuddy 宿主适配」路径，按 workbuddy-host-contract.md 执行，两条路径互斥）。
 - 写 `config.toml` 属于本机 provisioning，不属于仓库改动；仍遵守 UTF-8 无 BOM 与写前备份。
 - 工具已暴露时不得触发自举；自举是“未暴露”分支的前置补齐，不是每轮默认动作。
 
@@ -99,17 +113,19 @@ description: 【强制自动触发】当当前会话收到明确提问、需求�
 2. 若需要更新，基于用户提问、请求、goal 目标、恢复上下文或当前阶段主题提炼符合标题规则的中文简要。
 3. 发现当前宿主是否真实暴露 `rename_current_thread`。
 4. 若已暴露：只传 `title`，不得传入或猜测 `threadId`；MCP 返回 `RENAMED` 时立即停止工具路由，并输出：`会话标题: 已通过 rename_current_thread 重命名为「标题」`。
-5. 若未暴露且宿主具备自举条件：按“自举安装与注册”运行 `mcp/bootstrap.mjs`；`registered` 为 `added` 或 `already` 但工具仍未暴露时，输出重载提示并本轮显式跳过（例如：`会话标题: 已完成本机注册，重启 Codex 或新建任务后自动生效，本轮跳过`）。
-6. MCP 首次返回 `INVALID_TITLE` 时，按标题规则修正后最多重试 MCP 一次；第二次调用无论返回何种失败码都直接跳过，不再调用原生工具。
-7. MCP 返回 `THREAD_CONTEXT_MISSING`、`APP_SERVER_UNAVAILABLE`、`APP_SERVER_REJECTED`、`TIMEOUT`、未知错误或格式错误结果时，仅在真实存在可直接作用于当前会话的 `set_thread_title` 时执行一次原生回退。
-8. 原生回退成功后输出：`会话标题: 已通过 set_thread_title 回退重命名为「标题」`。
-9. 各条路径均不可用或失败时输出明确跳过原因；当前线程上下文缺失时禁止使用 `list_threads`、最近更新时间、`cwd`、preview 或标题相似度猜测当前会话。
-10. goal 或长任务过程中，只要进入新的稳定阶段且标题不匹配，就在阶段开始或恢复后尽早尝试改名；不得等到最终总结才首次处理标题。
+5. 若未暴露且宿主为 WorkBuddy Desktop（`CODEBUDDY_HOST=workbuddy-desktop`）：按「WorkBuddy 宿主适配」执行——`rename-session.py --check` 探测会话 ID 与当前标题 → 符合标题规则时用 `--title` 写入（可带 `--expect-old` 原子保护）→ 回读校验 → 输出 `会话标题: 已通过 WorkBuddy 原生存储重命名为「标题」` 或明确跳过原因；失败按适配节降级或跳过。
+6. 若未暴露、宿主非 WorkBuddy 且具备自举条件：按“自举安装与注册”运行 `mcp/bootstrap.mjs`；`registered` 为 `added` 或 `already` 但工具仍未暴露时，输出重载提示并本轮显式跳过（例如：`会话标题: 已完成本机注册，重启 Codex 或新建任务后自动生效，本轮跳过`）。
+7. MCP 首次返回 `INVALID_TITLE` 时，按标题规则修正后最多重试 MCP 一次；第二次调用无论返回何种失败码都直接跳过，不再调用原生工具。
+8. MCP 返回 `THREAD_CONTEXT_MISSING`、`APP_SERVER_UNAVAILABLE`、`APP_SERVER_REJECTED`、`TIMEOUT`、未知错误或格式错误结果时，仅在真实存在可直接作用于当前会话的 `set_thread_title` 时执行一次原生回退。
+9. 原生回退成功后输出：`会话标题: 已通过 set_thread_title 回退重命名为「标题」`。
+10. 各条路径均不可用或失败时输出明确跳过原因；当前线程上下文缺失时禁止使用 `list_threads`、最近更新时间、`cwd`、preview 或标题相似度猜测当前会话。
+11. goal 或长任务过程中，只要进入新的稳定阶段且标题不匹配，就在阶段开始或恢复后尽早尝试改名；不得等到最终总结才首次处理标题。
 
 ## 工具与证据约束
 
-- 统一工具输入、返回码、元数据来源、失败处理与本机自举以 [rename-tool-contract.md](references/rename-tool-contract.md) 为准。
+- 统一工具输入、返回码、元数据来源、失败处理与本机自举以 [rename-tool-contract.md](references/rename-tool-contract.md) 为准；WorkBuddy 宿主路径以 [workbuddy-host-contract.md](references/workbuddy-host-contract.md) 为准。
 - 必须通过真实工具调用完成会话重命名，禁止在回复正文中伪造 `<invoke>`、`<result>` 或 raw directive。
+- WorkBuddy 路径下，改名证据以 `rename-session.py` 的 `verified:true` 为准，禁止伪造 JSON 输出或声称已改名；会话 ID 只来自可信宿主元数据或显式参数，禁止猜测；不得打印含 Bearer token 的环境变量全文。
 - 自举必须真实运行 `mcp/bootstrap.mjs` 并以其 JSON 输出为准，禁止凭空声称“已注册 / 已安装”；脚本幂等，可安全重复运行。
 - MCP 成功后不得重复调用 `set_thread_title`；正常标题路径只调用一次 MCP。仅首次 `INVALID_TITLE` 允许修正标题后再调用一次 MCP，第二次失败后直接跳过；只有首次调用的非 `INVALID_TITLE` 失败最多再执行一次原生回退。
 - `THREAD_CONTEXT_MISSING` 不得降级为线程列表猜测；当前会话身份只能来自可信请求元数据或可直接作用于当前会话的原生工具。
@@ -122,7 +138,8 @@ description: 【强制自动触发】当当前会话收到明确提问、需求�
 
 - 应改名且 MCP 可用时，已优先调用 `rename_current_thread`，并且模型只传标题。
 - MCP 成功后没有重复调用原生工具。
-- MCP 未暴露且宿主具备自举条件时，已先运行 `mcp/bootstrap.mjs` 完成本机安装与注册，并按 `reloadRequired` 给出重载提示与本轮跳过结论，而不是直接静默跳过。
+- MCP 未暴露且宿主为 Codex 且具备自举条件时，已先运行 `mcp/bootstrap.mjs` 完成本机安装与注册，并按 `reloadRequired` 给出重载提示与本轮跳过结论，而不是直接静默跳过。
+- WorkBuddy 宿主下，已按「WorkBuddy 宿主适配」经 `rename-session.py` 写入 `custom_title` 用户改名槽并回读校验（`verified:true`），或给出明确跳过原因；未打印含 token 的环境变量全文。
 - 自举不可用或失败时，只有真实存在 `set_thread_title` 才执行一次回退；否则给出明确跳过原因。
 - 工具已暴露时没有触发多余自举。
 - 当前线程上下文缺失时，没有使用线程列表、路径、时间或标题相似度猜测当前会话。
