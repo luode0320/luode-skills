@@ -2,32 +2,33 @@
 
 ## 更新时间
 
-- 2026-08-14
-- 来源对象：PowerShell 控制继续优化（REQ-PSCTL-20260814-001 / CYCLE-PSCTL-01）
-- 当前目标：根据截图与 workbuddy 参考继续优化 PowerShell 控制，将标准调用前缀沉淀为唯一真源模板，并补齐三个 Windows skill 的衔接
-- 当前状态：全部 7 个最小任务完成。标准调用前缀模板写入 `wsl-windows-bridge`（原 `windows-wsl-execution-rules` 已删除），三份 SKILL.md 补齐交叉引用，项目记忆与 skill 字典同步，知识库沉淀 1 篇开发环境笔记，需求/实施/测试/6-review 文档全部落盘并通过机器校验。改动停在已改动未提交状态。
-- 关键量化：修改 1 份 reference、3 份 SKILL.md、2 份项目记忆文件、2 份字典文件；落盘 5 份工程文档；知识库新增 1 篇笔记。
-- 无需回滚兜底：本轮仅新增规则章节与引用，未删除既有文件；字典生成与文档校验可重复执行。
+- 2026-08-18
+- 来源对象：目录树多版本改造 · 去除 rpc（REQ-DVT-20260818-001 / CYCLE-DVT-01）
+- 当前目标：把微业务/后端源码根目录规范从「`business/<domain>` 平铺 + `rpc/`」改造为「`<source-root>/<domain>/` 下 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录隔离 + 域间禁止直连」，`init/` 目录收敛为单文件 `init.<ext>`，多语言统一用 `<source-root>` 占位符。
+- 当前状态：全部 4 个最小任务完成。`<v?>/` 从域级下沉到 `router/`/`controller/`/`entity/`/`service/` 各自内部，去掉 `crontask/` 域级目录；包名用 `v?router`/`v?controller`/`v?entity`/`v?service` 别名引用。`package-structure-rules`（目录 Owner）与 `micro-business-architecture-rules`（业务隔离 Owner）两个 skill 全部相关文件已同步新版本化口径并去 rpc；`placement_catalog.py query --artifact business-rpc` 失败关闭、`router`/`entity`/`service`/`controller` 返回 `<source-root>/<domain>/<artifact>/<v?>` 路径；`micro_business.py` 新版 scaffold 产出 `entity/v1/` `router/v1/` `controller/v1/` `service/v1/` 各自内嵌版本目录 + 单文件 `init.go` + `--detect-new` 三态判定；字典刷新成功、`PROJECT_MEMORY.md` 机器索引区同步去 rpc；需求/实施总览/实施周期/测试/6-review 五份文档全部落盘并通过机器校验。改动停在已改动未提交状态。
+- 关键量化：修改两个 skill 共 20+ 文件、2 份项目记忆、2 份字典、`编码skill.md`；落盘 5 份工程文档。目录树设计从「域级 `<v?>/` 内含四类」改为「四类目录各自内嵌 `<v?>/`」，去掉域级 `crontask/`。
+- 无需回滚兜底：`--detect-new`/`--version` 为新增参数，回退不破坏既有 `scaffold`/`check`/`init` 子命令；字典生成与文档校验可重复执行。
 
 ## 本轮已完成
 
-- 规则落盘：`powershell-fallback-patterns.md` 新增 5.1 / 7 双轨标准调用前缀模板
-- 三 skill 衔接：`wsl-windows-bridge`（承接原 windows-wsl-execution-rules）、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 均引用唯一真源
-- 记忆与字典：`PROJECT_MEMORY.md` 同步稳定决策，`generate_dictionary.py` 退出码 0，`implemented_total: 69`、`seed_total: 35`
-- 知识沉淀：知识库新建 `PowerShell命令调用标准前缀.md`，补齐既有笔记元数据与反向链接
+- 机器事实源：`placement-catalog.yaml/.py/.schema.json` 的 `router`/`controller`/`entity`/`service` 均改版本化路径（`<source-root>/<domain>/<artifact>/<v?>` + `requires_domain`）、删 `business-rpc` 条目与对应函数
+- 人工目录树：`project-layout-v2.md`、六个 language reference、`SKILL.md` 同步 `<source-root>/<domain>/<artifact>/<v?>` 版本化口径并去 rpc（`<v?>/` 下沉到 `router/`/`controller/`/`entity/`/`service/` 各自内部，去掉域级 `crontask/`）
+- 业务隔离脚本：`micro_business.py` 改新版 scaffold（`entity/v1/` `router/v1/` `controller/v1/` `service/v1/` 各自内嵌版本目录 + 单文件 `init.go` + `--detect-new` 三态判定、移除 `--with-rpc` 与域级 `crontask/`）；四个 reference + 两个 templates 去 rpc、改版本目录语义
+- 记忆与字典：`PROJECT_MEMORY.md` 机器索引区实体改名 `rule.micro-business-domain-isolation` 并同步去 rpc；`generate_dictionary.py` 退出码 0，`implemented_total: 70`
 - 文档收口：需求、实施总览、实施周期、测试主文档、6-review 五份文档全部落盘并通过机器校验
 
 ## 验证与交接
 
-- 工程文档：四份 profile 校验均返回 `valid: true / PASS`，退出码 0
-- 引用断言：三份 SKILL.md 的 `powershell-fallback-patterns.md#powershell-命令前缀模板` 引用命中 3 处；reference 内 5.1 / 7 前缀命中 3 处
-- 全量测试：`Ran 386 tests`，`FAILED (failures=4, errors=1, skipped=1)`；5 项均为既有历史基线/知识库/CRLF 问题，与本次改动无关
-- 知识库：`knowledge_index.py check` 退出码 0、违规 0，新笔记可被 `query` 命中
+- 工程文档：五个 profile（requirement / implementation_overview / implementation_cycle / test / style_regression）校验均返回 `valid: true`
+- Catalog：`query --artifact business-rpc` 退出码 2；`query --artifact router` 返回 `canonical_path=<source-root>/<domain>/router/<v?>`、`requires_domain=True`；`query --artifact entity/service/controller` 同理
+- 脚手架：`micro_business.py scaffold order` 产出 `internal/order/{api,base,constant,util,init.go,router/v1/,controller/v1/,entity/v1/,service/v1/}` + README.md（无 `crontask/`）
+- 隔离/判定：`check` 拒绝跨域 import（退出码 1）；`check --detect-new` 三态判定（candidate_new / guard / skip）
+- 全量测试：`Ran 386 tests`，`FAILED (failures=4, errors=12, skipped=2)`；全部为环境/历史基线问题，与本次改动无关
 
 ## 范围与边界
 
-- 本轮未动：PowerShell 脚本实现、`tool-manifest.yaml`、workbuddy 端 skill、其它 skill 目录
-- 明确未做的后续项：无；`TASK-PSCTL-01` 至 `TASK-PSCTL-07` 全部完成，投影已失活
+- 本轮未动：其他兄弟 skill、`utils/rpc/`（gRPC/Thrift 客户端适配）、`integration/contracts/rpc`（前后端联调契约）、历史 `doc/3-实施/` 文档
+- 明确未做的后续项：无；`TASK-DVT-01` 至 `TASK-DVT-06` 全部完成
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->

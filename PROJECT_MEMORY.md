@@ -342,6 +342,8 @@
 - 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；`config/yaml/` 与 `config/embedded/` 是二选一互斥的配置模式，一个项目只能选择其中一种，不可并存，推荐优先使用 embedded。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置格式名必须后置，使用 `embedded/config_local_yaml.go`、`embedded/config_test_yaml.go`、`embedded/config_prod_yaml.go`；环境集合可扩展，不要求所有环境齐全。格式名后置的原因是 `config_test.go` 会被 Go 当成测试文件并排除出 `go build`，因此 `embedded/config_<env>.go` 属于非法旧命名；环境名同样不得以 `_yaml` 结尾。外部 YAML 不参与编译，保持 `config_<env>.yaml`，不加 `_yaml` 后缀。文件名契约只对 `.go` 强制，其他语言的 embedded 仍只校验源码扩展名；`check` 只读，`init` 不生成动态环境配置文件。YAML 与 embedded 都允许有意持久化真实密钥、密码、token、私钥原值，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。config/ 根允许直接存放 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件，条件提交且 `init` 不创建；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
 - 稳定决策：fullstack、backend、frontend 三类项目统一使用项目根 `test/` 作为活动测试代码唯一入口；独立后端使用根 `test/`，不建立 `backend/test/`；前后端同仓也不建立 `backend/test/` 或 `frontend/test/`。Catalog 的测试目录 Owner 为 `test-strategy-rules`，`doc/5-tests/` 只保存测试说明和非可执行证据，不能替代根 `test/`。
 - 稳定决策：前后端同仓、独立后端、独立前端三类项目根都必须直接保存并提交 `Dockerfile`。Catalog 以 `project-governance/dockerfile` 的必需文件条目建模，`init` 自动创建空文件位置；`strict` 只读拒绝缺失或被目录占用，`adoption` 保持旧项目渐进采纳，不强制补迁移文件。
+- 稳定决策：业务域直连源码根 `<source-root>/<domain>/`，去掉 `business/` 中间层；业务相关逻辑完全通过版本目录 `<v?>`（`v1` 起，命名 `v[0-9]+`）隔离，`router/`、`controller/`、`entity/`、`service/` 下沉到版本目录内（`service/` 必建），`api/`、`base/`、`constant/`、`util/`、`crontask/` 为跨版本通用业务逻辑。域级初始化入口为单文件 `init.<ext>`（`<ext>` 为语言扩展名），全量注册本域所有版本路由并以 `/v1`、`/v2` 前缀区分、多版本并存对外，旧版本不因新版本诞生而下线、也不冻结。目录树用 `<source-root>` 占位符多语言统一（Go=`internal/`、Java=`src/main/java/<包>`、Node=`src/`、Python=`src/<包>`），不单为 Go 定 `internal/` 树。
+- 稳定决策：完全移除 `rpc/` 跨业务公开入口；业务域之间禁止直接 import 对方任何目录（无 rpc 例外），跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。机器事实源 `placement-catalog.yaml` 的 `router`/`controller` 已改版本级条目（含 `<source-root>`/`<domain>`/`<v?>` 占位符与 `requires_domain`）、`business-rpc` 条目已删除；`micro_business.py` 提供 `scaffold <域>`（建版本骨架 + 单文件 `init.go`）、`check`（校验域间禁止直连）、`check --detect-new`（候选新项目三态判定）。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
 - 更新时间：2026-08-05。
 
@@ -885,23 +887,24 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-29
-  - entity_id: rule.micro-business-json-rpc-boundary
-    name: "微业务跨域 JSON RPC 边界"
+  - entity_id: rule.micro-business-domain-isolation
+    name: "微业务业务域隔离与版本目录"
     type: "包结构与业务隔离规则"
     aliases:
-      - 业务域 rpc
-      - 微业务 JSON 通信
-      - 目标域 rpc 公开入口
-    definition: "业务域按需创建 business/<domain>/rpc。调用方只可精确导入目标域 rpc 的公开函数，输入和输出均为 JSON 字符串；目标域在自身 rpc 内完成解析、校验、私有服务调用和 Response{code,status,message,data} 序列化。目标域 api、service、entity、base、constant、init、crontask、util 等均为私有层，不得跨域导入。"
-    scope: "后端微业务目录、跨业务调用、CodeGraph 导入审查、JSON 响应边界"
+      - 业务域隔离
+      - 版本目录
+      - 域间禁止直连
+      - 业务域直连源码根
+    definition: "业务域直连源码根 <source-root>/<domain>/，业务相关逻辑完全通过版本目录 <v?>（v1、v2…）隔离，其余为跨版本通用业务逻辑；域级入口为单文件 init.<ext>，全量注册本域所有版本路由并以 /v1、/v2 前缀区分、多版本并存对外。业务域之间禁止直接 import 对方任何目录（无 rpc 例外），跨域共享结构仅走根 common/ 与 global/ 非业务运行引用。"
+    scope: "后端微业务目录、跨业务导入隔离、版本目录语义、CodeGraph 导入审查"
     status: "active"
     evidence_ids:
       - evidence.skill.package-structure-rules
       - evidence.skill.micro-business-architecture-rules
-      - evidence.dialog.micro-business-json-rpc-boundary
+      - evidence.dialog.micro-business-domain-isolation
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-28
+    updated_at: 2026-08-18
   - entity_id: rule.legacy-project-directory-adoption
     name: "旧项目目录规则渐进采纳"
     type: "包结构兼容规则"
@@ -1443,11 +1446,11 @@ evidence:
     type: "skill"
     source: "micro-business-architecture-rules/SKILL.md"
     path: "micro-business-architecture-rules/SKILL.md"
-    note: "微业务横向隔离、目标域 rpc 精确导入与 CodeGraph 审查来源"
-  - evidence_id: evidence.dialog.micro-business-json-rpc-boundary
+    note: "微业务横向隔离、业务域之间禁止直连与 CodeGraph 审查来源"
+  - evidence_id: evidence.dialog.micro-business-domain-isolation
     type: "dialog"
     source: "对话确认"
-    note: "当前对话冻结业务域 rpc 的 JSON 输入输出和私有层跨域导入禁令"
+    note: "当前对话冻结业务域之间禁止直接 import（无 rpc 例外）与版本目录隔离语义"
   - evidence_id: evidence.doc.psr-v2-adoption
     type: "doc"
     source: "代码位置目录规则 V2 旧项目渐进采纳需求"
@@ -1668,7 +1671,7 @@ lifecycle:
     - "rule.backend-utils-common-util-placement"
     - "rule.backend-database-storage-layout"
     - "rule.backend-root-data-forbidden"
-    - "rule.micro-business-json-rpc-boundary"
+    - "rule.micro-business-domain-isolation"
     - "rule.legacy-project-directory-adoption"
     - "rule.thread-title-process-trigger"
     - "rule.knowledge-flow-selective-default"
@@ -1832,12 +1835,12 @@ retrieval_hints:
       - "rule.backend-utils-common-util-placement"
     项目高关联工具函数:
       - "rule.backend-utils-common-util-placement"
-    业务域 rpc:
-      - "rule.micro-business-json-rpc-boundary"
-    微业务 JSON 通信:
-      - "rule.micro-business-json-rpc-boundary"
-    目标域 rpc 公开入口:
-      - "rule.micro-business-json-rpc-boundary"
+    业务域隔离:
+      - "rule.micro-business-domain-isolation"
+    版本目录:
+      - "rule.micro-business-domain-isolation"
+    域间禁止直连:
+      - "rule.micro-business-domain-isolation"
     旧项目渐进采纳:
       - "rule.legacy-project-directory-adoption"
     收敛清单:
@@ -1956,9 +1959,9 @@ retrieval_hints:
     后端公共工具归位:
       - "rule.backend-utils-common-util-placement"
     微业务隔离:
-      - "rule.micro-business-json-rpc-boundary"
+      - "rule.micro-business-domain-isolation"
     跨业务调用:
-      - "rule.micro-business-json-rpc-boundary"
+      - "rule.micro-business-domain-isolation"
     旧项目目录兼容:
       - "rule.legacy-project-directory-adoption"
     遗留源码维护:
@@ -2093,12 +2096,12 @@ retrieval_hints:
       - "rule.backend-utils-common-util-placement"
     package-structure-rules/SKILL.md:
       - "rule.backend-utils-common-util-placement"
-      - "rule.micro-business-json-rpc-boundary"
+      - "rule.micro-business-domain-isolation"
       - "rule.legacy-project-directory-adoption"
     doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md:
       - "rule.legacy-project-directory-adoption"
     micro-business-architecture-rules/SKILL.md:
-      - "rule.micro-business-json-rpc-boundary"
+      - "rule.micro-business-domain-isolation"
     编码skill.md:
       - "rule.backend-utils-common-util-placement"
     project-agents-bootstrap/SKILL.md:
