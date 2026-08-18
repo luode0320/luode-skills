@@ -83,3 +83,32 @@
 | 同一来源 | 好/差用例判据、7 陷阱、10 项质量清单 | 本地 `testing-pitfalls.md` 180 陷阱更强 | 保留本地 | 无新增 |
 | 同一来源 | 红线：不编造规则、不声称已执行/完整覆盖 | 本地 `functional-validation-rules` + `test-data-and-judgement` 伪通过检查更强 | 保留本地 | 无新增 |
 | 同一来源 | 输出 MD/CSV/Excel/JSON、输出到 `tests/<name>-test-cases.md` | apifox 导入导出 + `doc/5-tests/` 测试主文档体系已覆盖且更强 | 保留本地 | 无新增 |
+| BuiltinMarket「自然改写」(write v1.0.1，SkillHub 生态) | 编辑哲学五条（过度编辑=失败/作者声音赢/禁用词表是例子/少而强/规则不单调增长） | 本地白话契约只要求"短句和常用中文"，无编辑取舍哲学 | 合并 | `artifact-delivery-gate-rules/references/natural-writing-ai-taste-removal.md`（§0） |
+| 同一来源 | AI 味 20 模式（段末重述/升华/对比/瓶颈转移/系统定义/挑战展望/同义词循环/虚假范围/免责声明残留…） | 本地 `humanizer-zh` 有 9 类泛用模式，无中文技术文模式库 | 合并 | 同上（§2） |
+| 同一来源 | 翻译腔 4 套路（物理动词/形容词预判/抽象名词主语/未译英文混入） | 本地无 | 合并 | 同上（§3） |
+| 同一来源 | 专家腔 10 条（不补实作细节/元叙事/二人称预测/announce 引子/章节编号前缀/学习路径不改教程） | 本地无；"不补实作细节"与工程文档不编造红线同向 | 合并 | 同上（§4） |
+| 同一来源 | 用词去正式化 + 高频替换表（非常→很/例如→比如/综上所述→直接收尾/报告腔清单） | 本地无行文用词表 | 合并 | 同上（§5） |
+| 同一来源 | 句式/标题/列表/引号括号分号规则（电报句/bold+句号/判断式标题/列表去 list 化/括号超 10 字改写） | 白话契约无行文层规则 | 合并 | 同上（§6-8） |
+| 同一来源 | 长文结构模式（跨章节同义清单/表格旁复读/删段先确认信息量） | 白话契约有附录分层，无结构复读检查 | 合并 | 同上（§9） |
+| 同一来源 | 对外发文专项（身份脱敏/不踩竞品/用户感受先于功能清单） | 本地 delivery-summary 是内部交付，无公开文案红线 | 合并 | 同上（§10） |
+| 同一来源 | 标点门禁脚本（check_punctuation.py：全角/半角/中西空格/禁破折号，跳过代码块/URL） | 本地无自动标点检查 | 合并 | `artifact-delivery-gate-rules/scripts/check_punctuation.py` + `check-punctuation.sh` |
+| 同一来源 | 白话契约第 2 节"短句和常用中文"模糊要求 → 替换为自然行文规则引用 | 本地旧契约不可执行 | 合并（改写） | `plain-language-document-contract.md` §2 + §6 自检扩 8 条 |
+| 同一来源 | durable-context（记忆非授权/当前状态优先/redaction gate） | 本地 PROJECT_MEMORY/零决策模型已覆盖精神 | 保留本地 | 无新增 |
+| 同一来源 | 推文五规则、社交文案模式、product localization review | 本地无社交/多语言产品文案场景，低频 | 拒绝 | 无 |
+| 同一来源 | pre-flight 受众锁定、语言检测 | 本地工程文档受众由 `reader_level: business_general` 固定 | 保留本地 | 无 |
+| `woohahahaaa/auto-rename-session-label`（ClawHub/SkillHub，OpenClaw hook，message:received） | 仅对尚无标题的会话自动生成标题（幂等门槛，不覆盖已有 label） | 本地"标题已准确则跳过"已有精神，但无"仅空/泛化标题才生成"显式门槛 | 合并 | `thread-title-rules/SKILL.md` 适配节 + workbuddy-host-contract.md |
+| 同一来源 | 用该会话当前使用的模型生成标题 | 本地未指定生成模型 | 合并 | `thread-title-rules/SKILL.md` 标题生成规则第 8 条 |
+| 同一来源 | 失败安全降级：截断首条用户消息保证有标题 | 本地失败即跳过、无降级 | 合并 | `thread-title-rules/references/workbuddy-host-contract.md` 失败降级节 |
+| 同一来源 | 便携性：无硬编码路径，运行时解析 home/agentId/dist | 本地自举硬绑定 Codex 路径 | 合并 | `thread-title-rules/workbuddy/rename-session.py`（运行时解析 WORKBUDDY_CONFIG_DIR） |
+| 同一来源 | 独立副作用：只写 label，不干预 prompts/tools/消息流 | 本地"只负责会话元数据命名"已有精神 | 合并 | 边界声明强化（SKILL.md 适配节） |
+| 同一来源 | 写后核对验证（hooks list/info + sessions.json 人工核对） | 本地以"真实工具结果证明"但无回读校验 | 合并 | `rename-session.py` SELECT 回读 `verified:true` |
+| 同一来源 | 失败诊断：label 恒为截断首条消息 = LLM 分支失败 | 本地无诊断指引 | 合并 | workbuddy-host-contract.md 失败路由表 |
+| 同一来源 | `openclaw hooks enable` CLI 安装机制 | WorkBuddy 宿主无 openclaw CLI，引入宿主无关依赖 | 拒绝 | 无 |
+| 同一来源 | 写 OpenClaw `sessions.json` label 字段 | 宿主错误（本地目标是 WorkBuddy） | 拒绝 | 无（替换为 workbuddy.db 适配） |
+| `finia2na/auto-session-labels`（ClawHub 插件） | 会话须同时含用户消息+助手回复才生成（资格门槛） | 本地无显式资格门槛 | 合并 | `thread-title-rules/SKILL.md` 触发/跳过语义 |
+| 同一来源 | 写入前原子重查当前 label，防止生成期间被手动修改 | 本地无并发保护 | 合并 | `rename-session.py --expect-old` + workbuddy-host-contract.md |
+| 同一来源 | 空/泛化/不安全模型输出忽略 | 本地无 | 合并 | `thread-title-rules/SKILL.md` 标题生成规则第 8 条 |
+| 同一来源 | maxLabelLength 60 字符 | 本地 8-24 字更严格 | 保留本地 | 无新增 |
+| 同一来源 | maxTokens 32 默认值 | 与本地 24 字上限冲突且过低（外部自身 SKILL.md 亦注明 1024 更稳） | 拒绝 | 无 |
+| 本地 `thread-title-rules` 根因修复 | 根因：Codex 宿主绑定（MCP `rename_current_thread` + `~/.codex/config.toml`）在 WorkBuddy 静默失效 → 新增 WorkBuddy 原生适配（`workbuddy.db` sessions.custom_title 用户改名槽，双宿主矩阵互斥路由）；title 字段为主进程独占自动摘要槽、agent 写入会被回写覆盖（实测），禁止作为改名目标 | 本地无 WorkBuddy 路径 | 修复升级 | `workbuddy/rename-session.py` + `references/workbuddy-host-contract.md` + SKILL.md 双宿主矩阵 |
+| 本地 `thread-title-rules` 强项 | 中文 8-24 字、对象+动作/症状/阶段、稳定不频繁改名、跳过条件矩阵、工具与证据约束、Codex 自举 | 外部无此精细规则 | 保留本地 | 无新增 |

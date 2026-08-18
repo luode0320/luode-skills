@@ -96,6 +96,6 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
 - 只有在判断复用策略时，再读 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在判断命名模板或索引入口时，再读 `../artifact-storage-rules/references/naming-templates.md`。
 - 只要本轮涉及需求、实施、真实测试或 `6-review` 文档质量门禁，必须读取 `references/document-handoff-contract.md` 与 `references/document-quality-profiles.yaml`，并运行 `scripts/validate_engineering_docs.py`。
-- 只要本轮产生任何研发文档，还必须读取 `references/plain-language-document-contract.md`，检查正文能独立被普通业务读者理解，执行与追踪细节均已进入附录；白话开场的自然行文与去 AI 味标准见 `references/natural-writing-ai-taste-removal.md`（段末重述、升华、对比框架、翻译腔、专家腔），逐字符标点（全角/半角、中西空格、禁破折号）运行 `scripts/check_punctuation.py` 门禁。
+- 只要本轮产生任何研发文档，还必须读取 `references/plain-language-document-contract.md`，检查正文能独立被普通业务读者理解，执行与追踪细节均已进入附录；白话开场的自然行文与去 AI 味标准见 `references/natural-writing-ai-taste-removal.md`（段末重述、升华、对比框架、翻译腔、专家腔），逐字符标点（全角/半角、中西空格、禁破折号）运行 `python artifact-delivery-gate-rules/scripts/check_punctuation.py --lang zh <文件>` 门禁。
 - 只要本轮包含历史审查、历史验收、功能验证、浏览器联调或第三方验证资料兼容，还必须读取 `references/review-acceptance-gate-contract.md`，校验既有 `review_acceptance_gates`；新 `6-review` 文档不读取该字段。
 - 只要当前文档出现真实任务阻断，还必须读取 `references/task-blocker-closure-contract.md`，并由 `scripts/validate_engineering_docs.py` 校验阻断收口字段。
