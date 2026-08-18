@@ -1026,3 +1026,4 @@ claude-mem(记忆) :
 2026-08-18 19:55:39 feat: [TAPD环境引导] 新增本机凭据事实 skill
 2026-08-18 19:55:57 docs: [云盘junction挂载] 补充顺序铁律与排障条目
 2026-08-18 23:57:00 feat: [接口测试skill退役] 删除project-interface-release-execution-rules并入apifox测试链路
+2026-08-18 23:58:00 test: [接口测试skill退役] 删除旧引擎布局契约测试
