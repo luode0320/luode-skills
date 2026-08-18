@@ -41,6 +41,8 @@ description: >-
 
 ## 首次挂载流程
 
+> **顺序铁律：先让数据在云盘就位（第 1、2 步），再切换原路径（第 3 步）。** 反过来"先改名 → 再建链"，一旦 Target 不存在就会卡在中间状态：源已改名成 `.bak`、junction 又没建成。`New-Item` 的 `-Target` 必须**已存在**（不会自动创建），所以顺序只能是：建目录/拷数据 → 校验 → 改名 → 建链。
+
 目标：把真实目录 `X:\src` 迁到 `D:\谷歌云盘\dst`，`X:\src` 变成 junction 指向它。
 
 ### 第 0 步：确认方向与现状
@@ -147,6 +149,8 @@ Rename-Item "<X:\src>.bak" "<X:\src>"        # 恢复原真实目录（若保留
 | 改名源目录报"访问被拒绝" | 有进程（编辑器 / dev server / 云盘）占用 | 关占用进程后重试 |
 | junction 建后 `find` 报文件数 0 | Git Bash `find` 不穿透 junction 符号链接（`ls`/`cat` 正常） | 用 `ls` / PowerShell 验证，`find` 的 0 是误报 |
 | 删除 junction 后残留文件级占位（Link count=2） | junction 删除后的占位 | 若与源一致可安全删除后重建 |
+| `New-Item -ItemType Junction` 报 `Could not find item <目标>` | **Target 目录不存在**（junction 不会自动创建目标） | 先 `New-Item -ItemType Directory` 建目录，或先把数据 robocopy 到云盘再建链 |
+| 改名成功但建链失败 → 源没了、目标也没有（中间状态） | 流程顺序错误：数据没先在云盘就位就切换了 | 数据没丢，在 `.bak` 里：先建云盘目录 + robocopy，校验后再建 junction，确认后删 `.bak`；带数据源自适应的脚本可直接续跑 |
 
 ## 边界与不负责事项
 
