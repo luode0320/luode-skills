@@ -39,7 +39,7 @@
 
 ### 阶段审查、测试执行与 UI 主导
 
-`git-collaboration-rules`、`code-change-finalization-gate-rules`、`test-strategy-rules`、`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules`、`browser-session-automation-rules`、`project-interface-release-execution-rules`、`web-design-guidelines`、`frontend-design`。
+`git-collaboration-rules`、`code-change-finalization-gate-rules`、`test-strategy-rules`、`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules`、`browser-session-automation-rules`、`web-design-guidelines`、`frontend-design`。
 
 ### 需求、Bug、实施与验收
 

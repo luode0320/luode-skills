@@ -1,6 +1,6 @@
 # 和现有测试域 Skill 集成规则
 
-本文件明确 `project-interface-baseline-rules` 与 `project-interface-release-execution-rules` 和现有测试域其他 skill 的分工边界、调用关系与数据流转规则，避免职责重叠或冲突。
+本文件明确 `project-interface-baseline-rules` 与 apifox 测试链路和现有测试域其他 skill 的分工边界、调用关系与数据流转规则，避免职责重叠或冲突。
 
 ## 核心分工边界
 
@@ -25,7 +25,7 @@
 1. 代码实现完成，执行 `code-style-consistency-rules`，完成测试前静态自审。
 2. 执行 `functional-validation-rules`，确认当前改动功能验证通过。
 3. 执行 `test-regression-rules`，确认改动影响面回归验证通过。
-4. 执行 `project-interface-release-execution-rules`，完成上线前项目级核心接口测试并得到门禁结论。
+4. 执行 apifox 测试链路（`apifox-cli__skillhub/modules/`：范围选择、用例生成、数据构造、响应判定），完成上线前项目级核心接口测试并得到门禁结论。
 5. 执行 `code-style-consistency-rules`，参考测试门禁结论完成全量改动总审查。
 6. 执行 `delivery-summary-rules`，综合测试与审查结论给出最终验收结论。
 

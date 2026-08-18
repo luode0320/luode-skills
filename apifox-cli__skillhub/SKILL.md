@@ -41,6 +41,11 @@ npm install -g apifox-cli@latest --registry=https://registry.npmmirror.com/
 | 环境、变量、Mock、数据库连接 | `modules/environment.md` | environment, variables, mock, database-connection |
 | 分支、合并、merge request、AI 分支、pick-to | `modules/branch.md` | branch, merge-request |
 | 测试用例、test case、测试数据 | `modules/test-case.md` | test-case, test-data |
+| 生成/补全测试用例、测试设计、测试点分析、三类用例（正/异/边界） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论 |
+| 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法 | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
+| 陷阱检查、测试失败排查、接口异常但"看起来正常" | `modules/testing-pitfalls.md` | 180 陷阱知识库（apifox 场景版） |
+| 测试范围、优先级、哪些接口必测/可跳过、上线前测试 | `modules/test-selection-policy.md` | P0/P1/P2 风险分级 |
+| 测试数据构造、真实数据来源、响应判定、伪通过检查 | `modules/test-data-and-judgement.md` | 参数来源优先级 + 响应判定 |
 | 测试场景、多步骤、场景编排 | `modules/test-scenario.md` | test-scenario |
 | 测试套件、定时任务、runner、CI、报告 | `modules/test-automation.md` | test-suite, scheduled-task, runner, run, test-report |
 | 导入、导出、OpenAPI、Postman、质量门禁 | `modules/import-export.md` | import, export |

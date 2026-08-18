@@ -4,7 +4,7 @@
 
 ## 适用条件
 - `doc/5-tests/基线/interface-inventory.yaml` 不存在。
-- 项目从未执行过 `project-interface-baseline-rules` / `project-interface-release-execution-rules`。
+- 项目从未执行过 `project-interface-baseline-rules`（或历史的上线测试 skill，已并入 apifox 测试链路）。
 - 现有测试目录存在，但无法证明已经有项目级接口基线。
 
 ## 冷启动目标

@@ -102,15 +102,6 @@ synced: []
 
 ## 推荐脚本入口
 
-优先复用通用脚本：
+原 `project-interface-release-execution-rules/scripts/generate_release_test_plan.py` 已随该 skill 退役；接口基线同步由 `swag-openapi-maintainer-rules` 刷新 `swag/` + 本 skill 的基线扫描流程完成，不再依赖该脚本。若项目中仍存在历史调用点，按 apifox 测试链路（`apifox-cli__skillhub/modules/import-export.md`）重新接入。
 
-```bash
-python project-interface-release-execution-rules/scripts/generate_release_test_plan.py sync-interface-contract-assets \
-  --project-root . \
-  --manifest swag/.swag-manifest.yaml \
-  --inventory doc/5-tests/基线/interface-inventory.yaml \
-  --reusable-params doc/5-tests/基线/reusable-params.yaml \
-  --output test/release-artifacts/<时间戳>_release-interface-test/interface-sync-report.yaml
-```
-
-如果脚本报告 `requires_dual_refresh: true`，必须先执行 `swag-openapi-maintainer-rules` 刷新 `swag/`，再重新运行本同步命令。
+三方对账的"需双刷新"结论由本 skill 的扫描流程直接产出并写入 `interface-sync-report.yaml`，不再依赖外部脚本执行。

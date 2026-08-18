@@ -1,14 +1,14 @@
 ---
 name: project-interface-baseline-rules
-description: 当需要建立、刷新或核对项目接口事实基线时触发，包括扫描接口路由/controller、维护 Swagger/OpenAPI 双索引一致性、构建 provider/consumer 依赖图、管理参数来源与可复用参数的生命周期状态、判定基线是否漂移。负责在 `doc/5-tests/基线/` 长期资产库里持续沉淀接口清单、依赖图、参数来源和可复用参数；本 skill 只消费 `project-interface-release-execution-rules` 统一执行内核（`release_test_engine`）产出的运行结果，不持有该内核的实现，也不负责执行测试、判定接口响应或输出上线放行结论。
+description: 当需要建立、刷新或核对项目接口事实基线时触发，包括扫描接口路由/controller、维护 Swagger/OpenAPI 双索引一致性、构建 provider/consumer 依赖图、管理参数来源与可复用参数的生命周期状态、判定基线是否漂移。负责在 `doc/5-tests/基线/` 长期资产库里持续沉淀接口清单、依赖图、参数来源和可复用参数；本 skill 只维护接口事实资产，不负责执行测试、判定接口响应或输出上线放行结论（测试执行统一走 apifox 测试链路）。
 ---
 
 # 项目接口事实基线规则
 
 只在“需要确认或刷新项目当前接口事实、维护长期基线资产库”时使用这个 skill。
-如果需要执行测试、判定接口响应、输出上线放行结论，转交 `project-interface-release-execution-rules`；如果是任务级功能验证或改动影响面回归，分别转交 `functional-validation-rules`、`test-regression-rules`；如果是测试文档组织或目录结构，转交 `test-strategy-rules 的 test-asset-governance 条件路由`、`test-strategy-rules 的 test-asset-governance 条件路由`。
+如果需要执行测试、判定接口响应、生成完善测试用例并跑通，统一转交 `apifox` 测试链路（`apifox-cli__skillhub/modules/`：范围选择、用例生成、数据构造、响应判定）；如果是任务级功能验证或改动影响面回归，分别转交 `functional-validation-rules`、`test-regression-rules`；如果是测试文档组织或目录结构，转交 `test-strategy-rules 的 test-asset-governance 条件路由`。
 
-本 skill 与 `project-interface-release-execution-rules` 是同源拆分：本 skill 负责“接口事实是什么”，对方负责“测试怎么跑、结果是否通过”。共享执行内核 `scripts/release_test_engine/` 已物理迁移至 `project-interface-release-execution-rules/scripts/`，`project-interface-release-execution-rules` 是其唯一行为 owner；本 skill 只读取该内核产出的基线资产文件，不复制、不重写其代码。
+本 skill 只维护"接口事实是什么"的长期资产库；"测试怎么跑、结果是否通过"统一由 apifox 测试链路承接（范围选择 `test-selection-policy.md`、用例生成 `test-case-generation.md`、数据构造与判定 `test-data-and-judgement.md`、陷阱规避 `testing-pitfalls.md`）。本 skill 不持有执行引擎实现，只读取/沉淀接口事实资产。
 
 ## 测试隔离红线（强制，和现有测试域规则一致）
 - 严禁为了测试目的改动生产代码语义，包括但不限于新增测试专用方法、测试专用数据、测试专用结构体字段。
@@ -27,14 +27,14 @@ description: 当需要建立、刷新或核对项目接口事实基线时触发�
 - 项目首次触发本 skill，或 `doc/5-tests/基线/interface-inventory.yaml` 不存在。
 - 接口基线需要刷新：项目代码发生接口新增、删除或结构变化。
 - Swagger/OpenAPI 双索引不一致，或需要判定基线是否漂移。
-- `project-interface-release-execution-rules` 在执行测试前需要确认接口基线是否最新。
+- `apifox` 测试链路在执行测试前需要确认接口基线是否最新。
 
 ## 首次触发冷启动规则（强制）
 - 若项目从未触发过本 skill，或 `doc/5-tests/基线/interface-inventory.yaml` 不存在，必须自动进入冷启动流程。
 - 冷启动时不得因为“没有现成测试产物”直接阻断；必须先扫描项目路由、controller/handler、Swagger/OpenAPI、现有测试、README 和接口文档，生成第一版接口基线。
 - 冷启动时必须同时初始化 `doc/5-tests/基线/` 基线资产库，至少包含 `interface-inventory.yaml`、`dependency-graph.yaml`、`parameter-sources.yaml`、`reusable-params.yaml`、`scenario-catalog.yaml`、`script-adapter.yaml`、`execution-history.yaml`、`baseline-change-log.md` 和 `README.md` 的骨架。
 - 第一版接口基线允许存在 `待确认项`，但每个待确认项都必须记录发现来源、证据和缺失原因，禁止伪装成完整基线。
-- 冷启动涉及创建测试任务根目录、生成初版测试计划骨架时，联动 `test-strategy-rules 的 test-asset-governance 条件路由` 和 `project-interface-release-execution-rules` 完成对应骨架，本 skill 只负责基线资产骨架本身。
+- 冷启动涉及创建测试任务根目录、生成初版测试计划骨架时，联动 `test-strategy-rules 的 test-asset-governance 条件路由` 完成对应骨架，测试执行链路统一由 apifox 承接；本 skill 只负责基线资产骨架本身。
 
 ## 接口基线扫描规则（强制）
 - 每次执行本 skill 前，都必须先做一次接口基线扫描；首次触发执行全量建基线，后续执行默认做增量扫描。
@@ -80,14 +80,14 @@ description: 当需要建立、刷新或核对项目接口事实基线时触发�
 3. 按 `references/openapi-inventory-sync-rules.md` 对账当前代码、`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml`；任一缺失或接口集合不一致时先刷新 swag 与接口基线，并输出 `interface-sync-report.yaml`。
 4. 按 `references/inventory-reconcile-rules.md` 将扫描结果与现有基线对账，输出新增、删除、变更和待确认清单，并更新基线。
 5. 按接口漂移结果更新 `parameter-sources.yaml`、`dependency-graph.yaml` 和 `reusable-params.yaml` 中受影响项；受影响可复用参数先标记 `stale`。
-6. 基线刷新完成后交给 `project-interface-release-execution-rules` 继续测试范围筛选、执行、判定、报告和放行流程。
+6. 基线刷新完成后交给 apifox 测试链路继续测试范围筛选、用例生成、执行、判定和放行流程。
 
 ## 权责边界与不负责事项
-- 负责项目级接口事实基线，不负责测试执行、接口响应判定或上线放行结论，这些由 `project-interface-release-execution-rules` 负责。
+- 负责项目级接口事实基线，不负责测试执行、接口响应判定或上线放行结论，这些由 apifox 测试链路与 `functional-validation-rules` 承接。
 - 不替代 `functional-validation-rules` 的当前改动功能验证，不替代 `test-regression-rules` 的改动影响面回归验证。
 - 不负责测试文档的结构和归档规则，必须遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 和 `artifact-storage-rules` 的要求。
 - 不负责测试目录的创建和结构，必须遵循 `test-strategy-rules 的 test-asset-governance 条件路由` 的要求。
-- 不持有 `scripts/release_test_engine/` 的实现或运行时写权限，只读取其产出的基线资产文件。
+- 不持有测试执行引擎的实现或运行时写权限，只维护接口事实资产文件。
 
 ## 需要暂停并确认的条件
 - 基线资产结构损坏、可复用参数未脱敏、脚本适配配置缺失关键字段，导致无法安全复用历史资产。
@@ -100,7 +100,7 @@ description: 当需要建立、刷新或核对项目接口事实基线时触发�
 
 ## 执行结果归档要求
 - 项目长期测试资产更新到 `doc/5-tests/基线/`，至少维护 `interface-inventory.yaml`、`dependency-graph.yaml`、`parameter-sources.yaml`、`reusable-params.yaml`、`scenario-catalog.yaml`、`script-adapter.yaml`、`execution-history.yaml` 和 `README.md`。
-- 双索引同步报告 `interface-sync-report.yaml` 的字段结构由本 skill 定义，实际执行和落盘由 `project-interface-release-execution-rules` 完成。
+- 双索引同步报告 `interface-sync-report.yaml` 的字段结构由本 skill 定义，实际执行和落盘由 apifox 测试链路完成。
 - 所有归档遵循 `artifact-storage-rules` 和 `test-strategy-rules 的 test-asset-governance 条件路由` 的要求。
 
 ## references 读取规则

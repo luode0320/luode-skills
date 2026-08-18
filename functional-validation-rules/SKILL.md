@@ -133,11 +133,11 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 3. `historical_inflight`：业务表上 1/2/22/50 等在途区间的最近 N 条；用于验证长生命周期订单的查询/回调兼容。
 4. `current_listing_available`：`getFromPairList` / `getToPairList` / `getMainPairList` 当前可用币对；用于验证当前业务态下的可用性。
 
-### 三、判定与门禁（与 `project-interface-release-execution-rules` 联动）
+### 三、判定与门禁（独立内嵌，原 `project-interface-release-execution-rules` 已并入 apifox）
 
-- 写接口判定按 4 类（`PASS` / `EXPECTED_FAIL` / `UNEXPECTED_FAIL` / `PENDING`），详见 `project-interface-release-execution-rules/references/agent-response-judgement.md`。
-- 写接口门禁准入按 4 类样本矩阵 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 走 PARTIAL，详见 `project-interface-release-execution-rules/references/execution-gate.md`。
-- 功能验证报告必须附带"写接口样本分布"块（写接口场景下），详见 `project-interface-release-execution-rules/references/report-format.md`。
+- 写接口判定按 4 类（`PASS` / `EXPECTED_FAIL` / `UNEXPECTED_FAIL` / `PENDING`）：`PASS` = HTTP 状态码 + 业务码 + 结构 + 业务逻辑全部符合预期；`EXPECTED_FAIL` = 返回了业务预期内的失败码（如余额不足、币对下线）；`UNEXPECTED_FAIL` = 返回了非预期的 4xx/5xx 或结构异常；`PENDING` = 参数依赖未解决或环境阻断（详见 `apifox-cli__skillhub/modules/test-data-and-judgement.md` 的判定与阻断分类）。
+- 写接口门禁准入：4 类样本矩阵全部执行 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 走 PARTIAL；任一 `UNEXPECTED_FAIL` 即阻断，不得放行。
+- 功能验证报告必须附带"写接口样本分布"块（写接口场景下）：列出 4 类样本的获取来源、数量与判定分布。
 
 ### 四、与其他验证类型的关系
 
