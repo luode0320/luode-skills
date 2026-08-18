@@ -278,7 +278,7 @@
 - 类型: Python 工具风格
 - 示例: `同目录 NamedTemporaryFile -> flush -> os.fsync -> os.replace`、`候选全文 UTF-8 字节数先校验`、`区块外正文逐字保留`
 - 说明: 在 Markdown 中维护机器托管区时，使用唯一成对 marker 和字段白名单；先解析并校验已有区块、候选全文和最终字节数，再在同目录完整写入临时文件并原子替换。失败路径清理临时文件并保持原文件不变；Windows 不支持目录 fsync 时只降级目录刷新，不跳过文件 fsync。不得用按标题整段重写的通用脚本处理高频运行时投影。
-- 来源: `task-plan-rehydration-rules/scripts/task_plan_projection.py`、`project-interface-release-execution-rules/scripts/release_test_engine/storage.py`
+- 来源: `task-plan-rehydration-rules/scripts/task_plan_projection.py`
 - 适用范围: `PROJECT_CURRENT.md` 任务投影、Markdown 机器受管区、跨进程运行时状态
 - 更新时间: 2026-07-23
 - 状态: 启用
@@ -313,14 +313,14 @@
 - 更新时间: 2026-07-22
 - 状态: 启用
 
-### 上线测试脚本工具箱写法
-- 别名: release test scripts, 基线资产脚本, 可复用参数脚本, 双索引同步脚本
+### 上线接口测试流程写法
+- 别名: release test scripts, 接口测试流程, 上线测试
 - 类型: 工具风格
-- 示例: `python project-interface-release-execution-rules/scripts/generate_release_test_plan.py sync-interface-contract-assets --project-root . --manifest swag/.swag-manifest.yaml --inventory doc/5-tests/基线/interface-inventory.yaml --output test/release-artifacts/<时间戳>_release-interface-test/interface-sync-report.yaml`
-- 说明: 上线测试通用脚本优先沉淀为 `project-interface-release-execution-rules/scripts/generate_release_test_plan.py` 的子命令；项目差异写入项目 `doc/5-tests/基线/script-adapter.yaml` 或当轮测试目录，不写死进通用脚本。连续复用且变复杂的能力再拆成独立脚本，但必须保持总入口可发现、可复用、`--help` 可验证。`swag/.swag-manifest.yaml` 与 `interface-inventory.yaml` 的双索引同步也走同一总入口子命令，并固定输出 `interface-sync-report.yaml`。
-- 来源: `project-interface-release-execution-rules/references/reusable-script-toolbox.md`、`project-release-test-rules/scripts/generate_release_test_plan.py`
-- 适用范围: 上线接口测试脚本、基线初始化、依赖图、参数解析、基线回写
-- 更新时间: 2026-07-02
+- 示例: `apifox test-case run <caseId> --environment <envId>`、`apifox test-suite run <suiteId> --project <projectId> --environment <environmentId> --reporters cli,json,junit --upload-report`
+- 说明: 上线接口测试统一走 apifox 测试链路（`apifox-cli__skillhub/modules/`：范围选择 `test-selection-policy.md`、用例生成 `test-case-generation.md`、数据构造与判定 `test-data-and-judgement.md`、陷阱规避 `testing-pitfalls.md`）；原 `project-interface-release-execution-rules` 已退役并入 apifox。项目接口事实基线仍由 `project-interface-baseline-rules` 沉淀在 `doc/5-tests/基线/`。
+- 来源: `apifox-cli__skillhub/modules/test-case-generation.md`、`apifox-cli__skillhub/modules/test-data-and-judgement.md`
+- 适用范围: 上线接口测试、接口用例生成、测试数据构造、响应判定
+- 更新时间: 2026-08-18
 - 状态: 启用
 
 ### Swag OpenAPI 资产写法

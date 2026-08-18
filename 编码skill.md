@@ -531,8 +531,8 @@ Bug 域采用两条互补路径：
 | `browser-use-cloud-rules` | 当任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码，或用户明确点名 Browser Use Cloud 时自动触发。 | 作为 Cloud 执行、安全、费用和 session 生命周期的唯一 Owner；每次收费动作前检查本机 key、Billing、当前动作硬费用上限并取得当次确认。 |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足实施计划完成条件时自动触发。 | 负责当前需求对应的功能正确性验证。 |
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
-| `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有执行引擎实现。 |
-| `project-interface-release-execution-rules` | 当需要做上线前项目级全接口测试、替代人工接口回归验证、生成上线接口测试门禁结论时自动触发。 | 在接口基线就绪后完成项目级核心接口门禁测试、结论归档与最终放行输入，是 `release_test_engine` 的唯一行为 owner。 |
+| `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有测试执行实现。 |
+| `apifox`（上线接口测试链路） | 当需要做上线前项目级接口测试、生成/补全测试用例、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接上线接口测试：范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；原 `project-interface-release-execution-rules` 已并入。 |
 
 ### 测试域内部边界判定
 
@@ -584,10 +584,10 @@ Bug 域采用两条互补路径：
 
 7. 上线前项目级接口门禁
 
-- 由 `project-interface-baseline-rules`（接口基线）与 `project-interface-release-execution-rules`（门禁执行）共同负责
+- 由 `project-interface-baseline-rules`（接口基线）与 apifox 测试链路（门禁执行，`apifox-cli__skillhub/modules/`）共同负责
 - 聚焦“当前版本上线前，项目级核心接口是否具备统一放行条件”
 - 每次执行前都必须先扫描当前接口事实并与接口基线对账；首次触发执行全量建基线，后续执行默认做增量扫描
-- 对新增接口、删除接口和接口信息漂移先更新基线，再筛选必测接口并输出门禁结论
+- 对新增接口、删除接口和接口信息漂移先更新基线，再按 `test-selection-policy.md` 筛选必测接口，用 apifox 生成用例并真实跑通，输出门禁结论
 - 结果作为实施计划完成条件和真实测试证据的一部分
 
 ### 测试域默认分流规则
@@ -598,7 +598,7 @@ Bug 域采用两条互补路径：
 - 讨论“当前需求是否实现正确”时，进入 `functional-validation-rules`
 - 讨论“上下游系统是否打通、环境是否一致、链路是否闭环”时，先进入 `test-strategy-rules` 重新拆分验证路径，必要时升级到总控层协调
 - 讨论“旧功能有没有被这次改动带坏、回归范围怎么定、回归用例怎么选”时，进入 `test-regression-rules`
-- 讨论“上线前全项目接口要不要放行、核心接口是否全量过门禁、接口基线是否需要冷启动或增量更新”时，进入 `project-interface-baseline-rules`（基线冷启动/增量更新）与 `project-interface-release-execution-rules`（放行/门禁判定）
+- 讨论“上线前全项目接口要不要放行、核心接口是否全量过门禁、接口基线是否需要冷启动或增量更新”时，进入 `project-interface-baseline-rules`（基线冷启动/增量更新）与 apifox 测试链路（放行/门禁判定，`apifox-cli__skillhub/modules/test-selection-policy.md`）
 
 ### 测试域内部顺序
 
@@ -608,7 +608,7 @@ Bug 域采用两条互补路径：
 - 然后执行 `functional-validation-rules`
 - 涉及跨系统或跨环境时，回到 `test-strategy-rules` 重新确认验证路径与证据收集方式
 - 再执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证
-- 准备上线或需要统一放行结论时，最后先执行 `project-interface-baseline-rules` 扫描并更新接口基线，再执行 `project-interface-release-execution-rules` 完成项目级接口门禁
+- 准备上线或需要统一放行结论时，最后先执行 `project-interface-baseline-rules` 扫描并更新接口基线，再走 apifox 测试链路完成项目级接口门禁（`test-selection-policy.md` 选范围 → `test-case-generation.md` 生成用例 → `test-data-and-judgement.md` 构造与判定 → 真实 run 通过）
 
 ## 十二、交付域
 

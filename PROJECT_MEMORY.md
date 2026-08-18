@@ -138,13 +138,14 @@
 - 来源：`agent-runtime-recovery-rules/SKILL.md`、`references/adapter-contract.schema.json`、`doc/2-需求/2026-07-12_210000_统一智能体运行期自恢复规则.md`。
 - 更新时间：2026-07-12。
 
-## 通用上线测试引擎
+## 通用上线测试（apifox 链路）
 
-- 稳定决策：`project-interface-release-execution-rules/scripts/release_test_engine/` 是协议中立内核，统一 IR 版本为 `2.0`；未知技术栈必须输出 `PENDING/UNSUPPORTED_ADAPTER`，不得伪报通过。
+> 原 `project-interface-release-execution-rules`（含 `release_test_engine` 引擎）已于 2026-08-18 退役并并入 apifox 测试链路（`apifox-cli__skillhub/modules/`）。
+
+- 稳定决策：上线接口测试统一走 apifox：范围选择 `test-selection-policy.md`（P0/P1/P2）、用例生成 `test-case-generation.md`、数据构造与响应判定 `test-data-and-judgement.md`、陷阱规避 `testing-pitfalls.md`；`apifox test-case run` / `test-suite run` 为执行入口。
 - 稳定决策：所有运行连接只来自 `local` 配置；普通业务写接口允许执行，DROP/TRUNCATE/破坏性 ALTER、源码/基础设施删除等极端操作由安全 denylist 阻断。
-- 稳定决策：接口级结果固定为 `PASS`、`EXPECTED_FAIL`、`FAIL`、`PENDING`、`BLOCKED`；P0 入口任意非 `PASS` 阻断项目放行，项目门禁输出 `PASS`/`FAIL`/`PARTIAL`。
-- 稳定决策：兼容入口为 `generate_release_test_plan.py doctor/run`，旧资产命令保留回退路径；项目专属字段只能写入项目基线/adapter，通用规则不得硬编码业务实体。
-- 稳定决策：发现注册表覆盖 HTTP、CLI、GraphQL、gRPC、WebSocket、SOAP、JSON-RPC、消息、调度和事件；只有存在真实 local runner 的协议才允许 `PASS`，其余协议必须输出结构化 `PENDING`。
+- 稳定决策：接口级结果固定为 `PASS`、`EXPECTED_FAIL`、`UNEXPECTED_FAIL`、`PENDING`；P0 入口任意非 `PASS` 阻断项目放行，项目门禁输出 `PASS`/`FAIL`/`PARTIAL`。
+- 稳定决策：项目接口事实基线仍由 `project-interface-baseline-rules` 沉淀在 `doc/5-tests/基线/`；apifox 执行前确认基线最新，执行后回写新发现接口与参数来源。
 - 稳定决策：报告明细的 request/response 固定为脱敏 JSON 字符串，`responses.json` 保留脱敏对象；基线以 append-only 事件和 v2 原子投影为事实源。
 
 ## 核心记忆
