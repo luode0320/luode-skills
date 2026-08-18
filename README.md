@@ -1027,3 +1027,4 @@ claude-mem(记忆) :
 2026-08-18 19:55:57 docs: [云盘junction挂载] 补充顺序铁律与排障条目
 2026-08-18 23:57:00 feat: [接口测试skill退役] 删除project-interface-release-execution-rules并入apifox测试链路
 2026-08-18 23:58:00 test: [接口测试skill退役] 删除旧引擎布局契约测试
+2026-08-18 23:59:00 feat: [规则skill吸收迭代] 任务拆解体检与测试用例方法论登记

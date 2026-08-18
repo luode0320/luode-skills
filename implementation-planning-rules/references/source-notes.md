@@ -12,6 +12,10 @@
 - `skillmd.ai/tdd`（SkillMD 生态，Kent Beck / Michael Feathers / Fowler 方法 + Ousterhout 反方）
   - 吸收落点：`references/tdd-workflow.md`（红→绿→重构节奏）
   - 吸收内容：测试先行实现节奏（无失败测试不写生产代码、一次一个行为、三个 TDD pattern、使用/跳过时机、Ousterhout 反方平衡）
+- 外部「任务拆解 / 任务拆解规划」skill（目标→可执行计划拆解，SkillHub 生态）
+  - 吸收落点：`references/plan-review-checklist.md`（任务表体检节）、SKILL.md（不承诺工期/不指定负责人规则）
+  - 吸收内容：重复任务/依赖环/无人负责事项/顺序冲突检查；不凭空承诺工期与负责人
+  - 未吸收：预计工时估算（本地刻意去掉时间分箱）、单一责任人分配（本地零决策执行模型）、CSV/JSON 导出（本地落盘文档体系）
 
 ## 当前改写策略
 
