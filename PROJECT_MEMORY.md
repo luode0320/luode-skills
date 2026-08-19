@@ -108,6 +108,14 @@
 - 来源：`implementation-planning-rules/references/workbuddy-absorption-map.md`、四个 skill 的 references、`doc/2-需求/2026-08-13_110000_WorkBuddy官方市场规则吸收整理补充.md`。
 - 更新时间：2026-08-13。
 
+## 项目级 Skill 自动沉淀落点规则
+
+- 稳定决策：项目级 skill 统一落地用户级 `~/.workbuddy/skills/project-<项目slug>-<topic>-rules/`（junction 与 luode-skills 仓库物理同址），不再使用项目根 `skill/`（非标准加载路径、不会被自动命中、历史零落地）。
+- 稳定决策：`project-local-skills-rules` 是项目级 skill 自动沉淀唯一 Owner，description 语义命中双通道触发（任务收口自动评估 + 用户点名）；自动评估聚焦项目写操作，触发条件为 5+ tool call / 踩坑解法 / 用户纠正 / 复用 workflow；不沉淀一次性任务、用户拒绝、纯闲聊。
+- 稳定决策：quick_validate.py 要求 description 不得含尖括号（< >），模板占位符用自然语言描述。
+- 来源：`project-local-skills-rules/SKILL.md`、`project-local-skills-rules/references/auto-trigger-and-evaluation.md`、`references/dedup-and-update.md`、`references/workbuddy-absorption-map.md`、`references/source-notes.md`。
+- 更新时间：2026-08-19。
+
 ## 任务阻断收口与恢复规则
 
 - 真实阻断唯一使用 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的 `BLK-*` 记录，至少包含任务状态、阻断阶段、依据与证据、已尝试动作与停止边界、影响、至多三步解决计划、恢复后重入点、去重键和必填字段“用户授权操作”。
@@ -148,6 +156,12 @@
 - 稳定决策：项目接口事实基线仍由 `project-interface-baseline-rules` 沉淀在 `doc/5-tests/基线/`；apifox 执行前确认基线最新，执行后回写新发现接口与参数来源。
 - 稳定决策：报告明细的 request/response 固定为脱敏 JSON 字符串，`responses.json` 保留脱敏对象；基线以 append-only 事件和 v2 原子投影为事实源。
 - 稳定决策（2026-08-19 扩展）：接口级测试执行通道从「上线门禁专用」扩展到「所有接口级测试」——接口功能验证、回归、Bug 接口验证、上线门禁的接口部分统一走 apifox 真实测试并落地用例到 apifox「AI 团队」对应项目（`apifox test-case run` / `test-suite run`），环境只允许指向 local（localhost）；单元测试/代码级测试保留本地 go test/pytest。权威节为 `test-strategy-rules` 的《接口测试执行通道（强制）》；apifox skill 新增 `modules/ai-team-project.md`（AI 团队项目 projectId 解析与登记）与 `modules/api-sync-to-apifox.md`（接口新增/更新同步 apifox 强制流程，swag 生成仍归 swag-openapi-maintainer-rules）。
+- 稳定决策（2026-08-20）：测试域单一事实源为项目根 `PROJECT_TEST.md`（Apifox 项目绑定 + 覆盖度铁律，团队/projectId/默认分支只登记一次）；任何 apifox 操作前先读该文件，未登记则阻断并要求用户指明。`AGENTS.md`/`CLAUDE.md` 仅保留指向 `PROJECT_TEST.md` 的一行指针，不重复写 projectId（避免多工具口径漂移）。
+- 稳定决策（2026-08-20）：apifox 环境三约定——默认测试执行环境 = apifox「开发环境」（baseUrl `http://127.0.0.1:<项目端口>`，即 local）；测试环境/正式环境保留存在但 agent 禁止选用（不删除、不修改、不选用，仅由人/CI 使用）。项目无可用开发环境时按 `modules/environment.md` 默认创建，环境 ID 回填 `PROJECT_TEST.md` 的「本地测试环境」表。
+- 稳定决策（2026-08-20）：开发环境必须**配置齐备环境变量**（鉴权签名 apiKey/apiSecret、默认测试登录账号密码、token 等），清单回填 `PROJECT_TEST.md`「环境变量登记」表（只登记名称/用途/来源，敏感值不落文档）；用例运行 401/403/签名错误先查环境变量缺失再查接口，不算接口失败。
+- 稳定决策（2026-08-20）：鉴权自动化四方案（`apifox-cli__skillhub/modules/test-auth.md`）——A 登录用例+extractor 提取（默认）；B 前置脚本自动续期（token 过期快必用，preProcessor customScript 查 JWT exp 快过期重登）；C 本地脚本构造（JWT 自签/批量预取）；D 全局身份认证（优先启用，D+B 组合最稳）。测试默认用管理员账号；token 必须自动获取/续期，禁止手工复制粘贴。
+- 稳定决策（2026-08-20）：**apifox CLI 是硬依赖（强制）**——任何 apifox 操作前先 `apifox --version`，未安装必须立即安装（`npm install -g apifox-cli`，慢则切 `--registry=https://registry.npmmirror.com/`），装完验证版本并登录；不得以"CLI 未安装"跳过任务。完整流程见 apifox skill SKILL.md「安装（强制，最高优先级）」节。
+- 稳定决策（2026-08-20）：apifox 开发环境必须配置齐备环境变量（鉴权签名 apiKey/apiSecret、默认测试登录账号密码、登录后提取的 token 等），缺失即视为开发环境未就绪；用例运行失败（401/403/签名错误）先查环境变量。取值只从 local 配置或用户提供；敏感变量值不落文档（`PROJECT_TEST.md` 只登记名称/用途/来源）。清单见 `PROJECT_TEST.md`「环境变量登记」表。
 
 ## 核心记忆
 
