@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
+> 默认 使用 `AGENTS.md`，Claude 使用 `CLAUDE.md`，内容规则相同。
 
 ## 语言
 
@@ -168,7 +168,8 @@
 
 ## 本地连接调试测试红线（最高优先级，强制）
 
-- 接口级测试执行统一走 apifox 测试链路（`apifox test-case run` / `test-suite run`，落地用例到 apifox「AI 团队」对应项目），apifox environment 只允许指向 `local`（localhost / 本地开发配置声明的服务），判定标准与本节一致；单元测试 / 代码级测试（go test / pytest）保留本地执行。接口级 vs 代码级判定与执行链路见 `test-strategy-rules` 的《接口测试执行通道（强制）》节。
+- 接口级测试执行统一走 apifox 测试链路（`apifox test-case run` / `test-suite run`，落地用例到 apifox「AI 团队」对应项目），**apifox CLI 是硬依赖：未安装必须立即安装（npm install -g apifox-cli，慢则切 npmmirror 镜像），不得以"CLI 未安装"跳过任务**；apifox environment 只允许指向 **「开发环境」**（baseUrl `http://127.0.0.1:<项目端口>`，即 local；测试/正式环境存在但 agent 禁止选用），判定标准与本节一致；单元测试 / 代码级测试（go test / pytest）保留本地执行。接口级 vs 代码级判定与执行链路见 `test-strategy-rules` 的《接口测试执行通道（强制）》节。
+- 任何 apifox 操作前先读项目根目录 `PROJECT_TEST.md` 获取 Apifox 项目绑定（团队/projectId/默认分支/开发环境/环境变量清单）；未登记则**必须先向用户指明项目**，禁止猜测或"先试试"（完整规则见 `apifox-cli__skillhub/modules/ai-team-project.md`）。测试覆盖度铁律（每接口 正向+负向+边界值 三类、POST 必有完整用例）、三环境约定（开发=local 允许，测试/正式禁止选用）、环境变量约定（开发环境必须配置齐备鉴权签名/登录账号，敏感值不落文档）与鉴权自动化约定（测试默认管理员账号，token 自动获取/续期，401/403 优先查鉴权配置）也见 `PROJECT_TEST.md`（完整方案见 `apifox-cli__skillhub/modules/test-auth.md`）。
 - 需求侦察、Bug 复现 / 定位 / 运行时调试、功能验证、回归测试、上线接口测试、浏览器联调、启动前后端服务或执行任何测试脚本时，所有数据库、缓存、消息队列、HTTP/RPC 上游、前端 / 后端服务连接都只能使用 `local` 本地环境。
 - 「本地环境」的判定标准是**连接信息的配置归属**，不是连接地址是否指向本机：只要连接信息来自 `config_local*`、`.env.local`、`.env.development` 等 local 本地开发配置，即为允许使用的本地环境，即使其指向远程服务器、团队共享开发库或非 `localhost` 地址也属合法本地目标；`localhost` / `127.0.0.1` / 本机端口 / 本机开发容器只是 local 配置的常见形态，不是判定依据。`test`、`prod`、`production`、`staging`、`pre`、`release` 配置声明的连接信息一律禁止使用，即使其恰好指向本机也不例外。
 - 即使用户提供了 test / prod 连接串、账号、接口地址或临时授权，也不得由 agent 直接连接或调用；必须记录为环境阻断，并要求改用 local 本地数据库和本地服务。
