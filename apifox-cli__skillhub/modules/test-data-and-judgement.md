@@ -16,7 +16,7 @@
 
 | 优先级 | 来源 | apifox 场景说明 |
 |--------|------|------------------|
-| 1 | **可复用参数** | 之前用例中已验证可用的样本（环境变量/全局变量/数据文件中标记 reusable 的） |
+| 1 | **可复用参数** | 之前用例中已验证可用的样本（开发环境环境变量/全局变量/数据文件中标记 reusable 的；开发环境环境变量清单见 `modules/environment.md` 与项目根 `PROJECT_TEST.md`「环境变量登记」表） |
 | 2 | **上游接口返回数据** | 先调用 provider 接口，用 extractor 提取 `$.data.id` 等字段作为下游参数（见 `modules/test-case.md` 提取器） |
 | 3 | **数据库最近记录** | 从 local 数据库按时间倒序取最近 5-10 条，提取请求参数字段 |
 | 4 | **本地缓存数据** | 从 local Redis/缓存读取候选值 |
@@ -90,7 +90,7 @@
 ## apifox 落地映射
 
 - 上游数据提取：test-case 的 `extractor` 处理器（`shareScope=PROJECT`）实现优先级 2
-- 环境变量：apifox 环境变量/全局变量承载 reusable 参数（优先级 1）
+- 环境变量：apifox「开发环境」环境变量承载 reusable 参数（优先级 1；鉴权签名/登录账号等必须在开发环境配置齐备，清单见项目根 `PROJECT_TEST.md`「环境变量登记」表，配置约定见 `modules/environment.md`）
 - 断言：用 `modules/test-case.md` 的断言规则（httpCode/responseJson/responseText）落实判定依据
 - 前置依赖：多接口数据流用 `modules/test-scenario.md` 编排，跨步骤传参
-- 阻断标记：apifox 用例结果与判定不一致时，按阻断分类排查，不把环境问题算成接口失败
+- 阻断标记：apifox 用例结果与判定不一致时，按阻断分类排查，不把环境问题（如环境变量缺失导致的 401/403/签名错误）算成接口失败

@@ -13,6 +13,7 @@
 
 ## 强制同步流程
 
+0. **确认 apifox CLI 已安装（强制前置）**：`apifox --version`；未安装则立即按 SKILL.md「安装（强制，最高优先级）」安装（npm install -g apifox-cli，慢则切 npmmirror），装完验证版本并确认登录；CLI 不可用则**阻断**同步任务，不得跳过
 1. **代码实现完成**：接口、DTO、注解已落地（接口契约以代码为准）。
 2. **生成 swag YAML**：交由 `swag-openapi-maintainer-rules` 刷新 `swag/` 下的 OpenAPI 资产；本模块不重复生成。若 swag 缺失或接口集合不一致，先回流 `swag-openapi-maintainer-rules`。
 3. **确认目标项目**：按 `modules/ai-team-project.md` 解析「AI 团队」项目 projectId，确认 `--project <projectId>`。
@@ -23,8 +24,8 @@
    ```
    导入前必须按 `modules/import-export.md` 输出质量指标（paths/operations/schemas/writes/withBody/emptyObjectBodies）；导入后检查 `ignoreCount`，大量 ignore 是风险信号，不得忽略。
 6. **契约校验**：`apifox endpoint list/get` 确认 method+path+schema 已同步，与代码对账；校验不通过先修正再继续。
-7. **落地/更新测试用例**：按 `modules/test-case-generation.md` 补正/异/边界三类用例，按 `modules/test-case.md` 标准流程创建（先 `test-case category` 获取有效 categoryId，再 cli-schema get/validate，创建后 `get` 回读验证）。
-8. **运行验证**：`apifox test-case run <caseId> --project <projectId> --branch <aiBranchName> --environment <localhost环境>`，确认真实通过（判定规则见 `modules/test-data-and-judgement.md`）。
+7. **落地/更新测试用例**：按 `modules/test-case-generation.md` 的「覆盖度铁律」（每接口必须有 正向+负向+边界值 三类用例，POST 等非 GET 接口必须有完整用例）补全，按 `modules/test-case.md` 标准流程创建（先 `test-case category` 获取有效 categoryId，再 cli-schema get/validate，创建后 `get` 回读验证）。**不要在只补 1 个分页正向用例时就宣称覆盖到位**。
+8. **运行验证**：`apifox test-case run <caseId> --project <projectId> --branch <aiBranchName> --environment <开发环境Id>`，确认真实通过（判定规则见 `modules/test-data-and-judgement.md`）。
 9. **合并**：`merge-request preview` 让用户确认 → 用户确认后 `create merge-request` 或 `merge`。
 10. **同步接口基线**：提示 `project-interface-baseline-rules` 更新 `doc/5-tests/基线/` 接口清单，保持基线资产与 apifox 一致。
 

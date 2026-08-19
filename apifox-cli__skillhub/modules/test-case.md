@@ -36,7 +36,10 @@ apifox test-data --help
 
 ## 创建测试用例标准流程
 
-1. 确认项目和分支
+> 收口目标：在 apifox「自动化测试」菜单的 正向 / 负向 / 边界值 / 安全性 / 其他 分类下，每接口在「正向/负向/边界值」三个分类下都有用例，且正向上覆盖业务参数（非仅分页），POST 等非 GET 接口有完整覆盖。详见 `modules/test-case-generation.md` 的「覆盖度铁律」。
+
+0. **创建前自检覆盖度（强制）**：先用 `test-case list --endpoint <endpointId>` 拉取当前接口下已有用例，按 正向 / 负向 / 边界值 三维列出缺口（POST/PUT/PATCH/DELETE 接口必须有 0→完整 的覆盖推进），缺口先呈现给用户确认后再继续
+1. 确认项目和分支（参见 `modules/ai-team-project.md` 的「首轮必须指明 → 持久化」规则）
 2. 定位 endpoint：`apifox endpoint list/get`
 3. **必须执行** `apifox test-case category --project <projectId>` 获取有效 `categoryId`
 4. 如有类似 case，先 `test-case list --endpoint <endpointId>` 再 `get` 一个作为模板
@@ -53,12 +56,23 @@ apifox test-data --help
 
 ## 处理器结构
 
+> 处理器分两类：**preProcessors（前置，请求发出前执行）** 与 **postProcessors（后置，响应返回后执行）**。前置处理器用于鉴权自动续期、动态签名、动态参数准备；后置处理器用于断言、提取变量。鉴权自动化的完整方案（登录用例 extractor / 前置脚本自动重登 / JWT 构造）见 `modules/test-auth.md`。
+
 ```json
 {
   "requestBody": {
     "type": "application/json",
     "data": "{\n  \"name\": \"Demo\"\n}"
   },
+  "preProcessors": [
+    {
+      "id": "preProcessors.0.customScript",
+      "type": "customScript",
+      "data": "// 请求前脚本：如 token 过期自动重登（模板见 modules/test-auth.md 方案 B）",
+      "defaultEnable": true,
+      "enable": true
+    }
+  ],
   "postProcessors": [
     {
       "id": "postProcessors.0.customScript",
@@ -87,9 +101,10 @@ apifox test-data --help
 规则：
 - `requestBody.data` 必须是字符串，不要把 JSON Body 写成对象
 - 处理器使用扁平结构 `{ id, type, data, defaultEnable, enable }`
-- 处理器建议带稳定 `id`
+- 处理器建议带稳定 `id`（preProcessor 用 `preProcessors.N.*`，postProcessor 用 `postProcessors.N.*`）
 - `shareScope` 优先 `PROJECT`，不要默认 `TEAM`
 - 多行内容用 `\n` 预格式化
+- **`update` 是整体覆盖**：更新时保留原有 preProcessors + postProcessors，不要只带新增的处理器
 
 ## 断言规则
 
@@ -114,6 +129,41 @@ apifox test-data --help
 }
 ```
 
+## 断言顺序（强制）
+
+> 吸收自 API测试自动化专家版。每个用例的断言按固定顺序编写，避免"表面通过"：
+
+1. **先查状态码**：`httpCode` + `equal`（先确认 HTTP 层正确）
+2. **再查业务码**：`responseJson` + `$.code`（业务层是否正确）
+3. **后查关键字段**：`responseJson` + path 断言关键响应字段非空/值正确
+
+禁止只断言 2xx 不校验响应结构，也禁止把错误路径断言成"符合预期"。
+
+## 断言速查（16 种映射）
+
+> 吸收自 API测试自动化专家版 Assertions 分类，映射到 apifox assertion 字段。
+
+| 断言意图 | apifox 落地 |
+|----------|-------------|
+| HTTP 状态码 | `httpCode` + `equal` + value（支持多值 `[200, 201]`） |
+| 任意 2xx | 自定义脚本断言（pm.response.code 2xx） |
+| JSON 字段存在 | `responseJson` + path + `notNull` 或 `include` |
+| JSON 字段值 | `responseJson` + path + `equal` |
+| JSON 嵌套路径 | `responseJson` + `$.data.items[0].id` |
+| JSON Schema 结构 | 自定义脚本 + 关键字段类型断言兜底 |
+| 响应全文包含 | `responseText` + `include` |
+| Header 存在/值 | `responseHeader` + 名称 + `equal/include` |
+| Content-Type | `responseHeader` + `Content-Type` + `equal` |
+| 响应时间阈值 | 自定义脚本（pm.response.responseTime） |
+| 字段非空 | `responseJson` + path + 自定义脚本断言非空 |
+| 数组长度 | 自定义脚本（pm.expect(body.data.items.length)） |
+| 字段类型 | 自定义脚本（typeof） |
+| 数值大小比较 | 自定义脚本（pm.expect(Number(...)).to.be.above/below） |
+| 枚举值校验 | `responseJson` + path + `equal` 逐一断言 |
+| 错误结构校验 | `httpCode` 4xx + `responseJson` + `$.code` 非空 |
+
+> 规则：常规校验优先用可视化 `assertion`（上表前 6 行），复杂校验用自定义脚本兜底（`pm.test` / `pm.expect`）。
+
 ## 字段风险提醒
 
 - 不要把 `test-scenario` 的步骤结构写进 `test-case`
@@ -128,7 +178,8 @@ apifox test-data --help
 - `test-case run --endpoint <endpointId>` — 按接口运行
 - `--category <categoryId>` 必须和 `--endpoint <endpointId>` 一起使用
 - `apifox run --test-case <caseId>` 只支持 caseId
-- 建议显式指定 `--environment`
+- 建议显式指定 `--environment <开发环境Id>`
+- **运行前环境变量就绪检查（强制）**：用例依赖鉴权/登录/签名时，先核对开发环境变量是否齐备（对照 `PROJECT_TEST.md`「环境变量登记」表）；401/403/签名错误/token 无效 → 先查环境变量缺失/过期，再查接口——不要算成接口失败（详见 `modules/environment.md`「开发环境环境变量（强制）」节）
 
 ## 常见恢复
 
@@ -138,3 +189,5 @@ apifox test-data --help
 | 断言不生效 | 对比现有成功 case 模板，检查 assertion 字段 |
 | 提取变量为空 | 检查 extractor 层级、变量名、响应路径和执行报告 |
 | endpoint 下找不到 case | 检查 `--branch` 和 `--endpoint` |
+| 401/403/签名错误/token 无效 | 先核对开发环境变量（鉴权签名/登录账号/token）是否缺失或过期，对照 `PROJECT_TEST.md`「环境变量登记」表，再查接口 |
+| 登录后 token 没生效 | 检查登录用例 extractor（`shareScope=PROJECT`）与后续用例环境变量引用 {{token}} |
