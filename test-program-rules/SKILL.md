@@ -12,10 +12,7 @@ description: 当新增或修改测试程序、模拟程序、验证脚本、数�
 
 ## 活动模拟程序落点（强制）
 
-- 源码 `internal/service/history_client.go` 的活动测试资产统一落在 `test/internal/service/`：例如 `history_client_test.go`、`history_client_mock.go`、`history_client_stub.go`、`history_client_fake.go` 或对应 fixture 文件。
-- mock server、stub、fake、假依赖和模拟响应程序均按上述规则进入根 `test/` 的源码相对路径镜像；不能因为“只是模拟程序”而放到 `doc/5-tests/`、仓库根目录或业务源码目录。
-- `test/shared/` 只允许放不归属于单一源码路径、且已被多个测试域稳定复用的通用模拟能力；源码专属模拟程序不得借共享目录绕开镜像关系。
-- `doc/5-tests/` 每轮只保存一份扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文；禁止新增或复制 mock、stub、fake、fixture、测试脚本和 helper。
+> 本节遵循 `test-strategy-rules` 的 `test-asset-governance` 条件路由单一权威来源（见 `../test-strategy-rules/references/test-asset-governance.md`）：测试程序、mock、stub、fake、fixture 和 helper 统一落在根 `test/` 的源码相对路径镜像目录（如 `internal/service/history_client.go` → `test/internal/service/`），跨源码稳定复用才入 `test/shared/`；`doc/5-tests/` 只保存扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文，禁止放置或复制任何可执行测试或模拟程序。本 skill 不重复展开。
 
 ## Skill 作用与适用场景
 

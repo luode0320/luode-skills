@@ -14,9 +14,7 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 
 ## 活动回归资产落点（强制）
 
-- 回归测试程序、mock、stub、fake、fixture 和 helper 都是活动资产，必须放在根 `test/` 的源码相对路径镜像目录；例如被测 `internal/service/history_client.go` 的回归资产位于 `test/internal/service/`。
-- mock、stub、fake 等模拟程序必须与对应回归测试使用同一镜像目录；只有跨多个源码路径稳定复用的模拟能力才可放入 `test/shared/`。
-- `doc/5-tests/` 测试主文档 只保存扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文，不得放置或复制回归测试程序、mock、stub、fake、fixture 或 helper。
+> 本节遵循 `test-strategy-rules` 的 `test-asset-governance` 条件路由单一权威来源（见 `../test-strategy-rules/references/test-asset-governance.md`）：回归测试程序、mock、stub、fake、fixture 和 helper 必须位于根 `test/` 的源码相对路径镜像目录（如被测 `internal/service/history_client.go` → `test/internal/service/`），跨源码稳定复用才入 `test/shared/`；`doc/5-tests/` 只保存扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文，不得放置或复制任何可执行回归测试或模拟程序。本 skill 不重复展开。
 
 ## Skill 作用与适用场景
 

@@ -210,6 +210,11 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 
 - 接口验证结论写回 `doc/5-tests/` 测试主文档；用例保存证据（caseId / suiteId / 报告链接）内联进证据小节，不得只写「已测试」无凭据。
 
+### 专项方法论按需加载
+
+- 契约测试、性能测试、健康评分、YAML 批量定义等**专项方法论**（吸收自 API测试自动化专家版）按需加载 apifox 对应模块：`apifox-cli__skillhub/modules/test-contract.md` / `test-performance.md` / `test-health-score.md` / `test-yaml-definition.md`。
+- 这些专项为**可选策略维度**（见 `references/strategy-dimensions.md`），仅在对应需求出现时启用，不影响本通道的强制执行链路。
+
 ## 测试样本分布优先（强制）
 
 > 本节是测试策略中"测什么、用什么样本测"的强制规则，是对上文"测试隔离红线"的补充。任何测试策略、测试大纲、测试摘要，都必须显式回答"测试样本分布"问题。

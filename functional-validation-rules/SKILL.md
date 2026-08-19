@@ -17,9 +17,7 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 
 ## 活动测试资产落点（强制）
 
-- 功能验证使用的测试程序、mock、stub、fake、fixture 和 helper 都属于活动资产，必须位于根 `test/` 的源码相对路径镜像目录；例如被测 `internal/service/history_client.go` 对应 `test/internal/service/`。
-- mock、stub、fake 等模拟程序必须与对应功能测试使用同一镜像目录；只有跨多个源码路径稳定复用的模拟能力才可放入 `test/shared/`。
-- `doc/5-tests/` 测试主文档 只保存扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文，不得放置或复制任何测试程序、mock、stub、fake、fixture 或 helper。
+> 本节遵循 `test-strategy-rules` 的 `test-asset-governance` 条件路由单一权威来源（见 `../test-strategy-rules/references/test-asset-governance.md`）：活动测试代码、mock、stub、fake、fixture 和 helper 必须位于根 `test/` 的源码相对路径镜像目录，跨源码稳定复用才入 `test/shared/`；`doc/5-tests/` 只保存扁平测试主文档，日志、报告、截图和脱敏响应样例等非可执行证据内联进正文，不得放置任何可执行测试或模拟程序。本 skill 不重复展开。
 
 ## Skill 作用与适用场景
 
@@ -115,33 +113,8 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 
 ## 功能验证样本分布（强制）
 
-> 本节是功能验证中"用什么样本验证"的强制规则，是对上文"测试隔离红线"的补充。任何功能验证报告，必须显式回答"验证样本分布"问题。
+> 本节遵循 `test-strategy-rules` 的《测试样本分布优先（强制）》单一权威来源：读接口样本（数据库真实数据、≥2 场景、无数据先插后判）、写接口 4 级样本矩阵（`historical_succeeded` / `historical_failed_lifecycle` / `historical_inflight` / `current_listing_available`、N≥5 且总数≥10）、判定与门禁（`PASS` / `EXPECTED_FAIL` / `UNEXPECTED_FAIL` / `PENDING`、`UNEXPECTED_FAIL=0`、`EXPECTED_FAIL` 比例 ≥60% 走 PARTIAL）、apifox 用例落地与跨验证类型适用规则，统一按该权威节执行；数据来源优先级与响应判定细则见 `apifox-cli__skillhub/modules/test-data-and-judgement.md`。本 skill 不重复展开，仅保留功能验证侧补充：
 
-### 一、读接口的功能验证样本
-
-- 必须从数据库最近记录（`local` 配置连接）构造请求参数。
-- 至少覆盖 2 个业务场景或 2 个查询维度，避免单一场景假阳性。
-- 必须验证正常路径返回正确数据；再补 1-2 条异常路径（错误码、边界值）作为对照。
-- 数据库无数据时记录为待确认，不得直接判定为通过。
-
-### 二、写接口的功能验证样本（4 级矩阵）
-
-写接口的功能验证必须按 4 级样本矩阵执行，缺一类视为矩阵缺失：
-
-1. `historical_succeeded`：`orderUser` 等业务表中 `status=4`（或其他业务终态成功码）的最近 N 条；用于验证相同参数组合在历史时点走通整条链路。
-2. `historical_failed_lifecycle`：业务表上 51/52/61-65/70/71 等业务失败终态集合的最近 N 条；用于验证历史失败路径的稳定性。
-3. `historical_inflight`：业务表上 1/2/22/50 等在途区间的最近 N 条；用于验证长生命周期订单的查询/回调兼容。
-4. `current_listing_available`：`getFromPairList` / `getToPairList` / `getMainPairList` 当前可用币对；用于验证当前业务态下的可用性。
-
-### 三、判定与门禁（独立内嵌，原 `project-interface-release-execution-rules` 已并入 apifox）
-
-- 写接口判定按 4 类（`PASS` / `EXPECTED_FAIL` / `UNEXPECTED_FAIL` / `PENDING`）：`PASS` = HTTP 状态码 + 业务码 + 结构 + 业务逻辑全部符合预期；`EXPECTED_FAIL` = 返回了业务预期内的失败码（如余额不足、币对下线）；`UNEXPECTED_FAIL` = 返回了非预期的 4xx/5xx 或结构异常；`PENDING` = 参数依赖未解决或环境阻断（详见 `apifox-cli__skillhub/modules/test-data-and-judgement.md` 的判定与阻断分类）。
-- 写接口门禁准入：4 类样本矩阵全部执行 + `UNEXPECTED_FAIL=0` + `EXPECTED_FAIL` 比例 ≥60% 走 PARTIAL；任一 `UNEXPECTED_FAIL` 即阻断，不得放行。
-- 4 级样本矩阵的执行结果必须以 apifox 测试用例形式落地（用例保存到 apifox「AI 团队」对应项目，可下次复跑），测试主文档内联 caseId / 报告链接；不得只在本地跑一次 shell/curl 后不落地用例。
+- 读接口功能验证必须在正常路径外再补 1-2 条异常路径（错误码、边界值）作为对照，避免单一场景假阳性。
 - 功能验证报告必须附带"写接口样本分布"块（写接口场景下）：列出 4 类样本的获取来源、数量与判定分布。
-
-### 四、与其他验证类型的关系
-
-- 单元测试或代码审查不能替代 4 级样本矩阵。
-- 联调验证中遇到写接口时，同样适用 4 级样本矩阵。
-- 回归验证中遇到写接口时，至少保证 `historical_succeeded` + `current_listing_available` 2 类样本。
+- 单元测试或代码审查不能替代 4 级样本矩阵；联调验证中遇到写接口时同样适用。

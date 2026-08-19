@@ -63,3 +63,4 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 - 普通语言和最终门禁：`../artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`
 
 - 需求质量门（100 分制，90 分才移交）：`references/workbuddy-quality-gate.md`
+- 按改动规模选择流程深度（SIMPLE/QUICK/FULL 三档路由）：`references/workload-mode-routing.md`
