@@ -7,7 +7,7 @@
 
 **固定恢复顺序**
 
-1. 重新读取当前平台规则文件：Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`。
+1. 重新读取当前平台规则文件：默认 使用 `AGENTS.md`，Claude 使用 `CLAUDE.md`。
 2. 读取 `PROJECT_CURRENT.md` 恢复当前目标、范围、状态、已完成、待办、阻断、验证和下一执行点。
 3. 当前状态包含任务投影托管区时，调用 `task-plan-rehydration-rules` 校验；有效 `active` 投影真实调用 `update_plan`，`inactive`、`invalid`、`tool-unavailable` 分别记录，进行中步骤先核验中断点。
 4. 读取 `PROJECT_MEMORY.md` 恢复稳定规则与关键决策；`PROJECT_HISTORY.md` 默认不读，只有明确历史追问或当前状态真实不足时才窄检索。

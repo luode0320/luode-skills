@@ -12,17 +12,21 @@
 
 ## 推荐主题
 
-- `code-style-rules`：项目代码风格、目录约束、常见禁用写法。
-- `enum-static-usage-rules`：静态属性枚举与常量映射约束。
-- `string-number-conversion-rules`：字符串与数字转换工具包约定。
-- `time-conversion-rules`：时间格式、时区、时间戳互转约定。
-- `goroutine-usage-rules`：协程创建、回收、错误处理约定。
-- `http-package-rules`：HTTP 请求、超时、重试、错误处理约定。
-- `api-writing-rules`：接口路径、请求响应结构、幂等与版本约定。
-- `database-query-rules-project`：项目特有 SQL/ORM 查询约束。
-- `mongo-usage-rules`：Mongo 集合访问和索引约定。
-- `redis-usage-rules`：缓存 key 设计、过期策略、并发保护。
-- `polaris-config-rules`：北极星配置读取、隔离与降级约定。
+统一前缀 `project-<项目slug>-`（如 `project-ellipal-`）：
+
+- `project-<slug>-code-style-rules`：项目代码风格、目录约束、常见禁用写法。
+- `project-<slug>-enum-static-usage-rules`：静态属性枚举与常量映射约束。
+- `project-<slug>-string-number-conversion-rules`：字符串与数字转换工具包约定。
+- `project-<slug>-time-conversion-rules`：时间格式、时区、时间戳互转约定。
+- `project-<slug>-goroutine-usage-rules`：协程创建、回收、错误处理约定。
+- `project-<slug>-http-package-rules`：HTTP 请求、超时、重试、错误处理约定。
+- `project-<slug>-api-writing-rules`：接口路径、请求响应结构、幂等与版本约定。
+- `project-<slug>-database-query-rules`：项目特有 SQL/ORM 查询约束。
+- `project-<slug>-mongo-usage-rules`：Mongo 集合访问和索引约定。
+- `project-<slug>-redis-usage-rules`：缓存 key 设计、过期策略、并发保护。
+- `project-<slug>-polaris-config-rules`：北极星配置读取、隔离与降级约定。
+
+> 落点统一为用户级 `~/.workbuddy/skills/project-<slug>-<topic>-rules/`（junction 与 luode-skills 仓库同址）。
 
 ## 最小交付
 

@@ -59,7 +59,7 @@ python artifact-delivery-gate-rules/scripts/validate_engineering_docs.py --profi
    - 需求域：`doc/2-需求/` 主文档（正文内应包含 Mermaid 流程图与时序图）、统一 `doc/data/images/` 资产引用及 `IMG-*` 清单。
    - 实施域：`doc/3-实施/` 下的实施总览文档，以及按需存在的实施周期文档；若当前属于新项目、项目初期或多来源对象统一排序场景，还必须存在“需求与实施计划全量顺序实施方案”，并记录需求 / 来源对象清单、实施完成条件、实施总览、实施周期、周期内最小任务摘要、跨需求总顺序、依赖、状态和阻断项；实施总览 / 实施周期文档中必须记录周期顺序、第一期 / 第二期 / 第三期等期次定位、当前 / 各周期最小任务清单、周期内最小任务顺序和周期收口条件。若本轮已经进入执行，还必须记录每个最小任务的实现、真实测试、`6-review` 风格回归状态或证据。
    - Bug 域：`doc/4-bugs/YYYY-MM-DD_HHmmss_问题中文简介.md` 扁平主文档（正文内嵌 Mermaid 流程图与时序图，不另建独立图文件，也不建任务子目录）。
-   - 测试域：`doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md` 扁平主文档，日志、报告和证据内联在正文，不得新建 `evidence/`、`artifacts/` 子目录；可执行测试代码、mock、fixture 和 helper 只位于根 `test/` 的 ASCII 镜像目录，上线接口测试的机器产物位于 `test/release-artifacts/`。接口级测试用例与运行证据以 apifox 用例/报告为准（按 `test-strategy-rules` 的《接口测试执行通道（强制）》落地 apifox「AI 团队」对应项目），测试主文档内联 caseId/suiteId/报告链接，不得只写「已测试」无凭据。`doc/5-tests/基线/` 是唯一豁免的长期数据资产目录。
+   - 测试域：`doc/5-tests/YYYY-MM-DD_HHmmss_<测试任务中文主题>.md` 扁平主文档，日志、报告和证据内联在正文，不得新建 `evidence/`、`artifacts/` 子目录；测试资产落点（根 `test/` ASCII 镜像、`test/release-artifacts/` 机器产物）与接口级 apifox 用例/报告证据（caseId/suiteId 内联，不得只写「已测试」无凭据）按 `test-strategy-rules` 的 test-asset-governance 条件路由与《接口测试执行通道（强制）》核对。`doc/5-tests/基线/` 是唯一豁免的长期数据资产目录。
    - `6-review` 域：`doc/6-review/YYYY-MM-DD_HHmmss_<来源对象标识>_6-review.md`，每次真实测试后的风格回归都必须留档，必要时同步 `doc/6-review/README.md` 索引；历史 `doc/6-审查/`、`doc/7-验收/` 仅只读。
 5. 如发现本轮本应落盘却未落盘，直接判定当前任务不可收口，并回流对应主域 skill 补文档。
 6. 通过后再允许进入最终回复。

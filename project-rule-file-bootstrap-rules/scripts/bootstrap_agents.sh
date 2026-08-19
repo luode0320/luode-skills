@@ -6,7 +6,7 @@ set -euo pipefail
 #   bootstrap_agents.sh
 #   bootstrap_agents.sh --repo /path/to/repo
 #   bootstrap_agents.sh --target claude        # Claude Code 环境，创建/同步 CLAUDE.md
-#   bootstrap_agents.sh --target codex         # Codex 环境，创建/同步 AGENTS.md（默认）
+#   bootstrap_agents.sh --target default       # 默认环境，创建/同步 AGENTS.md（默认）
 #   bootstrap_agents.sh --target both          # 同时创建/同步 AGENTS.md 与 CLAUDE.md
 #
 # 说明:
@@ -14,7 +14,7 @@ set -euo pipefail
 #   - 无论 target 为何，根目录与子目录中所有已存在的 AGENTS.md / CLAUDE.md 都会被同步。
 
 REPO_DIR="$(pwd)"
-TARGET="codex"
+TARGET="default"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -28,22 +28,22 @@ while [[ $# -gt 0 ]]; do
       ;;
     --target)
       if [[ $# -lt 2 ]]; then
-        echo "[ERROR] --target 需要一个参数（codex|claude|both）" >&2
+        echo "[ERROR] --target 需要一个参数（default|claude|both）" >&2
         exit 1
       fi
       case "$2" in
-        codex|claude|both) TARGET="$2" ;;
-        *) echo "[ERROR] --target 取值必须是 codex|claude|both" >&2; exit 1 ;;
+        default|codex|claude|both) TARGET="$2" ;;
+        *) echo "[ERROR] --target 取值必须是 default|claude|both" >&2; exit 1 ;;
       esac
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 [--repo /path/to/repo] [--target codex|claude|both]"
+      echo "Usage: $0 [--repo /path/to/repo] [--target default|claude|both]"
       exit 0
       ;;
     *)
       echo "[ERROR] 未知参数: $1" >&2
-      echo "Usage: $0 [--repo /path/to/repo] [--target codex|claude|both]" >&2
+      echo "Usage: $0 [--repo /path/to/repo] [--target default|claude|both]" >&2
       exit 1
       ;;
   esac
@@ -753,7 +753,7 @@ create_rule_file() {
   local file="$1"
   printf '# AGENTS.md / CLAUDE.md\n\n' > "$file"
   cat >> "$file" <<'EOF'
-> Codex 使用 `AGENTS.md`，Claude Code 使用 `CLAUDE.md`，内容规则相同。
+> 默认 使用 `AGENTS.md`，Claude 使用 `CLAUDE.md`，内容规则相同。
 EOF
   echo "[OK] 已创建: $file"
 }
@@ -987,6 +987,7 @@ export PYTHONIOENCODING=utf-8
 # 1) 按 --target 创建缺失的根目录规则文件
 declare -a TARGET_FILES=()
 case "$TARGET" in
+  default) TARGET_FILES=("$REPO_DIR/AGENTS.md") ;;
   codex)  TARGET_FILES=("$REPO_DIR/AGENTS.md") ;;
   claude) TARGET_FILES=("$REPO_DIR/CLAUDE.md") ;;
   both)   TARGET_FILES=("$REPO_DIR/AGENTS.md" "$REPO_DIR/CLAUDE.md") ;;
@@ -1018,7 +1019,7 @@ for name in AGENTS.md CLAUDE.md; do
   sync_agents_file "$REPO_DIR/$name"
 done
 
-# 5) 显式要求双平台规则时，AGENTS.md 是唯一正文源，避免 Codex 与 Claude Code 读取不同规则。
+# 5) 显式要求双平台规则时，AGENTS.md 是唯一正文源，避免默认平台与 Claude Code 读取不同规则。
 if [[ "$TARGET" == "both" ]] && ! cmp -s "$REPO_DIR/AGENTS.md" "$REPO_DIR/CLAUDE.md"; then
   cp "$REPO_DIR/AGENTS.md" "$REPO_DIR/CLAUDE.md"
   echo "[INFO] 已以 AGENTS.md 同步根 CLAUDE.md"

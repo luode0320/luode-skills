@@ -56,7 +56,7 @@ templates:
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: []
   - template_id: TPL-PLAIN-BUG-002
-    path: bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-output-template.md
+    path: bug-intake-rules/references/bug-discovery-output-template.md
     profile: bug
     layers: [h1_summary, execution_appendix, tracking_appendix]
     exceptions: [investigation_evidence_remains_traceable_in_tracking_appendix]

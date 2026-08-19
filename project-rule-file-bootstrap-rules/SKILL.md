@@ -18,7 +18,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 2. 若两者都不存在，根据当前运行 AI 创建对应文件（Claude → `CLAUDE.md`，Codex → `AGENTS.md`）。
 3. 若两者都存在，使用与当前 AI 对应的文件，并在输出中标注另一个文件的存在。
 
-脚本平台传参：`scripts/bootstrap_agents.sh` 默认 `--target codex`。当前 AI 为 Claude Code 时必须显式追加 `--target claude`；两个规则文件都要同步时传 `--target both`，并以 `AGENTS.md` 为唯一正文源覆盖同步 `CLAUDE.md`。
+脚本平台传参：`scripts/bootstrap_agents.sh` 默认 `--target default`。当前 AI 为 Claude Code 时必须显式追加 `--target claude`；两个规则文件都要同步时传 `--target both`，并以 `AGENTS.md` 为唯一正文源覆盖同步 `CLAUDE.md`。
 
 ## 目标
 

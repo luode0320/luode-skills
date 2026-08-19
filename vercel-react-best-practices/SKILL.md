@@ -146,4 +146,4 @@ rules/bundle-barrel-imports.md
 
 ## 完整汇总文档
 
-所有规则展开版请查看：规则文件（Codex：`AGENTS.md`，Claude Code：`CLAUDE.md`）
+所有规则展开版请查看：规则文件（默认：`AGENTS.md`，Claude：`CLAUDE.md`）

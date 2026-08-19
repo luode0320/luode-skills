@@ -21,6 +21,7 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 - 从代码中抽取长期稳定事实，并持续回写到 `PROJECT_MEMORY.md`。
 - 对话中出现新的明确事实、旧事实被修订、废弃或冲突时，增量更新 `PROJECT_MEMORY.md`；项目概览与各会话当前任务摘要覆盖写入 `PROJECT_CURRENT.md`，重要完成或阻断事件追加到 `PROJECT_HISTORY.md`。
 - 用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md”等聚合指令时，作为四件套的记忆维护方参与统一编排。
+- 新项目 / 新会话首轮环境信息未命中时，按 `references/environment-probe.md` 执行项目环境探测（语言运行时、Web 框架、ORM、数据库、前端栈、构建与测试框架），探测结果固化进 `PROJECT_MEMORY.md`，后续会话优先复用记忆、不重复探测。
 
 ## 双区模型
 

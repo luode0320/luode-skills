@@ -1,0 +1,10 @@
+{
+  "slug": "3d-game-dev",
+  "name": "3D 游戏开发（Godot 4）",
+  "version": "1.0.0",
+  "installedAt": 1787149803925,
+  "source": "skillhub",
+  "labels": {
+    "requires_api_key": "false"
+  }
+}

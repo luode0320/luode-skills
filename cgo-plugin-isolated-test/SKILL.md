@@ -13,6 +13,26 @@ agent_created: true
   - `go test` 编译失败
 - 需要验证不依赖 cgo 的纯逻辑(调度、缓存、路由、配置解析等)
 
+## 首选:cgo-shim-build.py(自动化 shim)
+
+cpa-plugin 仓库已沉淀一键脚本 `scripts/cgo-shim-build.py`,自动完成:复制插件目录
+到临时区 → 剥离 main.go 的 cgo preamble 并替换 C.* 引用为 Go 桩 → 追加 shim
+类型/函数到文件末尾 → `CGO_ENABLED=0 go build/vet/test`。用法:
+
+```bash
+python scripts/cgo-shim-build.py workbuddy            # 全量 build+vet+test
+python scripts/cgo-shim-build.py <dir> --no-test --keep   # 跳过 test / 失败保留临时目录
+```
+
+脚本内置两条**真实 cgo 构建前置校验**(shim 本身会掩盖这两类错误,CI 才暴露,
+2026-08-19 两次踩坑后加入):
+- cgo preamble 必须含 `extern int cliproxyPluginCall` / `cliproxyPluginFree` /
+  `cliproxyPluginShutdown` 三件套(缺失 → `could not determine what
+  C.cliproxyPluginCall refers to`);
+- 包内必须存在 `func main()`(`-buildmode=c-shared` 硬性要求,缺失 →
+  `function main is undeclared in the main package`;workbuddy/qoderwork 都有
+  空 main,新插件别漏)。
+
 ## 核心方法:隔离目录 + shim
 
 1. **确认依赖图**:grep 被测试文件的引用符号,确定哪些定义在 cgo 文件(main.go/host_bridge.go)或重依赖文件(cache.go/billing.go/management.go)。
@@ -41,6 +61,22 @@ agent_created: true
 
 ## 关键坑
 
+- **正则灾难性回溯(DOTALL + 嵌套 `.*`)**:shim 重写 main.go 时
+  `(?://.*\n)*` 在 `re.DOTALL` 下对 31KB 文件 2^N 分支爆炸 → python 100% CPU
+  死循环(表现像"构建卡死",实际 go 没跑到)。必须用类否定 `(?://[^\n]*\n)*`
+  (单行锚定,线性)。任何 DOTALL 正则里的重复组都要警惕。
+- **config_yaml 是 base64 传输**:宿主 RPC 层 `ConfigYAML []byte` 经
+  encoding/json 序列化为 base64;插件端 `[]byte` 字段反序列化自动 base64 解码。
+  测试模拟必须 `json.Marshal(map{"config_yaml": []byte(yaml)})`,直接传字符串会
+  "illegal base64 data" 且被 `err == nil` 吞掉、配置静默失效。
+- **O_APPEND 句柄不能 Truncate(Windows)**:`os.OpenFile(path, O_APPEND|...)`
+  后 `f.Truncate(0)` 报 access denied(FILE_APPEND_DATA ≠ WRITE_DATA)。轮转
+  用独立 `os.Truncate(path, 0)` 再开 O_APPEND。
+- **零值配置触发 NewTicker(0) panic**:`usagestats.Open(Config{...})` 不补
+  默认值,测试必须显式传 FlushInterval/RetentionDays 等,否则
+  `time.NewTicker(0)` panic。
+- **shim 块放文件末尾**:Go 要求所有 import 在声明之前,shim 的
+  type/func 声明必须追加在 import 块之后(不能插在 package main 和 import 之间)。
 - **`go test -race` 在无 C 编译器时不可用**(`-race requires cgo`);并发正确性靠锁审查 + 正常测试。
 - **gofmt 对 CRLF 文件报 diff 是正常的**:仓库 Windows 下通常是 CRLF,`gofmt -l` 会列出所有仓库旧文件;只需确认自己**新写的文件**不在列表里(`gofmt -l session_auth.go` 无输出 = OK)。
 - **语法检查不依赖编译**:`gofmt -e <file>` 可对含 cgo 的文件做纯语法校验。

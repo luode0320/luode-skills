@@ -36,7 +36,18 @@ description: 当<明确触发条件>时触发。负责<核心职责>；不要用
 
 ## 命名建议
 
-- 统一后缀：`-rules`
-- 主题前缀按项目约定：例如 `project-` 或业务域前缀
-- 保持 ASCII 目录名，便于跨平台工具处理
+- 统一前缀：`project-<项目slug>-`；统一后缀：`-rules`
+- 示例：`project-ellipal-db-rules`、`project-goadmin-api-rules`
+- 保持 ASCII 小写 + 连字符，便于跨平台工具处理与自动命中
+- 落点：用户级 `~/.workbuddy/skills/`（junction 与 luode-skills 仓库同址，勿在项目根另建 `skill/`）
+
+## 质量标准（吸收自 skill-autosave）
+
+- ✅ description 清晰描述触发场景（什么时候用、什么情况下命中）
+- ✅ body 包含具体可执行步骤，不是泛泛而谈
+- ✅ 包含踩过的坑和注意事项（报错、解法、边界）
+- ✅ 代码 / 命令能直接复制执行
+- ❌ 泛泛而谈的指导
+- ❌ 只描述问题不给方案
+- ❌ 过度冗长的解释
 
