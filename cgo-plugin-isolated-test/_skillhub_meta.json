@@ -1,0 +1,5 @@
+{
+  "slug": "cgo-plugin-isolated-test",
+  "name": "cgo 插件隔离测试",
+  "source": "user-self-built"
+}
