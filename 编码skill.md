@@ -98,7 +98,7 @@
 | 编码基线域 | 所有编码任务都自动遵守的基础质量规则                             |
 | 代码位点域 | 改到哪类代码就触发哪类 skill                                     |
 | 代码风格回归域 | 测试后的格式、写法、位置与局部习惯回归，由 `code-style-consistency-rules` 提供唯一 `6-review` 入口和共享静态 Owner 路由；`continuous-code-quality-supervisor-rules` 仅在 Goal active 且用户明确“监控代码”时可选消费，不是 Gate |
-| 测试域     | 管理测试策略、测试位置、测试命名、测试文档、浏览器联动测试、功能验证与回归 |
+| 测试域     | 管理测试策略、测试位置、测试命名、测试文档、浏览器联动测试、功能验证与回归；接口级测试执行统一走 apifox 测试链路并落地用例（环境只允许指向 local） |
 | 交付域     | 管理提交流程、协作边界和交付说明                                 |
 
 ## 四、总控层
@@ -532,7 +532,7 @@ Bug 域采用两条互补路径：
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足实施计划完成条件时自动触发。 | 负责当前需求对应的功能正确性验证。 |
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
 | `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有测试执行实现。 |
-| `apifox`（上线接口测试链路） | 当需要做上线前项目级接口测试、生成/补全测试用例、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接上线接口测试：范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；原 `project-interface-release-execution-rules` 已并入。 |
+| `apifox`（接口测试执行链路） | 当需要做上线前项目级接口测试、接口级功能验证/回归/Bug 验证、生成/补全测试用例、接口新增/更新同步 apifox、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接接口级测试执行：AI 团队项目定位（`ai-team-project.md`）、接口同步（`api-sync-to-apifox.md`）、范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；执行通道见 `test-strategy-rules` 的《接口测试执行通道（强制）》，原 `project-interface-release-execution-rules` 已并入。 |
 
 ### 测试域内部边界判定
 
@@ -605,9 +605,9 @@ Bug 域采用两条互补路径：
 - 先由 `test-strategy-rules` 决定验证层级和重点
 - 再由测试资源管理类 skill 规范测试资产位置、命名和文档
 - 涉及页面交互、前端链路或真实浏览器操作时，先按统一浏览器路由选择执行工具
-- 然后执行 `functional-validation-rules`
+- 然后执行 `functional-validation-rules`；其中接口类验证按 `test-strategy-rules` 的《接口测试执行通道（强制）》在 apifox 中真实执行并落地用例
 - 涉及跨系统或跨环境时，回到 `test-strategy-rules` 重新确认验证路径与证据收集方式
-- 再执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证
+- 再执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证；接口类回归在 apifox 中执行（复用 apifox 测试套件）
 - 准备上线或需要统一放行结论时，最后先执行 `project-interface-baseline-rules` 扫描并更新接口基线，再走 apifox 测试链路完成项目级接口门禁（`test-selection-policy.md` 选范围 → `test-case-generation.md` 生成用例 → `test-data-and-judgement.md` 构造与判定 → 真实 run 通过）
 
 ## 十二、交付域

@@ -147,6 +147,7 @@
 - 稳定决策：接口级结果固定为 `PASS`、`EXPECTED_FAIL`、`UNEXPECTED_FAIL`、`PENDING`；P0 入口任意非 `PASS` 阻断项目放行，项目门禁输出 `PASS`/`FAIL`/`PARTIAL`。
 - 稳定决策：项目接口事实基线仍由 `project-interface-baseline-rules` 沉淀在 `doc/5-tests/基线/`；apifox 执行前确认基线最新，执行后回写新发现接口与参数来源。
 - 稳定决策：报告明细的 request/response 固定为脱敏 JSON 字符串，`responses.json` 保留脱敏对象；基线以 append-only 事件和 v2 原子投影为事实源。
+- 稳定决策（2026-08-19 扩展）：接口级测试执行通道从「上线门禁专用」扩展到「所有接口级测试」——接口功能验证、回归、Bug 接口验证、上线门禁的接口部分统一走 apifox 真实测试并落地用例到 apifox「AI 团队」对应项目（`apifox test-case run` / `test-suite run`），环境只允许指向 local（localhost）；单元测试/代码级测试保留本地 go test/pytest。权威节为 `test-strategy-rules` 的《接口测试执行通道（强制）》；apifox skill 新增 `modules/ai-team-project.md`（AI 团队项目 projectId 解析与登记）与 `modules/api-sync-to-apifox.md`（接口新增/更新同步 apifox 强制流程，swag 生成仍归 swag-openapi-maintainer-rules）。
 
 ## 核心记忆
 

@@ -371,8 +371,8 @@ python skill-dictionary/generate_dictionary.py
 | `agent-browser`               | 提供条件式浏览器自动化能力，重点覆盖隔离 profile、并发 session、网络/HAR、视觉 diff、录制/trace、代理和多引擎场景；普通 Chrome 状态与常规调试按统一浏览器路由处理。 |
 | `browser-use-cloud-rules`     | 仅接 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身和合规验证码场景；每次 `run_session` / `send_task` 前提醒本机配置 `BROWSER_USE_API_KEY`，检查 Billing、当前动作硬费用上限并取得当次确认，完成后停止遗留 session 并回读实际费用。 |
 | `functional-validation-rules` | 针对当前需求做功能正确性验证，确保主流程闭环。                                 |
-| `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响。  |
-| `project-release-test-rules`  | 作为上线前项目级接口测试门禁，强制每次执行前先扫描并更新接口基线，再完成必测接口筛选、门禁测试、结果归档与最终放行结论。 |
+| `test-regression-rules`       | 在 Bug 修复、公共模块修改、原有功能迭代后执行回归测试，防止新旧问题相互影响；接口类回归在 apifox 中执行。 |
+| `project-interface-baseline-rules` | 维护项目级接口事实基线（接口清单、依赖图、参数来源）；接口级测试执行统一走 apifox 测试链路（`apifox-cli__skillhub`：AI 团队项目定位、范围选择、用例生成、数据构造、响应判定），执行入口 `apifox test-case run` / `test-suite run`，环境只允许指向 local。 |
 
 ### 9. 交付域
 
@@ -1037,3 +1037,5 @@ claude-mem(记忆) :
 2026-08-19 00:45:30 feat: [thread-title修复型吸收] WorkBuddy原生会话改名适配与契约
 
 2026-08-19 00:46:00 docs: [精华吸收沉淀] 吸收裁决表扩展与标点门禁命令修正
+2026-08-19 19:03:00 feat: [接口测试apifox落地改造] 接口级测试执行通道切换与apifox模块扩展
+2026-08-19 19:05:00 docs: [接口测试apifox落地改造] 项目记忆与字典同步
