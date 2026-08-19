@@ -6,9 +6,9 @@
 
 | Skill 名称 | 职责范围 | 和本 skill 的关系 |
 | --- | --- | --- |
-| `test-strategy-rules` | 任务级测试的策略规划、优先级和覆盖范围 | 本 skill 是项目级上线测试门禁，不替代任务级测试策略；两者可并行，但上线门禁前必须先有清晰策略 |
-| `functional-validation-rules` | 任务级的当前改动功能验证 | 本 skill 可调用它执行单接口功能验证，结果纳入项目级门禁报告；本 skill 不替代单接口功能语义验证细节 |
-| `test-regression-rules` | 任务级的改动影响面回归验证 | 本 skill 关注项目级核心接口的上线前门禁回归，两者覆盖范围不同，可并行并复用结果 |
+| `test-strategy-rules` | 任务级测试的策略规划、优先级和覆盖范围 | 本 skill 是项目级上线测试门禁，不替代任务级测试策略；两者可并行，但上线门禁前必须先有清晰策略；接口测试执行通道（强制）以 `test-strategy-rules` 的《接口测试执行通道（强制）》节为单一权威 |
+| `functional-validation-rules` | 任务级的当前改动功能验证 | 本 skill 可调用它执行单接口功能验证，结果纳入项目级门禁报告；接口类功能验证在 apifox 中执行并落地用例（遵循 `test-strategy-rules` 的《接口测试执行通道（强制）》），本 skill 不替代单接口功能语义验证细节 |
+| `test-regression-rules` | 任务级的改动影响面回归验证 | 本 skill 关注项目级核心接口的上线前门禁回归，两者覆盖范围不同，可并行并复用结果；接口类回归在 apifox 中执行（复用 apifox 测试套件） |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试目录的创建和结构规范 | 本 skill 必须遵循它的要求，中文主报告落地到 `doc/5-tests/` 的扁平 md，机器产物落地到 `test/release-artifacts/YYYY-MM-DD_HHmmss_release-interface-test/` |
 | `test-strategy-rules 的 test-asset-governance 条件路由` | 测试文档的结构和归档规则 | 本 skill 的报告必须遵循它的要求，中文说明目录只放主 `README.md`，其他内容放 ASCII 镜像目录 |
 | `test-program-rules` | 测试脚本、测试程序和资产的组织规则 | 本 skill 的测试脚本、用例和数据必须遵循它的要求 |
@@ -23,9 +23,9 @@
 推荐的完整上线前测试流程顺序：
 
 1. 代码实现完成，执行 `code-style-consistency-rules`，完成测试前静态自审。
-2. 执行 `functional-validation-rules`，确认当前改动功能验证通过。
-3. 执行 `test-regression-rules`，确认改动影响面回归验证通过。
-4. 执行 apifox 测试链路（`apifox-cli__skillhub/modules/`：范围选择、用例生成、数据构造、响应判定），完成上线前项目级核心接口测试并得到门禁结论。
+2. 执行 `functional-validation-rules`，确认当前改动功能验证通过；其中接口类验证在 apifox「AI 团队」对应项目中执行并落地用例（遵循 `test-strategy-rules` 的《接口测试执行通道（强制）》）。
+3. 执行 `test-regression-rules`，确认改动影响面回归验证通过；其中接口类回归在 apifox 中执行（复用 apifox 测试套件）。
+4. 执行 apifox 测试链路（`apifox-cli__skillhub/modules/`：AI 团队项目定位、范围选择、用例生成、数据构造、响应判定），完成上线前项目级核心接口测试并得到门禁结论。
 5. 执行 `code-style-consistency-rules`，参考测试门禁结论完成全量改动总审查。
 6. 执行 `delivery-summary-rules`，综合测试与审查结论给出最终验收结论。
 

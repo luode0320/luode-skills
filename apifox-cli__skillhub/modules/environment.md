@@ -46,8 +46,19 @@ Mock 是独立于环境的功能，需要在接口层级配置 Mock 规则或期
 - 运行测试时建议显式带 `--environment`
 - CI 场景 token 通过 secret 注入，不要写入仓库
 
+## 被测服务本地启动（强制）
+
+接口级测试（功能验证/回归/Bug 验证/上线门禁的接口部分）默认以本地服务为被测对象：
+
+- 测试前必须先确认被测服务已在本地启动且端口可访问（`curl http://localhost:<port>/health` 或等价可达检查）
+- apifox environment 的 baseUrl 指向本地服务：`http://localhost:<port>`；环境名约定使用 `local` / `localhost`
+- 禁止新建指向 `test` / `prod` / `staging` / `pre` / `release` 的 environment，禁止把 baseUrl 指向非 local 服务（判定标准是配置归属，与 `test-strategy-rules` 的本地环境红线一致）
+- 运行测试显式带 `--environment <localhost环境Id>`，避免默认环境漂移
+- 数据构造仍从 local 数据库取真实样本（来源优先级见 `modules/test-data-and-judgement.md`），不得连非 local 服务取数
+
 ## 不可违反规则
 
 1. 敏感变量不要出现在最终回复中
 2. 运行测试建议显式指定 `--environment`，避免默认环境变化
 3. 不要在未确认环境的情况下执行有副作用的操作
+4. 接口级测试 environment 只允许指向 local（localhost），禁止指向非 local 服务

@@ -1,6 +1,6 @@
 ---
 name: test-strategy-rules
-description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试主文档、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳测试主文档，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。当本轮新增或修改生产代码、准备为可测性在生产文件中加函数/静态数据/字段/分支/第二构造器，或发现生产符号只被 `test/` 引用时，进入生产代码测试污染判定：完全禁止为测试改动生产代码，按引用面判据判定并由 `scripts/scan_test_pollution.py` 硬阻断，豁免须显式登记。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
+description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试主文档、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳测试主文档，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。当本轮新增或修改生产代码、准备为可测性在生产文件中加函数/静态数据/字段/分支/第二构造器，或发现生产符号只被 `test/` 引用时，进入生产代码测试污染判定：完全禁止为测试改动生产代码，按引用面判据判定并由 `scripts/scan_test_pollution.py` 硬阻断，豁免须显式登记。当测试对象是 HTTP 接口（有 method+path，经 HTTP 协议调用）需要执行接口级测试（功能验证、回归、Bug 接口验证、上线门禁的接口部分）时，进入「接口测试执行通道（强制）」：统一走 apifox 测试链路真实测试并落地测试用例到 apifox「AI 团队」对应项目，environment 只允许指向 local（localhost），单元测试/代码级测试保留本地。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
 ---
 
 # 测试策略规则
@@ -163,6 +163,52 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 - 若 local 数据不足、local 服务未启动或本地依赖不可达，只能补齐 / 启动 local 环境，或记录为本地环境阻断；不得为了补证据连接 test / prod 数据库、缓存、消息队列、外部服务或线上接口。
 - 对真实环境产生的写入 / 变更，测试结束后必须清理（事务回滚或 cleanup 脚本），不得遗留测试数据。
 - 本地配置常含敏感信息（数据库密码、密钥）：代码、配置、普通维护文档和 Git 提交允许有意持久化原值；测试主文档、测试证据、控制台、对外输出和项目记忆不得回显原值。
+
+## 接口测试执行通道（强制）
+
+> 本节是「接口级测试执行通道」的单一权威来源。接口功能验证、接口回归、Bug 接口验证、上线门禁的接口部分统一遵循本节；`functional-validation-rules`、`test-regression-rules`、`bug-validation-rules` 直接引用本节，不重复定义执行细节。
+
+### 判定边界：接口级 vs 代码级
+
+- 测试对象是 **HTTP 接口**（有 method+path，经 HTTP 协议调用）→ **接口级测试** → 必须走 apifox 真实测试并落地用例。
+- 测试对象是函数/方法/模块/纯逻辑 → **代码级测试** → 保留本地 `go test` / pytest，不切换。
+- 页面交互/浏览器联调 → 浏览器链路，不属本通道。
+- 同一轮验证可能同时含接口级与代码级测试：按测试对象分类各自执行，不得把整轮验证一刀切。
+
+### 接口级测试强制走 apifox（强制）
+
+- 接口功能验证、回归、Bug 接口验证、上线门禁的接口部分，统一用 `apifox test-case run` / `test-suite run` 在 apifox「AI 团队」对应项目中执行，并**落地测试用例保存到 apifox**（用例保留即落地，必要时并入 test-suite 回归）。
+- 不得只在本地 shell/curl 验证后不落地用例；「本地调试过」不构成跳过 apifox 落地的理由。
+- 目标项目解析与接口同步流程见 `apifox-cli__skillhub/modules/ai-team-project.md` 与 `modules/api-sync-to-apifox.md`；swag/OpenAPI 生成归 `swag-openapi-maintainer-rules`。
+
+### 环境红线不变（强制）
+
+- apifox environment 的 baseUrl 只允许指向 **local**（localhost / 本地开发配置声明的服务），禁止指向 `test` / `prod` / `staging` / `pre` / `release`；判定标准仍是「配置归属」而非物理地址，与「本地环境配置发现与连接」一致。
+- 运行测试显式带 `--environment <localhost环境Id>`，避免默认环境漂移。
+
+### 前置条件
+
+- 被测服务必须在本地启动且端口可访问（先做可达检查再执行用例）。
+- 数据构造按 `apifox-cli__skillhub/modules/test-data-and-judgement.md` 从 local 数据库取真实样本，禁止连非 local 服务取数。
+
+### 标准执行链路
+
+```text
+1. 本地启动被测服务，确认端口可访问
+2. 解析 apifox「AI 团队」项目 projectId（.apifox/settings.json 或 apifox project list）
+3. 确认/创建 localhost environment（baseUrl=http://localhost:<port>）
+4. （项目级）project-interface-baseline-rules 刷新接口基线
+5. endpoint 定位；不存在 → api-sync-to-apifox 模块先同步
+6. 生成/选择 test-case（category → cli-schema get/validate → create）
+7. test-case run <caseId> --project <projectId> --environment <localhostEnv>
+8. 按 test-data-and-judgement.md 判定 PASS/EXPECTED_FAIL/UNEXPECTED_FAIL/PENDING
+9. 用例保留在 apifox（通过即落地），必要时并入 test-suite 回归
+10. 结论写回 doc/5-tests/ 测试主文档（内联 caseId/报告链接），必要时回写接口基线
+```
+
+### 结论留痕
+
+- 接口验证结论写回 `doc/5-tests/` 测试主文档；用例保存证据（caseId / suiteId / 报告链接）内联进证据小节，不得只写「已测试」无凭据。
 
 ## 测试样本分布优先（强制）
 

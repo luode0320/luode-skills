@@ -30,6 +30,27 @@ npm install -g apifox-cli@latest --registry=https://registry.npmmirror.com/
 
 > 不要每次默认升级；只有命令返回版本过低/unknown command/参数缺失疑似旧版导致，或用户任务依赖新能力时，才建议升级。
 
+### 遥测与弹窗问题（Windows）
+
+apifox-cli 每次命令结束会异步 spawn `--telemetry-flush-worker` 子进程上报遥测数据（写入 `~/.apifox/telemetry/events.jsonl`）。在 Windows GUI 宿主（WorkBuddy / IDE / 桌面工具）中运行时，该子进程可能**弹出黑色命令窗口闪一下即关闭**，且随每次 apifox 命令反复出现。
+
+**禁用遥测可彻底消除**（apifox-cli 内置开关，源码逻辑为 `"0"===process.env.APIFOX_CLI_TELEMETRY`）：
+
+```bash
+# Windows 用户级持久化（推荐）
+[Environment]::SetEnvironmentVariable('APIFOX_CLI_TELEMETRY','0','User')
+
+# 或临时（当前命令会话）
+APIFOX_CLI_TELEMETRY=0 apifox <command>
+```
+
+要点：
+
+- 兼容变量：`APIFOX_CLI_TELEMETRY=0` / `APIDOG_CLI_TELEMETRY=0` / `<APP>_CLI_TELEMETRY=0`，任一为 `0` 即禁用
+- 设置后需**重启 GUI 宿主进程**（如 WorkBuddy）让用户环境变量全局生效；生效前跑命令显式带变量
+- 已存在的 telemetry worker 残留进程（命令行形如 `win32-x64.exe C:\Users\<user>\.apifox\telemetry\flush.lock`）无害、不再弹新窗，宿主重启后消失
+- 定位手段：`Get-WmiObject Win32_Process -Filter "Name='win32-x64.exe'" | Select ProcessId,CommandLine`，看 CommandLine 是否指向 `flush.lock`
+
 ## 模块按需加载
 
 本 skill 按命令类别拆分为以下模块。**读到本文件后，根据用户任务匹配模块，立即读取对应 `modules/<name>.md`：**
@@ -37,6 +58,8 @@ npm install -g apifox-cli@latest --registry=https://registry.npmmirror.com/
 | 用户任务关键词 | 加载模块 | 覆盖命令 |
 |---|---|---|
 | 安装、登录、项目、初次使用、help | `modules/quick-start.md` | login, project, 基础用法 |
+| AI 团队、项目定位、projectId、.apifox/settings.json、默认项目登记 | `modules/ai-team-project.md` | project, settings（AI 团队项目解析） |
+| 接口新增/更新同步 apifox、代码→swag→import、契约校验、接口落地 | `modules/api-sync-to-apifox.md` | import, endpoint 校验, test-case 落地（与 swag 联动） |
 | 接口、endpoint、Schema、目录/文件夹、安全方案 | `modules/api-design.md` | endpoint, schema, response-component, security-scheme, folder |
 | 环境、变量、Mock、数据库连接 | `modules/environment.md` | environment, variables, mock, database-connection |
 | 分支、合并、merge request、AI 分支、pick-to | `modules/branch.md` | branch, merge-request |
@@ -81,6 +104,7 @@ apifox <command> <subcommand> --help
 - 凭证存在 `~/.apifox/config.toml`；不要把 token 打印到日志、提交到仓库或写进普通聊天摘要
 - 项目未指定时，先查 `.apifox/settings.json` 中是否有默认 `projectId`
 - 项目 ID 可从「项目设置 - 基本设置 - 项目 ID」获取，或 `apifox project list`
+- 「AI 团队」对应项目的 projectId 解析与默认项目登记见 `modules/ai-team-project.md`
 - 写入任何本地配置文件前先询问用户
 
 ### 写入标准流程
@@ -112,6 +136,7 @@ apifox <command> <subcommand> --help
 - AI 分支初始为空，修改源分支已有资源前必须先 `pick-to`
 - AI 分支新建资源无需先导入
 - AI 分支修改不会自动写回源分支；完成后必须让用户确认是否合并
+- 接口新增/更新同步 apifox 默认走 AI 分支，流程见 `modules/api-sync-to-apifox.md`
 
 ### 必须询问用户
 
