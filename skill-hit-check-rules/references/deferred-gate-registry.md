@@ -17,8 +17,8 @@
 | gate skill | 触发检查点 | 任务类型前提（predicate） | 强制/条件 | 兑现说明 |
 |---|---|---|---|---|
 | `reasoning-summary-structure-rules` | 收口前 | 非 Plan Mode 的实质任务轮 | 强制 | 按其固定总结结构输出；恒为 `闸门预告` 成员 |
-| `comment-completion-gate-rules` | 中段改码 + 收口前 | 本轮有任意代码新增/修改 | 强制 | 改动位点注释补齐闸门，缺项不得收口 |
-| `comment-placement-granularity-rules` | 中段改码 | 本轮有任意代码新增/修改 | 强制 | 与上一条联动，判定注释落点与颗粒度 |
+| `comment-rules` | 中段改码 + 收口前 | 本轮有任意代码新增/修改 | 强制 | 改动位点注释补齐闸门，缺项不得收口 |
+| `comment-rules` | 中段改码 | 本轮有任意代码新增/修改 | 强制 | 与上一条联动，判定注释落点与颗粒度 |
 | `code-style-consistency-rules`（`6-review`） | 测试后 | 真实测试完成、准备风格回归 | 强制 | 唯一活动风格回归入口，只输出 STYLE |
 | `skill-execution-compliance-gate-rules` | 收口前 | 本轮命中多 skill / 有工具执行 / 改 skill 资产 | 强制 | 末端合规 PASS/FAIL |
 | `execution-failure-learning-rules` | 失败时 | 非预期工具/命令/API/环境失败 | 条件 | 失败才触发，首条登记「若失败则触发」 |

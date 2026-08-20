@@ -12,17 +12,11 @@ from typing import Iterable
 
 
 OWNER_NAMES = {
-    "api-endpoint-rules",
-    "api-request-rules",
-    "api-response-rules",
-    "api-swagger-rules",
-    "chinese-comment-rules",
+    "api-contract-rules",
+    "comment-rules",
     "code-generation-style-rules",
-    "code-minimal-change-rules",
-    "code-readability-rules",
+    "code-quality-rules",
     "code-style-consistency-rules",
-    "comment-completion-gate-rules",
-    "comment-placement-granularity-rules",
     "common-util-rules",
     "database-query-rules",
     "database-schema-rules",
@@ -44,13 +38,10 @@ OWNER_NAMES = {
 
 BASE_OWNER_NAMES = (
     "code-generation-style-rules",
-    "code-minimal-change-rules",
-    "code-readability-rules",
+    "code-quality-rules",
     "code-style-consistency-rules",
     "naming-rules",
-    "comment-placement-granularity-rules",
-    "comment-completion-gate-rules",
-    "chinese-comment-rules",
+    "comment-rules",
 )
 
 FRONTEND_SUFFIXES = (".vue", ".ts", ".tsx", ".js", ".jsx")
@@ -210,7 +201,7 @@ def route_owners(changed_files: Iterable[str], signals: Iterable[str] = ()) -> l
     if has_path_term("api", "controller", "controllers", "handler", "handlers", "openapi", "swagger") or signal_set.intersection(
         {"http-api", "api-endpoint", "api-request", "api-response", "api-swagger"}
     ):
-        add("api-endpoint-rules", "api-request-rules", "api-response-rules", "api-swagger-rules")
+        add("api-contract-rules", "api-contract-rules", "api-contract-rules", "api-contract-rules")
     if has_path_term("migration", "migrations", "schema", "schemas") or signal_set.intersection({"database-schema", "schema"}):
         add("database-schema-rules")
     if has_file_suffix(".sql") or has_path_term("repository", "repositories", "repo", "dao", "mapper", "query", "queries") or signal_set.intersection(

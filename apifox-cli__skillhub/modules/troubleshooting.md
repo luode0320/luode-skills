@@ -85,3 +85,4 @@ apifox test-scenario get <scenarioId> --project <projectId> --branch <branchName
 | run-config 或运行前失败 | 确认 case/scenario/endpoint/environment/branch 都存在 |
 | 云端报告找不到 | 确认运行时是否带 `--upload-report` |
 | agentHints 和 help 冲突 | 以当前 help 和实测为准 |
+| WSL 内 whoami 未登录/凭据缺失，但 Windows 侧确认已登录 | 检查并同步 Windows 侧 `~/.apifox/config.toml` 到 WSL，见 SKILL.md“跨系统凭据同步” |

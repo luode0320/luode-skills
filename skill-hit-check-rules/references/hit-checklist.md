@@ -9,7 +9,7 @@
 
 ## 注释场景补充
 
-- 用户请求“补充注释”“只改注释”等表达时，至少检查 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`chinese-comment-rules`、`code-change-finalization-gate-rules`。
+- 用户请求“补充注释”“只改注释”等表达时，至少检查 `comment-rules`（语言表达 / 位置颗粒度 / 补齐闸门三分区）、`code-change-finalization-gate-rules`。
 - 函数/方法改动、补丁位点和最终核对清单仍按注释类 Owner Skill 执行，不在命中入口重复定义字段。
 
 ## 图片输入场景补充
@@ -42,7 +42,7 @@
 
 ## 代码改动收口场景补充
 
-- 本轮发生代码新增或修改并准备收口时，按 `deferred-gate-registry.md` 与首条 `闸门预告` **逐项复核已声明 vs 已执行**：至少 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`code-style-consistency-rules` 的 `6-review`、`code-change-finalization-gate-rules`，并按 `reasoning-summary-structure-rules` 输出最终总结（Plan Mode 除外）。
+- 本轮发生代码新增或修改并准备收口时，按 `deferred-gate-registry.md` 与首条 `闸门预告` **逐项复核已声明 vs 已执行**：至少 `comment-rules`、`code-style-consistency-rules` 的 `6-review`、`code-change-finalization-gate-rules`，并按 `reasoning-summary-structure-rules` 输出最终总结（Plan Mode 除外）。
 - 具体注释字段、审查步骤、测试证据和 PASS / FAIL 由各 Owner 定义；`闸门预告` 登记过或注册表判定当前阶段必需的 gate 未执行时，先补执行再收口。
 
 ## 代码改动中段场景补充
@@ -54,7 +54,7 @@
 
 - 用户表达"吸收/借鉴/融合/采纳 某个 skill 的精华到我们的 skill""这个 skill 能不能吸收""把 XX skill 的思路用起来""优化我们的 skill 让它更强大""把外部精华沉淀成规则"等意图时，必须命中 `skill-absorption-rules`，按"获取原文 -> 三态裁决 -> 落点简化 -> 8维评分棘轮验证 -> 登记"闭环执行。
 - 提供外部 skill 的 URL / GitHub / 市场页面 / SKILL.md 原文时，先由 `skill-absorption-rules` 抓取并拆解；本入口不复制其裁决步骤。
-- 与 `skill-evolution-rules`（内部 gap 演进）、`skill-audit-rules`（多 skill 职责审计）按职责边界联动；外部种子场景由 `skill-absorption-rules` 总承接。
+- 与 `skill-absorption-rules`（内部 gap 演进）、`skill-audit-rules`（多 skill 职责审计）按职责边界联动；外部种子场景由 `skill-absorption-rules` 总承接。
 
 ## 判定原则
 
@@ -63,7 +63,7 @@
 - 仓库任务默认联动 `parallel-task-dispatch-rules`，由其统一判断串行、条件并行、真实启动、回收和回退；用户禁止或环境不支持时必须真实回退，不能伪报并行。
 - 非 Plan Mode 的仓库实质任务按 `deferred-gate-registry.md` + 当前任务类型，在首条 `闸门预告` 字段登记本轮将适用的延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员），强制项列入 `命中技能`。`闸门预告` 是预测：中段按真实改动对账修正，收口按其逐项复核声明与执行是否一致。Plan Mode 下延迟 gate 判定 `NOT_APPLICABLE`、`reasoning-summary-structure-rules` 不得命中，`闸门预告` 置 `不适用(Plan Mode)`。
 - 仓库任务执行知识库选择性判断：依赖历史知识或用户长期偏好时为 `检索`，形成可复用知识时为 `沉淀`，无价值时为 `不适用`，知识库目录不存在或不可读、路径不合法、写入后回读不一致且影响动作时为 `阻断`。仅 `检索` 或 `沉淀` 联动 `knowledge-flow`。所有知识库读写必须限定在知识库根目录内操作，写入后回读校验。
-- Skill 资产新增或修改时联动 `skill-execution-compliance-gate-rules`；description 或触发条件变化追加 `skill-evolution-rules`；多 Skill、职责边界或收口风险追加 `skill-audit-rules`。
+- Skill 资产新增或修改时联动 `skill-execution-compliance-gate-rules`；description 或触发条件变化追加 `skill-absorption-rules`；多 Skill、职责边界或收口风险追加 `skill-audit-rules`。
 - 非预期执行失败联动 `execution-failure-learning-rules`；预期负向测试、用户取消、权限阻断和业务 Bug 分别交给其专属 Owner。
 
 ## Git 短指令场景补充

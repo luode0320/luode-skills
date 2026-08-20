@@ -35,8 +35,8 @@
   - `/ponytail-help`：参考指南
 - **配置**：可选 `~/.config/ponytail/config.json`，或环境变量 `PONYTAIL_DEFAULT_MODE`（默认 `full`）。
 - **决策阶梯**：是否需要存在 → 代码库已有 → 标准库 → 平台原生特性 → 已装依赖 → 一行能否搞定 → 才写最小可行代码。
-- **适用**：希望 AI 生成精简代码、减少 review 负担、降低 token 成本；与 `code-minimal-change-rules`、`bug-fix-proposal-rules` 的根因 / 最小改动理念一致。
+- **适用**：希望 AI 生成精简代码、减少 review 负担、降低 token 成本；与 `code-quality-rules`、`bug-fix-proposal-rules` 的根因 / 最小改动理念一致。
 - **不适用**：生产级金融 / 医疗 / 安全系统的防御性编程、教学样板、有严格代码规范的团队。
 - **安全边界**：只砍「为防万一而写的样板代码」，不砍数据校验、访问控制、输入验证等安全代码。
-- **回退**：未安装或未激活时，按常规编码流程进行，并可联动 `code-minimal-change-rules` 手动控制代码量。
+- **回退**：未安装或未激活时，按常规编码流程进行，并可联动 `code-quality-rules` 手动控制代码量。
 - **⚠️ 注意**：网上第三方文章给的 `npx ponytail init` / `claude --ponytail` / `npm install -g ponytail` 等命令与官方**不符**，不要使用；一律以官方仓库 README 的 `/plugin marketplace add` 等命令为准。

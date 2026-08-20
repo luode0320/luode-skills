@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码质量规则"
+  short_description: "统一最小改动范围与可读性双主线约束"
+  default_prompt: "使用 $code-quality-rules 按双主线（最小改动→可读性）判断本轮代码质量：收缩改动范围、简单优先、副作用可见、结构化解析，并联动 comment-rules 完成改动位点注释补齐。"

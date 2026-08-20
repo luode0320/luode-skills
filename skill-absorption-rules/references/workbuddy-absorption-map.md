@@ -25,7 +25,7 @@
 | 7 | 四轮小步迭代（骨架→填充→复盘→风险） | `artifact-delivery-gate-rules`（6-review）、`code-change-finalization-gate-rules` | 保留本地 | 本地更强 |
 | 8 | 角色互搏（开发/产品双角色） | `adversarial-gap-interview.md` 已有对抗式缺口追问 | 合并 | `adversarial-gap-interview.md` 追加「设计阶段双角色自检」小节 |
 | 9 | 异常恢复指引（6.1-6.5） | `agent-runtime-recovery-rules`、`session-handoff-rules`、`task-plan-rehydration-rules` | 保留本地 | 本地更强 |
-| 10 | 11 条编码规范 | `code-generation-style-rules`、`code-readability-rules`、`error-handling-rules`、`logging-trace-rules`、`database-query-rules`、`naming-rules` 等十几条细分 | 保留本地 | 本地更细且 Go 生态适配 |
+| 10 | 11 条编码规范 | `code-generation-style-rules`、`code-quality-rules`、`error-handling-rules`、`logging-trace-rules`、`database-query-rules`、`naming-rules` 等十几条细分 | 保留本地 | 本地更细且 Go 生态适配 |
 | 11 | 文档编号规则（1-Requirement/2-Analysis/3-Design） | `artifact-storage-rules`（doc/1-架构 2-需求 3-实施）+ 稳定 ID | 保留本地 | 本地更强 |
 | 12 | TODO 分类规范（[临时]/[技债]/[外部依赖]/[逻辑补全]/[暂不明确]） | `task-blocker-closure-contract.md` 已有遗留项处理语义 | 拒绝 | 与本地闸门重叠，避免为吸收而吸收 |
 | 13 | 核心变量命名（storyNameCN/ID/Branch） | `naming-rules`、`git-collaboration-rules` | 保留本地 | — |

@@ -172,6 +172,15 @@ apifox test-data --help
 - 不要凭经验猜 processor/assertion/extractor 的字段名
 - test-case 不支持跨步骤数据传递，需要时加载 `test-scenario`
 
+## 数据清理机制（写接口用例，强制）
+
+> 方法论见 `modules/test-case-generation.md`「规则 F：写接口测试数据清理铁律」，本节只给 CLI 落地写法。
+
+- **POST 用例清理**：在 `postProcessors` 加 `extractor` 提取新建资源主键（`shareScope=PROJECT`），随后用 `test-scenario` 把"创建 case → 断言 case → 删除 case（复用 {{提取的id}}）"编成一条场景；单独跑创建 case 时不清理，必须跑场景才算完整闭环。
+- **PUT/PATCH 用例清理**：优先对 fixture（专用测试记录，不服务真实业务）操作；若必须改共享数据，在同一 case 的 `postProcessors` 末尾加一个还原请求（自定义脚本里发起还原调用，或场景里追加还原步骤）。
+- **DELETE 用例清理**：本身即清理动作，但前置必须是"本场景创建的数据"，不要对已有业务数据跑删除用例；场景第一步用创建 case 的 extractor 产出 id，最后一步才是 delete case。
+- **无删除接口的资源**：在 `PROJECT_TEST.md`「遗留测试数据」登记，不要跳过清理环节就直接收口。
+
 ## 运行规则
 
 - `test-case run <caseId>` — 单个 case

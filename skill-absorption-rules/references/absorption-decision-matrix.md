@@ -60,7 +60,7 @@
 
 - 优先落点：目标域 skill 的 `references/` 新增一个 reference（最小侵入、可追溯），或补进现有 reference 的相关小节。
 - 次选落点：目标 SKILL.md 正文（仅当规则是高频核心动作、且正文已有同类条目）。
-- 禁止落点：新建同类 skill 目录（除非职责边界稳定且现有 skill 明显承接不住，需与 `skill-evolution-rules` 的决策矩阵一致）。
+- 禁止落点：新建同类 skill 目录（除非职责边界稳定且现有 skill 明显承接不住，需与本 skill 的 `references/evolution-decision-matrix.md` 决策矩阵一致）。
 
 ## 反例（不得判为合并）
 

@@ -48,7 +48,7 @@ description: 当新增或修改前端页面、页面布局、主题样式、配�
 7. 如果当前任务涉及主题、配色、字体、图标和设计 token，再读 `references/color-typography-icon-rules.md`。
 8. 如果当前任务涉及表单、导航、图表、数据展示和空态，再读 `references/forms-nav-data-display-rules.md`。
 9. 完成前默认再读 `references/ui-delivery-checklist.md` 做一轮交付前 UI 自审。
-10. 若本轮修改前端代码文件，完成前必须确认 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
+10. 若本轮修改前端代码文件，完成前必须确认 `comment-rules`（位置颗粒度 + 补齐闸门分区）、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
 
 ## 权责边界与不负责事项
 

@@ -32,7 +32,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 - 每轮都命中本 skill；自动触发不依赖用户点名，也不因任务简单而跳过。
 - 仓库任务联动 `parallel-task-dispatch-rules` 并执行知识库选择性判断；非 Plan Mode 的实质任务轮按 `references/deferred-gate-registry.md` 用 `闸门预告` 登记本轮延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员）。
 - 当前轮存在 Git 意图时联动 `git-collaboration-rules`；只识别当前轮，不继承历史授权。
-- 修改 Skill 资产时联动 `skill-execution-compliance-gate-rules`，并按职责边界追加 `skill-evolution-rules`、`skill-audit-rules`。
+- 修改 Skill 资产时联动 `skill-execution-compliance-gate-rules`，并按职责边界追加 `skill-absorption-rules`、`skill-audit-rules`。
 - 联动条件、用户习惯、负向边界和漏触发防护统一见 `references/hit-checklist.md`；本入口不复制各 Owner 的执行细则。
 
 ## -1.0 新会话首轮保障（强制）
@@ -98,7 +98,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 ## 2.3 Skill 资产改动联动闸门（强制）
 
 - 本 skill 只输出联动摘要：是否命中执行合规、演进和多 Skill 审计。
-- PASS / FAIL、保护语义、迁移证据和字典刷新要求以 `skill-execution-compliance-gate-rules`、`skill-evolution-rules`、`skill-audit-rules` 为准。
+- PASS / FAIL、保护语义、迁移证据和字典刷新要求以 `skill-execution-compliance-gate-rules`、`skill-absorption-rules`、`skill-audit-rules` 为准。
 
 ## 3. 通过标准
 

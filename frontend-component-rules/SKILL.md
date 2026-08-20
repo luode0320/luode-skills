@@ -41,7 +41,7 @@ description: 当新增或修改 React、Vue、前端组件拆分、组件目录�
 4. 如果当前任务涉及组合复用、包装组件、hooks、composables 或公共组件抽象，再读 `references/composition-reuse-rules.md`。
 5. 如果当前任务涉及渲染副作用、请求时机、watch / effect / lifecycle、副作用清理，再读 `references/render-side-effect-rules.md`。
 6. 完成前默认再读 `references/component-review-checklist.md` 做一轮组件工程自审。
-7. 若本轮修改 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js` 前端组件代码，完成前必须确认 `comment-placement-granularity-rules`、`comment-completion-gate-rules`、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成”结论。
+7. 若本轮修改 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js` 前端组件代码，完成前必须确认 `comment-rules`（位置颗粒度 + 补齐闸门分区）、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成”结论。
 
 ## 权责边界与不负责事项
 

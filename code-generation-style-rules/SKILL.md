@@ -1,6 +1,6 @@
 ---
 name: code-generation-style-rules
-description: 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”；当修改上下文已经形成高度统一的编码风格时，必须优先原样延续局部结构，新增内容只做必要的模板替换，不引入多余代码；当实现已有接口时，必须优先查找并参考项目中已经实现该接口的样例，沿用其结构和表达方式。该 skill 同时约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。
+description: 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”；当修改上下文已经形成高度统一的编码风格时，必须优先原样延续局部结构，新增内容只做必要的模板替换，不引入多余代码；当实现已有接口时，必须优先查找并参考项目中已经实现该接口的样例，沿用其结构和表达方式。该 skill 同时约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-quality-rules`、`code-quality-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。
 ---
 
 # 代码生成风格规则
@@ -23,7 +23,7 @@ description: 当新增、修改、重构任意代码、脚本、测试支撑代�
 2. 读取目标文件最新内容；目标文件不存在时读取同目录或同模块的相邻样例。
 3. 读取根目录 `PROJECT_STYLE.md`，只采用状态为启用且与当前语言、目录、任务相关的条目。
 4. 加载全局用户风格反例库 `code-style-consistency-rules/references/user-style-feedback-library.md` 中状态为 active 的条目，作为本轮必须规避的用户禁用写法。
-5. 识别本轮已经命中的编码类 skill，例如 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill、日志或错误处理类 skill。
+5. 识别本轮已经命中的编码类 skill，例如 `code-quality-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill、日志或错误处理类 skill。
 6. 按 [style-priority.md](references/style-priority.md) 决定冲突优先级。
 7. 按 [local-context-and-interface-style.md](references/local-context-and-interface-style.md) 判断当前上下文是否存在高度统一的局部风格；存在时记录可直接复用的代码模板、排版、注释和调用方式。
 8. 如果本轮实现已有接口，按同一 reference 查找并记录最近的既有接口实现；不得跳过样例侦察直接套用个人或外部模板。
@@ -59,8 +59,8 @@ description: 当新增、修改、重构任意代码、脚本、测试支撑代�
 
 - `project-style-rules` 维护 `PROJECT_STYLE.md`，负责长期风格记忆的抽取、合并、废弃和回写；本 skill 负责在写代码前应用这些风格记忆。
 - `code-style-consistency-rules` 检查本次改动是否与本轮风格契约和局部既有写法一致，并作为全局用户风格反例库的唯一 owner；本 skill 先生成契约，并在写码前加载该库 active 反例纳入禁用写法。
-- `code-minimal-change-rules` 控制改动范围；本 skill 不允许借风格统一扩大无关 diff。
-- `code-readability-rules` 检查结构清晰度；本 skill 只提前声明本轮应遵守的结构风格。
+- `code-quality-rules` 控制改动范围；本 skill 不允许借风格统一扩大无关 diff。
+- `code-quality-rules` 检查结构清晰度；本 skill 只提前声明本轮应遵守的结构风格。
 - `naming-rules` 检查命名语义；本 skill 只把项目命名偏好纳入契约。
 - 注释类 skill 决定注释内容、位置和完整性；本 skill 只把注释风格要求列入契约。
 

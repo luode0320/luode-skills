@@ -54,6 +54,7 @@ openapi / swagger / routegen / docs generator / api docs / schema generator
 | `writes` | POST/PUT/PATCH 写接口数量 | body 覆盖目标 |
 | `withBody` | 写接口中有 requestBody 的数量 | requestBody 覆盖率 |
 | `emptyObjectBodies` | requestBody schema 是空对象的数量 | 路由骨架风险 |
+| `missingDescriptions` | 参数/响应/头部字段缺 `description` 的数量 | 字段说明完整度 |
 
 ### Step 4: 判断 spec 完整性
 
@@ -62,6 +63,7 @@ openapi / swagger / routegen / docs generator / api docs / schema generator
 | 接口/写接口多，schemas 极少 | 疑似路由骨架 | 继续找 DTO、生成器 |
 | 写接口多，withBody 覆盖不足 | requestBody 不完整 | 补充 request DTO |
 | emptyObjectBodies 很多 | 强风险 | 不作为最终 spec 导入 |
+| `missingDescriptions` 数量多（参数/响应/头部大量无说明） | 字段说明不完整 | 先在代码侧补中文注释（按 `swag-openapi-maintainer-rules/references/description-rules.md`）重新生成 swag，再导入 |
 | 纯 GET/健康检查/webhook 项目 | schemas 少可能合理 | 结合业务判断 |
 
 ### Step 5: 校验 tags 和可读性
@@ -111,3 +113,4 @@ apifox export --project <projectId> --format apifox --scope tags --include-tags 
 4. 不要在已有项目反复试错导入
 5. 不要忽略大量 `ignoreCount`
 6. 不要导入 tags 混乱、无法按业务导航的 spec
+7. 不要导入参数、响应或头部字段缺 `description` 的 spec；缺失先在代码侧补注释（按 `swag-openapi-maintainer-rules/references/description-rules.md`）重新生成 swag，再导入

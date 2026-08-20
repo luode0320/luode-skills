@@ -87,6 +87,6 @@ candidate 自动写入前必须全部满足：
 | --- | --- |
 | 产品/业务行为错误 | `bug-intake-rules` 及相关 `bug-*` 流程 |
 | 代码异常处理、重试或错误映射设计 | `error-handling-rules` |
-| 需求、规则、触发器或案例库职责缺口 | `skill-evolution-rules` |
+| 需求、规则、触发器或案例库职责缺口 | `skill-absorption-rules` |
 | 可跨项目复用的稳定事实/决策 | `knowledge-flow`，先检索再沉淀 |
 | 执行工具的可复用失败与已验证恢复 | 知识库中唯一 owner 案例笔记的 candidate/active；静态 casebook 仅作种子/基线 |

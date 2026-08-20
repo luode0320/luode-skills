@@ -37,8 +37,8 @@
 │   └── ci/                                # [条件·提交] 流水线片段
 ├── .devcontainer/                         # [条件·提交] 开发容器
 ├── .vscode/                               # [必需·提交] VSCodex 启动和任务配置
-│   ├── launch.json                        # [必需·提交] 联合调试配置
-│   ├── tasks.json                         # [必需·提交] dev、build、docker-build 任务
+│   ├── launch.json                        # [必需·提交] 联合调试配置：后端至少一条 local开发环境启动（args ["-env=local"]、无 preLaunchTask），环境只走 -env（见 vscode-launch-tasks.md）
+│   ├── tasks.json                         # [必需·提交] dev、build、docker-build 任务：全环境共用同一 build label，不按环境分裂 label
 
 │   ├── settings.json                      # [条件·提交] 团队设置
 │   └── extensions.json                    # [条件·提交] 推荐扩展
@@ -48,10 +48,9 @@
 │   │   └── <binary>/                       # [条件·提交] 单个额外二进制目录
 │   │       └── main.<ext>                  # [条件·提交] 同仓后端额外入口
 │   └── config/                              # [必需·提交] 同仓后端唯一配置根
-│       ├── load.<ext>                        # [条件·提交] 配置加载与解析入口；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local
+│       ├── load.<ext>                        # [条件·提交] 配置加载与解析入口；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local；Go 由 load.go 用 //go:embed yaml/config.*.yaml 编译期嵌入
 │       ├── model.<ext>                       # [条件·提交] 配置结构定义
-│       ├── yaml/                            # [条件·提交] 按环境拆分的外部 YAML；与 embedded/ 互斥二选一；只存放配置数据
-│       └── embedded/                        # [条件·提交] 源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用；允许源码私密配置，默认不依赖环境变量
+│       └── yaml/                            # [条件·提交] 唯一配置模式：按环境拆分的外部 YAML；允许有意持久化凭据原值，默认不依赖环境变量；只存放配置数据
 ├── frontend/                              # [必需·提交] 完整独立前端项目
 ├── test/                                   # [必需·提交] 唯一活动测试代码根，按被测源码目录镜像
 ├── integration/                           # [条件·提交] 仅限前后端联调资产
@@ -108,8 +107,8 @@
 │   └── ci/                                  # [条件·提交] 后端流水线引用的片段
 ├── .devcontainer/                           # [条件·提交] 开发容器
 ├── .vscode/                                 # [必需·提交] 启动、调试和任务配置
-│   ├── launch.json                          # [必需·提交] 本地调试配置
-│   ├── tasks.json                           # [必需·提交] 本地任务配置
+│   ├── launch.json                          # [必需·提交] 调试配置：至少一条 local开发环境启动（args ["-env=local"]、无 preLaunchTask），其余启动配置由项目自定；不要求为 test/prod 铺满（见 vscode-launch-tasks.md）
+│   ├── tasks.json                           # [必需·提交] 编译、签名与归档任务：全环境共用同一 build label，环境差异由 -env 决定，不按环境分裂 label
 
 │   ├── settings.json                        # [条件·提交] 团队设置
 │   └── extensions.json                      # [条件·提交] 推荐扩展
@@ -118,12 +117,10 @@
 │   └── <binary>/                            # [条件·提交] 单个额外二进制目录
 │       └── main.<ext>                       # [条件·提交] 额外二进制入口
 ├── config/                                  # [必需·提交] 唯一配置根
-│   ├── load.<ext>                            # [条件·提交] 配置加载与解析入口；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local
+│   ├── load.<ext>                            # [条件·提交] 配置加载与解析入口；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local；Go 由 load.go 用 //go:embed yaml/config.*.yaml 编译期嵌入
 │   ├── model.<ext>                           # [条件·提交] 配置结构定义
-│   ├── yaml/                                # [必需·提交] 按环境拆分的外部 YAML；允许有意持久化凭据原值；只存放配置数据
-│   │   └── config_<env>.yaml                 # [条件·提交] 兼容 `.yml`；标准环境为 local、test、prod
-│   └── embedded/                            # [条件·提交] 按环境拆分的源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用；允许源码私密配置，默认不依赖环境变量；只存放配置数据
-│       └── config_<env>_yaml.<ext>           # [条件·提交] Go 使用 config_<env>_yaml.go；格式名后置规避 Go 测试文件命名；允许源码私密配置，源码优先且默认不依赖环境变量
+│   └── yaml/                                # [必需·提交] 唯一配置模式：按环境拆分的外部 YAML；允许有意持久化凭据原值，默认不依赖环境变量；只存放配置数据
+│       └── config.<env>.yaml                 # [条件·提交] 点中缀命名（Go 生态主流）；兼容 `.yml`；标准环境为 local、test、prod
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── database/                                # [条件·提交] 数据存储代码和资产唯一根
 │   ├── connection/                          # [条件·提交] 关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化
@@ -252,6 +249,8 @@
 │       │   └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?controller 别名引用
 │       ├── entity/                          # [条件·提交] 领域实体目录；不同版本的实体会变化
 │       │   └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?entity 别名引用
+│       │                                    # 一个接口一个文件：req<Interface>/resp<Interface>（Go/TS 小驼峰、Java PascalCase、Python snake_case）
+│       │                                    # 禁止聚合成 request/response 或 dto/types/models；同一接口的响应树不拆散；细则见 entity-file-naming.md
 │       └── service/                         # [必需·提交] 业务流程目录；版本目录承载随版本变化的业务流程
 │           └── <v?>/                        # [必需·提交] 版本管理，从 v1 起递增（命名 v[0-9]+）；包名用 v?service 别名引用
 ├── scripts/                                 # [条件·提交] 工程脚本
@@ -299,7 +298,7 @@
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
-独立后端配置使用 `config/embedded/` 或 `config/yaml/`（两者互斥，只能二选一，推荐优先使用 `config/embedded/`），按 `config_<env>` 拆分环境。`embedded/` 模式：Go 使用 `config_prod_yaml.go`、`config_test_yaml.go`、`config_local_yaml.go`，格式名必须后置因为 `config_test.go` 会被 Go 当成测试文件。`yaml/` 模式：外部 YAML 使用 `config_prod.yaml`、`config_test.yaml`、`config_local.yaml`，不参与编译因此不加 `_yaml` 后缀。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展但不得以 `_yaml` 结尾；只检查已有文件，不要求三种环境齐全。外部 YAML 与 embedded 源码均允许有意持久化 API key、密钥、密码等私密信息，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 与 `config/embedded/` 只存放配置数据，且严格互斥不可并存；`test/` 目录不承载配置数据源，测试所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
+独立后端配置统一使用 `config/yaml/`（唯一配置模式；`config/embedded/` 已废弃，strict 下存在即报错，旧项目遗留须经收敛清单登记 `legacy_source_roots` 后继续维护，新配置一律进 `config/yaml/`），按 `config.<env>` 点中缀拆分环境（Go 生态主流，如 `config.local.yaml`）。外部 YAML 使用 `config.prod.yaml`、`config.test.yaml`、`config.local.yaml`（兼容 `.yml`），保持外部配置文件形态、不加 `_yaml` 后缀。Go 项目由 `config/load.go` 通过 `//go:embed yaml/config.*.yaml` 编译期嵌入并读取；非 Go 语言（Java/Node/Python）的 `load.<ext>` 从文件系统读取 `yaml/config.<env>.yaml`。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展；只检查已有文件，不要求三种环境齐全。外部 YAML 允许有意持久化 API key、密钥、密码等私密信息，默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 只存放配置数据；`test/` 目录不承载配置数据源，测试所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
 
 前后端同仓时，以上配置目录整体下移到 `backend/config/`，工作区根不建立后端 `config/`；后端主入口为 `backend/main.<ext>`，额外入口为 `backend/cmd/<binary>/main.<ext>`。独立后端主入口为根 `main.<ext>`，`cmd/` 只允许出现 `cmd/<binary>/main.<ext>`；`cmd/main.<ext>`、同仓工作区根 `main.<ext>` 和工作区根 `cmd/` 均非法。
 
@@ -320,13 +319,12 @@
 │   └── ci/                                  # [条件·提交] 前端流水线引用的片段
 ├── .devcontainer/                           # [条件·提交] 开发容器
 ├── .vscode/                                 # [必需·提交] 启动、调试和任务配置
-│   ├── launch.json                          # [必需·提交] 浏览器与开发服务器调试配置
-│   ├── tasks.json                           # [必需·提交] 本地启动、构建与镜像任务
+│   ├── launch.json                          # [必需·提交] 浏览器与开发服务器调试配置；至少保留一条本地开发启动配置，环境注入规则见 vscode-launch-tasks.md
+│   ├── tasks.json                           # [必需·提交] 本地启动、构建与镜像任务：全环境共用同一构建 label，不按环境分裂 label
 │   ├── settings.json                        # [条件·提交] 团队共享编辑器设置
 │   └── extensions.json                      # [条件·提交] 前端框架与格式化扩展
 ├── config/                                  # [必需·提交] 唯一配置根
-│   ├── yaml/                                # [条件·提交] 外部 YAML；与 embedded/ 互斥二选一
-│   └── embedded/                            # [条件·提交] 源码内 YAML 字符串；与 yaml/ 互斥二选一，推荐优先使用
+│   └── yaml/                                # [条件·提交] 唯一配置模式：外部 YAML；允许有意持久化凭据原值，默认不依赖环境变量
 ├── test/                                     # [必需·提交] 唯一活动测试代码根，按源码目录镜像
 ├── public/                                  # [必需·提交] 原样复制并按 URL 访问的公开文件
 ├── src/                                     # [必需·提交] 生产源码根

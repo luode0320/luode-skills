@@ -55,7 +55,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、根 `test/`、活动 `doc/6-review/` 以及历史只读 `doc/6-审查/`、`doc/7-验收/` 的跨域共享入口、命名模板和复用策略；根 `test/` 是唯一活动测试代码根，`doc/4-bugs/` 与 `doc/5-tests/` 每轮只保存一份扁平 md，日志、报告、截图和非可执行证据内联在正文
 - Markdown 图片资产统一进入 `doc/data/images/`；需求、实施、6-review 和通用文档必须按当前 Markdown 位置使用 `/` 分隔相对路径，并登记 `IMG-*`、用途、来源、版本、关联 ID、引用章节、敏感状态和版权状态。真实图片必须经 `imagegen` 生成，交付门禁负责签名、命名、路径、清单和孤儿校验；`doc/data/` 根不提供兼容图片入口
 - 活动文档时间前缀统一使用 `YYYY-MM-DD_HHmmss`；实施、测试和 `6-review` 文档必须在时间后保留来源对象标识，历史审查/验收文档只读保留，避免 `YYYY-MM-DD_主题.md` 或 `时间_阶段_说明.md` 这类不可追溯命名
-- `skill-evolution-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
+- `skill-absorption-rules` 负责在真实研发执行中发现现有 skill 缺口，推动最小化回补后再继续主流程
 - `artifact-delivery-gate-rules` 负责在需求、实施、Bug、真实测试和 `6-review` 收口前核对正式文档是否已经真实落盘，阻断“只在回复里说、不写文档”的假完成
 - 文档落盘闸门不只约束需求入口、需求与实施计划全量顺序实施方案、实施总览/实施周期、Bug 入口、测试总结和 `6-review` 入口；需求补齐/边界/拆分/变更、实施周期调整、Bug 复现/根因/运行时诊断/修复建议/回归风险、测试策略/命名/程序/目录/散落资产治理等中间链路，只要本轮已经形成应持久化结论，最终收口前同样必须联动 `artifact-delivery-gate-rules`；实施域还要检查新项目 / 多来源对象总顺序、周期顺序、期次定位、周期内最小任务顺序和已执行最小任务闭环状态
 - 需求阶段默认只允许读仓库、读资料、整理文档；“一次只推进一个关键问题”只允许围绕真实缺口提问，不允许把 agent 猜测包装成待确认答案，也不允许“先做了再补需求”
@@ -85,7 +85,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 需要决定需求文档、架构文档、实施文档、Bug 记录、测试代码、测试证据、风格回归或项目说明文档的统一落点与命名时，先进入 `artifact-storage-rules`
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
 - 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
-- 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-evolution-rules`
+- 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-absorption-rules`
 - 用户只给一句话 idea 或老板式方向时，进入 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察项目、数据、代码、上下游、关联项目、GitHub、相关网站和官方 API 文档；用户给出需求链接、资料、原型、物料时，进入同一需求主入口继续接入
 - 但如果用户同一轮明确是在索要计划（如“怎么做”“先给计划”“这个怎么改最合适”），或新项目 / 多来源对象需要“实施顺序总表”“需求与实施计划全量顺序实施方案”，则先进入 `implementation-planning-rules` 输出正式实施计划或全量顺序实施方案；前置条件未齐时输出受限计划 / 阻断计划，再回流需求域补齐缺口；当前上下文处于 `Plan Mode` 时，也先进入 `implementation-planning-rules` 作为第一层计划外壳，再按需回流前置域
 - 需求域中的澄清默认一次只推进一个真实关键缺口；若正式需求主文档尚未真实落盘，禁止进入实施规划或正式编码
@@ -98,7 +98,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 开始新增或修改代码时，进入编码基线域
 - 改到数据库表结构、SQL、Repository 时，进入数据库相关 Skill
 - 改到 API 接口、请求模型、响应结构、请求头时，进入 API 相关 Skill
-- 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-swagger-rules`
+- 改到 Swagger/OpenAPI 接口文档、Swagger 调试入口或文档暴露策略时，进入 `api-contract-rules`
 - 改到日志、trace、错误处理、安全校验时，进入对应位点 Skill
 - 写完代码后进入真实测试；测试完成后只由 `code-style-consistency-rules` 提供一次 `6-review` 风格回归，最终收口不再分支到业务审查或验收
 - 需求、Bug、测试、`6-review` 任一链路准备最终收口前，进入 `artifact-delivery-gate-rules`，确认正式文档已经真实写入 `doc/2-需求/`、`doc/4-bugs/`、`doc/5-tests/` 或 `doc/6-review/`
@@ -275,7 +275,7 @@ python skill-dictionary/generate_dictionary.py
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
 | `project-agents-bootstrap` | 新会话首轮或仓库级规则文件缺失时，负责补齐和同步 `AGENTS.md` / `CLAUDE.md` 及其关键受管章节。 |
-| `skill-evolution-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
+| `skill-absorption-rules`  | 在研发执行中发现某个已命中的 Skill 不完善时，判断应补哪个 Skill、是否阻断当前任务，并推动“回补后重载再继续”的闭环。 |
 | `artifact-delivery-gate-rules` | 在需求、Bug、测试、6-review 收口前检查正式文档是否真实落盘到中央约定目录，主入口与中间链路结论一视同仁；缺文档时直接阻断收口。 |
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `parallel-task-dispatch-rules` | 任一 Skill 进入实质执行前统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结互斥写集，并在系统能力和授权允许时真实启动、观测、回收及关闭子代理；输出计划、启动、完成、关闭数量，失败时真实回退串行。 |
@@ -324,13 +324,13 @@ python skill-dictionary/generate_dictionary.py
 | Skill                          | 功能                                                         |
 | ------------------------------ | ------------------------------------------------------------ |
 | `code-generation-style-rules`  | 编码前读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约。 |
-| `code-minimal-change-rules`    | 严控最小改动范围，避免无关修改、冗余调整和过度优化。         |
-| `code-readability-rules`       | 提升代码可读性，保证函数结构清晰、副作用显式，并用深模块口径拦截浅封装。 |
+| `code-quality-rules`    | 严控最小改动范围，避免无关修改、冗余调整和过度优化。         |
+| `code-quality-rules`       | 提升代码可读性，保证函数结构清晰、副作用显式，并用深模块口径拦截浅封装。 |
 | `code-style-consistency-rules` | 保持项目原有风格一致，不引入风格跳变。                       |
 | `naming-rules`                 | 统一命名语义与可理解性。                                     |
-| `chinese-comment-rules`        | 统一中文注释语言风格、语气和表述方式。                       |
-| `comment-placement-granularity-rules` | 统一代码注释是否必要、放置位置、颗粒度、字段注释和过期注释治理。 |
-| `comment-completion-gate-rules` | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
+| `comment-rules`        | 统一中文注释语言风格、语气和表述方式。                       |
+| `comment-rules` | 统一代码注释是否必要、放置位置、颗粒度、字段注释和过期注释治理。 |
+| `comment-rules` | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
 | `windows-encoding-rules` | 统一 Windows 终端与文件中文读写编码防护，预防 README、日志和提交说明乱码。 |
 
 ### 6. 代码位点域
@@ -341,10 +341,10 @@ python skill-dictionary/generate_dictionary.py
 | `common-util-rules`        | 统一工具类、通用方法、公共组件、复用函数、常量等公共代码的公共资格、复用边界、防重复封装和冻结策略；目录落点交给 `package-structure-rules`。 |
 | `database-schema-rules`    | 统一数据库表结构变更、迁移方式、兼容策略和回滚要求。                                            |
 | `database-query-rules`     | 统一数据库增删改查、SQL 性能、索引使用和查询安全规则。                                          |
-| `api-endpoint-rules`       | 统一 API 接口入口、路由设计、职责边界和接口组织方式。                                           |
-| `api-request-rules`        | 统一请求体、入参模型、输入校验、字段约束和请求约定。                                            |
-| `api-response-rules`       | 统一 API 响应结构、状态表达、兼容策略和返回规范。                                               |
-| `api-swagger-rules`        | 统一后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。                    |
+| `api-contract-rules`       | 统一 API 接口入口、路由设计、职责边界和接口组织方式。                                           |
+| `api-contract-rules`        | 统一请求体、入参模型、输入校验、字段约束和请求约定。                                            |
+| `api-contract-rules`       | 统一 API 响应结构、状态表达、兼容策略和返回规范。                                               |
+| `api-contract-rules`        | 统一后端 HTTP API 的 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。                    |
 | `error-handling-rules`     | 统一错误模型、错误传播、错误码和异常处理方式。                                                  |
 | `logging-trace-rules`      | 统一日志、trace、链路透传、关键节点记录和定位证据。                                             |
 | `frontend-design`          | 用于生成具有鲜明风格、达到生产级质量的前端界面；对前端 UI、组件、样式的调整/改进/界面 Bug 修复优先使用；若属于排版/对齐/歪斜问题，先由 `web-design-guidelines` 审查再由本 skill 修复。 |
@@ -1050,3 +1050,4 @@ claude-mem(记忆) :
 2026-08-19 17:14:49 docs: [项目状态同步] 项目记忆与字典更新
 2026-08-19 17:15:30 feat: [项目规则文件同步] AGENTS/CLAUDE 规则更新
 2026-08-20 02:05:00 feat: [skill元数据同步] 显示名中文化、skillId迁移与godot新skill接入
+2026-08-20 21:59:00 feat: [skill合并整理] api/comment/code/evolution 四组合并重构

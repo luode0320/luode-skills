@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码注释规则"
+  short_description: "统一注释中文表达、位置颗粒度与改动位点补齐闸门"
+  default_prompt: "使用 $comment-rules 按注释职责三分区（语言表达→位置颗粒度→补齐闸门）判断本轮注释规则；改动位点必须输出 PASS/FAIL 与三类核对清单供收口闸门消费。"

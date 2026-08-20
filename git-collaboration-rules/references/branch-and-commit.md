@@ -49,6 +49,7 @@ yyyy-MM-dd HH:mm:ss 提交标题
 - 如果拆成多次 git 提交，就要按提交次数追加多条日志。
 - 必须始终追加到当前“改动日志”最后一条提交日志后面，不插到更前面，也不追加到更靠前的旧日志上方。
 - 默认不处理“补记历史提交并按时间回插”的场景；本 skill 只要求本次提交日志始终落在改动日志末尾。
+- 行尾注意（CRLF 仓库）：用编辑工具改写 README 可能把整文件行尾重写为 LF，导致 diff 把整个文件标成改动、提交成“整文件行尾重写”。追加日志行前先确认原文件行尾（`tail -c 30 README.md | xxd`），按原行尾精确追加——回退用 `git checkout -- README.md`，再 `printf 'yyyy-MM-dd HH:mm:ss 标题\n' >> README.md`；提交前用 `git diff -- README.md` 确认仅 +1 行。WSL 挂载的仓库尤甚（9P 行尾 + core.autocrlf 交互）。
 
 示例：
 
@@ -92,7 +93,7 @@ yyyy-MM-dd HH:mm:ss 提交标题
 
 标题规则：
 
-- `<type>` 使用 `feat`、`fix`、`refactor`、`style`、`docs`、`test`、`chore` 等规范类型。
+- `<type>` 必须来自「格式三：规范类型字典」的固定前缀集合，当前支持 `feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`cr`、`test`、`build`、`revert`，维护类杂项沿用 `chore`；禁止自造其它前缀（如 `update`、`modify`、`opt` 等）。
 - `中文简要说明` 直接描述本次改动对象，例如“用户登录”“订单结算”“订单创建接口”。
 - 禁止使用 `type(scope): 标题` 的括号 scope 写法（例如 `feat(reqsend): 转账详细统计支持多Sheet导出错误明细`）。
 - 遇到 scope 场景必须改写为 `type: [scope] 标题`（例如 `feat: [reqsend] 转账详细统计支持多Sheet导出错误明细`）。
@@ -145,15 +146,28 @@ fix: [订单结算] 修复订单创建时金额计算错误
 - 影响：已创建的订单金额可能不正确
 ```
 
-### 格式三：其他类型
+### 格式三：规范类型字典（权威）
 
-根据需要也可以使用以下类型：
+`<type>` 必须取自下表，禁止使用约定外前缀。本表同步自版本控制规范（`Git/代码规范.md`）。
 
-- `refactor:` - 重构代码
-- `style:` - 代码格式调整
-- `docs:` - 文档更新
-- `test:` - 测试相关
-- `chore:` - 构建/工具相关
+| 类型 | 含义 | 说明 |
+| :--- | :--- | :--- |
+| `feat` | 新增特性 | 新增功能 / 特性 |
+| `fix` | 修复 bug | 修复缺陷（A bug fix） |
+| `docs` | 仅文档变更 | 只改文档，不改代码或逻辑（Documentation only changes） |
+| `style` | 代码格式调整 | 不影响代码逻辑（white-space、formatting、missing semi colons 等） |
+| `refactor` | 重构 | 不改变外部行为的代码重构（refactor） |
+| `perf` | 性能优化 | 提升性能的改动（A code change that improves performance） |
+| `cr` | 代码评审 | code review 相关修改 |
+| `test` | 测试相关 | 新增或修改测试代码（Adding missing tests or correcting existing tests） |
+| `build` | 构建/依赖变更 | 影响构建系统或外部依赖的改动（Changes that affect the build system or external dependencies） |
+| `revert` | 回滚 | 撤销某次提交（Reverts a previous commit） |
+
+补充说明：
+
+- `chore`：本 skill 沿用 `chore` 表示构建/工具类维护杂项；与 `build`（构建系统或外部依赖变更）语义接近时两者皆可，但一个提交只选其一，不并列使用。
+- `docs` 仅限纯文档变更；本仓库流程/状态文档按提交域隔离归入 `docs` 提交（见「提交域隔离」），不视为 `chore`。
+- 类型后一律跟英文冒号 `:`（半角），再接 `[中文简要说明] 标题说明`，禁止 `type(scope):` 括号 scope 写法。
 
 ## 多行说明写法（跨 shell 统一）
 

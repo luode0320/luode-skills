@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""三类项目代码位置 Catalog 的查询、渲染、初始化与只读检查入口。"""
+"""三类项目代码位置 Catalog 的查询、渲染、初始化与只读检查入口。
+
+config 配置数据统一使用 config/yaml/（唯一配置模式，允许有意持久化凭据原值、默认不依赖环境变量）；
+config/embedded/ 已废弃，strict 下存在即报错，旧项目遗留须经 adoption 收敛清单登记 legacy_source_roots。
+"""
 
 from __future__ import annotations
 
@@ -536,21 +540,20 @@ def configuration_root(project_kind: str | None) -> str | None:
 def check_environment_config_mutual_exclusion(
     root: Path, project_kind: str | None,
 ) -> list[str]:
-    """校验 config 互斥。
+    """校验 config/embedded/ 已废弃，存在即报错。
 
     [参数] root：待检查项目根；project_kind：项目类型。
-    [返回] list[str]：配置模式冲突或非法配置根的错误列表。
-    最近修改时间: 2026-08-09 新增 config/embedded/ 与 config/yaml/ 互斥 check。
+    [返回] list[str]：废弃配置目录或非法配置根的错误列表。
+    最近修改时间: 2026-08-20 config/embedded/ 废弃，config/yaml/ 唯一模式。
     """
     if project_kind not in {"backend", "fullstack"}:
         return []
     errors: list[str] = []
     config_root = configuration_root(project_kind)
     assert config_root is not None
-    yaml_dir = root / config_root / "yaml"
     embedded_dir = root / config_root / "embedded"
-    if yaml_dir.exists() and embedded_dir.exists():
-        errors.append(f"{config_root}/yaml/ 与 {config_root}/embedded/ 互斥，只能二选一，推荐优先使用 {config_root}/embedded/")
+    if embedded_dir.exists():
+        errors.append(f"{config_root}/embedded/ 已废弃，配置统一放入 {config_root}/yaml/")
     return errors
 
 
@@ -589,8 +592,8 @@ def check_environment_config_path(
         return [f"配置根源码文件必须为 load.<ext> 或 model.<ext>: {relative}"]
 
     category, separator, filename = child.partition("/")
-    if category not in {"yaml", "embedded"}:
-        return [f"配置目录只允许 yaml/ 或 embedded/: {relative}"]
+    if category != "yaml":
+        return [f"配置目录只允许 yaml/（embedded/ 已废弃）: {relative}"]
     if not separator:
         return []
     if not is_file or "/" in filename:
@@ -607,23 +610,13 @@ def check_environment_config_path(
     entry = entries[0]
     suffix = Path(filename).suffix.lower()
     allowed_extensions = set(entry.get("allowed_extensions", []))
-    if language is not None and category == "embedded":
-        allowed_extensions &= COMMON_UTIL_EXTENSIONS[language]
     if suffix not in allowed_extensions:
         return [f"环境配置文件扩展名不符合规则: {relative}"]
 
     environment_pattern = entry.get("environment_name_pattern", r"[a-z][a-z0-9_]*")
-    if category == "yaml":
-        filename_pattern = rf"config_{environment_pattern}\.(yaml|yml)"
-        if re.fullmatch(filename_pattern, filename) is None:
-            return [f"YAML 环境配置文件名必须符合 config_<env>.yaml|yml: {relative}"]
-    elif suffix == ".go":
-        # 1. 要求格式名后置：config_test.go 会被 Go 当成测试文件并排除出 go build，因此必须写成 config_test_yaml.go。
-        #    环境名允许下划线，所以额外排除以 _yaml 结尾的环境名，避免 config_test_yaml_yaml.go 无法唯一切分环境名与格式名。
-        filename_pattern = rf"config_{environment_pattern}_yaml\.go"
-        environment = filename[len("config_"):-len("_yaml.go")]
-        if environment.endswith("_yaml") or re.fullmatch(filename_pattern, filename) is None:
-            return [f"Go embedded 环境配置文件名必须符合 config_<env>_yaml.go: {relative}"]
+    filename_pattern = rf"config\.{environment_pattern}\.(yaml|yml)"
+    if re.fullmatch(filename_pattern, filename) is None:
+        return [f"YAML 环境配置文件名必须符合 config.<env>.yaml|yml: {relative}"]
     return []
 
 
@@ -1012,7 +1005,7 @@ def command_check(catalog: dict[str, Any], args: argparse.Namespace) -> int:
             errors.extend(check_adoption_path(catalog, adoption_state, relative, path, args.project_kind, args.language))
         else:
             errors.extend(check_path(catalog, relative, path.is_file(), args.project_kind, args.language))
-    # 3.1 配置模式互斥检查依赖全目录事实，单独在扫描后执行。
+    # 3.1 config/embedded/ 废弃检查依赖全目录事实，单独在扫描后执行。
     if args.policy == "strict":
         errors.extend(check_environment_config_mutual_exclusion(root, args.project_kind))
     # 4. strict 校验新项目根 Dockerfile 和双平台规则正文；adoption 不借此强迫旧项目补迁移文件。

@@ -1,4 +1,0 @@
-interface:
-  display_name: "注释补齐闸门"
-  short_description: "检查改动位点函数头元信息、步骤编号、补丁原因和字段注释补齐状态"
-  default_prompt: "使用 $comment-completion-gate-rules 检查本轮改动位点注释补齐状态；注释必要性和颗粒度转交 $comment-placement-granularity-rules，中文表达转交 $chinese-comment-rules。"

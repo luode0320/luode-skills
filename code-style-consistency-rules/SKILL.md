@@ -135,8 +135,8 @@ applog.Errorf(
 
 ## 权责边界与不负责事项
 
-- 只负责风格一致性，不替代 `code-generation-style-rules` 生成编码前风格契约，也不替代 `code-minimal-change-rules` 控制改动范围。
-- 不替代 `code-readability-rules` 处理结构清晰度。
+- 只负责风格一致性，不替代 `code-generation-style-rules` 生成编码前风格契约，也不替代 `code-quality-rules` 控制改动范围。
+- 不替代 `code-quality-rules` 处理结构清晰度。
 - 不替代注释类 skill 决定注释语言、颗粒度和写法。
 - 不主动发起全仓统一格式化或大面积风格清理。
 - 不把共享路由结果直接视为业务缺陷、需求覆盖、测试充分性或发布放行结论；这些判断仍由真实测试和对应业务流程负责。

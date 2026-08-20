@@ -1,52 +1,52 @@
 {
   "version": 1,
   "owners": {
-    "api-endpoint-rules": {
+    "api-contract-rules": {
       "source_paths": [
-        "api-endpoint-rules/SKILL.md",
-        "api-endpoint-rules/references/endpoint-examples.md",
-        "api-endpoint-rules/references/endpoint-responsibility.md",
-        "api-endpoint-rules/references/path-and-method-semantics.md"
+        "api-contract-rules/SKILL.md",
+        "api-contract-rules/references/endpoint-examples.md",
+        "api-contract-rules/references/endpoint-responsibility.md",
+        "api-contract-rules/references/path-and-method-semantics.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "api-request-rules": {
+    "api-contract-rules": {
       "source_paths": [
-        "api-request-rules/SKILL.md",
-        "api-request-rules/references/parameter-validation-rules.md",
-        "api-request-rules/references/request-examples.md",
-        "api-request-rules/references/request-shape-boundaries.md"
+        "api-contract-rules/SKILL.md",
+        "api-contract-rules/references/parameter-validation-rules.md",
+        "api-contract-rules/references/request-examples.md",
+        "api-contract-rules/references/request-shape-boundaries.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "api-response-rules": {
+    "api-contract-rules": {
       "source_paths": [
-        "api-response-rules/SKILL.md",
-        "api-response-rules/references/response-examples.md",
-        "api-response-rules/references/response-shape-baseline.md",
-        "api-response-rules/references/response-variants.md"
+        "api-contract-rules/SKILL.md",
+        "api-contract-rules/references/response-examples.md",
+        "api-contract-rules/references/response-shape-baseline.md",
+        "api-contract-rules/references/response-variants.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "api-swagger-rules": {
+    "api-contract-rules": {
       "source_paths": [
-        "api-swagger-rules/SKILL.md",
-        "api-swagger-rules/references/baseline-and-scope.md",
-        "api-swagger-rules/references/exposure-and-security.md",
-        "api-swagger-rules/references/sync-and-annotation-rules.md"
+        "api-contract-rules/SKILL.md",
+        "api-contract-rules/references/baseline-and-scope.md",
+        "api-contract-rules/references/exposure-and-security.md",
+        "api-contract-rules/references/sync-and-annotation-rules.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "chinese-comment-rules": {
+    "comment-rules": {
       "source_paths": [
-        "chinese-comment-rules/SKILL.md",
-        "chinese-comment-rules/references/chinese-comment-patterns.md",
-        "chinese-comment-rules/references/comment-examples.md",
-        "chinese-comment-rules/references/comment-language-boundary.md"
+        "comment-rules/SKILL.md",
+        "comment-rules/references/chinese-comment-patterns.md",
+        "comment-rules/references/comment-examples.md",
+        "comment-rules/references/comment-language-boundary.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
@@ -63,22 +63,22 @@
       "source_globs": [],
       "consumption": "static-only"
     },
-    "code-minimal-change-rules": {
+    "code-quality-rules": {
       "source_paths": [
-        "code-minimal-change-rules/SKILL.md",
-        "code-minimal-change-rules/references/minimal-change-boundaries.md",
-        "code-minimal-change-rules/references/minimal-change-examples.md",
-        "code-minimal-change-rules/references/minimal-change-general.md"
+        "code-quality-rules/SKILL.md",
+        "code-quality-rules/references/minimal-change-boundaries.md",
+        "code-quality-rules/references/minimal-change-examples.md",
+        "code-quality-rules/references/minimal-change-general.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "code-readability-rules": {
+    "code-quality-rules": {
       "source_paths": [
-        "code-readability-rules/SKILL.md",
-        "code-readability-rules/references/function-structure-rules.md",
-        "code-readability-rules/references/readability-examples.md",
-        "code-readability-rules/references/readability-general.md"
+        "code-quality-rules/SKILL.md",
+        "code-quality-rules/references/function-structure-rules.md",
+        "code-quality-rules/references/readability-examples.md",
+        "code-quality-rules/references/readability-general.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
@@ -97,23 +97,23 @@
       "source_globs": [],
       "consumption": "static-only"
     },
-    "comment-completion-gate-rules": {
+    "comment-rules": {
       "source_paths": [
-        "comment-completion-gate-rules/SKILL.md",
-        "comment-completion-gate-rules/references/comment-completion-priority.md",
-        "comment-completion-gate-rules/references/comment-examples.md",
-        "comment-completion-gate-rules/references/comment-function-metadata.md",
-        "comment-completion-gate-rules/references/comment-step-numbering-gate.md"
+        "comment-rules/SKILL.md",
+        "comment-rules/references/comment-completion-priority.md",
+        "comment-rules/references/comment-examples.md",
+        "comment-rules/references/comment-function-metadata.md",
+        "comment-rules/references/comment-step-numbering-gate.md"
       ],
       "source_globs": [],
       "consumption": "static-only"
     },
-    "comment-placement-granularity-rules": {
+    "comment-rules": {
       "source_paths": [
-        "comment-placement-granularity-rules/SKILL.md",
-        "comment-placement-granularity-rules/references/comment-examples.md",
-        "comment-placement-granularity-rules/references/comment-granularity.md",
-        "comment-placement-granularity-rules/references/comment-placement.md"
+        "comment-rules/SKILL.md",
+        "comment-rules/references/comment-examples.md",
+        "comment-rules/references/comment-granularity.md",
+        "comment-rules/references/comment-placement.md"
       ],
       "source_globs": [],
       "consumption": "static-only"

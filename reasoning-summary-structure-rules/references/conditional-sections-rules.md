@@ -31,7 +31,7 @@ Plan Mode 硬排除：本文件只服务非 Plan Mode 的总结渲染；当前�
 ## 4. 函数注释核对
 
 - 本节不再生成独立的“函数注释核对”用户可见区块。
-- 本轮存在代码改动时，只在「Skill 执行证据」中记录 `comment-completion-gate-rules: PASS/FAIL` 及证据定位；上层闸门不得复制函数字段、步骤编号、补丁说明或核对清单细则。
+- 本轮存在代码改动时，只在「Skill 执行证据」中记录 `comment-rules: PASS/FAIL` 及证据定位；上层闸门不得复制函数字段、步骤编号、补丁说明或核对清单细则。
 - `code-change-finalization-gate-rules` 为注释链的代码收口消费者；它只消费 PASS/FAIL，不重新定义 comment-completion 或 comment-placement 的规则。
 
 ## 5. 知识引用

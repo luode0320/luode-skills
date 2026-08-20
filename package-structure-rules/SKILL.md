@@ -14,18 +14,20 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 - 目录查询与检查入口：`scripts/placement_catalog.py`。
 - 查找、复用、引用与依赖方向：`references/lookup-and-reference-contract.md`。
 - 配置、数据库、后端工具包、前端目录分别由对应 reference 细化。
+- 领域实体目录内的文件粒度与 `req`/`resp` 命名：`references/entity-file-naming.md`。
+- `.vscode/launch.json` 与 `.vscode/tasks.json` 的分环境启动与编译任务规则：`references/vscode-launch-tasks.md`。
 
 当人工文档与 Catalog 不一致时，停止新增目录；先修复两者一致性，再继续生成或引用代码。
 
 ## 核心边界
 
 1. 同仓根仅保存工作区资产、`integration/` 和 `doc/`；后端、前端业务资产分别留在其独立项目中。
-2. 后端根级唯一位置：`config/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`；不建立根 `data/`。后端 `config/` 根直接存放 `load.<ext>`（配置加载与解析）与 `model.<ext>`（配置结构定义），`config/embedded/` 与 `config/yaml/` 只存放配置数据，且两者互斥——只能二选一，优先使用 `config/embedded/`。`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。
+2. 后端根级唯一位置：`config/`、`database/`、`utils/`、`common/`、`global/`、`crontask/`、`async/`、`middleware/`；不建立根 `data/`。后端 `config/` 根直接存放 `load.<ext>`（配置加载与解析）与 `model.<ext>`（配置结构定义），`config/yaml/` 是唯一配置模式、只存放配置数据，允许有意持久化凭据原值、默认不依赖环境变量；`config/embedded/` 已废弃，strict 下存在即报错；Go 由 `config/load.go` 通过 `//go:embed yaml/config.*.yaml` 编译期加载。`test/` 与 `mock/` 目录不承载配置数据源，测试和 Mock 所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 和 `mock/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。`.vscode/launch.json` 只强制至少保留一条 `local开发环境启动`（`args ["-env=local"]`、无 `preLaunchTask`），其余启动配置数量与命名由项目自定，不要求为 `config.test.yaml`、`config.prod.yaml` 铺满启动配置；已存在的启动配置环境只走 `-env=<env>`、禁止用 `env.APP_ENV` 注入，且必须能找到对应环境文件，需要先编译的配置挂 `tasks.json` 的统一 `build` label（细则见 `references/vscode-launch-tasks.md`）。
 后端项目根未列举且不在禁止清单的中性目录允许存在，新增需用户确认。
 3. 前后端同仓、独立后端、独立前端的项目根均固定提交 `Dockerfile`、`AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 仅在确有长期风格时创建并提交。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取；目录规则只负责其位置、初始化、查询和只读一致性检查，具体正文结构由项目规则、项目记忆与项目风格 Owner 管理。
 4. 后端根 `utils/` 承载可独立复制的技术工具包与 SDK；根目录只允许工具包子目录，不得直接存放文件，也不得依赖项目其他包。IP 地址提取、标准化与归属查询只进入 `utils/ip/`；服务注册发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`。
 5. 后端 `common/` 只允许 `request/`、`response/`、`constant/`、`error/`、`validation/`、`util/`、`dto/`、`page/`、`msg/`；`common/util/` 直接存放可依赖项目其他包的高关联工具函数，禁止建立子目录，不承载业务流程。`common/msg/` 只存放国际化消息码定义、语言解析与消息渲染源码，多语言文案数据文件仍唯一落在 `resources/i18n/`。
-6. 后端语言源码根直连业务域 `<domain>/`，业务相关逻辑通过 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录完全隔离，其余为跨版本通用业务逻辑；未列出且不在禁止清单的其他目录允许存在，新增须用户确认，且不得作为规范目录的别名。项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域级通用目录为 `api/`、`base/`、`constant/`、`util/` 与单文件 `init.<ext>`（域初始化入口，全量注册本域所有版本路由）；版本化目录各自内嵌 `<v?>/`（版本从 `v1` 递增），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用。业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外），跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。业务域内未列出的其他目录允许存在，新增须用户确认。
+6. 后端语言源码根直连业务域 `<domain>/`，业务相关逻辑通过 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录完全隔离，其余为跨版本通用业务逻辑；未列出且不在禁止清单的其他目录允许存在，新增须用户确认，且不得作为规范目录的别名。项目关联工具统一进入 `common/util/`，源码根 `util/` 不再建立。业务域级通用目录为 `api/`、`base/`、`constant/`、`util/` 与单文件 `init.<ext>`（域初始化入口，全量注册本域所有版本路由）；版本化目录各自内嵌 `<v?>/`（版本从 `v1` 递增），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用。`entity/<v?>/` 内一个接口一个文件、请求与响应各自独立成文件，文件名用 `req<Interface>` / `resp<Interface>`（Go 与 TS 小驼峰、Java PascalCase、Python snake_case），禁止聚合成 `request.<ext>` / `response.<ext>` 或按类型聚合成 `dto`/`types`/`models`；同一接口的响应树（只被它内嵌引用的子结构）留在该接口的响应文件内不拆散；被跨版本包引用的结构不进 `entity/<v?>/`，改放根 `common/`，细则见 `references/entity-file-naming.md`。业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外），跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。业务域内未列出的其他目录允许存在，新增须用户确认。
 7. `database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化源码入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码；独立 SQL 只进入 `database/sql/ddl/`、`database/sql/index/` 或 `database/sql/field/{create,update,delete}/`，每个叶子目录只直接存放 `.sql` 文件。
 8. 不建立根 `protocol/`、项目级 `schema/`、业务源码内独立 `tests/`、`infrastructure/`、`third_party/`、`supply-chain/`、`coverage/`；仓库根 `test/` 是唯一活动测试代码根，不属于生产包结构。
 9. Swag 内部目录与 YAML 规则只引用 `swag-openapi-maintainer-rules`。

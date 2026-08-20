@@ -1,0 +1,4 @@
+interface:
+  display_name: "接口契约规则"
+  short_description: "统一接口入口、请求 DTO、响应结构与 Swagger/OpenAPI 文档同步契约"
+  default_prompt: "使用 $api-contract-rules 按接口生命周期（入口→请求→响应→文档）判断当前接口契约设计；强制 POST + JSON body、明确 DTO 解析、响应四字段，并同步 Swagger/OpenAPI 文档。"

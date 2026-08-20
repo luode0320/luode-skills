@@ -1,12 +1,14 @@
 ---
 name: skill-absorption-rules
-description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"吸收某个skill的精华""这个skill能不能吸收到我们skill""借鉴XX skill的思路""把XX skill的精华融进我们的skill"），或主动引入外部种子（市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md、README、指南），或主动要求更新、调整、重构、合并、瘦身我们自己的 skill（如"优化一下这个skill""重构skill的结构""把这两个skill合并""这个skill太臃肿了调整一下""更新skill规则"）时触发。负责把来源（外部 skill 的原子精华，或自有 skill 的现状与调整诉求）逐条对照本地现状裁决（保留/合并/拒绝）、给出落点与简化建议、对触达的同域 skill 集合做冗余扫描（重复段落/门控层叠/散落产物/引用链）、按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录；它是 skill 体系裁决式调整（外部吸收 + 内部更新）的统一总入口。若来源精华已经在本地更强或重复命中，裁决为保留现状并记录理由，不重复吸收。不要用它代替 skill-evolution-rules（执行中暴露 gap 的小步回补）、skill-audit-rules（多 skill 职责审计）或具体业务实现。
+description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"吸收某个skill的精华""这个skill能不能吸收到我们skill""借鉴XX skill的思路""把XX skill的精华融进我们的skill"），或主动引入外部种子（市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md、README、指南），或主动要求更新、调整、重构、合并、瘦身我们自己的 skill（如"优化一下这个skill""重构skill的结构""把这两个skill合并""这个skill太臃肿了调整一下""更新skill规则"），或当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失等 gap 需要小步回补时触发。负责把来源（外部 skill 的原子精华，或自有 skill 的现状与调整诉求，或执行中暴露的 gap）逐条对照本地现状裁决（保留/合并/拒绝）、给出落点与简化建议、对触达的同域 skill 集合做冗余扫描（重复段落/门控层叠/散落产物/引用链）、按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录；它是 skill 体系裁决式调整（外部吸收 + 内部更新 + 执行中 gap 回补）的统一总入口。若来源精华已经在本地更强或重复命中，裁决为保留现状并记录理由，不重复吸收。不要用它代替 skill-audit-rules（多 skill 职责审计）或具体业务实现。
 ---
 
 # Skill 调整规则（外部吸收 + 内部更新）
 
-在"用户想把外部 skill 的精华改进我们自己的 skill 体系"或"用户想主动调整、重构、优化我们自己的 skill"时使用这个 skill。
-如果当前问题是已有 skill **执行中**暴露 gap、需要小步回补自身，那是 `skill-evolution-rules`；如果是多个 skill 职责重叠、需要审计边界，那是 `skill-audit-rules`；本 skill 负责"来源（外部种子或自有 skill 现状）-> 裁决 -> 落点 -> 同域去重 -> 验证 -> 登记"的裁决式调整闭环，覆盖外部吸收与内部更新双通道。
+在"用户想把外部 skill 的精华改进我们自己的 skill 体系""用户想主动调整、重构、优化我们自己的 skill"或"当前已命中的 skill 在执行中暴露 gap 需要小步回补"时使用这个 skill。
+如果当前问题是多个 skill 职责重叠、需要审计边界，那是 `skill-audit-rules`；本 skill 负责"来源（外部种子或自有 skill 现状或执行中 gap）-> 裁决 -> 落点 -> 同域去重 -> 验证 -> 登记"的裁决式调整闭环，覆盖外部吸收、内部更新与执行中 gap 回补三通道。
+
+> **2026-08-20 合并说明**：本 skill 已并入原 `skill-evolution-rules` 的职责（执行中暴露 gap 的小步回补）。原 evolution 的 gap-signals 判断、决策矩阵、改进输出模板与回补后恢复流程已迁入 `references/`（`gap-signals.md`、`evolution-decision-matrix.md`、`improvement-output-template.md`、`resume-workflow.md`），作为第三通道「执行中 gap 回补」的执行细则。原 evolution 目录已删除，相关引用统一指向本 skill。
 
 ## 设计内核（吸收自 darwin-skill 的 5 条核心原则）
 
@@ -38,20 +40,25 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 用户说"把 XX skill 的精华总结成/沉淀成我们的 skill"（含将本次吸收经验固化为新 skill 的意图）。
 - 用户主动要求更新、调整、重构、合并、瘦身我们自己的 skill："优化一下这个 skill""重构 skill 的结构""调整 skill 规则""更新我们的 skill""把这两个 skill 合并""这个 skill 太臃肿了，调整一下"。
 - 用户对自有 skill 提出结构性调整诉求（结构调整、职责重划、内容瘦身），且不是执行中临时补 gap。
-- 当前会话已命中 `skill-evolution-rules` 但根因是"外部有更好种子"，回落到本 skill 走吸收流程。
+- 当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充。
+- 当前任务已经因为 skill 缺口反复停顿、重复解释或临时手写补丁式规则。
+- 团队在执行中明确提出"这个 skill 还不完善，应该先补 skill 再继续"。
+- 当前 gap 已经不是一次性例外，而是未来会重复命中的稳定场景。
+- `execution-failure-learning-rules` 已确认根因并完成同输入复验，但目标 owner Skill 没有可承接的案例库、字段或生命周期结构。
 
-## 双通道判定（进入后先做）
+## 三通道判定（进入后先做）
 
-进入本 skill 后先判定本次调整的来源通道，两条通道复用同一套方法论（拆解 -> 三态裁决 -> 落点 -> 同域去重 -> 棘轮验证 -> 登记），仅来源获取与差异步骤不同：
+进入本 skill 后先判定本次调整的来源通道，三条通道复用同一套方法论（拆解 -> 三态裁决 -> 落点 -> 同域去重 -> 棘轮验证 -> 登记），仅来源获取与差异步骤不同：
 
 | 通道 | 来源 | 触发语义 | 差异 |
 |---|---|---|---|
 | **外部吸收通道** | 外部 skill / 种子（市场、GitHub、LobeHub、coze、SkillsMP 等） | "吸收 / 借鉴 / 融合 / 采纳 XX skill" | 需获取外部原文（本地安装源优先）；裁决对象 = 外部原子精华 vs 本地现状；完成后按第 0 步删除本地安装源 |
 | **内部更新通道** | 自有 skill 现状 + 用户调整诉求 | "优化 / 调整 / 重构 / 合并 / 瘦身这个 skill""更新 skill 规则" | 无需外部原文；裁决对象 = 调整诉求 / 现状问题 vs 既有内容；无外部源可删；来源记录写"内部调整" |
+| **执行中 gap 回补通道** | 已命中的 skill 在执行中暴露的 gap | "这个 skill 触发不准 / 缺规则 / 边界不清 / references 不足，继续要依赖临时口头补充" | 无需外部原文；先读 `references/gap-signals.md` 判断是否真是 skill gap（排除业务问题与工程问题）；再读 `references/evolution-decision-matrix.md` 判断补 description / 补流程 / 补 references / 新增独立 skill；最小化回补后按 `references/resume-workflow.md` 恢复主流程；gap 属阻断级时先暂停主流程补完再继续，非阻断级可记录建议后收口再补 |
 
-通道判定示例：用户说"这个 skill 太臃肿了，调整一下" → 内部更新通道；用户说"吸收 XX skill 的精华" → 外部吸收通道；用户说"借鉴 XX 的思路优化我们的 skill" → 外部吸收通道（来源是外部种子）。同一轮可能同时含两条通道（如"吸收 XX 精华后顺手优化本地 skill"），按来源分通道逐项裁决。
+通道判定示例：用户说"这个 skill 太臃肿了，调整一下" → 内部更新通道；用户说"吸收 XX skill 的精华" → 外部吸收通道；用户说"借鉴 XX 的思路优化我们的 skill" → 外部吸收通道（来源是外部种子）；执行中"当前 skill 没有覆盖这个场景，只能临时口头补规则" → 执行中 gap 回补通道。同一轮可能同时含多条通道（如"吸收 XX 精华后顺手优化本地 skill"），按来源分通道逐项裁决。
 
-**与 `skill-evolution-rules` 的边界**：`skill-evolution-rules` 处理**执行中被动暴露**的 gap 小步回补（触发不准 / 规则缺失 / 边界不清，主流程内补完继续）；本 skill 内部更新通道处理**主动发起**的裁决式结构调整（重构、合并、瘦身、整体优化，需要三态裁决与同域去重）。执行中汇总的 gap 若演变为结构性调整诉求，可回落到本通道走完整裁决流程。
+**与 `skill-audit-rules` 的边界**：`skill-audit-rules` 处理多个 skill 职责重叠审计（只读，不写）；本 skill 三通道都负责实际调整落盘（写）。执行中汇总的 gap 若演变为结构性调整诉求，可回落到内部更新通道走完整裁决流程。
 
 ## 进入后先做什么
 
@@ -78,11 +85,13 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 
 ## 权责边界与不负责事项
 
-- 只负责 skill 体系的裁决式调整闭环（外部吸收 + 内部更新），不负责执行中 gap 小步回补（`skill-evolution-rules`）、多 skill 职责审计（`skill-audit-rules`）、命中总控（`skill-hit-check-rules`）。
-- 与 `skill-evolution-rules` 的边界：被动执行中暴露 gap 的小步回补归 `skill-evolution-rules`（主流程内补完继续）；主动发起、需要三态裁决与同域去重的结构调整（重构 / 合并 / 瘦身 / 整体优化）归本 skill 内部更新通道。
+- 只负责 skill 体系的裁决式调整闭环（外部吸收 + 内部更新 + 执行中 gap 回补），不负责多 skill 职责审计（`skill-audit-rules`）、命中总控（`skill-hit-check-rules`）。
 - 不复制外部 skill 的整套工作流、目录结构、`.codebuddy/specs/` 等专属形态；只吸收原子规则。
 - 不因为"发现了新 skill"就默认新增独立 skill 目录；优先补现有 skill 的 reference。
 - 不把一次性低频特性或与本地红线冲突的内容硬塞进调整范围。
+- 不把一次性低频例外一律升级成"必须新增 skill"；不因为发现小缺口就无限放大改造范围，优先采用最小回补。
+- 不在当前任务本质还是业务问题时，错误地把锅甩给 skill 体系。
+- 不直接替用户决定要不要大规模重构整套 skill，必须给出理由和边界。
 - 不代替需求、Bug、编码、测试等业务域的执行。
 
 ## 需要暂停并确认的条件
@@ -93,11 +102,12 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 调整目标与现有 skill 职责高度重叠，无法判断该补哪个。
 - 用户希望新增独立 skill，但本地已有能力承接。
 - 吸收后评分低于基线，需要回滚但改动已跨多个文件。
+- 执行中 gap 回补时无法判断这是业务问题还是 skill gap。
 
 ## 执行通过 / 驳回标准
 
-- 通过：能说清来源拆成了哪些原子条目（外部精华或内部调整诉求）、每条三态裁决及理由、落点文件、**整理去重了什么（合并段落 / 消除引用 / 删除过时规则，含同域清理位置）**、**同域冗余扫描结论（范围 / 发现 / 清理 / PASS-FAIL）**、净增体积变化、8 维评分前后对比，并完成登记与验证。
-- 驳回：外部通道没有拿到原文就凭印象吸收、内部通道调整诉求不明却硬改、裁决表只有"不错/有用"没有理由、调整后未跑棘轮验证、**只增不减导致文件膨胀（新增内容未伴随同等规模的存量整理，且无正当理由）**、把外部整套工作流原样复制进来、**或未执行同域冗余扫描 / 扫描发现可清理冗余（重复段落、门控层叠、散落产物）却未在同一调整闭环内清理即收口**。
+- 通过：能说清来源拆成了哪些原子条目（外部精华或内部调整诉求或执行中 gap）、每条三态裁决及理由、落点文件、**整理去重了什么（合并段落 / 消除引用 / 删除过时规则，含同域清理位置）**、**同域冗余扫描结论（范围 / 发现 / 清理 / PASS-FAIL）**、净增体积变化、8 维评分前后对比，并完成登记与验证。执行中 gap 回补时，能明确说清是哪个 skill 不完善、缺在哪里、为什么影响当前任务、建议补哪些文件、是否阻断、补完后从哪一步继续（`resume-workflow.md`）。
+- 驳回：外部通道没有拿到原文就凭印象吸收、内部通道调整诉求不明却硬改、裁决表只有"不错/有用"没有理由、调整后未跑棘轮验证、**只增不减导致文件膨胀（新增内容未伴随同等规模的存量整理，且无正当理由）**、把外部整套工作流原样复制进来、**或未执行同域冗余扫描 / 扫描发现可清理冗余（重复段落、门控层叠、散落产物）却未在同一调整闭环内清理即收口**、或执行中 gap 回补时把业务问题误判成 skill 问题。
 
 ## 执行结果归档要求
 
@@ -113,6 +123,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 只有做评分验证时再读 `references/darwin-rubric.md`（8 维评分：结构 60 + 实测 40）。
 - 只有参考历史吸收案例时再读 `references/case-grill-me-absorption.md`（本次 grill-me 吸收全过程样例）。
 - 吸收触达多 skill 同域、或需要对照"同域冗余残留"反面教材时，再读 `references/case-apifox-absorption-domain-dedup.md`（api-test-automation-pro 吸收后同域冗余残留与补救全过程）；**内部更新通道同样适用**——主动调整自有 skill 引入交叉冗余时同理对照。
+- **执行中 gap 回补通道**（原 `skill-evolution-rules` 职责）：先读 `references/gap-signals.md` 确认是否真是 skill gap（排除业务问题与工程问题）；再读 `references/evolution-decision-matrix.md` 判断补 description / 补流程 / 补 references / 新增独立 skill；输出正式完善建议时读 `references/improvement-output-template.md`；补完后如何回到原任务继续执行读 `references/resume-workflow.md`。
 - 内部更新通道与外部吸收通道共用同一套裁决矩阵（`absorption-decision-matrix.md`）、评分标准（`darwin-rubric.md`）与同域扫描要求（SKILL.md 第 5 步）。
 - 需要确认文档落点与更新策略时，再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 吸收多轮后需整体防臃肿巡检时，联动 `skill-audit-rules`（职责重叠审计）与 `skill-split-preserve-rules`（体积超标拆分）；本 skill 只负责单轮吸收内的存量整理与同域去重，不代替体系级巡检。执行同域冗余扫描时若同域边界不清或发现疑似体系级职责重叠，按需联动 `skill-audit-rules` 确认边界。

@@ -120,9 +120,9 @@
 - 若连 `skill-hit-check-rules` 或 `parallel-task-dispatch-rules` 任一都未命中，视为上下文丢失严重、当前基础规则没有正确加载；此时禁止直接进入主任务，必须先补做 skill 命中检查与上下文重同步。
 - 若本轮任务存在多 skill 组合、并行拆分或规则收口风险，默认应额外启用 `skill-audit-rules` 进行只读审计。
 - 活动质量回归只保留测试后的 `code-style-consistency-rules` `6-review`；不再自动触发业务审查或最终验收。
-- 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-evolution-rules` 或功能测试；未授权不得晋级 active。
+- 任何模型、CLI、API、浏览器、MCP、安装器、生成器或验证入口出现非预期失败，或退出码为 0 但输出/产物不满足成功标准时，必须在无变化重试前自动触发 `execution-failure-learning-rules`；已注册高风险域还必须在执行前做 active 案例预检。该 Skill 负责分类、查库、快速恢复、同输入复验和 candidate 沉淀，不替代 `bug-*`、`skill-absorption-rules` 或功能测试；未授权不得晋级 active。
 - `6-review` 只检查代码风格、格式、位置、注释、日志、可读性和目录归位；不判断业务正确性、需求覆盖或发布放行。
-- 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-evolution-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
+- 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-absorption-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
 - 任何 agent 收到用户明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”）时，必须立即停止自动继续和扩散性输出，只允许给出必要的最小收口结论。
 - 若命中 `autonomous-execution-rules`，自动继续只允许用于“完成原始用户目标仍必需的动作”；不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
 - 当原始用户目标已经完成或用户已给出明确结束指令，且不存在完成原始目标仍必需的动作时，必须停止连续执行并直接结束；不得输出“下一步状态”“下一步建议”“等待用户新指令”“无需继续动作”等任何可能触发循环 loop 的占位区块或扩散性文案，除非用户明确要求后续建议。
@@ -307,7 +307,7 @@
 - 每个任务都必须转成可验证目标：Bug 修复优先有复现/回归验证，新增能力优先有行为验证，重构优先有改前/改后等价性验证；仅当纯文档、纯注释、纯排版或不会影响运行结果时，才允许写明免测理由。
 - 多步骤任务必须按“步骤 -> 验证点”推进；当前步骤未达到验证点前，不得把后续可选优化升级成当前必做事项。
 - 若发现方案已经明显复杂化，应先收缩为更小的具体实现；若继续推进只能依赖猜测、过度抽象或无验证目标，必须停下并回到需求 / 计划 / 测试前置域。
-- 本章节与 `code-minimal-change-rules`、`code-readability-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
+- 本章节与 `code-quality-rules`、`code-style-consistency-rules` 和真实测试类 skill 互补：这些专业 skill 负责具体检查，本章节负责把四原则作为仓库级自举硬闸门同步到 `AGENTS.md` / `CLAUDE.md`。
 
 ## 注意
 

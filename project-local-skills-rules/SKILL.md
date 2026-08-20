@@ -1,6 +1,6 @@
 ---
 name: project-local-skills-rules
-description: 项目级 skill 自动沉淀与项目专属规则管理。任务收口时，若本轮涉及项目仓库写操作（代码/文档/配置修改）且产生可复用经验——如 5+ 次 tool call 的非平凡任务、踩坑后找到解法、用户纠正了方法、发现可复用多步骤 workflow——自动评估是否值得沉淀；用户明确要求"分析项目/总结项目专属 skill/沉淀项目规则"时同样触发。负责查重后以 project-项目名-主题-rules 命名写入用户级 skill 目录（经 junction 与 luode-skills 仓库同址），供后续会话自动命中；不代替 knowledge-flow 知识库笔记沉淀与 skill-evolution-rules 内部演进。
+description: 项目级 skill 自动沉淀与项目专属规则管理。任务收口时，若本轮涉及项目仓库写操作（代码/文档/配置修改）且产生可复用经验——如 5+ 次 tool call 的非平凡任务、踩坑后找到解法、用户纠正了方法、发现可复用多步骤 workflow——自动评估是否值得沉淀；用户明确要求"分析项目/总结项目专属 skill/沉淀项目规则"时同样触发。负责查重后以 project-项目名-主题-rules 命名写入用户级 skill 目录（经 junction 与 luode-skills 仓库同址），供后续会话自动命中；不代替 knowledge-flow 知识库笔记沉淀与 skill-absorption-rules 内部演进。
 ---
 
 # 项目专属 Skill 沉淀规则
@@ -45,7 +45,7 @@ description: 项目级 skill 自动沉淀与项目专属规则管理。任务收
 2. 再读 `references/project-skill-template.md`，按统一模板产出每个子 skill（含踩坑经验与可直接复制的命令）。
 3. 需要确定优先级时，再读 `references/priority-and-roadmap.md`。
 4. 创建/更新落点：用户级 `~/.workbuddy/skills/project-<slug>-<topic>-rules/`；创建用 `.system/skill-creator/scripts/init_skill.py`，更新直接改 SKILL.md；改后跑 `quick_validate.py` 校验。
-5. 若发现与通用 skill 冲突，记录冲突点并转交 `skill-evolution-rules` 做体系侧回补。
+5. 若发现与通用 skill 冲突，记录冲突点并转交 `skill-absorption-rules` 做体系侧回补。
 
 ## 权责边界与不负责事项
 
@@ -54,7 +54,7 @@ description: 项目级 skill 自动沉淀与项目专属规则管理。任务收
 - 不把项目专属经验直接写进全局 skill（无项目前缀），避免污染其他项目。
 - 不把多个无关主题硬塞进一个项目 skill。
 - 不代替 `knowledge-flow` 的知识库笔记沉淀（笔记 vs skill 资产分开）。
-- 不负责已有 skill 执行中暴露 gap 的体系侧演进（那是 `skill-evolution-rules`）。
+- 不负责已有 skill 执行中暴露 gap 的体系侧演进（那是 `skill-absorption-rules`）。
 
 ## 需要暂停并确认的条件
 

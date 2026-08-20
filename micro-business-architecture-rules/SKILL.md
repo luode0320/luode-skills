@@ -42,7 +42,7 @@ description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业�
 
 - `package-structure-rules`：唯一拥有 `<source-root>/<domain>/` 目录树（含 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 版本化目录）、目录查询、初始化、渲染和严格检查规则。
 - `codegraph-analysis-rules`：拥有导入节点、调用链和影响面检索；本 Skill 只把其结果作为跨域隔离审查证据。
-- `code-readability-rules`：拥有一般抽象取舍；本规则的版本目录边界是已冻结的跨域隔离边界，不要求额外接口、注册或依赖注入层。
+- `code-quality-rules`：拥有一般抽象取舍；本规则的版本目录边界是已冻结的跨域隔离边界，不要求额外接口、注册或依赖注入层。
 - `artifact-storage-rules`：拥有研发文档产物路径；本 Skill 不另建测试或文档目录。
 - `architecture-doc-rules`：业务域与版本目录关系可按需摘要回写项目架构文档。
 

@@ -18,17 +18,17 @@ description: 当 Agent 执行 CLI、API、MCP、浏览器、安装器、生成�
 ## 执行流程
 
 1. **识别触发**：记录工具/阶段、输入摘要、环境来源和可观察结果；只保留最小必要证据。
-2. **分类与路由**：阅读 [classification-and-routing.md](references/classification-and-routing.md)，确定失败类别和唯一 owner skill。无法唯一归属时转交 `skill-evolution-rules`，不要创建临时重复案例库。
+2. **分类与路由**：阅读 [classification-and-routing.md](references/classification-and-routing.md)，确定失败类别和唯一 owner skill。无法唯一归属时转交 `skill-absorption-rules`，不要创建临时重复案例库。
 3. **预防或恢复**：`prevent` 只执行 `active` 案例允许的动作；`recover` 先查匹配案例，再定位根因，最多对同一输入做一次无变化复验，之后必须改变假设或停止。
 4. **验证**：使用原输入、同一成功标准和 local 环境验证修复。只通过静态阅读、偶然成功或不同输入的结果不足以晋级。
 5. **学习回写**：阅读 [lifecycle-and-gates.md](references/lifecycle-and-gates.md) 与 [case-template.md](references/case-template.md)。满足复现、根因、验证、脱敏、唯一 owner 和去重门禁后，先按知识库文件操作规则用 Grep/rg 检索去重键并用 Read 读取精确命中，再在固定知识库根的 owner 路径用 Write/Edit 创建或追加 `candidate`；冲突案例追加 `conflicted` 状态事件，不得覆盖旧案例。写入后必须回读校验内容一致，否则案例仍视为未持久化。
-6. **报告**：最终说明失败类别、根因、采取的恢复动作、验证证据、案例 ID/状态和是否需要 `skill-evolution-rules`；若产生工作树变更必须明确列出。恢复预算耗尽、同一输入的无变化复验已用尽或安全边界拒绝继续时，生成共享 `BLK-*` 事实并交给 `reasoning-summary-structure-rules`，不得只写泛化后续建议。
+6. **报告**：最终说明失败类别、根因、采取的恢复动作、验证证据、案例 ID/状态和是否需要 `skill-absorption-rules`；若产生工作树变更必须明确列出。恢复预算耗尽、同一输入的无变化复验已用尽或安全边界拒绝继续时，生成共享 `BLK-*` 事实并交给 `reasoning-summary-structure-rules`，不得只写泛化后续建议。
 
 ## 强制边界
 
 - 证据、复现和验证只能使用 `local` 配置；不得连接或写入 test、staging、pre、release、prod/production 环境。local 配置指配置归属，不以地址是否为 localhost 判断。
 - API key、token、密码、私钥、完整鉴权响应、用户私有输入、原始图片和未经脱敏的本机路径不得进入案例。
-- 业务或产品 Bug 交给 `bug-*`；代码异常处理设计交给 `error-handling-rules`；需求/规则缺口交给 `skill-evolution-rules`；跨项目稳定知识才交给 `knowledge-flow`。不要把这些问题伪装成执行案例。
+- 业务或产品 Bug 交给 `bug-*`；代码异常处理设计交给 `error-handling-rules`；需求/规则缺口交给 `skill-absorption-rules`；跨项目稳定知识才交给 `knowledge-flow`。不要把这些问题伪装成执行案例。
 - 预期负向测试、用户取消、明确权限阻断、一次性网络抖动和未经复验的猜测不晋级；可记录为当轮诊断，但不得写成可执行案例。
 - `candidate` 只表示待审经验，不得在没有当前轮 skill 维护授权时晋级 `active`。active 失效时标记 `superseded`/`stale`，保留替代关系和验证证据。
 - 动态 `candidate`、`active`、`conflicted`、`stale`、`superseded` 和 `rejected` 状态只写入知识库案例笔记；状态变更采用追加式状态事件并保留旧证据，不回写静态 casebook。

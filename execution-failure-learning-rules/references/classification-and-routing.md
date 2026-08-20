@@ -42,7 +42,7 @@ MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、
 | Git 状态、提交、推送或恢复 | `git-collaboration-rules` | 当前轮授权、工作树与远端边界 |
 | 功能/回归/策略验证 | `functional-validation-rules` | local 环境、样本、成功标准与副作用 |
 
-未列入注册表的领域先按 `recover` 分类；如果相同缺口重复出现，转 `skill-evolution-rules` 评估是否加入注册表或补现有 skill。`agent-runtime-recovery-rules` 尚未提供真实 adapter 的平台只能降级为观测/人工交接，不得把安装命令、进程名或 UI 操作当作通用恢复接口。
+未列入注册表的领域先按 `recover` 分类；如果相同缺口重复出现，转 `skill-absorption-rules` 评估是否加入注册表或补现有 skill。`agent-runtime-recovery-rules` 尚未提供真实 adapter 的平台只能降级为观测/人工交接，不得把安装命令、进程名或 UI 操作当作通用恢复接口。
 
 Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not recognized` 和缺失 manifest 命令归上述 owner。Git Bash 只有在 `git.exe` 根目录下的 `bin\\bash.exe` 经 `uname -s` 确认是 `MINGW` 或 `MSYS` 后，才可作为该 owner 的 Windows CLI 可见性证据。Linux/WSL 原生 shell 的 `127`、`command -v` 缺失、`wsl.exe` 路由和 `/mnt/*.exe` 误用仍归 `wsl-windows-bridge`。两类证据不得混写到同一 failure case。
 
@@ -56,8 +56,8 @@ Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not r
 
 1. 先按实际失败阶段确定 owner，不按“最先被调用的工具”确定。
 2. 一个案例只能有一个 canonical owner；其他 skill 只能引用案例 ID 和 owner 路径。
-3. 如果两个 owner 都合理，标记 `conflicted` 并暂停自动复用，交给 `skill-evolution-rules` 或人工裁决。
-4. owner 没有 casebook 时，输出结构化 candidate 交接并触发 `skill-evolution-rules`；不得在无归属目录下临时新建全局 casebook。
+3. 如果两个 owner 都合理，标记 `conflicted` 并暂停自动复用，交给 `skill-absorption-rules` 或人工裁决。
+4. owner 没有 casebook 时，输出结构化 candidate 交接并触发 `skill-absorption-rules`；不得在无归属目录下临时新建全局 casebook。
 5. provisioning 与 runtime 证据不得合并成一个案例；同一组件从“未安装”到“已配置后断连”必须分别记录在安装类 casebook 与运行期 owner casebook。
 
 ## 最小预检清单

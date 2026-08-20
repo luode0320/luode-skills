@@ -51,7 +51,7 @@
 
 ### 运行时、分析与元流程
 
-`code-context-resync-rules`、`codegraph-analysis-rules`、`project-local-skills-rules`、`project-style-rules`、`skill-hit-check-rules`、`skill-audit-rules`、`skill-execution-compliance-gate-rules`、`skill-evolution-rules`、`skill-creator`、`skill-installer`、`find-skills`、`autonomous-execution-rules`、`parallel-task-dispatch-rules`、`team-development-rules`、`execution-failure-learning-rules`、`mcp-installation-rules`、`plugin-installation-rules`。
+`code-context-resync-rules`、`codegraph-analysis-rules`、`project-local-skills-rules`、`project-style-rules`、`skill-hit-check-rules`、`skill-audit-rules`、`skill-execution-compliance-gate-rules`、`skill-absorption-rules`、`skill-creator`、`skill-installer`、`find-skills`、`autonomous-execution-rules`、`parallel-task-dispatch-rules`、`team-development-rules`、`execution-failure-learning-rules`、`mcp-installation-rules`、`plugin-installation-rules`。
 
 ### 项目分析、文档与专项工程流程
 

@@ -91,6 +91,17 @@ win-ps "Get-Service | Where-Object {\$_.DisplayName -like '*QMT*'}"
 win-copy /tmp/result.csv /mnt/d/app/output/result.csv
 ```
 
+**Sync Windows-side data (credentials/config) that WSL can't see:**
+```bash
+# C:\Users\<user>\ 下的文件(可能是指向网盘等其他真实位置的软链接)
+# 与 WSL 的 ~/ 是两套独立 HOME,不会自动同步。
+# 当 WSL 内某工具报"未登录/未配置",但 Windows 侧确认已配置过时:
+win-path /mnt/c/Users/<user>/.some-tool/config
+mkdir -p ~/.some-tool
+win-copy /mnt/c/Users/<user>/.some-tool/config ~/.some-tool/config
+```
+不要因为 WSL 侧读不到就判定环境不可用或要求用户重新粘贴密钥/token —— 先确认 Windows 侧是否已有,再同步过来。
+
 **Path conversion:**
 ```bash
 win-path /mnt/d/app

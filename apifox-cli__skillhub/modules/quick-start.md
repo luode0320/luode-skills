@@ -16,6 +16,8 @@ apifox login --with-token <TOKEN>
 
 Token 从 Apifox 客户端「用户头像 → 账号设置 → API 访问令牌」创建。
 
+> WSL 环境下 `apifox whoami` 显示未登录，但怀疑 Windows 侧已经登录过时，先看 `SKILL.md` 的“跨系统凭据同步（WSL ↔ Windows）”小节，检查并同步 Windows 侧 `~/.apifox/config.toml`，避免不必要的重复 `login --with-token`。
+
 ## 项目管理
 
 ```bash

@@ -77,6 +77,24 @@ APIFOX_CLI_TELEMETRY=0 apifox <command>
 - 已存在的 telemetry worker 残留进程（命令行形如 `win32-x64.exe C:\Users\<user>\.apifox\telemetry\flush.lock`）无害、不再弹新窗，宿主重启后消失
 - 定位手段：`Get-WmiObject Win32_Process -Filter "Name='win32-x64.exe'" | Select ProcessId,CommandLine`，看 CommandLine 是否指向 `flush.lock`
 
+### 跨系统凭据同步（WSL ↔ Windows）
+
+WSL 和 Windows 是两套独立的 `$HOME`，`~/.apifox/config.toml` 不会自动共享。若 agent 运行在 WSL 内，`apifox whoami` 显示未登录，但用户确认此前在 Windows 侧已登录（凭据在 `C:\Users\<user>\.apifox\config.toml`，可能是软链接指向网盘等其他真实位置），应先检查该文件是否存在并同步到 WSL，而不是直接要求用户重新粘贴 token：
+
+```bash
+# WSL 内检查 Windows 侧凭据是否存在（路径按实际用户名替换 <user>）
+ls -la /mnt/c/Users/<user>/.apifox/config.toml
+
+# 存在则同步到 WSL 本地
+mkdir -p ~/.apifox
+cp /mnt/c/Users/<user>/.apifox/config.toml ~/.apifox/config.toml
+
+# 验证登录状态
+apifox whoami
+```
+
+同步凭据时同样遵守“不要把 token 打印到日志或聊天摘要”的铁律。更通用的“WSL 读不到 Windows 侧 `C:\Users\<user>\` 下数据时如何定位与同步”的能力，见 `wsl-windows-bridge__skillhub`（`win-path` 定位 + `win-copy` 同步）。
+
 ## 模块按需加载
 
 本 skill 按命令类别拆分为以下模块。**读到本文件后，根据用户任务匹配模块，立即读取对应 `modules/<name>.md`：**
@@ -85,13 +103,13 @@ APIFOX_CLI_TELEMETRY=0 apifox <command>
 |---|---|---|
 | 安装、登录、项目、初次使用、help | `modules/quick-start.md` | login, project, 基础用法 |
 | AI 团队、项目定位、projectId、默认项目登记、首轮未指明阻断、持久化到 PROJECT_TEST.md、新项目接入自动生成测试文档 | `modules/ai-team-project.md` | project, settings（AI 团队项目解析）；标准模板见 `references/project-test-md-template.md` |
-| 接口新增/更新同步 apifox、代码→swag→import、契约校验、接口落地 | `modules/api-sync-to-apifox.md` | import, endpoint 校验, test-case 落地（与 swag 联动） |
-| 接口、endpoint、Schema、目录/文件夹、安全方案 | `modules/api-design.md` | endpoint, schema, response-component, security-scheme, folder |
+| 接口新增/更新同步 apifox、代码→swag→import、契约校验（含字段说明完整性）、接口落地 | `modules/api-sync-to-apifox.md` | import, endpoint 校验, test-case 落地（与 swag 联动） |
+| 接口、endpoint、Schema、目录/文件夹、安全方案、字段说明铁律（参数/响应/头部必须有 description） | `modules/api-design.md` | endpoint, schema, response-component, security-scheme, folder |
 | 环境、变量、Mock、数据库连接、开发环境环境变量（鉴权签名/登录账号/token） | `modules/environment.md` | environment, variables, mock, database-connection |
 | 分支、合并、merge request、AI 分支、pick-to | `modules/branch.md` | branch, merge-request |
 | 测试用例创建/更新/运行、测试数据、处理器/断言字段（CLI 操作层） | `modules/test-case.md` | test-case, test-data |
 | 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登 | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 |
-| 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、POST 必有完整用例（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
+| 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、正向分层组合（L1 单参数/L2 两两/L3 全参数/L4 过滤×分页）、POST 必有完整用例（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
 | 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法 | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
 | 陷阱检查、测试失败排查、接口异常但"看起来正常" | `modules/testing-pitfalls.md` | 180 陷阱知识库（apifox 场景版） |
 | 测试范围、优先级、哪些接口必测/可跳过、上线前测试 | `modules/test-selection-policy.md` | P0/P1/P2 风险分级 |
@@ -102,7 +120,7 @@ APIFOX_CLI_TELEMETRY=0 apifox <command>
 | 性能测试、负载、压力、并发、P95/P99 指标 | `modules/test-performance.md` | 性能方法论 + apifox 落地 |
 | YAML 测试定义、批量测试、无代码测试套件设计 | `modules/test-yaml-definition.md` | YAML 设计层 → apifox 映射 |
 | 健康评分、健康报告、API 健康度、上线健康评估 | `modules/test-health-score.md` | 五层健康评分方法论 |
-| 导入、导出、OpenAPI、Postman、质量门禁 | `modules/import-export.md` | import, export |
+| 导入、导出、OpenAPI、Postman、质量门禁（含字段说明完整度 missingDescriptions） | `modules/import-export.md` | import, export |
 | 创建一组接口、全流程、API 生命周期 | `modules/workflow.md` | 端到端工作流 |
 | 命令成功但页面没有、404、找不到资源、版本问题 | `modules/troubleshooting.md` | 排查与版本确认 |
 
@@ -133,6 +151,7 @@ apifox <command> <subcommand> --help
 
 - 未登录时让用户提供 API 访问令牌：`apifox login --with-token <TOKEN>`
 - 凭证存在 `~/.apifox/config.toml`；不要把 token 打印到日志、提交到仓库或写进普通聊天摘要
+- WSL 内怀疑未登录但 Windows 侧已登录时，先看上方“跨系统凭据同步（WSL ↔ Windows）”小节，不要直接重新 `login`
 - 项目未指定时，**先读项目根目录下 `PROJECT_TEST.md`**（测试域单一事实源；或用户约定的其他测试文档），命中则直接取登记的 projectId
 - 项目 ID 可从「项目设置 - 基本设置 - 项目 ID」获取，或 `apifox project list`
 - **首轮必须指明**：本项目此前未登记过 Apifox 项目时，必须先让用户指明 [AI] 团队下对应的项目，否则**阻断会话**（不得猜测、不得"先试试别的"）

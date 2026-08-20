@@ -85,12 +85,10 @@
   ],
   "allowed_children": {
     "config": [
-      "yaml",
-      "embedded"
+      "yaml"
     ],
     "backend/config": [
-      "yaml",
-      "embedded"
+      "yaml"
     ],
     "database/model": [
       "db",
@@ -224,7 +222,7 @@
       "artifact_kind": "entity",
       "content_type": "source_code",
       "canonical_path": "<source-root>/<domain>/entity/<v?>",
-      "purpose": "领域实体目录；版本目录内承载随版本变化的领域实体定义，包名用 v?entity 别名引用",
+      "purpose": "领域实体目录；版本目录内承载随版本变化的领域实体定义（接口请求/响应结构），包名用 v?entity 别名引用；一个接口一个文件、请求与响应各自独立成文件，禁止聚合成 request/response 单文件（聚合后难定位），同一接口的响应树（内嵌子结构）留在该接口的响应文件内不拆散；命名与拆分细则见 entity-file-naming.md",
       "creation_policy": "conditional",
       "tracked": true,
       "requires_domain": true,
@@ -234,6 +232,13 @@
         ".ts",
         ".js",
         ".py"
+      ],
+      "file_name_pattern": "req<Interface>.<ext>|resp<Interface>.<ext>",
+      "go_file_name_pattern": "req<Interface>.go|resp<Interface>.go",
+      "file_granularity": "one_interface_per_file",
+      "forbidden_file_names": [
+        "request.<ext>",
+        "response.<ext>"
       ],
       "owner_skill": "package-structure-rules",
       "search_entry": "entity"
@@ -284,14 +289,14 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "config/yaml",
-      "purpose": "按部署环境拆分的外部 YAML 配置；与 embedded/ 互斥二选一；允许有意持久化凭据原值但禁止过程性输出回显",
+      "purpose": "按部署环境拆分的外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
         ".yaml",
         ".yml"
       ],
-      "file_name_pattern": "config_<env>.yaml|config_<env>.yml",
+      "file_name_pattern": "config.<env>.yaml|config.<env>.yml",
       "environment_name_pattern": "[a-z][a-z0-9_]*",
       "standard_environments": [
         "local",
@@ -302,40 +307,8 @@
       "owner_skill": "package-structure-rules",
       "secret_policy": "allow_plain_secret",
       "source_policy": "yaml_mutually_exclusive",
-      "environment_variable_policy": "allowed_reference",
-      "search_entry": "config/yaml"
-    },
-    {
-      "id": "backend.config.embedded",
-      "project_kind": "backend",
-      "artifact_kind": "config",
-      "content_type": "source_code",
-      "category": "embedded",
-      "canonical_path": "config/embedded",
-      "purpose": "按部署环境拆分的源码内 YAML 字符串配置；与 yaml/ 互斥二选一，推荐优先使用；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
-      "creation_policy": "conditional",
-      "tracked": true,
-      "allowed_extensions": [
-        ".go",
-        ".java",
-        ".ts",
-        ".js",
-        ".py"
-      ],
-      "file_name_pattern": "config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名",
-      "go_file_name_pattern": "config_<env>_yaml.go",
-      "environment_name_pattern": "[a-z][a-z0-9_]*",
-      "standard_environments": [
-        "local",
-        "test",
-        "prod"
-      ],
-      "direct_files": true,
-      "owner_skill": "package-structure-rules",
-      "secret_policy": "allow_plain_secret",
-      "source_policy": "embedded_mutually_exclusive",
       "environment_variable_policy": "not_default",
-      "search_entry": "config/embedded"
+      "search_entry": "config/yaml"
     },
     {
       "id": "fullstack.config.yaml",
@@ -344,14 +317,14 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "backend/config/yaml",
-      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；与 embedded/ 互斥二选一；允许有意持久化凭据原值但禁止过程性输出回显",
+      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
         ".yaml",
         ".yml"
       ],
-      "file_name_pattern": "config_<env>.yaml|config_<env>.yml",
+      "file_name_pattern": "config.<env>.yaml|config.<env>.yml",
       "environment_name_pattern": "[a-z][a-z0-9_]*",
       "standard_environments": [
         "local",
@@ -362,40 +335,8 @@
       "owner_skill": "package-structure-rules",
       "secret_policy": "allow_plain_secret",
       "source_policy": "yaml_mutually_exclusive",
-      "environment_variable_policy": "allowed_reference",
-      "search_entry": "backend/config/yaml"
-    },
-    {
-      "id": "fullstack.config.embedded",
-      "project_kind": "fullstack",
-      "artifact_kind": "config",
-      "content_type": "source_code",
-      "category": "embedded",
-      "canonical_path": "backend/config/embedded",
-      "purpose": "按部署环境拆分的同仓后端源码内 YAML 字符串配置；与 yaml/ 互斥二选一，推荐优先使用；允许源码直接包含 API key、密钥、密码等私密信息，源码为主且默认不依赖环境变量",
-      "creation_policy": "conditional",
-      "tracked": true,
-      "allowed_extensions": [
-        ".go",
-        ".java",
-        ".ts",
-        ".js",
-        ".py"
-      ],
-      "file_name_pattern": "config_<env>_yaml.go（Go）；其他语言仅检查原有扩展名",
-      "go_file_name_pattern": "config_<env>_yaml.go",
-      "environment_name_pattern": "[a-z][a-z0-9_]*",
-      "standard_environments": [
-        "local",
-        "test",
-        "prod"
-      ],
-      "direct_files": true,
-      "owner_skill": "package-structure-rules",
-      "secret_policy": "allow_plain_secret",
-      "source_policy": "embedded_mutually_exclusive",
       "environment_variable_policy": "not_default",
-      "search_entry": "backend/config/embedded"
+      "search_entry": "backend/config/yaml"
     },
     {
       "id": "backend.config.loader",
@@ -405,7 +346,7 @@
       "content_type": "source_code",
       "canonical_path": "config/load.<ext>",
       "path_pattern": "config/load.<ext>",
-      "purpose": "配置加载与解析入口：按选定环境优先使用 config/embedded，对应配置不存在时回退 config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
+      "purpose": "配置加载与解析入口：统一从 config/yaml/ 加载对应环境文件并解析为配置结构；Go 通过 //go:embed yaml/config.*.yaml 编译期嵌入（见 configuration-layout.md）；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
       "creation_policy": "conditional",
       "init_policy": "forbidden",
       "dynamic": true,
@@ -454,7 +395,7 @@
       "content_type": "source_code",
       "canonical_path": "backend/config/load.<ext>",
       "path_pattern": "backend/config/load.<ext>",
-      "purpose": "同仓后端配置加载与解析入口：按选定环境优先使用 backend/config/embedded，对应配置不存在时回退 backend/config/yaml，并解析为配置结构；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
+      "purpose": "同仓后端配置加载与解析入口：统一从 backend/config/yaml/ 加载对应环境文件并解析为配置结构；Go 通过 //go:embed yaml/config.*.yaml 编译期嵌入（见 configuration-layout.md）；环境识别支持 -env、APP_ENV、ENV，优先级 -env > APP_ENV > ENV > local",
       "creation_policy": "conditional",
       "init_policy": "forbidden",
       "dynamic": true,

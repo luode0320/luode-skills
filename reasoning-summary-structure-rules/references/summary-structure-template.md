@@ -213,7 +213,7 @@ stateDiagram-v2
 - Mermaid 无法准确表达、数据不足或当前渲染能力不可靠时，写 `图形化表达：N/A`、`原因：...`、`证据：...`，不得使用无意义占位图。
 - 必须以 `---` + 一级主标题 `# 📋 本轮总结` 开场，与推理过程、中间进度、工具叙述视觉分界。
 - 小节用二级标题 `##`，标题字号大于正文且加粗，形成“主标题 > 小节标题 > 正文”三级层级；禁止用加粗文本冒充标题。
-- 不再单列“函数注释核对”节点（由 `code-change-finalization-gate-rules` / `comment-completion-gate-rules` 闸门内部完成）。
+- 不再单列“函数注释核对”节点（由 `code-change-finalization-gate-rules` / `comment-rules` 闸门内部完成）。
 - 状态用徽章：通过 ✅、警告 ⚠️、失败 ❌、阻断 ⛔；核心结论用 `>` 引用块突出。
 - 多项对照（需求对照、多文件改动、状态对照）优先用 markdown 表格，不堆长串冒号列表。
 - 总结中出现的项目内文件路径必须按用户可访问路径规则输出（原 `windows-wsl-execution-rules` 已删除，规则由 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要承接）：项目在 WSL 且用户从 Windows 桌面 / GUI 客户端访问时，一律使用 `\\wsl.localhost\<distro>\...`，不得输出 `/home/...`。

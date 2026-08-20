@@ -11,9 +11,9 @@ license: Complete terms in LICENSE.txt
 ## 触发后强制联动
 
 - 凡本轮新增或修改 `.vue`、`.tsx`、`.jsx`、`.ts`、`.js`、`.html`、`.css`、`.scss`、`.less` 前端代码文件，必须同时命中：
-  - `comment-placement-granularity-rules`
-  - `comment-completion-gate-rules`
-  - `chinese-comment-rules`
+  - `comment-rules`
+  - `comment-rules`
+  - `comment-rules`
   - `code-style-consistency-rules`
   - `code-change-finalization-gate-rules`
 - 上述任一 skill 未命中，不得给出“已完成前端改动”或“可提交”结论。

@@ -4,10 +4,10 @@
 
 ## 可并行
 
-- `comment-completion-gate-rules`
+- `comment-rules`
   - 做什么：补齐函数、方法、字段、补丁位点相关注释。
   - 建议：可并行，只要每个线程拥有不重叠的文件集。
-- `comment-placement-granularity-rules`
+- `comment-rules`
   - 做什么：判断注释该补在哪里、补多细、哪些位点必须补。
   - 建议：可并行，当注释补充发生在不同文件或不同模块时。
 - `functional-validation-rules`
@@ -19,7 +19,7 @@
 - `code-style-consistency-rules`
   - 做什么：统一代码风格、局部写法和团队约定。
   - 建议：可并行，只要每个线程处理的文件集不重叠。
-- `code-readability-rules`
+- `code-quality-rules`
   - 做什么：提升函数结构、表达顺序和局部可读性。
   - 建议：可并行，只要受影响模块彼此独立。
 - `skill-audit-rules`
@@ -67,7 +67,7 @@
 - `requirement-boundary-rules`
   - 做什么：定义需求边界、范围、排除项和优先级。
   - 建议：必须串行，它负责为下游工作定边界。
-- `api-endpoint-rules`
+- `api-contract-rules`
   - 做什么：约束 HTTP 接口、路由、方法和入口职责。
   - 建议：必须串行，接口未冻结前不要并行展开下游实现。
 - `database-schema-rules`

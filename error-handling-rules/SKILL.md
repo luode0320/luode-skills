@@ -6,7 +6,7 @@ description: 当新增或修改异常类、全局异常处理、错误中间件�
 # 错误处理规则
 
 只在判断“异常应该怎么分类、在哪一层处理、何时重试、何时降级或 fallback”时使用这个 skill。
-如果当前问题是错误响应结构本身，请转交 `api-response-rules`；如果当前问题是日志和 trace 记录点，请转交 `logging-trace-rules`。
+如果当前问题是错误响应结构本身，请转交 `api-contract-rules`；如果当前问题是日志和 trace 记录点，请转交 `logging-trace-rules`。
 
 ## Skill 作用与适用场景
 
@@ -36,11 +36,11 @@ description: 当新增或修改异常类、全局异常处理、错误中间件�
 2. 如果涉及处理层次和路径，再读 `references/handling-paths.md`。
 3. 如果涉及重试、超时、降级或 fallback，再读 `references/resilience-boundaries.md`。
 4. 输出异常分类、处理层次、处理路径和不适用的机制。
-5. 如果当前只是响应格式问题，停止停留在错误处理层并转给 `api-response-rules`。
+5. 如果当前只是响应格式问题，停止停留在错误处理层并转给 `api-contract-rules`。
 
 ## 权责边界与不负责事项
 
-- 只负责错误处理机制，不代替 `api-response-rules` 设计错误响应结构。
+- 只负责错误处理机制，不代替 `api-contract-rules` 设计错误响应结构。
 - 不代替 `logging-trace-rules` 设计日志字段、trace 字段和排障记录点。
 - 不代替业务层决定业务规则本身，只决定异常发生后怎么处理。
 - 不默认所有错误都适合重试、降级或 fallback。
