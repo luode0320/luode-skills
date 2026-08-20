@@ -62,7 +62,7 @@
 | `bug-fix-proposal-rules` | "先打个补丁特判一下就好" |
 | `bug-root-cause-rules` | "我大概知道原因了，直接改" |
 | `test-strategy-rules` | "这个太简单不用测""实现完再补测试" |
-| `code-minimal-change-rules` | "顺手把旁边也清理了""一起重构更高效" |
+| `code-quality-rules` | "顺手把旁边也清理了""一起重构更高效" |
 | `implementation-review-rules` | "测试前先不归位，后面再说" |
 | `final-acceptance-rules` | "差不多都过了，可以放行" |
 
@@ -88,7 +88,7 @@
 
 **我们现状**：已有 `code-review-automation-rules`、`project-change-review-rules`、`implementation-review-rules` 三个审查 skill，已有四级分级（致命/严重/中等/建议）。
 
-**具体改造**：统一三个审查 skill 的输出模板为附录 C；并把 change sizing 写进 `code-minimal-change-rules`。
+**具体改造**：统一三个审查 skill 的输出模板为附录 C；并把 change sizing 写进 `code-quality-rules`。
 
 ---
 
@@ -125,7 +125,7 @@
 **每批收口约束（沿用本仓库既有规矩）**：
 - 改 skill 资产 → 必过 `skill-compliance-gate-rules`，给出 PASS/FAIL；
 - 改了 description 或新增/修改 `##` 标题 → 重跑 `python skill-dictionary/generate_dictionary.py` 刷新 `data.js` 与 `字典.md`，禁止手改产物；
-- 涉及 description/触发条件变更 → 追加 `skill-evolution-rules`。
+- 涉及 description/触发条件变更 → 追加 `skill-absorption-rules`。
 
 ---
 

@@ -33,7 +33,7 @@
 - Bug 处理时，自动进入问题提出、复现、静态定位、运行时诊断、根因分析、修复建议和验证链路
 - 开始写代码时，自动进入可读性、命名、注释和风格一致性规则
 - 继续修改已有代码时，如果发现“AI 记忆代码”和“当前文件代码”不一致，自动先重读最新代码并在保留用户手动改动前提下增量合并，禁止按旧记忆覆盖还原
-- 只要本轮发生新增或修改代码，必须强制触发 `comment-placement-granularity-rules`、`comment-completion-gate-rules` 与 `chinese-comment-rules`：分别完成“注释必要性 / 位置 / 颗粒度判断”、“改动位点补齐闸门”（含步骤 `1/2/3` 就近注释）和中文表达检查。
+- 只要本轮发生新增或修改代码，必须强制触发 `comment-rules`（位置颗粒度分区、补齐闸门分区、语言表达分区）：分别完成“注释必要性 / 位置 / 颗粒度判断”、“改动位点补齐闸门”（含步骤 `1/2/3` 就近注释）和中文表达检查。
 - 改到特定代码位置时，自动命中特定 skill
 - 写完代码后进入真实测试；测试通过后由 `code-style-consistency-rules` 执行一次 `6-review` 风格回归，检查写法、位置、格式和既有习惯
 - `6-review` 只输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED`，不判断业务正确性、需求覆盖或发布放行
@@ -182,7 +182,7 @@
 | `project-rule-file-bootstrap-rules` | 当仓库级规则文件、`.gitattributes`、`.editorconfig` 或项目记忆四件套缺失、损坏或需要幂等同步时自动触发。 | 作为项目自举唯一入口，按 `rule-bootstrap` / `memory-bootstrap` 条件路由维护规则文件和 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 骨架，保护非受管内容、UTF-8、大小闸门和历史只追加；事实抽取仍由 `project-memory-rules` 负责。 |
 | `thread-title-rules` | 当当前 Codex / Claude / agent 会话收到明确提问、进入明确任务，或发生 goal 创建 / 恢复、上下文压缩续做、长任务阶段切换等可命名过程节点，且会话标题为空泛、过时、泛称或不匹配当前任务时自动触发。 | 负责生成 8-24 字中文简要标题；Codex App 优先调用只接收 `title` 的统一 MCP 工具 `rename_current_thread`，该工具未暴露且宿主具备自举条件时默认经 `parallel-task-dispatch-rules` 委派子代理完成 provisioning（检测派只读子 agent 运行 `mcp/bootstrap.mjs --check`、写 config 的注册派单一安装子 agent 运行 `mcp/bootstrap.mjs`）幂等完成本机安装与注册并提示重载，首次 `INVALID_TITLE` 只允许修正后重试 MCP 一次且第二次失败直接跳过，MCP 未暴露或首次调用的其他失败时仅在真实存在 `set_thread_title` 时回退一次；禁止通过线程列表、路径或时间猜测当前会话，其他宿主按真实工具能力决定执行或显式跳过。 |
 | `parallel-task-dispatch-rules` | 任一 skill 命中并准备进入实质执行阶段时强制自动触发。 | 统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结主/子职责与互斥写集，检查系统能力、当前轮授权、项目级完全授权和用户禁止信号，真实启动、观测、回收并关闭子代理，输出计划线程数、实际启动数、完成数、关闭数和回退原因。 |
-| `skill-evolution-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
+| `skill-absorption-rules` | 当研发任务已经命中某个现有 skill，但执行中发现该 skill 的触发不准、规则缺失、边界不清、references 不足或无法覆盖当前稳定高频场景，继续推进只能依赖临时口头补充时自动触发。 | 负责判断这是业务问题还是 skill 问题，明确应补哪个现有 skill、是否需要新增相邻 skill、给出最小完善建议，并在必要时先暂停当前任务，待 skill 更新并重新加载后再继续。 |
 | `skill-hit-check-rules` | 当用户每次提问进入新回合时自动触发。负责在执行主任务前先检查本轮是否命中任何 skill，防止漏触发或忘触发；若命中则必须在回复中明确告知命中 skill 列表，若本轮同时命中 `parallel-task-dispatch-rules`，还要额外输出并行触发的 skill 列表；若未命中则明确告知未命中及原因。 | 在每轮开始前强制执行命中检查并显式回报命中列表，避免静默漏触发。 |
 | `code-snippet-location-rules` | 当用户只粘贴代码片段、报错片段或函数片段，并说“这里改一下 / 这段需要修改 / 这里有问题”，但没有明确给出文件路径、符号全名或模块位置时自动触发。 | 负责按“用户明示路径 > 当前活动编辑器 / 当前打开文件 / 当前选区 > 代码片段精确匹配 > 仓库搜索候选 > 询问确认”的优先级定位真实目标文件，避免把相似代码误判到其他位置。 |
 | `skill-audit-rules` | 当主任务存在多 skill 组合、并行拆分或规则收口风险时自动触发。 | 负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。 |
@@ -209,7 +209,7 @@
 | 用户要求分析当前项目并整理项目专属编码规则，或要求把规则沉淀成多个项目私有 skill | 总控层 / `project-local-skills-rules` | 先按主题拆分项目专属 skill，再统一写入项目根目录 `skill/`，避免规则只停留在口头总结 |
 | 用户要求检查当前项目是否需要安装 MCP，或任务即将涉及前端页面验证 / Godot 编辑器操控，需要先判断 Chrome DevTools MCP、Browser Use Cloud MCP 或 Godot AI MCP | 总控层 / `mcp-installation-rules` | 先按项目结构与能力条件明确需要安装的 MCP，再把浏览器或编辑器控制权让给对应工具；Browser Use Cloud 只有专属需求才进入收费与安全闸门 |
 | 用户要求分析代码库结构、调用链、符号关系、影响面或重构范围，需要先缩小跨文件搜索 | 总控层 / `codegraph-analysis-rules` | 先用 CodeGraph 做图谱探索；未初始化时先自动初始化，失败后回退到本地搜索与阅读 |
-| 当前主流程已经明确，但执行中发现已命中的某个 skill 触发不准、规则缺失、边界不清、references 不足，继续推进只能靠临时口头规则兜底 | 总控辅助 / `skill-evolution-rules` | 先判断这是不是 skill gap，再决定补旧 skill、补相邻 skill 还是新增独立 skill；阻断级 gap 应先暂停当前任务 |
+| 当前主流程已经明确，但执行中发现已命中的某个 skill 触发不准、规则缺失、边界不清、references 不足，继续推进只能靠临时口头规则兜底 | 总控辅助 / `skill-absorption-rules` | 先判断这是不是 skill gap，再决定补旧 skill、补相邻 skill 还是新增独立 skill；阻断级 gap 应先暂停当前任务 |
 | 用户只粘贴一段代码、函数或报错片段并说“这里改”，但没有提供文件路径或可唯一定位的代码位置 | 总控层 / `code-snippet-location-rules` | 先依据明确路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件，再进入代码重读或具体修改 |
 | 当前会话刚开始，用户直接提当前项目里的需求、Bug、编码或测试问题，但本轮还没有前情上下文 | 记忆域 / `recent-context-bootstrap-rules` | 先压缩最近 3 天的项目活动，再进入真正主域 |
 | 用户要求分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成 / 补建根目录项目设计主文档 | 总控层 / `project-design-doc-rules` | 先把根目录项目设计类文档作为弱参考源对照真实代码和当前文档，再决定是更新还是补建 |
@@ -224,7 +224,7 @@
 | 用户描述报错、异常、结果不符、线上故障、偶发问题、历史行为错误 | Bug 域 / `bug-intake-rules` | 先标准化问题，再进入复现、定位和根因分析 |
 | Bug 仅靠读代码无法定位，需要运行中观察 | Bug 域 / `bug-intake-rules` 的 `runtime-diagnostics` 条件路由 | 选择最小必要的断点、临时日志或诊断断言进入运行时诊断，不应继续停留在纯静态分析 |
 | 需求或 Bug 已澄清，开始真正新增 / 修改代码 | 编码基线域 + 代码位点域 | 基线域默认并行生效，再按改动位点附加对应 skill |
-| 当前任务是后端 HTTP API 的 Swagger/OpenAPI 框架接入、接口文档同步、Swagger 调试入口、文档暴露路径或环境开关策略 | 代码位点域 / `api-swagger-rules` | 这是接口契约文档和调试入口规则，不代替接口入口、请求、响应或功能验证 |
+| 当前任务是后端 HTTP API 的 Swagger/OpenAPI 框架接入、接口文档同步、Swagger 调试入口、文档暴露路径或环境开关策略 | 代码位点域 / `api-contract-rules` | 这是接口契约文档和调试入口规则，不代替接口入口、请求、响应或功能验证 |
 | 代码已经完成，准备验证功能 | 测试域 | 先定测试策略，再看资源位置、功能验证、环境差异处理和回归；真实测试完成后才进入 `6-review` |
 | 真实测试已经完成，准备检查写法与目录归位 | 代码风格回归域 | 由 `code-style-consistency-rules` 执行一次 `6-review`，输出 `STYLE: PASS` 或 `STYLE: FIX_REQUIRED` |
 | 测试已基本完成，开始准备提交、交付说明或进入团队发布流程 | 交付域 | 进入 Git 协作与交付说明收口流程 |
@@ -390,14 +390,14 @@ Bug 域采用两条互补路径：
 | Skill 名字                     | 自动触发 description                                                        | 核心职责                                     |
 | ------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------- |
 | `code-generation-style-rules`  | 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。       | 读取 `PROJECT_STYLE.md`、当前文件和同目录样例，形成本轮代码风格契约，约束后续实现风格。 |
-| `code-minimal-change-rules`    | 当新增或修改代码、调整功能、修复 Bug 时自动触发。                           | 严控代码变更范围，杜绝无关修改、冗余改动和过度优化，保证每次变更聚焦单一目标，降低回归风险和排查难度；简单处理禁止顺手引入无收益接口抽象。 |
+| `code-quality-rules`    | 当新增或修改代码、调整功能、修复 Bug 时自动触发。                           | 严控代码变更范围，杜绝无关修改、冗余改动和过度优化，保证每次变更聚焦单一目标，降低回归风险和排查难度；简单处理禁止顺手引入无收益接口抽象。 |
 | `code-context-resync-rules`    | 当继续修改已有代码且发现当前文件与 AI 记忆/上次读取内容不一致时自动触发。    | 先重读最新文件并以当前内容为基线增量合并，禁止按旧记忆覆盖用户手动改动。 |
-| `code-readability-rules`       | 当新增或修改任意业务代码、工具代码、服务代码、脚本代码时自动触发。          | 保证函数结构清晰、逻辑顺序自然、副作用显式和复杂度可控，并用深模块口径拦截浅封装与无脑接口抽象。 |
+| `code-quality-rules`       | 当新增或修改任意业务代码、工具代码、服务代码、脚本代码时自动触发。          | 保证函数结构清晰、逻辑顺序自然、副作用显式和复杂度可控，并用深模块口径拦截浅封装与无脑接口抽象。 |
 | `code-style-consistency-rules` | 当新增或修改任意代码文件、或用户指出某写法不对时自动触发；真实测试通过后承接唯一 `6-review`。 | 跟随项目现有风格，不引入风格跳变；兼任全局用户风格反例库和共享静态 Owner 路由 owner。持续监控只能条件式消费该路由，不得复制来源映射或成为测试后 Gate。 |
 | `naming-rules`                 | 当新增或修改类名、函数名、变量名、常量名、DTO、实体、字段映射名时自动触发。 | 保证命名语义化。                             |
-| `chinese-comment-rules`        | 当新增或修改中文注释、业务说明、中文文档注释时自动触发。                    | 统一中文表达习惯和注释语气。                 |
-| `comment-placement-granularity-rules` | 当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时自动触发。 | 统一注释位置、颗粒度、字段相关注释和过期注释治理。 |
-| `comment-completion-gate-rules` | 当本轮代码新增或修改，或需要判断函数头元信息、步骤编号与补注释闸门时自动触发。 | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
+| `comment-rules`        | 当新增或修改中文注释、业务说明、中文文档注释时自动触发。                    | 统一中文表达习惯和注释语气。                 |
+| `comment-rules` | 当需要判断代码注释是否有必要、应放在哪里、写到什么颗粒度，以及字段注释、边界注释和过期注释如何治理时自动触发。 | 统一注释位置、颗粒度、字段相关注释和过期注释治理。 |
+| `comment-rules` | 当本轮代码新增或修改，或需要判断函数头元信息、步骤编号与补注释闸门时自动触发。 | 统一改动位点注释补齐、函数头元信息、步骤编号和注释缺失阻断闸门。 |
 | `windows-encoding-rules` | 当任务运行在 Windows 且涉及中文读写、README/Markdown 修改、日志追加、脚本输出重定向、Git 提交信息或终端显示时自动触发。 | 统一 Windows 终端与文件中文编码防护，避免中文乱码落盘。 |
 
 ## 九、代码位点域
@@ -411,10 +411,10 @@ Bug 域采用两条互补路径：
 | `common-util-rules`         | 当新增或修改工具类、通用方法、公共组件、工具函数、通用常量或复用代码时自动触发。 | 统一公共资格、复用检索、调用边界、防重复封装和 7 天冻结策略；`util`、`common/util`、二级子目录、依赖方向等目录落点交给 `package-structure-rules`。 |
 | `database-schema-rules`     | 当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。                                                                                                                        | 统一表结构变更、迁移安全和回滚策略。 |
 | `database-query-rules`      | 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。                                                                                                                  | 统一数据库访问和查询性能规则。       |
-| `api-endpoint-rules`        | 当新增或修改 controller、router、handler、路由声明、HTTP 方法、接口 CRUD、路径命名、幂等接口、超时预算时自动触发。                                                                                                  | 统一接口入口设计。                   |
-| `api-request-rules`         | 当新增或修改请求参数、DTO、query 参数、path 参数、body 结构、参数校验、请求模型时自动触发。                                                                                                                         | 统一请求模型和校验规则。             |
-| `api-response-rules`        | 当新增或修改返回体、响应包装器、分页结构、错误码结构、兼容字段、版本字段时自动触发。                                                                                                                                | 统一响应格式和兼容策略。             |
-| `api-swagger-rules`         | 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时自动触发。                                                                  | 统一 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。 |
+| `api-contract-rules`        | 当新增或修改 controller、router、handler、路由声明、HTTP 方法、接口 CRUD、路径命名、幂等接口、超时预算时自动触发。                                                                                                  | 统一接口入口设计。                   |
+| `api-contract-rules`         | 当新增或修改请求参数、DTO、query 参数、path 参数、body 结构、参数校验、请求模型时自动触发。                                                                                                                         | 统一请求模型和校验规则。             |
+| `api-contract-rules`        | 当新增或修改返回体、响应包装器、分页结构、错误码结构、兼容字段、版本字段时自动触发。                                                                                                                                | 统一响应格式和兼容策略。             |
+| `api-contract-rules`         | 当新增或修改后端 HTTP API、Swagger/OpenAPI 框架接入、接口文档注解/注释、Swagger 调试入口、接口分组标签、文档暴露路径或 Swagger 环境开关时自动触发。                                                                  | 统一 Swagger/OpenAPI 接入、接口文档同步和调试入口暴露规则。 |
 | `error-handling-rules`      | 当新增或修改异常类、全局异常处理、错误中间件、`try/catch`、错误映射、重试、超时、降级、fallback 时自动触发。                                                                                                        | 统一错误处理模型。                   |
 | `logging-trace-rules`       | 当新增或修改日志、logger、trace、span、审计日志、脱敏、排障字段、链路透传时自动触发。                                                                                                                               | 统一日志和链路追踪规则。             |
 | `frontend-design`           | 当用户要求构建 Web 组件、页面或前端应用，尤其强调整体界面成品质感、设计方向、前端落地效果或避免模板化 AI 审美时自动触发。                                                                                           | 生成具有鲜明风格、生产级质量的前端界面，并在与内部前端规则冲突时优先作为主导 skill。 |
@@ -430,12 +430,12 @@ Bug 域采用两条互补路径：
 1. 位点类 skill 允许并行命中
 
 - 同一次改动可以同时触发多个位点类 skill
-- 例如新增一个接口时，往往会同时命中 `api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`api-swagger-rules`
+- 例如新增一个接口时，往往会同时命中 `api-contract-rules`、`api-contract-rules`、`api-contract-rules`、`api-contract-rules`
 - 如果该接口还涉及日志记录或异常映射，则还会继续命中 `logging-trace-rules`、`error-handling-rules`
 
 2. 基线域默认并行生效
 
-- 只要进入编码，`code-generation-style-rules`、`code-minimal-change-rules`、`code-context-resync-rules`、`code-readability-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill 默认一起生效
+- 只要进入编码，`code-generation-style-rules`、`code-quality-rules`、`code-context-resync-rules`、`code-style-consistency-rules`、`naming-rules`、注释类 skill 默认一起生效
 - 位点类 skill 只负责“改到哪里就约束哪里”
 - 基线域负责“无论改哪里都应保持一致的基础质量”
 - 两者关系是并行叠加，不是二选一
@@ -454,7 +454,7 @@ Bug 域采用两条互补路径：
 
 5. 接口入口位点与横切位点并行叠加
 
-- `api-endpoint-rules`、`api-request-rules`、`api-response-rules`、`api-swagger-rules` 负责接口主干与接口文档同步
+- `api-contract-rules`、`api-contract-rules`、`api-contract-rules`、`api-contract-rules` 负责接口主干与接口文档同步
 - `error-handling-rules`、`logging-trace-rules` 负责当前保留的横切约束
 - 横切类 skill 不替代主干 skill，只在主干上叠加要求
 
@@ -988,7 +988,7 @@ skill-name/
 27. `SKILL.md` 的统一段落模板是否既方便审查，又不会把技能正文写得过长
 28. `team-development-rules` 的审查版正文骨架是否已经足够明确，能否直接进入正式 `SKILL.md` 起草
 29. 当前文档中的后续维护原则是否已经足够明确，能否支撑未来体系持续演进
-30. `code-minimal-change-rules` 的审查版正文骨架是否已经足够明确，能否作为第一个编码样板 skill
+30. `code-quality-rules` 的审查版正文骨架是否已经足够明确，能否作为第一个编码样板 skill
 
 ## 二十一、当前结论
 

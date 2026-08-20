@@ -12,7 +12,7 @@
 ## 凭据持久化与输出脱敏
 
 - 稳定决策：真实凭据原值可有意持久化于代码、配置、普通维护文档和对应 Git 提交；日志、错误、测试报告与证据、终端输出、Agent 回复、会话交接和自动知识摘要不得回显原值。
-- 稳定决策：配置 Catalog 的 YAML 与 embedded 条目均使用 `allow_plain_secret`；`source_policy`、Schema、CLI 参数和返回结构不因该决策改变。
+- 稳定决策：配置 Catalog 的 yaml 条目使用 `allow_plain_secret`（config/yaml/ 唯一配置模式）；`source_policy`、Schema、CLI 参数和返回结构不因该决策改变。
 ## Decimal 目录规则
 
 - 稳定决策：`utils/decimal/` 是 Decimal 高精度数值类型封装唯一目录，Catalog ID `backend.utils.decimal`，Go 包别名 `decimalUtil`。
@@ -94,8 +94,8 @@
 
 ## 配置环境来源契约
 
-- 稳定决策：`package-structure-rules` 的 loader 条目必须记录统一环境来源优先级 `-env > APP_ENV > ENV > local`；reference 正文、Catalog、Schema 和活动契约测试必须保持同一表达。该契约只描述配置 loader 的来源识别，不改变 embedded/YAML 秘密边界或真实项目迁移授权。
-- 稳定决策：`config/embedded/` 与 `config/yaml/` 是二选一互斥的配置模式，一个项目只能选择其中一种，不可并存，推荐优先使用 `config/embedded/`。YAML 条目标记为 `yaml_mutually_exclusive`，embedded 条目标记为 `embedded_mutually_exclusive`；两种模式都允许有意持久化真实密钥、密码、token、私钥原值，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。该模型取代旧的“embedded 主来源、YAML 回退并存”口径。
+- 稳定决策：`package-structure-rules` 的 loader 条目必须记录统一环境来源优先级 `-env > APP_ENV > ENV > local`；reference 正文、Catalog、Schema 和活动契约测试必须保持同一表达。该契约只描述配置 loader 的来源识别，不改变 yaml/ 私密边界或真实项目迁移授权。
+- 稳定决策：`config/yaml/` 是唯一配置模式，只存放配置数据，允许有意持久化真实密钥、密码、token、私钥原值、默认不依赖环境变量，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。`config/embedded/` 已废弃：strict 下存在即报错，adoption 下须登记 `legacy_source_roots` 才能继续维护。环境配置文件统一使用点中缀命名 `config.<env>.yaml`（Go 生态主流，如 `config.local.yaml`，兼容 `.yml`）。Go 项目由 `config/load.go` 通过 `//go:embed yaml/config.*.yaml` 编译期嵌入并按环境读取；非 Go 语言从文件系统读取 `yaml/config.<env>.yaml`。YAML 条目标记 `yaml_mutually_exclusive` 字段保留（元数据，脚本不消费）。该模型取代旧的“embedded/YAML 二选一互斥、推荐 embedded”口径。
 - 来源：`package-structure-rules/references/configuration-layout.md`、`package-structure-rules` Catalog/Schema 改动和配置契约测试。
 - 更新时间：2026-08-13。
 - 来源：`artifact-delivery-gate-rules/references/plain-language-document-contract.md`、`artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`、`artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`。
@@ -355,7 +355,7 @@
 - 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
 - 稳定决策：独立后端的默认二进制入口固定为根 `main.<ext>`，仅当存在额外 binary 时使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端对应固定为 `backend/main.<ext>` 与 `backend/cmd/<binary>/main.<ext>`。根 `cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 都是非法入口；Catalog 以动态 pattern 建模，`init` 显式启用时必须失败关闭且不得创建占位路径。
-- 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；`config/yaml/` 与 `config/embedded/` 是二选一互斥的配置模式，一个项目只能选择其中一种，不可并存，推荐优先使用 embedded。常见多环境 YAML 使用 `yaml/config_local.yaml`、`yaml/config_test.yaml`、`yaml/config_prod.yaml`，Go 源码内嵌配置格式名必须后置，使用 `embedded/config_local_yaml.go`、`embedded/config_test_yaml.go`、`embedded/config_prod_yaml.go`；环境集合可扩展，不要求所有环境齐全。格式名后置的原因是 `config_test.go` 会被 Go 当成测试文件并排除出 `go build`，因此 `embedded/config_<env>.go` 属于非法旧命名；环境名同样不得以 `_yaml` 结尾。外部 YAML 不参与编译，保持 `config_<env>.yaml`，不加 `_yaml` 后缀。文件名契约只对 `.go` 强制，其他语言的 embedded 仍只校验源码扩展名；`check` 只读，`init` 不生成动态环境配置文件。YAML 与 embedded 都允许有意持久化真实密钥、密码、token、私钥原值，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。config/ 根允许直接存放 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件，条件提交且 `init` 不创建；`config/yaml/` 与 `config/embedded/` 只存放配置数据。
+- 稳定决策：独立后端配置唯一根为 `config/`，前后端同仓的后端配置唯一根为 `backend/config/`；`config/yaml/` 是唯一配置模式（`config/embedded/` 已废弃，strict 下存在即报错，adoption 下登记 `legacy_source_roots` 后才可继续维护）。常见多环境 YAML 使用点中缀命名 `yaml/config.local.yaml`、`yaml/config.test.yaml`、`yaml/config.prod.yaml`（Go 生态主流，兼容 `.yml`），保持外部配置文件形态、不加 `_yaml` 后缀；环境集合可扩展，不要求所有环境齐全。Go 项目由 `config/load.go` 通过 `//go:embed yaml/config.*.yaml` 编译期嵌入并按环境读取（无 build tag）；非 Go 语言（Java/Node/Python）的 `load.<ext>` 从文件系统读取 `yaml/config.<env>.yaml`。`check` 只读，`init` 不生成动态环境配置文件。YAML 允许有意持久化真实密钥、密码、token、私钥原值、默认不依赖环境变量，但 Agent 输出、日志、README、错误和测试报告不得泄露原值。config/ 根允许直接存放 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件，条件提交且 `init` 不创建；`config/yaml/` 只存放配置数据。
 - 稳定决策：fullstack、backend、frontend 三类项目统一使用项目根 `test/` 作为活动测试代码唯一入口；独立后端使用根 `test/`，不建立 `backend/test/`；前后端同仓也不建立 `backend/test/` 或 `frontend/test/`。Catalog 的测试目录 Owner 为 `test-strategy-rules`，`doc/5-tests/` 只保存测试说明和非可执行证据，不能替代根 `test/`。
 - 稳定决策：前后端同仓、独立后端、独立前端三类项目根都必须直接保存并提交 `Dockerfile`。Catalog 以 `project-governance/dockerfile` 的必需文件条目建模，`init` 自动创建空文件位置；`strict` 只读拒绝缺失或被目录占用，`adoption` 保持旧项目渐进采纳，不强制补迁移文件。
 - 稳定决策：业务域直连源码根 `<source-root>/<domain>/`，去掉 `business/` 中间层；业务相关逻辑完全通过版本目录 `<v?>`（`v1` 起，命名 `v[0-9]+`）隔离，`router/`、`controller/`、`entity/`、`service/` 下沉到版本目录内（`service/` 必建），`api/`、`base/`、`constant/`、`util/`、`crontask/` 为跨版本通用业务逻辑。域级初始化入口为单文件 `init.<ext>`（`<ext>` 为语言扩展名），全量注册本域所有版本路由并以 `/v1`、`/v2` 前缀区分、多版本并存对外，旧版本不因新版本诞生而下线、也不冻结。目录树用 `<source-root>` 占位符多语言统一（Go=`internal/`、Java=`src/main/java/<包>`、Node=`src/`、Python=`src/<包>`），不单为 Go 定 `internal/` 树。
@@ -598,7 +598,7 @@ entities:
       - execution-failure-learning-rules
       - 执行失败案例演进
       - prevent recover learn
-    definition: "高风险工具调用前进入 prevent 预检，非预期失败进入 recover 分类、查库和同输入同成功标准复验，验证通过后才进入 learn。案例正文只归属于唯一 owner Skill；无维护授权保持 candidate，冲突标记 conflicted，业务 Bug、Skill 缺口和跨项目知识分别回流 bug-*、skill-evolution-rules 与 knowledge-flow。"
+    definition: "高风险工具调用前进入 prevent 预检，非预期失败进入 recover 分类、查库和同输入同成功标准复验，验证通过后才进入 learn。案例正文只归属于唯一 owner Skill；无维护授权保持 candidate，冲突标记 conflicted，业务 Bug、Skill 缺口和跨项目知识分别回流 bug-*、skill-absorption-rules 与 knowledge-flow。"
     scope: "imagegen、Windows/WSL、浏览器、认证 URL、MCP/插件安装、知识库文件读写及后续注册的高风险执行域"
     status: "active"
     evidence_ids:
@@ -788,8 +788,8 @@ entities:
     name: "长代码块内步骤注释"
     type: "代码注释规则"
     aliases:
-      - comment-completion-gate-rules
-      - comment-placement-granularity-rules
+      - comment-rules
+      - comment-rules
       - 代码块五行门槛
       - 长代码块步骤注释
       - 代码块内步骤注释
@@ -814,7 +814,7 @@ entities:
     scope: "函数拆分、局部检查、guard 分支、简单匹配逻辑、注释补充"
     status: "active"
     evidence_ids:
-      - evidence.skill.code-readability-rules
+      - evidence.skill.code-quality-rules
       - evidence.dialog.simple-check-inline
     context_ids:
       - context.code-generation-style
@@ -1406,13 +1406,13 @@ evidence:
     note: "代码生成前风格契约入口来源"
   - evidence_id: evidence.skill.comment-completion
     type: "skill"
-    source: "comment-completion-gate-rules/SKILL.md"
-    path: "comment-completion-gate-rules/SKILL.md"
+    source: "comment-rules/SKILL.md"
+    path: "comment-rules/SKILL.md"
     note: "改动位点注释补齐、步骤编号和代码块长度门槛来源"
   - evidence_id: evidence.skill.comment-placement
     type: "skill"
-    source: "comment-placement-granularity-rules/SKILL.md"
-    path: "comment-placement-granularity-rules/SKILL.md"
+    source: "comment-rules/SKILL.md"
+    path: "comment-rules/SKILL.md"
     note: "代码块内步骤注释落点与颗粒度来源"
   - evidence_id: evidence.dialog.comment-block-step-annotation
     type: "dialog"
@@ -1423,10 +1423,10 @@ evidence:
     source: "project-agents-bootstrap/SKILL.md"
     path: "project-agents-bootstrap/SKILL.md"
     note: "仓库级规则自举同步代码生成风格入口来源"
-  - evidence_id: evidence.skill.code-readability-rules
+  - evidence_id: evidence.skill.code-quality-rules
     type: "skill"
-    source: "code-readability-rules/SKILL.md"
-    path: "code-readability-rules/SKILL.md"
+    source: "code-quality-rules/SKILL.md"
+    path: "code-quality-rules/SKILL.md"
     note: "函数结构、职责拆分颗粒度和过度小函数内联规则来源"
   - evidence_id: evidence.dialog.simple-check-inline
     type: "dialog"
@@ -2096,17 +2096,17 @@ retrieval_hints:
       - "rule.style-regression"
     code-generation-style-rules/SKILL.md:
       - "rule.code-generation-style-contract"
-    comment-completion-gate-rules/SKILL.md:
+    comment-rules/SKILL.md:
       - "rule.comment-block-step-annotation"
-    comment-completion-gate-rules/references/comment-step-numbering-gate.md:
+    comment-rules/references/comment-step-numbering-gate.md:
       - "rule.comment-block-step-annotation"
-    comment-placement-granularity-rules/SKILL.md:
+    comment-rules/SKILL.md:
       - "rule.comment-block-step-annotation"
-    comment-placement-granularity-rules/references/comment-placement.md:
+    comment-rules/references/comment-placement.md:
       - "rule.comment-block-step-annotation"
-    code-readability-rules/SKILL.md:
+    code-quality-rules/SKILL.md:
       - "rule.simple-check-inline-readability"
-    code-readability-rules/references/function-structure-rules.md:
+    code-quality-rules/references/function-structure-rules.md:
       - "rule.simple-check-inline-readability"
     common-util-rules/SKILL.md:
       - "rule.backend-utils-common-util-placement"

@@ -4,6 +4,12 @@
 
 ## 事件
 
+- 2026-08-20：纠错 `package-structure-rules` 的 Go 嵌入模式：目录级 `//go:embed yaml`（会把 yaml/ 下所有文件嵌入）修正为模式匹配 `//go:embed yaml/config.*.yaml`（仅嵌入点中缀配置文件）；`config/load.go` 骨架的 Load 函数去掉 .yaml/.yml 双扩展名循环，改回单扩展名 `config.<env>.yaml`，并注明 `.yml` 项目将 embed 模式与 Load 扩展名相应调整。五处同步：configuration-layout.md（表/骨架/示例）、placement-catalog.yaml（loader purpose 2 处）、project-layout-v2.md（长句+两处树注释）、SKILL.md、PROJECT_MEMORY.md（2 条稳定决策）。全量测试 40 项通过。改动停在已改动未提交状态。
+
+- 2026-08-20：`package-structure-rules` 环境配置文件命名统一为**点中缀** `config.<env>.yaml`（Go 生态主流，如 `config.local.yaml`，兼容 `.yml`），替换下划线中缀 `config_<env>.yaml`；Go 加载骨架由 `//go:embed yaml/config_*.yaml` 改为目录级 `//go:embed yaml`（Load 兼容 .yaml/.yml 双扩展名）。五方一致改动：placement-catalog.yaml（file_name_pattern 2 处、loader purpose）、placement_catalog.py（文件名正则 `config\.<env>\.(yaml|yml)` + 文案）、configuration-layout.md（命名节/Go 骨架/示例全量点中缀）、project-layout-v2.md（目录树+长句）、SKILL.md（embed 表述）、configuration_layout_test.py（断言与样本点中缀化）、PROJECT_MEMORY.md（2 条稳定决策）。下划线旧命名现被 strict 拒绝。全量测试 40 项通过，六组手工验证通过。改动停在已改动未提交状态。
+
+- 2026-08-20：修订 `package-structure-rules` 的 config 处理规则，同步业界模式：删除 `config/embedded/`（源码内 YAML 字符串）模式，`config/yaml/` 成为唯一配置模式并吸收私密配置能力（允许有意持久化凭据原值、默认不依赖环境变量、只存放配置数据）；Go 项目由 `config/load.go` 通过 `//go:embed yaml/config_*.yaml` 编译期嵌入（无 build tag，参考 EllipalNodeSync 的 go:embed 模式）。五方一致改动：configuration-layout.md（核心重写+Go embed 代码骨架）、SKILL.md（核心边界 2）、placement-catalog.yaml（删 2 个 embedded 条目、yaml 条目 environment_variable_policy→not_default、loader purpose 更新）、project-layout-v2.md（三处目录树删 embedded/）、placement_catalog.py（embedded 存在即 strict 报错、category 只允许 yaml）、configuration_layout_test.py（13 用例含 2 新增废弃用例全绿）、PROJECT_MEMORY.md（4 条稳定决策改写）。schema.json enum 保留向后兼容。全量测试 40 项通过，五组手工验证通过。改动停在已改动未提交状态。
+
 - 2026-08-17：删除 `windows-wsl-execution-rules` skill，所有引用改指 `wsl-windows-bridge`（WSL↔Windows 工具桥，补齐 6 个 win-* wrapper 与 setup.sh 修复）；PowerShell 前缀唯一真源随删除撤销，改为 `windows-encoding-rules/SKILL.md` 内联前缀。更新 AGENTS/CLAUDE/PROJECT_*/字典/其余 skill 引用与 5 份历史文档。改动停在已改动未提交状态。
 
 - 2026-08-14：完成 PowerShell 控制继续优化（REQ-PSCTL-20260814-001/CYCLE-PSCTL-01）。以 `wsl-windows-bridge`（原 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md`）为唯一真源新增「PowerShell 命令前缀模板」，在 `wsl-windows-bridge`、`windows-encoding-rules`、`windows-powershell-environment-rules` 三份 SKILL.md 补齐交叉引用；5.1 路径先设 UTF-8 输出编码，7 路径继续优先 `pwsh`。同步 PROJECT_MEMORY 与 skill 字典（implemented_total 69、seed_total 35），落盘需求、实施总览、实施周期、测试主文档与 6-review 五份文档，四份工程文档 profile 校验 PASS，知识库新建 1 篇开发环境笔记并补双向关联；全量测试 386 项中 5 项既有失败与本次无关。改动停在已改动未提交状态。
