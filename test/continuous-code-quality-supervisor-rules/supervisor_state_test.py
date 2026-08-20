@@ -84,17 +84,17 @@ class SupervisorStateTests(unittest.TestCase):
         # 1. 启动监督、登记 Owner、扫描两次并验证同指纹合并。
         started = start(self.checkout, True, "监控代码", self.root / "state")
         self.assertEqual(started["status"], "active")
-        registered = register_owner(self.checkout, "code-readability-rules", "code-readability-rules/SKILL.md", "代码改动", self.root / "state")
+        registered = register_owner(self.checkout, "code-quality-rules", "code-quality-rules/SKILL.md", "代码改动", self.root / "state")
         self.assertEqual(len(registered["owners"]), 1)
         finding = {
-            "owner_skill": "code-readability-rules",
-            "rule_source": "code-readability-rules/SKILL.md",
+            "owner_skill": "code-quality-rules",
+            "rule_source": "code-quality-rules/SKILL.md",
             "file": "src/example.py",
             "evidence": "function has excessive branching",
             "severity": "P1",
             "fingerprint": finding_fingerprint(
-                "code-readability-rules",
-                "code-readability-rules/SKILL.md",
+                "code-quality-rules",
+                "code-quality-rules/SKILL.md",
                 "src/example.py",
                 "function has excessive branching",
             ),
@@ -123,7 +123,7 @@ class SupervisorStateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             register_owner(self.checkout, "unknown-owner", "missing", "anything", self.root / "state")
         invalid = {
-            "owner_skill": "code-readability-rules",
+            "owner_skill": "code-quality-rules",
             "rule_source": "owner/SKILL.md",
             "file": "src/example.py",
             "evidence": "safe",
@@ -148,17 +148,17 @@ class SupervisorStateTests(unittest.TestCase):
         # 1. 验证 API 四 Owner 同时命中且排除列表完全不进入结果。
         owners = route_owners(["src/api/user_controller.py"])
         expected_allowed = {
-            "api-endpoint-rules",
-            "api-request-rules",
-            "api-response-rules",
-            "api-swagger-rules",
-            "chinese-comment-rules",
+            "api-contract-rules",
+            "api-contract-rules",
+            "api-contract-rules",
+            "api-contract-rules",
+            "comment-rules",
             "code-generation-style-rules",
-            "code-minimal-change-rules",
-            "code-readability-rules",
+            "code-quality-rules",
+            "code-quality-rules",
             "code-style-consistency-rules",
-            "comment-completion-gate-rules",
-            "comment-placement-granularity-rules",
+            "comment-rules",
+            "comment-rules",
             "common-util-rules",
             "database-query-rules",
             "database-schema-rules",
@@ -179,10 +179,10 @@ class SupervisorStateTests(unittest.TestCase):
         }
         self.assertEqual(OWNER_NAMES, expected_allowed)
         self.assertIn("code-generation-style-rules", owners)
-        self.assertIn("api-endpoint-rules", owners)
-        self.assertIn("api-request-rules", owners)
-        self.assertIn("api-response-rules", owners)
-        self.assertIn("api-swagger-rules", owners)
+        self.assertIn("api-contract-rules", owners)
+        self.assertIn("api-contract-rules", owners)
+        self.assertIn("api-contract-rules", owners)
+        self.assertIn("api-contract-rules", owners)
         excluded = {
             "implementation-planning-rules",
             "agent-runtime-recovery-rules",
@@ -232,7 +232,7 @@ class SupervisorStateTests(unittest.TestCase):
 
         # 1. 使用普通服务文件验证条件专项不会误报。
         owners = set(route_owners(["src/service/user.py"]))
-        self.assertNotIn("api-endpoint-rules", owners)
+        self.assertNotIn("api-contract-rules", owners)
         self.assertNotIn("database-query-rules", owners)
         self.assertNotIn("golang-patterns", owners)
         self.assertNotIn("test-program-rules", owners)
@@ -262,7 +262,7 @@ class SupervisorStateTests(unittest.TestCase):
         vue_owners = route_owners(["src/router/App.vue"], ["vue-router"])
         self.assertIn("vue-best-practices", vue_owners)
         self.assertIn("vue-router-best-practices", vue_owners)
-        self.assertNotIn("api-endpoint-rules", vue_owners)
+        self.assertNotIn("api-contract-rules", vue_owners)
         self.assertIn("vercel-react-best-practices", route_owners(["src/App.tsx"]))
         test_owners = route_owners(["tests/fixtures/user_stub.py"])
         self.assertIn("test-program-rules", test_owners)
@@ -385,10 +385,10 @@ class SupervisorStateTests(unittest.TestCase):
         """
 
         # 1. 构造最小 Owner 与 source map，确认 reference 改动会改变摘要。
-        owner_dir = self.root / "code-readability-rules"
+        owner_dir = self.root / "code-quality-rules"
         ref_dir = owner_dir / "references"
         ref_dir.mkdir(parents=True)
-        (owner_dir / "SKILL.md").write_text("---\nname: code-readability-rules\n---\nbody\n", encoding="utf-8")
+        (owner_dir / "SKILL.md").write_text("---\nname: code-quality-rules\n---\nbody\n", encoding="utf-8")
         ref_file = ref_dir / "readability-general.md"
         ref_file.write_text("first reference\n", encoding="utf-8")
         map_dir = self.root / "code-style-consistency-rules" / "references"
@@ -406,10 +406,10 @@ class SupervisorStateTests(unittest.TestCase):
             payload = {
                 "version": 1,
                 "owners": {
-                    "code-readability-rules": {
+                    "code-quality-rules": {
                         "source_paths": source_paths if source_paths is not None else [
-                            "code-readability-rules/SKILL.md",
-                            "code-readability-rules/references/readability-general.md",
+                            "code-quality-rules/SKILL.md",
+                            "code-quality-rules/references/readability-general.md",
                         ],
                         "source_globs": source_globs if source_globs is not None else [],
                         "consumption": "static-only",
@@ -419,9 +419,9 @@ class SupervisorStateTests(unittest.TestCase):
             (map_dir / "static-owner-source-map.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
         write_map()
-        first = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")
+        first = read_owner_sources(self.root, ["code-quality-rules"], "src/example.py")
         ref_file.write_text("second reference\n", encoding="utf-8")
-        second = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")
+        second = read_owner_sources(self.root, ["code-quality-rules"], "src/example.py")
         first_ref = next(item for item in first["sources"] if item["rule_source"].endswith("readability-general.md"))
         second_ref = next(item for item in second["sources"] if item["rule_source"].endswith("readability-general.md"))
         self.assertNotEqual(first_ref["content_digest"], second_ref["content_digest"])
@@ -429,14 +429,14 @@ class SupervisorStateTests(unittest.TestCase):
         # 2. 不安全或不可解析来源不得被猜测使用，只能生成 limited finding。
         invalid_cases = [
             (["C:/outside/SKILL.md"], []),
-            (["../code-readability-rules/SKILL.md"], []),
+            (["../code-quality-rules/SKILL.md"], []),
             (["naming-rules/SKILL.md"], []),
-            (["code-readability-rules/missing.md"], []),
-            ([], ["code-readability-rules/references/no-match-*.md"]),
+            (["code-quality-rules/missing.md"], []),
+            ([], ["code-quality-rules/references/no-match-*.md"]),
         ]
         for source_paths, source_globs in invalid_cases:
             write_map(source_paths=source_paths, source_globs=source_globs)
-            limited = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")
+            limited = read_owner_sources(self.root, ["code-quality-rules"], "src/example.py")
             self.assertEqual(len(limited["limited_findings"]), 1)
             self.assertEqual(limited["limited_findings"][0]["owner_skill"], "unclassified")
             self.assertEqual(limited["limited_findings"][0]["status"], "limited")
@@ -450,19 +450,19 @@ class SupervisorStateTests(unittest.TestCase):
         """
 
         # 1. 创建临时 Owner，修改内容后确认下一次读取摘要变化。
-        owner_dir = self.root / "code-readability-rules"
+        owner_dir = self.root / "code-quality-rules"
         owner_dir.mkdir()
         skill_file = owner_dir / "SKILL.md"
-        skill_file.write_text("---\nname: code-readability-rules\n---\nfirst\n", encoding="utf-8")
-        first = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")
-        skill_file.write_text("---\nname: code-readability-rules\n---\nsecond\n", encoding="utf-8")
-        second = read_owner_sources(self.root, ["code-readability-rules"], "src/example.py")
+        skill_file.write_text("---\nname: code-quality-rules\n---\nfirst\n", encoding="utf-8")
+        first = read_owner_sources(self.root, ["code-quality-rules"], "src/example.py")
+        skill_file.write_text("---\nname: code-quality-rules\n---\nsecond\n", encoding="utf-8")
+        second = read_owner_sources(self.root, ["code-quality-rules"], "src/example.py")
         self.assertNotEqual(first["sources"][0]["content_digest"], second["sources"][0]["content_digest"])
         # 2. 缺失、未知名称和文件声明名称不一致都只能形成 unclassified/limited。
         mismatched_dir = self.root / "naming-rules"
         mismatched_dir.mkdir()
         (mismatched_dir / "SKILL.md").write_text("---\nname: other-rules\n---\n", encoding="utf-8")
-        limited = read_owner_sources(self.root, ["api-endpoint-rules", "renamed-owner"], "src/example.py")
+        limited = read_owner_sources(self.root, ["api-contract-rules", "renamed-owner"], "src/example.py")
         mismatched = read_owner_sources(self.root, ["naming-rules"], "src/example.py")
         limited["limited_findings"].extend(mismatched["limited_findings"])
         self.assertEqual(len(limited["limited_findings"]), 3)
@@ -496,7 +496,7 @@ class SupervisorStateTests(unittest.TestCase):
         # 1. 分别拒绝 Windows 盘符路径和路径穿越来源。
         start(self.checkout, True, "监控代码", self.root / "state")
         finding = {
-            "owner_skill": "code-readability-rules",
+            "owner_skill": "code-quality-rules",
             "rule_source": str(self.root / "owner" / "SKILL.md"),
             "file": "src/example.py",
             "evidence": "safe",
@@ -541,8 +541,8 @@ class SupervisorStateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             record_scan(self.checkout, "diff-009", ["src/example.py"], [finding], self.root / "state")
         # 2. 已分类 finding 的指纹必须与四个稳定字段完全一致。
-        finding["owner_skill"] = "code-readability-rules"
-        finding["rule_source"] = "code-readability-rules/SKILL.md"
+        finding["owner_skill"] = "code-quality-rules"
+        finding["rule_source"] = "code-quality-rules/SKILL.md"
         finding["status"] = "open"
         finding["fingerprint"] = "forged-fingerprint"
         with self.assertRaises(ValueError):

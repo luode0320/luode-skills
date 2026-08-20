@@ -72,18 +72,16 @@ class ConfigurationLayoutTests(unittest.TestCase):
     """覆盖配置查询、文件边界、策略分流和初始化语义。"""
 
     def test_catalog_query_and_schema_expose_environment_contract(self):
-        """确认独立后端和同仓后端的四个配置查询均唯一且包含契约元数据。
+        """确认独立后端和同仓后端的 yaml 配置查询唯一且包含契约元数据。
 
         [参数] 无。
         [返回] None：断言配置 Catalog 与 Schema 契约。
-                最近修改时间: 2026-08-13 00:00:00 同步 embedded/YAML 二选一互斥策略。
+                最近修改时间: 2026-08-20 同步 yaml/ 唯一模式，embedded 条目删除。
         """
-        # 1. 先验证 backend/fullstack 的四类 config query 都暴露完整策略字段。
+        # 1. 先验证 backend/fullstack 的 yaml 配置 query 都暴露完整策略字段。
         cases = (
             ("backend", "yaml", "config/yaml"),
-            ("backend", "embedded", "config/embedded"),
             ("fullstack", "yaml", "backend/config/yaml"),
-            ("fullstack", "embedded", "backend/config/embedded"),
         )
         for project_kind, category, expected_path in cases:
             with self.subTest(project_kind=project_kind, category=category):
@@ -96,25 +94,19 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertEqual(["local", "test", "prod"], entry["standard_environments"])
                 self.assertEqual("[a-z][a-z0-9_]*", entry["environment_name_pattern"])
                 self.assertTrue(entry["direct_files"])
-                if category == "yaml":
-                    self.assertEqual("config_<env>.yaml|config_<env>.yml", entry["file_name_pattern"])
-                    self.assertEqual("allow_plain_secret", entry["secret_policy"])
-                    self.assertEqual("yaml_mutually_exclusive", entry["source_policy"])
-                    self.assertEqual("allowed_reference", entry["environment_variable_policy"])
-                else:
-                    self.assertEqual("config_<env>_yaml.go", entry["go_file_name_pattern"])
-                    self.assertEqual("allow_plain_secret", entry["secret_policy"])
-                    self.assertEqual("embedded_mutually_exclusive", entry["source_policy"])
-                    self.assertEqual("not_default", entry["environment_variable_policy"])
+                self.assertEqual("config.<env>.yaml|config.<env>.yml", entry["file_name_pattern"])
+                self.assertEqual("allow_plain_secret", entry["secret_policy"])
+                self.assertEqual("yaml_mutually_exclusive", entry["source_policy"])
+                self.assertEqual("not_default", entry["environment_variable_policy"])
 
         # 2. 再核对 Catalog 与 Schema 的策略字段定义。
         catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
         environment_entries = [
             entry for entry in catalog["entries"]
-            if entry.get("artifact_kind") == "config" and entry.get("category") in {"yaml", "embedded"}
+            if entry.get("artifact_kind") == "config" and entry.get("category") == "yaml"
         ]
-        self.assertEqual(4, len(environment_entries))
+        self.assertEqual(2, len(environment_entries))
         properties = schema["properties"]["entries"]["items"]["properties"]
         for field in (
             "file_name_pattern", "go_file_name_pattern", "environment_name_pattern",
@@ -155,8 +147,8 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertEqual("conditional", entry["creation_policy"])
                 if category == "loader":
                     self.assertEqual("-env > APP_ENV > ENV > local", entry["environment_source_policy"])
-                    self.assertIn("优先使用", entry["purpose"])
-                    self.assertIn("回退", entry["purpose"])
+                    self.assertIn("统一从", entry["purpose"])
+                    self.assertIn("config/yaml/", entry["purpose"])
 
         # 2. 再核对两棵树渲染均暴露 load.<ext> 与 model.<ext> 占位契约。
         for project_kind in ("backend", "fullstack"):
@@ -193,78 +185,67 @@ class ConfigurationLayoutTests(unittest.TestCase):
         self.assertIn("ENV", layout)
         self.assertIn("-env > APP_ENV > ENV > local", layout)
 
-    def test_embedded_secret_boundary_is_distinct_from_yaml_boundary(self):
-        """确认 embedded 允许源码私密配置，但 YAML 和外部输出仍保持禁止边界。
+    def test_yaml_secret_boundary_covers_private_config(self):
+        """确认 yaml/ 唯一模式允许私密配置且默认不依赖环境变量，外部输出保持禁止边界。
 
         [参数] 无。
         [返回] None：断言配置 reference 文字与机器策略一致。
-        最近修改时间: 2026-08-13 00:00:00 新增 embedded 私密配置边界回归。
+        最近修改时间: 2026-08-20 yaml/ 唯一模式、embedded 废弃后的私密边界回归。
         """
-        # 1. 对照 reference 正文确认 embedded/YAML 和外部输出边界。
+        # 1. 对照 reference 正文确认 yaml 私密配置与外部输出边界。
         layout = CONFIGURATION_LAYOUT.read_text(encoding="utf-8")
-        self.assertIn("允许直接写入 API key、密钥、密码等私密信息", layout)
-        self.assertIn("源码配置是主来源，默认不依赖环境变量", layout)
+        self.assertIn("允许有意持久化真实密钥、密码、token、私钥原值", layout)
+        self.assertIn("默认不依赖环境变量", layout)
         self.assertIn("不得写入 Agent 输出、日志、README、错误或测试报告", layout)
-        self.assertIn("在 YAML 或 embedded 中有意持久化真实密码、token、私钥或连接串是允许的", layout)
+        self.assertIn("在 YAML 中有意持久化真实密码、token、私钥或连接串是允许的", layout)
 
-        # 2. 对照 Catalog 条目确认 YAML 与 embedded 均允许有意持久化。
+        # 2. 对照 Catalog 条目确认 yaml 允许有意持久化且默认不依赖环境变量。
         catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
-        embedded = [
-            entry for entry in catalog["entries"]
-            if entry.get("artifact_kind") == "config" and entry.get("category") == "embedded"
-        ]
         yaml_entries = [
             entry for entry in catalog["entries"]
             if entry.get("artifact_kind") == "config" and entry.get("category") == "yaml"
         ]
-        self.assertEqual(2, len(embedded))
         self.assertEqual(2, len(yaml_entries))
-        self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in embedded))
-        self.assertTrue(all(entry["source_policy"] == "embedded_mutually_exclusive" for entry in embedded))
-        self.assertTrue(all(entry["environment_variable_policy"] == "not_default" for entry in embedded))
         self.assertTrue(all(entry["secret_policy"] == "allow_plain_secret" for entry in yaml_entries))
+        self.assertTrue(all(entry["environment_variable_policy"] == "not_default" for entry in yaml_entries))
 
     def test_render_contains_environment_examples(self):
         """确认 render 暴露占位契约，reference 正文保留具体环境示例。
 
         [参数] 无。
         [返回] None：断言目录渲染和 reference 示例。
-        最近修改时间: 2026-08-03 17:48:21 embedded 示例文件名同步为格式名后置形式。
+        最近修改时间: 2026-08-20 yaml/ 唯一模式，render 不再输出 embedded/。
         """
-        # 1. 先核对两类项目的目录树渲染：embedded 占位改为格式名后置，外部 YAML 占位保持原样。
+        # 1. 先核对两类项目的目录树渲染：仅 yaml/ 目录，不含 embedded/。
         for project_kind in ("backend", "fullstack"):
             with self.subTest(project_kind=project_kind):
                 result = run_cli("render", "--project-kind", project_kind)
                 self.assertEqual(0, result.returncode, result.stderr)
                 self.assertIn("config/", result.stdout)
                 self.assertIn("yaml/", result.stdout)
-                self.assertIn("embedded/", result.stdout)
+                self.assertNotIn("embedded/", result.stdout)
                 if project_kind == "backend":
-                    self.assertIn("config_<env>.yaml", result.stdout)
-                    self.assertIn("config_<env>_yaml.<ext>", result.stdout)
+                    self.assertIn("config.<env>.yaml", result.stdout)
+                    self.assertNotIn("config_<env>_yaml.<ext>", result.stdout)
 
         # 2. 再核对 reference 正文保留具体环境示例，确保文档与 Catalog 命名口径不漂移。
         layout = CONFIGURATION_LAYOUT.read_text(encoding="utf-8")
         for filename in (
-            "config_prod.yaml", "config_test.yaml", "config_local.yaml",
-            "config_prod_yaml.go", "config_test_yaml.go", "config_local_yaml.go",
+            "config.prod.yaml", "config.test.yaml", "config.local.yaml",
         ):
             self.assertIn(filename, layout)
 
     def test_strict_accepts_split_and_unpaired_environment_files(self):
-        """确认标准/扩展环境、单文件和 YAML/embedded 不配对均通过。
+        """确认标准/扩展环境、单文件和 yaml/ 唯一模式样本均通过 strict。
 
         [参数] 无。
         [返回] None：断言合法环境配置样本通过 strict。
-        最近修改时间: 2026-08-13 00:00:00 Go embedded 合法样本改为格式名后置命名，并拆分互斥模式样本。
+        最近修改时间: 2026-08-20 yaml/ 唯一模式，删 embedded 合法样本。
         """
-        # 1. Go embedded 必须带 _yaml 后缀；`.java` 样本保持原名，锚定“只有 Go 强制文件名契约”。
+        # 1. yaml/ 唯一模式：标准/扩展环境与单文件样本均通过（点中缀命名）。
         cases = (
-            ("backend", ("config/yaml/config_prod.yaml", "config/yaml/config_pre_prod.yml"), "go"),
-            ("backend", ("config/embedded/config_local_yaml.go", "config/embedded/config_test_yaml.go"), "go"),
-            ("fullstack", ("backend/config/yaml/config_test.yaml",), "go"),
-            ("fullstack", ("backend/config/embedded/config_dev_yaml.go",), "go"),
-            ("backend", ("config/embedded/config_local.java",), "java"),
+            ("backend", ("config/yaml/config.prod.yaml", "config/yaml/config.pre_prod.yml"), "go"),
+            ("fullstack", ("backend/config/yaml/config.test.yaml",), "go"),
         )
         for project_kind, paths, language in cases:
             with self.subTest(project_kind=project_kind, language=language), tempfile.TemporaryDirectory() as directory:
@@ -277,22 +258,21 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stdout)
 
     def test_strict_rejects_invalid_names_locations_and_nesting(self):
-        """确认非法环境名、旧 Go 命名、嵌套文件和错误配置根失败关闭。
+        """确认非法环境名、废弃 embedded 目录、嵌套文件和错误配置根失败关闭。
 
         [参数] 无。
         [返回] None：断言非法配置样本失败关闭且不写入。
-        最近修改时间: 2026-08-03 17:48:21 非法样本改为缺少 _yaml 后缀与环境名以 _yaml 结尾两类。
+        最近修改时间: 2026-08-20 embedded 废弃，非法样本改为废弃目录与错误配置根两类。
         """
-        # 1. 旧命名 config_test.go 与双格式名 config_test_yaml_yaml.go 都必须失败关闭；
-        #    嵌套用例同步带 _yaml，确保它只因层级非法而失败。
+        # 1. 非法环境名与废弃 embedded 目录都必须失败关闭；
+        #    嵌套用例同步带废弃目录，确保它只因层级非法而失败。
         cases = (
-            ("backend", "go", "config/yaml/config_PROD.yaml", "环境配置文件名"),
-            ("backend", "go", "config/yaml/config_prod.json", "环境配置文件扩展名"),
-            ("backend", "go", "config/embedded/config_test.go", "Go embedded"),
-            ("backend", "go", "config/embedded/config_test_yaml_yaml.go", "Go embedded"),
-            ("backend", "go", "config/embedded/nested/config_local_yaml.go", "直接位于"),
-            ("backend", "go", "backend/config/yaml/config_local.yaml", "后端配置必须位于"),
-            ("fullstack", "go", "config/yaml/config_local.yaml", "后端配置必须位于"),
+            ("backend", "go", "config/yaml/config.PROD.yaml", "环境配置文件名"),
+            ("backend", "go", "config/yaml/config.prod.json", "环境配置文件扩展名"),
+            ("backend", "go", "config/embedded/config_test_yaml.go", "已废弃"),
+            ("backend", "go", "config/embedded/nested/config_local_yaml.go", "已废弃"),
+            ("backend", "go", "backend/config/yaml/config.local.yaml", "后端配置必须位于"),
+            ("fullstack", "go", "config/yaml/config.local.yaml", "后端配置必须位于"),
         )
         for project_kind, language, relative, expected in cases:
             with self.subTest(project_kind=project_kind, relative=relative), tempfile.TemporaryDirectory() as directory:
@@ -316,7 +296,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            invalid = root / "config" / "yaml" / "config_PROD.yaml"
+            invalid = root / "config" / "yaml" / "config.PROD.yaml"
             invalid.parent.mkdir(parents=True)
             invalid.write_text("sample: true\n", encoding="utf-8")
             before = directory_hash(root)
@@ -367,9 +347,9 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 )
                 self.assertEqual(0, result.returncode, result.stdout)
                 self.assertTrue((root / yaml_root).is_dir())
-                self.assertFalse(list(root.rglob("config_*.yaml")))
-                self.assertFalse(list(root.rglob("config_*.yml")))
-                self.assertFalse(list(root.rglob("config_*.go")))
+                self.assertFalse(list(root.rglob("config.*.yaml")))
+                self.assertFalse(list(root.rglob("config.*.yml")))
+                self.assertFalse(list(root.rglob("config.*.go")))
 
     def test_strict_accepts_config_root_source_files(self):
         """确认四语言 config/ 根 load/model 文件通过 strict 且检查只读。
@@ -410,8 +390,8 @@ class ConfigurationLayoutTests(unittest.TestCase):
             ("backend", "go", "config/helper.go", "配置根源码文件必须为 load.<ext> 或 model.<ext>"),
             ("backend", "go", "config/load.yaml", "配置根源码文件扩展名不符合规则"),
             ("backend", "go", "config/load.java", "配置根源码文件扩展名不符合规则"),
-            ("backend", "go", "config/load/load.go", "配置目录只允许 yaml/ 或 embedded/"),
-            ("backend", "go", "config/foo/", "配置目录只允许 yaml/ 或 embedded/"),
+            ("backend", "go", "config/load/load.go", "配置目录只允许 yaml/（embedded/ 已废弃）"),
+            ("backend", "go", "config/foo/", "配置目录只允许 yaml/（embedded/ 已废弃）"),
             ("backend", "go", "config/loader/load.go", "禁止路径"),
             ("fullstack", "go", "backend/config/helper.go", "配置根源码文件必须为 load.<ext> 或 model.<ext>"),
         )
@@ -457,6 +437,71 @@ class ConfigurationLayoutTests(unittest.TestCase):
             self.assertIn("动态入口 pattern", result.stdout)
             self.assertFalse((root / "config" / "load.<ext>").exists())
             self.assertFalse((root / "config" / "model.<ext>").exists())
+
+    def test_strict_rejects_legacy_embedded_directory(self):
+        """确认 strict 下存在 config/embedded/ 即失败关闭并提示废弃。
+
+        [参数] 无。
+        [返回] None：断言废弃目录的退出码、稳定文案与只读摘要。
+        最近修改时间: 2026-08-20 新增 embedded/ 废弃 strict 拒绝用例。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_files(root, ("config/embedded/config_test_yaml.go",))
+            before = directory_hash(root)
+            result = run_cli(
+                "check", "--root", str(root), "--project-kind", "backend",
+                "--language", "go", "--policy", "strict",
+            )
+            self.assertEqual(2, result.returncode, result.stdout)
+            self.assertIn("config/embedded/ 已废弃，配置统一放入 config/yaml/", result.stdout)
+            self.assertEqual(before, directory_hash(root))
+
+    def test_adoption_requires_legacy_registration_for_embedded(self):
+        """确认 adoption 下 config/embedded 未登记 legacy_source_roots 拒绝、登记后放行。
+
+        [参数] 无。
+        [返回] None：断言收敛清单登记与未登记两种路径。
+        最近修改时间: 2026-08-20 新增 embedded/ 废弃 adoption 迁移用例。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_files(root, ("config/embedded/config_test_yaml.go",))
+            manifest = root / "doc" / "1-架构" / "3-目录规则收敛清单.yaml"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({
+                "version": 1,
+                "project_kind": "backend",
+                "language": "go",
+                "adopted_paths": [],
+                "legacy_source_roots": [],
+            }), encoding="utf-8")
+
+            # 1. 未登记：embedded 未列入 legacy_source_roots，必须失败关闭。
+            rejected = run_cli(
+                "check", "--root", str(root), "--project-kind", "backend", "--language", "go",
+                "--policy", "adoption", "--adoption-manifest", "doc/1-架构/3-目录规则收敛清单.yaml",
+            )
+            self.assertEqual(2, rejected.returncode, rejected.stdout)
+
+            # 2. 登记后：embedded 列入 legacy_source_roots（对象快照格式），可继续维护并放行。
+            manifest.write_text(json.dumps({
+                "version": 1,
+                "project_kind": "backend",
+                "language": "go",
+                "adopted_paths": [],
+                "legacy_source_roots": [{
+                    "path": "config/embedded",
+                    "responsibility": "遗留 embedded 配置目录（已废弃，仅维护）",
+                    "existing_directories": ["config/embedded"],
+                    "existing_files": ["config/embedded/config_test_yaml.go"],
+                }],
+            }), encoding="utf-8")
+            accepted = run_cli(
+                "check", "--root", str(root), "--project-kind", "backend", "--language", "go",
+                "--policy", "adoption", "--adoption-manifest", "doc/1-架构/3-目录规则收敛清单.yaml",
+            )
+            self.assertEqual(0, accepted.returncode, accepted.stdout)
 
 
 if __name__ == "__main__":
