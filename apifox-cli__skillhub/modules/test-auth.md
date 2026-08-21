@@ -216,6 +216,72 @@ apifox environment update --project <projectId> --environment <开发环境Id> -
 - 若 local 环境无管理员账号数据：先向用户确认管理员账号与 local 密码，不要猜测
 - 需要验证权限边界时**另建普通账号用例**（负向），默认正向全用管理员
 
+## 鉴权配置必须进 apifox（强制，即使本地免签）
+
+> **本地免签 ≠ 不需要鉴权配置**。很多内部服务对内网来源免签，于是本地联调时"什么都不配也能 200"，鉴权就被整条跳过——接口文档里没有正确的安全方案、apifox 用例里没有签名/凭据。**这份文档一交出去，对接方按它写，上线必 401**。接口文档与用例必须反映线上真实调用方式，而不是本地便利路径。
+
+**每个走鉴权的接口，三件事必须齐（缺一即视为接口未真正落地）**：
+
+| # | 事项 | 判定标准 |
+|---|------|----------|
+| 1 | apifox 有**与真实机制一致**的鉴权组件 | `apifox security-scheme list/get` 能查到；`authConfigs` 的 type/in/name 与服务端实际校验方式一致；description 写清算法、参与签名的字段、密钥来源、免签例外 |
+| 2 | 用例带鉴权（签名/token）注入 | 用例 `preProcessors` 有鉴权脚本；本地免签时脚本可在凭据缺失时跳过，但**脚本本身必须在**，保证"用例即线上调用示例" |
+| 3 | 至少一组鉴权用例 | 正确凭据放行 + 缺失凭据被拒 + 错误凭据被拒（后两者不需要真实密钥，可立即通过） |
+
+**先把真实机制查清，再配 apifox**（不要照抄"Bearer token"这类默认假设）：
+
+```bash
+# 鉴权中间件读哪个头、怎么算、密钥从哪来
+grep -rn "Header.Get(\"Authorization\")\|md5.Sum\|hmac\|EqualFold" middleware/ internal/middleware/ 2>/dev/null
+# 免签分支的判定范围（哪些来源不校验）
+grep -rn "isLocalIP\|bypass\|whitelist" middleware/ 2>/dev/null
+```
+
+自定义签名（如 `md5(RequestURI + body + secret)`）**不是** `type: http, scheme: bearer`，而是 `type: apiKey, in: header, name: Authorization`。写错会让对接方按 `Authorization: Bearer xxx` 发请求，必然失败——真实案例见 `references/case-getactivityexposure-gap-backfill.md` 第七节。
+
+### 凭据处理红线（强制）
+
+- **agent 不把密钥/token 值填进 apifox**（apifox 是云端 SaaS，且"把凭据输入任何字段"属禁止操作）。agent 只做两件事：建**空值占位变量**、写**运行时取值的脚本**；真实值由用户在 apifox 客户端自行填入。
+- 需要在本地验证签名算法时，让脚本自己从项目配置/源码读密钥并计算，**明文不进 agent 输出、不进文档、不进聊天摘要**（与 `modules/environment.md` 敏感变量规则一致）。
+- 签名脚本里禁止写死密钥；必须 `pm.environment.get("<变量名>")` 运行时取，取不到就跳过（本地免签仍可跑通），并在用例名或说明里标注"需环境变量 X"。
+
+### 签名前置脚本模板（自定义 md5 签名）
+
+```javascript
+// 线上调用必须带签名: Authorization = md5(RequestURI + 请求体原文 + 密钥)
+// 密钥取自环境变量 authSecret（需在 apifox 客户端为开发环境填入，脚本内不落明文）
+// 未配置时跳过: 本地内网来源本身免签，用例仍可正常跑通
+var secret = pm.environment.get("authSecret");
+if (secret) {
+  var sign = CryptoJS.MD5("/api/xxx/yyy" + "{}" + secret).toString();
+  pm.request.headers.add({ key: "Authorization", value: sign });
+}
+```
+
+### 两条 CLI 事实（2026-08-21 于 apifox-cli 2.2.9 实测）
+
+| 事实 | 影响与对策 |
+|------|-----------|
+| **environment 读写不到环境变量**：`environment get` 只返回 `id/name/projectId/baseUrls/parameters`；带 `variables` 的 `environment update` 报 `success=true` 但回读恒为 `null` | 密钥类变量**只能人工在客户端添加**。CLI 侧不要反复重试或猜字段；把"需在客户端添加变量 X"写进项目 `PROJECT_TEST.md`「环境变量登记」表。运行时 `pm.environment.get()` 不受此限制（那是 runner API，与 CLI 读写无关） |
+| **导入 OpenAPI 的 operation-level `security` 不会绑定到接口鉴权**：导入后 `endpoint get` 的 `securityScheme` 为 `{}`，`apifox export` 出来的 `security` 也是 `[]`；鉴权组件是独立资源 | 鉴权组件会由导入自动创建（可 `security-scheme list` 查到），但**接口与组件的关联需人工在客户端点选**。`endpoint update` 的 `securityScheme` 字段 CLI 未给出结构定义，**不要猜着写**，以免损坏接口定义 |
+
+## 免签分支与来源头耦合（强制先查）
+
+很多内部服务对**内网来源免签**（判定形如 `isLocalIP(getClientIP(request))`），而取客户端 IP 的公共函数通常**优先读 `X-Forwarded-For`，其次 `X-Real-IP`，最后才是 `RemoteAddr`）。这带来一个容易误判的耦合：
+
+**只要用请求头伪造来源 IP 去测业务维度（地区白名单、区域灰度、IP 风控、按来源分流），就会同时离开免签分支**——请求转为"外网来源"，必须带签名/凭据，否则直接被鉴权拒绝。表现是那个业务维度"怎么测都不通"，看起来像接口 bug。
+
+进入这类测试前先查两件事：
+
+1. 鉴权中间件与业务代码**是不是同一个取 IP 函数**（`grep` 免签判定与业务侧的 IP 获取调用）。是 → 存在耦合。
+2. 该服务的签名算法与密钥来源（常见 `md5(url + body + secret)` / HMAC，密钥可能硬编码在中间件或 local 配置里）。
+
+处置（按可行性排序）：
+
+- **能拿到密钥** → 按方案 C 思路在前置脚本里算签名（`md5(RequestURI + body + secret)`），配合伪造来源头，即可测通该维度的放行路径；密钥只从 local 配置取，值不落文档。
+- **拿不到密钥或成本过高** → 把"伪造公网来源 + 无签名 → 被拒"固化成**安全性用例**（真实可断言，顺带验证鉴权边界），并把该业务维度的**放行路径登记为待补测**；拦截路径可用 `modules/test-data-and-judgement.md`「fixture 优先级反向设计」间接验证。
+- **任何情况下都不要**把"伪造来源被鉴权拦下"写成接口缺陷，也不要为了绕过鉴权去改生产代码（测试隔离红线）。
+
 ## 排查指引（401/403/签名错误）
 
 | 现象 | 优先检查 | 处理 |
@@ -230,6 +296,7 @@ apifox environment update --project <projectId> --environment <开发环境Id> -
 
 ## 不可违反规则
 
+0. **本地免签不免鉴权配置**：接口文档的安全方案、apifox 鉴权组件、用例签名脚本三件事必须齐，且与服务端真实校验方式一致；自定义签名不得写成 `http bearer`
 1. 测试默认用**管理员账号**，普通账号权限问题不得误报接口 bug
 2. token **必须自动获取/续期**，禁止手工复制粘贴 token 到用例
 3. 前置脚本刷新失败时**阻断并提示**，不得用过期 token 硬跑并断言通过

@@ -196,13 +196,17 @@ V1.0.1__add_user_phone.sql
 V1.0.2__create_report_tables.sql
 ```
 
-### 铁律
+### 迁移管理要点
+
+> 口径以 `SKILL.md` 的编号铁律为准（尤其铁律 0.2「自动迁移只做加法」）；本节只列版本化管理的操作要点，
+> 不另立一套术语。「铁律」这个词专指 `SKILL.md` 的编号体系。
 
 - 所有 DDL 进版本控制。
 - 迁移前向兼容：新加字段给 `DEFAULT`，不删旧字段。
 - 破坏性变更多步走：`add column` → 代码适配 → `drop column`（分版本）。
 - 生产禁删表、删列、改名（除非确认无依赖）。
-- 迁移安全与回滚细则见 `migration-safety-and-rollback.md`（双写、灰度、不可逆点声明等）。
+- 人工 DDL 的迁移安全与回滚细则见 `migration-safety-and-rollback.md`（双写、灰度、不可逆点声明等）。
+- 若变更由 ORM 在服务启动期自动执行，见 `orm-auto-migration.md`（边界、tag 陷阱、等价性验证矩阵）。
 
 ## 十、常见设计模式（低优先参考）
 

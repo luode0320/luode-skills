@@ -68,6 +68,17 @@ func Load(env string) ([]byte, error) {
 
 `<env>` 必须使用小写环境名，格式为 `[a-z][a-z0-9_]*`。`local`、`test`、`prod` 是标准环境名；可以按项目需要扩展为 `dev`、`staging`、`pre_prod` 等合法环境名，但扩展名不改变配置根和文件前缀规则。只检查已有文件，不要求三种环境齐全。
 
+### apifox 测试环境（config.apifox.yaml）
+
+`apifox` 是接口测试专用环境名，配置文件为 `config/yaml/config.apifox.yaml`（同仓后端 `backend/config/yaml/config.apifox.yaml`），由接口级测试（功能验证/回归/Bug 验证/上线门禁的接口部分）统一使用，被测服务以 `-env apifox` 启动。
+
+- **生成规则**：项目无 `config.apifox.yaml` 时，从 `config.local.yaml` **复制**生成，业务配置保持一致。
+- **数据库分离（强制）**：`config.apifox.yaml` 的 MySQL 数据库必须是**独立的 apifox 测试专用库**，**库名约定为 `apifox`，由开发人员手动创建并配置**；**禁止与 `config.local.yaml` 使用同一库**。库名相同时必须**阻断**测试流程，等待用户部署 apifox 测试专用库后再回填配置继续——达到 apifox 测试数据与本地开发数据隔离的目的。
+- **测试数据基准（数据灌入，强制）**：**apifox 以 local 数据库数据为基准**（local 库通常同步正式环境线上数据，测试更准确；「默认 apifox 环境」仅指被测服务启动环境，不禁用 local 数据源）；**apifox 库无数据且 local 有 → 优先从 `config.local.yaml` 指向的 local 库单向灌数据**到 apifox 测试库；**apifox 与 local 都无数据 → apifox 自造测试数据**；local 库只读源、禁止反向回灌、禁止从 test/prod/staging 取数；脱敏与可追溯要求见 `apifox-cli__skillhub/modules/test-data-and-judgement.md`。
+- **临时库特权（apifox 环境，强制）**：**前提是项目已有 apifox 环境配置**（`config.apifox.yaml` + apifox 测试专用库）；模型测试需要宽泛权限（建表/复杂数据构造/大范围写操作）时，允许 apifox 环境**自行新建 `tmp` 前缀临时库**测试使用，**测试完成后必须删除**；**正常库（非 `tmp` 前缀，含 apifox 测试专用库与 local 库）一律禁止删除**（见 `apifox-cli__skillhub/modules/environment.md`「临时库特权」）。
+- **范围**：apifox 环境仅用于接口测试的本地被测服务启动与数据源分离，不改变 `local`/`test`/`prod` 既有语义；`test` / `prod` / `staging` 配置一律不用于本地接口测试。
+- **环境选择（强制，优先级默认值）**：本地测试/接口级测试（模型测试）的被测服务 environment **只允许 `local` 与 `apifox`**；**默认启动环境按项目配置决定**——项目**存在 `config/yaml/config.apifox.yaml`（含同仓 `backend/config/yaml/config.apifox.yaml`）时默认使用 `apifox`**（`-env apifox` 启动）；项目**没有 apifox 环境配置时默认使用 `local`**；`test`/`prod`/`staging`/`pre`/`release` 等非 local 环境一律禁止。
+
 ## embedded/ 禁止
 
 `config/embedded/`（含同仓 `backend/config/embedded/`）已废弃，统一使用 `config/yaml/`：

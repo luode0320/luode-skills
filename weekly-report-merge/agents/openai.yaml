@@ -1,0 +1,4 @@
+interface:
+  display_name: "周报双源合并生成"
+  short_description: "合并叙事版与 Git 事实版两份周报，按固定格式输出最终 docx 周报"
+  default_prompt: "合并生成周报"

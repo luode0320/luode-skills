@@ -45,10 +45,115 @@ apifox test-data --help
 4. 如有类似 case，先 `test-case list --endpoint <endpointId>` 再 `get` 一个作为模板
 5. 获取 `test-case-create` schema 并校验
 6. 构造完整 JSON（不要只写空壳 name/endpointId）
-7. 创建后立即 `test-case get <caseId>` 确认后端保存结构
+7. **参数完整性校验（强制）**：创建后立即 `test-case get <caseId>`，对照 `endpoint get <endpointId>` 的 schema 校验参数完整性（见「参数完整性校验（强制）」节）——**接口有参但用例无参 = 用例无效**，缺参必须补全后才能继续
 8. 运行一次确认 requestBody、处理器、断言和脚本在 runner 中生效
 
 > `categoryId` 是前端展示测试用例的**关键必填字段**。无效 `categoryId` 可能导致 CLI 能看到但客户端不可见。
+
+## 参数完整性校验（强制）
+
+> **核心原则**：接口需要参数，测试用例就必须带参数。**接口有参但用例无参 = 无效测试**，禁止宣称"测试通过"。生成侧覆盖规则见 `modules/test-case-generation.md` 规则 B/C/E/E-1，本节是落地校验闸门。
+
+**「无参测试」判定**（任一命中即用例无效）：
+- 接口 endpoint schema 定义了 query/path/body 参数，而用例 request 对应位置为空
+- POST/PUT/PATCH 接口定义了 requestBody schema，而用例 `requestBody.data` 为空、为 `{}` 空壳、或遗漏任何必填字段
+- 接口有业务参数但用例只带了分页参数（page/size），业务参数全部缺失（不符合规则 E/E-1）
+
+**唯一例外：header-only 接口（强制按证据判定，不得凭 body 形状下结论）**
+
+有的 POST 接口**本身没有 body 业务字段**，全部业务维度走请求头（语言、版本灰度、来源 IP、租户标识等）。此时 `requestBody.data` 为 `{}` 是**真实契约**，不是空壳违规——判定依据是 **schema 有没有必填字段**，不是 body 长什么样。
+
+判定步骤（三条同时成立才认定为合法 header-only）：
+
+1. `endpoint get <endpointId>` 显示 requestBody 对应 schema 的 `properties` 为空对象（`{}`）且无 `required`；
+2. 该接口 `parameters.header` 非空，且其中存在承载业务语义的头（不只是 `Content-Type`、`Accept` 这类协议头）；
+3. 用例的 `parameters.header` 已按规则 E-1 覆盖关键请求头（L1 逐个关键头 + 一个全头满配用例）。
+
+三条任一不成立 → 仍按「无参测试」判无效。反例：接口 schema 明确有 3 个必填 body 字段，用例传 `{}` —— 这是空壳违规，不能借 header-only 例外放行。
+
+> 与规则 T-1 的关系：header-only 接口的 `{}` 依然要走 `pretty_jsonb()`（`{}` 本身即最小合法形态），T-1 检查的是"多字段 JSON 有没有被压成一行"，不是"body 能不能为空"。
+
+**双重闸门（创建校验 + 运行判定）**：
+
+1. **创建/更新后校验（阻断）**：`test-case get <caseId>` 读取用例真实保存结构，与 `endpoint get <endpointId>` 的 schema 对账：
+   - **必填参数一个不能少**（query/path/body 的 required 字段全部带上）
+   - **关键业务参数按规则 E-1 覆盖**（L1 单参数 / L2 两两 / L3 全参数 / L4 过滤×分页；可选参数按 E-1 关键参数定义纳入，纯展示参数不强制）
+   - **POST/PUT/PATCH 用例 `requestBody.data` 必须保留接口 schema 中的全部必填字段**，禁止删成空 body 或 `{}` 空壳
+   - 校验不通过 → **阻断**：先补全参数再继续，禁止在缺参状态宣称"用例已建好"
+
+2. **运行后判定（不通过）**：用例真实运行后，若接口 schema 有参数但该用例 request 无参/缺必填 → 该用例判定为**「不通过/无效」**，测试结果不计入通过；必须补全参数后重跑
+
+**POST body JSON 专项（强制）**：
+- body 中的 JSON 参数必须**保留在用例中**，不得删除、清空或替换为 `{}`；遗漏任何必填字段即视为无效用例
+- `requestBody.data` 必须是包含完整参数的 JSON 字符串（用 `\n` 转义多行），不要把 JSON Body 写成对象
+
+## 规则 T-1：JSON body 格式化（强制）
+
+> 防止 JSON 单行压缩不可读（如图 2）。所有写入用例 `requestBody.data` 的 JSON 必须 **pretty-print**（2 空格缩进），便于在 apifox 编辑器中人工对比与维护。生成侧规则同步进 `project-onboarding-checklist.md` 节点 2 → A5。
+
+**判定标准**：
+- `requestBody.data` 必须是**带缩进的格式化 JSON 字符串**（每个字段逐行排列），不是单行压缩字符串
+- 缩进按 apifox 编辑器默认 `2 空格`
+- 中文字段值不被转义（`ensure_ascii=False`）
+
+**CLI 写入小工具**（在脚本中复用，避免手工拼字符串出错）：
+```python
+import json
+
+def pretty_jsonb(data: dict) -> str:
+    """用于写入 apifox test-case requestBody.data（必须返回带 \\n 的字符串）"""
+    s = json.dumps(data, indent=2, ensure_ascii=False)
+    # apifox 的 data 字段是 JSON 字符串，所以 \n 必须保留为字面量
+    return s
+
+# 例：data = pretty_jsonb({"channel": "APIFOXTEST", "name": "策略-启用", "value": 0.035})
+# 输出：
+# {
+#   "channel": "APIFOXTEST",
+#   "name": "策略-启用",
+#   "value": 0.035
+# }
+```
+
+**不通过则阻断**：
+- 单行压缩（如图 2 中 `{"channel":"APIFOXTEST","name":"apifoxtest-策略-启用",...}`）→ 必须先格式化再写入，否则禁止声称用例已建好
+- 在测试用例审计（`project-onboarding-checklist.md` 节点 2 → A5）中识别出未格式化 → 阻断并提示用 `pretty_jsonb` 修正
+
+**应用时机**：
+- 步骤 6 构造完整 JSON 时，所有 `requestBody.data`、`examples.data`、`expected response.data` 都按此规则格式化
+- 现有未格式化用例批量修复 → 见 `project-onboarding-checklist.md` 「现有项目批量修复命令集」节第 3 项
+
+## 规则 T-2：Mock 200 响应示例真实性（强制）
+
+> 防止 Mock 的"成功"示例与请求无关（如图 3：200 示例 body 是 `{}` 空壳）。Mock 必须让开发者一眼看出"调通后接口长什么样"，否则示例拖慢用户理解且无任何验证作用。
+
+**判定标准**（任一命中即 Mock 示例无效）：
+- 200/201 响应示例的 `examples[*].data` 或 `responses[*].examples[*].data` 为 `{}` 空壳
+- 响应示例字段少于接口 schema 的必填响应字段
+- 响应示例与请求参数**完全无关**（不能反映「请求 X → 响应 Y」的语义对偶）
+
+**通过标准**：
+- 200 响应示例必须含接口 schema 中**全部必填响应字段**，且数据合理（ID 非空、时间字段为真实格式、枚举值为合法值）
+- 示例数据应能让前端/后端开发者直接拿来做对接参考
+
+**CLI 修复路径**：
+- 在 endpoint 创建/更新时，自动根据 schema 生成真实 Mock 示例（参考 `test-case-generation.md` 的「schema 驱动数据构造规则」表）
+- 对空壳示例 → 用 `endpoint update` 接口更新为真实示例，或删除该空壳示例
+
+**不通过则阻断**：
+- 创建用例/同步接口时若检测到 Mock 示例空壳 → 必须删除空壳或补全数据，不允许保留 `{}` 占位
+- 审计（`project-onboarding-checklist.md` 节点 2 → A6）中识别出空壳 → 阻断并提示修复路径
+
+**应用时机**：
+- 节点 2（创建/更新用例）时同步校验 Mock
+- 现有空壳示例批量修复 → 见 `project-onboarding-checklist.md` 「现有项目批量修复命令集」节第 4 项
+
+## 不可违反规则（test-case 模块，硬动作级）
+
+1. **无参测试 = 无效测试**：接口有参但用例无参必须补全，禁止"先建 1 个正向先收口"；唯一例外是经三条证据确认的 header-only 接口（见「参数完整性校验」节例外条款）
+2. **JSON 不格式化不允许写入**：`requestBody.data` / `examples.data` / 响应示例必须用 `pretty_jsonb` 格式化
+3. **Mock 空壳不允许存在**：200 响应示例必须是真实业务数据，禁止 `{}`
+4. **创建后必须 test-case get 对账 endpoint schema**（节点 2 → A7 双重闸门）
 
 ## 更新测试用例
 
@@ -188,6 +293,7 @@ apifox test-data --help
 - `--category <categoryId>` 必须和 `--endpoint <endpointId>` 一起使用
 - `apifox run --test-case <caseId>` 只支持 caseId
 - 建议显式指定 `--environment <开发环境Id>`
+- **结果统计口径（强制）**：以报告表格的「断言数 总数 / 失败数」为准；**不要用 `grep -c '√'` 或 `grep -c '×'` 判定通过**——失败断言在报告里是 `1. 2.` 编号形式，`×` 恒为 0 会把失败读成全绿（详见 `modules/testing-pitfalls.md` 陷阱 12-1）。
 - **运行前环境变量就绪检查（强制）**：用例依赖鉴权/登录/签名时，先核对开发环境变量是否齐备（对照 `PROJECT_TEST.md`「环境变量登记」表）；401/403/签名错误/token 无效 → 先查环境变量缺失/过期，再查接口——不要算成接口失败（详见 `modules/environment.md`「开发环境环境变量（强制）」节）
 
 ## 常见恢复
@@ -200,3 +306,4 @@ apifox test-data --help
 | endpoint 下找不到 case | 检查 `--branch` 和 `--endpoint` |
 | 401/403/签名错误/token 无效 | 先核对开发环境变量（鉴权签名/登录账号/token）是否缺失或过期，对照 `PROJECT_TEST.md`「环境变量登记」表，再查接口 |
 | 登录后 token 没生效 | 检查登录用例 extractor（`shareScope=PROJECT`）与后续用例环境变量引用 {{token}} |
+| 用例无参/参数丢失（接口有参但用例不带） | 对照 `endpoint get` schema 补全 query/path/body 参数；POST/PUT/PATCH 用例保留 requestBody 全部必填字段，禁止空 body / `{}` 空壳；**无参测试判定不通过**，补参后重跑（见「参数完整性校验（强制）」节） |

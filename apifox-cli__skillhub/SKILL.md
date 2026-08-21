@@ -103,17 +103,19 @@ apifox whoami
 |---|---|---|
 | 安装、登录、项目、初次使用、help | `modules/quick-start.md` | login, project, 基础用法 |
 | AI 团队、项目定位、projectId、默认项目登记、首轮未指明阻断、持久化到 PROJECT_TEST.md、新项目接入自动生成测试文档 | `modules/ai-team-project.md` | project, settings（AI 团队项目解析）；标准模板见 `references/project-test-md-template.md` |
-| 接口新增/更新同步 apifox、代码→swag→import、契约校验（含字段说明完整性）、接口落地 | `modules/api-sync-to-apifox.md` | import, endpoint 校验, test-case 落地（与 swag 联动） |
-| 接口、endpoint、Schema、目录/文件夹、安全方案、字段说明铁律（参数/响应/头部必须有 description） | `modules/api-design.md` | endpoint, schema, response-component, security-scheme, folder |
-| 环境、变量、Mock、数据库连接、开发环境环境变量（鉴权签名/登录账号/token） | `modules/environment.md` | environment, variables, mock, database-connection |
+| 接口新增/更新同步 apifox、代码→swag→import、契约校验（含字段说明完整性）、接口落地 | `modules/api-sync-to-apifox.md` | import, endpoint 校验, test-case 落地（与 swag 联动，硬动作 A3） |
+| 接口、endpoint、Schema、目录/文件夹、安全方案、字段说明铁律（参数/响应/头部必须有 description）、folder 选择规范（创建即归类，禁止停在「默认模块/接口」平铺层）、硬动作 A1 创建后立即 endpoint get 审计字段说明 | `modules/api-design.md` | endpoint, schema, response-component, security-scheme, folder |
+| 接口归类与持续整理、接口堆在默认模块未按业务归类、folder 目录组织、接口迁移/合并/拆分/归档、定期归类审计、硬动作 A11 创建/导入后立即校验 folder 归类 | `modules/api-folder-organization.md` | folder, endpoint 归类维护 |
+| 环境、变量、Mock、数据库连接、开发环境环境变量（鉴权签名/登录账号/token）、本地服务端口探测三级链与自动纠偏、WSL2 跨系统网络访问、硬动作 A2 创建/更新环境后立即探测、`config/yaml/config.apifox.yaml` 本地测试配置（无则从 local 复制且 MySQL 库必须独立、库名约定 apifox 由开发人员手动配置、与 local 相同即阻断；环境白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁其他环境**；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**）、服务重启与关停核验（包装式启动杀父进程不释放端口，"端口通了"≠新实例在跑） | `modules/environment.md` | environment, variables, mock, database-connection, config.apifox |
 | 分支、合并、merge request、AI 分支、pick-to | `modules/branch.md` | branch, merge-request |
-| 测试用例创建/更新/运行、测试数据、处理器/断言字段（CLI 操作层） | `modules/test-case.md` | test-case, test-data |
-| 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登 | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 |
-| 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、正向分层组合（L1 单参数/L2 两两/L3 全参数/L4 过滤×分页）、POST 必有完整用例（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
+| 测试用例创建/更新/运行、测试数据、处理器/断言字段、参数完整性校验（接口有参必须带参，无参=无效）、JSON 格式化 T-1（requestBody.data 必须 pretty-print）、Mock 真实性 T-2（200 示例禁止 `{}` 空壳）、双重闸门 A7（CLI 操作层）、header-only 接口空 body 例外（schema 无必填 + 维度全在请求头时 `{}` 是真实契约） | `modules/test-case.md` | test-case, test-data |
+| 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登、免签分支与来源头耦合（伪造 X-Forwarded-For 测地区/灰度维度会同时丢掉内网免签）、**鉴权配置必须进 apifox（本地免签不免鉴权配置：安全方案 + 用例签名脚本 + 鉴权用例三件齐；agent 不代填密钥；CLI 读写不到环境变量、operation security 不自动绑定接口）** | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 + 签名注入 |
+| 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、正向分层组合（L1 单参数/L2 两两/L3 全参数/L4 过滤×分页）、POST 必有完整用例、接口有参但用例无参=无效测试、硬动作 A4 创建用例前按分层强制生成（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
 | 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法 | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
 | 陷阱检查、测试失败排查、接口异常但"看起来正常" | `modules/testing-pitfalls.md` | 180 陷阱知识库（apifox 场景版） |
-| 测试范围、优先级、哪些接口必测/可跳过、上线前测试 | `modules/test-selection-policy.md` | P0/P1/P2 风险分级 |
-| 测试数据构造、真实数据来源、响应判定、伪通过检查 | `modules/test-data-and-judgement.md` | 参数来源优先级 + 响应判定 |
+| 测试范围、优先级、哪些接口必测/可跳过、上线前测试、三档执行策略（全量/受限/豁免）与受限豁免登记 | `modules/test-selection-policy.md` | P0/P1/P2 风险分级 + 执行策略分类 |
+| 项目接入 apifox 预检、5 节点 × 10+ 硬动作（A1 字段说明即时审计/A2 端口即时探测/A3 接口与 swag 契约校验/A4 正向分层强制生成/A5 JSON 格式化/A6 Mock 真实性/A7 参数完整性双重闸门/A8 受限豁免识别/A9 终检/A10 合并前预检/A11 folder 归类即时校验）、现有项目批量修复命令集、规则↔动作总入口 | `modules/project-onboarding-checklist.md` | 新项目接入、批量修复、定期质量审计、终检 |
+| 测试数据构造、真实数据来源、响应判定、伪通过检查、无参用例判定不通过、断言期望值必须实测取得、前置数据变更后的缓存生效确认、fixture 优先级反向设计（多过滤维度单结果接口） | `modules/test-data-and-judgement.md` | 参数来源优先级 + 响应判定 |
 | 测试场景、多步骤、场景编排 | `modules/test-scenario.md` | test-scenario |
 | 测试套件、定时任务、runner、CI、报告 | `modules/test-automation.md` | test-suite, scheduled-task, runner, run, test-report |
 | 契约测试、Schema 验证、防接口漂移、结构断言 | `modules/test-contract.md` | 契约方法论 + apifox 落地 |
@@ -177,8 +179,9 @@ apifox <command> <subcommand> --help
 ### AI 写入权限
 
 - 写入被 AI 权限限制时，不要替用户选择，优先询问：开启目标分支直接编辑权限，或在 AI 分支上编辑
+- **apifox 测试专用项目（用户为 apifox 测试单独创建的项目）默认直接在 `main` 分支操作**（接口文档操作/测试/补用例），不新开分支、不做「开分支 → 自动化测试 → 合并回 main」的多余操作；直接编辑 main 分支需在 Apifox 客户端 2.8.32+ 「项目设置 - 功能设置 - AI 功能设置 - 外部 AI 编辑权限」开启
 - 直接编辑主分支/迭代分支/通用分支 → 需在 Apifox 客户端 2.8.32+ 「项目设置 - 功能设置 - AI 功能设置 - 外部 AI 编辑权限」开启
-- 选择 AI 分支流程：创建 AI 分支 → pick-to 导入资源 → 编辑 → 完成后提醒用户合并
+- 选择 AI 分支流程（仅非测试专用项目/主分支受保护时兜底）：创建 AI 分支 → pick-to 导入资源 → 编辑 → 完成后提醒用户合并
 - 目标主分支受保护时（isProtected），优先 `merge-request`，不要直接 `merge`
 
 ### AI 分支说明
@@ -188,7 +191,7 @@ apifox <command> <subcommand> --help
 - AI 分支初始为空，修改源分支已有资源前必须先 `pick-to`
 - AI 分支新建资源无需先导入
 - AI 分支修改不会自动写回源分支；完成后必须让用户确认是否合并
-- 接口新增/更新同步 apifox 默认走 AI 分支，流程见 `modules/api-sync-to-apifox.md`
+- **apifox 测试专用项目直接在 `main` 分支操作（接口文档操作/测试/补用例），不新开 AI 分支 / api 分支，无合并环节**；接口新增/更新同步 apifox 的分支策略见 `modules/api-sync-to-apifox.md` 与 `modules/ai-team-project.md`
 
 ### 门控与确认清单（强制）
 

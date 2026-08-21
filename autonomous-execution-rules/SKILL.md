@@ -51,6 +51,13 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 - `update_goal` 进入 `blocked` 时，交给投影 Owner 持久化无进行中步骤的观察列表；不得把 blocked payload 解释为可以继续执行。`update_goal` 进入 `complete` 时，交给 Owner 失活 Goal 安全投影，随后真实收口 Goal；若结果为 `preserved_formal`，不得失活、改写或刷新独立的正式计划。
 - Plan Mode、无活动 Goal、来源不匹配、损坏投影或工具失败时退出 Goal 投影路径；投影和 `update_plan` 从不改变本 Skill 的授权状态。
 
+## 异步任务任务列表登记（强制）
+
+- 启动后台异步任务（`run_in_background` 轮询、CI 等待、异步下载 / 发布 / 构建、异步子会话 / 后台 agent 等）时，必须先通过宿主任务列表登记为可追踪条目：`TaskCreate` 条目描述统一按「做什么 + 任务标识（任务 ID / CI run 编号 / 进程名）+ 何时查看（轮询节奏或完成信号）」三段式，让用户在任务列表 UI 上即可看到“在干什么、进度到哪、什么时候回来看”。
+- 『启动异步任务』『等待 / 轮询结果』『回收并汇报结果』三个阶段必须用 `TaskCreate` / `TaskUpdate` 推进状态（pending → in_progress → completed），禁止把裸 `run_in_background` 后台进程当作唯一进度可见手段；异步任务启动即登记，不得等收口时才补。
+- 收口时由 `reasoning-summary-structure-rules` 渲染「🔄 后台异步任务」分流小节并校验登记发生；未登记的异步任务视为进度不可见，需补登记后再收口。
+- 登记只表示任务可见与可追踪，不改变本 Skill 的执行授权边界，也不授予任何额外的写入或外部副作用权限。
+
 ## 必须暂停确认的关键节点
 
 - 首次从需求、Bug 分析或方案进入编码，且许可不是 `confirmed`。

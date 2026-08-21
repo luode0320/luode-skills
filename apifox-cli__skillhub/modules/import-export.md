@@ -66,11 +66,13 @@ openapi / swagger / routegen / docs generator / api docs / schema generator
 | `missingDescriptions` 数量多（参数/响应/头部大量无说明） | 字段说明不完整 | 先在代码侧补中文注释（按 `swag-openapi-maintainer-rules/references/description-rules.md`）重新生成 swag，再导入 |
 | 纯 GET/健康检查/webhook 项目 | schemas 少可能合理 | 结合业务判断 |
 
-### Step 5: 校验 tags 和可读性
+### Step 5: 校验 tags、folder 和可读性
 
 - operation 必须有业务化 tags（不要按 URL path 机械分组）
 - tags 按产品模块/业务域/功能域分组
 - 不推荐 `api / v1 / <resource>` 这类技术路径展开
+- **导入后必须校验 folder 归类**：接口应落在业务 folder（产品模块/业务域/功能域）下，而不是「默认模块 / 接口」平铺层；未归类或归类错误 → 按 `modules/api-folder-organization.md`「持续维护工作流」迁移归位（对应硬动作 A11）
+- tags 与 folder 是互补维度：tags 决定导入分组与检索，folder 决定文档树导航，两者都要业务化
 
 ### Step 6: 执行导入并检查结果
 

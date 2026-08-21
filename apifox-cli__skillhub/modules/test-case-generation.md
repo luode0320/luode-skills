@@ -33,6 +33,8 @@
 | 边界值 | 每个有界字段 ≥ 1 个边界用例（min / max / 空 / 超长 / 0 / 负数） | 缺则补 |
 | 安全性（可选） | 有 securityScheme 时强制（无 Token / 过期 / 权限不足） | 有鉴权接口必加 |
 
+> **例外**：受限/豁免执行接口不适用本表——受限接口只保 **负向 + 边界值**，豁免接口**不建常规用例**（三档执行策略见 `modules/test-selection-policy.md`，登记表见项目根 `PROJECT_TEST.md`「受限/豁免接口登记」）。
+>
 > **项目落地**：本规则同步写入项目根 `PROJECT_TEST.md` 的「测试覆盖度铁律」节（模板见 `references/project-test-md-template.md`），保证无 skill 环境（纯 Codex/Claude）也能读到该规则。
 
 ### 规则 C：POST 接口铁律 — 任何方法 ≠ GET 都必须有完整用例
@@ -62,6 +64,8 @@
 
 ### 规则 E-1：正向用例分层组合细则
 
+- **适用范围**：本细则仅适用于**全量执行接口**（默认）；受限执行接口不建正向组合用例，豁免执行接口不建常规用例（三档执行策略见 `modules/test-selection-policy.md`，生成前先查 `PROJECT_TEST.md` 登记表）
+
 | 层 | 名称 | 内容 | 数量 |
 |----|------|------|------|
 | L1 | 单参数正向 | 每个关键参数单独取值，其余用默认/合法值 | N 个 |
@@ -73,6 +77,53 @@
 - **参数值**：用 schema 合法值；过滤参数优先用能命中数据的真实值（环境/前置数据提取）；数据不存在时允许断言"空结果但 2xx"，严禁编造导致 4xx 的值
 - **上限**：N 个关键参数 → 正向总数 ≤ min(N+3, 10)；目标值 L1×N + L2×k + L3×1 + L4×1 超限时，从低风险到高风险裁剪 L2，**保留 L1 全部 + L3 + L4**，裁剪项写入覆盖矩阵「裁剪原因」列
 - **特殊场景**：无过滤参数（仅分页）→ 正向 = 默认分页 + 分页边界 2~3 个，不强制凑组合；枚举值 ≤3 个逐值覆盖，>3 个选代表性值（首/尾/中间）+ 枚举外值负向兜底
+- **特殊场景（header-only 接口）**：接口无 body 业务字段、维度全在请求头（语言 / 版本灰度 / 来源 IP / 租户等）时，**关键参数就是这些业务请求头**，按 L1 逐个覆盖 + L2 取两两高风险组合 + L3 全请求头满配；**L4「过滤×分页」不适用**（无分页参数），在覆盖矩阵的「裁剪原因」列写明"接口无分页参数，L4 免除"。用例 body 保持 `{}` 且不判空壳违规，判定证据见 `modules/test-case.md` 的 header-only 例外条款
+- **服务端有一个"取客户端 IP"的公共函数时要留意**：伪造 `X-Forwarded-For` 之类的来源头既改业务维度也可能改鉴权判定，导致该维度不可测，先查 `modules/testing-pitfalls.md` 陷阱 22-1 再设计用例
+
+### 硬动作 A4：创建用例前强制按分层生成（强制）
+
+> 把规则 E-1 从"必须"变成"必执行"——文档写了"按 L1/L2/L3/L4 分层生成"但没触发器，实际只能产出 1 个正向用例（如图 1：5 个测试用例中只有 1 个正向）。本硬动作对应 `project-onboarding-checklist.md` 节点 2 → A4。
+
+**触发时机**：每个 endpoint 第一次建正向用例时 / 现有项目批量补全正向用例时。
+
+**执行命令**：
+
+```bash
+# 1) 列出接口下已有用例，识别分层缺口
+apifox test-case list --endpoint <endpointId> --output existing-cases.json
+python tools/check_positive_layer.py \
+  --endpoint schema.json \
+  --existing existing-cases.json \
+  --output coverage-gap.json   # 期望补 L1=?, L2=?, L3=?, L4=1
+
+# 2) 按缺口生成（按规则 E-1 表格逐层）
+# L1：每个关键参数 1 个
+for param in key_params:
+  case_json = make_l1_case(param, endpoint_schema)
+  apifox test-case create --project <projectId> --branch <branch> --file case_json
+
+# L2：pairwise 精选 2~3 个高风险组合（按"必填×枚举 > 枚举×范围 > 类型×格式"风险序）
+for combo in high_risk_combos[:3]:
+  case_json = make_l2_case(combo, endpoint_schema)
+  apifox test-case create ...
+
+# L3：1 个全参数满配
+case_json = make_l3_case(endpoint_schema)
+apifox test-case create ...
+
+# L4：1 个过滤×分页交互
+case_json = make_l4_case(endpoint_schema)
+apifox test-case create ...
+```
+
+**通过标准**：正向用例数 ≥ `min(关键参数数+3, 10)`；每层（L1/L2/L3/L4）都有真实存在的用例。
+
+**不通过则阻断**：
+
+- 每接口正向用例只有一个（如图 1）→ 必须按本表 L1/L2/L3/L4 重构，不允许"先建 1 个正向先收口"
+- 创建后立即 `test-case list --endpoint <endpointId>` 自动校验用例数是否达阈值，未达即视为覆盖缺口，禁止收口
+
+**批量修复**（针对已有项目如截图 1）：见 `project-onboarding-checklist.md` 「现有项目批量修复命令集」第 5 项。
 
 ### 规则 F：写接口测试数据清理铁律（强制）
 
@@ -100,6 +151,14 @@
 - 无 spec：`apifox endpoint list/get` 拉取现有接口，确认 method/path/params/requestBody/schema
 - 不完整时：先按 `modules/import-export.md` 的质量指标判断（paths/operations/schemas/withBody/emptyObjectBodies），缺什么补什么
 - 接口信息完善是测试用例的前提：**schema 不完整 → 测试用例必然不完整**
+
+### Step 2 前置：受限/豁免登记检查（强制）
+
+- 生成用例前**必须先查**项目根 `PROJECT_TEST.md` 的「受限/豁免接口登记」表（无登记表先建；判定与登记规则见 `modules/test-selection-policy.md` 三档执行策略）
+- **全量执行**（默认）：按规则 B/E/E-1 完整生成 正向（分层组合）+ 负向 + 边界值
+- **受限执行**（基础配置类，如权限/角色/菜单/字典）：只建 **负向 + 边界值**，重点验证无权限/缺权限/越权等场景；**不建正向组合用例**
+- **豁免执行**（真实副作用类，如云存储上传/短信/邮件/支付回调）：**不建常规用例**，仅接口变更时人工回归；登记表必须标注理由（费用/真实外部副作用/低频基础配置）
+- P0 资金/交易/支付类接口**禁止默认豁免**；豁免必须用户显式确认并在登记表写明理由
 
 ### Step 2: 按三类意图生成用例（核心）
 
@@ -145,14 +204,15 @@
 3. `cli-schema get test-case-create` → 构造完整 JSON（含 requestBody、postProcessors、assertion）→ `cli-schema validate` → `create`
 4. 创建后 `test-case get` 确认保存结构，再 `test-case run <caseId>` 运行
 
-> ⚠️ Step 4 创建前必须先对照规则 B 的覆盖度铁律自检：当前接口的正/负/边界覆盖是否满足最低要求？POST 接口是否有完整用例？正向用例是否覆盖了非分页参数？**任一不满足则继续补，不要在缺口存在时宣称"用例已建好"。**
+> ⚠️ Step 4 创建前必须先对照规则 B 的覆盖度铁律自检：当前接口的正/负/边界覆盖是否满足最低要求？POST 接口是否有完整用例？正向用例是否覆盖了非分页参数？**接口有参数而用例无参 = 无效测试**——任一不满足则继续补，不要在缺口存在时宣称"用例已建好"（落地校验闸门见 `modules/test-case.md`「参数完整性校验（强制）」节）。
 
 ### Step 5: 真实测试通过（收口目标）
 
 - 每个用例必须真实运行：`apifox run --test-case <caseId> --environment <env>` 或 `test-case run`
 - 断言失败 → 检查是接口定义问题、环境问题还是用例问题；修到真实通过
+- **接口有参数但用例无参（含 POST body 空壳/缺必填）→ 该用例判定「不通过/无效」**，测试结果不计入通过；必须补全参数后重跑（校验闸门见 `modules/test-case.md`「参数完整性校验（强制）」节）
 - **"在 apifox 测试通过" = 用例在 apifox runner 中真实执行并全绿**，不是写完就收口
-- **"覆盖达标" = 该接口在「自动化测试」菜单中能看到 正向 / 负向 / 边界值 三个分类下都有用例，且 POST 等非 GET 接口有完整覆盖**（校验基准：项目根 `PROJECT_TEST.md` 的「测试覆盖度铁律」节）
+- **"覆盖达标" = 该接口在「自动化测试」菜单中能看到 正向 / 负向 / 边界值 三个分类下都有用例，且 POST 等非 GET 接口有完整覆盖**（校验基准：项目根 `PROJECT_TEST.md` 的「测试覆盖度铁律」节；受限/豁免接口按其登记策略执行，不适用此基准）
 - 多接口编排 → `modules/test-scenario.md`；多用例回归 → `modules/test-automation.md`（test-suite + CI）
 
 ---

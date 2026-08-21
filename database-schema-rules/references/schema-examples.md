@@ -283,3 +283,30 @@ CREATE TABLE orders (
 - 表名、字段名、索引名均未按规范使用反引号包裹。
 - `enabled` 这类名称在不同方言或演进阶段容易产生兼容与可读性问题。
 - 风格不统一会增加迁移脚本 diff 噪音与 review 成本。
+
+## GORM tag 写法（AutoMigrate 幂等性）【2026-08-21 补充】
+
+> 以下规则仅针对 **GORM tag 写法**（`gorm.io/gorm` v1.25+ / `gorm.io/driver/mysql` v1.5+）。纯 SQL DDL 中 `DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` 顺序无关、两种写法建出的列完全一致；差异只发生在 GORM `MigrateColumn` 对默认值的比对，因此位置敏感。
+>
+> 与铁律 0.2（自动迁移只做加法）的关系：按铁律 0.2 实现的迁移不比对已存在列，反例 13 的"每次启动重复 ALTER"不会再发生。但本条**仍须遵守**——一是项目里任何仍在调用 `AutoMigrate` 的位置（新项目起步、临时脚本、测试夹具）都会重现该问题；二是 tag 是建新表的唯一依据，写法错了新环境建出的列虽正确但与 DDL 文本不一致，会给后续结构比对留噪声。存量表相关的完整边界见 `orm-auto-migration.md`。
+
+### 正例 9：时间字段的 GORM tag 写法
+
+```go
+// ✅ 推荐：UpdatedAt 由 GORM autoUpdateTime 应用层自动维护时，DB 层无需 ON UPDATE
+gorm:"column:updated_at;type:timestamp;not null;default:CURRENT_TIMESTAMP;comment:更新时间"
+
+// ✅ 需要 DB 层兜底（存在绕过 GORM 的裸 SQL 更新）时：ON UPDATE 放在 type 里，AutoMigrate 比对通过、幂等
+gorm:"type:timestamp ON UPDATE CURRENT_TIMESTAMP;not null;default:CURRENT_TIMESTAMP;comment:更新时间"
+```
+
+✅ 原因：GORM 的 `MigrateColumn` 用数据库报告的 `column_default`（只存 `CURRENT_TIMESTAMP`，`ON UPDATE` 在 `EXTRA` 列、MySQL 驱动不读取不比对）与 tag 的 `DefaultValue` 比对。把 `ON UPDATE` 放进 `type:` 后，`field.DefaultValue` 仍是 `CURRENT_TIMESTAMP`，与数据库一致 → 比对通过，迁移幂等。
+
+### 反例 13：GORM tag 把 ON UPDATE 放进 default 标签
+
+```go
+// ❌ 错误：ON UPDATE 放在 default 标签里（写法 A）
+gorm:"type:timestamp;not null;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;comment:更新时间"
+```
+
+❌ 问题：建出的列本身正确（MySQL 中 DEFAULT 与 ON UPDATE 顺序无关），但 `field.DefaultValue = "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"` 与数据库报告的 `CURRENT_TIMESTAMP` 永不相等 → 每次 AutoMigrate 都判定列需要修改，重复执行 `ALTER TABLE ... MODIFY COLUMN`，迁移不幂等（大表有锁表开销、启动日志刷 DDL）。需要 DB 层兜底时用正例 9 第二种写法，不需要时用第一种，**不要写成反例 13 的写法**。

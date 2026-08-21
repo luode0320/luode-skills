@@ -147,6 +147,7 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 ### 发现本地环境配置
 
 - 需要本地环境连接信息时，必须先到项目约定的「本地配置文件」位置读取，不要凭空假设连接串、也不要直接要求用户重复提供已在配置里的信息。
+- 接口测试场景（接口功能验证/回归/Bug 验证/上线门禁的接口部分）**优先读取 `config/yaml/config.apifox.yaml`**（本地接口测试专用配置，无则从 `config.local.yaml` 复制生成）；被测服务以 `-env apifox` 启动。
 - 通用发现方式：在仓库内按命名模式搜索本地 / 开发环境配置，常见命名含 `local` / `dev` / `.env`，例如 `*config*local*`、`*local*config*`、`config.local.*`、`*_local_*`、`.env.local`、`.env.development`。
 - 若同时存在 `config_local*` 与 `config_test*`，本地自动化测试、启动调试和查询必须优先且仅允许读取 `local` 配置；`test` 配置只代表隔离测试环境，不属于当前本地自动化测试输入来源。
 - 典型示例（仅示例，具体以各项目实际为准）：`backend/configs/config.local.yaml`、`go-admin/config/config_local_yaml.go`。
@@ -178,18 +179,21 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 ### 接口级测试强制走 apifox（强制）
 
 - 接口功能验证、回归、Bug 接口验证、上线门禁的接口部分，统一用 `apifox test-case run` / `test-suite run` 在 apifox「AI 团队」对应项目中执行，并**落地测试用例保存到 apifox**（用例保留即落地，必要时并入 test-suite 回归）。
+- **apifox 测试专用项目（用户为 apifox 测试单独创建的项目）直接在 `main` 分支操作**：接口文档操作、测试、补充测试用例全部直接落在 main 分支，**不新开 AI 分支 / api 分支，不做「开分支 → 自动化测试 → 合并回 main」的多余操作**（项目级隔离已足够）。
 - 不得只在本地 shell/curl 验证后不落地用例；「本地调试过」不构成跳过 apifox 落地的理由。
 - 目标项目解析与接口同步流程见 `apifox-cli__skillhub/modules/ai-team-project.md` 与 `modules/api-sync-to-apifox.md`；swag/OpenAPI 生成归 `swag-openapi-maintainer-rules`。
 
 ### 环境红线不变（强制）
 
+- **被测服务 environment 白名单（强制）**：本地测试与接口级测试的被测服务启动环境**只允许 `local` 与 `apifox`** 两个环境（对应 `config/yaml/config.local.yaml` 与 `config/yaml/config.apifox.yaml`）；**选择优先级按项目配置决定**——项目**存在 apifox 环境配置（`config/yaml/config.apifox.yaml`，含同仓 `backend/config/yaml/config.apifox.yaml`）时默认使用 `apifox` 环境**（被测服务 `-env apifox` 启动）；项目**没有 apifox 环境配置时默认使用 `local` 环境**；`test` / `prod` / `staging` / `pre` / `release` 等非 local 环境**一律禁止**用于本地测试与接口测试。
 - apifox environment 的 baseUrl 只允许指向 **local**（localhost / 本地开发配置声明的服务），禁止指向 `test` / `prod` / `staging` / `pre` / `release`；判定标准仍是「配置归属」而非物理地址，与「本地环境配置发现与连接」一致。
 - 运行测试显式带 `--environment <localhost环境Id>`，避免默认环境漂移。
 
 ### 前置条件
 
 - 被测服务必须在本地启动且端口可访问（先做可达检查再执行用例）。
-- 数据构造按 `apifox-cli__skillhub/modules/test-data-and-judgement.md` 从 local 数据库取真实样本，禁止连非 local 服务取数。
+- 被测服务以 `config/yaml/config.apifox.yaml` 启动（无则从 `config.local.yaml` 复制生成），且**库分离校验通过**：apifox 的 MySQL 库名约定为 `apifox`（开发人员手动创建配置），与 `config.local.yaml` 相同必须阻断，等用户部署 apifox 测试专用库后再继续（见 `apifox-cli__skillhub/modules/environment.md`）。
+- 数据构造以 **local 数据库为数据基准**（见 `apifox-cli__skillhub/modules/test-data-and-judgement.md`）：**apifox 库无数据且 local 有 → 优先从 local 库单向灌数据到 apifox 测试库**（local 只读源、脱敏、可追溯）；**apifox 与 local 都无数据 → apifox 自造测试数据**；禁止连非 local 服务取数。**模型测试宽权限场景**（建表/复杂数据构造/大范围写操作）：项目已有 apifox 环境配置时，允许 apifox 环境自建 **`tmp` 前缀临时库**测试使用，**测试完成必须删除**；正常库（非 `tmp` 前缀，含 apifox 库/local 库）**禁止删除**（见 `apifox-cli__skillhub/modules/environment.md`「临时库特权」）。
 
 ### 标准执行链路
 

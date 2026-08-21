@@ -4,3 +4,4 @@ __pycache__/
 thread-title-rules/mcp/node_modules/
 .workbuddy/*
 .disable*
+node_modules/

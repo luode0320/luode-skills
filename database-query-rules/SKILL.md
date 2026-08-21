@@ -1,6 +1,6 @@
 ---
 name: database-query-rules
-description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界；GORM 查询、统计、更新、创建、保存必须显式使用 `Model(&models.X{})` 或等价方式声明目标表模型，禁止依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导；避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。
+description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询时自动触发。负责统一数据库访问实现、查询性能、事务与锁边界；GORM 查询、统计、更新、创建、保存必须显式使用 `Model(&models.X{})` 或等价方式声明目标表模型，禁止依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导；访问层的表名必须引用模型暴露的表名方法（如 `model.X{}.TableName()`），禁止在仓储成员、`.Table("...")` 或原生 SQL 里硬编码表名字符串；避免把 schema 设计、缓存策略和业务逻辑混进数据访问层；不要用它代替 database-schema-rules、缓存策略约束或业务规则本身。
 ---
 
 # 数据库访问规则
@@ -13,6 +13,7 @@ description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder�
 - 统一 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、分页和批量操作的访问规则。
 - 统一 SQL 标识符书写风格：表名、字段名、索引名统一使用反引号包裹（例如 `enabled`），避免访问层 SQL 风格漂移。
 - 统一 GORM 访问入口：查询、统计、更新、创建和保存必须显式声明 `Model(&models.X{})` 或项目等价封装，让读者一眼能看出访问的目标表模型。
+- **统一表名来源：访问层要用表名时一律引用模型暴露的表名方法（如 `model.X{}.TableName()`），禁止在仓储构造函数、`tableName` 成员、`.Table("...")` 调用或原生 SQL 里重复硬编码表名字符串。表名的定义权威在 `database-schema-rules`（铁律 1.2 表名单一定义源），本 skill 只负责检查访问层是否正确引用，不重复定义规则。**
 - 对于只在单个查询点使用的简单条件 SQL，优先直接写在 `Where` / `Join` / `Raw` 使用处，不要先抽成 const/var 再回填，避免把本地查询逻辑拆碎。
 - 只有在同一条 SQL 被多处复用、或查询模板本身确实承载稳定语义时，才考虑提成常量或仓储内部命名片段。
 - 区分数据访问层、schema 结构层、缓存层和业务规则层的职责边界。
@@ -24,6 +25,7 @@ description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder�
 - 新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder、事务、锁、批量 CRUD、分页查询。
 - 新增或修改 GORM `Where`、`First`、`Find`、`Count`、`Create`、`Save`、`Updates` 等链式访问。
 - 发现 GORM 访问依赖目标变量类型推导表名，而没有显式 `Model(&models.X{})`。
+- 发现仓储 / DAO 里出现表名字符串字面量（如 `tableName: "xxx_table"`、`.Table("xxx_table")`），而模型已提供 `TableName()`。
 - 需要判断某段逻辑该落在数据访问层还是业务层。
 - 需要确认事务边界、锁粒度、批量写入方式或分页策略是否合理。
 - 发现查询慢、事务过大、锁范围过宽或访问层混入业务判断时。
@@ -35,7 +37,8 @@ description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder�
 3. 判断当前逻辑属于数据访问职责，还是已经越界进入业务编排。
 4. 确认访问层 SQL 的标识符统一使用反引号包裹（表名、字段名、索引名）。
 5. 确认每个 GORM 访问链路都显式声明 `Model(&models.X{})` 或等价项目封装，不依赖目标变量类型推导表名。
-6. 确认当前性能问题是访问实现问题，而不是 schema 或缓存策略问题。
+6. 确认访问层的表名全部来自模型的表名方法，没有硬编码表名字面量；模型缺少表名方法时先回 `database-schema-rules` 补齐定义，再继续访问层实现。
+7. 确认当前性能问题是访问实现问题，而不是 schema 或缓存策略问题。
 
 ## 默认执行流程
 
@@ -55,6 +58,7 @@ description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder�
 - 不默认所有慢查询都靠 SQL 技巧解决，也不默认所有一致性问题都要靠大事务解决。
 - 不允许在访问层混用“有的 SQL 加反引号、有的 SQL 不加反引号”的风格，必须统一反引号。
 - 不允许在 GORM 访问层混用“有的链路显式 Model、有的链路依赖目标变量推导”的风格，必须统一显式模型声明。
+- 不允许在访问层混用“有的仓储引用模型表名方法、有的仓储硬编码表名字符串”的风格，必须统一引用模型表名方法。
 
 ## 需要暂停并确认的条件
 
@@ -66,8 +70,8 @@ description: 当新增或修改 SQL、Repository、DAO、Mapper、QueryBuilder�
 
 ## 执行通过 / 驳回标准
 
-- 通过：数据访问层职责清楚，SQL / Repository / DAO / Mapper 落点合理，事务和锁使用可解释，分页与批量策略没有明显风险，SQL 标识符统一使用反引号，且 GORM 访问链路显式声明 `Model(&models.X{})` 或等价项目封装。
-- 驳回：访问层混入业务逻辑、事务边界失控、锁范围过宽、分页和批量策略不稳定，或把 schema / 缓存问题伪装成 query 问题；或 SQL 标识符裸写导致风格不统一（如 enabled 未写成 `enabled`）；或 GORM 访问依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导而没有显式模型；或把单点使用的简单查询条件硬抽成 const/var，导致可读性下降。
+- 通过：数据访问层职责清楚，SQL / Repository / DAO / Mapper 落点合理，事务和锁使用可解释，分页与批量策略没有明显风险，SQL 标识符统一使用反引号，GORM 访问链路显式声明 `Model(&models.X{})` 或等价项目封装，且访问层表名全部引用模型的表名方法。
+- 驳回：访问层混入业务逻辑、事务边界失控、锁范围过宽、分页和批量策略不稳定，或把 schema / 缓存问题伪装成 query 问题；或 SQL 标识符裸写导致风格不统一（如 enabled 未写成 `enabled`）；或 GORM 访问依赖 `Find(&slice)`、`First(&obj)`、`Create(&obj)`、`Save(&obj)` 的类型推导而没有显式模型；或把单点使用的简单查询条件硬抽成 const/var，导致可读性下降；或在访问层硬编码表名字符串，与模型的表名方法形成两个真相源。
 
 ## 执行结果归档要求
 

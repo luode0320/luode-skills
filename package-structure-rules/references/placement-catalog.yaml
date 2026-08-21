@@ -289,7 +289,7 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "config/yaml",
-      "purpose": "按部署环境拆分的外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据",
+      "purpose": "按部署环境拆分的外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据；apifox 环境（config.apifox.yaml）为接口测试专用，从 config.local.yaml 复制生成但 MySQL 数据库必须使用独立 apifox 测试专用库（库名约定 apifox、与 local 相同即阻断）",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
@@ -301,7 +301,8 @@
       "standard_environments": [
         "local",
         "test",
-        "prod"
+        "prod",
+        "apifox"
       ],
       "direct_files": true,
       "owner_skill": "package-structure-rules",
@@ -317,7 +318,7 @@
       "content_type": "config_asset",
       "category": "yaml",
       "canonical_path": "backend/config/yaml",
-      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据",
+      "purpose": "按部署环境拆分的同仓后端外部 YAML 配置；唯一配置模式；允许有意持久化凭据原值但禁止过程性输出回显；默认不依赖环境变量；只存放配置数据；apifox 环境（config.apifox.yaml）为接口测试专用，从 config.local.yaml 复制生成但 MySQL 数据库必须使用独立 apifox 测试专用库（库名约定 apifox、与 local 相同即阻断）",
       "creation_policy": "conditional",
       "tracked": true,
       "allowed_extensions": [
@@ -329,7 +330,8 @@
       "standard_environments": [
         "local",
         "test",
-        "prod"
+        "prod",
+        "apifox"
       ],
       "direct_files": true,
       "owner_skill": "package-structure-rules",
