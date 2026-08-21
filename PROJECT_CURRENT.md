@@ -2,33 +2,35 @@
 
 ## 更新时间
 
-- 2026-08-18
-- 来源对象：目录树多版本改造 · 去除 rpc（REQ-DVT-20260818-001 / CYCLE-DVT-01）
-- 当前目标：把微业务/后端源码根目录规范从「`business/<domain>` 平铺 + `rpc/`」改造为「`<source-root>/<domain>/` 下 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录隔离 + 域间禁止直连」，`init/` 目录收敛为单文件 `init.<ext>`，多语言统一用 `<source-root>` 占位符。
-- 当前状态：全部 4 个最小任务完成。`<v?>/` 从域级下沉到 `router/`/`controller/`/`entity/`/`service/` 各自内部，去掉 `crontask/` 域级目录；包名用 `v?router`/`v?controller`/`v?entity`/`v?service` 别名引用。`package-structure-rules`（目录 Owner）与 `micro-business-architecture-rules`（业务隔离 Owner）两个 skill 全部相关文件已同步新版本化口径并去 rpc；`placement_catalog.py query --artifact business-rpc` 失败关闭、`router`/`entity`/`service`/`controller` 返回 `<source-root>/<domain>/<artifact>/<v?>` 路径；`micro_business.py` 新版 scaffold 产出 `entity/v1/` `router/v1/` `controller/v1/` `service/v1/` 各自内嵌版本目录 + 单文件 `init.go` + `--detect-new` 三态判定；字典刷新成功、`PROJECT_MEMORY.md` 机器索引区同步去 rpc；需求/实施总览/实施周期/测试/6-review 五份文档全部落盘并通过机器校验。改动停在已改动未提交状态。
-- 关键量化：修改两个 skill 共 20+ 文件、2 份项目记忆、2 份字典、`编码skill.md`；落盘 5 份工程文档。目录树设计从「域级 `<v?>/` 内含四类」改为「四类目录各自内嵌 `<v?>/`」，去掉域级 `crontask/`。
-- 无需回滚兜底：`--detect-new`/`--version` 为新增参数，回退不破坏既有 `scaffold`/`check`/`init` 子命令；字典生成与文档校验可重复执行。
+- 2026-08-21
+- 来源对象：异步任务宿主任务列表桥接规则（用户确认第二层规则层方案，承接上轮「异步任务分流 + hook 增强」）
+- 当前目标：让异步任务（异步子会话 / 异步下载 / 异步发布 / CI 轮询等）像 WorkBuddy 任务列表 UI 一样对用户可见、可追踪进度——执行期 `TaskCreate` 登记（描述三段式：做什么 + 任务标识 + 何时查看）+ 三阶段 `TaskUpdate` 推进，收口期「🔄 后台异步任务」小节增加「宿主任务列表映射」字段校验登记；禁止裸 `run_in_background` 当唯一进度可见手段。
+- 当前状态：全部完成。`reasoning-summary-structure-rules/SKILL.md` 6 处（description/自动触发信号/进入后先做什么/输出要求第 8 条/发送前自检/通过驳回标准）、模板「🔄 后台异步任务」表格加宿主任务列表映射行 + 结构要求、条件字段 5.1 触发条件/必填字段/hook 联动补登记要求、`autonomous-execution-rules/SKILL.md` 新增「异步任务任务列表登记（强制）」节、agents/openai.yaml（short_description/default_prompt）、编码skill.md 字典行 + 字典重跑（implemented_total 64）；PROJECT_MEMORY.md 稳定决策 + 机器索引 definition/evidence note 更新、PROJECT_HISTORY.md 置顶追加并裁剪至 20 条、知识库笔记《最终总结异步任务分流与WorkBuddy hook增强触发.md》追加 1.1 宿主任务列表桥接节。改动停在已改动未提交状态。
+- 关键量化：SKILL.md 6 处修改 + 模板 2 处 + 条件字段 3 处 + autonomous-execution-rules 新增 1 节 + agents 2 处 + 字典 1 行 + PROJECT_MEMORY 3 处 + PROJECT_HISTORY 1 条 + 知识库笔记 1 处。
+- 无需回滚兜底：任务列表桥接是对上轮「异步任务分流」的增量增强（执行期登记 + 收口期映射字段），既有异步小节、hook 文档、必填小节全部保留；`autonomous-execution-rules` 新增节不改变其既有授权三态与暂停边界。
 
 ## 本轮已完成
 
-- 机器事实源：`placement-catalog.yaml/.py/.schema.json` 的 `router`/`controller`/`entity`/`service` 均改版本化路径（`<source-root>/<domain>/<artifact>/<v?>` + `requires_domain`）、删 `business-rpc` 条目与对应函数
-- 人工目录树：`project-layout-v2.md`、六个 language reference、`SKILL.md` 同步 `<source-root>/<domain>/<artifact>/<v?>` 版本化口径并去 rpc（`<v?>/` 下沉到 `router/`/`controller/`/`entity/`/`service/` 各自内部，去掉域级 `crontask/`）
-- 业务隔离脚本：`micro_business.py` 改新版 scaffold（`entity/v1/` `router/v1/` `controller/v1/` `service/v1/` 各自内嵌版本目录 + 单文件 `init.go` + `--detect-new` 三态判定、移除 `--with-rpc` 与域级 `crontask/`）；四个 reference + 两个 templates 去 rpc、改版本目录语义
-- 记忆与字典：`PROJECT_MEMORY.md` 机器索引区实体改名 `rule.micro-business-domain-isolation` 并同步去 rpc；`generate_dictionary.py` 退出码 0，`implemented_total: 70`
-- 文档收口：需求、实施总览、实施周期、测试主文档、6-review 五份文档全部落盘并通过机器校验
+- `reasoning-summary-structure-rules/SKILL.md`：6 处修改——frontmatter description 补「先 TaskCreate 登记宿主任务列表 + 禁止裸 run_in_background 当唯一进度可见手段」；自动触发信号补「校验任务列表登记可回指任务标识」；进入后先做什么补「启动异步任务后必须 TaskCreate 登记、等待/回收用 TaskUpdate 推进、未登记视为异步状态不可见需补登记」；输出要求第 8 条补「任务列表桥接（强制）：三段式条目描述 + 启动/等待/回收三阶段 TaskUpdate 推进（pending→in_progress→completed）+ 异步子会话/异步下载/异步发布/异步构建同等待处理」；发送前自检补「宿主任务列表映射 + 登记校验」；通过/驳回标准双向补「未登记任务列表 / 条目无法回指任务标识 → 驳回」
+- `reasoning-summary-structure-rules/references/summary-structure-template.md`：「🔄 后台异步任务」表格新增「宿主任务列表」映射行（对应 TaskCreate 登记的条目名 / 任务列表 UI 查看位置）；结构要求补「启动异步任务必须 TaskCreate 登记、三阶段 TaskUpdate 推进、宿主任务列表行必须回指登记条目」
+- `reasoning-summary-structure-rules/references/conditional-sections-rules.md`：5.1 触发条件补「启动即 TaskCreate 登记、禁止裸后台进程当唯一进度可见手段」；必填字段加「宿主任务列表映射」；hook 联动校验信号加「宿主任务列表映射」
+- `autonomous-execution-rules/SKILL.md`：新增「异步任务任务列表登记（强制）」节——启动异步任务先 TaskCreate 登记（三段式描述）、启动/等待/回收三阶段 TaskUpdate 推进、禁止裸 run_in_background 当唯一进度可见手段、收口由 reasoning-summary-structure-rules 渲染校验、登记不改变执行授权边界
+- `reasoning-summary-structure-rules/agents/openai.yaml`：short_description 与 default_prompt 补「TaskCreate 登记宿主任务列表 + 三段式描述 + 三阶段推进 + 宿主任务列表映射字段」
+- `编码skill.md`：reasoning-summary-structure-rules 字典行补任务列表桥接口径（异步下载/异步发布纳入）；`skill-dictionary/generate_dictionary.py` 重跑（implemented_total 64，退出码 0）
+- 记忆与沉淀：PROJECT_MEMORY.md「总结异步任务分流规则」追加稳定决策 + 机器索引 `rule.summary-async-task-section` definition/evidence note 更新；PROJECT_HISTORY.md 置顶追加（21→裁最旧 1 条→20 条合规）；知识库笔记《最终总结异步任务分流与WorkBuddy hook增强触发.md》追加「1.1 宿主任务列表桥接（TaskCreate 登记，强制）」节 + 经验补「任务列表 UI 常驻化是宿主产品诉求」；双路径（仓库/安装）junction 同一物理目录
 
 ## 验证与交接
 
-- 工程文档：五个 profile（requirement / implementation_overview / implementation_cycle / test / style_regression）校验均返回 `valid: true`
-- Catalog：`query --artifact business-rpc` 退出码 2；`query --artifact router` 返回 `canonical_path=<source-root>/<domain>/router/<v?>`、`requires_domain=True`；`query --artifact entity/service/controller` 同理
-- 脚手架：`micro_business.py scaffold order` 产出 `internal/order/{api,base,constant,util,init.go,router/v1/,controller/v1/,entity/v1/,service/v1/}` + README.md（无 `crontask/`）
-- 隔离/判定：`check` 拒绝跨域 import（退出码 1）；`check --detect-new` 三态判定（candidate_new / guard / skip）
-- 全量测试：`Ran 386 tests`，`FAILED (failures=4, errors=12, skipped=2)`；全部为环境/历史基线问题，与本次改动无关
+- 字典：`skill-dictionary/generate_dictionary.py` 退出码 0（implemented_total 64）
+- 双路径：仓库与安装路径 junction 同一物理目录（上轮已确认 realpath 一致）
+- 知识库：笔记回读校验通过（readback_OK 2539 chars，含 TaskCreate 桥接节）
+- 待执行：WorkBuddy hook 真实任务实测（`Stop` exit code 2 反馈是否生效需在真实会话验证）；「异步任务 TaskCreate 登记 → 任务列表 UI 可见」需在真实异步任务轮次观察生效
+- 未执行：真实项目接入验证（本轮为规则文本演进，未配置用户级 hook）
 
 ## 范围与边界
 
-- 本轮未动：其他兄弟 skill、`utils/rpc/`（gRPC/Thrift 客户端适配）、`integration/contracts/rpc`（前后端联调契约）、历史 `doc/3-实施/` 文档
-- 明确未做的后续项：无；`TASK-DVT-01` 至 `TASK-DVT-06` 全部完成
+- 本轮未动：异步分流小节的收口信号语义（非未完成/非阻断/不触发后续）、hook 文档、知识引用、任务阻断收口、Plan Mode 排除等既有结构（保持原口径）；任务列表桥接只约束"异步任务必须登记可见"，不改变执行授权边界
+- 明确未做的后续项：「任务列表 UI 常驻未完成会话底部」是 WorkBuddy 宿主产品诉求，需提给 WorkBuddy 产品/前端评估（前端判断会话任务列表是否全部 completed），不在本规则仓库范围
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
@@ -755,4 +757,11 @@
 - 当前状态：六个任务全部完成。五份工程文档已落盘并通过 profile 校验；四个 skill 新增五个 reference 并补齐 SKILL.md 引用；全量测试 396 项通过（1 项跳过），修复三处既有测试基线；字典 seed_total 35；测试主文档与 6-review 文档已落盘；知识库沉淀 1 篇并双向关联；PROJECT_MEMORY.md 已同步吸收裁决与配置互斥契约。改动停在已改动未提交状态。
 - 关键量化：新增 5 个 reference、2 份收口文档、1 篇知识库笔记；修改 4 个 SKILL.md、3 个测试文件、`test/shared/layout_policy.py`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
 - 验证与交接：全量测试 `python -B test/run_python_tests.py` 退出码 0；`validate_engineering_docs.py` 七份文档 PASS；`generate_dictionary.py` 退出码 0；`knowledge_index.py check` 0 违规。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+
+## 2026-08-21 补充 apifox 测试专用项目直接 main 分支口径
+
+- 来源对象：apifox 测试专用项目直接 main 分支（用户确认）
+- 当前目标：把「apifox 测试专用项目直接 main 分支（不新开分支、无合并环节）」作为分支策略固化进 apifox 分支相关模块 / 测试策略 / 规划表，并同步字典、项目记忆与知识库，修正既有「默认走 AI 分支」的相反表述。
+- 当前状态：全部完成。apifox-cli__skillhub（ai-team-project.md「分支策略」节 + 不可违反规则第 9 条、api-sync-to-apifox.md 步骤 4/9 + 不可违反规则第 5 条、branch.md「先判断怎么改」、SKILL.md AI 写入权限 + AI 分支说明、workflow.md 适用场景 + Step 1）、test-strategy-rules（接口级测试强制走 apifox 节）、编码skill.md apifox 行 + 字典重跑、PROJECT_MEMORY.md 稳定决策 + 机器索引 definition、PROJECT_HISTORY.md 置顶追加、知识库笔记决策 7 + 权威落点 + 执行要点 7。AI 分支流程保留为兜底路径（非 apifox 测试专用项目 / main 分支受保护时使用），未删除既有能力。
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态。

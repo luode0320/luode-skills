@@ -22,6 +22,19 @@
 - 更新时间：2026-08-09。
 
 
+## Apifox 测试分离库规则（config.apifox.yaml）
+
+- 稳定决策：接口测试（功能验证/回归/Bug 验证/上线门禁的接口部分）的服务侧配置统一走 `config/yaml/config.apifox.yaml`（同仓后端 `backend/config/yaml/config.apifox.yaml`），被测服务以 `-env apifox` 启动；项目无此文件时从 `config.local.yaml` **复制**生成，业务配置保持一致。
+- 稳定决策：**数据库分离（强制阻断）**——`config.apifox.yaml` 的 MySQL 数据库必须使用**独立的 apifox 测试专用库**，**库名约定为 `apifox`、由开发人员手动创建并配置**，**禁止与 `config.local.yaml` 使用同一库**；库名相同必须**阻断**测试流程，等待用户部署 apifox 测试专用库并回填配置后再继续。目的：apifox 测试数据与本地开发数据隔离，避免测试污染 local 库。
+- 稳定决策：**数据基准（local → apifox 测试库，强制）**——**apifox 以 local 数据库数据为基准**（local 库通常同步正式环境线上数据，测试更准确）；「默认 apifox 环境」仅指被测服务启动环境，**不代表禁止使用 local 配置/数据**，数据可从 local 单向流通到 apifox 供测试使用。**数据准备优先级**：① apifox 库无数据且 local 有 → **优先**从 `config.local.yaml` 指向的 local 库**单向灌数据**到 apifox 测试库（默认路径，不限于旧接口）；② apifox 与 local 都无数据 → **apifox 自行创造测试数据**。约束不变：local 库**只读源**（仅 SELECT、禁止写入/删除）、**禁止反向回灌**、禁止从 test/prod/staging 取数、脱敏并记录来源库/表、条数、时间（可追溯）。与库分离不冲突：分离管「测试写入不污染 local」，灌数据是「初始化 apifox 库数据」。
+- 稳定决策：apifox 环境属接口测试专用，不改变 `local`/`test`/`prod` 既有语义；`test`/`prod`/`staging` 配置一律不用于本地接口测试（环境红线不变）。
+- 稳定决策：**被测服务 environment 白名单只允许 `local` 与 `apifox`，选择优先级按项目配置决定**——项目**存在 `config/yaml/config.apifox.yaml`（含同仓 `backend/config/yaml/config.apifox.yaml`）时默认使用 `apifox` 环境**（被测服务 `-env apifox` 启动）；项目**没有 apifox 环境配置时默认使用 `local` 环境**；`test`/`prod`/`staging`/`pre`/`release` 等非 local 环境一律禁止用于本地测试与接口测试。
+- 稳定决策：**apifox 测试专用项目直接 `main` 分支操作**——用户为 apifox 测试**单独创建的项目**（项目级隔离已足够），apifox 项目内**接口文档操作、测试、补充测试用例直接在 `main` 分支（如 `1.main`）操作**，**不新开 AI 分支 / api 分支，不做「开分支 → 自动化测试 → 合并回 main」的多余操作**；仅当目标项目不是 apifox 测试专用项目（如共享主项目）或 main 分支受保护不可直接写时，才走 AI 分支兜底（`ai/年月日-...` + pick-to + 合并）。
+- 稳定决策：**临时库特权（apifox 环境，强制）**——**前提是项目已提供 apifox 环境配置**（有 `config/yaml/config.apifox.yaml` + 对应 apifox 测试专用库）。模型测试需要**宽泛权限**（建表/复杂数据构造/大范围写操作等超出 apifox 专用库约束的场景）时，**允许 apifox 环境自行新建临时库测试使用**：① 临时库名必须以 **`tmp` 前缀**标识（如 `tmp_<测试用途>`），用于与正常库区分；② **生命周期（建→用→删，强制）**：测试完成后**必须删除**（`DROP DATABASE`），删除动作记录到 `PROJECT_TEST.md`（库名/用途/删除时间）；③ **删除边界**：只有 `tmp` 前缀临时库允许删除，**正常库（非 `tmp` 前缀，含 apifox 测试专用库、local 库）一律禁止删除**——即使 apifox 环境具备连接权限也不得删除。与库分离不冲突：分离管「apifox 专用库 ≠ local 库」，临时库是在 apifox 专用库之外额外创建的生命周期库，用完即删。
+- 来源：`package-structure-rules/references/configuration-layout.md`、`package-structure-rules/references/placement-catalog.yaml`、`package-structure-rules/SKILL.md`、`apifox-cli__skillhub/modules/environment.md`、`apifox-cli__skillhub/SKILL.md`、`test-strategy-rules/SKILL.md`、用户需求确认（2026-08-21 重新规划 apifox 测试分离库方案）。
+- 更新时间：2026-08-21。
+
+
 ## 计划输出完整性规则
 
 - 稳定决策：`implementation-planning-rules` 的正式实施计划必须零决策完整落盘；plan-structure-template.md 禁止在最终输出时压缩或省略思考阶段已形成的任何落点、文件/符号、命令、断言、回滚和完成条件。
@@ -392,6 +405,15 @@
 - 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`knowledge-flow/references/capture-retrieve-distill.md`、`doc/2-需求/2026-08-04_总结知识引用清单_Obsidian引用可视化.md`、`doc/3-实施/2026-08-04_总结知识引用清单_实施周期21_Obsidian引用可视化.md`。
 - 更新时间：2026-08-04。
 
+## 总结异步任务分流规则（2026-08-21）
+
+- 稳定决策：`reasoning-summary-structure-rules` 最终总结新增条件小节 `## 🔄 后台异步任务`——本轮启动了后台异步任务（`run_in_background` 轮询 / CI 等待 / 长任务后台执行）时必选，位于「结果与结论」之后、「后续内容」之前；逐项写明任务标识、任务类型、轮询节奏、预计完成信号、结果回流渠道（系统通知 / 下一会话 / 用户指令）与用户等待语义。
+- 稳定决策：该小节是「同步已完成 + 异步在跑」的收口信号——不是"任务未完成"、不是 `blocked`/`manual_handoff`、不触发「后续内容」、不让用户误判会话被阻断；`Stop` hook 校验认该小节为异步收口信号，缺失视为未收口。
+- 稳定决策：WorkBuddy hooks 可提高本 skill 触发准确率——`UserPromptSubmit` 注入 `additionalContext` 软提醒 + `Stop` 事件 exit code 2 硬校验（stderr 注入下一条消息强制补总结）；hook 配置在 `~/.workbuddy/settings.json` 或项目 `.workbuddy/settings.json` 的 `hooks` 字段，配置与脚本见 `reasoning-summary-structure-rules/references/hook-integration.md`；hook 支持需真实任务实测（文档列了不等于桌面版真的触发）。
+- 稳定决策（2026-08-21 追加）：异步任务（轮询 / CI 等待 / 异步下载 / 异步发布 / 异步构建 / 异步子会话）必须**执行期登记宿主任务列表**——启动时 `TaskCreate`（条目描述三段式：做什么 + 任务标识 + 何时查看），启动/等待/回收三阶段用 `TaskUpdate` 推进（pending → in_progress → completed），禁止裸 `run_in_background` 当唯一进度可见手段；执行期契约在 `autonomous-execution-rules`，收口期渲染与登记校验在 `reasoning-summary-structure-rules`（「🔄 后台异步任务」小节增加「宿主任务列表」映射字段）。「任务列表 UI 常驻未完成会话底部」属宿主产品诉求，不在规则仓库范围。
+- 来源：`reasoning-summary-structure-rules/SKILL.md`、`references/summary-structure-template.md`、`references/conditional-sections-rules.md`、`references/hook-integration.md`、`autonomous-execution-rules/SKILL.md`、WorkBuddy 官方 hook 文档（`workbuddy.cn/docs/ide/Features/Hooks`）。
+- 更新时间：2026-08-21。
+
 ## 知识库可迭代更新规则
 
 - 稳定决策：知识库从只增量补充改为可迭代更新。写入前必须显式判定 `补充` / `矛盾未裁决` / `取代` 三态之一；判为取代必须在同一轮内处置旧笔记，只写新笔记不处置旧笔记是禁止行为。
@@ -558,6 +580,22 @@ entities:
     context_ids:
       - context.skill-governance
     updated_at: 2026-07-25
+  - entity_id: rule.apifox-test-separate-db
+    name: "Apifox 测试分离库规则（config.apifox.yaml）"
+    type: "接口测试配置与数据隔离规则"
+    aliases:
+      - config.apifox.yaml
+      - apifox 测试专用库
+      - apifox 库分离
+      - 接口测试配置
+    definition: "接口测试的服务侧配置统一走 config/yaml/config.apifox.yaml（同仓后端 backend/config/yaml/config.apifox.yaml），被测服务以 -env apifox 启动；项目无此文件时从 config.local.yaml 复制生成、业务配置保持一致。数据库分离为强制阻断项：config.apifox.yaml 的 MySQL 数据库必须使用独立的 apifox 测试专用库，库名约定为 apifox（开发人员手动创建配置），与 config.local.yaml 相同必须阻断测试流程，等待用户部署 apifox 测试专用库并回填配置后再继续——达到 apifox 测试数据与本地开发数据隔离。被测服务 environment 白名单只允许 local 与 apifox，选择优先级按项目配置决定：项目有 config/yaml/config.apifox.yaml 配置时默认使用 apifox 环境（-env apifox 启动），无 apifox 环境配置时默认使用 local；test/prod/staging/pre/release 等非 local 环境一律禁止用于本地测试与接口测试。数据基准：apifox 以 local 数据库数据为基准（local 常同步正式环境线上数据，测试更准确），「默认 apifox 环境」仅指被测服务启动环境、不禁用 local 数据源；数据准备优先级——apifox 库无数据且 local 有数据时优先从 config.local.yaml 指向的 local 库单向灌数据到 apifox 测试库（默认路径、不限于旧接口），apifox 与 local 都无数据时 apifox 自行创造测试数据（local 库只读源仅 SELECT、禁止反向回灌、禁止 test/prod 取数、脱敏并记录来源/条数/时间），灌入后 apifox 库仍独立。临时库特权（前提：项目已有 apifox 环境配置）：模型测试需要宽泛权限（建表/复杂数据构造/大范围写操作）时，允许 apifox 环境自行新建 tmp 前缀临时库测试使用，测试完成后必须删除（DROP DATABASE，删除动作记录到 PROJECT_TEST.md 库名/用途/删除时间）；只有 tmp 前缀临时库允许删除，正常库（非 tmp 前缀，含 apifox 测试专用库、local 库）一律禁止删除。apifox 测试专用项目（用户为 apifox 测试单独创建的项目）内接口文档操作、测试、补充测试用例直接在 main 分支操作，不新开 AI 分支 / api 分支、无「开分支→自动化测试→合并回 main」多余操作；仅非测试专用项目或 main 分支受保护时才走 AI 分支兜底。"
+    scope: "apifox-cli__skillhub（environment.md 配置来源/端口探测/不可违反规则）、test-strategy-rules（本地配置发现/接口执行通道前置条件）、package-structure-rules（configuration-layout.md/placement-catalog.yaml/SKILL.md）"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.apifox-test-separate-db
+    context_ids:
+      - context.test-flow
+    updated_at: 2026-08-21
   - entity_id: rule.swag-upstream-openapi
     name: "上游与第三方出站接口文档规则"
     type: "API 文档资产规则"
@@ -1223,6 +1261,21 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-08-13
+  - entity_id: rule.summary-async-task-section
+    name: "总结异步任务分流规则"
+    type: "Skill 治理规则"
+    aliases:
+      - 异步任务分流
+      - 后台异步任务小节
+      - hook 增强触发
+    definition: "`reasoning-summary-structure-rules` 最终总结在启动后台异步任务（run_in_background 轮询 / CI 等待 / 长任务 / 异步下载 / 异步发布 / 异步构建 / 异步子会话）时必须在「结果与结论」之后输出 `## 🔄 后台异步任务` 条件小节：任务标识、任务类型、轮询节奏、预计完成信号、结果回流渠道（系统通知 / 下一会话 / 用户指令）、用户等待语义、宿主任务列表映射；该小节是「同步已完成 + 异步在跑」的收口信号，不是未完成、不是 blocked/manual_handoff、不触发后续内容。异步任务必须执行期 TaskCreate 登记宿主任务列表（条目描述三段式：做什么 + 任务标识 + 何时查看），启动/等待/回收三阶段用 TaskUpdate 推进 pending→in_progress→completed，禁止裸 run_in_background 当唯一进度可见手段；执行期契约在 autonomous-execution-rules，收口期渲染与登记校验在本 skill。WorkBuddy hooks 可把本 skill 触发从自觉升级为强制：UserPromptSubmit 注入 additionalContext 软提醒 + Stop 事件 exit code 2 硬校验（stderr 注入下一条消息）；配置在 ~/.workbuddy/settings.json 或项目 .workbuddy/settings.json 的 hooks 字段，脚本见 references/hook-integration.md；hook 支持需真实任务实测。"
+    scope: "最终总结收口、异步任务状态显式分流、宿主任务列表登记桥接、WorkBuddy hook 触发增强"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.summary-async-task-section
+    context_ids:
+      - context.final-summary
+    updated_at: 2026-08-21
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -1277,11 +1330,21 @@ evidence:
     source: "6-review 共享静态 Owner 路由"
     path: "code-style-consistency-rules/scripts/static_owner_router.py"
     note: "唯一静态 Owner 路由和来源映射；持续监控仅条件式消费，7 项路由单测、17 项监控单测与专项脚本均通过。"
+  - evidence_id: evidence.skill.apifox-test-separate-db
+    type: "skill"
+    source: "apifox-cli__skillhub/modules/environment.md、test-strategy-rules/SKILL.md、package-structure-rules（configuration-layout.md/placement-catalog.yaml/SKILL.md）"
+    path: "apifox-cli__skillhub/modules/environment.md"
+    note: "config.apifox.yaml 本地接口测试配置（从 config.local.yaml 复制生成）、MySQL 库分离强制阻断（库名约定 apifox 由开发人员手动配置、与 local 相同即阻断等专用库）、端口探测 L1 与取值来源优先、被测服务 environment 白名单仅 local 与 apifox（**有 apifox 配置默认用 apifox、无则 local、禁其他环境**）；**apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）**；**临时库特权（项目已有 apifox 配置时，模型测试宽权限场景允许自建 tmp 前缀临时库、测完必删，正常库禁删）**；2026-08-21 重新规划 apifox 测试分离库方案落地。"
   - evidence_id: evidence.skill.swag-openapi-maintainer
     type: "skill"
     source: "swag-openapi-maintainer-rules/SKILL.md 与 references"
     path: "swag-openapi-maintainer-rules/SKILL.md"
     note: "上游出站接口触发、B1 子目录、manifest 元数据、递归校验和根/上游隔离规则来源"
+  - evidence_id: evidence.skill.summary-async-task-section
+    type: "skill"
+    source: "reasoning-summary-structure-rules/SKILL.md、references/summary-structure-template.md、references/conditional-sections-rules.md、references/hook-integration.md、autonomous-execution-rules/SKILL.md"
+    path: "reasoning-summary-structure-rules/references/hook-integration.md"
+    note: "2026-08-21 新增总结异步任务分流 + 宿主任务列表桥接：后台异步任务必选 `## 🔄 后台异步任务` 小节（结果与结论之后、后续内容之前），任务标识/类型/轮询节奏/完成信号/回流渠道/等待语义/宿主任务列表映射七字段；启动时必须 TaskCreate 登记宿主任务列表（描述三段式：做什么+任务标识+何时查看），启动/等待/回收三阶段 TaskUpdate 推进，禁止裸 run_in_background 当唯一进度可见手段（执行期契约在 autonomous-execution-rules）；该小节是「同步已完成 + 异步在跑」收口信号，非未完成、非阻断、不触发后续。WorkBuddy hooks 增强触发：UserPromptSubmit additionalContext 软提醒 + Stop exit code 2 硬校验；配置路径 ~/.workbuddy/settings.json 或项目 .workbuddy/settings.json；hook 支持需真实任务实测。"
   - evidence_id: evidence.dialog.swag-upstream-openapi
     type: "dialog"
     source: "2026-07-14 需求实施计划与离线验证"

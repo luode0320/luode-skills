@@ -98,7 +98,7 @@
 | 编码基线域 | 所有编码任务都自动遵守的基础质量规则                             |
 | 代码位点域 | 改到哪类代码就触发哪类 skill                                     |
 | 代码风格回归域 | 测试后的格式、写法、位置与局部习惯回归，由 `code-style-consistency-rules` 提供唯一 `6-review` 入口和共享静态 Owner 路由；`continuous-code-quality-supervisor-rules` 仅在 Goal active 且用户明确“监控代码”时可选消费，不是 Gate |
-| 测试域     | 管理测试策略、测试位置、测试命名、测试文档、浏览器联动测试、功能验证与回归；接口级测试执行统一走 apifox 测试链路并落地用例（环境只允许指向 local） |
+| 测试域     | 管理测试策略、测试位置、测试命名、测试文档、浏览器联动测试、功能验证与回归；接口级测试执行统一走 apifox 测试链路并落地用例（被测服务 environment 白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁止其他环境**） |
 | 交付域     | 管理提交流程、协作边界和交付说明                                 |
 
 ## 四、总控层
@@ -188,7 +188,7 @@
 | `skill-audit-rules` | 当主任务存在多 skill 组合、并行拆分或规则收口风险时自动触发。 | 负责只读审计是否漏触发应有 skill，以及已触发 skill 是否还有未执行完的规则。 |
 | `skill-execution-compliance-gate-rules` | 当任务已经进入编码、审查、测试或交付收口阶段，且本轮已触发一个或多个 skill，但存在“只执行了部分规则、未执行规则没有明确后续动作”的风险时触发。 | 在最终回复前执行一次 skill 执行完整性闸门检查，补齐主任务优先的下一步建议，并校验 `blocked/manual_handoff` 共享契约。 |
 | `code-change-finalization-gate-rules` | 当本轮存在代码新增/修改（含测试文件），准备最终回复前触发。 | 校验注释三 Owner 终检、测试目录一致性、真实运行验证与 `6-review` 风格回归。 |
-| `reasoning-summary-structure-rules` | 当进入本轮最终推理总结或结束输出阶段时自动触发。负责检查总结结构完整性；存在流程、依赖、状态、执行链、跨角色交互或量化结果时，按内容优先输出 Mermaid 图形化总览，简单单点任务不强制造图。 | 作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段和阻断收口，防止关键信息缺失或图文漂移。 |
+| `reasoning-summary-structure-rules` | 当进入本轮最终推理总结或结束输出阶段时自动触发。负责检查总结结构完整性；存在流程、依赖、状态、执行链、跨角色交互或量化结果时，按内容优先输出 Mermaid 图形化总览，简单单点任务不强制造图；本轮启动了后台异步任务（轮询/CI 等待/长任务/异步下载/异步发布）时必须先用 `TaskCreate` 在宿主任务列表登记（描述三段式：做什么+任务标识+何时查看），并在「结果与结论」之后输出「🔄 后台异步任务」分流小节（任务标识、轮询节奏、结果回流渠道、用户等待语义、宿主任务列表映射），明确「同步已完成 + 异步在跑」收口信号。 | 作为最终总结结构闸门，统一图形优先的输出顺序、图形目的与关联 ID、必填字段、异步任务分流与任务列表桥接、阻断收口，防止关键信息缺失或图文漂移。 |
 
 ### 总控层默认分流决策表
 
@@ -406,7 +406,7 @@ Bug 域采用两条互补路径：
 
 | Skill 名字                  | 自动触发 description                                                                                                                                                                                                | 核心职责                             |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `package-structure-rules`   | 当新增或修改包、目录、模块、分层结构、包名定义、文件归属、跨层引用关系时自动触发。 | 统一代码包定义、目录分层、包名职责、模块边界和依赖方向，尤其约束 Go 等语言中的 `routes`、`services`、`utils`、`models`、`repositories`、`middleware`、`constants`、`config`、`controller` 等包结构，避免目录失控和职责混乱。 |
+| `package-structure-rules`   | 当新增或修改包、目录、模块、分层结构、包名定义、文件归属、跨层引用关系时自动触发。 | 统一代码包定义、目录分层、包名职责、模块边界和依赖方向，尤其约束 Go 等语言中的 `routes`、`services`、`utils`、`models`、`repositories`、`middleware`、`constants`、`config`、`controller` 等包结构，避免目录失控和职责混乱；`config/yaml/config.apifox.yaml` 为接口测试专用环境配置（从 `config.local.yaml` 复制生成、MySQL 库必须独立且库名约定 apifox，与 local 相同即阻断；被测服务 environment 白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁其他环境**；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**）。 |
 | `micro-business-architecture-rules` | 当新建项目/新会话首轮检测到新或空仓库，或用户提出「微业务/伪微服务/按业务分目录包/业务隔离/业务版本化/新业务开新包/一个项目一个服务的伪微服务」等诉求，或项目已存在微业务标记时自动触发。 | 把单项目单服务按业务垂直切分为互不关联的业务域，业务域直连源码根、业务相关逻辑通过 `router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 四类版本化目录隔离（包名用 `v?router`/`v?controller`/`v?entity`/`v?service` 别名引用）、业务域之间禁止直接导入对方任何目录；定义多语言统一目录布局、每业务域 README 与全局业务索引 md 规则，并提供幂等脚本建版本骨架、写标记与校验跨业务非法依赖，让 AI 只读单业务上下文即可分析。分层落点交给 `package-structure-rules`。 |
 | `common-util-rules`         | 当新增或修改工具类、通用方法、公共组件、工具函数、通用常量或复用代码时自动触发。 | 统一公共资格、复用检索、调用边界、防重复封装和 7 天冻结策略；`util`、`common/util`、二级子目录、依赖方向等目录落点交给 `package-structure-rules`。 |
 | `database-schema-rules`     | 当新增或修改表、字段、索引、唯一约束、外键、迁移脚本、DDL、实体结构、schema 定义时自动触发。                                                                                                                        | 统一表结构变更、迁移安全和回滚策略。 |
@@ -525,14 +525,14 @@ Bug 域采用两条互补路径：
 
 | Skill 名字                    | 自动触发 description                                                             | 核心职责                     |
 | ----------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
-| `test-strategy-rules`         | 当功能实现和编码审查完成后开始制定测试策略、补测试、写验证脚本或做回归检查时触发；当新增/修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 镜像、`doc/5-tests/` 时间戳证据目录或发现测试资产散落时进入 `test-asset-governance` 条件路由。 | 统一测试优先级、测试类型组合、覆盖范围，以及活动测试代码与证据文档的双根布局。 |
+| `test-strategy-rules`         | 当功能实现和编码审查完成后开始制定测试策略、补测试、写验证脚本或做回归检查时触发；当新增/修改测试 README、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 镜像、`doc/5-tests/` 时间戳证据目录或发现测试资产散落时进入 `test-asset-governance` 条件路由。 | 统一测试优先级、测试类型组合、覆盖范围，以及活动测试代码与证据文档的双根布局；接口测试执行通道前置条件：被测服务以 `config/yaml/config.apifox.yaml` 启动且库分离校验通过（apifox MySQL 库名约定 apifox、≠ local 库）；被测服务 environment 白名单仅 local 与 apifox（**有 apifox 配置默认用 apifox、无则 local、禁 test/prod 等其他环境**）；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**。 |
 | `browser-session-automation-rules` | 当任务需要隔离 profile、具名/并发 session、认证登录、表单交互、批量执行等核心浏览器自动化，或用户明确要求该工具时自动触发；普通 Chrome 状态与常规页面调试按统一浏览器路由选择。 | 提供条件式核心浏览器自动化能力，不固化为默认联调工具。 |
 | `browser-advanced-testing-rules` | 当任务需要网络/HAR、视觉 diff、trace/profiling、代理或多引擎等高级验证与观测能力，或用户明确要求该工具时自动触发。 | 提供条件式浏览器高级验证与观测能力，不固化为默认联调工具。 |
 | `browser-use-cloud-rules` | 当任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码，或用户明确点名 Browser Use Cloud 时自动触发。 | 作为 Cloud 执行、安全、费用和 session 生命周期的唯一 Owner；每次收费动作前检查本机 key、Billing、当前动作硬费用上限并取得当次确认。 |
 | `functional-validation-rules` | 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足实施计划完成条件时自动触发。 | 负责当前需求对应的功能正确性验证。 |
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
 | `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有测试执行实现。 |
-| `apifox`（接口测试执行链路） | 当需要做上线前项目级接口测试、接口级功能验证/回归/Bug 验证、生成/补全测试用例、接口新增/更新同步 apifox、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接接口级测试执行：AI 团队项目定位（`ai-team-project.md`）、接口同步（`api-sync-to-apifox.md`）、范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；执行通道见 `test-strategy-rules` 的《接口测试执行通道（强制）》，原 `project-interface-release-execution-rules` 已并入。 |
+| `apifox`（接口测试执行链路） | 当需要做上线前项目级接口测试、接口级功能验证/回归/Bug 验证、生成/补全测试用例、接口新增/更新同步 apifox、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接接口级测试执行：AI 团队项目定位（`ai-team-project.md`）、接口同步（`api-sync-to-apifox.md`）、范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；本地接口测试服务侧配置统一走 `config/yaml/config.apifox.yaml`（无则从 `config.local.yaml` 复制生成，MySQL 库名约定 apifox 由开发人员手动配置、与 local 相同即阻断等专用库；被测服务 environment 白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁其他环境**；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**）；**apifox 测试专用项目直接在 `main` 分支操作（接口文档操作/测试/补用例），不新开 AI 分支 / api 分支、无合并环节**；执行通道见 `test-strategy-rules` 的《接口测试执行通道（强制）》，原 `project-interface-release-execution-rules` 已并入。 |
 
 ### 测试域内部边界判定
 
