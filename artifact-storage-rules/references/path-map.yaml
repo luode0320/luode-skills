@@ -12,7 +12,7 @@ roots:
   historical_review_records: "doc/6-审查"
   historical_acceptance_docs: "doc/7-验收"
   project_docs: "doc"
-  project_local_skills: "skill"
+  project_local_skills: "skills"
 entry_files:
   architecture_overview_doc: "1-总架构.md"
   architecture_directory_tree_doc: "2-目录树.md"
@@ -80,7 +80,7 @@ bootstrap:
     - "doc/6-审查"
     - "doc/7-验收"
     - "doc"
-    - "skill"
+    - "skills"
   weak_reference_root_files:
     - "项目设计.md"
     - "架构设计.md"

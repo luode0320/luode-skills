@@ -2,17 +2,18 @@
 
 > 吸收自外部 skill-autosave（查重/更新流程），路径适配 WorkBuddy 环境。
 
-## 落点（junction 说明）
+## 落点（项目根 skills/）
 
-- 项目级 skill 统一写入用户级 `C:\Users\luode\.workbuddy\skills\`（即 `~/.workbuddy/skills/`）。
-- 该目录是 junction，物理指向 `D:\谷歌云盘\luode-skills`（luode-skills 仓库）——**用户级即仓库，勿在项目根另建 `skill/` 目录**（非标准加载路径，不会被自动命中）。
+- 项目级 skill 统一写入**项目根目录 `skills/`**（如 `D:\某项目\skills\project-<slug>-<topic>-rules\`），跨工具通用，不依赖任何工具专属路径（如 `~/.workbuddy/skills/`）。
+- 命中方式：由项目级规则文件（`AGENTS.md` / `CLAUDE.md`）显式声明引用 `skills/` 目录；AI 按声明扫描命中。
+- luode-skills 仓库特例：仓库根即 skill 资产库（88 个 skill 平级在根下），`project-*` 直接落仓库根；`~/.workbuddy/skills` → `D:\谷歌云盘\luode-skills` 的 junction 仅是 WorkBuddy 侧加载机制（物理事实），不是落点规则。
 - 命名：`project-<项目slug>-<topic>-rules`，ASCII 小写 + 连字符，`-rules` 后缀。示例：`project-ellipal-db-rules`、`project-goadmin-api-rules`。
 
 ## 查重步骤
 
 1. 列出已有项目级 skill：
    ```bash
-   ls ~/.workbuddy/skills/ | grep '^project-'
+   ls <项目根>/skills/ | grep '^project-'    # luode-skills 仓库: ls . | grep '^project-'
    ```
 2. 与目标名（`project-<slug>-<topic>`）比较 name 与 description，判断是否覆盖同一场景：
    - 完全覆盖 → 走「更新」流程。
@@ -23,12 +24,12 @@
 ## 创建
 
 ```bash
-python3 ~/.workbuddy/skills/.system/skill-creator/scripts/init_skill.py project-<slug>-<topic>-rules --path ~/.workbuddy/skills --resources references
+python3 <luode-skills 仓库>/.system/skill-creator/scripts/init_skill.py project-<slug>-<topic>-rules --path <项目根>/skills --resources references
 ```
 
 - 生成 SKILL.md 骨架 + agents/openai.yaml；随后按 `project-skill-template.md` 填充正文。
 - 生成 `display_name`、`short_description`、`default_prompt` 时用 `--interface key=value` 传入。
-- 校验：`python3 ~/.workbuddy/skills/.system/skill-creator/scripts/quick_validate.py <skill目录>`。
+- 校验：`python3 <luode-skills 仓库>/.system/skill-creator/scripts/quick_validate.py <skill目录>`。
 
 ## 更新（已有 skill）
 

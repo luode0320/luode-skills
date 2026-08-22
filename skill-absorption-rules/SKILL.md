@@ -60,6 +60,16 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 
 **与 `skill-audit-rules` 的边界**：`skill-audit-rules` 处理多个 skill 职责重叠审计（只读，不写）；本 skill 三通道都负责实际调整落盘（写）。执行中汇总的 gap 若演变为结构性调整诉求，可回落到内部更新通道走完整裁决流程。
 
+## 自动吸收例外（记忆高频条目通道）
+
+> **2026-08-22 补**：`memory-usage-tracking-rules` 对项目记忆三文件（`PROJECT_MEMORY.md` / `PROJECT_STYLE.md` / `PROJECT_HISTORY.md`）中达到阈值的高频条目执行**自动吸收**为 `project-<slug>-<topic>-rules`，是本 skill「人在回路」原则（第 5 条）与「棘轮验证」的受控例外，仅限此来源，不开放为通用自动吸收。
+
+- **触发源**：仅由 `memory-usage-tracking-rules` 的候选扫描（`scripts/scan_absorption_candidates.py`）命中吸收阈值时进入；阈值本身即量化判据，替代主观评估。
+- **人在回路 → 可回滚自动执行**：不设人工确认闸门，但满足等价兜底——① 执行序列固定（候选识别 → 查重 → `init_skill.py` 生成 SKILL.md → 原条目标记 `absorbed_to` → `quick_validate.py` 结构校验 → 登记 `workbuddy-absorption-map.md` / `source-notes.md` / 当日日志 → 收口）；② git 全程可回滚，吸收后停在已改动未提交状态供用户审计；③ 结构校验失败或查重无法判断归属时**立即转人工**，不得强行收口。
+- **棘轮验证 → 结构校验**：新 skill 无吸收前基线，8 维评分不适用，改用 `quick_validate.py` 结构校验 + 同域冗余扫描（沿用本 skill 第 5 步四项检查）作为替代；校验/扫描不过即回滚。
+- **防重复吸收与防膨胀**：吸收后原条目标记 `absorbed_to` 冻结计数；阈值（≥3 次且跨 ≥2 日期）过滤偶然引用；同域去重沿用「单一权威 + 引用」收敛。
+- 完整执行细则见 `memory-usage-tracking-rules/references/absorption-trigger.md`。
+
 ## 进入后先做什么
 
 1. 先判定本次调整的来源通道（见「双通道判定」）：**外部吸收通道**先拿到外部 skill 的**原始内容**——用户已安装到本地时（`~/.workbuddy/skills/<name>/`、`{workspace}/<name>/` 或带 `__skillhub` 后缀目录），直接读取本地安装目录的 `SKILL.md` 与 references 原文，不再 WebFetch / WebSearch；未安装时才抓取源页面 / 原文，再不行让用户贴原文；禁止凭印象"重建"外部 skill 内容。**内部更新通道**直接读取目标 skill 现状（SKILL.md + references）并明确用户的调整诉求，无外部原文。

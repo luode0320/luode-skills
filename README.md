@@ -84,7 +84,7 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 - 新会话刚开始且没有上下文时，先压缩最近 3 天的 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、根 `test/`、`doc/6-review/`、历史归档和 Git 活动
 - 需要决定需求文档、架构文档、实施文档、Bug 记录、测试代码、测试证据、风格回归或项目说明文档的统一落点与命名时，先进入 `artifact-storage-rules`
 - 需要分析整个项目、梳理架构 / 模块 / 主链路，或同步 / 生成根目录 `项目设计.md` 时，先进入 `project-design-doc-rules`
-- 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skill/`
+- 用户要求“分析项目并总结项目专属 skill”时，进入 `project-local-skills-rules`，并将项目私有规则拆分沉淀到项目根目录 `skills/`
 - 开发过程中如果发现当前已命中的 skill 不完善、缺边界、缺细则、缺 references，先进入 `skill-absorption-rules`
 - 用户只给一句话 idea 或老板式方向时，进入 `requirement-intake-rules` 的 `initial-discovery` 路由主动侦察项目、数据、代码、上下游、关联项目、GitHub、相关网站和官方 API 文档；用户给出需求链接、资料、原型、物料时，进入同一需求主入口继续接入
 - 但如果用户同一轮明确是在索要计划（如“怎么做”“先给计划”“这个怎么改最合适”），或新项目 / 多来源对象需要“实施顺序总表”“需求与实施计划全量顺序实施方案”，则先进入 `implementation-planning-rules` 输出正式实施计划或全量顺序实施方案；前置条件未齐时输出受限计划 / 阻断计划，再回流需求域补齐缺口；当前上下文处于 `Plan Mode` 时，也先进入 `implementation-planning-rules` 作为第一层计划外壳，再按需回流前置域
@@ -270,7 +270,7 @@ python skill-dictionary/generate_dictionary.py
 | `artifact-storage-rules` | 统一 `doc/1-架构/` 到活动 `doc/6-review/`，并兼容读取历史 `doc/6-审查/`、`doc/7-验收/`，提供研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `architecture-doc-rules` | 统一 `doc/1-架构/` 下 `1-总架构.md` 到 `4-主要业务链路.md` 四个有序中文主入口；业务链路从序号 `5` 开始按最大编号加一，支持更新原编号链路或追加新链路，并维护与根目录 `项目设计.md` 的分层关系。 |
-| `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skill/`。 |
+| `project-local-skills-rules` | 当用户要求分析项目并总结项目专属 skill 时，负责将项目私有规则拆分为多个独立 skill 并统一落地到项目根目录 `skills/`。 |
 | `mcp-installation-rules` | 当需要分析项目并判断是否应安装 Chrome DevTools MCP、Browser Use Cloud MCP 或 Godot AI MCP 时，负责根据项目结构和统一矩阵给出安装、配置与让路结论；Browser Use Cloud 只用于云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等专属场景，不作为其它浏览器工具的故障后备。 |
 | `godot-project-bootstrap-rules` | 当仓库命中 `project.godot`、`.gd`、`.tscn` 等 Godot 标记，且需要自动补齐项目级规则文件（`AGENTS.md` / `CLAUDE.md`）、Godot AI MCP 配置、图像生成配置模板或检查 Godot 开发环境是否可直接进入执行时强制自动触发。负责把 Godot 项目的环境准备、自举补齐、图像通道模板和只差人工配置的缺口一次性收口。 |
 | `codegraph-analysis-rules` | 当需要分析代码库结构、调用链、符号关系或影响面时，负责优先提醒使用 CodeGraph；未初始化时先自动初始化，失败则回退到本地搜索与阅读。 |
@@ -1055,3 +1055,4 @@ claude-mem(记忆) :
 2026-08-20 22:03:00 test: [测试同步] supervisor路由与配置布局测试更新
 2026-08-22 00:10:00 feat: [skill批量增强] apifox main分支口径/ORM迁移/异步任务桥接/周报合并新skill
 2026-08-22 00:12:00 docs: [项目状态同步] 项目记忆与字典更新
+2026-08-22 14:25:00 feat: [记忆使用计数规则] memory-usage-tracking-rules 新skill与项目本地skill目录落地

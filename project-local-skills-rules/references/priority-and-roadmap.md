@@ -1,6 +1,6 @@
 # 项目专属 Skill 优先级
 
-> 落点统一为用户级 `~/.workbuddy/skills/`，按 `project-<项目slug>-` 前缀做项目隔离（junction 与 luode-skills 仓库同址）。
+> 落点统一为项目根目录 `skills/`，按 `project-<项目slug>-` 前缀做项目隔离（luode-skills 仓库直接落仓库根）。
 
 ## 第一优先级（先做）
 

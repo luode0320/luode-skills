@@ -3783,8 +3783,22 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - `PROJECT_STYLE.md` 仍是按需代码风格来源，不属于启动必读四件套（联动 `project-style-rules`）。
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；来源冲突时以高优先级为准。
 - 当前状态覆盖写入 `PROJECT_CURRENT.md`，稳定规则合并写入 `PROJECT_MEMORY.md`，历史事件追加到 `PROJECT_HISTORY.md`；不得用其中一个文件替代另一个职责。
-- `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点。
+- `PROJECT_CURRENT.md` 中的单一任务投影托管区由 `task-plan-rehydration-rules` 管理，区内 v4 registry 可隔离保存多个会话 projection。新会话、上下文恢复或用户消息包含任意“继续”或恢复意图时，首条命中列表必须先列出该 Skill；至少覆盖“继续”“接着做”“接着执行”“恢复任务”“恢复执行”“按原计划继续”“继续上次任务”“往下做”“继续刚才的工作”及同义表达，不要求出现“任务”或“计划”。随后在任何领域动作前按当前 `session_id` 校验目标 projection；当前处于 `Plan Mode` 时不读取、不写入或刷新投影，也不调用 `update_plan`。只有当前回合能证明与该会话 projection 属于同一来源对象时，才调用 `update_plan` 重建悬浮任务列表；若 registry 缺失或当前会话无匹配 projection，则先派只读子代理收集当前会话与项目文档证据，再由主代理决定绑定当前会话的 `exact` 正式补建或固定三步 `fallback` 安全恢复列表。失活、损坏、过期、来源不匹配、多匹配或归属不确定时必须明确退出，禁止静默跳过、跨会话覆盖或错投。UI 重建不恢复执行授权，进行中步骤先核验中断点；主动执行时间扣除暂停后严格超过 600 秒且当前会话仍无活动投影时，才先调用只读 `probe-timeout`，仅 `goal_check_required` 由主 Agent 执行 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan`，不匹配、不可用、失败或结果不明确时用原 `ensure-timeout` 生成脱敏普通投影且禁止重复创建；Goal 摘要必须是单行中文、不超过 80 个 Unicode 字符并脱敏，不写入项目文件或知识库。
 - `PROJECT_CURRENT.md` 还包含 `<!-- BEGIN RECENT PROJECT SESSIONS -->` 最近 5 个同项目会话托管区，它是只读回忆索引，帮助新会话了解近期其它会话在做什么；标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实，非 Codex App 宿主只读取不刷新。
+
+### 记忆使用次数计数（强制）
+
+- 项目记忆三文件 `PROJECT_MEMORY.md` / `PROJECT_STYLE.md` / `PROJECT_HISTORY.md` 的条目带使用次数计数（`PROJECT_MEMORY.md` 在底部机器索引区，另两文件在底部 `## 计数锚点区`），统一由 `memory-usage-tracking-rules` 管理。
+- 仅"实际引用"计数：条目被检索用于决策、输出、代码生成或被 skill 引用（含 HISTORY 窄读）时 +1；会话启动全文读取不计；同会话同条目只 +1。
+- 任务收口前（非 Plan Mode）若本轮实际引用过记忆条目，必须按 `memory-usage-tracking-rules` 回写计数锚点；回写前跑 `scripts/usage_ledger_validate.py` 校验 claim，`ok=false` 阻断回写。
+- 达到吸收阈值（`usage_count ≥ 3` 且跨 ≥ 2 个日期且 `absorbed_to` 为空）的条目自动吸收为 `project-<slug>-<topic>-rules` 项目 skill，原条目标记 `absorbed_to` 冻结计数。
+
+### 项目本地 skill 目录（强制）
+
+- 项目根目录 `skills/` 下的 `project-<slug>-<topic>-rules/` 是项目本地 skill 资产目录，会被自动加载 / 扫描，跨工具通用；`~/.workbuddy/skills/`、`~/.claude/skills/` 等工具专属路径不是项目本地 skill 的落点规则。
+- 会话开始或任务开始时，须按项目级 `AGENTS.md` / `CLAUDE.md` 的声明扫描项目根 `skills/` 目录，命中适用的项目本地 skill 并加载其规则；目录不存在视为无项目本地 skill，不阻断任务。
+- 项目本地 skill 的创建、查重、吸收与生命周期由 `project-local-skills-rules` 管理；记忆条目达吸收阈值自动固化为项目本地 skill 由 `memory-usage-tracking-rules` 管理。
+- 违反视为流程违规，必须停止当前执行，回到命中检查重走。
 
 ### 知识库知识流选择性默认触发（强制）
 
@@ -3847,7 +3861,6 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 - 若本轮新增或修改任意 skill 资产（`SKILL.md`、`references`、`scripts`、`agents` 等），必须命中 `skill-execution-compliance-gate-rules` 并在收口前给出 PASS / FAIL 结论；改动 `description` 或触发条件追加 `skill-absorption-rules`，涉及多 skill / 职责边界 / 规则收口风险追加 `skill-audit-rules`；改动 `description` 或新增 / 修改 `##` 级标题后，收口前必须重跑 skill 字典生成脚本刷新 `data.js` 与 `字典.md`；上述联动未走完不得收口。
 - 任何 agent 收到用户明确结束指令（如“结束”“停止”“到此为止”“不要继续”“不要下一步建议”“不要扩散”）时，必须立即停止自动继续和扩散性输出，只允许给出必要的最小收口结论。
 - 若命中 `autonomous-execution-rules`，自动继续只允许用于“完成原始用户目标仍必需的动作”；不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
-- 若命中 `long-run-loop-rules`（Goal 处于 active 且 objective 含完成标记，或用户显式提出 goal / 使用 `/goal` 命令，即使平台无 Goal 目标模式），由循环控制器创建 worker 检测完成标记，未完成则跨线程接力续跑，达上限或死循环则标记 blocked；同样不得把“进一步优化 / 可继续整理 / 总结里的下一步建议 / 未来迭代建议”自动升级成新的执行目标。
 - 当原始用户目标已经完成或用户已给出明确结束指令，且不存在完成原始目标仍必需的动作时，必须停止连续执行并直接结束；不得输出“下一步状态”“下一步建议”“等待用户新指令”“无需继续动作”等任何可能触发循环 loop 的占位区块或扩散性文案，除非用户明确要求后续建议。
 - 若当前运行环境存在 goal / plan / task 等显式状态收口机制，且原始用户目标已经完成或已满足该机制的阻断条件，必须在最终收口前真实执行对应收口动作；只写完成文案不算真正结束运行时状态。Codex goal 仅是其中一种特例。
 

@@ -27,6 +27,10 @@ extensions:
   retrieval_provider: ""
   vector_doc_id: ""
   graph_node_id: ""
+usage_tracking:
+  schema_version: 1
+  counted_files:
+    - PROJECT_MEMORY.md
 ```
 
 ## 字段说明
@@ -60,7 +64,21 @@ extensions:
   context_ids:
     - report.daily
   updated_at: 2026-07-03
+  usage_count: 0
+  last_used_at: null
+  absorbed_to: null
 ```
+
+实体可选计数字段（缺省即 0/null，老实体不报错、无需全量迁移）：
+
+| 字段 | 类型 | 含义 |
+|---|---|---|
+| `usage_count` | `int` | 累计实际引用次数（同会话同实体只 +1） |
+| `usage_days` | `int` | 累计实际引用天数（用于判定"跨 ≥ 2 个日期"） |
+| `last_used_at` | `YYYY-MM-DD` | 最近一次实际引用日期 |
+| `absorbed_to` | `string` | 已吸收到的项目 skill 目录名；非空即冻结计数，不再进吸收候选 |
+
+计数语义、回写时机、防虚报校验与吸收触发统一由 `memory-usage-tracking-rules` 管理。
 
 ### `relations`
 
@@ -133,6 +151,15 @@ extensions:
 - 类型: `object`
 - 含义: 为未来外部记忆系统预留的扩展字段。
 - 当前仅预留，不作为本轮运行依赖。
+
+### `usage_tracking`
+
+- 类型: `object`
+- 含义: 记忆条目的使用次数计数配置（可选键，由 `memory-usage-tracking-rules` 统一管理）。
+- 子键:
+  - `schema_version`: `number`，当前固定为 `1`。
+  - `counted_files`: `list`，纳入计数的记忆文件清单。
+- 规则: 本 skill 只负责原样保留该键，计数回写与吸收触发见 `memory-usage-tracking-rules`。
 
 ## 约束
 

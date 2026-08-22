@@ -1,6 +1,6 @@
 ---
 name: project-memory-rules
-description: 从对话、代码与项目文档中抽取并维护项目本地四件套：`PROJECT_CURRENT.md` 保存项目概览与多会话可交接的当前状态并覆盖更新，`PROJECT_CURRENT.md` 还通过 `<!-- BEGIN RECENT PROJECT SESSIONS -->` 托管区记录最近 5 个同项目会话的只读回忆索引；`PROJECT_MEMORY.md` 保存稳定规则、关键决策和长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。`PROJECT_MEMORY.md` 继续保留兼容的“人类阅读区 + 底部机器索引区”结构，但不再作为当前状态或历史流水的唯一承载文件；不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。
+description: 从对话、代码与项目文档中抽取并维护项目本地四件套：`PROJECT_CURRENT.md` 保存项目概览与多会话可交接的当前状态并覆盖更新，`PROJECT_CURRENT.md` 还通过 BEGIN RECENT PROJECT SESSIONS 托管区记录最近 5 个同项目会话的只读回忆索引；`PROJECT_MEMORY.md` 保存稳定规则、关键决策和长期事实，`PROJECT_HISTORY.md` 只追加关键历史事件。`PROJECT_MEMORY.md` 继续保留兼容的“人类阅读区 + 底部机器索引区”结构，但不再作为当前状态或历史流水的唯一承载文件；不得新增 `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。
 ---
 
 # 项目记忆规则
@@ -111,6 +111,7 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 - `lifecycle`
 - `retrieval_hints`
 - `extensions`
+- `usage_tracking`（可选，由 `memory-usage-tracking-rules` 统一管理）
 
 字段定义与约束统一下沉到：
 
@@ -120,6 +121,10 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 - [memory-extraction-workflow.md](references/memory-extraction-workflow.md)
 - [memory-retrieval-patterns.md](references/memory-retrieval-patterns.md)
 - [memory-conflict-and-staleness.md](references/memory-conflict-and-staleness.md)
+
+## 使用次数计数（委托）
+
+`entities[]` 每个实体可追加 3 个**可选**计数字段：`usage_count`、`last_used_at`、`absorbed_to`，顶层可追加 `usage_tracking` 键。计数语义、回写时机、防虚报校验与吸收触发统一由 `memory-usage-tracking-rules` 管理；本 skill 只负责在维护实体时**原样保留**这些字段（存在则更新，缺失则补默认值），不自行定义计数规则。会话启动全文读取不计入使用次数。
 
 ## 跨项目沉淀判断（可选）
 

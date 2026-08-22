@@ -1,0 +1,24 @@
+interface:
+  display_name: "记忆使用计数与高频吸收"
+  short_description: "统计记忆条目使用次数并按阈值自动吸收为项目 skill"
+  default_prompt: >-
+    使用 $memory-usage-tracking-rules 在任务收口前完成记忆使用计数回写与高频条目吸收判定。
+    计数锚点统一采用机器索引区模式：`PROJECT_MEMORY.md` 扩展现有机器索引区（顶层
+    `usage_tracking` 键 + `entities[]` 追加 `usage_count` / `usage_days` / `last_used_at` /
+    `absorbed_to` 四个可选字段）；`PROJECT_STYLE.md` 与 `PROJECT_HISTORY.md` 在文件底部新增
+    `## 计数锚点区`（yaml `anchors[]`，key 用条目标题或事件主题短语）。仅"实际引用时"计数
+    （条目用于决策、输出、代码、被 skill 引用，或 HISTORY 窄读），会话启动全文读取不计；
+    同会话同条目只 +1，`usage_days` 在当天首次引用时 +1（跨日判定用）。回写前必须跑
+    `scripts/usage_ledger_validate.py` 校验 claim
+    （锚点存在性 + 可定位性 + 去重），`ok=false` 阻断回写防虚报。回写后跑
+    `scripts/scan_absorption_candidates.py` 扫描吸收候选；命中阈值（`usage_count ≥ 3` 且
+    `usage_days ≥ 2` 且 `absorbed_to` 为空且生命周期为 active）时按
+    `references/absorption-trigger.md` 自动吸收：查重 -> `init_skill.py` 生成
+    `project-<slug>-<topic>-rules/` -> 回写原条目标记 `absorbed_to` + 人类区"已沉淀" ->
+    `quick_validate.py` 校验 + 同域冗余扫描 -> 登记 `workbuddy-absorption-map.md` /
+    `source-notes.md` / 当日日志。三条件 PASS/FAIL（quick_validate PASS + 同域扫描 PASS +
+    指针可达）替代人工确认，任一 FAIL 自动回滚。计数只写机器区/计数锚点区，人类区不展示
+    计数；`更新时间`（内容修订）与 `last_used_at`（最近引用）语义分离。吸收后
+    `absorbed_to` 非空即冻结计数，后续引用走 skill。本机制为全局通用，适用于任意使用
+    项目记忆四件套的项目；不自动 git commit（停在已改动未提交状态），每轮只回写当前
+    会话所属项目的记忆文件，不修改其他项目文件。

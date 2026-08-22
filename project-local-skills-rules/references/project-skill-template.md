@@ -39,7 +39,7 @@ description: 当<明确触发条件>时触发。负责<核心职责>；不要用
 - 统一前缀：`project-<项目slug>-`；统一后缀：`-rules`
 - 示例：`project-ellipal-db-rules`、`project-goadmin-api-rules`
 - 保持 ASCII 小写 + 连字符，便于跨平台工具处理与自动命中
-- 落点：用户级 `~/.workbuddy/skills/`（junction 与 luode-skills 仓库同址，勿在项目根另建 `skill/`）
+- 落点：项目根目录 `skills/`（luode-skills 仓库以仓库根为 skill 资产库，直接落根）；命中由项目级 `AGENTS.md` / `CLAUDE.md` 显式引用，不依赖工具专属路径
 
 ## 质量标准（吸收自 skill-autosave）
 

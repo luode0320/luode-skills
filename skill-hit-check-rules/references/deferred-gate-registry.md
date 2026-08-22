@@ -30,6 +30,7 @@
 | `code-context-resync-rules` | 中段改码 | 继续修改已有代码且疑似文件内容漂移 | 条件 | 改前重读文件防脏写 |
 | `autonomous-execution-rules` | 中段推进 | 多步任务尚未闭环且有必需下一步 | 条件 | 自动继续边界 |
 | `long-run-loop-rules` | 中段推进 | Goal 处于 active 且 objective 含完成标记，或用户显式提出 goal / 使用 `/goal` 命令（即使平台无 Goal 目标模式） | 条件 | 循环控制器：创建 worker 检测完成标记，未完成则跨线程接力续跑，达上限/死循环则标记 blocked |
+| `memory-usage-tracking-rules` | 收口前 | 本轮实际引用项目记忆三文件条目（用于决策/输出/代码/被 skill 引用，或 HISTORY 窄读）且非 Plan Mode | 条件 | 收口前回写计数锚点（+1、刷新日期），回写前跑 `usage_ledger_validate.py` 校验 claim；回写后跑 `scan_absorption_candidates.py` 检查吸收候选；无引用则 PASS |
 
 ## 维护约定
 

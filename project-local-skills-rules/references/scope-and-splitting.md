@@ -26,7 +26,7 @@
 - `project-<slug>-redis-usage-rules`：缓存 key 设计、过期策略、并发保护。
 - `project-<slug>-polaris-config-rules`：北极星配置读取、隔离与降级约定。
 
-> 落点统一为用户级 `~/.workbuddy/skills/project-<slug>-<topic>-rules/`（junction 与 luode-skills 仓库同址）。
+> 落点统一为项目根目录 `skills/project-<slug>-<topic>-rules/`（luode-skills 仓库直接落仓库根）。
 
 ## 最小交付
 

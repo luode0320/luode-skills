@@ -40,6 +40,8 @@ description: 当用户要求生成、补齐、刷新、维护项目 swag、更�
 - 单接口文件名优先使用显式中文 `summary`；缺失时允许按受控推导生成短中文说明；若仍无法稳定得到中文说明，可回退到纯路径文件名，但必须在 manifest 中记录 `summary_source: unresolved`。
 - 中文简要说明进入文件名之前，必须先剥离数字前缀、序号包裹符号和无业务意义的开头特殊符号；文件名后缀只保留接口中文简介本体。
 - 头部、请求参数、响应字段的中文说明是强制要求，不允许因为“源码无注释”而长期留空；只能按受控推导规则补齐或阻断通过。
+- `securitySchemes` 必须按鉴权中间件的**真实校验方式**生成，不得套用 `BearerAuth: {type: http, scheme: bearer}` 之类的默认模板：自定义签名头走 `type: apiKey` + `in: header` + 真实头名，description 必须写清签名算法与参与拼接的字段、密钥来源（不写密钥值）、以及免签例外（如内网私有网段直接放行）。判定依据只能是中间件代码，不是"看起来像 token 就写 bearer"。**错的安全方案比缺失更危险**——对接方会照着写并全部 401；本地内网免签不构成"安全方案可以糊弄"的理由（真实事故：53 个 YAML 全量写成 `http bearer`，真实机制是 `Authorization: md5(RequestURI+body+secret)`，直到接口进 apifox 做鉴权用例时才暴露）。
+- 安全方案口径变更属**全量重生成**范围：修正后必须同步刷新所有受影响接口的单接口 YAML 与 `swag/openapi.yaml`，不允许只改用户当前点名的那一个，留下其余接口继续误导对接方。
 - 删除接口后，对 `.swag-manifest.yaml` 中标记为本 skill 生成的旧单接口 YAML 默认清理。
 - 只删除 manifest 标记为本 skill 生成的文件，禁止清理用户手写或来源不明的 YAML。
 - 清理必须按目录和 `source_type` 隔离：根 manifest 只能清理根目录裸文件，上游 manifest 只能清理自身 vendor 目录内裸文件，不得跨目录删除。

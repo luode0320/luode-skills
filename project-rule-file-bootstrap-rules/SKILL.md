@@ -68,6 +68,21 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 - 新项目模板只提供 v4 registry 中空的 `projections` 数组；既有项目首次补齐、会话归属、活动状态、指纹、原子写入和失活均由 `task-plan-rehydration-rules` 负责，本 Skill 不扩大“既有文件不重写”边界。
 - 模板只读预览见 [`references/项目记忆模板/四件套模板.md`](references/项目记忆模板/四件套模板.md)；执行时写入源仍以唯一脚本内的 `PROJECT_CURRENT_TEMPLATE`、`PROJECT_MEMORY_MACHINE_SECTION`、`PROJECT_HISTORY_TEMPLATE` 为准。
 
+## Schema 变更强制检查（强制）
+
+> 教训来源（2026-08-22）：为项目记忆文件新增 `usage_tracking` 计数键时，只改了补齐路径，漏掉「文件不存在→新建」最常走路径（`create_project_memory_file` 内嵌模板）、`PROJECT_HISTORY_TEMPLATE` 计数锚点区与 `BODY_SKILL_AUTO` 计数子节，端到端真实自举测试才抓到三处断点。凡 schema / 结构变更必须按本节执行，否则阻断。
+
+本节适用于对项目记忆文件（`PROJECT_CURRENT.md` / `PROJECT_MEMORY.md` / `PROJECT_HISTORY.md`）或规则文件（`AGENTS.md` / `CLAUDE.md`）的 **schema / 结构变更**：新增、删除、改名键、锚点区、受管章节标题或模板字段。变更是强制检查项，不是可选项：
+
+1. **模板三路联动（缺一即阻断）**：承载该 schema 的全部写入源必须一起改——
+   - 新建路径：`create_project_memory_file` 调用的 `PROJECT_CURRENT_TEMPLATE` / `PROJECT_MEMORY_MACHINE_SECTION` / `PROJECT_HISTORY_TEMPLATE` 内嵌模板；
+   - 补齐路径：幂等补丁列表中的内嵌最小骨架与 yaml 兜底列表（如 `usage_tracking:` / `anchors:`）；
+   - 规则文件路径：对应受管章节 heredoc（如 `BODY_SKILL_AUTO`）及其模板索引 `references/规则文件模板/agents-md-sections-index.md`、`references/项目记忆模板/四件套模板.md`。
+   禁止只改其中一两条路径就收口；漏改「新建路径」是最高频断点。
+2. **真实自举兜底（强制）**：改动落地后必须对临时项目真实运行一次 `scripts/bootstrap_agents.sh --repo $TMP --target default`，分别验证「文件不存在→新建」与「文件已存在→幂等补齐」两条路径，再用 `grep -c` 确认重跑不重复追加。只跑 `bash -n` 语法检查或静态读码不视为兜底；端到端测试抓到的断点，必须回到本节第 1 条修模板后重测。
+3. **仓库模板回写**：变更涉及四件套模板时，同步更新 `references/项目记忆模板/四件套模板.md`，避免模板索引与脚本漂移。
+4. **缺项阻断**：任一路径未联动、未跑真实自举或重跑重复，判定为阻断，不得以口头说明替代。
+
 ## 统一执行步骤
 
 1. 调用唯一入口 `scripts/bootstrap_agents.sh`；Claude Code 使用 `--target claude`，需要同步双平台规则文件时使用 `--target both`，并在根目录以 `AGENTS.md` 覆盖同步 `CLAUDE.md`。
@@ -78,6 +93,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 6. 若脚本失败、只完成部分文件、未核对结果、覆盖非受管内容、`PROJECT_CURRENT.md` 超限、机器索引区未补齐或历史内容被覆盖，判定为阻断。
 7. 若仓库命中 Godot 项目标记，额外核对两个 Godot 受管章节及图片配置中不存在密钥原值。
 8. 若当前服务器未安装 `codegraph`，必须从 `colbymchenry/codegraph` 强制下载安装并对当前项目执行 `codegraph init`；失败则回退不阻塞主任务。该自动准备仍发生在本 skill 的项目自举阶段，不因 owner 合并而提前、延后或取消。
+9. 若本轮涉及项目记忆文件或规则文件 schema / 结构变更（新增、删除、改名键、锚点区、受管章节或模板字段），必须按「Schema 变更强制检查」执行模板三路联动与真实自举兜底；未完成前不进入收口。
 
 ## 脚本用法
 

@@ -80,6 +80,24 @@ if err != nil {
 - 已废弃内容直接标记 `状态: 废弃`。
 - 保持文档紧凑、易扫描。
 
+## 计数锚点区（可选，由 memory-usage-tracking-rules 统一管理）
+
+文件底部固定标题 `## 计数锚点区`，`yaml` fenced block，锚点 key 用条目标题（`### 标题`，稳定可回指）：
+
+```yaml
+version: 1
+anchors:
+  - title: 方法返回空值
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+```
+
+- 只承载计数，不承载全文、证据或历史。
+- 条目标题变更时同步更新锚点 `title`；条目删除时删除对应锚点。
+- 计数回写与吸收触发见 `memory-usage-tracking-rules`，本模板不定义计数规则。
+
 ## 什么算风格
 
 - 项目偏好的命名方式。
