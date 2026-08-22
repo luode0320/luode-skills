@@ -391,3 +391,27 @@
 - 2026-07-15：补充代码生成风格的局部一致性与接口实现对照规则；统一局部上下文只做必要模板替换，接口实现优先参考既有实现，风格契约记录局部证据、参考实现和最小新增内容。
 - 2026-07-16：新增长代码块内步骤注释风格，明确超过 5 行有效代码的代码块必须在块内就近补顶层步骤编号，嵌套超长代码块单独检查。
 - 2026-07-22：新增 PowerShell 使用优先级风格，明确 Windows 下命令入口优先 Git Bash / bash，仅 PowerShell 专项场景才用 PowerShell，且专项场景优先 PowerShell 7（`pwsh`）、Windows PowerShell 5.1 仅阻断回退；canonical 判定随 `windows-wsl-execution-rules` 删除而撤销，现以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。
+
+## 计数锚点区
+
+> 本区由 `memory-usage-tracking-rules` 收口闸门维护：仅"实际引用"条目时 +1（用于决策/输出/代码），会话启动全文读取不计；同会话同条目只 +1；`usage_days` 当天首次引用时 +1。锚点 key 与人类阅读区 `### 标题` 一致，条目新增/删除/改名时同步维护本区。
+
+```yaml
+version: 1
+anchors:
+  - title: 中文优先表达
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: doc 顶层混合命名
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: 根文档命名习惯
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+```

@@ -596,6 +596,10 @@ entities:
     context_ids:
       - context.test-flow
     updated_at: 2026-08-21
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.swag-upstream-openapi
     name: "上游与第三方出站接口文档规则"
     type: "API 文档资产规则"
@@ -2216,6 +2220,11 @@ retrieval_hints:
     package-structure-rules/scripts/placement_catalog.py:
     AGENTS.md:
     CLAUDE.md:
+
+usage_tracking:
+  schema_version: 1
+  counted_files: [PROJECT_MEMORY.md, PROJECT_STYLE.md, PROJECT_HISTORY.md]
+  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md
 
 extensions:
   external_refs:
