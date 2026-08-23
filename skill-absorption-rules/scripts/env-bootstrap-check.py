@@ -14,15 +14,13 @@ references/workbuddy-env-manifest.md 的权威定义，从仓库 assets 自动�
   python3 env-bootstrap-check.py --home-dir <DIR>   # 覆盖 home 目录（测试/模拟新机器）
   python3 env-bootstrap-check.py --repo-root <DIR>  # 覆盖仓库根（默认脚本上溯两级）
 
-检测项（8 项，权威定义见 references/workbuddy-env-manifest.md）：
+检测项（6 项，权威定义见 references/workbuddy-env-manifest.md）：
   1. settings.json  autoCompactEnabled == true
   2. settings.json  hooks.Stop 含 summary-check.py 条目
-  3. 环境变量 CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE == 60
-  4. 环境变量 CODEBUDDY_CODE_MAX_TURNS == 1000
-  5. 环境变量 CODEBUDDY_MAX_RETRIES == 15
-  6. 环境变量 CODEBUDDY_PRE_MESSAGE_COMPACT_PCT == 10
-  7. hook 脚本 ~/.workbuddy/hooks/summary-check.py 存在且与资产一致
-  8. hook 脚本 ~/.workbuddy/hooks/ralph-stop.py 存在且与资产一致
+  3. 环境变量 CODEBUDDY_CODE_MAX_TURNS == 1000
+  4. 环境变量 CODEBUDDY_MAX_RETRIES == 15
+  5. hook 脚本 ~/.workbuddy/hooks/summary-check.py 存在且与资产一致
+  6. hook 脚本 ~/.workbuddy/hooks/ralph-stop.py 存在且与资产一致
 
 安全边界：
   - settings.json 用 merge 写入（只改目标 key，保留其余配置，修改前备份 .bak-<ts>）
@@ -47,11 +45,12 @@ import sys
 
 SETTINGS_REL = os.path.join(".workbuddy", "settings.json")   # 相对 home 目录（真实位置 ~/.workbuddy/settings.json）
 HOOKS_DIR_REL = os.path.join(".workbuddy", "hooks")
+# 注意：已移除 CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE / CODEBUDDY_PRE_MESSAGE_COMPACT_PCT。
+# 这两个变量会把压缩阈值压到 60%/10%，导致频繁提前压缩 + 连续 abort（2026-08-23
+# "频繁乱压缩 / 会话突然结束" 事故根因），禁止再写入，压缩阈值回归平台默认。
 ENV_VARS = {
-    "CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE": "60",
     "CODEBUDDY_CODE_MAX_TURNS": "1000",
     "CODEBUDDY_MAX_RETRIES": "15",
-    "CODEBUDDY_PRE_MESSAGE_COMPACT_PCT": "10",
 }
 HOOK_ASSETS = ["summary-check.py", "ralph-stop.py"]
 SUMMARY_HOOK_TAG = "summary-check-pmw002"
@@ -253,18 +252,12 @@ def fix_hook_file(home_dir, name):
 CHECKS = [
     ("settings.autoCompactEnabled", check_settings_autocompact, fix_settings_autocompact),
     ("settings.hooks.Stop.summary-check", check_settings_stop_hook, fix_settings_stop_hook),
-    ("env.CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE",
-     lambda h: check_env_var("CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE", ENV_VARS["CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE"]),
-     lambda h: fix_env_var("CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE", ENV_VARS["CODEBUDDY_AUTOCOMPACT_PCT_OVERRIDE"])),
     ("env.CODEBUDDY_CODE_MAX_TURNS",
      lambda h: check_env_var("CODEBUDDY_CODE_MAX_TURNS", ENV_VARS["CODEBUDDY_CODE_MAX_TURNS"]),
      lambda h: fix_env_var("CODEBUDDY_CODE_MAX_TURNS", ENV_VARS["CODEBUDDY_CODE_MAX_TURNS"])),
     ("env.CODEBUDDY_MAX_RETRIES",
      lambda h: check_env_var("CODEBUDDY_MAX_RETRIES", ENV_VARS["CODEBUDDY_MAX_RETRIES"]),
      lambda h: fix_env_var("CODEBUDDY_MAX_RETRIES", ENV_VARS["CODEBUDDY_MAX_RETRIES"])),
-    ("env.CODEBUDDY_PRE_MESSAGE_COMPACT_PCT",
-     lambda h: check_env_var("CODEBUDDY_PRE_MESSAGE_COMPACT_PCT", ENV_VARS["CODEBUDDY_PRE_MESSAGE_COMPACT_PCT"]),
-     lambda h: fix_env_var("CODEBUDDY_PRE_MESSAGE_COMPACT_PCT", ENV_VARS["CODEBUDDY_PRE_MESSAGE_COMPACT_PCT"])),
     ("hook.summary-check.py", lambda h: check_hook_file(h, "summary-check.py"),
      lambda h: fix_hook_file(h, "summary-check.py")),
     ("hook.ralph-stop.py", lambda h: check_hook_file(h, "ralph-stop.py"),
@@ -309,7 +302,7 @@ def main():
     log("-" * 60)
 
     if not has_issue:
-        log("全部 8 项配置完备，无需处理。exit=0")
+        log("全部 %d 项配置完备，无需处理。exit=0" % len(CHECKS))
         return 0
 
     if mode == "check":

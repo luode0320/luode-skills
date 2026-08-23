@@ -178,6 +178,15 @@ if __name__ == "__main__":
 - **豁免清单**：Plan Mode（`<proposed_plan>` / `Plan Mode` 标记）；用户明确结束（“结束 / 停止 / 到此为止 / 不要继续 / 不要下一步建议 / 不要扩散 / 终止 / 停手”）；已输出「任务阻断收口」或 `BLK-*`；状态文件 `stop_hook_active=true`；打回次数达上限（3 次 / 10 分钟窗口，防死循环）。
 - **现网先例**：`ralph-stop.py` 自 2026-08-22 部署于同一 `hooks.Stop` 通道，当日调用 188 次、exit code 2 打回机制实测有效，证明该通道在 WorkBuddy 桌面版真实触发。
 
+### 投影中断防护（P0-2 + P1-1，2026-08-23 已部署）
+
+针对「平台中断（连续压缩上限 abort）后会话被伪装成完成」的帮凶链路，`summary-check.py` 在原有「未完成 step 打回」之上新增两层硬检测，二者都只对「投影本该存在/应当继续」的场景打回，不影响无投影的正常会话：
+
+- **P0-2 registry 损坏/空检测**：`registry is None` 时做二级判断——若 `PROJECT_CURRENT.md` 仍残留投影托管痕迹（`BEGIN/END TASK PLAN PROJECTION` marker）但 JSON 解析失败或为空，视为「投影丢失/损坏」，输出显式中断点 + exit code 2 打回；完全无托管痕迹才放行（`no_registry`）。
+- **P1-1 平台中断痕迹检测**：即便投影没有未完成 step（疑似被误标 completed），若 transcript 尾部命中宿主 abort 完整原话 `Aborting session for context compaction` / `stopping compact loop`，也输出显式中断点打回，阻断「已完成」式总结。
+
+**核心口径：平台中断 ≠ 完成。** 中断（连续压缩上限 abort / 超时 / 额度 / 非交互退出）发生时，投影必须保持 `in_progress` / `incomplete`，禁止标记 `completed` 或失活 `inactive`；只有真实验证通过后才能走 `complete` 收口。投影写入端（`task-plan-rehydration-rules`）已同步加固：单条损坏投影写入时被隔离，不再阻塞新会话投影落盘（避免 registry 被整体清空导致 hook 失去防护依据）。
+
 ## 实测注意事项（重要）
 
 - WorkBuddy 官方文档列了 7 类事件（SessionStart / SessionEnd / PreToolUse / PostToolUse / UserPromptSubmit / Stop / PreCompact），但「文档列了」不等于「桌面版真的触发」——配置后必须用真实任务实测确认 `Stop` 的 exit code 2 反馈确实生效。
