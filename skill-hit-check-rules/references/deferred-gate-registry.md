@@ -17,6 +17,7 @@
 | gate skill | 触发检查点 | 任务类型前提（predicate） | 强制/条件 | 兑现说明 |
 |---|---|---|---|---|
 | `reasoning-summary-structure-rules` | 收口前 | 非 Plan Mode 的实质任务轮 | 强制 | 按其固定总结结构输出；恒为 `闸门预告` 成员 |
+| `reasoning-summary-structure-rules`（`SUMMARY-GATE-PMW-002` 任务状态检查） | 收口前 | 本轮存在宿主任务列表任务（TaskList）或投影 registry active projection | 强制 | 收口前校验未完成项：存在未完成必需项时不得“已完成”式收口，继续执行或输出显式中断点 |
 | `comment-rules` | 中段改码 + 收口前 | 本轮有任意代码新增/修改 | 强制 | 改动位点注释补齐闸门，缺项不得收口 |
 | `comment-rules` | 中段改码 | 本轮有任意代码新增/修改 | 强制 | 与上一条联动，判定注释落点与颗粒度 |
 | `code-style-consistency-rules`（`6-review`） | 测试后 | 真实测试完成、准备风格回归 | 强制 | 唯一活动风格回归入口，只输出 STYLE |

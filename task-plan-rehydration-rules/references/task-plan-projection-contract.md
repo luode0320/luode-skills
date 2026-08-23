@@ -53,7 +53,7 @@ v4 registry 顶层字段必须且只能包含：
 
 每个 v4 projection 的字段必须且只能包含：`projection_id`、`session_id`、`projection_origin`、`synthesis_mode`、`state`、`plan_key`、`source_document`、`plan_fingerprint`、`updated_at`、`steps`。`session_id` 非空且原样保存宿主会话 / 线程标识，仅允许出现在该字段；`projection_id` 非空且在 registry 内唯一，推荐使用 `session:<session-id>:<plan-key-hash>`。
 
-旧 v1-v3 projection 读取时必须绑定当前调用解析出的 `session_id` 后包装为 v4 registry；解析顺序固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退，两者冲突、均缺失或非法时失败关闭，不得写入、恢复或迁移。任何成功 `write`、`ensure-start`、`deactivate`、Goal 生命周期或 `migrate` 都统一输出 v4。
+旧 v1-v3 projection 读取时必须绑定当前调用解析出的 `session_id` 后包装为 v4 registry；解析优先级固定为显式 `--session-id` > `CODEX_THREAD_ID` > WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `mcpServers.*.headers["X-WorkBuddy-Session-Id"]` 唯一值，或 `WORKBUDDY_SESSION_ID` 环境变量），多来源不一致、均缺失或非法时失败关闭，不得写入、恢复或迁移。任何成功 `write`、`ensure-start`、`deactivate`、Goal 生命周期或 `migrate` 都统一输出 v4。
 
 每个步骤必须且只能包含 `id`、`step`、`status`。其中 `id` 非空且当前投影内唯一，`step` 非空且最多 256 个 Unicode 字符，`status` 只能为 `pending`、`in_progress` 或 `completed`。常规活动投影最多一个 `in_progress`；常规 `active` 必须有未完成步骤，`inactive` 仅允许空步骤或全部完成步骤。
 
@@ -112,7 +112,7 @@ Goal 投影的 ID、顺序和文案必须与上述三步完全一致，只允许
 
 活动 Goal 的 payload 使用“Goal 任务进度已恢复；进行中步骤必须先核验中断点”。阻断 Goal 的 payload 使用“Goal 当前已阻断；任务列表仅用于观察进度，不恢复执行授权”。常规 persisted/exact/fallback 投影保留各自既有说明。
 
-脚本只生成 payload，不直接调用 UI 工具。主 Agent 固定按“成功持久化 -> 读取返回 payload -> 下一动作调用 `update_plan`”执行；两者之间禁止代码、文档、测试、委派等领域写操作。`update_plan` 失败或不可用时进入 `UI_SYNC_BLOCKED`，保留当前 session projection 并禁止继续领域写入，后续检查点优先重试 UI。Plan Mode 不读取、写入或刷新投影。Goal 投影和 UI 重建均不构成执行授权。
+脚本只生成 payload，不直接调用 UI 工具。主 Agent 固定按“成功持久化 -> 读取返回 payload -> 下一动作同步 UI”执行；两者之间禁止代码、文档、测试、委派等领域写操作。分级阻断语义：投影持久化失败（原子写失败、超限、UTF-8 损坏）、会话归属冲突或不确定（多来源不一致、无匹配投影）、执行状态不明（进行中步骤无法核验）时硬阻断，原文件不变、禁止错投、禁止重放未知写操作；仅 UI 同步通道不可用（`update_plan` 缺失或调用失败，但磁盘投影已成功且会话归属明确）时降级继续：保留磁盘投影、继续领域执行、下一检查点重试 UI，并如实说明；不得声称 UI 已恢复或伪造 UI 同步成功。Plan Mode 不读取、写入或刷新投影。Goal 投影和 UI 重建均不构成执行授权。
 
 ## 首次持久化与会话解析
 
@@ -122,7 +122,7 @@ Goal 投影的 ID、顺序和文案必须与上述三步完全一致，只允许
 ensure-start --project-current PROJECT_CURRENT.md --input projection_or_synthesis_context.json [--session-id <session-id>]
 ```
 
-会话解析顺序固定为显式 `--session-id`，其次为宿主环境 `CODEX_THREAD_ID`。两者同时存在但不一致、任一值非法、或两者都缺失时失败关闭且不得写文件。成功结果必须同时返回绑定当前 session 的 projection 和可直接传给 `update_plan` 的 payload；正式 `write` 也必须返回同样的 payload。
+会话解析优先级固定为显式 `--session-id` > 宿主环境 `CODEX_THREAD_ID` > WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `mcpServers.*.headers["X-WorkBuddy-Session-Id"]` 唯一值，或 `WORKBUDDY_SESSION_ID` 环境变量）。多来源同时存在但不一致、任一值非法、或全部缺失时失败关闭且不得写文件；解析时禁止打印 `CODEBUDDY_MCP_CONFIG` 全文或其中的 token。成功结果必须同时返回绑定当前 session 的 projection 和可直接传给 UI 通道的 payload；正式 `write` 也必须返回同样的 payload。
 
 ## `probe-timeout` 与 Goal 优先超时升级
 
@@ -147,7 +147,7 @@ probe-timeout -> get_goal -> 复用匹配活动 Goal 或 create_goal 一次 -> g
 - `create_goal` 结果不明确时仅允许一次 `get_goal` 复核，不允许无变化重试创建。Goal 创建成功但投影失败时不得再创建 Goal。
 - 任务摘要来源为已确认计划摘要、已确认用户目标或固定兜底文案，必须单行中文且最多 80 个 Unicode 字符。禁止密钥、token、密码、连接串、完整路径、session ID、原始 prompt、原始日志和大段输入；无法可靠脱敏时使用“完成当前已确认的长任务并完成验证收口”。摘要只传给 `create_goal`，不得持久化。
 - Goal 不可用、失败、不匹配或仍不明确时，调用原 `ensure-timeout` 作为降级入口。该入口继续按 `timeout` trigger 生成并原子写入 `exact/fallback` 普通投影，再返回 `escalated` 与 payload；其输入、返回和落盘兼容语义不变。
-- Goal 投影或普通投影持久化成功后才调用 `update_plan`。UI 失败保留磁盘状态且不得宣称已刷新；后续检查点只恢复 UI。
+- Goal 投影或普通投影持久化成功后才同步 UI。仅 UI 同步通道不可用时降级继续：保留磁盘投影、继续领域执行、后续检查点只恢复 UI；不得宣称已刷新或伪造同步成功。
 - 计时事实只属于当前执行上下文，不新增 registry 字段，也不写入投影文案。该链路没有后台唤醒能力，只能在工具返回、阶段进度和回合结束前等可执行检查点调用。
 
 ## Goal CLI 生命周期

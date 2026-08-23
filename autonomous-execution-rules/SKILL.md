@@ -33,14 +33,15 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 ## 默认执行策略
 
 1. 先确认有效计划、完成定义、停止条件、最大推进边界和验证点。
-2. 获得 `confirmed` 后，按当前计划连续推进，不在普通步骤重复询问；无论任务大小，首次领域动作前都先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection，持久化成功后的下一动作必须立即调用 `update_plan`，成功后才允许继续领域动作。
-3. 每个最小任务必须独立满足实施计划完成条件，并完成“实现 -> 真实测试 -> 6-review”，不得批量实现后统一验证；每次状态迁移都先原子更新当前 session projection，再立即刷新悬浮任务列表；刷新失败进入 `UI_SYNC_BLOCKED`，保留 projection 并禁止继续领域写入。
+2. 获得 `confirmed` 后，按当前计划连续推进，不在普通步骤重复询问；无论任务大小，首次领域动作前都先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection，持久化成功后的下一动作必须立即调用 `update_plan`；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域动作，单纯 UI 同步不可用（磁盘投影已成功且归属明确）时保留磁盘投影并继续领域执行，下一检查点重试 UI。
+3. 每个最小任务必须独立满足实施计划完成条件，并完成“实现 -> 真实测试 -> 6-review”，不得批量实现后统一验证；每次状态迁移都先原子更新当前 session projection，再立即刷新悬浮任务列表；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断，单纯 UI 刷新失败进入 `UI_SYNC_BLOCKED` 降级继续：保留磁盘 projection + 继续领域执行，下一检查点重试 UI，不得声称 UI 已刷新。
 4. 当前周期未收口不得跳到后续周期；当前周期收口且仍有计划内必需周期时自动继续。当前投影全部完成后先写为 `inactive`，后续回合不得重放。
-5. 中间进度只说明已完成与正在推进的必需动作，不交还非关键执行权；`update_plan` 成功后才可声称 UI 已刷新；不可用或失败时进入 `UI_SYNC_BLOCKED`，只能说明磁盘 projection 已保存并停止领域写入，后续检查点优先重试。
+5. 中间进度只说明已完成与正在推进的必需动作，不交还非关键执行权；`update_plan` 成功后才可声称 UI 已刷新；不可用或失败但磁盘投影已成功且归属明确时进入 `UI_SYNC_BLOCKED` 降级继续，如实说明磁盘 projection 已保存并继续领域执行，下一检查点优先重试 UI，不得声称 UI 已恢复。
 5.1 十分钟只作缺失 projection 的异常修复闸门：任务已真实执行但当前 session 仍无活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后严格超过 600 秒时，先把资格交给 `task-plan-rehydration-rules` 的只读 `probe-timeout`，随后补建当前 session projection 并立即调用 `update_plan`；不得把 600 秒作为正常任务首次显示悬浮窗的入口。仅 `goal_check_required` 时由当前主 Agent 先 `get_goal`，复用明确匹配的活动 Goal，或在无活动 Goal 时使用脱敏摘要调用一次 `create_goal`；不匹配、不可用、失败或结果不明确时禁止重复创建并降级原 `ensure-timeout` 普通投影。任何 projection 成功持久化后才能调用 `update_plan`。
 6. 遇到关键节点、高风险、越界、冲突或授权不足时立即暂停。
 7. 真实 `blocked/manual_handoff` 先收口运行时状态，再交接结构化事实。
 8. 原始目标完成后只允许三类合法后续；无合法后续时直接结束。
+9. 准备输出最终回复前执行收口前任务状态检查（联动 `reasoning-summary-structure-rules` 的 `SUMMARY-GATE-PMW-002`）：若宿主任务列表仍存在 pending / in_progress 任务，或当前 session projection 存在未完成必需 step，且执行授权为 `confirmed`、无真实阻断 → 必须先继续执行，不得输出“已完成”式总结；因平台硬限制（上下文/token 上限、单回合步数上限、超时、额度、非交互模式进程退出）或真实阻断无法继续时 → 输出显式中断点（已完成清单 + 剩余任务清单 + 下一动作 + 重入入口/投影 ID），禁止“已完成”式收口。
 
 完整执行节奏见 `references/continuation-and-pause.md`。
 

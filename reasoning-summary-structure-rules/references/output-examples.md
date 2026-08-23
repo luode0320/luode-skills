@@ -362,3 +362,94 @@ flowchart LR
 ````
 
 不通过原因：图形虚构了“部署生产”步骤，且与正文的本地验证事实不一致。
+
+## 反例 1（Mermaid 可读性违反·降级通道）
+
+````markdown
+图形目的：展示本轮外部吸收的主流程与每步结论。
+关联 ID：`ABS-DESIGN-20260822`
+
+```mermaid
+flowchart LR
+    A[源: Design v1.0.0<br/>偏好学习模板+2 references] --> B[拆解 8 条原子精华]
+    B --> C[三态裁决<br/>合并6 / 拒绝2]
+    C --> D[用户确认方案]
+    D --> E[落盘: preference-learning reference<br/>+ SKILL.md 流程第2步]
+    E --> F[同域扫描 0 冗余]
+    F --> G[棘轮评分<br/>69.3 → 87.5]
+    G --> H[登记档案 + 删除源 design__skillhub]
+    H --> I[知识库沉淀 + 工作日志]
+    I --> J[改动停在已改动未提交]
+```
+````
+
+不通过原因：
+
+1. 单图节点 10 个，超出 ≤ 8 上限；且未用 `subgraph` 分组，扁平长链难以一眼看清阶段。
+2. 多个节点文字超长（如「源: Design v1.0.0<br/>偏好学习模板+2 references」含 `<br/>` 强行换行、字符数远超 8 个汉字 / 5 个英文单词）。
+3. 缺少 `%%{init:...}%%` 基础字号与间距配置，默认 Mermaid 字号 ≤ 14px，节点挤压看不清。
+4. 整条链路只表达了线性执行；按「裁决 / 落盘 / 验证」用 `subgraph` 分组后，主流程更清晰且每个 `subgraph` 内部 ≤ 3 节点。
+
+## 正例（Mermaid 降级通道·符合可读性约束）
+
+````markdown
+图形目的：展示本轮外部吸收的主流程与每步结论。
+关联 ID：`ABS-DESIGN-20260822`
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '20px', 'fontSizeLabel': '16px'}, 'flowchart': {'nodeSpacing': 50, 'rankSpacing': 70}}}%%
+flowchart LR
+    subgraph 裁决
+        A[源 Design] --> B[三态裁决]
+    end
+    subgraph 落盘
+        C[reference] --> D[SKILL.md]
+    end
+    subgraph 验证
+        E[棘轮 87.5] --> F[同域 0 冗余]
+    end
+    B --> C
+    D --> E
+    F --> G[删源沉淀]
+```
+````
+
+通过要点：
+
+1. `flowchart LR` 横向布局，避免节点纵向挤压。
+2. `%%{init:...}%%` 强制基础字号 20px、节点间距 50、层级间距 70。
+3. 三个 `subgraph` 把「裁决 / 落盘 / 验证」分组，每段 ≤ 3 节点，扁平链变为可读段落。
+4. 每节点 ≤ 5 个汉字 / 3 个英文单词，关键词替代句子；长描述放正文。
+5. 总节点 7 + `subgraph` 3（`subgraph` 不算独立图，仍满足「最多 2 张」红线）。
+
+## 反例 2（渲染通道优先级违反）
+
+````markdown
+图形目的：展示本轮外部吸收的主流程与每步结论。
+关联 ID：`ABS-DESIGN-20260822`
+
+```mermaid
+flowchart LR
+    A[源 Design] --> B[三态裁决] --> C[落盘] --> D[删源沉淀]
+```
+````
+
+不通过原因：宿主工具列表存在 Visualizer / `show_widget` 等内联可视化工具，却仍输出 Mermaid 代码块——Mermaid 在聊天容器中被整图等比缩放，即使配置 `%%{init}%%` 字号也会被容器压小，属于违反「渲染通道优先级」的硬 FAIL；必须改经内联可视化通道输出。
+
+## 正例（渲染通道优先级·内联可视化）
+
+宿主支持 WorkBuddy Visualizer 时，图形化总览经可视化工具输出内联 SVG，正文只保留标注，不输出 Mermaid：
+
+````markdown
+图形目的：展示本轮外部吸收的主流程与每步结论。
+关联 ID：`ABS-DESIGN-20260822`
+
+（此处经可视化工具输出内联 SVG：画布 680px 定宽、节点文字 ≥ 13px、
+节点 ≤ 5 个、按「裁决 / 落盘 / 验证」三阶段分组，不随容器缩放。）
+````
+
+通过要点：
+
+1. 走宿主内联可视化通道，画布定宽不随容器缩放，文字天然清晰。
+2. 正文不重复输出同一张 Mermaid 图，避免双图冗余。
+3. 「图形目的 / 关联 ID」标注照常写在正文、紧邻图形说明。

@@ -9,6 +9,7 @@
 | 浏览器自动化会话 | profile 断开、页面会话失效、浏览器进程退出 | L1 probe | L2 rebind、L3 profile/session reload、L4 受管浏览器 restart、L5 checkpoint resume | 不能清除认证数据或对所有 profile 执行 close-all |
 | 外部工具/本地服务 | 子进程退出、端口不可用、响应格式异常 | L1 probe | L2 reconnect、L4 指定实例 restart | 只能操作当前任务拥有的实例；不能按模糊名称杀进程 |
 | 智能体宿主 | 主进程崩溃、宿主 API 不可用、上下文丢失 | L1 probe | L4 host restart、L5 startup resume | 没有启动续接 hook 时最多报告 restarted，不得承诺任务继续 |
+| WorkBuddy 宿主 | 宿主任务列表工具不可用、UI 同步失败 | L1 probe（磁盘投影校验） | 宿主任务列表同步（任务条目协议）；与 Codex `update_plan` 互斥不双写 | 磁盘投影已成功且会话归属明确时，仅 UI 同步通道问题不阻断领域执行；只保留磁盘投影，不伪造 UI 同步成功，下一检查点重试 UI |
 
 ## 注册准入
 

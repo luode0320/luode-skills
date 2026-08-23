@@ -28,8 +28,9 @@ description: 当当前会话已发生“压缩上下文 / 自动压缩上下文 
 1. 确认压缩已经完成；未完成则不触发。
 2. 读取 `references/context-recovery-contract.md`，按固定顺序恢复规则、项目状态、目标、范围、验证和许可。
 3. 重新读取当前平台规则文件；项目存在 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md` 时按契约读取，不把 `PROJECT_HISTORY.md` 当作默认来源。
-4. `PROJECT_CURRENT.md` 存在任务投影托管区时，先由 `task-plan-rehydration-rules` 按当前 `session_id` 校验有效 `active`/`blocked` projection，并立即真实调用 `update_plan` 重建悬浮任务列表；失活、损坏、过期、工具不可用分别记录状态，不伪报恢复。恢复后的领域动作必须等 UI 同步成功。
-   - 若压缩恢复后许可已为 `confirmed` 但当前 session 没有活动 projection，必须先持久化 `active` 或 `blocked` projection，再立即调用 `update_plan`；任一步失败都进入 `UI_SYNC_BLOCKED`，保留 projection 并禁止继续领域写入。
+4. `PROJECT_CURRENT.md` 存在任务投影托管区时，先由 `task-plan-rehydration-rules` 按当前 `session_id` 校验有效 `active`/`blocked` projection，并立即真实调用 `update_plan` 重建悬浮任务列表；失活、损坏、过期、工具不可用分别记录状态，不伪报恢复。仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域动作；单纯 UI 同步通道不可用（磁盘投影已成功且归属明确）时保留磁盘投影并继续领域执行，下一检查点重试 UI，不得声称 UI 已恢复。
+   - 若压缩恢复后许可已为 `confirmed` 但当前 session 没有活动 projection，必须先持久化 `active` 或 `blocked` projection，再立即调用 `update_plan`；投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断，仅 UI 同步失败时进入 `UI_SYNC_BLOCKED` 降级继续：保留磁盘 projection + 继续领域执行，下一检查点重试 UI，不得声称 UI 已恢复。
+   - 压缩恢复后必须先核对任务状态（联动 `reasoning-summary-structure-rules` 的 `SUMMARY-GATE-PMW-002`）：读取宿主任务列表 pending/in_progress 任务与投影 registry 未完成 step；存在未完成必需项时，恢复后必须继续执行，或输出显式中断点（已完成清单 + 剩余任务清单 + 下一动作 + 重入入口/投影 ID），禁止“压缩后误判已完成”式收口。
 5. 评估近期事实状态：只有明确缺少继续任务所需的最近改动、证据或执行点时才标记 `missing`。
 6. 状态为 `missing` 时条件联动 `recent-context-bootstrap-rules`；`sufficient` 时直接继续，`uncertain` 时先核验现有来源，不得无条件预热。
 7. 输出最小上下文包并交还当前主域。

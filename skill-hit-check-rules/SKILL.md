@@ -19,7 +19,7 @@ description: 【强制总控】每轮用户新消息（含新会话第一条）�
 - 默认执行模式取得 `confirmed` 后，必须先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作只能是立即调用 `update_plan`，不得插入其它领域动作。
 - 非 Plan Mode 的仓库实质任务轮，首条命中列表必须按 `references/deferred-gate-registry.md` + 当前任务类型，用 `闸门预告` 字段登记本轮将适用的延迟触发 gate（`reasoning-summary-structure-rules` 恒为成员），并把强制项列入 `命中技能`；`闸门预告` 是预测，中段按真实改动对账修正，收口按其逐项复核声明与执行是否一致，不得只在回合末端凭自觉临时补触发。
 - 当前处于 Plan Mode 时，命中列表不得包含 `reasoning-summary-structure-rules`，`闸门预告` 置 `不适用(Plan Mode)`；该 Skill 明确判定 `NOT_APPLICABLE`，计划出口只交给 `implementation-planning-rules`。
-- `update_plan` 成功后才放行领域动作；失败或不可用时进入 `UI_SYNC_BLOCKED`，保留当前 session projection 并禁止继续领域写入，下一检查点优先重试同步。`Plan Mode` 不持久化活动 projection，也不调用 `update_plan`；`inactive` projection 不创建悬浮任务列表，禁止跨 session 读取、刷新或覆盖。
+- 仅当投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域动作；`update_plan` 成功后才可声称 UI 已同步，单纯 UI 同步通道不可用（缺失或调用失败，磁盘投影已成功且归属明确）时进入 `UI_SYNC_BLOCKED` 降级继续：保留磁盘 projection + 继续领域执行，下一检查点优先重试 UI，不得声称 UI 已恢复。`Plan Mode` 不持久化活动 projection，也不调用 `update_plan`；`inactive` projection 不创建悬浮任务列表，禁止跨 session 读取、刷新或覆盖。
 - 十分钟只作缺失 projection 的异常修复闸门：任务已真实执行但当前 session 没有活动 projection 时，才先执行只读 `probe-timeout`，随后补建并同步；不作为正常任务首次显示悬浮窗的入口。
 
 ## -1.5 违规处理（强制）

@@ -168,6 +168,16 @@ if __name__ == "__main__":
 - 本脚本只在「缺少总结容器」或「有异步信号但缺异步小节」两种明确缺口时打回；Agent 补写后即可通过，不会无限循环。
 - 如需更强防死循环，可在 `Stop` payload 的 `stop_hook_active` 字段为 true（表示已处于 stop hook 反馈循环）时直接放行一次，避免重复打回。
 
+### 任务状态检查（SUMMARY-GATE-PMW-002，已部署）
+
+除「缺总结容器打回」外，Stop 通道还承载「收口前任务状态检查」：agent 准备停止时若当前会话仍有未完成任务，则打回继续，把「模型自觉检查任务清单」升级为「平台强制」。
+
+- **已部署脚本**：`~/.workbuddy/hooks/summary-check.py`（用户级 `settings.json` 的 `hooks.Stop` 第二条，与 ralph-loop 的 `ralph-stop.py` 并列、互不干扰；ralph 管 loop-state.md 循环，summary-check 管收口前任务状态检查）。
+- **数据源**：`<cwd>/PROJECT_CURRENT.md` 的 v4 投影 registry（`BEGIN TASK PLAN PROJECTION` JSON 区块），按 Stop payload 的 `session_id`（缺失时回退 `WORKBUDDY_SESSION_ID` / `CODEBUDDY_MCP_CONFIG` 的 `X-WorkBuddy-Session-Id`）匹配当前会话 `active` / `blocked` projection。
+- **打回条件**：存在未完成 step（pending / in_progress）且未命中豁免 → stderr 注入剩余任务清单 + exit code 2。
+- **豁免清单**：Plan Mode（`<proposed_plan>` / `Plan Mode` 标记）；用户明确结束（“结束 / 停止 / 到此为止 / 不要继续 / 不要下一步建议 / 不要扩散 / 终止 / 停手”）；已输出「任务阻断收口」或 `BLK-*`；状态文件 `stop_hook_active=true`；打回次数达上限（3 次 / 10 分钟窗口，防死循环）。
+- **现网先例**：`ralph-stop.py` 自 2026-08-22 部署于同一 `hooks.Stop` 通道，当日调用 188 次、exit code 2 打回机制实测有效，证明该通道在 WorkBuddy 桌面版真实触发。
+
 ## 实测注意事项（重要）
 
 - WorkBuddy 官方文档列了 7 类事件（SessionStart / SessionEnd / PreToolUse / PostToolUse / UserPromptSubmit / Stop / PreCompact），但「文档列了」不等于「桌面版真的触发」——配置后必须用真实任务实测确认 `Stop` 的 exit code 2 反馈确实生效。

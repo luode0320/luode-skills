@@ -31,6 +31,8 @@ LOCK_WAIT_SECONDS = 0.05
 TIMEOUT_SECONDS = 600.0
 INACTIVE_PROJECTION_RETENTION_SECONDS = 604_800
 SESSION_ENV_NAME = "CODEX_THREAD_ID"
+WORKBUDDY_SESSION_ENV_NAME = "WORKBUDDY_SESSION_ID"
+WORKBUDDY_MCP_CONFIG_ENV_NAME = "CODEBUDDY_MCP_CONFIG"
 EXPLANATION = "悬浮任务列表已从 PROJECT_CURRENT 重建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_EXACT = "悬浮任务列表已根据当前会话与项目文档正式补建；进行中步骤必须先核验中断点"
 EXPLANATION_SYNTH_FALLBACK = "悬浮任务列表已根据当前会话与项目文档生成安全恢复列表；进行中步骤必须先核验中断点"
@@ -125,6 +127,44 @@ def _require_session_id(value: Any) -> str:
     return resolve_session_id(value)
 
 
+def _resolve_workbuddy_session_id(source: Mapping[str, str]) -> str | None:
+    """从 WorkBuddy 宿主元数据解析唯一会话标识，禁止泄露配置原文。
+
+    [参数] source: 环境映射（通常为 os.environ）。
+    [返回] str | None：仅当 `CODEBUDDY_MCP_CONFIG` 中所有会话标识去重后
+        恰好唯一且通过格式校验时返回该值，否则返回 None 视为不可用。
+    最近修改时间：2026-08-23 00:00:00；改动原因：让会话解析链支持 WorkBuddy 宿主回退且不打印令牌。
+    """
+    # 1. 只提取会话 ID，绝不输出配置全文或任何 token 原值；解析失败一律视为不可用。
+    candidates: dict[str, str] = {}
+    config_text = source.get(WORKBUDDY_MCP_CONFIG_ENV_NAME)
+    if config_text:
+        try:
+            config = json.loads(config_text)
+        except (TypeError, ValueError):
+            config = None
+        if isinstance(config, Mapping):
+            servers = config.get("mcpServers")
+            if isinstance(servers, Mapping):
+                for server in servers.values():
+                    if not isinstance(server, Mapping):
+                        continue
+                    headers = server.get("headers")
+                    if not isinstance(headers, Mapping):
+                        continue
+                    header_value = headers.get("X-WorkBuddy-Session-Id")
+                    if isinstance(header_value, str) and header_value.strip():
+                        candidates[header_value] = header_value
+    # 2. 多个不同值视为不可用；唯一值仍需通过受控会话标识校验。
+    unique_values = list(candidates)
+    if len(unique_values) != 1:
+        return None
+    try:
+        return _validate_session_id(unique_values[0])
+    except ProjectionContractError:
+        return None
+
+
 def resolve_session_id(
     value: Any = None,
     *,
@@ -134,24 +174,45 @@ def resolve_session_id(
     """解析当前会话标识，冲突或缺失时失败关闭。
 
     [参数] value: 可选显式会话标识；environ: 可选环境映射；required: 是否要求最终存在标识。
-    [返回] str | None：显式参数或 `CODEX_THREAD_ID` 的受控值。
-    最近修改时间：2026-07-26 00:00:00；改动原因：让宿主会话自动绑定任务投影并拒绝身份冲突。
+    [返回] str | None：显式参数、`CODEX_THREAD_ID` 或 WorkBuddy 元数据的受控值。
+    最近修改时间：2026-08-23 00:00:00；改动原因：会话解析链增加 WorkBuddy 宿主回退并对任意来源冲突失败关闭。
     """
     # 1. 显式值先校验；环境变量存在时也校验，禁止空值或非法内容绕过安全边界。
     explicit = _validate_session_id(value) if value is not None else None
     source = os.environ if environ is None else environ
-    env_present = SESSION_ENV_NAME in source
-    env_value = _validate_session_id(source.get(SESSION_ENV_NAME)) if env_present else None
-    # 2. 两个来源同时存在但不一致时立即停止，不猜测归属。
-    if explicit is not None and env_value is not None and explicit != env_value:
+    codex_present = SESSION_ENV_NAME in source
+    codex_value = _validate_session_id(source.get(SESSION_ENV_NAME)) if codex_present else None
+    # 2. 显式值与 CODEX 冲突沿用既有失败文案；随后统一收集全部来源做一致性判定。
+    if explicit is not None and codex_value is not None and explicit != codex_value:
         raise ProjectionContractError("session_id conflicts with CODEX_THREAD_ID")
+    workbuddy_env_present = WORKBUDDY_SESSION_ENV_NAME in source
+    workbuddy_env_value = (
+        _validate_session_id(source.get(WORKBUDDY_SESSION_ENV_NAME))
+        if workbuddy_env_present
+        else None
+    )
+    workbuddy_mcp_value = _resolve_workbuddy_session_id(source)
+    candidates: list[tuple[str, str]] = []
     if explicit is not None:
-        return explicit
-    if env_value is not None:
-        return env_value
+        candidates.append(("--session-id", explicit))
+    if codex_value is not None:
+        candidates.append((SESSION_ENV_NAME, codex_value))
+    if workbuddy_mcp_value is not None:
+        candidates.append((WORKBUDDY_MCP_CONFIG_ENV_NAME, workbuddy_mcp_value))
+    if workbuddy_env_value is not None:
+        candidates.append((WORKBUDDY_SESSION_ENV_NAME, workbuddy_env_value))
+    # 3. 任意两个来源存在且不一致时立即停止，不猜测归属。
+    unique_values = {candidate_value for _, candidate_value in candidates}
+    if len(unique_values) > 1:
+        source_names = sorted(name for name, _ in candidates)
+        raise ProjectionContractError(
+            f"session_id conflicts across sources: {', '.join(source_names)}"
+        )
+    if candidates:
+        return candidates[0][1]
     if required:
         raise ProjectionContractError(
-            "session_id is required; pass --session-id or set CODEX_THREAD_ID"
+            "session_id is required; pass --session-id, set CODEX_THREAD_ID or set WORKBUDDY_SESSION_ID"
         )
     return None
 
@@ -1564,7 +1625,7 @@ def ensure_start_projection(
 
     [参数] path: PROJECT_CURRENT 路径；input_value: 正式投影或 start/continue 补建上下文；session_id: 当前会话。
     [返回] dict：创建、保留或更新动作、投影和可直接调用的 payload。
-    最近修改时间：2026-07-26 00:00:00；改动原因：持久化任务后强制进入悬浮任务列表同步检查点。
+    最近修改时间：2026-08-23 00:00:00；改动原因：合成上下文缺 trigger 时默认按 start 处理，timeout 仍仅属异常修复入口。
     """
     # 1. 先解析当前会话；没有显式参数时只允许使用宿主 CODEX_THREAD_ID。
     sid = _require_session_id(session_id)
@@ -1597,6 +1658,8 @@ def ensure_start_projection(
             if candidate["state"] != "active":
                 raise ProjectionContractError("ensure-start requires an active projection")
         else:
+            if isinstance(input_value, Mapping) and "trigger" not in input_value:
+                input_value = {**input_value, "trigger": "start"}
             context = _normalize_context(input_value)
             if context["trigger"] == "timeout":
                 raise ProjectionContractError("ensure-start requires start or continue trigger")
