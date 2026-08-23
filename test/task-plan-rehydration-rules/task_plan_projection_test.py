@@ -2159,6 +2159,84 @@ class TaskPlanProjectionTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("request_user_input", planning_coverage)
 
+    def test_upsert_isolates_corrupt_projection_and_writes_new_session(self) -> None:
+        """验证损坏的旧投影（指纹不一致）不会阻塞新会话投影落盘（写入路径隔离降级）。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-08-23；改动原因：修复「旧投影指纹损坏阻塞新 session 写入」导致 registry 空。
+        """
+        # 1. 构造含「坏投影（指纹损坏）+ 好投影」的 v4 registry 文件，坏项在前。
+        #    inactive 投影要求 steps 全部 completed，故这里用全完成状态构造合法样本；
+        #    updated_at 用近期时间，避免好项被 7 天保留窗口误清理（坏项在隔离阶段即被剔除）。
+        done = ("completed", "completed", "completed")
+        recent = "2026-08-22T00:00:00Z"
+        good = self._sample_v4_entry("good-session", statuses=done, state="inactive", updated_at=recent)
+        corrupt = dict(self._sample_v4_entry("corrupt-session", statuses=done, state="inactive", updated_at=recent))
+        corrupt["plan_fingerprint"] = "0" * 64  # 满足 64 位 hex 格式，但与 steps 不一致
+        registry = {
+            "version": 4,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-07-20T00:00:00Z",
+            "projections": [corrupt, good],
+        }
+        root = Path(tempfile.mkdtemp())
+        path = root / "PROJECT_CURRENT.md"
+        registry_json = json.dumps(registry, ensure_ascii=False, indent=2)
+        path.write_text(
+            "# 项目当前状态\n\n用户正文。\n"
+            + "\n".join(
+                (
+                    projection.BEGIN_MARKER,
+                    "```json",
+                    registry_json,
+                    "```",
+                    projection.END_MARKER,
+                )
+            ),
+            encoding="utf-8",
+            newline="",
+        )
+
+        # 2. 严格读取应报错（坏项导致整体失败），验证这是隔离降级的触发前提。
+        with self.assertRaises(projection.ProjectionContractError):
+            projection.extract_registry(path.read_text(encoding="utf-8"), session_id="new-session")
+
+        # 3. 写入新会话投影，不应因坏项而失败，坏项被隔离、好项保留、新项写入。
+        new_proj = self._sample_v4_projection("new-session")
+        projection.upsert_projection(path, new_proj, session_id="new-session")
+        result = projection.extract_registry(path.read_text(encoding="utf-8"), session_id="new-session")
+        session_ids = {entry["session_id"] for entry in result["projections"]}
+        self.assertIn("new-session", session_ids)
+        self.assertIn("good-session", session_ids)
+        self.assertNotIn("corrupt-session", session_ids)  # 坏项已被隔离
+
+    def test_tolerant_extract_rejects_top_level_contract_violation(self) -> None:
+        """验证隔离降级仍对顶层契约违规保持严格（不误吞版本/schema 错误）。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-08-23；改动原因：确保隔离只针对单条投影，不放宽顶层契约。
+        """
+        # 1. 构造 version 字段错误的 v4 registry，隔离降级必须仍然报错。
+        registry = {
+            "version": 3,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-07-20T00:00:00Z",
+            "projections": [],
+        }
+        document = "# x\n" + "\n".join(
+            (
+                projection.BEGIN_MARKER,
+                "```json",
+                json.dumps(registry, ensure_ascii=False, indent=2),
+                "```",
+                projection.END_MARKER,
+            )
+        )
+        with self.assertRaises(projection.ProjectionContractError):
+            projection._extract_registry_tolerant(document, session_id="new-session")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
