@@ -1,0 +1,13 @@
+{
+  "slug": "unclecheng-garbage-cleanup-master",
+  "name": "垃圾清理大师",
+  "version": "1.1.0",
+  "installedAt": 1787413120376,
+  "source": "skillhub",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7920727c-4e7d-496a-9223-d9c6673e9e53.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\unclecheng-garbage-cleanup-master__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7920727c-4e7d-496a-9223-d9c6673e9e53.png"
+}

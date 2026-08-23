@@ -1,0 +1,11 @@
+{
+  "slug": "self-dev-regex",
+  "name": "正则表达式编写",
+  "version": "1.0.1",
+  "installedAt": 1787413212570,
+  "source": "skillhub",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "iconDownloadFailedAt": 1787461662392
+}
