@@ -42,6 +42,7 @@ flowchart LR
   - 对高复用通用代码执行保守策略：最近修改超过 7 天时，默认新增能力，不直接改旧行为。
   - 最小改动 ≠ 打补丁：修复 Bug 时不得以"最小改动"为由在表层加特判/吞异常/对坏数据兜底来绕过根因；较大重构按 `bug-fix-proposal-rules` 先提方案确认。
   - 完成后复查是否混入无关重构、无关格式化、无关命名调整、无关清理。
+  - 当"删除某代码 / 功能 / 模块"是本轮明确目标时，执行**彻底删除（remove 语义）**：同步清理调用点、测试、配置与文档提及，禁止创建 `xxxv2` 类"删除版本"备份，禁止在记忆或文档中写入"已删除 / 禁止使用"残留描述；细则见 `references/code-removal-discipline.md`。此条与"阻断顺手清理旧代码"互补：前者防少删（被要求删的要删干净），后者防多删（没被要求删的别删）。
 
 ### 主线 2：可读性（readability）
 
@@ -127,3 +128,4 @@ flowchart LR
 
 - 最小改动主线：默认读 `references/minimal-change-general.md`；边界不清读 `references/minimal-change-boundaries.md`；越界判断读 `references/minimal-change-examples.md`。
 - 可读性主线：默认读 `references/readability-general.md`；函数结构读 `references/function-structure-rules.md`；正反例读 `references/readability-examples.md`。
+- 本轮涉及删除代码 / 功能 / 模块时，读 `references/code-removal-discipline.md`。

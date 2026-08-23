@@ -1,6 +1,6 @@
 ---
 name: browser-use-cloud-rules
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。当浏览器任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身浏览或服务商提供的合规验证码处理能力，或用户明确点名 Browser Use Cloud 时触发。作为 Browser Use Cloud 执行、安全、费用确认和 session 生命周期的唯一 Owner，负责检查 `BROWSER_USE_API_KEY`、Billing 余额、运行时 MCP 工具 schema 的硬费用上限、逐次 `run_session` / `send_task` 确认、默认无 profile/录制/保活，以及任务结束后的停止与费用回读。普通网页检索、真实 Chrome 登录态、应用内 Browser、DevTools 调试、本地 agent-browser、HAR/视觉 diff/trace 不使用本 Skill；不得用 Cloud 绕过权限、安全策略或真实浏览器连接失败。
+description: 凭据默认来源为 `~/.browser-use/.env`（单一权威，junction 指向 Google Drive 同步目录），环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。当项目程序需要操作公网浏览器（https 有域名站点）——通过 Browser Use Cloud REST API 提交/轮询/停止浏览器任务——或浏览器任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身浏览或服务商提供的合规验证码处理能力，或用户明确点名 Browser Use Cloud 时触发。作为 Browser Use Cloud 执行、安全、费用确认和 session 生命周期的唯一 Owner，负责检查 `BROWSER_USE_API_KEY`、Billing 余额、运行时 MCP 工具 schema 的硬费用上限、逐次 `run_session` / `send_task` 确认、默认无 profile/录制/保活，以及任务结束后的停止与费用回读。普通网页检索、真实 Chrome 登录态、应用内 Browser、DevTools 调试、本地 agent-browser、本地 URL/本地页面交互、HAR/视觉 diff/trace 不使用本 Skill；不得用 Cloud 绕过权限、安全策略或真实浏览器连接失败。
 ---
 
 # Browser Use Cloud 安全路由规则
@@ -16,13 +16,46 @@ description: 凭据默认来源为项目代码/项目配置/普通维护文档�
 
 1. 冻结任务摘要、目标域名、读写动作、业务副作用和预期完成条件。
 2. 读取 [routing-and-safety.md](references/routing-and-safety.md)，复核 Cloud 正向条件、禁止替代场景和 MCP 配置边界。
-3. 检查 `BROWSER_USE_API_KEY` 的可用性；默认凭据来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖。只报告存在或缺失，不读取其它凭据来源。
+3. 检查 `BROWSER_USE_API_KEY` 的可用性；默认凭据来源为 `~/.browser-use/.env`（单一权威），环境变量仅作运行时覆盖。只报告存在或缺失，不读取其它凭据来源，不回显 key 原值。
 4. 从当前 Browser Use Cloud MCP 工具描述取得本次收费动作的真实 JSON schema：创建任务读取 `run_session`，追加任务读取 `send_task`；不得根据 REST 文档猜测 MCP 已支持同名参数。
 5. 运行 `scripts/browser_use_cloud_preflight.py` 查询 Billing 并检查当前动作的可写 input schema。只有 `ready_for_confirmation` 可进入普通费用确认。
 
 密钥缺失时固定输出：
 
-> Browser Use Cloud 已命中，但未检测到 `BROWSER_USE_API_KEY`。请从 Browser Use Cloud 设置页取得 key，在项目代码/配置或本机用户环境变量中配置后重启；不要在聊天中粘贴 key。
+> Browser Use Cloud 已命中，但未检测到 `BROWSER_USE_API_KEY`。请从 Browser Use Cloud 设置页取得 key，写入 `~/.browser-use/.env`（一行 `BROWSER_USE_API_KEY=xxx`，模板见 `scripts/.env.example`）；不要在聊天或仓库中粘贴 key。
+
+## REST API 操作通道（项目程序）
+
+面向「项目程序需要操作公网浏览器」的场景：程序化提交浏览器任务、轮询结果、停止任务、查询余额。使用 REST API v2 而非 MCP 时走本通道：
+
+- 操作指南（端点、状态机、curl/Python 集成、模型定价）：[references/api-operations.md](references/api-operations.md)。
+- 命令行助手（自动从 `~/.browser-use/.env` 加载密钥）：
+
+  ```bash
+  scripts/browser-use.sh "打开 example.com 提取主标题"     # 提交并等待结果
+  scripts/browser-use.sh --no-wait "搜索 AI 新闻"          # 只提交，返回 TASK_ID
+  scripts/browser-use.sh --balance                         # 查询余额（只读）
+  scripts/browser-use.sh --check                           # 环境自检（只读）
+  ```
+
+- REST 通道同样受本 Skill 全部安全闸门约束：任何收费动作前完成费用确认；任务结束后停止遗留任务并回读费用；禁止上传登录态/绕过站点限制。
+- 项目程序直接调用 API 时，需在程序内自行实现 SKILL.md 的密钥检查、费用确认与结果收口（参考 `api-operations.md` 的 Python 示例）。
+
+## 环境自检
+
+凭据存储路径是环境依赖（`~/.browser-use` junction → `D:\谷歌云盘\browser-use`，换机器需重建），检测 / 配置 / 验证：
+
+```bash
+# 检测：脚本自检（缺失时输出缺什么，只读不消费额度）
+bash browser-use-cloud-rules/scripts/browser-use.sh --check
+
+# 配置：创建密钥文件（幂等；把真实 key 替换 your-key-here）
+mkdir -p ~/.browser-use && cp browser-use-cloud-rules/scripts/.env.example ~/.browser-use/.env
+#   然后编辑 ~/.browser-use/.env 填入真实 key；Windows 建议 icacls 限制本用户读写
+
+# 验证：自检全部 [ok] 且 --balance 返回脱敏余额摘要（正确端点 GET /billing/account，/credits 已下线）
+bash browser-use-cloud-rules/scripts/browser-use.sh --check && bash browser-use-cloud-rules/scripts/browser-use.sh --balance
+```
 
 ## 预检命令
 
@@ -80,4 +113,13 @@ python -X utf8 -B browser-use-cloud-rules/scripts/browser_use_cloud_preflight.py
 
 - 单元测试：`python -X utf8 -B -m unittest discover -s test/browser-use-cloud-rules -p "*_test.py"`。
 - Skill 校验：`python -X utf8 -B .system/skill-creator/scripts/quick_validate.py browser-use-cloud-rules`。
+- REST 通道：`bash -n browser-use-cloud-rules/scripts/browser-use.sh`（语法）+ `bash browser-use-cloud-rules/scripts/browser-use.sh --check`（环境自检，不消费额度）。
 - 测试只能使用 loopback local mock 和哨兵 key，不调用真实 Browser Use Cloud，不消费额度；必须覆盖两种收费动作的独立 schema、output schema 误判、三类任务结果清理、`strategy="session"`、最终 stopped 状态和实际费用回读。
+
+## References
+
+- `references/routing-and-safety.md`：路由判定、MCP 配置、默认参数、确认与清理契约。
+- `references/api-operations.md`：REST API v2 操作指南（端点、状态机、curl/Python 集成、模型定价）。
+- `scripts/browser-use.sh`：REST 命令行助手（提交/轮询/余额/自检）。
+- `scripts/browser_use_cloud_preflight.py`：MCP 路径 Billing 与 schema 预检。
+- 外部路由矩阵：`mcp-installation-rules/references/tool-priority.md`。

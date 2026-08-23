@@ -43,7 +43,7 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 ## 默认执行流程
 
 1. 默认先读 `references/regression-scope-selection.md`，确定回归范围和用例选取方式。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认根 `test/` 镜像、测试主文档、测试主文档、证据目录和同一轮回归是否继续复用同一证据根目录。
+2. 修复型回归在决定"测试写在哪里、是否值得写"时，先读 `references/correct-seam.md`，按「正确接缝 + 修复前失败测试 + 重跑原始场景」纪律锁定回归资产；再读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`，确认根 `test/` 镜像、测试主文档、测试主文档、证据目录和同一轮回归是否继续复用同一证据根目录。
 3. 如果问题归属不清，可能混入功能验证或联调问题，再读 `references/regression-boundaries.md`。
 4. 输出回归结论、风险项和未覆盖说明时，再读 `references/regression-template-and-examples.md`。
 5. 给出回归通过、驳回或待补测结论，并明确是否需要回流编码域、Bug 域、联调域或测试策略域。
@@ -82,6 +82,7 @@ description: 当 Bug 修复、原有功能迭代、公共模块修改、共享�
 ## references 读取规则
 
 - 默认先读 `references/regression-scope-selection.md`。
+- 修复型回归需要判断测试接缝、修复前失败测试与收尾清理时，再读 `references/correct-seam.md`。
 - 在定位根 `test/` 镜像、测试主文档、测试主文档、证据目录或判断是否继续沿用同一轮回归根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在功能验证、联调验证、回归验证边界不清时，再读 `references/regression-boundaries.md`。
 - 只有在需要回归结论模板和样例时，再读 `references/regression-template-and-examples.md`。

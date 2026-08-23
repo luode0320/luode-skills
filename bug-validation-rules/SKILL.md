@@ -41,8 +41,9 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 4. 需要对照边界或正反例时，再读 `references/validation-template.md`，需要输出统一修复验证结论模板。
 5. 输出修复验证结论、未覆盖说明、关联测试目录和关闭建议。
 6. 接口类 Bug 在 apifox 中执行 `test-case run` 验证，并补/更新对应接口测试用例作为回归资产（用例落地 apifox「AI 团队」对应项目）；代码级验证在本地执行。
-7. 将本轮验证结论写回当前 Bug 主文档。
-8. 若发现兼容性和旧能力风险，继续转 `test-regression-rules`；若验证未通过，则回流编码域或 `bug-fix-proposal-rules`。
+7. 形成关闭建议后、正式关闭前，读 `references/post-mortem.md` 做一次修复后复盘，确认"什么能阻止这个 Bug"及是否需要架构后续项。
+8. 将本轮验证结论写回当前 Bug 主文档。
+9. 若发现兼容性和旧能力风险，继续转 `test-regression-rules`；若验证未通过，则回流编码域或 `bug-fix-proposal-rules`。
 
 ## 权责边界与不负责事项
 
@@ -78,6 +79,7 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 ## references 读取规则
 
 - 默认先读 `references/validation-checklist.md`。
+- 修复验证通过后、关闭 Bug 前，再读 `references/post-mortem.md` 做修复后复盘。
 - 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 判断与相邻测试 skill 的边界 时，再读 `references/validation-boundaries.md`。
 - 只有在 套用验证结论模板或对照样例 时，再读 `references/validation-template.md`。

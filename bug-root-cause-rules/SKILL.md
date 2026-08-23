@@ -36,7 +36,7 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 
 1. 默认先读 `references/static-analysis-path.md`，按静态定位路径逐步收敛。
 2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
-3. 如果需要判断根因结论是否成立，再读 `references/root-cause-evidence.md`。
+3. 在开始多候选假设比较前，先读 `references/root-cause-catalog.md` 扫一遍常见根因类别候选池（含第三方库 / runtime / 数据损坏边界场景），再读 `references/hypothesis-ranking.md`，按「3-5 个排序假设 + 可证伪预测 + 给用户看」纪律展开；若要判断根因结论是否成立，再读 `references/root-cause-evidence.md`。
 4. 如果需要判断是否已经到达静态定位极限，再读 `references/when-to-stop-static-analysis.md`。
 5. 输出根因结论、证据链或“证据不足需升级运行时诊断”的结论。
 6. 将本轮静态定位路径、关键证据和结论写回当前 Bug 主文档。
@@ -73,6 +73,7 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 ## references 读取规则
 
 - 默认先读 `references/static-analysis-path.md`。
+- 在生成多候选根因假设前，先扫 `references/root-cause-catalog.md` 的常见根因类别清单，再读 `references/hypothesis-ranking.md` 做排序或可证伪判断。
 - 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估根因证据是否成立时，再读 `references/root-cause-evidence.md`。
 - 只有在判断是否该停止静态分析时，再读 `references/when-to-stop-static-analysis.md`。

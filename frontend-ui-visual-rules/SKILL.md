@@ -40,15 +40,16 @@ description: 当新增或修改前端页面、页面布局、主题样式、配�
 ## 默认执行流程
 
 1. 默认先读 `references/ui-priority-model.md`，先按优先级确定本次界面该先修什么。
-2. 如果当前任务是新页面、新首页、新后台或要重新定界面气质，先读 `references/aesthetic-direction-rules.md`，明确用途、语气、记忆点和表达强度。
-3. 如果当前任务要进一步匹配页面类型、产品场景和风格边界，再读 `references/page-style-and-scenario.md`。
-4. 如果内部规则仍不足以确定风格方向、产品风格映射或配色字体方案，再读 `references/design-search-workflow.md`，并按需运行本 skill 内置的 `scripts/search.py`。
-5. 如果当前任务涉及版式、断点、容器、手机端适配和滚动体验，再读 `references/layout-responsive-rules.md`。
-6. 如果当前任务涉及点击反馈、无障碍、动效、加载态和表单交互，再读 `references/interaction-accessibility-rules.md`。
-7. 如果当前任务涉及主题、配色、字体、图标和设计 token，再读 `references/color-typography-icon-rules.md`。
-8. 如果当前任务涉及表单、导航、图表、数据展示和空态，再读 `references/forms-nav-data-display-rules.md`。
-9. 完成前默认再读 `references/ui-delivery-checklist.md` 做一轮交付前 UI 自审。
-10. 若本轮修改前端代码文件，完成前必须确认 `comment-rules`（位置颗粒度 + 补齐闸门分区）、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
+2. 用户已有视觉偏好或本轮收到视觉反馈时，先读 `references/visual-preference-learning.md`：有历史偏好则按四分类查询既有条目作为风格方向输入；本轮有新反馈则按其中判定标准决定是否沉淀。
+3. 如果当前任务是新页面、新首页、新后台或要重新定界面气质，先读 `references/aesthetic-direction-rules.md`，明确用途、语气、记忆点和表达强度。
+4. 如果当前任务要进一步匹配页面类型、产品场景和风格边界，再读 `references/page-style-and-scenario.md`。
+5. 如果内部规则仍不足以确定风格方向、产品风格映射或配色字体方案，再读 `references/design-search-workflow.md`，并按需运行本 skill 内置的 `scripts/search.py`。
+6. 如果当前任务涉及版式、断点、容器、手机端适配和滚动体验，再读 `references/layout-responsive-rules.md`。
+7. 如果当前任务涉及点击反馈、无障碍、动效、加载态和表单交互，再读 `references/interaction-accessibility-rules.md`。
+8. 如果当前任务涉及主题、配色、字体、图标和设计 token，再读 `references/color-typography-icon-rules.md`。
+9. 如果当前任务涉及表单、导航、图表、数据展示和空态，再读 `references/forms-nav-data-display-rules.md`。
+10. 完成前默认再读 `references/ui-delivery-checklist.md` 做一轮交付前 UI 自审。
+11. 若本轮修改前端代码文件，完成前必须确认 `comment-rules`（位置颗粒度 + 补齐闸门分区）、`code-style-consistency-rules` 已执行；任一缺失不得给“已完成前端改动”结论。
 
 ## 权责边界与不负责事项
 
@@ -83,6 +84,7 @@ description: 当新增或修改前端页面、页面布局、主题样式、配�
 ## references 读取规则
 
 - 默认先读 `references/ui-priority-model.md`。
+- 用户已有视觉偏好或本轮收到视觉反馈时，先读 `references/visual-preference-learning.md`。
 - 只有在需要先收敛审美方向、语气和页面记忆点时，再读 `references/aesthetic-direction-rules.md`。
 - 只有在定风格方向时，再读 `references/page-style-and-scenario.md`。
 - 只有在需要借助合并后的外部种子搜索风格方向时，再读 `references/design-search-workflow.md`。

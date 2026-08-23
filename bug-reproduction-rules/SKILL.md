@@ -35,10 +35,11 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 ## 默认执行流程
 
 1. 默认先读 `references/reproduction-template.md`，先按统一格式记录复现步骤。
-2. 如需继续展开，再读 `references/stability-checks.md`，需要判断问题是稳定复现还是条件复现。
-3. 需要对照边界或正反例时，再读 `references/reproduction-examples.md`，需要对照复现结论样例。
-4. 输出 复现步骤、复现条件、稳定性判断和未复现说明。
-5. 复现成功后转 `bug-root-cause-rules` 或 `bug-intake-rules` 的 `runtime-diagnostics` 条件路由；若稳定性不足但怀疑时序问题，可继续转运行时诊断路径。
+2. 如果先要确认是否已具备可调试的 pass/fail 信号，先读 `references/feedback-loop.md`，按「反馈回路优先」原则构建快速确定性回路，再进入复现步骤记录；构建完成后按其中「复现确认」三件事验收。
+3. 如需继续展开，再读 `references/stability-checks.md`，需要判断问题是稳定复现还是条件复现，或生产环境才出现需按环境约束匹配复现。
+4. 需要对照边界或正反例时，再读 `references/reproduction-examples.md`，需要对照复现结论样例。
+5. 输出 复现步骤、复现条件、稳定性判断和未复现说明。
+6. 复现成功后转 `bug-root-cause-rules` 或 `bug-intake-rules` 的 `runtime-diagnostics` 条件路由；若稳定性不足但怀疑时序问题，可继续转运行时诊断路径。
 
 ## 权责边界与不负责事项
 
@@ -72,8 +73,9 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 ## references 读取规则
 
 - 默认先读 `references/reproduction-template.md`。
+- 在开始复现前需要构建 pass/fail 反馈回路、处理非确定性复现或性能回归测量时，再读 `references/feedback-loop.md`。
 - 在决定当前 Bug 主文档、测试目录映射和复用策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 只有在 判断稳定性和触发条件 时，再读 `references/stability-checks.md`。
+- 只有在 判断稳定性和触发条件、或按生产环境约束做匹配复现 时，再读 `references/stability-checks.md`。
 - 只有在 对照复现正反例或处理未复现结论 时，再读 `references/reproduction-examples.md`。
 - 输出 Bug 复现记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文说明能否复现和对用户的影响，步骤、环境、数据和命令进入执行附录。
 - 若复现依赖浏览器、第三方接口或授权环境，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，按门禁记录适用性和替代验证。

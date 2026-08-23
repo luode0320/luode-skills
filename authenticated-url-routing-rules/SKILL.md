@@ -27,7 +27,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 1. 已接通且能力满足的 `Chrome DevTools MCP`
 2. 需要隔离 profile、并发 session 等核心自动化时使用 `browser-session-automation-rules`；需要 HAR/route、视觉 diff、录制/trace、代理或其他引擎等高级验证时使用 `browser-advanced-testing-rules`
-3. 只有需要云端自主长链、托管并发、地域出口、托管代理、隐身或站点允许的合规验证码处理时，才转交 `browser-use-cloud-rules`；缺 `BROWSER_USE_API_KEY` 时提醒用户在本机环境变量配置并重启 Codex，禁止在聊天中粘贴 key
+3. 只有需要云端自主长链、托管并发、地域出口、托管代理、隐身或站点允许的合规验证码处理时，才转交 `browser-use-cloud-rules`；缺 `BROWSER_USE_API_KEY` 时提醒用户写入 `~/.browser-use/.env`（单一权威，见 `browser-use-cloud-rules`），禁止在聊天中粘贴 key
 4. 所选通道不可用时，记录阻断并说明恢复条件；不得把 Browser Use Cloud 当作不等价回退
 
 依赖真实 Chrome profile 的页面不进入以上回退；应请求用户修复 Chrome 连接、扩展或授权。
@@ -112,7 +112,7 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 ## 安全边界
 
 - 不要求用户粘贴 cookie、token、localStorage、sessionStorage 或账号密码。
-- 不要求用户在聊天中粘贴 `BROWSER_USE_API_KEY`；Cloud 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；默认不选择 Cloud profile，也不上传 Cookie、本地 Chrome profile 或登录状态。
+- 不要求用户在聊天中粘贴 `BROWSER_USE_API_KEY`；Cloud 凭据默认来源为 `~/.browser-use/.env`（单一权威，由 `browser-use-cloud-rules` 定义），环境变量仅作运行时覆盖；默认不选择 Cloud profile，也不上传 Cookie、本地 Chrome profile 或登录状态。
 - 不把认证 state、profile、截图、HAR、导出文件等敏感临时产物提交到仓库。
 - 如果必须临时保存 state 文件，必须说明其敏感性，放入忽略路径或任务后删除。
 - 不在未确认范围的情况下跨域跳转到无关站点。

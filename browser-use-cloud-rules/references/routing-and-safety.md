@@ -23,7 +23,7 @@
 
 ## MCP 配置模板
 
-配置只引用环境变量，不保存 key 原值：
+配置只引用环境变量，不保存 key 原值；`BROWSER_USE_API_KEY` 的值默认来自 `~/.browser-use/.env`（单一权威，见 SKILL.md「环境自检」），环境变量仅作运行时覆盖：
 
 ```toml
 [mcp_servers.browser_use_cloud]

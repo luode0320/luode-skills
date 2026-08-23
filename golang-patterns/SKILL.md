@@ -1,6 +1,6 @@
 ---
 name: golang-patterns
-description: Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。
+description: Go 语言惯用模式、最佳实践与编码约定，用于构建健壮、高效、可维护的 Go 应用。编写、评审或排查 Go 代码时启用；提供并发、接口、错误处理等模式指引与陷阱速查清单（goroutine 泄漏、nil interface、错误链等高频坑）。
 origin: ECC
 ---
 
@@ -216,6 +216,20 @@ goimports -w .
 - 上下文贯穿 I/O 调用
 - 尽早返回，减少嵌套
 - 代码要“无聊但可靠”
+
+## 陷阱速查（Traps Checklist）
+
+编码或评审 Go 代码时，把高频坑当「上线前检查表」逐类过一遍。完整清单见 [references/go-traps-checklist.md](references/go-traps-checklist.md)，重点三类高发区：
+
+| 陷阱类别 | 高发点 | 一句话要点 |
+|---|---|---|
+| Goroutine 泄漏 | 无退出条件、for range 无人 close、ctx 取消不生效 | 写 `go func()` 前先想清退出条件，循环内检查 `ctx.Done()` |
+| nil interface | nil 指针放入接口 ≠ nil 接口 | 接口为 nil 当且仅当 type 与 value 同时为 nil |
+| 错误链 | sentinel 每次 new、忘记 Unwrap | 哨兵 `var ErrX` 定义一次，包装后必须 `errors.Is/As` |
+| Defer | 参数立即求值、循环内累积、LIFO | 需要延迟取值就包闭包，`defer mu.Unlock()` 紧跟 Lock |
+| Channel | nil/closed channel、select 随机、只有 sender 能 close | make 后再用，close 责任唯一化 |
+| 集合 | slice 共享底层数组、map 写 nil panic、并发不安全 | 需要独立就复制；并发访问用 `sync.Map` 或加锁 |
+| 构建 | go:embed 相对源文件、init 顺序非直觉 | 嵌入路径写相对源文件目录，init 不做依赖顺序敏感的事 |
 
 ## 常见反模式
 

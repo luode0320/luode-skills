@@ -82,11 +82,15 @@ python scripts/cgo-shim-build.py <dir> --no-test --keep   # 跳过 test / 失败
 - **语法检查不依赖编译**:`gofmt -e <file>` 可对含 cgo 的文件做纯语法校验。
 - **SDK 字段兼容性**:隔离测试用 go.mod 锁定的版本编译,若被测代码用了新 SDK 字段(如 `SchedulerOptions.Headers/Metadata`),直接 `go doc github.com/.../pluginapi.SchedulerOptions` 确认该版本有该字段。
 - **git 凭据 helper 卡死**:`credential.helper=helper-selector` 会导致 git push 静默挂起。解决:GIT_ASKPASS 脚本必须放在 **Windows 路径**(Git for Windows 的 git.exe 不认 POSIX `/tmp`),例如 `C:\Users\luode\.github\git-askpass.sh`,内容 `echo "$(cat /c/Users/luode/.github/token | tr -d '\r\n')"`,执行 `GIT_TERMINAL_PROMPT=0 GIT_ASKPASS='C:\...' git -c credential.helper= push origin main`,用完删除脚本。
+- **Windows 上清理 shim 目录 rm -rf 可能卡死 3 分钟+**:git bash 的 rm -rf 递归删 cpa-shim-* 时,若 go 子进程/防病毒仍持有句柄会挂起(表现:命令 auto-background 后无输出)。处理:先 `ls -d cpa-shim-*` 确认残留,能删的已删,剩空壳目录用 `rmdir <dir>` 逐个删(rmdir 不递归,失败即证明非空,再看是哪个文件被锁)。无需为此强杀进程。
+- **`--keep` 只在失败时保留目录**:脚本成功路径(`if ok:`)无条件 rmtree,即使传了 --keep 也删。想在成功后进 shim 目录跑 verbose 测试不可行;成功路径必然留下空壳目录,rmdir 清掉即可。
+- **哨兵测试验证"新测试真的进编译"**:`go test` 输出 `ok` 无法区分"测试全过"和"测试文件没被复制/没匹配"。要确证新写的 *_test.go 被 shim 编译执行:临时在文件里加一个必失败测试(如 `func TestSentinelX(t *testing.T){t.Fatal("x")}`),跑 shim → 输出必须出现 `--- FAIL: TestSentinelX`;随后删掉哨兵再跑一遍全绿。两轮各约 10s,但能钉死"测试文件在 shim 编译集内"这个事实,防止测试静默缺失。
 
 ## 验证清单
 
 - [ ] 隔离目录 `go test ./...` 全绿
 - [ ] `gofmt -e` 所有修改文件无语法错误
-- [ ] 新文件 `gofmt -l` 不出现(格式干净)
-- [ ] 隔离目录已删除
+- [ ] 新文件 `gofmt -l` 不出现(格式干净;注意 gofmt -w 会顺手修注释缩进,改完重跑 shim 一轮)
+- [ ] 新测试文件用哨兵测试确认已进编译(见上)
+- [ ] 隔离目录已删除(残留空壳 rmdir 逐个删)
 - [ ] 真实 cgo 编译留给 CI(GitHub Actions 有完整 CGO 环境)
