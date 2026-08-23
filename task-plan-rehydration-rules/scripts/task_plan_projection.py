@@ -711,6 +711,83 @@ def extract_registry(document: str, *, session_id: str | None = None) -> dict[st
     return _new_registry([_projection_entry_from_projection(legacy, sid)])
 
 
+def _extract_registry_tolerant(
+    document: str, *, session_id: str | None = None
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """写入路径专用：隔离损坏投影，避免单个坏项阻塞新会话落盘。
+
+    [参数] document: PROJECT_CURRENT.md 全文；session_id: 旧活动投影兼容归属。
+    [返回] tuple：(隔离后的 registry 或 None, 被跳过的坏项信息列表)。
+    仅对 v4 registry 的「单条投影损坏」做隔离；顶层字段错误或旧版单投影仍走严格路径。
+    最近修改时间：2026-08-23；改动原因：修复「旧投影指纹损坏阻塞新 session 写入」导致 registry 空。
+    """
+    # 1. 读取原始值，非 v4（旧版单投影 / 顶层损坏）不做隔离，回退严格路径。
+    value = _extract_raw_projection_value(document)
+    if value is None:
+        return None, []
+    if not (isinstance(value, Mapping) and value.get("version") == REGISTRY_VERSION):
+        return extract_registry(document, session_id=session_id), []
+    # 2. 顶层契约仍严格：版本 / schema / 更新时间 / projections 结构任一违规都拒绝写入。
+    if set(value) != REGISTRY_FIELDS:
+        raise ProjectionContractError("registry fields mismatch (top-level contract violation)")
+    if value.get("registry_schema") != REGISTRY_SCHEMA:
+        raise ProjectionContractError("registry_schema is invalid")
+    _validate_utc_timestamp(value.get("registry_updated_at"))
+    raw_projections = value.get("projections")
+    if not isinstance(raw_projections, list) or len(raw_projections) > MAX_PROJECTIONS:
+        raise ProjectionContractError(
+            f"projections must be an array of at most {MAX_PROJECTIONS} entries"
+        )
+    # 3. 逐条校验，坏项隔离（跳过），好项保留；重复 projection_id / session_id 也隔离后者。
+    normalized_entries: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    projection_ids: set[str] = set()
+    session_ids: set[str] = set()
+    for index, entry in enumerate(raw_projections):
+        try:
+            normalized = validate_projection_entry(entry)
+        except ProjectionContractError as error:
+            skipped.append({"index": index, "reason": str(error)})
+            continue
+        if normalized["projection_id"] in projection_ids:
+            skipped.append({"index": index, "reason": f"duplicate projection_id {normalized['projection_id']}"})
+            continue
+        if normalized["session_id"] in session_ids:
+            skipped.append({"index": index, "reason": f"duplicate session_id {normalized['session_id']}"})
+            continue
+        projection_ids.add(normalized["projection_id"])
+        session_ids.add(normalized["session_id"])
+        normalized_entries.append(normalized)
+    registry = {
+        "version": REGISTRY_VERSION,
+        "registry_schema": REGISTRY_SCHEMA,
+        "registry_updated_at": value["registry_updated_at"],
+        "projections": normalized_entries,
+    }
+    return registry, skipped
+
+
+def _load_registry_for_write(document: str, sid: str) -> dict[str, Any]:
+    """写入路径读取 registry：优先严格解析，单条损坏时降级隔离，仍失败则报错。
+
+    [参数] document: PROJECT_CURRENT.md 全文；sid: 已校验的当前会话标识。
+    [返回] dict：可直接用于 upsert 的合法 registry。
+    最近修改时间：2026-08-23；改动原因：让损坏的旧投影不再阻塞新会话投影落盘。
+    """
+    try:
+        registry = extract_registry(document, session_id=sid)
+        return registry if registry is not None else _new_registry()
+    except ProjectionContractError:
+        registry, skipped = _extract_registry_tolerant(document, session_id=sid)
+        if skipped:
+            print(
+                "[task_plan_projection] isolated %d corrupt projection(s) during write: %s"
+                % (len(skipped), skipped),
+                file=sys.stderr,
+            )
+        return registry if registry is not None else _new_registry()
+
+
 def load_projection(
     path: str | os.PathLike[str],
     *,
@@ -1005,7 +1082,7 @@ def upsert_projection(
         except (OSError, UnicodeDecodeError) as error:
             raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
         bounds = _validate_markers(document)
-        registry = extract_registry(document, session_id=sid) or _new_registry()
+        registry = _load_registry_for_write(document, sid)
         # 2. 调用只允许在持锁状态使用的写入函数，完成校验和原子替换。
         return _upsert_projection_while_locked(target, document, bounds, registry, projection, sid)
 
