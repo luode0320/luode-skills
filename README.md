@@ -1060,3 +1060,4 @@ claude-mem(记忆) :
 2026-08-23 17:54:00 feat: [任务投影跨宿主适配] WorkBuddy会话回退与ensure-start输入契约修复
 2026-08-23 17:55:00 feat: [skillhub批量安装] 23个新skill接入与6个元数据同步
 2026-08-23 18:05:00 feat: [skill资产批量增强] Bug系列/前端/代码质量/SSH运维 skill 与吸收映射落地
+2026-08-23 18:10:00 test: [测试同步] 任务投影 WorkBuddy 会话回退链用例扩展

@@ -38,22 +38,36 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：完成每个测试的宿主环境隔离。
-        最近修改时间：2026-07-26 00:00:00；改动原因：让新增会话回退测试不受真实宿主环境污染。
+        最近修改时间：2026-08-23 00:00:00；改动原因：新增 WorkBuddy 会话来源并隔离宿主超长环境变量。
         """
         # 1. 移除宿主会话变量并注册清理回调，确保每个用例独立运行。
-        self._host_thread_id = os.environ.pop(projection.SESSION_ENV_NAME, None)
-        self.addCleanup(self._restore_host_thread_id)
+        self._host_session_env: dict[str, str] = {}
+        for env_name in (
+            projection.SESSION_ENV_NAME,
+            projection.WORKBUDDY_SESSION_ENV_NAME,
+            projection.WORKBUDDY_MCP_CONFIG_ENV_NAME,
+        ):
+            if env_name in os.environ:
+                self._host_session_env[env_name] = os.environ.pop(env_name)
+        # 2. 宿主环境可能注入超长变量（超过 Windows os.putenv 的 32767 限制），
+        #    它们会破坏 mock.patch.dict 退出时的整体写回，故仅移除、不再写回。
+        for env_name in list(os.environ):
+            if len(os.environ[env_name]) > 32_767:
+                os.environ.pop(env_name)
+        self.addCleanup(self._restore_host_session_env)
 
-    def _restore_host_thread_id(self) -> None:
+    def _restore_host_session_env(self) -> None:
         """恢复测试前的宿主会话环境。
 
         [参数] 无。
         [返回] None：恢复测试前的环境变量状态。
-        最近修改时间：2026-07-26 00:00:00；改动原因：避免测试清理影响后续宿主会话。
+        最近修改时间：2026-08-23 00:00:00；改动原因：与新增 WorkBuddy 会话来源保持同域恢复。
         """
-        # 1. 仅在测试前存在宿主会话时恢复，保持原本缺失状态不变。
-        if self._host_thread_id is not None:
-            os.environ[projection.SESSION_ENV_NAME] = self._host_thread_id
+        # 1. 仅恢复测试前存在的宿主会话变量，保持原本缺失状态不变；超长值无法写回 Windows 环境则跳过。
+        for env_name, env_value in self._host_session_env.items():
+            if len(env_value) > 32_767:
+                continue
+            os.environ[env_name] = env_value
 
     # _sample 构造合法活动或失活投影。
     # [参数] statuses: 步骤状态；state: 投影状态；updated_at: UTC 时间。
@@ -1789,6 +1803,116 @@ class TaskPlanProjectionTests(unittest.TestCase):
             with self.assertRaises(projection.ProjectionContractError):
                 projection.ensure_start_projection(path_without_session, self._sample())
 
+    def test_ensure_start_context_defaults_trigger_to_start_but_timeout_rejected(self) -> None:
+        """验证 ensure-start 合成上下文缺 trigger 默认按 start，timeout 仍拒绝，synthesize 保持严格。
+
+        [参数] 无。
+        [返回] None：断言默认 start 可创建活动投影且 timeout 与缺 trigger 的 synthesize 均失败关闭。
+        最近修改时间：2026-08-23 00:00:00；改动原因：覆盖合成上下文缺 trigger 默认 start 契约。
+        """
+        # 1. 缺 trigger 的合法上下文经 ensure-start 成功创建并保持 active。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_dir = root / "doc" / "3-实施"
+            source_dir.mkdir(parents=True)
+            (source_dir / "plan.md").write_text(
+                "- [TASK-SYN-01] 冻结补建契约\n- [TASK-SYN-02] 实现补建引擎\n- [TASK-SYN-03] 回归验证\n",
+                encoding="utf-8",
+            )
+            path = self._write_current(root)
+            context = self._synthesis_context(trigger="start")
+            del context["trigger"]
+            result = projection.ensure_start_projection(path, context, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(result["action"], "created")
+            self.assertEqual(result["mode"], "exact")
+            self.assertEqual(result["projection"]["state"], "active")
+
+            # 2. 显式 timeout 是异常修复入口，对新文件 ensure-start 必须拒绝。
+            timeout_path = self._write_current(root, "# 新文件\n")
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.ensure_start_projection(
+                    timeout_path,
+                    self._synthesis_context(trigger="timeout"),
+                    session_id=self.TEST_SESSION_ID,
+                )
+
+            # 3. 直接 synthesize 缺 trigger 保持严格必填，不放宽。
+            missing_trigger = self._synthesis_context(trigger="continue")
+            del missing_trigger["trigger"]
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.synthesize_projection(path, missing_trigger, session_id=self.TEST_SESSION_ID)
+
+    def test_session_resolution_falls_back_to_workbuddy_and_rejects_conflicts(self) -> None:
+        """验证 WorkBuddy 宿主会话回退、冲突与缺失失败关闭。
+
+        [参数] 无。
+        [返回] None：断言 WorkBuddy 回退、显式值一致/冲突和全缺失边界。
+        最近修改时间：2026-08-23 00:00:00；改动原因：覆盖会话解析链的 WorkBuddy 第三级来源。
+        """
+        # 1. 仅 WORKBUDDY_SESSION_ID 时回退成功。
+        with mock.patch.dict(
+            os.environ,
+            {projection.WORKBUDDY_SESSION_ENV_NAME: "wb-session"},
+        ):
+            self.assertEqual(projection.resolve_session_id(None), "wb-session")
+
+        # 2. CODEBUDDY_MCP_CONFIG 含唯一 X-WorkBuddy-Session-Id 时回退成功。
+        mcp_config = json.dumps(
+            {
+                "mcpServers": {
+                    "server-a": {"headers": {"X-WorkBuddy-Session-Id": "mcp-session"}},
+                    "server-b": {"headers": {"X-WorkBuddy-Session-Id": "mcp-session"}},
+                }
+            }
+        )
+        with mock.patch.dict(
+            os.environ,
+            {projection.WORKBUDDY_MCP_CONFIG_ENV_NAME: mcp_config},
+        ):
+            self.assertEqual(projection.resolve_session_id(None), "mcp-session")
+
+        # 3. 显式值与 WorkBuddy 来源不一致时抛错，一致时成功。
+        with mock.patch.dict(
+            os.environ,
+            {projection.WORKBUDDY_SESSION_ENV_NAME: "wb-session"},
+        ):
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.resolve_session_id("explicit-session")
+            self.assertEqual(projection.resolve_session_id("wb-session"), "wb-session")
+
+        # 4. 两个 WorkBuddy 来源不一致时也视为冲突。
+        with mock.patch.dict(
+            os.environ,
+            {
+                projection.WORKBUDDY_SESSION_ENV_NAME: "wb-env-session",
+                projection.WORKBUDDY_MCP_CONFIG_ENV_NAME: mcp_config,
+            },
+        ):
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.resolve_session_id(None)
+
+        # 5. MCP 配置内多个不同会话标识视为不可用，全缺失时失败关闭。
+        multi_mcp_config = json.dumps(
+            {
+                "mcpServers": {
+                    "server-a": {"headers": {"X-WorkBuddy-Session-Id": "session-a"}},
+                    "server-b": {"headers": {"X-WorkBuddy-Session-Id": "session-b"}},
+                }
+            }
+        )
+        with mock.patch.dict(
+            os.environ,
+            {projection.WORKBUDDY_MCP_CONFIG_ENV_NAME: multi_mcp_config},
+        ):
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.resolve_session_id(None)
+
+        # 6. 全缺失时 required=True 抛错，required=False 返回 None。
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.resolve_session_id(None)
+            self.assertIsNone(projection.resolve_session_id(None, required=False))
+
     def test_cli_state_entry_uses_environment_session_and_rejects_conflict(self) -> None:
         """验证 CLI 缺省参数回退宿主会话，冲突时保持文件不变。
 
@@ -1932,7 +2056,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
         contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
         for token in ("create_goal", "get_goal", "update_goal", "先持久化", "Plan Mode"):
             self.assertIn(token, rehydration_document)
-        self.assertIn("成功持久化 -> 读取返回 payload -> 下一动作调用 `update_plan`", contract_document)
+        self.assertIn("成功持久化 -> 读取返回 payload -> 下一动作同步 UI", contract_document)
         # 2. 自主执行 Owner 只能交接生命周期，不得借悬浮窗扩大执行授权。
         autonomous_document = (REPOSITORY_ROOT / "autonomous-execution-rules" / "SKILL.md").read_text(encoding="utf-8")
         for token in ("create_goal", "get_goal", "update_goal", "不因此自动取得", "不得把 blocked payload", "Plan Mode"):
