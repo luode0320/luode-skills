@@ -1,0 +1,10 @@
+{
+  "slug": "ip",
+  "name": "IP Address Query - IP查询",
+  "version": "1.0.2",
+  "installedAt": 1787483890627,
+  "source": "skillhub",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png",
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\ip__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png"
+}
