@@ -1,0 +1,127 @@
+{
+  "valid": false,
+  "status": "BLOCKED",
+  "profile": "implementation_overview",
+  "document": "D:\\谷歌云盘\\luode-skills\\doc\\3-实施\\2026-08-23_040049_BUG-TASK-PROJECTION-HOST-001_实施总览.md",
+  "ids": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "TASK-A",
+    "TASK-C",
+    "TASK-D",
+    "TASK-PROJECTION-HOST",
+    "TASK-PROJECTION-HOST-001",
+    "TASK-RTP-C01-A",
+    "TASK-RTP-C01-B",
+    "TASK-RTP-C01-C",
+    "TASK-RTP-C01-D",
+    "TASK-RTP-C01-E",
+    "TEST-1",
+    "TEST-2",
+    "TEST-3",
+    "TEST-4"
+  ],
+  "diagrams": {
+    "flowchart": 0,
+    "sequenceDiagram": 0,
+    "stateDiagram-v2": 0,
+    "erDiagram": 0
+  },
+  "images": {
+    "count": 0,
+    "ids": [],
+    "paths": [],
+    "decision": "na",
+    "manifest": {
+      "required": false,
+      "rows": 0,
+      "ids": [],
+      "valid": true
+    },
+    "asset_root": "D:\\谷歌云盘\\luode-skills\\doc\\data\\images",
+    "valid": true
+  },
+  "errors": [
+    "missing YAML front matter",
+    "plain-language front matter must set reader_level: business_general",
+    "plain-language front matter must set writing_style: plain_chinese",
+    "plain-language front matter must set appendix_policy: preserve_existing_or_one_terminal_appendix",
+    "plain-language opening must not contain stable IDs",
+    "missing required content phrase: unresolved_decisions",
+    "missing required content phrase: 最大推进边界",
+    "insufficient Markdown tables: expected 4, got 3",
+    "N/A requires reason/evidence at line 48",
+    "N/A requires reason/evidence at line 177",
+    "N/A requires reason/evidence at line 199",
+    "N/A requires reason/evidence at line 200",
+    "N/A requires reason/evidence at line 380",
+    "insufficient flowchart diagrams: expected 1, got 0",
+    "insufficient total diagrams: expected 3, got 2",
+    "Mermaid block 1 missing purpose and associated ID before fence",
+    "Mermaid block 2 missing purpose and associated ID before fence",
+    "unsupported Mermaid diagram type at block 1: %%{init:",
+    "unsupported Mermaid diagram type at block 2: %%{init:"
+  ],
+  "warnings": [
+    "heading baseline skipped: document is not tracked in HEAD"
+  ],
+  "traceability": {
+    "mode": "document",
+    "valid": false,
+    "ids": [
+      "AC-1",
+      "AC-2",
+      "AC-3",
+      "AC-4",
+      "AC-5",
+      "TASK-A",
+      "TASK-C",
+      "TASK-D",
+      "TASK-PROJECTION-HOST",
+      "TASK-PROJECTION-HOST-001",
+      "TASK-RTP-C01-A",
+      "TASK-RTP-C01-B",
+      "TASK-RTP-C01-C",
+      "TASK-RTP-C01-D",
+      "TASK-RTP-C01-E",
+      "TEST-1",
+      "TEST-2",
+      "TEST-3",
+      "TEST-4"
+    ]
+  },
+  "unresolved_decisions": {
+    "count": 0,
+    "items": []
+  },
+  "coverage": {
+    "id_count": 19,
+    "image_count": 0,
+    "valid": false
+  },
+  "gates": {
+    "valid": true,
+    "blocking": false,
+    "release_status": "allowed",
+    "items": [],
+    "error_codes": []
+  },
+  "style_regression": {
+    "required": false,
+    "result": null,
+    "valid": true,
+    "error_codes": []
+  },
+  "task_blocker_closure": {
+    "required": false,
+    "triggers": [],
+    "section": "任务阻断收口",
+    "records": [],
+    "valid": true,
+    "error_codes": []
+  },
+  "error_codes": []
+}

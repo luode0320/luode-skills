@@ -1,0 +1,127 @@
+{
+  "valid": false,
+  "status": "BLOCKED",
+  "profile": "implementation_cycle",
+  "document": "D:\\谷歌云盘\\luode-skills\\doc\\3-实施\\2026-08-23_040049_BUG-TASK-PROJECTION-HOST-001_实施周期01_跨宿主适配与输入契约修复.md",
+  "ids": [
+    "AC-1",
+    "AC-5",
+    "TASK-PROJECTION-HOST",
+    "TASK-PROJECTION-HOST-001",
+    "TASK-RTP-C01-A",
+    "TASK-RTP-C01-B",
+    "TASK-RTP-C01-C",
+    "TASK-RTP-C01-D",
+    "TASK-RTP-C01-E",
+    "TEST-1",
+    "TEST-2",
+    "TEST-3",
+    "TEST-4"
+  ],
+  "diagrams": {
+    "flowchart": 0,
+    "sequenceDiagram": 0,
+    "stateDiagram-v2": 0,
+    "erDiagram": 0
+  },
+  "images": {
+    "count": 0,
+    "ids": [],
+    "paths": [],
+    "decision": null,
+    "manifest": {
+      "required": false,
+      "rows": 0,
+      "ids": [],
+      "valid": true
+    },
+    "asset_root": "D:\\谷歌云盘\\luode-skills\\doc\\data\\images",
+    "valid": false
+  },
+  "errors": [
+    "missing YAML front matter",
+    "plain-language front matter must set reader_level: business_general",
+    "plain-language front matter must set writing_style: plain_chinese",
+    "plain-language front matter must set appendix_policy: preserve_existing_or_one_terminal_appendix",
+    "plain-language opening after H1 must be one paragraph",
+    "plain-language opening must contain summary field: 结论",
+    "plain-language opening must contain summary field: 影响",
+    "plain-language opening must contain summary field: 范围",
+    "plain-language opening must contain summary field: 非范围",
+    "plain-language opening must contain summary field: 变化",
+    "plain-language opening must contain summary field: 完成标准",
+    "plain-language opening must contain summary field: 术语说明",
+    "plain-language opening must contain summary field: 验证状态",
+    "plain-language opening must not contain stable IDs",
+    "missing required section: 当前代码/文档基线",
+    "missing required section: 周期内最小任务执行顺序",
+    "missing required section: 最小任务闭环",
+    "missing required section: 当前周期验证矩阵",
+    "missing required section: 自审结论",
+    "missing one of required sections: ['当前周期目标', '当前周期目标、边界与进入条件']",
+    "missing one of required sections: ['进入条件与收口条件', '当前周期目标、边界与进入条件']",
+    "missing one of required sections: ['文件与符号操作契约', '文件/符号操作契约', '最小任务闭环']",
+    "missing one of required sections: ['真实测试与断言', '当前周期验证矩阵']",
+    "missing one of required sections: ['回滚与停止条件', '周期阻断、停止与回滚']",
+    "missing one of required sections: ['周期追踪矩阵', '当前周期验证矩阵']",
+    "missing required content phrase: 停止条件",
+    "missing required content phrase: 文件/符号",
+    "insufficient Markdown tables: expected 4, got 2",
+    "image asset decision must be explicit: 需要 or N/A + reason + evidence",
+    "insufficient flowchart diagrams: expected 1, got 0",
+    "insufficient total diagrams: expected 2, got 0"
+  ],
+  "warnings": [
+    "heading baseline skipped: document is not tracked in HEAD"
+  ],
+  "traceability": {
+    "mode": "document",
+    "valid": false,
+    "ids": [
+      "AC-1",
+      "AC-5",
+      "TASK-PROJECTION-HOST",
+      "TASK-PROJECTION-HOST-001",
+      "TASK-RTP-C01-A",
+      "TASK-RTP-C01-B",
+      "TASK-RTP-C01-C",
+      "TASK-RTP-C01-D",
+      "TASK-RTP-C01-E",
+      "TEST-1",
+      "TEST-2",
+      "TEST-3",
+      "TEST-4"
+    ]
+  },
+  "unresolved_decisions": {
+    "count": 0,
+    "items": []
+  },
+  "coverage": {
+    "id_count": 13,
+    "image_count": 0,
+    "valid": false
+  },
+  "gates": {
+    "valid": true,
+    "blocking": false,
+    "release_status": "allowed",
+    "items": [],
+    "error_codes": []
+  },
+  "style_regression": {
+    "required": false,
+    "result": null,
+    "valid": true,
+    "error_codes": []
+  },
+  "task_blocker_closure": {
+    "required": false,
+    "triggers": [],
+    "section": "任务阻断收口",
+    "records": [],
+    "valid": true,
+    "error_codes": []
+  },
+  "error_codes": []
+}

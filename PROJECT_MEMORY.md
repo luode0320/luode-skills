@@ -53,8 +53,8 @@
 - 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
 - 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
 - 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
-- 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。`update_plan` 失败进入 `UI_SYNC_BLOCKED`，保留 projection 并禁止继续领域写入；`inactive` 不创建悬浮任务列表。
-- 稳定决策：任务投影会话解析固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退；两者冲突、非法或同时缺失时失败关闭。`ensure-start` 和带 payload 的 `write` 是首次持久化入口，返回结果必须绑定当前 session 并携带可直接调用的 `update_plan` payload。
+- 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续：保留 projection + 继续领域执行 + 下一检查点重试 UI，不得声称 UI 已恢复。`inactive` 不创建悬浮任务列表。
+- 稳定决策：任务投影会话解析固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退、WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `X-WorkBuddy-Session-Id` 唯一值或 `WORKBUDDY_SESSION_ID`）再回退；任意来源不一致、非法或全部缺失时失败关闭。`ensure-start` 和带 payload 的 `write` 是首次持久化入口，返回结果必须绑定当前 session 并携带可直接调用的 `update_plan` payload。
 - 稳定决策：十分钟只作缺失 projection 的异常修复闸门。任务已真实执行但当前会话缺少活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后主动执行时间严格大于 600 秒时，才先调用只读 `probe-timeout`，随后补建并立即同步；不再把十分钟作为正常任务首次显示悬浮窗的入口。
 - 稳定决策：`probe-timeout` 不创建锁文件、临时文件、projection 或 payload；`goal_check_required` 后只允许主 Agent 按 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行，子 Agent 不得调用 Goal 或主悬浮窗工具。
 - 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
@@ -689,15 +689,15 @@ entities:
       - browser-use-cloud-rules
       - BROWSER_USE_API_KEY
       - Cloud 浏览器
-    definition: "Browser Use Cloud 只用于 Cloud 专属能力，不接本地 Browser Use，也不替换现有浏览器路由。每次 run_session/send_task 前检查本机 key、Billing、当前动作可写 maxCostUsd 并取得当次确认；免费层也确认，无硬上限默认停止。任务结束后用 strategy=session 停止遗留 session，只有 stopped 且实际总费用合法才收口。"
-    scope: "Browser Use Cloud 路由、收费动作、密钥提醒、session 生命周期"
+    definition: "Browser Use Cloud 只用于 Cloud 专属能力，不接本地 Browser Use，也不替换现有浏览器路由。凭据统一存储在 ~/.browser-use/.env（单一权威，junction 指向 Google Drive 同步目录），环境变量仅作运行时覆盖。每次 run_session/send_task 前检查本机 key、Billing、当前动作可写 maxCostUsd 并取得当次确认；免费层也确认，无硬上限默认停止。任务结束后用 strategy=session 停止遗留 session，只有 stopped 且实际总费用合法才收口。REST API v2 通道（references/api-operations.md + scripts/browser-use.sh）供项目程序操作公网（https 域名）浏览器。"
+    scope: "Browser Use Cloud 路由、收费动作、密钥提醒、session 生命周期、REST API v2 操作通道"
     status: "active"
     evidence_ids:
       - evidence.skill.browser-use-cloud
       - evidence.accept.browser-use-cloud-20260726
     context_ids:
       - context.url-analysis
-    updated_at: 2026-07-26
+    updated_at: 2026-08-23
   - entity_id: rule.reasoning-summary-detail
     name: "结果与结论适中详细度契约"
     type: "最终总结输出规则"
@@ -1191,8 +1191,8 @@ entities:
       - ensure-timeout
       - ensure-start
       - UI_SYNC_BLOCKED
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan，失败进入 UI_SYNC_BLOCKED 并禁止继续领域写入。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退，冲突或缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门；计时不持久化，也不承诺后台唤醒。"
-    scope: "Codex Desktop 默认执行回合、首次任务可见性、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续并下一检查点重试 UI，不得声称 UI 已恢复。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退、WorkBuddy 宿主元数据再回退，任意来源冲突或全缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门；计时不持久化，也不承诺后台唤醒。"
+    scope: "跨宿主（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）默认执行回合、首次任务可见性、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
     status: "active"
     evidence_ids:
       - evidence.skill.task-plan-rehydration
@@ -1201,6 +1201,10 @@ entities:
       - evidence.doc.task-plan-first-persist-cycle
     context_ids:
       - context.task-plan-rehydration
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-08-23
+    absorbed_to: null
     updated_at: 2026-07-25
   - entity_id: rule.session-handoff
     name: "会话交接与新任务接续"
