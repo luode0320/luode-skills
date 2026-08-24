@@ -61,7 +61,7 @@
 | `database/model/mongo/` | `database-schema-rules` | 暂无 |
 | `database/repository/` | `database-query-rules` | 暂无 |
 | `database/migration/` | `database-schema-rules` | 暂无 |
-| `database/sql/ddl/` | `database-schema-rules` | 暂无 |
+| `database/scripts/sql/ddl/` | `database-schema-rules` | 暂无 |
 
 ## 持续扩展示例
 

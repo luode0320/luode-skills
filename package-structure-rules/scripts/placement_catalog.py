@@ -698,26 +698,26 @@ def check_database_storage_source_path(
     return errors
 
 
-def check_database_sql_path(catalog: dict[str, Any], relative: str, is_file: bool) -> list[str]:
-    """校验每个独立 SQL 叶子目录只直接存放 .sql 文件。
+def check_database_script_path(catalog: dict[str, Any], relative: str, is_file: bool) -> list[str]:
+    """校验每个数据库脚本叶子目录只直接存放声明扩展名文件。
 
     [参数] catalog：目录事实源；relative：项目相对路径；is_file：当前路径是否为文件。
-    [返回] list[str]：SQL 扩展名或嵌套层级不合规时的稳定错误。
-    最近修改时间: 2026-07-31 22:16:49 新增字段 create、update、delete 独立 SQL 目录。
+    [返回] list[str]：扩展名或嵌套层级不合规时的稳定错误。
+    最近修改时间: 2026-08-24 21:00:00 从 database/sql 迁移到 database/scripts，按文件类型覆盖 SQL/js/lua 脚本目录。
     """
     errors: list[str] = []
-    # 1. 只把 Catalog 声明的 SQL 叶子目录视为文件边界，字段分类根仍由 allowed_children 管理。
+    # 1. 只把 Catalog 声明的脚本叶子目录视为文件边界，分类根仍由 allowed_children 管理。
     for entry in catalog["entries"]:
-        if entry["artifact_kind"] != "database_sql":
+        if entry["artifact_kind"] not in {"database_sql", "database_script"}:
             continue
         canonical_path = entry["canonical_path"]
         if relative == canonical_path or not relative.startswith(canonical_path + "/"):
             continue
         child = relative[len(canonical_path) + 1:]
         if not is_file or "/" in child:
-            errors.append(f"独立 SQL 目录只允许直接 .sql 文件: {relative}")
+            errors.append(f"数据库脚本目录只允许直接存放声明扩展名文件: {relative}")
         elif Path(relative).suffix.lower() not in set(entry.get("allowed_extensions", [])):
-            errors.append(f"独立 SQL 目录只允许 .sql 文件: {relative}")
+            errors.append(f"数据库脚本目录只允许 {', '.join(entry.get('allowed_extensions', []))} 文件: {relative}")
     return errors
 
 
@@ -747,10 +747,8 @@ def check_path(
     suffix = Path(relative).suffix.lower()
     if is_file and is_under(relative, "database/migration") and suffix == ".sql":
         errors.append(f"自动迁移目录禁止 SQL 文件: {relative}")
-    if is_file and is_under(relative, "database/sql") and suffix in SOURCE_EXTENSIONS:
-        errors.append(f"独立 SQL 目录禁止生产源码: {relative}")
     errors.extend(check_database_storage_source_path(catalog, relative, is_file))
-    errors.extend(check_database_sql_path(catalog, relative, is_file))
+    errors.extend(check_database_script_path(catalog, relative, is_file))
     # 2. 后端根 utils 只承载工具包子目录，common/util 与源码根旧 util 分别执行边界校验。
     if project_kind == "backend" and is_file and Path(relative).parent.as_posix() == "utils":
         errors.append(f"根 utils 禁止直接文件: {relative}")

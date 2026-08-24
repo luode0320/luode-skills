@@ -28,6 +28,6 @@
 - 业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外）；跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。
 - 根 `common/request/`、`common/response/`、`common/constant/`、`common/error/`、`common/validation/`、`common/dto/`、`common/page/`、`common/msg/` 可作为稳定公共结构直接流通。`common/msg/` 只允许依赖 `common/constant/`、`common/error/` 等稳定结构与 `resources/i18n/` 资源加载，禁止反向依赖具体业务域，也不承载业务流程。根 `global/` 只能提供已装配的配置、日志、数据库连接和技术客户端等非业务运行引用，禁止保存、传递业务实体、业务列表、业务状态或可变业务缓存。
 - `database/`、根 `utils/`、根 `common/`、根 `global/`、根 `middleware/` 禁止反向依赖具体业务域。
-- `database/connection/` 只提供数据存储连接与客户端初始化，`database/model/{db,redis,mongo}/` 只承载相应存储模型；二者不得承载业务流程。独立字段 SQL 只能使用 `database/sql/field/{create,update,delete}/` 的直接 `.sql` 文件，自动迁移源码仍只在 `database/migration/`。
+- `database/connection/` 只提供数据存储连接与客户端初始化，`database/model/{db,redis,mongo}/` 只承载相应存储模型；二者不得承载业务流程。独立字段 SQL 只能使用 `database/scripts/sql/field/{create,update,delete}/` 的直接 `.sql` 文件，Mongo shell 脚本进入 `database/scripts/js/`，Redis 执行脚本进入 `database/scripts/lua/`，自动迁移源码仍只在 `database/migration/`。
 - `database/repository/` 不得调用迁移程序；自动迁移只允许启动装配、迁移命令和数据库初始化链路调用。
 - 新增目录、删除目录或职责迁移后，更新 `doc/1-架构/2-目录树.md`。

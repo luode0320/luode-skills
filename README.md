@@ -1070,3 +1070,4 @@ claude-mem(记忆) :
 2026-08-25 00:43:00 feat: [吸收映射体系增强] 多skill吸收映射与8维评分巡检落地
 2026-08-25 00:44:00 feat: [Bug系列规则增强] 症状根因映射与接口测试预埋
 2026-08-25 00:45:00 feat: [apifox调试用例修正] 两类用例两套资源与T-3请求示例规则
+2026-08-25 00:46:00 feat: [package-structure数据库脚本目录调整] database/sql迁移至database/scripts

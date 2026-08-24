@@ -9,7 +9,7 @@
 3. **新增规范外目录的确认闸门（强制）**：agent 新增任何不属于目录树规范的目录前，必须先向用户说明目录名、职责、为什么无法落到规范目录，并取得**当前轮显式同意**；未取得同意时只能落到规范目录或停下来询问，不得以"看起来更合理""顺手建一个"为由自行创建。
 4. **扩展目录准入四条**（同意后仍须全部满足）：
    - 不落在 `forbidden_paths`（根 `data/`、`schema/`、`protocol/`、源码根 `util/`、`infrastructure/` 等）；
-   - 不位于 `allowed_children` 已声明父目录下（`config/`、`database/model/`、`database/sql/`、`common/`、`scripts/`、`deploy/`、`integration/`、`utils/discovery/` 的子目录集合仍封闭）；
+   - 不位于 `allowed_children` 已声明父目录下（`config/`、`database/model/`、`database/scripts/`、`common/`、`scripts/`、`deploy/`、`integration/`、`utils/discovery/` 的子目录集合仍封闭）；
    - 不与任何规范目录职责重复，也不是规范目录的同义别名；
    - 创建后按 `architecture-doc-rules` 更新 `doc/1-架构/2-目录树.md`。
 5. **扩展目录不获得引用特权**：业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外）；跨域共享结构仅走根 `common/`（request/response/constant/error/validation）与 `global/` 非业务运行引用。
@@ -143,13 +143,16 @@
 │   │       ├── read/                        # [条件·提交] 读取索引结构
 │   │       ├── update/                      # [条件·提交] 更新索引
 │   │       └── delete/                      # [条件·提交] 受控删除索引
-│   └── sql/                                 # [条件·提交] 独立 SQL 文件根；禁止生产源码与直接文件
-│       ├── ddl/                             # [条件·提交] 直接存放建表、改表与约束 `.sql` 文件
-│       ├── index/                           # [条件·提交] 直接存放索引 `.sql` 文件
-│       └── field/                           # [条件·提交] 字段变更 SQL 分类根；禁止直接文件
-│           ├── create/                      # [条件·提交] 直接存放新增字段 `.sql` 文件
-│           ├── update/                      # [条件·提交] 直接存放修改字段 `.sql` 文件
-│           └── delete/                      # [条件·提交] 直接存放删除字段 `.sql` 文件
+│   └── scripts/                             # [条件·提交] 数据库执行脚本资产根；禁止生产源码与直接文件
+│       ├── sql/                             # [条件·提交] 独立 SQL 文件根；禁止生产源码与直接文件
+│       │   ├── ddl/                         # [条件·提交] 直接存放建表、改表与约束 `.sql` 文件
+│       │   ├── index/                       # [条件·提交] 直接存放索引 `.sql` 文件
+│       │   └── field/                       # [条件·提交] 字段变更 SQL 分类根；禁止直接文件
+│       │       ├── create/                  # [条件·提交] 直接存放新增字段 `.sql` 文件
+│       │       ├── update/                  # [条件·提交] 直接存放修改字段 `.sql` 文件
+│       │       └── delete/                  # [条件·提交] 直接存放删除字段 `.sql` 文件
+│       ├── js/                              # [条件·提交] 直接存放 Mongo shell 执行 `.js` 文件
+│       └── lua/                             # [条件·提交] 直接存放 Redis 执行 `.lua` 文件
 ├── swag/                                    # [条件·提交] Swag 正式输出；内部规则由专属 Owner 管理
 ├── resources/                               # [条件·提交] 运行时只读资源
 │   ├── templates/                           # [条件·提交] 模板

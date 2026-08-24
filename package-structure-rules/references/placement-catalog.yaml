@@ -4,6 +4,7 @@
   "content_types": [
     "source_code",
     "sql_asset",
+    "script_asset",
     "config_asset",
     "static_data",
     "resource_asset"
@@ -25,15 +26,16 @@
     "database/migration/index/add",
     "database/migration/index/drop",
     "database/migration/index/alter",
-    "database/sql/dml",
-    "database/sql/view",
-    "database/sql/function",
-    "database/sql/procedure",
-    "database/sql/trigger",
-    "database/sql/partition",
-    "database/sql/permission",
-    "database/sql/seed",
-    "database/sql/maintenance",
+    "database/sql",
+    "database/scripts/sql/dml",
+    "database/scripts/sql/view",
+    "database/scripts/sql/function",
+    "database/scripts/sql/procedure",
+    "database/scripts/sql/trigger",
+    "database/scripts/sql/partition",
+    "database/scripts/sql/permission",
+    "database/scripts/sql/seed",
+    "database/scripts/sql/maintenance",
     "protocol",
     "schema",
     "config/examples",
@@ -95,12 +97,17 @@
       "redis",
       "mongo"
     ],
-    "database/sql": [
+    "database/scripts": [
+      "sql",
+      "js",
+      "lua"
+    ],
+    "database/scripts/sql": [
       "ddl",
       "index",
       "field"
     ],
-    "database/sql/field": [
+    "database/scripts/sql/field": [
       "create",
       "update",
       "delete"
@@ -548,7 +555,7 @@
       "artifact_kind": "database_sql",
       "content_type": "sql_asset",
       "category": "ddl",
-      "canonical_path": "database/sql/ddl",
+      "canonical_path": "database/scripts/sql/ddl",
       "purpose": "独立建表、改表与约束 SQL 文件",
       "creation_policy": "conditional",
       "tracked": true,
@@ -570,7 +577,7 @@
       "artifact_kind": "database_sql",
       "content_type": "sql_asset",
       "category": "index",
-      "canonical_path": "database/sql/index",
+      "canonical_path": "database/scripts/sql/index",
       "purpose": "独立索引 SQL 文件",
       "creation_policy": "conditional",
       "tracked": true,
@@ -593,7 +600,7 @@
       "content_type": "sql_asset",
       "category": "field",
       "operation": "create",
-      "canonical_path": "database/sql/field/create",
+      "canonical_path": "database/scripts/sql/field/create",
       "purpose": "独立新增字段 SQL 文件",
       "creation_policy": "conditional",
       "tracked": true,
@@ -616,7 +623,7 @@
       "content_type": "sql_asset",
       "category": "field",
       "operation": "update",
-      "canonical_path": "database/sql/field/update",
+      "canonical_path": "database/scripts/sql/field/update",
       "purpose": "独立修改字段 SQL 文件",
       "creation_policy": "conditional",
       "tracked": true,
@@ -639,7 +646,7 @@
       "content_type": "sql_asset",
       "category": "field",
       "operation": "delete",
-      "canonical_path": "database/sql/field/delete",
+      "canonical_path": "database/scripts/sql/field/delete",
       "purpose": "独立删除字段 SQL 文件",
       "creation_policy": "conditional",
       "tracked": true,
@@ -647,6 +654,52 @@
         ".sql"
       ],
       "forbidden_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.scripts.js",
+      "project_kind": "backend",
+      "artifact_kind": "database_script",
+      "content_type": "script_asset",
+      "category": "js",
+      "canonical_path": "database/scripts/js",
+      "purpose": "Mongo shell 手工执行脚本文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".js"
+      ],
+      "forbidden_extensions": [
+        ".sql",
+        ".go",
+        ".java",
+        ".ts",
+        ".py",
+        ".lua"
+      ],
+      "owner_skill": "package-structure-rules"
+    },
+    {
+      "id": "backend.database.scripts.lua",
+      "project_kind": "backend",
+      "artifact_kind": "database_script",
+      "content_type": "script_asset",
+      "category": "lua",
+      "canonical_path": "database/scripts/lua",
+      "purpose": "Redis 手工执行脚本文件",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".lua"
+      ],
+      "forbidden_extensions": [
+        ".sql",
         ".go",
         ".java",
         ".ts",
