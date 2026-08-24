@@ -25,6 +25,32 @@
 | 测试数据集 | `test-data` | 可供迭代运行的数据 |
 | 接口定义 | `endpoint` | case 的依赖对象，不等同 case |
 
+## 两类用例是两套资源（强制区分，2026-08-24 实测修正）
+
+> **本节此前的论断是错的**：原文写"接口树里接口下方的成功/失败子项 = 接口用例（test-case）""不存在把测试用例复制到调试用例这个操作"。实测证明接口树下的子项与 CLI `test-case` **是两套独立资源**，按原论断做参数完整性校验会得出**假通过**——CLI 侧全绿，用户在客户端点开接口看到的却是空 body。
+
+| | 调试用例（接口树下） | 自动化测试用例 |
+|---|---|---|
+| 客户端位置 | 接口管理 → 接口下方的「成功」等子项 | 自动化测试 → 正向/负向/边界值分类 |
+| 导出结构 | `api.cases[]`，`type=DEBUG_CASE`，`categoryId=0` | `apiTestCaseCollection` |
+| CLI 可见 | ❌ `test-case list --endpoint` **拿不到** | ✅ |
+| CLI 可写 | ❌ 见下方「CLI 能力边界」 | ✅ `test-case create/update` |
+| body 来源 | 只在 `import` 时按 OpenAPI 的 example 生成 | 由 `test-case create` 的 `requestBody.data` 写入 |
+
+**CLI 能力边界（逐条实测，别再试）**：
+
+- `endpoint get` 返回里**没有 `cases` 字段**，读不到调试用例
+- `endpoint-update` 的 schema **不含 `cases` / `DEBUG_CASE`**，写不了调试用例
+- `endpoint update` 写 `requestBody.example` → **报 `success: true` 但回读为空**（与 environment variables 同型的假成功，见 `modules/environment.md`）
+- 结论：**调试用例的 body 只能在 `import` 时经 example 灌入**，事后无法用 CLI 补；已存在的接口要么删掉重导（见规则 T-3），要么由用户在客户端点「自动生成」
+
+**因此验收要分两路**（只查一路即为假通过）：
+
+1. 自动化测试用例 → `test-case get` 对账 endpoint schema（见「参数完整性校验」节）
+2. 调试用例 → `export --format apifox` 查 `api.cases[].requestBody.data` 是否非空（见规则 T-3）
+
+**仍然成立的部分**："保存的请求"（`history` 资源）是账号维度私有、其他成员不可见、且 CLI 只读（仅 list/get，无 create）；团队共享的调试例子应落为接口下的调试用例，而非请求历史。`branch pick-to` 的 `--include-endpoint-cases` 指的就是调试用例。
+
 ## 命令入口
 
 ```bash
@@ -137,8 +163,9 @@ def pretty_jsonb(data: dict) -> str:
 - 示例数据应能让前端/后端开发者直接拿来做对接参考
 
 **CLI 修复路径**：
-- 在 endpoint 创建/更新时，自动根据 schema 生成真实 Mock 示例（参考 `test-case-generation.md` 的「schema 驱动数据构造规则」表）
-- 对空壳示例 → 用 `endpoint update` 接口更新为真实示例，或删除该空壳示例
+- **接口创建/导入时**就按 schema 把真实示例写进 OpenAPI（参考 `test-case-generation.md` 的「schema 驱动数据构造规则」表）——这是唯一可靠时机
+- ⚠️ **不要指望 `endpoint update` 补示例**：实测写 `requestBody.example` 报 `success: true` 但回读为空（2026-08-24）。响应示例侧同理，回写后必须用 `export --format apifox` 回读确认，不能只看 update 的返回
+- 已存在接口的空壳示例只能删除，或按规则 T-3 删接口重导
 
 **不通过则阻断**：
 - 创建用例/同步接口时若检测到 Mock 示例空壳 → 必须删除空壳或补全数据，不允许保留 `{}` 占位
@@ -148,12 +175,50 @@ def pretty_jsonb(data: dict) -> str:
 - 节点 2（创建/更新用例）时同步校验 Mock
 - 现有空壳示例批量修复 → 见 `project-onboarding-checklist.md` 「现有项目批量修复命令集」节第 4 项
 
+## 规则 T-3：调试用例请求示例（强制，2026-08-24 新增）
+
+> 防止「自动化测试用例全绿、但对接方点开接口只看到空 body」。调试用例是对接方理解接口的第一入口，空 body 等于没有示例。
+
+**example 必须放 MediaType 层级——这是本规则的关键，放错位置静默无效**：
+
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:                    # ← 放 schema.example 无效！实测重导后 0/5 仍为空
+        type: object
+        properties:
+          id: {type: integer, description: 主键, example: 1}   # 字段级 example 另有用途，不能替代下面这个
+      example:                   # ← 必须放这里（MediaType 层级，与 schema 同级），实测 5/5 生效
+        id: 1
+        enabled: 1
+```
+
+OpenAPI 规范里 `MediaType.example` 与 `Schema.example` 都合法，**apifox 生成调试用例 body 时只认前者**。
+
+**判定标准**（任一命中即不通过）：
+
+- `export --format apifox` 里该接口 `api.cases[].requestBody.data` 为空串
+- OpenAPI 的 requestBody 缺 `content."application/json".example`
+- example 只写在 `schema.example` 或仅字段级 `properties.*.example`
+
+**通过标准**：每个有 body 的接口，`api.cases[]` 中至少一个 `DEBUG_CASE` 的 `requestBody.data` 非空，且内容是可直接发送的合法请求（必填字段齐全、枚举值合法）。
+
+**已存在接口的修复路径**（CLI 补不了，只有两条路）：
+
+1. **删接口重导**（可自动化）：`endpoint delete` → 用带 example 的 YAML `import` → 重新绑定 securityScheme → **重建该接口下的测试用例**（endpointId 会变，旧 caseId 全部失效）→ 重跑回归。破坏性操作，执行前须用户确认。
+2. **用户在客户端点「自动生成」**：零风险、不动任何 ID，但需人工逐接口点击。
+
+**应用时机**：写 OpenAPI / swag YAML 时就带上 example（节点 2 → A12）；导入后立即验收，不要等对接方反馈。
+
 ## 不可违反规则（test-case 模块，硬动作级）
 
 1. **无参测试 = 无效测试**：接口有参但用例无参必须补全，禁止"先建 1 个正向先收口"；唯一例外是经三条证据确认的 header-only 接口（见「参数完整性校验」节例外条款）
 2. **JSON 不格式化不允许写入**：`requestBody.data` / `examples.data` / 响应示例必须用 `pretty_jsonb` 格式化
 3. **Mock 空壳不允许存在**：200 响应示例必须是真实业务数据，禁止 `{}`
 4. **创建后必须 test-case get 对账 endpoint schema**（节点 2 → A7 双重闸门）
+5. **两类用例分别验收**：`test-case` 全绿不代表调试用例有参数，二者是两套资源；导入接口后必须按规则 T-3 用 `export --format apifox` 查 `api.cases[].requestBody.data`（节点 2 → A12）
+6. **CLI 写入报 success 不等于落库**：`endpoint update` 的 `requestBody.example`、`environment update` 的 `variables` 都属"假成功"字段，写完必须回读确认
 
 ## 更新测试用例
 

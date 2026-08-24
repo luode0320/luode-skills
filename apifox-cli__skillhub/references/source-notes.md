@@ -2,6 +2,25 @@
 
 > 归属 owner：`apifox`。记录本 skill 各模块的能力来源，可回指来源仓库/版本。
 
+## 2026-08-24：内部调整（执行中 gap 回补）—— 调试用例与测试用例是两套资源
+
+- **来源**：无外部源。EllipalFinance-go 项目为 5 个活动曝光管理接口建完 21 个 test-case 并跑绿后，用户截图指出客户端接口树下的「成功」用例 Body 仍是空的。查证发现本 skill 有**两条与实测相反的论断**，导致参数完整性闸门给出**假通过**（CLI 侧全绿、交付物空壳）。
+- **调整通道**：`skill-absorption-rules` 执行中 gap 回补通道（阻断级：不补会持续测错方向）。
+- **缺口类型**：判定标准错误 + 闸门缺失。
+- **纠错的两条错误论断**：
+  1. `modules/test-case.md`「接口用例 = 调试入口」节原写"接口树里接口下方的成功/失败子项 = 接口用例（test-case）""不存在把测试用例复制到调试用例这个操作" → 实测两者是**两套独立资源**（`api.cases[]` 的 `type=DEBUG_CASE`/`categoryId=0` vs `apiTestCaseCollection`），`test-case list --endpoint` 拿不到前者。
+  2. 同文件规则 T-2 修复路径原写"用 `endpoint update` 接口更新为真实示例" → 实测写 `requestBody.example` 报 `success: true` 但回读为空（与 `environment update` 的 `variables` 同型的假成功）。
+- **回补落点**：
+  - `modules/test-case.md` ← 「两类用例是两套资源」节（**重写原错误段**，含对照表 + CLI 能力边界 + 双路验收）、规则 T-3（调试用例请求示例，含 example 层级 YAML 示例与两条修复路径）、T-2 修复路径**纠错**、不可违反规则新增第 5/6 条
+  - `modules/project-onboarding-checklist.md` ← 硬动作 A12（导入后 `export --format apifox` 查 `api.cases[].requestBody.data` 非空）+ 映射表一行
+  - `modules/api-sync-to-apifox.md` ← 不可违反规则第 10 条（OpenAPI 必须带请求 example 且放 MediaType 层级）
+  - `SKILL.md` ← `modules/test-case.md` 路由行补 T-3 与「两套资源」关键词
+- **关键实测事实（example 放错层级静默失效）**：`example` 必须放 `content."application/json".example`（MediaType 层级，与 `schema` 同级）；放进 `schema.example` **无效**——实测删接口重导后调试用例 body 覆盖 0/5，改到 MediaType 层级后 5/5 生效。OpenAPI 两处都合法，apifox 只认前者。
+- **拒绝的记录**：项目侧事实（endpointId `505895223~505895227`、21 个 caseId、fixture 主键）不进全局 skill，留在项目 `PROJECT_TEST.md`。
+- **同域去重结论**：扫描范围 `SKILL.md` + `modules/{test-case,project-onboarding-checklist,api-sync-to-apifox,import-export,branch}.md`。权威正文（对照表 / YAML 示例 / 判定标准 / 修复路径）**只在 `test-case.md` 一处**，checklist 与 api-sync 均为触发点/一句话规则并回指 T-3，`branch.md` 的 `--include-endpoint-cases` 已在新节中被解释归位。**PASS（0 处需清理）**。
+- **净增体积**：新增约 62 行（T-3 规则 + 两套资源对照表 + A12 + 两条不可违反规则），其中约 12 行是**替换**原错误论断而非纯增；无可删除的过时内容（原段落是纠错重写，不是叠加）。
+- **实战证据**：项目内 `PROJECT_TEST.md`「Apifox CLI 已验证事实」表新增 5 行；case study 见 `case-debug-case-vs-test-case.md`。
+
 ## 2026-08-21（续2）：内部调整 —— 接口归类与持续维护（folder 组织）
 
 - **来源**：无外部源。用户指明"apifox 的接口生成也记得归类，后续也可以持续整理接口的位置，不是生成了就不用调整"，附截图反面案例：全部接口堆在「默认模块 / 接口」平铺层，未按业务模块（交易所 / 兑换活动 / 币种 / 翻译…）归类。

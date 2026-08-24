@@ -21,6 +21,7 @@
 | `test-case.md` 规则 T-1 JSON 格式化（新增） | A5：用例 body 必须 pretty-print 入字符串 | 节点 2 |
 | `test-case.md` 规则 T-2 Mock 真实性（新增） | A6：Mock 200 响应示例必须含真实数据 | 节点 2 |
 | `test-case.md` 参数完整性校验（双重闸门） | A7：创建后 test-case get 对账 endpoint schema | 节点 2 |
+| `test-case.md` 规则 T-3 调试用例请求示例（新增） | A12：导入后 `export --format apifox` 查 `api.cases[].requestBody.data` 非空 | 节点 2 |
 | `api-design.md` 字段说明铁律 | A1：创建后立即 endpoint get 校验 description | 节点 1 |
 | `api-folder-organization.md` folder 归类铁律 | A11：创建/导入后立即校验业务 folder 归类 | 节点 1 |
 | `environment.md` 端口三级链 | A2：环境创建/更新后立即探测实际监听端口 | 节点 3 |
@@ -68,6 +69,15 @@
 - **通过标准**：JSON 内容可读性对齐 apifox 编辑器的「美化输出」（2 空格缩进、字段逐行排列）
 - **不通过则阻断**：单行压缩 → 必须先格式化再写入（如 CLI 生成时使用 `json.dumps(obj, indent=2, ensure_ascii=False).replace('"', '\\"').replace('\n', '\\n')` 工具函数）
 - **关联规则**：`test-case.md` 规则 T-1（新增）
+
+#### A12：调试用例请求示例非空（强制）
+
+- **触发时机**：写 OpenAPI / swag YAML 时（必须带 example）、`import` 完成后立即验收
+- **执行命令**：`apifox export --project <id> --format apifox --output x.json`，检查目标接口 `api.cases[].requestBody.data` 是否非空
+- **通过标准**：每个有 body 的接口，至少一个 `DEBUG_CASE` 的 `requestBody.data` 是可直接发送的合法请求
+- **不通过则阻断**：body 为空串 → 检查 OpenAPI 的 example 是否写在 `content."application/json".example`（MediaType 层级）；写在 `schema.example` 无效。已存在接口只能删接口重导或由用户在客户端点「自动生成」
+- **为什么单列一条**：`test-case` 全绿**不代表**调试用例有参数，两者是两套资源（`apiTestCaseCollection` vs `api.cases[]`），只查 A7 会得出假通过
+- **关联规则**：`test-case.md` 规则 T-3（新增）
 
 #### A6：Mock 200 响应示例真实性（强制）
 

@@ -53,3 +53,4 @@
 7. 接口变更后，字段说明（参数/响应/头部 `description`）必须随接口同步更新，不允许只改字段不改说明
 8. **安全方案必须与鉴权中间件真实机制一致**：本地免签不构成"不配鉴权"的理由；自定义签名不得写成 `http bearer`，发现不一致回流 swag 修生成口径并全量重生成（见步骤 6.1 与 `modules/test-auth.md`「鉴权配置必须进 apifox」）
 9. **接口必须落在业务 folder 下**：导入后停在「默认模块 / 接口」平铺层或归类错误 → 视为归类缺口，按 `api-folder-organization.md` 迁移归位后再收口（见步骤 6.2 与硬动作 A11）
+10. **有 body 的接口，OpenAPI 必须带请求 example，且放在 MediaType 层级**（`content."application/json".example`，与 `schema` 同级）：这是接口树下调试用例 body 的**唯一来源**，`import` 是唯一写入时机——漏了就只能删接口重导，CLI 事后补不了。放进 `schema.example` 静默无效。导入后按硬动作 A12 用 `export --format apifox` 验收（见 `modules/test-case.md` 规则 T-3）
