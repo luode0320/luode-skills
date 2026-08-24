@@ -7,6 +7,12 @@ description: 【Goal 激活或用户显式 goal 意图即触发】当当前会�
 
 ## 核心概念
 
+### 范式定位
+
+> 来源：吸收 `loop-engineering`（skillhub）范式演进模型。
+
+AI 编程范式三阶段演进：**Prompt Engineering**（人工逐条提示、模型单次执行、人判结果）-> **Harness Engineering**（为单 Agent 搭受限环境，带预检/修复/hook，仍靠人触发）-> **Loop Engineering**（多 Agent 编排 + 决策 + 自主循环，长期自驱动）。本 skill 是 Loop Engineering 阶段在本平台（WorkBuddy Desktop，无 CLI wrapper）的落地实现。
+
 ### 为什么需要长任务循环
 
 LLM 有一个根本缺陷：它无法准确判断自己的工作是否真正完成。人类的完成标准是客观的——所有测试通过、功能完整可用、代码质量达标。但 AI 只能基于"感觉"来判断。长任务循环的核心思想是：让 AI 在一个循环中工作，每次它想退出时，外部系统检查三个问题——真的完成了吗？符合客观标准了吗？还有没有遗漏？如果没有，就重新注入任务，继续下一轮。
@@ -41,6 +47,7 @@ LLM 有一个根本缺陷：它无法准确判断自己的工作是否真正完�
 
 ### 触发后行为
 
+- 若目标仍为模糊大目标（无法直接写出完成标记，如"想转行""想把技能体系做好"），先按 `references/goal-breakdown-before-loop.md` 倒推法拆解（澄清目标与 deadline → 拆 3 层动作 → 标出首个最小可行步），拆解产物作为 goal objective 输入后再继续；目标已可直接写完成标记时跳过本步
 - 解析任务目标中的完成标记；若用户目标里未写完成标记，采用默认标记 `<promise>DONE</promise>` 并明确告知用户
 - 进入控制器模式，主 agent 转为循环控制器
 - 创建工作线程执行实际任务（无线程工具时降级为 L1 内部续跑）
@@ -58,6 +65,26 @@ LLM 有一个根本缺陷：它无法准确判断自己的工作是否真正完�
 - "持续工作 / 长时间运行"
 - "一直做直到完成"
 - "建个 goal / 创建目标 / 下个目标 / /goal"
+- "拆解目标 / 怎么实现 / 大目标太小步 / OKR"（目标模糊需先拆解再执行时）
+
+### /loop 定时循环映射（平台无原生 /loop 时的等价）
+
+> 来源：吸收 `loop-engineering` 的 `/loop` vs `/goal` 原语区分。
+
+本平台的 `/goal` 语义对应本 skill 的目标驱动路径（Goal 触发 + 完成标记）。`/loop`（定时重复执行）语义在本平台等价映射为：
+
+- **定时触发**：WorkBuddy `automation_update`（automations 表，rrule 定时），对应模式库「巡逻循环」
+- **两者共用约束**：完成条件必须客观可验证（文件存在、测试通过、指标达标）；`/loop` 等价物必须设置次数上限或终止条件——无终止条件 = 无限循环，属反模式
+
+## 循环模式选择
+
+> 来源：吸收 `loop-engineering` 八种循环模式库。
+
+命中后先判断任务属于哪种循环模式，8 种模式库见 `references/loop-patterns-library.md`：
+
+- 本 skill 主路径 = 模式 5「目标驱动探索」（Goal 触发 + 完成标记 + 线程接力）
+- 定时巡检类 = 模式 1「巡逻循环」（配合 automation 定时触发）
+- 其余模式（数据管道 / 批处理 / 多智能体评审 / 增量构建 / 自愈等）按模式库选择指南调整循环设计
 
 ## 三层递进架构
 
@@ -179,6 +206,8 @@ LLM 有一个根本缺陷：它无法准确判断自己的工作是否真正完�
 | `dead_loop_similarity_threshold` | 0.95 | 死循环判定阈值 |
 | `cost_alert_thresholds` | [10, 50, 100] | 成本预警阈值（美元） |
 | `rate_limit_per_hour` | 100 | 每小时速率限制 |
+| `max_runtime_minutes` | 480 | 最大运行时间（分钟，默认 8 小时） |
+| `worker_timeout_minutes` | 30 | 单个 worker 线程超时时间 |
 
 ### 在 Goal objective 中覆盖
 
@@ -251,5 +280,6 @@ LLM 有一个根本缺陷：它无法准确判断自己的工作是否真正完�
 - 新增 safety 机制时同步更新 `references/safety-mechanisms.md`
 - 修改完成标记检测逻辑时同步更新 `references/completion-marker-pattern.md`
 - 修改 default 配置时同步更新 `references/loop-config-schema.md`
+- 新增或调整循环模式时同步更新 `references/loop-patterns-library.md`
 - 修改脚本时同步更新本 SKILL.md 的执行流程描述
 - 修改后必须运行 `python skill-dictionary/generate_dictionary.py` 刷新 `skill-dictionary/data.js` 与 `字典.md`

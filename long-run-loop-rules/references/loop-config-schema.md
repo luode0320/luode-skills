@@ -30,7 +30,7 @@
 ### 在 Goal objective 中覆盖
 
 ```
-<objective --max-iterations 100 --checkpoint-interval 20 --max-runtime 600>
+<objective --max-iterations 100 --checkpoint-interval 20 --max-runtime-minutes 600>
 ...
 </objective>
 ```
@@ -116,3 +116,16 @@ limited -> active: 修复后重新激活
 - 过夜跑：10-15（每 10-15 轮暂停一次，人工确认）
 - 白天监控：5-8（更频繁的人工检查）
 - 完全信任：0（不暂停，仅靠硬限制保护）
+
+## Automation 触发参数心智（L3 监控模式）
+
+> 来源：吸收 `loop-engineering` config-examples 的 Automation 配置心智（平台无关），供 L3 自动化监控与 `automation_update` 定时触发设计参考。
+
+| 参数 | 作用 | 要点 |
+|---|---|---|
+| preconditions | 触发前置条件 | 用条件门挡住无效触发（如"系统 active 且上次运行已隔 5h 且非维护模式"） |
+| retry + backoff | 失败重试策略 | 指数退避（1m/2m/4m），只对可重试错误（超时/网络错误）重试，防级联失败 |
+| on_failure | 失败兜底 | 三选一：skip（跳过本轮）/ retry（重试）/ halt（停止并告警） |
+| timeout | 单次执行超时 | 防止单次执行卡死拖垮后续调度；cron 间隔必须大于单次执行时长，防任务堆积 |
+
+原则：定时触发定义"何时唤醒"，循环内逻辑定义"唤醒后怎么执行"，两者职责分离。

@@ -1066,3 +1066,4 @@ claude-mem(记忆) :
 2026-08-23 21:26:00 feat: [投影写入隔离降级] 损坏投影不阻塞新会话落盘
 2026-08-23 21:27:00 feat: [IP查询skill接入] ip__skillhub新skill落盘
 2026-08-23 21:28:00 test: [测试同步] 投影隔离降级与summary hook中断防护回归
+2026-08-25 00:42:00 feat: [long-run-loop-rules范式演进] 吸收loop-engineering循环模式与目标拆解
