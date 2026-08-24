@@ -63,7 +63,6 @@
 | `requirements-driven-workflow/agents/requirements-generate.md` | 技术规格直接映射文件、函数、接口、配置与验证 | 本地实施总览/周期已要求文件/符号落点与真实测试 | 保留本地 | 无 |
 
 ## 吸收后必须保持的边界
-
 - 不新增 Skill 目录，不复制官方插件目录。
 - 不引入 `.codebuddy/specs/`、`--skip-tests`、`requirements-pilot` 或 Feature Dev 阶段问答链作为正式入口。
 - 本地四类 skill 仍是唯一 Owner；官方精华只作为 references 或正文补充。
@@ -112,3 +111,66 @@
 | 同一来源 | maxTokens 32 默认值 | 与本地 24 字上限冲突且过低（外部自身 SKILL.md 亦注明 1024 更稳） | 拒绝 | 无 |
 | 本地 `thread-title-rules` 根因修复 | 根因：Codex 宿主绑定（MCP `rename_current_thread` + `~/.codex/config.toml`）在 WorkBuddy 静默失效 → 新增 WorkBuddy 原生适配（`workbuddy.db` sessions.custom_title 用户改名槽，双宿主矩阵互斥路由）；title 字段为主进程独占自动摘要槽、agent 写入会被回写覆盖（实测），禁止作为改名目标 | 本地无 WorkBuddy 路径 | 修复升级 | `workbuddy/rename-session.py` + `references/workbuddy-host-contract.md` + SKILL.md 双宿主矩阵 |
 | 本地 `thread-title-rules` 强项 | 中文 8-24 字、对象+动作/症状/阶段、稳定不频繁改名、跳过条件矩阵、工具与证据约束、Codex 自举 | 外部无此精细规则 | 保留本地 | 无新增 |
+
+## 2026-08-23 吸收：dw-goal-breakdown（SkillHub 目标拆解）
+
+- **来源**：`dw-goal-breakdown`（SkillHub 安装源，工作区 `D:\谷歌云盘\luode-skills\dw-goal-breakdown__skillhub\`，SKILL.md 读原文；v1.0.0，作者 Dream，MIT）
+- **拆解原子条目**：5 条 → 合并 4 / 拒绝 1
+
+| # | 外部精华 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---------|---------|------|------------|
+| 1 | 适用场景三件套：目标写成可衡量结果 / 拆月→周→日 / 标今日第一步 | 本地无自有目标拆解规则；long-run-loop-rules 只做执行循环 | 合并 | `implementation-planning-rules/references/goal-breakdown-seed.md`（新建，工程域入口）|
+| 2 | 倒推法：澄清目标与 deadline → 拆 3 层动作 → 最小可行步 | 本地无同义规则 | 合并 | 方法本体单一权威在 `long-run-loop-rules/references/goal-breakdown-before-loop.md`；seed 引用式接入 |
+| 3 | 首个最小可行步（默认 10 分钟内可启动） | 本地无 | 合并 | seed.md「最小步下沉」节：首个任务必须短时可启动 |
+| 4 | 示例：转行做开发 → 季度学基础/月做项目/周刷题 + 今日选入门课 | 本地无 | 合并 | seed.md 示例节（改写为本地口径）|
+| 5 | 源文件排版缺陷（逐字换行乱码、`示例: None` 占位） | 本地 skill 规范禁止乱码与空占位 | 拒绝 | 缺陷形态不吸收 |
+
+- **落盘改动**：
+  - 新增 `references/goal-breakdown-seed.md`（约 1.4KB，引用式）。
+  - 修改 `SKILL.md`：自动触发信号补 1 条（模糊大目标计划型问题 → 轻量拆解入口）、references 读取规则补 1 条。
+  - `references/source-notes.md` 追加来源记录。
+- **整理去重**：方法步骤在 seed.md 与 before-loop.md 高度重复 → 收敛为「单一权威（before-loop）+ 引用式（seed）」，seed 已重写不重复定义步骤。
+- **同域扫描结论**：范围 = implementation-planning-rules / long-run-loop-rules / requirement-splitting-rules / requirement-intake-rules / goal__skillhub / autonomous-execution-rules。关键词（倒推法/最小可行步/周→日/10 分钟可启动/拆解目标/大目标太小步）扫描：除本次两处新落盘文件外 0 命中；无门控层叠（long-run-loop 侧触发词已限定"目标模糊需先拆解再执行"）；无散落产物；引用链可达（seed → before-loop 跨 skill 相对路径正确）。**PASS**。
+- **环境依赖**：N/A（规则纯文本，无环境变量/宿主配置/hook/依赖/路径引用）。
+- **自检能力**：N/A（无环境依赖项）。
+- **净增体积**：+约 1.4KB（seed.md）+ 约 0.3KB（SKILL.md 两行 + source-notes 一段）；引用式接入，不构成膨胀。
+- **棘轮验证**：8 维评分 implementation-planning-rules 基线 85.0 → 吸收后 90.5（+5.5，主要提升：边界条件覆盖模糊目标 fallback、资源整合跨 skill 引用链）；新分严格高于基线，保留。评分方式：第三方视角（间隔一轮重新打分）。
+- **删除源**：已删除工作区安装源 `dw-goal-breakdown__skillhub/`。
+
+## 2026-08-23 吸收：conductor（Context-Driven Development，实施执行协议）
+
+- **来源**：`conductor`（市场 `codebuddy-plugins-official/external_plugins/conductor`，本地只读缓存；Google Conductor 的 Claude Code 移植版，Apache-2.0；原文 = README + context-driven-development/track-management/workflow-patterns 三 SKILL + new-track/implement 两 command + conductor-validator）
+- **拆解原子条目**：18 条 → 合并 8 / 保留本地 8 / 拒绝 2
+
+| # | 外部精华 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---------|---------|------|------------|
+| 1 | Context→Spec&Plan→Implement 三阶段工作流 | REQ→AC→CYCLE→TASK + 上下文四件套更强 | 保留本地 | 无新增 |
+| 2 | 上下文工件四文档（product/tech-stack/workflow/tracks） | PROJECT_CURRENT/MEMORY/HISTORY/STYLE 四件套等价 | 保留本地 | 形态映射已存在 |
+| 3 | 实施前上下文校验（读→标过时→提议更新→确认） | `pre-implementation-code-exploration.md` 只覆盖代码库探索 | 合并 | `task-execution-protocol.md`「实施前上下文校验」节 |
+| 4 | spec.md 模板（FR/NFR/AC/Scope/Risks） | requirement-structure-template + 极致完整性更强 | 保留本地 | 无新增 |
+| 5 | plan.md 分阶段模板 | implementation-cycle-template 更强 | 保留本地 | 无新增 |
+| 6 | 任务状态标记协议：`[ ]`/`[~]`/`[x]`/`[-]`/`[!]` 五态 | 无清单标记约定（仅单任务内部状态机） | 合并 | `task-execution-protocol.md`「状态标记」节 |
+| 7 | 任务完成记录 commit SHA（plan 内可追溯） | 「绿后提交」无 plan 内 SHA 记录要求 | 合并 | 同上 |
+| 8 | 阶段检查点机制（阶段完成→验证→checkpoint SHA；**去掉原版人工审批**） | 有最小任务闭环+6-review，无阶段级检查点协议 | 合并(适配) | 同上；放行走本地既有闸门，不引入人工等待 |
+| 9 | 偏差标注格式（DEVIATION/Reason/Impact 三级 + 四类型分层） | requirement-change-rules 管需求层面，无执行期偏差标注格式 | 合并 | 同上（执行期偏差）；需求层面仍归 change-rules |
+| 10 | 按工作单元语义回滚（周期/阶段/任务靠 plan 内 SHA 定位） | git-collaboration-rules 管 git 操作，无计划单元级回滚映射 | 合并 | 同上（git 红线仍归 git-collaboration-rules） |
+| 11 | 任务规模量化指南（2-4 阶段/8-20 任务；>5 阶段或 >25 任务过大） | splitting 域无量化规模；本地单任务 ≤5 文件为文件粒度 | 合并 | 同上 |
+| 12 | TDD 11 步核心节奏（RED→GREEN→REFACTOR） | `tdd-workflow.md` 已吸收且更强 | 保留本地 | 无新增 |
+| 13 | git notes 附加任务摘要 | 无 git notes 用法 | 合并(轻量) | 同上「可选增强」1 句 |
+| 14 | 覆盖率 80% 目标 | test-strategy-rules 管覆盖策略，不写死通用值 | 保留本地 | 无新增 |
+| 15 | 错误恢复（测试失败回退/检查点拒绝/依赖阻塞） | error-handling-rules / bug-validation-rules 等价 | 保留本地 | 无新增（`[!]` 标记并入 #6） |
+| 16 | 上下文反模式（Stale/Sprawl/Implicit/Hoarding/Over-Spec） | project-memory-rules 管记忆维护 | 保留本地 | 无新增 |
+| 17 | plugin 命令形态（/setup /new-track /implement 等） | 本地是规则 skill 非 CLI 插件 | 拒绝 | 形态不匹配 |
+| 18 | conductor/ 专属目录 + metadata.json 进度跟踪 | artifact-storage path-map + PROJECT_CURRENT.md 已有等价 | 拒绝 | 形态不匹配 |
+
+- **落盘改动**：
+  - 新增 `references/task-execution-protocol.md`（8643B：状态标记五态 + SHA 追踪 + 阶段检查点适配版 + 偏差标注 + 语义回滚 + 规模量化 + 实施前校验 + git notes）。
+  - 修改 `SKILL.md`：references 读取规则补 1 条（+4/-1 行）。
+  - `references/source-notes.md` 追加来源记录。
+- **用户调整**：阶段检查点审批协议中的人工审批规则不吸收（本地零决策执行模型：强模型冻结决策、执行模型自动闭环），只保留「验证→记录→放行」机制，审批走本地既有闸门。
+- **整理去重**：外部 4 文件约 20KB → 合并 8 项精华 → 新增 8643B；TDD 节奏已存在（tdd-workflow.md）不重复吸收。
+- **同域扫描结论**：范围 = implementation-planning-rules / tdd-workflow（节奏互补）/ minimum-task-execution-contract（状态机互补）/ requirement-change（偏差分层）/ git-collaboration（git 机制边界）/ task-granularity-and-order（规模互补）。关键词（五态标记/checkpoint/DEVIATION/人工审批/语义回滚/规模阈值）扫描：除本次新落盘文件外 0 命中；无门控层叠；引用链可达。**PASS**。
+- **环境依赖**：N/A（规则纯文本）。
+- **净增体积**：+8643B（新 reference）+ 约 0.2KB（SKILL.md 登记）。
+- **棘轮验证**：8 维评分 implementation-planning-rules 基线 63.3 → 吸收后 88.4（+25.1，主要提升：实测表现 3→9 四场景全部可直接执行、边界条件覆盖阻塞/跳过/规模阈值、检查点设计去掉人工审批适配零决策模型）；新分严格高于基线，保留。评分方式：独立子 agent 第三方视角。
+- **删除源**：市场缓存为只读共享资产，不删除。

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luode-skills 体系 8 维评分巡检报告</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --line:#e5e7eb; --text:#1f2329;
+    --muted:#6b7280; --accent:#2f6fed; --red:#d92d20; --amber:#d97706; --green:#15803d;
+    --rules:#2f6fed; --skillhub:#9333ea; --other:#0d9488; --market:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card .k{font-size:12px;color:var(--muted);margin-bottom:4px}
+  .card .v{font-size:22px;font-weight:700}
+  .card .d{font-size:11px;color:var(--muted);margin-top:2px}
+  .section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .section h2{font-size:16px;margin:0 0 12px}
+  .bar-wrap{display:flex;align-items:center;gap:8px;margin:6px 0}
+  .bar-label{width:150px;font-size:12px;color:var(--muted);text-align:right;flex-shrink:0}
+  .bar-track{flex:1;background:#f0f1f3;border-radius:6px;height:18px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;color:#fff;font-size:11px;line-height:18px;padding-left:6px;white-space:nowrap}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+  .controls label{font-size:12px;color:var(--muted)}
+  button{font:12px/1 sans-serif;padding:5px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);cursor:pointer}
+  button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button:hover{opacity:.9}
+  .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:20px;color:#fff}
+  .p-rules{background:var(--rules)} .p-skillhub{background:var(--skillhub)} .p-other{background:var(--other)} .p-market{background:var(--market)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+  th{background:#fafbfc;color:var(--muted);font-weight:600;position:sticky;top:0}
+  td.name{text-align:left;font-weight:500}
+  .score{font-weight:700}
+  .s-low{color:var(--red)} .s-mid{color:var(--amber)} .s-high{color:var(--green)}
+  .note{color:var(--muted);font-size:11.5px;text-align:left;white-space:normal;max-width:220px}
+  .toplist li{margin:5px 0;font-size:13px}
+  .rank{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:#f0f1f3;font-size:11px;margin-right:6px;font-weight:700}
+  .legend{font-size:12px;color:var(--muted)}
+  .legend b{margin-right:14px}
+  .footer{color:var(--muted);font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>luode-skills 体系 8 维评分巡检报告</h1>
+  <div class="sub">评分标准：<b>skill-absorption-rules / references / darwin-rubric.md</b> 的 8 维 Rubric。本次只做维度 1–7 静态评分（满分 75），维度 8「实测表现」（25 分）统一标注「未实测」。共 157 个 skill，由 6 个独立子代理分批打分。</div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="section">
+    <h2>分类对比（平均静态分）</h2>
+    <div id="catBars"></div>
+    <div class="legend">
+      分类：<b style="color:var(--rules)">■ 自有规则型 *-rules</b>
+      <b style="color:var(--other)">■ 自有工具/领域</b>
+      <b style="color:var(--skillhub)">■ 第三方 __skillhub</b>
+      <b style="color:var(--market)">■ 市场 skill_编号</b>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>短板 Top 25（静态分最低，满分 75）</h2>
+    <ol class="toplist" id="toplist"></ol>
+  </div>
+
+  <div class="section">
+    <h2>完整打分清单（默认按静态分升序，短板在前）</h2>
+    <div class="controls">
+      <label>筛选：</label>
+      <button data-f="all" class="active">全部 157</button>
+      <button data-f="rules">自有 rules</button>
+      <button data-f="other">自有工具</button>
+      <button data-f="skillhub">第三方 skillhub</button>
+      <button data-f="market">市场编号</button>
+      <span style="flex:1"></span>
+      <button id="sortBtn">按分数降序</button>
+    </div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Skill</th><th>分类</th>
+        <th>Front<br>matter</th><th>工作流</th><th>边界</th><th>检查点</th><th>具体性</th><th>资源</th><th>架构</th>
+        <th>静态分</th><th>短板/亮点</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="footer">维度权重：Frontmatter 8 / 工作流 15 / 边界 10 / 检查点 7 / 具体性 15 / 资源 5 / 架构 15；静态总分 = Σ(维度分×权重)/10，满分 75。维度 8（实测表现 25 分）未实测。</div>
+  </div>
+</div>
+
+<script>
+const D=[
+["2d-game-dev__skillhub",9,9,7,6,9,7,9,"验证闭环自测到位","skillhub"],
+["3d-game-dev__skillhub",9,9,7,6,9,7,9,"灰盒先行性能清单全","skillhub"],
+["agent-runtime-recovery-rules",9,9,9,9,8,9,9,"状态机与幂等续接强","rules"],
+["agent-sprite-forge-design",8,8,7,9,7,7,8,"确认闸门多但缺实例","other"],
+["api-contract-rules",9,9,8,8,9,9,9,"四阶段路由references全","rules"],
+["apifox-cli__skillhub",7,8,8,9,8,9,8,"模块庞大但组织清晰","skillhub"],
+["architecture-doc-rules",8,8,8,8,8,9,8,"编号主入口规则明确","rules"],
+["artifact-delivery-gate-rules",8,8,9,9,9,9,8,"机器门禁脚本落地强","rules"],
+["artifact-storage-rules",8,8,9,8,9,9,9,"单一真相源引用清晰","rules"],
+["authenticated-url-routing-rules",8,8,9,8,8,7,8,"实测回灌与阻断细致","rules"],
+["autonomous-execution-rules",8,8,9,9,8,9,8,"授权三态防失控到位","rules"],
+["bash__skillhub",5,5,4,3,7,7,6,"参考手册缺工作流步骤","skillhub"],
+["browser-advanced-testing-rules",8,7,7,5,8,8,8,"命令全但检查点偏少","rules"],
+["browser-session-automation-rules",8,8,8,5,9,9,9,"实战经验与模板丰富","rules"],
+["browser-use-cloud-rules",8,8,9,9,9,9,8,"费用与清理闸门严格","rules"],
+["bug-fix-proposal-rules",8,8,8,8,8,8,8,"反打补丁原则明确","rules"],
+["bug-intake-rules",8,8,8,8,8,9,8,"条件路由与references全","rules"],
+["bug-reproduction-rules",7,8,7,7,8,8,8,"复现模板规范","rules"],
+["bug-root-cause-rules",7,8,8,7,8,8,8,"症状分类映射细致","rules"],
+["bug-validation-rules",7,8,8,8,8,8,8,"关闭前复盘闭环","rules"],
+["cgo-plugin-isolated-test",7,8,9,5,9,4,8,"关键坑详实脚本外链","other"],
+["character-sprite-animation-production",8,7,6,8,7,7,8,"QA审查到位","other"],
+["charset-fix__skillhub",6,5,5,3,7,6,6,"诊断参考缺流程","skillhub"],
+["code-change-finalization-gate-rules",8,8,8,8,8,6,8,"阻断分级明确","rules"],
+["code-context-resync-rules",7,8,6,7,7,6,7,"防覆盖原则清晰","rules"],
+["code-generation-style-rules",8,8,8,7,8,8,8,"风格契约收敛到位","rules"],
+["code-quality-rules",9,9,9,9,9,10,9,"双主线清晰注释联动到位","rules"],
+["code-snippet-location-rules",9,8,8,8,8,10,9,"定位优先级明确防误判","rules"],
+["code-style-consistency-rules",9,8,8,8,9,10,8,"职责过重反例库耦合偏大","rules"],
+["codegraph-analysis-rules",8,7,8,7,8,4,7,"缺自有资源全依赖外部","rules"],
+["comment-rules",9,9,9,9,10,10,9,"三分区闸门严密近乎无短板","rules"],
+["common-util-rules",9,8,8,8,8,10,9,"复用检索冻结策略清晰","rules"],
+["context-compression-rules",8,7,8,8,8,10,8,"表达晦涩状态机复杂","rules"],
+["continuous-code-quality-supervisor-rules",8,8,8,8,8,10,8,"触发闸门严边界清晰","rules"],
+["crypto-price__skillhub",7,6,6,5,7,10,7,"无用户确认点英文描述","skillhub"],
+["crypto-quant-analysis__skillhub",8,7,9,6,9,10,7,"篇幅冗余示例堆叠过多","skillhub"],
+["cryptocurrency-data-api__skillhub",4,7,7,7,8,10,7,"名不规范缺触发词","skillhub"],
+["database-query-rules",9,8,8,8,9,10,9,"GORM规则具体边界清楚","rules"],
+["database-schema-rules",9,9,9,9,10,10,9,"铁律体系完整近乎无短板","rules"],
+["delivery-summary-rules",9,8,8,9,8,9,9,"强制确认到位落点规范","rules"],
+["doc",6,7,7,5,8,7,4,"目录被项目文档严重污染","other"],
+["docker-direct-deploy",9,9,8,8,9,10,9,"模板与校验完整可直接用","other"],
+["docker__skillhub",7,7,8,6,8,10,7,"参考文件平铺根目录","skillhub"],
+["error-handling-rules",9,7,8,8,8,10,9,"结构清晰篇幅略短","rules"],
+["execution-failure-learning-rules",9,8,9,9,9,10,8,"门禁严谨案例生命周期全","rules"],
+["file-organize__skillhub",8,7,6,5,7,3,7,"无脚本纯靠AI执行","skillhub"],
+["find-skills",8,8,7,7,8,6,8,"流程清晰验证质量到位","other"],
+["free-api-50__skillhub",1,5,4,4,6,8,4,"缺frontmatter偏宣传","skillhub"],
+["frontend-component-rules",9,8,8,8,8,10,9,"组件边界与联动齐全","rules"],
+["frontend-design",8,6,4,5,7,3,6,"纯指导无流程与资源","other"],
+["frontend-ui-visual-rules",9,9,8,8,9,10,8,"资源丰富视觉规则完整","rules"],
+["functional-validation-rules",9,8,9,8,9,10,8,"真实验证红线强样本细","rules"],
+["game-asset-design-gate-rules",8,9,9,9,9,9,9,"设计确认闸门闭环完整","rules"],
+["game-asset-production-handoff-rules",8,9,9,8,9,9,9,"后处理脚本与流程齐全","rules"],
+["gdrive-junction-mount",8,9,10,8,10,7,9,"边界坑速查与回滚扎实","other"],
+["git-collaboration-rules",7,9,9,9,8,9,7,"description过长致入口过载","rules"],
+["git__skillhub",6,7,8,7,8,9,8,"name不规范且流程偏散","skillhub"],
+["github__skillhub",6,6,4,4,7,6,5,"内容过薄缺边界与检查点","skillhub"],
+["goal__skillhub",7,6,4,4,6,8,5,"内容薄缺少工作流指引","skillhub"],
+["godot-animation-sh-e8kv4e__skillhub",2,8,8,4,9,2,6,"references引用文件缺失","skillhub"],
+["godot-audio-sh-0rkwcx__skillhub",2,8,8,4,9,2,6,"references引用文件缺失","skillhub"],
+["godot-project-bootstrap-rules",8,8,8,6,8,8,8,"缺用户确认检查点","rules"],
+["golang-patterns",8,7,8,5,9,8,8,"陷阱清单与正反例扎实","other"],
+["golang__skillhub",7,6,4,4,7,5,5,"脚本未在正文引用","skillhub"],
+["history-recall-rules",9,8,9,8,8,8,8,"降级回溯与边界清晰","rules"],
+["humanizer__skillhub",9,7,8,4,9,6,7,"模式与正反例丰富","skillhub"],
+["image-redbox-focus-rules",8,8,7,5,7,6,7,"单一职责红框优先清晰","rules"],
+["imagegen",9,9,10,9,10,10,9,"fallback与案例库完整","other"],
+["implementation-planning-rules",7,7,9,9,8,9,7,"description严重超载","rules"],
+["ip__skillhub",5,6,6,4,8,4,5,"脚本路径与实际不符","skillhub"],
+["knowledge-flow",8,8,9,7,9,9,8,"四态判定与路径安全齐","other"],
+["linux__skillhub",5,5,7,3,7,6,5,"纯清单缺流程与检查点","skillhub"],
+["logging-trace-rules",8,8,8,7,9,8,8,"排版规范与正反例强","rules"],
+["long-run-loop-rules",8,8,9,9,9,9,8,"安全机制与上限设计完整","rules"],
+["mcp-installation-rules",7,8,8,7,8,9,7,"路由多但入口过载","rules"],
+["memory-usage-tracking-rules",8,8,8,7,9,9,8,"计数吸收闭环可校验","rules"],
+["micro-business-architecture-rules",8,7,8,5,8,9,8,"隔离校验脚本可落地","rules"],
+["mongodb__skillhub",5,5,7,3,7,8,5,"陷阱清单但无流程","skillhub"],
+["mysql__skillhub",5,3,4,2,6,8,7,"纯知识点缺工作流","skillhub"],
+["naming-rules",8,8,8,8,7,8,8,"结构完整规范","rules"],
+["nginx__skillhub",5,3,4,2,6,8,7,"纯知识参考无流程","skillhub"],
+["package-structure-rules",8,7,8,7,9,10,8,"目录Owner完备","rules"],
+["parallel-task-dispatch-rules",8,9,9,9,8,10,9,"状态机对账严谨","rules"],
+["pdf",7,7,7,5,7,6,7,"工作流简洁实用","other"],
+["plugin-installation-rules",8,8,8,8,7,8,8,"官方源为准防臆造","rules"],
+["powershell__skillhub",4,3,4,2,6,5,7,"无触发词无流程","skillhub"],
+["proactive-agent__skillhub",4,5,6,6,7,8,4,"冗余备份偏多","skillhub"],
+["project-design-doc-rules",8,8,8,8,7,8,8,"弱参考优先级清晰","rules"],
+["project-interface-baseline-rules",8,8,9,8,8,9,8,"双索引对账严密","rules"],
+["project-local-skills-rules",8,8,8,8,8,9,8,"三通道沉淀完善","rules"],
+["project-memory-rules",8,8,9,8,8,9,8,"双区脱敏严谨","rules"],
+["project-rule-file-bootstrap-rules",8,8,9,8,8,9,8,"schema三路联动","rules"],
+["project-style-rules",8,8,8,7,8,8,8,"风格字段规范","rules"],
+["project-timeline-rules",8,8,8,8,7,8,8,"后端降级清晰","rules"],
+["py__skillhub",4,3,4,2,6,8,7,"无触发词无流程","skillhub"],
+["quant-analyst__skillhub",4,5,6,6,7,4,5,"依赖外部仓库","skillhub"],
+["reasoning-summary-structure-rules",7,9,9,9,9,8,8,"发送前硬闸严密","rules"],
+["recent-context-bootstrap-rules",8,8,8,8,7,8,8,"让路边界清晰","rules"],
+["redis-usage-rules",8,8,8,8,8,8,8,"双确认到位","rules"],
+["requirement-boundary-rules",8,8,8,8,7,8,8,"归属判定清晰","rules"],
+["requirement-change-rules",8,8,8,8,7,8,8,"失效回开严密","rules"],
+["requirement-intake-rules",8,8,9,8,8,9,8,"条件路由防猜测","rules"],
+["requirement-splitting-rules",8,8,8,8,7,8,8,"无环依赖约束","rules"],
+["self-dev-regex__skillhub",6,3,4,2,6,5,7,"纯语法清单","skillhub"],
+["self-ent-tech-database-design__skillhub",5,5,3,5,5,5,5,"缺触发词和资源内容偏薄","skillhub"],
+["self-improving-agent__skillhub",5,9,8,5,9,2,5,"references脚本全部断链","skillhub"],
+["session-handoff-rules",9,9,9,8,9,9,9,"全维度均衡资源完备","rules"],
+["shell__skillhub",7,4,2,2,5,2,5,"脚本断链且无流程步骤","skillhub"],
+["skill-absorption-rules",8,9,9,9,9,10,7,"资源最全描述过长","rules"],
+["skill-audit-rules",8,6,5,4,6,5,7,"简洁但流程检查点偏弱","rules"],
+["skill-displayname-patcher",8,7,6,7,8,4,8,"脚本外置未打包进目录","other"],
+["skill-execution-compliance-gate-rules",8,8,8,7,8,8,8,"边界清晰检查点扎实","rules"],
+["skill-hit-check-rules",8,8,8,8,9,9,7,"硬闸门强小节版本略乱","rules"],
+["skill-split-preserve-rules",8,8,8,7,8,9,8,"承接映射与阻断设计扎实","rules"],
+["skill_2053082027691548672",6,4,3,2,6,5,6,"仅命令示例无流程边界","market"],
+["skill_2054901716814716928",7,7,5,3,7,5,7,"教程完整但缺确认检查点","market"],
+["spreadsheet",7,7,6,4,8,3,7,"示例目录断链偏参考","other"],
+["sqlite__skillhub",5,4,4,2,7,5,6,"纯参考无流程与触发词","skillhub"],
+["ssh-server-ops-rules",9,8,9,9,9,9,8,"危险分级与确认设计优秀","rules"],
+["swag-openapi-maintainer-rules",8,9,9,7,9,9,8,"约束完备脚本段重复","rules"],
+["swap-tokens__skillhub",8,7,6,6,8,5,7,"简洁实用交易前有确认","skillhub"],
+["tapd-addcomment",8,7,6,5,8,8,7,"示例丰富检查点偏少","other"],
+["tapd-cli",7,6,4,3,7,4,6,"依赖外部脚本边界弱","other"],
+["tapd-env-bootstrap",8,6,6,4,7,5,7,"事实清晰但流程单薄","other"],
+["tapd-openapi",8,8,8,7,9,10,8,"资源海量降级处理扎实","other"],
+["task-plan-rehydration-rules",8,9,9,8,9,9,7,"安全约束强体积偏大","rules"],
+["team-development-rules",8,7,6,6,6,9,7,"路由清晰执行细则简","rules"],
+["test-program-rules",7,8,8,6,8,9,6,"规则重复措辞冗余","rules"],
+["test-regression-rules",7,8,8,6,8,9,7,"接缝纪律清晰略有重复","rules"],
+["test-strategy-rules",8,9,9,7,9,10,7,"权威单一但体量过大","rules"],
+["tg__skillhub",9,6,3,3,8,6,7,"命令齐全但缺异常处理","skillhub"],
+["thread-title-rules",4,9,10,9,9,9,6,"描述过长但流程严密","rules"],
+["time-util-rules",8,6,4,4,6,5,7,"依赖项目上下文较单薄","rules"],
+["trade-executor__skillhub",6,7,7,9,8,8,8,"风控和确认设计扎实","skillhub"],
+["trading-engine-crypto-futures-trading__skillhub",7,4,3,5,6,4,5,"太薄缺流程和边界","skillhub"],
+["ubuntu-wsl-system-cleanup__skillhub",9,8,8,7,8,9,8,"安全分层设计扎实","skillhub"],
+["unclecheng-garbage-cleanup-master__skillhub",8,9,9,9,9,8,7,"流程详尽且确认到位","skillhub"],
+["vercel-react-best-practices",8,6,3,3,7,9,7,"规则丰富但无工作流","other"],
+["vscode-fullstack-debug",9,8,7,5,9,5,8,"坑点覆盖很扎实","other"],
+["vscode__skillhub",6,4,3,3,6,4,5,"像速查表而非技能","skillhub"],
+["vue-best-practices",9,9,6,6,8,9,8,"流程和资源都很扎实","other"],
+["vue-component-generator__skillhub",6,4,3,3,6,5,4,"混入无关变现内容","skillhub"],
+["vue-router-best-practices",5,3,2,2,6,8,4,"正文太薄全靠链接","other"],
+["vue__skillhub",6,4,3,3,7,8,6,"陷阱清单无流程","skillhub"],
+["web-design-guidelines",8,6,3,3,6,4,6,"依赖远程规范无本地兜底","other"],
+["weekly-report-merge",9,8,7,5,7,8,7,"流程清晰但缺确认点","other"],
+["windows-encoding-rules",9,8,9,7,9,8,7,"回滚和验证设计好","rules"],
+["windows-powershell-environment-rules",9,8,9,7,9,9,8,"状态机设计严密","rules"],
+["work-report-summary-rules",8,8,8,7,8,9,7,"描述冗余但规则完整","rules"],
+["write",9,8,7,7,8,9,9,"分层严谨资源齐全","other"],
+["wsl-chrome-cdp__skillhub",1,5,4,3,5,3,4,"无frontmatter且脚本断链","skillhub"],
+["wsl-path-converter__skillhub",5,3,2,2,5,4,4,"内容太薄无流程","skillhub"],
+["wsl-powershell__skillhub",1,3,3,2,5,3,4,"无frontmatter纯示例","skillhub"],
+["wsl-service-deploy__skillhub",8,7,6,4,8,7,7,"速查表实用缺确认","skillhub"],
+["wsl-shell-reliability__skillhub",6,7,8,6,7,8,8,"决策表清晰","skillhub"],
+["wsl-windows-bridge__skillhub",8,6,5,3,7,8,7,"脚本齐全缺边界处理","skillhub"],
+["z-data-crypto__skillhub",5,3,3,2,4,4,4,"空洞占位未接数据源","skillhub"]
+];
+
+const W=[8,15,10,7,15,5,15];
+function score(d){let s=0;for(let i=0;i<7;i++)s+=d[i+1]*W[i];return Math.round(s/10*10)/10;}
+
+// 增强数据：计算总分
+const rows=D.map(d=>({name:d[0],d:d.slice(1,8),score:score(d),note:d[8],cat:d[9]}));
+
+// 统计卡片
+function statCards(){
+  const avg=r=>r.reduce((a,b)=>a+b.score,0)/r.length;
+  const all=rows;
+  const rules=rows.filter(r=>r.cat==="rules");
+  const skillhub=rows.filter(r=>r.cat==="skillhub");
+  const other=rows.filter(r=>r.cat==="other");
+  const market=rows.filter(r=>r.cat==="market");
+  const sorted=[...all].sort((a,b)=>a.score-b.score);
+  const median=sorted[Math.floor(sorted.length/2)].score;
+  const mk=(k,v,d)=>`<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  document.getElementById("cards").innerHTML=
+    mk("Skill 总数",all.length,"含 .system 外的仓库全部")+
+    mk("平均静态分",avg(all).toFixed(1),"满分 75")+
+    mk("中位数",median.toFixed(1),"静态分")+
+    mk("自有 rules 平均",avg(rules).toFixed(1),`${rules.length} 个`)+
+    mk("自有工具平均",avg(other).toFixed(1),`${other.length} 个`)+
+    mk("第三方 skillhub 平均",avg(skillhub).toFixed(1),`${skillhub.length} 个`)+
+    mk("最低分",sorted[0].score.toFixed(1),sorted[0].name);
+}
+
+// 分类条形
+function catBars(){
+  const cats=[["rules","自有规则型 *-rules"],["other","自有工具/领域"],["skillhub","第三方 __skillhub"],["market","市场 skill_编号"]];
+  const max=75;
+  const html=cats.map(([k,label])=>{
+    const r=rows.filter(x=>x.cat===k);
+    const a=r.length?r.reduce((s,x)=>s+x.score,0)/r.length:0;
+    const pct=a/max*100;
+    return `<div class="bar-wrap"><div class="bar-label">${label} (${r.length})</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--${k})">${a.toFixed(1)}</div></div></div>`;
+  }).join("");
+  document.getElementById("catBars").innerHTML=html;
+}
+
+// 短板 Top25
+function topList(){
+  const sorted=[...rows].sort((a,b)=>a.score-b.score).slice(0,25);
+  document.getElementById("toplist").innerHTML=sorted.map((r,i)=>{
+    const cls=r.score<40?"s-low":(r.score<52?"s-mid":"s-high");
+    const pn={rules:"p-rules",skillhub:"p-skillhub",other:"p-other",market:"p-market"}[r.cat];
+    return `<li><span class="rank">${i+1}</span><b>${r.name}</b> <span class="pill ${pn}">${r.cat}</span> <span class="score ${cls}">${r.score.toFixed(1)}</span> — ${r.note}</li>`;
+  }).join("");
+}
+
+let filter="all", asc=true;
+function render(){
+  let list=rows.filter(r=>filter==="all"||r.cat===filter);
+  list.sort((a,b)=>asc?a.score-b.score:b.score-a.score);
+  const cls=s=>s<40?"s-low":(s<52?"s-mid":"s-high");
+  const pn=c=>({rules:"p-rules",skillhub:"p-skillhub",other:"p-other",market:"p-market"}[c]);
+  document.getElementById("tbody").innerHTML=list.map((r,i)=>{
+    return `<tr><td>${i+1}</td><td class="name">${r.name}</td><td><span class="pill ${pn(r.cat)}">${r.cat}</span></td>`+
+    r.d.map(v=>`<td>${v}</td>`).join("")+
+    `<td class="score ${cls(r.score)}">${r.score.toFixed(1)}</td><td class="note">${r.note}</td></tr>`;
+  }).join("");
+}
+document.querySelectorAll(".controls button[data-f]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".controls button[data-f]").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");filter=b.dataset.f;render();
+});
+document.getElementById("sortBtn").onclick=function(){
+  asc=!asc;this.textContent=asc?"按分数降序":"按分数升序";render();
+};
+
+statCards();catBars();topList();render();
+</script>
+</body>
+</html>

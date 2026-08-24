@@ -14,8 +14,9 @@
 
 - 路径格式：`/{资源名}/{操作类型}`
 - 资源名使用复数形式，如 `orders`、`users`、`products`
+- 多词资源名使用 kebab-case（小写 + 连字符），如 `order-items`、`team-members`；禁止 snake_case（`order_items`）与驼峰（`orderItems`）
 - 操作类型使用清晰的动词，如 `get`、`add`、`del`、`update`、`list`、`query` 等
-- 路径层级应反映资源关系，不应反映内部实现细节
+- 路径层级应反映资源关系，不应反映内部实现细节；子资源关系用路径层级表达（如 `POST /users/orders/list` 表示用户下的订单列表）
 - 能用资源 + 操作类型表达的，不额外塞动词
 
 ## 路径命名示例

@@ -8,6 +8,110 @@
 >
 > **内部更新通道登记（2026-08-20 起）**：本表同时登记「内部 skill 更新通道」的裁决式调整——来源列写"内部调整：<目标 skill>，<调整诉求>"，其余列（裁决 / 落点 / 整理去重 / 同域扫描结论 / 净增体积）要求与外部吸收完全一致，无外部源可删。
 
+## 2026-08-24：内部更新——8 维评分体系巡检工作流固化
+
+- **来源**：内部调整：`skill-absorption-rules`（吸收规则总入口），调整诉求 = "把「用 darwin-rubric 8 维给全仓库 skill 打分 + 生成 skill-8维评分报告.html」的实操经验固化为可复用流程，后续快速打分更新报告"。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：3 条。
+- **裁决**：
+  - 8 维评分标准（权重 / 计分公式）→ 保留本地（`darwin-rubric.md` 已是单一权威，不重复定义）。
+  - 体系巡检执行流程（范围分类 / 分批打分 / 报告产出）→ 合并（缺口）：新增 `score-inspection-workflow.md` 作流程单一权威。
+  - 报告固定文件与结构约定 → 合并（缺口）：报告路径 `skill-8维评分报告.html` 与 JS 数据格式约定写入新流程文件。
+- **落盘改动**：
+  - `skill-absorption-rules/references/score-inspection-workflow.md`（新建）：触发信号 / 范围四分类 / 并行子代理分批打分 / 固定输出格式 / 短板识别 / 报告结构约定。
+  - `skill-absorption-rules/SKILL.md`：references 读取规则补 1 条指针。
+  - `skill-absorption-rules/references/darwin-rubric.md`：第 60 行补 1 句指向新流程文件。
+- **整理去重**：评分标准已在 darwin-rubric.md，新文件只补「执行流程」不复制维度定义；无存量重复段落可清（N/A + 理由）。
+- **同域扫描结论**：范围 = skill-absorption-rules（落点）、skill-audit-rules（只读审计，涉及多 skill 巡检但职责为职责重叠审计非评分）、skill-hit-check-rules（触发总控）；发现 = 0 处重复段落、0 处门控层叠、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 3.2KB（score-inspection-workflow.md ~3.0KB + SKILL.md 1 行指针 ~0.1KB + darwin-rubric.md 1 句 ~0.1KB）；无外部源，净增即缺口流程本身。
+- **棘轮验证**：引用链 2 处可达（SKILL.md 读取规则 + darwin-rubric.md 均指向 score-inspection-workflow.md）；UTF-8 3 文件 OK。
+
+## 2026-08-24：内部更新——文档阶段接口测试要求预埋
+
+- **来源**：内部调整：`test-strategy-rules`（测试策略统一主入口），调整诉求 = "写需求 / 计划 / bug / 实施 md 文档时，涉及 API 接口测试必须预埋「本地 test/ 单元测试 + 完善 apifox 接口用例」双要求"。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：4 条。
+- **裁决**：
+  - 测试双要求（test/ 单元测试 + apifox 接口用例）→ 保留本地（`test-strategy-rules`「接口测试执行通道」已覆盖执行阶段）。
+  - 顺序约束（先单测后 apifox）→ 保留本地（执行通道已隐含）。
+  - 完成标准（apifox 用例完善 = 落地 + 通过，非本地 curl）→ 保留本地（执行通道「不得只本地 curl 不落地」）。
+  - 文档阶段预埋 → 合并（缺口）：新增「文档阶段接口测试要求预埋（强制）」节作单一权威。
+- **落盘改动**：
+  - `test-strategy-rules/SKILL.md`：新增「文档阶段接口测试要求预埋（强制）」节（单一权威，「接口测试执行通道」姊妹节）。
+  - `requirement-intake-rules/SKILL.md`、`implementation-planning-rules/SKILL.md`、`bug-intake-rules/SKILL.md`：各加 1 行引用指针，不重复定义。
+- **整理去重**：执行阶段规则已存在未重复；新增仅补文档阶段缺口，引用式接入，无存量冗余可清（N/A + 理由）。
+- **同域扫描结论**：范围 = 测试域（test-strategy / test-program / test-regression / functional-validation / bug-validation）+ 文档域（requirement-intake / implementation-planning / bug-intake / artifact-delivery-gate）；发现 = 0 处重复段落（「文档阶段预埋」vs「接口测试执行通道」为写文档时 vs 执行测试时两阶段，非重复）、0 处门控层叠、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 1.3KB（test-strategy-rules 新节 ~1.1KB + 3 处引用指针各 ~0.07KB）；无外部源，净增即缺口规则本身。
+- **棘轮验证**：引用链 4 处可达（单一权威节 + 3 引用指针，均指向 `test-strategy-rules/SKILL.md` 新节）；UTF-8 4 文件 OK。
+
+## 2026-08-23：skill-merger（技能合并器，ClawHub mimo-skill-merger）
+
+- **来源**：skillhub 安装源 `mimo-skill-merger__skillhub`（用户级 + 工作区 junction 同一物理目录，version 1.3.0，homepage qqyougitcom/mimo-skill-merger，MIT-0）。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 删除源）；吸收目标为 skill-absorption-rules 自身——补齐「内部更新通道」的多技能合并执行细则（本地此前仅有触发信号"把这两个 skill 合并"，无策略框架）。
+- **拆解原子规则数**：17 条。
+
+| # | 外部精华 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---------|---------|------|------------|
+| 1 | 吸收型策略（B⊂A → 独特能力并入 A 作子模块） | 外部吸收通道仅覆盖外部→本地单向吸收，无自有技能间吸收显式策略 | 合并 | `merge-strategies.md`「吸收型」节 |
+| 2 | 融合型策略（交叉各有优势 → 统一新流程） | 本地无平等合并策略；红线不新增 skill 目录 | 合并(适配) | 「融合型」节；融合产物落现有主 skill 的 reference，不新建目录 |
+| 3 | 编排型策略（独立常配合 → 编排层路由） | 本地无编排层概念（audit 只读、split 管拆分） | 合并 | 「编排型」节 |
+| 4 | Step1 技能分析（读 SKILL.md 提取能力识别重叠） | 裁决第 2 步要求读 SKILL.md + references 原文 | 保留本地 | 本地更严（references 全文） |
+| 5 | Step2 策略选择 | 随 1-3 落地 | 合并 | 并入三策略节 |
+| 6 | 触发词冲突 → 合并关键词 + 细化排除场景，触发词/排除词双列不单留 | 触发体系在 hit-check-rules；absorption 无显式触发合并冲突规则 | 合并 | 「冲突处理」节 |
+| 7 | 冲突处理·流程重叠 → 保留更详细版 | 「保留本地（本地更强）」裁决语义等价 | 保留本地 | 裁决矩阵已覆盖 |
+| 8 | 冲突处理·输出格式 → 统一模板 | 本地裁决表格式更细（含整理建议列） | 保留本地 | 本地更强 |
+| 9 | 变更对比模板（+新增 / -消除 / ~调整） | 本地无此输出模板 | 合并 | 「变更对比」节 |
+| 10 | 不丢功能（覆盖所有源核心能力） | 「语义零丢失」原则等价且更强 | 保留本地 | 吸收即整理原则 |
+| 11 | 保持独立（不强制合并差异大技能） | 红线「不新增同类目录」更强 | 保留本地 | 本地红线更强 |
+| 12 | 版本管理（新技能从 v1.0.0 起） | 本地合并产物是 reference/正文补丁，无新技能实体 | 拒绝 | 形态不匹配（不新建 skill 目录） |
+| 13 | 反合理化①"差异大合并不了" → 编排型兜底，至少输出编排方案 | 无此兜底规则 | 合并 | 「反合理化」节 |
+| 14 | 反合理化②"怕丢功能" → 变更对比逐条确认 | 「语义零丢失」有原则、无强制输出 | 合并 | 同 #9 |
+| 15 | 反合理化③"触发词冲突" → 双列排除 | 同 #6 | 合并 | 同 #6 |
+| 16 | 反合理化④"逐个看" → 只读 description+前 3 步 | 本地「能查证就不要凭记忆」要求读原文 | 拒绝 | 本地更强（裁决必须读原文，快速扫描仅可预判策略） |
+| 17 | 反合理化⑤"命名不好定" → 主功能词+后缀 | 本地不新建目录，命名场景少 | 拒绝 | 形态不匹配 |
+
+- **落盘改动**：
+  - 新增 `skill-absorption-rules/references/merge-strategies.md`（3889B，三策略 + 冲突处理 + 变更对比模板 + 反合理化表 + 同域边界）。
+  - 修改 `skill-absorption-rules/SKILL.md`（三通道表格内部更新通道行补合并策略指引 + references 读取规则补 1 条，+507B）。
+- **整理去重**：外部 3KB → 合并 8 项 → 新 reference 3889B；SKILL.md 正文仅净增 3 行（表格 1 行 + 读取规则 1 行），细则下沉 references，符合「单一可编辑资产 + 吸收即整理」；本地无同义重复段落可清（引用式结构，N/A + 理由）。
+- **同域扫描结论**：范围 = skill-absorption-rules（落点）、skill-audit-rules（只读审计）、skill-split-preserve-rules（拆分）、skill-hit-check-rules（触发冲突）；发现 = 0 处重复段落（三策略关键词同域 3 skill 零命中）、0 处门控层叠（吸收型/融合型/编排型为本地缺失能力，与 audit 只读、split 反向拆分语义可区分）、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量/宿主配置/hook/依赖安装/路径引用）。
+- **净增体积**：+约 4.4KB（merge-strategies 3889B + SKILL.md 补丁 507B）；外部源 3KB 已删除，体系净增约 +1.4KB 等价。
+- **棘轮验证**：`quick_validate.py` 结构校验 PASS；独立子 agent 8 维评分基线 75.8 → 86.8（+11.0）PASS；UTF-8 2 文件 OK；引用链 2 处可达（SKILL.md 三通道表格 + 读取规则）。
+- **源清理**：吸收完成后删除本地安装源 `mimo-skill-merger__skillhub`（用户级 + 工作区 junction 双路径验证）。
+
+## 2026-08-23：qa-bug-root-cause-analysis（Kokxi/qa-test-skills）
+
+- **来源**：skillhub 安装源 `qa-bug-root-cause-analysis__skillhub`（用户级 + 工作区 junction 同一物理目录，version 1.7.0，homepage Kokxi/qa-test-skills，QA Test Skills 技能集 49 个之一）。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 删除源）。
+- **拆解原子规则数**：10 条。
+
+| # | 外部精华 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---------|---------|------|------------|
+| 1 | 5 类症状 → 根因方向树状映射（返回错误/数据不对/性能退化/没反应/偶发） | root-cause-catalog 有代码层类别池，缺「症状层入口」 | 合并 | `bug-root-cause-rules/references/symptom-rootcause-map.md`（新建） |
+| 2 | 现象速查表（现象→大概率方向→优先排查 14 行） | 本地无此表 | 合并 | 同上 |
+| 3 | 排查顺序（先外部→配置→数据→代码） | catalog 边界场景部分覆盖，无完整顺序 | 合并 | 同上（交叉引用不重复展开） |
+| 4 | 分析流程 4 步（收集→分类→缩小→验证） | intake 收集 + static-analysis 收窄 + evidence 验证 | 保留本地 | 五件套分阶段更强 |
+| 5 | 根因分析表模板 | Bug 主文档 + evidence 证据条件 | 保留本地 | 本地更强 |
+| 6 | 输出示例 2 个 | 本地有真实案例 | 拒绝 | 一次性教学示例形态 |
+| 7 | 检查清单 6 项 | evidence + delivery-gate 收口 | 保留本地 | 本地更强 |
+| 8 | frontmatter 机制（input/output/深度量化） | Bug 主文档 + 触发路由体系 | 拒绝 | 机制形态不迁移 |
+| 9 | 根因分层：直接/间接/系统 3 层级 | hypothesis-ranking 有横向候选，缺纵向追问 | 合并 | 并入 symptom-rootcause-map.md「根因分层」节 |
+| 10 | 生产数据脱敏警告 | 无脱敏专项 | 合并 | 并入 symptom-rootcause-map.md 注意事项 |
+
+- **落盘改动**：
+  - 新增 `bug-root-cause-rules/references/symptom-rootcause-map.md`（6239B，五类症状映射 + 速查表 + 排查顺序 + 根因分层 + 脱敏）。
+  - 修改 `bug-root-cause-rules/SKILL.md`（默认执行流程第 3 步升级为「症状分类 → 类别候选池 → 排序假设」四级链路 + references 读取规则 1 处）。
+  - 修改 `bug-root-cause-rules/references/root-cause-catalog.md`（顶部加症状层入口衔接句）。
+- **整理去重**：外部 328 行 → 合并 5 项 → 精简为 103 行核心表；catalog「外部原因优先排除」与新排查顺序重叠处收敛为交叉引用（catalog 顶部衔接句），未重复展开；本地无同义重复段落可清（引用式结构，N/A + 理由）。
+- **同域扫描结论**：范围 = Bug 域 5 skill（intake/reproduction/root-cause/fix-proposal/validation）+ 测试域 3 skill（strategy/program/regression）；发现 = 0 处重复段落（症状分类关键词仅命中 root-cause 域内部 3 文件，同域 7 skill 零命中）、0 处门控层叠（症状映射/类别候选池/假设排序为同一链路上下游三阶段）、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量/宿主配置/hook/依赖安装/路径引用）。
+- **净增体积**：+约 6.5KB（新 reference 6239B + SKILL.md 补丁 ~180B + catalog 衔接 ~100B）；外部源 5KB 已删除，体系净增约 +1.5KB 等价。
+- **棘轮验证**：`quick_validate.py` 5/5 skill PASS（落点 + 同域四件套）；独立子 agent 8 维评分基线 78.8 → 86.8（+8.0）PASS；UTF-8 3 文件 OK；引用链 3 处可达（SKILL.md L39/L76 + catalog L5）。
+- **源清理**：吸收完成后删除本地安装源 `qa-bug-root-cause-analysis__skillhub`（用户级 + 工作区 junction 双路径验证均不存在）。
+
 ## 2026-08-23：browser-use API + guide 合并吸收（Cloud REST 操作通道）
 
 - **来源**：skillhub 安装源 `browser-use-api__skillhub`（REST v2 API 操作指南，含 `scripts/browser-use.sh`）+ `browser-use-guide__skillhub`（browser-use 完整指南，含开源库/CLI/OpenClaw/云端对比）；两源均同时存在于仓库根与用户级（junction 同一物理目录）。

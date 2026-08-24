@@ -61,7 +61,8 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 - 新项目开始、项目初期或大项目规划阶段已经出现多份需求文档、多份实施总览、多个实施周期，执行前需要先确定总执行顺序。
 - 用户要求“实施顺序总表”“全量顺序实施方案”“需求与实施计划全量顺序实施方案”“新项目实施总顺序”“项目第一期/第二期整体排序”等跨需求执行索引。
 - 用户明确要求先写开发计划、实施方案、落地步骤、任务清单或编码前执行方案。
-- 用户明确提出计划型问题，例如“这件事怎么做”“这个需求怎么落地”“先给我一个计划”“先出方案和步骤”“这个怎么改最合适”。
+- 用户明确提出计划型问题，例如"这件事怎么做""这个需求怎么落地""先给我一个计划""先出方案和步骤""这个怎么改最合适"。
+- 计划型问题但来源对象仍是模糊大目标（未达到条件闸门收敛，如"怎么实现 XX 大目标"）时，先按 `references/goal-breakdown-seed.md` 倒推法轻量拆解（3 层动作 + 首个最小可行步），再回流正式计划链路。
 - 用户明确表示“按建议执行 / 按方案执行 / 就按刚才那个建议做 / 按你说的做”，但当前只有聊天建议或方案结论，还没有正式实施计划。
 - 用户要求“补充实施文档 / 补充需求、实施文档 / 完善需求与实施文档”，且目标是已有实施总览或实施周期文档。
 - 当前实现路径存在多个合理技术方案，需要先比较后收口。
@@ -84,6 +85,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 ## references 读取规则
 
 - 默认先读 `references/plan-entry-checklist.md`。
+- 只要计划涉及 API 接口测试（有 method + path 的 HTTP 接口），必须读 `../test-strategy-rules/SKILL.md` 的「文档阶段接口测试要求预埋（强制）」节，把「本地 test/ 单元测试 + 完善 apifox 接口用例」两层要求按顺序写进真实测试安排章节。
 - 只要计划要交给新会话执行，或计划包含跨项目代码引用，必须先读 `references/cross-session-plan-execution-contract.md`。
 - 只要需要引用其他项目但只知道项目名、不知道项目路径，必须先读 `references/sibling-project-discovery.md` 按发现顺序定位，再回到 `EXT-*` 契约登记。
 - 在决定实施总览/实施周期文档的根目录、命名模板和同文档更新策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
@@ -103,3 +105,5 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 
 - 实施前代码库探索与批准闸门：`references/pre-implementation-code-exploration.md`
 - 最小任务内测试驱动实现节奏（红→绿→重构，吸收自外部 tdd skill）：`references/tdd-workflow.md`
+- 最小任务/阶段执行期的任务状态标记（五态）、阶段检查点、偏差标注、按工作单元语义回滚与任务规模量化（吸收自外部 conductor）：`references/task-execution-protocol.md`
+- 来源对象仍为模糊大目标、尚未达到条件闸门收敛时，先读 `references/goal-breakdown-seed.md` 做轻量拆解（吸收自外部 dw-goal-breakdown skill）再回流正式流程。

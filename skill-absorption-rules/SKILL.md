@@ -54,7 +54,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 | 通道 | 来源 | 触发语义 | 差异 |
 |---|---|---|---|
 | **外部吸收通道** | 外部 skill / 种子（市场、GitHub、LobeHub、coze、SkillsMP 等） | "吸收 / 借鉴 / 融合 / 采纳 XX skill" | 需获取外部原文（本地安装源优先）；裁决对象 = 外部原子精华 vs 本地现状；完成后按第 0 步删除本地安装源 |
-| **内部更新通道** | 自有 skill 现状 + 用户调整诉求 | "优化 / 调整 / 重构 / 合并 / 瘦身这个 skill""更新 skill 规则" | 无需外部原文；裁决对象 = 调整诉求 / 现状问题 vs 既有内容；无外部源可删；来源记录写"内部调整" |
+| **内部更新通道** | 自有 skill 现状 + 用户调整诉求 | "优化 / 调整 / 重构 / 合并 / 瘦身这个 skill""更新 skill 规则" | 无需外部原文；裁决对象 = 调整诉求 / 现状问题 vs 既有内容；无外部源可删；来源记录写"内部调整"。用户要求"把这两个 skill 合并 / 技能整合 / 超级技能"时，多技能合并三策略（吸收 / 融合 / 编排）与冲突处理、变更对比、反合理化表见 `references/merge-strategies.md` |
 | **执行中 gap 回补通道** | 已命中的 skill 在执行中暴露的 gap | "这个 skill 触发不准 / 缺规则 / 边界不清 / references 不足，继续要依赖临时口头补充" | 无需外部原文；先读 `references/gap-signals.md` 判断是否真是 skill gap（排除业务问题与工程问题）；再读 `references/evolution-decision-matrix.md` 判断补 description / 补流程 / 补 references / 新增独立 skill；最小化回补后按 `references/resume-workflow.md` 恢复主流程；gap 属阻断级时先暂停主流程补完再继续，非阻断级可记录建议后收口再补 |
 
 通道判定示例：用户说"这个 skill 太臃肿了，调整一下" → 内部更新通道；用户说"吸收 XX skill 的精华" → 外部吸收通道；用户说"借鉴 XX 的思路优化我们的 skill" → 外部吸收通道（来源是外部种子）；执行中"当前 skill 没有覆盖这个场景，只能临时口头补规则" → 执行中 gap 回补通道。同一轮可能同时含多条通道（如"吸收 XX 精华后顺手优化本地 skill"），按来源分通道逐项裁决。
@@ -132,10 +132,12 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 
 - 默认先读 `references/absorption-decision-matrix.md`（三态裁决标准与反例）。
 - 只有做评分验证时再读 `references/darwin-rubric.md`（8 维评分：结构 60 + 实测 40）。
+- 需要批量对全仓库 skill 做 8 维评分巡检、产出/更新 `skill-8维评分报告.html` 时，读 `references/score-inspection-workflow.md`（范围四分类 / 并行子代理分批打分 / 固定输出格式 / 短板识别 / 报告结构约定）。
 - 只有参考历史吸收案例时再读 `references/case-grill-me-absorption.md`（本次 grill-me 吸收全过程样例）。
 - 吸收触达多 skill 同域、或需要对照"同域冗余残留"反面教材时，再读 `references/case-apifox-absorption-domain-dedup.md`（api-test-automation-pro 吸收后同域冗余残留与补救全过程）；**内部更新通道同样适用**——主动调整自有 skill 引入交叉冗余时同理对照。
 - **执行中 gap 回补通道**（原 `skill-evolution-rules` 职责）：先读 `references/gap-signals.md` 确认是否真是 skill gap（排除业务问题与工程问题）；再读 `references/evolution-decision-matrix.md` 判断补 description / 补流程 / 补 references / 新增独立 skill；输出正式完善建议时读 `references/improvement-output-template.md`；补完后如何回到原任务继续执行读 `references/resume-workflow.md`。
 - 内部更新通道与外部吸收通道共用同一套裁决矩阵（`absorption-decision-matrix.md`）、评分标准（`darwin-rubric.md`）与同域扫描要求（SKILL.md 第 5 步）。
+- 用户要求"合并 / 整合多个自有 skill"（技能合并、超级技能、技能组合）时，读 `references/merge-strategies.md`（吸收 / 融合 / 编排三策略 + 触发词双列 + 变更对比模板 + 反合理化表；本地红线：合并产物不新建 skill 目录）。
 - 涉及环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用的吸收或内部更新时，先读 `references/env-dependency-absorption.md`（环境依赖五类识别 / 登记 / 自检附加 / 换机器恢复流程）；需要 WorkBuddy 平台级配置的权威定义时读 `references/workbuddy-env-manifest.md`，或直接运行 `scripts/env-bootstrap-check.py` 检测/补齐。
 - 需要确认文档落点与更新策略时，再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 吸收多轮后需整体防臃肿巡检时，联动 `skill-audit-rules`（职责重叠审计）与 `skill-split-preserve-rules`（体积超标拆分）；本 skill 只负责单轮吸收内的存量整理与同域去重，不代替体系级巡检。执行同域冗余扫描时若同域边界不清或发现疑似体系级职责重叠，按需联动 `skill-audit-rules` 确认边界。

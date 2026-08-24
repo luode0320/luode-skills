@@ -2,6 +2,45 @@
 
 > 归属 owner：`skill-absorption-rules`。追加每次吸收的来源与落点，可回指原始仓库 / 市场 / 版本。
 
+## 2026-08-24：内部调整——8 维评分体系巡检工作流固化
+
+- **来源名称**：无外部源（内部更新通道）；调整诉求 = "把「用 darwin-rubric 8 维给全仓库 skill 打分 + 生成 skill-8维评分报告.html」的实操经验固化为可复用流程，后续快速打分更新报告"。
+- **获取方式**：内部调整（本次实操经验来自 2026-08-24 全量巡检打分，非外部 skill 源）。
+- **吸收落点**：
+  - `skill-absorption-rules/references/score-inspection-workflow.md`（新建）：体系评分巡检完整流程（触发信号 / 范围四分类 / 并行子代理分批打分 / 固定输出格式 / 短板识别 / 报告固定文件与结构约定）。
+  - `skill-absorption-rules/SKILL.md`（修改）：references 读取规则补 1 条（体系评分巡检读 score-inspection-workflow.md）。
+  - `skill-absorption-rules/references/darwin-rubric.md`（修改）：第 60 行「体系巡检」处补指向 score-inspection-workflow.md 的引用。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-08-24 内部更新条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：N/A（内部更新通道，无外部源可删）。
+
+## 2026-08-23：skill-merger（技能合并器）
+
+- **来源名称**：技能合并器（mimo-skill-merger）
+- **获取方式**：skillhub 安装源（用户级 + 工作区 junction 同一物理目录，`mimo-skill-merger__skillhub`，version 1.3.0，MIT-0，homepage qqyougitcom/mimo-skill-merger）
+- **来源描述**：多技能合并工具——吸收型/融合型/编排型三策略 + 冲突处理（触发词双列）+ 变更对比模板 + 反合理化表。吸收目标为 skill-absorption-rules 自身，补齐「内部更新通道」的多技能合并执行细则（本地此前仅有触发信号"把这两个 skill 合并"，无策略框架）。
+- **原始文件**：`SKILL.md`（74 行）+ `references/details.md`（24 行）+ `skill-card.md`
+- **吸收落点**：
+  - `skill-absorption-rules/references/merge-strategies.md`（新建）：三策略 + 冲突处理 + 变更对比模板 + 反合理化表 + 同域边界。
+  - `skill-absorption-rules/SKILL.md`（修改）：三通道表格内部更新通道行 + references 读取规则。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-08-23 skill-merger 条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：吸收完成后删除本地安装源 `mimo-skill-merger__skillhub`（junction 双路径验证均不存在）。
+
+## 2026-08-23：qa-bug-root-cause-analysis（缺陷根因分析）
+
+- **来源名称**：缺陷根因分析（qa-bug-root-cause-analysis）
+- **获取方式**：skillhub 安装源（用户级 + 工作区 junction 同一物理目录，`qa-bug-root-cause-analysis__skillhub`，version 1.7.0）
+- **来源描述**：QA Test Skills 技能集（49 个之一，作者 Kokxi/qa-test-skills）——从症状出发，用症状分类映射、现象速查表、排查顺序、根因分层等方法系统化定位缺陷根源。⚠️ 源 skill 声明"完整工作流体验需安装全套 12 步工作流"，本次仅吸收根因分析精华到本地 Bug 域。
+- **原始文件**：`SKILL.md`（328 行）
+- **吸收落点**：
+  - `bug-root-cause-rules/references/symptom-rootcause-map.md`（新建）：五类症状→根因方向映射 + 现象速查表 + 排查顺序 + 根因分层 + 脱敏注意事项。
+  - `bug-root-cause-rules/SKILL.md`（修改）：默认执行流程第 3 步 + references 读取规则登记。
+  - `bug-root-cause-rules/references/root-cause-catalog.md`（修改）：顶部症状层入口衔接。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-08-23 qa-bug-root-cause-analysis 条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：吸收完成后删除本地安装源 `qa-bug-root-cause-analysis__skillhub`（junction 双路径验证均不存在）。
+
 ## 2026-08-23：browser-use API + guide 合并吸收
 
 - **来源名称**：Browser Use API（browser-use-api）+ browser-use AI浏览器自动化（browser-use-guide）

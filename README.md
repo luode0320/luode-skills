@@ -1067,3 +1067,4 @@ claude-mem(记忆) :
 2026-08-23 21:27:00 feat: [IP查询skill接入] ip__skillhub新skill落盘
 2026-08-23 21:28:00 test: [测试同步] 投影隔离降级与summary hook中断防护回归
 2026-08-25 00:42:00 feat: [long-run-loop-rules范式演进] 吸收loop-engineering循环模式与目标拆解
+2026-08-25 00:43:00 feat: [吸收映射体系增强] 多skill吸收映射与8维评分巡检落地

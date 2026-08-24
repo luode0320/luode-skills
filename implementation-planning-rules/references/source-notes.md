@@ -16,6 +16,15 @@
   - 吸收落点：`references/plan-review-checklist.md`（任务表体检节）、SKILL.md（不承诺工期/不指定负责人规则）
   - 吸收内容：重复任务/依赖环/无人负责事项/顺序冲突检查；不凭空承诺工期与负责人
   - 未吸收：预计工时估算（本地刻意去掉时间分箱）、单一责任人分配（本地零决策执行模型）、CSV/JSON 导出（本地落盘文档体系）
+- `dw-goal-breakdown`（SkillHub，v1.0.0，作者 Dream，MIT）
+  - 吸收落点：`references/goal-breakdown-seed.md`（模糊目标的轻量拆解入口）、SKILL.md（自动触发信号 + references 引用）
+  - 吸收内容：倒推法 3 层拆解（澄清目标+deadline → 周→日动作 → 首个最小可行步）、"首个最小可行步"下沉到第一个最小任务
+  - 未吸收：源文件排版缺陷（逐字换行乱码、`示例: None` 占位）
+  - 方法本体单一权威在 `long-run-loop-rules/references/goal-breakdown-before-loop.md`，本文件只承接工程域使用时机与衔接
+- `conductor`（Context-Driven Development，市场 `codebuddy-plugins-official/external_plugins/conductor` 只读缓存，Google Conductor 的 Claude Code 移植版，Apache-2.0）
+  - 吸收落点：`references/task-execution-protocol.md`（执行期状态管理协议）、SKILL.md（references 读取规则 1 条）
+  - 吸收内容：任务状态标记五态（`[ ]`/`[~]`/`[x]`+SHA/`[-]`/`[!]`）、阶段检查点机制（本地适配版去掉人工审批）、偏差标注格式（DEVIATION/Reason/Impact 三级 + 四类型分层）、按工作单元语义回滚（周期/阶段/任务靠 plan 内 SHA 定位）、任务规模量化指南（2-4 阶段/8-20 任务）、实施前上下文校验、git notes 可选增强
+  - 未吸收：阶段检查点的人工审批等待（本地零决策执行模型，放行走既有闸门）、plugin 命令形态、conductor/ 专属目录与 metadata.json（artifact-storage path-map + PROJECT_CURRENT.md 已有等价）、覆盖率 80% 硬目标（test-strategy-rules 管覆盖策略）、上下文反模式清单（project-memory-rules 管记忆维护）
 
 ## 当前改写策略
 
