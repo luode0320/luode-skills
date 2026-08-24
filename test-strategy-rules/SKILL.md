@@ -219,6 +219,26 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 - 契约测试、性能测试、健康评分、YAML 批量定义等**专项方法论**（吸收自 API测试自动化专家版）按需加载 apifox 对应模块：`apifox-cli__skillhub/modules/test-contract.md` / `test-performance.md` / `test-health-score.md` / `test-yaml-definition.md`。
 - 这些专项为**可选策略维度**（见 `references/strategy-dimensions.md`），仅在对应需求出现时启用，不影响本通道的强制执行链路。
 
+## 文档阶段接口测试要求预埋（强制）
+
+> 本节是「文档阶段接口测试要求预埋」的单一权威来源。写需求主文档、实施总览 / 实施周期 / 最小任务、Bug 主文档时，凡涉及 API 接口测试，必须在文档的测试要求 / 测试映射 / 真实测试安排章节显式预埋本节要求；`requirement-intake-rules`、`implementation-planning-rules`、`bug-intake-rules` 直接引用本节，不重复定义。
+
+### 判定「涉及 API 接口测试」
+
+- 来源对象（需求 / Bug）存在「有 method + path、经 HTTP 协议调用」的接口，且本轮需要做接口功能验证、回归或上线门禁的接口部分，即视为涉及 API 接口测试。
+- 仅改函数 / 模块 / 纯逻辑、无 HTTP 接口 → 只要求本地 `test/` 单元测试，不强制 apifox。
+- 纯文档 / 注释 / 排版等不改变可执行行为的改动 → 按 `implementation-planning-rules` 的「无需真实测试」豁免，写 `N/A + 原因 + 证据`。
+
+### 预埋要求（两层，缺一不可）
+
+涉及 API 接口测试时，文档测试安排必须显式写出两层要求，并保持顺序：
+
+1. **本地 `test/` 单元测试（代码级）**：走根 `test/` 的 `go test` / pytest，覆盖函数、模块、纯逻辑；落点按 `test-program-rules` 的 ASCII 源码镜像目录。
+2. **完善 apifox API 接口用例（接口级）**：走「接口测试执行通道（强制）」，用例真实运行并落地保存到 apifox「AI 团队」对应项目。
+
+- **顺序约束**：先本地 `test/` 单元测试，后完善 apifox 接口用例；不得只写单测漏 apifox 用例，也不得以「本地 curl 验证过」替代 apifox 落地。
+- **完成标准**：apifox 接口用例「完善」= 用例已创建、已真实运行、结论写回 `doc/5-tests/` 测试主文档（内联 caseId / 报告链接）并通过；「已测试」无凭据不算完善。
+
 ## 测试样本分布优先（强制）
 
 > 本节是测试策略中"测什么、用什么样本测"的强制规则，是对上文"测试隔离红线"的补充。任何测试策略、测试大纲、测试摘要，都必须显式回答"测试样本分布"问题。

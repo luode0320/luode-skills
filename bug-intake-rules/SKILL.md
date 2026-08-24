@@ -88,6 +88,7 @@ description: 当用户描述报错、异常行为、结果不符、线上问题�
 ## references 读取规则
 
 - 默认先读 `references/bug-description-template.md`；命中 `discovery-and-gap` 或 `runtime-diagnostics` 时追加读取对应条件路由 reference。
+- 若 Bug 涉及 API 接口（有 method + path 的 HTTP 接口）且后续需接口验证，读 `../test-strategy-rules/SKILL.md` 的「文档阶段接口测试要求预埋（强制）」节，在 Bug 主文档测试安排中预埋「本地 test/ 单元测试 + 完善 apifox 接口用例」。
 - 在决定 Bug 主文档命名和同 Bug 复用策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在需要把其他项目作为对照样本排查、但只知道项目名不知道路径时，再读 `../implementation-planning-rules/references/sibling-project-discovery.md`。
 - 只有在检查基础字段是否齐全时，再读 `references/minimum-intake-fields.md`。

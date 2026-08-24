@@ -1,6 +1,8 @@
 # 常见根因类别清单（Root Cause Catalog）
 
 > 归属 owner：`bug-root-cause-rules`。本文件吸收自 awesome-ai-agent-skills 的 `调试`（debugging，v1.0.0，2026-08-22 吸收）。作为「假设生成」阶段的候选池：先扫一遍类别清单避免漏项，再按 `hypothesis-ranking.md` 的 3-5 个排序假设纪律收敛。
+>
+> 症状层入口：先用 `symptom-rootcause-map.md` 按五类症状映射根因方向，再进入本文件的代码层类别候选池；两文件为同一链路的上下游。
 
 ## 用途
 

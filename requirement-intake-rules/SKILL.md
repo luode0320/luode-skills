@@ -49,6 +49,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 - 接入边界和正反例：`references/intake-boundaries-and-examples.md`
 - 极致完整性、稳定 ID、N/A 和追踪：`references/extreme-completeness-standard.md`
 - 需求结构与占位模板：`references/requirement-structure-template.md`
+- 涉及 API 接口测试时需求文档须预埋「本地 test/ 单元测试 + 完善 apifox 接口用例」双测试要求：`../test-strategy-rules/SKILL.md`「文档阶段接口测试要求预埋（强制）」
 - 主动侦察：`references/initial-discovery-route.md`
 - 侦察清单：`references/initial-discovery-checklist.md`
 - 侦察证据和记忆：`references/initial-discovery-evidence-and-memory.md`
