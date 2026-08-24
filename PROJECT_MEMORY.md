@@ -364,7 +364,7 @@
 - 稳定决策：`package-structure-rules` 是三类项目的代码位置、查找与引用唯一 Owner；人工目录树、JSON 兼容 YAML Catalog、CLI 和相邻 Skill 必须保持一致。
 - 稳定决策：后端项目无关、可独立复制的技术工具、SDK 和服务注册发现统一位于项目根 `utils/<package>/`；`utils/` 仅允许工具包子目录且不得直接存放文件，服务发现只允许 `utils/discovery/polaris/`、`utils/discovery/nacos/`，不得使用 `infrastructure/`、根 `util/`、`utils/graphql/`、`utils/asyncapi/`、`utils/avro/` 或 `utils/api/http/`。需要引用项目其他包但不承载业务流程的高关联工具统一位于独立后端 `common/util/`，直接存放当前语言文件且禁止子目录；源码根 `util/` 为废弃位置。
 - 稳定决策：前后端同仓、独立后端和独立前端项目根都直接保存 `AGENTS.md`、`CLAUDE.md`、`PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`；`PROJECT_STYLE.md` 是条件文件。`AGENTS.md` 与 `CLAUDE.md` 正文必须一致，分别供 Codex 与 Claude Code 读取。Catalog 将六项建模为 `.md` 文件节点，`init` 只创建五个必需文件位置，且仅在显式启用时创建 `PROJECT_STYLE.md`，不负责或覆盖各 Owner 的文件正文；strict 仅只读拒绝双文件正文漂移。
-- 稳定决策：`database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；独立 SQL 仅在 `database/sql/ddl/`、`database/sql/index/` 与 `database/sql/field/{create,update,delete}/`，每个 SQL 叶子目录只直接保存 `.sql` 文件，且与迁移源码严格隔离。
+- 稳定决策：`database/connection/` 是关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化入口；`database/model/` 只允许 `db/`、`redis/`、`mongo/` 子目录。`database/migration/` 是自动迁移生产源码，字段和索引均按 CRUD 分类；手工执行脚本统一进入 `database/scripts/`，按执行文件类型分子目录（独立 SQL 仅在 `database/scripts/sql/ddl/`、`database/scripts/sql/index/` 与 `database/scripts/sql/field/{create,update,delete}/`，Mongo shell 脚本在 `database/scripts/js/`，Redis 执行脚本在 `database/scripts/lua/`），每个脚本叶子目录只直接保存声明扩展名文件，且与迁移源码严格隔离；旧 `database/sql/` 已废弃，命中即禁止。
 - 稳定决策：后端项目根不建立 `data/`、`data/business/`、`data/project/` 或 `data/seed/`；Catalog 将根 `data` 作为禁止路径，query、init 与 strict 必须失败关闭。该限制不影响前端 `src/data/`、业务域数据或 `doc/data/`。
 - 稳定决策：旧项目不自动迁移。每个独立项目以 `doc/1-架构/3-目录规则收敛清单.yaml` 人工登记 `adopted_paths` 与 `legacy_source_roots`；已采纳 V2 目录可按 Catalog 扩展，遗留快照只允许维护已登记的源码文件和目录。新业务、新模块与可独立演进逻辑必须使用 V2 唯一位置，`check --policy adoption` 全程只读且不得成为绕过禁止路径的通道。
 - 稳定决策：独立后端的默认二进制入口固定为根 `main.<ext>`，仅当存在额外 binary 时使用 `cmd/<binary>/main.<ext>`；前后端同仓的后端对应固定为 `backend/main.<ext>` 与 `backend/cmd/<binary>/main.<ext>`。根 `cmd/main.<ext>`、同仓根 `main.<ext>`、同仓根 `cmd/` 和 `backend/cmd/main.<ext>` 都是非法入口；Catalog 以动态 pattern 建模，`init` 显式启用时必须失败关闭且不得创建占位路径。
@@ -904,15 +904,15 @@ entities:
       - database model 分类
       - 独立字段 SQL
       - database 连字符查询
-    definition: "database/connection 承载关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化；database/model 只能使用 db、redis、mongo 子目录；自动迁移源码留在 database/migration 的字段和索引 CRUD 分类；独立 SQL 只进入 database/sql/ddl、database/sql/index、database/sql/field/create、update、delete，叶子目录只能直接保存 .sql 文件。公开 database 连字符 artifact 查询兼容 Catalog 的内部下划线字段。"
-    scope: "后端目录树、Catalog 查询、初始化、strict 检查与独立 SQL 边界"
+    definition: "database/connection 承载关系型数据库、Redis、Mongo 等数据存储服务的连接、连接池与客户端初始化；database/model 只能使用 db、redis、mongo 子目录；自动迁移源码留在 database/migration 的字段和索引 CRUD 分类；手工执行脚本统一进入 database/scripts，按执行文件类型分子目录：独立 SQL 只进入 database/scripts/sql/ddl、database/scripts/sql/index、database/scripts/sql/field/create、update、delete，Mongo shell 脚本在 database/scripts/js，Redis 执行脚本在 database/scripts/lua，脚本叶子目录只能直接保存声明扩展名文件。公开 database 连字符 artifact 查询兼容 Catalog 的内部下划线字段。"
+    scope: "后端目录树、Catalog 查询、初始化、strict 检查与数据库脚本边界"
     status: "active"
     evidence_ids:
       - evidence.skill.package-structure-rules
       - evidence.dialog.backend-database-storage-layout
     context_ids:
       - context.code-generation-style
-    updated_at: 2026-07-31
+    updated_at: 2026-08-24
   - entity_id: rule.backend-root-data-forbidden
     name: "后端根 data 禁止路径"
     type: "包结构禁止规则"
