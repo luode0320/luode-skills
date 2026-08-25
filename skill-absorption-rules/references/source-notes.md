@@ -112,3 +112,23 @@
   - `skill-absorption-rules/SKILL.md`（修改）：固化「本地安装源吸收」流程（读取本地原文 → 吸收 → 删除源）。
 - **裁决表**：`workbuddy-absorption-map.md`（2026-08-19 条目）。
 - **源清理**：吸收完成后删除本地安装 `java-story-develop__skillhub`（工作区 + 用户级）。
+
+## 2026-08-25 · 内部调整：记忆计数锚点链路「从写得进去到读得出来」
+
+- **通道**：内部更新 + 执行中 gap 回补（无外部源，无需源清理）。
+- **调整诉求**：用户要求把某存量项目首次启用计数锚点时暴露的问题，吸收进规则 md 同步 skill 与脚本，使下次更新规则 md 时同类问题被同步处理。
+- **来源事实**：该项目 `PROJECT_MEMORY.md` 机器索引区 yaml 长期整块解析失败（3 处反引号开头裸标量 + 2 处 `- *_test.go`），16 个实体一个读不到；两个读取脚本 `except: return {}` 静默降级，扫描仍报 `candidates: []` 且退出码 0。
+- **裁决**：7 条原子条目全部「合并」，0 条保留现状，0 条拒绝。
+- **吸收落点**：
+  - `memory-usage-tracking-rules/scripts/check_memory_anchors.py`（新建）：C1~C5 五项结构健康检查，`--list-missing` 出回补清单。
+  - `memory-usage-tracking-rules/scripts/{usage_ledger_validate,scan_absorption_candidates}.py`（修改）：解析失败改抛 `AnchorParseError` + 退出码 2，不再静默返回空。
+  - `memory-usage-tracking-rules/SKILL.md`（修改）：计数回写两级前置校验 + 新增「存量项目锚点回补（强制）」。
+  - `memory-usage-tracking-rules/references/usage-anchor-schema.md`（修改）：新增第 0 节「写入约束：中文技术内容的 yaml 裸标量」+ 脚本解析契约补第三个脚本与「解析失败不得静默」。
+  - `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`（修改）：三处 `counted_files` 模板补全 + 「键在但内容不全」`[WARN]`。
+  - `project-rule-file-bootstrap-rules/SKILL.md`（修改）：Schema 变更强制检查新增「解析器判据」与「存量项目回补」，统一执行步骤新增 4.1 锚点健康检查（每次都跑）。
+  - `project-memory-rules/SKILL.md` + `references/memory-index-schema.md`（修改）：计数字段 3→4 补 `usage_days`，`counted_files` 副本补全。
+  - `project-rule-file-bootstrap-rules/references/项目记忆模板/四件套模板.md`（修改）：模板副本补全。
+- **整理去重**：删除 2 处 `except: return {}` 静默降级；`counted_files` 的 5 份字面副本从「各自维护」收敛为「schema 为权威 + `check_memory_anchors.py` 校验副本」，不新增第 6 份。净增 1 个脚本。
+- **同域冗余扫描**：范围 memory-usage-tracking / project-rule-file-bootstrap / project-memory / project-style；重复段落 0、门控层叠 0、散落产物 0（fixture 已清理）、引用链 18 处一致无断链。**PASS**。
+- **验证**：新脚本正向 `ok=true`（16/26/20）+ 双 fixture 负向覆盖 C1~C5；坏样本下两读取脚本退出码 2；真实自举三路径全通过；三脚本回归与基线一致。
+- **裁决表**：本条即裁决登记（目标 skill 无 `workbuddy-absorption-map.md`，不为单次内部调整新建该文件，避免散落产物）。

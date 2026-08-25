@@ -125,7 +125,9 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 ## 使用次数计数（委托）
 
-`entities[]` 每个实体可追加 3 个**可选**计数字段：`usage_count`、`last_used_at`、`absorbed_to`，顶层可追加 `usage_tracking` 键。计数语义、回写时机、防虚报校验与吸收触发统一由 `memory-usage-tracking-rules` 管理；本 skill 只负责在维护实体时**原样保留**这些字段（存在则更新，缺失则补默认值），不自行定义计数规则。会话启动全文读取不计入使用次数。
+`entities[]` 每个实体可追加 4 个**可选**计数字段：`usage_count`、`usage_days`、`last_used_at`、`absorbed_to`，顶层可追加 `usage_tracking` 键。计数语义、回写时机、防虚报校验与吸收触发统一由 `memory-usage-tracking-rules` 管理；本 skill 只负责在维护实体时**原样保留**这些字段（存在则更新，缺失则补默认值），不自行定义计数规则。会话启动全文读取不计入使用次数。
+
+> `usage_days` 不可省略：吸收阈值是「`usage_count ≥ 3` **且** `usage_days ≥ 2`」，缺该字段时 `scan_absorption_candidates.py` 判 `None < min_days` 直接跳过，条目引用再多也永不进候选。本条曾漏写成「3 个字段」，2026-08-25 校准。
 
 ## 跨项目沉淀判断（可选）
 

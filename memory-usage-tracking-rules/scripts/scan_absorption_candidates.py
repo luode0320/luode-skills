@@ -47,6 +47,7 @@ from usage_ledger_validate import (  # noqa: E402
     HISTORY_NAME,
     MEMORY_NAME,
     STYLE_NAME,
+    AnchorParseError,
     parse_anchor_section_anchors,
     parse_memory_anchors,
 )
@@ -137,6 +138,11 @@ def main():
     except OSError as e:
         print(json.dumps({"ok": False, "error": f"读取文件失败: {e}"}, ensure_ascii=False))
         sys.exit(1)
+    except AnchorParseError as e:
+        # 解析失败绝不能退化成「候选为空」：那会让锚点块整块读不到的项目被误判为
+        # “没有达阈值的条目”，且退出码 0，缺陷长期静默。
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        sys.exit(2)
 
     candidates = []
 

@@ -616,6 +616,9 @@ usage_tracking:
   schema_version: 1
   counted_files:
     - PROJECT_MEMORY.md
+    - PROJECT_STYLE.md
+    - PROJECT_HISTORY.md
+  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md
 ```
 EOF
 )
@@ -825,6 +828,9 @@ usage_tracking:
   schema_version: 1
   counted_files:
     - PROJECT_MEMORY.md
+    - PROJECT_STYLE.md
+    - PROJECT_HISTORY.md
+  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md
 ```
 EOF
   echo "[OK] 已创建: $file"
@@ -925,7 +931,7 @@ start = text.index(marker)
 fence_start = text.find("```yaml", start)
 if fence_start == -1:
     insert_at = start + len(marker)
-    text = text[:insert_at] + "\n\n```yaml\nversion: 1\nentities: []\nrelations: []\nevidence: []\ncontexts: []\nlifecycle:\n  active: []\n  deprecated: []\n  stale: []\n  conflicted: []\n  retired: []\nretrieval_hints:\n  aliases: {}\n  scopes: {}\n  sources: {}\nextensions:\n  external_refs: []\n  retrieval_provider: \"\"\n  vector_doc_id: \"\"\n  graph_node_id: \"\"\nusage_tracking:\n  schema_version: 1\n  counted_files:\n    - PROJECT_MEMORY.md\n```\n" + text[insert_at:]
+    text = text[:insert_at] + "\n\n```yaml\nversion: 1\nentities: []\nrelations: []\nevidence: []\ncontexts: []\nlifecycle:\n  active: []\n  deprecated: []\n  stale: []\n  conflicted: []\n  retired: []\nretrieval_hints:\n  aliases: {}\n  scopes: {}\n  sources: {}\nextensions:\n  external_refs: []\n  retrieval_provider: \"\"\n  vector_doc_id: \"\"\n  graph_node_id: \"\"\nusage_tracking:\n  schema_version: 1\n  counted_files:\n    - PROJECT_MEMORY.md\n    - PROJECT_STYLE.md\n    - PROJECT_HISTORY.md\n  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md\n```\n" + text[insert_at:]
     path.write_text(text, encoding="utf-8")
     print(f"[INFO] 已补齐机器索引区 yaml 骨架: {path}")
     raise SystemExit(0)
@@ -944,7 +950,7 @@ required_blocks = [
     ("lifecycle:", "lifecycle:\n  active: []\n  deprecated: []\n  stale: []\n  conflicted: []\n  retired: []\n"),
     ("retrieval_hints:", "retrieval_hints:\n  aliases: {}\n  scopes: {}\n  sources: {}\n"),
     ("extensions:", "extensions:\n  external_refs: []\n  retrieval_provider: \"\"\n  vector_doc_id: \"\"\n  graph_node_id: \"\"\n"),
-    ("usage_tracking:", "usage_tracking:\n  schema_version: 1\n  counted_files:\n    - PROJECT_MEMORY.md\n"),
+    ("usage_tracking:", "usage_tracking:\n  schema_version: 1\n  counted_files:\n    - PROJECT_MEMORY.md\n    - PROJECT_STYLE.md\n    - PROJECT_HISTORY.md\n  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md\n"),
 ]
 
 missing = []
@@ -962,6 +968,19 @@ if missing:
     print(f"[INFO] 已补齐机器索引区最小 schema: {path}")
 else:
     print(f"[INFO] 机器索引区已存在且满足最小骨架: {path}")
+
+# 存量块「键在但内容不全」检测：只做加法的补齐路径无法重写已有键，
+# 早期版本写出的 usage_tracking 只有 counted_files 单项、无 policy_ref，
+# 而上面的 `needle not in block` 判据会一路判定“已满足”，缺陷因此长期静默。
+# 这里不改用户内容，只把不完整显式报出来，交由 check_memory_anchors.py 定位与人工回补。
+if "usage_tracking:" in block:
+    stale = []
+    for expected in ("PROJECT_STYLE.md", "PROJECT_HISTORY.md", "policy_ref"):
+        if expected not in block:
+            stale.append(expected)
+    if stale:
+        print(f"[WARN] usage_tracking 已存在但不完整，缺: {'、'.join(stale)}（只做加法不覆盖已有键）")
+        print("[WARN] 请跑 memory-usage-tracking-rules/scripts/check_memory_anchors.py 定位并回补")
 PY
 }
 

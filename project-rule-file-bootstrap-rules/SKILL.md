@@ -59,7 +59,7 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 | `PROJECT_CURRENT.md` | 缺失时创建当前状态骨架和 v4 空任务投影 registry；已存在时验证 UTF-8 与 51,200 字节上限，不重写已有内容 | 当前项目概览与会话状态维护、registry 活动 projection 更新和 `update_plan` payload |
 | `PROJECT_MEMORY.md` | 缺失时创建人类阅读区与机器索引区双区骨架；机器索引区缺失或 schema 不完整时只补最小受管结构 | 事实抽取、实体关系和长期事实更新 |
 | `PROJECT_HISTORY.md` | 缺失时创建追加式骨架（按日期倒序、只保留最近 20 条）；已存在时只验证 UTF-8，不覆盖、不重排历史内容 | 具体历史事件追加 |
-| `PROJECT_STYLE.md` | 不创建、不检测，仅保留其由 `project-style-rules` 按需维护的边界 | 风格主文档创建与合并 |
+| `PROJECT_STYLE.md` | 不创建、不写入，仅保留其由 `project-style-rules` 按需维护的边界；第 4.1 步的锚点健康检查会**读取并报告**其计数锚点区状态，但回补动作交回 `project-style-rules` / `memory-usage-tracking-rules` | 风格主文档创建、合并与锚点写入 |
 
 额外约束：
 
@@ -80,8 +80,10 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
    - 规则文件路径：对应受管章节 heredoc（如 `BODY_SKILL_AUTO`）及其模板索引 `references/规则文件模板/agents-md-sections-index.md`、`references/项目记忆模板/四件套模板.md`。
    禁止只改其中一两条路径就收口；漏改「新建路径」是最高频断点。
 2. **真实自举兜底（强制）**：改动落地后必须对临时项目真实运行一次 `scripts/bootstrap_agents.sh --repo $TMP --target default`，分别验证「文件不存在→新建」与「文件已存在→幂等补齐」两条路径，再用 `grep -c` 确认重跑不重复追加。只跑 `bash -n` 语法检查或静态读码不视为兜底；端到端测试抓到的断点，必须回到本节第 1 条修模板后重测。
-3. **仓库模板回写**：变更涉及四件套模板时，同步更新 `references/项目记忆模板/四件套模板.md`，避免模板索引与脚本漂移。
-4. **缺项阻断**：任一路径未联动、未跑真实自举或重跑重复，判定为阻断，不得以口头说明替代。
+3. **解析器判据（强制，2026-08-25 补）**：`grep -c` 只能证明**文本在**，不能证明**结构生效**。凡变更涉及 yaml 结构（机器索引区、计数锚点区），兜底判据必须升级为「解析器读出预期数量」——跑 `memory-usage-tracking-rules/scripts/check_memory_anchors.py --project-root $TMP` 并要求 `ok=true`，且 `summary` 里的实体数/锚点数与预期一致。教训来源：某项目机器索引区因反引号开头的裸标量整块解析失败，`grep` 全部命中、`usage_tracking:` 也在，脚本却一个实体都读不到，缺陷长期静默。
+4. **仓库模板回写**：变更涉及四件套模板时，同步更新 `references/项目记忆模板/四件套模板.md`，避免模板索引与脚本漂移。
+5. **存量项目回补（强制，2026-08-25 补）**：新 schema 只在「新建路径」自动生效，存量项目走的是「补齐路径」，而补齐路径只做加法、不重写已有键——早期版本写出的半截结构会被 `needle not in block` 判据一路判为"已满足"，永远不会被修正。因此 schema 变更必须同时回答：存量项目怎么发现（跑 `check_memory_anchors.py`）、怎么回补（人工按 `--list-missing` 清单补齐）。脚本侧对"键在但内容不全"输出 `[WARN]` 提示，不静默跳过。
+6. **缺项阻断**：任一路径未联动、未跑真实自举、未过解析器判据或重跑重复，判定为阻断，不得以口头说明替代。
 
 ## 统一执行步骤
 
@@ -89,6 +91,13 @@ description: 新会话第一轮默认自动触发，不依赖用户点名；当 
 2. 只要进入本 skill，就不能停留在“已读取但未落盘”；必须真实执行脚本并核对结果。
 3. 按 `rule-bootstrap` 核对规则文件、`.gitattributes`、`.editorconfig` 和全部受管章节，确认非受管内容未被覆盖。
 4. 按 `memory-bootstrap` 核对三个项目记忆文件、51,200 字节闸门、机器索引区和历史只追加保护。
+4.1 **锚点健康检查（强制，每次都跑，不限于 schema 变更轮）**：脚本执行后跑一次
+   `python memory-usage-tracking-rules/scripts/check_memory_anchors.py --project-root <项目根>`。
+   `ok=true` 才算 `memory-bootstrap` 完成；`ok=false` 时按 `problems[]` 的 check 分流——
+   `C1/C2` 是 yaml 写坏（本轮必须修，否则计数与吸收链路整条失效）；
+   `C3/C4` 是存量项目锚点未初始化或已漂移（用 `--list-missing` 取清单回补）；
+   `C5` 是锚点区不在文件底部（把掉在其后的正文条目移回人类阅读区）。
+   本步是「下次更新规则 md 时同类问题被同步发现」的实际机制，不依赖执行者记得这些规则。
 5. 输出逐文件结果：新建、更新或跳过及原因；禁止只给整体一句“已更新”。
 6. 若脚本失败、只完成部分文件、未核对结果、覆盖非受管内容、`PROJECT_CURRENT.md` 超限、机器索引区未补齐或历史内容被覆盖，判定为阻断。
 7. 若仓库命中 Godot 项目标记，额外核对两个 Godot 受管章节及图片配置中不存在密钥原值。

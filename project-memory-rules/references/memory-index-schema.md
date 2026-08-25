@@ -31,6 +31,9 @@ usage_tracking:
   schema_version: 1
   counted_files:
     - PROJECT_MEMORY.md
+    - PROJECT_STYLE.md
+    - PROJECT_HISTORY.md
+  policy_ref: memory-usage-tracking-rules/references/usage-tracking-policy.md
 ```
 
 ## 字段说明
@@ -158,8 +161,9 @@ usage_tracking:
 - 含义: 记忆条目的使用次数计数配置（可选键，由 `memory-usage-tracking-rules` 统一管理）。
 - 子键:
   - `schema_version`: `number`，当前固定为 `1`。
-  - `counted_files`: `list`，纳入计数的记忆文件清单。
-- 规则: 本 skill 只负责原样保留该键，计数回写与吸收触发见 `memory-usage-tracking-rules`。
+  - `counted_files`: `list`，纳入计数的记忆文件清单，**固定为 3 项**（`PROJECT_MEMORY.md` / `PROJECT_STYLE.md` / `PROJECT_HISTORY.md`）。
+  - `policy_ref`: `string`，计数策略文档路径，固定为 `memory-usage-tracking-rules/references/usage-tracking-policy.md`。
+- 规则: 本 skill 只负责原样保留该键，计数回写与吸收触发见 `memory-usage-tracking-rules`。权威定义在 `memory-usage-tracking-rules/references/usage-anchor-schema.md` 第 1 节；本文件是同步副本，改 schema 必须两边一起改，并跑 `check_memory_anchors.py` 验证（2026-08-25 校准：此前 `counted_files` 只列 1 项、缺 `policy_ref`）。
 
 ## 约束
 

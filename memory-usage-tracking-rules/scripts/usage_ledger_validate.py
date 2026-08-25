@@ -59,6 +59,14 @@ ALLOWED_FILES = {
 }
 
 
+class AnchorParseError(Exception):
+    """记忆文件 yaml 块解析失败。
+
+    必须显式抛出而不是静默返回空：解析失败与「确实没有锚点」如果返回值相同，
+    调用方拿到的空结果既可能是“无数据”也可能是“整块没被读进去”，缺陷会长期潜伏。
+    """
+
+
 def extract_yaml_block(text, section_title):
     """提取 markdown 中指定小节标题后第一个 ```yaml ... ``` 块文本。"""
     pattern = re.compile(
@@ -78,8 +86,11 @@ def parse_memory_anchors(text):
         return {}
     try:
         data = yaml.safe_load(block) or {}
-    except yaml.YAMLError:
-        return {}
+    except yaml.YAMLError as e:
+        raise AnchorParseError(
+            "PROJECT_MEMORY.md 机器索引区 yaml 解析失败：%s；"
+            "请跑 check_memory_anchors.py 定位非法裸标量" % str(e).replace("\n", " ")[:200]
+        )
     result = {}
     for ent in data.get("entities", []) or []:
         if isinstance(ent, dict) and ent.get("entity_id"):
@@ -96,8 +107,11 @@ def parse_anchor_section_anchors(text, section_title="计数锚点区"):
         return []
     try:
         data = yaml.safe_load(block) or {}
-    except yaml.YAMLError:
-        return []
+    except yaml.YAMLError as e:
+        raise AnchorParseError(
+            "计数锚点区 yaml 解析失败：%s；请跑 check_memory_anchors.py 定位非法裸标量"
+            % str(e).replace("\n", " ")[:200]
+        )
     return [a for a in data.get("anchors", []) or [] if isinstance(a, dict) and a.get("title")]
 
 
@@ -204,12 +218,16 @@ def main():
         print(json.dumps({"ok": False, "error": f"读取记忆文件失败: {e}"}, ensure_ascii=False))
         sys.exit(2)
 
-    anchors_map = {
-        "memory": parse_memory_anchors(bodies["memory"]),
-        "style": [a["title"] for a in parse_anchor_section_anchors(bodies["style"])],
-        "history": [a["title"] for a in parse_anchor_section_anchors(bodies["history"])],
-        "_body": bodies,
-    }
+    try:
+        anchors_map = {
+            "memory": parse_memory_anchors(bodies["memory"]),
+            "style": [a["title"] for a in parse_anchor_section_anchors(bodies["style"])],
+            "history": [a["title"] for a in parse_anchor_section_anchors(bodies["history"])],
+            "_body": bodies,
+        }
+    except AnchorParseError as e:
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        sys.exit(2)
 
     seen = set()
     valid_claims = []

@@ -66,10 +66,20 @@ anchors:
 - **谁 +1**：仅"实际引用时"——条目被检索后用于决策、输出、代码生成、被其他 skill 引用时 +1；HISTORY 窄读计入；**会话启动全文读取不计**。
 - **收集**：会话内维护内存台账 `usage_log: [{file, anchor, reason}]`，不即时写盘，按 `(file, anchor)` 去重（同会话同条目只 +1）。
 - **回写时机**：任务收口时由本 skill（已注册为延迟 gate）统一执行，不即时写盘。非 Plan Mode 实质任务轮恒为 `闸门预告` 成员。
-- **前置校验（防虚报）**：回写前跑 `scripts/usage_ledger_validate.py`，每条 claim 锚点必须真实存在于文件且可定位，输出 `{ok, valid_claims, invalid_claims}`；`ok=false` 阻断回写，先修正台账再回写。
+- **前置校验（两级，缺一即阻断回写）**：① **结构健康**——跑 `scripts/check_memory_anchors.py`，`ok=false` 时先修结构：锚点块整块解析不出来时，claim 校验报出的"通过"毫无意义；② **防虚报**——跑 `scripts/usage_ledger_validate.py`，每条 claim 锚点必须真实存在于文件且可定位，输出 `{ok, valid_claims, invalid_claims}`；`ok=false` 阻断回写，先修正台账再回写。
 - **机器/人类区同步**：计数只写机器区/计数锚点区，**人类区不展示计数**（控体积）；吸收后人类区条目状态标记"已沉淀"。
 - **与更新时间不联动**：`更新时间` = 内容修订时间，`last_used_at` = 最近引用时间，语义分离。
 - 回写动作由 AI 编辑记忆文件（脚本只读校验，AI 写盘），三文件结构不同、回写含状态标记，不脚本化写盘。
+
+## 存量项目锚点回补（强制）
+
+> 教训来源（2026-08-25）：自举脚本只为新项目建 `anchors: []` 空锚点，而**存量项目的既有条目没有任何路径能把锚点补上**。结果是计数恒 0、`scan_absorption_candidates.py` 永远返回空、吸收链路整条形同虚设——机制"装好了"却从未真正运转。某项目 16 个实体 / 26 条风格 / 20 条历史全部靠一次性人工回补才激活。
+
+- **触发时机**：本 skill 首次在某个存量项目生效时，或 `check_memory_anchors.py` 报 `C3`（实体缺计数字段）/ `C4`（条目无对应锚点）时。
+- **回补动作**：跑 `scripts/check_memory_anchors.py --project-root <根> --list-missing` 取清单，按 `usage-anchor-schema.md` 逐条补齐，初值统一 `usage_count: 0` / `usage_days: 0` / `last_used_at: null` / `absorbed_to: null`。
+- **完成判据**：`ok=true`，且 `summary` 中 `style_entries == style_anchors`、`history_entries == history_anchors`、`memory_entities_lacking_fields == 0`。数量对不上就是没补完。
+- **回补本身不计数**：为建立锚点而通读三文件属于元操作，不是"引用条目内容用于决策/输出/代码生成"，不触发 +1。
+- **写入前先读 `references/usage-anchor-schema.md` 第 0 节**：回补写入的是大量中文技术标题，正是最容易踩到 yaml 保留字符的场景。
 
 ## 吸收触发与自动吸收流程
 
@@ -125,4 +135,4 @@ anchors:
 - 定义回写时机、台账格式、防虚报规则时读 `references/usage-tracking-policy.md`。
 - 判定吸收阈值与执行序列时读 `references/absorption-trigger.md`。
 - 登记吸收来源与落点时读 `references/source-notes.md`（吸收动作由 `project-local-skills-rules` / `skill-absorption-rules` 承接，本文件只登记计数侧来源）。
-- 校验脚本契约以 `scripts/usage_ledger_validate.py` 与 `scripts/scan_absorption_candidates.py` 的 CLI docstring 为准。
+- 校验脚本契约以 `scripts/check_memory_anchors.py`、`scripts/usage_ledger_validate.py` 与 `scripts/scan_absorption_candidates.py` 的 CLI docstring 为准；三者的调用次序固定为「健康检查 → claim 校验 → 候选扫描」，前者不过不进入后者。
