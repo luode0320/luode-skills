@@ -239,10 +239,12 @@ grep -rn "isLocalIP\|bypass\|whitelist" middleware/ 2>/dev/null
 
 自定义签名（如 `md5(RequestURI + body + secret)`）**不是** `type: http, scheme: bearer`，而是 `type: apiKey, in: header, name: Authorization`。写错会让对接方按 `Authorization: Bearer xxx` 发请求，必然失败——真实案例见 `references/case-getactivityexposure-gap-backfill.md` 第七节。
 
-### 凭据处理红线（强制）
+### 凭据处理红线（按 apifox 环境隔离等级分流，强制）
 
-- **agent 不把密钥/token 值填进 apifox**（apifox 是云端 SaaS，且"把凭据输入任何字段"属禁止操作）。agent 只做两件事：建**空值占位变量**、写**运行时取值的脚本**；真实值由用户在 apifox 客户端自行填入。
-- 需要在本地验证签名算法时，让脚本自己从项目配置/源码读密钥并计算，**明文不进 agent 输出、不进文档、不进聊天摘要**（与 `modules/environment.md` 敏感变量规则一致）。
+- **凭据填写按 apifox 环境隔离等级分流**（与 `modules/environment.md` 敏感变量规则一致）：
+  - **默认档（共享/正式 apifox 项目）**：agent **不把密钥/token 值填进 apifox**（apifox 是云端 SaaS，且"把凭据输入任何字段"属禁止操作）。agent 只做两件事：建**空值占位变量**、写**运行时取值的脚本**；真实值由用户在 apifox 客户端自行填入。
+  - **隔离档（apifox 测试专用隔离项目，密钥低敏）**：agent **可代填**——从 local 配置/用户提供取值，经 **Apifox 开放 API**（`PUT /api/v1/projects/{projectId}/environments/{id}`，Bearer Token）写入；写后 GET 回读核对，值可在必要输出中出现（详见 `modules/environment.md`「agent 代填通道」）。
+- 需要在本地验证签名算法时，让脚本自己从项目配置/源码读密钥并计算，**明文默认不进 agent 输出、不进文档、不进聊天摘要**（隔离档可放宽到必要输出，但仍不进 `PROJECT_TEST.md`）。
 - 签名脚本里禁止写死密钥；必须 `pm.environment.get("<变量名>")` 运行时取，取不到就跳过（本地免签仍可跑通），并在用例名或说明里标注"需环境变量 X"。
 
 ### 签名前置脚本模板（自定义 md5 签名）
@@ -262,7 +264,7 @@ if (secret) {
 
 | 事实 | 影响与对策 |
 |------|-----------|
-| **environment 读写不到环境变量**：`environment get` 只返回 `id/name/projectId/baseUrls/parameters`；带 `variables` 的 `environment update` 报 `success=true` 但回读恒为 `null` | 密钥类变量**只能人工在客户端添加**。CLI 侧不要反复重试或猜字段；把"需在客户端添加变量 X"写进项目 `PROJECT_TEST.md`「环境变量登记」表。运行时 `pm.environment.get()` 不受此限制（那是 runner API，与 CLI 读写无关） |
+| **environment 读写不到环境变量**：`environment get` 只返回 `id/name/projectId/baseUrls/parameters`；带 `variables` 的 `environment update` 报 `success=true` 但回读恒为 `null` | **CLI 写不了变量，但 Apifox 开放 API 可以**（`PUT /api/v1/projects/{projectId}/environments/{id}`，Bearer Token，见 `modules/environment.md`「agent 代填通道」）。隔离档（apifox 测试专用隔离项目）由 agent 经开放 API 代填；共享项目由用户在客户端添加。CLI 侧不要反复重试或猜字段；把变量清单写进项目 `PROJECT_TEST.md`「环境变量登记」表。运行时 `pm.environment.get()` 不受此限制（那是 runner API，与 CLI 读写无关） |
 | **导入 OpenAPI 的 operation-level `security` 不会绑定到接口鉴权**：导入后 `endpoint get` 的 `securityScheme` 为 `{}`，`apifox export` 出来的 `security` 也是 `[]`；鉴权组件是独立资源 | 鉴权组件会由导入自动创建（可 `security-scheme list` 查到），但**接口与组件的关联需人工在客户端点选**。`endpoint update` 的 `securityScheme` 字段 CLI 未给出结构定义，**不要猜着写**，以免损坏接口定义 |
 
 ## 免签分支与来源头耦合（强制先查）
@@ -300,6 +302,6 @@ if (secret) {
 1. 测试默认用**管理员账号**，普通账号权限问题不得误报接口 bug
 2. token **必须自动获取/续期**，禁止手工复制粘贴 token 到用例
 3. 前置脚本刷新失败时**阻断并提示**，不得用过期 token 硬跑并断言通过
-4. 敏感值（token/密码/secret）不落回复、日志、`PROJECT_TEST.md`、聊天摘要
+4. 敏感值（token/密码/secret）默认不落回复、日志、`PROJECT_TEST.md`、聊天摘要；**apifox 测试专用隔离项目**（密钥低敏）agent 可代填并可在必要输出中出现，但 `PROJECT_TEST.md` 仍不写值
 5. JWT 自签密钥只允许 local 配置里的密钥，禁止 test/prod 密钥
 6. 每个需要鉴权的用例必须先确认其鉴权来源（全局认证/环境变量/前置脚本），不留"不知道 token 哪来"的用例

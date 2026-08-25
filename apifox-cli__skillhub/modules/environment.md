@@ -56,6 +56,7 @@ Mock 是独立于环境的功能，需要在接口层级配置 Mock 规则或期
 
 - **生成规则**：项目无 `config.apifox.yaml` 时，从 `config.local.yaml` **复制**生成，业务配置保持一致；生成前先确认，生成后登记到 `PROJECT_TEST.md`「本地测试环境」表。
 - **数据库分离（强制阻断）**：`config.apifox.yaml` 的 MySQL 数据库必须使用**独立的 apifox 测试专用库**，**库名约定为 `apifox`，由开发人员手动创建并配置**。配置后必须先校验：**apifox 库名与 `config.local.yaml` 的库名相同 → 阻断**测试流程，等待用户部署 apifox 测试专用库并回填配置后再继续；禁止用 local 同一库跑接口测试（会污染本地开发数据）。
+- **表结构基准（local → apifox，强制）**：apifox 测试专用库是独立新库，可能**连表都没有**。**无条件信任 local 库是稳定基准**（表一定存在、数据可能没有）：**测试前主动对账一次表清单**，apifox 缺表 → 从 local 库 `SHOW CREATE TABLE` 抄表结构迁移建表，粒度仅「表 + 索引 + 唯一约束」（物理外键本禁、触发器/视图/存储过程默认不用）；local 无表或迁移失败 → 标记「有问题，无法测试」并阻断。细节见 `modules/test-data-and-judgement.md` 第〇节。
 - **数据基准（local → apifox，强制）**：apifox 测试专用库是独立新库，**以 local 数据库数据为基准**——local 库通常同步正式环境线上数据（测试更准确）；「默认 apifox 环境」仅指被测服务启动环境，**不代表禁止使用 local 配置/数据**。**apifox 库无数据且 local 库有数据 → 优先从 local 库单向灌数据到 apifox 测试库**（默认路径，不限于旧接口）；**apifox 与 local 都无数据 → apifox 自行创造测试数据**。local 库只读源（仅 SELECT）、脱敏、记录来源/条数/时间，见 `modules/test-data-and-judgement.md`；**禁止反向回灌**，禁止从 test/prod/staging 取数灌入。
 - **临时库特权（apifox 环境可自建，强制）**：**前提是项目已提供 apifox 环境配置**（有 `config/yaml/config.apifox.yaml` + 对应 apifox 测试专用库）。模型测试需要**宽泛权限**（建表/复杂数据构造/大范围写操作等超出 apifox 专用库约束的场景）时，**允许 apifox 环境自行新建临时库测试使用**：
   - **命名标识（强制）**：临时库名必须以 **`tmp` 前缀**标识（如 `tmp_<测试用途>`），用于与正常库区分；非 `tmp` 前缀的库一律视为正常库。
@@ -171,6 +172,19 @@ Apifox 新建项目默认自带三个环境：**开发环境（Development）、
 - 端口上的 PID 是否是新进程（重启前后 PID 必须变化）
 - 至少跑一个能体现本次改动的请求，确认响应符合新行为——若响应变化可以用缓存过期解释，就还不能算重启已生效（见 `modules/testing-pitfalls.md` 陷阱 18-1）
 
+### 测试优先可重启授权（强制）
+
+> 规则权威在 `test-strategy-rules`「项目联调条件化规则」。多会话共享同一被测服务时，**测试流程有最高重启优先权**：测试代码/配置有改动需要重新启动服务时，允许杀死并重启——**无论服务由谁启动**（用户手动启动、其他测试会话启动、本会话启动），都不构成重启阻碍。用户手动启动的服务被测试重启后，由用户自行发现与接受，不额外保护。
+
+- **测试前快照服务指纹（强制）**：开始用例前记录被测服务指纹：`ps -eo pid,lstart,cmd | grep <真实进程>`（PID + 启动时间 + 真实命令行），作为「服务是否被重启过」的判定基准。
+- **失败归因零绑定（强制）**：用例失败时先做服务一致性检查，判断是否因服务被重启导致——**只用 OS 事实**（PID/lstart/端口监听/服务日志），不依赖任何工具私有状态（如 `.workbuddy/` 目录或特定 AI 工具约定），所有工具会话与手动操作可见同一事实：
+  - PID / lstart 与测试前快照不同 → 服务被重启过 → 归因 `ENV_RESTARTED`，**不写入缺陷**
+  - 端口无监听（服务不可达）→ 判定重启窗口中 → 等健康恢复后 rerun
+  - PID / lstart 未变且服务健康 → 真实失败，走正常 Bug 流程
+- **重跑语义**：`ENV_RESTARTED` 失败等健康恢复（端口可达 + `/health` 通过 + 稳定 2-3 秒）后 rerun；**重跑通过以重跑为准**，测试文档记录「首轮失败因服务重启（旧PID→新PID），重跑通过」；重跑仍失败才走缺陷流程。
+- **窗口最小化（推荐）**：重启顺序固定为 SIGTERM 优雅停机 → 等端口释放 → 立即启动 → 健康检查稳定 → 才算完成；把不可用窗口从分钟级压到秒级，降低对相邻会话测试的干扰。
+- 归因分类见 `modules/test-data-and-judgement.md`（`ENV_RESTARTED`），陷阱场景见 `modules/testing-pitfalls.md` 陷阱 33。
+
 ### WSL2 跨系统网络访问（环境适配）
 
 > WSL2 默认 NAT 网络下，`127.0.0.1` 只在单侧系统内自洽，跨系统（WSL ⇄ Windows 宿主）访问需按服务所在侧选择地址。apifox CLI 只是 HTTP 客户端，**跑在能直连被测服务的一侧**，不要从不可达侧硬跑再怀疑端口。
@@ -204,12 +218,31 @@ Apifox 新建项目默认自带三个环境：**开发环境（Development）、
 - **禁止**从 test/prod/staging 配置取环境变量值（与本地环境红线一致）
 - 项目 local 配置缺失时，询问用户提供，不要猜测或编造密钥
 
-**敏感变量处理（强制）**：
+**敏感变量处理（按 apifox 环境隔离等级分流，强制）**：
 
-- `apiSecret`、密码、token 等敏感变量**值不得回显**：不出现在回复、日志、聊天摘要、`PROJECT_TEST.md` 中
-- `PROJECT_TEST.md` 只登记**变量名 + 用途 + 来源**，不登记值（见模板「环境变量登记」表）
-- **值由用户在 apifox 客户端自行填入，agent 不代填**（把密钥/token 输入任何字段属禁止操作，apifox 又是云端 SaaS）。agent 只负责：向用户说明需要哪个变量名与用途、在用例里写好运行时取值的脚本（`pm.environment.get("<变量名>")`）、把变量名登记进 `PROJECT_TEST.md`
-- **CLI 读写不到环境变量（2026-08-21 实测 apifox-cli 2.2.9）**：`environment get` 只返回 `id/name/projectId/baseUrls/parameters`；带 `variables` 的 `environment update` 会返回 `success=true` 但回读恒为 `null`。所以不要试图用 CLI 建变量或核对变量是否已填，也不要因为回读为空就反复重试；以"是否有人在客户端填过"为事实来源（详见 `modules/test-auth.md`「两条 CLI 事实」）
+保密策略分两档，按目标 apifox 项目是否属于「apifox 测试专用隔离项目」（用户**单独为测试创建**的隔离团队/项目，判定见 SKILL.md「权限豁免」与知识库「apifox 测试专用项目权限边界」）决定：
+
+- **默认档（共享/正式 apifox 项目）**：
+  - `apiSecret`、密码、token 等敏感变量**值不得回显**：不出现在回复、日志、聊天摘要、`PROJECT_TEST.md` 中
+  - `PROJECT_TEST.md` 只登记**变量名 + 用途 + 来源**，不登记值（见模板「环境变量登记」表）
+  - **值由用户在 apifox 客户端自行填入，agent 不代填**（把密钥/token 输入任何字段属禁止操作，apifox 又是云端 SaaS）。agent 只负责：向用户说明需要哪个变量名与用途、在用例里写好运行时取值的脚本（`pm.environment.get("<变量名>")`）、把变量名登记进 `PROJECT_TEST.md`
+- **隔离档（apifox 测试专用隔离项目，环境本身隔离、密钥低敏）**：**agent 可直接代填**，不要求用户手动操作——从项目 local 测试配置/用户提供取值，经 **Apifox 开放 API** 写入环境变量（见下「agent 代填通道」）；代填后回读核对变量名与用途，值可在必要输出中出现（如向用户确认已填入），但 `PROJECT_TEST.md` 登记表仍只登记名称/用途/来源（防文档漂移与 git 扩散）
+- 两档通用：取值来源只从 local 测试配置或用户提供（禁止 test/prod/staging，见上「取值来源」）；签名脚本内不写死密钥，`pm.environment.get()` 运行时取
+- **CLI 读写不到环境变量（2026-08-21 实测 apifox-cli 2.2.9，两档都适用）**：`environment get` 只返回 `id/name/projectId/baseUrls/parameters`；带 `variables` 的 `environment update` 会返回 `success=true` 但回读恒为 `null`。**代填/核对统一走开放 API，不要用 CLI**，也不要因为回读为空就反复重试（详见 `modules/test-auth.md`「两条 CLI 事实」）
+
+**agent 代填通道（Apifox 开放 API，仅隔离档；共享项目禁止）**：
+
+- 写入：`PUT https://api.apifox.com/api/v1/projects/{projectId}/environments/{id}`；回读核对：`GET https://api.apifox.com/api/v1/projects/{projectId}/environments/{id}`（开放 API 可读写 `variables`，与 CLI 不同）
+- 鉴权：`Authorization: Bearer <Access Token>`（账号设置 → API Access Token 生成，用户提供一次，agent 不打印 token 本身）+ `X-Apifox-Api-Version: 2024-03-28` + `Content-Type: application/json`
+- Body（`variables` 是**序列化后的 JSON 字符串**）：
+  ```json
+  {
+    "name": "<环境名，environment list 取>",
+    "baseUrls": "{\"default\":\"http://127.0.0.1:<端口>\"}",
+    "variables": "[{\"name\":\"apiSecret\",\"value\":\"<取值>\",\"description\":\"鉴权签名密钥\",\"isFixedValue\":true}]"
+  }
+  ```
+- 返回 `{"data": null, "success": true}` 即成功；随后 GET 回读核对变量已写入；`projectId` 取 `PROJECT_TEST.md` 登记值，环境 `id` 用 CLI `environment list` 获取
 
 **登记**：环境变量清单（名称/用途/来源）回填到项目根 `PROJECT_TEST.md` 的「环境变量登记」表，后续会话按表核对是否齐备。
 
@@ -226,13 +259,13 @@ Apifox 新建项目默认自带三个环境：**开发环境（Development）、
 
 ## 不可违反规则
 
-1. 敏感变量（apiSecret/密码/token）值不要出现在最终回复、日志、聊天摘要或 `PROJECT_TEST.md` 中，只登记名称/用途/来源
+1. 敏感变量（apiSecret/密码/token）值默认不出现在最终回复、日志、聊天摘要或 `PROJECT_TEST.md` 中，只登记名称/用途/来源；**apifox 测试专用隔离项目**（密钥低敏）agent 可代填并可在必要输出中出现，但 `PROJECT_TEST.md` 仍只登记名称/用途/来源（防 git 扩散）
 2. 运行测试建议显式指定 `--environment`，避免默认环境变化
 3. 不要在未确认环境的情况下执行有副作用的操作
 4. 接口级测试 environment 只允许指向**开发环境**（baseUrl `http://127.0.0.1:<项目端口>`），禁止选用「测试环境」「正式环境」及任何非 local 服务
 5. 项目无可用开发环境时必须**默认创建**（baseUrl `http://127.0.0.1:<项目端口>`），不得改用其他环境替代
 6. 项目已存在的「测试环境」「正式环境」保留不碰：不删除、不修改、不选用
-7. 开发环境必须**配置齐备环境变量**（鉴权签名 apiKey/apiSecret、默认测试登录账号密码等），缺失即视为开发环境未就绪，用例运行失败先查环境变量而非只查接口；变量值由用户在客户端填入，**agent 不代填、也不能用 CLI 读写变量**（CLI 无此能力）
+7. 开发环境必须**配置齐备环境变量**（鉴权签名 apiKey/apiSecret、默认测试登录账号密码等），缺失即视为开发环境未就绪，用例运行失败先查环境变量而非只查接口；**变量值由谁填按隔离等级分流**——apifox 测试专用隔离项目 agent 经开放 API 代填（见「agent 代填通道」），共享/正式项目由用户在客户端填入；**CLI 两档都不能读写变量**（CLI 无此能力，代填/核对走开放 API）
 8. 环境变量取值只从 local 本地配置或用户提供，禁止从 test/prod/staging 配置取
 9. 测试前必须按「本地服务端口探测」三级链验证**实际监听端口**，禁止直接使用 `PROJECT_TEST.md` 静态登记端口开测
 10. 登记端口与实际监听端口不一致时**必须自动纠偏**（更新 apifox 开发环境 baseUrl + 回写 `PROJECT_TEST.md`），不得带错端口继续测试
@@ -242,3 +275,6 @@ Apifox 新建项目默认自带三个环境：**开发环境（Development）、
 14. 数据准备以 **local 库为数据基准**：**apifox 库无数据且 local 有数据 → 优先从 local 单向灌入 apifox 测试库**；**apifox 与 local 都无数据 → apifox 自行创造测试数据**；local 库只读（仅 SELECT，禁止写入/删除），禁止反向回灌，禁止从 test/prod/staging 取数灌入；灌入数据必须脱敏并记录来源库/表、条数、时间
 15. 重启或关停被测服务必须按「服务重启与关停核验」三步核验（真实进程名结束 → 端口含副端口无监听 → 无残留进程），并确认改动真的生效；**"端口通了"不等于"新实例在跑"**，包装式启动（`go run` / `nodemon` / `--reload` / `mvn spring-boot:run`）杀父进程不释放端口，用例照样能全绿却测的是旧实例
 16. **临时库特权只属于 apifox 环境且必须满足前提**：项目已有 apifox 环境配置（`config/yaml/config.apifox.yaml` + apifox 测试专用库）时，模型测试宽权限场景允许自建 **`tmp` 前缀**临时库，**测试完成后必须删除**；**正常库（非 `tmp` 前缀，含 apifox 测试专用库与 local 库）一律禁止删除**，不得以「有连接权限」「测试需要」为由删除正常库
+17. **表结构以 local 库为稳定基准（强制）**：**测试前主动对账一次表清单**，apifox 测试库缺表 → 从 local 库 `SHOW CREATE TABLE` 抄表结构迁移建表（粒度仅「表 + 索引 + 唯一约束」，物理外键本禁、触发器/视图/存储过程默认不用）；local 无表或迁移失败 → 标记「有问题，无法测试」并阻断，不得因缺表接受伪通过
+18. **apifox 测试专用项目权限豁免（强制）**：apifox 测试专用团队/项目是**隔离测试体**，其内**平台资源**增删改查（接口/用例/环境/Mock/目录）与破坏性操作（删除/归档/覆盖导入/批量更新），以及**被测数据层**（隔离 apifox 测试库内增删改查、登录鉴权）均**默认放开、不逐次确认**；但豁免不突破越界红线——local 库只读、正常库（非 `tmp` 前缀）禁删、test/prod/staging 禁碰、敏感脱敏照旧；本地配置写入、项目绑定、P0 受限/豁免登记、Runner 创建等**非破坏性**确认项仍按各自规则执行
+19. **测试优先可重启（强制）**：测试代码/配置有改动需要重启被测服务时，允许杀死并重启——**无论服务由谁启动**（用户手动/其他会话/本会话）；测试前快照服务指纹（PID+lstart），用例失败先做服务一致性检查，服务被重启导致的失败归因 `ENV_RESTARTED`（可恢复型环境阻断，**不写缺陷**，健康恢复后 rerun 为准），禁止把重启窗口内的失败直接记 Bug（见「测试优先可重启授权」节）

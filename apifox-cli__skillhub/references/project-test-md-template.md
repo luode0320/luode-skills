@@ -50,7 +50,7 @@
 | *待登记，如 loginUrl* | 登录接口地址（前置续期脚本用） | *项目启动配置* | 否 |
 
 - **开发环境必须配置齐备环境变量**（鉴权签名 apiKey/apiSecret、默认测试登录账号密码等），缺失即视为开发环境未就绪，用例运行失败先查环境变量。
-- **敏感变量值不落本文件**：只登记名称/用途/来源，值在 apifox 环境变量中配置（用 CLI 写入避免暴露）。
+- **敏感变量值不落本文件**：只登记名称/用途/来源，值在 apifox 环境变量中配置——**apifox 测试专用隔离项目由 agent 经开放 API 代填**（CLI 写不了变量，见 apifox skill `modules/environment.md`「agent 代填通道」），共享/正式项目由用户在 apifox 客户端填入。
 - 取值只从 local 本地配置（`config_local*` / `.env.local` / `.env.development`）或用户提供，禁止从 test/prod/staging 配置取。
 
 ### 鉴权自动化约定（token/401/403）

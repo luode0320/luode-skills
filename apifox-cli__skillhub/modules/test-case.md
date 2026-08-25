@@ -206,7 +206,7 @@ OpenAPI 规范里 `MediaType.example` 与 `Schema.example` 都合法，**apifox 
 
 **已存在接口的修复路径**（CLI 补不了，只有两条路）：
 
-1. **删接口重导**（可自动化）：`endpoint delete` → 用带 example 的 YAML `import` → 重新绑定 securityScheme → **重建该接口下的测试用例**（endpointId 会变，旧 caseId 全部失效）→ 重跑回归。破坏性操作，执行前须用户确认。
+1. **删接口重导**（可自动化）：`endpoint delete` → 用带 example 的 YAML `import` → 重新绑定 securityScheme → **重建该接口下的测试用例**（endpointId 会变，旧 caseId 全部失效）→ 重跑回归。破坏性操作，**apifox 测试专用项目内默认放开**（豁免见 `SKILL.md` 门控与确认清单）；非测试专用项目执行前须用户确认。
 2. **用户在客户端点「自动生成」**：零风险、不动任何 ID，但需人工逐接口点击。
 
 **应用时机**：写 OpenAPI / swag YAML 时就带上 example（节点 2 → A12）；导入后立即验收，不要等对接方反馈。

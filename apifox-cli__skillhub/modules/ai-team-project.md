@@ -62,7 +62,7 @@
   2. 询问用户指明 [AI] 团队下对应的 Apifox 项目（规则一）
   3. 用户指明后回填绑定表 → 完成接入
   4. **确认/创建开发环境**：若项目下无可用开发环境，按 `modules/environment.md` 创建，baseUrl `http://127.0.0.1:<项目端口>`，环境 ID 回填 `PROJECT_TEST.md` 的「本地测试环境（开发环境）」表
-  5. **配置环境变量（强制）**：按 `modules/environment.md`「开发环境环境变量（强制）」节补齐开发环境变量——鉴权签名（apiKey/apiSecret/appId/nonce/signature）、默认测试登录账号密码（testUsername/testPassword）、token（登录用例 extractor 回写）等，变量清单回填 `PROJECT_TEST.md` 的「环境变量登记」表（只登记名称/用途/来源，**不登记敏感值**）
+  5. **配置环境变量（强制）**：按 `modules/environment.md`「开发环境环境变量（强制）」节补齐开发环境变量——鉴权签名（apiKey/apiSecret/appId/nonce/signature）、默认测试登录账号密码（testUsername/testPassword）、token（登录用例 extractor 回写）等；变量值由谁填按隔离等级分流——**apifox 测试专用隔离项目 agent 经开放 API 代填**（见 `modules/environment.md`「agent 代填通道」），共享/正式项目由用户手动填；变量清单回填 `PROJECT_TEST.md` 的「环境变量登记」表（只登记名称/用途/来源，**不登记敏感值**）
   6. 在 `AGENTS.md` / `CLAUDE.md` 各放一行指针（指向 `PROJECT_TEST.md`；若项目无这两个文件则跳过并在输出中说明）
 - **后续其他项目**：同一 skill 在**每个新项目**首次接入时都会重复此流程，生成该项目自己的 `PROJECT_TEST.md`——该文件是**所有项目的标配**（如同 `AGENTS.md` / `PROJECT_MEMORY.md`），不是当前项目独有
 - **何时不重复生成**：项目根目录已存在 `PROJECT_TEST.md`（或用户约定的其他测试文档）→ 直接复用，不覆盖已有内容

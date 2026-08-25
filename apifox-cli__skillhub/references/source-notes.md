@@ -2,6 +2,23 @@
 
 > 归属 owner：`apifox`。记录本 skill 各模块的能力来源，可回指来源仓库/版本。
 
+## 2026-08-25：内部调整（用户指示口径调整）—— apifox 测试隔离环境密钥策略放宽
+
+- **来源**：无外部源。用户明确指示"apifox 环境允许 agent 自行填入，不需要用户手动，因为环境本身是隔离的，无需保密密钥安全，这个要吸收到 apifox skill 中"。触发场景：11 个用例依赖 `v2ApiSecret`，原 skill 强制"agent 不代填、必须用户手动在客户端填"，在隔离测试项目里造成无谓阻塞。
+- **调整通道**：`skill-absorption-rules` 内部更新通道（用户指示口径调整，非外部吸收）
+- **核心变化**：敏感变量/凭据策略从"一律不代填"改为**按 apifox 环境隔离等级两档分流**——默认档（共享/正式 apifox 项目）保持"值不回显 + agent 不代填"；隔离档（apifox 测试专用隔离项目）密钥低敏、**agent 可经 Apifox 开放 API 直接代填**，脱敏红线收窄为"值不扩散到仓库文档/git/聊天摘要/PROJECT_TEST.md"。
+- **新增技术通道**：Apifox 开放 API `PUT/GET /api/v1/projects/{projectId}/environments/{id}` 可读写 `variables`（CLI 2.2.9 仍读写不到），鉴权 `Authorization: Bearer <Access Token>` + `X-Apifox-Api-Version: 2024-03-28`，body 的 `variables` 为序列化 JSON 字符串；代填后 GET 回读核对。
+- **回补落点**（详见 `workbuddy-absorption-map.md` 2026-08-25 续3 段）：
+  - `modules/environment.md` ← 敏感变量节改两档分流 + 「agent 代填通道」小节 + 不可违反规则第 1 条补隔离档口径
+  - `modules/test-auth.md` ← 凭据处理红线按档分流 + CLI 事实表第一行补开放 API 通道 + 不可违反规则第 4 条
+  - `modules/ai-team-project.md` ← 步骤 5 加注隔离档 agent 可代填
+  - `SKILL.md` ← 权限豁免节补充"密钥类变量值在隔离体内低敏" + 鉴权自动化路由行同步
+  - `references/project-test-md-template.md` ← **存量纠错**："用 CLI 写入避免暴露"（做不到的规则）改为"开放 API 代填（隔离档）/ 人工填（默认档）"
+  - `references/case-getactivityexposure-gap-backfill.md` ← 79/83 行加注 2026-08-25 口径更新指针
+- **拒绝的记录**：无（用户指示全部合并）。
+- **同域去重结论**：全量 skill 扫描"不代填/只能人工/客户端自行填"关键词，仅 apifox skill 内部命中（默认档分支 + case 加注），无跨 skill 污染。**PASS（0 处需清理）**。
+- **口径演进链**：2026-08-21 从"CLI 写入"（做不到）纠错为"人工在客户端填" → 2026-08-25 隔离档放宽为"agent 经开放 API 代填"。教训：apifox 是云端 SaaS 的保密推理只适用于**共享/正式项目**，测试专用隔离项目应优先判定隔离档。
+
 ## 2026-08-24：内部调整（执行中 gap 回补）—— 调试用例与测试用例是两套资源
 
 - **来源**：无外部源。EllipalFinance-go 项目为 5 个活动曝光管理接口建完 21 个 test-case 并跑绿后，用户截图指出客户端接口树下的「成功」用例 Body 仍是空的。查证发现本 skill 有**两条与实测相反的论断**，导致参数完整性闸门给出**假通过**（CLI 侧全绿、交付物空壳）。

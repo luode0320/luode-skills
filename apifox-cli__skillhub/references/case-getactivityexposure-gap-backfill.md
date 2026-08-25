@@ -76,11 +76,11 @@ apifox_gate_expired  sort=70  窗口已过期
 
 1. 安全方案全量修正（53 个 YAML → `apiKey` / `in: header` / `name: Authorization` + 算法与免签例外说明），并把口径沉进 `swag-openapi-maintainer-rules`「核心约束」——它是生成侧真相源，只改产物下次生成还会写错。
 2. apifox 侧：鉴权组件由导入自动创建（`ApiSignAuth`），10 个既有用例统一注入签名前置脚本，新增 2 个签名安全性用例。
-3. 落 `modules/test-auth.md`「鉴权配置必须进 apifox」：三件事齐（安全方案 + 用例签名脚本 + 鉴权用例）、凭据红线（agent 不代填）、签名脚本模板、两条 CLI 事实。
+3. 落 `modules/test-auth.md`「鉴权配置必须进 apifox」：三件事齐（安全方案 + 用例签名脚本 + 鉴权用例）、凭据红线（agent 不代填）、签名脚本模板、两条 CLI 事实。**2026-08-25 口径更新：隔离档（apifox 测试专用项目）agent 可经 Apifox 开放 API 代填环境变量，凭据红线收窄为"值不扩散到仓库文档/git/聊天摘要"，详见 `modules/environment.md`「agent 代填通道」与 `SKILL.md` 权限豁免节。**
 
 ### 两条 CLI 事实（都是"报成功但没生效"）
 
-- `environment update` 带 `variables` 返回 `success=true`，回读恒为 `null`——**CLI 2.2.9 读写不到环境变量**，只暴露 `baseUrls` 与 `parameters`。密钥类变量只能人工在客户端填；顺带修正了 `modules/environment.md` 原先"值写入 apifox 环境变量时用 CLI 写入"这条**做不到的存量规则**。
+- `environment update` 带 `variables` 返回 `success=true`，回读恒为 `null`——**CLI 2.2.9 读写不到环境变量**，只暴露 `baseUrls` 与 `parameters`。密钥类变量只能人工在客户端填（**2026-08-25 口径更新：隔离档 agent 可经 Apifox 开放 API `PUT /api/v1/projects/{projectId}/environments/{id}` 代填，CLI 仍无此能力**）；顺带修正了 `modules/environment.md` 原先"值写入 apifox 环境变量时用 CLI 写入"这条**做不到的存量规则**。
 - 导入 OpenAPI 的 operation-level `security` 不会绑定到 apifox 接口：导入后 `endpoint get` 的 `securityScheme` 是 `{}`，`apifox export` 出来的 `security` 也是 `[]`。鉴权组件是独立资源，接口关联需人工点选；`endpoint update` 的 `securityScheme` 字段 CLI 无结构定义，**不猜着写**。
 
 ### 一个差点误报的坑（最值得记）

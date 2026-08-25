@@ -109,7 +109,7 @@ apifox whoami
 | 环境、变量、Mock、数据库连接、开发环境环境变量（鉴权签名/登录账号/token）、本地服务端口探测三级链与自动纠偏、WSL2 跨系统网络访问、硬动作 A2 创建/更新环境后立即探测、`config/yaml/config.apifox.yaml` 本地测试配置（无则从 local 复制且 MySQL 库必须独立、库名约定 apifox 由开发人员手动配置、与 local 相同即阻断；环境白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁其他环境**；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**）、服务重启与关停核验（包装式启动杀父进程不释放端口，"端口通了"≠新实例在跑） | `modules/environment.md` | environment, variables, mock, database-connection, config.apifox |
 | 分支、合并、merge request、AI 分支、pick-to | `modules/branch.md` | branch, merge-request |
 | 测试用例创建/更新/运行、测试数据、处理器/断言字段、参数完整性校验（接口有参必须带参，无参=无效）、JSON 格式化 T-1（requestBody.data 必须 pretty-print）、Mock 真实性 T-2（200 示例禁止 `{}` 空壳）、**调试用例请求示例 T-3（接口树下的用例 body 空、点开只有空壳、example 该放哪一层）**、双重闸门 A7（CLI 操作层）、header-only 接口空 body 例外（schema 无必填 + 维度全在请求头时 `{}` 是真实契约）、**两类用例是两套资源（`api.cases[]` DEBUG_CASE vs `apiTestCaseCollection`，CLI 只能写后者）** | `modules/test-case.md` | test-case, test-data |
-| 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登、免签分支与来源头耦合（伪造 X-Forwarded-For 测地区/灰度维度会同时丢掉内网免签）、**鉴权配置必须进 apifox（本地免签不免鉴权配置：安全方案 + 用例签名脚本 + 鉴权用例三件齐；agent 不代填密钥；CLI 读写不到环境变量、operation security 不自动绑定接口）** | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 + 签名注入 |
+| 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登、免签分支与来源头耦合（伪造 X-Forwarded-For 测地区/灰度维度会同时丢掉内网免签）、**鉴权配置必须进 apifox（本地免签不免鉴权配置：安全方案 + 用例签名脚本 + 鉴权用例三件齐；隔离档 agent 可经开放 API 代填密钥、值不扩散出隔离体；CLI 读写不到环境变量、operation security 不自动绑定接口）** | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 + 签名注入 |
 | 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、正向分层组合（L1 单参数/L2 两两/L3 全参数/L4 过滤×分页）、POST 必有完整用例、接口有参但用例无参=无效测试、硬动作 A4 创建用例前按分层强制生成（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
 | 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法 | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
 | 陷阱检查、测试失败排查、接口异常但"看起来正常" | `modules/testing-pitfalls.md` | 180 陷阱知识库（apifox 场景版） |
@@ -197,11 +197,15 @@ apifox <command> <subcommand> --help
 
 > 合并原「必须询问用户」事项级确认与「三重门控」阶段级确认（吸收自 API 测试自动化专家版 Inversion 门控），避免概念层叠。执行前逐项核对，匹配任一即先确认再继续；门控通过不代表可以绕过"写入标准流程"与"分支参数规则"。
 
+**权限豁免（apifox 测试专用项目，强制）**：
+
+> 当操作目标属于「apifox 测试专用团队/项目」——即用户**单独为 apifox 测试创建**的隔离团队与项目（非正式接口文档库、非团队共享生产文档）——该团队/项目内**全部资源操作默认放开、不逐次确认**，含平台资源增删改查（接口/用例/环境/Mock/目录）与破坏性操作（删除/归档/覆盖导入/批量更新）。豁免边界（不因豁免而放开）：local 库只读、正常库（非 `tmp` 前缀）禁删、test/prod/staging 禁碰；**密钥类变量值在隔离体内低敏**——apifox 测试专用项目/环境是用户单独创建的隔离体，agent 可经 Apifox 开放 API 代填环境变量（`PUT /api/v1/projects/{projectId}/environments/{id}`，见 `modules/environment.md`「agent 代填通道」），脱敏红线收窄为**值不扩散到仓库文档/git/聊天摘要/PROJECT_TEST.md**；本地配置写入、项目绑定、P0 受限/豁免登记、Runner 创建等**非破坏性**确认项仍按各自规则执行。
+
 **事项级确认（具体操作前）**：
 
 - 登录 token、本地配置写入、私有部署地址
 - 创建/切换 AI 分支、导入源分支资源到 AI 分支
-- 删除、归档、覆盖导入、批量更新等破坏性操作
+- 删除、归档、覆盖导入、批量更新等破坏性操作（**apifox 测试专用项目内豁免**，见上）
 - AI 分支改动 merge / merge-request 回源分支
 - 是否升级 CLI
 
