@@ -1,5 +1,14 @@
 # 项目当前状态
 
+## 2026-08-25 日志链路打通实施完成
+
+- 来源对象：`REQ-LOG-20260825-001`（用户确认「开始落盘推进」）
+- 当前目标：打通日志"写入 → 取证 → 定位"闭环，新建读日志侧唯一权威并联动写侧/bug 域/接口测试
+- 当前状态：全部完成。新建 `log-analysis-rules`（SKILL.md + 5 references）；四处联动补丁（logging-trace-rules 可反查字段、bug-root-cause-rules/bug-intake-rules 指向读侧、apifox 第 5 步服务端取证、test-program-rules 过程日志默认放行）。需求/实施总览/6-review 三份文档机器校验均 valid:true；字典 seed 92；知识库沉淀 1 篇；PROJECT_MEMORY 补稳定决策；PROJECT_HISTORY 置顶追加并裁剪至 20 条。
+- 关键量化：新建 6 文件 + 修改 5 处规则资产 + 落盘 3 份工程文档 + 1 篇知识库笔记。
+- 验证与交接：quick_validate PASS；全量 400 测试失败 14/错误 13 与基线一致（缺 Go 等既有环境项，无本改动新回归）；knowledge_index 0 死链；语义 grep 全部命中。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+
 ## 更新时间
 
 - 2026-08-23
@@ -48,7 +57,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-23T04:40:26.041360Z",
+  "registry_updated_at": "2026-08-25T09:24:29.334236Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -484,6 +493,82 @@
         {
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/76da4d7feeb4d337a0d49944b3a86050e5bea27de4c6214c522cf3c2575a7213",
+      "session_id": "4695cb7b-6460-48c9-8521-5fbb4004f348",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "inactive",
+      "plan_key": "SYNTH-FALLBACK/20260825T083445Z",
+      "source_document": "",
+      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
+      "updated_at": "2026-08-25T08:48:54.452720Z",
+      "steps": [
+        {
+          "id": "RECOVERY-01",
+          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-02",
+          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "status": "completed"
+        },
+        {
+          "id": "RECOVERY-03",
+          "step": "[RECOVERY-03] 继续当前任务执行",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/c37795474960e410ba7eec813d2cad70bc3c709979cd6253b176ed9a7f8f128b",
+      "session_id": "8771c90c-a57b-4fcb-907a-5a808c3f60b8",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "APIFOX-SECRET-POLICY",
+      "source_document": "当前会话：luode 指令将 apifox 测试专用隔离环境密钥代填决策吸收进 apifox-cli__skillhub",
+      "plan_fingerprint": "bf737936c74ae748e1d1ea676c337994930f09e8039484dac6861161fa2ffe2f",
+      "updated_at": "2026-08-25T09:24:29.333963Z",
+      "steps": [
+        {
+          "id": "S1",
+          "step": "修改 modules/environment.md：敏感变量处理按隔离等级分流 + 新增 agent 代填通道（Apifox 开放 API）",
+          "status": "completed"
+        },
+        {
+          "id": "S2",
+          "step": "修改 modules/test-auth.md：凭据红线分流 + CLI 事实表补开放 API 通道",
+          "status": "completed"
+        },
+        {
+          "id": "S3",
+          "step": "修改 modules/ai-team-project.md 步骤 5 与 references/project-test-md-template.md 存量纠错",
+          "status": "completed"
+        },
+        {
+          "id": "S4",
+          "step": "修改 SKILL.md 权限豁免节与 case 案例加注口径更新",
+          "status": "completed"
+        },
+        {
+          "id": "S5",
+          "step": "登记 workbuddy-absorption-map.md 与 references/source-notes.md",
+          "status": "completed"
+        },
+        {
+          "id": "S6",
+          "step": "知识库沉淀：更新 apifox测试专用项目权限边界.md + 回读校验 + knowledge_index check",
+          "status": "completed"
+        },
+        {
+          "id": "S7",
+          "step": "收口 gate：skill-execution-compliance-gate-rules + reasoning-summary-structure-rules",
           "status": "completed"
         }
       ]

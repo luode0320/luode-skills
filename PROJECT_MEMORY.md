@@ -338,6 +338,14 @@
 - `artifact-delivery-gate-rules` 是文档质量唯一机器门禁；profile、严格追踪、N/A 理由、失效链接、Mermaid 语法和 UTF-8 检查失败时必须回开上游文档。
 - 实施规划使用单来源实施总览和项目级全量顺序实施方案两层入口；周期状态、任务状态、项目当前状态、真实测试和 6-review 状态必须同步，不能保留已被后续事实超越的旧入口状态。
 
+## 日志使用链路规则
+
+- 读日志侧唯一权威：`log-analysis-rules` 统一承载日志文件定位、DEBUG 级别切换、request-id 反查、取证过滤、调试窗口纪律五项；其它 skill 查日志取证必须引用它，不重复发明读日志步骤。
+- 写侧可反查字段：日志必须含 request-id / trace-id / 订单号等可反查稳定标识（纯本地任务用业务键），命名与 `logging-trace-rules` 的 trace-propagation 约定一致。
+- apifox 服务端取证：四层诊断无法从响应体定位时进入第 5 步服务端取证，按 request-id 反查服务日志，证据回贴测试主文档；服务日志不可达记 `ENV_LOG_BLOCKED`。
+- 测试脚本过程日志：默认放行项（默认必须输出 7 项最小过程日志），实施计划冻结可升级硬判。
+- 决策来源：`REQ-LOG-20260825-001`；更新时间 2026-08-25。
+
 ## Windows PowerShell 环境自动迭代规则
 
 - `windows-powershell-environment-rules` 的新会话入口是 `initialize_windows_powershell.ps1 -Mode SessionEnsure`；通过用户级 TTL marker 和原子锁避免重复准备，Apply journal 不完整时写 `complete=false`，不得伪造健康状态。
