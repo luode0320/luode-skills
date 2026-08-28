@@ -2,6 +2,30 @@
 
 > 归属 owner：`skill-absorption-rules`。追加每次吸收的来源与落点，可回指原始仓库 / 市场 / 版本。
 
+## 2026-08-26：内部调整——测试进程生命周期强制收口
+
+- **来源名称**：无外部源（内部更新通道）；调整诉求 = "测试任务结束后必须强制关闭测试启动的进程，禁止遗留后台；用户需要时自行启动"。
+- **获取方式**：内部调整（经验事实源为本次 ellipal_admin 合作方新字段同步任务的真实链路测试——12801 被测服务在测试收口后仍留后台，用户指出应强制关闭，非外部 skill 源）。
+- **吸收落点**：
+  - `test-strategy-rules/SKILL.md`（修改）：新增《测试进程生命周期（强制）》节，作为测试域进程生命周期的单一权威来源（测试收口必关 / 核验可证 / 不替用户保留 / 残留清理 / 联调衔接）。
+  - `functional-validation-rules/SKILL.md`（修改）：联调节第 6 条补引用指针指向权威节。
+  - `browser-advanced-testing-rules/SKILL.md`（修改）：联调节第 6 条补引用指针指向权威节。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-08-26 内部更新条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：N/A（内部更新通道，无外部源可删）。
+
+## 2026-08-26：内部调整——低分 skill 优化 SOP 固化（八轮经验总结）
+
+- **来源名称**：无外部源（内部更新通道）；调整诉求 = "八轮低分 skill 优化（7 个 skill：24.7~33.4 → 62.6~69.0）的实操经验总结成标准流程，后续评分巡检中的低分 skill 都按此流程优化；经验吸收进本 skill"。
+- **获取方式**：内部调整（经验事实源为知识库笔记《Windows-WSL命令失败恢复与Skill持续迭代.md》八轮完整记录 + 本项目 8 轮会话实操，非外部 skill 源）。
+- **吸收落点**：
+  - `skill-absorption-rules/references/low-score-skill-optimization-sop.md`（新建，6306B）：触发信号 / 八步闭环表 / 短板类型学 7 类映射 / 市场检索规律 / 验证纪律 / 实操坑 / 单轮收口清单 / 与 darwin-rubric、score-inspection-workflow、skill-audit-rules 边界。
+  - `skill-absorption-rules/SKILL.md`（修改）：自动触发信号补 1 条（"总结多轮实操经验成标准流程"）+ references 读取规则补 1 条（低分 skill 优化闭环读 SOP）。
+  - `skill-absorption-rules/references/score-inspection-workflow.md`（修改）：短板识别节自有 rules/other 出口补指向 SOP 的衔接句。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-08-26 内部更新条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：N/A（内部更新通道，无外部源可删）。
+
 ## 2026-08-24：内部调整——8 维评分体系巡检工作流固化
 
 - **来源名称**：无外部源（内部更新通道）；调整诉求 = "把「用 darwin-rubric 8 维给全仓库 skill 打分 + 生成 skill-8维评分报告.html」的实操经验固化为可复用流程，后续快速打分更新报告"。
@@ -132,3 +156,21 @@
 - **同域冗余扫描**：范围 memory-usage-tracking / project-rule-file-bootstrap / project-memory / project-style；重复段落 0、门控层叠 0、散落产物 0（fixture 已清理）、引用链 18 处一致无断链。**PASS**。
 - **验证**：新脚本正向 `ok=true`（16/26/20）+ 双 fixture 负向覆盖 C1~C5；坏样本下两读取脚本退出码 2；真实自举三路径全通过；三脚本回归与基线一致。
 - **裁决表**：本条即裁决登记（目标 skill 无 `workbuddy-absorption-map.md`，不为单次内部调整新建该文件，避免散落产物）。
+
+## 2026-08-26 · 内部调整：全量 8 维评分巡检第二轮（157 → 158 skill，报告刷新）
+
+- **通道**：内部更新（评分巡检报告刷新，无外部源，无需源清理）。
+- **调整诉求**：用户要求「对所有 skill 再打分一次，更新打分的 html」——第二轮全量评分巡检。
+- **执行**：6 个独立子代理并行分批打分（每批约 26 个，darwin-rubric 静态 7 维，维度 8 未实测）；当前 158 个含新增 log-analysis-rules，无删除；总分由脚本按权重 W=[8,15,10,7,15,5,15] 复算，不以子代理手算为准。
+- **结果**：总平均 60.6（上轮 54.4，+6.2）；rules 63.4（83）、other 58.3（25）、skillhub 57.3（48）、market 55.3（2）；中位数 60.9；最低 self-ent-tech-database-design__skillhub 36.9，最高 imagegen 74.3。
+- **产物**：`skill-8维评分报告.html` 覆盖更新（D 数组 158 行 + 副标题/按钮数字同步）。
+- **验证**：Python 独立复算 158 行/分类计数/平均分/最低最高/中位数全部一致；维度界 1-10 全通过；旧数字无残留。
+
+## 2026-08-26 · 内部调整：低分 skill 批量优化第十一轮（9 个，A+B+D 裁决）
+
+- **通道**：内部更新（用户点名 9 个低分 skill 按顺序逐个优化，默认 A+B+D 组裁决，无外部源、无市场吸收）。
+- **调整诉求**：用户列出评分报告最低 9 个 skill（36.9-49.2），要求「按照顺序，一个一个 skill 优化他们，直到这些都优化完成，默认都是 A+B+D」。
+- **执行**：逐 skill 八步闭环（基线核验→实测→落盘→quick_validate→统一独立复评）。清单：self-ent-tech-database-design（36.9→63.3，frontmatter 空键致 YAML 解析失败 + 缺触发词/资源）、goal（37.7→62.8，纯命令入口补流程边界）、golang（46.0→66.1，脚本 12 处 case 顶层误用 local 全命令写入损坏 + 宣称构建工具实为日志工具）、frontend-design（46.7→61.2，补 5 步流程 + 2 确认检查点 + 删 comment-rules 三连重复）、tg（48.6→66.5，发送强制确认闸门 + 异常处理）、file-organize（48.7→67.5，补个人文件操作安全红线 + 分批移动 + 新建 references/category-map.md 资源）、skill_2054901716814716928（48.8→63.3，frontmatter 8 违规键合规化 + 删营销签名 + 补流程检查点）、cryptocurrency-data-api（49.0→66.1，工具表去重 + 修 search_schools 复制残留 + 补错误处理）、ip（49.2→64.6，脚本路径断链修复 + ip.py 去 requests 改标准库 + name 合规化）。
+- **结果**：9 个全部提升（+14.5 ~ +26.4）；`skill-8维评分报告.html` 对应 9 行更新，总平均 60.6→61.7；新最低 pdf 50.1（原最低 self-ent-tech 36.9 出列）。
+- **验证**：9×quick_validate `Skill is valid!`；golang 脚本 12 命令实测 Saved 全通过 + export 非法格式 exit=1；ip.py 无 key/缺参/非法 JSON/假 key 联网 4 分支实测通过；Node+Python 双端校验 158 行/总平均 61.7/分类计数（skillhub 48/rules 83/other 25/market 2）一致。
+- **产物**：9 个 SKILL.md 重构 + 2 个脚本修复（golang script.sh、ip ip.py）+ 1 个新 reference（file-organize references/category-map.md）。

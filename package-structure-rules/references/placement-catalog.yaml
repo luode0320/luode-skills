@@ -129,6 +129,7 @@
       "error",
       "validation",
       "util",
+      "entity",
       "dto",
       "page",
       "msg"
@@ -288,6 +289,25 @@
       ],
       "owner_skill": "package-structure-rules",
       "search_entry": "request"
+    },
+    {
+      "id": "backend.common.entity",
+      "project_kind": "backend",
+      "artifact_kind": "entity",
+      "content_type": "source_code",
+      "canonical_path": "common/entity",
+      "purpose": "跨业务域共享的公共实体（领域模型）：Currency 及报价/下单结果等被 100+ 处引用的结构，2026-08-26 由 common/dto/currency.go 迁入；不承载具体接口的请求/响应（那归 entity/<v?>/），与 common/dto 的接口出参 DTO 划清边界",
+      "creation_policy": "conditional",
+      "tracked": true,
+      "allowed_extensions": [
+        ".go",
+        ".java",
+        ".ts",
+        ".js",
+        ".py"
+      ],
+      "owner_skill": "package-structure-rules",
+      "search_entry": "entity"
     },
     {
       "id": "backend.config.yaml",

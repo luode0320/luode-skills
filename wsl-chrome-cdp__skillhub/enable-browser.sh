@@ -35,7 +35,7 @@ unset http_proxy https_proxy 2>/dev/null || true
 
 # 获取 Windows IP
 get_windows_ip() {
-    local ip=$($POWERShell -Command "(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike '*Loopback*' -and $_.IPAddress -notlike '169.254.*' -and $_.IPAddress -ne '127.0.0.1'}).IPAddress" 2>/dev/null | head -n1)
+    local ip=$($POWERShell -NoProfile -ExecutionPolicy Bypass -Command "(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {\$_.InterfaceAlias -notlike '*Loopback*' -and \$_.IPAddress -notlike '169.254.*' -and \$_.IPAddress -ne '127.0.0.1'}).IPAddress" 2>/dev/null | head -n1)
     if [ -z "$ip" ]; then
         ip=$(cat /etc/resolv.conf 2>/dev/null | grep nameserver | awk '{print $2}' | head -n1)
     fi
@@ -78,7 +78,7 @@ warn "Chrome CDP 未就绪，正在自动启动..."
 log "通过 PowerShell 启动 Chrome 调试模式..."
 
 ps_command='Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "--remote-debugging-port=9222","--user-data-dir=C:\Users\$env:USERNAME\AppData\Local\Google\Chrome\Debug","--no-first-run"'
-$POWERShell -Command "$ps_command"
+$POWERShell -NoProfile -ExecutionPolicy Bypass -Command "$ps_command"
 
 log "等待 Chrome 启动（8 秒）..."
 sleep 8

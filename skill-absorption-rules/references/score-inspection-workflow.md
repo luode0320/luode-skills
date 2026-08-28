@@ -57,7 +57,7 @@
 - 按静态总分升序取垫底 N 个（默认 Top 25）。
 - **必须区分两类短板**，结论导向不同：
   - 第三方 `skillhub` / `market` 短板（缺 frontmatter / 缺触发词 / 无工作流 / 脚本断链）→ 建议**删除或重装**，不进入内部迭代。
-  - 自有 `rules` / `other` 短板 → 进入 `skill-absorption-rules` 内部更新通道逐条迭代。
+  - 自有 `rules` / `other` 短板 → 进入 `skill-absorption-rules` 内部更新通道，按 `low-score-skill-optimization-sop.md`（低分 skill 优化 SOP：八步闭环 + 短板类型学 + 验证纪律）执行逐条迭代。
 - 打分时同步算分类平均分（rules / other / skillhub / market），作为「短板集中在哪类」的判断依据。
 
 ## 报告产出（固定文件）

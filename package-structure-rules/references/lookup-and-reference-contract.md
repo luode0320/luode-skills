@@ -31,3 +31,12 @@
 - `database/connection/` 只提供数据存储连接与客户端初始化，`database/model/{db,redis,mongo}/` 只承载相应存储模型；二者不得承载业务流程。独立字段 SQL 只能使用 `database/scripts/sql/field/{create,update,delete}/` 的直接 `.sql` 文件，Mongo shell 脚本进入 `database/scripts/js/`，Redis 执行脚本进入 `database/scripts/lua/`，自动迁移源码仍只在 `database/migration/`。
 - `database/repository/` 不得调用迁移程序；自动迁移只允许启动装配、迁移命令和数据库初始化链路调用。
 - 新增目录、删除目录或职责迁移后，更新 `doc/1-架构/2-目录树.md`。
+
+## 版本化目录导入别名对齐（强制）
+
+导入版本化目录（`router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/` 及其内嵌子包）时，导入别名必须与版本目录名对齐：`v1<后缀>`、`v2<后缀>`。
+
+- 正例：`v1list "ellipal_finance/internal/service/v1/list"`、`v2list "ellipal_finance/internal/service/v2/list"`。
+- 反例：`swapList "ellipal_finance/internal/service/v1/list"`——`swapList` 不携带版本信息，与 `v2list` 不对称，无法从调用处看出这是 v1 的包。
+- 原因：同一业务多版本并存时，语义别名让版本从名字上消失；调用方只记得"调了 swapList 的缓存清理"，实际只清了 v1，v2 停留在旧过滤结果直到 600 秒 TTL 兜底，且无任何报错。
+- 要求：同一业务域的 v1/v2 版本包必须成对以 `v1<后缀>` / `v2<后缀>` 别名引用，禁止语义别名与版本别名混用；清理类成对调用必须逐个版本显式执行。

@@ -1,104 +1,85 @@
 ---
-name: "goal"
-version: "1.0.0"
-description: "Goal setting reference — SMART goals, OKRs, habit formation, accountability systems. Use when setting personal or professional goals, designing habit systems, or implementing OKR frameworks."
-author: "BytesAgain"
-homepage: "https://bytesagain.com"
-source: "https://github.com/bytesagain/ai-skills"
-tags: [goal-setting, smart-goals, okr, habits, productivity, motivation, accountability]
-category: "life"
+name: goal
+description: "目标设定与达成方法论参考：SMART 目标、OKR、习惯养成、目标拆解、动机科学与复盘系统。当用户需要设定个人或职业目标、写 SMART 目标、设计 OKR、规划习惯养成体系、拆解大目标、做周/月/季度复盘时触发。触发词：目标设定、SMART、OKR、习惯养成、目标拆解、里程碑、复盘、动机、目标管理、goal、okr。平台内 Goal 生命周期与长任务循环执行机制见 long-run-loop-rules。"
+license: MIT
+metadata:
+  displayName: "目标设定与达成"
+  version: "1.1.0"
+  author: "BytesAgain"
+  homepage: "https://bytesagain.com"
+  source: "https://github.com/bytesagain/ai-skills"
+  tags: [goal-setting, smart-goals, okr, habits, productivity, motivation, accountability]
+  category: "life"
+allowed-tools: Read, Write, Bash
 ---
 
-# Goal — Goal Setting & Achievement Reference
+# Goal — 目标设定与达成参考
 
-Quick-reference skill for goal-setting frameworks, habit formation, and personal achievement systems.
+目标方法论顾问：提供 SMART/OKR/习惯养成/复盘等被验证的框架速查，帮助把模糊愿望变成可执行、可跟踪、可复盘的目标体系。
 
-## When to Use
+## 适用边界
 
-- Setting SMART goals or defining OKRs
-- Designing habit formation and tracking systems
-- Understanding motivation science and goal psychology
-- Building accountability structures
-- Reviewing and adjusting goals systematically
+- **做**：目标框架速查（SMART/OKR/习惯/拆解/动机/复盘/常见陷阱）、目标体系设计建议。
+- **不做（转交）**：
+  - 平台内 Goal 生命周期（创建/激活/循环执行/完成验证）→ `long-run-loop-rules`
+  - 目标跟踪的自动提醒/定时任务 → 交给自动化能力（如 `automation_update` 定时任务），本 skill 只给方法论
 
-## Commands
+## 工作流（4 步）
 
-### `intro`
+### 第 1 步：识别目标场景
 
-```bash
-scripts/script.sh intro
-```
+- **输入**：用户的目标描述或意图（一句话愿望 / 现有目标清单 / 想搭建的习惯体系）。
+- **动作**：判断场景类型——设定新目标（走 SMART/OKR）、习惯养成（走 habits）、大目标拆解（走 planning）、目标进展停滞（走 motivation + review）。
+- **输出**：场景判定 + 建议使用的框架。
 
-Goal setting fundamentals — why goals work, common pitfalls, research-backed principles.
+### 第 2 步：选择并取用框架
 
-### `smart`
+- **输入**：场景判定结果。
+- **动作**：执行对应命令取用参考内容（见下方命令速查表），或直接按框架要点现场输出。
+- **输出**：框架要点 + 适配用户场景的示例。
 
-```bash
-scripts/script.sh smart
-```
+### 第 3 步：落地执行与跟踪
 
-SMART goal framework — Specific, Measurable, Achievable, Relevant, Time-bound with examples.
+- **输入**：确认后的目标与里程碑。
+- **动作**：把目标拆成可测量的关键结果与日常行动项，明确复盘节奏（周/月/季）。
+- **检查点**：目标量级大、涉及多周期时，先与用户确认投入边界（时间/资源/优先级），不替用户默认排期。
+- **输出**：目标-里程碑-行动项清单。
 
-### `okr`
+### 第 4 步：复盘与调整
 
-```bash
-scripts/script.sh okr
-```
+- **输入**：执行期的进展与反馈。
+- **动作**：按 review 框架复盘——哪些达成、哪些偏离、原因是什么、如何纠偏。
+- **输出**：复盘结论 + 下一周期调整建议。
 
-OKR framework — Objectives and Key Results, scoring, cadence, alignment.
+## 命令速查表
 
-### `habits`
+脚本：`scripts/script.sh`（支持任意 cwd 以绝对路径调用）。未列出参数时默认展示帮助。
 
-```bash
-scripts/script.sh habits
-```
+| 命令 | 用途 |
+|---|---|
+| `intro` | 目标设定基础：为什么目标有效、常见陷阱、研究依据 |
+| `smart` | SMART 框架：Specific/Measurable/Achievable/Relevant/Time-bound + 示例 |
+| `okr` | OKR 框架：目标与关键结果、评分、节奏、对齐 |
+| `habits` | 习惯养成：提示-行动-奖励、原子习惯、执行意图 |
+| `planning` | 目标拆解：大目标 → 里程碑 → 冲刺 → 每日行动 |
+| `motivation` | 动机科学：内在/外在动机、克服平台期 |
+| `review` | 复盘系统：周/月/季复盘、纠偏、庆祝 |
+| `pitfalls` | 常见目标设定错误与对策 |
+| `help` / `version` | 帮助 / 版本 |
 
-Habit formation science — cue-routine-reward, atomic habits, implementation intentions.
+## 边界条件
 
-### `planning`
+- **框架不适用**：用户只是随手记录想法、无明确达成意愿时，不强行套 SMART/OKR，先帮其澄清意图。
+- **脚本不可用**：`bash` 缺失或脚本执行失败时，降级为直接按框架要点现场输出（本 skill 的参考内容已在速查表内联，不依赖脚本才能工作）。
+- **目标冲突**：多个目标互抢资源时，先与用户确认优先级排序，不默认全做。
+- **过度承诺**：用户目标明显超出可执行范围时，提示拆小步或延长时间窗，不附和空头承诺。
 
-```bash
-scripts/script.sh planning
-```
+## 退出机制
 
-Goal decomposition — breaking big goals into milestones, sprints, and daily actions.
+用户输入「结束」→ 停止，回复「目标指导完成。」；信息不足（目标对象不明、时间窗未知、衡量标准缺失）时先补齐信息再继续。
 
-### `motivation`
+## 约束
 
-```bash
-scripts/script.sh motivation
-```
-
-Motivation science — intrinsic vs extrinsic, self-determination theory, overcoming plateaus.
-
-### `review`
-
-```bash
-scripts/script.sh review
-```
-
-Review systems — weekly reviews, retrospectives, course correction, celebration.
-
-### `pitfalls`
-
-```bash
-scripts/script.sh pitfalls
-```
-
-Common goal-setting mistakes and evidence-based countermeasures.
-
-### `help`
-
-```bash
-scripts/script.sh help
-```
-
-### `version`
-
-```bash
-scripts/script.sh version
-```
-
----
-
-*Powered by BytesAgain | bytesagain.com | hello@bytesagain.com*
+- 参考内容基于目标设定与行为科学主流研究（Locke & Latham 等），输出时标注依据，不编造数据。
+- 所有建议必须落到可执行的下一步行动，不止于理论。
+- 涉及行为改变类建议，先说明预期成本（意志力/时间/社交影响），再给方案。

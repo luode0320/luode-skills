@@ -115,8 +115,7 @@ CREATE INDEX `idx_orders_user_status_id_amount` ON `orders` (`user_id`, `status`
 
 ### 必须声明
 
-- `NOT NULL`：业务必填字段。
-- `DEFAULT`：有默认值的字段（避免 NULL 带来的判断负担）。
+- **字段三件套（强制）**：每个字段必须 `NOT NULL` + 显式 `DEFAULT` + `COMMENT`；例外仅 `AUTO_INCREMENT` 主键（自增隐式默认）与 TEXT/BLOB/JSON 等无默认值能力的类型（至少 NOT NULL + COMMENT）。细则见 `schema-boundaries.md`「铁律：字段三件套」。
 - `UNIQUE`：业务唯一键。
 - `PRIMARY KEY`：每表必须有主键。
 
@@ -216,8 +215,8 @@ V1.0.2__create_report_tables.sql
 CREATE TABLE `config_type` (
   `id` BIGINT PRIMARY KEY,
   `type_code` VARCHAR(32) NOT NULL COMMENT '类型编码',
-  `name` VARCHAR(100) COMMENT '名称',
-  `enabled` TINYINT DEFAULT 1 COMMENT '是否启用',
+  `name` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '名称',
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT '是否启用',
   UNIQUE KEY `uk_type_code` (`type_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='配置类型表';
 ```
@@ -229,8 +228,8 @@ CREATE TABLE `entity_relation` (
   `id` BIGINT PRIMARY KEY,
   `entity_a_id` BIGINT NOT NULL COMMENT '实体A',
   `entity_b_id` BIGINT NOT NULL COMMENT '实体B',
-  `sort_order` INT DEFAULT 1 COMMENT '排序',
-  `is_active` TINYINT DEFAULT 1 COMMENT '状态',
+  `sort_order` INT NOT NULL DEFAULT 1 COMMENT '排序',
+  `is_active` TINYINT NOT NULL DEFAULT 1 COMMENT '状态',
   UNIQUE KEY `uk_entity_relation` (`entity_a_id`, `entity_b_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='实体关联表';
 ```
@@ -243,12 +242,15 @@ CREATE TABLE `audit_log` (
   `table_name` VARCHAR(64) NOT NULL COMMENT '表名',
   `record_id` BIGINT NOT NULL COMMENT '记录ID',
   `action` VARCHAR(16) NOT NULL COMMENT '动作：INSERT/UPDATE/DELETE',
-  `changed_by` BIGINT COMMENT '操作人',
-  `changed_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+  `changed_by` BIGINT NOT NULL DEFAULT 0 COMMENT '操作人',
+  `changed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
   `old_value` JSON COMMENT '旧值',
   `new_value` JSON COMMENT '新值',
   KEY `idx_audit_log_table_record` (`table_name`, `record_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='审计日志表';
+```
+
+> 注：`old_value` / `new_value` 为 JSON 列，无默认值能力，属字段三件套的例外类型（仍须 NOT NULL + COMMENT 按业务定）；审计日志若语义上允许"无旧值"，可保留 NULL 并在模型注释中写明理由。
 ```
 
 ## 严禁清单（评审快速否决项）

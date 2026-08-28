@@ -1,7 +1,7 @@
 {
   "slug": "nginx",
   "name": "Nginx",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "installedAt": 1787413247937,
   "source": "skillhub",
   "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/a78375f1-773e-4817-b4f3-0557b6afd777.png",

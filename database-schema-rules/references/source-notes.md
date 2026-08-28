@@ -2,6 +2,20 @@
 
 > 归属：`database-schema-rules`。记录外部吸收来源与落点，保证可追溯。
 
+## 内部调整：字段三件套（NOT NULL + DEFAULT + COMMENT）（2026-08-26）
+
+- **来源名称**：内部调整 —— `database-schema-rules`，新增「字段三件套」强制规则
+- **来源形态**：用户明确规则指令「数据库表的字段必须 NOT NULL，并且需要有 DEFAULT 默认值、COMMENT 说明」；无外部 skill / URL
+- **调整诉求**：新建表每个字段必须满足三件套（NOT NULL + 显式 DEFAULT + COMMENT），例外仅 AUTO_INCREMENT 主键与 TEXT/BLOB/JSON 等无默认值能力类型；存量表新增字段的可空过渡最终态收口三件套
+- **吸收日期**：2026-08-26
+- **落点**：
+  - `SKILL.md`（铁律 1 重写为三件套 + description；触发信号、权责边界、暂停确认、通过/驳回标准、执行结果归档要求共 6 处 DDL 完整性位点统一补 NOT NULL）
+  - `references/schema-boundaries.md`（DDL 完整清单第 2 项「非空 + 默认值（字段三件套）」；新增「铁律：字段三件套」小节含例外两类与存量可空过渡；检查清单项同步；完整 DDL 示例 `remark` 改 NOT NULL）
+  - `references/schema-examples.md`（正例 1 `remark` 改 NOT NULL；正例 5 补「最终态收口三件套」注记；反例 5 问题列表补缺 NOT NULL 项）
+  - `references/table-design-standards.md`（「必须声明」小节改为字段三件套口径；配置驱动表/多对多/审计日志表示例补 NOT NULL + DEFAULT；JSON 列注明无默认值能力例外）
+- **裁决依据**：既有铁律 1 未强制 NOT NULL、检查清单「默认值（如果适用）」弱化、多处示例存在可空字段，与用户强约束冲突；三件套作为统一口径，例外边界防止规则自相矛盾；存量表可空过渡是既有「铁律适用范围」的天然延伸，不新开流程
+- **状态**：已落盘，无外部源需删除。
+
 ## 执行中 gap 回补：存量表纳入 ORM 自动迁移（2026-08-21）
 
 - **来源名称**：内部实践 —— EllipalFinance-go 项目连续两轮真实执行，无外部 skill / URL

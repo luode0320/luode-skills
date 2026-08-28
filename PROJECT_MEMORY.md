@@ -129,6 +129,14 @@
 - 来源：`project-local-skills-rules/SKILL.md`、`project-local-skills-rules/references/auto-trigger-and-evaluation.md`、`references/dedup-and-update.md`、`references/workbuddy-absorption-map.md`、`references/source-notes.md`。
 - 更新时间：2026-08-19。
 
+## 低分 Skill 优化 SOP 规则
+
+- 稳定决策：评分巡检中低分 skill 的优化统一按 `skill-absorption-rules/references/low-score-skill-optimization-sop.md` 八步闭环执行（基线核验→市场检索→同域对照→裁决确认→落盘→机器校验→独立复评→闭环修复+沉淀）；市场检索为低收益动作（八轮 28+ 组关键词 0 候选），重点放在同域对照与「让脚本兑现宣称」。
+- 稳定决策：优化闭环收口必须含独立子代理 7 维复评（固定输出格式 `skill|D1..D7|总分|短板`）+ 维度 8 本机实测；复评发现问题按「本侧修正」原则闭环修复，不跨 skill 修改成熟资产。
+- 稳定决策：工具类 skill 的「隐性失实」短板（宣称"开箱即用"但框架依赖未装、宣称"免费无 key"但数据源不可达）→ 修复模式为「去框架依赖 + 数据源诚实声明 + `--check` 探测命令」，而非换源重写；DNS 解析到私有网段（172.x/10.x）+ TLS 握手失败 = 域名级不可达判据（free-api-50__skillhub 轮沉淀）。
+- 来源：`skill-absorption-rules/references/low-score-skill-optimization-sop.md`。
+- 更新时间：2026-08-26。
+
 ## 任务阻断收口与恢复规则
 
 - 真实阻断唯一使用 `artifact-delivery-gate-rules/references/task-blocker-closure-contract.md` 的 `BLK-*` 记录，至少包含任务状态、阻断阶段、依据与证据、已尝试动作与停止边界、影响、至多三步解决计划、恢复后重入点、去重键和必填字段“用户授权操作”。
@@ -381,8 +389,9 @@
 - 稳定决策：前后端同仓、独立后端、独立前端三类项目根都必须直接保存并提交 `Dockerfile`。Catalog 以 `project-governance/dockerfile` 的必需文件条目建模，`init` 自动创建空文件位置；`strict` 只读拒绝缺失或被目录占用，`adoption` 保持旧项目渐进采纳，不强制补迁移文件。
 - 稳定决策：业务域直连源码根 `<source-root>/<domain>/`，去掉 `business/` 中间层；业务相关逻辑完全通过版本目录 `<v?>`（`v1` 起，命名 `v[0-9]+`）隔离，`router/`、`controller/`、`entity/`、`service/` 下沉到版本目录内（`service/` 必建），`api/`、`base/`、`constant/`、`util/`、`crontask/` 为跨版本通用业务逻辑。域级初始化入口为单文件 `init.<ext>`（`<ext>` 为语言扩展名），全量注册本域所有版本路由并以 `/v1`、`/v2` 前缀区分、多版本并存对外，旧版本不因新版本诞生而下线、也不冻结。目录树用 `<source-root>` 占位符多语言统一（Go=`internal/`、Java=`src/main/java/<包>`、Node=`src/`、Python=`src/<包>`），不单为 Go 定 `internal/` 树。
 - 稳定决策：完全移除 `rpc/` 跨业务公开入口；业务域之间禁止直接 import 对方任何目录（无 rpc 例外），跨域共享结构仅走根 `common/` 与 `global/` 非业务运行引用。机器事实源 `placement-catalog.yaml` 的 `router`/`controller` 已改版本级条目（含 `<source-root>`/`<domain>`/`<v?>` 占位符与 `requires_domain`）、`business-rpc` 条目已删除；`micro_business.py` 提供 `scaffold <域>`（建版本骨架 + 单文件 `init.go`）、`check`（校验域间禁止直连）、`check --detect-new`（候选新项目三态判定）。
+- 稳定决策：后端根级任务入口有三类，按触发机制区分——`crontask/` 承载时间驱动（cron 表达式/固定间隔）的周期任务；`cachetask/` 承载缓存过期驱动的异步重建任务（Stale-While-Revalidate：缓存 TTL 到期后先返回旧数据、再异步重建新缓存，典型如 60s 级短 TTL 内存缓存）；`async/` 承载消息/队列驱动的 Worker 与消费者。缓存读写技术适配归 `utils/cache/`（Redis/Mongo 客户端封装），`cachetask/` 只承载过期后的业务重建逻辑入口，不重复实现缓存读写；三目录均为条件提交、`cachetask/<task>/` 单任务入口。
 - 来源：`package-structure-rules/SKILL.md`、`package-structure-rules/references/project-layout-v2.md`、`package-structure-rules/references/placement-catalog.yaml`。
-- 更新时间：2026-08-05。
+- 更新时间：2026-08-27。
 
 ## 非 Plan Mode 最小计划分级规则
 
@@ -989,6 +998,23 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-29
+  - entity_id: rule.cachetask-root-task-entry
+    name: "根级 cachetask 缓存重建任务目录"
+    type: "代码位置目录规则"
+    aliases:
+      - cachetask
+      - 缓存重建任务
+      - Stale-While-Revalidate
+      - 过期驱动异步重建
+    definition: "后端根级任务入口按触发机制分三类：crontask/（时间驱动 cron 周期任务）、cachetask/（缓存过期驱动的异步重建，SWR：TTL 到期先返回旧数据再异步重建新缓存，典型 60s 级短 TTL 内存缓存）、async/（消息/队列驱动 Worker）。缓存读写技术适配归 utils/cache/，cachetask/ 只承载过期后的业务重建逻辑入口，三者均为条件提交、单任务入口 cachetask/<task>/。"
+    scope: "后端项目根级目录落点、三类任务入口职责边界、adoption 根级目录白名单"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.package-structure-rules
+      - evidence.dialog.cachetask-root-task-entry
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-08-27
   - entity_id: rule.thread-title-process-trigger
     name: "会话标题过程触发"
     type: "工作台规则"
@@ -2193,6 +2219,7 @@ retrieval_hints:
       - "rule.backend-utils-common-util-placement"
       - "rule.micro-business-domain-isolation"
       - "rule.legacy-project-directory-adoption"
+      - "rule.cachetask-root-task-entry"
     doc/2-需求/2026-07-28_014412_代码位置目录规则V2.md:
       - "rule.legacy-project-directory-adoption"
     micro-business-architecture-rules/SKILL.md:
@@ -2227,9 +2254,12 @@ retrieval_hints:
     test-strategy-rules/SKILL.md:
     test-strategy-rules/references/test-asset-governance.md:
     package-structure-rules/SKILL.md:
+      - "rule.cachetask-root-task-entry"
     package-structure-rules/references/project-layout-v2.md:
+      - "rule.cachetask-root-task-entry"
     package-structure-rules/references/placement-catalog.yaml:
     package-structure-rules/scripts/placement_catalog.py:
+      - "rule.cachetask-root-task-entry"
     AGENTS.md:
     CLAUDE.md:
 

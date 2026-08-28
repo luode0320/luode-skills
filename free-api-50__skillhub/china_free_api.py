@@ -1,22 +1,38 @@
 # -*- coding: utf-8 -*-
 """
-Clawhub 免费中国API Skill V6.0
-完全免费 | 无密钥 | 无次数限制 | 国内接口
+中国免费 API 查询 CLI（纯 requests 实现，无第三方框架依赖）
+数据源：wttr.in（实测可用）+ api.muxiaoguo.cn（需网络可达性验证）
+用法：python china_free_api.py <command> [args...]
+      python china_free_api.py --check    # 探测数据源可达性
+      python china_free_api.py --list     # 列出全部命令
 """
 import requests
 import urllib.parse
 import random
 import string
-from clawhub import Skill, skill_command
+import sys
 
-class ChinaFreeAPISkill(Skill):
+VERSION = "1.1.0"
+
+# ---- 命令注册表（兼容原 @skill_command("name") 装饰器，去 clawhub 依赖）----
+COMMANDS = {}
+
+
+def skill_command(name):
+    """注册一个命令：记录方法名到 COMMANDS 表。"""
+
+    def deco(fn):
+        COMMANDS[name] = fn.__name__
+        return fn
+
+    return deco
+
+
+class ChinaFreeAPISkill:
     def __init__(self):
-        super().__init__(
-            name="china_free_api",
-            description="中国免费API大全：天气、快递、股票、油价、日历、IP、二维码、去水印、百科、汇率、OCR、周公解梦、高校、拼音、表情包、热量等",
-            version="6.0.0",
-            author="Clawhub Developer"
-        )
+        self.skill_name = "china_free_api"
+        self.skill_desc = "中国免费API大全：天气、快递、股票、油价、日历、IP、二维码、去水印、百科、汇率、OCR、周公解梦、高校、拼音、表情包、热量等"
+        self.skill_version = VERSION
 
     # ====================== 1. 天气 ======================
     @skill_command("weather")
@@ -654,7 +670,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 银行卡查询失败"
 
-    # ====================== 【新增】45. 周公解梦 ======================
+    # ====================== 45. 周公解梦 ======================
     @skill_command("dream")
     def dream(self, keyword: str):
         try:
@@ -667,7 +683,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 解梦失败"
 
-    # ====================== 【新增】46. 新闻分类 ======================
+    # ====================== 46. 新闻分类 ======================
     @skill_command("newstype")
     def newstype(self, type: str):
         try:
@@ -683,7 +699,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 获取新闻失败"
 
-    # ====================== 【新增】47. 随机表情包 ======================
+    # ====================== 47. 随机表情包 ======================
     @skill_command("emote")
     def emote(self):
         try:
@@ -695,7 +711,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 获取失败"
 
-    # ====================== 【新增】48. 车牌估值 ======================
+    # ====================== 48. 车牌估值 ======================
     @skill_command("carprice")
     def carprice(self, plate: str):
         try:
@@ -707,7 +723,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 车牌估值失败"
 
-    # ====================== 【新增】49. 歌曲搜索 ======================
+    # ====================== 49. 歌曲搜索 ======================
     @skill_command("song")
     def song(self, name: str):
         try:
@@ -723,7 +739,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 歌曲搜索失败"
 
-    # ====================== 【新增】50. 图片OCR文字识别 ======================
+    # ====================== 50. 图片OCR文字识别 ======================
     @skill_command("ocr")
     def ocr(self, pic_url: str):
         try:
@@ -735,7 +751,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ OCR识别失败"
 
-    # ====================== 【新增】51. 全国高校查询 ======================
+    # ====================== 51. 全国高校查询 ======================
     @skill_command("school")
     def school(self, name: str):
         try:
@@ -753,7 +769,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 高校查询失败"
 
-    # ====================== 【新增】52. 汉字转拼音 ======================
+    # ====================== 52. 汉字转拼音 ======================
     @skill_command("pinyin")
     def pinyin(self, text: str):
         try:
@@ -766,7 +782,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 拼音转换失败"
 
-    # ====================== 【新增】53. 随机二次元壁纸 ======================
+    # ====================== 53. 随机二次元壁纸 ======================
     @skill_command("acg")
     def acg(self):
         try:
@@ -778,7 +794,7 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 获取失败"
 
-    # ====================== 【新增】54. 食物热量查询 ======================
+    # ====================== 54. 食物热量查询 ======================
     @skill_command("food")
     def food(self, name: str):
         try:
@@ -796,6 +812,76 @@ class ChinaFreeAPISkill(Skill):
             pass
         return "❌ 食物热量查询失败"
 
+def _probe(url, timeout=8):
+    """探测 URL 可达性，返回 (状态码, 摘要)。"""
+    try:
+        r = requests.get(url, timeout=timeout)
+        body = r.text[:120].replace("\n", " ") if r.text else ""
+        return r.status_code, body
+    except Exception as e:
+        return None, f"{type(e).__name__}: {str(e)[:100]}"
+
+
+def cmd_check():
+    """--check：探测两个数据源可达性。"""
+    print("=== 数据源可达性探测 ===")
+    code, body = _probe("http://wttr.in/beijing?format=j1")
+    ok_weather = code == 200
+    print(f"[{'OK' if ok_weather else 'FAIL'}] wttr.in         (命令: weather)        HTTP {code}")
+    code2, body2 = _probe("https://api.muxiaoguo.cn/api/mobile?phone=13800138000")
+    ok_mxg = code2 == 200
+    print(f"[{'OK' if ok_mxg else 'FAIL'}] api.muxiaoguo.cn  (其余命令共用)          HTTP {code2} {body2[:80]}")
+    print()
+    if not ok_mxg:
+        print("提示：木小果 API 不可达时，weather 命令仍可用，其余命令返回 ❌ 查询失败。")
+        print("可能原因：域名 DNS 被劫持 / 内网拦截 / 服务下线。可更换网络环境后重跑 --check。")
+    return 0 if ok_weather else 1
+
+
+def main():
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help", "help"):
+        print(f"中国免费 API 查询 CLI v{VERSION}")
+        print("用法: python china_free_api.py <command> [args...]")
+        print()
+        print("选项:")
+        print("  --list      列出全部命令")
+        print("  --check     探测数据源可达性")
+        print("  --version   显示版本")
+        print("  --help      显示本帮助")
+        print()
+        print(f"共 {len(COMMANDS)} 个命令，常用示例:")
+        print("  python china_free_api.py weather 北京")
+        print("  python china_free_api.py stock 600519")
+        print("  python china_free_api.py oil")
+        return 0
+    if args[0] in ("-v", "--version", "version"):
+        print(f"china_free_api v{VERSION}")
+        return 0
+    if args[0] == "--list":
+        for name in sorted(COMMANDS):
+            print(name)
+        return 0
+    if args[0] == "--check":
+        return cmd_check()
+    cmd = args[0]
+    if cmd not in COMMANDS:
+        print(f"未知命令: {cmd}（用 --list 查看全部，或 --help 查看用法）")
+        return 1
+    try:
+        fn = getattr(ChinaFreeAPISkill(), COMMANDS[cmd])
+        raw_args = args[1:]
+        if cmd == "password" and raw_args:
+            # password 是唯一需要 int 参数的命令
+            result = fn(int(raw_args[0]))
+        else:
+            result = fn(*raw_args)
+        print(result)
+        return 0
+    except TypeError as e:
+        print(f"参数错误: {cmd} {str(e)}（用 --help 查看用法）")
+        return 1
+
+
 if __name__ == "__main__":
-    skill = ChinaFreeAPISkill()
-    skill.run()
+    sys.exit(main())

@@ -1,0 +1,14 @@
+# package-structure-rules 来源记录
+
+## 2026-08-27
+
+- 内部调整：`package-structure-rules`，调整诉求「新增根级 `cachetask/` 目录，专门承载缓存过期驱动的异步重建任务（Stale-While-Revalidate：TTL 到期先返回旧数据，再异步更新新缓存）」。
+- 触发来源：用户会话——`crontask/` 是定时任务目录，但存在"类定时任务"（如缓存 60s 到期先返旧数据再异步重建），希望有专属目录；知识库《配置表驱动缓存五件套》印证现有 `crontask/` 承担的是周期主动刷新（30 分钟 cron），与 SWR 模式触发机制不同。
+- 落点：`project-layout-v2.md`（目录树条目 + 三类任务入口正文说明）、`SKILL.md`（description + 核心边界第 2 条）、`structure-general.md`/`node-python-module-layout.md`/`java-layer-layout.md`（根级目录列表）、`placement_catalog.py`（`ADOPTION_V2_SOURCE_ROOTS["backend"]` 集合）、`work-report-summary-rules/scripts/generate_git_report.py`（目录分类映射）。
+- 顺手修复：`configuration_layout_test.py` `standard_environments` 断言同步 apifox（2026-08-21 引入的标准环境扩展，测试基线未同步的既有漂移）。
+
+## 2026-08-26
+
+- 内部调整：`package-structure-rules`，调整诉求「版本化目录导入别名必须与版本目录名对齐，禁止业务语义别名（v1/v2 不对称导致缓存漏清）」。
+- 触发来源：ellipal_finance 代码实测，`swapList "ellipal_finance/internal/service/v1/list"` + `v2list` 不对称；`swapList.ClearSwapListCache()` 只清 v1，v2 主币列表停留旧结果直到 600 秒 TTL 兜底且不报错。
+- 落点：SKILL.md 核心边界第 6 条 + `references/lookup-and-reference-contract.md`「版本化目录导入别名对齐（强制）」。

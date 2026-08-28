@@ -1,79 +1,96 @@
 ---
-name: Regex
-description: Write correct, efficient regular expressions across different engines. Triggers: regex, pattern, match, replace, grep.
+name: regex
+description: "编写与调试正则表达式：匹配、替换、提取（grep/提取/校验）场景的正则设计工作流、贪婪与懒惰量词、转义、锚点、字符类、分组与反向引用、前后查找、flags、引擎差异（JS/Python/PCRE/Go RE2）、灾难性回溯、常见错误。适用于写/改/查正则不匹配、性能爆表、跨语言移植场景。触发词：正则、regex、正则表达式、pattern、匹配、替换、grep、提取、通配、反向引用、lookahead、回溯、正则不匹配、正则报错。"
+license: MIT
+metadata:
+  displayName: "正则表达式编写与调试"
+  version: "1.1.0"
+  author: "Clawhub Developer"
 ---
 
-## Greedy vs Lazy
+# 正则表达式编写与调试
 
-- `.*` is greedy—matches as much as possible; `.*?` is lazy—matches minimum
-- Greedy often overshoots: `<.*>` on `<a>b</a>` matches entire string, not `<a>`
-- Default quantifiers `+ * {n,}` are greedy—add `?` for lazy: `+?` `*?` `{n,}?`
+从"语法清单"升级为**可执行工作流**：写前定引擎 → 写模式 → 测边界 → 查性能 → 防注入。语法细节保留在下方「语法参考」，调试时按「排查流程」定位。
 
-## Escaping
+## 编写工作流
 
-- Metacharacters need escape: `\. \* \+ \? \[ \] \( \) \{ \} \| \\ \^ \$`
-- Inside character class `[]`: only `]`, `\`, `^`, `-` need escape (and `^` only at start, `-` only mid)
-- Literal backslash: `\\` in regex, but in strings often need `\\\\` (double escape)
+1. **定引擎**：先确认目标语言/工具的引擎（JS / Python `re` / PCRE / Go RE2），决定可用特性（见「引擎差异」）。
+2. **写模式**：从需求拆出最小匹配单元，用非捕获组 `(?:)` 组织，避免 `.*` 开头。
+3. **测边界**：至少测：空串、最短匹配、最长输入、Unicode、含特殊字符的输入。
+4. **查性能**：检查嵌套量词（`(a+)+` 类），必要时锚定 `^`。
+5. **防注入**：用户输入作为字面量匹配时，先做 `re.escape()` / 等价转义。
 
-## Anchors
+## 排查流程（正则不匹配/误匹配时）
 
-- `^` start, `$` end—but behavior changes with multiline flag
-- Multiline mode: `^` `$` match line starts/ends; without, only string start/end
-- `\A` always string start, `\Z` always string end (not all engines)
-- Word boundary `\b` matches position, not character—`\bword\b` for whole words
+1. **拆解验证**：把模式拆成最小片段逐段测试（regex101 可视化），定位失效片段。
+2. **检查贪婪**：`<.*>` 在 `<a>b</a>` 上会整串匹配——需要 `.*?` 或 `[^>]*`。
+3. **检查转义**：`\.` 是否真的转义了；字符串里是否多/少了一层 `\\`。
+4. **检查锚点**：`^`/`$` 在 multiline 下行为不同；需要整串匹配用 `\A`/`\Z`（引擎支持时）。
+5. **检查引擎**：当前引擎不支持的特性（如 Go 无 lookahead）→ 换实现思路。
+6. **考虑不用正则**：见「适用边界」——解析 HTML/JSON/邮箱/URL 用专用解析器。
 
-## Character Classes
+## 语法参考
 
-- `[abc]` matches one of a, b, c; `[^abc]` matches anything except a, b, c
-- Ranges: `[a-z]` `[0-9]`—but `[a-Z]` is invalid (ASCII order matters)
-- Shorthand: `\d` digit, `\w` word char, `\s` whitespace; uppercase negates: `\D` `\W` `\S`
-- `.` matches any char except newline—use `[\s\S]` for truly any, or `s` flag if available
+### 量词（贪婪 vs 懒惰）
+- `.*` 贪婪（尽可能多）；`.*?` 懒惰（尽可能少）
+- 默认 `+ * {n,}` 都贪婪，加 `?` 变懒惰：`+?` `*?` `{n,}?`
+- 反向引用优化：用 `[^>]*` 而非 `.*?` 常更清晰高效
 
-## Groups
+### 转义
+- 元字符需转义：`\. \* \+ \? \[ \] \( \) \{ \} \| \\ \^ \$`
+- 字符类 `[]` 内只需转义 `]`、`\`、`^`（仅开头）、`-`（仅中间）
+- 字面反斜杠：正则 `\\`；字符串里常需 `\\\\`（双重转义）
 
-- Capturing `()` vs non-capturing `(?:)`—use `(?:)` when you don't need backreference
-- Named groups: `(?<name>...)` or `(?P<name>...)` depending on engine
-- Backreferences: `\1` `\2` refer to captured groups in same pattern
-- Groups also establish scope for alternation: `cat|dog` vs `ca(t|d)og`
+### 锚点
+- `^` 开头、`$` 结尾；multiline 下按行匹配
+- `\A` 永远串首、`\Z` 永远串尾（非所有引擎支持）
+- `\b` 匹配位置（词边界），`\bword\b` 匹配整词
 
-## Lookahead & Lookbehind
+### 字符类
+- `[abc]` 之一；`[^abc]` 排除；范围 `[a-z]`（注意 ASCII 顺序）
+- 简写：`\d` 数字、`\w` 词字符、`\s` 空白；大写取反 `\D \W \S`
+- `.` 不匹配换行——要真任意用 `[\s\S]` 或 `s` flag
 
-- Positive lookahead `(?=...)`: assert what follows, don't consume
-- Negative lookahead `(?!...)`: assert what doesn't follow
-- Positive lookbehind `(?<=...)`: assert what precedes
-- Negative lookbehind `(?<!...)`: assert what doesn't precede
-- Lookbehinds must be fixed-width in most engines—no `*` or `+` inside
+### 分组
+- 捕获 `()` vs 非捕获 `(?:)`——不需要反向引用时用 `(?:)` 省性能
+- 命名组：`(?<name>...)`（PCRE/JS）或 `(?P<name>...)`（Python）
+- 反向引用 `\1 \2`；交替作用域：`cat|dog` vs `ca(t|d)og`
 
-## Flags
+### 前后查找
+- `(?=...)` 正向前瞻、`(?!...)` 负向前瞻、`(?<=...)` 正向后顾、`(?<!...)` 负向后顾
+- 多数引擎后顾需**定宽**——里面不能有 `*` `+`
 
-- `i` case-insensitive, `m` multiline (^$ match lines), `g` global (find all)
-- `s` (dotall): `.` matches newline—not supported everywhere
-- `u` unicode: enables `\p{}` properties, proper surrogate handling
-- Flags syntax varies: `/pattern/flags` (JS), `(?flags)` inline, or function arg (Python `re.I`)
+### Flags
+- `i` 忽略大小写、`m` multiline、`g` 全局、`s` dotall（`.` 匹配换行）、`u` Unicode（`\p{}`）
+- 写法随引擎：JS `/pattern/flags`、Python `re.I` 参数、内联 `(?i)` 等
 
-## Engine Differences
+### 引擎差异
+| 引擎 | 特点 | 缺什么 |
+|---|---|---|
+| JavaScript | 现代版支持 lookbehind | 无 `\A`/`\Z`、无占有量词 |
+| Python `re` | `(?P<name>)` 命名组 | 无 `\p{}`（需 `regex` 模块） |
+| PCRE（PHP/grep -P） | 全特性 | —（有占有量词/递归） |
+| Go RE2 | 线性时间保证 | 无反向引用、无 lookahead |
 
-- JavaScript: no lookbehind until ES2018; no `\A` `\Z`; no possessive quantifiers
-- Python `re`: uses `(?P<name>)` for named groups; no `\p{}` without `regex` module
-- PCRE (PHP, grep -P): full features; possessive `++` `*+`; recursive patterns
-- Go: RE2 engine, no backreferences, no lookahead—guaranteed linear time
+### 性能
+- 灾难性回溯：`(a+)+` 对 `aaaaaaaaaab` 指数级——避免嵌套量词
+- 占有量词 `++` `*+` 与原子组 `(?>...)` 阻止回溯
+- 锚定 `^prefix` 是 O(1)，未锚定 `prefix` 是 O(n)
 
-## Performance
+## 适用边界
 
-- Catastrophic backtracking: `(a+)+` against `aaaaaaaaaab` is exponential—avoid nested quantifiers
-- Possessive quantifiers `++` `*+` prevent backtracking—use when backtracking pointless
-- Atomic groups `(?>...)` don't give back chars—similar to possessive
-- Anchor patterns when possible—`^prefix` is O(1), unanchored `prefix` is O(n)
+**何时用**：文本提取、格式校验（简单格式）、替换、日志筛选、grep 模式。
 
-## Common Mistakes
+**何时不用**：
+- HTML/XML 解析——嵌套结构正则处理不了，用解析器；
+- 邮箱/URL 严格校验——RFC 正则 6000+ 字符，用库或简单检查；
+- JSON/CSV 解析——用专用解析器；
+- 命令行 grep/sed 实际用法 → 转 `shell__skillhub`、`bash__skillhub`。
 
-- Email validation: RFC-compliant regex is 6000+ chars—use simple check or library
-- URL matching: edge cases are endless—use URL parser, regex for quick extraction only
-- Don't use regex for HTML/XML—use a parser; regex can't handle nesting
-- Forgetting to escape user input—regex injection is real; use literal escaping functions
+## 验收清单
 
-## Testing
-
-- Test edge cases: empty string, special chars, unicode, very long input
-- Visualize with tools: regex101.com shows matches and explains
-- Check which engine documentation you're reading—features vary significantly
+- [ ] 已明确引擎并核对特性支持（反向引用/lookbehind/`\p{}`）
+- [ ] 测试过：空串、最短/最长输入、Unicode、特殊字符
+- [ ] 无嵌套量词 / 无可变宽后顾（性能与合法性）
+- [ ] 用户输入已转义（无正则注入）
+- [ ] 不用正则的场景已改解析器

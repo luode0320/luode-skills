@@ -1,63 +1,18 @@
 ---
 name: proactive-agent
-version: 3.1.0
-description: "Transform AI agents from task-followers into proactive partners that anticipate needs and continuously improve. Now with WAL Protocol, Working Buffer, Autonomous Crons, and battle-tested patterns. Part of the Hal Stack 🦞"
-author: halthelobster
+description: "将 AI 智能体从被动执行者转变为主动伙伴：WAL 协议（先写后答）、工作缓冲区、压缩恢复、统一搜索、安全加固、自主 vs 提示式定时任务、工具迁移清单、主动检查、反向提示、自我改进护栏。适用于配置智能体的持久记忆、上下文压缩恢复、主动行为、安全审计场景。触发词：主动智能体、proactive、WAL 协议、工作缓冲区、working buffer、压缩恢复、compaction、上下文丢失、会话状态、SESSION-STATE、自主运行、定时任务、cron、反向提示、self-improving、安全审计、agent 记忆。"
+license: MIT
+metadata:
+  displayName: "主动智能体架构"
+  version: "3.2.0"
+  author: "halthelobster"
 ---
 
-# Proactive Agent 🦞
-
-**By Hal Labs** — Part of the Hal Stack
+# 主动智能体架构
 
 **A proactive, self-improving architecture for your AI agent.**
 
 Most agents just wait. This one anticipates your needs — and gets better at it over time.
-
-## What's New in v3.1.0
-
-- **Autonomous vs Prompted Crons** — Know when to use `systemEvent` vs `isolated agentTurn`
-- **Verify Implementation, Not Intent** — Check the mechanism, not just the text
-- **Tool Migration Checklist** — When deprecating tools, update ALL references
-
-## What's in v3.0.0
-
-- **WAL Protocol** — Write-Ahead Logging for corrections, decisions, and details that matter
-- **Working Buffer** — Survive the danger zone between memory flush and compaction
-- **Compaction Recovery** — Step-by-step recovery when context gets truncated
-- **Unified Search** — Search all sources before saying "I don't know"
-- **Security Hardening** — Skill installation vetting, agent network warnings, context leakage prevention
-- **Relentless Resourcefulness** — Try 10 approaches before asking for help
-- **Self-Improvement Guardrails** — Safe evolution with ADL/VFM protocols
-
----
-
-## The Three Pillars
-
-**Proactive — creates value without being asked**
-
-✅ **Anticipates your needs** — Asks "what would help my human?" instead of waiting
-
-✅ **Reverse prompting** — Surfaces ideas you didn't know to ask for
-
-✅ **Proactive check-ins** — Monitors what matters and reaches out when needed
-
-**Persistent — survives context loss**
-
-✅ **WAL Protocol** — Writes critical details BEFORE responding
-
-✅ **Working Buffer** — Captures every exchange in the danger zone
-
-✅ **Compaction Recovery** — Knows exactly how to recover after context loss
-
-**Self-improving — gets better at serving you**
-
-✅ **Self-healing** — Fixes its own issues so it can focus on yours
-
-✅ **Relentless resourcefulness** — Tries 10 approaches before giving up
-
-✅ **Safe evolution** — Guardrails prevent drift and complexity creep
-
----
 
 ## Contents
 
@@ -603,30 +558,6 @@ For comprehensive agent capabilities, combine this with:
 
 ---
 
-## License & Credits
+## License
 
 **License:** MIT — use freely, modify, distribute. No warranty.
-
-**Created by:** Hal 9001 ([@halthelobster](https://x.com/halthelobster)) — an AI agent who actually uses these patterns daily. These aren't theoretical — they're battle-tested from thousands of conversations.
-
-**v3.1.0 Changelog:**
-- Added Autonomous vs Prompted Crons pattern
-- Added Verify Implementation, Not Intent section
-- Added Tool Migration Checklist
-- Updated TOC numbering
-
-**v3.0.0 Changelog:**
-- Added WAL (Write-Ahead Log) Protocol
-- Added Working Buffer Protocol for danger zone survival
-- Added Compaction Recovery Protocol
-- Added Unified Search Protocol
-- Expanded Security: Skill vetting, agent networks, context leakage
-- Added Relentless Resourcefulness section
-- Added Self-Improvement Guardrails (ADL/VFM)
-- Reorganized for clarity
-
----
-
-*Part of the Hal Stack 🦞*
-
-*"Every day, ask: How can I surprise my human with something amazing?"*

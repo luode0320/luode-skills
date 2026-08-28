@@ -1,9 +1,9 @@
 ---
 name: wsl-windows-bridge
-description: 'WSL ↔ Windows cross-system bridge for OpenClaw agents. Provides win-python / win-ps / win-cmd / win-copy / win-run-py / win-path to invoke Windows Python (Anaconda), execute PowerShell/CMD commands, and read/write Windows files from WSL2. Ideal for quantitative trading (QMT/xtquant), cross-system file operations, and Windows environment scripting.'
+description: 'WSL ↔ Windows cross-system bridge for agents. Provides win-python / win-ps / win-cmd / win-copy / win-run-py / win-path to invoke Windows Python (Anaconda), execute PowerShell/CMD commands, and read/write Windows files from WSL2. Ideal for quantitative trading (QMT/xtquant), cross-system file operations, and Windows environment scripting. Also covers the reverse topology: agent on Windows host working with WSL projects (Temp-copy compile workflow for go.mod RLock, 18080 port, captcha dev bypass, PowerShell interception, Windows Python path style). 也覆盖 agent 在 Windows 宿主、项目在 WSL 的编译启动调试工作流。另含「免桥直读」前置判定：WSL 内只读写 Windows 盘上的文件时走 drvfs /mnt/<drive> 直读，不用 win-* 命令；只有调用 Windows 侧程序才用桥。并收录 WSL↔Windows 通信静默失败陷阱清单：find 起点是符号链接时零结果、Windows 风格路径被当相对路径、drvfs 以 9p 类型出现、同盘符多挂载点、中文路径分词、heredoc 定界符冲突、管道遮蔽退出码。当 WSL 侧读不到 Windows 盘上的文件、目录看起来是空的、脚本报路径不存在但手敲能进、写出的文件被静默截断时按其排查顺序定位。'
 license: MIT
-compatibility: 'WSL2 + Windows 10/11, Windows Python (Anaconda or any), PowerShell'
 metadata:
+  compatibility: 'WSL2 + Windows 10/11, Windows Python (Anaconda or any), PowerShell'
   openclaw:
     emoji: 🪟
     requires:
@@ -26,6 +26,58 @@ metadata:
 | `win-copy` | Copy files between WSL and Windows |
 | `win-run-py` | Run .py scripts with logging |
 | `win-path` | Convert paths WSL `/mnt/*` ↔ Windows `D:\*` |
+
+## 前置判定：先确认真的需要桥（免桥直读优先）
+
+bridge 的价值在**跨系统执行**，不在跨系统读文件。WSL 已经把 Windows 盘经 drvfs 挂载到
+`/mnt/<drive>`，POSIX 工具可直接读写，多套一层 `win-ps` / `win-copy` 只会增加进程开销、
+编码转换风险和失败面。动手前先按下表判定：
+
+| 当前动作 | 走哪条路 |
+| --- | --- |
+| 读 / 写 / 搜索 / 移动 Windows 盘上的文件 | **免桥直读** `/mnt/<drive>/...`，用 `cat` / `rg` / `find` / `mv` / heredoc |
+| 执行 Windows 侧程序（Python、exe、cmdlet、服务查询） | 用桥：`win-python` / `win-ps` / `win-cmd` |
+| 把文件从 WSL 家目录搬到 Windows 盘（或反向） | 直接 `cp` 到 `/mnt/<drive>/...` 即可；`win-copy` 只在需要 Windows 侧权限语义时用 |
+| 路径形态互转 | `wslpath` / `win-path`，见 `wsl-path-converter__skillhub` |
+
+### 免桥直读要点
+
+```bash
+# 1. 确认盘符已挂载。WSL2 现版本 drvfs 以 9p 类型出现，不要因为 type 不是字面 drvfs 就判定未挂载
+ls -d /mnt/d
+mount | grep -i drvfs        # D:\ on /mnt/d type 9p (...aname=drvfs;path=D:\...)
+
+# 2. 含中文或空格的路径全程加引号，否则被 shell 分词
+DIR="/mnt/d/谷歌云盘/知识库"
+ls -1 "$DIR"
+
+# 3. 写入用 quoted heredoc，避免正文里的 $ / 反引号 / 反斜杠被 shell 展开
+cat > "$DIR/note.md" <<'MD'
+正文原样写入
+MD
+
+# 4. 回读校验编码与指纹，确认中文未乱码
+file -i "$DIR/note.md"       # 应为 charset=utf-8
+md5sum "$DIR/note.md"; wc -c "$DIR/note.md"
+```
+
+同一盘符可能同时挂载在多个挂载点（`/mnt/d` 与 `~/d/<user>` 等），它们指向同一份文件；
+统一只用 `/mnt/<drive>` 这一个规范形态参与路径拼接，避免同一文件在证据里出现两种绝对路径。
+
+**不要因为 WSL 侧一时读不到就上桥**：先按第 1 步确认挂载、按第 2 步确认引号。真正需要桥的
+只有「Windows 侧 HOME 与 WSL HOME 是两套独立目录」这类场景（见下文 Sync Windows-side data）。
+
+### 静默失败先查陷阱清单
+
+WSL 侧读不到 Windows 盘上的东西时，绝大多数是**不报错**的静默失败：零结果、`False`、
+看起来"目录是空的"。上桥前先按
+[references/wsl-windows-comm-pitfalls.md](references/wsl-windows-comm-pitfalls.md)
+的排查顺序走一遍——7 个实测陷阱，含 find 起点是符号链接时零结果、Windows 风格路径被当
+相对路径、heredoc 定界符与正文冲突导致文件静默截断。**零结果先查起点类型与路径形态，
+不要先怀疑编码或权限。**
+
+Google Drive 同步目录（知识库等）在 WSL 内的读写口径见
+`knowledge-flow` 的 `references/wsl-access.md`，本 skill 不重复。
 
 ## Requirements
 
@@ -110,6 +162,10 @@ win-path /mnt/d/app
 win-path --to-wsl D:\app
 # → /mnt/d/app
 ```
+
+## Windows 宿主侧工作流（agent 在 Windows、项目在 WSL）
+
+bridge 默认方向是「WSL 内 agent 调 Windows」；**反向拓扑**（agent 跑在 Windows 宿主、项目源码在 WSL 时的编译/启动/调试）见 [references/windows-host-side-workflow.md](references/windows-host-side-workflow.md)：Temp 副本编译（`go.mod RLock: Incorrect function`）、18080 端口、验证码 dev 放行、登录断言 HTTP 恒 200、Bash 调 PowerShell 拦截、Windows Python `/tmp` 路径坑。
 
 ### Quantitative Trading Example (QMT/xtquant)
 

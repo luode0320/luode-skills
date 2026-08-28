@@ -76,7 +76,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言配置 Catalog 与 Schema 契约。
-                最近修改时间: 2026-08-20 同步 yaml/ 唯一模式，embedded 条目删除。
+                最近修改时间: 2026-08-27 同步 apifox 标准环境扩展（2026-08-21 引入）。
         """
         # 1. 先验证 backend/fullstack 的 yaml 配置 query 都暴露完整策略字段。
         cases = (
@@ -91,7 +91,7 @@ class ConfigurationLayoutTests(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stdout)
                 entry = json.loads(result.stdout)["entry"]
                 self.assertEqual(expected_path, entry["canonical_path"])
-                self.assertEqual(["local", "test", "prod"], entry["standard_environments"])
+                self.assertEqual(["local", "test", "prod", "apifox"], entry["standard_environments"])
                 self.assertEqual("[a-z][a-z0-9_]*", entry["environment_name_pattern"])
                 self.assertTrue(entry["direct_files"])
                 self.assertEqual("config.<env>.yaml|config.<env>.yml", entry["file_name_pattern"])

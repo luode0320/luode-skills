@@ -61,7 +61,6 @@ WSL-PowerShell 控制脚本
 环境变量:
   DEBUG=1             启用调试模式
   VERBOSE=1           启用详细模式
-  PWSH_PATH           自定义 PowerShell 路径
 EOF
 }
 
@@ -90,6 +89,45 @@ find_pwsh() {
 process_wsl_paths() {
     local cmd="$1"
     echo "$cmd" | sed -E 's|/mnt/([a-zA-Z])/|\1:\\|g'
+}
+
+# 标准调用前缀（唯一真源：windows-encoding-rules/SKILL.md「调用 PowerShell 命令时的标准化前缀」）
+# PowerShell 7: -NoLogo -NoProfile -ExecutionPolicy Bypass；5.1 回退必须先在命令体设置 UTF-8 输出编码。
+is_pwsh7() {
+    [ "$(basename "$1")" = "pwsh.exe" ]
+}
+
+run_pwsh_command() {
+    local host="$1"
+    local cmd="$2"
+    if is_pwsh7 "$host"; then
+        "$host" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$cmd"
+    else
+        "$host" -NoProfile -ExecutionPolicy Bypass -Command "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; \$OutputEncoding = [Console]::OutputEncoding; $cmd"
+    fi
+}
+
+run_pwsh_stdin() {
+    local host="$1"
+    local file="$2"
+    if is_pwsh7 "$host"; then
+        cat "$file" | "$host" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command -
+    else
+        {
+            echo "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; \$OutputEncoding = [Console]::OutputEncoding;"
+            cat "$file"
+        } | "$host" -NoProfile -ExecutionPolicy Bypass -Command -
+    fi
+}
+
+run_pwsh_file() {
+    local host="$1"
+    shift
+    if is_pwsh7 "$host"; then
+        "$host" -NoLogo -NoProfile -ExecutionPolicy Bypass "$@"
+    else
+        "$host" -NoProfile -ExecutionPolicy Bypass "$@"
+    fi
 }
 
 main() {
@@ -139,7 +177,7 @@ main() {
                 log_info "检查 PowerShell..."
                 if pwsh_path=$(find_pwsh $use_pwsh_core); then
                     log_info "PowerShell 可用：$pwsh_path"
-                    "$pwsh_path" -Command "Write-Output 'PowerShell 测试成功'"
+                    run_pwsh_command "$pwsh_path" "Write-Output 'PowerShell 测试成功'"
                     exit 0
                 else
                     log_error "未找到可用的 PowerShell"
@@ -198,7 +236,7 @@ main() {
                 log_info "执行脚本 (stdin 模式): $file"
             fi
 
-            cat "$file" | "$pwsh_path" -ExecutionPolicy Bypass -NoProfile -Command -
+            run_pwsh_stdin "$pwsh_path" "$file"
             exit $?
         fi
 
@@ -208,7 +246,7 @@ main() {
             log_info "执行脚本：$win_file"
         fi
 
-        "$pwsh_path" -File "$win_file"
+        run_pwsh_file "$pwsh_path" -File "$win_file"
         exit $?
     fi
 
@@ -224,7 +262,7 @@ main() {
             log_info "执行命令：$cmd"
         fi
 
-        "$pwsh_path" -NoProfile -Command "$cmd"
+        run_pwsh_command "$pwsh_path" "$cmd"
         exit $?
     fi
 }

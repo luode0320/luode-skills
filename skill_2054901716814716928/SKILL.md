@@ -1,55 +1,64 @@
 ---
 name: github-pages-auto-deploy
-description: "Configure automatic website deployment to GitHub Pages with GitHub Actions and custom domain support. Use when a static site should deploy automatically after code is pushed."
-description_zh: "配置 GitHub Pages 自动部署和自定义域名支持"
-description_en: "Configure automatic GitHub Pages deployment with custom domains"
-version: 1.0.0
-homepage: https://api.skillhub.cn/sendwealth/github-pages-auto-deploy
-allowed-tools: Bash,Read,Write
-display_name: "GitHub Pages Auto Deploy"
-display_name_en: "Github Pages Auto Deploy"
-visibility: "public"
-icon: "https://codebuddy-platform-1258344699.cos.accelerate.myqcloud.com/public/45edac6b-2078-4678-89f3-6f9800cf5e5f/avatar/skill/au_1c4a13fe-e87.svg"
+description: "配置 GitHub Pages 自动部署：GitHub Actions 工作流、自定义域名（CNAME）、HTTPS、CDN 与预览环境。当用户需要把静态网站（个人博客、项目文档、作品集、官网）自动部署到 GitHub Pages、配置自定义域名或排查 Pages 部署失败时触发。触发词：GitHub Pages、自动部署、静态网站部署、gh-pages、部署网站、自定义域名、pages 部署、deploy to github pages。"
+license: MIT
+metadata:
+  displayName: "GitHub Pages 自动部署"
+  version: "1.1.0"
+  homepage: "https://api.skillhub.cn/sendwealth/github-pages-auto-deploy"
+  tags: [github-pages, deploy, static-site, github-actions, custom-domain]
+allowed-tools: Bash, Read, Write
 ---
-# GitHub Pages 自动部署技能
 
-## 功能
+# GitHub Pages 自动部署
 
-让你的网站在推送代码时自动部署到 GitHub Pages，实现：
+配置静态网站自动部署到 GitHub Pages：推送代码 → Actions 自动构建 → 上线，支持自定义域名与 HTTPS。
 
-- ✅ 自动构建和部署
-- ✅ 自定义域名支持
-- ✅ 免费 HTTPS 证书
-- ✅ CDN 加速
-- ✅ 版本控制
+## 适用边界
 
-## 适用场景
+- **做**：生成 deploy-pages.yml 工作流、配置 GitHub Pages 源为 Actions、自定义域名（CNAME + DNS）、HTTPS 启用、预览环境、部署后健康检查。
+- **不做（转交）**：
+  - 其它平台部署（Vercel/Netlify/CloudStudio）→ 对应部署 skill（如 `cloudstudio-deploy`）
+  - GitHub 仓库/PR/认证操作 → `github`（GitHub CLI）
+  - 静态站点生成（Hugo/Jekyll/Next 构建）→ 先在本项目构建出静态产物再部署
 
-- 个人博客
-- 公司官网
-- 项目文档
-- 作品集
-- 静态应用
+## 工作流（5 步）
 
-## 快速开始
+### 第 1 步：确认站点结构与产物目录
 
-### 1. 创建网站
+- **输入**：本地站点目录（如 `website/` 或构建产物目录）。
+- **动作**：确认静态文件存在（index.html 等）；区分「纯静态目录」与「需构建的框架项目」（框架项目先确认构建命令与产物目录）。
+- **输出**：站点类型 + 部署目录结论。
 
-```
-your-repo/
-├── website/
-│   ├── index.html
-│   ├── style.css
-│   └── script.js
-└── .github/
-    └── workflows/
-        └── deploy-pages.yml
-```
+### 第 2 步：生成工作流文件（检查点）
 
-### 2. 配置 Actions
+- **输入**：第 1 步结论。
+- **动作**：创建 `.github/workflows/deploy-pages.yml`（模板见下），按实际目录与分支调整 `path` 与 `branches`。
+- **检查点【必确认】**：目标分支（master/main）、部署目录、是否含自定义域名三项与用户确认后再落盘；分支受保护时说明需要 PR 或临时放开。
+- **输出**：deploy-pages.yml。
+
+### 第 3 步：启用 Pages 并推送
+
+- **输入**：确认后的工作流文件。
+- **动作**：仓库 Settings → Pages → Source 选 GitHub Actions；推送代码触发部署。
+- **检查点【必确认】**：推送/部署涉及写仓库历史与远端，执行前必须获得用户当轮明确授权（遵循仓库 Git 规则）。
+- **输出**：触发记录 + 部署 URL。
+
+### 第 4 步：配置自定义域名（可选）
+
+- **输入**：用户拥有的域名。
+- **动作**：`website/` 下创建 `CNAME` 文件；域名服务商加 CNAME 记录（名称 `@` 或 `www`，值 `yourusername.github.io`）；Settings → Pages → Enforce HTTPS 等证书生成。
+- **输出**：DNS 配置清单 + 生效检查点（DNS 传播最长 48h）。
+
+### 第 5 步：验证与监控
+
+- **输入**：部署完成后的 URL。
+- **动作**：健康检查（`curl -f <url>`）、必要时接 Lighthouse CI；确认页面与资源可达。
+- **输出**：验证结论（可访问 / 失败原因）。
+
+## 工作流模板（deploy-pages.yml）
 
 ```yaml
-# .github/workflows/deploy-pages.yml
 name: Deploy Website to GitHub Pages
 
 on:
@@ -70,168 +79,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'website'
-
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 ```
 
-### 3. 启用 Pages
+自定义域名：`website/CNAME` 写入 `yourdomain.com`；预览环境可加 `deploy-preview` job（`if: github.event_name == 'pull_request'`，`rossjrw/pr-preview-action`）。
 
-1. 仓库 Settings > Pages
-2. Source: GitHub Actions
-3. 保存
+## 边界条件与异常处理
 
-### 4. 推送代码
+- **部署失败**：先查 Actions 日志 → 确认 Pages 已启用（Source=GitHub Actions）→ 验证 `path` 与产物目录一致 → 确认权限（`pages: write`、`id-token: write`）。
+- **域名无法访问**：检查 DNS 记录与 CNAME 文件是否在部署目录内 → 等待传播（最多 48h）→ 确认 HTTPS 已启用。
+- **HTTPS 证书错误**：等待证书生成（几分钟）→ 检查域名解析 → 确认 DNS 指向 `yourusername.github.io`。
+- **分支保护**：目标分支受保护时，不强行 push；改为走 PR 合并触发或与用户确认调整策略。
+- **构建型站点**：先在本地/CI 构建出静态产物，工作流中构建步骤产物路径与 `upload-pages-artifact` 的 `path` 一致，避免空目录部署。
 
-```bash
-git add .
-git commit -m "Add website"
-git push
-```
+## 成本说明
 
-网站会在 1-2 分钟内上线！
+- GitHub Pages / CDN / HTTPS：免费；自定义域名：域名注册费（约 ¥50-100/年）。
 
-## 自定义域名
+## 退出机制
 
-### 1. 添加 CNAME
+用户输入「结束」→ 停止，回复「部署配置完成。」；工作流落盘、推送、DNS 变更等对外/写仓库动作前必须先经用户确认。
 
-在 `website/` 目录创建 `CNAME` 文件：
+## 约束
 
-```
-yourdomain.com
-```
-
-### 2. 配置 DNS
-
-在你的域名服务商添加 CNAME 记录：
-
-```
-类型: CNAME
-名称: @ (或 www)
-值: yourusername.github.io
-```
-
-### 3. 启用 HTTPS
-
-- Settings > Pages > Enforce HTTPS
-- 等待证书生成（几分钟）
-
-## 高级配置
-
-### 构建优化
-
-```yaml
-- name: Minify HTML/CSS/JS
-  run: |
-    npm install -g html-minifier clean-css-cli uglify-js
-    html-minifier --collapse-whitespace website/index.html -o website/index.html
-    cleancss -o website/style.css website/style.css
-    uglifyjs website/script.js -o website/script.js
-```
-
-### 缓存策略
-
-```yaml
-- name: Cache dependencies
-  uses: actions/cache@v3
-  with:
-    path: ~/.npm
-    key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-```
-
-### 预览环境
-
-```yaml
-deploy-preview:
-  runs-on: ubuntu-latest
-  if: github.event_name == 'pull_request'
-  steps:
-    - name: Deploy Preview
-      uses: rossjrw/pr-preview-action@v1
-      with:
-        source-dir: website
-```
-
-## 性能优化
-
-### 1. 图片压缩
-```bash
-# 使用 squoosh 或 imagemagick
-npx squoosh-cli website/images/*.jpg --webp auto
-```
-
-### 2. 懒加载
-```html
-<img src="image.jpg" loading="lazy" alt="...">
-```
-
-### 3. 预连接
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-```
-
-## 监控
-
-### 正常运行检查
-
-```yaml
-- name: Health Check
-  run: |
-    sleep 60  # 等待部署完成
-    curl -f https://yourdomain.com || exit 1
-```
-
-### Lighthouse CI
-
-```yaml
-- name: Run Lighthouse
-  uses: treosh/lighthouse-ci-action@v9
-  with:
-    urls: https://yourdomain.com
-```
-
-## 常见问题
-
-### Q: 部署失败？
-- 检查 Actions 日志
-- 确认 Pages 已启用
-- 验证文件路径正确
-
-### Q: 域名无法访问？
-- 检查 DNS 配置
-- 等待 DNS 传播（最多 48h）
-- 确认 CNAME 文件存在
-
-### Q: HTTPS 证书错误？
-- 等待证书生成
-- 检查域名解析
-- 重新启用 HTTPS
-
-## 成本
-
-- **GitHub Pages**: 免费 ✅
-- **自定义域名**: ¥50-100/年（域名费用）
-- **CDN**: 免费（GitHub 提供）
-- **HTTPS**: 免费 ✅
-
-## 案例
-
-**CLAW.AI 官网**
-- URL: https://sendwealth.github.io/claw-intelligence/
-- 技术栈: HTML + CSS + JavaScript
-- 部署方式: GitHub Actions 自动部署
-- 域名: GitHub 默认域名
-- 状态: 🟢 运行中
-
----
-
-**作者**: uc (AI CEO) 🍋
-**网站**: https://sendwealth.github.io/claw-intelligence/
+- 工作流 YAML 与 GitHub Pages 官方 Actions 用法保持一致，使用 `actions/checkout@v4`、`actions/configure-pages@v4`、`actions/upload-pages-artifact@v3`、`actions/deploy-pages@v4` 版本组合。
+- 推送/部署写仓库历史与远端，遵守仓库 Git 规则，未获当轮授权不执行。
+- 域名/DNS 变更影响线上访问，变更前与用户确认，变更后给出验证步骤。

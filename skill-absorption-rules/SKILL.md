@@ -39,6 +39,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 用户提供外部 skill 的 URL、GitHub 仓库、市场页面、SKILL.md 内容、README 或描述，并要求改进自有 skill 体系。
 - 用户说"优化我们的 skill，让它更强大""持续迭代我们的 skill""把外部精华沉淀成规则"。
 - 用户说"把 XX skill 的精华总结成/沉淀成我们的 skill"（含将本次吸收经验固化为新 skill 的意图）。
+- 用户要求把多轮实操经验总结成标准流程、后续同类任务按流程执行（如"总结一下优化经验，后续按这个流程来""后续低分 skill 都按这个流程优化"）。
 - 用户主动要求更新、调整、重构、合并、瘦身我们自己的 skill："优化一下这个 skill""重构 skill 的结构""调整 skill 规则""更新我们的 skill""把这两个 skill 合并""这个 skill 太臃肿了，调整一下"。
 - 用户对自有 skill 提出结构性调整诉求（结构调整、职责重划、内容瘦身），且不是执行中临时补 gap。
 - 当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充。
@@ -133,6 +134,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 默认先读 `references/absorption-decision-matrix.md`（三态裁决标准与反例）。
 - 只有做评分验证时再读 `references/darwin-rubric.md`（8 维评分：结构 60 + 实测 40）。
 - 需要批量对全仓库 skill 做 8 维评分巡检、产出/更新 `skill-8维评分报告.html` 时，读 `references/score-inspection-workflow.md`（范围四分类 / 并行子代理分批打分 / 固定输出格式 / 短板识别 / 报告结构约定）。
+- 巡检识别出低分 skill、需要执行单 skill 优化闭环时，读 `references/low-score-skill-optimization-sop.md`（八轮验证的低分 skill 优化 SOP：八步闭环 + 短板类型学 9 类映射 + 市场检索规律 + 验证纪律 + 实操坑 + 收口清单）。
 - 只有参考历史吸收案例时再读 `references/case-grill-me-absorption.md`（本次 grill-me 吸收全过程样例）。
 - 吸收触达多 skill 同域、或需要对照"同域冗余残留"反面教材时，再读 `references/case-apifox-absorption-domain-dedup.md`（api-test-automation-pro 吸收后同域冗余残留与补救全过程）；**内部更新通道同样适用**——主动调整自有 skill 引入交叉冗余时同理对照。
 - **执行中 gap 回补通道**（原 `skill-evolution-rules` 职责）：先读 `references/gap-signals.md` 确认是否真是 skill gap（排除业务问题与工程问题）；再读 `references/evolution-decision-matrix.md` 判断补 description / 补流程 / 补 references / 新增独立 skill；输出正式完善建议时读 `references/improvement-output-template.md`；补完后如何回到原任务继续执行读 `references/resume-workflow.md`。

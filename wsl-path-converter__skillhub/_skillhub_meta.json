@@ -1,7 +1,7 @@
 {
   "slug": "wsl-path-converter",
   "name": "WSL 路径转换",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "installedAt": 1786980552258,
   "source": "skillhub",
   "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/60484da4-21ca-4044-b2ff-2b3a1ddcd63f.png",

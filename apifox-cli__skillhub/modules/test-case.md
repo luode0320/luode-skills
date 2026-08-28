@@ -42,7 +42,8 @@
 - `endpoint get` 返回里**没有 `cases` 字段**，读不到调试用例
 - `endpoint-update` 的 schema **不含 `cases` / `DEBUG_CASE`**，写不了调试用例
 - `endpoint update` 写 `requestBody.example` → **报 `success: true` 但回读为空**（与 environment variables 同型的假成功，见 `modules/environment.md`）
-- 结论：**调试用例的 body 只能在 `import` 时经 example 灌入**，事后无法用 CLI 补；已存在的接口要么删掉重导（见规则 T-3），要么由用户在客户端点「自动生成」
+- **但有一条隐藏通道（2026-08-26 实测）**：`import --format apifox` 用**原生导出文件 + match-name 模式**重导时，已存在接口的 **`api.cases[]`（DEBUG_CASE）会执行 update 语义**——`preProcessors`/`postProcessors` 等用例字段**真实落库**（实测 66 接口 endpointCase updateCount=138 全命中，重导后回读 66/66 脚本在）。接口契约字段（name/path/method/securityScheme/parameters/requestBody/responses）全部保留；唯一副作用是 `ordering` 归零（仅显示排序重置，无契约影响）。
+- 结论修正：**DEBUG_CASE 的处理器（preProcessors/postProcessors）事后可经「导出 → 改 JSON → match-name 重导」批量补齐**；但 **body 示例仍只能在 `import` 时经 example 灌入**（重导不改 `requestBody.data`）。body 缺失的已存在接口仍走删接口重导（规则 T-3）或客户端「自动生成」。
 
 **因此验收要分两路**（只查一路即为假通过）：
 
@@ -204,10 +205,13 @@ OpenAPI 规范里 `MediaType.example` 与 `Schema.example` 都合法，**apifox 
 
 **通过标准**：每个有 body 的接口，`api.cases[]` 中至少一个 `DEBUG_CASE` 的 `requestBody.data` 非空，且内容是可直接发送的合法请求（必填字段齐全、枚举值合法）。
 
-**已存在接口的修复路径**（CLI 补不了，只有两条路）：
-
-1. **删接口重导**（可自动化）：`endpoint delete` → 用带 example 的 YAML `import` → 重新绑定 securityScheme → **重建该接口下的测试用例**（endpointId 会变，旧 caseId 全部失效）→ 重跑回归。破坏性操作，**apifox 测试专用项目内默认放开**（豁免见 `SKILL.md` 门控与确认清单）；非测试专用项目执行前须用户确认。
-2. **用户在客户端点「自动生成」**：零风险、不动任何 ID，但需人工逐接口点击。
+**已存在接口的修复路径**（body 补不了，只有两条路；处理器类字段另有第三条）：
+  - 补 **body 示例**（`requestBody.data`）：
+    1. **删接口重导**（可自动化）：`endpoint delete` → 用带 example 的 YAML `import` → 重新绑定 securityScheme → **重建该接口下的测试用例**（endpointId 会变，旧 caseId 全部失效）→ 重跑回归。破坏性操作，**apifox 测试专用项目内默认放开**（豁免见 `SKILL.md` 门控与确认清单）；非测试专用项目执行前须用户确认。
+    2. **用户在客户端点「自动生成」**：零风险、不动任何 ID，但需人工逐接口点击。
+  - 补 **preProcessors/postProcessors 等用例处理器**（2026-08-26 实测）：
+    3. **原生导出 → 改 JSON → match-name 重导**：`export --format apifox` 全量导出 → 脚本改 `api.cases[]` 各 DEBUG_CASE 的 `preProcessors` → `import --project <id> --format apifox --file <json> --module-import-mode match-name`（模块冲突时加 `--module-map "source:<源>=<目标>"`）→ 导出回读验证。接口契约字段全保留、用例脚本真实落库，**不动任何 ID、不重建用例**；唯一副作用 `ordering` 归零。这是给全量接口用例批量补鉴权脚本的标准通道（完整证据链/命令/豁免清单见 `references/case-debug-case-vs-test-case.md` 第八节）。
+    4. **接口节点本身的 preProcessors 也走同一通道**（2026-08-26 追加验证）：改 `api.preProcessors`（接口节点字段，非 cases 内），同一次 match-name 重导即落库（66/66）。**⚠️ 但接口层脚本会被所有下级用例级联执行**（Apifox 继承机制，用例默认继承接口前后置操作）——给接口层加脚本后必须同步检查豁免用例（负向缺凭据/安全性），否则它们被级联注入合法签名而失效；修复方式是给豁免用例加「清除鉴权头」脚本抵消（`pm.request.headers.remove('x-api-key')` + `remove('Authorization')`，实测 9/9 恢复）。**`inheritPreProcessors: {"enable": false}` 落库但 CLI 执行引擎不读，不可依赖**。完整证据链见 case study 第九节。
 
 **应用时机**：写 OpenAPI / swag YAML 时就带上 example（节点 2 → A12）；导入后立即验收，不要等对接方反馈。
 

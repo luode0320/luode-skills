@@ -7,8 +7,8 @@
 ## 🔍 快速诊断
 
 ```bash
-# 运行诊断脚本
-./skills/wsl-chrome-cdp/enable-browser.sh
+# 运行诊断脚本（本仓库布局：脚本在 skill 根目录）
+./enable-browser.sh
 ```
 
 **根据输出信息排查：**
@@ -153,8 +153,8 @@ ls -la "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
 # 2. 检查 PowerShell
 ls -la /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 
-# 3. 运行启用脚本
-./skills/wsl-chrome-cdp/enable-browser.sh
+# 3. 运行启用脚本（skill 根目录）
+./enable-browser.sh
 
 # 4. 测试 CDP
 curl http://127.0.0.1:9222/json/version
@@ -175,4 +175,4 @@ openclaw browser status
 
 ---
 
-*故障排查指南版本：1.0.0 | 最后更新：2026-03-11*
+*故障排查指南版本：1.1.0 | 最后更新：2026-08-25*

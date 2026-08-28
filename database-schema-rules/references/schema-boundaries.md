@@ -9,11 +9,39 @@
 **数据库的字段必须要定义以下内容，不要遗漏，否则会导致自动创建表出现不可控的因素：**
 
 1. **数据类型** - 明确每个字段的数据类型（INT、VARCHAR、TEXT、DATETIME、DECIMAL 等）
-2. **默认值** - 明确每个字段的默认值（如果有）
+2. **非空 + 默认值（字段三件套）** - 每个字段必须 `NOT NULL` 且带显式 `DEFAULT` 默认值；例外仅 `AUTO_INCREMENT` 主键（自增隐式默认）与 TEXT/BLOB 等不允许默认值的类型（至少 NOT NULL + COMMENT）；存量表新增字段的可空过渡见「铁律：字段三件套」
 3. **是否需要索引** - 明确哪些字段需要索引、哪些需要唯一索引、哪些不需要索引
 4. **CHARSET=utf8mb4** - 明确指定字符集为 utf8mb4
 5. **ENGINE=InnoDB** - 明确指定存储引擎为 InnoDB
-6. **注释说明** - 为每个字段和表添加清晰的注释说明。载体是 ORM 的 `comment:` tag 与 DDL 的 `COMMENT`（会真正落进数据库列注释，DBA、SQL 客户端和其他语言的调用方都能看到）；模型字段行尾的 `//` 注释不算满足本项，也不要拿它重抄 `comment:` 的内容——重复副本的治理规则见 `comment-rules` 的位置分区
+6. **注释说明（三件套之一）** - 为每个字段和表添加清晰的注释说明。载体是 ORM 的 `comment:` tag 与 DDL 的 `COMMENT`（会真正落进数据库列注释，DBA、SQL 客户端和其他语言的调用方都能看到）；模型字段行尾的 `//` 注释不算满足本项，也不要拿它重抄 `comment:` 的内容——重复副本的治理规则见 `comment-rules` 的位置分区
+
+## 铁律：字段三件套（NOT NULL + DEFAULT + COMMENT）
+
+**新建表的每个字段必须同时满足「三件套」：非空、有默认值、有注释，三者缺一不可。**
+
+- `NOT NULL`：字段不允许 NULL，杜绝「NULL 满天飞」导致 `WHERE` 条件遗漏 `IS NULL`、应用层空值判断负担。
+- `DEFAULT <默认值>`：字段必须带显式默认值，插入不赋值时由数据库兜底；字符串默认 `''`、数字默认 `0`、时间默认 `CURRENT_TIMESTAMP`。
+- `COMMENT '说明'`：字段必须有注释，载体是 ORM `comment:` tag / DDL `COMMENT`（会落进数据库列注释）。
+
+例外仅两类（出现时必须显式说明理由）：
+
+1. `AUTO_INCREMENT` 主键：自增隐式提供默认值，无需也不能写显式 `DEFAULT`；仍须 `NOT NULL` + `COMMENT`。
+2. 数据库不允许默认值的类型（TEXT/BLOB 等）：无法写 `DEFAULT`，至少强制 `NOT NULL` + `COMMENT`。
+
+存量表新增字段的可空过渡：按 `schema-examples.md` 正例 5 走「新增可空 → 回填 → 改非空」兼容路径时**允许临时 NULL**，但最终态必须收口为三件套（`NOT NULL` + `DEFAULT` + `COMMENT`），可空只是中间态不是终点；存量表本身不据此改（见「铁律的适用范围」）。
+
+```sql
+-- ✅ 三件套
+`status` TINYINT NOT NULL DEFAULT 0 COMMENT '订单状态：0-待支付，1-已支付',
+`remark` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '备注',
+
+-- ❌ 缺 NOT NULL（可空）
+`status` TINYINT DEFAULT 0 COMMENT '订单状态',
+-- ❌ 缺 DEFAULT（可给 '' 兜底，业务正常路径自行赋值）
+`order_no` VARCHAR(64) NOT NULL COMMENT '订单号',
+-- ❌ 缺 COMMENT
+`is_deleted` TINYINT NOT NULL DEFAULT 0,
+```
 
 ## 铁律：SQL 标识符统一反引号
 
@@ -209,7 +237,7 @@ CREATE TABLE `orders` (
   `amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '订单金额',
   `discount_amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '优惠金额',
   `pay_amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '实付金额',
-  `remark` VARCHAR(255) NULL DEFAULT '' COMMENT '备注',
+  `remark` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '备注',
   `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0-非删除，1-删除',
   `created_at_ts` BIGINT NOT NULL DEFAULT 0 COMMENT '创建时间毫秒级时间戳',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -226,7 +254,7 @@ CREATE TABLE `orders` (
 ### 检查清单
 
 - [ ] 每个字段都有明确的数据类型
-- [ ] 每个字段都有明确的默认值（如果适用）
+- [ ] 每个字段都满足三件套：NOT NULL + 显式 DEFAULT（AUTO_INCREMENT 主键 / TEXT/BLOB 等无默认值能力类型除外）+ COMMENT
 - [ ] 明确指定了哪些字段需要索引
 - [ ] 明确指定了 CHARSET=utf8mb4
 - [ ] 明确指定了 ENGINE=InnoDB

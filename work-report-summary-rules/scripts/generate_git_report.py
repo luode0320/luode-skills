@@ -108,6 +108,7 @@ MODULE_LABELS = {
     "internal/router": "路由层",
     "internal/service": "服务层",
     "crontask": "定时任务",
+    "cachetask": "缓存任务",
     "cmd/migrate": "数据迁移",
     "frontend": "前端页面",
     "web": "前端页面",

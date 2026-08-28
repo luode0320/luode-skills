@@ -2,6 +2,26 @@
 
 > 归属：`database-schema-rules`。记录外部 skill 精华的吸收裁决，来源可回指，每行含「整理去重」列。
 
+## 内部更新：字段三件套（NOT NULL + DEFAULT + COMMENT）（2026-08-26）
+
+**来源**：内部调整（无外部 skill）。用户明确规则指令：「数据库表的字段必须 NOT NULL，并且需要有 DEFAULT 默认值、COMMENT 说明」，要求吸收进本 skill。
+
+**通道**：内部更新通道。**裁决结果**：合并 5 条 / 保留本地 0 条 / 拒绝 0 条。
+
+| 条目 | 本地现状 | 裁决 | 落点 | 整理去重 |
+|------|---------|------|------|---------|
+| 字段必须 `NOT NULL` | 铁律 1 只要求「默认值、注释说明」未强制非空；检查清单「默认值（如果适用）」弱化；多处示例存在 NULL / 缺 NOT NULL | 合并（强化） | `SKILL.md` 铁律 1 + description + 触发信号 + 权责边界 + 暂停确认 + 通过/驳回 + 归档要求 | 6 处检查位点统一补 NOT NULL 口径（用同一条短语替换），避免部分位点漏改造成双口径 |
+| 字段必须有显式 `DEFAULT` | 铁律 1 有「默认值」但语义是「如果适用」 | 合并（强化） | `schema-boundaries.md`「铁律：字段三件套」+ DDL 完整清单第 2 项 + 检查清单项 | 消除「（如果有）」弱化措辞 |
+| 字段必须有 `COMMENT` | 铁律 1 已强制且载体（`comment:` tag / DDL `COMMENT`）已定义 | **保留本地** | 三件套表述中引用既有载体定义 | 不重复落盘载体规则 |
+| 例外边界（`AUTO_INCREMENT` 自增隐式默认；TEXT/BLOB/JSON 无默认值能力） | 无 | 合并 | `schema-boundaries.md` 三件套小节「例外仅两类」 | 防止「必须有 DEFAULT」与自增主键 / JSON 列产生规则自相矛盾 |
+| 存量表新增字段可空过渡最终收口三件套 | `schema-examples.md` 正例 5 有「NULL→回填→NOT NULL」流程但未声明最终态 | 合并（补注） | `schema-examples.md` 正例 5 注记 | 与既有兼容路径衔接，不新增流程；存量表本身不据此改的边界已在「铁律的适用范围」 |
+
+**同域冗余扫描（落盘后执行）**：范围 = `database-schema-rules`、`database-query-rules`、`comment-rules`。① 重复段落：0 处——全仓 grep `NOT NULL`/`三件套` 命中仅 database-schema-rules 自身文件；② 门控层叠：0 处——未新增独立门控，复用铁律 1 检查位点；③ 散落产物：0 处——未新建文件，全部追加进既有文件；④ 引用链：`SKILL.md` 铁律 1 → `schema-boundaries.md`「铁律：字段三件套」可达。结论 **PASS**。
+
+**净增体积**（收口时按磁盘实测）：`SKILL.md` +1 行（铁律 1 重写）、`schema-boundaries.md` +约 30 行（三件套小节 + 清单强化）、`schema-examples.md` +4 行（正例 5 注记 + 反例 5 问题行）、`table-design-standards.md` 约束小节改写 + 审计表注记 +1 行（示例行补 NOT NULL 为行内改写不增行）。
+
+**已删除源**：N/A（内部更新通道，无外部安装源）。
+
 ## 执行中 gap 回补：存量表纳入 ORM 自动迁移（2026-08-21）
 
 **来源**：内部实践（无外部 skill）。EllipalFinance-go 两轮真实执行——先把 15 张业务表以正式环境 DDL 为准

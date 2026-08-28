@@ -13,7 +13,7 @@ CREATE TABLE `orders` (
   `amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '订单金额',
   `discount_amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '优惠金额',
   `pay_amount` VARCHAR(32) NOT NULL DEFAULT '0.00' COMMENT '实付金额',
-  `remark` VARCHAR(255) NULL DEFAULT '' COMMENT '备注',
+  `remark` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '备注',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `created_at_ts` BIGINT NOT NULL DEFAULT 0 COMMENT '创建时间毫秒级时间戳',
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -70,6 +70,9 @@ CREATE TABLE `orders` (
 
 ### 正例 5：新增可空字段，先上线兼容代码，再逐步回填，再改为非空
 
+> 存量表新增字段的**可空过渡**（字段三件套的兼容演进路径）：允许临时 NULL，但最终态必须收口为
+> `NOT NULL` + `DEFAULT` + `COMMENT`（见 `schema-boundaries.md`「铁律：字段三件套」），可空只是中间态不是终点。
+
 ```sql
 -- 第一步：新增可空字段
 ALTER TABLE `orders` ADD COLUMN `pay_time` DATETIME NULL DEFAULT NULL COMMENT '支付时间' AFTER `status`;
@@ -77,7 +80,7 @@ ALTER TABLE `orders` ADD COLUMN `pay_time` DATETIME NULL DEFAULT NULL COMMENT '�
 -- 第二步：逐步回填历史数据
 -- ... (数据回填脚本)
 
--- 第三步：改为非空
+-- 第三步：改为非空（收口三件套）
 ALTER TABLE `orders` MODIFY COLUMN `pay_time` DATETIME NOT NULL COMMENT '支付时间';
 ```
 
@@ -197,12 +200,12 @@ CREATE TABLE `orders` (
 ❌ 问题：
 - 金额字段使用 DECIMAL 数值类型（会导致精度问题）
 - 缺少冗余毫秒级时间戳 created_at_ts
+- 部分字段未满足三件套（remark、created_at、updated_at 缺 NOT NULL；部分字段缺默认值）
 - 缺少字段注释
 - 缺少表注释
 - 缺少索引定义（除了主键）
 - 缺少 ENGINE=InnoDB
 - 缺少 CHARSET=utf8mb4
-- 部分字段缺少默认值
 - created_at 和 updated_at 定义不正确
 - 会导致自动创建表出现不可控的因素
 

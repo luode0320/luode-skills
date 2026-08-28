@@ -1,10 +1,48 @@
 ---
-name: Linux
-description: Operate Linux systems avoiding permission traps, silent failures, and common admin mistakes.
-metadata: {"clawdbot":{"emoji":"🐧","os":["linux","darwin"]}}
+name: linux
+description: "Linux 系统运维与排障：权限陷阱（chmod/chown/umask/ACL）、进程管理（kill/nohup/zombie）、文件系统（rm 安全/符号链接/inode）、磁盘空间排查（lsof/journalctl/docker）、网络（防火墙/端口/ss）、SSH 排障（权限/known_hosts）、systemd 服务、cron、内存与 OOM。适用于排查磁盘满、服务起不来、SSH 连不上、进程杀不掉、OOM 问题场景。触发词：linux、linux 报错、磁盘满、df、空间不足、服务起不来、systemctl、systemd、journalctl、ssh 连不上、权限不足、chmod、chown、进程杀不掉、kill、zombie、OOM、内存不足、cron 不执行、防火墙、端口占用、inode 满。"
+license: MIT
+metadata:
+  displayName: "Linux 运维与排障"
+  version: "1.1.0"
+  author: "Clawhub Developer"
 ---
 
-# Linux Gotchas
+# Linux 运维与排障
+
+Linux 系统排障与正确操作手册。**先走「工作流」再查「知识区」**：磁盘满、服务异常、SSH 失败、进程管理各有固定排查流程；陷阱细节按主题知识区深入。
+
+## 工作流
+
+### 磁盘满排查流程
+1. `df -h` 定位满的挂载点。
+2. 空间被删文件占用：`lsof +L1` 找被进程持有但已删除的文件 → 重启对应进程释放。
+3. 系统日志占用：`journalctl --vacuum-size=500M`；`du -sh /var/log/*` 找大日志。
+4. 容器空间：`docker system prune -a`（确认后执行）。
+5. inode 满（`df -i` 100% 但空间有）：大量小文件问题，`find /path -type f | wc -l` 定位目录。
+6. **验证**：`df -h` 确认空间恢复。
+
+### 服务起不来排查流程
+1. `systemctl status <svc>` 看状态与错误（Active/Inactive/Failed）。
+2. `journalctl -u <svc> -n 50 --no-pager` 看具体报错。
+3. 检查 `enable` 与 `start` 是否都执行（enable 不启动服务）。
+4. 依赖网络：`After=network-online.target`（不是 network.target）+ `Wants=network-online.target`。
+5. 崩溃不重启：unit 加 `Restart=on-failure`。
+6. **验证**：`systemctl is-active <svc>` 返回 active；`restart` 后连接保持（优先 reload 保连接）。
+
+### SSH 连不上排查流程
+1. 权限：`~/.ssh` 目录 700、私钥 600（错误权限 = 静默认证失败）。
+2. known_hosts 过期：服务器重建后报 hash 不匹配 → `ssh-keygen -R <host>`。
+3. 配置匹配：`~/.ssh/config` Host 块**第一个匹配生效**——具体主机放通配符前面。
+4. 空闲断连：加 `ServerAliveInterval 60`。
+5. **验证**：`ssh -v <host>` 能看到认证成功；`ssh <host> 'echo ok'` 返回 ok。
+
+### 进程管理流程
+1. `ps aux | grep <name>` 定位 PID；`kill <pid>` 先发 SIGTERM（可被忽略，进程有机会清理）。
+2. 等待数秒后 `ps` 复查；仍存活才 `kill -9`（跳过清理，可能丢数据）。
+3. zombie 进程杀不掉：其父进程必须 `wait()` 或杀掉父进程，zombie 由 init 回收。
+4. 后台任务保活：`nohup cmd &` 或 `disown`（`&` 单独用终端关闭即死）。
+5. **验证**：`ps` 确认进程消失/状态符合预期。
 
 ## Permission Traps
 - `chmod 777` fixes nothing, breaks everything — find the actual owner/group issue
@@ -75,3 +113,22 @@ metadata: {"clawdbot":{"emoji":"🐧","os":["linux","darwin"]}}
 - `ps aux` memory percentage can exceed 100% (shared memory counted multiple times)
 - `uptime` load average includes uninterruptible I/O wait — not just CPU
 - `top` CPU percentage is per-core — 400% means 4 cores maxed
+
+## 适用边界
+
+**何时用**：Linux 系统排障（磁盘/服务/SSH/进程/OOM）、权限与文件系统操作、systemd/cron 管理。
+
+**何时不用**：
+- Windows 系统操作 → 转 `windows-powershell-environment-rules`、`windows-encoding-rules`；
+- 容器/Docker 内部编排 → 转 `docker__skillhub`、`docker-direct-deploy`；
+- 远程服务器批量运维/连接管理 → 转 `ssh-server-ops-rules`；
+- Bash/PowerShell 脚本语义 → 转 `bash__skillhub`、`powershell__skillhub`。
+
+## 验收清单
+
+- [ ] 排障已按对应「工作流」逐步执行（磁盘/服务/SSH/进程）
+- [ ] `kill` 先 SIGTERM 后 SIGKILL；无滥用 `kill -9`
+- [ ] `chmod 777` / `chown -R` 未作为通用手段（已定位真实 owner/权限问题）
+- [ ] 服务改动后 `systemctl is-active` 验证；unit 已考虑 `Restart=on-failure`
+- [ ] SSH 已检查目录/私钥权限与 known_hosts
+- [ ] `rm -rf` 路径书写谨慎（无意外空格/尾斜杠陷阱）

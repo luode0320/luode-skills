@@ -1,6 +1,6 @@
 ---
 name: knowledge-flow
-description: 将固定根目录的 Google Drive 知识库作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、PROJECT_CURRENT.md、PROJECT_MEMORY.md 和 PROJECT_HISTORY.md 负责项目本地启动上下文，知识库仍采用选择性默认触发。每轮先判断知识库四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有笔记时才通过标准文件工具检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过标准文件工具沉淀；知识库可迭代更新而非只增量堆积。适用于知识库、Markdown 知识管理、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习和文件系统笔记操作场景。
+description: 将固定根目录的 Google Drive 知识库作为跨项目知识库管理，并与项目根目录四件套分层：父目录通用规则、PROJECT_CURRENT.md、PROJECT_MEMORY.md 和 PROJECT_HISTORY.md 负责项目本地启动上下文，知识库仍采用选择性默认触发。每轮先判断知识库四态（检索、沉淀、不适用、阻断）；只有问题依赖跨项目历史决策、知识库内容、用户偏好、重复实体或既有笔记时才通过标准文件工具检索，收口形成可复用事实、决策、流程、定义、偏好、来源或调试经验时才通过标准文件工具沉淀；知识库可迭代更新而非只增量堆积。适用于知识库、Markdown 知识管理、第二大脑、知识图谱、自动会话笔记、知识提取、快速回忆、本地笔记库、知识库检索、会话总结沉淀、执行失败持续学习、跨宿主（Windows 宿主 / WSL 内）知识库访问和文件系统笔记操作场景。
 ---
 
 # 知识库知识流
@@ -15,7 +15,7 @@ description: 将固定根目录的 Google Drive 知识库作为跨项目知识�
 - iterate: 写入前先判定新信息是补充、矛盾未裁决还是取代旧结论；判为取代时按分级处置改状态、归档或删除旧笔记，并双向写入接替关系。知识库因此可迭代更新，而不是只增量堆积。
 - learn: 把已确认的非预期执行失败转成一篇追加式、脱敏的执行案例笔记；笔记同时保存反例、正例、验证证据和状态事件，供后续精确检索。
 
-所有笔记读写使用标准文件工具（Get-Content、Set-Content、Add-Content、Move-Item、Remove-Item、rg、Select-String），不再依赖任何 CLI 桥接层。
+所有笔记读写使用当前宿主的标准文件工具，不再依赖任何 CLI 桥接层：Windows 宿主用 Get-Content、Set-Content、Add-Content、Move-Item、Remove-Item、Select-String、rg；agent 运行在 WSL 内时用 cat、heredoc 重定向、mv、rm、find、rg。
 
 ## 项目本地四件套边界
 
@@ -40,9 +40,10 @@ description: 将固定根目录的 Google Drive 知识库作为跨项目知识�
 
 本 skill 只认一个固定的知识库根目录：
 
-- 固定根目录：D:\谷歌云盘\知识库\
+- 固定根目录（Windows 宿主）：D:\谷歌云盘\知识库\
+- 同一目录在 WSL 内的 drvfs 形态：/mnt/d/谷歌云盘/知识库
 
-不要再通过环境变量、配置文件或候选路径重新推导。固定映射一旦已知，后续所有检索、捕获和沉淀都直接以此目录为准。
+两者是同一份文件而非两份副本，只是宿主不同导致的路径形态差异。不要再通过配置文件或候选路径重新推导固定映射；固定映射一旦已知，后续所有检索、捕获和沉淀都直接以此目录为准。仅当知识库确实不在默认位置时，才允许用环境变量 `KNOWLEDGE_VAULT_ROOT` 显式覆盖脚本根目录——这是例外通道，不是探测手段。
 
 所有笔记读写都必须限制在上述目录下。禁止通过符号链接、相对路径 ..、盘符或 UNC 写出该范围。
 
@@ -53,6 +54,7 @@ description: 将固定根目录的 Google Drive 知识库作为跨项目知识�
 3. 直接使用固定映射，并按场景读取参考文件：
    - 决定目录落点时读 [knowledge-layout.md](references/knowledge-layout.md)。
    - 读写笔记前读 [file-operations.md](references/file-operations.md)，确认路径安全规则与写后回读流程。
+   - agent 运行在 WSL 内时读 [wsl-access.md](references/wsl-access.md)，用 POSIX 工具口径替换 PowerShell 口径，并按其挂载探测与回读校验流程执行。
    - 决定笔记字段、组件和双链规则时读 [note-schema.md](references/note-schema.md)。
    - 执行捕获、检索、沉淀流程时读 [capture-retrieve-distill.md](references/capture-retrieve-distill.md)。
    - 处理执行失败正反例、去重、状态事件和自动学习时读 [execution-case-notes.md](references/execution-case-notes.md)。
@@ -100,7 +102,8 @@ description: 将固定根目录的 Google Drive 知识库作为跨项目知识�
 
 ## 文件系统约定
 
-- 使用标准 Windows 文件工具读写笔记
+- 按宿主选择读写工具：Windows 宿主用标准 Windows 文件工具（见 [file-operations.md](references/file-operations.md)）；agent 运行在 WSL 内时用 POSIX 工具直读 drvfs 挂载路径（见 [wsl-access.md](references/wsl-access.md)），不需要 PowerShell 或任何 bridge 命令
+- 无论哪个宿主，笔记路径参数都只用裸相对路径；`D:\...` 与 `/mnt/d/...` 绝对路径只出现在 shell 命令里，不写入 frontmatter、wikilink 或引用台账
 - 所有文件操作必须使用 UTF-8 编码，写入后回读验证一致性
 - 路径安全规则：所有笔记路径必须是相对知识库根 `D:\谷歌云盘\知识库\` 的裸相对路径（如 `20-Knowledge/topic/note.md`），禁止 ..、盘符、UNC 或 Windows 非法字符
 - 禁止在笔记路径上再加 `知识库/` 前缀：根目录本身已经是 `知识库`，前缀叠加会生成嵌套目录 `D:\谷歌云盘\知识库\知识库\`

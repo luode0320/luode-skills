@@ -6,13 +6,39 @@ import argparse
 import ast
 import difflib
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
-KB_ROOT = Path("D:/谷歌云盘/知识库")
+# 知识库根目录跨宿主解析。同一个 Google Drive 目录在 Windows 侧是 D:\谷歌云盘\知识库，
+# 在 WSL 侧经 drvfs 挂载为 /mnt/d/谷歌云盘/知识库。此前只硬编码 Windows 形态，导致 agent 在
+# WSL 内运行时第一跳机器索引固定返回 KB_ROOT_NOT_FOUND(exit 4)，只能退到 rg 全文兜底。
+# 解析顺序：环境变量显式覆盖 -> 各宿主候选按实测存在命中 -> 回退首个候选保持原有报错语义。
+KB_ROOT_ENV = "KNOWLEDGE_VAULT_ROOT"
+KB_ROOT_CANDIDATES = (
+    Path("D:/谷歌云盘/知识库"),
+    Path("/mnt/d/谷歌云盘/知识库"),
+)
+
+
+def resolve_kb_root() -> Path:
+    """按环境变量与宿主候选解析知识库根目录。
+
+    [返回] Path: 命中的知识库根目录；全部候选不存在时返回首个候选。
+    """
+    override = os.environ.get(KB_ROOT_ENV)
+    if override:
+        return Path(override)
+    for candidate in KB_ROOT_CANDIDATES:
+        if candidate.exists():
+            return candidate
+    return KB_ROOT_CANDIDATES[0]
+
+
+KB_ROOT = resolve_kb_root()
 # 主题落点根目录。巡检默认扫全库，本常量只用于主题推导，不再作为默认扫描范围。
 KNOWLEDGE_FOLDER = "20-Knowledge"
 TITLE_SIMILARITY_THRESHOLD = 0.72

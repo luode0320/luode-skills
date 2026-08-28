@@ -2,7 +2,7 @@
   "name": "github",
   "installedAt": 1786986809923,
   "source": "marketplace",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "skillId": "skill_2053082027691548672",
   "examples_zh": [
     "列出我GitHub仓库里所有开放的Issue",

@@ -1,102 +1,73 @@
-# wsl-chrome-cdp - WSL2 访问 Windows Chrome 浏览器
-
-**版本：** 1.0.0
-**作者：** 杏子
-**创建日期：** 2026-03-11
-**适用系统：** Windows + WSL2 + OpenClaw
-
+---
+name: wsl-chrome-cdp
+description: 当 WSL2 环境需要访问 Windows Chrome 浏览器（CDP 远程调试）时使用。触发词：打开浏览器 / 打开网页 / 浏览器截图 / chrome / cdp / browser automation。自动检测 CDP 是否就绪、通过 PowerShell 启动 Chrome 调试模式、验证连接后移交网页操作层 skill 执行。
+license: MIT
+metadata:
+  version: "1.1.0"
+  author: 杏子
+  displayName: WSL Chrome CDP
+  compatibility: Windows + WSL2
+  environment:
+    - google-chrome（Windows 侧，默认路径 C:\Program Files\Google\Chrome\Application\chrome.exe）
+    - powershell.exe（Windows 侧，WSL 内 /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe）
+  selfcheck: bash -n enable-browser.sh && curl -s --connect-timeout 2 http://127.0.0.1:9222/json/version
 ---
 
-## 📋 技能描述
+# wsl-chrome-cdp — WSL2 访问 Windows Chrome（CDP 桥接启动器）
 
-解决 WSL2 环境中无法访问 Windows Chrome 浏览器的问题，实现 OpenClaw browser 工具对 Windows Chrome 的远程控制。
+## 一、定位与适用边界
 
-**核心功能：**
-- ✅ 自动检测 Chrome 是否运行
-- ✅ 自动启动 Chrome 调试模式
-- ✅ 自动验证 CDP 连接
-- ✅ 完全无需手动操作
+解决 WSL2 环境中无法访问 Windows Chrome 的问题：检测 CDP（Chrome DevTools Protocol）是否就绪，未就绪时自动启动 Windows Chrome 调试模式并验证连接。
 
----
+- **职责边界**：本 skill 只做「桥接启动器」——检测 / 启动 / 验证 CDP。打开页面、截图、点击、填表等**网页操作层**动作不在本 skill 范围，见「七、交叉引用」。
+- **适用系统**：Windows + WSL2。
+- **前置依赖**：Windows 侧安装 Chrome；WSL 内可访问 `/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe`。
 
-## 🚀 使用方法
+## 二、工作流（4 步）
 
-### **全自动模式（推荐）**
+1. **检测 CDP**：`curl -s --connect-timeout 3 http://127.0.0.1:9222/json/version`，失败则尝试 Windows IP（`/etc/resolv.conf` nameserver）。
+2. **启动 Chrome**：CDP 未就绪时，运行 `./enable-browser.sh`（自动经 PowerShell 以 `--remote-debugging-port=9222` 启动 Chrome 调试模式，等待 8 秒）。
+3. **验证连接**：再次请求 `/json/version`，解析 `Browser` 版本字段；失败则按「五、故障排查」定位。
+4. **移交操作层**：CDP 就绪后，将浏览器操作交给 `browser-session-automation-rules`（见交叉引用），本 skill 收尾。
 
-**安装技能后，无需任何配置！**
-
-**在 OpenClaw 对话中直接说：**
-
-```
-打开百度
-```
-
-```
-访问 GitHub
-```
-
-```
-帮我截图
-```
-
-**杏子会自动：**
-1. ✅ 检测 Chrome 是否运行
-2. ✅ 如果没运行，自动启动 Chrome 调试模式
-3. ✅ 验证 CDP 连接
-4. ✅ 执行你的请求
-
-**完全无需手动操作！**
-
----
-
-### **手动运行（可选）**
+## 三、脚本调用
 
 ```bash
-# 一键启用浏览器
-./skills/wsl-chrome-cdp/enable-browser.sh
+# 一键检测 + 启动 + 验证（skill 根目录，本仓库布局）
+./enable-browser.sh
 ```
 
----
+脚本行为：取消代理 → 探测 CDP → 未就绪则 PowerShell 启动 Chrome 调试模式 → 等待 8 秒 → 复验 → 输出 Chrome 版本或明确失败原因（exit 1）。
 
-## 📁 文件结构
+- PowerShell 调用已统一使用标准前缀 `-NoProfile -ExecutionPolicy Bypass`（唯一真源见 `windows-encoding-rules/SKILL.md`「调用 PowerShell 命令时的标准化前缀」，禁止在本 skill 复制或漂移）。
+- `get_windows_ip()` 内的 `$_` 已做 bash 转义（`\$_.`），避免双引号内被 bash 先行展开导致 PowerShell 命令失效。
+
+## 四、文件结构
 
 ```
-wsl-chrome-cdp/
+wsl-chrome-cdp__skillhub/
 ├── SKILL.md                          # 技能说明（本文件）
 ├── README.md                         # 快速入门
-├── enable-browser.sh                 # 全自动启用脚本
-├── scripts/
-│   └── start-chrome-debug.bat        # Windows 备用启动脚本
+├── enable-browser.sh                 # 全自动启用脚本（唯一脚本）
 └── docs/
     └── troubleshooting.md            # 故障排查指南
 ```
 
----
+> 注意：原仓库声明的 `scripts/start-chrome-debug.bat` 在本仓库**不存在**（无真实来源不补造），Windows 备用启动逻辑已并入 `enable-browser.sh` 的 PowerShell 调用。
 
-## 🔍 故障排查
+## 五、故障排查
 
-### **问题 1：Chrome 启动失败**
+### 问题 1：Chrome CDP 启动失败
 
-**症状：** 脚本显示 "Chrome CDP 启动失败"
-
-**解决：**
 ```bash
-# 1. 检查 Chrome 是否安装
+# 检查 Chrome 是否安装（硬编码路径）
 ls -la "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
-
-# 2. 手动启动 Chrome 调试模式
-/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \
-  'Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" \
-   -ArgumentList "--remote-debugging-port=9222","--user-data-dir=C:\Users\$env:USERNAME\AppData\Local\Google\Chrome\Debug","--no-first-run"'
 ```
 
----
+未安装则安装 Chrome；已安装但仍失败，检查端口 9222 是否被占用与防火墙是否放行。
 
-### **问题 2：CDP 连接超时**
+### 问题 2：CDP 连接超时
 
-**症状：** `curl http://127.0.0.1:9222/json/version` 超时
-
-**解决：**
 ```bash
 # 1. 取消代理
 unset http_proxy https_proxy
@@ -106,49 +77,44 @@ WINDOWS_IP=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
 curl http://$WINDOWS_IP:9222/json/version
 ```
 
----
+### 问题 3：端口被占用
 
-### **问题 3：端口被占用**
-
-**症状：** 端口 9222 已被其他进程占用
-
-**解决：**
 ```powershell
-# Windows 上检查端口
 netstat -ano | findstr 9222
-
-# 结束占用进程
 taskkill /F /PID <进程 ID>
 ```
 
----
+### 更多问题
 
-### **更多问题**
+查看 `docs/troubleshooting.md`（完整 5 类问题排查）。
 
-**查看完整故障排查指南：** `docs/troubleshooting.md`
+## 六、环境依赖与自检（D4 登记）
 
----
+| 依赖 | 说明 |
+|---|---|
+| google-chrome（Windows 侧） | 硬编码路径 `C:\Program Files\Google\Chrome\Application\chrome.exe`；本机缺失时端到端实测不可行，只能做语法与探测级自检 |
+| powershell.exe（WSL 内可访问） | `/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe` |
 
-## 📚 参考资料
+**自检命令**（无 Chrome 时仍可执行）：
 
-- [OpenClaw Browser 文档](https://docs.openclaw.ai/tools/browser)
+```bash
+bash -n enable-browser.sh                                  # 语法校验
+curl -s --connect-timeout 2 http://127.0.0.1:9222/json/version   # CDP 端口探测
+```
+
+## 七、交叉引用（不复制正文）
+
+| 场景 | 引用 |
+|---|---|
+| CDP 就绪后的网页操作（打开页面 / 快照 / 交互） | `browser-session-automation-rules`（agent-browser CLI） |
+| 网络 HAR 记录 / 视觉 diff / profiling | `browser-advanced-testing-rules` |
+| WSL↔Windows 桥接通用层 / 标准 PowerShell 前缀真源 | `wsl-powershell__skillhub`、`wsl-windows-bridge__skillhub`、`windows-encoding-rules` |
+
+## 八、参考资料
+
 - [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/)
+- [OpenClaw Browser 文档](https://docs.openclaw.ai/tools/browser)
 
 ---
 
-## 💕 关于作者
-
-**杏子（Apricot）** - OpenClaw 社区贡献者
-
-**创建背景：**
-> 2026-03-11，为解决 WSL2 中 OpenClaw 无法访问 Windows Chrome 的问题，
-> 杏子整理了完整的自动化配置流程。
-> 希望这个技能能帮助更多人！
-
-**技能理念：**
-> "配置应该是全自动的，排查应该是清晰的。"
-> "今天踩的坑，明天就不用再踩了。"
-
----
-
-*技能版本：1.0.0 | 最后更新：2026-03-11*
+*技能版本：1.1.0 | 更新：2026-08-25（标准前缀修复 + `$_` 转义 + 断链清理 + frontmatter 合规）*

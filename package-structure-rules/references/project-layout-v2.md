@@ -216,15 +216,18 @@
 │   ├── constant/                            # [条件·提交] 稳定常量和枚举
 │   ├── error/                               # [条件·提交] 错误类型与错误码
 │   ├── validation/                          # [条件·提交] 通用校验
-│   ├── dto/                                 # [条件·提交] 跨域共享领域模型与数据传输对象
+│   ├── entity/                              # [条件·提交] 跨业务域共享的公共实体（领域模型）；不承载具体接口请求/响应
+│   ├── dto/                                 # [条件·提交] 跨域共享接口出参 DTO 与数据传输对象
 │   ├── page/                                # [条件·提交] 分页请求与响应协议
 │   ├── msg/                                 # [条件·提交] 国际化消息码与消息渲染源码；文案数据在 resources/i18n/
 │   └── util/                                # [条件·提交] 可依赖项目其他包的高关联工具函数；代码文件直接放此目录，禁止子目录
 ├── global/                                  # [条件·提交] 已装配共享引用
 │   └── <capability>/                        # [条件·提交] 单项共享引用
-├── crontask/                                # [条件·提交] Cron 入口
+├── crontask/                                # [条件·提交] Cron 入口：时间驱动（cron 表达式/间隔）周期任务
 │   └── <task>/                              # [条件·提交] 单个任务入口
-├── async/                                   # [条件·提交] Worker 与消费者入口
+├── cachetask/                               # [条件·提交] 缓存重建任务入口：缓存过期驱动的异步重建（Stale-While-Revalidate：TTL 到期先返回旧数据，再异步重建新缓存）
+│   └── <task>/                              # [条件·提交] 单个缓存任务入口
+├── async/                                   # [条件·提交] Worker 与消费者入口：消息/队列驱动后台任务
 │   └── <worker>/                            # [条件·提交] 单个 Worker 入口
 ├── middleware/                              # [条件·提交] 横切中间件
 │   ├── authentication/                      # [条件·提交] 身份认证
@@ -298,6 +301,7 @@
 ```
 
 源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。业务域直连源码根，业务相关逻辑在各版本目录 `<v?>` 隔离；域级入口为单文件 `init.<ext>`（`<ext>` 为当前语言扩展名，如 Go 的 `init.go`），全量注册本域各版本路由，`/v1`、`/v2` 前缀区分，多版本并存对外。版本目录挂在 `router/`、`controller/`、`entity/`、`service/` 各自之下（`router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/`），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用区分版本。
+`crontask/`、`cachetask/`、`async/` 是三类并行的根级任务入口，按触发机制区分：`crontask/` 承载时间驱动（cron 表达式/固定间隔）的周期任务；`cachetask/` 承载缓存过期驱动的异步重建任务（Stale-While-Revalidate 模式：缓存 TTL 到期后先返回旧数据，再异步重建新缓存，典型如 60s 级短 TTL 内存缓存）；`async/` 承载消息/队列驱动的 Worker 与消费者。缓存读写技术适配归 `utils/cache/`（Redis/Mongo 客户端封装），`cachetask/` 只承载缓存过期后的业务重建逻辑入口，不重复实现缓存读写。
 后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 

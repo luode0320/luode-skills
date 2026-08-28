@@ -60,13 +60,13 @@ chmod +x ~/.openclaw/workspace/skills/wsl-powershell/scripts/psctl.sh
 
 ```bash
 # Execute PowerShell command
-./scripts/psctl.sh "Get-Process | Select-Object -First 5 Name,Id"
+./psctl.sh "Get-Process | Select-Object -First 5 Name,Id"
 
 # Execute PowerShell script file
-./scripts/psctl.sh -f /mnt/c/scripts/myscript.ps1
+./psctl.sh -f /mnt/c/scripts/myscript.ps1
 
 # Check PowerShell availability
-./scripts/psctl.sh --check
+./psctl.sh --check
 ```
 
 ## 📖 Examples
@@ -75,68 +75,68 @@ chmod +x ~/.openclaw/workspace/skills/wsl-powershell/scripts/psctl.sh
 
 ```bash
 # Get system info
-./scripts/psctl.sh "Get-ComputerInfo | Select-Object WindowsProductName,WindowsVersion"
+./psctl.sh "Get-ComputerInfo | Select-Object WindowsProductName,WindowsVersion"
 
 # Get process list
-./scripts/psctl.sh "Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name,Id,CPU"
+./psctl.sh "Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name,Id,CPU"
 
 # Get service status
-./scripts/psctl.sh "Get-Service | Where-Object {\$_.Status -eq 'Running'} | Select-Object -First 10 Name,DisplayName"
+./psctl.sh "Get-Service | Where-Object {\$_.Status -eq 'Running'} | Select-Object -First 10 Name,DisplayName"
 ```
 
 ### File Operations
 
 ```bash
 # List directory
-./scripts/psctl.sh "Get-ChildItem C:\\Users"
+./psctl.sh "Get-ChildItem C:\\Users"
 
 # Copy file
-./scripts/psctl.sh "Copy-Item C:\\source\\file.txt C:\\dest\\file.txt -Force"
+./psctl.sh "Copy-Item C:\\source\\file.txt C:\\dest\\file.txt -Force"
 
 # Create file
-./scripts/psctl.sh "New-Item -Path C:\\test.txt -ItemType File -Force"
+./psctl.sh "New-Item -Path C:\\test.txt -ItemType File -Force"
 ```
 
 ### Process Management
 
 ```bash
 # Start program
-./scripts/psctl.sh "Start-Process notepad.exe"
+./psctl.sh "Start-Process notepad.exe"
 
 # Stop process
-./scripts/psctl.sh "Stop-Process -Name notepad -Force"
+./psctl.sh "Stop-Process -Name notepad -Force"
 ```
 
 ### Network Operations
 
 ```bash
 # Get network config
-./scripts/psctl.sh "Get-NetIPConfiguration | Select-Object InterfaceAlias,IPv4Address"
+./psctl.sh "Get-NetIPConfiguration | Select-Object InterfaceAlias,IPv4Address"
 
 # Ping test
-./scripts/psctl.sh "Test-Connection -ComputerName google.com -Count 2"
+./psctl.sh "Test-Connection -ComputerName google.com -Count 2"
 ```
 
 ## 🔧 Advanced Options
 
 ```bash
 # Show help
-./scripts/psctl.sh --help
+./psctl.sh --help
 
 # Show version
-./scripts/psctl.sh --version
+./psctl.sh --version
 
 # Debug mode
-DEBUG=1 ./scripts/psctl.sh "Get-Process"
+DEBUG=1 ./psctl.sh "Get-Process"
 
 # Verbose output
-./scripts/psctl.sh -v "Get-Service"
+./psctl.sh -v "Get-Service"
 
 # Use PowerShell Core
-./scripts/psctl.sh -p "Get-Module -ListAvailable"
+./psctl.sh -p "Get-Module -ListAvailable"
 
 # Check PowerShell availability
-./scripts/psctl.sh --check
+./psctl.sh --check
 ```
 
 ## ⚠️ Notes
@@ -144,7 +144,7 @@ DEBUG=1 ./scripts/psctl.sh "Get-Process"
 1. **Permissions**: Some operations require administrator privileges
    ```bash
    # Start elevated PowerShell
-   ./scripts/psctl.sh "Start-Process powershell -Verb RunAs"
+   ./psctl.sh "Start-Process powershell -Verb RunAs"
    ```
 
 2. **Path Escaping**: Backslashes `\` in Windows paths must be escaped as `\\`

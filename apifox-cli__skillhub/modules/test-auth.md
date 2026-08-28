@@ -225,7 +225,8 @@ apifox environment update --project <projectId> --environment <开发环境Id> -
 | # | 事项 | 判定标准 |
 |---|------|----------|
 | 1 | apifox 有**与真实机制一致**的鉴权组件 | `apifox security-scheme list/get` 能查到；`authConfigs` 的 type/in/name 与服务端实际校验方式一致；description 写清算法、参与签名的字段、密钥来源、免签例外 |
-| 2 | 用例带鉴权（签名/token）注入 | 用例 `preProcessors` 有鉴权脚本；本地免签时脚本可在凭据缺失时跳过，但**脚本本身必须在**，保证"用例即线上调用示例" |
+| 2 | 用例带鉴权（签名/token）注入 | 用例 `preProcessors` 有鉴权脚本；本地免签时脚本可在凭据缺失时跳过，但**脚本本身必须在**，保证"用例即线上调用示例"。**TEST_CASE** 走 `test-case create/update` 写入；**DEBUG_CASE（接口用例）** 走「导出 → 改 JSON → match-name 原生重导」批量注入（通道与命令见 `test-case.md` 规则 T-3 第 3 条 + `references/case-debug-case-vs-test-case.md` 第八节）；负向「缺凭据」与安全性「错误签名」类用例**豁免注入** |
+| 2.5 | **接口节点本身**带鉴权脚本（2026-08-26 追加） | `api.preProcessors`（接口节点字段）也要有鉴权脚本——客户端直接调试接口（不选用例）时同样能过鉴权。与用例层同走 match-name 重导（同一通道，改接口节点字段）；**⚠️ 接口层脚本会被所有下级用例级联执行**（Apifox 继承机制），给接口层加脚本后必须给豁免用例补「清除鉴权头」脚本抵消（`headers.remove('x-api-key')` + `remove('Authorization')`）；`inheritPreProcessors` 落库但 **CLI 执行引擎不读**，不可依赖。完整证据链见 `references/case-debug-case-vs-test-case.md` 第九节 |
 | 3 | 至少一组鉴权用例 | 正确凭据放行 + 缺失凭据被拒 + 错误凭据被拒（后两者不需要真实密钥，可立即通过） |
 
 **先把真实机制查清，再配 apifox**（不要照抄"Bearer token"这类默认假设）：

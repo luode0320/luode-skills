@@ -8,6 +8,51 @@
 >
 > **内部更新通道登记（2026-08-20 起）**：本表同时登记「内部 skill 更新通道」的裁决式调整——来源列写"内部调整：<目标 skill>，<调整诉求>"，其余列（裁决 / 落点 / 整理去重 / 同域扫描结论 / 净增体积）要求与外部吸收完全一致，无外部源可删。
 
+## 2026-08-26：内部更新——测试进程生命周期强制收口
+
+- **来源**：内部调整：`test-strategy-rules`（测试策略统一主入口）+ `functional-validation-rules` + `browser-advanced-testing-rules`，调整诉求 = "测试任务结束后必须强制关闭测试启动的进程，禁止遗留后台；用户需要时自行启动。实测教训：真实链路测试启动的 12801 被测服务在测试收口后仍留在后台运行（goadmin-server-tmp 进程 + 端口监听），直到用户追问才处理"。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：5 条（A1 测试收口必关 / A2 核验可证 / A3 不替用户保留 / A4 残留清理 / A5 联调衔接）。
+- **裁决**：
+  - A1 测试收口必关（任务完成不包含服务继续留在后台）→ 合并（缺口）：现有三 skill 只有「联调完成后关闭前后端进程」，未覆盖真实链路测试启动的被测服务场景。
+  - A2 核验可证（关闭动作 + 关闭后状态检查证据）→ 合并（缺口）：现只有 functional-validation 第 7 条有半句，未成权威。
+  - A3 不替用户保留（用户需要时自行启动）→ 合并（缺口）：全新原则，各 skill 均无。
+  - A4 残留清理（发现历史残留先核验归属再清理）→ 合并（缺口）：全新原则。
+  - A5 联调衔接（开场基线收口与收尾强制关闭互补）→ 合并（缺口）：明确两者关系防只开场不收尾。
+- **落盘改动**：
+  - `test-strategy-rules/SKILL.md`：新增《测试进程生命周期（强制）》节（单一权威，位于「测试隔离红线」之后）。
+  - `functional-validation-rules/SKILL.md`：联调节第 6 条补引用指针（指向权威节），第 7 条保留（域专属补充）。
+  - `browser-advanced-testing-rules/SKILL.md`：联调节第 6 条补引用指针（指向权威节），第 7 条保留。
+- **整理去重**：三 skill 原有「联调完成后必须关闭前后端进程」条款语义重叠 → 收敛为「单一权威（test-strategy-rules）+ 引用（两个下游 skill 只留域专属补充与指针）」；下游重复定义段删除，不留两套进程收口规则。
+- **同域扫描结论**：范围 = test-strategy-rules（权威落点）、functional-validation-rules、browser-advanced-testing-rules、test-regression-rules、test-program-rules、bug-validation-rules；发现 = 2 处重复段落（functional-validation 第 6 条 / browser-advanced 第 6 条与权威节语义重复）、0 处门控层叠、0 处散落产物；清理 2 处（改为引用指针）；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 1.0KB（test-strategy-rules 权威节 ~0.9KB + 两处引用指针 ~0.1KB）；两处下游重复段删除抵消部分增量。
+- **棘轮验证**：`quick_validate.py` 三 skill → `Skill is valid!`（exit 0）；UTF-8 OK；引用指针 2 处可达（指向 test-strategy-rules 权威节标题）。
+
+## 2026-08-26：内部更新——低分 skill 优化 SOP 固化（八轮经验总结）
+
+- **来源**：内部调整：`skill-absorption-rules`（吸收规则总入口），调整诉求 = "八轮低分 skill 优化实操经验总结成标准流程，后续评分巡检低分 skill 都按此流程优化；经验吸收进本 skill"。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：7 条（A1 八步闭环 SOP / A2 短板类型学 / A3 验证纪律 / A4 市场检索规律 / B1 SKILL.md 触发信号 / B2 SKILL.md 读取规则 / B3 score-inspection 衔接指针）。
+- **裁决**：
+  - 八步闭环 SOP → 合并（缺口）：新增 `references/low-score-skill-optimization-sop.md` 作低分优化流程单一权威。
+  - 短板类型学 7 类映射 → 合并（缺口）：并入新 SOP（诊断→修复一对一）。
+  - 验证纪律（独立子代理/固定格式/维度8实测/本侧修正/棘轮/早停/确定性小问题顺手修复）→ 合并（缺口）：并入新 SOP；评分公式不复制（引用 darwin-rubric）。
+  - 市场检索规律（28+ 组关键词 0 候选、解药在仓库内）→ 合并（缺口）：并入新 SOP。
+  - SKILL.md 触发信号补"多轮实操经验总结" → 合并（缺口）：+1 条。
+  - SKILL.md references 读取规则补 SOP 指针 → 合并（缺口）：+1 条。
+  - score-inspection-workflow 短板识别出口衔接 → 合并（缺口）：自有 rules/other 短板出口补 SOP 指针。
+  - 新建独立 skill 承载 SOP → 拒绝（本地红线：不新增 skill 目录，属本 skill 职责）。
+- **落盘改动**：
+  - 新增 `skill-absorption-rules/references/low-score-skill-optimization-sop.md`（6306B）。
+  - 修改 `skill-absorption-rules/SKILL.md`（触发信号 +1 行 + 读取规则 +1 行，约 +0.3KB）。
+  - 修改 `skill-absorption-rules/references/score-inspection-workflow.md`（短板识别出口 1 句）。
+- **整理去重**：评分标准已在 darwin-rubric.md、巡检流程已在 score-inspection-workflow.md，新 SOP 只补「优化执行流程」不复制维度定义与打分公式（边界声明在 SOP「与相关文件边界」节）；无存量重复段落可清（N/A + 理由）。
+- **同域扫描结论**：范围 = skill-absorption-rules（落点）、score-inspection-workflow（巡检上游）、darwin-rubric（评分标准）、skill-audit-rules（只读审计）、skill-hit-check-rules（触发总控）；发现 = 0 处重复段落（SOP 讲"优化"、score-inspection 讲"打分"，指针衔接非重复）、0 处门控层叠（SOP 独有术语"八步闭环/短板类型学/本侧修正"与既有 gate 无嵌套）、0 处散落产物（新文件为正式资产，improvement-output-template.md 为既有 gap 模板非散落）；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 6.6KB（SOP 6306B + SKILL.md 2 行 ~0.3KB + score-inspection 1 句 ~0.1KB）；无外部源，净增即缺口流程本身。
+- **棘轮验证**：`quick_validate.py` → `Skill is valid!`（exit 0）；独立子代理覆盖度审查 **PASS**（7 skill 名单/分数/八步顺序/7 类短板/6 实操坑全部核实一致，2 处轻微表述已修正）；知识库 `knowledge_index.py check` 0 死链；UTF-8 3 文件 OK；引用链 2 处可达（SKILL.md 读取规则 + score-inspection 出口）。
+
 ## 2026-08-24：内部更新——8 维评分体系巡检工作流固化
 
 - **来源**：内部调整：`skill-absorption-rules`（吸收规则总入口），调整诉求 = "把「用 darwin-rubric 8 维给全仓库 skill 打分 + 生成 skill-8维评分报告.html」的实操经验固化为可复用流程，后续快速打分更新报告"。
@@ -342,3 +387,21 @@
 - **同域扫描结论**：范围 = 剩余全部 skill（17 A 类 + 39 B 类）；发现 = 4 组候选重叠 + 4 个残留；清理 4 个残留；真实冗余 0（A 类职责差异/低价值说明）；**PASS**。
 - **净增体积**：-41KB（删除 4 个脚本）。
 - **棘轮验证**：删除不影响任何引用（0 引用复核），评分不降。
+
+## 2026-08-26：内部更新——全量 8 维评分巡检报告刷新（第二轮）
+
+- **来源**：内部调整：skill 体系评分巡检，调整诉求 = 「对所有 skill 再打分一次，更新打分的 html」。
+- **形态**：内部更新通道（只读打分 + 报告刷新，无 skill 内容改动）。
+- **裁决**：不涉及吸收/合并/拒绝裁决——纯评分巡检，产物为 `skill-8维评分报告.html`。
+- **执行摘要**：6 个独立子代理分批打分 158 个 skill（静态 7 维，权重 W=[8,15,10,7,15,5,15]，满分 75）；总分脚本复算；独立校验通过。新增 log-analysis-rules（上轮无），无删除。
+- **结果**：总平均 60.6（上轮 54.4，+6.2）；rules 63.4/83、other 58.3/25、skillhub 57.3/48、market 55.3/2；最低 self-ent-tech-database-design 36.9；最高 imagegen 74.3；中位数 60.9。
+- **棘轮验证**：全量重新打分（非单 skill 优化），158 个全部重评；整体平均较上轮 +6.2，主要来自 08-25/26 期间 26+ 个低分 skill 优化闭环（skillhub 类 44.5 → 57.3）。
+
+## 2026-08-26：内部更新——低分 skill 批量优化第十一轮（9 个，A+B+D 裁决）
+
+- **来源**：内部调整：用户点名 9 个最低分 skill 逐个优化，默认 A+B+D（内容+交叉引用+版本环境），排除 C 市场吸收。
+- **形态**：内部更新通道（9×SKILL.md 重构 + 2 脚本修复 + 1 新 reference）。
+- **裁决**：A+B+D 组裁决（用户默认），无 C 市场吸收。
+- **执行摘要**：逐 skill 八步闭环；修复真实 bug 2 处（golang script.sh case 顶层 local 误用、ip.py 依赖 requests 未装）；修复硬伤 2 处（cryptocurrency-data-api search_schools 残留、ip SKILL.md 脚本路径断链）；frontmatter 合规化 5 个（self-ent-tech/gol/golang/tg/cryptocurrency-data-api/ip/skill_2054901716814716928 8 违规键）。
+- **结果**：36.9→63.3 / 37.7→62.8 / 46.0→66.1 / 46.7→61.2 / 48.6→66.5 / 48.7→67.5 / 48.8→63.3 / 49.0→66.1 / 49.2→64.6；报告总平均 60.6→61.7；新最低 pdf 50.1。
+- **棘轮验证**：全量重新打分（非单 skill 优化），9 个全部高于基线（+14.5 ~ +26.4），无早停项。

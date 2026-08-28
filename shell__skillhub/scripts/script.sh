@@ -4,6 +4,8 @@
 set -euo pipefail
 
 VERSION="1.0.0"
+# 自定位：脚本所在目录，供任意 cwd 调用方引用（断链规避）
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cmd_intro() {
     cat << 'EOF'

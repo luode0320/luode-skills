@@ -1,13 +1,96 @@
 # 项目当前状态
 
-## 2026-08-25 日志链路打通实施完成
+## 2026-08-28 tapd-env-bootstrap SKILL.md 路径去用户名化（内部更新通道）
 
-- 来源对象：`REQ-LOG-20260825-001`（用户确认「开始落盘推进」）
-- 当前目标：打通日志"写入 → 取证 → 定位"闭环，新建读日志侧唯一权威并联动写侧/bug 域/接口测试
-- 当前状态：全部完成。新建 `log-analysis-rules`（SKILL.md + 5 references）；四处联动补丁（logging-trace-rules 可反查字段、bug-root-cause-rules/bug-intake-rules 指向读侧、apifox 第 5 步服务端取证、test-program-rules 过程日志默认放行）。需求/实施总览/6-review 三份文档机器校验均 valid:true；字典 seed 92；知识库沉淀 1 篇；PROJECT_MEMORY 补稳定决策；PROJECT_HISTORY 置顶追加并裁剪至 20 条。
-- 关键量化：新建 6 文件 + 修改 5 处规则资产 + 落盘 3 份工程文档 + 1 篇知识库笔记。
-- 验证与交接：quick_validate PASS；全量 400 测试失败 14/错误 13 与基线一致（缺 Go 等既有环境项，无本改动新回归）；knowledge_index 0 死链；语义 grep 全部命中。
+- 来源对象：用户指出本机 TAPD 凭据配置路径不应写死 `C:\Users\luode`、`/home/luode`，改用 `~/` 用户路径。
+- 当前目标：`tapd-env-bootstrap/SKILL.md` 中 4 处硬编码用户路径改为 `~` / `$env:USERPROFILE` 动态形式。
+- 当前状态：全部完成。真源文件（Windows/WSL）两行改 `~/.tapd/env.sh`（Windows 注明即 `$env:USERPROFILE\.tapd\env.sh`）；更新凭据流程第 1 步同改；第 2 步 WSL 同步命令改为 PowerShell 双行（`$env:USERPROFILE` → WSL 内 `wslpath` 解析 → `cp` 到 `~/.tapd/env.sh`），已实测链路可行。
+- 关键量化：1 文件 4 处路径；grep 零残留；tapd 系列其他 skill 无同类硬编码。
+- 验证与交接：`wsl -e bash -lc "wslpath '$env:USERPROFILE'"` 实测返回 `/mnt/c/Users/luode`，目标文件 EXISTS；改动停在已改动未提交状态。
+- 遗留：`.system/skill-creator/scripts/quick_validate.py` 允许键不含 `agent_created`，对所有 agent 创建 skill 报 Unexpected key 警告（既有基线，非本轮引入）。
+
+## 2026-08-27 根级 cachetask 缓存重建任务目录加入目录树（内部更新通道）
+
+- 来源对象：用户提出——`crontask/` 是定时任务目录，但存在"类定时任务"（缓存 60s 到期后先返回旧数据、再异步更新新缓存，Stale-While-Revalidate），希望专属目录 `cachetask/` 承载并加入目录树、说明用处。
+- 当前目标：把 `cachetask/` 作为后端根级任务入口加入 `package-structure-rules` 目录树，与 `crontask/`（时间驱动）、`async/`（消息驱动）并列，形成"三类根级任务入口"边界。
+- 当前状态：全部完成。落盘：`project-layout-v2.md`（目录树条目 + 三类任务入口正文说明）；`SKILL.md`（description + 核心边界第 2 条）；三个语言 reference 根级目录列表；`placement_catalog.py` `ADOPTION_V2_SOURCE_ROOTS["backend"]` 白名单；`work-report-summary-rules/scripts/generate_git_report.py` MODULE_LABELS；字典重跑；顺手修复 `configuration_layout_test.py` apifox 环境断言基线（2026-08-21 引入的既有漂移）；登记 absorption-map + source-notes + PROJECT_MEMORY（人类区稳定决策 + 机器索引 rule.cachetask-root-task-entry）；知识库沉淀《cachetask缓存重建任务目录》并与《配置表驱动缓存五件套》双向关联。
+- 关键量化：6 个规则/脚本文件 + 1 测试基线 + 2 字典文件 + 3 记忆文件 + 1 知识库新笔记 + 1 6-review；净增内容最小化。
+- 验证与交接：adoption/strict 双策略 check 临时项目（含 cachetask/coin_price/refresh.go）均 exit 0；package-structure-rules 45 项测试全通过；字典重跑 exit 0；`knowledge_index.py check` exit 0（254 链接 0 死链）；6-review `STYLE: PASS`。全量 400 测试 12 失败/13 错误为既有环境性基线（缺 Go 工具链、git 环境、台账断言等），失败文件与本轮改动无交集。改动停在已改动未提交状态。
+- 遗留：无（本轮独立闭环）。
+
+## 2026-08-26 字段三件套（NOT NULL + DEFAULT + COMMENT）吸收进 database-schema-rules
+
+- 来源对象：用户规则指令「数据库表的字段必须 NOT NULL，并且需要有 DEFAULT 默认值、COMMENT 说明」，要求吸收进 skill。
+- 当前目标：把「字段三件套」作为新建表强约束统一进 `database-schema-rules`（内部更新通道）。
+- 当前状态：全部完成。落盘：SKILL.md 铁律 1 重写为三件套 + description + 6 处 DDL 完整性位点补 NOT NULL；schema-boundaries.md 新增「铁律：字段三件套」小节（例外仅 AUTO_INCREMENT 主键 / TEXT-BLOB-JSON 无默认值能力；存量表可空过渡最终收口三件套）+ 检查清单 + 示例修正；schema-examples.md 正例 1/5、反例 5 同步；table-design-standards.md 约束小节与 5 处示例修正；登记 absorption-map + source-notes；知识库《数据库表设计规范.md》强化并回读校验。
+- 关键量化：git diff 90 insertions / 23 deletions（SKILL.md 16、schema-boundaries +36、schema-examples +9、table-design-standards 18、登记文件 +34）；无新文件，净增内容最小化。
+- 验证与交接：quick_validate `Skill is valid!`（exit 0）；knowledge_index check PASS；同域冗余扫描 PASS（database-query-rules / comment-rules 0 重复）；改动停在已改动未提交状态。
+- 遗留：无（本轮独立闭环）。
+
+## 2026-08-26 低分 skill 批量优化第十一轮（9 个 A+B+D 全闭环，报告刷新）
+
+- 来源对象：用户列出评分报告最低 9 个 skill（36.9-49.2），要求「按顺序一个一个优化，默认 A+B+D」。
+- 当前目标：按 `low-score-skill-optimization-sop.md` 八步闭环逐个优化 9 个低分 skill，并更新评分报告。
+- 当前状态：全部完成。9 个全部提升（+14.5 ~ +26.4）：self-ent-tech-database-design 36.9→63.3（frontmatter 空键修复+触发词+工作流）、goal 37.7→62.8（纯命令入口补流程边界）、golang 46.0→66.1（脚本 12 处 case 顶层 local 误用真实 bug 修复+诚实化定位）、frontend-design 46.7→61.2（5 步流程+2 检查点+删重复）、tg 48.6→66.5（发送强制确认闸门）、file-organize 48.7→67.5（安全红线+分批移动+新 reference）、skill_2054901716814716928 48.8→63.3（8 违规键合规+删营销）、cryptocurrency-data-api 49.0→66.1（工具表去重+修 search_schools 残留）、ip 49.2→64.6（路径断链修复+去 requests 依赖）。
+- 关键量化：报告总平均 60.6→61.7；新最低 pdf 50.1（原最低 36.9 出列）；9×quick_validate valid；Node+Python 双端校验 158 行/分类计数一致。
+- 验证与交接：9 个 SKILL.md 重构 + 2 脚本修复（golang script.sh、ip ip.py）+ 1 新 reference（file-organize category-map.md）；独立子代理复评全部高于基线（棘轮保留）；已登记 source-notes.md + workbuddy-absorption-map.md + PROJECT_HISTORY + 知识库沉淀。
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留：下一轮低分优化候选——pdf（50.1）、unclecheng-garbage-cleanup-master、windows-encoding-rules 等（报告短板 Top 25 动态更新）。
+
+## 2026-08-26 全量 8 维评分巡检第二轮（157 → 158 skill，报告刷新完成）
+
+- 来源对象：用户指令「对所有 skill 再打分一次，更新打分的 html」——第二轮全量评分巡检。
+- 当前目标：按 `score-inspection-workflow.md` 对仓库全部含 SKILL.md 的 skill 重新静态 7 维打分并刷新 `skill-8维评分报告.html`。
+- 当前状态：全部完成。6 个独立子代理并行分批打分（每批约 26 个，darwin-rubric 静态 7 维，维度 8 未实测）；当前 158 个（新增 log-analysis-rules，无删除）；总分由脚本按 W=[8,15,10,7,15,5,15] 复算。
+- 关键量化：总平均 60.6（上轮 54.4，+6.2）；rules 63.4/83、other 58.3/25、skillhub 57.3/48、market 55.3/2；中位数 60.9；最低 self-ent-tech-database-design 36.9，最高 imagegen 74.3。
+- 验证与交接：Python 独立复算 158 行/分类计数/平均分/最低最高/中位数全部一致；维度界 1-10 全通过；旧数字无残留；已登记 source-notes.md + workbuddy-absorption-map.md。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留：下一轮低分优化按 SOP 从最低分 self-ent-tech-database-design__skillhub（36.9）与 goal__skillhub（37.7）开始。
+
+## 2026-08-26 版本化目录导入别名对齐规则吸收进 package-structure-rules（代码实测 gap）
+
+- 来源对象：ellipal_finance 代码实测问题「v1/v2 各持一份主币缓存必须各调一次；`swapList`（语义别名）导入 v1 list 包 + `v2list` 不对称，只调 v1 时 v2 停留旧结果直到 600 秒 TTL 兜底且不报错」。
+- 当前目标：把「版本化目录导入别名必须与版本目录名对齐（`v1<后缀>`/`v2<后缀>`），禁止业务语义别名」规则吸收进 skill。
+- 当前状态：全部完成。落盘：`package-structure-rules/SKILL.md` 核心边界第 6 条补强制句（动作前必读位置）+ `references/lookup-and-reference-contract.md` 新增「版本化目录导入别名对齐（强制）」小节（正例/反例/原因/要求）；新建 `workbuddy-absorption-map.md` + `references/source-notes.md` 登记（内部更新通道）；知识库沉淀《版本化目录导入别名对齐.md》并与《版本化接口DTO的文件组织与落点》双向关联。
+- 关键量化：SKILL.md +1 句（~160B）、reference +1 小节（~380B）、知识库 +1 笔记；quick_validate `Skill is valid!`（exit 0）；knowledge_index check 本轮新笔记 0 违规（存量 8 篇缺 frontmatter 属历史遗留，另行处理）。
+- 验证与交接：同域冗余扫描 PASS（package-structure-rules/naming-rules/code-style-consistency-rules 0 重复，归属引用契约唯一权威）；改动停在已改动未提交状态。
+- 遗留：知识库 8 篇历史笔记缺 frontmatter（`20-Knowledge/AI协作/*`、`20-Knowledge/研发流程/*`）未在本轮处理；ellipal_finance 侧代码对齐（`swapList`→`v1list`、补 v2 缓存清理调用）属跨项目只读边界，已在会话给出改动计划，需在目标项目新开会话执行。
+
+- 来源对象：用户指令「优化 free-api-50__skillhub skillhub 34.1 — 缺 frontmatter 偏宣传」（SOP 固化后首轮执行）
+- 当前目标：按 `low-score-skill-optimization-sop.md` 八步闭环优化第 10 个低分 skill
+- 当前状态：全部完成。基线实锤：SKILL.md 28 行完全无 frontmatter（校验器 `No YAML frontmatter found`）+ 宣称与实现不符 2 处（clawhub 依赖未装、"无密钥"但木小果 API 本机不可达 DNS→内网 172.29.1.188 TLS 失败，仅 wttr.in 可用）。落盘：脚本去 clawhub 改纯 argparse CLI（886 行 54 命令 + --check/--list/--version）、SKILL.md 重构 104 行（frontmatter + 数据源诚实声明 + 流程/边界/检查点/命令表 + 交叉引用）、requirements 仅 requests、version 1.1.0。
+- 关键量化：脚本 800→886 行（去框架依赖）、SKILL.md 28→104 行、54/56 命令实测 0 Traceback、修 2 个自引 bug、复评闭环修复 2 处（命令数口径 54/53、脚本 10 处【新增】注释清理）。
+- 验证与交接：quick_validate `Skill is valid!`（exit 0）；独立子代理复评 `1|5|4|4|6|8|4 → 9|9|8|8|9|7|8`（34.1 → 63.3/75，+29.2）；维度 8 实测全通过；知识库沉淀追加 1 段 + 工作日志追加。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+
+
+- 来源对象：用户指令「总结经验和步骤，后续评分巡检中低分 skill 都按这个流程优化，经验吸收进吸收 skill 的 skill」
+- 当前目标：把八轮优化闭环经验总结成标准 SOP，吸收进 `skill-absorption-rules`
+- 当前状态：全部完成。新增 `references/low-score-skill-optimization-sop.md`（6306B：触发信号 + 八步闭环表 + 短板类型学 7 类映射 + 市场检索规律 + 验证纪律 + 实操坑 + 单轮收口清单 + 边界声明）；SKILL.md 自动触发信号 +1 条 + references 读取规则 +1 条；score-inspection-workflow.md 短板识别节补衔接句（自有 rules/other 短板 → 按 SOP 逐条优化），"打分发报告"与"低分优化"上下游闭环；登记 source-notes.md + workbuddy-absorption-map.md。
+- 关键量化：净增 1 reference（6306B）+ SKILL.md 2 行 + score-inspection 1 句；覆盖度审查修正 2 处轻微表述 + 补入"复评确定性小问题顺手修复"经验。
+- 验证与交接：quick_validate `Skill is valid!`（exit 0）；同域冗余扫描 4 项 PASS（SOP vs score-inspection 为"优化 vs 打分"引用式衔接，无重复段落/无门控层叠/无散落产物/引用链可达）；独立子代理覆盖度审查 PASS（对照知识库八轮记录逐节核对：无漏项、无失实）；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留：后续低分 skill 优化一律按 SOP 执行（制度化）；全量评分报告未更新（保持口径）。
+
+## 2026-08-26 vue-component-generator__skillhub skill 优化落盘 + 复评完成（33.4 → 63.8/75）
+
+- 来源对象：低分 skill 优化第八轮（用户确认 A+B+D 组裁决）
+- 当前目标：优化 `vue-component-generator__skillhub`（基线 33.4/75，短板"混入无关变现内容"）
+- 当前状态：全部完成。删「变现思路」节；脚本 22 → 186 行兑现全部宣称参数（--api 三风格/--typescript/--scss/--output/--help/--version/PascalCase 校验/完整 props-emits-样式模板/SCRIPT_DIR 自定位）；SKILL.md 重构为 158 行（适用边界 + 4 步流程带输入输出 + 能力矩阵 + 3 API 内联模板速查 + 7 项验收清单 + 环境自检 + 交叉引用三兄弟）；metadata.version 1.1.0。复评：独立子代理 `6|4|3|3|6|5|4 → 9|8|9|8|9|9|8`（+30.4），维度 8 实测全通过。
+- 关键量化：改动 2 文件（SKILL.md 重构 + 脚本 22→186 行）；市场 4 组关键词 0 个 Vue 组件生成候选（授权安装验证无对象）；校验器拦截 1 次（description 尖括号）已修；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
+- 验证与交接：quick_validate `Skill is valid!`（exit 0）；维度 8 实测 6 组合生成 + 4 错误分支 exit 1 + kebab-case 转换（含 MyAPIClient→my-api-client 修复）全通过；闭环修复 3 处（SED_I 平台分支/连续大写 kebab-case/补 script-setup 模板）+ 流程输入输出，复验 valid 回归无破坏。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留：同域 vue 四兄弟（best-practices/__skillhub/router/generator）职责边界已用交叉引用分层，体系级冗余留档 skill-audit-rules 审计。
+
+## 2026-08-26 shell__skillhub skill 优化落盘 + 复评完成（31.0 → 69.0/75）
+
+- 来源对象：低分 skill 优化第七轮（用户确认 A+B+D 组裁决）
+- 当前目标：优化 `shell__skillhub`（基线 31.0/75，短板"脚本断链且无流程步骤"）
+- 当前状态：全部完成。SKILL.md 重构（111 → 240 行）：4 步工作流 + 8 大陷阱内联速查（问题-修复对）+ 断链修复（script.sh 内置 SCRIPT_DIR 自定位 + 双调用方式）+ frontmatter 合规化（6 违规键收 metadata）+ 环境自检（含 bash 缺失 4 级降级链）+ 交叉引用 bash/linux/powershell 三兄弟 + 版本 1.1.0。复评：独立子代理 `7|4|2|2|5|2|5 → 9|9|9|9|10|9|9`（+38.0），维度 8 实测全通过。
+- 关键量化：改动 2 文件（SKILL.md 重构 + script.sh +1 行自定位）；市场 6 组关键词 0 个 shell 候选（授权安装验证无对象）；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
+- 验证与交接：quick_validate `Skill is valid!`（exit 0）；脚本 10 命令实测 exit 0；速查表断言实测通过（子壳 count=0→2、数组长度 2、参数展开 DEFAULT）；双调用方式（cd 相对 / 任意 cwd 绝对）均通；同域冗余扫描 PASS（bash__skillhub 等 3 目标引用可达）。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留：同域"速查版 vs 手册版"双胞胎（bash__skillhub vs shell__skillhub）已用交叉引用分层，体系级冗余留档 skill-audit-rules 审计。
 
 ## 更新时间
 

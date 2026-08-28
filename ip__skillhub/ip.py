@@ -8,7 +8,8 @@ https://www.jisuapi.com/api/ip/
 import sys
 import json
 import os
-import requests
+import urllib.request
+import urllib.parse
 
 
 IP_LOCATION_URL = "https://api.jisuapi.com/ip/location"
@@ -34,26 +35,21 @@ def query_ip_location(appkey: str, req: dict):
     params["ip"] = ip
 
     try:
-        resp = requests.get(IP_LOCATION_URL, params=params, timeout=10)
+        url = IP_LOCATION_URL + "?" + urllib.parse.urlencode(params)
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            body = resp.read().decode("utf-8", errors="replace")
     except Exception as e:
         return {
             "error": "request_failed",
             "message": str(e),
         }
 
-    if resp.status_code != 200:
-        return {
-            "error": "http_error",
-            "status_code": resp.status_code,
-            "body": resp.text,
-        }
-
     try:
-        data = resp.json()
+        data = json.loads(body)
     except Exception:
         return {
             "error": "invalid_json",
-            "body": resp.text,
+            "body": body,
         }
 
     if data.get("status") != 0:

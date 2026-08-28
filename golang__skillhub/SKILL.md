@@ -1,115 +1,88 @@
 ---
 name: golang
-version: "2.0.0"
-author: BytesAgain
-homepage: https://bytesagain.com
-source: https://github.com/bytesagain/ai-skills
+description: "Go 开发操作日志与审计追踪工具：记录构建/测试/lint/格式化/生成/修复等开发操作的时间戳条目，支持按命令回看、全文搜索、导出 JSON/CSV/TXT 与统计。当用户需要给 Go 开发过程留痕、记录构建测试结果、跟踪 lint/格式化操作、检索历史开发记录、导出开发日志做周报或审计时触发。触发词：golang、go 日志、开发日志、构建记录、测试记录、lint 记录、审计追踪、导出日志、代码操作记录。真正的 Go 工程实践（代码风格/模式/构建测试写法）见 golang-patterns。"
 license: MIT-0
-tags: [golang, tool, utility]
-description: "Build, test, lint, and format Go projects with integrated dev tooling. Use when compiling binaries, running tests, linting code, or formatting files."
+metadata:
+  displayName: "Go 开发日志工具"
+  version: "2.0.1"
+  author: "BytesAgain"
+  homepage: "https://bytesagain.com"
+  source: "https://github.com/bytesagain/ai-skills"
+  tags: [golang, tool, utility]
+allowed-tools: Read, Write, Bash
 ---
 
-# Golang
+# Go 开发日志工具
 
-Developer toolkit for checking, validating, generating, formatting, linting, converting, and managing Go development entries. All operations are logged with timestamps and stored locally for full traceability.
+Go 开发操作的本地日志与审计追踪工具：把构建、测试、lint、格式化、生成、修复等操作以时间戳条目落盘，供回看、检索、导出与统计。**注意：本工具只记录操作日志，不执行构建/测试/lint 本身**（那是 `go build` / `go test` / `golangci-lint` 等命令的职责）。
 
-## Commands
+## 适用边界
 
-| Command | Usage | Description |
-|---------|-------|-------------|
-| `check` | `golang check <input>` | Record a check entry or view recent checks |
-| `validate` | `golang validate <input>` | Record a validation entry or view recent validations |
-| `generate` | `golang generate <input>` | Record a generate entry or view recent generations |
-| `format` | `golang format <input>` | Record a format entry or view recent formatting operations |
-| `lint` | `golang lint <input>` | Record a lint entry or view recent lint results |
-| `explain` | `golang explain <input>` | Record an explain entry or view recent explanations |
-| `convert` | `golang convert <input>` | Record a convert entry or view recent conversions |
-| `template` | `golang template <input>` | Record a template entry or view recent templates |
-| `diff` | `golang diff <input>` | Record a diff entry or view recent diffs |
-| `preview` | `golang preview <input>` | Record a preview entry or view recent previews |
-| `fix` | `golang fix <input>` | Record a fix entry or view recent fixes |
-| `report` | `golang report <input>` | Record a report entry or view recent reports |
-| `stats` | `golang stats` | Show summary statistics across all entry types |
-| `export <fmt>` | `golang export json\|csv\|txt` | Export all entries to JSON, CSV, or plain text |
-| `search <term>` | `golang search <term>` | Search across all log files for a keyword |
-| `recent` | `golang recent` | Show the 20 most recent history entries |
-| `status` | `golang status` | Health check — version, entry count, disk usage, last activity |
-| `help` | `golang help` | Show help with all available commands |
-| `version` | `golang version` | Print version string |
+- **做**：记录开发操作条目（带时间戳）、按命令回看最近 20 条、跨日志全文搜索、导出 JSON/CSV/TXT、统计各类型条目数、健康检查。
+- **不做（转交）**：
+  - Go 代码风格、惯用模式、构建/测试写法 → `golang-patterns`
+  - 代码质量规则（注释/命名/错误处理等）→ `code-quality-rules` 相关域
 
-Each command (check, validate, generate, format, lint, explain, convert, template, diff, preview, fix, report) works the same way:
+## 工作流（4 步）
 
-- **With arguments:** Saves the input with a timestamp to `<command>.log` and logs to `history.log`.
-- **Without arguments:** Displays the 20 most recent entries from `<command>.log`.
+### 第 1 步：记录操作
 
-## Data Storage
+- **输入**：一次真实发生的 Go 开发操作（如 `go build ./...` 通过、`golangci-lint` 发现 3 个问题）。
+- **动作**：选择对应命令记录，如 `golang check "go vet ./... clean"`、`golang lint "3 issues in pkg/handler"`。
+- **检查点**：记录内容含敏感信息（密钥、内网路径、个人信息）时，先脱敏再写入——日志文件是明文本地存储。
+- **输出**：带时间戳的日志条目（写入 `<command>.log` + `history.log`）。
 
-All data is stored locally at `~/.local/share/golang/`:
+### 第 2 步：回看与检索
 
-- `<command>.log` — Timestamped entries for each command (e.g., `check.log`, `lint.log`, `format.log`)
-- `history.log` — Unified activity log across all commands
-- `export.json`, `export.csv`, `export.txt` — Generated export files
+- **输入**：想查的历史记录（某个命令最近操作 / 某个关键词 / 某包某文件）。
+- **动作**：`golang lint`（无参回看该命令最近 20 条）、`golang search "handler"`（跨全部日志搜索）。
+- **输出**：命中条目列表；无命中时输出空结果提示（不是报错）。
 
-No cloud, no network calls, no API keys required. Fully offline.
+### 第 3 步：导出与统计
 
-## Requirements
+- **输入**：周报/审计/复盘需要的结构化数据。
+- **动作**：`golang export json|csv|txt` 导出到数据目录；`golang stats` 查看各类型条目数。
+- **输出**：导出文件（`export.json/csv/txt`）或统计摘要。
 
-- Bash 4+ (uses `set -euo pipefail`)
-- Standard Unix utilities (`date`, `wc`, `du`, `grep`, `head`, `tail`, `sed`)
-- No external dependencies
+### 第 4 步：健康检查与复盘
 
-## When to Use
+- **输入**：数据目录状态 / 长期使用后的整理需求。
+- **动作**：`golang status` 查看版本、条目总数、磁盘占用、最后活动；据此决定归档或清理。
+- **输出**：健康状态报告。
 
-1. **Logging Go build and test results** — Use `golang check "go build ./... passed"` or `golang validate "all tests green on v1.4.2"` to record build/test outcomes with timestamps for CI audit trails.
-2. **Tracking lint and format operations** — Use `golang lint "golangci-lint found 3 issues in pkg/handler"` and `golang format "gofmt applied to cmd/"` to maintain a history of code quality actions.
-3. **Recording code generation and templates** — Use `golang generate "protobuf stubs for api/v2"` and `golang template "new service boilerplate created"` to log what was generated and when.
-4. **Searching past development notes** — Use `golang search "handler"` to find all entries across every log file mentioning a specific package, file, or concept.
-5. **Exporting development logs for review** — Use `golang export json` to extract all logged entries as structured JSON for team reviews, retrospectives, or integration with project management tools.
+## 命令速查表
 
-## Examples
+脚本：`scripts/script.sh`（`golang <command> [args]`，支持任意 cwd 以绝对路径调用）。
 
-```bash
-# Record a check entry
-golang check "go vet ./... clean on main branch"
+| 命令 | 用途 |
+|---|---|
+| `check/validate/generate/format/lint/explain/convert/template/diff/preview/fix/report <input>` | 记录一条带时间戳的日志；无参时回看该命令最近 20 条 |
+| `stats` | 各日志类型条目数统计 |
+| `export json\|csv\|txt` | 导出全部条目（非法格式返回退出码 1） |
+| `search <term>` | 跨全部日志文件搜索关键词 |
+| `recent` | 最近 20 条跨命令活动 |
+| `status` | 健康检查：版本/条目数/磁盘/最后活动 |
+| `help` / `version` | 帮助 / 版本 |
 
-# Record a lint finding
-golang lint "unused variable in internal/cache/store.go:88"
+## 数据存储
 
-# Log a format operation
-golang format "goimports applied to all .go files"
+- 位置：`~/.local/share/golang/`（`<command>.log` 各命令独立日志、`history.log` 统一流水、`export.*` 导出文件）。
+- 全离线：无云、无网络调用、无 API key。
 
-# Record code generation
-golang generate "mockgen interfaces for service layer"
+## 边界条件与异常处理
 
-# Log a fix
-golang fix "resolved nil pointer in middleware/auth.go"
+- **脚本不可用**（bash 缺失或执行失败）：降级为纯文本记录——直接在本轮对话输出带时间戳的条目，并提示用户数据未落盘。
+- **写入失败**（数据目录不可写、磁盘满）：脚本报错退出，不静默吞掉；用户看到错误后换可写路径（改 `HOME` 或手工建目录）。
+- **非法导出格式**：`export xml` 输出可用格式提示并返回退出码 1（实测行为）。
+- **搜索无结果**：输出空结果说明，不伪造命中。
+- **敏感信息**：写入前脱敏（见第 1 步检查点）。
 
-# View recent lint entries (no args = list mode)
-golang lint
+## 退出机制
 
-# Search all logs for a keyword
-golang search "middleware"
+用户输入「结束」→ 停止，回复「日志记录完成。」；记录内容为空或命令含义不明时先向用户确认再写入。
 
-# Export everything to JSON
-golang export json
+## 约束
 
-# Export to CSV for spreadsheet analysis
-golang export csv
-
-# View summary statistics
-golang stats
-
-# Health check
-golang status
-
-# View recent activity across all commands
-golang recent
-```
-
-## How It Works
-
-Golang stores all data locally in `~/.local/share/golang/`. Each command logs activity with timestamps in the format `YYYY-MM-DD HH:MM|<input>`, enabling full traceability. The unified `history.log` records every operation with `MM-DD HH:MM <command>: <input>` format for cross-command auditing.
-
----
-
-Powered by BytesAgain | bytesagain.com | hello@bytesagain.com
+- 日志是审计凭据：条目必须真实对应发生的操作，禁止编造或补记未发生的事件。
+- 只记录操作摘要（谁/何时/做了什么/结果），不复制源码大段内容。
+- 数据目录在 `~/.local/share/golang/`，跨机器迁移时需自行备份该目录。

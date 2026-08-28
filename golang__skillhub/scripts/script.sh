@@ -126,10 +126,10 @@ case "${1:-help}" in
             echo "Recent check entries:"
             tail -20 "$DATA_DIR/check.log" 2>/dev/null || echo "  No entries yet. Use: golang check <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/check.log"
-            local total=$(wc -l < "$DATA_DIR/check.log")
+            total=$(wc -l < "$DATA_DIR/check.log")
             echo "  [Golang] check: $input"
             echo "  Saved. Total check entries: $total"
             _log "check" "$input"
@@ -141,10 +141,10 @@ case "${1:-help}" in
             echo "Recent validate entries:"
             tail -20 "$DATA_DIR/validate.log" 2>/dev/null || echo "  No entries yet. Use: golang validate <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/validate.log"
-            local total=$(wc -l < "$DATA_DIR/validate.log")
+            total=$(wc -l < "$DATA_DIR/validate.log")
             echo "  [Golang] validate: $input"
             echo "  Saved. Total validate entries: $total"
             _log "validate" "$input"
@@ -156,10 +156,10 @@ case "${1:-help}" in
             echo "Recent generate entries:"
             tail -20 "$DATA_DIR/generate.log" 2>/dev/null || echo "  No entries yet. Use: golang generate <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/generate.log"
-            local total=$(wc -l < "$DATA_DIR/generate.log")
+            total=$(wc -l < "$DATA_DIR/generate.log")
             echo "  [Golang] generate: $input"
             echo "  Saved. Total generate entries: $total"
             _log "generate" "$input"
@@ -171,10 +171,10 @@ case "${1:-help}" in
             echo "Recent format entries:"
             tail -20 "$DATA_DIR/format.log" 2>/dev/null || echo "  No entries yet. Use: golang format <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/format.log"
-            local total=$(wc -l < "$DATA_DIR/format.log")
+            total=$(wc -l < "$DATA_DIR/format.log")
             echo "  [Golang] format: $input"
             echo "  Saved. Total format entries: $total"
             _log "format" "$input"
@@ -186,10 +186,10 @@ case "${1:-help}" in
             echo "Recent lint entries:"
             tail -20 "$DATA_DIR/lint.log" 2>/dev/null || echo "  No entries yet. Use: golang lint <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/lint.log"
-            local total=$(wc -l < "$DATA_DIR/lint.log")
+            total=$(wc -l < "$DATA_DIR/lint.log")
             echo "  [Golang] lint: $input"
             echo "  Saved. Total lint entries: $total"
             _log "lint" "$input"
@@ -201,10 +201,10 @@ case "${1:-help}" in
             echo "Recent explain entries:"
             tail -20 "$DATA_DIR/explain.log" 2>/dev/null || echo "  No entries yet. Use: golang explain <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/explain.log"
-            local total=$(wc -l < "$DATA_DIR/explain.log")
+            total=$(wc -l < "$DATA_DIR/explain.log")
             echo "  [Golang] explain: $input"
             echo "  Saved. Total explain entries: $total"
             _log "explain" "$input"
@@ -216,10 +216,10 @@ case "${1:-help}" in
             echo "Recent convert entries:"
             tail -20 "$DATA_DIR/convert.log" 2>/dev/null || echo "  No entries yet. Use: golang convert <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/convert.log"
-            local total=$(wc -l < "$DATA_DIR/convert.log")
+            total=$(wc -l < "$DATA_DIR/convert.log")
             echo "  [Golang] convert: $input"
             echo "  Saved. Total convert entries: $total"
             _log "convert" "$input"
@@ -231,10 +231,10 @@ case "${1:-help}" in
             echo "Recent template entries:"
             tail -20 "$DATA_DIR/template.log" 2>/dev/null || echo "  No entries yet. Use: golang template <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/template.log"
-            local total=$(wc -l < "$DATA_DIR/template.log")
+            total=$(wc -l < "$DATA_DIR/template.log")
             echo "  [Golang] template: $input"
             echo "  Saved. Total template entries: $total"
             _log "template" "$input"
@@ -246,10 +246,10 @@ case "${1:-help}" in
             echo "Recent diff entries:"
             tail -20 "$DATA_DIR/diff.log" 2>/dev/null || echo "  No entries yet. Use: golang diff <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/diff.log"
-            local total=$(wc -l < "$DATA_DIR/diff.log")
+            total=$(wc -l < "$DATA_DIR/diff.log")
             echo "  [Golang] diff: $input"
             echo "  Saved. Total diff entries: $total"
             _log "diff" "$input"
@@ -261,10 +261,10 @@ case "${1:-help}" in
             echo "Recent preview entries:"
             tail -20 "$DATA_DIR/preview.log" 2>/dev/null || echo "  No entries yet. Use: golang preview <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/preview.log"
-            local total=$(wc -l < "$DATA_DIR/preview.log")
+            total=$(wc -l < "$DATA_DIR/preview.log")
             echo "  [Golang] preview: $input"
             echo "  Saved. Total preview entries: $total"
             _log "preview" "$input"
@@ -276,10 +276,10 @@ case "${1:-help}" in
             echo "Recent fix entries:"
             tail -20 "$DATA_DIR/fix.log" 2>/dev/null || echo "  No entries yet. Use: golang fix <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/fix.log"
-            local total=$(wc -l < "$DATA_DIR/fix.log")
+            total=$(wc -l < "$DATA_DIR/fix.log")
             echo "  [Golang] fix: $input"
             echo "  Saved. Total fix entries: $total"
             _log "fix" "$input"
@@ -291,10 +291,10 @@ case "${1:-help}" in
             echo "Recent report entries:"
             tail -20 "$DATA_DIR/report.log" 2>/dev/null || echo "  No entries yet. Use: golang report <input>"
         else
-            local input="$*"
-            local ts=$(date '+%Y-%m-%d %H:%M')
+            input="$*"
+            ts=$(date '+%Y-%m-%d %H:%M')
             echo "$ts|$input" >> "$DATA_DIR/report.log"
-            local total=$(wc -l < "$DATA_DIR/report.log")
+            total=$(wc -l < "$DATA_DIR/report.log")
             echo "  [Golang] report: $input"
             echo "  Saved. Total report entries: $total"
             _log "report" "$input"

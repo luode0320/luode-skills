@@ -14,7 +14,7 @@
 # 从 ClawHub 安装（待发布）
 openclaw skills install wsl-chrome-cdp
 
-# 或手动安装
+# 或手动安装（clone 到技能目录后，脚本位于 skill 根目录）
 git clone https://github.com/openclaw/wsl-chrome-cdp.git ~/.openclaw/workspace/skills/wsl-chrome-cdp
 ```
 
@@ -33,8 +33,8 @@ git clone https://github.com/openclaw/wsl-chrome-cdp.git ~/.openclaw/workspace/s
 ## 🔧 手动启用（可选）
 
 ```bash
-# 一键启用浏览器
-./skills/wsl-chrome-cdp/enable-browser.sh
+# 一键启用浏览器（本仓库布局：脚本在 skill 根目录）
+./enable-browser.sh
 ```
 
 **输出示例：**
@@ -82,11 +82,11 @@ WSL Chrome CDP - 全自动启用
 ## 🍑 关于
 
 **作者：** 杏子
-**版本：** 1.0.0
+**版本：** 1.1.0
 **创建日期：** 2026-03-11
 
 **使用问题？** 查看 [SKILL.md](SKILL.md) 或 [故障排查](docs/troubleshooting.md)
 
 ---
 
-*快速入门版本：1.0.0 | 最后更新：2026-03-11*
+*快速入门版本：1.1.0 | 最后更新：2026-08-25*
