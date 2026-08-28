@@ -13,8 +13,8 @@ agent_created: true
 
 | 项                  | 位置/值                                                           |
 | ------------------- | ----------------------------------------------------------------- |
-| 真源文件（Windows） | `C:\Users\luode\.tapd\env.sh`                                     |
-| 真源文件（WSL）     | `/home/luode/.tapd/env.sh`（与 Windows 侧内容一致）               |
+| 真源文件（Windows） | `~/.tapd/env.sh`（Windows 用户主目录，即 `$env:USERPROFILE\.tapd\env.sh`） |
+| 真源文件（WSL）     | `~/.tapd/env.sh`（与 Windows 侧内容一致）                           |
 | 注入层（Windows）   | 用户级环境变量（注册表 User scope），重启应用后自动继承           |
 | 注入层（WSL）       | `~/.bashrc` 末尾 `[ -f ~/.tapd/env.sh ] && source ~/.tapd/env.sh` |
 | API 端点            | `https://api.tapd.cn`（TAPD_API_ENDPOINT）                        |
@@ -45,8 +45,12 @@ curl -s -m 15 -H "Authorization: Bearer $TAPD_TOKEN" "$TAPD_API_ENDPOINT/users/i
 
 ## 更新凭据流程
 
-1. 编辑 Windows 侧真源 `C:\Users\luode\.tapd\env.sh`
-2. 同步到 WSL：`wsl -e bash -lc 'cp /mnt/c/Users/luode/.tapd/env.sh ~/.tapd/env.sh && chmod 600 ~/.tapd/env.sh'`
+1. 编辑 Windows 侧真源 `~/.tapd/env.sh`（即 `$env:USERPROFILE\.tapd\env.sh`）
+2. 同步到 WSL（PowerShell，`$env:USERPROFILE` 自动解析 Windows 用户主目录，不写死用户名）：
+   ```powershell
+   $src = (wsl -e bash -lc "wslpath '$env:USERPROFILE'").Trim()
+   wsl -e bash -lc "cp '$src/.tapd/env.sh' ~/.tapd/env.sh && chmod 600 ~/.tapd/env.sh"
+   ```
 3. 同步 Windows 用户级环境变量（PowerShell，4 个变量逐一）：
    ```powershell
    [Environment]::SetEnvironmentVariable('TAPD_TOKEN','新值','User')
