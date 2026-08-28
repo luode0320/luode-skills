@@ -1,6 +1,6 @@
 ---
 name: tapd-addcomment
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。通过 Python 脚本调用，方便 AI 直接写评论。当用户给出 `tapd.cn` 链接并要求评论 / 回复时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并提示用户在项目代码/配置或环境变量中配置。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。通过 Python 脚本调用，方便 AI 直接写评论。当用户给出 `tapd.cn` 链接并要求评论 / 回复时随 `tapd-openapi` 自动联动触发；执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并按 `tapd-env-bootstrap` 的本机真源核对环境。
 allowed-tools: Bash,Read
 ---
 
@@ -23,6 +23,8 @@ allowed-tools: Bash,Read
 | `TAPD_COMMENT_ID` | 否 | 触发评论 ID（回复时用作 reply_id） |
 | `TAPD_COMMENT_ROOT_ID` | 否 | 根评论 ID（回复时用作 root_id） |
 | `TAPD_NPC_ROLE` | 否 | NPC 登录名（作为 author） |
+
+> 环境变量注入机制（Windows 用户级环境变量 / WSL `~/.bashrc` source / 真源 `~/.tapd/env.sh`）以 `tapd-env-bootstrap` 记录的本机事实为准；`TAPD_TOKEN` 缺失时先按该 skill 核对环境。
 
 ## 使用方式
 
@@ -92,9 +94,17 @@ echo '<p>评论内容</p>' | python3 scripts/add_comment.py --description -
    - **HTML**：直接使用，如 `<p>内容</p>`
    - **Markdown**：自动转换为 HTML（支持标题、列表、表格、代码块、加粗、斜体、链接等）
    - **纯文本**：自动包裹 `<p>` 标签
-2. **Markdown 转换依赖**：使用 `markdown` Python 库（需提前安装：`pip install markdown`），启用表格、围栏代码块、换行转 `<br>` 等扩展
+2. **Markdown 转换依赖**：使用 `markdown` Python 库（需提前安装：`pip install markdown`），启用表格、围栏代码块、换行转 `<br>` 等扩展。**缺库降级**：纯文本 / HTML 输入不依赖该库可直接用；Markdown 输入且库未安装时，先 `pip install markdown`，安装失败则降级为纯文本（自动包裹 `<p>`）或手动转 HTML 后提交
 3. **@提及**：在 description 中使用 `<b class="at-who" contenteditable="false" data-userid="用户ID" data-type="user">@用户名</b>` 触发通知（@提及部分请用 HTML 格式）
 4. **回复评论**：`root_id` 和 `reply_id` 必须同时提供
    - 回复根评论：`root_id` = `reply_id` = 被回复评论的 ID
    - 回复子评论：`root_id` = 线程根评论 ID，`reply_id` = 被回复的子评论 ID
 5. **支持的 HTML 标签**：`<b>` 加粗、`<i>` 斜体、`<u>` 下划线、`<s>` 删除线、`<span style="color:red;">` 颜色、`<ul><li>` / `<ol><li>` 列表、`<pre><code>` 代码块、`<blockquote>` 引用、`<a href>` 链接、`<table>` 表格
+
+## 排障
+
+| 现象 | 排查路径 |
+|------|---------|
+| 脚本报 `ModuleNotFoundError: markdown` | 按上文安装 `markdown` 库，或改用纯文本 / HTML 输入绕过 |
+| 鉴权失败 / 401 | 按 `tapd-env-bootstrap` 验证 `TAPD_TOKEN` 已注入且非空（只判断有无，不回显明文） |
+| 评论未出现 / 内容异常 | 确认 `--entry-type` / `--entry-id` 与目标实体一致；HTML 标签需在支持列表内，Markdown 转换失败时改传 HTML |

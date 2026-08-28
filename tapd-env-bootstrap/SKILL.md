@@ -1,6 +1,6 @@
 ---
 name: tapd-env-bootstrap
-description: 本机 TAPD 凭据环境事实（luode 专用）。当涉及 TAPD OpenAPI 操作、TAPD 环境预检、TAPD_TOKEN 缺失或配置位置疑问、与 tapd-openapi 等技能配合排查"未配置"报错时自动加载。记录本机 TAPD 凭据的真实存放位置与注入机制：~/.tapd/env.sh（Windows 与 WSL 各一份）+ Windows 用户级环境变量注入，取代 tapd-openapi SKILL.md 中"写入 .codex/config.toml"的旧指引。
+description: 本机 TAPD 凭据环境事实（luode 专用）。当涉及 TAPD OpenAPI 操作、TAPD 环境预检、TAPD_TOKEN 缺失或配置位置疑问、与 tapd-openapi 等技能配合排查"未配置"报错时自动加载。记录本机 TAPD 凭据的真实存放位置与注入机制：~/.tapd/env.sh（Windows 与 WSL 各一份）+ Windows 用户级环境变量注入；tapd-openapi 的环境预检指引已与此对齐。
 allowed-tools: Read,Bash
 agent_created: true
 ---
@@ -25,7 +25,7 @@ env.sh 内容为 4 个 export：`TAPD_TOKEN` / `TAPD_API_ENDPOINT` / `TAPD_SITE_
 
 ## 关键事实（与 tapd-openapi 文档的差异）
 
-1. **不再使用 `.codex/config.toml` 的 `[shell_environment_policy.set]` 存 TAPD 变量**（2026-08-18 已迁移并清理，0 残留）。若 tapd-openapi SKILL.md 仍指引"打开项目级配置 ./.codex/config.toml"，以本 skill 为准。
+1. **不再使用 `.codex/config.toml` 的 `[shell_environment_policy.set]` 存 TAPD 变量**（2026-08-18 已迁移并清理，0 残留）。tapd-openapi 的环境预检指引已于 2026-08-28 同步对齐本口径（优先本机真源 `~/.tapd/env.sh` + 兜底通用配置），不再出现 `.codex/config.toml` 旧指引。
 2. **WorkBuddy Bash 工具是隔离 shell**：`BASH_ENV` 指向 WorkBuddy 自带 `safe-delete-bash-env.sh`，非交互 `bash -c` 不读 `~/.bashrc`/`~/.bash_profile`。因此 Windows 侧自动注入只依赖"用户级环境变量"，修改后需重启应用才生效；当前会话内可用临时 `export` 应急。
 3. **WSL 侧**：交互终端读 `~/.bashrc` 自动加载；非交互 `wsl -e bash -lc` 不会自动加载（Ubuntu 默认 .bashrc 对非交互直接 return），需手动 `source ~/.tapd/env.sh`。
 4. `workspace_list` 接口返回空数组属正常现象，排查定位用 `workspace_id` 直查实体接口即可。

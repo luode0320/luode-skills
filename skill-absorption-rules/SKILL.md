@@ -1,6 +1,6 @@
 ---
 name: skill-absorption-rules
-description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"吸收某个skill的精华""这个skill能不能吸收到我们skill""借鉴XX skill的思路""把XX skill的精华融进我们的skill"），或主动引入外部种子（市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md、README、指南），或主动要求更新、调整、重构、合并、瘦身我们自己的 skill（如"优化一下这个skill""重构skill的结构""把这两个skill合并""这个skill太臃肿了调整一下""更新skill规则"），或当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失等 gap 需要小步回补时触发。负责把来源（外部 skill 的原子精华，或自有 skill 的现状与调整诉求，或执行中暴露的 gap）逐条对照本地现状裁决（保留/合并/拒绝）、给出落点与简化建议、对触达的同域 skill 集合做冗余扫描（重复段落/门控层叠/散落产物/引用链）、按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录；它是 skill 体系裁决式调整（外部吸收 + 内部更新 + 执行中 gap 回补）的统一总入口。若来源精华已经在本地更强或重复命中，裁决为保留现状并记录理由，不重复吸收。不要用它代替 skill-audit-rules（多 skill 职责审计）或具体业务实现。
+description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"吸收某个skill的精华""这个skill能不能吸收到我们skill""借鉴XX skill的思路""把XX skill的精华融进我们的skill"），或主动引入外部种子（市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md、README、指南），或主动要求更新、调整、重构、合并、瘦身我们自己的 skill（如"优化一下这个skill""重构skill的结构""把这两个skill合并""这个skill太臃肿了调整一下""更新skill规则"），或直接点名"优化 XX skill"（XX 为任意 skill 名，如"优化 vue-router-best-practices skill"）触发固定优化流程，或当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失等 gap 需要小步回补时触发。负责把来源（外部 skill 的原子精华，或自有 skill 的现状与调整诉求，或执行中暴露的 gap）逐条对照本地现状裁决（保留/合并/拒绝）、给出落点与简化建议、对触达的同域 skill 集合做冗余扫描（重复段落/门控层叠/散落产物/引用链）、按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录；它是 skill 体系裁决式调整（外部吸收 + 内部更新 + 执行中 gap 回补）的统一总入口。若来源精华已经在本地更强或重复命中，裁决为保留现状并记录理由，不重复吸收。不要用它代替 skill-audit-rules（多 skill 职责审计）或具体业务实现。
 ---
 
 # Skill 调整规则（外部吸收 + 内部更新）
@@ -40,7 +40,8 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 用户说"优化我们的 skill，让它更强大""持续迭代我们的 skill""把外部精华沉淀成规则"。
 - 用户说"把 XX skill 的精华总结成/沉淀成我们的 skill"（含将本次吸收经验固化为新 skill 的意图）。
 - 用户要求把多轮实操经验总结成标准流程、后续同类任务按流程执行（如"总结一下优化经验，后续按这个流程来""后续低分 skill 都按这个流程优化"）。
-- 用户主动要求更新、调整、重构、合并、瘦身我们自己的 skill："优化一下这个 skill""重构 skill 的结构""调整 skill 规则""更新我们的 skill""把这两个 skill 合并""这个 skill 太臃肿了，调整一下"。
+- 用户主动要求更新、调整、重构、合并、瘦身我们自己的 skill："优化一下这个 skill""重构 skill 的结构""调整 skill 规则""更新我们的 skill""把这两个 skill 合并""这个 skill 太臃肿了，调整一下"；其中"优化 XX skill"（XX 为任意 skill 名，如"优化 vue-router-best-practices skill"）为泛化触发模板，命中后路由见下条。
+- 用户直接点名"优化 XX skill"（XX 为任意 skill 名，如"优化 wsl-powershell skill""优化 vue skill"）：一律走固定优化流程——有 8 维评分基线的按 `references/low-score-skill-optimization-sop.md` 八步闭环（基线→检索→对照→裁决→落盘→校验→复评→收口）执行；无基线的走内部更新通道同一闭环，机器校验用 `quick_validate.py` 结构校验替代棘轮基线，落盘后补同域冗余扫描。
 - 用户对自有 skill 提出结构性调整诉求（结构调整、职责重划、内容瘦身），且不是执行中临时补 gap。
 - 当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失或无法覆盖当前高频场景，继续推进只能依赖临时口头补充。
 - 当前任务已经因为 skill 缺口反复停顿、重复解释或临时手写补丁式规则。

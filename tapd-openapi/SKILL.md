@@ -1,6 +1,6 @@
 ---
 name: tapd-openapi
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD OpenAPI 调用。用于需求、缺陷、任务、评论、测试用例、迭代、评论、Wiki、工时、附件、用户等 TAPD 平台操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接（需求 / 缺陷 / 任务 / 迭代 / Wiki 等实体页），自动触发本 skill 并按需联动 `tapd-addcomment`、`tapd-cli`；执行任何 TAPD 动作前必须先做环境预检，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并提示用户在项目代码/配置或环境变量中配置。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD OpenAPI 调用。用于需求、缺陷、任务、评论、测试用例、迭代、评论、Wiki、工时、附件、用户等 TAPD 平台操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接（需求 / 缺陷 / 任务 / 迭代 / Wiki 等实体页），自动触发本 skill 并按需联动 `tapd-addcomment`、`tapd-cli`；执行任何 TAPD 动作前必须先做环境预检，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并提示用户按 `tapd-env-bootstrap` 的本机真源配置或注入环境变量。
 allowed-tools: Bash,Read,Glob,Grep
 ---
 
@@ -18,11 +18,9 @@ allowed-tools: Bash,Read,Glob,Grep
 
 1. 检查 `TAPD_TOKEN` 是否已注入且非空（只判断有无，**禁止回显 Token 明文**），同时检查 `TAPD_API_ENDPOINT`、`TAPD_WORKSPACE_IDS`。
 2. `TAPD_TOKEN` 为空或未注入 → **阻断当前 TAPD 任务**（其他非 TAPD 任务不受影响），并向用户输出以下配置指引：
-   - 打开项目级配置 `./.codex/config.toml`（缺失时按 `mcp-installation-rules` 的 TAPD 安装规则创建），在 `[shell_environment_policy.set]` 段填写：
-     - `TAPD_TOKEN`：登录 TAPD 开放平台 `https://www.tapd.cn/open_platform/open_api_redirect` 获取个人 API Token 后填入
-     - `TAPD_WORKSPACE_IDS`：TAPD 项目 ID 列表，逗号分隔（取自 TAPD 项目 URL 中的数字段）
-     - `TAPD_API_ENDPOINT = "https://api.tapd.cn"`、`TAPD_SITE_URL = "https://www.tapd.cn"` 保持默认
-   - 填写完成后重启 Codex 会话，环境变量才会注入生效。
+   - **优先按本机真源配置**：TAPD 环境变量的真实存放位置与注入机制以 `tapd-env-bootstrap` 为准（Windows 用户级环境变量注入 + `~/.tapd/env.sh` 真源文件；WSL 侧通过 `~/.bashrc` source 加载）。Token 获取入口：TAPD 开放平台 `https://www.tapd.cn/open_platform/open_api_redirect`。
+   - **兜底通用方式**：仅当当前机器不存在 `tapd-env-bootstrap` 或未配置真源时，才回退到项目级配置（如 `.codex/config.toml` 的 `[shell_environment_policy.set]`）或直接注入环境变量；`TAPD_API_ENDPOINT = "https://api.tapd.cn"`、`TAPD_SITE_URL = "https://www.tapd.cn"` 保持默认。
+   - 配置完成后需重启会话/应用，环境变量才会注入生效；当前会话内可用临时 `export` 应急。
 3. `TAPD_TOKEN` 已配置但 `TAPD_WORKSPACE_IDS` 为空 → 不阻断，但提示用户补齐；若链接中可解析出 workspace_id，可用该值继续本次调用。
 4. 预检通过后首个 API 调用若返回鉴权失败，按下方「失败处理」执行，不重复预检。
 

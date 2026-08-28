@@ -405,3 +405,14 @@
 - **执行摘要**：逐 skill 八步闭环；修复真实 bug 2 处（golang script.sh case 顶层 local 误用、ip.py 依赖 requests 未装）；修复硬伤 2 处（cryptocurrency-data-api search_schools 残留、ip SKILL.md 脚本路径断链）；frontmatter 合规化 5 个（self-ent-tech/gol/golang/tg/cryptocurrency-data-api/ip/skill_2054901716814716928 8 违规键）。
 - **结果**：36.9→63.3 / 37.7→62.8 / 46.0→66.1 / 46.7→61.2 / 48.6→66.5 / 48.7→67.5 / 48.8→63.3 / 49.0→66.1 / 49.2→64.6；报告总平均 60.6→61.7；新最低 pdf 50.1。
 - **棘轮验证**：全量重新打分（非单 skill 优化），9 个全部高于基线（+14.5 ~ +26.4），无早停项。
+
+
+## 2026-08-28：内部更新——新增「优化 XX skill」泛化触发 + 按基线分流路由
+
+- **来源**：内部调整：skill-absorption-rules，调整诉求 = 「加入提示词触发：只要提出 优化 <?> skill 就走固定优化流程」。
+- **形态**：内部更新通道（1×SKILL.md 触发机制增强，无外部源、无市场吸收）。
+- **裁决**：A 类内容（泛化触发词）合并 → description；A 类内容（路由绑定）合并 → 自动触发信号第 8 条；无 C 市场吸收、无 D 版本环境。
+- **执行摘要**：description 追加「优化 XX skill（XX 为任意 skill 名，如 优化 vue-router-best-practices skill）触发固定优化流程」；触发信号第 7 条追加模板说明（去重合并），新增第 8 条按基线分流路由（有 8 维基线 → 低分 SOP 八步闭环；无基线 → 内部更新通道同闭环 + quick_validate 替代棘轮）。
+- **整理去重**：原第 7 条列举式与新增模板合并为互补结构，净增约 350 字节（description 646→约 710 字符，<1024 合规）。
+- **同域扫描结论**：全仓 grep 无抢触发，**PASS**。
+- **棘轮验证**：无既有评分基线，按方案以 quick_validate 结构校验 + 同域扫描替代（用户已确认）。

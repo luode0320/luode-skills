@@ -174,3 +174,14 @@
 - **结果**：9 个全部提升（+14.5 ~ +26.4）；`skill-8维评分报告.html` 对应 9 行更新，总平均 60.6→61.7；新最低 pdf 50.1（原最低 self-ent-tech 36.9 出列）。
 - **验证**：9×quick_validate `Skill is valid!`；golang 脚本 12 命令实测 Saved 全通过 + export 非法格式 exit=1；ip.py 无 key/缺参/非法 JSON/假 key 联网 4 分支实测通过；Node+Python 双端校验 158 行/总平均 61.7/分类计数（skillhub 48/rules 83/other 25/market 2）一致。
 - **产物**：9 个 SKILL.md 重构 + 2 个脚本修复（golang script.sh、ip ip.py）+ 1 个新 reference（file-organize references/category-map.md）。
+
+
+## 2026-08-28 · 内部调整：新增「优化 XX skill」泛化触发模板 + 按基线分流路由
+
+- **通道**：内部更新（用户诉求固化触发词，无外部源）。
+- **调整诉求**：用户要求加入提示词触发——只要提出「优化 <skill名> skill」就走固定优化流程。
+- **落点**：`skill-absorption-rules/SKILL.md`（description 追加泛化触发短语；自动触发信号第 7 条追加模板说明 + 新增第 8 条路由条目）。
+- **整理去重**：触发信号原第 7 条（列举式「优化一下这个 skill」等）与新增模板语义部分重叠，合并为「列举 + 模板化路由」互补结构，未新增重复条目。净增约 350 字节。
+- **同域冗余扫描**：范围 = 全仓 SKILL.md（grep「优化.*skill|skill.*优化」）；发现 0 个抢触发（其余命中均为审计/总结语境）；引用链无断链。**PASS**。
+- **验证**：quick_validate.py `Skill is valid!`（中途踩 description 禁尖括号坑，按 SOP 实操坑改文字表述，三处统一为「XX 占位符」）；回读三处改动一致。
+- **裁决表**：条目 1（泛化触发词）合并 → description；条目 2（按基线分流路由）合并 → 触发信号第 8 条；无拒绝项。
