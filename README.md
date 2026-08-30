@@ -1085,3 +1085,4 @@ claude-mem(记忆) :
 2026-08-30 23:26:00 feat: [tapd任务执行] tapd-task-executor落盘与openapi脚本变量兼容
 2026-08-30 23:27:00 feat: [测试用例设计方法] test-strategy单一权威与apifox维度边界
 2026-08-30 23:28:00 docs: [吸收映射登记] tapd与comprehensive吸收登记至source-notes与map
+2026-08-30 23:29:00 feat: [分层沉淀铁律] project-local可迁移判定与通用github-release-pipeline
