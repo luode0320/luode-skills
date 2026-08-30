@@ -94,6 +94,16 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
 8. **认证二选一**：默认 `Authorization: Bearer $TAPD_TOKEN`；无 Token 时才用 Basic（`TAPD_API_USER` + `TAPD_API_PASSWORD` 的 base64），详见 `references/id-conversion.md`
 9. **自定义字段前置**：使用 `custom_field_*` 前必须先调对应实体的 `custom_fields_settings` 获取配置；任务状态仅 open/progressing/done，需求状态走工作流接口
 
+## 输出规范（列表结果必须逐条列）
+
+向用户输出 story / bug / task 列表时：
+
+1. **一条一行，禁止合并**：每个单子占独立的列表项，禁止把多个单号塞进同一行、同一个表格单元格，或压缩成「xx 类 8 个」这种统计口径。用户要的是可点、可逐条处理的清单，不是汇总。
+2. **标题即链接**：写成 `- [标题](详情页URL) — 状态 / 优先级`，让用户直接点标题跳转，不要只给裸单号或裸 URL。
+3. **19 位单号全量**：需要展示 ID 时一律完整输出，禁止截断成 `...000187`。
+4. **分组只用小标题**：按迭代/状态分组时用小标题分段，段内仍然一条一行。
+5. **确实很多时**：先给总数，再按分组全量列出；要省略必须问用户，不要自作主张只列一部分。
+
 ## 失败处理
 
 接口最多 **2 次**（原始 + 1 次降级），禁止反复重试：
