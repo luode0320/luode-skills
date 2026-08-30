@@ -511,6 +511,10 @@ entities:
     context_ids:
       - context.knowledge-flow
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.summary-knowledge-citation-section
     name: "总结知识引用小节与引用台账"
     type: "总结结构与知识库规则"
@@ -526,6 +530,10 @@ entities:
     context_ids:
       - context.knowledge-flow
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.root-test-code-and-evidence-layout
     name: "根测试代码与测试证据双根规则"
     type: "测试资产目录规则"
@@ -551,6 +559,10 @@ entities:
     scope: "后端运行时 Mock 落点、Go 构建标签、入口 selector、assembly 装配、Catalog 查询与 CLI 只读检查"
     status: "active"
     updated_at: 2026-08-08
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.package-structure-three-project-test-root
     name: "三类项目根测试目录落点"
     type: "包结构目录规则"
@@ -566,6 +578,10 @@ entities:
     context_ids:
       - context.test-asset-governance
     updated_at: 2026-08-02
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.shared-static-owner-routing
     name: "共享静态 Owner 路由与可选监控消费者"
     type: "Skill 治理规则"
@@ -581,6 +597,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-08-01
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.control-plane-single-direction-routing
     name: "总控层单向路由与合并规则"
     type: "Skill 治理规则"
@@ -597,6 +617,10 @@ entities:
     context_ids:
       - context.skill-governance
     updated_at: 2026-07-25
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.apifox-test-separate-db
     name: "Apifox 测试分离库规则（config.apifox.yaml）"
     type: "接口测试配置与数据隔离规则"
@@ -634,6 +658,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-14
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.imagegen-error-case-evolution
     name: "Imagegen 错误案例持续演进"
     type: "Skill 维护规则"
@@ -650,6 +678,10 @@ entities:
     context_ids:
       - context.imagegen-maintenance
     updated_at: 2026-07-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.execution-failure-learning
     name: "执行失败持续学习与主动预防"
     type: "Skill 维护规则"
@@ -666,6 +698,10 @@ entities:
     context_ids:
       - context.execution-failure-learning
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.task-blocker-closure
     name: "任务阻断收口与恢复"
     type: "流程规则"
@@ -684,6 +720,10 @@ entities:
     context_ids:
       - context.task-blocker-closure
     updated_at: 2026-08-09
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.authenticated-url-routing
     name: "URL 认证浏览器默认路由"
     type: "浏览器路由规则"
@@ -699,6 +739,10 @@ entities:
     context_ids:
       - context.url-analysis
     updated_at: 2026-07-26
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.browser-use-cloud-safety
     name: "Browser Use Cloud 收费与安全路由"
     type: "浏览器路由规则"
@@ -715,6 +759,10 @@ entities:
     context_ids:
       - context.url-analysis
     updated_at: 2026-08-23
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.reasoning-summary-detail
     name: "结果与结论适中详细度契约"
     type: "最终总结输出规则"
@@ -732,6 +780,10 @@ entities:
     context_ids:
       - context.final-summary
     updated_at: 2026-07-26
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.windows-powershell-environment
     name: "Windows PowerShell 环境准备与工具边界"
     type: "环境规则"
@@ -748,6 +800,10 @@ entities:
     context_ids:
       - context.windows-powershell-environment
     updated_at: 2026-07-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.plain-language-document-layering
     name: "白话文档与附录分层"
     type: "文档交接规则"
@@ -764,6 +820,10 @@ entities:
     context_ids:
       - context.document-handoff
     updated_at: 2026-07-13
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: term.doc-top-level-mixed-naming
     name: "doc 顶层混合命名"
     type: "术语"
@@ -778,6 +838,10 @@ entities:
     context_ids:
       - context.doc-directory-naming
     updated_at: 2026-07-03
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.old-directory-cleanup
     name: "旧目录处理规则"
     type: "迁移约束"
@@ -792,6 +856,10 @@ entities:
     context_ids:
       - context.directory-migration
     updated_at: 2026-07-03
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.implementation-cycle-minimum-task
     name: "实施周期与最小任务闭环"
     type: "流程规则"
@@ -809,6 +877,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-08-01
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.implementation-sequence-master-plan
     name: "需求与实施计划全量顺序实施方案"
     type: "流程规则"
@@ -826,6 +898,10 @@ entities:
       - context.implementation-flow
       - context.doc-directory-naming
     updated_at: 2026-07-05
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.code-generation-style-contract
     name: "代码生成风格入口链路"
     type: "流程规则"
@@ -843,6 +919,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-15
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.comment-block-step-annotation
     name: "长代码块内步骤注释"
     type: "代码注释规则"
@@ -862,6 +942,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-16
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.simple-check-inline-readability
     name: "简单检查职责就地表达"
     type: "代码可读性规则"
@@ -878,6 +962,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-09
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.backend-utils-common-util-placement
     name: "后端 utils 与 common/util 工具分流"
     type: "包结构规则"
@@ -896,6 +984,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-08-04
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.backend-root-governance-files
     name: "后端根治理文件位置"
     type: "项目治理目录规则"
@@ -913,6 +1005,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-29
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.backend-database-storage-layout
     name: "后端数据存储目录分层"
     type: "包结构与数据存储规则"
@@ -930,6 +1026,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-08-24
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.backend-root-data-forbidden
     name: "后端根 data 禁止路径"
     type: "包结构禁止规则"
@@ -946,6 +1046,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-31
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.project-dual-platform-rule-files
     name: "三类项目双平台协作规则文件"
     type: "项目治理目录规则"
@@ -962,6 +1066,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-29
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.micro-business-domain-isolation
     name: "微业务业务域隔离与版本目录"
     type: "包结构与业务隔离规则"
@@ -980,6 +1088,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-08-18
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.legacy-project-directory-adoption
     name: "旧项目目录规则渐进采纳"
     type: "包结构兼容规则"
@@ -998,6 +1110,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-07-29
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.cachetask-root-task-entry
     name: "根级 cachetask 缓存重建任务目录"
     type: "代码位置目录规则"
@@ -1015,6 +1131,10 @@ entities:
     context_ids:
       - context.code-generation-style
     updated_at: 2026-08-27
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.thread-title-process-trigger
     name: "会话标题过程触发"
     type: "工作台规则"
@@ -1032,6 +1152,10 @@ entities:
     context_ids:
       - context.thread-title-management
     updated_at: 2026-07-05
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.knowledge-flow-selective-default
     name: "知识库知识流选择性默认触发链"
     type: "流程规则"
@@ -1052,6 +1176,10 @@ entities:
       - context.knowledge-flow
       - context.memory-domain
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.legacy-windows-wsl-bridge-boundary
     name: "知识库 Windows/WSL bridge 固定执行边界（已取代）"
     type: "跨宿主执行规则"
@@ -1071,6 +1199,10 @@ entities:
     superseded_by:
       - rule.knowledge-base-migration-path-prefix
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.git-knowledge-capture-link
     name: "Git 协作联动知识库沉淀"
     type: "流程规则"
@@ -1090,6 +1222,10 @@ entities:
       - context.git-collaboration
       - context.memory-domain
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.knowledge-base-migration-path-prefix
     name: "知识库承载体迁移与裸相对路径基准"
     type: "知识库治理规则"
@@ -1110,6 +1246,10 @@ entities:
       - context.knowledge-flow
       - context.memory-domain
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.git-commit-domain-split
     name: "Git 提交域隔离规则"
     type: "流程规则"
@@ -1126,6 +1266,10 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-08-02
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.git-commit-review-acceptance-evidence
     name: "Git 提交基础质量闸门"
     type: "流程规则"
@@ -1142,6 +1286,10 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-08-01
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
     type: "统计口径"
@@ -1159,6 +1307,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: fact.skill-split-candidate-matrix-20260717
     name: "Skill 体积候选矩阵"
     type: "拆分决策"
@@ -1175,6 +1327,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: fact.skill-split-validation-entry-20260717
     name: "Skill 拆分通用测试入口"
     type: "测试契约"
@@ -1195,6 +1351,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: fact.skill-split-cycle-01-closure-20260717
     name: "Skill 拆分周期 01 收口状态"
     type: "周期状态"
@@ -1213,6 +1373,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-07-17
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.task-plan-rehydration
     name: "Codex Desktop 任务投影断点恢复"
     type: "运行时恢复规则"
@@ -1266,6 +1430,10 @@ entities:
       - context.session-handoff
       - context.memory-domain
     updated_at: 2026-08-02
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.plan-mode-decision-wait-loop
     name: "Plan Mode 决策选择框永久等待"
     type: "交互状态规则"
@@ -1287,6 +1455,10 @@ entities:
       - context.plan-mode-wait-loop
       - context.implementation-flow
     updated_at: 2026-07-26
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.workbuddy-market-skill-absorption
     name: "WorkBuddy 官方市场 skill 吸收整理补充"
     type: "Skill 治理规则"
@@ -1303,6 +1475,10 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-08-13
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.summary-async-task-section
     name: "总结异步任务分流规则"
     type: "Skill 治理规则"
@@ -1318,6 +1494,10 @@ entities:
     context_ids:
       - context.final-summary
     updated_at: 2026-08-21
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -2262,6 +2442,10 @@ retrieval_hints:
       - "rule.cachetask-root-task-entry"
     AGENTS.md:
     CLAUDE.md:
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
 
 usage_tracking:
   schema_version: 1

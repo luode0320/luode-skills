@@ -1,8 +1,12 @@
+- 2026-08-28：**吸收 EllipalNodeSync 同事 tapd 资产（外部吸收）**。用户指向 `EllipalNodeSync/.claude/skills/tapd-openapi` + `.tapd/`。裁决：合并 2（新版 tapd_client_stdlib.py 545 行全文替换本地 287 行，新增 mine 子命令/with_ancestors 父需求树/status_map/resolve_iteration/download_entity_images 等 15 函数；SKILL.md 新增「输出规范」章节）；拒绝 3（SKILL.md 其余段本地 env-bootstrap 联动更优、search_wiki.py/hooks.json 与本地一致、.tapd/ 壳项目级参考不落盘）。关键适配：外部变量名 TAPD_ACCESS_TOKEN/TAPD_API_BASE_URL → 本地 TAPD_TOKEN/TAPD_API_ENDPOINT，_get_headers/_get_base_url/_is_cloud 三处 or 回退。联动增强：tapd-task-executor 第 3 步优先 mine。验证：真实 API 冒烟 mine 输出父需求树（兑换→兑换提供外部服务-对接开放接口），quick_validate 双 valid，同域 0 冲突。改动停在已改动未提交状态。
+
 # 项目历史事件
 
 > 本文件追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；普通启动默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
 
 ## 事件
+
+- 2026-08-28：**新建 tapd-task-executor skill（用户指令）**。用户要求：说「找 tapd 的任务做」等主动领取语义即自动触发，拉取当前用户名下未完成任务+bug，分析描述清楚度与可实现性，可执行项在当前会话项目内自行实现修复，无可执行项时列 3 条高优先级待完善。经 AskUserQuestion 确认 4 项决策：独立 skill（执行编排层，复用 tapd 四兄弟能力不重复造轮子）、只筛当前会话项目（跨项目一律忽略，符合 AGENTS.md 跨项目写入红线）、完成回写=领取置处理中+评论执行摘要+终态交人工、兜底仅当前用户范围。落盘：`tapd-task-executor/SKILL.md` + `references/task-analysis-criteria.md`（描述清楚度/可实现性判定标准）。验证：quick_validate `Skill is valid!`（exit 0）；同域触发扫描（全仓 grep「找任务做/tapd做」）0 抢触发 PASS；冒烟 TAPD_TOKEN len=40 已注入、tapd-cli.cjs/add_comment.py 存在。环境观察：TAPD_WORKSPACE_IDS 运行时为 `62459836,30399328`（env-bootstrap 记录 3 个、少 36150079，待核对）。登记：知识库《TAPD任务自动执行skill-20260828》+ source-notes + 工作日志。改动停在已改动未提交状态。
 
 - 2026-08-28：**skill-absorption-rules 新增「优化 XX skill」泛化触发模板（内部更新通道）**。用户诉求：只要提出「优化 <?> skill」（<?> 为任意 skill 名）就走固定优化流程。落盘：description 追加泛化触发短语（646→约710字符，<1024 合规）；自动触发信号第 7 条追加模板说明（与列举式合并去重）+ 新增第 8 条按基线分流路由（有 8 维评分基线→`low-score-skill-optimization-sop.md` 八步闭环；无基线→内部更新通道同闭环 + `quick_validate.py` 结构校验替代棘轮）。关键坑：① description 含尖括号被 quick_validate 拒绝（`Description cannot contain angle brackets`），占位符统一改「XX」文字表达；② Git Bash 双引号内嵌 python -c 长字符串时反引号被 bash 命令替换篡改文本（source-notes 两处反引号片段被剥离，已 Edit 修复）。验证：quick_validate `Skill is valid!`（exit 0）；同域扫描（全仓 grep「优化.*skill|skill.*优化」）0 抢触发 PASS；知识库沉淀《WorkBuddy官方市场skill吸收整理补充》追加「泛化触发模板」节 + updated 刷新，`knowledge_index.py check` 268 链接 0 死链 exit 0；登记 source-notes + absorption-map + 工作日志。改动停在已改动未提交状态。
 
@@ -40,3 +44,130 @@
 - 2026-08-21：补充 apifox 测试环境白名单口径。用户确认：接口级测试与本地测试的被测服务启动环境**只允许 `local` 与 `apifox`** 两个环境，**禁止 `test`/`prod`/`staging`/`pre`/`release`**；`apifox` **仅在走 apifox 接口测试通道时使用**（`-env apifox` 启动），其他测试一律使用 `local`。同步落点：`test-strategy-rules`（环境红线节新增白名单声明）、`package-structure-rules`（configuration-layout.md apifox 章节补环境白名单）、`apifox-cli__skillhub`（environment.md 本地测试配置节 + 运行环境红线 + 不可违反规则第 13 条、SKILL.md 模块路由行）、`编码skill.md` 四处 + 字典重跑、PROJECT_MEMORY.md 稳定决策与机器索引 definition/evidence note、知识库笔记决策 5 与执行要点 4。改动停在已改动未提交状态。
 
 - 2026-08-21：补充 apifox 测试专用库命名约定。用户确认：apifox 测试专用 MySQL 库**固定命名为 `apifox`**，由**开发人员手动创建并配置**（与已回退 sqlite 方案无关，保持 MySQL 仅换专用库名）。同步落点：`package-structure-rules`（configuration-layout.md 数据库分离节补库名约定、placement-catalog.yaml 两处 purpose 补库名约定）、`apifox-cli__skillhub`（environment.md 本地测试配置节与不可违反规则第 12 条、SKILL.md 模块路由行）、`test-strategy-rules`（接口执行通道前置条件）、`编码skill.md` 三行 + 字典重跑、PROJECT_MEMORY.md 稳定决策与 evidence note、知识库笔记《apifox测试分离库config.apifox.yaml》决策/执行要点同步。改动停在已改动未提交状态。
+
+## 计数锚点区
+
+```yaml
+version: 1
+anchors:
+  - title: "新建 tapd-task-executor skill（用户指令）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "skill-absorption-rules 新增「优化 XX skill」泛化触发模板（内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "tapd-env-bootstrap SKILL.md 路径去用户名化（用户指令）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "新增根级 `cachetask/` 缓存重建任务目录进目录树（内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "字段三件套（NOT NULL + DEFAULT + COMMENT）吸收进 `database-schema-rules`（内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "低分 skill 批量优化第十一轮（9 个，A+B+D 裁决，36.9-49.2 → 61.2-67.5）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "版本化目录导入别名对齐规则吸收进 `package-structure-rules`（代码实测 gap → 内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "低分 skill 优化 SOP 固化（八轮经验总结 → 吸收进 skill-absorption-rules）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "低分 skill 优化第八轮：vue-component-generator__skillhub（33.4 → 63.8/75，实测全通过）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "低分 skill 优化第七轮：shell__skillhub（31.0 → 69.0/75，实测全通过）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "打通日志使用链路（REQ-LOG-20260825-001，用户确认落盘推进）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "实施「任务投影跨宿主适配」修复（BUG-TASK-PROJECTION-HOST-001，用户 /goal 授权并行）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "吸收「调试」（awesome-ai-agent-skills v1.0.0）通用调试方法论进 Bug 域"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "「项目根 `skills/` 加载声明」补进 bootstrap 受管章节 + 规则 md"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "bootstrap schema 变更强制检查固化进 `project-rule-file-bootstrap-rules/SKILL.md`"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "项目本地 skill 落点回归项目根 `skills/`"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "完成「记忆使用计数与高频"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "异步任务宿主任务列表桥接"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "完成 `reasonin"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "完成「apifox 临时"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "完成「模型测试数据基准与"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "补充**模型测试环境选择"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "补充 **apifox "
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "补充 apifox 测试"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+```

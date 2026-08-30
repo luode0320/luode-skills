@@ -414,4 +414,149 @@ anchors:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
+  - title: "长代码块内步骤注释"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "架构文档中文稳定命名"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "规则调整回写原条目"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "字典刷新命令"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "代码生成风格契约写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "简单检查职责优先就地表达"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "后端工具落点区分 utils 与 common/util"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "静态属性优先复用"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "子 agent 状态公告写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "子 agent 完全授权写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "命中检查可见输出样式"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "知识库判断可见输出样式"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "项目四件套与知识库分层写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Git 收口联动沉淀写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Git 提交域隔离写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "会话标题中文简要写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "普通说明不用代码围栏"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Windows 命令分层写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Windows 规则写法优先主路由再写 PowerShell 兜底"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "WSL 工具来源诊断命令"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "项目内文件引用路径写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "文件写入显式 UTF-8"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Markdown 托管区先校验后原子替换"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "实施计划按垂直切片书写"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "需求问题只写真实缺口"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "需求文档正文摘要加附录详解"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "上线接口测试流程写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "Swag OpenAPI 资产写法"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "并行旧目录口径"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
 ```
