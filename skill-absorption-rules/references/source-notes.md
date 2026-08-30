@@ -185,3 +185,23 @@
 - **同域冗余扫描**：范围 = 全仓 SKILL.md（grep「优化.*skill|skill.*优化」）；发现 0 个抢触发（其余命中均为审计/总结语境）；引用链无断链。**PASS**。
 - **验证**：quick_validate.py `Skill is valid!`（中途踩 description 禁尖括号坑，按 SOP 实操坑改文字表述，三处统一为「XX 占位符」）；回读三处改动一致。
 - **裁决表**：条目 1（泛化触发词）合并 → description；条目 2（按基线分流路由）合并 → 触发信号第 8 条；无拒绝项。
+
+## 2026-08-28 · 内部新增：tapd-task-executor（TAPD 任务自动执行 skill）
+
+- **通道**：内部新增（用户需求创建新 skill，无外部源、非吸收）。
+- **诉求**：用户提出「找 tapd 的任务做」→ 自动寻找当前用户的任务/bug，分析描述清楚度与可实现性，可执行项自行实现修复，无可执行项时列 3 条高优先级待完善。
+- **落点**：`tapd-task-executor/SKILL.md` + `references/task-analysis-criteria.md`（判定标准）。
+- **架构**：执行编排层，依赖 tapd-openapi / tapd-cli / tapd-addcomment / tapd-env-bootstrap（复用能力，不重复实现）。
+- **关键决策（用户确认）**：独立 skill；只筛当前会话项目（跨项目忽略）；领取置处理中 + 完成评论回写，终态交人工；兜底仅当前用户范围列 3 条。
+- **同域扫描**：全仓 grep「找任务做/tapd做」0 抢触发，PASS。
+- **验证**：quick_validate.py `Skill is valid!`；TAPD_TOKEN（len=40）注入、tapd-cli.cjs、add_comment.py 冒烟通过。
+
+
+## 2026-08-28 · 外部吸收：EllipalNodeSync 同事 tapd 资产（tapd_client_stdlib mine 能力 + 输出规范）
+
+- **通道**：外部吸收（同 team 项目 `.claude/skills/tapd-openapi` + `.tapd/`，8/28 提交）。
+- **来源**：`EllipalNodeSync/.claude/skills/tapd-openapi/`（SKILL.md 333 行 + scripts/tapd_client_stdlib.py 545 行 + search_wiki.py + hooks）+ `.tapd/`（env.sh/run/mine/README）。
+- **裁决**：条目 1（新版 tapd_client_stdlib.py，含 mine 子命令 + 15 新函数）**合并** → 本地 scripts/ 全文替换 + token 变量兼容适配；条目 2（SKILL.md 输出规范章节）**合并** → 关键规则后新增；条目 3（SKILL.md 其余段）**拒绝**（本地 env-bootstrap 联动更优）；条目 4（search_wiki.py/hooks.json）**拒绝**（与本地完全一致）；条目 5（.tapd/ 壳）**保留参考不落盘**（项目级用法示范）。
+- **适配**：外部脚本读 `TAPD_ACCESS_TOKEN`/`TAPD_API_BASE_URL`，本地注入 `TAPD_TOKEN`/`TAPD_API_ENDPOINT` → `_get_headers`/`_get_base_url`/`_is_cloud` 三处加回退。
+- **联动增强**：tapd-task-executor 第 3 步改为优先 `tapd_client_stdlib.py mine`（一条命令拉需求+缺陷+迭代+树），tapd-cli 降为兜底。
+- **验证**：真实 API 冒烟 `mine --iteration current` → 输出父需求树（兑换 → 兑换提供外部服务，含 19 位 id/状态/优先级/链接）；`--bugs` → 0 项正常；AST 语法 OK；两个 skill quick_validate `Skill is valid!`；同域触发扫描 0 冲突。

@@ -416,3 +416,13 @@
 - **整理去重**：原第 7 条列举式与新增模板合并为互补结构，净增约 350 字节（description 646→约 710 字符，<1024 合规）。
 - **同域扫描结论**：全仓 grep 无抢触发，**PASS**。
 - **棘轮验证**：无既有评分基线，按方案以 quick_validate 结构校验 + 同域扫描替代（用户已确认）。
+
+
+## 2026-08-28：外部吸收——tapd-openapi 脚本 mine 能力 + SKILL.md 输出规范（来源：EllipalNodeSync 同事资产）
+
+- **来源**：外部（同 team 项目 EllipalNodeSync `.claude/skills/tapd-openapi/` + `.tapd/`），非官方市场。
+- **形态**：外部吸收（脚本升级 + SKILL.md 章节增量 + 编排层联动增强）。
+- **裁决**：A 合并 × 2（新版 tapd_client_stdlib.py 545 行全文替换本地 287 行旧版，含 mine 子命令、with_ancestors 父需求树、status_map、resolve_iteration、download_entity_images 等 15 个新函数；SKILL.md 新增「输出规范」章节）；拒绝 × 3（SKILL.md 其余段本地更优、search_wiki.py/hooks.json 与本地一致、.tapd/ 壳为项目级参考不落盘）。
+- **兼容适配**：外部变量名 `TAPD_ACCESS_TOKEN`/`TAPD_API_BASE_URL` → 本地 `TAPD_TOKEN`/`TAPD_API_ENDPOINT`，`_get_headers`/`_get_base_url`/`_is_cloud` 三处加 `or` 回退（实测本地仅注入 TAPD_TOKEN，未适配必失败）。
+- **联动增强**：tapd-task-executor「拉取我的任务+bug」步骤改为优先 mine 子命令，tapd-cli 兜底。
+- **棘轮验证**：无既有评分基线，以真实 API 冒烟 + quick_validate + AST + 同域扫描替代。mine 实测输出父需求树：`兑换（父）→ 兑换提供外部服务-对接开放接口`，19 位 id/状态/优先级/链接完整；bugs 查询 0 项正常。
