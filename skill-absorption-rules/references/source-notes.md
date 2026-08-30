@@ -205,3 +205,14 @@
 - **适配**：外部脚本读 `TAPD_ACCESS_TOKEN`/`TAPD_API_BASE_URL`，本地注入 `TAPD_TOKEN`/`TAPD_API_ENDPOINT` → `_get_headers`/`_get_base_url`/`_is_cloud` 三处加回退。
 - **联动增强**：tapd-task-executor 第 3 步改为优先 `tapd_client_stdlib.py mine`（一条命令拉需求+缺陷+迭代+树），tapd-cli 降为兜底。
 - **验证**：真实 API 冒烟 `mine --iteration current` → 输出父需求树（兑换 → 兑换提供外部服务，含 19 位 id/状态/优先级/链接）；`--bugs` → 0 项正常；AST 语法 OK；两个 skill quick_validate `Skill is valid!`；同域触发扫描 0 冲突。
+
+## 2026-08-30 · 内部调整：通用性优先（agent 无关）规则
+
+- **通道**：内部更新通道。
+- **调整诉求**：用户提出「吸收 / 优化改进的 skill，默认不允许和指定的 agent 工具挂钩（codex、claude、zcode、workbuddy 等），尽量要求是通用所有 agent 都能使用」。
+- **落点**：`SKILL.md` 设计内核新增第 9 条「通用性优先（agent 无关）」+ 权责边界补充 + 驳回标准补充；`references/absorption-decision-matrix.md` 新增「agent 通用性判定」小节 + 裁决表新增「agent 通用性」列 + 判定顺序冲突候选补充；`references/env-dependency-absorption.md` 补充「与 agent 通用性的区分」提示。
+- **强制程度（用户确认）**：软性优先 + 例外登记——默认要求通用所有 agent，确需绑定单 agent 的场景允许例外，但必须在裁决表「agent 通用性」列登记 `例外: <绑定对象> + 理由`，未登记静默绑定判拒绝。
+- **约束范围（用户确认，四项全选）**：禁止专属路径 / 配置 / hook；禁止单 agent 声明；禁止单 agent 术语 / 命令；要求通用落点。
+- **净增减**：3 文件 +20 / -4（SKILL.md +4/-1、absorption-decision-matrix +14/-2、env-dependency-absorption +2/-1）；无新建文件。
+- **同域扫描**：全仓 grep「通用 agent / 禁止绑定 agent / 通用性优先」→ 其余命中均为 AGENTS.md 落点约定或零散措辞，无逐字重复的「吸收禁止绑定 agent」规则；收敛单一权威为本 skill。PASS。
+- **验证**：quick_validate.py `Skill is valid!`（结构校验替代棘轮基线，内部更新通道无 8 维评分基线）；UTF-8 校验通过；未改 description、未改 `##` 级标题，无需重跑 skill 字典。
