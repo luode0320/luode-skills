@@ -1,6 +1,6 @@
 ---
 name: test-strategy-rules
-description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试主文档、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳测试主文档，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。当本轮新增或修改生产代码、准备为可测性在生产文件中加函数/静态数据/字段/分支/第二构造器，或发现生产符号只被 `test/` 引用时，进入生产代码测试污染判定：完全禁止为测试改动生产代码，按引用面判据判定并由 `scripts/scan_test_pollution.py` 硬阻断，豁免须显式登记。当测试对象是 HTTP 接口（有 method+path，经 HTTP 协议调用）需要执行接口级测试（功能验证、回归、Bug 接口验证、上线门禁的接口部分）时，进入「接口测试执行通道（强制）」：统一走 apifox 测试链路真实测试并落地测试用例到 apifox「AI 团队」对应项目，environment 只允许指向 local（localhost），单元测试/代码级测试保留本地。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
+description: 当准备进入测试阶段需要确定测试策略、优先级、覆盖范围和待补测风险时触发；当新增或修改测试主文档、验证说明、测试报告、覆盖说明、执行记录，确定根 `test/` 测试代码镜像、`doc/5-tests/` 时间戳测试主文档，或发现测试脚本、fixture、测试 Mock、数据和说明散落时，也自动进入本 owner 的 `test-asset-governance` 条件路由。当本轮新增或修改生产代码、准备为可测性在生产文件中加函数/静态数据/字段/分支/第二构造器，或发现生产符号只被 `test/` 引用时，进入生产代码测试污染判定：完全禁止为测试改动生产代码，按引用面判据判定并由 `scripts/scan_test_pollution.py` 硬阻断，豁免须显式登记。当测试对象是 HTTP 接口（有 method+path，经 HTTP 协议调用）需要执行接口级测试（功能验证、回归、Bug 接口验证、上线门禁的接口部分）时，进入「接口测试执行通道（强制）」：统一走 apifox 测试链路真实测试并落地测试用例到 apifox「AI 团队」对应项目，environment 只允许指向 local（localhost），单元测试/代码级测试保留本地。当需要从需求文档或现有用例设计、评审、优化测试用例，需要确定覆盖哪些质量维度，需要应用黑盒测试方法（等价类、边界值、决策表、状态转换、场景法），或需要判定用例写得到底合不合格时，统一读取 `references/test-case-design-methods.md`（测试域用例设计方法单一权威，接口级落地细节归 apifox）；被测对象为游戏（玩法、数值平衡、技能道具、多人联机、付费内购、本地化、更新兼容）时同样读取该 reference 的游戏测试专项小节。负责测试策略与测试资产治理的统一主入口，必须以 `artifact-storage-rules` 为中央路径真相，并保留本地环境红线、生产代码不污染、Go 可编译路径和 artifact gate 约束；不要用它代替具体测试程序、功能验证或回归验证。
 ---
 
 # 测试策略规则
@@ -132,6 +132,8 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 - 在决定测试主文档、主说明文件和多轮测试拆分方式时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在需要确定测试优先级和覆盖收口时，再读 `references/priority-model.md`。
 - 只有在需要模板和正反例时，再读 `references/strategy-template.md`。
+- 需要设计、评审或优化测试用例，确定覆盖哪几个质量维度，应用黑盒测试方法，或判定用例质量是否合格时，读 `references/test-case-design-methods.md`；接口级字段模板与 RTM 以 `apifox-cli__skillhub/modules/test-case-from-requirement.md` 为准，不在本文件重复。
+- 需要给出基于风险的测试结论分层时，读 `references/risk-based-test-conclusion.md`。
 - 只要创建或修改测试策略主文档，必须同时读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`，让策略结论、影响、范围、变化和完成标准先以白话开场，技术步骤与证据保留在既有技术章节或附录。
 - 只要涉及浏览器联调或第三方验证，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
 ## 项目联调条件化规则
@@ -284,4 +286,12 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 - 联调测试中遇到写接口时，同样适用 4 级样本矩阵。
 - 回归测试中遇到写接口时，至少保证 `historical_succeeded` + `current_listing_available` 2 类样本。
 
-- 基于风险的测试结论分层：`references/risk-based-test-conclusion.md`
+## 用例设计方法（单一权威）
+
+> 本节是测试域「测几个维度、用什么方法设计用例、用例质量怎么判」的唯一定义处。功能验证、回归、测试程序、Bug 验证等测试 skill 需要用例设计方法时统一以本节为准，不再各立一套；接口级字段模板与 RTM 归 apifox。
+
+- 任何测试策略、测试大纲、用例集都必须显式回答**覆盖哪几个质量维度**（8 维：功能 / 异常健壮性 / 安全 / 性能 / 界面 UI / 易用性 / 兼容性 / 领域专项）；铺满 8 维属策略失控，按任务类型裁剪最小维度集。
+- 用例设计按被测特征选择**黑盒五法**（等价类、边界值、决策表、状态转换、场景法），不机械铺满，接口级字段模板与命名以 apifox 模块为准。
+- 通道判据：只有"测试对象是 HTTP 接口"的维度才进 apifox；UI / 易用性 / 客户端兼容性 / 游戏体验等维度**不得硬写成接口用例充数**。
+- 用例收口前按**四性**（正确性 / 完整性 / 可执行性 / 一致性）判定，任一不通过不得作为覆盖证据；禁止占位符数据、"正常显示"式不可验证预期、孤儿用例。
+- 维度定义、方法要点、按任务类型裁剪表、四性检查项与游戏领域专项，统一见 `references/test-case-design-methods.md`；本文件只保留上述四条硬约束。

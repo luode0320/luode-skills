@@ -247,3 +247,29 @@
 **棘轮验证**：darwin 8 维评分 吸收前约 75.7 → 吸收后 92.1（独立子 agent 评分，2026-08-19）；实测 3/3 路由命中；保留。
 
 **源处置**：吸收确认后删除源 skill 双副本（用户级 `C:\Users\luode\.workbuddy\skills\api-test-automation-pro__skillhub\` + 工作区 `D:\谷歌云盘\luode-skills\api-test-automation-pro__skillhub\`），详见 source-notes。
+
+---
+
+## 2026-08-30：外部吸收 `comprehensive-test-case-writer`（全面测试用例编写器）
+
+- **来源**：skillhub 安装源 `functional-use-cases__skillhub`（SKILL.md 8,501 字节，无 references）。
+- **通道**：外部吸收（本地安装源模式）。**环境依赖**：N/A（纯方法论，无 CLI / 环境变量 / hook / 依赖安装 / 路径引用）。
+- **用户确认的落点约定**：用例设计方法权威归 `test-strategy-rules`，apifox 侧只补维度落地边界表。
+- **本轮结论**：apifox 侧**基本持平**，仅落 1 条边界表（棘轮规则下小幅增益，不做凑分式膨胀）。
+
+| # | 外部条目 | 本地现状（吸收前） | 裁决 | 落点 | 整理去重 |
+|---|---------|-------------------|------|------|----------|
+| 1 | 8 大质量维度（功能/性能/安全/易用性/界面/兼容性/异常/游戏） | 本地 `test-case-generation.md`「测试点分析」只有接口向 8 项，无"哪些维度不该进 apifox"的边界 | 合并（仅边界部分） | `test-case-from-requirement.md` 新增 Step 3.5 维度边界表 | 维度**定义**不落本 skill，显式指向 `test-strategy-rules/references/test-case-design-methods.md` 单一权威；本表只保留"可落地 / 落地方式 / 转出去向"三列，防逐字重复 |
+| 2 | 需求驱动 + RTM + 五维预检 | `test-case-from-requirement.md` 已覆盖且更强 | 保留本地 | — | N/A（已覆盖） |
+| 3 | 黑盒五法（等价类/边界值/决策表/状态转换/场景法） | 同文件 Step 3 已有方法选择表 | 保留本地 | — | N/A（已覆盖，且比源更细） |
+| 4 | 用例模板 7 字段 + P0-P3 | 本地 12 字段模板 + 风险导向 P0-P2 | 拒绝 | — | N/A（会形成两套模板 / 两套优先级） |
+| 5 | 质量检查点 | Step 5 已含 11 项覆盖验证 | 保留本地 | — | 在 test-strategy-rules 侧补分工声明：接口级以本 Step 5 为准，四性只做非接口场景与跨维度总判，防门控层叠 |
+| 6 | 游戏测试专项 | 本地无 | 拒绝落本 skill | 落 `test-strategy-rules` | N/A（拒绝原因：apifox 只承接游戏服务端 HTTP 接口，玩法/数值/联机体验不属本 skill；避免引入不可执行的"游戏用例"） |
+
+**净增减**：`test-case-from-requirement.md` +约 1,300 字节（Step 3.5）+ `SKILL.md` 路由行 +约 60 字节；无删除（无可整理项）。
+
+**同域冗余扫描（2026-08-30）**：与 test-strategy-rules 新维度表做交叉比对——两表列定义与措辞不同且互引权威，判定为域专属补充而非重复；未发现可清理冗余；PASS。
+
+**棘轮验证**：本轮 apifox 侧增益集中在"防越界"（❌ 维度禁止拼成接口用例充数），属质量红线补齐；与吸收前（92.1 基线）相比为小幅提升，不做大改。保留。
+
+**源处置**：吸收确认后删除源 skill 双副本（用户级 + 工作区），与 test-strategy-rules 侧共用同一源，删除一次即可，详见 `references/source-notes.md`。

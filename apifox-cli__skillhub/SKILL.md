@@ -111,7 +111,7 @@ apifox whoami
 | 测试用例创建/更新/运行、测试数据、处理器/断言字段、参数完整性校验（接口有参必须带参，无参=无效）、JSON 格式化 T-1（requestBody.data 必须 pretty-print）、Mock 真实性 T-2（200 示例禁止 `{}` 空壳）、**调试用例请求示例 T-3（接口树下的用例 body 空、点开只有空壳、example 该放哪一层）**、双重闸门 A7（CLI 操作层）、header-only 接口空 body 例外（schema 无必填 + 维度全在请求头时 `{}` 是真实契约）、**两类用例是两套资源（`api.cases[]` DEBUG_CASE vs `apiTestCaseCollection`，CLI 只能写后者）** | `modules/test-case.md` | test-case, test-data |
 | 鉴权自动化、token/JWT 获取与续期、401/403/签名错误、管理员账号、前置脚本自动重登、免签分支与来源头耦合（伪造 X-Forwarded-For 测地区/灰度维度会同时丢掉内网免签）、**鉴权配置必须进 apifox（本地免签不免鉴权配置：安全方案 + 用例签名脚本 + 鉴权用例三件齐；隔离档 agent 可经开放 API 代填密钥、值不扩散出隔离体；CLI 读写不到环境变量、operation security 不自动绑定接口）** | `modules/test-auth.md` | 登录用例 extractor + preProcessor 续期 + 脚本构造 token + 全局认证 + 签名注入 |
 | 生成/补全测试用例、测试设计、测试点分析、覆盖度铁律（正/负/边界）、正向分层组合（L1 单参数/L2 两两/L3 全参数/L4 过滤×分页）、POST 必有完整用例、接口有参但用例无参=无效测试、硬动作 A4 创建用例前按分层强制生成（设计方法论层） | `modules/test-case-generation.md` | OpenAPI→用例生成方法论；规则同步进项目 `PROJECT_TEST.md` |
-| 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法 | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
+| 从 PRD/需求文档/用户故事/验收标准/功能拆分生成用例、需求追溯矩阵、五维预检、按风险选方法、质量维度边界表（Step 3.5：界面 UI / 易用性 / 客户端兼容性等 ❌ 维度禁止拼成接口用例充数） | `modules/test-case-from-requirement.md` | 需求文档→用例 + RTM |
 | 陷阱检查、测试失败排查、接口异常但"看起来正常" | `modules/testing-pitfalls.md` | 180 陷阱知识库（apifox 场景版） |
 | 测试范围、优先级、哪些接口必测/可跳过、上线前测试、三档执行策略（全量/受限/豁免）与受限豁免登记 | `modules/test-selection-policy.md` | P0/P1/P2 风险分级 + 执行策略分类 |
 | 项目接入 apifox 预检、5 节点 × 10+ 硬动作（A1 字段说明即时审计/A2 端口即时探测/A3 接口与 swag 契约校验/A4 正向分层强制生成/A5 JSON 格式化/A6 Mock 真实性/A7 参数完整性双重闸门/A8 受限豁免识别/A9 终检/A10 合并前预检/A11 folder 归类即时校验）、现有项目批量修复命令集、规则↔动作总入口 | `modules/project-onboarding-checklist.md` | 新项目接入、批量修复、定期质量审计、终检 |

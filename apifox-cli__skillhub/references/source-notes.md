@@ -97,3 +97,14 @@
   - README 提及但实际缺失的 5 个 references（smart_parser_guide.md / diagnostic_guide.md / template_loader_guide.md / memory_system.md / security_checks.md）：均为脚本层专属文档且未落地，拒绝；其分类精华从 README/SKILL.md 可读描述吸收。
   - HTTP 全表参考：低频冗余，本地 troubleshooting/test-case 已覆盖场景。
 - **历史吸收（早于本次）**：`modules/testing-pitfalls.md` 原 31 条陷阱与 `modules/test-case-generation.md` 三类用例方法论亦标注吸收自 API 测试类 skill（含本源的 180 陷阱库），本次为补缺式二次吸收。
+
+---
+
+## 2026-08-30：外部吸收 `comprehensive-test-case-writer`（全面测试用例编写器）
+
+- **来源**：外部 skill（skillhub 安装源 `functional-use-cases__skillhub`，SKILL.md 8,501 字节，无 references、无脚本）。
+- **通道**：外部吸收（本地安装源模式）。**环境依赖**：N/A（纯方法论）。
+- **本 skill 落点（仅 1 处）**：`modules/test-case-from-requirement.md` 新增 **Step 3.5 质量维度边界表**（逐条标注 apifox 可落地 / 落地方式 / 转出去向），并附红线：❌ 维度（界面 UI、易用性、客户端兼容性、游戏玩法与联机体验）禁止为凑覆盖矩阵拼成接口用例。
+- **同步落点（其他 owner）**：维度定义、黑盒五法、按任务类型裁剪、用例质量四性、游戏测试专项 → `test-strategy-rules/references/test-case-design-methods.md`（测试域单一权威）；下游引用 → `functional-validation-rules/SKILL.md` references 读取规则。
+- **拒绝落本 skill 的条目**：用例模板 7 字段与 P0-P3 优先级（本地 12 字段 + 风险导向 P0-P2 更强，防两套模板）；需求驱动 / RTM / 黑盒五法 / 质量检查点（本地已覆盖）；游戏测试专项（玩法与联机体验不属 apifox 承接范围，仅游戏服务端 HTTP 接口可进 apifox）。
+- **已删除的源**：吸收确认后删除源 skill 双副本（用户级 `C:\Users\luode\.workbuddy\skills\functional-use-cases__skillhub\` + 工作区 `D:\谷歌云盘\luode-skills\functional-use-cases__skillhub\`）。

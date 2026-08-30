@@ -1083,3 +1083,4 @@ claude-mem(记忆) :
 2026-08-25 22:27:00 docs: [字典同步] 刷新skill字典数据与统计
 2026-08-30 23:25:00 docs: [项目状态同步] 提交记忆锚点与历史资产
 2026-08-30 23:26:00 feat: [tapd任务执行] tapd-task-executor落盘与openapi脚本变量兼容
+2026-08-30 23:27:00 feat: [测试用例设计方法] test-strategy单一权威与apifox维度边界

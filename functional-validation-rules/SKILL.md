@@ -86,12 +86,13 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 ## references 读取规则
 
 - 默认先读 `references/validation-scope.md`。
-- 在定位根 `test/` 镜像、测试主文档、测试主文档、证据目录或判断是否继续沿用同一轮验证根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
+- 在定位根 `test/` 镜像、测试主文档、证据目录或判断是否继续沿用同一轮验证根目录时，先读 `../artifact-storage-rules/references/path-map.yaml`、`../artifact-storage-rules/references/naming-templates.md` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在职责边界不清或问题归属有争议时，再读 `references/validation-boundaries.md`。
 - 只有在需要结论模板和样例时，再读 `references/validation-template-and-examples.md`。
 - 只要创建或修改功能验证测试主文档，必须同时读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`，让结论、影响、范围、变化和完成标准先以白话开场，技术步骤与证据保留在既有技术章节或附录。
 - 只要涉及浏览器联调或第三方验证，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
 - 只有明确必需的功能验证无法继续且没有替代验证，或测试污染导致结论无效时，必须读取 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`；其他受限结论不得误建 `BLK-*`。
+- 需要设计、补充、评审或优化验证用例，需要确定覆盖哪些质量维度，或需要应用等价类 / 边界值 / 决策表 / 状态转换 / 场景法时，读取 `../test-strategy-rules/references/test-case-design-methods.md`（测试域用例设计方法单一权威，本 skill 不重复定义；接口级字段模板与 RTM 归 `apifox-cli__skillhub/modules/test-case-from-requirement.md`）。
 ## 项目联调条件化规则
 
 ### 触发规则补充（强制）
