@@ -1094,3 +1094,4 @@ claude-mem(记忆) :
 2026-09-01 22:44:00 docs: [tapd回写] 三件套硬收口与缺陷状态自动流转
 2026-09-01 22:45:00 feat: [出网排查] 新增outbound-dns-triage分层排查skill
 2026-09-01 22:46:00 docs: [接口测试收口] apifox证据硬闸与code-change联动
+2026-09-01 22:47:00 docs: [项目本地skill] 登记ellipal表格页规则创建记录
