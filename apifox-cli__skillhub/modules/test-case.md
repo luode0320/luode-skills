@@ -215,6 +215,70 @@ OpenAPI 规范里 `MediaType.example` 与 `Schema.example` 都合法，**apifox 
 
 **应用时机**：写 OpenAPI / swag YAML 时就带上 example（节点 2 → A12）；导入后立即验收，不要等对接方反馈。
 
+## 规则 T-4：伪失败四坑（强制，2026-09-01 实操补充）
+
+> 这四种情况都表现为**业务码 500 / 断言失败**，看着像接口缺陷，实际是用例构造或运行方式问题。**先按本节排除，再去查接口代码**——把伪失败写进缺陷清单比漏测更糟，会让后续所有人怀疑一个没问题的接口。
+
+**坑① 数字字段引用变量必须去掉外层引号**
+
+apifox 的变量替换是**纯文本替换**，`"id": "{{fixtureId}}"` 替换后是 JSON 字符串，强类型后端直接拒绝：
+
+```text
+json: cannot unmarshal string into Go struct field XxxReq.id of type int
+```
+
+正确形态（变量占位裸放，此时 body 文本本身不是合法 JSON，但 apifox 发送前会替换）：
+
+```jsonc
+{
+  "id": {{fixtureId}},
+  "ids": [{{fixtureId}}]
+}
+```
+
+生成侧写法（`pretty_jsonb` 之后再剥引号，避免手工拼串出错）：
+
+```python
+import json, re
+
+def pretty_jsonb(data):
+    text = json.dumps(data, indent=2, ensure_ascii=False)
+    # 数字/数组元素位置的变量占位去掉外层引号；字符串字段的变量不受影响需另行处理
+    return re.sub(r'"(\{\{[A-Za-z0-9_]+\}\})"', lambda m: m.group(1), text)
+```
+
+**坑② 单条 `run --test-case` 是独立进程，extractor 变量不跨运行传递**
+
+`postProcessors` 的 extractor 写入的变量（即使 `variableType=globals` + `shareScope=PROJECT`）在**下一次独立 run 里取不到**。因此「依赖前序步骤产出的 id」这类用例**独立跑必失败**，且属伪失败：
+
+- 依赖前序数据的用例必须编入 `test-scenario`（同一次运行内变量共享），见 `modules/test-scenario.md`
+- 这类用例**不得计入独立可跑批次**：批量运行脚本要显式把它们排除，否则每轮回归都会有几条恒定失败，久了就被当成「已知失败」忽略
+- 收口时如实登记为「仅在场景内成立」，不算覆盖缺口也不算通过
+
+**坑③ 写库用例要能重复运行，靠运行时唯一后缀**
+
+带唯一性校验的创建接口（币种组合、名称、编码等），固定测试数据只能跑一次，第二次运行首步就 500「已存在」。清理铁律解决的是「跑完不留残留」，**幂等解决的是「能不能再跑一次」**，两者都要：
+
+```javascript
+// 前置脚本：让写操作闭环可重复运行
+var suffix = String(Date.now()).slice(-9);
+pm.variables.set("fixtureSuffix", suffix);
+// body 里引用：{"shortName": "APIFOXTEST{{fixtureSuffix}}"}（字符串字段保留引号）
+```
+
+配合场景末步 delete 回收，即可连跑 N 轮都全绿。**验收标准：场景必须连跑两次结果一致**，只跑一次通过不算数。
+
+**坑④ CLI 输出前可能有人类可读提示，直接 `json.loads` 会失败**
+
+`test-case create` 等命令会在 JSON 前后打「💡 创建后检查」「📖 运行 apifox test-case view <id>」等提示行。脚本里直接 `json.loads(stdout)` 会抛异常，**把已经创建成功的资源误判为失败**（本轮 41 条用例全部创建成功却被脚本报成 0 成功）。统一用正则截取 JSON 主体：
+
+```python
+match = re.search(r"\{.*\}", raw, re.S)
+data = json.loads(match.group(0)) if match else None
+```
+
+同时注意：`test-case create` 的返回提示里「`commonParameters` 可能未正确保存」对 `{}` 空对象是**常态提示**，不是错误；`preProcessors 可能未正确保存` 出现在刻意留空的安全性用例上同理。判定落库真实性一律靠 `test-case get` 回读，不看提示文案。
+
 ## 不可违反规则（test-case 模块，硬动作级）
 
 1. **无参测试 = 无效测试**：接口有参但用例无参必须补全，禁止"先建 1 个正向先收口"；唯一例外是经三条证据确认的 header-only 接口（见「参数完整性校验」节例外条款）
@@ -223,6 +287,7 @@ OpenAPI 规范里 `MediaType.example` 与 `Schema.example` 都合法，**apifox 
 4. **创建后必须 test-case get 对账 endpoint schema**（节点 2 → A7 双重闸门）
 5. **两类用例分别验收**：`test-case` 全绿不代表调试用例有参数，二者是两套资源；导入接口后必须按规则 T-3 用 `export --format apifox` 查 `api.cases[].requestBody.data`（节点 2 → A12）
 6. **CLI 写入报 success 不等于落库**：`endpoint update` 的 `requestBody.example`、`environment update` 的 `variables` 都属"假成功"字段，写完必须回读确认
+7. **失败先按规则 T-4 排除伪失败**：业务码 500 / 断言失败时，先排除「变量带引号、变量不跨运行、写库用例不幂等、CLI 输出解析错」四坑，再判定为接口缺陷；未排除即写进缺陷清单的一律驳回
 
 ## 更新测试用例
 

@@ -108,3 +108,10 @@
 - **同步落点（其他 owner）**：维度定义、黑盒五法、按任务类型裁剪、用例质量四性、游戏测试专项 → `test-strategy-rules/references/test-case-design-methods.md`（测试域单一权威）；下游引用 → `functional-validation-rules/SKILL.md` references 读取规则。
 - **拒绝落本 skill 的条目**：用例模板 7 字段与 P0-P3 优先级（本地 12 字段 + 风险导向 P0-P2 更强，防两套模板）；需求驱动 / RTM / 黑盒五法 / 质量检查点（本地已覆盖）；游戏测试专项（玩法与联机体验不属 apifox 承接范围，仅游戏服务端 HTTP 接口可进 apifox）。
 - **已删除的源**：吸收确认后删除源 skill 双副本（用户级 `C:\Users\luode\.workbuddy\skills\functional-use-cases__skillhub\` + 工作区 `D:\谷歌云盘\luode-skills\functional-use-cases__skillhub\`）。
+
+## 2026-09-01 内部调整：用例构造四类伪失败（执行中 gap 回补）
+
+- 通道：执行中 gap 回补（无外部源）。
+- 来源实操：ellipal_admin 热门列表 8 接口首次接入 apifox（项目 8730939 / folder 94750815 / 场景 8686960），43 用例 + 11 步闭环场景落地过程中的真实踩坑。
+- 落点：`modules/test-case.md` 新增规则 T-4（伪失败四坑）+ 硬动作第 7 条；`modules/test-scenario.md` 补 `--sync manual` 副本语义与写库场景连跑两次验收标准；`modules/testing-pitfalls.md` 第七节挂第 0 层指针。
+- 裁决表：见本 skill `workbuddy-absorption-map.md` 2026-09-01 条目。

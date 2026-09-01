@@ -52,6 +52,13 @@ apifox test-scenario add-ref <scenarioId> --project <projectId> --scenario <sour
 - `--sync manual` = 默认，导入后可补业务参数
 - `--sync auto` = 随源自动同步（仅支持 endpoint/test-case 来源）
 
+**`--sync manual` 下改用例不会回灌到场景（2026-09-01 实测踩坑）**：步骤是导入那一刻的**副本**，之后用 `test-case update` 改了源用例（改 body、改断言、加前置脚本），场景里跑的仍是旧副本——表现为「用例明明改好了、回读也确认了，场景却还是按老逻辑失败」。两条出路：
+
+- 导入时就用 `--sync auto`（源用例后续改动自动生效，写库闭环推荐）
+- 已用 `manual` 导入且源用例有改动 → 重新 `import-steps`，或直接重建场景重导（步骤顺序敏感时重建更稳）
+
+判断依据：`test-scenario get <id> --with-case-detail` 回读步骤真实 body，与 `test-case get` 的结果逐字对比，不要凭「我刚改过」推断。
+
 ## 场景建模标准流程
 
 1. 明确业务目标：验证什么流程、成功条件、失败如何清理
@@ -101,6 +108,14 @@ apifox test-scenario add-ref <scenarioId> --project <projectId> --scenario <sour
 - 可视化断言字段：`httpCode`、`responseJson`、`responseText` + `include`
 - 比较符：`equal`，不要用 `equals`
 
+## 写操作闭环场景的验收标准（强制，2026-09-01 补）
+
+写库场景（创建 → 改 → 查 → 删）**必须连跑两次且结果一致**才算通过，只跑一次全绿不算数：
+
+- 第一次通过、第二次首步就失败 → 场景不幂等，测试数据带唯一性约束却用了固定值（修法见 `modules/test-case.md` 规则 T-4 坑③）
+- 两次都通过但库里行数递增 → 清理链没闭合，末步 delete 没覆盖全部自建数据
+- 收口证据要给出「连跑 N 次结果一致 + 残留条数 + 全表行数对照」，不能只给一次运行的断言数
+
 ## 不可违反规则
 
 1. 不要把 `test-case` 结构直接当作 `test-scenario` 步骤
@@ -110,3 +125,5 @@ apifox test-scenario add-ref <scenarioId> --project <projectId> --scenario <sour
 5. 更新场景前必须先 `get --with-case-detail` 原结构
 6. 不要在未确认环境的情况下执行有副作用步骤
 7. 不要让后续步骤引用未确认来源的数据
+8. 不要在 `--sync manual` 导入后改源用例却不重新导入（步骤是副本，改动不回灌，见上方「语义边界」）
+9. 写库场景没有连跑两次验证就不得声称通过
