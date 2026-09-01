@@ -11,7 +11,7 @@ description: >-
   当用户提到"Windows agent + WSL 项目""符号链接挂载编译""go build 报错
   Incorrect function""wsl.exe 编译/起服务""WSL 里启动调试""\\wsl.localhost 文件锁"
   时使用。
-agent_created: true
+
 ---
 
 # Windows 宿主 Agent + WSL 项目（符号链接拓扑）编译启动调试

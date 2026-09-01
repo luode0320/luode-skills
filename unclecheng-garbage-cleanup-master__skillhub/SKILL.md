@@ -1,9 +1,11 @@
 ---
-name: 垃圾清理大师
+name: unclecheng-garbage-cleanup-master
 description: "磁盘垃圾清理助手。自动扫描磁盘找到老文件、大文件、垃圾文件，生成垃圾桶.md让用户审核确认后再清理。触发词：清理垃圾、清理磁盘、清理硬盘、扫描垃圾、垃圾文件、老文件、大文件、磁盘清理、空间不足、清理缓存、垃圾清理大师"
-description_zh: "磁盘垃圾清理助手，扫描老文件和大文件，生成审核清单后安全清理"
-description_en: "Disk junk cleaner - scan old/large files, generate review list, then safe cleanup"
-version: 1.1.0
+metadata:
+  displayName: 垃圾清理大师
+  description_zh: 磁盘垃圾清理助手，扫描老文件和大文件，生成审核清单后安全清理
+  description_en: Disk junk cleaner - scan old/large files, generate review list, then safe cleanup
+  version: 1.1.0
 ---
 
 # 垃圾清理大师 🧹

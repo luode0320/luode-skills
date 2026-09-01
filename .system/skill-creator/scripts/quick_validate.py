@@ -20,7 +20,7 @@ def validate_skill(skill_path):
     if not skill_md.exists():
         return False, "SKILL.md not found"
 
-    content = skill_md.read_text()
+    content = skill_md.read_text(encoding="utf-8")
     if not content.startswith("---"):
         return False, "No YAML frontmatter found"
 
@@ -37,7 +37,17 @@ def validate_skill(skill_path):
     except yaml.YAMLError as e:
         return False, f"Invalid YAML in frontmatter: {e}"
 
-    allowed_properties = {"name", "description", "license", "allowed-tools", "metadata"}
+    # Claude Code 实际支持的 frontmatter 键（user-invocable / disable-model-invocation
+    # 控制调用可见性，迁入 metadata 会破坏运行时行为，因此纳入白名单）
+    allowed_properties = {
+        "name",
+        "description",
+        "license",
+        "allowed-tools",
+        "metadata",
+        "user-invocable",
+        "disable-model-invocation",
+    }
 
     unexpected_keys = set(frontmatter.keys()) - allowed_properties
     if unexpected_keys:

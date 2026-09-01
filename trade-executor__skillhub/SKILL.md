@@ -1,17 +1,16 @@
 ---
 name: trade-executor
-version: "0.1.0"
 description: Execute cryptocurrency trades on exchanges (Binance, OKX) with risk controls, user confirmation, and audit logging.
-homepage: https://www.binance.com
 metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "💹",
-        "requires": { "env": ["BINANCE_API_KEY", "BINANCE_API_SECRET"] },
-        "primaryEnv": "BINANCE_API_KEY",
-      },
-  }
+  version: 0.1.0
+  homepage: https://www.binance.com
+  openclaw:
+    emoji: 💹
+    requires:
+      env:
+      - BINANCE_API_KEY
+      - BINANCE_API_SECRET
+    primaryEnv: BINANCE_API_KEY
 ---
 
 # Skill: trade-executor（接口定义）

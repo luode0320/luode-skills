@@ -1,23 +1,24 @@
 ---
-name: Godot音频
-slug: godot-audio
-version: 1.0.0
-displayName: Godot音频
+name: godot-audio
 description: >
   Godot音频专用技能，帮助AI Agent高效完成相关任务。
-summary: "Godot音频专用技能，帮助AI Agent高效完成相关任务。"
 license: Apache-2.0
-category: 游戏开发
-framework:
+metadata:
+  slug: godot-audio
+  version: 1.0.0
+  displayName: Godot音频
+  summary: Godot音频专用技能，帮助AI Agent高效完成相关任务。
+  category: 游戏开发
+  framework:
   - Claude Code
   - Codex
   - Hermes Agent
   - OpenClaw
   - QClaw
   - WorkBuddy
-platform: multi-platform
-homepage: "https://github.com/1991513ccie-png"
-repository: "https://github.com/1991513ccie-png"
+  platform: multi-platform
+  homepage: https://github.com/1991513ccie-png
+  repository: https://github.com/1991513ccie-png
 ---
 
 

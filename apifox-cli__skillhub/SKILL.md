@@ -5,7 +5,7 @@ metadata:
   requires:
     bins: ["apifox"]
   cliHelp: "apifox --help"
-agent_created: true
+
 ---
 
 # Apifox CLI

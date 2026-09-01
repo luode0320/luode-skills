@@ -2,10 +2,10 @@
 name: wsl-shell-reliability
 description: Reliability-first shell selection policy for AI agents on Windows. Choose WSL or PowerShell based on execution risk, not preference.
 license: MIT
-compatibility: Windows (WSL optional; recommended for POSIX-fragile workflows)
 metadata:
+  compatibility: Windows (WSL optional; recommended for POSIX-fragile workflows)
   author: simon
-  version: "2.0"
+  version: '2.0'
 ---
 
 # WSL Shell Reliability

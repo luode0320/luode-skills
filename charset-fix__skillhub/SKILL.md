@@ -5,14 +5,14 @@ description: >-
   Windows via POSIX shells (Git Bash, MSYS2, WSL, BusyBox, etc.). Handles
   Python, PowerShell, and cmd.exe GBK/CP936 output encoding mismatch with
   UTF-8 terminals.
-version: 1.0.0
 metadata:
+  version: 1.0.0
   openclaw:
     requires:
       bins:
-        - python3
+      - python3
     os:
-      - windows
+    - windows
     emoji: 🔤
 ---
 

@@ -2,7 +2,7 @@
 name: tapd-env-bootstrap
 description: 本机 TAPD 凭据环境事实（luode 专用）。当涉及 TAPD OpenAPI 操作、TAPD 环境预检、TAPD_TOKEN 缺失或配置位置疑问、与 tapd-openapi 等技能配合排查"未配置"报错时自动加载。记录本机 TAPD 凭据的真实存放位置与注入机制：~/.tapd/env.sh（Windows 与 WSL 各一份）+ Windows 用户级环境变量注入；tapd-openapi 的环境预检指引已与此对齐。
 allowed-tools: Read,Bash
-agent_created: true
+
 ---
 
 # TAPD 环境引导（本机事实，2026-08-18 建档）

@@ -84,15 +84,30 @@ def normalize_path(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def first_heading(text: str) -> str:
+def lines_outside_code_fence(text: str):
+    """逐行产出正文行，跳过 ``` 代码围栏内部。
+
+    skill 文档里常内嵌 Markdown 模板（如评论骨架），模板中的 `## xxx`
+    是示例内容不是本 skill 的章节，不跳过会被误收进字典造成污染。
+    """
+    in_fence = False
     for line in text.splitlines():
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            yield line
+
+
+def first_heading(text: str) -> str:
+    for line in lines_outside_code_fence(text):
         if line.startswith("# "):
             return line[2:].strip()
     return ""
 
 
 def second_level_headings(text: str) -> list[str]:
-    return [line[3:].strip() for line in text.splitlines() if line.startswith("## ")]
+    return [line[3:].strip() for line in lines_outside_code_fence(text) if line.startswith("## ")]
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:

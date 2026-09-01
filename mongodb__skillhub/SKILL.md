@@ -1,9 +1,20 @@
 ---
-name: MongoDB
-slug: mongodb
-version: 1.0.1
+name: mongodb
 description: Design MongoDB schemas with proper embedding, indexing, aggregation, and production-ready patterns.
-metadata: {"clawdbot":{"emoji":"🍃","requires":{"anyBins":["mongosh","mongo"]},"os":["linux","darwin","win32"]}}
+metadata:
+  displayName: MongoDB
+  slug: mongodb
+  version: 1.0.1
+  clawdbot:
+    emoji: 🍃
+    requires:
+      anyBins:
+      - mongosh
+      - mongo
+    os:
+    - linux
+    - darwin
+    - win32
 ---
 
 ## When to Use

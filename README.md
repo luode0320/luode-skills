@@ -1088,3 +1088,4 @@ claude-mem(记忆) :
 2026-08-30 23:29:00 feat: [分层沉淀铁律] project-local可迁移判定与通用github-release-pipeline
 2026-08-30 23:30:00 chore: [skillhub元数据同步] 图标重试时间戳与迁移标记
 2026-08-31 00:28:00 feat: [skill吸收通用性约束] 吸收产物默认通用所有agent并登记例外
+2026-09-01 22:41:00 refactor: [frontmatter规范化] 顶层字段迁入metadata并扩充白名单

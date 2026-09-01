@@ -1,7 +1,7 @@
 ---
 name: github-release-pipeline
 description: 通用 GitHub Actions 手动发布流水线（workflow_dispatch 驱动）。当任何仓库需要走「bump 版本 → commit/push → dispatch CI → 轮询 run → 下载 release assets → git add 资产 → 运行 registry/发布脚本 → 远端 raw URL 验证 → 二进制级产物验证」的发版链路（用户说"发布/发版"）时使用。沉淀了 GitHub API 层与 Actions 层的通用陷阱：dispatch 422（choice 枚举）、runs API 判重（display_title 恒为 Build）、head_sha 40 位、TLS 通道选择（PowerShell vs curl）、raw URL CDN 延迟、git add 顺序、二进制验证。不含任何项目特定事实（路径/仓库名/脚本名），项目专属版见对应项目的 cpa-plugin-release 类技能。
-agent_created: true
+
 ---
 
 # GitHub Actions 手动发布流水线（通用）

@@ -1,7 +1,7 @@
 ---
 name: cgo-plugin-isolated-test
 description: 在无 C 工具链的 Windows 环境(或任何 CGO_ENABLED=0 环境)下,验证 c-shared Go 插件包(cgo)的逻辑与单元测试。当插件包含 import "C" 的 main.go 导致 go build/go vet/go test 报 undefined 符号或 IgnoredGoFiles 时使用。
-agent_created: true
+
 ---
 
 # cgo 插件包隔离测试

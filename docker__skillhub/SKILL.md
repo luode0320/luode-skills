@@ -1,11 +1,21 @@
 ---
-name: Docker
-slug: docker
-version: 1.0.4
-homepage: https://clawic.com/skills/docker
+name: docker
 description: "Docker containers, images, Compose stacks, networking, volumes, debugging, production hardening, and the commands that keep real environments stable. Use when (1) the task touches Docker, Dockerfiles, images, containers, or Compose; (2) build reliability, runtime behavior, logs, ports, volumes, or security matter; (3) the agent needs Docker guidance and should apply it by default."
-changelog: Simplified the skill name and kept the stateless activation guidance
-metadata: {"clawdbot":{"emoji":"🐳","requires":{"bins":["docker"]},"os":["linux","darwin","win32"]}}
+metadata:
+  displayName: Docker
+  slug: docker
+  version: 1.0.4
+  homepage: https://clawic.com/skills/docker
+  changelog: Simplified the skill name and kept the stateless activation guidance
+  clawdbot:
+    emoji: 🐳
+    requires:
+      bins:
+      - docker
+    os:
+    - linux
+    - darwin
+    - win32
 ---
 
 ## When to Use

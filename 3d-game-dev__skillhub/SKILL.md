@@ -1,9 +1,5 @@
 ---
 name: 3d-game-dev
-slug: 3d-game-dev
-version: 1.0.0
-displayName: 3D 游戏开发（Godot 4）
-summary: 用 Godot 4 从零到可玩的 3D 游戏完整工作流：第一/第三人称控制器、glTF 资产管线、关卡拼搭、灯光氛围、导航 AI、性能与导出。
 description: >-
   用 Godot 4 + GDScript 开发 3D 游戏的端到端工作流。触发场景："做一个 3D 游戏"、
   "第一人称/第三人称/FPS/TPS/3D 平台跳跃"、"用 Godot 做 3D"、"加个 3D 角色控制器/
@@ -13,6 +9,11 @@ description: >-
   StandardMaterial3D 材质贴图、WorldEnvironment 灯光氛围、NavigationAgent3D 敌人
   寻路、动画播放、HUD、无头验证与截图验收、性能优化、导出。只做 3D；2D 游戏用
   2d-game-dev skill。
+metadata:
+  slug: 3d-game-dev
+  version: 1.0.0
+  displayName: 3D 游戏开发（Godot 4）
+  summary: 用 Godot 4 从零到可玩的 3D 游戏完整工作流：第一/第三人称控制器、glTF 资产管线、关卡拼搭、灯光氛围、导航 AI、性能与导出。
 ---
 
 # 3D 游戏开发（Godot 4 + GDScript）

@@ -1,23 +1,24 @@
 ---
-name: Godot动画
-slug: godot-animation
-version: 1.0.0
-displayName: Godot动画
+name: godot-animation
 description: >
   Godot动画专用技能，帮助AI Agent高效完成相关任务。
-summary: "Godot动画专用技能，帮助AI Agent高效完成相关任务。"
 license: Apache-2.0
-category: 游戏开发
-framework:
+metadata:
+  slug: godot-animation
+  version: 1.0.0
+  displayName: Godot动画
+  summary: Godot动画专用技能，帮助AI Agent高效完成相关任务。
+  category: 游戏开发
+  framework:
   - Claude Code
   - Codex
   - Hermes Agent
   - OpenClaw
   - QClaw
   - WorkBuddy
-platform: multi-platform
-homepage: "https://github.com/1991513ccie-png"
-repository: "https://github.com/1991513ccie-png"
+  platform: multi-platform
+  homepage: https://github.com/1991513ccie-png
+  repository: https://github.com/1991513ccie-png
 ---
 
 

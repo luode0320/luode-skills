@@ -5,7 +5,6 @@ license: MIT
 metadata:
   id: z-data-crypto
   version: 1.1.0
-  agent_created: true
   platforms: 全平台
   category: data-analysis
   slug: z-data-crypto

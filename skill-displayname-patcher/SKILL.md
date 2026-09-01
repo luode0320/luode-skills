@@ -1,7 +1,8 @@
 ---
 name: skill-displayname-patcher
-displayName: "Skill 显示标题中文规范化"
 description: 当 WorkBuddy「我安装的」技能列表中英文显示标题混杂，或 builtin skill 被 workbuddySeedManaged 重新同步回英文时触发。负责扫描所有 skill 目录、识别缺中文 name 的 _skillhub_meta.json、给出简洁技术风的中文翻译并批量写入（不改 slug、不动 SKILL.md、不破坏调用），以及给 user 自建无 meta 的 skill 创建中文 _skillhub_meta.json。
+metadata:
+  displayName: Skill 显示标题中文规范化
 ---
 
 # Skill 显示标题中文规范化

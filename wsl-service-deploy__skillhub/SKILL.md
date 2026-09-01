@@ -3,7 +3,7 @@ name: wsl-service-deploy
 description: >-
   WSL Ubuntu 服务一键部署。通过 wsl.exe + su -c root + aptitude，无需 SSH 即可在 Windows 宿主机上安全、快速地安装和管理后端服务。
   覆盖 MySQL、Redis、Nginx、PostgreSQL、MongoDB 等任意 aptitude 可搜到的包。适用场景：WSL 运维、服务安装、环境搭建。
-agent_created: true
+
 ---
 
 # WSL Service Deploy

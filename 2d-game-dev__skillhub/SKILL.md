@@ -1,9 +1,5 @@
 ---
 name: 2d-game-dev
-slug: 2d-game-dev
-version: 1.0.0
-displayName: 2D 游戏开发（Godot 4）
-summary: 用 Godot 4 从零到可玩的 2D 游戏完整工作流：脚手架、场景架构、平台跳跃/俯视角控制器、TileMap、UI、资产接入、无头验证与导出。
 description: >-
   用 Godot 4 + GDScript 开发 2D 游戏的端到端工作流。触发场景："做一个 2D 游戏"、
   "写个平台跳跃/横版/俯视角/弹幕/roguelike 游戏"、"用 Godot 做游戏"、"加个角色控制器/
@@ -12,6 +8,11 @@ description: >-
   模板（CharacterBody2D 控制器、TileMap 关卡、Area2D 拾取与伤害、敌人 AI）、UI/HUD、
   像素画导入设置、免费素材源、命令行无头验证与截图验收、导出发布。只做 2D；3D 游戏用
   3d-game-dev skill。
+metadata:
+  slug: 2d-game-dev
+  version: 1.0.0
+  displayName: 2D 游戏开发（Godot 4）
+  summary: 用 Godot 4 从零到可玩的 2D 游戏完整工作流：脚手架、场景架构、平台跳跃/俯视角控制器、TileMap、UI、资产接入、无头验证与导出。
 ---
 
 # 2D 游戏开发（Godot 4 + GDScript）

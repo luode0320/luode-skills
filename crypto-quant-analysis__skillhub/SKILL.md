@@ -1,7 +1,7 @@
 ---
 name: crypto-quant-analysis
 description: "Enhanced cryptocurrency-only quantitative analysis skill for crypto/digital assets. Triggers on technical indicators (RSI/MACD/Bollinger/EMA), statistical analysis (correlation/volatility/regression), strategy backtesting (MA cross/RSI/Bollinger), portfolio optimization (mean-variance/risk parity), risk metrics (VaR/max drawdown/Sharpe), category-specific fundamental analysis (DeFi TVL/Meme narrative/L1 ecosystem), and on-chain data (protocol TVL/fees/chain stats). Features multi-source data cross-validation (CoinGecko + exchanges), network-aware exchange selection (Binance/Bybit vs Gate/OKX), and auto-detected token categorization. Never use for stocks, equities, forex, commodities, or traditional securities."
-agent_created: true
+
 ---
 
 # Crypto Quantitative Analysis v2.2

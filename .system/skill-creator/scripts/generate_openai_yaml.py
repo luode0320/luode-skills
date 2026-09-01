@@ -106,7 +106,7 @@ def read_frontmatter_name(skill_dir):
     if not skill_md.exists():
         print(f"[ERROR] SKILL.md not found in {skill_dir}")
         return None
-    content = skill_md.read_text()
+    content = skill_md.read_text(encoding="utf-8")
     match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not match:
         print("[ERROR] Invalid SKILL.md frontmatter format.")

@@ -1,14 +1,15 @@
 ---
 name: write
 description: Rewrites and polishes prose in Chinese or English, removes AI-like wording, and reviews product localization copy while preserving intent for drafts, docs, release notes, launch copy, and social posts. Use when users ask in any language to draft, rewrite, proofread, localize, polish release notes, remove AI-like wording, or prepare launch and social copy. Not for code comments, commit messages, or inline docs.
-version: 1.0.1
-when_to_use: 帮我写, 改稿, 润色, 去AI味, 写一段, 审稿, 文档review, 本地化文案, 多语言文案, i18n copy, localization copy, check this document, 推特, twitter, X推文, tweet, social post, 连贯性, 段落连贯, draft, edit text, proofread, sound natural, polish, rewrite
-dispatch_intent: Writing, editing prose, polish, release notes, launch/social copy, remove AI tone
-display_name: "自然改写"
-display_name_en: "Natural Rewrite"
-description_zh: "去除文本中的 AI 味，把稿件改写得更自然、像人写的。支持中英文润色、去 AI 味、发布说明、社交文案、产品本地化审校与长文结构打磨，保留原意与作者语气，不做过度修饰。"
-description_en: "Strip AI patterns from prose and rewrite it to sound human. Supports Chinese/English polishing, de-AI rewriting, release notes, social copy, product localization review, and long-form structural editing—preserving meaning and author voice without over-editing."
-visibility: "public"
+metadata:
+  version: 1.0.1
+  when_to_use: 帮我写, 改稿, 润色, 去AI味, 写一段, 审稿, 文档review, 本地化文案, 多语言文案, i18n copy, localization copy, check this document, 推特, twitter, X推文, tweet, social post, 连贯性, 段落连贯, draft, edit text, proofread, sound natural, polish, rewrite
+  dispatch_intent: Writing, editing prose, polish, release notes, launch/social copy, remove AI tone
+  display_name: 自然改写
+  display_name_en: Natural Rewrite
+  description_zh: 去除文本中的 AI 味，把稿件改写得更自然、像人写的。支持中英文润色、去 AI 味、发布说明、社交文案、产品本地化审校与长文结构打磨，保留原意与作者语气，不做过度修饰。
+  description_en: Strip AI patterns from prose and rewrite it to sound human. Supports Chinese/English polishing, de-AI rewriting, release notes, social copy, product localization review, and long-form structural editing—preserving meaning and author voice without over-editing.
+  visibility: public
 ---
 
 # Write: Cut the AI Taste
