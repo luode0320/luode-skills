@@ -193,7 +193,8 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 
 - 接口功能验证、回归、Bug 接口验证、上线门禁的接口部分，统一用 `apifox test-case run` / `test-suite run` 在 apifox「AI 团队」对应项目中执行，并**落地测试用例保存到 apifox**（用例保留即落地，必要时并入 test-suite 回归）。
 - **apifox 测试专用项目（用户为 apifox 测试单独创建的项目）直接在 `main` 分支操作**：接口文档操作、测试、补充测试用例全部直接落在 main 分支，**不新开 AI 分支 / api 分支，不做「开分支 → 自动化测试 → 合并回 main」的多余操作**（项目级隔离已足够）。
-- 不得只在本地 shell/curl 验证后不落地用例；「本地调试过」不构成跳过 apifox 落地的理由。
+- **任何本地测试形态都不构成豁免（强制，2026-09-01 实操补强）**：不得只做本地验证后不落地用例。「本地」包括但不限于 shell/curl、Python/Node 脚本（`urllib`/`requests`/`axios` 直调接口）、`go test` / pytest 外部黑盒包、`test/` 下的接口对照脚本。**「本地脚本已经覆盖了同样的断言」是最常见的漏触发借口，明确不成立**——本地脚本证明的是「这一次逻辑正确」，apifox 用例是团队可复用、可回归、可进 CLI/CI 的资产，二者验证目标不同，不可互相替代。原条款只列了 shell/curl，导致本地 Python 接口脚本在字面上不被覆盖而被自我判定为「已满足接口级测试」，故扩展为形态无关表述。
+- **接口实现改动即触发（强制）**：只要本轮改动触达接口可见行为（新增/修改 handler、路由、请求或响应 DTO、参数校验、字段白名单、排序/筛选/分页口径、错误码与错误文案），无论是否新增接口，都必须走本通道；「只是给已有接口加了两个字段」「只是加了个排序参数」同样触发。
 - 目标项目解析与接口同步流程见 `apifox-cli__skillhub/modules/ai-team-project.md` 与 `modules/api-sync-to-apifox.md`；swag/OpenAPI 生成归 `swag-openapi-maintainer-rules`。
 
 ### 环境红线不变（强制）
@@ -223,9 +224,23 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 10. 结论写回 doc/5-tests/ 测试主文档（内联 caseId/报告链接），必要时回写接口基线
 ```
 
+### 收口硬闸：接口改动轮必须给出 apifox 证据（强制）
+
+> 本节是「接口级测试收口证据」的判据单一权威；`code-change-finalization-gate-rules` 只引用本节做闸门执行，不重复定义判据。补于 2026-09-01：此前本通道只写了「必须走 apifox」，但收口清单里没有对应的证据项，导致本地测试全绿即被当成可收口，漏触发在收口阶段无人拦截。
+
+- **触发判定**：本轮存在接口实现改动（判据见上方「接口实现改动即触发」）。
+- **收口必须给出的证据**（缺任一项即不得宣称「已完成 / 已验证可用」）：
+  1. projectId + 接口 endpointId（新接口须说明是 `import` 同步还是 `endpoint create` 直建）；
+  2. 用例 / 场景标识（caseId 列表或 scenarioId）与分类分布（正向 / 负向 / 边界值 / 安全性各几条）；
+  3. 真实运行结果，按**断言总数 / 失败数**口径给出（不用勾叉计数，理由见 `apifox-cli__skillhub/modules/testing-pitfalls.md` 陷阱 12-1）；
+  4. 写接口的数据清理复核结论（残留条数 + 全表行数对照）。
+- **本地测试结果不能顶替上述任何一项**：本地脚本断言数可以一并列出，但必须与 apifox 证据分列，禁止合并成一个「测试全过」的笼统结论。
+- **允许的例外**：接口无法在 local 环境达成前置条件（上游不可达、依赖外部签名等）时，按环境阻断如实登记（哪几条、阻断原因、补跑命令），**不得默认视为已覆盖**；例外只针对具体用例，不豁免整轮。
+
 ### 结论留痕
 
 - 接口验证结论写回 `doc/5-tests/` 测试主文档；用例保存证据（caseId / suiteId / 报告链接）内联进证据小节，不得只写「已测试」无凭据。
+- 项目已有 `PROJECT_TEST.md`（测试域 SSOT）时，apifox 侧的接口 id / 用例 id / 场景 id、踩到的用例构造坑与覆盖缺口一并追加到其变更记录，供后续同类模块直接复用。
 
 ### 专项方法论按需加载
 

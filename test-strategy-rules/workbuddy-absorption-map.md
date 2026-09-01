@@ -39,3 +39,24 @@
 **棘轮验证**：吸收前测试域在"用例设计方法"维度为空白（无可引用的方法定义、无维度清单、无质量判定），吸收后新增单一权威 reference + 3 处下游引用 + apifox 边界表，覆盖从 0 → 有；体积净增约 8.2 KB（其中 SKILL.md 主体仅 +730 字节，其余在按需加载的 reference），符合"净增最小化"。保留。
 
 **源处置**：吸收确认后删除源 skill 双副本（用户级 + 工作区），详见 `references/source-notes.md`。
+
+## 2026-09-01 执行中 gap 回补：接口改动轮漏接 apifox 测试
+
+- **来源**：内部调整（执行中 gap 回补通道）。真实触发场景 = ellipal_admin 热门列表 `fromSort`/`toSort` 改为可编辑并新增排序查询后，agent 只跑了本地 Python 接口对照测试（104 断言全过）即宣称收口，用户指出「涉及接口实现改动，单元测试后要继续 apifox 测试」。
+- **通道**：执行中 gap 回补（`references/gap-signals.md` 判定为 skill 缺口，类型 = 闸门缺失 + 负向条款覆盖不全，等级 = 阻断级：直接导致错误宣称完成）。
+- **环境依赖**：N/A（本次补的是判据与闸门文本，不引入环境变量 / hook / 依赖安装；apifox CLI 与环境配置依赖已由 `apifox-cli__skillhub` 既有条款承载）。
+- **agent 通用性**：通用（判据不依赖任何特定 agent 能力，纯规则文本）。
+
+| # | gap 条目 | 本地现状（回补前） | 裁决 | 落点 | 整理去重 |
+|---|---------|-------------------|------|------|----------|
+| 1 | 本地脚本测试不构成 apifox 豁免 | 已有「不得只在本地 shell/curl 验证后不落地用例」，但只列了 shell/curl，本地 Python/Go 接口脚本在字面上不被覆盖，导致自我判定为「已满足接口级测试」 | 合并（扩展为形态无关表述） | `test-strategy-rules/SKILL.md` 接口级测试强制走 apifox 节 | 改写原条款而非新增并列条款，避免两处表述并存 |
+| 2 | 接口实现改动即触发（含只加字段/加排序参数） | 原触发判定只写「测试对象是 HTTP 接口」，未说明「已有接口的小改动同样触发」 | 合并 | 同上 | 与条目 1 合为同一列表相邻两条，不另起小节 |
+| 3 | 收口必须给出 apifox 证据 | 通道写了「必须走 apifox」，但收口清单无对应证据项，漏触发在收口阶段无人拦截 | 合并（新增判据小节） | `test-strategy-rules/SKILL.md` 新增「收口硬闸：接口改动轮必须给出 apifox 证据」 | 声明为判据单一权威，`code-change-finalization-gate-rules` 只加 1 行引用，不重复定义 |
+| 4 | 结果登记进 PROJECT_TEST.md | 「结论留痕」只要求写 `doc/5-tests/` | 合并 | 同节「结论留痕」追加 1 行 | 复用既有小节，不新增小节 |
+| 5 | 环境对齐手法（CLI 在宿主侧、服务在 WSL 时用 TCP 转发） | 无记录 | 拒绝 | — | 属一次性环境适配技巧且高度依赖具体机器拓扑，`apifox-cli__skillhub/modules/environment.md` 已有「本地服务端口探测三级链 + WSL2 跨系统访问」承载同类问题，再写一条属为吸收而吸收 |
+
+**同域冗余扫描**：范围 = `test-strategy-rules` / `test-program-rules` / `functional-validation-rules` / `test-regression-rules` / `bug-validation-rules` / `code-change-finalization-gate-rules`。发现 2 处需确认、清理 0 处需改写——① `test-program-rules:48` 已是「引用 + 边界声明」形态（明确写不重复定义接口级测试落点），与新增内容不冲突；② 收口证据判据全仓仅 `test-strategy-rules` 一处定义，gate 侧为引用形态。结论 **PASS**。
+
+**净增体积**：`test-strategy-rules/SKILL.md` 约 +1.6 KB（改写 1 条 + 新增 2 条 + 新增 1 小节 + 留痕 1 行），`code-change-finalization-gate-rules/SKILL.md` +1 行引用。无新增 reference 文件。
+
+**验证替代**：本次为规则文本回补，无 8 维评分基线；以「原漏触发场景能否被拦住」做效果验证——本轮实操中正是缺这两条（形态无关负向条款 + 收口证据项）导致漏触发，补后同场景在收口阶段即被判为证据缺失，判定成立。

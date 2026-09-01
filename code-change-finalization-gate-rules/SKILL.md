@@ -1,6 +1,6 @@
 ---
 name: code-change-finalization-gate-rules
-description: 只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释链（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。
+description: '只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释链（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。'
 ---
 
 
@@ -33,6 +33,7 @@ description: 只要本轮存在代码新增/修改（含测试文件），最终
 4. 补注释请求只核验 comment-completion 的优先范围结论，不复制函数头、方法块或补丁字段定义。
 5. 核验真实测试完成后是否执行 `6-review`，并消费其 `STYLE: PASS/FIX_REQUIRED` 结果。
 6. 核验核心接口、页面、导出、查询、提交或任务入口的真实运行验证状态；仅有静态证据时必须降级。
+6.1 本轮改动触达接口可见行为时，按 `test-strategy-rules` 的「收口硬闸：接口改动轮必须给出 apifox 证据」逐项核验（判据与证据清单以该节为唯一权威，本入口不重复定义）；**本地脚本/单元测试结果不能顶替该证据**，缺失即不得给出「已完成 / 已验证可用」结论。
 7. 若出现用户手改与旧上下文冲突，核验 `code-context-resync-rules` 已执行且最终 diff 未回退用户内容。
 
 ## 默认执行流程
