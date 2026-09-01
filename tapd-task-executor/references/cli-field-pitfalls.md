@@ -2,7 +2,7 @@
 
 本文件只收录**实测踩过、且会导致静默错误结论**的坑。静默错误比报错危险——报错会停下，静默错误会让你拿着错数据往下走。
 
-来源：2026-08-28 完成需求 1162459836001001627 的真实执行。
+来源：2026-08-28 完成需求 1162459836001001627、2026-09-01 完成缺陷 1130399328001002897 的真实执行。
 
 ## 一、按人筛选：story 与 bug 的字段不一样
 
@@ -145,3 +145,40 @@ tapd-cli story update workspaceid=<id> id=<19位id> status=resolved current_user
 ```
 
 返回体里会带更新后的完整 Story 对象，**核对 `status` 与 `modified` 字段确认真的改了**，不要只看 `status:1`（那是 API 调用成功标志，不是业务状态）。
+
+### 缺陷不能直接置 resolved——工作流要求逐跳走，且中间跳有必填字段
+
+需求可以一步 `status=resolved`，**缺陷不行**。缺陷受项目工作流约束，`new` 通常没有直达 `resolved` 的边，硬传会失败或静默不生效。
+
+先拉工作流，筛出从当前状态出发的合法下一跳与必填字段（`Notnull=yes`）：
+
+```bash
+python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py \
+  get --endpoint workflows/all_transitions -p workspace_id=<id> -p system=bug
+```
+
+实测 30399328「研发内部需求」的缺陷工作流（2026-09-01，缺陷 1002897）：
+
+| 起点 | 合法下一跳 | 该跳必填字段 |
+|---|---|---|
+| `new` | `new` / `in_progress` / `rejected` | 到 `in_progress` 必填 `de`（开发人员）、`effort`（预估工时）|
+| `in_progress` | `in_progress` / `resolved` / `rejected` | 无 |
+| `resolved` | `resolved` / `verified` / `reopened` / `closed` | 到 `verified` 必填 `te`（测试人员）|
+
+所以 `new → resolved` 实际要走两跳：
+
+```
+POST bugs  status=in_progress  de=<中文名>  effort=<小时>
+POST bugs  status=resolved
+```
+
+**每跳后回读实体核对再走下一跳**，缺陷额外核对 `resolved` 时间戳已写入：
+
+```python
+r = tc.request("GET", "bugs", params={"workspace_id": ws, "id": bug_id,
+                                      "fields": "id,status,de,effort,resolved"})
+```
+
+**工作流是项目级配置，各项目不同**，上表只是一个实例，不能当通用常量套用——每次都读 `all_transitions`。
+
+**终态止于 `resolved`**：`verified` / `closed` 代表测试已验证通过，属测试角色判定，自动化流程不越权置上。
