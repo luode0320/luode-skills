@@ -1,0 +1,15 @@
+{
+  "slug": "wails-desktop-app-framework-go-web",
+  "name": "Wails Go 和网络技术桌面应用框架",
+  "version": "1.0.0",
+  "installedAt": 1789295522791,
+  "source": "skillhub",
+  "namespace": "user_3c6cb52e",
+  "canonicalName": "@user_3c6cb52e/wails-desktop-app-framework-go-web",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "Wails 是一个开源框架，使用 Go 作为后端逻辑，使用标准网页技术（HTML、CSS、JavaScript）作为前端来构建桌面应用程序。它编译成单个原生二进制文件，无嵌入式浏览器开销。",
+  "description_en": "Wails 是一个开源框架，使用 Go 作为后端逻辑，使用标准网页技术（HTML、CSS、JavaScript）作为前端来构建桌面应用程序。它编译成单个原生二进制文件，无嵌入式浏览器开销。",
+  "installs": 155
+}

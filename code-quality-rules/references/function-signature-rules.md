@@ -12,41 +12,45 @@
 2. 必填的业务主参数居中。
 3. 可选、配置、扩展类参数放最后，并默认收敛进结构体。
 
-## 数量控制：以语义为准
+## 数量控制：硬性上限（参数与返回值 ≤ 2）
 
-- 不以固定数字作为唯一标准，优先判断参数是否“同源”，即是否属于同一业务对象或同一次操作。
-- 同源参数达到 3 个及以上时，建议收敛为结构体。
-- 只要出现可选参数、默认值或未来会扩展的字段，就直接收敛为结构体，不再继续追加位置参数。
+- **硬性上限**：函数参数和返回值均不得超过 2 个；一旦超过 2 个，必须改用结构体传参或返回。
+- **参数收敛**：入参达到 3 个及以上时，必须定义结构体收敛传参（例如 `(ctx context.Context, params XxxParams)`）；只要出现可选参数、默认值或未来会扩展的字段，直接收敛为结构体。
+- **返回值收敛**：返回值达到 3 个及以上时，必须定义结果结构体返回（例如 `(res XxxResult, err error)`），禁止直接返回 3 个及以上独立值。
 
-## 单参数 与 结构体参数 的取舍
+## 独立参数/返回值 与 结构体 的取舍
 
-保持独立参数：
+保持独立参数/返回值：
 
+- 参数数量 ≤ 2 个（例如单业务参数或 `ctx` + 业务主参数）；
+- 返回值数量 ≤ 2 个（例如 `(data, error)` 或 `(bool, error)`）；
 - 参数彼此独立，没有共同归属；
-- 全部必填，没有默认值；
-- 短期内不会扩展；
-- 所有调用点用法一致。
+- 全部必填，没有默认值且短期内不扩展。
 
-收敛为结构体参数：
+收敛为结构体：
 
-- 同源参数达到 3 个及以上；
+- 参数超过 2 个（达到 3 个及以上）必须封装为参数结构体；
+- 返回值超过 2 个（达到 3 个及以上）必须封装为结果结构体；
 - 存在可选、默认值或扩展字段；
-- 这组参数需要跨函数、跨层传递；
-- 参数会随需求演进，需要保持签名稳定。
+- 需要跨函数、跨层传递。
 
 禁止：
 
-- 参数只有 1-2 个时硬造结构体，属过度封装，按主线 1 的反对项处理；
+- 参数超过 2 个时继续平铺位置参数；
+- 返回值超过 2 个时散落返回多个零散变量；
 - 用可变参数 `...T` 规避参数设计；变参只用于同质、不定长集合。
 
 ## 命名与注释
 
 - 结构体参数命名：全必填用 `XxxParams`，含可选或配置项用 `XxxOptions`。
+- 结构体返回值命名：用 `XxxResult` 或 `XxxResp`。
 - 结构体与其字段的注释按 `comment-rules` 执行，本规则不重复。
 
 ## 正反例
 
-正例：同源参数 3 个及以上时收敛为结构体。
+### 1. 参数收敛
+
+正例：参数超过 2 个时收敛为结构体（`ctx` 算第 1 个参数，`params` 算第 2 个参数，总数不超过 2 个）。
 
 ```go
 type HandleStageFailureParams struct {
@@ -58,10 +62,30 @@ type HandleStageFailureParams struct {
 func HandleStageFailure(ctx context.Context, params HandleStageFailureParams) error
 ```
 
-反例：同源参数堆叠，还混入可选开关。
+反例：参数超过 2 个平铺展开。
 
 ```go
-func HandleStageFailure(ctx context.Context, orderID, stage string, retryMax int, withNotify bool) error
+func HandleStageFailure(ctx context.Context, orderID string, stage string, retryMax int) error
+```
+
+### 2. 返回值收敛
+
+正例：返回值超过 2 个时封装为结果结构体（结果结构体 + error 总数不超过 2 个）。
+
+```go
+type OrderSummaryResult struct {
+    TotalAmount  int64
+    SuccessCount int
+    FailCount    int
+}
+
+func CalculateOrderSummary(ctx context.Context, orderID string) (*OrderSummaryResult, error)
+```
+
+反例：返回值超过 2 个散落多值返回。
+
+```go
+func CalculateOrderSummary(ctx context.Context, orderID string) (int64, int, int, error)
 ```
 
 ## 与相邻规则的边界

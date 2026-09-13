@@ -1,5 +1,19 @@
 # 项目当前状态
 
+## 2026-09-14 补充代码分解规则（目录树 skill 与代码拆分 skill）
+
+- 来源对象：用户明确要求为『目录树 skill』和『代码拆分 skill』补充 5 项代码分解规则：
+  1. 单个代码文件超过 200 行时，拆分为多个 diamond 文件并存放在同级目录；
+  2. 一个同级目录只能包含一种业务逻辑，若拆解后仍归为两种及以上业务，即使很小也必须拆分到不同目录；
+  3. 一个目录只做一件事，逻辑过多则拆分为多个同级文件存放；
+  4. 单个代码块或函数不得超过 80 行，超出则拆分为多个函数；
+  5. 函数参数和返回值均不得超过 2 个，否则改用结构体传参或返回。
+- 当前状态：**全部落地落盘**。
+  - ① 『目录树 skill』（`package-structure-rules`）：SKILL.md 核心边界新增第 12 条代码分解与目录内聚规则，通过标准同步；`structure-general.md` 新增代码分解与目录内聚规则（强制）专节；`project-layout-v2.md` 补齐扩展约束第 7 条；description 同步更新。
+  - ② 『代码拆分 skill』（`code-quality-rules`）：SKILL.md 统一硬约束、可读性主线 2、自动触发信号、进入后先做什么、通过/驳回标准全量同步 5 项规则，全面替换原 500 行粗拆分阈值；`readability-general.md` 总则更新 5 项分解规则；`function-structure-rules.md` 补齐 80 行函数上限、200 行 diamond 文件拆分与参数/返回值 ≤ 2 规则；`function-signature-rules.md` 重构数量控制为硬性上限（参数与返回值 ≤ 2），补齐参数与返回值结构体设计及正反例；`readability-examples.md` 补充正反例。
+  - ③ 字典与索引：重跑 `generate_dictionary.py`，同步刷新 `字典.md` 与 `skill-dictionary/data.js`。
+- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；工作日志写入 `.workbuddy/memory/2026-09-14.md`；改动完成提交（提交标题：feat: [代码分解与规则同步] 补齐目录树与代码拆分规则及技能字典资产同步）。
+
 ## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（内部更新通道）
 
 - 来源对象：用户明确提出将规范固化到 Apifox skill 中（附带客户端截图红框证据：左侧接口树 `auth`、`registry`、`tasks`、`policies`、`audit`、`tenants` 等纯英文文件夹及 `GET Health` 英文接口名，团队不熟悉英文的成员读不懂）。核心规范：**接口的 API 路径保持原有英文路径不变，但所有用于展示和阅读的内容必须统一使用简体中文**（包括接口显示名称、文件夹名称、接口说明文档，以及请求参数和响应字段的注释描述），生成或更新接口定义时严格按此规范执行。
@@ -122,22 +136,6 @@
 - 关键量化：SKILL.md +1 句（~160B）、reference +1 小节（~380B）、知识库 +1 笔记；quick_validate `Skill is valid!`（exit 0）；knowledge_index check 本轮新笔记 0 违规（存量 8 篇缺 frontmatter 属历史遗留，另行处理）。
 - 验证与交接：同域冗余扫描 PASS（package-structure-rules/naming-rules/code-style-consistency-rules 0 重复，归属引用契约唯一权威）；改动停在已改动未提交状态。
 - 遗留：知识库 8 篇历史笔记缺 frontmatter（`20-Knowledge/AI协作/*`、`20-Knowledge/研发流程/*`）未在本轮处理；ellipal_finance 侧代码对齐（`swapList`→`v1list`、补 v2 缓存清理调用）属跨项目只读边界，已在会话给出改动计划，需在目标项目新开会话执行。
-
-- 来源对象：用户指令「优化 free-api-50__skillhub skillhub 34.1 — 缺 frontmatter 偏宣传」（SOP 固化后首轮执行）
-- 当前目标：按 `low-score-skill-optimization-sop.md` 八步闭环优化第 10 个低分 skill
-- 当前状态：全部完成。基线实锤：SKILL.md 28 行完全无 frontmatter（校验器 `No YAML frontmatter found`）+ 宣称与实现不符 2 处（clawhub 依赖未装、"无密钥"但木小果 API 本机不可达 DNS→内网 172.29.1.188 TLS 失败，仅 wttr.in 可用）。落盘：脚本去 clawhub 改纯 argparse CLI（886 行 54 命令 + --check/--list/--version）、SKILL.md 重构 104 行（frontmatter + 数据源诚实声明 + 流程/边界/检查点/命令表 + 交叉引用）、requirements 仅 requests、version 1.1.0。
-- 关键量化：脚本 800→886 行（去框架依赖）、SKILL.md 28→104 行、54/56 命令实测 0 Traceback、修 2 个自引 bug、复评闭环修复 2 处（命令数口径 54/53、脚本 10 处【新增】注释清理）。
-- 验证与交接：quick_validate `Skill is valid!`（exit 0）；独立子代理复评 `1|5|4|4|6|8|4 → 9|9|8|8|9|7|8`（34.1 → 63.3/75，+29.2）；维度 8 实测全通过；知识库沉淀追加 1 段 + 工作日志追加。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-
-
-- 来源对象：用户指令「总结经验和步骤，后续评分巡检中低分 skill 都按这个流程优化，经验吸收进吸收 skill 的 skill」
-- 当前目标：把八轮优化闭环经验总结成标准 SOP，吸收进 `skill-absorption-rules`
-- 当前状态：全部完成。新增 `references/low-score-skill-optimization-sop.md`（6306B：触发信号 + 八步闭环表 + 短板类型学 7 类映射 + 市场检索规律 + 验证纪律 + 实操坑 + 单轮收口清单 + 边界声明）；SKILL.md 自动触发信号 +1 条 + references 读取规则 +1 条；score-inspection-workflow.md 短板识别节补衔接句（自有 rules/other 短板 → 按 SOP 逐条优化），"打分发报告"与"低分优化"上下游闭环；登记 source-notes.md + workbuddy-absorption-map.md。
-- 关键量化：净增 1 reference（6306B）+ SKILL.md 2 行 + score-inspection 1 句；覆盖度审查修正 2 处轻微表述 + 补入"复评确定性小问题顺手修复"经验。
-- 验证与交接：quick_validate `Skill is valid!`（exit 0）；同域冗余扫描 4 项 PASS（SOP vs score-inspection 为"优化 vs 打分"引用式衔接，无重复段落/无门控层叠/无散落产物/引用链可达）；独立子代理覆盖度审查 PASS（对照知识库八轮记录逐节核对：无漏项、无失实）；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留：后续低分 skill 优化一律按 SOP 执行（制度化）；全量评分报告未更新（保持口径）。
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 
