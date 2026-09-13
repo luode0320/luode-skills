@@ -8,7 +8,69 @@
 >
 > **内部更新通道登记（2026-08-20 起）**：本表同时登记「内部 skill 更新通道」的裁决式调整——来源列写"内部调整：<目标 skill>，<调整诉求>"，其余列（裁决 / 落点 / 整理去重 / 同域扫描结论 / 净增体积）要求与外部吸收完全一致，无外部源可删。
 
-## 2026-08-26：内部更新——测试进程生命周期强制收口
+## 2026-09-06：外部吸收——Design（skillhub）设计偏好学习机制 → frontend-design 集成
+
+- **来源**：skillhub `design` v1.0.0（ownerId `kn73vp5rarc3b14rc7wjcw8f8580t5d1`），本地安装源 `~/.workbuddy/skills/design__skillhub/`。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 删除源）。
+- **吸收目标**：`frontend-design`（前端设计生成型 skill，版本 1.1.0 → 1.2.0）。
+- **同域前任**：`frontend-ui-visual-rules` 已于 2026-08-22 从同一源吸收，落点为 `references/visual-preference-learning.md`（case-design-absorption.md 记录）。
+- **拆解原子规则数**：9 条。
+
+| 外部来源 | 外部精华 | 本地现状 | 裁决 | agent 通用性 | 落点 / 理由 |
+|---------|---------|---------|------|-------------|------------|
+| design | 自动学习视觉偏好——从用户选择、反馈、反应中检测模式 | 缺失。frontend-design 无偏好学习机制 | 合并 | 通用 | 增强 `frontend-ui-visual-rules/references/visual-preference-learning.md`（权威文件），补充工作流集成节 |
+| design | 偏好分类体系（Aesthetic / By Medium / Brands / Never） | 缺失。但同域已有权威文件（visual-preference-learning.md 四分类语义等价） | 合并(同域收敛) | 通用 | 不新写，增强权威文件并补充 frontend-design 工作流衔接 |
+| design | 偏好添加准则（1次明确表达+2+次一致模式，排除客户需求/一次性实验） | 缺失。同域权威文件已有相同语义 | 合并(同域收敛) | 通用 | 增强权威文件，补充「反馈模式记录示例」节 |
+| design | 设计维度检测框架（8个维度：视觉风格/颜色/字体/布局/UI/图形/动效/媒介） | 同域权威文件已有检测维度节 | 保留本地 | — | 同域权威文件已覆盖，不重复 |
+| design | 反馈模式捕捉（记录喜欢/不喜欢/参考来源/竞品参考） | 缺失。同域权威文件无示例 | 合并(同域收敛) | 通用 | 增强权威文件，补充「反馈模式记录示例」节 |
+| design | 媒介限定——不同媒介不同偏好 | 缺失。同域权威文件「按介质」分类语义等价 | 保留本地 | — | 同域权威文件已覆盖 |
+| design | 主观性处理——趋势而非规则，记录例外，随品味更新 | 缺失。同域权威文件「倾向性表述」语义等价 | 保留本地 | — | 同域权威文件已覆盖 |
+| design | 维护规则——保持紧凑，合并相似项 | 同域权威文件「同义词合并」+ 本地上轮「吸收即整理」原则覆盖 | 保留本地 | — | 本地更强 |
+| design | 整体偏好记录为 SKILL.md 内的模板段落 | 形态不匹配，frontend-design 是工作流型 skill | 拒绝 | — | 形态不迁移，精华已通过上方合并条目收敛至同域权威 |
+
+- **落盘改动**：
+  - 修改 `frontend-design/SKILL.md`（版本 1.1.0 → 1.2.0）：第 1 步工作流增加偏好查询环节（①-④ 步）+ 职责边界引用指向 `frontend-ui-visual-rules/references/visual-preference-learning.md`。
+  - 增强 `frontend-ui-visual-rules/references/visual-preference-learning.md`（权威文件）：新增「在 frontend-design 工作流中的应用」节（第 1-2-5 步衔接）+「反馈模式记录示例」节。
+  - 新增 `frontend-design/references/source-notes.md`（吸收登记）。
+- **整理去重**：新建的 `design-preference-learning.md`（~5.5KB）与同域权威文件 `visual-preference-learning.md` 高度重复 → 删除冗余文件；出错的文件（~5.5KB）已删除。权威文件净增约 +0.8KB（工作流集成 + 反馈示例），减去冗余文件后体系净增为负。
+- **同域扫描结论**：范围 = frontend-design（吸收目标）、frontend-ui-visual-rules（同域权威）、frontend-component-rules（同域技术层）、frontend-ui-visual-rules（数据层）。发现 = 1 处重复段落（新建 `design-preference-learning.md` 与 `visual-preference-learning.md` 高度重复）、0 处门控层叠、0 处散落产物；清理 1 处（删除冗余文件）；引用链收敛为「单一权威（visual-preference-learning.md）+ 引用（frontend-design SKILL.md 指针）」；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：SKILL.md +1.8KB（版本增约 +0.5KB，工作流 +0.5KB，引用 +0.1KB，source-notes +0.7KB）；权威文件 +0.8KB；删除冗余文件 -5.5KB；**体系净增 ≈ -2.9KB（净减）**。
+- **棘轮验证**：引用链 2 处可达（frontend-design SKILL.md L19-L24 工作流 → visual-preference-learning.md 相应节；SKILL.md L65 职责边界 → visual-preference-learning.md）；UTF-8 3 文件 OK；`quick_validate.py` 结构校验 PASS（待执行）。
+- **源清理**：吸收完成后删除本地安装源 `design__skillhub`（用户级 ~/.workbuddy/skills/design__skillhub/ 目录）。
+
+## 2026-09-06：外部吸收——Apple 流体交互设计（apple-design）→ frontend-design 集成
+
+- **来源**：WorkBuddy 市场 skill `apple-design`（个人开发者，v1.0.0，slug `apple-design`），本地安装源 `~/.workbuddy/skills/apple-design/`。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 删除源）。
+- **吸收目标**：`frontend-design`（前端设计生成型 skill，版本 1.2.0 → 1.3.0）。
+- **拆解原子规则数**：12 条。
+
+| # | 外部精华 | 本地现状 | 裁决 | agent 通用性 | 落点 / 理由 |
+|---|---------|---------|------|-------------|------------|
+| 1 | 流体交互核心思想（即时响应/连续运动/动量传递/动画可打断/物理模拟） | 本地动效节有"错峰 reveal、滚动触发、hover"但无物理模拟思想 | 合并 | 通用 | 增强 frontend-design SKILL.md 动效节，追加「弹簧物理驱动」段 |
+| 2 | 弹簧参数表（阻尼比/响应时间，三大交互类型参数） | 本地无任何弹簧物理参数 | 合并 | 通用 | `references/apple-fluid-design.md` 新建 |
+| 3 | 速度移交公式（手势释放速度移交至动画） | 本地无 | 合并 | 通用 | 同上 reference |
+| 4 | 动量投射公式（decelerationRate + 投影到最近吸附点） | 本地无 | 合并 | 通用 | 同上 reference |
+| 5 | 毛玻璃材质（backdrop-filter blur(20px) saturate(180%)） | 本地有"渐变网格、噪点纹理"但无毛玻璃配方 | 合并 | 通用 | 增强 frontend-design SKILL.md 背景节，追加毛玻璃材质段 |
+| 6 | 光学字号排版（字号/行高/字间距动态适配） | 本地有字体风格选择但无排版参数 | 合并 | 通用 | 并入 `references/apple-fluid-design.md` |
+| 7 | 无障碍动效降级 CSS（prefers-reduced-motion / prefers-reduced-transparency） | 本地边界条件仅提到"可访问性"但无具体 CSS | 合并 | 通用 | 增强 frontend-design SKILL.md 边界条件，追加无障碍动效降级节 |
+| 8 | 八大设计原则校验清单（目的性/控制权/责任/熟悉感/灵活性/简洁/工艺/愉悦感） | 本地无结构化评审原则 | 合并 | 通用 | 并入 `references/apple-fluid-design.md` |
+| 9 | 核心交互校验清单（按下即反馈/拖拽1:1/动画可打断/弹簧替代transition/动量投射/橡胶边界/路径对称） | 本地第 4 步自查有"风格统一、细节打磨"但无交互校验 | 合并 | 通用 | 增强 frontend-design SKILL.md 第 4 步，追加交互校验清单 |
+| 10 | 代码生成脚本（code-snippet-gen.py，仅 2 个硬编码模板） | 简陋形态，精华已通过上方条目吸收 | 拒绝 | — | 机制形态不迁移 |
+| 11 | 前置工具声明（allowed-tools: Read/Write/Bash） | 本地已有工具协议 | 拒绝 | — | 形态不匹配 |
+| 12 | 被动触发模式（user-invocable/disable-model-invocation） | 本地是主动触发型 skill | 拒绝 | — | 形态不匹配 |
+
+- **落盘改动**：
+  - 新增 `frontend-design/references/apple-fluid-design.md`（~6.7KB，弹簧参数/速度移交/动量投射/毛玻璃配方/无障碍降级/八大原则/交互校验清单/流体交互思想）。
+  - 修改 `frontend-design/SKILL.md`（版本 1.2.0 → 1.3.0）：动效节追加「弹簧物理驱动」段；背景节追加「毛玻璃材质」段；边界条件追加「无障碍动效降级」节；第 4 步自查追加交互校验清单引用；职责边界引用新增 `apple-fluid-design.md`。
+  - 修改 `frontend-design/references/source-notes.md`：追加本次吸收登记。
+- **整理去重**：N/A + 理由——弹簧参数、毛玻璃配方、流体交互校验均为本地全新能力，无存量重复段落可清。frontend-design 的"动效"节原有 1 段，现扩充为 2 段（传统动效 + 弹簧物理），语义互补非重复。
+- **同域扫描结论**：范围 = frontend-design（吸收目标）、frontend-ui-visual-rules（同域规则层）、frontend-component-rules（同域组件层）。发现 = 0 处重复段落（弹簧参数/毛玻璃配方/交互校验均为本地缺失能力，同域 2 个 skill 零命中）、0 处门控层叠、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 7.2KB（apple-fluid-design.md ~6.7KB + SKILL.md 约 +0.5KB）；外部源 6 文件约 247KB（含 _icon.png 236KB 图片 + 脚本 1.5KB + 模板/元数据），**体系净增 = +7.2KB（规则正文净增），源图片/脚本不计入规则体积**。
+- **棘轮验证**：引用链 4 处可达（SKILL.md L77 弹簧物理 → apple-fluid-design.md 弹簧参数节；L80 毛玻璃 → apple-fluid-design.md 毛玻璃节；L42 交互校验 → apple-fluid-design.md 核心交互校验清单节；L92 无障碍降级 → apple-fluid-design.md 无障碍降级节）；UTF-8 3 文件 OK；quick_validate.py 结构校验待执行。
+- **源清理**：吸收完成后删除本地安装源 `apple-design`（用户级 ~/.workbuddy/skills/apple-design/ 目录，6 文件 247KB 含图片）。
 
 - **来源**：内部调整：`test-strategy-rules`（测试策略统一主入口）+ `functional-validation-rules` + `browser-advanced-testing-rules`，调整诉求 = "测试任务结束后必须强制关闭测试启动的进程，禁止遗留后台；用户需要时自行启动。实测教训：真实链路测试启动的 12801 被测服务在测试收口后仍留在后台运行（goadmin-server-tmp 进程 + 端口监听），直到用户追问才处理"。
 - **形态**：内部更新通道（无外部源可删）。
@@ -426,3 +488,77 @@
 - **兼容适配**：外部变量名 `TAPD_ACCESS_TOKEN`/`TAPD_API_BASE_URL` → 本地 `TAPD_TOKEN`/`TAPD_API_ENDPOINT`，`_get_headers`/`_get_base_url`/`_is_cloud` 三处加 `or` 回退（实测本地仅注入 TAPD_TOKEN，未适配必失败）。
 - **联动增强**：tapd-task-executor「拉取我的任务+bug」步骤改为优先 mine 子命令，tapd-cli 兜底。
 - **棘轮验证**：无既有评分基线，以真实 API 冒烟 + quick_validate + AST + 同域扫描替代。mine 实测输出父需求树：`兑换（父）→ 兑换提供外部服务-对接开放接口`，19 位 id/状态/优先级/链接完整；bugs 查询 0 项正常。
+
+## 2026-09-05：外部吸收——grilling（严格拷问，marketplace 个人开发者 v1.0.0）
+
+- **来源**：WorkBuddy 市场 skill `grilling`（`_skillhub_meta.json`：source marketplace，skillId skill_2095263945412698112，display_name 严格拷问），本地安装源 `D:\谷歌云盘\luode-skills\grilling\`。
+- **形态**：外部吸收（本地安装源模式，直接读 `grilling/SKILL.md` 原文，不 WebFetch）。
+- **裁决**：拆解 8 条原子规则（每轮只问一个最关键问题 / 问题须推动决策或暴露风险 / 可查证事实先自查不丢给用户 / 决策权在用户且可给推荐答案不可拍板 / 无共享理解不执行 / 沿依赖最强分支问 / 语气直接有压力但不辱骂 / 输出=核心风险一句话+一个问题+一句推荐）→ **保留本地 × 8，合并 × 0**。逐条对应本地更强出处：`requirement-intake-rules/references/gap-routing.md`（一次只推一个真实缺口）、`adversarial-gap-interview.md`（推荐答案待确认建议 + 反方批评 + 决策树依赖优先 + 输出格式）、`initial-discovery-route.md`（可查证先自查）、`extreme-completeness-standard.md`（不满足模糊答案、直到共识）。本质为本地 2026-08-18 已吸收 `softspark-ai-toolkit-grill-me` 精华的同源复刻，无新增精华。
+- **落点**：无规则落盘（0 合并）；grilling 本体保留为独立「用户召唤式通用拷问入口」（本地对抗式追问均内嵌需求/实施流程，无独立 grill 触发入口，保留不构成重复）。
+- **环境依赖**：N/A（纯规则文本，无环境变量 / 配置 / hook / 依赖）。
+- **agent 通用性**：通用（frontmatter 无单 agent 绑定、正文无专属路径 / 命令 / 术语）。
+- **整理去重**：N/A + 理由（本次无合并内容落盘；仅登记，未触碰既有 adversarial / plan-devils-advocate-review 文件）。
+- **同域扫描**：范围 = grilling / requirement-intake adversarial-gap-interview / implementation-planning plan-devils-advocate-review；发现 0 处重复段落（grilling 正文与本地吸收产物无逐字重复，职责为独立召唤入口 vs 流程内嵌），清理 0 处。PASS。
+- **棘轮验证**：0 合并即无内容增量，无 8 维基线可比；以结构核对 + 同域扫描替代。净增体积：本体 0 改动，登记文件约 +15 行。
+- **源清理**：保留（用户主动安装的可用 skill，裁决为本地化保留非并入删除）。
+
+## 2026-09-07：外部吸收——量化策略回测师（wm-backtest）→ crypto-quant-analysis 集成
+
+- **来源**：WorkBuddy 市场 skill `wm-backtest`（个人开发者，v0.3.25，slug `wm-backtest`），本地安装源 `~/.workbuddy/skills/wm-backtest__skillhub/`。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 删除源）。
+- **吸收目标**：`crypto-quant-analysis`（加密货币量化分析 skill，v2.2）。
+- **拆解原子规则数**：11 条。
+
+| # | 外部精华 | 本地现状 | 裁决 | agent 通用性 | 落点 / 理由 |
+|---|---------|---------|------|-------------|------------|
+| 1 | 策略迭代方法论（基线→单变量假设→测试→拉执行历史→归因→1-3条改法→再跑） | 本地有 backtest.py 但无结构化迭代方法论 | 合并 | 通用 | 新增 `references/strategy-iteration-methodology.md` |
+| 2 | 结果归因框架（不只看总收益，要读执行历史+过程日志+因子暴露） | 回测仅输出收益率/夏普/回撤，无归因分析框架 | 合并 | 通用 | 同上 reference |
+| 3 | "一次只改一类"纪律（禁止同时改多个变量，否则无法归因） | 本地无此纪律 | 合并 | 通用 | 同上 reference |
+| 4 | 关键分支必须打点（归因依赖日志，仅 return 不 trace 无法证明规则是否触发） | 本地 Python 回测脚本无结构化日志概念 | 合并 | 通用 | 同上 reference，适配 Python 语境 |
+| 5 | 自然语言→回测工作流（预览确认→发起→输出→解读→偏差→下一轮改法） | 回测是直接执行，无"确认后发起"和"偏差解读"工作流 | 合并 | 通用 | 增强 SKILL.md 新增「策略迭代工作流」节 |
+| 6 | 结果分层拉取（先 summary 看全景，再 deep 看细节，再 trace 看过程） | 无分层概念 | 合并 | 通用 | 并入 references/strategy-iteration-methodology.md |
+| 7 | simulation.* / bt.* / run_custom / from_watchlist 等平台 API | 本地无此平台 | 拒绝 | — | 平台专属，不迁移 |
+| 8 | ConfigOverride 机制（改窗口/宇宙/参数 vs 改脚本逻辑分离） | 平台专属机制 | 拒绝 | — | 形态不匹配 |
+| 9 | 阶段 XS 引擎（selector→rank→trading→risk 日环） | 本地回测是 Python 函数调用 | 拒绝 | — | 引擎形态不匹配 |
+| 10 | 计费/Scope/EC 系统 | 平台运营专属 | 拒绝 | — | 形态不匹配 |
+| 11 | 8 个 reference 文件（system/lifecycle/stages/simulation-api 等） | 全部为平台 API 文档 | 拒绝 | — | 平台专属，不迁移 |
+
+- **落盘改动**：
+  - 新增 `crypto-quant-analysis__skillhub/references/strategy-iteration-methodology.md`（~6.8KB，策略迭代闭环/归因框架/一次只改一类/关键分支打点/分层结果解读/自然语言→回测工作流）。
+  - 修改 `crypto-quant-analysis__skillhub/SKILL.md`：策略回测 scope 增强（+"支持策略迭代闭环"）；新增「策略迭代工作流」节（完整闭环+每轮规范+结果解读规范+关键纪律）；Q5 FAQ 更新。
+  - 新增 `crypto-quant-analysis__skillhub/references/source-notes.md`（吸收登记）。
+- **整理去重**：N/A + 理由——策略迭代方法论/归因框架/一次只改一类纪律均为本地全新能力，crypto-quant-analysis 已有的回测内容仅为脚本调用表和示例工作流，不含方法论层面重复。
+- **同域扫描结论**：范围 = crypto-quant-analysis（吸收目标）、crypto-price（价格查询）、quant-analyst（量化交易系统）、swap-tokens、cryptocurrency-data-api。发现 = 0 处重复段落（策略迭代方法论/归因框架均为本地缺失能力，同域 4 skill 零命中）、0 处门控层叠、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：+约 7.5KB（strategy-iteration-methodology.md ~6.8KB + source-notes.md ~0.6KB + SKILL.md 增量 ~0.1KB）；外部源 22 文件约 108KB（含脚本 90KB+），**体系净增 = +7.5KB（规则正文净增），源脚本/图片不计入规则体积**。
+- **棘轮验证**：引用链 2 处可达（SKILL.md L1018 策略迭代工作流 → strategy-iteration-methodology.md；L1047 Q5 FAQ → strategy-iteration-methodology.md）；UTF-8 3 文件 OK。
+- **源清理**：吸收完成后删除本地安装源 `wm-backtest__skillhub`（用户级 ~/.workbuddy/skills/wm-backtest__skillhub/ 目录，22 文件 108KB 含脚本）。
+
+## 2026-09-10：内部更新——artifact-storage-rules 补齐「文档生命周期与退场」治理
+
+- **来源**：内部调整：`artifact-storage-rules`，调整诉求 = 「`doc/` 下长期未动的过程文档从未被清理；很多长时间文档的结论已归类总结吸收进知识库，应当退场，请把这套治理补进规则」。
+- **形态**：内部更新通道（触发语「优化我们的skill规则」）。
+- **吸收目标**：`artifact-storage-rules`。
+- **拆解原子规则数**：5 条。
+
+| # | 内部调整诉求 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|---|
+| 1 | 区分过程产物与长期资产的生命周期 | 仅覆盖空间维度（落点 / 命名 / 复用），时间维度完全缺失 | 合并 | SKILL.md 新增「文档生命周期与退场（强制）」+ `lifecycle-policy.md` 第一节 |
+| 2 | 给出退场时间阈值 | 无时间阈值；仅事件驱动清理（`.gap.md`、图片旧版本、迁移后旧目录、`test/{skill}/temp`） | 合并 | `path-map.yaml` → `process_doc_retire_after_days: 15`（用户选定「半个月」） |
+| 3 | 落实「先沉淀再清理」前置条件 | `knowledge-flow/conflict-staleness.md` 有知识笔记三档处置与引用守卫，但未延伸到 doc 产物 | 合并 | `lifecycle-policy.md` 四道守卫；沉淀守卫 owner 显式指向 `knowledge-flow` |
+| 4 | 明确退场动作与批次 | 无 | 合并 | `process_doc_retire_action: git_rm` + `process_doc_retire_batch_limit: 10`（用户选定「沉淀知识库后删除老文档」，不设归档目录） |
+| 5 | 防止退场误伤长期资产与在用文档 | 无边界声明 | 合并 | `process_doc_long_lived_roots` 白名单 + 驳回标准新增两条 |
+
+- **落盘改动**：
+  - 新增 `artifact-storage-rules/references/lifecycle-policy.md`（两类产物定位 / 时间判据 / 四道前置守卫 / 退场清单格式 / 批次与执行 / 相邻规则边界 / 禁止事项）。
+  - 修改 `artifact-storage-rules/SKILL.md`：`description` 扩触发面（生命周期判定 + 长期文档退场）；新增「文档生命周期与退场（强制）」章节；自动触发信号 +2；进入后先做什么 +1；默认执行流程 +1；需要暂停并确认的条件 +2；执行通过 / 驳回标准 +2；references 读取规则 +1；执行结果归档要求 +1。
+  - 修改 `artifact-storage-rules/references/path-map.yaml`：`policies` 新增 10 个 `process_doc_*` 键。
+  - 修改 `artifact-storage-rules/references/update-policy.md`：新增「过程产物生命周期与退场」策略摘要节。
+  - 修改 `artifact-storage-rules/references/skill-integration.md` 与 `references/root-directories.md`：补引用入口与生命周期定位。
+  - 刷新 `skill-dictionary/data.js` 与 `字典.md`（改 `description` + 新增 `##` 级标题的强制动作）。
+- **整理去重**：不以复制存量条款换取新增——`update-policy.md` 退场节只保留策略摘要与边界声明，判定细则、取证命令与清单模板全部收敛到 `lifecycle-policy.md`（单一权威）；既有事件驱动清理条款（`.gap.md`、图片旧版本、迁移后旧目录、`test/{skill}/temp`）保持原位不动，新章节显式声明「两者不互相替代」。
+- **同域扫描结论**：范围 = `artifact-storage-rules`（目标）、`artifact-delivery-gate-rules`、`knowledge-flow`、`test-strategy-rules`（`test-asset-lifecycle`）、`project-design-doc-rules`、`architecture-doc-rules`、`project-interface-baseline-rules`。发现 = 0 处重复段落（全仓检索「退场 / 生命周期 / process_doc_retire / 长期文档」，命中均为其他语境：接口生命周期、参数样本 `retired`、agent 恢复链、触发契约）、0 处门控层叠（沉淀判定收敛到 `knowledge-flow` 单一 owner）、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由——纯规则文本；正文引用的知识库根（`D:\谷歌云盘\知识库\`）由 `AGENTS.md` 固定、`git rm` 由 `git-collaboration-rules` 承载，均属既有约定，未新增环境变量 / 宿主配置 / hook / 依赖安装。
+- **净增体积**：新增 `lifecycle-policy.md` 约 6.1KB + 5 个既有文件增量约 4.2KB；字典产物刷新另计（含 2026-09-01 至 2026-09-10 的 9 天累积同步，非本次规则增量）。
+- **棘轮验证**：`quick_validate.py` → `Skill is valid!`（内部更新通道无 8 维评分基线，以结构校验替代）；`path-map.yaml` YAML 解析通过（version 10，`process_doc_*` 11 键回读一致）；UTF-8 与乱码自检通过；引用链 3 处可达（SKILL.md → lifecycle-policy.md，skill-integration.md → lifecycle-policy.md，update-policy.md → lifecycle-policy.md）。
+- **源清理**：N/A（内部更新通道，无外部安装源）。

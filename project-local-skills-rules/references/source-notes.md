@@ -1,5 +1,19 @@
 # 来源记录
 
+## 2026-09-02 更新：project-ellipal-admin-vue-table-page-rules（内部更新通道，补列宽拖拽）
+
+- **来源**：用户主动点名——「把这个支持表头拖宽的也吸收到项目的 skill 中，之前已经吸收了表头拖动了」。内部更新通道，无外部源。
+- **证据**：同会话在 `go-admin-vue3/src/views/reqsend/index.vue`（转账流水页）真实落地并通过 `npm run build-test`；arco 结论来自读源码——`table.js` `contentStyle`（`<table>` width 由 `scroll.x` 硬设）、`table-col-group.js:52`（`columnWidth[dataIndex] || column.width`）、`table.js:1247`（末列无拖宽把手）、`utils.js:91`（拖宽按 dataIndex 存）、`style/index.less:86`（handle 绝对定位 z-index:1）。
+- **裁决**：7 条原子条目 → 合并 6 / 保留本地 1（build-test + 产物 grep 验证法本地已有且更完整）。agent 通用性：全部「通用」，无单 agent 绑定。环境依赖：N/A（纯前端约定，无环境变量 / hook / 依赖安装）。
+- **落点**：约定二扩为「表头拖动交互（换列位置 + 调列宽）」两个子节，不新开约定四——避免 `scroll.x` 规则在两节重复讲；成套代码进 `references/column-drag-recipe.md` 第 5 段。
+- **核心新增**：只加 `:column-resizable="true"` 不够——`scroll.x` 大于列宽之和时多余宽度被 `table-layout: fixed` 摊回每列，拖 10px 实际变 `10 × (scroll.x / 列宽之和)` px；必须把 `scroll.x` 做成响应式求和，并把字符串权重 width 按 `X / S` 倍率换算成真实像素（转账流水页实测 3000/1480 = 2.03，换算后新和 2960，差 1.4% 肉眼无差别）。
+- **整理去重（3 处）**：① 约定一的静态 `TABLE_SCROLL_X` 常量升级为响应式 `tableScrollX`，SKILL.md 与 recipe 两处同步，不并存两套写法（全仓库 grep `TABLE_SCROLL_X` 残留为 0）；② 约定一「既有页面跟随字面量 `x: 2000` 即可」补例外限定，消除与 resizable 场景的自相矛盾；③ 落盘后自查发现 SKILL.md 2.2 的 JS 代码段与 recipe 第 5 段逐字重复，按「单一权威 + 引用」收敛——SKILL.md 只留判据与坑，成套代码归 recipe。
+- **同域冗余扫描**：范围 = 项目根 `skills/` 全部 2 个 skill。`project-ellipal-admin-route-interface-mapping-rules` grep `scroll.x` / `a-table` / `columns` 零命中，无交叉重复。发现 1 处（本文件族内部 2.2↔recipe 重复）、清理 1 处 → **PASS**。
+- **净增**：SKILL.md +89 行、recipe +66 行、openai.yaml +4/-2；约定数保持三条不膨胀，收敛后 SKILL.md 13,064 字节 / recipe 9,641 字节。
+- **验证**：`PYTHONUTF8=1 quick_validate.py` → `Skill is valid!`；回归校验同域兄弟 skill 亦 PASS；三文件均 UTF-8，引用链 `references/column-drag-recipe.md` 可达无断链。
+- **字典刷新**：不适用——同下（`ROOT` 固定 `~/.claude/skills`，不扫描项目根 `skills/`）。
+- **关联记忆**：新增 `arco-resizable-needs-scrollx-equals-sum`；已有 `arco-column-drag-via-titleslotname`。
+
 ## 2026-09-01 创建：project-ellipal-admin-vue-table-page-rules（项目本地 skill）
 
 - **来源**：用户主动点名（通道 B）——「列表数据支持左右滚动查看和支持将表头拖动左右切换位置、默认10条一页吸收到我们项目本地skill」。

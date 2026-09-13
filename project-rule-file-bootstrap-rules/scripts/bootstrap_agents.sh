@@ -100,6 +100,19 @@ PY
   exit 1
 }
 
+# to_native_path
+# [参数] path: Git Bash 形式路径（如 /c/Users/name/repo）
+# [返回] 原生 Python 可直接使用的路径；非 Windows 平台原样返回
+# 最近修改时间: 2026-09-12 00:00:00 新增平台路径转换，避免 POSIX 路径被原生 Windows Python 解析成相对当前盘根的无效路径
+# 仅用于交给 Python 的参数；bash 侧的文件判断继续使用原始 POSIX 路径。
+to_native_path() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    printf '%s' "$1"
+  fi
+}
+
 is_godot_project() {
   if [[ -f "$REPO_DIR/project.godot" ]]; then
     return 0
@@ -711,7 +724,7 @@ sync_section() {
   local mode="${4:-}"
 
   # shellcheck disable=SC2086
-  $PYTHON_BIN - "$file" "$header" "$body" "$mode" <<'PY'
+  $PYTHON_BIN - "$(to_native_path "$file")" "$header" "$body" "$mode" <<'PY'
 from pathlib import Path
 import sys
 
@@ -846,7 +859,7 @@ ensure_project_current_file() {
 
   # 1. 缺失时只创建最小模板，避免覆盖项目已有当前状态。
   if [[ ! -f "$file" ]]; then
-    $PYTHON_BIN - "$file" "$PROJECT_CURRENT_TEMPLATE" <<'PY'
+    $PYTHON_BIN - "$(to_native_path "$file")" "$PROJECT_CURRENT_TEMPLATE" <<'PY'
 from pathlib import Path
 import sys
 
@@ -856,7 +869,7 @@ PY
     return 0
   fi
 
-  $PYTHON_BIN - "$file" "$PROJECT_CURRENT_MAX_BYTES" <<'PY'
+  $PYTHON_BIN - "$(to_native_path "$file")" "$PROJECT_CURRENT_MAX_BYTES" <<'PY'
 from pathlib import Path
 import sys
 
@@ -880,7 +893,7 @@ ensure_project_history_file() {
 
   # 1. 缺失时创建追加式模板；已有历史只读校验，不做重排或覆盖。
   if [[ ! -f "$file" ]]; then
-    $PYTHON_BIN - "$file" "$PROJECT_HISTORY_TEMPLATE" <<'PY'
+    $PYTHON_BIN - "$(to_native_path "$file")" "$PROJECT_HISTORY_TEMPLATE" <<'PY'
 from pathlib import Path
 import sys
 
@@ -890,7 +903,7 @@ PY
     return 0
   fi
 
-  $PYTHON_BIN - "$file" <<'PY'
+  $PYTHON_BIN - "$(to_native_path "$file")" <<'PY'
 from pathlib import Path
 import sys
 
@@ -910,7 +923,7 @@ sync_project_memory_file() {
   fi
 
   # 只补双区骨架，不重写人类正文区；事实抽取与正文归并仍交给 project-memory-rules。
-  $PYTHON_BIN - "$file" "$PROJECT_MEMORY_MACHINE_SECTION" <<'PY'
+  $PYTHON_BIN - "$(to_native_path "$file")" "$PROJECT_MEMORY_MACHINE_SECTION" <<'PY'
 from pathlib import Path
 import sys
 

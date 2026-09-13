@@ -537,11 +537,12 @@ class EngineeringDocumentValidatorTests(unittest.TestCase):
     # test_strict_trace_report_fields 验证严格模式所需机器报告字段始终存在。
     # [参数] 无：使用最小完整追踪 fixture。
     # [返回] None：断言报告含状态、追踪、覆盖率和未决决策字段。
-    # 最近修改时间：2026-07-12 增加机器报告契约断言，避免只返回 valid/ids 的不完整报告。
+    # 最近修改时间：2026-09-12 00:00:00；原夹具需求文档已改名，改用现存需求文书并加缺失前置断言。
     def test_strict_trace_report_fields(self) -> None:
         """验证严格模式机器报告具备验收标准要求的结构化字段。"""
         # 1. 运行单文档校验并核对统一机器报告字段。
-        document = ROOT / "doc" / "2-需求" / "2026-07-12_033322_需求与实施文档极致完备化.md"
+        document = ROOT / "doc" / "2-需求" / "2026-08-25_REQ-LOG-20260825-001_日志链路打通.md"
+        self.assertTrue(document.is_file(), f"夹具需求文档缺失，请同步更新路径：{document}")
         profile = self.payload["profiles"]["requirement"]
         result = validator.validate_document(document, "requirement", profile, self.payload, ROOT)
         for field in ("status", "errors", "warnings", "ids", "traceability", "diagrams", "unresolved_decisions", "coverage"):

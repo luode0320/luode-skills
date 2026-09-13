@@ -1,5 +1,7 @@
 # 实施文档图形化标准
 
+> 各图表类型的语法细节（Flowchart、Sequence、ER、Class、State、Gantt、Mindmap、Pie、Timeline、GitGraph）与常见陷阱（特殊字符转义、保留字、未闭合块等）统一见 `reasoning-summary-structure-rules/references/mermaid-syntax-reference.md`，本文件只定义语义匹配、数量质量与图片资产边界。
+
 ## 语义匹配
 
 | 问题 | 必选图形 | 说明 |

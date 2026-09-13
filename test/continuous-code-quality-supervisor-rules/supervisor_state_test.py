@@ -402,19 +402,24 @@ class SupervisorStateTests(unittest.TestCase):
             最近修改时间：2026-08-01 00:00:00；将 fixture 写入共享来源映射目录。
             """
 
-            # 1. 仅构造单一 Owner 的临时来源映射，隔离无关规则。
+            # 1. 仅构造单一 Owner 的临时来源映射，隔离无关规则；结构必须与生产一致的 v2 数组形态。
             payload = {
-                "version": 1,
-                "owners": {
-                    "code-quality-rules": {
-                        "source_paths": source_paths if source_paths is not None else [
-                            "code-quality-rules/SKILL.md",
-                            "code-quality-rules/references/readability-general.md",
+                "version": 2,
+                "owners": [
+                    {
+                        "owner": "code-quality-rules",
+                        "sites": [
+                            {
+                                "source_paths": source_paths if source_paths is not None else [
+                                    "code-quality-rules/SKILL.md",
+                                    "code-quality-rules/references/readability-general.md",
+                                ],
+                                "source_globs": source_globs if source_globs is not None else [],
+                                "consumption": "static-only",
+                            }
                         ],
-                        "source_globs": source_globs if source_globs is not None else [],
-                        "consumption": "static-only",
                     }
-                },
+                ],
             }
             (map_dir / "static-owner-source-map.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 

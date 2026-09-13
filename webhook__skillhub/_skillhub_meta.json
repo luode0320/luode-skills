@@ -1,0 +1,18 @@
+{
+  "slug": "webhook",
+  "name": "Webhook",
+  "version": "1.0.0",
+  "installedAt": 1788602565697,
+  "source": "skillhub",
+  "namespace": "clawhub_ivangdavila",
+  "canonicalName": "@clawhub_ivangdavila/webhook",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "实现具备适当验证与可靠性的安全Webhook接收器与发送器。",
+  "description_en": "Implement secure webhook receivers and senders with proper verification and reliability.",
+  "installs": 4825,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\webhook__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png"
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "100-indicators-analysis",
+  "name": "100-indicators-analysis",
+  "version": "1.0.1",
+  "installedAt": 1788618138936,
+  "source": "skillhub",
+  "namespace": "clawhub_luokeer52",
+  "canonicalName": "@clawhub_luokeer52/100-indicators-analysis",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "基于100个热门TradingView Pine Script指标转化的Python技术分析工具集，提供专业指标计算、分析与可视化。",
+  "description_en": "基于100个热门TradingView Pine Script指标转换的Python技术分析工具集，提供专业的技术指标计算、分析和可视化功能",
+  "installs": 853,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\100-indicators-analysis__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png"
+}

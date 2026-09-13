@@ -14,6 +14,7 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 ## Skill 作用与适用场景
 
 - 对本轮实际命中的 skill 做末端合规检查，识别“已执行 / 可执行但未执行 / 当前阶段不适用”。
+- 收口前以「本轮真实变更集」为输入、以独立读者视角，按 `references/delivery-residue-self-check.md` 执行 6 维交付残留自查，识别计划外残留。
 - 校验计划内必需项、真实阻断事实、工具执行证据和 goal/plan/task 等显式运行时状态是否真实收口。
 - 真实 `blocked/manual_handoff` 时只校验共享阻断契约与唯一渲染条件，不生成用户可见阻断区块或解决计划。
 - 最终总结、条件区块和后续内容全部交给 `reasoning-summary-structure-rules`；本 skill 只产出 PASS/FAIL、缺失项和结构化事实。
@@ -30,6 +31,7 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 
 1. 列出本轮实际命中的 skill，不臆造未命中项。
 2. 读取 `references/applicability-and-gap-check.md`，只核验当前阶段可执行规则；并读取 `../skill-hit-check-rules/references/deferred-gate-registry.md`，核对本轮首条 `闸门预告` 登记的延迟 gate 声明与执行是否一致。
+2.1 收口前读取 `references/delivery-residue-self-check.md`，以磁盘真实变更集为输入执行 6 维交付残留自查；中段改码后只跑轻量版（维度 1、4）。
 3. 分类计划内必需缺口、真实阻断候选和不适用项；`limited/not_applicable` 不得升级为阻断。
 4. 出现非预期执行失败时，核验 `execution-failure-learning-rules` 的分类、恢复、同输入复验和状态处理证据。
 5. 核验本轮工具调用的 Skill 执行证据，以及 goal/plan/task 等显式状态的真实收口动作。
@@ -38,11 +40,12 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 ## 默认执行流程
 
 1. 收集本轮编辑、命令、测试、日志、产物和运行时状态证据。
-2. 逐 Skill 核对当前阶段规则，记录执行状态和证据定位；对照延迟触发 gate 注册表与本轮 `闸门预告`，凡登记过或注册表判定当前阶段必需的延迟 gate 未执行即计入缺口。
-3. 对非预期执行失败核验失败学习链；对代码/测试改动只检查是否已交给 `code-change-finalization-gate-rules`，不重复执行专项闸门。
-4. 校验共享阻断事实的状态、阶段、依据、已尝试与停止条件、影响、恢复入口和去重关系。
-5. 形成唯一合规结论：PASS，或 FAIL + 缺失字段/未完成动作。
-6. 最终渲染前读取 `../reasoning-summary-structure-rules/references/conditional-sections-rules.md`；本 skill 不自行定义或输出后续内容、阻断区块和等待类文案。
+2. 按 `references/delivery-residue-self-check.md` 以独立读者视角重读本轮全部产物，6 个维度逐项自查并产出残留清单与处置状态；输入必须是磁盘上的真实变更集，不接受记忆、声明或计划文本。
+3. 逐 Skill 核对当前阶段规则，记录执行状态和证据定位；对照延迟触发 gate 注册表与本轮 `闸门预告`，凡登记过或注册表判定当前阶段必需的延迟 gate 未执行即计入缺口。
+4. 对非预期执行失败核验失败学习链；对代码/测试改动只检查是否已交给 `code-change-finalization-gate-rules`，不重复执行专项闸门。
+5. 校验共享阻断事实的状态、阶段、依据、已尝试与停止条件、影响、恢复入口和去重关系。
+6. 形成唯一合规结论：PASS，或 FAIL + 缺失字段/未完成动作；残留清单存在未处置发现项时不得给 PASS。
+7. 最终渲染前读取 `../reasoning-summary-structure-rules/references/conditional-sections-rules.md`；本 skill 不自行定义或输出后续内容、阻断区块和等待类文案。
 
 ## 阻断判定与处理
 
@@ -52,6 +55,7 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 - 工具调用后的 Skill 执行证据缺失，且自动补救后仍不可核验。
 - 显式运行时状态应收口但未执行真实状态动作。
 - `blocked/manual_handoff` 的共享契约缺少必填事实或存在重复冲突记录。
+- 6 维交付残留自查存在未执行维度、改了契约面却跳过影响面扫描、发现项既不修复也不登记（静默丢弃），或残留清单未落盘。
 
 属于非阻断级：
 
@@ -67,13 +71,15 @@ description: 只要本轮任务已命中其他 skill 且可能存在“只做了
 
 ## 执行通过 / 驳回标准
 
-- 通过：当前阶段所有已命中 Skill 均有执行状态和证据；失败学习、共享阻断契约、Skill 执行证据和运行时状态均按适用性完成核验。
+- 通过：当前阶段所有已命中 Skill 均有执行状态和证据；失败学习、共享阻断契约、Skill 执行证据和运行时状态均按适用性完成核验；6 维交付残留自查逐项有可核验证据且发现项均已处置。
 - 驳回：存在可执行但未执行的必需规则、无法核验的工具结果、未真实收口的运行时状态，或共享阻断事实不完整/不唯一，却仍给出完成结论。
+- 驳回：6 维交付残留自查缺项、结论无可核验证据、改了契约面却跳过影响面扫描，或残留清单未落盘。
 - 驳回：本 skill 自行渲染用户可见后续内容、阻断区块、解决计划或等待类占位文案。
 
 ## references 读取规则
 
 - 默认先读 `references/applicability-and-gap-check.md`。
+- 收口前必须读 `references/delivery-residue-self-check.md` 并按 6 个维度自查；中段改码后触发其轻量版（仅维度 1、4）。
 - 判断最终条件区块时只读 `../reasoning-summary-structure-rules/references/conditional-sections-rules.md`，不得维护第二份规则。
 
 ## 回到主流程的重启点

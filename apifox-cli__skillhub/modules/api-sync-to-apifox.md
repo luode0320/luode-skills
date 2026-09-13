@@ -23,9 +23,12 @@
    apifox import --project <projectId> --branch main --format openapi --file swag/openapi.yaml
    ```
    导入前必须按 `modules/import-export.md` 输出质量指标（paths/operations/schemas/writes/withBody/emptyObjectBodies）；导入后检查 `ignoreCount`，大量 ignore 是风险信号，不得忽略。
-6. **契约校验（含字段说明完整性）**：`apifox endpoint list/get` 确认 method+path+schema 已同步，与代码对账；同时检查参数/请求体/响应/头部每个字段的 `description` 是否非空——**缺失则回流 `swag-openapi-maintainer-rules`（`references/description-rules.md`）在代码侧补中文注释 → 重新生成 swag → 重新导入**，接口侧与代码侧两边都要补，不要遗漏；校验不通过先修正再继续。
+6. **契约校验（含中文展示与字段说明完整性）**：`apifox endpoint list/get` 确认 method+path+schema 已同步，与代码对账：
+   - **API 路径保持原有英文路径不变**（网络调用契约稳定）
+   - **接口显示名称与说明文档必须为简体中文**（禁止出现纯英文接口名称如 `Health` 或纯英文说明）
+   - **参数/请求体/响应/头部每个字段的 `description` 必须为非空简体中文**——缺失或为英文则回流 `swag-openapi-maintainer-rules`（`references/description-rules.md`）在代码侧补中文注释 → 重新生成 swag → 重新导入，接口侧与代码侧两边都要补，不要遗漏；校验不通过先修正再继续。
 6.1 **安全方案必须与真实机制一致（强制）**：契约校验时把 `securitySchemes` 与鉴权中间件对账，不要放过"看起来有鉴权"的默认写法。判定标准：`type`/`in`/`name` 与服务端实际读取的位置一致（自定义签名是 `apiKey` + `in: header` + 真实头名，**不是** `http`/`bearer`），description 写清算法、参与签名的字段、密钥来源与免签例外。**错的安全方案比没有更危险**——对接方会照着写并全部 401。发现不一致回流 `swag-openapi-maintainer-rules` 修生成口径后全量重生成，不只改当前接口（真实案例：53 个 YAML 全部写着 `BearerAuth: http bearer`，真实机制是 `Authorization: md5(RequestURI+body+secret)`）。apifox 侧的两条 CLI 限制（环境变量读写不到、operation security 不自动绑定接口）见 `modules/test-auth.md`。
-6.2 **folder 归类校验（强制）**：导入后检查每个 endpoint 是否落在**业务 folder**（产品模块 / 业务域 / 功能域）下，而不是「默认模块 / 接口」平铺层。未归类或归类错误 → 按 `modules/api-folder-organization.md`「持续维护工作流」迁移归位，迁移后 `endpoint get` 回读验证；**接口生成了不是就完事，归类欠账必须随本轮同步清零**。归类识别方法见 `api-folder-organization.md`「业务模块识别法」，对应硬动作 A11。
+6.2 **folder 归类与中文命名校验（强制）**：导入后检查每个 endpoint 是否落在**业务简体中文 folder**（产品模块 / 业务域 / 功能域）下，而不是「默认模块 / 接口」平铺层，**更禁止落在纯英文 folder**（如 `auth`、`registry`、`tasks` 等）。未归类、英文命名或归类错误 → 按 `modules/api-folder-organization.md`「持续维护工作流」重命名或迁移归位，迁移后 `endpoint get` 回读验证；**接口生成了不是就完事，归类与中文命名欠账必须随本轮同步清零**。归类识别方法见 `api-folder-organization.md`「业务模块识别与中文命名规范」，对应硬动作 A11。
 7. **落地/更新测试用例**：按 `modules/test-case-generation.md` 的「覆盖度铁律」（每接口必须有 正向+负向+边界值 三类用例，POST 等非 GET 接口必须有完整用例）补全，按 `modules/test-case.md` 标准流程创建（先 `test-case category` 获取有效 categoryId，再 cli-schema get/validate，创建后 `get` 回读验证）。**不要在只补 1 个分页正向用例时就宣称覆盖到位**。
 8. **运行验证**：`apifox test-case run <caseId> --project <projectId> --branch main --environment <开发环境Id>`，确认真实通过（判定规则见 `modules/test-data-and-judgement.md`）。
 9. **合并**：apifox 测试专用项目**无合并环节**（直接在 main 分支操作）；仅走 AI 分支兜底流程时：`merge-request preview` 让用户确认 → 用户确认后 `create merge-request` 或 `merge`。
@@ -52,5 +55,7 @@
 6. 不修改 swag 生成逻辑，swag 资产归 `swag-openapi-maintainer-rules`
 7. 接口变更后，字段说明（参数/响应/头部 `description`）必须随接口同步更新，不允许只改字段不改说明
 8. **安全方案必须与鉴权中间件真实机制一致**：本地免签不构成"不配鉴权"的理由；自定义签名不得写成 `http bearer`，发现不一致回流 swag 修生成口径并全量重生成（见步骤 6.1 与 `modules/test-auth.md`「鉴权配置必须进 apifox」）
-9. **接口必须落在业务 folder 下**：导入后停在「默认模块 / 接口」平铺层或归类错误 → 视为归类缺口，按 `api-folder-organization.md` 迁移归位后再收口（见步骤 6.2 与硬动作 A11）
+9. **接口必须落在业务 folder 下且必须为中文命名**：导入后停在「默认模块 / 接口」平铺层、归类错误、或落在纯英文 folder（如 `auth`、`registry`、`tasks`）→ 视为归类与展示缺口，按 `api-folder-organization.md` 重命名并迁移归位后再收口（见步骤 6.2 与硬动作 A11）
 10. **有 body 的接口，OpenAPI 必须带请求 example，且放在 MediaType 层级**（`content."application/json".example`，与 `schema` 同级）：这是接口树下调试用例 body 的**唯一来源**，`import` 是唯一写入时机——漏了就只能删接口重导，CLI 事后补不了。放进 `schema.example` 静默无效。导入后按硬动作 A12 用 `export --format apifox` 验收（见 `modules/test-case.md` 规则 T-3）
+11. **接口展示与阅读内容统一使用简体中文**：接口显示名称、文件夹名称、接口说明文档、请求参数注释、响应字段注释全部使用简体中文，禁止直接导入纯英文显示名称或纯英文目录
+12. **API 路径保持原有英文不变**：机器调用的接口 path 严格保持英文原样不变，禁止翻译为中文或拼音路径

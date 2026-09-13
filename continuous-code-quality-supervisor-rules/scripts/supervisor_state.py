@@ -23,6 +23,7 @@ if str(SHARED_ROUTER_DIR) not in sys.path:
 from static_owner_router import (
     BASE_OWNER_NAMES,
     OWNER_NAMES,
+    SOURCE_MAP_VERSION,
     owner_source_map_path,
     route_owners,
 )
@@ -236,12 +237,49 @@ def _source_map_path(repository_root: Path) -> Path:
     return owner_source_map_path(repository_root)
 
 
+def _owner_source_entry(payload: object, owner_skill: str) -> dict[str, list[str]]:
+    """把共享来源映射规范化成单个 Owner 的合并来源条目。
+
+    [参数] payload：已解析的来源映射文档；owner_skill：目标 Owner 名称
+    [返回] `source_paths` 与 `source_globs` 两个合并列表
+    最近修改时间：2026-09-11 00:00:00；跟进来源映射 v2 数组结构，监督目录不再按 v1 对象口径解析。
+    """
+
+    # 1. 版本与数组形态先过关：v1 用对象 key 承载 Owner，同一位点会被 JSON 静默覆盖。
+    if not isinstance(payload, dict) or payload.get("version") != SOURCE_MAP_VERSION:
+        raise ValueError("source_map_version_invalid")
+    owners = payload.get("owners")
+    if not isinstance(owners, list):
+        raise ValueError("source_map_owners_invalid")
+
+    # 2. 逐分组合并来源，保持与 6-review 规范加载器一致的字段语义。
+    for item in owners:
+        if not isinstance(item, dict) or item.get("owner") != owner_skill:
+            continue
+        sites = item.get("sites")
+        if not isinstance(sites, list) or not sites:
+            raise ValueError("source_map_owner_invalid")
+        entry: dict[str, list[str]] = {"source_paths": [], "source_globs": []}
+        for site in sites:
+            if not isinstance(site, dict):
+                raise ValueError("source_map_owner_invalid")
+            for key in ("source_paths", "source_globs"):
+                values = site.get(key, [])
+                if not isinstance(values, list):
+                    raise ValueError(f"source_map_{key}_invalid")
+                for value in values:
+                    if value not in entry[key]:
+                        entry[key].append(value)
+        return entry
+    raise ValueError("source_map_owner_missing")
+
+
 def _owner_source_candidates(repository_root: Path, owner_skill: str) -> list[Path]:
     """读取 Owner 的静态质量来源列表。
 
     [参数] repository_root：仓库根目录；owner_skill：允许 Owner 名称
     [返回] 已排序去重的绝对路径列表
-    最近修改时间：2026-07-25 18:40:00；让直接 reference 更新能被下一轮扫描感知。
+    最近修改时间：2026-09-11 00:00:00；改由 v2 数组结构解析，避免来源映射升级后静默降级为 limited。
     """
 
     default = [(repository_root / owner_skill / "SKILL.md").resolve()]
@@ -252,12 +290,7 @@ def _owner_source_candidates(repository_root: Path, owner_skill: str) -> list[Pa
         payload = json.loads(source_map.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise ValueError(f"source_map_unreadable:{error}") from error
-    owners = payload.get("owners")
-    if not isinstance(owners, dict) or owner_skill not in owners:
-        raise ValueError("source_map_owner_missing")
-    entry = owners[owner_skill]
-    if not isinstance(entry, dict):
-        raise ValueError("source_map_owner_invalid")
+    entry = _owner_source_entry(payload, owner_skill)
     candidates: list[Path] = []
     for key in ("source_paths", "source_globs"):
         values = entry.get(key, [])

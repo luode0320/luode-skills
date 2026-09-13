@@ -66,13 +66,18 @@ openapi / swagger / routegen / docs generator / api docs / schema generator
 | `missingDescriptions` 数量多（参数/响应/头部大量无说明） | 字段说明不完整 | 先在代码侧补中文注释（按 `swag-openapi-maintainer-rules/references/description-rules.md`）重新生成 swag，再导入 |
 | 纯 GET/健康检查/webhook 项目 | schemas 少可能合理 | 结合业务判断 |
 
-### Step 5: 校验 tags、folder 和可读性
+### Step 5: 校验 tags、folder、中文规范和可读性
 
-- operation 必须有业务化 tags（不要按 URL path 机械分组）
-- tags 按产品模块/业务域/功能域分组
+- **接口展示与阅读统一使用简体中文（强制铁律）**：
+  - **API 路径保持原有英文不变**（网络调用契约稳定）
+  - **接口名称（operation summary）必须为简体中文**（如 `健康检查`，禁止直接写 `Health` 或方法名）
+  - **tags 与 folder 必须为业务简体中文**（如 `认证授权`、`服务注册`、`任务管理`，禁止出现 `auth`、`registry`、`tasks` 等英文 tags / 英文目录）
+  - **参数与响应字段 description 必须为简体中文**
+- operation 必须有业务化中文 tags（不要按 URL path 机械分组）
+- tags 按产品模块/业务域/功能域简体中文分组
 - 不推荐 `api / v1 / <resource>` 这类技术路径展开
-- **导入后必须校验 folder 归类**：接口应落在业务 folder（产品模块/业务域/功能域）下，而不是「默认模块 / 接口」平铺层；未归类或归类错误 → 按 `modules/api-folder-organization.md`「持续维护工作流」迁移归位（对应硬动作 A11）
-- tags 与 folder 是互补维度：tags 决定导入分组与检索，folder 决定文档树导航，两者都要业务化
+- **导入后必须校验 folder 归类与中文命名**：接口应落在业务简体中文 folder（产品模块/业务域/功能域）下，而不是「默认模块 / 接口」平铺层，更严禁留在英文 folder 中；未归类或英文命名 → 按 `modules/api-folder-organization.md`「持续维护工作流」重命名或迁移归位（对应硬动作 A11）
+- tags 与 folder 是互补维度：tags 决定导入分组与检索，folder 决定文档树导航，两者都要业务化、简体中文化
 
 ### Step 6: 执行导入并检查结果
 

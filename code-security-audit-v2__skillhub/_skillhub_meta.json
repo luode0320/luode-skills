@@ -1,0 +1,18 @@
+{
+  "slug": "code-security-audit-v2",
+  "name": "代码安全检测",
+  "version": "4.0.0",
+  "installedAt": 1788765441557,
+  "source": "skillhub",
+  "namespace": "user_4bfc9f62",
+  "canonicalName": "@user_4bfc9f62/code-security-audit-v2",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "专业级AI代码安全审计工具，基于111条内置规则进行深度静态安全扫描。支持12种编程语言（Python/Java/JavaScript/TypeScript/Go/Rust/C/C++/PHP/Ruby/Swift/Kotlin/Solidity），覆盖50+类安全漏洞，对齐OWASP Top 10/CWE/CVE国际安全标准，输出包含漏洞位置、风险等级、原理分析、修复代码示例、参考链接的完整审计报告，是开发者和安全工程师的必备工具。\n\n核心功能：\n• 支持12种编程语言深度检测\n• 50+类漏洞覆盖（注入类/认证授权/数据安全/输入验证/业务逻辑/配置安全/LLM安全/隐私合规/Web3钱包安全）\n• 5级严重等级标注（CRITICAL/HIGH/MEDIUM/LOW/INFO）+ Web3钱包P0/P1/P2分级\n• 为每个漏洞提供\"危险代码→安全代码\"对比修复方案\n• 输出结构化安全审计报告（含原理分析、攻击场景、修复代码、参考链接）\n• SKILL.md 安全审查（指令注入/数据泄露/权限提升/隐藏指令）\n• 区块链钱包/Web3安全审查（8大类60+检查项，覆盖密钥安全/数值精度/交易风控/dapp授权/供应链/日志/状态持久化/UI安全）\n\n漏洞覆盖：\nSQL注入、XSS跨站脚本、硬编码密钥泄露、命令注入、路径遍历、反序列化、CSRF、SSRF、XXE、越权访问、弱加密算法、缓冲区溢出、竞态条件、内存泄漏、整数溢出、不安全重定向、模板注入、LDAP注入、NoSQL注入、JWT安全缺陷、Prompt注入、隐私泄露、SKILL.md指令注入、助记词/私钥泄露、chainId错误、数值精度损失、重放攻击、盲签、dapp域名白名单绕过等50+类\n\n适用场景：代码发布前安全审计、安全编码规范检查、漏洞修复指导、团队安全编码培训、DevSecOps流水线、第三方代码审计、SKILL.md安全审查、区块链钱包/Web3项目安全审查",
+  "description_en": "Professional AI code security audit tool supporting 12 programming languages, 50+ vulnerability types, OWASP Top 10 / CWE / CVE standards alignment, with actionable fix suggestions and complete audit reports",
+  "installs": 430,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\code-security-audit-v2__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png"
+}

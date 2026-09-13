@@ -1,0 +1,18 @@
+{
+  "slug": "flutter",
+  "name": "Flutter",
+  "version": "1.0.1",
+  "installedAt": 1788622129924,
+  "source": "skillhub",
+  "namespace": "clawhub_ivangdavila",
+  "canonicalName": "@clawhub_ivangdavila/flutter",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/81015f94-5620-494e-bbd6-ac3268e7ccd3.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "使用 Flutter 组件、状态管理和平台集成构建高性能跨平台应用。",
+  "description_en": "Build performant cross-platform apps with Flutter widgets, state management, and platform integration.",
+  "installs": 3814,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\flutter__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/81015f94-5620-494e-bbd6-ac3268e7ccd3.png"
+}

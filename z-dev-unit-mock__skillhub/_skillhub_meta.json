@@ -1,0 +1,18 @@
+{
+  "slug": "z-dev-unit-mock",
+  "name": "单元测试Mock生成器",
+  "version": "1.0.1",
+  "installedAt": 1788855772034,
+  "source": "skillhub",
+  "namespace": "user_af163eaa",
+  "canonicalName": "@user_af163eaa/z-dev-unit-mock",
+  "iconSource": "https://skillhub-1388575217.cos.accelerate.myqcloud.com/skill-icons/uploads/604475/951bc934f41a409b90a5ae72d7685dbf.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "当用户要补单元测试、生成测试桩与 Mock 数据时使用。",
+  "description_en": "当用户要补单元测试、生成测试桩与 Mock 数据时使用。",
+  "installs": 122,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\z-dev-unit-mock__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://skillhub-1388575217.cos.accelerate.myqcloud.com/skill-icons/uploads/604475/951bc934f41a409b90a5ae72d7685dbf.png"
+}

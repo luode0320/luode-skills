@@ -1,5 +1,14 @@
 # package-structure-rules 来源记录
 
+## 2026-09-11
+
+- 内部调整：`package-structure-rules`，调整诉求「补齐结构体『按类型与作用分层』缺口——角色谱系、各角色落点、按语言生态的差异与注释颗粒度」。
+- 触发来源：用户会话——AI 辅助开发瓶颈已从逻辑正确性转向代码质量，其九维清单中「结构体按类型与作用分层的定义位置及注释」此前无承接；`entity-file-naming.md` 只讲 `entity/<v?>/` 内文件粒度（`req`/`resp` 前缀），不含角色分层。
+- 口径：用户裁决「按语言生态」（Go 用导出性表达外传边界、Java `class`/`record` + 既有 PO/DTO/VO、TS `interface`/`type`、Python `dataclass`/Pydantic）。
+- 落点：`references/struct-role-layering.md`（新建，4652B）、`SKILL.md` 唯一事实源第 18 行。
+- 裁决依据：见 `../workbuddy-absorption-map.md` 2026-09-11 段落。
+- 顺手修复：`references/directory-usage-routing.md` 第 19 行原将 `utils/decimal/` 行与 `utils/cache/redis/` 行挤在同一行（缺换行），Markdown 表格破损，已拆回两行；本项由 Item 4（公共工具索引契约）基线侦察时发现。
+
 ## 2026-08-27
 
 - 内部调整：`package-structure-rules`，调整诉求「新增根级 `cachetask/` 目录，专门承载缓存过期驱动的异步重建任务（Stale-While-Revalidate：TTL 到期先返回旧数据，再异步更新新缓存）」。

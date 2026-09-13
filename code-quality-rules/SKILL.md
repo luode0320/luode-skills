@@ -16,7 +16,7 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 - **简单优先**：大多数代码默认不需要封装或抽象接口；只有存在真实复用、边界隔离、复杂度下降或多实现替换证据时才允许新增封装 / 接口层。
 - **副作用可见**：写库、发请求、改状态、发事件、写文件、触发异步任务的函数必须在名称、调用位置或职责层级上暴露副作用；查询型函数默认不改状态。
 - **结构化解析**：业务方法禁止直接用 JSON 字符串 key 取字段，必须经 DTO/对象解析层访问；Go 接入第三方 API 默认使用结构体解析响应，禁止长期使用 map + key 硬编码。
-- **注释联动**：本轮改动位点必须联动 `comment-rules`（位置颗粒度分区 + 补齐闸门分区）完成注释检查与补齐，最小改动不等于跳过注释。
+- **注释联动**：本轮改动位点必须联动 `comment-rules`（位置颗粒度分区 + 补齐闸门分区）完成注释检查与补齐，最小改动不等于跳过注释。**特别注意：小改动（修 Bug、改需求、删逻辑）容易在注释中留下"修复了什么""改了什么"的历史记录，必须交由 `comment-rules` 的"改动历史不进注释"闸门拦截，确保改动历史写入 `doc/` 对应文档，注释只描述当前状态。同时遵循"默认无注释"原则：语义自明的字段赋值、函数调用替换、变量重命名等不加解释性注释，注释仅在不自明或存在风险时添加。**
 
 ## 双主线路由
 
@@ -50,6 +50,8 @@ flowchart LR
 
 - 进入后先读 `references/readability-general.md`，确认可读性底线。
 - 涉及函数拆分、步骤组织、控制流安排时读 `references/function-structure-rules.md`。
+- 涉及函数或方法的参数顺序、数量控制、单参数与结构体参数取舍时读 `references/function-signature-rules.md`。
+- 判断局部变量、包级变量与常量的定义位置时读 `references/definition-placement-rules.md`。
 - 判断写法优劣或做正反例对照时读 `references/readability-examples.md`。
 - 核心约束：
   - 保持函数结构清晰、逻辑顺序自然；控制单个函数或模块的复杂度，避免隐式跳转和过深嵌套。
@@ -127,5 +129,5 @@ flowchart LR
 ## references 读取规则
 
 - 最小改动主线：默认读 `references/minimal-change-general.md`；边界不清读 `references/minimal-change-boundaries.md`；越界判断读 `references/minimal-change-examples.md`。
-- 可读性主线：默认读 `references/readability-general.md`；函数结构读 `references/function-structure-rules.md`；正反例读 `references/readability-examples.md`。
+- 可读性主线：默认读 `references/readability-general.md`；函数结构读 `references/function-structure-rules.md`；函数签名与参数取舍读 `references/function-signature-rules.md`；定义位置读 `references/definition-placement-rules.md`；正反例读 `references/readability-examples.md`。
 - 本轮涉及删除代码 / 功能 / 模块时，读 `references/code-removal-discipline.md`。

@@ -216,3 +216,26 @@
 - **净增减**：3 文件 +20 / -4（SKILL.md +4/-1、absorption-decision-matrix +14/-2、env-dependency-absorption +2/-1）；无新建文件。
 - **同域扫描**：全仓 grep「通用 agent / 禁止绑定 agent / 通用性优先」→ 其余命中均为 AGENTS.md 落点约定或零散措辞，无逐字重复的「吸收禁止绑定 agent」规则；收敛单一权威为本 skill。PASS。
 - **验证**：quick_validate.py `Skill is valid!`（结构校验替代棘轮基线，内部更新通道无 8 维评分基线）；UTF-8 校验通过；未改 description、未改 `##` 级标题，无需重跑 skill 字典。
+
+## 2026-09-05：外部吸收——grilling（严格拷问）
+
+- **来源名称**：grilling（WorkBuddy 市场，个人开发者，v1.0.0，display_name 严格拷问）
+- **获取方式**：本地安装源（`D:\谷歌云盘\luode-skills\grilling\`，`_skillhub_meta.json` source marketplace，skillId skill_2095263945412698112）
+- **来源描述**：用户召唤式拷问 skill——当用户想被严格拷问、逐题追问、压力测试方案/决策时使用；每轮只问一个最关键问题、问题附推荐答案、可查证先自查、决策权归用户、无共享理解不执行、沿依赖最强分支追问、输出固定为「核心风险一句话 → 一个问题 → 一句推荐」。
+- **裁决摘要**：8 条原子规则对照本地 2026-08-18 已吸收 `softspark-ai-toolkit-grill-me` 产物（`requirement-intake-rules/references/adversarial-gap-interview.md` + `gap-routing.md` + `initial-discovery-route.md` + `extreme-completeness-standard.md`）全部更强 → 保留本地 × 8、合并 × 0。grilling 为同源市场复刻，无新增精华。
+- **吸收落点**：无规则落盘；grilling 本体本地化保留为独立通用拷问入口（本地无用户召唤式 grill 触发 skill，保留不构成同域重复）。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-09-05 grilling 条目）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **源清理**：保留（用户主动安装的可用 skill；本次裁决为本地化保留，非并入后删除）。
+
+## 2026-09-10 · 内部调整：artifact-storage-rules 补齐「文档生命周期与退场」
+
+- **调整诉求**：`doc/` 下长期未动的过程文档从未被清理；用户判断「很多长时间文档的结论已归类总结吸收进知识库，应当退场」，要求把该治理能力补进 skill 规则（原话「优化我们的skill规则」）。
+- **通道**：内部更新通道。
+- **裁决摘要**：5 条原子诉求全部「合并」——本地仅覆盖存储的空间维度（落点 / 命名 / 复用），时间维度完全缺失；`knowledge-flow` 已有知识笔记侧的退场机制，但未延伸到 doc 产物。参数取值由用户拍板：时间阈值「半个月」（15 天）、退场动作「沉淀知识库后删除老文档」（删除档，不设归档目录）。
+- **落点**：`artifact-storage-rules`（`SKILL.md` + `references/path-map.yaml` + `references/update-policy.md` + `references/skill-integration.md` + `references/root-directories.md` + 新增 `references/lifecycle-policy.md`）。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-09-10 内部更新条目）。
+- **同域扫描**：范围 7 个同域 skill，发现 0 处冗余，PASS（详见裁决表）。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **验证**：`quick_validate.py` `Skill is valid!`（结构校验替代棘轮基线，内部更新通道无 8 维评分基线）；`path-map.yaml` YAML 解析通过；UTF-8 校验通过；改 `description` + 新增 `##` 级标题，已重跑 `skill-dictionary/generate_dictionary.py` 刷新 `data.js` 与 `字典.md`。
+- **源清理**：N/A（内部更新通道）。

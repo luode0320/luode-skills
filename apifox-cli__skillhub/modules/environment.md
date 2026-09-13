@@ -35,10 +35,12 @@ apifox environment get <environmentId> --project <projectId>
 
 ## Mock 配置
 
-Mock 是独立于环境的功能，需要在接口层级配置 Mock 规则或期望。
+Mock 是独立于环境的功能，需要在接口层级配置 Mock 规则或期望。完整规则见 `modules/mock.md`，这里只记录要点：
 
 - 先确认接口已有响应定义，再配置 Mock
-- Mock 未配置可能导致接口测试返回 404 或异常响应
+- 每个有测试用例的接口必须有**至少一个兜底 Mock**，否则接口测试可能返回 404 或异常响应
+- Mock 数据必须与真实接口行为一致，测试用例跑通后应自动同步 Mock
+- Mock 创建/更新/查询/删除入口在 `mock` 命令，完整流程见 `modules/mock.md`
 - 区分：接口测试失败 ≠ 接口定义未保存，也可能是 Mock/环境未配置
 
 ## 运行环境建议

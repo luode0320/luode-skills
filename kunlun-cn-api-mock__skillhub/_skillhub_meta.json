@@ -1,0 +1,17 @@
+{
+  "slug": "kunlun-cn-api-mock",
+  "name": "API Mock 与联调助手",
+  "version": "1.0.0",
+  "installedAt": 1788859952869,
+  "source": "skillhub",
+  "namespace": "kunlungrowth",
+  "canonicalName": "@kunlungrowth/kunlun-cn-api-mock",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "当前后端并行开发或依赖未就绪时，设计 Mock 接口：约定数据契约、给出 Mock 服务思路与响应示例、联调清单，减少等待与联调扯皮",
+  "description_en": "当前后端并行开发或依赖未就绪时，设计 Mock 接口：约定数据契约、给出 Mock 服务思路与响应示例、联调清单，减少等待与联调扯皮",
+  "installs": 46,
+  "publisher_name": "昆仑增长",
+  "iconDownloadFailedAt": 1789043758368
+}

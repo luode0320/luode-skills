@@ -1,6 +1,6 @@
 ---
 name: code-change-finalization-gate-rules
-description: '只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释链（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。'
+description: '只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释链（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`test-asset-lifecycle` 测试资产清理检查、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。'
 ---
 
 
@@ -15,9 +15,10 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
 - 注释链只消费 `comment-rules` 补齐闸门分区的 PASS/FAIL；该 PASS 必须包含其对位置颗粒度分区的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
-- 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留扁平测试主文档、日志、报告和非可执行证据内联在其正文；同时核验补注释优先级、测试后的 `6-review` 风格回归、真实运行验证状态、`internal/router` 风格和用户手改保护。
+- 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留扁平测试主文档、日志、报告和非可执行证据内联在其正文；同时核验补注释优先级、测试后的 `6-review` 风格回归、测试资产清理（`test-asset-lifecycle` 条件路由）、真实运行验证状态、`internal/router` 风格和用户手改保护。
 - Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和白盒降级细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
 - 本轮存在生产代码新增或修改时，消费 `test-strategy-rules` 的生产代码测试污染扫描结论 `POLLUTION: PASS/FAIL`；判据、豁免语义和治理步骤由该 Owner 唯一定义，本闸门只校验其已真实执行且结论为放行。
+- 消费 `../skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md` 交付残留自查中与代码/测试改动相关的结论：影响面与消费方对账（维度 2）、残留物清扫（维度 3）、验证有效性反审（维度 6）；判据、命令模板与归档要求以该文件为唯一权威，本入口不复制。
 - 只产出专项闸门 PASS/FAIL 与证据；最终输出和后续内容统一由 `reasoning-summary-structure-rules` 渲染。
 
 ## 自动触发信号
@@ -35,13 +36,15 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 6. 核验核心接口、页面、导出、查询、提交或任务入口的真实运行验证状态；仅有静态证据时必须降级。
 6.1 本轮改动触达接口可见行为时，按 `test-strategy-rules` 的「收口硬闸：接口改动轮必须给出 apifox 证据」逐项核验（判据与证据清单以该节为唯一权威，本入口不重复定义）；**本地脚本/单元测试结果不能顶替该证据**，缺失即不得给出「已完成 / 已验证可用」结论。
 7. 若出现用户手改与旧上下文冲突，核验 `code-context-resync-rules` 已执行且最终 diff 未回退用户内容。
+8. 核验 `test-strategy-rules` 的 `test-asset-lifecycle` 条件路由是否已执行：本轮产生了临时测试数据则必须已清理，`__pycache__` 已自动清理，不适用时写 `N/A + 无临时数据产生`。
+9. 消费 `../skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md` 的 6 维自查结论：本轮改动触及契约面（签名 / 形态 / 路径 / 配置键 / 枚举 / 输出格式）时，核验维度 2 的消费方扫描已执行；核验维度 3 残留物清单与维度 6 验证有效性反审均有可核验证据。
 
 ## 默认执行流程
 
 1. 确认本轮存在代码/测试改动并冻结最终 diff 范围。
 2. 执行测试目录一致性检查；涉及 `internal/router` 时执行 router 专项检查。
 3. 涉及生产代码改动时执行生产代码测试污染扫描，收集 `POLLUTION: PASS/FAIL` 与命中明细。
-4. 收集 comment-completion PASS/FAIL、`6-review` 风格结果、真实运行证据和用户手改保护证据。
+4. 收集 comment-completion PASS/FAIL、`6-review` 风格结果、测试资产清理确认（`test-asset-lifecycle`）、真实运行证据和用户手改保护证据。
 5. 对真实运行证据不足的路径明确标记“仅静态验证”或“未完成真实验证”，并提供可执行的人工验证交接；不得宣称功能可用。
 6. 形成专项闸门 PASS/FAIL；最终用户结构读取 `reasoning-summary-structure-rules`，本 skill 不生成独立后续或阻断模板。
 
@@ -67,6 +70,8 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 - 仅有 build、lint、静态搜索或风格回归，却宣称功能、接口已验证可用。
 - 补注释优先范围未通过 comment-completion 闸门。
 - 用户手改冲突未执行 `code-context-resync-rules`，或最终 diff 回退用户内容。
+- 本轮测试产生临时数据但 `test-asset-lifecycle` 未执行清理，或 `__pycache__` 未自动清理。
+- 交付残留自查中与代码/测试改动相关的维度（影响面 / 残留物 / 验证有效性）未执行或无证据。
 
 属于非阻断级：
 
@@ -82,13 +87,15 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 
 ## 执行通过 / 驳回标准
 
-- 通过：测试目录、comment-completion PASS、`6-review` STYLE 结果、真实运行验证状态、router 适用项和用户手改保护均按适用性完成并有证据。
+- 通过：测试目录、comment-completion PASS、`6-review` STYLE 结果、测试资产清理确认、真实运行验证状态、router 适用项和用户手改保护均按适用性完成并有证据。
 - 驳回：任一阻断级专项缺口存在，却仍给出“可继续 / 已完成 / 已验证可用”结论。
+- 驳回：交付残留自查的代码相关维度（2 / 3 / 6）缺项或无证据，却仍给出“已完成 / 已验证可用”结论。
 - 驳回：本 skill 自行渲染后续内容、阻断区块、解决计划或等待类占位文案。
 
 ## references 读取规则
 
 - 最终条件区块统一读取 `../reasoning-summary-structure-rules/references/conditional-sections-rules.md`。
+- 收口前消费 `../skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md` 的代码相关维度结论；本 skill 不维护该 6 维判据的第二份副本。
 - 不再维护本 skill 私有的 next-step 模板。
 
 ## 回到主流程的重启点

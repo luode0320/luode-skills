@@ -1,10 +1,17 @@
-- 2026-08-28：**吸收 EllipalNodeSync 同事 tapd 资产（外部吸收）**。用户指向 `EllipalNodeSync/.claude/skills/tapd-openapi` + `.tapd/`。裁决：合并 2（新版 tapd_client_stdlib.py 545 行全文替换本地 287 行，新增 mine 子命令/with_ancestors 父需求树/status_map/resolve_iteration/download_entity_images 等 15 函数；SKILL.md 新增「输出规范」章节）；拒绝 3（SKILL.md 其余段本地 env-bootstrap 联动更优、search_wiki.py/hooks.json 与本地一致、.tapd/ 壳项目级参考不落盘）。关键适配：外部变量名 TAPD_ACCESS_TOKEN/TAPD_API_BASE_URL → 本地 TAPD_TOKEN/TAPD_API_ENDPOINT，_get_headers/_get_base_url/_is_cloud 三处 or 回退。联动增强：tapd-task-executor 第 3 步优先 mine。验证：真实 API 冒烟 mine 输出父需求树（兑换→兑换提供外部服务-对接开放接口），quick_validate 双 valid，同域 0 冲突。改动停在已改动未提交状态。
-
 # 项目历史事件
 
 > 本文件追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；普通启动默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
 
 ## 事件
+
+- 2026-09-12：**新增「交付残留自查」收口前横切环节（内部更新通道）**。用户痛点：需求 / Bug / 计划任务执行完成后**再次复查仍能查出该任务残留的新问题**。诊断出六处结构性薄弱环节（均有本仓库实证）：① 收口链为消费型 / 信任型，gate 只消费下游 owner 的 PASS/FAIL，能防「漏执行」防不住「执行得不够」；② 触发靠首条 `闸门预告` 预测后正向对账，缺从真实变更集反推应有 gate 的第二机制；③ `6-review` 被制度性限定只查风格、不判业务正确性与需求覆盖，而仓库已不再自动触发业务审查与最终验收，导致需求覆盖在收口链上**无责任方**；④ 检查单位是单 gate 单维度，无「变更集 → 影响面 / 消费方」横切扫描；⑤ `SUMMARY-GATE-PMW-002` 只查计划内显式登记项，查不到计划外残留；⑥ 验证粒度停留在对象本身，缺「整体重读」，等于把独立复查外包给用户。最强实证：来源映射 v1→v2 升级后监督侧读取方静默降级为 P1，**测试因自带 v1 夹具而全绿**，缺陷对测试套件不可见。用户裁决落成共享 reference + 6 维全部强制。落盘：新建 `skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md`（6 维 = 需求覆盖对账 / 影响面与消费方对账 / 残留物清扫 / 文档与引用一致性 / 口径一致性 / 验证有效性反审；三档触发「中段改码轻量版 → 收口前完整版 → 失败时」；三态处置「已修复 / 显式遗留 / `BLK-*`」；防退化三约束「输入必须是磁盘事实 / 发现项必须落盘 / 二次发现即机制失效回流失败学习」）；`skill-execution-compliance-gate-rules/SKILL.md` 承载（作用条目 + `2.1` + 流程第 2 步 + 阻断级 + 驳回标准 + references 读取规则）；`code-change-finalization-gate-rules/SKILL.md` 消费维度 2 / 3 / 6；`deferred-gate-registry.md` 登记为强制 gate。**形态裁决：不做独立 gate skill**——仓库已有 5 个收口 gate，新增同构 gate 会造成层叠且无法改变「自我声明式 PASS」的失效模式，故落为被消费的横切 reference。验证：双 `quick_validate` PASS；引用链 8 处可达；新 reference CR=0 / LF=101；同域冗余扫描 PASS（1 处「静态验证不能顶替真实运行验证」措辞近似已在同闭环收敛为引用式）；独立 8 维评分 60.3 → 64.0（+3.7，棘轮保留）；补建该 skill 原缺的 `source-notes.md` 与 `workbuddy-absorption-map.md`。**执行踩坑（可复用教训）**：并行对同一文件发多个 Edit 会发生 **lost update**——6 个 Edit 全部返回 `Successfully edited`，回读却只落实 2 处，另有 1 次 `EBUSY: resource busy or locked`；根因是同消息内多 Edit 被并行执行、后写覆盖前写，且工具返回不反映真实落盘结果；处置为整文件重写一次落全 + grep 逐条回读校验。**教训：同一文件的多次修改必须串行，批量修改后必须回读磁盘而非相信工具返回。** 诚实局限（已写入交付说明）：本环节不能消灭残留，只能把「用户复查发现」前移为「agent 收口发现」。记忆维护：`PROJECT_CURRENT.md` 逼近 51,200 上限，压缩最旧 2026-08-23 条目为摘要；`PROJECT_HISTORY.md` 满 20 条，裁剪最旧 2026-08-22「吸收调试」条。改动停在已改动未提交状态。
+
+- 2026-09-11：**代码质量九维治理：四项规则缺口补齐（内部更新通道）**。用户提出 AI 辅助开发瓶颈已从「逻辑正确性」转向「代码质量」，列出九维（架构与模块划分 / 编写习惯与风格 / 注释与定义位置与命名 / 引用方式与包别名 / 静态风格命名与位置 / 函数签名 / 结构体按作用分层 / 纯转换工具函数落点 / 工具函数索引文档规范），要求系统化治理。用户裁决保守节奏「先补规则内容，后处理编排时机」+ 三项口径（函数参数=语义优先、定义位置=开头集中、结构体分层=按语言生态）。逐项闭环（落地→校验→索引→登记），四项全部完成：① 新建 `code-quality-rules/references/function-signature-rules.md`（参数顺序 ctx→必填→可选；数量语义优先，同源≥3 建议收、含可选/扩展字段必收；单参数与结构体取舍判据；命名 `XxxParams`/`XxxOptions`）；② 新建 `code-quality-rules/references/definition-placement-rules.md`（局部变量函数开头集中、包级变量常量顶部集中、函数追加末尾；与 `code-style-consistency-rules` 的「声明形式」约定配套）；③ 新建 `package-structure-rules/references/struct-role-layering.md`（角色谱系与落点表 + 引用面从小到大判定顺序 + Go/Java/TS/Python 生态差异 + 按角色注释颗粒度）；④ 新建 `common-util-rules/references/util-index-doc-contract.md` + `util-placement.md` 新增「纯转换工具函数的落点（点名判据）」小节——**关键落点发现**：公共工具索引唯一合法落点为 `doc/1-架构/3-模块职责.md` 的「公共工具索引」小节，原候选 `utils/<pkg>/README.md`（Catalog `allowed_extensions` 只含源码扩展名，`.md` 不在列）与 `doc/` 新建子目录（doc 子目录已由 Catalog 固定）**全被 Catalog 否掉**。附带：补建 `common-util-rules` 登记文件 2 个（该 skill 原缺 source-notes + absorption-map）；顺手修复 `package-structure-rules/references/directory-usage-routing.md` 第 19 行表破损（`utils/decimal/` 与 `utils/cache/redis/` 挤成一行）。验证：4 个新 reference 引用链 grep 一致；`package-structure-rules` 测试 7/7 PASS（含覆盖索引文件的 `backend_utils_usage_routing_test.py`）；同域冗余扫描 PASS；字典重跑 exit 0（implemented 65 / planned_missing 8 / seed 113）；全仓 runner 因缺 `pyyaml`（既有环境基线）无法整体启动。登记：4 个 skill 的 source-notes + absorption-map、当日工作日志、PROJECT_CURRENT。改动停在已改动未提交状态。
+- 2026-09-10：**跨项目写入红线改造：绝对禁止 → 默认只读 + 会话级写入授权（用户决策）**。原规则「其他项目绝对只读、不存在取得用户授权后即可执行的例外」阻断多项目功能对接。经 AskUserQuestion 三项确认：① 授权粒度=**会话级**（本会话内一次确认对目标项目持续有效，会话结束 / 撤销 / 越界 / 版本漂移即失效）；② 操作范围=**全权限**（文件写入、构建测试、依赖安装、Git 提交推送）；③ 不设绝对禁止子项。落盘 6 处：`AGENTS.md` 与 `CLAUDE.md`「跨项目写入红线」同文改写（新增「例外通道（会话级跨项目写入授权）」+ `WRT-*` 授权记录契约 + 生效 / 失效条件 + 未授权唯一出口）；`implementation-planning-rules/references/sibling-project-discovery.md`「绝对禁止」节改「默认只读 + 会话级写入授权」、「需要改动兄弟项目时的唯一出口」改「未获授权时的唯一出口」；`cross-session-plan-execution-contract.md` 补 `EXT-*` 涉及修改时的 `WRT-*` 前置；`codegraph-analysis-rules/SKILL.md` 兄弟项目 `codegraph init` 由「一律禁止」改「授权覆盖下可执行」；`bug-intake-rules/references/discovery-and-gap-bug-discovery-rules-evidence-and-db-readonly.md` 对照项目由「绝对只读」改「默认只读 + 授权例外」。保留独立红线（非本条子项）：`local` 连接红线、凭据不回显、个人文件安全、当前项目 Git 当轮意图。校验：AGENTS.md / CLAUDE.md 双文件 blob 一致（`ee7d3b84`）、6 文件手术式 diff 无越界、未改 `description` 与 `##` 标题故无需重跑字典。改动停在已改动未提交状态。
+
+- 2026-09-10：**补齐 `doc/` 文档生命周期与退场规则（`artifact-storage-rules` 内部更新通道）**。用户发现 `code/EllipalFinance-go/doc/` 约 180 份、本仓库 `doc/` 约 145 份过程文档长期无人清理。根因是规则缺位：`knowledge-flow` 侧早有知识笔记三档退场机制，而 `artifact-storage-rules` 只覆盖存储的空间维度（落点 / 命名 / 复用），时间维度完全缺失，既有清理条款（`.gap.md`、图片旧版本、迁移后旧目录、`test/{skill}/temp`）全为事件驱动。用户拍板：落点扩展 `artifact-storage-rules`、时间阈值半个月（15 天）、处置「沉淀知识库后删除老文档」（删除档，不设归档目录）。落盘：新增 `references/lifecycle-policy.md`（四道前置守卫：沉淀·引用·闭环·可恢复）；`SKILL.md` 新增「文档生命周期与退场（强制）」章节并扩 `description`；`path-map.yaml` 新增 10 个 `process_doc_*` 键；`update-policy.md` / `skill-integration.md` / `root-directories.md` 补策略摘要与引用入口；重跑字典刷新 `data.js` 与 `字典.md`。验证：`quick_validate.py` `Skill is valid!`；YAML 解析通过（version 10，11 键回读一致）；同域扫描 7 个 skill 0 冗余 PASS。登记 absorption-map + source-notes + 当日日志。**本轮同时修复 PROJECT_HISTORY 两处既有锚点缺陷**（补「吸收 EllipalNodeSync 同事 tapd 资产」缺失锚点、补全被截断的「记忆使用计数与高频条目自动吸收」锚点 title 与 4 个计数字段）。改动停在已改动未提交状态。
+
+- 2026-08-28：**吸收 EllipalNodeSync 同事 tapd 资产（外部吸收）**。用户指向 `EllipalNodeSync/.claude/skills/tapd-openapi` + `.tapd/`。裁决：合并 2（新版 tapd_client_stdlib.py 545 行全文替换本地 287 行，新增 mine 子命令/with_ancestors 父需求树/status_map/resolve_iteration/download_entity_images 等 15 函数；SKILL.md 新增「输出规范」章节）；拒绝 3（SKILL.md 其余段本地 env-bootstrap 联动更优、search_wiki.py/hooks.json 与本地一致、.tapd/ 壳项目级参考不落盘）。关键适配：外部变量名 TAPD_ACCESS_TOKEN/TAPD_API_BASE_URL → 本地 TAPD_TOKEN/TAPD_API_ENDPOINT，_get_headers/_get_base_url/_is_cloud 三处 or 回退。联动增强：tapd-task-executor 第 3 步优先 mine。验证：真实 API 冒烟 mine 输出父需求树（兑换→兑换提供外部服务-对接开放接口），quick_validate 双 valid，同域 0 冲突。改动停在已改动未提交状态。
 
 - 2026-08-28：**新建 tapd-task-executor skill（用户指令）**。用户要求：说「找 tapd 的任务做」等主动领取语义即自动触发，拉取当前用户名下未完成任务+bug，分析描述清楚度与可实现性，可执行项在当前会话项目内自行实现修复，无可执行项时列 3 条高优先级待完善。经 AskUserQuestion 确认 4 项决策：独立 skill（执行编排层，复用 tapd 四兄弟能力不重复造轮子）、只筛当前会话项目（跨项目一律忽略，符合 AGENTS.md 跨项目写入红线）、完成回写=领取置处理中+评论执行摘要+终态交人工、兜底仅当前用户范围。落盘：`tapd-task-executor/SKILL.md` + `references/task-analysis-criteria.md`（描述清楚度/可实现性判定标准）。验证：quick_validate `Skill is valid!`（exit 0）；同域触发扫描（全仓 grep「找任务做/tapd做」）0 抢触发 PASS；冒烟 TAPD_TOKEN len=40 已注入、tapd-cli.cjs/add_comment.py 存在。环境观察：TAPD_WORKSPACE_IDS 运行时为 `62459836,30399328`（env-bootstrap 记录 3 个、少 36150079，待核对）。登记：知识库《TAPD任务自动执行skill-20260828》+ source-notes + 工作日志。改动停在已改动未提交状态。
 
@@ -21,35 +28,30 @@
 - 2026-08-26：**低分 skill 优化第七轮：shell__skillhub（31.0 → 69.0/75，实测全通过）**。短板实锤：SKILL.md 111 行纯命令链接壳（9 入口全裸相对路径 `scripts/script.sh <cmd>`），脚本 587 行 8 大模块内容充实被埋没——"内容有、路由无"结构性缺陷再现；frontmatter 6 违规键（author/category/homepage/source/tags/version）校验器实测确认。断链真因：脚本本体实测可执行（10 命令 exit 0），"断链"= 裸相对路径脱离 skill 根失效 + 知识全锁脚本无内联承载。市场结论：6 组关键词（shell/bash/scripting/脚本/linux/terminal/command line）0 个 shell 候选，授权安装验证无对象；同域 `bash__skillhub`（79 行陷阱速查）定位"速查 vs 手册"互补，拒绝合并留档体系审计。落盘：SKILL.md 重构为 4 步工作流（识别场景→查速查→调脚本→分阶段验收）+ 8 大陷阱内联速查（引用/三件套/子壳/数组/参数展开/信号/退出码/工具，全"问题-修复"对）+ script.sh 加 `SCRIPT_DIR` 自定位（+1 行）+ 双调用方式（cd 相对 / 任意 cwd 绝对）+ frontmatter 合规化 + 环境自检（bash 缺失 4 级降级链）+ 交叉引用 bash/linux/powershell + 版本 1.1.0。复评：独立子代理 `7|4|2|2|5|2|5 → 9|9|9|9|10|9|9`（+38.0）；维度 8 实测全通过（10 命令 exit 0 / 子壳陷阱 count=0→2 / `${#arr[@]}`=2 / `${var:-default}`=DEFAULT / 双调用方式均通）。闭环修复 3 处（SCRIPT_DIR 自定位、检查点分写前/写后、bash 缺失降级链），quick_validate 复验 valid。同域冗余扫描 4 项 PASS。知识库沉淀回读一致（223 链接 0 死链）。改动停在已改动未提交状态。
 - 2026-08-25：**打通日志使用链路（REQ-LOG-20260825-001，用户确认落盘推进）**。新建 `log-analysis-rules` 作为读日志侧唯一权威（SKILL.md + 5 references：log-file-location / log-level-switching / request-id-traceback / log-fetch-and-filter / debug-window-discipline）；联动四处：`logging-trace-rules` 补可反查稳定标识字段（request-id/trace-id/订单号，纯本地用业务键）、`bug-root-cause-rules` 与 `bug-intake-rules` 查日志取证显式指向读侧、apifox `testing-pitfalls.md` 四层诊断补第 5 步服务端取证（request-id 反查 + 证据回贴测试主文档 + ENV_LOG_BLOCKED 阻断归因）、`test-program-rules` 写接口过程日志从自查项升级为默认放行项（计划冻结可升级硬判）。落盘：需求 `doc/2-需求/2026-08-25_REQ-LOG-20260825-001_日志链路打通.md`（valid:true）+ 实施总览 + 6-review（STYLE: PASS）；字典重跑 seed 92；知识库沉淀 1 篇并更新 INDEX.md；PROJECT_MEMORY 补稳定决策。验证：quick_validate PASS、三份工程文档机器校验 valid:true、语义 grep 全部命中（写侧 4 处 / bug 域 2 处 / 取证 7 处 / 升级 3 处）、全量 400 测试失败 14/错误 13 与改动前基线一致（缺 Go 等既有环境项，无新回归）、knowledge_index 0 死链。改动停在已改动未提交状态。
 - 2026-08-23：**实施「任务投影跨宿主适配」修复（BUG-TASK-PROJECTION-HOST-001，用户 /goal 授权并行）**。将任务投影从 Codex 专属硬闸门改造为跨宿主分级适配：① 脚本层 task_plan_projection.py 新增 _resolve_workbuddy_session_id 与三级会话回退链（显式 --session-id > CODEX_THREAD_ID > WorkBuddy 元数据，任意来源冲突/全缺失失败关闭），ensure-start 合成上下文缺 trigger 默认补 start（synthesize 保持严格必填）；② 规则层 task-plan-rehydration-rules SKILL.md 与契约文档跨宿主化（Codex/WorkBuddy/无任务 UI 宿主三档通道 + 互斥不双写），UI_SYNC_BLOCKED 改分级语义——持久化失败/会话冲突/状态不明硬阻断，仅 UI 通道不可用降级继续；③ 上层联动 6 文件（skill-hit-check / autonomous-execution x2 / context-compression / session-handoff / platform-capability-matrix）同步分级语义，PROJECT_MEMORY 三处稳定决策与定义/scope 更新。执行：3 worker 并行（write set 互斥），首次因网关 502 失败，探测恢复后重试成功。验证：单元测试 73/73 OK、quick_validate PASS、实施总览与周期01 文档校验 valid:true、语义 Grep 无绝对化残留、6-review STYLE: PASS。落盘：Bug 主文档 + 实施总览 + 实施周期01 + 测试主文档 + 6-review 记录。改动停在已改动未提交状态。
-- 2026-08-22：**吸收「调试」（awesome-ai-agent-skills v1.0.0）通用调试方法论进 Bug 域**（用户指令「调试 去试试…吸收这个skill」）。与上轮 diagnose 吸收同域互补：diagnose 提供方法论骨架（回路/假设/接缝/复盘），本 skill 提供领域知识（根因类别/定位战术/边界场景/工具表）。裁决 20 条：合并 10 / 保留本地 9（复现、修复、验证工作流与 diagnose 已吸收的方法论重叠，本地更强或全覆盖）/ 拒绝 1（教学示例形态）。落点：`bug-root-cause-rules/references/root-cause-catalog.md`（新建，7 类常见根因清单 + 第三方库/runtime/数据损坏三类边界场景 + 区分根因与症状）、`bug-root-cause-rules/references/static-analysis-path.md`（补堆栈从下往上阅读纪律 + 先查最近变更 + 二分隔离/stub 排除三节）、`bug-intake-rules/references/runtime-diagnostics-bug-runtime-debug-rules-runtime-observation-methods.md`（补 Heisenbug 场景 + 跨语言工具参考表）、`bug-reproduction-rules/references/stability-checks.md`（补环境特定 Bug 匹配复现）；root-cause 与 reproduction 两个 SKILL.md 同步引用，顺手修复 bug-reproduction SKILL.md 编号重复（上轮 feedback-loop 插入遗留格式瑕疵）。验证：3 skill quick_validate 全 PASS、4 落盘文件 UTF-8 无乱码、净增 +5005 bytes 引用式、同域扫描（Bug 5 + 测试 3）0 冗余 PASS、catalog→hypothesis-ranking→evidence 三级引用链单向可达。登记：workbuddy-absorption-map.md 条目 + source-notes.md + case-debugging-absorption.md。源清理：删除仓库根 `debugging-skillhub__skillhub/`（junction 双路径自动失效）。改动停在已改动未提交状态。
 - 2026-08-22：**「项目根 `skills/` 加载声明」补进 bootstrap 受管章节 + 规则 md**。用户质疑「项目根级 skills/ 目录下的 skill 也会被加载，这个规则 md 中有了吗？同步规则脚本了吗？」——核查确认**没有**：`project-local-skills-rules` 第 26 行规定「命中方式 = 由项目级规则文件（AGENTS.md/CLAUDE.md）显式声明引用 `skills/` 目录」，但该声明从未进入 `bootstrap_agents.sh` 的受管章节模板，其他项目 bootstrap 后规则文件无 skills/ 加载条款，项目本地 skill 无法稳定命中（与 usage_tracking 计数条款缺口同构）。修复：`BODY_SKILL_AUTO` heredoc 新增「### 项目本地 skill 目录（强制）」子节（项目根 `skills/` 下 `project-<slug>-<topic>-rules/` 会被自动加载/扫描、跨工具通用、`~/.workbuddy/skills/` 等工具专属路径非落点规则；会话开始须按声明扫描命中；创建/查重/吸收由 `project-local-skills-rules` 与 `memory-usage-tracking-rules` 管理）；跑 `bootstrap_agents.sh --repo . --target both` 同步根 AGENTS.md + CLAUDE.md（字节一致 49778，双平台无漂移）。验证：临时项目端到端（新建路径含子节 + 重跑幂等 grep -c=1）、bash -n PASS、quick_validate PASS、UTF-8 OK。副作用提示：bootstrap 递归同步了 2 个 skillhub 第三方资产目录的 AGENTS.md（proactive-agent__skillhub/assets、vercel-react-best-practices，设计行为）。改动停在已改动未提交状态。
 - 2026-08-22：**bootstrap schema 变更强制检查固化进 `project-rule-file-bootstrap-rules/SKILL.md`**。承接上轮「usage_tracking 三处同步断点」教训（新建路径 `create_project_memory_file` 内嵌模板 / 补齐路径幂等补丁 / 规则文件受管章节 heredoc，端到端真实自举才抓到），用户确认把教训补为规则强制项。SKILL.md 新增「## Schema 变更强制检查（强制）」章节：模板三路联动（新建 + 补齐 + 受管章节及模板索引，缺一即阻断，漏改新建路径是最高频断点）、真实自举兜底（临时项目跑 `bootstrap_agents.sh --repo $TMP --target default` 验证新建与幂等两路径 + `grep -c` 不重复，`bash -n` 不算兜底）、仓库模板回写四件套模板、缺项阻断；「统一执行步骤」追加第 9 条强制引用。验证：quick_validate PASS、UTF-8 OK、frontmatter 完整。改动停在已改动未提交状态。
 - 2026-08-22：**项目本地 skill 落点回归项目根 `skills/`**（用户纠正 + git 历史证实）。初版 `project-local-skills-rules`（91357e8）落点即项目根 `skill/`，2b0b251 吸收 skill-autosave 时被"路径适配 WorkBuddy 环境"改为用户级 `~/.workbuddy/skills/` 并新增"勿在项目根另建 skill/"条款；而 `artifact-storage-rules/references/path-map.yaml` 的 `project_local_skills` 一直是 `skill`，两条规则长期矛盾。本次统一：落点 = **项目根目录 `skills/`**（复数，用户拍板），命中由项目级 `AGENTS.md` / `CLAUDE.md` 显式声明引用（不依赖任何工具专属路径）；luode-skills 仓库特例直接落仓库根（仓库根即 skill 资产库）。修正范围：`project-local-skills-rules`（SKILL.md description+5 处落点、dedup-and-update.md 落点节/查重/init 路径、project-skill-template、scope-and-splitting、priority-and-roadmap、agents/openai.yaml）、`artifact-storage-rules`（SKILL.md、path-map.yaml `skill`→`skills` 两处、root-directories、naming-templates、update-policy、skill-integration）、`memory-usage-tracking-rules`（SKILL.md 查重/落点、absorption-trigger 查重/落点、scan_absorption_candidates.py 三处+existing_project_skills 三路查重、source-notes 登记）、字典.md / 编码skill.md / README.md 登记行。验证：3 skill quick_validate 全绿、path-map yaml 解析正确、scan 脚本自测通过（项目根 skills/ + 仓库根特例 + 用户级兼容三路查重）、19 文件 UTF-8 OK、"勿在项目根 / 项目根 `skill/`（单数）/ 写入用户级 skill"全仓清零。改动停在已改动未提交状态。
-- 2026-08-22：完成「记忆使用计数与高频条目自动吸收」机制上线（REQ 升级：给 PROJECT_MEMORY.md / PROJECT_STYLE.md / PROJECT_HISTORY.md 条目增加使用次数统计，高频条目自动吸收为项目本地 skill）。核心设计：① 计数锚点统一走机器索引区模式——MEMORY 扩展现有机器索引区（顶层 `usage_tracking` 键 + entities[] 追加 `usage_count` / `usage_days` / `last_used_at` / `absorbed_to` 四可选字段），STYLE 与 HISTORY 底部新增 `## 计数锚点区`（yaml anchors[]，key 用条目标题）；② 仅"实际引用"计数（条目用于决策/输出/代码/被 skill 引用，HISTORY 窄读计入），会话启动全文读取不计，同会话同条目只 +1；③ 收口前由 `memory-usage-tracking-rules`（新 skill，延迟 gate）回写，回写前跑 `usage_ledger_validate.py` 校验 claim 防虚报（ok=false 阻断），回写后跑 `scan_absorption_candidates.py` 扫候选；④ 吸收阈值 `usage_count ≥ 3` 且 `usage_days ≥ 2` 且未吸收，达阈值自动吸收为 `project-<slug>-<topic>-rules`，与 skill-absorption-rules「人在回路」调和为「自动执行 + git 可回滚 + quick_validate 结构校验 + 登记留痕」，原条目标记 absorbed_to 冻结计数。落点：新建 `memory-usage-tracking-rules/`（SKILL.md + 4 references + agents/openai.yaml + 2 scripts）；修改 project-memory-rules / project-style-rules / project-local-skills-rules（通道 C）/ skill-absorption-rules（自动吸收例外 + evolution-decision-matrix 量化判据）/ skill-hit-check-rules（deferred-gate-registry 登记）/ bootstrap_agents.sh（三处 usage_tracking 同步）/ 四件套模板 / AGENTS.md（计数强制条款）/ 三记忆文件落地骨架 / 字典登记（2.5.1）/ 编码skill.md 字典行；顺手修复 project-memory-rules description 基线尖括号导致 quick_validate 失败的问题。两脚本自测通过（合法/非法 claim、去重、阈值过滤、absorbed_to 冻结过滤、弱信号）。改动停在已改动未提交状态。
-
-- 2026-08-21：异步任务宿主任务列表桥接规则（用户确认第二层规则层方案，承接上一条异步分流）。用户诉求：异步任务（异步子会话 / 异步下载 / 异步发布 / CI 轮询等）应像 WorkBuddy 任务列表 UI 一样可见进度，用户要知道"在干什么、进度到哪、何时回来看"。核心口径：① 启动即登记——异步任务启动时先用 `TaskCreate` 在宿主任务列表登记，条目描述三段式「做什么 + 任务标识 + 何时查看」；② 三段式推进——启动/等待/回收三阶段用 `TaskUpdate` 推进（pending → in_progress → completed），禁止裸 `run_in_background` 当唯一进度可见手段；③ 职责分工——执行期契约进 `autonomous-execution-rules`（新增「异步任务任务列表登记（强制）」节），收口期渲染与登记校验进 `reasoning-summary-structure-rules`（「🔄 后台异步任务」小节新增「宿主任务列表映射」字段）；④ UI 常驻是宿主产品诉求，提给 WorkBuddy 产品/前端评估，不在规则仓库范围。落点：`reasoning-summary-structure-rules/SKILL.md` 6 处（description/自动触发信号/进入后先做什么/输出要求第 8 条/发送前自检/通过驳回标准）、模板 + 条件字段（宿主任务列表映射行 + 登记要求）、`autonomous-execution-rules/SKILL.md`（新增执行期登记节）、agents/openai.yaml、编码skill.md 字典行 + 字典重跑（implemented_total 64）；PROJECT_MEMORY 稳定决策 + 机器索引 definition/evidence note 更新、知识库笔记《最终总结异步任务分流与WorkBuddy hook增强触发.md》追加 1.1 节。改动停在已改动未提交状态。
-
-- 2026-08-21：完成 `reasoning-summary-structure-rules` 总结异步任务分流规则 + WorkBuddy hook 增强触发。用户痛点：AI 回复「看起来没完成但实际不再有后续」（如 CI run 已启动、轮询在跑但会话已收口），用户无法区分「被阻断 / 真正完成」。根因：`run_in_background` 类异步任务与同步主任务在同一屏展示，且最终回复缺少「同步已完成 + 异步在跑」显式收口信号。核心口径：① 新增条件小节 `## 🔄 后台异步任务`——本轮启动后台异步任务（run_in_background 轮询 / CI 等待 / 长任务）时必选，位于「结果与结论」之后、「后续内容」之前，逐项写明任务标识、任务类型、轮询节奏、预计完成信号、结果回流渠道（系统通知 / 下一会话 / 用户指令）、用户等待语义；该小节是收口信号，不是未完成、不是 blocked/manual_handoff、不触发后续内容、不让用户误判会话被阻断。② WorkBuddy hook 增强触发（回答用户「hook 是否更准确」：是）——`UserPromptSubmit` 注入 additionalContext 软提醒 + `Stop` 事件 exit code 2 硬校验（stderr 注入下一条消息强制补总结），配置在 `~/.workbuddy/settings.json` 或项目 `.workbuddy/settings.json` 的 hooks 字段；hook 支持需真实任务实测（文档列了不等于桌面版真的触发）。落点：SKILL.md（description/自动触发信号/进入后先做什么/输出要求第 8 条/发送前自检/视觉规范/通过驳回标准/references 读取规则 8 处）、references/summary-structure-template.md（模板条件小节 + 结构要求）、references/conditional-sections-rules.md（新增 5.1 后台异步任务条件字段）、**新建 references/hook-integration.md**（配置示例 + UserPromptSubmit/Stop 双脚本 + 防死循环 + 实测注意）、agents/openai.yaml（short_description/default_prompt）、编码skill.md 字典行 + 字典重跑（implemented_total 64）；PROJECT_MEMORY.md 稳定决策「总结异步任务分流规则」+ 机器索引实体 `rule.summary-async-task-section` + evidence note、PROJECT_HISTORY 置顶。双路径（仓库/安装）为 junction 同一物理目录，diff -rq 一致。改动停在已改动未提交状态。
-
-- 2026-08-21：完成「apifox 临时库特权」规则吸收（apifox 环境数据维度的第二通道）。用户澄清：**模型测试时常需要宽泛权限**（建表/复杂数据构造/大范围写操作），**允许 apifox 环境自行新建临时库测试使用**——前提是**项目已提供 apifox 环境配置**（有 `config/yaml/config.apifox.yaml` + 对应 apifox 测试专用库）。规则要点：① 临时库名必须以 **`tmp` 前缀**标识（如 `tmp_<测试用途>`）区分正常库；② **生命周期（建→用→删，强制）**：测试完成后**必须删除**（`DROP DATABASE`），删除动作记录到 `PROJECT_TEST.md`（库名/用途/删除时间）；③ **删除边界**：只有 `tmp` 前缀临时库允许删除，**正常库（非 `tmp` 前缀，含 apifox 测试专用库、local 库）一律禁止删除**——即使 apifox 环境具备连接权限也不得删。与库分离不冲突：分离管「apifox 专用库 ≠ local 库」，临时库是额外创建的生命周期库、用完即删。落点：`environment.md`（本地测试配置节「临时库特权」小节 + 运行环境红线 + 不可违反规则第 16 条）、`test-data-and-judgement.md`（数据准备优先级第 3 条）、`test-strategy-rules/SKILL.md`（接口执行通道前置条件）、`package-structure-rules/references/configuration-layout.md`（临时库特权节）、编码skill.md 三处 + apifox SKILL.md 路由行 + 字典重跑（64 项）；PROJECT_MEMORY.md 稳定决策 + 机器索引 definition/evidence note、PROJECT_CURRENT 覆盖。改动停在已改动未提交状态。
-
-- 2026-08-21：完成「模型测试数据基准与流通优先级」规则吸收（apifox 环境选择优先级的第二维度）。用户澄清：**「有 apifox 配置默认用 apifox」仅指被测服务启动环境，不代表禁止使用 local 配置/数据**；apifox 以 local 数据库数据为基准（local 常同步正式环境线上数据，测试更准确），环境隔离仅隔离测试写入、不隔离数据来源。新增**数据准备优先级**：① apifox 库无数据且 local 有 → **优先**从 local 单向灌入 apifox 测试库（默认路径，不限于旧接口）；② apifox 与 local 都无数据 → apifox 自造测试数据（不得空结果伪通过）。local 只读源（仅 SELECT）/ 单向 / 禁 test/prod 取数 / 脱敏 / 可追溯约束不变。落点：`test-data-and-judgement.md` 〇节升级（标题改「local 基准灌入 + 双无自造」+ 新增数据准备优先级 2 条）、`environment.md` 三处（数据基准节/运行环境红线/不可违反规则 14）、`test-strategy-rules/SKILL.md`、`package-structure-rules/references/configuration-layout.md`、编码skill.md 三处 + apifox SKILL.md 路由行 + 字典重跑（64 项）；PROJECT_MEMORY.md 稳定决策 + 机器索引 definition/evidence note、PROJECT_HISTORY 置顶、PROJECT_CURRENT 覆盖、知识库笔记决策 6 升级 + 决策 9 新增。旧口径「测试旧接口需要旧数据时允许灌入」全仓库清零。改动停在已改动未提交状态。
-
-- 2026-08-21：补充**模型测试环境选择优先级默认口径**。用户确认：模型测试/接口级测试的**默认启动环境按项目配置决定**——项目**存在 `config/yaml/config.apifox.yaml`（含同仓 `backend/config/yaml/config.apifox.yaml`）时默认使用 `apifox` 环境**（被测服务 `-env apifox` 启动）；项目**没有 apifox 环境配置时默认使用 `local` 环境**；除 `local` 与 `apifox` 之外的环境（`test`/`prod`/`staging`/`pre`/`release` 等）一律禁止。这是对既有「环境白名单 {local, apifox}」的优先级增强：从「apifox 仅限接口测试通道、其他测试一律 local」演进为「有 apifox 配置默认 apifox、无则 local、禁其他」。同步落点：`apifox-cli__skillhub`（environment.md 本地测试配置节 + 运行环境红线 + 不可违反规则第 13 条、SKILL.md 模块路由行）、`test-strategy-rules`（环境红线节）、`package-structure-rules`（configuration-layout.md apifox 章节）、`编码skill.md` 四处 + 字典重跑（implemented_total 64）、PROJECT_MEMORY.md 稳定决策与机器索引 definition/evidence note、知识库笔记《apifox测试分离库config.apifox.yaml》决策 8 + 权威落点 + 执行要点。改动停在已改动未提交状态。
-
-- 2026-08-21：补充 **apifox 测试专用项目直接 main 分支**口径。用户确认：用户为 apifox 测试**单独创建项目**（项目级隔离已足够），apifox 项目内**接口文档操作、测试、补充测试用例直接在 `main` 分支（如 `1.main`）操作**，**不新开 AI 分支 / api 分支，不做「开分支 → 自动化测试 → 合并回 main」的多余操作**；仅非测试专用项目（如共享主项目）或 main 分支受保护不可直接写时才走 AI 分支兜底。同步落点：`apifox-cli__skillhub`（ai-team-project.md「分支策略」节 + 不可违反规则第 9 条、api-sync-to-apifox.md 步骤 4/9 + 不可违反规则第 5 条、branch.md「先判断怎么改」、SKILL.md AI 写入权限 + AI 分支说明、workflow.md 适用场景 + Step 1）、`test-strategy-rules`（接口级测试强制走 apifox 节补分支策略）、`编码skill.md` apifox 行 + 字典重跑、PROJECT_MEMORY.md 稳定决策 + 机器索引 definition、知识库笔记决策 7 + 权威落点 + 执行要点 7。改动停在已改动未提交状态。
-
-- 2026-08-21：补充 apifox 测试库**旧数据灌入**口径。用户确认：apifox 测试专用库是独立新库，测试旧接口需要旧数据时，允许从 `config.local.yaml` 指向的 local 本地库**单向灌数据**到 apifox 测试库（local 库只读源仅 SELECT、禁止反向回灌、禁止从 test/prod/staging 取数、脱敏并记录来源库/表与条数/时间）。同步落点：`apifox-cli__skillhub`（test-data-and-judgement.md 新增「〇、测试库数据准备：旧数据灌入」节、environment.md 本地测试配置节 + 运行环境红线 + 不可违反规则第 14 条、SKILL.md 模块路由行）、`test-strategy-rules`（接口执行通道前置条件补数据准备）、`package-structure-rules`（configuration-layout.md apifox 章节补测试数据来源）、`编码skill.md` 三行 + 字典重跑、PROJECT_MEMORY.md 稳定决策与机器索引 definition、知识库笔记决策 6 + 权威落点 + 执行要点 6。改动停在已改动未提交状态。
-
-- 2026-08-21：补充 apifox 测试环境白名单口径。用户确认：接口级测试与本地测试的被测服务启动环境**只允许 `local` 与 `apifox`** 两个环境，**禁止 `test`/`prod`/`staging`/`pre`/`release`**；`apifox` **仅在走 apifox 接口测试通道时使用**（`-env apifox` 启动），其他测试一律使用 `local`。同步落点：`test-strategy-rules`（环境红线节新增白名单声明）、`package-structure-rules`（configuration-layout.md apifox 章节补环境白名单）、`apifox-cli__skillhub`（environment.md 本地测试配置节 + 运行环境红线 + 不可违反规则第 13 条、SKILL.md 模块路由行）、`编码skill.md` 四处 + 字典重跑、PROJECT_MEMORY.md 稳定决策与机器索引 definition/evidence note、知识库笔记决策 5 与执行要点 4。改动停在已改动未提交状态。
-
-- 2026-08-21：补充 apifox 测试专用库命名约定。用户确认：apifox 测试专用 MySQL 库**固定命名为 `apifox`**，由**开发人员手动创建并配置**（与已回退 sqlite 方案无关，保持 MySQL 仅换专用库名）。同步落点：`package-structure-rules`（configuration-layout.md 数据库分离节补库名约定、placement-catalog.yaml 两处 purpose 补库名约定）、`apifox-cli__skillhub`（environment.md 本地测试配置节与不可违反规则第 12 条、SKILL.md 模块路由行）、`test-strategy-rules`（接口执行通道前置条件）、`编码skill.md` 三行 + 字典重跑、PROJECT_MEMORY.md 稳定决策与 evidence note、知识库笔记《apifox测试分离库config.apifox.yaml》决策/执行要点同步。改动停在已改动未提交状态。
 
 ## 计数锚点区
 
 ```yaml
 version: 1
 anchors:
+  - title: "跨项目写入红线改造：绝对禁止 → 默认只读 + 会话级写入授权（用户决策）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "补齐 `doc/` 文档生命周期与退场规则（`artifact-storage-rules` 内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "吸收 EllipalNodeSync 同事 tapd 资产（外部吸收）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: "新建 tapd-task-executor skill（用户指令）"
     usage_count: 0
     usage_days: 0
@@ -130,42 +132,7 @@ anchors:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
-  - title: "完成「记忆使用计数与高频"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "异步任务宿主任务列表桥接"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "完成 `reasonin"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "完成「apifox 临时"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "完成「模型测试数据基准与"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "补充**模型测试环境选择"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "补充 **apifox "
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "补充 apifox 测试"
+  - title: "完成「记忆使用计数与高频条目自动吸收」机制上线"
     usage_count: 0
     usage_days: 0
     last_used_at: null

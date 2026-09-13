@@ -1,18 +1,24 @@
-# 提交域与工作树清空
+# 业务提交范围与工作树清空
 
 本文件定义提交拆分和“提交git”场景的完成目标。
 
-### 提交域隔离
+### 按业务合并提交
 
-- 同一任务的流程文档统一归入 `docs` 提交域，包含 `doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`、`doc/7-验收/` 以及项目状态同步文件。
-- 项目状态同步文件至少包括 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`、`PROJECT_STYLE.md`、`编码skill.md`、`字典.md`、`skill-dictionary/data.js`；它们默认跟随同一任务的 `docs` 提交，不再额外拆 `chore`。
-- 可执行测试文件至少包括根 `test/**`、`*_test.*`、`*.spec.*`、`*.test.*`，归入 `test` 提交，不与代码实现或 `docs` 提交混提；`doc/5-tests/**` 只保存测试说明、日志、报告、截图和非可执行证据，归入 `docs` 提交。
-- 代码实现和运行配置作为实现域，不与 `docs` 域或 `test` 域混提。
-- 每次暂存前先冻结当前 commit 的文件清单；发现 `docs`、`test`、实现域跨域时拆分，不为追求一次提交强行混提。
+- 提交拆分的唯一依据是**业务目标**：互不相关的业务目标拆成多笔，同一业务目标的改动合并为一笔。
+- 同一笔提交可以同时包含代码实现、运行配置、可执行测试、流程文档（`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/`、`doc/7-验收/`）和项目状态同步文件。
+- 项目状态同步文件至少包括 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`、`PROJECT_STYLE.md`、`编码skill.md`、`字典.md`、`skill-dictionary/data.js`，随所属业务一并提交，不额外拆 `chore`。
+- 不再按 `docs` / `test` / 实现提交域做二次拆分；这三类文件出现在同一笔提交中不再构成阻断。
+- 暂存前先冻结本笔提交的业务范围与文件清单；若发现夹带了不属于该业务目标的改动，应拆出或停下确认，而不是为了“凑齐一次提交”强行混入。
+- **落点规则与提交边界无关**：新增或修改的 Go 测试必须位于根 `test/`、`internal/service/*.go` 必须子目录化、`doc/5-tests/**` 只保存测试说明 / 日志 / 报告 / 截图等非可执行证据——这些约束继续生效，不因合并提交而放宽。
+
+### 提交标题类型选取
+
+- 一笔提交的 `type` 按该业务的主要意图选取，通常为 `feat`、`fix`、`refactor`、`perf` 等。
+- 仅当整笔提交都是纯文档或纯测试改动时，才使用 `docs` 或 `test`。
 
 ### 清空目标
 
-用户当前轮明确要求“提交git”时，目标是清空 staged、unstaged 和 untracked 改动。允许按业务域创建多个 commit，逐次执行盘点、核查、pre gate、commit 和 post gate，直到 `git status --short` 为空。
+用户当前轮明确要求“提交git”时，目标是清空 staged、unstaged 和 untracked 改动。允许按业务目标创建多个 commit，逐次执行盘点、核查、pre gate、commit 和 post gate，直到 `git status --short` 为空。
 
 若存在未获放行的用户改动、门禁失败、冲突或其它明确阻断，停止循环并报告剩余文件与原因；不得把“部分提交成功”描述为工作树已清空。
 

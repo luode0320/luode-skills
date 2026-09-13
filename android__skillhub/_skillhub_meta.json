@@ -1,0 +1,18 @@
+{
+  "slug": "android",
+  "name": "Android",
+  "version": "1.0.1",
+  "installedAt": 1788622173370,
+  "source": "skillhub",
+  "namespace": "clawhub_ivangdavila",
+  "canonicalName": "@clawhub_ivangdavila/android",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "Android 构建系统与部署模式",
+  "description_en": "Android build system and deployment patterns",
+  "installs": 3655,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\android__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png"
+}

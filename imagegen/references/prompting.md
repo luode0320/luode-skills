@@ -1,8 +1,8 @@
 # Prompting best practices
 
 These prompting principles are shared by both top-level modes of the skill:
-- built-in `image_gen` tool (default)
-- explicit `scripts/image_gen.py` CLI fallback
+- 内置出图工具（default，宿主不同名称不同）
+- CLI fallback（AI Hive，`scripts/imagegen.py`）
 
 This file is about prompt structure, specificity, and iteration. Fallback-only execution controls such as `quality`, `input_fidelity`, masks, output format, and output paths live in the fallback docs.
 
@@ -61,7 +61,7 @@ Do not add:
 - Put literal text in quotes or ALL CAPS and specify typography (font style, size, color, placement).
 - Spell uncommon words letter-by-letter if accuracy matters.
 - For in-image copy, require verbatim rendering and no extra characters.
-- In CLI fallback mode, use `medium` or `high` quality for small text, dense infographics, data-heavy slides, multi-font layouts, legends, axes, and footnotes.
+- 图片内含小字、密集信息图、多字体排版、图例坐标轴时，要求逐字渲染并提分辨率/正式参数出图（CLI 参数以平台实时 imageConfig 为准）。
 
 ## Input images and references
 - Do not assume that every provided image is an edit target.
@@ -76,22 +76,18 @@ Do not add:
 - Prefer one targeted follow-up at a time over rewriting the whole prompt.
 
 ## Transparent images
-- Use built-in `image_gen` first for transparent-image requests. If the subject is clearly too complex for chroma-key removal, explain the fallback and ask before switching to CLI.
-- Prompt for a perfectly flat solid chroma-key background, usually `#00ff00`; use `#ff00ff` when the subject is green, and avoid key colors that appear in the subject.
-- Explicitly prohibit shadows, gradients, floor planes, reflections, texture, and lighting variation in the background.
-- Ask for crisp edges, generous padding, and no use of the key color inside the subject.
-- After generation, remove the background locally with `python "${CODEX_HOME:-$HOME/.codex}/skills/imagegen/scripts/remove_chroma_key.py" --input <source> --out <final.png> --auto-key border --soft-matte --transparent-threshold 12 --opaque-threshold 220 --despill` and validate the alpha result before shipping it.
-- Use soft matte and despill for antialiased edges; hard tolerance-only removal is mainly for flat pixel-art or exact-color fixtures.
-- Use CLI `gpt-image-1.5 --background transparent --output-format png` only after the user explicitly confirms the fallback, or when the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback. Ask first for true/native transparency requests, failed chroma-key validation, or complex transparent subjects such as hair, fur, glass, smoke, liquids, translucent materials, reflective objects, or soft shadows.
+- 优先用内置出图工具处理透明底请求；主体明显复杂到不适合抠图时，说明限制并与用户对齐处理方式，不擅自承诺透明结果。
+- Prompt 要求铺满单一纯色抠图背景，通常 `#00ff00`；主体为绿色时用 `#ff00ff`，避免用主体中出现的颜色。
+- 明确禁止背景出现阴影、渐变、地面、反射、纹理与光照变化。
+- 要求主体边缘清晰、留足边距、主体内部不使用 key 色。
+- 生成后用本地脚本去底：`python "<skill-dir>/scripts/remove_chroma_key.py" --input <source> --out <final.png> --auto-key border --soft-matte --transparent-threshold 12 --opaque-threshold 220 --despill`（`<skill-dir>` = 本 SKILL.md 所在目录），并在交付前校验 alpha。
+- 边缘抗锯齿用 soft matte + despill；纯硬边像素/精确取色场景才用仅 tolerance 的去除。
 
 ## Fallback-only execution controls
-- `quality`, `input_fidelity`, explicit masks, output format, and output paths are fallback-only execution controls.
-- Do not assume they are built-in `image_gen` tool arguments.
-- If the user explicitly chooses CLI fallback, see `references/cli.md` and `references/image-api.md` for those controls.
-- In CLI fallback mode, `gpt-image-2` is the default. It supports `quality=low|medium|high|auto`; use `low` for fast drafts and thumbnails, and move to `medium`, `high`, or `auto` for final assets.
-- `gpt-image-2` always uses high fidelity for image inputs, so do not set `input_fidelity` with that model.
-- If a transparent request needs true CLI transparency, ask before using `gpt-image-1.5` unless the user already explicitly chose it. Explain that built-in chroma-key removal is the default path, but `gpt-image-2` does not support `background=transparent`.
-- If the user asks for 4K-style output with `gpt-image-2`, use `3840x2160` for landscape or `2160x3840` for portrait.
+- CLI 专属执行控制（模型参数、输出格式与路径等）不混入内置工具语义；用户明确走 CLI 时读 `references/cli.md`。
+- CLI fallback 固定模型 `public_model_gpt_image_2`，模型参数用 `--param key=value` 透传；支持范围以平台实时 `imageConfig` 为准。
+- 草稿优先低成本（低分辨率、`--batch 1`、`COST_FIRST` 路由）；正式图按需求提分辨率与参数。
+- 任务提交后只查原 `taskId`，不重复提交避免重复扣费。
 
 ## Use-case tips
 Generate:
@@ -112,7 +108,7 @@ Edit:
 - identity-preserve: Lock identity (face, body, pose, hair, expression); change only the specified elements; match lighting and shadows.
 - precise-object-edit: Specify exactly what to remove/replace; preserve surrounding texture and lighting; keep everything else unchanged.
 - lighting-weather: Change only environmental conditions (light, shadows, atmosphere, precipitation); keep geometry, framing, and subject identity.
-- background-extraction: For simple opaque subjects, request a clean cutout on a perfectly flat chroma-key background; crisp silhouette; generous padding; no shadows; no halos; preserve label text exactly; no restyling. Ask before using true CLI transparency for complex subjects.
+- background-extraction: For simple opaque subjects, request a clean cutout on a perfectly flat chroma-key background; crisp silhouette; generous padding; no shadows; no halos; preserve label text exactly; no restyling. 复杂主体需要真透明时，说明通道不支持原生透明，回到内置工具或与用户对齐处理方式。
 - style-transfer: Specify style cues to preserve (palette, texture, brushwork) and what must change; add `no extra elements` to prevent drift.
 - compositing: Reference inputs by index; specify what moves where; match lighting, perspective, and scale; keep the base framing unchanged.
 - sketch-to-render: Preserve layout, proportions, and perspective; choose materials and lighting that support the supplied sketch without adding new elements.

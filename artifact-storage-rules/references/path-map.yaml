@@ -1,4 +1,4 @@
-version: 9
+version: 11
 roots:
   architecture_docs: "doc/1-架构"
   requirement_docs: "doc/2-需求"
@@ -37,6 +37,8 @@ entry_files:
   implementation_sequence_master_doc_note: "新项目、项目初期或多来源对象需要统一排序时，必须在 doc/3-实施/ 下创建或更新“需求与实施计划全量顺序实施方案”；文件名使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留项目或来源集合标识，例如：2026-04-16_141518_交易后台重构_需求与实施计划全量顺序实施方案.md。该文档是跨需求/跨来源对象总顺序表，不替代单来源对象实施总览。"
   implementation_cycle_doc: "{datetime}_{source_object_id}_实施周期{cycle_no}_{cycle_cn_title}.md"
   implementation_cycle_doc_note: "实施周期文档必须使用 yyyy-MM-DD_HHmmss 时间前缀，并在时间后保留来源对象标识（需求或 Bug），再追加“_实施周期NN_中文主题”；例如：2026-04-16_141518_多业务复用Swap适配控制需求_实施周期01_接口与配置落点.md。不得只写“时间_阶段_说明”，必须保留来源对象标识。"
+  implementation_task_plan_doc: "{datetime}_{source_object_id}_实施周期{cycle_no}_任务{task_seq:03d}_{task_cn_title}.md"
+  implementation_task_plan_doc_note: "每个实施最小任务一份独立任务计划文档，落 doc/3-实施/，服务于有损压缩前提下的状态落盘与最小偏移恢复；文件名内嵌三位零填充执行序号 task_seq，执行顺序以序号为权威（来源对象实施范围内从 001 起全局递增，跨周期不重置、不复用、不因会话或压缩重排），时间戳仅记录创建时刻不参与排序。文档最小字段集、状态机与恢复流程见 ../autonomous-execution-rules/references/state-persistence-and-task-granularity.md。"
   bug_doc: "{datetime}_{bug_cn_title}.md"
   bug_doc_note: "Bug 主文档是 doc/4-bugs/ 下的单个扁平 md，不建时间戳子目录，也不再使用 README.md 作为入口；例如：doc/4-bugs/2026-08-11_101500_订单退款状态错乱.md。同一 Bug 的复现、根因、诊断、修复建议和验证结论全部续写进这一份 md。"
   test_doc: "{datetime}_{test_cn_title}.md"
@@ -69,6 +71,8 @@ directories:
   test_baseline_dir_note: "doc/5-tests/ 下唯一豁免扁平化的子目录，承载 project-interface-baseline-rules 的长期机器数据资产（interface-inventory.yaml、dependency-graph.yaml、execution-history.yaml 等）；它是跨轮复用的数据资产库而非任务文档，不适用扁平 md 约定。"
   release_test_artifacts_root: "test/release-artifacts"
   release_test_artifacts_root_note: "上线接口测试引擎每轮的机器产物根，按 test/release-artifacts/{datetime}_release-interface-test/ 组织；这些 YAML/JSON/日志会被后续命令回读，无法内联进 md，因此移出 doc/ 落在活动测试根内，路径保持 ASCII。中文主报告仍是 doc/5-tests/ 下的扁平 md。"
+  test_temp_assets: "test/{skill}/temp"
+  test_temp_assets_note: "临时测试数据目录（fixture、生成文件、截图等），收口时由 test-strategy-rules 的 test-asset-lifecycle 条件路由清理，不提交到 Git。"
 bootstrap:
   recent_context_scan_roots:
     - "doc/1-架构"
@@ -131,6 +135,8 @@ policies:
   test_doc_is_evidence_only: true
   release_test_machine_artifacts_outside_doc: true
   test_support_scripts_under_test_root: true
+  test_temp_assets_cleaned_on_close: true
+  test_temp_assets_cleaned_on_close_note: "临时测试数据（test/{skill}/temp/）在测试收口时由 test-asset-lifecycle 条件路由清理，不长期保留在 test/ 中。"
   style_regression_outputs_under_doc_review_root: true
   same_project_design_updates_same_doc: true
   project_design_doc_is_weak_reference: true

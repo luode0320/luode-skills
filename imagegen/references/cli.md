@@ -1,242 +1,73 @@
-# CLI reference (`scripts/image_gen.py`)
+# CLI reference（`scripts/imagegen.py` — AI Hive 通道）
 
-This file is for the fallback CLI mode only. Read it when the user explicitly asks to use `scripts/image_gen.py` / CLI / API / model controls, or after the user explicitly confirms that a transparent-output request should use the `gpt-image-1.5` true-transparency fallback path.
+> 仅供 CLI fallback 模式使用。当内置出图工具不可用、或用户显式要求 CLI/API/模型参数控制时读取本文件。
+> 本文件承接旧版 `image-api.md` 的职责（通道参数与模型说明），2026-09-05 合并改写为 AI Hive 语义。
 
-`generate-batch` is a CLI subcommand in this fallback path. It is not a top-level mode of the skill.
-The word `batch` in a user request is not CLI opt-in by itself.
+## 本 CLI 做什么
 
-## What this CLI does
-- `generate`: generate a new image from a prompt
-- `edit`: edit one or more existing images
-- `generate-batch`: run many generation jobs from a JSONL file after the user explicitly chooses CLI/API/model controls
+- `generate`：从 prompt 生成新图，或带参考图/编辑要求出图（固定模型 `public_model_gpt_image_2`）
+- `task`：查询生成任务状态并下载结果
+- `upload`：上传图片获取 `mediaId`
+- `init`：交互式初始化 API Key（写 `~/.ai-hive/config.json`，权限 0600）
 
-Real API calls require **network access** + a configured current OpenAI-compatible image channel. `--dry-run` does not.
+真实 API 调用需要**外网** + 已配置的 AI Hive API Key（`sk-api-*`）。
 
-## Quick start (works from any repo)
-Set a stable path to the skill CLI (default `CODEX_HOME` is `~/.codex`):
-
-```
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-export IMAGE_GEN="$CODEX_HOME/skills/imagegen/scripts/image_gen.py"
-```
-
-Install dependencies into that environment with its package manager. In uv-managed environments, `uv pip install ...` remains the preferred path.
-
-## Quick start
-
-Dry-run (no API call; no network required; does not require the `openai` package):
+## 快速开始
 
 ```bash
-python "$IMAGE_GEN" generate \
-  --prompt "Test" \
-  --out output/imagegen/test.png \
-  --dry-run
+# 首次配置（浏览器引导拿 Key）
+python3 "$SKILL_PATH/scripts/imagegen.py" init --skill-name imagegen
+
+# 最简验证（--no-download 只提交不下载，返回 taskId 即成功）
+python3 "$SKILL_PATH/scripts/imagegen.py" generate --prompt "test" --no-download
 ```
 
-Notes:
-- One-off dry-runs print the API payload and the computed output path(s).
-- Repo-local finals should live under `output/imagegen/`.
+## generate 参数
 
-Generate (requires the current image channel + network):
+| 参数 | 说明 | 默认 |
+|---|---|---|
+| `--prompt` | 图片描述或编辑要求 | 必填 |
+| `--image` | 参考图片路径，可多张 | — |
+| `--batch` | 同一 prompt 生成数量 | `1` |
+| `--param key=value` | 模型参数透传，可多个 | — |
+| `--routing` | `COST_FIRST` / `SPEED_FIRST` / `SUCCESS_FIRST` | `COST_FIRST` |
+| `--output-dir` | 输出目录 | `~/Downloads/AiHive/` |
+| `--no-download` | 只提交任务、不等待下载 | 关 |
+| `--api-key` / `--base-url` / `--verbose` | 覆盖配置 / 详细日志 | — |
 
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A cozy alpine cabin at dawn" \
-  --size 1024x1024 \
-  --out output/imagegen/alpine-cabin.png
-```
+编辑语义：`--image` 传修改目标，prompt 里写"保留 X 不变，只改 Y"，并逐张说明参考图角色；多次迭代时重复 invariants 防止漂移。
 
-Edit:
+## 模型与参数语义
 
-```bash
-python "$IMAGE_GEN" edit \
-  --image input.png \
-  --prompt "Replace only the background with a warm sunset" \
-  --out output/imagegen/sunset-edit.png
-```
+- 固定模型：`public_model_gpt_image_2`（图片生成与编辑一体，参考图数量规则以实时能力为准）。
+- **实时配置为准**：支持的分辨率、格式、尺寸枚举、参数 key 随平台 `imageConfig` 变化，不要在文档里写死；任务前可用一次 `--no-download` 或错误返回确认当前支持范围。
+- 草稿优先低成本：小分辨率 + `--batch 1` + `COST_FIRST` 路由；正式图再按需求提分辨率/批量。
+- 路由建议：默认 `COST_FIRST`；赶时间用 `SPEED_FIRST`；重要任务要求稳定可用用 `SUCCESS_FIRST`。
+- `--param` 只透传模型支持的 key；传错会在任务响应中报 InvalidParameter，按实时 `imageConfig` 修正。
+
+## 任务与计费
+
+- 任务提交后返回 `taskId`；下载失败/超时用 `task --task-id <id>` 只查原任务，不要重新提交（避免重复扣费）。
+- 价格以脚本运行时查询的实时销售价与扣费为准。
+- 批量前先确认实时费用；`--no-download` 可先试成本。
+
+## 输出与落盘
+
+- 临时/调试文件放 `tmp/imagegen/`，正式资产按 SKILL.md「保存规则」落项目 `images/<YYYYMMDDHHMMSS>/`。
+- 同一张图多轮返修用 `-v1/-v2` 版本名，不覆盖旧版。
+- CLI 结果文件为 PNG/JPEG/WebP 或平台实时支持格式。
 
 ## Guardrails
-- Use the bundled CLI directly (`python "$IMAGE_GEN" ...`) after activating the correct environment.
-- Do **not** create one-off runners (for example `gen_images.py`) unless the user explicitly asks for a custom wrapper.
-- **Never modify** `scripts/image_gen.py`. If something is missing, ask the user before doing anything else.
-- Do not silently downgrade from CLI `gpt-image-2` or built-in `image_gen` to CLI `gpt-image-1.5`; ask first unless the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback.
 
-## Defaults
-- Model: `gpt-image-2`
-- Supported model family for this CLI: GPT Image models (`gpt-image-*`)
-- Size: `auto`
-- Quality: `medium`
-- Output format: `png`
-- Default one-off output path: `output/imagegen/output.png`
-- Background: unspecified unless `--background` is set
+- 直接用捆绑 CLI（`python3 scripts/imagegen.py ...`），不要自建一次性 wrapper。
+- 不修改脚本的模型固定与通道逻辑；脚本能力不够先与用户对齐。
+- 不静默把本通道替换成其他模型/平台；模型下线时查 `models` 实时列表并与用户确认。
+- 透明底请求默认走"纯色背景 + `scripts/remove_chroma_key.py` 本地去底"（见 SKILL.md），本通道不支持时不要承诺原生透明。
 
-## gpt-image-2 size and model guidance
+## 常见问题
 
-`gpt-image-2` is the default model for new CLI fallback work.
-
-- Use `--quality low` for fast drafts, thumbnails, and quick iterations.
-- Use `--quality medium`, `--quality high`, or `--quality auto` for final assets, dense text, diagrams, identity-sensitive edits, and high-resolution outputs.
-- Square images are typically fastest. Use `--size 1024x1024` for quick square drafts.
-- If the user asks for 4K-style output, use `--size 3840x2160` for landscape or `--size 2160x3840` for portrait.
-- Do not pass `--input-fidelity` with `gpt-image-2`; this model always uses high fidelity for image inputs.
-- Do not use `--background transparent` with `gpt-image-2`; the default transparent-image workflow uses built-in `image_gen` on a flat chroma-key background plus local removal. Use `gpt-image-1.5` only after the user explicitly confirms the true-transparent CLI fallback, unless they already requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback.
-
-Popular `gpt-image-2` sizes:
-- `1024x1024`
-- `1536x1024`
-- `1024x1536`
-- `2048x2048`
-- `2048x1152`
-- `3840x2160`
-- `2160x3840`
-- `auto`
-
-`gpt-image-2` size constraints:
-- max edge `<= 3840px`
-- both edges multiples of `16px`
-- long edge to short edge ratio `<= 3:1`
-- total pixels between `655,360` and `8,294,400`
-- outputs above `2560x1440` total pixels are experimental
-
-Fast draft:
-
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A product thumbnail of a matte ceramic mug on a stone surface" \
-  --quality low \
-  --size 1024x1024 \
-  --out output/imagegen/mug-draft.png
-```
-
-Final 2K landscape:
-
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A polished landing-page hero image of a matte ceramic mug on a stone surface" \
-  --quality high \
-  --size 2048x1152 \
-  --out output/imagegen/mug-hero.png
-```
-
-4K landscape:
-
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A detailed architectural visualization at golden hour" \
-  --size 3840x2160 \
-  --quality high \
-  --out output/imagegen/architecture-4k.png
-```
-
-True transparent fallback request:
-
-Ask for confirmation before using this command unless the user already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback.
-
-```bash
-python "$IMAGE_GEN" generate \
-  --model gpt-image-1.5 \
-  --prompt "A clean product cutout on a transparent background" \
-  --background transparent \
-  --output-format png \
-  --out output/imagegen/product-cutout.png
-```
-
-When using this path, explain briefly that built-in `image_gen` plus chroma-key removal is the default transparent-image path, but this request needs true model-native transparency. `gpt-image-2` does not support `background=transparent`, so `gpt-image-1.5` is required for this confirmed fallback.
-
-## Quality, input fidelity, and masks (CLI fallback only)
-These are explicit CLI controls. They are not built-in `image_gen` tool arguments.
-
-- `--quality` works for `generate`, `edit`, and `generate-batch`: `low|medium|high|auto`
-- `--input-fidelity` is **edit-only** and validated as `low|high`; it is not supported for `gpt-image-2`
-- `--mask` is **edit-only**
-
-Example:
-
-```bash
-python "$IMAGE_GEN" edit \
-  --model gpt-image-1.5 \
-  --image input.png \
-  --prompt "Change only the background" \
-  --quality high \
-  --input-fidelity high \
-  --out output/imagegen/background-edit.png
-```
-
-Mask notes:
-- For multi-image edits, pass repeated `--image` flags. Their order is meaningful, so describe each image by index and role in the prompt.
-- The CLI accepts a single `--mask`.
-- Image and mask must be the same size and format and each under 50MB.
-- Masks must include an alpha channel.
-- If multiple input images are provided, the mask applies to the first image.
-- Masking is prompt-guided; do not promise exact pixel-perfect mask boundaries.
-- Use a PNG mask when possible; the script treats mask handling as best-effort and does not perform full preflight validation beyond file checks/warnings.
-- In the edit prompt, repeat invariants (`change only the background; keep the subject unchanged`) to reduce drift.
-
-## Output handling
-- Use `tmp/imagegen/` for temporary JSONL inputs or scratch files.
-- Use `output/imagegen/` for final outputs.
-- Reruns fail if a target file already exists unless you pass `--force`.
-- `--out-dir` changes one-off naming to `image_1.<ext>`, `image_2.<ext>`, and so on.
-- Downscaled copies use the default suffix `-web` unless you override it.
-
-## Common recipes
-
-Generate with augmentation fields:
-
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A minimal hero image of a ceramic coffee mug" \
-  --use-case "product-mockup" \
-  --style "clean product photography" \
-  --composition "wide product shot with usable negative space for page copy" \
-  --constraints "no logos, no text" \
-  --out output/imagegen/mug-hero.png
-```
-
-Generate + also write a downscaled copy for fast web loading:
-
-```bash
-python "$IMAGE_GEN" generate \
-  --prompt "A cozy alpine cabin at dawn" \
-  --size 1024x1024 \
-  --downscale-max-dim 1024 \
-  --out output/imagegen/alpine-cabin.png
-```
-
-Generate multiple prompts concurrently (async batch):
-
-```bash
-mkdir -p tmp/imagegen output/imagegen/batch
-cat > tmp/imagegen/prompts.jsonl << 'EOF'
-{"prompt":"Cavernous hangar interior with a compact shuttle parked near the center","use_case":"stylized-concept","composition":"wide-angle, low-angle","lighting":"volumetric light rays through drifting fog","constraints":"no logos or trademarks; no watermark","size":"1536x1024"}
-{"prompt":"Gray wolf in profile in a snowy forest","use_case":"photorealistic-natural","composition":"eye-level","constraints":"no logos or trademarks; no watermark","size":"1024x1024"}
-EOF
-
-python "$IMAGE_GEN" generate-batch \
-  --input tmp/imagegen/prompts.jsonl \
-  --out-dir output/imagegen/batch \
-  --concurrency 5
-
-rm -f tmp/imagegen/prompts.jsonl
-```
-
-Notes:
-- `generate-batch` requires `--out-dir`.
-- generate-batch requires --out-dir.
-- Use `--concurrency` to control parallelism (default `5`).
-- Per-job overrides are supported in JSONL (for example `size`, `quality`, `background`, `output_format`, `output_compression`, `moderation`, `n`, `model`, `out`, and prompt-augmentation fields).
-- `--n` generates multiple variants for a single prompt; `generate-batch` is for many different prompts.
-- In batch mode, per-job `out` is treated as a filename under `--out-dir`.
-- For many requested deliverable assets, provide one prompt/job per distinct asset and use semantic filenames when possible.
-
-## CLI notes
-- Supported sizes depend on the model. `gpt-image-2` supports flexible constrained sizes; older GPT Image models support `1024x1024`, `1536x1024`, `1024x1536`, or `auto`.
-- True transparent CLI outputs require `output_format` to be `png` or `webp` and are not supported by `gpt-image-2`.
-- `--prompt-file`, `--output-compression`, `--moderation`, `--max-attempts`, `--fail-fast`, `--force`, and `--no-augment` are supported.
-- This CLI is intended for GPT Image models. Do not assume older non-GPT image-model behavior applies here.
-
-## See also
-- API parameter quick reference for fallback CLI mode: `references/image-api.md`
-- Prompt examples shared across both top-level modes: `references/sample-prompts.md`
-- Network/sandbox notes for fallback CLI mode: `references/codex-network.md`
-- Built-in-first transparent image workflow: `SKILL.md` and `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`
+- 提示缺图片：该请求要求参考图，补 `--image`。
+- 提示模型不存在：平台模型下线/更名，查实时模型列表或 `--base-url` 是否正确。
+- 提示 401：检查 API Key（`init` 重配或 `--api-key`）。
+- 提示 InvalidParameter：按实时 `imageConfig` 修正 `--param`/尺寸/数量。
+- 任务一直 pending：保留 `taskId` 稍后 `task --task-id` 查询。

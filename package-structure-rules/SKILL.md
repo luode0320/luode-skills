@@ -15,6 +15,7 @@ description: 用于判断前后端同仓、独立后端、独立前端项目中�
 - 查找、复用、引用与依赖方向：`references/lookup-and-reference-contract.md`。
 - 配置、数据库、后端工具包、前端目录分别由对应 reference 细化。
 - 领域实体目录内的文件粒度与 `req`/`resp` 命名：`references/entity-file-naming.md`。
+- 结构体按类型与作用划分的角色谱系、落点与注释口径：`references/struct-role-layering.md`。
 - `.vscode/launch.json` 与 `.vscode/tasks.json` 的分环境启动与编译任务规则：`references/vscode-launch-tasks.md`。
 
 当人工文档与 Catalog 不一致时，停止新增目录；先修复两者一致性，再继续生成或引用代码。

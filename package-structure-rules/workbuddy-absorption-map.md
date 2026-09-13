@@ -30,3 +30,18 @@
 **同域冗余扫描**：范围 {package-structure-rules, work-report-summary-rules, architecture-doc-rules}；发现 0 处逐字重复（`cachetask/` 与 `crontask/`、`async/`、`utils/cache/` 职责边界已在目录树正文显式区分）；清理 0 处；PASS。
 **棘轮评分**：内部更新通道按最小回补执行（非外部吸收，不适用 8 维评分基线对比；改动为规则补齐）。
 **源删除**：无（内部更新通道）。
+
+## 2026-09-11 内部更新：结构体角色与落点总谱（按语言生态）
+
+来源：用户会话提出——AI 辅助开发瓶颈已从"逻辑正确性"转向"代码质量"，其九维清单中"结构体按类型与作用分层的定义位置及注释"此前无任何承接（`entity-file-naming.md` 只覆盖 `entity/<v?>/` 内的文件粒度与 `req`/`resp` 命名，不讲角色分层）。
+
+| 来源 | 调整条目 | 本地现状 | 裁决 | 落点 / 理由 | 整理去重 |
+| --- | --- | --- | --- | --- | --- |
+| 用户需求 | 结构体角色谱系与落点表（持久化模型 / 领域实体 / 接口 req-resp / 公共传输 / 配置 / 函数参数 / 内部临时结构）+ 引用面从小到大判定顺序 | `entity-file-naming.md` 只讲文件粒度与 req/resp 前缀；`structure-general.md`/`go-package-layout.md`/`java-layer-layout.md`/`node-python-module-layout.md` 均为骨架布局，无角色谱系 | 合并 | `references/struct-role-layering.md`（新建）；`SKILL.md` 唯一事实源挂引用 | 与 `entity-file-naming.md` 并列而非合并：一管"文件怎么切"，一管"结构属于哪个角色、落哪里" |
+| 用户需求 | 按语言生态的差异（Go 导出性 / Java class-record + PO-DTO-VO / TS interface-type / Python dataclass-Pydantic） | 无任何 skill 按语言区分结构体角色载体 | 合并 | 并入 `struct-role-layering.md` 第二节 | 与 `code-style-consistency-rules`（管排版形式）、`naming-rules`（管符号命名）分工，不复述 |
+| 用户需求 | 按角色的注释颗粒度（持久化模型不重抄 DB `COMMENT`、内部临时结构字段通常不注释、公共结构必须全字段注释） | `comment-rules` 管注释语言与分层写法，但不按"结构体角色"区分颗粒度 | 合并 | 并入 `struct-role-layering.md` 第三节；注释写法仍以 `comment-rules` 为 Owner | 只做"角色→颗粒度"映射，注释形式与格式不复制 `comment-rules` |
+
+**净增/净减**：`struct-role-layering.md` +1 新文件（4652 字节）；`SKILL.md` 唯一事实源 +1 行；无删除。
+**同域冗余扫描**：范围 {package-structure-rules, entity-file-naming, code-style-consistency-rules, naming-rules, comment-rules, code-quality-rules}；发现 0 处逐字重复（角色分层是新增维度，`entity-file-naming.md` 管文件切分、`comment-rules` 管注释写法、`code-quality-rules/function-signature-rules.md` 管函数参数结构，均无覆盖）；清理 0 处；PASS。
+**棘轮评分**：内部更新通道按最小回补执行（非外部吸收，不适用 8 维评分基线对比；改动为规则补齐，覆盖一个原 0 分维度"结构体角色分层"，无回退）。
+**源删除**：无（内部更新通道）。

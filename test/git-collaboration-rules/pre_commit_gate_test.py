@@ -1,4 +1,4 @@
-"""Git 提交域 pre gate 回归测试。"""
+"""Git 提交 pre gate 回归测试。"""
 
 from __future__ import annotations
 
@@ -26,19 +26,25 @@ BASH_EXECUTABLE = next(
 
 
 class PreCommitGateTests(unittest.TestCase):
-    """验证 docs/test/implementation 三类提交域边界。"""
+    """验证按业务合并提交的 pre gate 边界。"""
 
-    def test_same_task_docs_and_project_state_can_commit_together(self) -> None:
-        """验证同一任务文档和项目状态同步文件可合并为 docs 提交。
+    # 宿主已有 ripgrep 时直接复用：通过 PATH 注入 shim 再经 shebang 调起原生解释器，
+    # 会受 MSYS /tmp 与盘符路径转换影响而失败，仅在缺少宿主 rg 时才回退到内置 shim。
+    HOST_RG = shutil.which("rg")
+
+    def test_business_scope_can_commit_together(self) -> None:
+        """验证同一业务目标的实现、测试、文档与状态文件可同笔提交。
 
         [参数] 无。
         [返回] 无；断言失败时由 unittest 抛出异常。
-        最近修改时间：2026-08-02 17:14:57；覆盖同一任务 docs 提交正例。
+        最近修改时间：2026-09-10 17:20:00；覆盖按业务合并提交正例。
         """
-        # 1. 构造同一任务的流程文档、项目状态和字典同步文件。
+        # 1. 构造同一业务目标的实现、可执行测试、流程文档与项目状态同步文件。
         result = self.run_gate(
-            title="docs: [订单创建规则] 更新需求实施与风格回归记录",
+            title="feat: [订单创建规则] 新增订单创建能力并同步流程文档",
             files={
+                "src/order/create_order.py": "def create_order():\n    return True\n",
+                "test/order/create_order_test.py": "import unittest\n",
                 "doc/2-需求/2026-08-02_订单创建规则.md": "需求",
                 "doc/3-实施/2026-08-02_订单创建规则_实施总览.md": "实施",
                 "doc/5-tests/2026-08-02_订单创建规则/README.md": "测试说明",
@@ -50,32 +56,32 @@ class PreCommitGateTests(unittest.TestCase):
             },
         )
 
-        # 2. 正例必须通过提交域和基础门禁。
-        self.assertEqual(result.returncode, 0, result.stderr)
+        # 2. 按业务合并提交必须通过门禁，不再因跨域混提阻断。
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("PASS: pre-commit gate", result.stdout + result.stderr)
 
-    def test_docs_and_executable_test_must_split(self) -> None:
-        """验证 docs 域不能与可执行测试域混提。
+    def test_docs_and_executable_test_no_longer_blocked(self) -> None:
+        """验证文档与可执行测试同笔提交不再被提交域门禁阻断。
 
         [参数] 无。
         [返回] 无；断言失败时由 unittest 抛出异常。
-        最近修改时间：2026-08-02 17:14:57；覆盖 docs/test 反例。
+        最近修改时间：2026-09-10 17:20:00；覆盖原提交域阻断规则被移除后的行为。
         """
         # 1. 构造流程文档和根 test 目录中的可执行测试。
         result = self.run_gate(
-            title="docs: [订单创建规则] 更新需求实施与风格回归记录",
+            title="docs: [订单创建规则] 更新需求实施记录并补充回归用例",
             files={
                 "doc/2-需求/2026-08-02_订单创建规则.md": "需求",
                 "test/order/create_order_test.py": "import unittest\n",
             },
         )
 
-        # 2. 混提必须由提交域门禁阻断。
-        self.assertEqual(result.returncode, 17, result.stdout + result.stderr)
-        self.assertIn("BLOCK: staged files span multiple docs/test commit domains", result.stderr)
+        # 2. 同一业务目标的文档与测试合并提交必须通过，且不再出现提交域阻断文案。
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("commit domains", result.stdout + result.stderr)
 
     def test_persisted_sentinel_does_not_block_or_echo(self) -> None:
-        """代码、配置和普通文档中的 sentinel 不得被提交域门禁阻断或回显。"""
+        """代码、配置和普通文档中的 sentinel 不得被门禁阻断或回显。"""
         sentinel = "fixture-secret"
         result = self.run_gate(
             title="feat: [凭据边界] 更新持久化规则",
@@ -89,25 +95,43 @@ class PreCommitGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertNotIn(sentinel, result.stdout + result.stderr)
 
-    def test_docs_and_implementation_must_split(self) -> None:
-        """验证 docs 域不能与实现域混提。
+    def test_go_test_outside_root_test_still_blocked(self) -> None:
+        """验证 Go 测试落点约束未因合并提交而放宽。
 
         [参数] 无。
         [返回] 无；断言失败时由 unittest 抛出异常。
-        最近修改时间：2026-08-02 17:14:57；覆盖 docs/实现反例。
+        最近修改时间：2026-09-10 17:20:00；覆盖 Go 测试落点阻断仍生效。
         """
-        # 1. 构造流程文档和实现文件。
+        # 1. 构造根 test/ 之外的新增 Go 测试文件。
         result = self.run_gate(
-            title="docs: [订单创建规则] 更新需求实施与风格回归记录",
+            title="feat: [订单创建] 新增订单创建能力",
             files={
-                "doc/3-实施/2026-08-02_订单创建规则_实施总览.md": "实施",
-                "src/order/create_order.py": "def create_order():\n    return True\n",
+                "internal/order/create_order_test.go": "package order\n",
             },
         )
 
-        # 2. 混提必须由提交域门禁阻断。
-        self.assertEqual(result.returncode, 17, result.stdout + result.stderr)
-        self.assertIn("BLOCK: staged implementation files mixed with docs/test commit domains", result.stderr)
+        # 2. 落点违规必须继续阻断，退出码与原文案保持不变。
+        self.assertEqual(result.returncode, 15, result.stdout + result.stderr)
+        self.assertIn("BLOCK: staged *_test.go must be under root test/", result.stderr)
+
+    def test_service_layer_root_file_still_blocked(self) -> None:
+        """验证服务层根目录直落约束未因合并提交而放宽。
+
+        [参数] 无。
+        [返回] 无；断言失败时由 unittest 抛出异常。
+        最近修改时间：2026-09-10 17:20:00；覆盖服务层落点阻断仍生效。
+        """
+        # 1. 构造 internal/service 根目录直落的实现文件。
+        result = self.run_gate(
+            title="feat: [订单创建] 新增订单创建能力",
+            files={
+                "internal/service/create_order.go": "package service\n",
+            },
+        )
+
+        # 2. 落点违规必须继续阻断，退出码与原文案保持不变。
+        self.assertEqual(result.returncode, 16, result.stdout + result.stderr)
+        self.assertIn("BLOCK: staged file in internal/service/*.go root", result.stderr)
 
     def run_gate(self, *, title: str, files: dict[str, str]) -> subprocess.CompletedProcess[str]:
         """在临时 Git 仓库中 staged 指定文件并执行真实 gate 脚本。
@@ -116,12 +140,13 @@ class PreCommitGateTests(unittest.TestCase):
         [返回] subprocess.CompletedProcess[str]：gate 执行结果。
         最近修改时间：2026-08-02 17:18:00；固定 Git Bash 来源并补齐临时工具路径。
         """
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=self.temp_root()) as directory:
             root = Path(directory)
 
-            # 1. 准备隔离的 Git 仓库、README 日志和本地 rg shim。
+            # 1. 准备隔离的 Git 仓库、README 日志与 rg 依赖。
             shutil.copy2(GATE_SCRIPT, root / "pre_commit_gate.sh")
-            self.write_rg_shim(root)
+            if self.HOST_RG is None:
+                self.write_rg_shim(root)
             self._run_command(["git", "init"], root)
             self._run_command(["git", "config", "user.email", "test@example.invalid"], root)
             self._run_command(["git", "config", "user.name", "Pre Commit Gate Test"], root)
@@ -161,7 +186,7 @@ class PreCommitGateTests(unittest.TestCase):
         # 1. 先创建文件父目录，再以 UTF-8 写入夹具内容。
         path = root / relative_path
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
+        path.write_text(content, encoding="utf-8", newline="\n")
 
     def write_rg_shim(self, root: Path) -> None:
         """提供 gate 脚本所需的最小 rg 行过滤能力。
@@ -198,6 +223,7 @@ class PreCommitGateTests(unittest.TestCase):
             "        status = 0\n"
             "sys.exit(status)\n",
             encoding="utf-8",
+            newline="\n",
         )
 
         # 2. 设置 Git Bash 可执行权限，保证临时 PATH 能调用 shim。
@@ -216,6 +242,24 @@ class PreCommitGateTests(unittest.TestCase):
         # 2. 使用 Windows PATH 语法注入目录，由 Git Bash 负责转换路径。
         env["PATH"] = os.pathsep.join([str(root), env.get("PATH", "")])
         return env
+
+    @staticmethod
+    def temp_root() -> str:
+        """返回 Git Bash 能正确映射的临时目录根。
+
+        [参数] 无。
+        [返回] str：可直接传给 `tempfile.TemporaryDirectory(dir=...)` 的目录。
+        最近修改时间：2026-09-10 17:35:00；规避宿主 TMP=/tmp 被解析成 C:\\tmp 后脱离 Git Bash 路径映射的问题。
+        """
+        # 1. 宿主把 TEMP/TMP 设为 POSIX 风格路径（如 /tmp）时，Git Bash 会把该值
+        #    解析成 C:\tmp，而 MSYS 启动原生 python.exe 时又会把 TEMP 转成用户临时目录；
+        #    两边对 /tmp 的理解不一致，导致 shim 被解释器按不存在的路径打开。
+        # 2. 这里不依赖环境变量，直接固定到用户临时目录，使宿主与 Git Bash 路径语义一致。
+        if os.name == "nt":
+            candidate = Path.home() / "AppData" / "Local" / "Temp"
+            if candidate.is_dir():
+                return str(candidate)
+        return tempfile.gettempdir()
 
 
 if __name__ == "__main__":

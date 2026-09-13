@@ -1,0 +1,18 @@
+{
+  "slug": "hyperliquid",
+  "name": "Hyperliquid",
+  "version": "1.0.0",
+  "installedAt": 1788856528543,
+  "source": "skillhub",
+  "namespace": "clawhub_k0nkupa",
+  "canonicalName": "@clawhub_k0nkupa/hyperliquid",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "只读 Hyperliquid 市场数据助手（永续 + 可选现货），支持自然语言请求与确定性命令解析（终端风格 `hl ...` 与斜杠风格 `/hl …`）。通过 https://api.hyperliquid.xyz/info 获取报价（标记价/中间价/预言价/资金费率/未平仓量/成交量）、涨跌幅排行、资金费率排行、L2 订单簿以及 K 线快照，并将其格式化输出用于聊天。",
+  "description_en": "Read-only Hyperliquid market data assistant (perps + spot optional) with support for natural-language requests and deterministic command parsing (terminal-style `hl ...` and slash-style `/hl ...`). Use to fetch quotes (mark/mid/oracle/funding/OI/volume), top movers, funding rankings, L2 order book, and candle snapshots via https://api.hyperliquid.xyz/info, and to format results for chat.",
+  "installs": 5050,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\hyperliquid__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png"
+}

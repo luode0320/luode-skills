@@ -115,10 +115,12 @@ class KnowledgeLedgerContractTest(unittest.TestCase):
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。
-        最近修改时间: 2026-08-04 20:10:45 新增知识引用契约测试。
+        最近修改时间: 2026-09-12 00:00:00 台账入口断言由精确计数改为下限，避免规则正文合理扩充后误判。
         """
         content = read_text(KNOWLEDGE_SKILL)
-        self.assertEqual(content.count("引用台账"), 3, "检索规则、捕获规则与 reference 指引各需一处台账入口")
+        self.assertGreaterEqual(
+            content.count("引用台账"), 3, "检索规则、捕获规则与 reference 指引各需一处台账入口"
+        )
         self.assertIn("取自读写笔记时所用的相对路径", content)
         self.assertIn("检索命中但未读取的笔记不得入表", content)
 

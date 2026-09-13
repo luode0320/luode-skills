@@ -14,7 +14,20 @@ import tempfile
 import unittest
 
 
-HOOK = os.path.expanduser(r"~/.workbuddy/hooks/summary-check.py")
+INSTALLED_HOOK = os.path.expanduser(r"~/.workbuddy/hooks/summary-check.py")
+# 仓库内版本化源码是已部署实例的上游；本机未部署时回退到它，保证该 E2E 断言不依赖机器状态。
+REPO_HOOK = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "skill-absorption-rules",
+        "assets",
+        "hooks",
+        "summary-check.py",
+    )
+)
+HOOK = INSTALLED_HOOK if os.path.isfile(INSTALLED_HOOK) else REPO_HOOK
 PY = os.path.expanduser(
     r"~/.workbuddy/binaries/python/versions/3.13.12/python.exe"
 )

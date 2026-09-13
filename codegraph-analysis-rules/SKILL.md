@@ -48,7 +48,7 @@ description: 当需要分析代码库结构、符号关系、调用链、被调�
 
 - `.codegraph/` 索引是 per-project 的，查询兄弟项目的符号、调用链或影响面时，必须先切到**目标项目根**再查，不得在当前项目索引里找兄弟项目符号。
 - 目标项目只知道名字、不知道路径时，按 `../implementation-planning-rules/references/sibling-project-discovery.md` 的发现顺序定位。
-- 在兄弟项目执行 `codegraph init` 会生成 `.codegraph/`，属于写入动作，**一律禁止**；本 skill 的“任何仓库都默认强制初始化”只适用于当前会话绑定的项目，不适用于兄弟项目，用户临时授权也不构成例外。
+- 在兄弟项目执行 `codegraph init` 会生成 `.codegraph/`，属于写入动作：默认禁止；只有在取得「会话级跨项目写入授权」`WRT-*` 且授权范围覆盖该目标项目与"命令执行 / 生成产物"操作类型时才允许，否则一律禁止。本 skill 的“任何仓库都默认强制初始化”仍只适用于当前会话绑定的项目。
 - 兄弟项目已有 `.codegraph/` 时可直接只读查询；没有时回退到 `rg` / `read` 等只读手段，不假装 CodeGraph 已经参与。
 
 ## CodeGraph 初始化规则

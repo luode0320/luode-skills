@@ -2164,13 +2164,14 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
         [参数] 无。
         [返回] None。
-        最近修改时间：2026-08-23；改动原因：修复「旧投影指纹损坏阻塞新 session 写入」导致 registry 空。
+        最近修改时间：2026-09-12 00:00:00；改动原因：夹具时间改为相对当下取值，消除硬编码日期越过保留窗后的假失败。
         """
         # 1. 构造含「坏投影（指纹损坏）+ 好投影」的 v4 registry 文件，坏项在前。
         #    inactive 投影要求 steps 全部 completed，故这里用全完成状态构造合法样本；
-        #    updated_at 用近期时间，避免好项被 7 天保留窗口误清理（坏项在隔离阶段即被剔除）。
+        #    updated_at 必须相对当下取值：硬编码日期会随真实时间推进越过 7 天保留窗口，
+        #    导致好项被当作过期完成投影清理，产生与隔离逻辑无关的假失败。
         done = ("completed", "completed", "completed")
-        recent = "2026-08-22T00:00:00Z"
+        recent = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat().replace("+00:00", "Z")
         good = self._sample_v4_entry("good-session", statuses=done, state="inactive", updated_at=recent)
         corrupt = dict(self._sample_v4_entry("corrupt-session", statuses=done, state="inactive", updated_at=recent))
         corrupt["plan_fingerprint"] = "0" * 64  # 满足 64 位 hex 格式，但与 steps 不一致

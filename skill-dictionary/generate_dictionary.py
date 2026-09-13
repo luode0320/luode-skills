@@ -604,11 +604,13 @@ def render_markdown(payload: dict) -> str:
 
 def write_outputs(payload: dict) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # 显式锁定 LF：Windows 文本模式默认会把 \n 翻成 \r\n，违反 .editorconfig 的 end_of_line=lf。
     DATA_FILE.write_text(
         "window.SKILL_DICTIONARY = " + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n",
         encoding="utf-8",
+        newline="\n",
     )
-    MARKDOWN_FILE.write_text(render_markdown(payload), encoding="utf-8")
+    MARKDOWN_FILE.write_text(render_markdown(payload), encoding="utf-8", newline="\n")
 
 
 def main() -> None:

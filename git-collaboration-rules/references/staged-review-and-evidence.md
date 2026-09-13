@@ -22,7 +22,7 @@
 使用 `templates/evidence-template.md`，按时间顺序列出：
 
 - 本轮产生的全部 commit hash 与标题。
-- 每个 commit 的提交域和文件范围。
+- 每个 commit 的业务目标和文件范围。
 - 格式、注释、安全、并发、崩溃、边界和基础验收结论；不适用项附原因。
 - pre/post gate 使用的脚本或回退路径及结果。
 - 用户显式放行后一并提交的文件。

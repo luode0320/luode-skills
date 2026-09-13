@@ -61,6 +61,12 @@ apifox test-data --help
 
 具体参数以当前 CLI help 为准。
 
+## CLI 事实：test-case run 不注入 path 参数（2026-09-06 实测 2.2.9，当前最新版）
+
+- **现象**：用例（TEST_CASE，含 `apiDetailId`）的 `parameters.path` 值已正确设置（`name`/`value`/`enable:true` 与接口定义参数行 `id` 匹配），CLI `test-case run` 请求 URL 仍保持字面量 `/xxx/{id}` 不替换，后端按非法参数拒绝；CLI 汇总显示「失败数 0」（无断言时伪通过）。
+- **已排除**：参数结构（含补 `type: "integer"` 重写重跑）、`relatedId` 关联（与 endpoint 参数行 id 一致）、运行时 `--env-var <name>=<value>`（无效）、CLI 版本（2.2.9 已是 npm latest）。
+- **处置**：含 path 参数的用例在 **Apifox GUI 客户端运行**（GUI runner 注入正常）；CLI 侧把该用例标记为「工具受限，GUI 运行」，不宣称通过；升级 CLI 后先用单用例复测确认是否已修复再撤销标记。
+
 ## 创建测试用例标准流程
 
 > 收口目标：在 apifox「自动化测试」菜单的 正向 / 负向 / 边界值 / 安全性 / 其他 分类下，每接口在「正向/负向/边界值」三个分类下都有用例，且正向上覆盖业务参数（非仅分页），POST 等非 GET 接口有完整覆盖。详见 `modules/test-case-generation.md` 的「覆盖度铁律」。
@@ -153,6 +159,7 @@ def pretty_jsonb(data: dict) -> str:
 ## 规则 T-2：Mock 200 响应示例真实性（强制）
 
 > 防止 Mock 的"成功"示例与请求无关（如图 3：200 示例 body 是 `{}` 空壳）。Mock 必须让开发者一眼看出"调通后接口长什么样"，否则示例拖慢用户理解且无任何验证作用。
+> 完整的 Mock 期望管理规则见 `modules/mock.md`，本节是接口侧响应示例的校验规则。
 
 **判定标准**（任一命中即 Mock 示例无效）：
 - 200/201 响应示例的 `examples[*].data` 或 `responses[*].examples[*].data` 为 `{}` 空壳
@@ -167,6 +174,7 @@ def pretty_jsonb(data: dict) -> str:
 - **接口创建/导入时**就按 schema 把真实示例写进 OpenAPI（参考 `test-case-generation.md` 的「schema 驱动数据构造规则」表）——这是唯一可靠时机
 - ⚠️ **不要指望 `endpoint update` 补示例**：实测写 `requestBody.example` 报 `success: true` 但回读为空（2026-08-24）。响应示例侧同理，回写后必须用 `export --format apifox` 回读确认，不能只看 update 的返回
 - 已存在接口的空壳示例只能删除，或按规则 T-3 删接口重导
+- 如果是**需要配置条件匹配的 Mock 期望**，见 `modules/mock.md`，本节只校验响应示例
 
 **不通过则阻断**：
 - 创建用例/同步接口时若检测到 Mock 示例空壳 → 必须删除空壳或补全数据，不允许保留 `{}` 占位
@@ -402,6 +410,19 @@ data = json.loads(match.group(0)) if match else None
 | 错误结构校验 | `httpCode` 4xx + `responseJson` + `$.code` 非空 |
 
 > 规则：常规校验优先用可视化 `assertion`（上表前 6 行），复杂校验用自定义脚本兜底（`pm.test` / `pm.expect`）。
+
+## 无条件断言响应头（强制，吸收自 petrkindlmann/qa-skills，2026-09-01）
+
+> 吸收来源：petrkindlmann/qa-skills（api-testing 侧，MIT，2026-09-01 外部吸收通道），改写为通用形态、不绑定任何 agent。响应头是契约的一部分，**每个用例都必须无条件断言**，不得只在"觉得相关"时加——条件性断言会让"该断言的头没断到"。
+
+| 响应头 | 无条件断言内容 | apifox 落地 |
+|--------|---------------|-------------|
+| `Content-Type` | 与实际响应体类型一致（`application/json` 等），不因请求头变化而漂移 | `responseHeader` + `Content-Type` + `equal` |
+| `Cache-Control` | 是否存在、缓存语义符合接口设计（如 GET 列表可缓存、写接口禁缓存） | `responseHeader` + `Cache-Control` + `include/equal` |
+| `Rate-Limit` 系 | `X-RateLimit-Limit` / `Remaining` / `Reset` 等是否随请求变化/存在 | `responseHeader` + 名称 + `notNull` 或脚本断言 |
+| `Server` / 版本头 | 不泄露具体版本（安全契约） | `responseHeader` 断言不存在或脱敏 |
+
+> 与既有「断言速查」的边界：速查表给出断言写法；本节给出**哪些头是契约、必须无条件断言**。写接口用例时按本节清单逐项补响应头断言，禁止"仅断言 body 不看头"。
 
 ## 字段风险提醒
 

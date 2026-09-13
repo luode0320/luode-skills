@@ -59,8 +59,8 @@ description: 从对话、代码与项目文档中抽取并维护项目本地四�
 
 - 不创建 `PROJECT_MEMORY_INDEX.yaml`、`PROJECT_MEMORY.log.md` 或其他平行记忆根文件。
 - `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md` 是项目本地记忆三文件；不得用其中一个替代另一个职责。
-- `PROJECT_CURRENT.md` 采用覆盖式维护，UTF-8 字节数不得超过 51,200；超限必须阻断并压缩。覆盖普通项目概览或会话任务摘要时必须原样保留 `task-plan-rehydration-rules` 的单一 registry 托管区，不得删除、复制、解析或改写其中字段；不得将一个会话的摘要覆盖为其它会话状态。
-- `PROJECT_HISTORY.md` 追加关键事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；初始化或重复 bootstrap 不得覆盖已有历史。
+- `PROJECT_CURRENT.md` 采用覆盖式维护，UTF-8 字节数不得超过 51,200；超限必须阻断并压缩。**AI 应在任务执行中主动关注文件大小，接近 51KB 时主动裁剪最旧的已完成任务条目**（而非等到超限提示才处理），删除旧条目时在当日工作日志记录。覆盖普通项目概览或会话任务摘要时必须原样保留 `task-plan-rehydration-rules` 的单一 registry 托管区，不得删除、复制、解析或改写其中字段；不得将一个会话的摘要覆盖为其它会话状态。
+- `PROJECT_HISTORY.md` 追加关键事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；**AI 应在任务执行中主动检查条目数，超过 20 条时立即裁剪最旧条目**，被裁剪事件的计数锚点随事件一起删除，裁剪记录写入当日工作日志。初始化或重复 bootstrap 不得覆盖已有历史。
 
 ### 历史事件保留窗口
 

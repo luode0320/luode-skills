@@ -20,10 +20,13 @@
 | `test-case-generation.md` 规则 E-1 分层组合 | A4：创建用例前自动按 L1/L2/L3/L4 生成 | 节点 2 |
 | `test-case.md` 规则 T-1 JSON 格式化（新增） | A5：用例 body 必须 pretty-print 入字符串 | 节点 2 |
 | `test-case.md` 规则 T-2 Mock 真实性（新增） | A6：Mock 200 响应示例必须含真实数据 | 节点 2 |
+| `mock.md` 节点 M1 测试前 Mock 覆盖度检查 | M1：运行测试前检查 Mock 是否缺失/过时 | 节点 2 |
+| `mock.md` 节点 M2 测试后 Mock 自动对齐 | M2：跑通测试用例后自动同步 Mock 为真实响应 | 节点 5 |
+| `mock.md` 节点 M3 Mock 质量审计 | M3：定期审计 Mock 空壳/过时/不匹配 | 节点 6 |
 | `test-case.md` 参数完整性校验（双重闸门） | A7：创建后 test-case get 对账 endpoint schema | 节点 2 |
 | `test-case.md` 规则 T-3 调试用例请求示例（新增） | A12：导入后 `export --format apifox` 查 `api.cases[].requestBody.data` 非空 | 节点 2 |
-| `api-design.md` 字段说明铁律 | A1：创建后立即 endpoint get 校验 description | 节点 1 |
-| `api-folder-organization.md` folder 归类铁律 | A11：创建/导入后立即校验业务 folder 归类 | 节点 1 |
+| `api-design.md` 接口中文规范与字段说明铁律 | A1：创建后立即 endpoint get 校验接口中文名、中文说明与参数/响应中文 description | 节点 1 |
+| `api-folder-organization.md` folder 归类与中文命名铁律 | A11：创建/导入后立即校验业务 folder 归类与简体中文命名（严禁英文目录） | 节点 1 |
 | `environment.md` 端口三级链 | A2：环境创建/更新后立即探测实际监听端口 | 节点 3 |
 | `test-selection-policy.md` 三档执行策略 | A8：生成用例前查 PROJECT_TEST 受限/豁免表 | 节点 4 |
 | `api-sync-to-apifox.md` 字段说明+契约校验 | A3：同步后立即 endpoint list/get 验证 | 节点 5 |
@@ -32,20 +35,24 @@
 
 ### 节点 1：创建 / 更新 endpoint（接口）
 
-#### A1：endpoint get 校验 description（强制）
+#### A1：endpoint get 校验中文展示与字段说明（强制）
 
 - **触发时机**：创建或更新接口后立刻
-- **执行命令**：`apifox endpoint get <endpointId>`，对账 schema `parameters[*].description`、`requestBody.schema.properties[*].description`、`responses[*].schema.properties[*].description`、`headers[*].description`
-- **通过标准**：每个字段都有非空中文/英文 description
-- **不通过则阻断**：缺失字段 → 必须先用 swag-openapi-maintainer-rules 的 description-rules.md 流程补代码注释 → 重新 swag init → 重新生成 → 再补 apifox；接口侧 + 代码侧两边都补不遗漏
-- **关联规则**：`api-design.md` 「字段说明铁律」节
+- **执行命令**：`apifox endpoint get <endpointId>`，对账：
+  1. API 路径：必须保持原有英文路径不变；
+  2. 接口显示名称（name/summary）：必须为简体中文（禁止英文如 `Health`）；
+  3. 接口说明文档（description）：必须为简体中文；
+  4. 字段注释：对账 schema `parameters[*].description`、`requestBody.schema.properties[*].description`、`responses[*].schema.properties[*].description`、`headers[*].description`
+- **通过标准**：API 路径为英文；接口名称、说明文档及每个参数/响应字段都有非空简体中文 description
+- **不通过则阻断**：英文接口名、英文说明或缺失字段说明 → 必须补全为简体中文；代码侧有 swag 则同步补代码注释 → 重新 swag init → 重新生成 → 再补 apifox；接口侧 + 代码侧两边都补不遗漏
+- **关联规则**：`api-design.md` 「接口展示与阅读中文规范」与「字段说明铁律」节
 
-#### A11：folder 归类即时校验（强制）
+#### A11：folder 归类与中文命名即时校验（强制）
 
 - **触发时机**：创建/更新接口后立即、导入 swag 后立即、项目质量审计（A9/A10）时
-- **执行命令**：`apifox endpoint list --output endpoints.json`，解析每个 endpoint 的 folder 归属；`apifox folder list` 对照业务模块结构
-- **通过标准**：接口全部落在业务 folder（产品模块/业务域/功能域）下，无「默认模块 / 接口」平铺层滞留、无归类错误、无空 folder 残留
-- **不通过则阻断**：未归类/归类错误 → 按 `api-folder-organization.md`「持续维护工作流」迁移归位，迁移后 `endpoint get` 回读验证，复扫归零才收口；**接口生成了不是就完事，归类欠账必须随本轮清零**
+- **执行命令**：`apifox endpoint list --output endpoints.json`，解析每个 endpoint 的 folder 归属；`apifox folder list` 对照业务模块结构与名称语言
+- **通过标准**：接口全部落在业务**简体中文 folder**（产品模块/业务域/功能域）下，无「默认模块 / 接口」平铺层滞留、**无纯英文 folder 残留（如 auth, tasks 等）**、无归类错误、无空 folder 残留
+- **不通过则阻断**：未归类、英文目录名或归类错误 → 按 `api-folder-organization.md`「持续维护工作流」重命名或迁移归位，迁移后 `endpoint get` 回读验证，复扫归零才收口；**接口生成了不是就完事，归类与中文命名欠账必须随本轮清零**
 - **关联规则**：`api-folder-organization.md` 全文、`api-design.md` 「folder 选择规范」节
 
 ### 节点 2：创建 / 更新测试用例
@@ -78,6 +85,15 @@
 - **不通过则阻断**：body 为空串 → 检查 OpenAPI 的 example 是否写在 `content."application/json".example`（MediaType 层级）；写在 `schema.example` 无效。已存在接口只能删接口重导或由用户在客户端点「自动生成」
 - **为什么单列一条**：`test-case` 全绿**不代表**调试用例有参数，两者是两套资源（`apiTestCaseCollection` vs `api.cases[]`），只查 A7 会得出假通过
 - **关联规则**：`test-case.md` 规则 T-3（新增）
+
+#### A13：接口用例覆盖度铁律（强制，2026-09-01 新增）
+
+- **触发时机**：接口导入/更新后、批量工具链补处理器后、项目接入终检时
+- **执行命令**：`apifox export --project <id> --format apifox --output x.json`，检查**每个有 body 的接口**是否都有 **≥1 非空 DEBUG_CASE**
+- **通过标准**：每个有 `requestBody` 的接口，其 `api.cases[]` 中 `type=DEBUG_CASE` 的用例 `requestBody.data` 非空（`""` 即空壳，不通过）；header-only 接口（schema 无必填 + 维度全在请求头）允许 `{}` 空 body 例外
+- **不通过则阻断**：空壳 → 新建接口回写 OpenAPI MediaType 层级 example 重导；存量接口 body 不可事后补（删接口重导或客户端点「自动生成」），处理器可经 match-name 重导批量补（见 `modules/debug-case.md` 批量工具链 + 豁免清单）
+- **为什么单列一条**：A12 保证"有 body 的接口至少一个调试用例有参数"，A13 把这条升级为**全量覆盖度铁律**（每个有 body 接口 ≥1 非空 DEBUG_CASE），防止只有个别接口补了、其余仍空壳
+- **关联规则**：`modules/debug-case.md` 覆盖度铁律（新增）
 
 #### A6：Mock 200 响应示例真实性（强制）
 
@@ -138,6 +154,19 @@
 - **不通过则阻断**：差异（method 改了/路径改了/字段丢了说明）→ 先修正代码侧 swag 注解→ 重新生成 → 重新导入；字段说明缺失同 A1
 - **关联规则**：`api-sync-to-apifox.md` 「契约校验」+「字段说明完整性校验」
 
+#### M2：Mock 数据自动对齐（强制，2026-09-08 新增）
+
+- **触发时机**：接口测试用例跑通（HTTP 200 + 业务码正确 + 结构完整）后，立即
+- **执行命令**：
+  1. 记录真实响应 body
+  2. `apifox mock list --project <id> --http-api-id <endpointId>` 查询该接口的 Mock
+  3. 对比 Mock 的 `response.bodyData` 与真实响应：不一致且 Mock 过时（空壳/字段明显缺失）→ 更新 Mock
+  4. 遵循写入标准流程：`mock get` → 改 bodyData → `cli-schema validate mock-update` → `mock update`
+- **通过标准**：Mock 的 bodyData 与真实响应一致（或已确认 Mock 是特意构造的异常场景，不做覆盖）
+- **不通过则阻断**：Mock 过时且未更新 → 视为 Mock 未就绪，必须同步后再继续
+- **例外规则**：401/403（环境变量缺失导致）、500（业务数据不足导致）不同步；4xx/5xx 是接口正常业务逻辑的可同步但标注为异常场景
+- **关联规则**：`modules/mock.md` 节点 M2
+
 #### A9：API 文档完整性终检（强制）
 
 - **触发时机**：项目最终验收或上线前
@@ -152,10 +181,35 @@
 
 ### 节点 6（流程收口）：合并 / 创建 MR 前必跑
 
+#### A13：接口用例覆盖度铁律（强制，2026-09-01 新增）
+
+- **触发时机**：接口导入/更新后、批量工具链补处理器后、项目接入终检时
+- **执行命令**：`apifox export --project <id> --format apifox --output x.json`，检查**每个有 body 的接口**是否都有 **≥1 非空 DEBUG_CASE**
+- **通过标准**：每个有 `requestBody` 的接口，其 `api.cases[]` 中 `type=DEBUG_CASE` 的用例 `requestBody.data` 非空（`""` 即空壳，不通过）；header-only 接口（schema 无必填 + 维度全在请求头）允许 `{}` 空 body 例外
+- **不通过则阻断**：空壳 → 新建接口回写 OpenAPI MediaType 层级 example 重导；存量接口 body 不可事后补（删接口重导或客户端点「自动生成」），处理器可经 match-name 重导批量补（见 `modules/debug-case.md` 批量工具链 + 豁免清单）
+- **为什么单列一条**：A12 保证"有 body 的接口至少一个调试用例有参数"，A13 把这条升级为**全量覆盖度铁律**（每个有 body 接口 ≥1 非空 DEBUG_CASE），防止只有个别接口补了、其余仍空壳
+- **关联规则**：`modules/debug-case.md` 覆盖度铁律（新增）
+
+### M1：Mock 覆盖度检查（强制，2026-09-08 新增）
+
+- **触发时机**：准备运行接口测试前、创建完接口和测试用例后
+- **执行命令**：`apifox mock list --project <id> --http-api-id <endpointId> --branch <branch>`，检查该接口是否有 Mock 期望
+- **通过标准**：每个有用例的接口至少有一个 Mock 期望，且 `response.bodyData` 含全部必填响应字段、空壳 `{}` → 不通过
+- **不通过则阻断**：无 Mock 或 Mock 空壳 → 按 `modules/mock.md` 兜底 Mock 创建规则创建/更新 Mock，测试才能继续
+- **关联规则**：`modules/mock.md` 节点 M1
+
+#### M3：Mock 质量审计（强制，2026-09-08 新增）
+
+- **触发时机**：项目最终验收或上线前
+- **执行命令**：对全量接口批量检查：`apifox endpoint list` → 逐接口 `mock list` → 扫描空壳 Mock 或过时 Mock → 输出审计报告
+- **通过标准**：所有指标 P1 以上接口 100% 达标
+- **不通过则阻断**：报告中存在红色指标（空壳 Mock/过时 Mock）→ 必须修复到绿再上线
+- **关联规则**：`modules/mock.md` 节点 M3
+
 #### A10：预检清单全过（强制）
 
 - **触发时机**：MR 创建前
-- **执行命令**：按本模块 10 个动作全跑一遍（建议封装为 `apifox audit pre-merge` 子命令脚本，逐项输出）
+- **执行命令**：按本模块 10+ 个动作全跑一遍（建议封装为 `apifox audit pre-merge` 子命令脚本，逐项输出）
 - **通过标准**：所有动作都通过 / 用户已确认豁免项
 - **不通过则阻断**：还有红色指标 → 不允许创建 MR，先修复
 
@@ -204,16 +258,19 @@ apifox test-case get <caseId>  # 拉原结构
 apifox test-case update <caseId> --file <patched-case.json>
 ```
 
-### 4. 修复 Mock 真实性（节点 2 → A6）
+### 4. 修复 Mock 真实性（节点 2 → A6/M1）
 
 ```bash
 # 扫描空壳 Mock 200 响应示例
 python tools/scan_empty_mock_examples.py endpoints.json > empty-mocks.json
 
-# 删除空壳示例或补全真实数据（按 schema 自动生成 Mock 数据：每个字段填合法值，参考 test-case-generation.md 的 schema 驱动数据构造规则）
-apifox endpoint get <endpointId>  # 看 response component
+# 对每个空壳 Mock：
+apifox mock list --project <projectId> --http-api-id <endpointId>  # 列出当前 Mock
+# 如果没有 Mock → 按 schema 创建兜底 Mock（modules/mock.md）
+# 如果有 Mock 但空壳 → 按 schema 补全真实数据 → apifox mock update
+apifox mock get <mockId> --project <projectId>
 # 在 editor 中补 200 真实示例（id=*, createdTime=now, ...所有 schema 字段全部填值）
-apifox endpoint update <endpointId> --file <patched-endpoint.json>
+apifox mock update <mockId> --project <projectId> --file <patched-mock.json>
 ```
 
 ### 5. 按规则 E-1 补正向用例（节点 2 → A4）
@@ -302,10 +359,13 @@ apifox endpoint get <endpointId>  # 确认 folder 归属已生效
 
 1. 节点 1 描述校验与节点 3 端口探测是**两个绝对动作**——这两个动作没跑就不算"接口已就绪"
 2. 节点 2 每条用例都必须通过 A5/A6/A7 三项校验
-3. 节点 4 未登记前不允许生成用例（防止误豁免 P0 资金/交易/支付类接口）
-4. 节点 5 终检报告有红色指标时不允许合并 MR
-5. 项目级强制：`PROJECT_TEST.md` 写入本模块作为「项目测试质量铁律」节首条
-6. **接口必须落在业务 folder 下**（A11）：「默认模块 / 接口」平铺层滞留或归类错误 → 视为归类缺口，迁移归位后才算接口就绪；「生成了就不调整」是反面模式
+3. **节点 2 每个有用例的接口必须通过 M1 Mock 覆盖度检查**——无 Mock 或空壳 Mock 不允许运行测试
+4. 节点 4 未登记前不允许生成用例（防止误豁免 P0 资金/交易/支付类接口）
+5. 节点 5 终检报告有红色指标时不允许合并 MR
+6. 项目级强制：`PROJECT_TEST.md` 写入本模块作为「项目测试质量铁律」节首条
+7. **接口必须落在业务 folder 下**（A11）：「默认模块 / 接口」平铺层滞留或归类错误 → 视为归类缺口，迁移归位后才算接口就绪；「生成了就不调整」是反面模式
+8. **每个有 body 接口 ≥1 非空 DEBUG_CASE**（A13）：覆盖度铁律，不满足即接口用例未就绪——不得用自动化用例（`apiTestCaseCollection`）覆盖顶替（两套资源），空壳调试用例必须补齐或登记豁免
+9. **每个有用例的接口 ≥1 非空 Mock**（M1）：无 Mock 不允许运行测试，Mock 空壳必须补齐
 
 ## 关联文档
 

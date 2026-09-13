@@ -1,5 +1,72 @@
 # 项目当前状态
 
+## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（内部更新通道）
+
+- 来源对象：用户明确提出将规范固化到 Apifox skill 中（附带客户端截图红框证据：左侧接口树 `auth`、`registry`、`tasks`、`policies`、`audit`、`tenants` 等纯英文文件夹及 `GET Health` 英文接口名，团队不熟悉英文的成员读不懂）。核心规范：**接口的 API 路径保持原有英文路径不变，但所有用于展示和阅读的内容必须统一使用简体中文**（包括接口显示名称、文件夹名称、接口说明文档，以及请求参数和响应字段的注释描述），生成或更新接口定义时严格按此规范执行。
+- 当前状态：**全部落地落盘**。
+  - ① `apifox-cli__skillhub/SKILL.md`：核心共享规则新增「接口展示与阅读中文规范（强制铁律）」小节，模块按需加载路由表同步补充中文规范关键词；
+  - ② `modules/api-design.md`：新增「接口展示与阅读中文规范（强制铁律）」专节（机器调用走英文 vs 人类阅读全中文对照表 + 典型红框反面案例剖析），更新创建接口标准流程、不可违反规则，并将硬动作 A1 强化为包含中文规范与字段说明完整性即时审计（伪代码增加中文正则校验）；
+  - ③ `modules/api-folder-organization.md`：核心原则与业务模块识别法明确文件夹必须命名为业务简体中文，禁止英文目录，提供英文反例（`auth`、`tasks` 等）与中文规范（`认证授权`、`任务管理` 等）对照表，并在不可违反规则与审计命令集强化中文检查；
+  - ④ `modules/api-sync-to-apifox.md`：步骤 6 契约校验增加接口中文名与说明核验，步骤 6.2 强化 folder 必须为中文业务目录，不可违反规则补充第 11、12 条；
+  - ⑤ `modules/import-export.md`：Step 5 增加 tags、folder、summary、description 简体中文校验；
+  - ⑥ `modules/project-onboarding-checklist.md`：节点 1 硬动作 A1 与 A11 同步强化中文展示规范与审计要求；
+  - ⑦ 登记：`references/source-notes.md` 追加 2026-09-13 来源记录，`workbuddy-absorption-map.md` 追加续6裁决与同域去重；`PROJECT_MEMORY.md` 固化稳定决策。
+- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`；Windows 与 WorkBuddy 运行时技能目录（通过 NTFS junction 链接）完全同步生效；同域冗余扫描 PASS；改动停在已改动未提交状态（无 Git 提交授权）。
+
+## 2026-09-12 新增「交付残留自查」收口前横切环节（内部更新通道）
+
+- 来源对象：用户提出「需求 / Bug / 计划任务执行完成后再次复查仍能查出该任务残留的新问题」，要求诊断现有流程薄弱环节、评估增设收口前自动自查是否有效，并明确其维度 / 时机 / 标准；用户裁决「落成共享 reference」且「6 维全部为必须项」。
+- 当前状态：全部落地。新建 `skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md`（6 维：需求覆盖对账 / 影响面与消费方对账 / 残留物清扫 / 文档与引用一致性 / 口径一致性 / 验证有效性反审；三档触发；三态处置「已修复 / 显式遗留 / `BLK-*`」；防退化三约束）；该 skill `SKILL.md` 承载、「进入后先做什么」新增 `2.1`、默认执行流程第 2 步、阻断级与驳回标准；`code-change-finalization-gate-rules/SKILL.md` 消费维度 2 / 3 / 6；`skill-hit-check-rules/references/deferred-gate-registry.md` 登记为强制 gate（收口前 + 中段改码）。
+- 诊断结论（六处结构性薄弱环节，均有本仓库实证）：① 收口链为消费型 / 信任型，只防「漏执行」；② 触发靠首条 `闸门预告` 预测后正向对账，缺从真实变更集反推的第二机制；③ `6-review` 被限定只查风格，而仓库已不再自动触发业务审查与最终验收，导致需求覆盖在收口链上无责任方；④ 无「变更集 → 影响面 / 消费方」横切扫描；⑤ `SUMMARY-GATE-PMW-002` 只查计划内显式登记项；⑥ 缺「整体重读」，等于把独立复查外包给用户。
+- 形态裁决：**不做独立 gate skill**——仓库已有 5 个收口 gate，新增同构 gate 会造成层叠且无法改变「自我声明式 PASS」的失效模式；落为被既有 gate 消费的横切 reference，符合「单一权威 + 消费不复制」架构。
+- 验证：`quick_validate.py` 双 PASS；引用链 8 处全可达；新 reference CR=0 / LF=101（纯 LF）；同域冗余扫描 PASS（1 处措辞近似已在同闭环收敛为引用）；独立 8 维评分 60.3 → 64.0（+3.7，棘轮保留）；补建该 skill 原缺的 `source-notes.md` 与 `workbuddy-absorption-map.md`。
+- 执行踩坑：**并行对同一文件发多个 Edit 会发生 lost update**（工具返回 `Successfully edited` 但内容未落盘，另有 1 次 `EBUSY`）→ 同一文件多次修改必须串行，批量修改后必须回读磁盘而非相信工具返回值。
+- 诚实局限：本环节**不能消灭残留，只能把「用户复查发现」前移为「agent 收口发现」**；不承诺「以后没有残留」。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 须知：`PROJECT_CURRENT.md` 逼近 51,200 上限，已把最旧 2026-08-23 条目压缩为 5 行摘要；`PROJECT_HISTORY.md` 满 20 条，已裁剪最旧 2026-08-22「吸收调试」条。
+
+## 2026-09-12 行尾归一 + 编码规则加固 + 既有测试红项清零（内部更新通道）
+
+- 来源对象：用户对上一轮登记的三项待办回复「都修复」——① 加固编码规则技能；② 行尾债务；③ 既有测试失败。
+- 当前状态：**三项全部落地，全量测试 33 个文件 / 468.9 秒 / failures = 0**（起始 32 文件、10 失败）。细节与逐项根因见 `doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md`。
+- ① 行尾：根因是 **8 处 Python 写入点缺 `newline`**（`.system/skill-creator/scripts/{generate_openai_yaml,init_skill}.py`、`.system/plugin-creator/scripts/{create_basic_plugin,update_plugin_cachebuster}.py`），Windows 文本模式把 `\n` 翻成 `\r\n`，每次生成都把 `agents/openai.yaml` 写回 CRLF——即 `asset_eol_health_test` 所述「修掉后又回归」的机制。已全部补齐并**真实重跑生成器验证产物 CR=0**。工作副本范围内（排除 `doc/`、`.git`、缓存、`.workbuddy`、二进制）归一为 LF，终态 **整文件 CRLF=0 / 混合=0**。
+- ② 编码规则加固：`windows-encoding-rules/SKILL.md` 新增「换行判定与写入（实证陷阱）」——判定必须走字节级判据，**禁用 `grep -c $'\r'`**（本环境退化为匹配所有行，对 LF 与 CRLF 文件给出同一数值）；Python 写入必须显式 `newline="\n"`；两者均入通过/驳回标准。字典已重刷（65/8/113）。
+- ③ 测试红项：10 个文件逐个定性后修复（非放水）。主要根因：**时间炸弹**夹具（硬编码日期越过 7 天保留窗，伪造成隔离逻辑缺陷）；登记表 `template_count` 与列表不符（唯一一致解 21）；夹具引用已删文档；`bootstrap_agents.sh` 把 `/c/...` 喂给原生 Python 被解析成 `\c\...`（新增 `to_native_path()`，**6 处调用点一并修**）；治理扫描未排除工具运行时目录 `.workbuddy`；端到端测试依赖本机钩子部署（改为优先已部署、缺失回退仓库版本化源码，**未擅自部署**）；精确计数断言改下限；`imagegen/SKILL.md` 补回按其自身事实的凭据口径。
+- ④ 历史资产对账（用户裁决「对账现状」）：`doc/5-tests/` 历史资产在 `3dae6219 fix: 删除旧数据` 中被整体清除（该提交共删 746 文件，其中 571 个在该目录；基线期望的 85 个可执行资产现为 0）。按裁决**不恢复**：基线更新为当前实际；仍被引用的 Plan Mode 等待循环状态机测试从 `e20effc8` 迁入 `test/implementation-planning-rules/plan_mode_wait_loop_test.py`（修正写死的 `parents[4]`→`parents[2]`），夹具同迁。
+- ⑤ 知识库主题合规：`20-Knowledge/测试与验证/` 违反 `knowledge-layout.md`「不得自行新造主题」（09-10 日报已诊断），按主题定义并入 `研发流程/` 并撤销目录；09-10 日报 4 处 wikilink 同步新路径并加注后迁（不追溯改写当日分类）。`build` → 178 篇，`check` → **dead_link_count = 0**。
+- ⑥ 新增仓库级规则「夹具与守卫参照物稳健性」（用户裁决）：根因是本轮 10 个红项里 5 个的参照物都是**外部事实的快照**。唯一事实源 `test-program-rules/references/fixture-and-guard-robustness.md`（时间 / 路径 / 结构 / 范围 / 基线五类硬约束 + 判据 + 反例 + 复核口径）；`AGENTS.md` 与 `CLAUDE.md` 同步加入仓库级最小约束摘要章节「夹具与守卫参照物稳健性（强制）」；`test-program-rules/SKILL.md` 补触发信号、references 读取规则与通过/驳回标准；来源映射已登记（**覆盖率断言在登记前真实拦下该文件并给出可执行信息**，为 09-11 断言的实活验证）；流水线 `STYLE-09` 已将其纳入检查落点。
+- 验证证据：全量 33/33；`asset_eol_health_test` 4/4；`asset_location_test` 12/12；`validate_engineering_docs_test` 60/60；`task_plan_projection_test` 75/75；`supervisor_state_test` 17/17；`static_owner_router_test` 20/20；`scan_test_pollution.py --diff-only` → **POLLUTION: PASS**；6-review 文档 `--profile style_regression` → **valid=true / status=PASS / errors=[]**。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留（既有，仅登记）：知识库 `check` 仍 42 项违规（39 篇缺 frontmatter、3 篇缺必填字段、2 项接替关系），属 09-10 日报已记录存量；`doc/5-tests/` 571 个历史文件按裁决不恢复。
+- 须用户留意：**4 个文件因 HEAD 本身为 CRLF 而形成真实行尾变更**（`database-schema-rules/SKILL.md`、`database-query-rules/SKILL.md`、`code-snippet-location-rules/SKILL.md`、`code-snippet-location-rules/references/source-priority.md`）；其余 CRLF-only 差异经 `git hash-object --path` 验证归一后 == HEAD、提交不产生差异。如需保留其历史 CRLF 可单独回退。
+
+## 2026-09-11 代码质量九维治理：四项规则缺口补齐（内部更新通道）
+
+- 来源对象：用户提出 AI 辅助开发瓶颈已从"逻辑正确性"转向"代码质量"，列出九维（架构与模块划分 / 编写习惯与风格 / 注释与定义位置与命名 / 引用方式与包别名 / 静态风格命名与位置 / 函数签名 / 结构体按作用分层 / 纯转换工具函数落点 / 工具函数索引文档规范），要求系统化改进与治理。
+- 当前目标：按用户裁决的保守节奏「先补规则内容，后处理编排时机」，先补齐九维中经实证确认的 4 处内容缺口；吸收优先（补 reference，不新建 skill，依 `编码skill.md` 第十八条）。
+- 当前状态：4 项内容缺口 + 后续「6-review 编排时机」全部落地并闭环（落地 → 校验 → 索引 → 登记）。
+  - ① 函数签名：新建 `code-quality-rules/references/function-signature-rules.md`——参数顺序 ctx → 必填 → 可选；数量控制语义优先（同源 ≥3 建议收、含可选/扩展字段必收）；单参数与结构体参数取舍判据；命名 `XxxParams` / `XxxOptions`。
+  - ② 定义位置：新建 `code-quality-rules/references/definition-placement-rules.md`——局部变量函数开头集中、包级变量与常量顶部集中、函数追加末尾；与 `code-style-consistency-rules` 的"声明形式"约定配套（形式 vs 位置）。
+  - ③ 结构体角色分层：新建 `package-structure-rules/references/struct-role-layering.md`——角色谱系与落点表 + 引用面从小到大判定顺序 + Go/Java/TS/Python 语言生态差异 + 按角色注释颗粒度。
+  - ④ 纯转换函数落点 + 公共工具索引契约：新建 `common-util-rules/references/util-index-doc-contract.md`，并在 `util-placement.md` 新增「纯转换工具函数的落点（点名判据）」小节；索引唯一合法落点为 `doc/1-架构/3-模块职责.md` 的 `## 公共工具索引` 小节（`utils/<pkg>/README.md` 因 Catalog 只允许源码扩展名而被否，`doc/` 新建子目录需改 Catalog 亦被否）。
+- 关键量化：新建 4 个 reference；改造 `code-quality-rules` / `package-structure-rules` / `common-util-rules` 三个 SKILL.md 的引用与红线；补建 `common-util-rules` 登记文件 2 个（该 skill 原缺 `source-notes.md` 与 `workbuddy-absorption-map.md`）；顺手修复 `package-structure-rules/references/directory-usage-routing.md` 第 19 行表破损 1 处；字典重跑。
+- 验证与交接：4 个新 reference 引用链 grep 一致；`package-structure-rules` 测试 7/7 PASS（含覆盖索引文件的 `backend_utils_usage_routing_test.py`）；同域冗余扫描 PASS（关键短语除本 skill 与登记注记外 0 命中）；字典重跑 exit 0（implemented 65 / planned_missing 8 / seed 113）。
+- 编排时机收口（续做，已完成）：
+  - ① 来源映射重复 key 静默覆盖已修复：v1「对象 key = Owner 名」形态实测 28 个位点经 `json.load` 后仅剩 22 个（`api-contract-rules`×3 / `comment-rules`×2 / `code-quality-rules`×1，共丢 6 个），已迁移为 `version: 2` 有序数组，28 个位点全部保留。
+  - ② `static_owner_router.py` 已升级：新增 `load_owner_source_map()` / `owner_source_paths()` / `route_review_pipeline()` / `render_review_pipeline()` 与九步 `REVIEW_STEPS`，`6-review` 检查步骤由**已加载的来源映射**派生，不再手写；来源映射加载失败（含 v1 形态、重复 Owner、Owner 集合漂移、路径越界或缺失）一律失败关闭。
+  - ③ 已新增 `references/style-review-pipeline.md`（九步 × 九维 × 判定 × 证据格式，含加载契约与负向边界）。
+  - ④ 加载期新增**覆盖率断言**：Owner 目录下的规则 Markdown 必须全部登记，漏登记即失败关闭，杜绝「规则文件存在却没有 6-review 检查落点」。断言实测拦下 18 条漏登记规则文件（`package-structure-rules` 5 / `code-quality-rules` 3 / `code-style-consistency-rules` 3 / `database-schema-rules` 2 / `test-program-rules` 2 / `common-util-rules` 1 / `frontend-ui-visual-rules` 1 / `golang-patterns` 1），已按语义分组全部补登记，登记来源 217 → 235 条；豁免口径（`source-notes.md` / `workbuddy-absorption-map.md` / `case-*-absorption.md` / 模板与数据目录）已显式写入契约。
+  - ⑤ 关联修复 `test-program-rules`：`references/mock-factory-pattern.md` 与 `references/runtime-mock-pattern.md`（8880B / 7332B）此前在该 skill 内零引用（不在正文引用区也不在读取规则），已补 `references 读取规则` 恢复可达；顺带修掉 `description` 重复整句与「进入后先做什么」重复编号 `7.`（顺延 8、9）。
+  - ⑥ 补建 `code-style-consistency-rules/references/source-notes.md`（该 skill 原缺来源登记文件），并写入本轮 v1→v2 迁移损失明细、覆盖率断言口径与关联修复。
+  - ⑦ **波及面自查修复（新）**：映射迁 v2 后，监督侧读取方 `continuous-code-quality-supervisor-rules/scripts/supervisor_state.py` 的 `_owner_source_candidates()` 仍按 v1 对象形态解析 → `owners` 数组判定恒假 → 每个 Owner 静默降级为一条 **P1** `limited` 发现（实测 `sources=0 / limited=1`）。根因是该 skill 的测试自带 v1 最小夹具，与生产数据格式脱钩，缺陷对测试套件不可见。已新增 `_owner_source_entry()` 按 v2 逐分组合并来源路径与通配，版本常量改由 router 单一来源导入，测试夹具同步改为 v2 数组形态。
+  - 验证：`test/code-style-consistency-rules/static_owner_router_test.py` 20/20 PASS（原 7 例 → 20 例，新增覆盖率断言 3 例）；`test/continuous-code-quality-supervisor-rules/supervisor_state_test.py` 17/17 PASS；`read_owner_sources()` 对真实仓库取 `code-quality-rules` / `comment-rules` / `api-contract-rules` 分别 10 / 9 / 13 条来源、`limited` 全 0；命令行 `--changed` / `--json` 端到端可用；覆盖率断言补登记前拦下 18 条、补登记后通过；字典重跑 exit 0（implemented 65 / planned_missing 8 / seed 113）。
+- 待办/交接：无未完成必需项。本任务链没有 `doc/3-实施/` 正式任务计划文档，因此当前会话投影走 `fallback` 安全恢复列表（已落 registry，绑定会话 `ca214e6e-8368-4f88-bad3-37c4a5df2a36`）。
+- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+- 遗留（已更正）：此前记录的「缺 `pyyaml` 导致无法整体校验」为**误判**——WorkBuddy 内置基线 3.13.12 确无 pyyaml，但隔离 venv `C:/Users/luode/.workbuddy/binaries/python/envs/default/Scripts/python.exe` 已装 pyyaml 6.0.3。涉及 yaml 的 skill 脚本（含 `artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`）一律走该 venv 即可正常运行，无需正则保底。
+- 遗留（既有债务，本轮仅登记未处理）：全仓行尾字节级普查 LF 1630 / 整文件 CRLF 219 / 混合行尾 17，违反 `.editorconfig` 的 `[*] end_of_line = lf`；其中包含仓库自身的 `AGENTS.md` / `CLAUDE.md` 与 `.system/` 上游 vendor skill。整仓归一会产生巨量 diff 且触及上游资产，按保守节奏暂不动，待用户裁决。
+- 全量测试现状（本轮实测，逐文件执行，非阻塞式旧 runner）：32 个测试文件 / 601 秒 / **10 个文件失败**。**本轮改动集内无失败**——`test/code-style-consistency-rules/static_owner_router_test.py` 20/20 OK、`test/continuous-code-quality-supervisor-rules/supervisor_state_test.py` 17/17 OK。10 处失败均为既有问题，已定性但不在本轮修：环境类 1 处（`bootstrap_agents_test.py` 的 MSYS 路径被转成 `\c\Users\...`）；既有数据/缺陷类 9 处（`validate_engineering_docs_test.py` 夹具引用不存在的旧需求文档 + 模板注册表声明 22 与实际 21 不符、`asset_eol_health_test.py` `.system/*` 与 `tapd-task-executor` 的 `.yaml` 含 CRLF、`task_plan_projection_test.py` 损坏投影隔离误删好项、`knowledge_citation_contract_test.py` 该文件本身即混合行尾 CR=316/LF=323、`summary_check_hook_test.py` 6 例、`credential-policy` / `plan_output_contract_test.py` / `path_prefix_contract_test.py` / `asset_location_test.py` 各 1 例）。
+- 测量口径提醒：`grep -c $'\r'` 在本环境**不可用于判定换行**（退化为匹配所有行，返回值恒等于行数）；换行必须走字节级判据（Python `bytes.count(13)` / `od -c` / `grep -Pc '\r$'`）。
+
 ## 2026-08-28 tapd-env-bootstrap SKILL.md 路径去用户名化（内部更新通道）
 
 - 来源对象：用户指出本机 TAPD 凭据配置路径不应写死 `C:\Users\luode`、`/home/luode`，改用 `~/` 用户路径。
@@ -72,58 +139,6 @@
 - 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
 - 遗留：后续低分 skill 优化一律按 SOP 执行（制度化）；全量评分报告未更新（保持口径）。
 
-## 2026-08-26 vue-component-generator__skillhub skill 优化落盘 + 复评完成（33.4 → 63.8/75）
-
-- 来源对象：低分 skill 优化第八轮（用户确认 A+B+D 组裁决）
-- 当前目标：优化 `vue-component-generator__skillhub`（基线 33.4/75，短板"混入无关变现内容"）
-- 当前状态：全部完成。删「变现思路」节；脚本 22 → 186 行兑现全部宣称参数（--api 三风格/--typescript/--scss/--output/--help/--version/PascalCase 校验/完整 props-emits-样式模板/SCRIPT_DIR 自定位）；SKILL.md 重构为 158 行（适用边界 + 4 步流程带输入输出 + 能力矩阵 + 3 API 内联模板速查 + 7 项验收清单 + 环境自检 + 交叉引用三兄弟）；metadata.version 1.1.0。复评：独立子代理 `6|4|3|3|6|5|4 → 9|8|9|8|9|9|8`（+30.4），维度 8 实测全通过。
-- 关键量化：改动 2 文件（SKILL.md 重构 + 脚本 22→186 行）；市场 4 组关键词 0 个 Vue 组件生成候选（授权安装验证无对象）；校验器拦截 1 次（description 尖括号）已修；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
-- 验证与交接：quick_validate `Skill is valid!`（exit 0）；维度 8 实测 6 组合生成 + 4 错误分支 exit 1 + kebab-case 转换（含 MyAPIClient→my-api-client 修复）全通过；闭环修复 3 处（SED_I 平台分支/连续大写 kebab-case/补 script-setup 模板）+ 流程输入输出，复验 valid 回归无破坏。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留：同域 vue 四兄弟（best-practices/__skillhub/router/generator）职责边界已用交叉引用分层，体系级冗余留档 skill-audit-rules 审计。
-
-## 2026-08-26 shell__skillhub skill 优化落盘 + 复评完成（31.0 → 69.0/75）
-
-- 来源对象：低分 skill 优化第七轮（用户确认 A+B+D 组裁决）
-- 当前目标：优化 `shell__skillhub`（基线 31.0/75，短板"脚本断链且无流程步骤"）
-- 当前状态：全部完成。SKILL.md 重构（111 → 240 行）：4 步工作流 + 8 大陷阱内联速查（问题-修复对）+ 断链修复（script.sh 内置 SCRIPT_DIR 自定位 + 双调用方式）+ frontmatter 合规化（6 违规键收 metadata）+ 环境自检（含 bash 缺失 4 级降级链）+ 交叉引用 bash/linux/powershell 三兄弟 + 版本 1.1.0。复评：独立子代理 `7|4|2|2|5|2|5 → 9|9|9|9|10|9|9`（+38.0），维度 8 实测全通过。
-- 关键量化：改动 2 文件（SKILL.md 重构 + script.sh +1 行自定位）；市场 6 组关键词 0 个 shell 候选（授权安装验证无对象）；知识库沉淀追加 1 段（223 链接 0 死链）；工作日志追加。
-- 验证与交接：quick_validate `Skill is valid!`（exit 0）；脚本 10 命令实测 exit 0；速查表断言实测通过（子壳 count=0→2、数组长度 2、参数展开 DEFAULT）；双调用方式（cd 相对 / 任意 cwd 绝对）均通；同域冗余扫描 PASS（bash__skillhub 等 3 目标引用可达）。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留：同域"速查版 vs 手册版"双胞胎（bash__skillhub vs shell__skillhub）已用交叉引用分层，体系级冗余留档 skill-audit-rules 审计。
-
-## 更新时间
-
-- 2026-08-23
-- 来源对象：`BUG-TASK-PROJECTION-HOST-001`（用户 `/goal` 显式授权"计划落盘 + 按计划执行 + 允许并行"）
-- 当前目标：将任务投影协议从 Codex Desktop 专属硬闸门改造为跨宿主（Codex / WorkBuddy / 无任务 UI 宿主）分级适配，修复 `ensure-start` 输入契约
-- 当前状态：全部完成。计划三件套落盘并通过机器校验（Bug 主文档 + 实施总览 + 实施周期01）；3 worker 并行执行（脚本层 + 规则层 + 上层联动，write set 互斥）；单元测试 73/73 OK、quick_validate PASS、语义 Grep 无绝对化残留、6-review `STYLE: PASS`。改动停在已改动未提交状态。
-- 关键量化：改动 2 脚本/测试文件 + 9 规则文档 + 6 项目文档；新增 2 单元测试用例（ensure-start 缺省 trigger、WorkBuddy 会话回退/冲突/全缺失）；并行实际启动 3 个 worker，全部完成并回收。
-- 无需回滚兜底：磁盘投影 schema（v4 registry）未变更；Codex 既有路径 `CODEX_THREAD_ID + update_plan` 保留为适配层之一；`synthesize` 严格必填语义未放宽。
-
-## 本轮已完成
-
-- 计划落盘：`doc/4-bugs/2026-08-23_040049_任务投影跨宿主适配缺陷.md`、`doc/3-实施/2026-08-23_040049_BUG-TASK-PROJECTION-HOST-001_实施总览.md`、`doc/3-实施/2026-08-23_040049_BUG-TASK-PROJECTION-HOST-001_实施周期01_跨宿主适配与输入契约修复.md`（均 `valid: true`）
-- 脚本层（Worker A）：`task_plan_projection.py` 新增 `_resolve_workbuddy_session_id`、三级会话回退链（显式 > CODEX_THREAD_ID > WorkBuddy 元数据，冲突/全缺失失败关闭）、`ensure-start` 缺 `trigger` 默认补 `start`（timeout 仍拒绝、synthesize 严格必填）；测试新增 2 用例，73/73 通过
-- 规则层（Worker B）：`task-plan-rehydration-rules/SKILL.md` 跨宿主化（frontmatter/目标/触发信号/新增「跨宿主适配」节/状态迁移/通过标准）+ 契约文档会话解析与分级语义；quick_validate PASS
-- 上层联动（Worker C）：6 文件分级语义（skill-hit-check / autonomous-execution ×2 / context-compression / session-handoff / platform-capability-matrix WorkBuddy 行）；语义 Grep 无绝对化残留
-- 记忆与证据：PROJECT_MEMORY 三处旧语义更新为分级、PROJECT_HISTORY 置顶追加并裁剪 20 条、工作日志追加、测试主文档 + 6-review 记录落盘
-
-## 验证与交接
-
-- 结构校验：`quick_validate.py task-plan-rehydration-rules` → `Skill is valid!`（退出码 0）
-- 单元测试：`python -X utf8 -B test/task-plan-rehydration-rules/task_plan_projection_test.py` → 73 tests OK（5.271s）
-- 文档校验：实施总览、实施周期01 → `valid: true`（JSON 报告在 doc/5-tests/）
-- 语义校验：全仓 Grep `禁止继续领域写入|UI_SYNC_BLOCKED|update_plan.*不可用|update_plan.*失败` → 规则文件全部分级表述；AGENTS.md/CLAUDE.md 命中为 Goal 降级语义（正确表述）
-- 风格回归：doc/6-review/2026-08-23_114924_BUG-TASK-PROJECTION-HOST-001_6-review.md → `STYLE: PASS`
-- 待观察：WorkBuddy 宿主实际注入 `X-WorkBuddy-Session-Id` / `WORKBUDDY_SESSION_ID` 后，会话回退链在真实宿主轮次中的行为验证（当前环境探测为 absent，机制已实现未实测）
-
-## 范围与边界
-
-- 本轮未动：投影磁盘 schema（v4 registry）、Goal 生命周期协议、WorkBuddy 任务列表工具本身、其他宿主专项适配
-- 明确未做的后续项：WorkBuddy 宿主注入会话元数据后的真实回退验证；WorkBuddy 任务列表工具作为 UI 通道的宿主侧接入（规则层已声明，宿主工具属平台能力）
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态
-
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 
 ## 最近 5 个同项目会话
@@ -140,7 +155,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-08-25T09:24:29.334236Z",
+  "registry_updated_at": "2026-09-12T02:38:28.076861Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -553,15 +568,63 @@
       ]
     },
     {
-      "projection_id": "SESSION/e6785b3fd899bd1e7dab4abea6e8af3954a19e49c99187de1ad02f290330b7f1",
-      "session_id": "22a0ee03-5158-4530-b93a-98903d5960ce",
+      "projection_id": "SESSION/e0144d7e9ebd9049434065e074d7fca98d348a4eb213029c82e0bc22595208a1",
+      "session_id": "sess_e542ed62-f6b0-457f-82d0-9c49236d2f24",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "exact",
+      "state": "active",
+      "plan_key": "IMP-OVERVIEW-ABSORB-20260901-001",
+      "source_document": "doc/3-实施/2026-09-01_000000_SKILL-ABSORB-INTERFACE-CASES-20260901_实施总览.md",
+      "plan_fingerprint": "f9db44208f1060eeb7993fafa23c6eac9e1d6ac281afba48d59f141f91b45806",
+      "updated_at": "2026-09-01T14:52:18.333307Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "[TASK-01] 路由入口与 debug-case 骨架",
+          "status": "in_progress"
+        },
+        {
+          "id": "TASK-02",
+          "step": "[TASK-02] debug-case 覆盖度铁律与维护流程",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-03",
+          "step": "[TASK-03] 吸收源3 用例任务门禁",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-04",
+          "step": "[TASK-04] 吸收源1 契约专项维度",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-05",
+          "step": "[TASK-05] 吸收源2 契约分离与断言增强",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-06",
+          "step": "[TASK-06] 吸收源6 风险覆盖与可执行性",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-07",
+          "step": "[TASK-07] 覆盖度铁律硬动作 A13 与合规收口",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/dff025fe4d9d957a9015b19c8e03b240c872a596505fb706010b25f3adcbce73",
+      "session_id": "ca214e6e-8368-4f88-bad3-37c4a5df2a36",
       "projection_origin": "synthesized",
       "synthesis_mode": "fallback",
       "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260823T043028Z",
+      "plan_key": "SYNTH-FALLBACK/20260911T091333Z",
       "source_document": "",
       "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-23T04:40:26.041060Z",
+      "updated_at": "2026-09-12T02:38:28.076660Z",
       "steps": [
         {
           "id": "RECOVERY-01",
@@ -576,82 +639,6 @@
         {
           "id": "RECOVERY-03",
           "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/76da4d7feeb4d337a0d49944b3a86050e5bea27de4c6214c522cf3c2575a7213",
-      "session_id": "4695cb7b-6460-48c9-8521-5fbb4004f348",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260825T083445Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-08-25T08:48:54.452720Z",
-      "steps": [
-        {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
-          "status": "completed"
-        },
-        {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/c37795474960e410ba7eec813d2cad70bc3c709979cd6253b176ed9a7f8f128b",
-      "session_id": "8771c90c-a57b-4fcb-907a-5a808c3f60b8",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "APIFOX-SECRET-POLICY",
-      "source_document": "当前会话：luode 指令将 apifox 测试专用隔离环境密钥代填决策吸收进 apifox-cli__skillhub",
-      "plan_fingerprint": "bf737936c74ae748e1d1ea676c337994930f09e8039484dac6861161fa2ffe2f",
-      "updated_at": "2026-08-25T09:24:29.333963Z",
-      "steps": [
-        {
-          "id": "S1",
-          "step": "修改 modules/environment.md：敏感变量处理按隔离等级分流 + 新增 agent 代填通道（Apifox 开放 API）",
-          "status": "completed"
-        },
-        {
-          "id": "S2",
-          "step": "修改 modules/test-auth.md：凭据红线分流 + CLI 事实表补开放 API 通道",
-          "status": "completed"
-        },
-        {
-          "id": "S3",
-          "step": "修改 modules/ai-team-project.md 步骤 5 与 references/project-test-md-template.md 存量纠错",
-          "status": "completed"
-        },
-        {
-          "id": "S4",
-          "step": "修改 SKILL.md 权限豁免节与 case 案例加注口径更新",
-          "status": "completed"
-        },
-        {
-          "id": "S5",
-          "step": "登记 workbuddy-absorption-map.md 与 references/source-notes.md",
-          "status": "completed"
-        },
-        {
-          "id": "S6",
-          "step": "知识库沉淀：更新 apifox测试专用项目权限边界.md + 回读校验 + knowledge_index check",
-          "status": "completed"
-        },
-        {
-          "id": "S7",
-          "step": "收口 gate：skill-execution-compliance-gate-rules + reasoning-summary-structure-rules",
           "status": "completed"
         }
       ]
@@ -661,23 +648,4 @@
 ```
 <!-- END TASK PLAN PROJECTION -->
 
-- 2026-08-11
-- 来源对象：CYCLE-MOCK-REMOVE-01
-- 当前目标：删除技能仓库中所有 Mock 相关资产
-- 当前状态：全部 Mock 删除已完成。删除 10 条 Catalog 条目、Schema Mock 条件、placement_catalog.py 中 200+ 行 Mock 代码、2 个参考文档、runtime_mock_layout_test.py 完整测试文件、layout_policy.py 中 2 个模拟函数、asset_location_test.py 中 6 个 Mock 测试、7 个 SKILL.md 的 Mock 规则段落、project-layout-v2.md 的 Mock 目录行、PROJECT_MEMORY.md 的 Mock 规则。guide --category runtime-mock --language go 退出码 2 无匹配。字典刷新退出码 0。改动停在已改动未提交状态。
-
-## 2026-08-13 WorkBuddy 官方市场规则吸收整理补充
-
-- 来源对象：REQ-WBA-20260813-001 / CYCLE-ABS-01..03
-- 当前目标：分析本地 skill 对需求、实施、Bug、测试的规则，对照 WorkBuddy 官方市场同类 skill 取精华去糟粕；吸收是整理补充，不是无限制累加。
-- 当前状态：六个任务全部完成。五份工程文档已落盘并通过 profile 校验；四个 skill 新增五个 reference 并补齐 SKILL.md 引用；全量测试 396 项通过（1 项跳过），修复三处既有测试基线；字典 seed_total 35；测试主文档与 6-review 文档已落盘；知识库沉淀 1 篇并双向关联；PROJECT_MEMORY.md 已同步吸收裁决与配置互斥契约。改动停在已改动未提交状态。
-- 关键量化：新增 5 个 reference、2 份收口文档、1 篇知识库笔记；修改 4 个 SKILL.md、3 个测试文件、`test/shared/layout_policy.py`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`。
-- 验证与交接：全量测试 `python -B test/run_python_tests.py` 退出码 0；`validate_engineering_docs.py` 七份文档 PASS；`generate_dictionary.py` 退出码 0；`knowledge_index.py check` 0 违规。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-
-## 2026-08-21 补充 apifox 测试专用项目直接 main 分支口径
-
-- 来源对象：apifox 测试专用项目直接 main 分支（用户确认）
-- 当前目标：把「apifox 测试专用项目直接 main 分支（不新开分支、无合并环节）」作为分支策略固化进 apifox 分支相关模块 / 测试策略 / 规划表，并同步字典、项目记忆与知识库，修正既有「默认走 AI 分支」的相反表述。
-- 当前状态：全部完成。apifox-cli__skillhub（ai-team-project.md「分支策略」节 + 不可违反规则第 9 条、api-sync-to-apifox.md 步骤 4/9 + 不可违反规则第 5 条、branch.md「先判断怎么改」、SKILL.md AI 写入权限 + AI 分支说明、workflow.md 适用场景 + Step 1）、test-strategy-rules（接口级测试强制走 apifox 节）、编码skill.md apifox 行 + 字典重跑、PROJECT_MEMORY.md 稳定决策 + 机器索引 definition、PROJECT_HISTORY.md 置顶追加、知识库笔记决策 7 + 权威落点 + 执行要点 7。AI 分支流程保留为兜底路径（非 apifox 测试专用项目 / main 分支受保护时使用），未删除既有能力。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
+<!-- 注：旧条目 2026-08-11/08-13/08-21 已裁剪，保留在 PROJECT_HISTORY.md 中。-->

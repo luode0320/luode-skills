@@ -43,7 +43,7 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 
 ## 测试进程生命周期（强制）
 
-> 本节是测试域「测试进程生命周期」的单一权威来源。任何测试任务（功能验证、真实链路测试、回归、接口测试、浏览器联调等）启动的进程与服务——被测后端、前端 dev server、mock/代理、浏览器实例等——统一按本节管理生命周期。`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules` 等测试 skill 直接引用本节，不再重复定义，各自只保留本域专属补充（如联调开场的进程基线收口）。
+> 本节是测试域「测试进程生命周期」的单一权威来源。任何测试任务（功能验证、真实链路测试、回归、接口测试、浏览器联调等）启动的进程与服务——被测后端、前端 dev server、mock/代理、浏览器实例等——统一按本节管理生命周期。`functional-validation-rules`、`test-regression-rules`、`browser-advanced-testing-rules` 等测试 skill 直接引用本节，不再重复定义，各自只保留本域专属补充（如联调开场的进程基线收口）。**本节同时扩展为「测试进程+测试数据」双生命周期**：测试收口时不仅关闭进程，还按 `test-asset-lifecycle` 条件路由清理临时测试数据。`__pycache__` 自动清理（可重建），其他临时数据生成清单后用户确认清理。
 
 - **测试收口必关（强制）**：测试任务结束（含验证结论输出前）必须关闭本轮为测试启动的全部进程与服务；「任务完成」不包含「服务继续留在后台」。任何「测试已完成但服务还挂着」的状态都视为测试进程残留，必须在收口前清理。
 - **核验可证（强制）**：关闭动作必须伴随至少一次「关闭动作 + 关闭后状态检查」结论作为执行证据（端口不再监听 / 进程已退出 / 后台任务列表无残留），不得只声明「已关闭」而无检查证据。
@@ -125,9 +125,16 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 
 自动触发别名包括：`测试主文档`、`测试说明`、`测试文档`、`测试命名`、`时间戳测试主文档`、`测试脚本散落`、`fixture 散落`、`迁移散落测试资产`、`新建测试主文档`、`测试资产镜像`。这些别名只路由到本 owner 的条件细则，不再产生独立 Skill 入口。
 
+## 条件路由：test-asset-lifecycle
+
+当任务命中测试资产生命周期管理（测试数据清理、测试资产过期、`__pycache__` 堆积、临时测试资产清理、遗留测试资产处置）任一信号时，唯一进入 `test-strategy-rules` 的 `test-asset-lifecycle` 路由；先读取 `references/test-asset-lifecycle.md`，再按“六类资产分类 -> 触发条件判定 -> 清理策略选择 -> 清理执行 -> 证据归档”顺序执行。该路由与 `test-asset-governance` 平级，收口闸门和交付闸门可直接引用。
+
+自动触发别名包括：`测试数据清理`、`测试资产过期`、`__pycache__ 清理`、`临时测试数据`、`遗留测试资产`、`测试资产 EOL`、`清理测试资产`、`test 目录膨胀`。这些别名只路由到本 owner 的条件细则，不再产生独立 Skill 入口。
+
 ## references 读取规则
 
 - 默认先读 `references/strategy-dimensions.md`；命中测试资产治理时追加读取 `references/test-asset-governance.md`。
+- 命中测试资产生命周期时追加读取 `references/test-asset-lifecycle.md`；再按需读取 `references/cleanup-triggers.md`、`references/cleanup-strategy.md`、`references/integration-map.md`。
 - 本轮涉及生产代码新增或修改，或需要判定某个符号是否属于测试污染时，必须读 `references/production-test-pollution.md`，并执行 `scripts/scan_test_pollution.py`。
 - 在决定测试主文档、主说明文件和多轮测试拆分方式时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在需要确定测试优先级和覆盖收口时，再读 `references/priority-model.md`。

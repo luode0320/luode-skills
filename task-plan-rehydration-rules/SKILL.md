@@ -9,6 +9,15 @@ description: 当正式实施计划需要投影到宿主任务悬浮窗（跨宿�
 
 把当前实施周期的精简任务列表持久化到 `PROJECT_CURRENT.md`，在宿主关闭（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）、会话中断或上下文恢复后的首次继续回合中重建悬浮任务列表。正式实施文档仍是真实计划源，本 Skill 只拥有运行时任务投影。本 Skill 的 UI 同步通道按宿主分级适配，不再以 Codex 专属协议作为所有宿主的硬闸门。
 
+## 与持久层任务计划文档的关系（强制）
+
+本 Skill 拥有的 registry 投影是紧凑运行时视图（最多 20 条，仅任务 ID、悬浮窗文案、三态），不是全保真事实源；全保真事实源是按执行顺序命名、落盘在项目 `doc/3-实施/` 的独立任务计划文档（契约唯一细则见 `../autonomous-execution-rules/references/state-persistence-and-task-granularity.md`，落点与命名见 `../artifact-storage-rules/references/path-map.yaml` 的 `implementation_task_plan_doc`）：
+
+- 固定写入顺序：先落盘任务计划文档（L1 事实源），再原子更新 registry 投影（L2）；任何投影写入不得替代或推迟 L1 落盘。
+- 恢复时以任务计划文档的状态字段和“下一动作”指针确认中断点；registry 只用于重建悬浮任务列表，不用于判定任务真实状态。
+- registry 与任务计划文档不一致时，以任务计划文档为准，并在下一检查点把投影修正为与事实源一致。
+- 压缩后的会话层不可信；registry 恰好落盘了三态，因此跨会话再水化安全，但决策、偏差、证据只存在于任务计划文档，恢复细节必须回读 L1。
+
 ## 自动触发信号
 
 - 正式实施周期首次进入执行，需要把最小任务同步到悬浮任务列表。

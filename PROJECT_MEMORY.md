@@ -13,6 +13,25 @@
 
 - 稳定决策：真实凭据原值可有意持久化于代码、配置、普通维护文档和对应 Git 提交；日志、错误、测试报告与证据、终端输出、Agent 回复、会话交接和自动知识摘要不得回显原值。
 - 稳定决策：配置 Catalog 的 yaml 条目使用 `allow_plain_secret`（config/yaml/ 唯一配置模式）；`source_policy`、Schema、CLI 参数和返回结构不因该决策改变。
+
+## 跨项目写入授权规则
+
+- 稳定决策：跨项目写入从「绝对禁止、无授权例外」改为「默认只读 + 会话级写入授权」，例外通道为「会话级跨项目写入授权」契约。
+- 稳定决策：授权要素 = 目标项目绝对路径 + 授权范围（文件 / 符号 / 模块或整项目）+ 操作类型（文件写入 / 构建测试 / 依赖安装 / Git 写操作）+ 版本冻结（分支 + commit）+ 改动意图 + 验证方式 + 回滚方案；缺任一项不得授权、不得写入。
+- 稳定决策：授权记录 `WRT-*` 为会话级，本会话内对目标项目 + 授权范围 + 操作类型持续有效；授权记录留痕在 `PROJECT_CURRENT.md` 或会话内明确声明。
+- 稳定决策：授权失效条件 = 会话结束 / 用户撤销 / 目标或范围越界 / 版本冻结漂移；失效后回到默认只读，须重新申请。
+- 稳定决策：授权不覆盖的独立红线（非本条子项，仍按各章执行）：`local` 本地连接调试测试红线、凭据不回显、个人文件安全与删除保护、当前项目自身 Git 写入的当轮意图要求。
+- 来源：用户决策（2026-09-10，AskUserQuestion 三项确认）+ `AGENTS.md` / `CLAUDE.md`「跨项目写入红线」+ `implementation-planning-rules/references/sibling-project-discovery.md`。
+- 更新时间：2026-09-10。
+
+## 记忆文件超长主动整理规则
+
+- 稳定决策：`PROJECT_CURRENT.md` 的 UTF-8 字节数上限为 51,200；`PROJECT_HISTORY.md` 只保留最近 20 条事件。当任务执行中发现这两个文件超长（CURRENT 接近 51KB / HISTORY 超过 20 条），AI 应主动裁剪过期旧记录，无需等待用户指令。
+- 稳定决策：裁剪原则——CURRENT 删除最旧的任务条目（按时间戳判断，保留最近完成的条目）；HISTORY 按「日期倒序、新事件置顶、追加后自动裁剪」规则只保留最近 20 条，被裁剪事件的计数锚点随事件一起删除。裁剪后记录到当日工作日志。
+- 稳定决策：本规则是对 `project-memory-rules/SKILL.md` 写入规则中 CURRENT 51,200 字节闸门和 HISTORY 20 条上限的补充执行约定——之前一直存在"超限只提示阻断，未要求 AI 主动裁剪"的缺口，本规则要求 AI 自行判断并执行裁剪。
+- 来源：2026-09-07 用户指令吸收 + `project-memory-rules/SKILL.md` 写入规则。
+- 更新时间：2026-09-07。
+
 ## Decimal 目录规则
 
 - 稳定决策：`utils/decimal/` 是 Decimal 高精度数值类型封装唯一目录，Catalog ID `backend.utils.decimal`，Go 包别名 `decimalUtil`。
@@ -33,6 +52,18 @@
 - 稳定决策：**临时库特权（apifox 环境，强制）**——**前提是项目已提供 apifox 环境配置**（有 `config/yaml/config.apifox.yaml` + 对应 apifox 测试专用库）。模型测试需要**宽泛权限**（建表/复杂数据构造/大范围写操作等超出 apifox 专用库约束的场景）时，**允许 apifox 环境自行新建临时库测试使用**：① 临时库名必须以 **`tmp` 前缀**标识（如 `tmp_<测试用途>`），用于与正常库区分；② **生命周期（建→用→删，强制）**：测试完成后**必须删除**（`DROP DATABASE`），删除动作记录到 `PROJECT_TEST.md`（库名/用途/删除时间）；③ **删除边界**：只有 `tmp` 前缀临时库允许删除，**正常库（非 `tmp` 前缀，含 apifox 测试专用库、local 库）一律禁止删除**——即使 apifox 环境具备连接权限也不得删除。与库分离不冲突：分离管「apifox 专用库 ≠ local 库」，临时库是在 apifox 专用库之外额外创建的生命周期库，用完即删。
 - 来源：`package-structure-rules/references/configuration-layout.md`、`package-structure-rules/references/placement-catalog.yaml`、`package-structure-rules/SKILL.md`、`apifox-cli__skillhub/modules/environment.md`、`apifox-cli__skillhub/SKILL.md`、`test-strategy-rules/SKILL.md`、用户需求确认（2026-08-21 重新规划 apifox 测试分离库方案）。
 - 更新时间：2026-08-21。
+
+## Apifox 接口展示与阅读简体中文统一规范（API 路径英文不变）
+
+- 稳定决策：**机器调用走英文，人类阅读全中文（强制铁律）**——团队成员背景多元，接口文档是团队协作与联调的核心资产。规范强制要求：**API 路径保持原有英文路径不变，但所有用于展示和阅读的内容必须统一使用简体中文**。在通过 skill 生成、导入或更新接口定义时，必须严格按此规范执行，确保团队中不熟悉英文的成员也能直接读懂接口文档。
+- 稳定决策：**API 路径英文保持**——接口 URL Path（如 `/health`、`/api/v1/auth/login` 等）作为网络协议契约，严格保持原有英文路径不变，禁止翻译为中文拼音或汉字。
+- 稳定决策：**接口显示名称中文化**——接口显示名称（name / summary / title）必须统一为规范业务简体中文（如：`健康检查`、`用户登录认证`），严禁直接用英文单词、缩写或方法名作为显示名称。
+- 稳定决策：**文件夹名称中文化**——接口目录（folder name）必须统一使用业务领域简体中文命名（如：`认证授权`、`服务注册`、`任务管理`、`策略配置`、`审计日志`、`租户管理`），严禁在左侧文档树中创建或保留 `auth`、`registry`、`tasks` 等纯英文文件夹。
+- 稳定决策：**接口说明文档中文化**——接口说明（description）必须使用简体中文，详述业务背景、调用时机、调用限制与操作指引。
+- 稳定决策：**请求参数与响应字段注释中文化**——Path、Query、Header、Body 每个参数以及响应 JSON Schema 与响应头的每个属性 `description`，必须统一使用非空简体中文注释说明其业务含义、约束与取值范围。
+- 稳定决策：**即时审计硬动作**——在通过 skill 生成、更新或同步接口定义后，必须立即执行硬动作 A1（接口中文名+说明+参数/响应中文注释审计）与 A11（业务 folder 归类与中文命名审计），不合格项必须当轮修复归零，不得以英文或空注释草率收口。
+- 来源：用户指令（2026-09-13）+ 客户端截图红框证据 + `apifox-cli__skillhub/SKILL.md` + `apifox-cli__skillhub/modules/{api-design,api-folder-organization,api-sync-to-apifox,import-export,project-onboarding-checklist}.md`。
+- 更新时间：2026-09-13。
 
 
 ## 计划输出完整性规则
@@ -211,6 +242,15 @@
 - 来源: `artifact-storage-rules/references/path-map.yaml`
 - 适用范围: 文档归档与规则引用
 - 更新时间: 2026-06-28
+- 状态: 启用
+
+### 过程产物退场规则
+- 别名: doc 文档生命周期, 长期文档清理, 过程产物退场, 半个月阈值
+- 类型: 目录规则
+- 定义: `doc/3-实施/`、`doc/4-bugs/`（限已闭环）、`doc/5-tests/`（不含 `基线/`）、`doc/6-review/` 是过程产物，最后修改超过 15 天（半个月）仅构成退场候选，不构成退场理由。必须同时满足四道前置守卫：沉淀守卫（可复用结论已真实进入知识库笔记且可检索，判定由 `knowledge-flow` 负责）、引用守卫（全仓库引用数为 0）、闭环守卫（来源对象已闭环且无未决 P0/P1、无未关闭 gap、无进行中实施周期）、可恢复守卫（已被 Git 跟踪且历史提交存在）。四道守卫全满足并经用户明确确认后，以 `git rm` 删除，不保留并行归档副本、不新建归档目录，单批次不超过 10 个文件。`doc/1-架构/`、`doc/2-需求/`、`doc/5-tests/基线/`、`doc/6-审查/`、`doc/7-验收/` 与根目录 `项目设计.md` 属长期资产，不适用时间退场。
+- 来源: `artifact-storage-rules/SKILL.md`、`artifact-storage-rules/references/lifecycle-policy.md`、`artifact-storage-rules/references/path-map.yaml`
+- 适用范围: doc 产物归档治理、长期过程文档清理与退场判定
+- 更新时间: 2026-09-10
 - 状态: 启用
 
 ### 活动文档命名前缀
@@ -488,6 +528,14 @@
 - 本仓库落地：写码前强制加载入口是 `code-style-consistency-rules/references/user-style-feedback-library.md` 的 active 条目；Go 改动默认补读 `references/go-coding-rules.md`。只写 `SKILL.md` 正文或 `consistency-examples.md` 等于放在事后复盘层，拦不住生成。
 - 本仓库分流：跨项目通用偏好走 `style-feedback-workflow.md` 的 candidate→用户确认→active 流程写入全局反例库；项目专属一次性约定才走 `PROJECT_STYLE.md`（边界依据 `project-style-rules/SKILL.md:51`）。
 - 更新时间：2026-08-12（判据已迁知识库，此处只留本仓库落地口径）。
+
+
+## 代码质量九维治理规则（吸收优先）
+
+- 稳定口径：AI 辅助开发的代码质量治理按九维落点分流（架构与模块划分 / 编写习惯与风格 / 注释与定义位置与命名 / 引用方式与包别名 / 静态风格命名与位置 / 函数签名 / 结构体按作用分层 / 纯转换工具函数落点 / 工具函数索引文档规范）；发现内容缺口时**吸收优先**——补 reference，不新建 skill（依 `编码skill.md` 第十八条）；节奏为「先补规则内容，后处理 6-review 编排时机」。
+- 本仓库落地：函数签名 `code-quality-rules/references/function-signature-rules.md`（参数顺序 ctx → 必填 → 可选；数量语义优先，同源 ≥3 建议收、含可选/扩展字段必收；命名 `XxxParams` / `XxxOptions`）；定义位置 `code-quality-rules/references/definition-placement-rules.md`（局部变量函数开头集中、包级变量与常量顶部集中、函数追加末尾，与 `code-style-consistency-rules` 的「声明形式」约定配套）；结构体角色分层 `package-structure-rules/references/struct-role-layering.md`（角色谱系与落点表 + 引用面从小到大判定 + 按语言生态 Go/Java/TS/Python 差异）。
+- 本仓库落地：**公共工具索引唯一合法落点 = `doc/1-架构/3-模块职责.md` 的「公共工具索引」小节**（契约 `common-util-rules/references/util-index-doc-contract.md`）。`utils/<pkg>/README.md` 不可用（Catalog `allowed_extensions` 只含源码扩展名）；`doc/` 新建子目录不可用（doc 子目录与 `doc/1-架构/` 序号由 Catalog 与 `artifact-storage-rules` 固定）。纯转换函数（确定性 / 无副作用 / 无 IO / 无项目依赖）必进根 `utils/<pkg>/`，一旦需项目依赖降级 `common/util/<函数>.<ext>`。
+- 更新时间：2026-09-11。
 
 
 ## 机器索引区

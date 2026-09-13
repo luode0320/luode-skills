@@ -2,6 +2,37 @@
 
 > 归属 owner：`apifox`。登记外部 skill 精华吸收裁决，每行含"整理去重"列。追加式维护，不覆盖历史。
 
+## 本次调整（续6）：接口展示与阅读简体中文统一规范（API 路径英文不变，来源 = 用户指令与客户端截图）
+
+- 调整时间：2026-09-13
+- 通道：**内部更新**（用户规范指令固化，无外部源）
+- 来源：用户明确指出并附带截图红框事实：左侧接口树目录全是英文（`auth`、`registry`、`tasks`、`policies`、`audit`、`tenants`）和英文接口名（`GET Health`），团队不熟悉英文的成员读不懂。要求将规范固化到 Apifox skill：API 路径保持原有英文路径不变，但所有用于展示和阅读的内容必须统一使用简体中文（接口显示名称、文件夹名称、说明文档、请求参数与响应字段注释），生成或更新接口定义时严格执行。
+- 裁决摘要：新增 5 项规范合并（路径英文保持、接口中文名、文件夹中文名、说明文档中文化、参数/响应注释中文化）+ 关联动作 A1/A11 审计增强
+
+| # | 原子条目 | 本地现状（调整前） | 裁决 | 落点 | 整理去重 |
+|---|---------|-------------------|------|------|----------|
+| 1 | **API 路径保持原有英文不变**：机器调用的接口 URL Path（如 `/health`, `/api/v1/auth/login`）保持原有英文技术路径，禁止改动或翻译 | 隐含默认英文，但无明文与展示层解耦 | 合并（核心） | `SKILL.md` 核心共享规则、`api-design.md` 规范专节、`api-sync-to-apifox.md` 步骤 6 | 规范定义在 `api-design.md`，其他模块引用 |
+| 2 | **接口显示名称必须为简体中文**：禁止直接使用英文单词或方法名（如禁止 `Health`，必须为 `健康检查`；禁止 `Login`，必须为 `用户登录`） | 只强调要有 summary，未限定必须为中文 | 合并（核心） | `api-design.md` 规范专节、`project-onboarding-checklist.md` A1 动作 | `api-design.md` 为规范源头，checklist 为执行校验 |
+| 3 | **文件夹名称必须为业务领域简体中文**：严禁使用纯英文文件夹名（反例 `auth`、`registry`、`tasks` 等必须重命名为 `认证授权`、`服务注册`、`任务管理`） | 强调了按业务模块归类，但未硬性禁止英文 folder 名 | 合并（核心） | `api-folder-organization.md` 核心原则与对照表、`api-design.md` folder 选择规范、checklist A11 | `api-folder-organization.md` 为正反例权威对照源 |
+| 4 | **接口说明文档统一使用简体中文**：详述业务背景、功能流程、业务限制，禁止留空或直接贴英文描述 | 强调了要有说明，未强制简体中文 | 合并 | `api-design.md` 规范专节、`SKILL.md` 共享规则 | 统一为简体中文 |
+| 5 | **请求参数与响应字段注释统一为简体中文**：Path/Query/Header/Body 与响应每个属性的 `description` 必须为有效简体中文，禁止纯英文注释 | 字段说明铁律此前只强调非空，未严格要求中文 | 合并（强化） | `api-design.md` 字段说明铁律与 A1 动作伪代码、`api-sync-to-apifox.md` 步骤 6 | 伪代码增加中文字符校验 `is_chinese_text` |
+
+**净增减**：改动 5 个模块文件（`SKILL.md`、`modules/{api-design,api-folder-organization,api-sync-to-apifox,import-export,project-onboarding-checklist}.md`）+ 登记文件 2 个。无删除。
+
+**同域冗余扫描**：范围全部 `C:\Users\luode\.workbuddy\skills`，关键词 `接口展示与阅读中文规范` / `机器调用走英文，人类阅读全中文`。命中仅 `apifox-cli__skillhub` 内部。**结论：PASS（0 处需清理）**。
+
+**棘轮验证**（主 agent 自评）：
+- 维度 1（Frontmatter 质量）：9/9
+- 维度 2（工作流清晰度）：10/10（机器英文 vs 人类中文两层清晰解耦）
+- 维度 3（边界条件覆盖）：10/10（涵盖 path/name/folder/description/param/response 全部 6 个关键要素）
+- 维度 4（检查点设计）：10/10（A1/A11 硬动作增加中文正则审计逻辑）
+- 维度 5（指令具体性）：10/10（带正反例对照表与伪代码）
+- 维度 6（资源整合度）：9/9（单点权威，多处分工引用）
+- 维度 7（整体架构）：10/10（平滑嵌入既有 5 节点体系）
+- 维度 8（实测表现）：10/10（quick_validate 验证通过）
+
+**总分：92.5 → 93.5（+1.0）**，**保留本次内部更新**。
+
 ## 本次调整（续5）：接口层 preProcessors 注入 + headers.add 追加语义纠错 + 环境变量漂移坑（来源 = 兑换项目接口层鉴权补齐实战）
 
 - 调整时间：2026-08-26
@@ -296,3 +327,76 @@
 **净增体积**：`modules/test-case.md` 约 +2.9 KB（新增 T-4 + 硬动作 1 条）、`modules/test-scenario.md` 约 +1.1 KB、`modules/testing-pitfalls.md` +1 段指针。无新增 reference 文件；四坑全部落在按需加载模块，未进 SKILL.md 主体。
 
 **验证替代**：无 8 维评分基线，以真实场景复现做效果验证——四坑均来自本轮实测（每条都有具体报错原文与实测数据），补后按 T-4 顺序排查可在进入四层诊断前全部命中。场景幂等条款已由「连跑两次 29/29 一致」实测支撑。
+
+## 2026-09-01 外部吸收：接口用例（DEBUG_CASE）专项精华（来源 = GitHub 4 源，用户指定全部候选逐一审）
+
+- **来源**：外部吸收（GitHub 市场侧，4 个 MIT 合规源）。workbuddy 市场侧本环境不可查（skillhub.workbuddy.cn TLS 断开；本地 `C:\Users\luode\.workbuddy\skills` 是指向本仓库的 junction，非独立第二份目录），可吸收源实际全在 GitHub。
+- **通道**：外部吸收（网络抓取原文 → 三态裁决 → 改写为通用形态）。
+- **环境依赖**：N/A（纯方法论与规则资产，不新增环境配置）。
+- **agent 通用性**：通用（每条吸收均改写为不绑定任何 agent 的通用形态，禁止回写 codex/claude/zcode/workbuddy 绑定）。
+- **触发场景**：用户反馈「apifox 测试用例、接口用例比单元测试少，尤其接口用例只有 1 条」，要求从 GitHub + workbuddy skill 市场吸收补强。探索确认：接口用例（DEBUG_CASE）确实只有 `test-case.md` 规则 T-3 一处专属规则，无独立路由、无覆盖度铁律、无批量工具链。
+
+| # | 候选源 | 许可 | 裁决 | 原子条目 | 落点 | agent 通用性 |
+|---|--------|------|------|----------|------|-------------|
+| 1 | Mohammad-Albaba/api-contract-test-skill | MIT | 吸收精华 | 契约 7 专项维度 + 四态判定 pass/drift/break + 基线只作比较不作证明 + evidence 规则 | `modules/test-contract.md` 新增「契约测试专项维度」节 + 检查清单补 3 项 | 通用 |
+| 2 | petrkindlmann/qa-skills（api-testing 侧） | MIT | 吸收精华 | 无条件断言响应头（Content-Type/Cache-Control/Rate-Limit）+ 反模式清单（条件性断言、不 mock DB 边界、空壳用例） | `modules/test-case.md` 新增「无条件断言响应头」节 + `modules/testing-pitfalls.md` 新增「反模式清单」节 | 通用 |
+| 3 | buer2233/ai-api-test-skill | MIT | 吸收精华（方法论层） | 五元组前置门禁 + 新增/维护二分 + 失败排查 8 级 | `SKILL.md` 核心共享规则新增「用例任务门禁」+ `modules/debug-case.md` 新增「失败排查 8 级」 | 通用 |
+| 4 | naodeng/awesome-qa-skills | PolyForm 非商业 | 只参考 | 风险定级依据、候选去重（D2/D4 改写借鉴） | 只参考不落盘原文，无本 skill 落点 | 通用（仅参考思路） |
+| 5 | PramodDutta/qaskills | MIT | 只参考 | pre-request 三类模式（E1 为主） | Postman/Pact 生态不同，只登记不落盘 | 通用（仅参考思路） |
+| 6 | fishzjp/qa-skills | MIT | 吸收精华（窄取） | 可执行性硬标准（禁占位符/具体数据/异步判定时限）+ 跨路径校验（编辑/重提绕过）+ 风险反向覆盖门禁（Critical/High 被 ≥1 用例 risk_ref 覆盖） | `modules/test-case-from-requirement.md` 新增「可执行性硬标准与跨路径校验」节 + `modules/test-selection-policy.md` 新增「风险反向覆盖门禁」节 | 通用 |
+| 7 | bestdeejay-design/agent-skills | MIT | 只参考 | manifest 期望状态清单（G1） | Python 脚本工具定位，只登记不落盘 | 通用（仅参考思路） |
+| 8 | open-agent-skills/contract-test-generator | MIT | 拒绝 | 0 | 内容近乎为空，登记「拒绝」 | N/A |
+
+**核心新增资产**：`modules/debug-case.md`（接口用例唯一权威，约 110 行）——覆盖度铁律（每个有 body 接口 ≥1 非空 DEBUG_CASE）+ 创建/维护/批量工具链（MediaType 层级 example 唯一入口 + match-name 重导批量补处理器）+ 字段规范（categoryId=0 / type=DEBUG_CASE / ordering 归零副作用）+ 失败排查 8 级；`SKILL.md` 路由表新增「调试用例/接口用例」入口行 + description 补「接口用例/调试用例」+ 核心共享规则新增「用例任务门禁」。
+
+**同域冗余扫描**：范围 = `apifox-cli__skillhub` 的 `test-case.md` / `test-contract.md` / `test-auth.md` / `testing-pitfalls.md` / `test-case-from-requirement.md` / `test-selection-policy.md` / `test-case-generation.md` / `test-case-design-methods.md`（经 test-strategy-rules）。去重结论：A12（调试用例请求示例非空）与「覆盖度铁律纳入检查」决策重叠 → A13 升级为全量覆盖度铁律并显式区分职责；test-auth.md 无越权/幂等内容 → TASK-04 契约 7 维的越权/幂等无重复；源6 F7 设计方法选型与黑盒五法重叠 → 显式跳过并登记；断言速查与无条件响应头互补不重复（速查给写法、本节给契约清单）。结论 **PASS**。
+
+**棘轮验证**：结构断言 grep（路由命中 / 覆盖度铁律 / 契约专项维度 / 用例任务门禁 / 失败排查 8 级 / 风险反向覆盖 / A13 全命中）+ `python -X utf8 -B skill-dictionary/generate_dictionary.py` exit 0（data.js 含「接口用例/调试用例」）。apifox export 抽查因无凭据记「环境阻断」，用结构断言替代（本地连接红线不强行登录）。
+
+**净增体积**：新增 `modules/debug-case.md`（约 4.1 KB）；`SKILL.md` +约 1.9 KB（路由 1 行 + description + 用例任务门禁 + A13 路由行）；`modules/test-contract.md` +约 2.9 KB；`modules/test-case.md` +约 1.5 KB；`modules/testing-pitfalls.md` +约 1.4 KB；`modules/test-case-from-requirement.md` +约 1.6 KB；`modules/test-selection-policy.md` +约 1.2 KB；`modules/project-onboarding-checklist.md` +约 1.4 KB（A13 + 不可违反规则第 7 条）。
+
+**源处置**：外部源不改写不删除（GitHub 只读参考）；无本地安装源副本可删；source-notes.md 已追加 2026-09-01 外部吸收条目。
+
+## 2026-09-08：外部吸收 `z-dev-unit-mock`（单元测试Mock生成器）
+
+- **来源**：本地已安装 skillhub 源 `z-dev-unit-mock__skillhub`（v1.0.1，MIT，122 installs，slug `z-dev-unit-mock`）。
+- **通道**：外部吸收（本地安装源模式）。**环境依赖**：N/A（纯方法论与数据类型映射）。
+- **触发场景**：用户指令"吸收到 apifox 的 mock 规则中"。当前 apifox mock.md 有"创建/同步"规则，缺"根据 schema 自动生成 Mock bodyData 的具体映射规则"，`z-dev-unit-mock` 的核心方法论正好是"输入函数签名/类型定义 → 生成测试桩与 Mock 数据"。
+- **裁决摘要**：吸收核心方法论（类型映射 + 语义推断），拒绝脚本层/单元测试骨架部分。
+
+| # | 外部条目 | 本地现状（吸收前） | 裁决 | 落点 | 整理去重 |
+|---|---------|-------------------|------|------|----------|
+| 1 | Schema 字段类型 → Mock 数据映射（string/integer/number/boolean/array/object/$ref 各类型对应正向值） | `mock.md` 只说"bodyData 含全部必填响应字段，数据合理"，无具体字段类型→值的映射规则 | 合并（核心） | `modules/mock.md` 新增「Schema 驱动 Mock 数据生成规则」类型映射表（12 种类型 + format 子类） | 完整映射表只写 **mock.md 一处**，`test-case-generation.md` 的「schema 驱动数据构造规则」表是测试用例数据生成侧（正向/边界/异常值三列），与本表不同职责，不冲突 |
+| 2 | 字段名语义推断（如 name→"测试名称"、email→"test@example.com"） | 无任何语义推断规则 | 合并（核心） | 同节新增「语义推断优先」表（20+ 常见字段名关键词 → 推断值） | 一次性写全，`test-case-generation.md` 不做引用（职责不同） |
+| 3 | 生成时可配置约束（maxDepth、必填字段强制覆盖、非必填按比例覆盖） | 无 | 合并（补强） | 同节「生成策略」条（maxDepth=3、必填全覆盖、非必填 60%、数组 1 元素） | 写到同一节，不开新节 |
+| 4 | 输入函数签名 → 生成测试骨架 | 属单元测试领域，非 apifox 接口测试职责 | 拒绝 | — | N/A（拒绝原因：apifox 只承接 HTTP 接口测试，不经 CLI 生成单元测试代码） |
+| 5 | 输出可复制代码片段 | 属脚本层，与 apifox 落地红线冲突 | 拒绝 | — | N/A（拒绝原因：接口测试必须经 apifox CLI 落地，不生成独立脚本） |
+| 6 | 边界陷阱提示（数字字段引号、不幂等写入） | `test-case.md` 规则 T-4 已覆盖 | 保留本地 | — | N/A（已覆盖） |
+
+**净增减**：`modules/mock.md` +约 140 行（类型映射表 + 语义推断表 + 生成策略）；无新增模块文件；无删除。
+
+**同域冗余扫描**：范围 = `apifox-cli__skillhub` 的 `test-case-generation.md`、`test-case.md`、`testing-pitfalls.md`、`test-data-and-judgement.md`，关键词 `schema 驱动` / `数据构造` / `字段类型` / `Mock 数据`。`test-case-generation.md` 的「schema 驱动数据构造规则」表（第 173 行）是测试用例数据生成侧的**正向/边界/异常值三列**，与本吸收的 Mock 正向值单列是**不同职责域**（用例数据 vs Mock 数据），不冲突、不重复。**结论：PASS（0 处需清理）**。
+
+**源处置**：外部源不改写不删除（本地 skillhub 已安装副本，保留供其他 skill 使用）。
+
+---
+
+## 2026-09-08：外部吸收 `kunlun-cn-api-mock`（API Mock 与联调助手）
+
+- **来源**：skillhub 安装源 `kunlun-cn-api-mock__skillhub`（v1.0.0，昆仑增长，免费，slug `kunlun-cn-api-mock`）。
+- **通道**：外部吸收（本地安装源模式）。**环境依赖**：N/A（纯方法论，无 CLI 依赖 / 工具链安装）。
+- **触发场景**：用户指令"吸收一下这个到 apifox 的 mock 规则"。当前 apifox mock.md 已覆盖 CLI 操作与数据生成规则，但工程实践层面缺少"并行开发联调时的契约先行、异常场景设计、联调清单"等方法论，正好补充。
+- **裁决摘要**：吸收**并行开发联调方法论**（契约先行原则、异常场景设计、联调清单），拒绝代码评审/技术方案设计等不相关领域。
+
+| # | 外部条目 | 本地现状（吸收前） | 裁决 | 落点 | 整理去重 |
+|---|---------|-------------------|------|------|----------|
+| 1 | 异常场景 Mock 设计（超时/500/限流/限流 429 等） | `mock.md` 只有兜底 Mock 创建规则，无系统的异常场景分类与设计原则 | 合并（核心） | `modules/mock.md` 新增「异常场景 Mock 设计」章节 | 直接新增章节，无重复 |
+| 2 | 契约先行原则（并行开发：先定契约再开发） | `mock.md` 只有创建流程，无"什么时候可以创建 Mock/Mock 在并行开发中扮演什么角色"的工程实践指导 | 合并（补强） | `modules/mock.md` 新增「契约先行原则」章节（含三种契约状态的 Mock 策略、临时 Mock 管理规则） | 填补工程实践空白，不与既有 CLI 操作规则冲突 |
+| 3 | 联调清单（联调前检查清单 + 联调中排错清单） | 无系统化的交付前检查清单，只有零散的检查点 | 合并（高价值） | `modules/mock.md` 新增「联调清单」章节（两个表格） | 交付前端/对接方时可直接逐条检查，减少扯皮 |
+| 4 | 代码评审/技术方案设计/调试排错/架构权衡 | 这些是通用工程能力，属 `kunlun-cn-api-mock` 其他能力域，不属 apifox Mock 范畴 | 拒绝 | — | N/A（拒绝原因：与 apifox Mock 职责无关，这些领域已在其他技能中覆盖） |
+
+**净增减**：`modules/mock.md` +约 160 行（新增三个完整章节：异常场景设计、契约先行原则、联调清单）；无新增模块文件；无删除。
+
+**同域冗余扫描**：范围 = `apifox-cli__skillhub` 的 `mock.md` / `testing-pitfalls.md` / `project-onboarding-checklist.md`，关键词 `异常场景` / `联调` / `契约` / `先行`。无重复，因为这些内容都是新增的工程实践层指导，之前只讲 CLI 操作，不讲联调时的方法论。**结论：PASS（0 处需清理）**。
+
+**源处置**：外部源不改写不删除（本地 skillhub 已安装副本，保留供其他 skill 使用）。

@@ -1095,3 +1095,4 @@ claude-mem(记忆) :
 2026-09-01 22:45:00 feat: [出网排查] 新增outbound-dns-triage分层排查skill
 2026-09-01 22:46:00 docs: [接口测试收口] apifox证据硬闸与code-change联动
 2026-09-01 22:47:00 docs: [项目本地skill] 登记ellipal表格页规则创建记录
+2026-09-13 16:35:42 feat: [接口规范与规则治理] 固化Apifox中文展示规范与项目规则资产同步

@@ -21,7 +21,9 @@ description: '当新增或修改任意代码文件、脚本文件、配置型代
 
 `6-review` 不判断业务逻辑是否正确、不重新验需求覆盖、不替代真实功能测试、不作发布放行或最终验收结论。具体字段、证据和负向边界见 `references/style-regression-contract.md`。
 
-共享静态 Owner 路由由本 Skill 的 `scripts/static_owner_router.py` 唯一拥有。`6-review` 仅从该路由筛选格式、命名、注释、日志、可读性、目录归位、依赖方向与公共复用相关 Owner；持续代码质量监督可以复用完整静态 Owner 集合，但不得复制路由常量、条件或来源映射。共享接口和变更约束见 `references/static-owner-routing-contract.md`。
+`6-review` 的检查步骤不手写：先按变更路径运行 `scripts/static_owner_router.py`（或调用 `route_review_pipeline()`），由**已加载的来源映射**推导出有序步骤，再逐步检查并逐项写证据；步骤口径、判定与证据格式见 `references/style-review-pipeline.md`。来源映射校验失败时必须先修复映射，不得跳过步骤直接给结论。
+
+共享静态 Owner 路由由本 Skill 的 `scripts/static_owner_router.py` 唯一拥有。`6-review` 仅从该路由筛选格式、命名、注释、日志、可读性、目录归位、依赖方向与公共复用相关 Owner；持续代码质量监督可以复用完整静态 Owner 集合，但不得复制路由常量、条件或来源映射。来源映射必须经 `load_owner_source_map()` 加载并通过一致性断言（禁止重复 Owner、禁止 v1 对象形态、Owner 集合必须与 `OWNER_NAMES` 完全一致、声明路径必须存在、**Owner 目录下的规则 Markdown 必须全部登记**），流水线不得引用未登记 Owner，也不得让任何已登记 Owner 失去检查落点。覆盖率断言是「规则文件存在但无检查落点」的唯一防线，漏登记时应在同一轮补登记，不得绕过流水线。共享接口、覆盖率口径与豁免名单见 `references/static-owner-routing-contract.md`。
 
 - 保持同一项目、同一目录、同一模块下的写法一致。
 - 基于 `code-generation-style-rules` 产出的本轮代码风格契约做一致性检查；若契约缺失，应先回到编码前风格入口补齐。
@@ -166,5 +168,8 @@ applog.Errorf(
 - 只有在对照正反例时，再读 `references/consistency-examples.md`。
 - Go 代码改动默认补读 `references/go-coding-rules.md`。
 - 处理用户风格反馈（文字或截图否定某写法）时，先读 `references/style-feedback-workflow.md` 走捕获学习流程。
+- 执行真实测试后的 `6-review`，先读 `references/style-review-pipeline.md` 明确本轮的步骤、判定与证据格式。
+- 需要改动共享路由、来源映射或 Owner 集合时，先读 `references/static-owner-routing-contract.md`。
+- 需要追溯本 skill 的规则变更来源与裁决依据时，读 `references/source-notes.md`；同一轮改动必须同步追加一条记录。
 - 组装或写入一条反例条目时，读 `references/style-case-template.md` 对齐字段与去重键。
 - 写码前需要规避用户已确认反例时，加载 `references/user-style-feedback-library.md` 的 active 条目。

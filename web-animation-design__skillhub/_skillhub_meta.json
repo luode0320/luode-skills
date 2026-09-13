@@ -1,0 +1,18 @@
+{
+  "slug": "web-animation-design",
+  "name": "Web Animation Design",
+  "version": "1.0.0",
+  "installedAt": 1788602482188,
+  "source": "skillhub",
+  "namespace": "clawhub_aa-on-ai",
+  "canonicalName": "@clawhub_aa-on-ai/web-animation-design",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "设计与实现自然且有目的性的网页动画。当用户询问动画、动态效果等相关问题时，主动使用此技能。",
+  "description_en": "Design and implement web animations that feel natural and purposeful. Use this skill proactively whenever the user asks questions about animations, motion, e...",
+  "installs": 10717,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\web-animation-design__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png"
+}

@@ -1,398 +1,527 @@
 {
-  "version": 1,
-  "owners": {
-    "api-contract-rules": {
-      "source_paths": [
-        "api-contract-rules/SKILL.md",
-        "api-contract-rules/references/endpoint-examples.md",
-        "api-contract-rules/references/endpoint-responsibility.md",
-        "api-contract-rules/references/path-and-method-semantics.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+  "version": 2,
+  "owners": [
+    {
+      "owner": "api-contract-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "api-contract-rules/SKILL.md",
+            "api-contract-rules/references/endpoint-examples.md",
+            "api-contract-rules/references/endpoint-responsibility.md",
+            "api-contract-rules/references/path-and-method-semantics.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "api-contract-rules/SKILL.md",
+            "api-contract-rules/references/parameter-validation-rules.md",
+            "api-contract-rules/references/request-examples.md",
+            "api-contract-rules/references/request-shape-boundaries.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "api-contract-rules/SKILL.md",
+            "api-contract-rules/references/response-examples.md",
+            "api-contract-rules/references/response-shape-baseline.md",
+            "api-contract-rules/references/response-variants.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "api-contract-rules/SKILL.md",
+            "api-contract-rules/references/baseline-and-scope.md",
+            "api-contract-rules/references/exposure-and-security.md",
+            "api-contract-rules/references/sync-and-annotation-rules.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "api-contract-rules": {
-      "source_paths": [
-        "api-contract-rules/SKILL.md",
-        "api-contract-rules/references/parameter-validation-rules.md",
-        "api-contract-rules/references/request-examples.md",
-        "api-contract-rules/references/request-shape-boundaries.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "comment-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "comment-rules/SKILL.md",
+            "comment-rules/references/chinese-comment-patterns.md",
+            "comment-rules/references/comment-examples.md",
+            "comment-rules/references/comment-language-boundary.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "comment-rules/SKILL.md",
+            "comment-rules/references/comment-completion-priority.md",
+            "comment-rules/references/comment-examples.md",
+            "comment-rules/references/comment-function-metadata.md",
+            "comment-rules/references/comment-step-numbering-gate.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "comment-rules/SKILL.md",
+            "comment-rules/references/comment-examples.md",
+            "comment-rules/references/comment-granularity.md",
+            "comment-rules/references/comment-placement.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "api-contract-rules": {
-      "source_paths": [
-        "api-contract-rules/SKILL.md",
-        "api-contract-rules/references/response-examples.md",
-        "api-contract-rules/references/response-shape-baseline.md",
-        "api-contract-rules/references/response-variants.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "code-generation-style-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "code-generation-style-rules/SKILL.md",
+            "code-generation-style-rules/references/local-context-and-interface-style.md",
+            "code-generation-style-rules/references/post-change-style-gate.md",
+            "code-generation-style-rules/references/pre-coding-checklist.md",
+            "code-generation-style-rules/references/style-contract-template.md",
+            "code-generation-style-rules/references/style-priority.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "api-contract-rules": {
-      "source_paths": [
-        "api-contract-rules/SKILL.md",
-        "api-contract-rules/references/baseline-and-scope.md",
-        "api-contract-rules/references/exposure-and-security.md",
-        "api-contract-rules/references/sync-and-annotation-rules.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "code-quality-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "code-quality-rules/SKILL.md",
+            "code-quality-rules/references/minimal-change-boundaries.md",
+            "code-quality-rules/references/minimal-change-examples.md",
+            "code-quality-rules/references/minimal-change-general.md",
+            "code-quality-rules/references/code-removal-discipline.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        },
+        {
+          "source_paths": [
+            "code-quality-rules/SKILL.md",
+            "code-quality-rules/references/function-structure-rules.md",
+            "code-quality-rules/references/readability-examples.md",
+            "code-quality-rules/references/readability-general.md",
+            "code-quality-rules/references/function-signature-rules.md",
+            "code-quality-rules/references/definition-placement-rules.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "comment-rules": {
-      "source_paths": [
-        "comment-rules/SKILL.md",
-        "comment-rules/references/chinese-comment-patterns.md",
-        "comment-rules/references/comment-examples.md",
-        "comment-rules/references/comment-language-boundary.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "code-style-consistency-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "code-style-consistency-rules/SKILL.md",
+            "code-style-consistency-rules/references/consistency-examples.md",
+            "code-style-consistency-rules/references/go-coding-rules.md",
+            "code-style-consistency-rules/references/local-convention-detection.md",
+            "code-style-consistency-rules/references/style-baseline.md",
+            "code-style-consistency-rules/references/style-case-template.md",
+            "code-style-consistency-rules/references/style-feedback-workflow.md",
+            "code-style-consistency-rules/references/user-style-feedback-library.md",
+            "code-style-consistency-rules/references/static-owner-routing-contract.md",
+            "code-style-consistency-rules/references/style-regression-contract.md",
+            "code-style-consistency-rules/references/style-review-pipeline.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "code-generation-style-rules": {
-      "source_paths": [
-        "code-generation-style-rules/SKILL.md",
-        "code-generation-style-rules/references/local-context-and-interface-style.md",
-        "code-generation-style-rules/references/post-change-style-gate.md",
-        "code-generation-style-rules/references/pre-coding-checklist.md",
-        "code-generation-style-rules/references/style-contract-template.md",
-        "code-generation-style-rules/references/style-priority.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "common-util-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "common-util-rules/SKILL.md",
+            "common-util-rules/references/util-examples.md",
+            "common-util-rules/references/util-placement.md",
+            "common-util-rules/references/util-qualification.md",
+            "common-util-rules/references/util-index-doc-contract.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "code-quality-rules": {
-      "source_paths": [
-        "code-quality-rules/SKILL.md",
-        "code-quality-rules/references/minimal-change-boundaries.md",
-        "code-quality-rules/references/minimal-change-examples.md",
-        "code-quality-rules/references/minimal-change-general.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "database-query-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "database-query-rules/SKILL.md",
+            "database-query-rules/references/access-layer-boundaries.md",
+            "database-query-rules/references/query-performance-examples.md",
+            "database-query-rules/references/transactions-locks-and-batch.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "code-quality-rules": {
-      "source_paths": [
-        "code-quality-rules/SKILL.md",
-        "code-quality-rules/references/function-structure-rules.md",
-        "code-quality-rules/references/readability-examples.md",
-        "code-quality-rules/references/readability-general.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "database-schema-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "database-schema-rules/SKILL.md",
+            "database-schema-rules/references/migration-safety-and-rollback.md",
+            "database-schema-rules/references/schema-boundaries.md",
+            "database-schema-rules/references/schema-examples.md",
+            "database-schema-rules/references/orm-auto-migration.md",
+            "database-schema-rules/references/table-design-standards.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "code-style-consistency-rules": {
-      "source_paths": [
-        "code-style-consistency-rules/SKILL.md",
-        "code-style-consistency-rules/references/consistency-examples.md",
-        "code-style-consistency-rules/references/go-coding-rules.md",
-        "code-style-consistency-rules/references/local-convention-detection.md",
-        "code-style-consistency-rules/references/style-baseline.md",
-        "code-style-consistency-rules/references/style-case-template.md",
-        "code-style-consistency-rules/references/style-feedback-workflow.md",
-        "code-style-consistency-rules/references/user-style-feedback-library.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "error-handling-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "error-handling-rules/SKILL.md",
+            "error-handling-rules/references/error-classification.md",
+            "error-handling-rules/references/handling-paths.md",
+            "error-handling-rules/references/resilience-boundaries.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "comment-rules": {
-      "source_paths": [
-        "comment-rules/SKILL.md",
-        "comment-rules/references/comment-completion-priority.md",
-        "comment-rules/references/comment-examples.md",
-        "comment-rules/references/comment-function-metadata.md",
-        "comment-rules/references/comment-step-numbering-gate.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "frontend-component-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "frontend-component-rules/SKILL.md",
+            "frontend-component-rules/references/component-boundary-rules.md",
+            "frontend-component-rules/references/component-review-checklist.md",
+            "frontend-component-rules/references/composition-reuse-rules.md",
+            "frontend-component-rules/references/props-events-contract-rules.md",
+            "frontend-component-rules/references/render-side-effect-rules.md",
+            "frontend-component-rules/references/state-ownership-rules.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "comment-rules": {
-      "source_paths": [
-        "comment-rules/SKILL.md",
-        "comment-rules/references/comment-examples.md",
-        "comment-rules/references/comment-granularity.md",
-        "comment-rules/references/comment-placement.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "frontend-ui-visual-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "frontend-ui-visual-rules/SKILL.md",
+            "frontend-ui-visual-rules/references/aesthetic-direction-rules.md",
+            "frontend-ui-visual-rules/references/color-typography-icon-rules.md",
+            "frontend-ui-visual-rules/references/design-search-workflow.md",
+            "frontend-ui-visual-rules/references/forms-nav-data-display-rules.md",
+            "frontend-ui-visual-rules/references/interaction-accessibility-rules.md",
+            "frontend-ui-visual-rules/references/layout-responsive-rules.md",
+            "frontend-ui-visual-rules/references/page-style-and-scenario.md",
+            "frontend-ui-visual-rules/references/seed-source-notes.md",
+            "frontend-ui-visual-rules/references/ui-delivery-checklist.md",
+            "frontend-ui-visual-rules/references/ui-priority-model.md",
+            "frontend-ui-visual-rules/references/visual-preference-learning.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "common-util-rules": {
-      "source_paths": [
-        "common-util-rules/SKILL.md",
-        "common-util-rules/references/util-examples.md",
-        "common-util-rules/references/util-placement.md",
-        "common-util-rules/references/util-qualification.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "golang-patterns",
+      "sites": [
+        {
+          "source_paths": [
+            "golang-patterns/SKILL.md",
+            "golang-patterns/references/go-traps-checklist.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "database-query-rules": {
-      "source_paths": [
-        "database-query-rules/SKILL.md",
-        "database-query-rules/references/access-layer-boundaries.md",
-        "database-query-rules/references/query-performance-examples.md",
-        "database-query-rules/references/transactions-locks-and-batch.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "logging-trace-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "logging-trace-rules/SKILL.md",
+            "logging-trace-rules/references/backend-framework-and-config.md",
+            "logging-trace-rules/references/log-types-and-fields.md",
+            "logging-trace-rules/references/logging-examples.md",
+            "logging-trace-rules/references/trace-propagation.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "database-schema-rules": {
-      "source_paths": [
-        "database-schema-rules/SKILL.md",
-        "database-schema-rules/references/migration-safety-and-rollback.md",
-        "database-schema-rules/references/schema-boundaries.md",
-        "database-schema-rules/references/schema-examples.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "micro-business-architecture-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "micro-business-architecture-rules/SKILL.md",
+            "micro-business-architecture-rules/references/boundaries.md",
+            "micro-business-architecture-rules/references/directory-layout.md",
+            "micro-business-architecture-rules/references/isolation-and-communication.md",
+            "micro-business-architecture-rules/references/md-convention.md",
+            "micro-business-architecture-rules/references/trigger-and-marker.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "error-handling-rules": {
-      "source_paths": [
-        "error-handling-rules/SKILL.md",
-        "error-handling-rules/references/error-classification.md",
-        "error-handling-rules/references/handling-paths.md",
-        "error-handling-rules/references/resilience-boundaries.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "naming-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "naming-rules/SKILL.md",
+            "naming-rules/references/domain-term-alignment.md",
+            "naming-rules/references/naming-examples.md",
+            "naming-rules/references/naming-principles.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "frontend-component-rules": {
-      "source_paths": [
-        "frontend-component-rules/SKILL.md",
-        "frontend-component-rules/references/component-boundary-rules.md",
-        "frontend-component-rules/references/component-review-checklist.md",
-        "frontend-component-rules/references/composition-reuse-rules.md",
-        "frontend-component-rules/references/props-events-contract-rules.md",
-        "frontend-component-rules/references/render-side-effect-rules.md",
-        "frontend-component-rules/references/state-ownership-rules.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "package-structure-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "package-structure-rules/SKILL.md",
+            "package-structure-rules/references/go-package-layout.md",
+            "package-structure-rules/references/java-layer-layout.md",
+            "package-structure-rules/references/node-python-module-layout.md",
+            "package-structure-rules/references/structure-general.md",
+            "package-structure-rules/references/project-layout-v2.md",
+            "package-structure-rules/references/placement-catalog.yaml",
+            "package-structure-rules/references/placement-catalog.schema.json",
+            "package-structure-rules/references/lookup-and-reference-contract.md",
+            "package-structure-rules/references/configuration-layout.md",
+            "package-structure-rules/references/database-layout.md",
+            "package-structure-rules/references/backend-util-layout.md",
+            "package-structure-rules/references/frontend-project-layout.md",
+            "package-structure-rules/scripts/placement_catalog.py",
+            "package-structure-rules/references/directory-usage-routing.md",
+            "package-structure-rules/references/entity-file-naming.md",
+            "package-structure-rules/references/struct-role-layering.md",
+            "package-structure-rules/references/usage-recipes-go.md",
+            "package-structure-rules/references/vscode-launch-tasks.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "frontend-ui-visual-rules": {
-      "source_paths": [
-        "frontend-ui-visual-rules/SKILL.md",
-        "frontend-ui-visual-rules/references/aesthetic-direction-rules.md",
-        "frontend-ui-visual-rules/references/color-typography-icon-rules.md",
-        "frontend-ui-visual-rules/references/design-search-workflow.md",
-        "frontend-ui-visual-rules/references/forms-nav-data-display-rules.md",
-        "frontend-ui-visual-rules/references/interaction-accessibility-rules.md",
-        "frontend-ui-visual-rules/references/layout-responsive-rules.md",
-        "frontend-ui-visual-rules/references/page-style-and-scenario.md",
-        "frontend-ui-visual-rules/references/seed-source-notes.md",
-        "frontend-ui-visual-rules/references/ui-delivery-checklist.md",
-        "frontend-ui-visual-rules/references/ui-priority-model.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "test-program-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "test-program-rules/SKILL.md",
+            "test-program-rules/references/program-boundaries.md",
+            "test-program-rules/references/program-examples.md",
+            "test-program-rules/references/program-types-and-splitting.md",
+            "test-program-rules/references/mock-factory-pattern.md",
+            "test-program-rules/references/runtime-mock-pattern.md",
+            "test-program-rules/references/fixture-and-guard-robustness.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "golang-patterns": {
-      "source_paths": [
-        "golang-patterns/SKILL.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "time-util-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "time-util-rules/SKILL.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "logging-trace-rules": {
-      "source_paths": [
-        "logging-trace-rules/SKILL.md",
-        "logging-trace-rules/references/backend-framework-and-config.md",
-        "logging-trace-rules/references/log-types-and-fields.md",
-        "logging-trace-rules/references/logging-examples.md",
-        "logging-trace-rules/references/trace-propagation.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "vercel-react-best-practices",
+      "sites": [
+        {
+          "source_paths": [
+            "vercel-react-best-practices/SKILL.md",
+            "vercel-react-best-practices/rules/_sections.md",
+            "vercel-react-best-practices/rules/_template.md",
+            "vercel-react-best-practices/rules/advanced-effect-event-deps.md",
+            "vercel-react-best-practices/rules/advanced-event-handler-refs.md",
+            "vercel-react-best-practices/rules/advanced-init-once.md",
+            "vercel-react-best-practices/rules/advanced-use-latest.md",
+            "vercel-react-best-practices/rules/async-api-routes.md",
+            "vercel-react-best-practices/rules/async-cheap-condition-before-await.md",
+            "vercel-react-best-practices/rules/async-defer-await.md",
+            "vercel-react-best-practices/rules/async-dependencies.md",
+            "vercel-react-best-practices/rules/async-parallel.md",
+            "vercel-react-best-practices/rules/async-suspense-boundaries.md",
+            "vercel-react-best-practices/rules/bundle-barrel-imports.md",
+            "vercel-react-best-practices/rules/bundle-conditional.md",
+            "vercel-react-best-practices/rules/bundle-defer-third-party.md",
+            "vercel-react-best-practices/rules/bundle-dynamic-imports.md",
+            "vercel-react-best-practices/rules/bundle-preload.md",
+            "vercel-react-best-practices/rules/client-event-listeners.md",
+            "vercel-react-best-practices/rules/client-localstorage-schema.md",
+            "vercel-react-best-practices/rules/client-passive-event-listeners.md",
+            "vercel-react-best-practices/rules/client-swr-dedup.md",
+            "vercel-react-best-practices/rules/js-batch-dom-css.md",
+            "vercel-react-best-practices/rules/js-cache-function-results.md",
+            "vercel-react-best-practices/rules/js-cache-property-access.md",
+            "vercel-react-best-practices/rules/js-cache-storage.md",
+            "vercel-react-best-practices/rules/js-combine-iterations.md",
+            "vercel-react-best-practices/rules/js-early-exit.md",
+            "vercel-react-best-practices/rules/js-flatmap-filter.md",
+            "vercel-react-best-practices/rules/js-hoist-regexp.md",
+            "vercel-react-best-practices/rules/js-index-maps.md",
+            "vercel-react-best-practices/rules/js-length-check-first.md",
+            "vercel-react-best-practices/rules/js-min-max-loop.md",
+            "vercel-react-best-practices/rules/js-request-idle-callback.md",
+            "vercel-react-best-practices/rules/js-set-map-lookups.md",
+            "vercel-react-best-practices/rules/js-tosorted-immutable.md",
+            "vercel-react-best-practices/rules/rendering-activity.md",
+            "vercel-react-best-practices/rules/rendering-animate-svg-wrapper.md",
+            "vercel-react-best-practices/rules/rendering-conditional-render.md",
+            "vercel-react-best-practices/rules/rendering-content-visibility.md",
+            "vercel-react-best-practices/rules/rendering-hoist-jsx.md",
+            "vercel-react-best-practices/rules/rendering-hydration-no-flicker.md",
+            "vercel-react-best-practices/rules/rendering-hydration-suppress-warning.md",
+            "vercel-react-best-practices/rules/rendering-resource-hints.md",
+            "vercel-react-best-practices/rules/rendering-script-defer-async.md",
+            "vercel-react-best-practices/rules/rendering-svg-precision.md",
+            "vercel-react-best-practices/rules/rendering-usetransition-loading.md",
+            "vercel-react-best-practices/rules/rerender-defer-reads.md",
+            "vercel-react-best-practices/rules/rerender-dependencies.md",
+            "vercel-react-best-practices/rules/rerender-derived-state-no-effect.md",
+            "vercel-react-best-practices/rules/rerender-derived-state.md",
+            "vercel-react-best-practices/rules/rerender-functional-setstate.md",
+            "vercel-react-best-practices/rules/rerender-lazy-state-init.md",
+            "vercel-react-best-practices/rules/rerender-memo-with-default-value.md",
+            "vercel-react-best-practices/rules/rerender-memo.md",
+            "vercel-react-best-practices/rules/rerender-move-effect-to-event.md",
+            "vercel-react-best-practices/rules/rerender-no-inline-components.md",
+            "vercel-react-best-practices/rules/rerender-simple-expression-in-memo.md",
+            "vercel-react-best-practices/rules/rerender-split-combined-hooks.md",
+            "vercel-react-best-practices/rules/rerender-transitions.md",
+            "vercel-react-best-practices/rules/rerender-use-deferred-value.md",
+            "vercel-react-best-practices/rules/rerender-use-ref-transient-values.md",
+            "vercel-react-best-practices/rules/server-after-nonblocking.md",
+            "vercel-react-best-practices/rules/server-auth-actions.md",
+            "vercel-react-best-practices/rules/server-cache-lru.md",
+            "vercel-react-best-practices/rules/server-cache-react.md",
+            "vercel-react-best-practices/rules/server-dedup-props.md",
+            "vercel-react-best-practices/rules/server-hoist-static-io.md",
+            "vercel-react-best-practices/rules/server-no-shared-module-state.md",
+            "vercel-react-best-practices/rules/server-parallel-fetching.md",
+            "vercel-react-best-practices/rules/server-parallel-nested-fetching.md",
+            "vercel-react-best-practices/rules/server-serialization.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "micro-business-architecture-rules": {
-      "source_paths": [
-        "micro-business-architecture-rules/SKILL.md",
-        "micro-business-architecture-rules/references/boundaries.md",
-        "micro-business-architecture-rules/references/directory-layout.md",
-        "micro-business-architecture-rules/references/isolation-and-communication.md",
-        "micro-business-architecture-rules/references/md-convention.md",
-        "micro-business-architecture-rules/references/trigger-and-marker.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "vue-best-practices",
+      "sites": [
+        {
+          "source_paths": [
+            "vue-best-practices/SKILL.md",
+            "vue-best-practices/references/animation-class-based-technique.md",
+            "vue-best-practices/references/animation-state-driven-technique.md",
+            "vue-best-practices/references/component-async.md",
+            "vue-best-practices/references/component-data-flow.md",
+            "vue-best-practices/references/component-fallthrough-attrs.md",
+            "vue-best-practices/references/component-keep-alive.md",
+            "vue-best-practices/references/component-slots.md",
+            "vue-best-practices/references/component-suspense.md",
+            "vue-best-practices/references/component-teleport.md",
+            "vue-best-practices/references/component-transition-group.md",
+            "vue-best-practices/references/component-transition.md",
+            "vue-best-practices/references/composables.md",
+            "vue-best-practices/references/directives.md",
+            "vue-best-practices/references/perf-avoid-component-abstraction-in-lists.md",
+            "vue-best-practices/references/perf-v-once-v-memo-directives.md",
+            "vue-best-practices/references/perf-virtualize-large-lists.md",
+            "vue-best-practices/references/plugins.md",
+            "vue-best-practices/references/reactivity.md",
+            "vue-best-practices/references/render-functions.md",
+            "vue-best-practices/references/sfc.md",
+            "vue-best-practices/references/state-management.md",
+            "vue-best-practices/references/updated-hook-performance.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "naming-rules": {
-      "source_paths": [
-        "naming-rules/SKILL.md",
-        "naming-rules/references/domain-term-alignment.md",
-        "naming-rules/references/naming-examples.md",
-        "naming-rules/references/naming-principles.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "vue-router-best-practices",
+      "sites": [
+        {
+          "source_paths": [
+            "vue-router-best-practices/SKILL.md",
+            "vue-router-best-practices/reference/router-beforeenter-no-param-trigger.md",
+            "vue-router-best-practices/reference/router-beforerouteenter-no-this.md",
+            "vue-router-best-practices/reference/router-guard-async-await-pattern.md",
+            "vue-router-best-practices/reference/router-navigation-guard-infinite-loop.md",
+            "vue-router-best-practices/reference/router-navigation-guard-next-deprecated.md",
+            "vue-router-best-practices/reference/router-param-change-no-lifecycle.md",
+            "vue-router-best-practices/reference/router-simple-routing-cleanup.md",
+            "vue-router-best-practices/reference/router-use-vue-router-for-production.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     },
-    "package-structure-rules": {
-      "source_paths": [
-        "package-structure-rules/SKILL.md",
-        "package-structure-rules/references/go-package-layout.md",
-        "package-structure-rules/references/java-layer-layout.md",
-        "package-structure-rules/references/node-python-module-layout.md",
-        "package-structure-rules/references/structure-general.md",
-        "package-structure-rules/references/project-layout-v2.md",
-        "package-structure-rules/references/placement-catalog.yaml",
-        "package-structure-rules/references/placement-catalog.schema.json",
-        "package-structure-rules/references/lookup-and-reference-contract.md",
-        "package-structure-rules/references/configuration-layout.md",
-        "package-structure-rules/references/database-layout.md",
-        "package-structure-rules/references/backend-util-layout.md",
-        "package-structure-rules/references/frontend-project-layout.md",
-        "package-structure-rules/scripts/placement_catalog.py"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "test-program-rules": {
-      "source_paths": [
-        "test-program-rules/SKILL.md",
-        "test-program-rules/references/program-boundaries.md",
-        "test-program-rules/references/program-examples.md",
-        "test-program-rules/references/program-types-and-splitting.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "time-util-rules": {
-      "source_paths": [
-        "time-util-rules/SKILL.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "vercel-react-best-practices": {
-      "source_paths": [
-        "vercel-react-best-practices/SKILL.md",
-        "vercel-react-best-practices/rules/_sections.md",
-        "vercel-react-best-practices/rules/_template.md",
-        "vercel-react-best-practices/rules/advanced-effect-event-deps.md",
-        "vercel-react-best-practices/rules/advanced-event-handler-refs.md",
-        "vercel-react-best-practices/rules/advanced-init-once.md",
-        "vercel-react-best-practices/rules/advanced-use-latest.md",
-        "vercel-react-best-practices/rules/async-api-routes.md",
-        "vercel-react-best-practices/rules/async-cheap-condition-before-await.md",
-        "vercel-react-best-practices/rules/async-defer-await.md",
-        "vercel-react-best-practices/rules/async-dependencies.md",
-        "vercel-react-best-practices/rules/async-parallel.md",
-        "vercel-react-best-practices/rules/async-suspense-boundaries.md",
-        "vercel-react-best-practices/rules/bundle-barrel-imports.md",
-        "vercel-react-best-practices/rules/bundle-conditional.md",
-        "vercel-react-best-practices/rules/bundle-defer-third-party.md",
-        "vercel-react-best-practices/rules/bundle-dynamic-imports.md",
-        "vercel-react-best-practices/rules/bundle-preload.md",
-        "vercel-react-best-practices/rules/client-event-listeners.md",
-        "vercel-react-best-practices/rules/client-localstorage-schema.md",
-        "vercel-react-best-practices/rules/client-passive-event-listeners.md",
-        "vercel-react-best-practices/rules/client-swr-dedup.md",
-        "vercel-react-best-practices/rules/js-batch-dom-css.md",
-        "vercel-react-best-practices/rules/js-cache-function-results.md",
-        "vercel-react-best-practices/rules/js-cache-property-access.md",
-        "vercel-react-best-practices/rules/js-cache-storage.md",
-        "vercel-react-best-practices/rules/js-combine-iterations.md",
-        "vercel-react-best-practices/rules/js-early-exit.md",
-        "vercel-react-best-practices/rules/js-flatmap-filter.md",
-        "vercel-react-best-practices/rules/js-hoist-regexp.md",
-        "vercel-react-best-practices/rules/js-index-maps.md",
-        "vercel-react-best-practices/rules/js-length-check-first.md",
-        "vercel-react-best-practices/rules/js-min-max-loop.md",
-        "vercel-react-best-practices/rules/js-request-idle-callback.md",
-        "vercel-react-best-practices/rules/js-set-map-lookups.md",
-        "vercel-react-best-practices/rules/js-tosorted-immutable.md",
-        "vercel-react-best-practices/rules/rendering-activity.md",
-        "vercel-react-best-practices/rules/rendering-animate-svg-wrapper.md",
-        "vercel-react-best-practices/rules/rendering-conditional-render.md",
-        "vercel-react-best-practices/rules/rendering-content-visibility.md",
-        "vercel-react-best-practices/rules/rendering-hoist-jsx.md",
-        "vercel-react-best-practices/rules/rendering-hydration-no-flicker.md",
-        "vercel-react-best-practices/rules/rendering-hydration-suppress-warning.md",
-        "vercel-react-best-practices/rules/rendering-resource-hints.md",
-        "vercel-react-best-practices/rules/rendering-script-defer-async.md",
-        "vercel-react-best-practices/rules/rendering-svg-precision.md",
-        "vercel-react-best-practices/rules/rendering-usetransition-loading.md",
-        "vercel-react-best-practices/rules/rerender-defer-reads.md",
-        "vercel-react-best-practices/rules/rerender-dependencies.md",
-        "vercel-react-best-practices/rules/rerender-derived-state-no-effect.md",
-        "vercel-react-best-practices/rules/rerender-derived-state.md",
-        "vercel-react-best-practices/rules/rerender-functional-setstate.md",
-        "vercel-react-best-practices/rules/rerender-lazy-state-init.md",
-        "vercel-react-best-practices/rules/rerender-memo-with-default-value.md",
-        "vercel-react-best-practices/rules/rerender-memo.md",
-        "vercel-react-best-practices/rules/rerender-move-effect-to-event.md",
-        "vercel-react-best-practices/rules/rerender-no-inline-components.md",
-        "vercel-react-best-practices/rules/rerender-simple-expression-in-memo.md",
-        "vercel-react-best-practices/rules/rerender-split-combined-hooks.md",
-        "vercel-react-best-practices/rules/rerender-transitions.md",
-        "vercel-react-best-practices/rules/rerender-use-deferred-value.md",
-        "vercel-react-best-practices/rules/rerender-use-ref-transient-values.md",
-        "vercel-react-best-practices/rules/server-after-nonblocking.md",
-        "vercel-react-best-practices/rules/server-auth-actions.md",
-        "vercel-react-best-practices/rules/server-cache-lru.md",
-        "vercel-react-best-practices/rules/server-cache-react.md",
-        "vercel-react-best-practices/rules/server-dedup-props.md",
-        "vercel-react-best-practices/rules/server-hoist-static-io.md",
-        "vercel-react-best-practices/rules/server-no-shared-module-state.md",
-        "vercel-react-best-practices/rules/server-parallel-fetching.md",
-        "vercel-react-best-practices/rules/server-parallel-nested-fetching.md",
-        "vercel-react-best-practices/rules/server-serialization.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "vue-best-practices": {
-      "source_paths": [
-        "vue-best-practices/SKILL.md",
-        "vue-best-practices/references/animation-class-based-technique.md",
-        "vue-best-practices/references/animation-state-driven-technique.md",
-        "vue-best-practices/references/component-async.md",
-        "vue-best-practices/references/component-data-flow.md",
-        "vue-best-practices/references/component-fallthrough-attrs.md",
-        "vue-best-practices/references/component-keep-alive.md",
-        "vue-best-practices/references/component-slots.md",
-        "vue-best-practices/references/component-suspense.md",
-        "vue-best-practices/references/component-teleport.md",
-        "vue-best-practices/references/component-transition-group.md",
-        "vue-best-practices/references/component-transition.md",
-        "vue-best-practices/references/composables.md",
-        "vue-best-practices/references/directives.md",
-        "vue-best-practices/references/perf-avoid-component-abstraction-in-lists.md",
-        "vue-best-practices/references/perf-v-once-v-memo-directives.md",
-        "vue-best-practices/references/perf-virtualize-large-lists.md",
-        "vue-best-practices/references/plugins.md",
-        "vue-best-practices/references/reactivity.md",
-        "vue-best-practices/references/render-functions.md",
-        "vue-best-practices/references/sfc.md",
-        "vue-best-practices/references/state-management.md",
-        "vue-best-practices/references/updated-hook-performance.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "vue-router-best-practices": {
-      "source_paths": [
-        "vue-router-best-practices/SKILL.md",
-        "vue-router-best-practices/reference/router-beforeenter-no-param-trigger.md",
-        "vue-router-best-practices/reference/router-beforerouteenter-no-this.md",
-        "vue-router-best-practices/reference/router-guard-async-await-pattern.md",
-        "vue-router-best-practices/reference/router-navigation-guard-infinite-loop.md",
-        "vue-router-best-practices/reference/router-navigation-guard-next-deprecated.md",
-        "vue-router-best-practices/reference/router-param-change-no-lifecycle.md",
-        "vue-router-best-practices/reference/router-simple-routing-cleanup.md",
-        "vue-router-best-practices/reference/router-use-vue-router-for-production.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
-    },
-    "windows-encoding-rules": {
-      "source_paths": [
-        "windows-encoding-rules/SKILL.md"
-      ],
-      "source_globs": [],
-      "consumption": "static-only"
+    {
+      "owner": "windows-encoding-rules",
+      "sites": [
+        {
+          "source_paths": [
+            "windows-encoding-rules/SKILL.md"
+          ],
+          "source_globs": [],
+          "consumption": "static-only"
+        }
+      ]
     }
-  }
+  ]
 }

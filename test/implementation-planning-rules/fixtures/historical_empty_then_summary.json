@@ -1,0 +1,8 @@
+{
+  "events": [
+    {"type": "request_user_input", "question_ids": ["scope", "cost"]},
+    {"type": "tool_return", "answers": {}},
+    {"type": "summary", "title": "结果与结论"},
+    {"type": "task_complete"}
+  ]
+}

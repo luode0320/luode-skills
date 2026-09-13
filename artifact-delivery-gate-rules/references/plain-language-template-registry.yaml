@@ -1,6 +1,6 @@
 version: 1
 scope: new_or_modified_managed_document_generation_entries
-template_count: 22
+template_count: 21
 summary_opening:
   placement: after_h1_before_first_h2
   paragraph_count: 1

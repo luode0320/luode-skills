@@ -1,0 +1,10 @@
+{
+  "name": "自然语言转命令工具",
+  "installedAt": 1788603726707,
+  "source": "marketplace",
+  "version": "1.0.0",
+  "skillId": "skill_2095591800615153664",
+  "description_zh": "将中文操作意图精准翻译为可执行命令行，内置命令库检索与 JSON 结构化输出，提升终端效率。",
+  "description_en": "Translate Chinese intent into executable shell commands with built-in command lookup and JSON output.",
+  "iconSource": "letter:auto"
+}

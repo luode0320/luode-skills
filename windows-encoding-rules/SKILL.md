@@ -153,11 +153,28 @@ pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "<你的命令>"
 
 该模板的完整原因、引号嵌套规则和临时脚本建议以本文件上文「PowerShell 前缀」段落为唯一真源（原 `windows-wsl-execution-rules/references/powershell-fallback-patterns.md#powershell-命令前缀模板` 随旧 skill 删除而撤销）。编码 skill 不重复维护语法保底规则，只保证在 PowerShell 专项场景中先按上述前缀执行。
 
+## 换行判定与写入（实证陷阱）
+
+**判据：换行是字节级事实，只能用字节级方法判定。**
+
+- 禁止用 `grep -c $'\r' <file>` 判定 CRLF：该写法在本环境会退化为“匹配所有行”，返回值恒等于**总行数**，会把纯 LF 文件报成满篇 CRLF。实测对照组中，已知 LF 文件与已知 CRLF 文件被测得**同一数值**，因此它既会误报、也无法区分。
+- 正确判据择一：Python `Path(p).read_bytes().count(13)`；`od -c`；`grep -Pc '\r$'`（`\r$` 锚定行尾）。
+- 两种测量法给出同一数字**不构成相互印证**；疑似行尾异常时必须换一种独立判据复核，再下结论。
+
+**写入：Python 在 Windows 必须显式声明 `newline`。**
+
+- `Path.write_text()` 与 `open(..., "w")` 不带 `newline` 时，文本模式会把 `\n` 翻译为 `\r\n`，使生成物在 Windows 上静默变成 CRLF，违反仓库 `.editorconfig` 的 `end_of_line = lf`。
+- 统一写法：`write_text(text, encoding="utf-8", newline="\n")`；`open(path, "w", encoding="utf-8", newline="\n")`；`json.dump` 写入文本句柄同理。
+- 该缺陷只在 Windows 暴露，Linux 下等同 no-op，最容易在“本机看不出问题”时漏过；批量生成脚本（字典、模板、配置生成器）必须逐个补齐。
+- 生成器类脚本改完后，验证方式是**真实重跑一次生成**并用上文字节级判据确认 `CR=0`，而不是只读代码。
+
 ## 通过 / 驳回标准
 
 - 通过：中文在终端可读、文件回读正常、`git diff` 无异常乱码片段。
 - 通过：仓库存在 `.gitattributes` / `.editorconfig`，Windows 下默认配置不会再把无关文件批量带进改动，`*.sh` / `*.bash` / `*.yml` / `*.yaml` 等需稳定 `LF` 的文件类型有明确换行约束，脚本文件也不再因 mode change 反复脏掉。
+- 通过：换行结论来自字节级判据（`bytes.count(13)` / `od -c` / `grep -Pc '\r$'`），生成类脚本显式声明 `newline="\n"` 并已真实重跑验证。
 - 驳回：依赖默认编码写入、使用 GBK / ANSI / 系统默认编码落盘、写后未验证、发现乱码仍继续后续流程。
+- 驳回：用 `grep -c $'\r'` 一类退化写法判定行尾；生成脚本未声明 `newline`，导致产物在 Windows 静默变成 CRLF。
 
 ## 边界
 

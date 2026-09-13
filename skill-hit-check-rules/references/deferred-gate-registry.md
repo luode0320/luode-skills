@@ -22,6 +22,7 @@
 | `comment-rules` | 中段改码 | 本轮有任意代码新增/修改 | 强制 | 与上一条联动，判定注释落点与颗粒度 |
 | `code-style-consistency-rules`（`6-review`） | 测试后 | 真实测试完成、准备风格回归 | 强制 | 唯一活动风格回归入口，只输出 STYLE |
 | `skill-execution-compliance-gate-rules` | 收口前 | 本轮命中多 skill / 有工具执行 / 改 skill 资产 | 强制 | 末端合规 PASS/FAIL |
+| `skill-execution-compliance-gate-rules`（`delivery-residue-self-check` 6 维残留自查） | 收口前 + 中段改码 | 本轮存在代码 / 文档 / 规则 / 测试资产改动，或产生交付结论 | 强制 | 按 `references/delivery-residue-self-check.md` 逐项自查并落盘残留清单；中段改码后跑轻量版（维度 1、4）；失败时把受影响范围并入维度 2 |
 | `execution-failure-learning-rules` | 失败时 | 非预期工具/命令/API/环境失败 | 条件 | 失败才触发，首条登记「若失败则触发」 |
 | `code-change-finalization-gate-rules` | 收口前 | 本轮有代码/测试改动且准备最终收口 | 强制 | 复核测试与 6-review 结果 |
 | `artifact-delivery-gate-rules` | 收口前 | 本轮产生或应产生持久化研发文档 | 条件 | 文档落盘闸门 |

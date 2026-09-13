@@ -1,0 +1,18 @@
+{
+  "slug": "ios",
+  "name": "iOS",
+  "version": "1.0.0",
+  "installedAt": 1788622155587,
+  "source": "skillhub",
+  "namespace": "clawhub_ivangdavila",
+  "canonicalName": "@clawhub_ivangdavila/ios",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "使用 Swift、Xcode 及 App Store 最佳实践，构建、测试并发布 iOS 应用。",
+  "description_en": "Build, test, and ship iOS apps with Swift, Xcode, and App Store best practices.",
+  "installs": 3357,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\ios__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png"
+}

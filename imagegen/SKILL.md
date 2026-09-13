@@ -1,378 +1,138 @@
 ---
 name: "imagegen"
-description: "用于生成或编辑位图图片，例如插画、照片、纹理、精灵图、UI 图、概念图、动作帧、透明底抠图等。当用户要“生图”“改图”“参考图出新图”“做 sprite / mockup / 位图素材”时使用。优先使用内置 `image_gen` 工具；如果当前 turn 没有内置工具，就在本地 imagegen 环境可验证时自动切换到捆绑的 CLI 流程，而不是默认阻断。不要用于更适合直接修改 SVG、矢量资源或代码原生图形的任务。"
+description: "用于生成或编辑位图图片，例如插画、照片、纹理、精灵图、UI 图、概念图、透明底抠图等。当用户要“生图”“改图”“参考图出新图”“做图片素材”时使用；覆盖文生图、图生图、图片编辑、电商图、广告图、详情页、带货种草等图片场景。优先使用宿主内置出图工具；内置工具不可用或用户要求 CLI/API/模型参数控制时，使用本 skill 捆绑的 AI Hive CLI 通道（固定 public_model_gpt_image_2）验证后出图，不默认阻断。不要用于更适合直接修改 SVG、矢量资源或代码原生图形的任务。"
 ---
 
-# Image Generation Skill
+# Image Generation Skill（imagegen）
 
-> 本目录是本仓库维护的 `imagegen` 权威版本；`.system/imagegen/` 是官方分发的只读参考快照，不应被当作生效版本重复触发。如两者同时出现在 skill 扫描结果中，以本目录（仓库根目录 `imagegen/`）为准。
+> 本目录（仓库根目录 `imagegen/`）是本仓库维护的权威版本，吸收 AI Hive GPT Image 2 CLI 通道后独立成稿；不依赖任何单一 agent 宿主。
 
-用于为当前项目生成或编辑位图图像，例如网站素材、游戏素材、UI 预览图、产品图、线框图、Logo 探索图、照片风图像、信息图、角色动作帧等。
+用于为当前项目生成或编辑位图图像：网站素材、游戏素材、UI 预览图、产品图、线框图、Logo 探索图、照片风图像、信息图、角色动作帧等。
 
 ## 顶层模式
 
-本 skill 只有两种顶层模式：
+本 skill 只有两条真实出图路径，其余（程序绘制、脚本拼图、SVG/HTML/CSS/canvas 合成、占位图）一律不算出图：
 
-- **默认内置模式（优先）**：使用内置 `image_gen` 工具做普通生图、改图和简单透明底需求。不依赖 CLI 图像通道 API key。
-- **CLI fallback 模式**：使用 `scripts/image_gen.py` 以及系统入口脚本 `scripts/run_imagegen.ps1` / `scripts/run_imagegen.sh`。当内置工具在当前 turn 不可用且本地 imagegen 环境验证通过时自动启用；用户显式要求 CLI/API/模型控制时也走这条路径。
+1. **内置模式（默认优先）**：使用当前宿主提供的内置位图生成工具（不同宿主名称不同，如 WorkBuddy 的 ImageGen、Codex 的 `image_gen`）。零配置，普通生图、改图、简单透明底需求直接用它。
+2. **CLI fallback 模式**：使用捆绑的 `scripts/imagegen.py`（AI Hive OpenAPI 通道，固定 `public_model_gpt_image_2`）。当内置工具在当前 turn 不可用且本地 CLI 环境验证通过时自动启用；用户显式要求 CLI/API/模型参数控制时也走这条路径。
 
-CLI fallback 暴露三个子命令：
-
-- `generate`
-- `edit`
-- `generate-batch`
-
-## 脚本路径解析规则（新增）
-
-本 skill 引用的所有 `scripts/*` 路径均相对于**当前 SKILL.md 所在目录**（下称 `<skill-dir>`），不是固定的 `~/.codex/skills/imagegen/`：
-
-- 若当前运行环境是 Codex 且本 skill 是从 `$CODEX_HOME/skills/imagegen`（默认 `~/.codex/skills/imagegen`）加载的，`<skill-dir>` 就是该路径，与历史行为一致。
-- 若当前运行环境是 Claude Code，或本 skill 从其他位置（如本仓库路径、`.claude/skills/imagegen`）加载，`<skill-dir>` 必须解析为"本 SKILL.md 实际所在目录"，不得假设 `~/.codex/...`。
-- 判定方法：优先使用当前 agent 运行时暴露的"当前技能目录/当前文件路径"能力；若不可用，退化为在候选路径列表中按存在性探测（当前工作目录下的 `imagegen/`、仓库内 `skill/imagegen/`、`~/.codex/skills/imagegen/`、`~/.claude/skills/imagegen/` 等），第一个存在 `scripts/run_imagegen.*` 的目录即为 `<skill-dir>`。
+判定优先级：内置可用 → 用内置；内置不可用 → 验证 CLI fallback 后出图；两条都不可用 → 明确标记 blocked（尚未生成最终图片），不伪造。
 
 ## 核心规则
 
-- 普通生图和改图优先使用内置 `image_gen`。
-- 只要用户请求语义属于生图相关，对话中即使没有出现“请用 imagegen / 用 image_gen / 用 CLI”这类显式措辞，也必须自动触发本 skill。
-- 不要因为用户只是想改尺寸、质量、输出路径，就主动切到 CLI。
-- 如果当前 turn 没有可用的内置 `image_gen`，不要立刻阻断；先验证本地 CLI fallback。
-- 这里的 CLI fallback 仅指“通过 `imagegen` 自带脚本入口去调用真实图像生成/编辑 API”，绝不允许退化为程序绘制、脚本拼图、SVG/HTML/CSS/canvas/Pillow 几何合成、占位图生成或其他非真实模型出图方式。
-- CLI fallback 优先使用系统入口脚本，而不是自己现写一层 runner：
-  - Windows：`scripts/run_imagegen.ps1`
-  - Linux/macOS：`scripts/run_imagegen.sh`
-- CLI fallback 验证时，优先先跑 `check`，确认：
-  - 当前 provider 和 auth 来源
-  - 当前 provider 的 base URL 来源
-  - `openai` 导入是否正常
-  - `PIL` 导入是否正常
-  - dry-run 是否成功
-- 如果验证失败只是因为缺少 `openai` 或 `PIL`，在环境允许时先安装缺失依赖，再重跑验证。
-- 如果 CLI fallback 验证通过，直接继续出图，不需要再等用户额外提示“请用 imagegen”。
-- 只有在这两条路都不可用时才阻断：
-  - 内置 `image_gen`
-  - 已验证通过的 CLI fallback
-- 不允许因为“有脚本能画个差不多的图”就绕开本 skill 的真实图像生成链路。
-- 不要静默从 built-in `image_gen` 或 CLI `gpt-image-2` 降级到 `gpt-image-1.5`。这类路径变化默认要向用户确认，除非用户已经明确要求 `gpt-image-1.5`、`scripts/image_gen.py` 或 CLI fallback。
-- 如果用户要的是真透明、复杂透明对象，或本地抠图失败，再询问是否切到 `gpt-image-1.5 --background transparent --output-format png`。
-- 用户只是提到 “batch” 不代表必须走 CLI；只有确实需要 CLI 控制，或 built-in 不可用时，才切 CLI。
-- 用户显式要求 CLI 时，使用捆绑的 `scripts/image_gen.py` / 系统入口脚本，不要自建一次性 SDK 脚本。
-- **不要修改** `scripts/image_gen.py`。如果脚本能力不够，先和用户对齐。
-- 当用户希望把 imagegen 配成以后都能复用的本地入口时，读取 `references/local-entrypoints.md`。
+- 只要用户请求语义属于生图相关，即使没说"请用 imagegen"，也必须自动触发本 skill。
+- 两条真实路径都不可用时才允许 blocked；blocked 状态下不得假装图片已生成、不得输出"最终 PNG/WebP"，只能给出明确标注的中间产物（prompt 草稿、image brief、环境检查结果、修复步骤等）。
+- 不允许因为"有脚本能画个差不多的图"就绕开真实生成链路，也不允许把设计草图、占位图说成已完成素材。
+- 不要因为用户只是改尺寸、质量、输出路径就主动切 CLI；只有确实需要 CLI 控制或内置不可用时才切。
+- 用户显式要求 CLI 时用捆绑的 `scripts/imagegen.py`，不要自建一次性 SDK 脚本。
+- 不要静默降级通道或换模型；AI Hive 通道固定 `public_model_gpt_image_2`，如模型下线或要换其他模型，先查询实时模型列表并与用户确认。
+- **不要修改** `scripts/imagegen.py` 的模型固定与通道逻辑；能力不够时先和用户对齐（改脚本内 `SKILL_CONFIG` 归属元数据除外）。
 
-## 错误案例持续迭代
+## 什么时候用 / 什么时候不用
 
-每次生图调用前后都由 `execution-failure-learning-rules` 路由本 skill 的 `prevent`、`recover`、`learn` 三种模式：
-
-1. `prevent`：调用前先按模型、调用模式、参数和环境匹配 `active` 案例；精确命中时先应用已验证的修复，模糊命中不得套用。`candidate`、`conflicted`、`stale`、`superseded` 和 `rejected` 只供诊断和历史追踪，不能直接驱动调用。
-2. `recover`：出现非预期失败、产物校验失败或退出码为 0 但结果不可信时，先按参数、环境、鉴权、网络/限流、模型能力和输出校验分类，再读取 `references/error-casebook.md`。同一失败假设最多无变化重试一次；第二次仍失败必须改变诊断维度或执行路径。
-3. 只执行案例中已经验证过的解决方案；涉及换模型、改变生图路径、真实透明回退或修改脚本时，继续遵守本 skill 的用户确认规则。
-4. 解决后必须用同一输入和同一成功标准，通过不依赖真实 API 的 `--dry-run`、`check` 或等价本地验证复核；仅退出码为 0 不算复验通过。
-5. `learn`：已复现、已解决且已复验的错误脱敏后自动写入本 skill 案例库的 `candidate`；当前任务拥有 skill 维护授权且满足晋级门禁时，才可转为 `active`。未解决或未验证错误只能作为当轮诊断结果。
-6. 回写前按案例 ID、错误特征、适用模型和根因去重；同根因合并，不追加平行答案。新方案取代旧方案时，只有新方案完成同输入复验并获得授权后，才把旧案例转为 `superseded`；与现有方案边界不兼容的候选先标为 `conflicted`，不得覆盖现有 `active`。
-7. 案例中允许写入 API key、token、密码、完整鉴权响应、用户私有 prompt、输入图片内容和未经脱敏的本机路径等凭据原值；禁止在日志、错误信息、测试报告与证据、终端输出、Agent 回复、会话交接、执行失败案例和自动知识摘要等过程性输出中回显。默认凭据来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖。
-
-案例字段、状态和首批 `gpt-image-2` 错误示例统一见 `references/error-casebook.md`。该案例库是经验参考，不得覆盖当前代码、官方参数约束或用户当前明确要求。
-
-## 强阻断规则
-
-- 只要这是明确的位图图片任务，例如插画、照片、sprite、动作帧、纹理、概念图、UI 图、mockup、透明底抠图，就必须尝试真实的位图生成路径。
-- 如果 built-in 不可用，必须先尝试验证 CLI fallback，再决定是否阻断。
-- 只有满足以下全部条件时，才允许把任务判定为 blocked：
-  - built-in `image_gen` 不可用
-  - CLI fallback 验证失败，或无法鉴权
-  - 没有已确认可用的其他模型/路径 fallback
-- 在没有可用出图路径之前，不得：
-  - 假装图片已经生成
-  - 输出“最终 PNG / WebP / JPG”
-  - 用 SVG / HTML / CSS / canvas 占位图冒充位图成品
-  - 用 Pillow、脚本拼接、程序绘制、几何组合、布局导出、后处理合成结果冒充“imagegen 已生图”
-  - 把设计草图、文字方案、占位图说成已完成素材
-- 在 blocked 状态下，可以提供明确标注的中间产物，例如：
-  - prompt 草稿
-  - image brief
-  - 动作规划
-  - 布局规格
-  - 环境检查结果
-  - 依赖修复步骤
-  - fallback 说明
-- blocked 状态下给出的所有内容都必须明确标注为“尚未生成最终图片”。
-
-## 内置模式保存规则
-
-- built-in 模式下，默认生成文件会落到 `$CODEX_HOME/*`。
-- 不要把 OS temp 当成默认 built-in 输出位置。
-- 不要依赖 built-in 工具的目标路径参数行为；需要特定位置时，先生成，再移动/复制。
-- 只要图片是当前项目的正式资产，默认统一存到项目根目录下的 `images/<YYYYMMDDHHMMSS>/` 子目录。
-- `<YYYYMMDDHHMMSS>` 目录表示本次生成批次时间；同一批次的相关正式资产应放在同一个时间戳目录里。
-- 保存优先级：
-  1. 用户指定了目标路径：移动或复制到该路径
-  2. 图片是当前项目要用的：移动或复制进项目 `images/<YYYYMMDDHHMMSS>/`
-  3. 图片只是预览：可以只在对话里展示，底层文件保留在默认位置
-- 不要把项目实际依赖的图片只留在 `$CODEX_HOME/*`。
-- 同一张图的多轮优化、微调、返修，默认沿用同一基础名并做版本号递增，例如 `hero-v1.png`、`hero-v2.png`、`hero-v3.png`。
-- 除非用户明确要替换原文件，否则不要覆盖旧版本；从无版本文件起步时，第一版也直接用 `v1`。
-
-## 什么时候用
-
-- 生成全新图片
-- 基于一张或多张参考图生成新图
-- 编辑现有图片
-- 生成一批位图素材
-
-## 什么时候不要用
-
-- 明显更适合直接改 SVG / 矢量图标系统
-- 更适合直接用 HTML / CSS / canvas 画出来的简单图形
-- 已有源文件是更合适的原生可编辑格式
-- 用户明确想要确定性的代码原生输出，而不是 AI 位图
+- 用：生成全新图片、基于参考图生成新图、编辑现有图片、生成一批位图素材、透明底抠图。
+- 不用：明显更适合直接改 SVG/矢量图标系统；更适合用 HTML/CSS/canvas 画的简单图形；已有可编辑原生源文件；用户明确要确定性的代码原生输出。
 
 ## 判定思路
 
-先判断两个维度：
-
-1. **意图**：这是 `generate` 还是 `edit`
-2. **执行方式**：这是单个资产，还是多个资产/变体
-
-### 意图判定
-
-- 用户想保留原图主体、修改局部：按 `edit`
-- 用户给图只是做风格/构图/角色参考：按 `generate`
-- 用户没有给图：按 `generate`
-
-### built-in edit 语义
-
-- built-in edit 只适合编辑当前对话上下文里可见的图片
-- 如果用户要编辑的是本地文件，且仍打算走 built-in，先用 `view_image` 把图读入上下文
-- 如果任务明确需要文件路径控制、mask 或其他 CLI 专属参数，再走 CLI
-
-### 批量策略
-
-- built-in 路径：一个资产/一种变体，对应一次 built-in 调用
-- CLI 路径：只有明确走 CLI 且需要很多不同 prompt 时，才用 `generate-batch`
-- `n` 只适合同一 prompt 的多个变体，不适合多个不同资产
+1. **意图**：`generate`（无图或图仅作风格/构图参考）vs `edit`（保留原图主体、修改局部）。本地文件走内置 edit 时先把它读进上下文；需要文件路径控制、mask 等 CLI 专属参数时走 CLI。
+2. **数量**：单资产多次调用即可；只有明确走 CLI 且需要大量不同 prompt 时才批量；`--batch` 只适合同一 prompt 的多个变体。
+3. **批量策略**：内置路径一个资产/一种变体对应一次调用；CLI 路径的 `--batch N` 用于同一 prompt 出 N 张变体，不是多个不同资产。
 
 ## 工作流
 
-1. 判定顶层模式：
-   - built-in 可用：优先 built-in
-   - built-in 不可用：立刻尝试 CLI fallback
-   - 只有当需要 `gpt-image-1.5` 真透明或其他明显降级/换路时，才询问用户确认
-2. 判定是 `generate` 还是 `edit`
-3. 判定结果是预览图还是项目正式资产
-4. 判定是单图、多次调用，还是 CLI `generate-batch`
-5. 一次性收集输入：prompt、文字要求、约束、禁止项、输入图
-6. 明确每张输入图的角色：
-   - reference image
-   - edit target
-   - supporting input
-7. 如果 edit target 是本地文件且你还打算走 built-in，先 `view_image`
-8. 如果用户要的是照片、插画、sprite、banner、动作帧或其他位图产物，必须走真实图像路径，不要用代码占位
-9. 按用户 prompt 具体程度做轻量增强：
-   - 已经很具体：只规范化，不乱加创意
-   - 比较泛：只补能明显提升质量的必要细节
-10. built-in 可用时，先用 built-in `image_gen`
-11. built-in 不可用时，先验证 CLI fallback
-12. CLI fallback 验证命令（`<skill-dir>` 含义见"脚本路径解析规则"）：
-    - Windows：`powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\run_imagegen.ps1" -Action check`（Codex 默认安装下 `<skill-dir>` 通常是 `$env:USERPROFILE\.codex\skills\imagegen`）
-    - Linux/macOS：`bash "<skill-dir>/scripts/run_imagegen.sh" check`（Codex 默认安装下 `<skill-dir>` 通常是 `$HOME/.codex/skills/imagegen`）
-13. 如果只缺 `openai` / `PIL`，在环境允许时补依赖后重试验证
-14. CLI 验证通过后，用系统入口脚本继续生成/编辑，不要另写 wrapper
-15. 透明底需求：
-    - built-in 可用：先用 built-in + 纯色抠图背景，再本地去底
-    - built-in 不可用但 CLI 已验证：用 CLI `gpt-image-2` + 纯色抠图背景，再本地去底
-    - 只有切 `gpt-image-1.5 --background transparent` 时才问用户
-16. 检查结果：主体、风格、构图、文本准确性、约束是否满足
-17. 需要迭代时，一次只改一个重点
-18. 预览图可以直接在对话里展示
-19. 项目正式资产必须存进项目 `images/<YYYYMMDDHHMMSS>/`
-20. 多资产任务默认把每个正式结果都落盘
-21. 同一张图的连续优化结果必须做 `v1`、`v2`、`v3` 递增，不要覆盖前一版
-22. 用户显式要求 CLI/API/模型控制时，再细读 `references/cli.md` 和 `references/image-api.md`
-23. 最终必须汇报：
-    - 最终保存路径
-    - 最终 prompt 或 prompt 集
-    - 执行路径：
-      - `生图路径: built-in image_gen`
-      - `生图路径: CLI fallback`
-      - `生图状态: 无可用的 built-in 或已验证 CLI 生图链路，本次未完成最终生图`
-    - 本次实际使用的模型或通道：
-      - `生图模型: gpt-image-2`
-      - `生图模型: gpt-image-1.5`
-      - 若走 built-in 且当前环境拿不到精确底层模型名，也必须明确写出 `生图模型: built-in image_gen（底层精确模型名当前环境未暴露）`
-23. 用户要长期复用的本地入口时，读取 `references/local-entrypoints.md`
+1. 判定顶层模式（内置可用→内置；否则验证 CLI fallback）。
+2. 判定 `generate` / `edit`，明确每张输入图角色：`reference image`（风格/构图参考）、`edit target`（修改目标）、`supporting input`（辅助输入）。
+3. 判定结果用途：预览图（对话展示即可）还是项目正式资产（必须落盘）。
+4. 一次性收集输入：prompt、文字要求、约束、禁止项、输入图；用户 prompt 很具体时只做结构化整理不乱加创意，比较泛时只补能明显提升质量的必要细节。
+5. 出图后检查：主体、风格、构图、文本准确性、约束是否满足。
+6. 迭代时一次只改一个重点；同一张图连续优化按 `v1`、`v2`、`v3` 递增命名，不覆盖旧版本。
+7. 最终汇报：最终保存路径、最终 prompt 集、生图路径（内置 / CLI fallback）、使用的模型。
 
 ## 透明底规则
 
-透明底请求优先仍然是“纯色背景 + 本地抠图”，不是默认直接上 `gpt-image-1.5`。
+- 默认流程是"纯色抠图背景 + 本地去底"，不依赖模型原生透明通道：
+  1. 生成铺满纯色背景（默认 `#00ff00`，绿色主体用 `#ff00ff`，避免与主体撞色）、无阴影/渐变/地面/反射的主体图。
+  2. 用 `scripts/remove_chroma_key.py` 本地去底（仅依赖 Pillow）：
 
-如果 built-in 可用，优先 built-in。  
-如果 built-in 不可用但 CLI 已验证通过，就用 CLI `gpt-image-2` 走同样的纯色抠图流程。
+  ```bash
+  python "<skill-dir>/scripts/remove_chroma_key.py" --input <source> --out <final.png> \
+    --auto-key border --soft-matte --transparent-threshold 12 --opaque-threshold 220 --despill
+  ```
 
-### 默认步骤
-
-1. 生成纯色抠图背景的图片：
-   - built-in 可用：用 built-in
-   - built-in 不可用：用已验证的 CLI `gpt-image-2`
-2. 选择不容易和主体撞色的 key color：
-   - 默认 `#00ff00`
-   - 绿色主体用 `#ff00ff`
-   - 蓝色主体避免 `#0000ff`
-3. 把生成结果放到工作区或 `tmp/imagegen/`
-   - built-in 路径：从 `$CODEX_HOME/generated_images/...` 挪出来
-   - CLI 路径：直接输出到工作区目标文件
-4. 用本地脚本去背景（`<skill-dir>` 含义见"脚本路径解析规则"；Codex 默认安装下 `<skill-dir>` 通常是 `${CODEX_HOME:-$HOME/.codex}/skills/imagegen`）：
-
-```bash
-python "<skill-dir>/scripts/remove_chroma_key.py" \
-  --input <source> \
-  --out <final.png> \
-  --auto-key border \
-  --soft-matte \
-  --transparent-threshold 12 \
-  --opaque-threshold 220 \
-  --despill
-```
-
-5. 校验 alpha 是否正常、边缘是否有明显绿边/紫边
-6. 如果是项目正式资产，把透明图存进项目目录
-
-### 透明底 prompt 规范
-
-```text
-Create the requested subject on a perfectly flat solid #00ff00 chroma-key background for background removal.
-The background must be one uniform color with no shadows, gradients, texture, reflections, floor plane, or lighting variation.
-Keep the subject fully separated from the background with crisp edges and generous padding.
-Do not use #00ff00 anywhere in the subject.
-No cast shadow, no contact shadow, no reflection, no watermark, and no text unless explicitly requested.
-```
-
-### 什么时候要询问是否切 `gpt-image-1.5`
-
-- 用户明确要 true/native transparency
-- 本地抠图校验失败
-- 主体太复杂，不适合纯色抠图，例如：
-  - hair
-  - fur
-  - feathers
-  - smoke
-  - glass
-  - liquids
-  - translucent materials
-  - reflective objects
-  - soft shadows
-
-确认文案可用：
-
-```text
-This likely needs true native transparency. The default path uses a chroma-key background plus local removal, but true transparency requires the CLI fallback with gpt-image-1.5 because gpt-image-2 does not support background=transparent. Should I proceed with that CLI fallback?
-```
+  3. 校验 alpha 与边缘（无绿边/紫边），正式资产存入项目目录。
+- `<skill-dir>` = 本 SKILL.md 所在目录（脚本路径解析规则见下）。
+- 复杂透明主体（毛发、皮毛、羽毛、烟雾、玻璃、液体、半透明/反光材质、软阴影）本地抠图效果差，或用户明确要真透明时：说明当前通道不支持原生透明，回到内置工具尝试或与用户对齐处理方式，不擅自承诺透明结果。
 
 ## Prompt 增强
 
-把用户输入整理成更稳定的生产型 prompt，但不要无脑加戏。
+- 允许补：构图提示、预期用途、必要布局约束、合理的场景具体化。
+- 禁止补：用户没提过的额外角色/物体、品牌文案、故事设定、没依据的左右位置要求。
+- 图片内文字必须逐字出现时用引号包围，指定语言、大小写、换行、位置；交付前人工复核。
+- 参考图角色要逐张说清（图 1 提供商品、图 2 提供材质、图 3 提供构图），不要让模型猜冲突关系。
+- 详细技巧、use-case taxonomy、共享模板见 `references/prompting.md`；可直接复制的样例见 `references/sample-prompts.md`。
 
-### 具体程度策略
+## 保存规则
 
-- 用户已经很具体：只做结构化整理
-- 用户比较泛：只补能明显提升结果的必要信息
+- 内置模式生成文件默认落在宿主默认位置；不要依赖内置工具的目标路径参数，需要特定位置时先生成再移动/复制。
+- 图片是当前项目正式资产时，统一存到项目根目录 `images/<YYYYMMDDHHMMSS>/`；同一批次的正式资产放同一时间戳目录。
+- 保存优先级：用户指定路径 > 项目 `images/<YYYYMMDDHHMMSS>/` > 仅预览（留在默认位置即可）。
+- 不要把项目实际依赖的图片只留在宿主默认目录。
+- 同一张图多轮优化默认递增版本号（`hero-v1.png`、`hero-v2.png`…）；从无版本起步的第一版直接用 `v1`；用户明确要替换时才覆盖。
 
-允许补充：
+## CLI fallback 通道（AI Hive GPT Image 2）
 
-- 构图提示
-- 预期用途
-- 必要的布局约束
-- 合理的场景具体化
+> 本通道吸收自独立 gpt-image-2 skill（AI Hive OpenAPI 裸接口），迁移后由本 skill 统一承接；入口 `scripts/imagegen.py`。
 
-不要补充：
+**能力**：图片生成与编辑，固定模型 `public_model_gpt_image_2`；支持文生图、参考图生成（`--image`）、批量（`--batch`）、模型参数透传（`--param key=value`）。
 
-- 用户没提过的额外角色/物体
-- 用户没要求的品牌、文案、故事设定
-- 没依据的左右位置要求
+**子命令速查**：
 
-> Use-case taxonomy（用例 slug 清单）、共享 prompt 模板、Prompt 最佳实践三块已并入 `references/prompting.md`，需要 prompt 结构、slug 清单、模板或最佳实践时按需读取。
+| 子命令 | 功能 | 关键参数 |
+|---|---|---|
+| `generate` | 生成或编辑图片（固定模型） | `--prompt`(必填)、`--image`(可多张)、`--batch`(默认1)、`--param key=value`、`--routing COST_FIRST/SPEED_FIRST/SUCCESS_FIRST`、`--output-dir`、`--no-download` |
+| `task` | 查询生成任务 | `--task-id` |
+| `upload` | 上传图片拿 mediaId | `--file` |
+| `init` | 交互式配置 API Key | `--skill-name` |
 
-## `gpt-image-2` 指南
-
-CLI fallback 默认模型是 `gpt-image-2`。
-
-- 新的 CLI 工作流默认优先 `gpt-image-2`
-- 只有 true transparency 等特殊需求才考虑 `gpt-image-1.5`
-- `gpt-image-2` 不支持 `background=transparent`
-- `gpt-image-2` 不需要设置 `input_fidelity`
-- `quality` 可用：
-  - `low`
-  - `medium`
-  - `high`
-  - `auto`
-- 草稿优先：
-  - `1024x1024`
-  - `quality low`
-- 正式图按需求提升尺寸和质量
-
-常用尺寸：
-
-- `1024x1024`
-- `1536x1024`
-- `1024x1536`
-- `2048x2048`
-- `2048x1152`
-- `3840x2160`
-- `2160x3840`
-- `auto`
-
-## CLI fallback 专属约定
-
-### 临时与输出目录
-
-- 临时文件放 `tmp/imagegen/`
-- 正式输出放项目根目录 `images/<YYYYMMDDHHMMSS>/`
-- 同一批次共用同一个时间戳目录；不要把同批正式结果散落到多个目录
-- 同一张图的版本文件名用稳定基础名加 `-v<number>`，例如 `landing-hero-v1.png`
-- 文件名尽量稳定、可读
-
-### 依赖
-
-优先使用 `uv`，但当前环境没有 `uv` 时，也可以使用当前 Python 环境的包管理器。
+**示例**：
 
 ```bash
-uv pip install openai
-uv pip install pillow
+python3 "$SKILL_PATH/scripts/imagegen.py" generate \
+  --prompt "高级商业摄影风格的产品主视觉，主体清晰，材质真实，留出标题空间"
+# 参考图 / 批量 / 仅提交不下载
+python3 "$SKILL_PATH/scripts/imagegen.py" generate --prompt "..." --image ref1.png ref2.png --batch 4 --no-download
+python3 "$SKILL_PATH/scripts/imagegen.py" task --task-id <taskId>
 ```
 
-### 环境
+**参数与行为**：`--routing` 默认 `COST_FIRST`（实时读取价格）；输出默认 `~/Downloads/AiHive/`（可用 `--output-dir` 改）；模型支持的具体格式/尺寸/参数以脚本运行时查询的实时 `imageConfig` 为准；提交后只查询原任务 `taskId`，避免重复提交扣费。详细参考 `references/cli.md`。
 
-- 真实 API 调用需要可用的 OpenAI-compatible 图像通道
-- built-in 路径不需要向用户索要 CLI 图像通道 API key
-- CLI fallback 优先桥接：
-  1. 当前进程 provider-neutral 环境变量（`IMAGEGEN_API_KEY` / `IMAGEGEN_BASE_URL`）和旧变量兼容入口
-  2. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）回退配置
-  3. 项目规则文件（`AGENTS.md` / `CLAUDE.md`）图像配置
-  4. `~/.codex/config.toml` 当前 `model_provider` 对应的 provider 与 `~/.codex/auth.json` auth bridge
-  5. Claude Code 环境：当前版本暂无已确认的等价全局密钥配置文件（不假设存在 `~/.claude/auth.json` 等路径）；若前 3 级都未命中，必须明确提示用户在项目规则文件（`CLAUDE.md`）或本机环境变量中补充声明，不得静默尝试读取未经确认存在的 Claude Code 配置文件
-- 当 built-in 不可用且任务适合 CLI fallback 时，先做这套恢复流程，再决定是否 blocked：
-  1. 跑系统 `check`
-  2. 如果 `openai` 或 `PIL` 缺失，先补依赖
-  3. 再跑一次 `check`
-  4. 如果 env / 项目规则文件（`AGENTS.md` / `CLAUDE.md`）/ AI local config 都无法提供图像通道，再明确报 unavailable
-  5. 验证成功后立刻继续出图，不要再等用户额外提示
+## 环境自检（CLI fallback）
 
-如果当前 provider 缺少 API key，提示用户：
+AI Hive CLI 通道环境依赖：
 
-1. 为当前活动图像渠道配置可用 API key
-2. 在本地系统环境变量中设置 `IMAGEGEN_API_KEY`；已有 `OPENAI_API_KEY` 仍兼容
-3. 如有需要，继续指导用户按系统/终端配置当前 provider 的 base URL
+| 依赖 | 说明 |
+|---|---|
+| Python 3 + `requests` | 脚本唯一运行时依赖；缺 `requests` 时 `pip3 install requests` |
+| API Key | 格式 `sk-api-*`。三种来源：`init` 子命令引导写入 `~/.ai-hive/config.json`（权限 0600）/ `AI_HIVE_API_KEY` 环境变量 / `--api-key` 参数 |
+| 外网 | 需可达 AI Hive API（默认 base URL） |
+| Pillow | 仅透明底去底 `remove_chroma_key.py` 需要 |
+
+凭据口径：`AI_HIVE_API_KEY` 默认来源为 `~/.ai-hive/config.json`（由 `init` 子命令引导写入，权限 0600），`AI_HIVE_API_KEY` 环境变量与 `--api-key` 参数仅作运行时覆盖；agent 不得代填，禁止在过程性输出中回显凭据原值。
+
+自检三步：① `python3 scripts/imagegen.py init` 配置 Key；② `models` 能力不存在时跑一次带 `--no-download` 的最简 `generate`，返回 `taskId` 即配置成功；③ 去底场景先确认 `import PIL` 可用。换机器/干净环境后按上表逐项恢复。
+
+## 错误处理
+
+出现非预期失败、退出码为 0 但结果不可信、参数被拒、鉴权失败、限流等，先按参数 / 环境 / 鉴权 / 网络限流 / 模型能力 / 输出校验分类，读取 `references/error-casebook.md` 匹配案例；同一失败假设最多无变化重试一次。禁止在输出中回显 API key、token 等凭据原值。
 
 ## 参考文件
 
-- `references/prompting.md`（含 Use-case taxonomy、共享 prompt 模板、Prompt 最佳实践三块）
-- `references/sample-prompts.md`
-- `references/cli.md`
-- `references/image-api.md`
-- `references/codex-network.md`（仅适用于 Codex CLI 的网络/沙箱审批配置；Claude Code 环境下没有等价的 `approval_policy`/`sandbox_mode` 概念，网络访问由宿主环境而非 skill 层配置控制，遇到网络受限问题应提示用户检查当前 Claude Code 会话的网络权限设置，不要尝试套用 Codex 的 TOML 配置项）
-- `references/local-entrypoints.md`
-- `references/error-casebook.md`
-- `scripts/image_gen.py`
-- `scripts/bootstrap_imagegen_env.py`
-- `scripts/run_imagegen.ps1`
-- `scripts/run_imagegen.sh`
-- `<skill-dir>/scripts/remove_chroma_key.py`（Codex 默认 `$CODEX_HOME/skills/imagegen/scripts/remove_chroma_key.py`；`<skill-dir>` 含义见"脚本路径解析规则"）
+- `references/prompting.md` — prompt 结构、specificity、use-case taxonomy、共享模板
+- `references/sample-prompts.md` — 可直接复制的 prompt 样例
+- `references/cli.md` — AI Hive CLI 通道完整参考（generate/task/upload/init 参数与模型说明）
+- `references/error-casebook.md` — 已验证错误案例库（active/candidate 状态演进）
+- `references/config.example.json` — API 配置示例
+- `scripts/imagegen.py` — AI Hive CLI 通道（固定 `public_model_gpt_image_2`）
+- `scripts/remove_chroma_key.py` — 透明底本地去底（纯 Pillow，通道无关）
+- `workbuddy-absorption-map.md` / `references/source-notes.md` — 吸收登记（gpt-image-2 → imagegen）

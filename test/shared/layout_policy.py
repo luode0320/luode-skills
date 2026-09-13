@@ -9,6 +9,8 @@ from pathlib import Path
 
 EXECUTABLE_SUFFIXES = frozenset({".bat", ".cmd", ".go", ".js", ".ps1", ".py", ".sh", ".ts"})
 SPECIAL_TEST_DIRECTORIES = frozenset({"shared", "test-asset-governance", "credential-policy"})
+# 仓库资产扫描需要跳过的目录：doc 为历史归档只读，.workbuddy 为工具运行时数据而非仓库内容。
+SCAN_IGNORED_DIRECTORIES = ("doc", ".workbuddy")
 
 
 def repository_root() -> Path:
@@ -33,6 +35,16 @@ def is_within(path: Path, directory: Path) -> bool:
     except ValueError:
         return False
     return True
+
+
+def is_scan_ignored(root: Path, path: Path) -> bool:
+    """判断路径是否落在仓库资产扫描应跳过的非活动区域。
+
+    [参数] root：仓库根目录；path：待判定路径。
+    [返回] bool：位于历史归档或工具运行时数据目录时返回真。
+    最近修改时间：2026-09-12；改动原因：全仓扫描需排除工具运行时数据目录，避免误报非仓库资产。
+    """
+    return any(is_within(path, root / name) for name in SCAN_IGNORED_DIRECTORIES)
 
 
 def executable_doc5_assets(root: Path) -> list[tuple[str, str]]:
@@ -128,7 +140,7 @@ def validate_root_test_layout(root: Path) -> list[str]:
 
     [参数] root：仓库根目录。
     [返回] list：活动测试的目录、命名和 Go 白盒路径错误。
-    最近修改时间：2026-08-01；改动原因：统一活动测试根并拒绝旧目录新增入口。
+    最近修改时间：2026-09-12；改动原因：全仓扫描统一改走 is_scan_ignored，排除工具运行时数据目录。
     """
     # 1. 根 test 不存在时直接报告，避免后续扫描把缺失误当成空测试集。
     test_root = root / "test"
@@ -147,10 +159,10 @@ def validate_root_test_layout(root: Path) -> list[str]:
                 errors.append(f"测试镜像缺少被测目录：{path.relative_to(root).as_posix()}")
 
     for path in root.rglob("test_*.py"):
-        if not is_within(path, root / "doc"):
+        if not is_scan_ignored(root, path):
             errors.append(f"禁止活动 Python 测试使用 test_ 前缀：{path.relative_to(root).as_posix()}")
 
     for path in root.rglob("*_test.go"):
-        if not is_within(path, test_root) and not is_within(path, root / "doc"):
+        if not is_within(path, test_root) and not is_scan_ignored(root, path):
             errors.append(f"Go 源码目录禁止 *_test.go：{path.relative_to(root).as_posix()}")
     return errors

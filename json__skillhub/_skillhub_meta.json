@@ -1,0 +1,18 @@
+{
+  "slug": "json",
+  "name": "JSON",
+  "version": "1.0.0",
+  "installedAt": 1788602622092,
+  "source": "skillhub",
+  "namespace": "clawhub_ivangdavila",
+  "canonicalName": "@clawhub_ivangdavila/json",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/2d8152d9-7618-454e-9d87-2487f1b4457f.png",
+  "labels": {
+    "requires_api_key": "false"
+  },
+  "description_zh": "熟练处理 JSON 数据结构、API 调用和序列化",
+  "description_en": "Work with JSON data structures, APIs, and serialization effectively.",
+  "installs": 3435,
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\json__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/2d8152d9-7618-454e-9d87-2487f1b4457f.png"
+}

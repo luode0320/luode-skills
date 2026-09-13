@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_PATH = Path(__file__).with_name("fixtures") / "plan_output_cases.json"
-WAIT_LOOP_TEST = REPO_ROOT / "doc" / "5-tests" / "2026-07-26_040607" / "plan_mode_wait_loop" / "test_plan_mode_wait_loop.py"
+WAIT_LOOP_TEST = REPO_ROOT / "test" / "implementation-planning-rules" / "plan_mode_wait_loop_test.py"
 
 
 class PlanOutputContractTests(unittest.TestCase):
@@ -44,7 +44,7 @@ class PlanOutputContractTests(unittest.TestCase):
         for token in case["forbidden_tokens"]:
             self.assertNotIn(token, visible)
 
-    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-07-26 18:10:00，接入永久等待状态模型回归。
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-09-12 00:00:00，状态机测试已从 doc/5-tests 迁入根 test/ 并重指向。
     def test_wait_loop_behavior_model_passes(self) -> None:
         # 1. 运行现有状态机回归，验证空答案、部分答案和冻结输出的真实迁移。
         result = subprocess.run(
