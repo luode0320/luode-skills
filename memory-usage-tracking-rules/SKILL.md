@@ -114,7 +114,7 @@ anchors:
 - 只负责"记忆条目计数 + 高频条目吸收为项目 skill"的闭环，不替代 `project-memory-rules`（记忆维护）、`project-style-rules`（风格维护）的主流程。
 - 计数/吸收是 **skill 资产**；`knowledge-flow` 的知识库笔记沉淀、`PROJECT_MEMORY.md` 的 `bridge_candidate` 字段不参与计数与吸收。
 - 不自动执行 git commit / push / PR（AGENTS.md 严禁自动提交，收口停在"已改动未提交"）。
-- 不修改其他项目的文件（跨项目写入红线：其他项目一律只读）。
+- 只维护当前项目的记忆与吸收产物，不修改其他项目的文件；确需跨项目写入时另走 `WRT-*` 会话级跨项目写入授权通道，不在本 skill 内自行放行。
 - 吸收落点 `project-*` 统一为**项目根目录 `skills/`**（如 `D:\某项目\skills\project-<slug>-<topic>-rules\`），luode-skills 仓库特例直接落仓库根（仓库根即 skill 资产库）；命中由项目级 `AGENTS.md` / `CLAUDE.md` 显式声明引用，不依赖任何工具专属路径。
 
 ## 需要暂停并确认的条件
@@ -127,7 +127,7 @@ anchors:
 ## 执行通过 / 驳回标准
 
 - 通过：计数回写前 `usage_ledger_validate.py` 输出 `ok=true`；吸收候选经查重、落盘、`quick_validate.py` PASS、同域冗余扫描 PASS；`absorbed_to` 指针可达；登记 `source-notes.md` 与当日日志；收口总结列出改动文件清单且不自动提交。
-- 驳回：未过前置校验就回写计数（虚报）；达阈值候选未执行吸收而静默跳过；吸收后未跑校验/同域扫描；吸收导致 skill 库膨胀（无整理去重证据）；跨项目写入或自动提交。
+- 驳回：未过前置校验就回写计数（虚报）；达阈值候选未执行吸收而静默跳过；吸收后未跑校验/同域扫描；吸收导致 skill 库膨胀（无整理去重证据）；未取得 `WRT-*` 授权就跨项目写入，或自动提交。
 
 ## references 读取规则
 

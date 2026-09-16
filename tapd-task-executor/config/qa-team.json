@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "description": "TAPD 测试人员名单与状态流转持久化配置",
+  "qa_assignees": [
+    "杨莹",
+    "李红",
+    "韩忠宝"
+  ],
+  "target_status": "待版本验证",
+  "assignment_strategy": {
+    "policy": "specified_or_round_robin",
+    "description": "优先指派条目原关联测试/指定测试人员，未指定时从测试人员名单轮询或指定指派"
+  },
+  "updated_at": "2026-09-16"
+}

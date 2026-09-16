@@ -37,6 +37,16 @@
 ```yaml
 version: 1
 anchors:
+  - title: "新增「交付残留自查」收口前横切环节（内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "代码质量九维治理：四项规则缺口补齐（内部更新通道）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: "跨项目写入红线改造：绝对禁止 → 默认只读 + 会话级写入授权（用户决策）"
     usage_count: 0
     usage_days: 0
@@ -112,11 +122,6 @@ anchors:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
-  - title: "吸收「调试」（awesome-ai-agent-skills v1.0.0）通用调试方法论进 Bug 域"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
   - title: "「项目根 `skills/` 加载声明」补进 bootstrap 受管章节 + 规则 md"
     usage_count: 0
     usage_days: 0
@@ -128,11 +133,6 @@ anchors:
     last_used_at: null
     absorbed_to: null
   - title: "项目本地 skill 落点回归项目根 `skills/`"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "完成「记忆使用计数与高频条目自动吸收」机制上线"
     usage_count: 0
     usage_days: 0
     last_used_at: null

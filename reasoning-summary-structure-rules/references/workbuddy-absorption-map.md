@@ -4,6 +4,8 @@
 
 | 日期 | 外部来源 | 外部精华（原子条目） | 本地现状 | 裁决 | 落点 | 整理去重（含同域清理） |
 |---|---|---|---|---|---|---|
+| 2026-09-16 | 内部更新（用户纠正与深化） | 待裁定事项强制四要素闭环（建议+选项+默认最安全兜底方案） | 待裁定闭环缺未裁定时的默认安全兜底 | 合并 | `SKILL.md`、`references/{summary-structure-template,conditional-sections-rules,output-examples}.md` | 补充四要素闭环与默认最安全兜底方案，零冗余 |
+| 2026-09-15 | 内部更新（用户反馈） | 三段式极简结构与决策研判三反铁律 | 原工程多节模板导致决策任务臃肿、探查流水账严重 | 合并 | `SKILL.md`、`references/{summary-structure-template,output-examples,conditional-sections-rules}.md` | 区分工程执行 vs 决策研判，零冗余 |
 | 2026-09-05 | `markdown` Skillhub 市场 Skill | 空白行陷阱（列表前空行/嵌套列表4空格/纯空格行） | 无对应规则 | 合并 | `references/markdown-writing-rules.md` | 无（新文件，零存量冗余） |
 | 2026-09-05 | 同上 | URL 括号/空格转义、引用式链接验证 | 无对应规则 | 合并 | 同上 | 同上 |
 | 2026-09-05 | 同上 | 代码栅栏技巧（三重反引号内嵌、行内反引号含反引号）、语言提示 | 已有 Mermaid 语言标记规则，未覆盖通用场景 | 合并 | 同上 | 同上 |

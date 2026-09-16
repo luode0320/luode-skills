@@ -93,6 +93,11 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
 7. **请求标记**：TAPD 请求在 URL 追加 `?s=mcp`（已有 query 用 `&s=mcp`），Header 加 `Via: mcp`，与本地 Bearer 认证兼容
 8. **认证二选一**：默认 `Authorization: Bearer $TAPD_TOKEN`；无 Token 时才用 Basic（`TAPD_API_USER` + `TAPD_API_PASSWORD` 的 base64），详见 `references/id-conversion.md`
 9. **自定义字段前置**：使用 `custom_field_*` 前必须先调对应实体的 `custom_fields_settings` 获取配置；任务状态仅 open/progressing/done，需求状态走工作流接口
+10. **全生命周期自动化行为约束（与 tapd-task-executor 契约对齐）**：
+   - **分析完成**：确认完成任务/需求/bug 分析时，必须自动添加一条分析评论（必含：分析结论、是否可开始执行、是否缺失材料、是否缺少前置条件、是否需要人工补充缺失信息）；
+   - **开始执行**：分析结论为可直接执行且已添加“可以开始做”评论、实际进入代码实现后，及时追加评论：`agent开始代码实现`；
+   - **实现完成**：代码实现完成后，自动添加一条评论说明实现已完成，并总结本次实现内容；
+   - **收口流转**：实现完成评论发布后，将该条目状态流转至「待版本验证」，并将处理人变更为测试人员（名单持久化保存于 `tapd-task-executor/config/qa-team.json` 与项目长期记忆：杨莹、李红、韩忠宝）。
 
 ## 输出规范（列表结果必须逐条列）
 

@@ -562,3 +562,80 @@
 - **净增体积**：新增 `lifecycle-policy.md` 约 6.1KB + 5 个既有文件增量约 4.2KB；字典产物刷新另计（含 2026-09-01 至 2026-09-10 的 9 天累积同步，非本次规则增量）。
 - **棘轮验证**：`quick_validate.py` → `Skill is valid!`（内部更新通道无 8 维评分基线，以结构校验替代）；`path-map.yaml` YAML 解析通过（version 10，`process_doc_*` 11 键回读一致）；UTF-8 与乱码自检通过；引用链 3 处可达（SKILL.md → lifecycle-policy.md，skill-integration.md → lifecycle-policy.md，update-policy.md → lifecycle-policy.md）。
 - **源清理**：N/A（内部更新通道，无外部安装源）。
+
+## 2026-09-14：内部更新——测试流程补齐「前端页面自动化点击测试」第三层
+
+- **来源**：内部调整：`test-strategy-rules`（测试策略统一主入口）+ `functional-validation-rules` + `browser-session-automation-rules`，调整诉求 = 「测试 skill 流程存在遗漏：前后端测试只覆盖后端单元测试与 Apifox 接口测试，缺少前端页面的自动化点击测试；需补充该环节，用 agent 内置浏览器或系统默认浏览器对前端页面做自动化点击与交互验证，确保前后端联调完整性与功能正确性」。
+- **形态**：内部更新通道（无外部源可删）。
+- **吸收目标**：测试域三 skill（权威落点 `test-strategy-rules`）+ 三处下游引用。
+- **拆解原子条目数**：6 条（A1 判定边界三分 / A2 新增页面级通道权威节 / A3 文档预埋两层→三层 / A4 条件化冲突修正 / A5 执行侧同步 / A6 下游引用同步）。
+
+| # | 内部调整诉求 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|---|
+| 1 | 测试对象分类缺第三类 | 《接口测试执行通道》只区分「接口级 vs 代码级」，页面交互仅被写成「不属本通道」的排除项 | 合并 | `test-strategy-rules/SKILL.md`「判定边界」升级为代码级 / 接口级 / 页面前端级三条通道 |
+| 2 | 缺页面级执行通道 | 无任何节点承载前端点击测试的执行要求与证据口径 | 合并 | 新增 `## 页面/UI 级测试执行通道（强制）`（单一权威，与接口通道平级） |
+| 3 | 文档阶段无第三层落点 | 「文档阶段接口测试要求预埋」只预埋「本地单测 + apifox 用例」两层 | 合并 | 该节升级为「文档阶段测试要求预埋（强制）」，预埋要求改为「最多三层，按序缺一不可」 |
+| 4 | 条件化条款吃掉第三层（根因） | `test-strategy-rules` / `functional-validation-rules` 均写「前后端同时存在不等于浏览器联调必需」，且以历史门禁 `browser_integration` 的 `applicable` 为唯一触发条件；与 `browser-session-automation-rules`「同时存在即必须联调」语义对立，实践以前者为准 → 第三层被静默降级 | 合并（冲突收敛） | 三 skill 统一改为「存在前端改动面即强制」；`browser_integration` 降为历史兼容门禁，不再决定新流程是否执行 |
+| 5 | 执行工具无默认优先级 | 仅泛引「统一浏览器工具路由矩阵」，未固化页面点击测试场景的默认通道 | 合并 | 页面级通道节固化「agent 内置浏览器优先（Chrome DevTools MCP / agent-browser），系统默认浏览器兜底（Chrome Plugin）」；矩阵本体仍归 `mcp-installation-rules/references/tool-priority.md` |
+| 6 | 收口证据口径缺失 | 无页面级「动作序列 + 断言明细 + Network 结果 + 进程收口」证据要求 | 合并 | 新增「收口硬闸：前端改动轮必须给出浏览器证据（强制）」7 项；与接口证据同口径但分列 |
+
+- **落盘改动**：
+  - `test-strategy-rules/SKILL.md`：判定边界升级为三条通道；新增「页面/UI 级测试执行通道（强制）」；「文档阶段接口测试要求预埋」→「文档阶段测试要求预埋（强制）」升级三层；「项目联调条件化规则」触发与执行要求同步；`description` 追加第三层触发（890 → 998 字符，<1024 合规）。
+  - `functional-validation-rules/SKILL.md`：默认执行流程第 2 条改为三层真实运行验证（新增页面点击测试并明确不得以前两层证据替代）；联调条件化规则触发与执行要求同步；`description` 追加页面验证口径。
+  - `browser-session-automation-rules/SKILL.md`：项目联调规则触发条件由「项目同时存在前后端」改为「本轮存在前端改动面即强制」并接权威节；工具默认优先级与矩阵对齐；`description` 移除与新口径冲突的「不因前后端联调自动强制本 skill」。
+  - `requirement-intake-rules/SKILL.md`、`implementation-planning-rules/SKILL.md`、`bug-intake-rules/SKILL.md`：对该预埋节的引用文案由「双测试要求 / 两层」同步为三层 + `N/A + 原因 + 依据` 豁免口径。
+- **整理去重**：本次以「冲突收敛」而非「新增并行条款」落盘——四处重复的对立条件化条款（test-strategy 两处 + functional-validation 一处 + browser-session 一处）收敛为「单一权威（页面/UI 级测试执行通道）+ 引用」；`browser_integration` 门禁不再作为新流程触发条件，消除与 `browser-session-automation-rules` 的语义对立；未新增独立 skill 目录，未复制浏览器矩阵内容（矩阵仍单一权威在 `mcp-installation-rules`）。
+- **同域扫描结论**：范围 = 测试域（test-strategy / functional-validation / test-regression / test-program / bug-validation）、浏览器域（browser-session-automation / browser-advanced-testing / browser-use-cloud / mcp-installation）、文档域（requirement-intake / implementation-planning / bug-intake / artifact-delivery-gate）。发现 = 1 处跨 skill 语义冲突（条件化 vs 必须联调，已收敛）、1 处引用链悬空风险（节名变更涉及 3 处下游指针，已全部同步）、0 处门控层叠（页面通道为并列第三条通道，非嵌套门禁）、0 处散落产物；清理 4 处冲突条款；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本；浏览器通道的实际安装与配置由 `mcp-installation-rules` 既有登记承载，未新增环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：`test-strategy-rules` +约 3.6KB（新节约 2.9KB + 判定边界/预埋/条件化补丁约 0.7KB）；`functional-validation-rules` +约 0.6KB；`browser-session-automation-rules` +约 0.2KB；三处下游引用约 +0.2KB；合计约 +4.6KB，冲突条款清理抵消部分增量。
+- **棘轮验证**：6 个 SKILL.md UTF-8 校验 PASS；frontmatter YAML 解析 PASS（`test-strategy-rules` description 998 字符 <1024，`functional-validation-rules` 498→约 570、`browser-session-automation-rules` 478→约 520）；旧节名残留扫描仅命中本表历史记录，历史事实保留不回溯改写；新节名引用链 4 处可达（本体 + requirement-intake + implementation-planning + bug-intake）；因改动 `description` 且新增 `##` 级标题，同轮刷新 `skill-dictionary/data.js` 与 `字典.md`；`quick_validate.py` 本机不存在，以 YAML 解析 + UTF-8 + 引用链扫描替代（沿用 2026-08-28 已确认的替代口径）。
+- **源清理**：N/A（内部更新通道，无外部安装源）。
+
+## 2026-09-14（续）：内部更新——纯前端项目（无后端）纳入第三层强制判定
+
+- **来源**：内部调整：`test-strategy-rules` + `functional-validation-rules`，调整诉求 = 「将『纯前端项目（无后端）』也纳入第三层强制判定」（承接同日上一条，用户确认方向后追加）。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：5 条（B1 项目形态不影响判定 / B2 Network 断言分支化 / B3 local 红线按来源归位 / B4 收口证据与进程收口分支 / B5 预埋与执行侧同步）。
+
+| # | 内部调整诉求 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|---|
+| 1 | 明确「无后端」不构成豁免 | 触发判定只按「改动面」维度写 `applicable` / `not_applicable`，未声明项目形态（有无后端）不参与判定，存在被解释为「无后端 → 无从联调 → `not_applicable`」的漏洞 | 合并 | 触发判定新增「项目形态不影响判定（强制）」条，「允许的例外」显式封堵该借口 |
+| 2 | 无后端时的 Network 断言 | 「确认请求真实到达后端并返回成功」在纯前端项目不可满足，会把规则推向「编造证据」或「降级豁免」 | 合并 | 最低执行要求改为三分支：有后端 / 无后端（mock、静态 JSON、浏览器存储、纯静态渲染）/ 第三方公网接口 |
+| 3 | local 红线适用对象 | 原文绑定「后端 API」，纯前端项目无对象 | 合并 | 改为「有后端时的后端 API + 页面 URL / 代理 / 鉴权回调」，并指明纯前端时约束作用于页面自身服务来源与数据来源 |
+| 4 | 收口证据与进程收口 | 运行环境要求写「被测服务启动环境 `local`」、进程收口列「前端 dev server / 后端服务 / 浏览器实例」，对纯前端项目无对象 | 合并 | 运行环境改为按有无后端二选一填写；进程收口改为「纯前端至少收口前端 dev server 与浏览器实例」；观测证据补纯静态场景替代 |
+| 5 | 预埋与执行侧同步 | 预埋节判定条与第 3 条、`functional-validation-rules` 执行流程第 2 条均未提纯前端场景 | 合并 | 三处补「纯前端项目（无后端）本层同样必填」及数据来源类型登记要求；接口级层补「无后端接口时按 `not_applicable` 登记，不构成跳过下一层的理由」 |
+
+- **落盘改动**：
+  - `test-strategy-rules/SKILL.md`（共 6 处）：触发判定新增「项目形态不影响判定」、强化「不得以层代层」（无接口级层时同样成立）；最低执行要求 Network 三分支 + local 红线按来源归位；收口硬闸第 4/5/6 项补无后端分支；「允许的例外」封堵「无后端」借口；预埋节判定条第 3 项与本层要求同步。
+  - `functional-validation-rules/SKILL.md`：默认执行流程第 2 条补「无后端接口时接口级层 `not_applicable`、纯前端项目第三层同样必做」。
+- **整理去重**：不以新增并行条款落地——三处「无后端」口径（判定 / 执行 / 收口）收敛在《页面/UI 级测试执行通道（强制）》单一权威内，执行侧只留引用；未新增 skill 目录；未改动 `browser-session-automation-rules`（其触发条已按「存在前端改动面即强制」表述，天然覆盖纯前端项目）。
+- **同域扫描结论**：范围 = 测试域（test-strategy / functional-validation / test-regression / bug-validation）、浏览器域（browser-session-automation / browser-advanced-testing / mcp-installation）、文档域（requirement-intake / implementation-planning / bug-intake）。发现 = 0 处新增重复段落（无后端分支为本轮新增语义，同域零命中）、0 处门控层叠（三分支为同一断言的互斥取值，非嵌套门禁）、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：`test-strategy-rules` +约 1.4KB（6 处补丁）；`functional-validation-rules` +约 0.2KB；合计约 +1.6KB。
+- **棘轮验证**：2 个 SKILL.md UTF-8 与 frontmatter 解析 PASS；无后端分支关键字回读一致（项目形态不影响判定 / 无接口级层时同样成立 / 无后端（纯前端项目）/ 无后端时写前端服务来源 / 纯前端项目至少收口前端 dev server / 无后端时本层仍为强制项 / 纯前端项目（无后端）本层同样必填 / 项目无后端接口时该层按）；`description` 本轮未改动（`test-strategy-rules` 维持 998 字符 <1024，避免超限），字典产物按同轮正文变更刷新。
+- **源清理**：N/A（内部更新通道，无外部安装源）。
+
+## 2026-09-14（续二）：内部更新——第三层触发判据收严为三条件合取
+
+- **来源**：内部调整：`test-strategy-rules` + `functional-validation-rules` + `browser-session-automation-rules`，调整诉求 = 「前后端项目除『纯后端改动 + 不影响前端 + 不是前端调用的接口』三条件同时满足外，都应当做联调测试」（用户指出原判据可用「前端仓库零 diff」绕过）。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：5 条（C1 判据收严 / C2 调用面检索 / C3 错误示例封堵 / C4 跨 skill 冲突收敛 / C5 接口层与前端层联动）。
+
+| # | 内部调整诉求 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|---|
+| 1 | 豁免判据由「改动面」升级为「三条件合取」 | 原判据写「前端代码零改动且不涉及前端可见行为变化」→ `not_applicable`，其中「不涉及前端可见行为变化」未量化，实际执行退化为「看前端仓库有没有 diff」 | 合并 | 触发判定改为「任一命中即触发（前端改动面 / **被前端调用的接口改动** / 影响前端可见行为的其他后端变更）」，豁免改为「纯后端改动 **且** 不影响前端可见行为 **且** 不涉及前端调用的接口」三条件同时满足 |
+| 2 | 「被前端调用的接口」需可判定 | 无「接口 → 前端调用面」的检索要求，易以「接口名看起来像内部接口」代替判断 | 合并 | 新增「接口调用面检索（强制）」：检索前端 API 封装层 / 请求路径常量 / 路由与页面组件；命中须写调用方文件与符号，零命中须显式写「前端调用面：全仓零命中」结论 |
+| 3 | 错误示例诱导漏测 | 预埋节第 3 条原示例「本轮为纯后端改动，前端代码零改动」会被执行者直接当作有效豁免理由 | 合并 | 删除该示例，改为「写 `N/A` 必须同时满足三条件 + 附调用面检索结论；只写『纯后端改动、前端代码零改动』**不构成有效豁免理由**」 |
+| 4 | 跨 skill 冲突 | `browser-session-automation-rules` 联调触发条写「前端代码零改动时按该节记 `not_applicable`」，与三条件口径对立，会成为绕过入口 | 合并（冲突收敛） | 改为「**前端仓库零 diff 不等于豁免**」，与权威节完全对齐 |
+| 5 | 接口层与前端层联动闭环 | 接口通道只声明「接口实现改动即触发接口级」，未声明同时触发前端级 | 合并 | 接口通道「接口实现改动即触发」补「若存在前端调用面则**同时触发**页面前端级；接口级用例全绿不构成前端点击验证的替代证据」 |
+
+- **落盘改动**：
+  - `test-strategy-rules/SKILL.md`（7 处）：触发判定标题与条件重写（任一命中即触发 + 三条件合取豁免 + 接口调用面检索）；「不得以层代层」补「后端改动轮尤其成立」及其典型漏检点；「项目联调条件化规则」触发条同步；接口通道补与页面前端级的联动；预埋节判定条同步 + 第 3 条错误示例封堵；`description` 等长替换收严（998 → 999 字符）。
+  - `functional-validation-rules/SKILL.md`：联调条件化规则触发条同步为「任一命中即强制 + 三条件才可豁免」。
+  - `browser-session-automation-rules/SKILL.md`：联调触发条改为按权威节触发判定任一条命中，并明确「前端仓库零 diff 不等于豁免」。
+- **整理去重**：本轮为**判据收严 + 冲突收敛**，未新增并行条款——三处「豁免条件」表述（test-strategy 条件化规则 / 预埋节 / functional-validation 条件化规则）统一收敛为「任一命中即触发 + 三条件合取豁免」，并全部指向《页面/UI 级测试执行通道（强制）》单一权威；封堵一处会诱导漏测的错误示例；未新增 skill 目录。
+- **同域扫描结论**：范围 = 测试域（test-strategy / functional-validation / test-regression / bug-validation）、浏览器域（browser-session-automation / browser-advanced-testing / mcp-installation）、文档域（requirement-intake / implementation-planning / bug-intake）。发现 = 1 处跨 skill 对立表述（`browser-session-automation-rules` 的零 diff 豁免，已收敛）、1 处诱导性错误示例（预埋节第 3 条，已封堵）、0 处门控层叠、0 处散落产物；全仓旧口径关键字扫描（前端改动面存在即强制 / 触达前端页面改动面 / 前端代码零改动时按该节记 / 且前端代码零改动时，记）在 3 个 SKILL.md 内**清零**；清理 2 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：`test-strategy-rules` +约 1.3KB（7 处补丁，含条件重写与示例替换）；`functional-validation-rules` +约 0.2KB；`browser-session-automation-rules` +约 0.3KB；合计约 +1.8KB。
+- **棘轮验证**：3 个 SKILL.md UTF-8 与 frontmatter 解析 PASS（`description` 999 / 583 / 565 字符，均 <1024）；三条件口径关键字回读（被前端调用的接口改动 ×3、不触发条件三条件合取 ×1、接口调用面检索 ×1、后端改动轮尤其成立 ×1、与页面前端级的联动 ×1、不构成有效豁免理由 ×1）；全仓旧口径扫描清零；`description` 变更触发字典产物同轮刷新。
+- **源清理**：N/A（内部更新通道，无外部安装源）。

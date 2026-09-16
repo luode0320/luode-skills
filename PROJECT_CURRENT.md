@@ -1,5 +1,81 @@
 # 项目当前状态
 
+## 2026-09-16 agent 自行完成代码实现即自动提交本地 Git 规则落地与本地 Commit 收口
+
+- 来源对象：用户指令明确要求：“agent自行完成的代码实现, 不要暂存在项目的更改中, 完成就提交到git本地。”
+- 当前状态：**全部落地闭环并执行本地提交**。
+  - ① 规则与红线更新：`tapd-task-executor/SKILL.md`（步骤 2、步骤 3、红线与模板）及 `references/story-bug-task-workflow.md` 全面更新：Agent 自行完成代码实现自测后，严禁残留工作区暂存更改，必须立即自动执行本地 `git commit`；严禁自动 push 远端；回写评论明确注明本地 commit hash。
+  - ② 长期记忆与来源登记：`PROJECT_MEMORY.md` 人类阅读区与机器索引区同步固化该铁律；`references/source-notes.md` 完成第五批内部调整记录。
+  - ③ 本地 Git 提交闭环：严格执行用户“完成就提交到git本地”的当轮授权，遵照 `git-collaboration-rules` 对本轮 agent 完成的代码与规则配置统一执行本地 Git 提交，保持工作区干净，且绝对不执行 git push。
+
+## 2026-09-16 TAPD Story / Bug / Task 分类自动化工作流落地与线上子任务创建
+
+- 来源对象：用户确认按【选项 B（立即创建）】推进叶子需求 `1162459836001002168`（Onramper 接入 v2 接口透传 IP）的自动化子任务拆解与创建。
+- 当前状态：**全部落地闭环**。
+  - ① 规范文件落盘：新建 `tapd-task-executor/references/story-bug-task-workflow.md`，规范叶子需求识别与拆解、Bug 现场保护与评论排查、独立 Task 承接全流程；
+  - ② Skill 规则同步：`tapd-task-executor/SKILL.md` 新增 §4.1 分类处理工作流，参考列表补齐契约；
+  - ③ 长期记忆同步：`PROJECT_MEMORY.md` 固化 Story/Bug/Task 分类处理规则，机器索引区实体同步；
+  - ④ 分析评论自动回写：按约束 1 在需求 `1162459836001002168` 发布五要素分析评论（ID `1162459836001005275`，明确材料齐备但需关注服务商接口与测试网络）；
+  - ⑤ 子 Task 创建与核查：成功为该叶子需求创建 3 项子任务并回读校验生效，处理人均指派为“罗德;”：
+    - `1162459836001003250`: `[后端] Onramper v2 接口适配与用户 IP 透传支持`（预估 3h）
+    - `1162459836001003251`: `[后端] Onramper v2 订单创建与回调结果处理兼容`（预估 3h）
+    - `1162459836001003252`: `[联调自测] Onramper v2 接口全链路沙箱测试与验证`（预估 2h）
+    - 合计工时 8h，与需求原预估工时完全吻合。
+- 验证与交接：`quick_validate.py` 验证通过；`git diff --check` PASS；改动停留在已改动未提交状态。
+
+## 2026-09-16 TAPD 全生命周期四大自动化行为约束与测试人员持久化配置更新
+
+- 来源对象：用户提出更新 TAPD 的 skill 规则，新增四条自动化行为约束：
+  1. 会话确认已完成任务/需求/bug 分析时，自动添加分析评论（含五要素：分析结论、是否可开始执行、是否缺失材料、是否缺少前置条件、是否需要人工补充缺失信息）；
+  2. 分析结论为可直接执行且已添加“可以开始做”评论、会话实际开始执行后，及时追加评论：“agent开始代码实现”；
+  3. 代码实现完成后，自动添加一条评论说明实现已完成，并总结本次实现的内容；
+  4. 实现完成评论后，将条目状态流转至“待版本验证”，并将处理人变更为测试人员；测试人员名单通过落盘配置记忆持久化保存：杨莹、李红、韩忠宝。
+- 当前状态：**全部落地落盘**。
+  - ① 持久化配置落盘：新建 `tapd-task-executor/config/qa-team.json`，保存测试人员名单（杨莹、李红、韩忠宝）与目标流转状态。
+  - ② 业务规则与契约落盘：新建 `tapd-task-executor/references/qa-assignment-rules.md`，规范流转至“待版本验证”操作与测试指派策略；在 `references/task-analysis-criteria.md` 补齐分析评论五要素标准模版；在 `references/source-notes.md` 完整登记来源裁决。
+  - ③ Skill 规范同步：`tapd-task-executor/SKILL.md` 核心流程全面写入四大自动化约束，升级全生命周期回写规范与红线约束；`tapd-openapi/SKILL.md` 与 `tapd-addcomment/SKILL.md` 同步对齐契约。
+  - ④ 项目长期记忆固化：`PROJECT_MEMORY.md` 人类阅读区固化“TAPD 全流程自动化行为与测试人员流转规则”，机器索引区同步新增实体 `rule.tapd-automation-lifecycle-and-qa-assignment`。
+  - ⑤ 字典与索引刷新：重跑 `generate_dictionary.py`，同步刷新 `字典.md` 与 `skill-dictionary/data.js`。
+- 验证与交接：`quick_validate.py` 验证 `tapd-task-executor`、`tapd-openapi`、`tapd-addcomment` 全部 PASS（exit 0）；全文件 LF 格式对齐；当前无 Git 提交授权，改动停留在已改动未提交状态。
+
+## 2026-09-16 reasoning-summary-structure-rules 待裁定事项建议、选项与安全兜底闭环更新
+
+- 来源对象：用户指出在总结结论中出现“需你裁定的事”时仅列出待裁定事项而没有给出建议与选项选择属于半成品输出；用户进一步明确要求：引入「如果不做裁定，默认推进的最安全兜底方案」，彻底消除未选选项或回复“继续”时的系统停滞死锁或盲目冒进风险。
+- 当前状态：**全部落地落盘**。
+  - ① `reasoning-summary-structure-rules/SKILL.md`：
+    - Frontmatter description 补充四要素闭环约束（裁定点与影响 + 推荐建议倾向 + 选项选择 + 默认最安全兜底方案）并控制在 740 字符（通过 `quick_validate.py` 1024 字符限制）；
+    - 「Skill 作用与适用场景」新增待裁定事项四要素闭环说明；
+    - 「待裁定事项处理铁律」升级为四要素闭环（1. 裁定点与影响；2. 明确建议与理由，加粗倾向；3. 选项选择，清晰 A/B 方案；4. 默认最安全兜底方案：说明未做裁定/回复继续时的默认安全推进路径与防限流/防击穿/防破坏依据）；
+    - 「输出要求」第 7 项（当前解决结果、结论）与 T1 标准档同步补齐默认安全兜底方案要求；
+    - 「发送前强制自检」与「执行通过/驳回标准」将未给建议、未给选项或未声明默认安全兜底的总结列为硬闸驳回项。
+  - ② `references/summary-structure-template.md`：在 T2 完整档模板与结构要求中补充待裁定事项四要素标准格式（含 `- **默认安全兜底**：若直接回复“继续”或未显式选择，默认按【选项 X】推进...`）。
+  - ③ `references/conditional-sections-rules.md`：在「0. 档位判定与对照表降级规则」中同步四要素判定规则。
+  - ④ `references/output-examples.md`：正反例全面更新，反例增加缺少默认安全兜底的驳回原因，正例给出包含默认安全兜底的范式。
+  - ⑤ 来源登记：`references/source-notes.md` 与 `references/workbuddy-absorption-map.md` 同步登记。
+  - ⑥ `字典.md`：同步刷新 1.18 `reasoning-summary-structure-rules` 核心职责描述。
+  - ⑦ `PROJECT_MEMORY.md`：固化“待裁定事项建议、选项与默认最安全兜底闭环规则”长期稳定决策并同步机器索引区实体。
+- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`（exit 0）；`git diff --check` 空白与格式检查 PASS；`summary_check_hook_test.py` 全量通过（6/6 OK）；所有涉及文件保持纯 LF；当前无 Git 提交授权，改动停在已改动未提交状态。
+
+## 2026-09-15 project-memory-rules 补充历史条目裁剪强力脱敏提示
+
+- 来源对象：用户指出在其他会话中遇到 Agent 面对 `PROJECT_HISTORY.md` 95 条超限时因顾虑「不可逆删除」而未自动裁剪、停下向用户请示的问题，要求在 `project-memory-rules` 中补充强力脱敏提示（“历史条目已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示”）。
+- 当前状态：**全部落地**。
+  - ① `project-memory-rules/SKILL.md`：在「写入规则」第 4 点补充加粗强力脱敏提示，并在「历史事件保留窗口」中明确旧事件删除已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示。
+  - ② `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`：在受管模板 `BODY_PROJECT_CONTEXT` 的 `PROJECT_HISTORY.md` 规范行同步追加脱敏与强制自主裁剪要求，确保多项目自举时生效。
+  - ③ `AGENTS.md` 与 `CLAUDE.md`：根规则文件同步更新，所有新会话第一轮直接加载该硬约束。
+- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`（exit 0）；`git diff --check` 空白与格式检查 PASS；所有涉及文件 LF 编码归一化；改动停在已改动未提交状态。
+
+## 2026-09-15 优化「输出总结」Skill 规则（三段式极简结构与决策收敛）
+
+- 来源对象：用户提出总结越长越说不清，存在铺垫多、论证重复、重点淹没的问题。参考手机维度 4 列拆成员案例（`phoneTop30ModelsJson` 月累计口径是否拆表），要求重写总结规则：简单建议走极简断言（如“你说个拆或不拆就行”），复杂建议走强制三段式结构（1. 待判断字段/决策点；2. 作用与跨成员影响；3. 明确建议与倾向，给出方案供用户选择），坚决去除核实过程流水账与冗余论证，篇幅压到最短。
+- 当前状态：**已全部落地落盘**。
+  - ① `reasoning-summary-structure-rules/SKILL.md`：重塑档位与任务性质分流，确立工程执行任务与决策研判任务边界；针对字段判断与架构选型任务强制规定极简断言与三段式极简结构；写入反铺垫、反探查流水账（严禁倾倒核实代码/SQL排查过程）、反重复论证三反铁律作为硬闸自检项。
+  - ② `references/summary-structure-template.md`：新增简单建议模板（≤ 3 行极简断言）与复杂建议模板（三段式结构，含明确倾向与 A/B 方案选项），并明确不合格写法。
+  - ③ `references/output-examples.md`：引入正例 1（简单场景拆/不拆二选一）、正例 2（手机维度 4 列拆表三段式标准范式），以及典型反面案例（长铺垫、排查过程流水账、反复论证、重点淹没）剖析。
+  - ④ `references/conditional-sections-rules.md`：明确决策任务天然豁免图形化总览与工程执行流水账，无文件改动时省略改动点。
+  - ⑤ `字典.md`：刷新 1.18 `reasoning-summary-structure-rules` 核心职责描述。
+- 验证与交接：文件更新完成并读回校验通过；工作日志记录至 `.workbuddy/memory/2026-09-15.md`；当前无 Git 提交授权，代码停留在已改动未提交状态。
+
 ## 2026-09-14 补充代码分解规则（目录树 skill 与代码拆分 skill）
 
 - 来源对象：用户明确要求为『目录树 skill』和『代码拆分 skill』补充 5 项代码分解规则：
@@ -12,7 +88,8 @@
   - ① 『目录树 skill』（`package-structure-rules`）：SKILL.md 核心边界新增第 12 条代码分解与目录内聚规则，通过标准同步；`structure-general.md` 新增代码分解与目录内聚规则（强制）专节；`project-layout-v2.md` 补齐扩展约束第 7 条；description 同步更新。
   - ② 『代码拆分 skill』（`code-quality-rules`）：SKILL.md 统一硬约束、可读性主线 2、自动触发信号、进入后先做什么、通过/驳回标准全量同步 5 项规则，全面替换原 500 行粗拆分阈值；`readability-general.md` 总则更新 5 项分解规则；`function-structure-rules.md` 补齐 80 行函数上限、200 行 diamond 文件拆分与参数/返回值 ≤ 2 规则；`function-signature-rules.md` 重构数量控制为硬性上限（参数与返回值 ≤ 2），补齐参数与返回值结构体设计及正反例；`readability-examples.md` 补充正反例。
   - ③ 字典与索引：重跑 `generate_dictionary.py`，同步刷新 `字典.md` 与 `skill-dictionary/data.js`。
-- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；工作日志写入 `.workbuddy/memory/2026-09-14.md`；改动完成提交（提交标题：feat: [代码分解与规则同步] 补齐目录树与代码拆分规则及技能字典资产同步）。
+  - ④ 规则 md 同步与工程化校准：运行 `bootstrap_agents.sh` 统一自举，全量同步受管章节并双平台对齐；将 5 项代码分解规则升格固化进 `AGENTS.md` 与 `CLAUDE.md`，确立「非必要不突破」原则与三大正当特例（数据表、状态机主干、纯入口编排函数），划定坏味道防掩盖红线；修复 `PROJECT_HISTORY.md` 计数锚点漂移（C1~C5 全量 PASS）。
+- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；`check_memory_anchors.py` 验证 PASS；工作日志写入 `.workbuddy/memory/2026-09-14.md`。
 
 ## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（内部更新通道）
 
@@ -54,88 +131,18 @@
 - 遗留（既有，仅登记）：知识库 `check` 仍 42 项违规（39 篇缺 frontmatter、3 篇缺必填字段、2 项接替关系），属 09-10 日报已记录存量；`doc/5-tests/` 571 个历史文件按裁决不恢复。
 - 须用户留意：**4 个文件因 HEAD 本身为 CRLF 而形成真实行尾变更**（`database-schema-rules/SKILL.md`、`database-query-rules/SKILL.md`、`code-snippet-location-rules/SKILL.md`、`code-snippet-location-rules/references/source-priority.md`）；其余 CRLF-only 差异经 `git hash-object --path` 验证归一后 == HEAD、提交不产生差异。如需保留其历史 CRLF 可单独回退。
 
-## 2026-09-11 代码质量九维治理：四项规则缺口补齐（内部更新通道）
+## 2026-09-11 代码质量九维治理：四项规则缺口补齐与 6-review 编排（已归档摘要）
 
-- 来源对象：用户提出 AI 辅助开发瓶颈已从"逻辑正确性"转向"代码质量"，列出九维（架构与模块划分 / 编写习惯与风格 / 注释与定义位置与命名 / 引用方式与包别名 / 静态风格命名与位置 / 函数签名 / 结构体按作用分层 / 纯转换工具函数落点 / 工具函数索引文档规范），要求系统化改进与治理。
-- 当前目标：按用户裁决的保守节奏「先补规则内容，后处理编排时机」，先补齐九维中经实证确认的 4 处内容缺口；吸收优先（补 reference，不新建 skill，依 `编码skill.md` 第十八条）。
-- 当前状态：4 项内容缺口 + 后续「6-review 编排时机」全部落地并闭环（落地 → 校验 → 索引 → 登记）。
-  - ① 函数签名：新建 `code-quality-rules/references/function-signature-rules.md`——参数顺序 ctx → 必填 → 可选；数量控制语义优先（同源 ≥3 建议收、含可选/扩展字段必收）；单参数与结构体参数取舍判据；命名 `XxxParams` / `XxxOptions`。
-  - ② 定义位置：新建 `code-quality-rules/references/definition-placement-rules.md`——局部变量函数开头集中、包级变量与常量顶部集中、函数追加末尾；与 `code-style-consistency-rules` 的"声明形式"约定配套（形式 vs 位置）。
-  - ③ 结构体角色分层：新建 `package-structure-rules/references/struct-role-layering.md`——角色谱系与落点表 + 引用面从小到大判定顺序 + Go/Java/TS/Python 语言生态差异 + 按角色注释颗粒度。
-  - ④ 纯转换函数落点 + 公共工具索引契约：新建 `common-util-rules/references/util-index-doc-contract.md`，并在 `util-placement.md` 新增「纯转换工具函数的落点（点名判据）」小节；索引唯一合法落点为 `doc/1-架构/3-模块职责.md` 的 `## 公共工具索引` 小节（`utils/<pkg>/README.md` 因 Catalog 只允许源码扩展名而被否，`doc/` 新建子目录需改 Catalog 亦被否）。
-- 关键量化：新建 4 个 reference；改造 `code-quality-rules` / `package-structure-rules` / `common-util-rules` 三个 SKILL.md 的引用与红线；补建 `common-util-rules` 登记文件 2 个（该 skill 原缺 `source-notes.md` 与 `workbuddy-absorption-map.md`）；顺手修复 `package-structure-rules/references/directory-usage-routing.md` 第 19 行表破损 1 处；字典重跑。
-- 验证与交接：4 个新 reference 引用链 grep 一致；`package-structure-rules` 测试 7/7 PASS（含覆盖索引文件的 `backend_utils_usage_routing_test.py`）；同域冗余扫描 PASS（关键短语除本 skill 与登记注记外 0 命中）；字典重跑 exit 0（implemented 65 / planned_missing 8 / seed 113）。
-- 编排时机收口（续做，已完成）：
-  - ① 来源映射重复 key 静默覆盖已修复：v1「对象 key = Owner 名」形态实测 28 个位点经 `json.load` 后仅剩 22 个（`api-contract-rules`×3 / `comment-rules`×2 / `code-quality-rules`×1，共丢 6 个），已迁移为 `version: 2` 有序数组，28 个位点全部保留。
-  - ② `static_owner_router.py` 已升级：新增 `load_owner_source_map()` / `owner_source_paths()` / `route_review_pipeline()` / `render_review_pipeline()` 与九步 `REVIEW_STEPS`，`6-review` 检查步骤由**已加载的来源映射**派生，不再手写；来源映射加载失败（含 v1 形态、重复 Owner、Owner 集合漂移、路径越界或缺失）一律失败关闭。
-  - ③ 已新增 `references/style-review-pipeline.md`（九步 × 九维 × 判定 × 证据格式，含加载契约与负向边界）。
-  - ④ 加载期新增**覆盖率断言**：Owner 目录下的规则 Markdown 必须全部登记，漏登记即失败关闭，杜绝「规则文件存在却没有 6-review 检查落点」。断言实测拦下 18 条漏登记规则文件（`package-structure-rules` 5 / `code-quality-rules` 3 / `code-style-consistency-rules` 3 / `database-schema-rules` 2 / `test-program-rules` 2 / `common-util-rules` 1 / `frontend-ui-visual-rules` 1 / `golang-patterns` 1），已按语义分组全部补登记，登记来源 217 → 235 条；豁免口径（`source-notes.md` / `workbuddy-absorption-map.md` / `case-*-absorption.md` / 模板与数据目录）已显式写入契约。
-  - ⑤ 关联修复 `test-program-rules`：`references/mock-factory-pattern.md` 与 `references/runtime-mock-pattern.md`（8880B / 7332B）此前在该 skill 内零引用（不在正文引用区也不在读取规则），已补 `references 读取规则` 恢复可达；顺带修掉 `description` 重复整句与「进入后先做什么」重复编号 `7.`（顺延 8、9）。
-  - ⑥ 补建 `code-style-consistency-rules/references/source-notes.md`（该 skill 原缺来源登记文件），并写入本轮 v1→v2 迁移损失明细、覆盖率断言口径与关联修复。
-  - ⑦ **波及面自查修复（新）**：映射迁 v2 后，监督侧读取方 `continuous-code-quality-supervisor-rules/scripts/supervisor_state.py` 的 `_owner_source_candidates()` 仍按 v1 对象形态解析 → `owners` 数组判定恒假 → 每个 Owner 静默降级为一条 **P1** `limited` 发现（实测 `sources=0 / limited=1`）。根因是该 skill 的测试自带 v1 最小夹具，与生产数据格式脱钩，缺陷对测试套件不可见。已新增 `_owner_source_entry()` 按 v2 逐分组合并来源路径与通配，版本常量改由 router 单一来源导入，测试夹具同步改为 v2 数组形态。
-  - 验证：`test/code-style-consistency-rules/static_owner_router_test.py` 20/20 PASS（原 7 例 → 20 例，新增覆盖率断言 3 例）；`test/continuous-code-quality-supervisor-rules/supervisor_state_test.py` 17/17 PASS；`read_owner_sources()` 对真实仓库取 `code-quality-rules` / `comment-rules` / `api-contract-rules` 分别 10 / 9 / 13 条来源、`limited` 全 0；命令行 `--changed` / `--json` 端到端可用；覆盖率断言补登记前拦下 18 条、补登记后通过；字典重跑 exit 0（implemented 65 / planned_missing 8 / seed 113）。
-- 待办/交接：无未完成必需项。本任务链没有 `doc/3-实施/` 正式任务计划文档，因此当前会话投影走 `fallback` 安全恢复列表（已落 registry，绑定会话 `ca214e6e-8368-4f88-bad3-37c4a5df2a36`）。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留（已更正）：此前记录的「缺 `pyyaml` 导致无法整体校验」为**误判**——WorkBuddy 内置基线 3.13.12 确无 pyyaml，但隔离 venv `C:/Users/luode/.workbuddy/binaries/python/envs/default/Scripts/python.exe` 已装 pyyaml 6.0.3。涉及 yaml 的 skill 脚本（含 `artifact-delivery-gate-rules/scripts/validate_engineering_docs.py`）一律走该 venv 即可正常运行，无需正则保底。
-- 遗留（既有债务，本轮仅登记未处理）：全仓行尾字节级普查 LF 1630 / 整文件 CRLF 219 / 混合行尾 17，违反 `.editorconfig` 的 `[*] end_of_line = lf`；其中包含仓库自身的 `AGENTS.md` / `CLAUDE.md` 与 `.system/` 上游 vendor skill。整仓归一会产生巨量 diff 且触及上游资产，按保守节奏暂不动，待用户裁决。
-- 全量测试现状（本轮实测，逐文件执行，非阻塞式旧 runner）：32 个测试文件 / 601 秒 / **10 个文件失败**。**本轮改动集内无失败**——`test/code-style-consistency-rules/static_owner_router_test.py` 20/20 OK、`test/continuous-code-quality-supervisor-rules/supervisor_state_test.py` 17/17 OK。10 处失败均为既有问题，已定性但不在本轮修：环境类 1 处（`bootstrap_agents_test.py` 的 MSYS 路径被转成 `\c\Users\...`）；既有数据/缺陷类 9 处（`validate_engineering_docs_test.py` 夹具引用不存在的旧需求文档 + 模板注册表声明 22 与实际 21 不符、`asset_eol_health_test.py` `.system/*` 与 `tapd-task-executor` 的 `.yaml` 含 CRLF、`task_plan_projection_test.py` 损坏投影隔离误删好项、`knowledge_citation_contract_test.py` 该文件本身即混合行尾 CR=316/LF=323、`summary_check_hook_test.py` 6 例、`credential-policy` / `plan_output_contract_test.py` / `path_prefix_contract_test.py` / `asset_location_test.py` 各 1 例）。
-- 测量口径提醒：`grep -c $'\r'` 在本环境**不可用于判定换行**（退化为匹配所有行，返回值恒等于行数）；换行必须走字节级判据（Python `bytes.count(13)` / `od -c` / `grep -Pc '\r$'`）。
+- 来源与状态：4 项内容缺口（函数签名、定义位置、结构体角色分层、纯转换函数落点与公共工具索引）及 6-review 九步流水线全部落地闭环，测试全量 PASS，已固化进长期记忆与字典。
 
-## 2026-08-28 tapd-env-bootstrap SKILL.md 路径去用户名化（内部更新通道）
 
-- 来源对象：用户指出本机 TAPD 凭据配置路径不应写死 `C:\Users\luode`、`/home/luode`，改用 `~/` 用户路径。
-- 当前目标：`tapd-env-bootstrap/SKILL.md` 中 4 处硬编码用户路径改为 `~` / `$env:USERPROFILE` 动态形式。
-- 当前状态：全部完成。真源文件（Windows/WSL）两行改 `~/.tapd/env.sh`（Windows 注明即 `$env:USERPROFILE\.tapd\env.sh`）；更新凭据流程第 1 步同改；第 2 步 WSL 同步命令改为 PowerShell 双行（`$env:USERPROFILE` → WSL 内 `wslpath` 解析 → `cp` 到 `~/.tapd/env.sh`），已实测链路可行。
-- 关键量化：1 文件 4 处路径；grep 零残留；tapd 系列其他 skill 无同类硬编码。
-- 验证与交接：`wsl -e bash -lc "wslpath '$env:USERPROFILE'"` 实测返回 `/mnt/c/Users/luode`，目标文件 EXISTS；改动停在已改动未提交状态。
-- 遗留：`.system/skill-creator/scripts/quick_validate.py` 允许键不含 `agent_created`，对所有 agent 创建 skill 报 Unexpected key 警告（既有基线，非本轮引入）。
+## 2026-08-28 tapd-env-bootstrap SKILL.md 路径去用户名化（已归档摘要）
 
-## 2026-08-27 根级 cachetask 缓存重建任务目录加入目录树（内部更新通道）
+- 来源与状态：已落地，将凭据路径硬编码改为动态 `~/.tapd/env.sh` 与 `$env:USERPROFILE` 形式。
 
-- 来源对象：用户提出——`crontask/` 是定时任务目录，但存在"类定时任务"（缓存 60s 到期后先返回旧数据、再异步更新新缓存，Stale-While-Revalidate），希望专属目录 `cachetask/` 承载并加入目录树、说明用处。
-- 当前目标：把 `cachetask/` 作为后端根级任务入口加入 `package-structure-rules` 目录树，与 `crontask/`（时间驱动）、`async/`（消息驱动）并列，形成"三类根级任务入口"边界。
-- 当前状态：全部完成。落盘：`project-layout-v2.md`（目录树条目 + 三类任务入口正文说明）；`SKILL.md`（description + 核心边界第 2 条）；三个语言 reference 根级目录列表；`placement_catalog.py` `ADOPTION_V2_SOURCE_ROOTS["backend"]` 白名单；`work-report-summary-rules/scripts/generate_git_report.py` MODULE_LABELS；字典重跑；顺手修复 `configuration_layout_test.py` apifox 环境断言基线（2026-08-21 引入的既有漂移）；登记 absorption-map + source-notes + PROJECT_MEMORY（人类区稳定决策 + 机器索引 rule.cachetask-root-task-entry）；知识库沉淀《cachetask缓存重建任务目录》并与《配置表驱动缓存五件套》双向关联。
-- 关键量化：6 个规则/脚本文件 + 1 测试基线 + 2 字典文件 + 3 记忆文件 + 1 知识库新笔记 + 1 6-review；净增内容最小化。
-- 验证与交接：adoption/strict 双策略 check 临时项目（含 cachetask/coin_price/refresh.go）均 exit 0；package-structure-rules 45 项测试全通过；字典重跑 exit 0；`knowledge_index.py check` exit 0（254 链接 0 死链）；6-review `STYLE: PASS`。全量 400 测试 12 失败/13 错误为既有环境性基线（缺 Go 工具链、git 环境、台账断言等），失败文件与本轮改动无交集。改动停在已改动未提交状态。
-- 遗留：无（本轮独立闭环）。
+## 2026-08-27 根级 cachetask 缓存重建任务目录加入目录树（已归档摘要）
 
-## 2026-08-26 字段三件套（NOT NULL + DEFAULT + COMMENT）吸收进 database-schema-rules
-
-- 来源对象：用户规则指令「数据库表的字段必须 NOT NULL，并且需要有 DEFAULT 默认值、COMMENT 说明」，要求吸收进 skill。
-- 当前目标：把「字段三件套」作为新建表强约束统一进 `database-schema-rules`（内部更新通道）。
-- 当前状态：全部完成。落盘：SKILL.md 铁律 1 重写为三件套 + description + 6 处 DDL 完整性位点补 NOT NULL；schema-boundaries.md 新增「铁律：字段三件套」小节（例外仅 AUTO_INCREMENT 主键 / TEXT-BLOB-JSON 无默认值能力；存量表可空过渡最终收口三件套）+ 检查清单 + 示例修正；schema-examples.md 正例 1/5、反例 5 同步；table-design-standards.md 约束小节与 5 处示例修正；登记 absorption-map + source-notes；知识库《数据库表设计规范.md》强化并回读校验。
-- 关键量化：git diff 90 insertions / 23 deletions（SKILL.md 16、schema-boundaries +36、schema-examples +9、table-design-standards 18、登记文件 +34）；无新文件，净增内容最小化。
-- 验证与交接：quick_validate `Skill is valid!`（exit 0）；knowledge_index check PASS；同域冗余扫描 PASS（database-query-rules / comment-rules 0 重复）；改动停在已改动未提交状态。
-- 遗留：无（本轮独立闭环）。
-
-## 2026-08-26 低分 skill 批量优化第十一轮（9 个 A+B+D 全闭环，报告刷新）
-
-- 来源对象：用户列出评分报告最低 9 个 skill（36.9-49.2），要求「按顺序一个一个优化，默认 A+B+D」。
-- 当前目标：按 `low-score-skill-optimization-sop.md` 八步闭环逐个优化 9 个低分 skill，并更新评分报告。
-- 当前状态：全部完成。9 个全部提升（+14.5 ~ +26.4）：self-ent-tech-database-design 36.9→63.3（frontmatter 空键修复+触发词+工作流）、goal 37.7→62.8（纯命令入口补流程边界）、golang 46.0→66.1（脚本 12 处 case 顶层 local 误用真实 bug 修复+诚实化定位）、frontend-design 46.7→61.2（5 步流程+2 检查点+删重复）、tg 48.6→66.5（发送强制确认闸门）、file-organize 48.7→67.5（安全红线+分批移动+新 reference）、skill_2054901716814716928 48.8→63.3（8 违规键合规+删营销）、cryptocurrency-data-api 49.0→66.1（工具表去重+修 search_schools 残留）、ip 49.2→64.6（路径断链修复+去 requests 依赖）。
-- 关键量化：报告总平均 60.6→61.7；新最低 pdf 50.1（原最低 36.9 出列）；9×quick_validate valid；Node+Python 双端校验 158 行/分类计数一致。
-- 验证与交接：9 个 SKILL.md 重构 + 2 脚本修复（golang script.sh、ip ip.py）+ 1 新 reference（file-organize category-map.md）；独立子代理复评全部高于基线（棘轮保留）；已登记 source-notes.md + workbuddy-absorption-map.md + PROJECT_HISTORY + 知识库沉淀。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留：下一轮低分优化候选——pdf（50.1）、unclecheng-garbage-cleanup-master、windows-encoding-rules 等（报告短板 Top 25 动态更新）。
-
-## 2026-08-26 全量 8 维评分巡检第二轮（157 → 158 skill，报告刷新完成）
-
-- 来源对象：用户指令「对所有 skill 再打分一次，更新打分的 html」——第二轮全量评分巡检。
-- 当前目标：按 `score-inspection-workflow.md` 对仓库全部含 SKILL.md 的 skill 重新静态 7 维打分并刷新 `skill-8维评分报告.html`。
-- 当前状态：全部完成。6 个独立子代理并行分批打分（每批约 26 个，darwin-rubric 静态 7 维，维度 8 未实测）；当前 158 个（新增 log-analysis-rules，无删除）；总分由脚本按 W=[8,15,10,7,15,5,15] 复算。
-- 关键量化：总平均 60.6（上轮 54.4，+6.2）；rules 63.4/83、other 58.3/25、skillhub 57.3/48、market 55.3/2；中位数 60.9；最低 self-ent-tech-database-design 36.9，最高 imagegen 74.3。
-- 验证与交接：Python 独立复算 158 行/分类计数/平均分/最低最高/中位数全部一致；维度界 1-10 全通过；旧数字无残留；已登记 source-notes.md + workbuddy-absorption-map.md。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留：下一轮低分优化按 SOP 从最低分 self-ent-tech-database-design__skillhub（36.9）与 goal__skillhub（37.7）开始。
-
-## 2026-08-26 版本化目录导入别名对齐规则吸收进 package-structure-rules（代码实测 gap）
-
-- 来源对象：ellipal_finance 代码实测问题「v1/v2 各持一份主币缓存必须各调一次；`swapList`（语义别名）导入 v1 list 包 + `v2list` 不对称，只调 v1 时 v2 停留旧结果直到 600 秒 TTL 兜底且不报错」。
-- 当前目标：把「版本化目录导入别名必须与版本目录名对齐（`v1<后缀>`/`v2<后缀>`），禁止业务语义别名」规则吸收进 skill。
-- 当前状态：全部完成。落盘：`package-structure-rules/SKILL.md` 核心边界第 6 条补强制句（动作前必读位置）+ `references/lookup-and-reference-contract.md` 新增「版本化目录导入别名对齐（强制）」小节（正例/反例/原因/要求）；新建 `workbuddy-absorption-map.md` + `references/source-notes.md` 登记（内部更新通道）；知识库沉淀《版本化目录导入别名对齐.md》并与《版本化接口DTO的文件组织与落点》双向关联。
-- 关键量化：SKILL.md +1 句（~160B）、reference +1 小节（~380B）、知识库 +1 笔记；quick_validate `Skill is valid!`（exit 0）；knowledge_index check 本轮新笔记 0 违规（存量 8 篇缺 frontmatter 属历史遗留，另行处理）。
-- 验证与交接：同域冗余扫描 PASS（package-structure-rules/naming-rules/code-style-consistency-rules 0 重复，归属引用契约唯一权威）；改动停在已改动未提交状态。
-- 遗留：知识库 8 篇历史笔记缺 frontmatter（`20-Knowledge/AI协作/*`、`20-Knowledge/研发流程/*`）未在本轮处理；ellipal_finance 侧代码对齐（`swapList`→`v1list`、补 v2 缓存清理调用）属跨项目只读边界，已在会话给出改动计划，需在目标项目新开会话执行。
+- 来源与状态：已全量落地收口，将 `cachetask/` 作为三类根级任务入口之一加入 `package-structure-rules` 与 Catalog，已沉淀知识库与长期记忆。
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 
@@ -646,4 +653,4 @@
 ```
 <!-- END TASK PLAN PROJECTION -->
 
-<!-- 注：旧条目 2026-08-11/08-13/08-21 已裁剪，保留在 PROJECT_HISTORY.md 中。-->
+<!-- 注：旧条目 2026-08-11/08-13/08-21/08-26 已裁剪，保留在 PROJECT_HISTORY.md 中。-->

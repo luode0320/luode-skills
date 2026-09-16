@@ -85,7 +85,7 @@ description: 当来源对象（需求或 Bug）的条件闸门已收敛且前置
 ## references 读取规则
 
 - 默认先读 `references/plan-entry-checklist.md`。
-- 只要计划涉及 API 接口测试（有 method + path 的 HTTP 接口），必须读 `../test-strategy-rules/SKILL.md` 的「文档阶段接口测试要求预埋（强制）」节，把「本地 test/ 单元测试 + 完善 apifox 接口用例」两层要求按顺序写进真实测试安排章节。
+- 只要计划涉及 API 接口测试（有 method + path 的 HTTP 接口）或前端页面改动面，必须读 `../test-strategy-rules/SKILL.md` 的「文档阶段测试要求预埋（强制）」节，把本轮适用的层（本地 test/ 单元测试 + 完善 apifox 接口用例 + 前端页面自动化点击测试）按顺序写进真实测试安排章节。
 - 只要计划要交给新会话执行，或计划包含跨项目代码引用，必须先读 `references/cross-session-plan-execution-contract.md`。
 - 只要需要引用其他项目但只知道项目名、不知道项目路径，必须先读 `references/sibling-project-discovery.md` 按发现顺序定位，再回到 `EXT-*` 契约登记。
 - 在决定实施总览/实施周期文档的根目录、命名模板和同文档更新策略时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
