@@ -1,6 +1,6 @@
 ---
 name: code-change-finalization-gate-rules
-description: '只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责校验注释链（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`test-asset-lifecycle` 测试资产清理检查、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。'
+description: '只要本轮存在代码新增/修改（含测试文件），最终回复前必须命中本 skill 作为默认收口闸门。负责 OCR 代码审查（基于阿里巴巴 Open Code Review 规则）、注释链校验（`comment-rules` 补齐闸门分区终检）、根 `test/` 测试代码镜像与命名一致性、生产代码测试污染扫描结论（`POLLUTION: PASS/FAIL`，FAIL 且未登记豁免为阻断级）、补注释优先级闸门、测试后的 `6-review` 风格回归、真实运行验证闸门、`test-asset-lifecycle` 测试资产清理检查、`internal/router` 提交前风格检查、用户手改保护（`code-context-resync-rules`）。若存在计划内未完成必需项或阻断级规则缺口，禁止给"已完成/已验证可用"结论；真实 `blocked/manual_handoff` 时只校验共享阻断契约，不生成面向用户的阻断区块或解决计划，用户可见渲染仍唯一由 `reasoning-summary-structure-rules` 完成。'
 ---
 
 
@@ -14,6 +14,7 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 ## Skill 作用与适用场景
 
 - 代码或测试新增/修改后，在最终回复前自动触发并核验专项收口。
+- 每次收口时自动触发 OCR 代码审查：读取 `references/ocr-review/review-workflow.md`，按 `rule-path-map.md` 匹配文件类型，加载对应 `rule_docs/` 规则进行行级审查。Critical 级别问题阻断收口。
 - 注释链只消费 `comment-rules` 补齐闸门分区的 PASS/FAIL；该 PASS 必须包含其对位置颗粒度分区的适用性处理证据，本入口不复制任何注释字段、编号或清单细则。
 - 核验新增测试文件的根 `test/` 镜像与 `*_test.<ext>` 命名一致性，以及 `doc/5-tests/` 只保留扁平测试主文档、日志、报告和非可执行证据内联在其正文；同时核验补注释优先级、测试后的 `6-review` 风格回归、测试资产清理（`test-asset-lifecycle` 条件路由）、真实运行验证状态、`internal/router` 风格和用户手改保护。
 - Go 测试资产链只消费 `test-program-rules` 与 `test-strategy-rules` 的适用性结论和 PASS/FAIL；源码目录禁放、ASCII 镜像和白盒降级细则由这些 Owner 唯一定义，本闸门不复制目录清单或扫描命令。
@@ -43,6 +44,8 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 
 1. 确认本轮存在代码/测试改动并冻结最终 diff 范围。
 2. 执行测试目录一致性检查；涉及 `internal/router` 时执行 router 专项检查。
+2.5 **OCR 代码审查**：读取 `references/ocr-review/review-workflow.md`，对本次改动运行自动审查。依次执行：
+   - 获取改动文件列表 → 查 `rule-path-map.md` 匹配规则 → 加载对应 `rule_docs/` 规则 → 逐文件行级审查 → 输出 `OCR 审查:PASS/ISSUES`
 3. 涉及生产代码改动时执行生产代码测试污染扫描，收集 `POLLUTION: PASS/FAIL` 与命中明细。
 4. 收集 comment-completion PASS/FAIL、`6-review` 风格结果、测试资产清理确认（`test-asset-lifecycle`）、真实运行证据和用户手改保护证据。
 5. 对真实运行证据不足的路径明确标记“仅静态验证”或“未完成真实验证”，并提供可执行的人工验证交接；不得宣称功能可用。
@@ -61,6 +64,7 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 
 属于阻断级：
 
+- **OCR 审查发现 Critical 级别问题且未修复** → 阻断级（除非用户明确要求不修复）。High/Medium 级别为非阻断级，在最终回复中提示。
 - Go 测试资产适用但专职 Owner 未执行、为 FAIL 或缺少可追溯证据。
 - 本轮改动生产代码，但生产代码测试污染扫描未执行、为 `POLLUTION: FAIL` 且未登记豁免，或命中项的豁免理由明显不成立。
 - 新增测试文件未统一落到根 `test/`、未镜像被测路径、Python 未使用 `*_test.py`，或 Go 测试不在 ASCII 外部黑盒包路径。
@@ -97,6 +101,8 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 - 最终条件区块统一读取 `../reasoning-summary-structure-rules/references/conditional-sections-rules.md`。
 - 收口前消费 `../skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md` 的代码相关维度结论；本 skill 不维护该 6 维判据的第二份副本。
 - 不再维护本 skill 私有的 next-step 模板。
+- OCR 审查工作流统一读取 `references/ocr-review/review-workflow.md`，路径映射读取 `references/ocr-review/rule-path-map.md`，各语言规则读取 `references/ocr-review/rule_docs/{语言}.md`。
+- OCR 相关的 `rule_docs/` 文件是阿里巴巴 Open Code Review 项目的翻译版吸收。如需更新，从 `https://github.com/alibaba/open-code-review` 同步。
 
 ## 回到主流程的重启点
 
@@ -107,3 +113,4 @@ description: '只要本轮存在代码新增/修改（含测试文件），最�
 
 - 只输出 `代码收口:PASS/FAIL`、验证降级状态和可核验证据。
 - 最终总结结构、后续内容、阻断区块与无后续收口规则统一读取 `reasoning-summary-structure-rules`，本 skill 不复制。
+- OCR 审查结果按 `OCR 审查:CRITICAL/ISSUES/PASS` 标记，Critical 问题清单随阻断证据输出，High/Medium 作为提示信息。
