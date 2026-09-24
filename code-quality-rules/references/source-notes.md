@@ -48,3 +48,17 @@
 - **裁决依据**：见 `../code-quality-rules/workbuddy-absorption-map.md` 2026-09-11 定义位置段落。
 - **未落盘内容**：无。
 - **外部源**：无（内部更新通道）。
+
+## 2026-09-18：外部吸收——ponytail（马尾辫 · 懒资深开发模式）
+
+- **调整类型**：外部吸收通道。
+- **外部源**：GitHub DietrichGebert/ponytail（v4.9.0，本地安装源位于 `~/.workbuddy/skills/ponytail/`）。
+- **调整诉求**：吸收其「屋里最懒的资深开发」的七级阶梯（The Seven-Step Minimal Ladder）、过度设计审查五标签与平台原生替代清单。
+- **裁决结论**：9 条原子精华中 4 条合并、3 条保留本地（本地更强）、2 条拒绝（交互档位与专属钩子形态不迁移）。
+- **落点**：
+  - 主定义 1：`code-quality-rules/references/minimal-solution-ladder.md`（七级阶梯 + tradeoff 注释规范 + 审查五标签）
+  - 主定义 2：`code-quality-rules/references/platform-native-substitutes.md`（HTML/CSS/JS 平台原生替代清单）
+  - 存量整理：`code-quality-rules/references/minimal-change-general.md`（收敛简单优先与阶梯描述）
+  - 入口引用：`code-quality-rules/SKILL.md`（统一硬约束 + 主线 1 核心约束 + references 读取规则）
+- **裁决依据**：见 `code-quality-rules/workbuddy-absorption-map.md` 2026-09-18 段落。
+- **外部源删除**：已删除本地安装源 `C:\Users\luode\.workbuddy\skills\ponytail\`。

@@ -36,7 +36,7 @@ POST
 | current_owner | 否 | string | 处理人 |
 | template_id | 否 | integer | 模板ID |
 | cc | 否 | string | 抄送人 |
-| reporter | 否 | string | 创建人 |
+| reporter | 否 | string | 创建人（**必须显式传入真实员工姓名如“罗德”，严禁省略导致默认变成 tapd_my_token 占位符，严禁随便取名；创建后只读不可修改**） |
 | participator | 否 | string | 参与人 |
 | te | 否 | string | 测试人员 |
 | de | 否 | string | 开发人员 |

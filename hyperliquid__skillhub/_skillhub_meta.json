@@ -14,5 +14,6 @@
   "description_en": "Read-only Hyperliquid market data assistant (perps + spot optional) with support for natural-language requests and deterministic command parsing (terminal-style `hl ...` and slash-style `/hl ...`). Use to fetch quotes (mark/mid/oracle/funding/OI/volume), top movers, funding rankings, L2 order book, and candle snapshots via https://api.hyperliquid.xyz/info, and to format results for chat.",
   "installs": 5050,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\hyperliquid__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/401a454b-4b16-4aee-a18c-4e3467ca48f1.png",
+  "installedContentHash": "sha256:27aa2407d42dbbd1e5b36b800ff2c21ad5b5854bdef97b3ac32e20035c67a521"
 }

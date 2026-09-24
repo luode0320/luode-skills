@@ -6,5 +6,6 @@
   "skillId": "skill_2095591800615153664",
   "description_zh": "将中文操作意图精准翻译为可执行命令行，内置命令库检索与 JSON 结构化输出，提升终端效率。",
   "description_en": "Translate Chinese intent into executable shell commands with built-in command lookup and JSON output.",
-  "iconSource": "letter:auto"
+  "iconSource": "letter:auto",
+  "installedContentHash": "sha256:3dcb2c919437d04ada0b4fa74d3e807fc53216890f595d5f4d0fd9fe9938dc69"
 }

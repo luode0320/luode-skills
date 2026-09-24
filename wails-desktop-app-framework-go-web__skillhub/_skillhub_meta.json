@@ -12,5 +12,6 @@
   "description_zh": "Wails 是一个开源框架，使用 Go 作为后端逻辑，使用标准网页技术（HTML、CSS、JavaScript）作为前端来构建桌面应用程序。它编译成单个原生二进制文件，无嵌入式浏览器开销。",
   "description_en": "Wails 是一个开源框架，使用 Go 作为后端逻辑，使用标准网页技术（HTML、CSS、JavaScript）作为前端来构建桌面应用程序。它编译成单个原生二进制文件，无嵌入式浏览器开销。",
   "installs": 155,
-  "iconDownloadFailedAt": 1789459362705
+  "iconDownloadFailedAt": 1789703864192,
+  "installedContentHash": "sha256:d0f6e63468a6f56a7456ef9e194a3cfc66a25c265a90987c03c8f03224d62f21"
 }

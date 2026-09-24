@@ -9,5 +9,6 @@
     "requires_api_key": "false"
   },
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\free-api-50__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png",
+  "installedContentHash": "sha256:2d0dca5cd78179ae958f15df192f4b45ff934b2f657ca88ac90487b367a832bc"
 }

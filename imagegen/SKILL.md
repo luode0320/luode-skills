@@ -1,22 +1,69 @@
 ---
 name: "imagegen"
-description: "用于生成或编辑位图图片，例如插画、照片、纹理、精灵图、UI 图、概念图、透明底抠图等。当用户要“生图”“改图”“参考图出新图”“做图片素材”时使用；覆盖文生图、图生图、图片编辑、电商图、广告图、详情页、带货种草等图片场景。优先使用宿主内置出图工具；内置工具不可用或用户要求 CLI/API/模型参数控制时，使用本 skill 捆绑的 AI Hive CLI 通道（固定 public_model_gpt_image_2）验证后出图，不默认阻断。不要用于更适合直接修改 SVG、矢量资源或代码原生图形的任务。"
+description: "用于生成或编辑位图图片，例如插画、照片、纹理、精灵图、UI 图、概念图、透明底抠图等。当用户要“生图”“改图”“参考图出新图”“做图片素材”时使用；覆盖文生图、图生图、图片编辑、电商图、广告图、详情页、带货种草等图片场景。优先使用宿主内置出图工具；内置工具不可用或用户要求 CLI/API/模型参数控制时，使用本 skill 捆绑的双模 CLI 通道（优先 gpt-image-2.5-sunburst，支持多Key并发池与OpenAI/AI Hive兼容端点）出图。不要用于更适合直接修改 SVG、矢量资源或代码原生图形的任务。"
 ---
 
 # Image Generation Skill（imagegen）
 
-> 本目录（仓库根目录 `imagegen/`）是本仓库维护的权威版本，吸收 AI Hive GPT Image 2 CLI 通道后独立成稿；不依赖任何单一 agent 宿主。
+> 本目录（仓库根目录 `imagegen/`）是本仓库维护的权威版本，吸收新一代 GPT Image 模型族（`gpt-image-2.5-sunburst` / `gpt-image-2.5-flare` / `gpt-image-2`）、OpenAI 兼容端点、多 Key 并发密钥池与 AI Hive CLI 通道后独立成稿；不依赖任何单一 agent 宿主。
 
 用于为当前项目生成或编辑位图图像：网站素材、游戏素材、UI 预览图、产品图、线框图、Logo 探索图、照片风图像、信息图、角色动作帧等。
+
+## 模型梯队与优先级原则
+
+新版生图通道支持三大主力模型，执行生图时默认遵循以下优先级与选型阶梯：
+
+1. **`gpt-image-2.5-sunburst`（【默认主力】最高画质 / 丁达尔漫射与微距细节之王）**：
+   - **画质特质**：大场景大气散射（Sunburst 阳光漫射效果）、体积雾、多层次远近景深、超微结构雕刻（极细齿轮、羽翼纹理、苔藓纤维）表现最为惊艳。
+   - **耗时**：单张约 90 秒。
+   - **选型建议**：**全链路默认主力模型**。优先用于最终正式素材交付、游戏概念图、高精原画与商业级插画。
+2. **`gpt-image-2.5-flare`（高动态反光 / 极速增强版）**：
+   - **画质特质**：镜面高光、边缘眩光（Flare 效应）、强烈金属质感反光，出图干净利落。
+   - **耗时**：单张约 39 秒（速度最快）。
+   - **选型建议**：适合潮玩道具、工业产品渲染、机甲/科幻风格、对出图时效敏感的多轮快速迭代预览。
+3. **`gpt-image-2`（标准基准款）**：
+   - **画质特质**：色彩自然均衡，标准写实光影。
+   - **耗时**：单张约 45 秒。
+   - **选型建议**：作为兼容兜底或基准测试使用。
 
 ## 顶层模式
 
 本 skill 只有两条真实出图路径，其余（程序绘制、脚本拼图、SVG/HTML/CSS/canvas 合成、占位图）一律不算出图：
 
 1. **内置模式（默认优先）**：使用当前宿主提供的内置位图生成工具（不同宿主名称不同，如 WorkBuddy 的 ImageGen、Codex 的 `image_gen`）。零配置，普通生图、改图、简单透明底需求直接用它。
-2. **CLI fallback 模式**：使用捆绑的 `scripts/imagegen.py`（AI Hive OpenAPI 通道，固定 `public_model_gpt_image_2`）。当内置工具在当前 turn 不可用且本地 CLI 环境验证通过时自动启用；用户显式要求 CLI/API/模型参数控制时也走这条路径。
+2. **CLI fallback 模式**：使用捆绑的 `scripts/imagegen.py` 或 `scripts/image_gen.py`。支持 OpenAI 兼容接口（如 `https://laaai.cc/v1` 等中转平台）与 AI Hive OpenAPI 接口。默认使用 `gpt-image-2.5-sunburst`，支持多 Key 轮换与限流故障切换。当内置工具不可用或用户显式要求参数/并发控制时走本路径。
 
 判定优先级：内置可用 → 用内置；内置不可用 → 验证 CLI fallback 后出图；两条都不可用 → 明确标记 blocked（尚未生成最终图片），不伪造。
+
+## 全局用户配置体系与多 Key 并发池
+
+为了让开发机上所有项目（前后端、独立脚本、不同工作区）无需重复配置即可调用这套 API，本 skill 建立了分层解析与容灾机制：
+
+### 1. 配置加载优先级
+1. **CLI 运行时入参**（最高优先级）：`--model`、`--api-key`、`--base-url`
+2. **专用环境变量覆盖**：`IMAGEGEN_MODEL`、`IMAGEGEN_BASE_URL`、`IMAGEGEN_API_KEYS`
+3. **用户全局配置文件（核心单一真理源）**：`~/.imagegen/config.json`（跨所有项目通用，优先读取避免 Windows 进程环境变量缓存漂移）
+4. **Windows 用户级注册表环境变量**：`PROJECT_IMAGE_MODEL`、`PROJECT_IMAGE_BASE_URL`、`PROJECT_IMAGE_OPENAI_API_KEY`
+5. **系统默认兜底**：模型 `gpt-image-2.5-sunburst`
+
+### 2. 多 Key 并发密钥池架构（Multi-Key Pool）
+- **配置文件结构 (`~/.imagegen/config.json`)**：
+  ```json
+  {
+    "base_url": "https://laaai.cc/v1",
+    "model": "gpt-image-2.5-sunburst",
+    "model_priority": ["gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-2"],
+    "api_key": "sk-primary...",
+    "api_keys": [
+      "sk-account-1...",
+      "sk-account-2...",
+      "sk-account-3..."
+    ]
+  }
+  ```
+- **并发与限流应对**：
+  - **Round-Robin 负载均衡**：批量生成或并发请求按 Key 队列轮询派发，突破单个 Key 的 QPS/并发上限。
+  - **429 自动降级与切换（Rate-Limit Failover）**：当某个 Key 遇到限流（HTTP 429）或配额不足时，捕获异常后自动切换至密钥池中的下一个可用 Key 并执行指数退避重试，无须中断生成任务。
 
 ## 核心规则
 
@@ -25,8 +72,8 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 - 不允许因为"有脚本能画个差不多的图"就绕开真实生成链路，也不允许把设计草图、占位图说成已完成素材。
 - 不要因为用户只是改尺寸、质量、输出路径就主动切 CLI；只有确实需要 CLI 控制或内置不可用时才切。
 - 用户显式要求 CLI 时用捆绑的 `scripts/imagegen.py`，不要自建一次性 SDK 脚本。
-- 不要静默降级通道或换模型；AI Hive 通道固定 `public_model_gpt_image_2`，如模型下线或要换其他模型，先查询实时模型列表并与用户确认。
-- **不要修改** `scripts/imagegen.py` 的模型固定与通道逻辑；能力不够时先和用户对齐（改脚本内 `SKILL_CONFIG` 归属元数据除外）。
+- 模型选型默认使用 `gpt-image-2.5-sunburst`（画质最高）；用户指定速度优先时切 `gpt-image-2.5-flare`。
+- **【游戏素材默认非像素铁律（Default Anti-Pixel Rule for Game Assets）】**：凡是处理 2D 游戏资产（角色、怪物、英雄、NPC、Boss、地图地砖、场景组件、技能特效、道具、UI 图标、Sprite 精灵图）的生图或改图请求，**除非用户显式要求“像素风 / pixel art / 8-bit / 16-bit / 点阵 / 复古像素”**，否则**一律默认采用现代 2D 高清微立体手绘矢量卡通风格（Modern 2D High-Definition Stylized Vector Cartoon Art）**，且底层必须默认自动注入黄金反像素负向词库（`pixel art, pixelated, 8-bit, 16-bit, retro sprite, mosaic, dithering, low resolution, aliasing, jagged lines, photo, photorealistic, noise, 3d render artifacts, blurry edges, compression artifacts, dirty textures, sketch lines`）。严禁在用户未显式要求像素时默认生成像素画或粗糙点阵图。
 
 ## 什么时候用 / 什么时候不用
 

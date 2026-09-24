@@ -13,7 +13,8 @@ description: 当新增或修改代码、调整功能、修复 Bug、补测试支
 ## 统一硬约束（双主线生效）
 
 - **改动聚焦**：本次改动与当前目标直接相关，范围可解释，无明显无关修改。
-- **简单优先**：大多数代码默认不需要封装或抽象接口；只有存在真实复用、边界隔离、复杂度下降或多实现替换证据时才允许新增封装 / 接口层。
+- **七级极简解法阶梯**：动手前经历阶梯反射，在第一个站得住的台阶停下（1.需求需要存在吗(YAGNI) → 2.代码库已有吗 → 3.标准库能做吗 → 4.平台原生能做吗 → 5.已装依赖能解决吗 → 6.能内联写成一行吗 → 7.编写最小可运行实现）；绝不为几行代码就能搞定的事新增第三方依赖；非平凡逻辑保留最小自检断言。
+- **简单优先与折中标注**：大多数代码默认不需要封装或抽象接口；只有存在真实复用、边界隔离、复杂度下降或多实现替换证据时才允许新增封装 / 接口层；确因控制改动做出的有意折中（如全局锁、朴素算法），必须显式标注 `# tradeoff: <天花板>, <升级触发条件>` 技术债注释。
 - **代码分解与文件行数约束**：单个代码文件超过 200 行时，拆分为多个 diamond 文件并存放在同级目录；一个目录只做一件事，逻辑过多则拆分为多个同级文件存放。
 - **目录业务逻辑单一性**：一个同级目录只能包含一种业务逻辑，若拆解后仍归为两种及以上业务，即使很小也必须拆分到不同目录。
 - **函数与代码块长度**：单个代码块或函数不得超过 80 行，超出则拆分为多个函数。
@@ -35,6 +36,7 @@ flowchart LR
 控制"本次到底该改多少、该改到哪里"时命中本主线。
 
 - 进入后先读 `references/minimal-change-general.md`，明确允许的改动范围与"假设-目标-验证"最小闭环。
+- 动手前严格依序执行七级阶梯反射并查阅平台原生替代，读 `references/minimal-solution-ladder.md` 与 `references/platform-native-substitutes.md`。
 - 边界不清时读 `references/minimal-change-boundaries.md`。
 - 判断越界时读 `references/minimal-change-examples.md` 对照正反例。
 - 核心约束：
@@ -133,6 +135,6 @@ flowchart LR
 
 ## references 读取规则
 
-- 最小改动主线：默认读 `references/minimal-change-general.md`；边界不清读 `references/minimal-change-boundaries.md`；越界判断读 `references/minimal-change-examples.md`。
+- 最小改动主线：默认读 `references/minimal-change-general.md`；需要执行阶梯排查、折中标注或过度设计审查时读 `references/minimal-solution-ladder.md`；查阅 HTML/CSS/JS 平台原生替代清单时读 `references/platform-native-substitutes.md`；边界不清读 `references/minimal-change-boundaries.md`；越界判断读 `references/minimal-change-examples.md`。
 - 可读性主线：默认读 `references/readability-general.md`；函数结构读 `references/function-structure-rules.md`；函数签名与参数取舍读 `references/function-signature-rules.md`；定义位置读 `references/definition-placement-rules.md`；正反例读 `references/readability-examples.md`。
 - 本轮涉及删除代码 / 功能 / 模块时，读 `references/code-removal-discipline.md`。

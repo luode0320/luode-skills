@@ -430,3 +430,72 @@ Input images: Image 1: drawing
 Primary request: turn the drawing into a photorealistic image
 Constraints: preserve layout, proportions, and perspective; choose realistic materials and lighting; do not add new elements or text
 ```
+
+
+## 现代 2D 高清微立体游戏资产实战模板（反像素系列）
+
+以下模板均严格遵循反像素（Anti-Pixel Art）红线，适用于现代商业级 2D 游戏素材生成：
+
+### 1. 植物塔防防御塔 / 英雄角色（Hero / Tower Unit）
+```text
+Use case: modern-2d-game-unit
+Asset type: In-game character sprite (Tower Defense Unit)
+Primary request: An iconic cute peashooter plant turret character sprite, ready for battle
+Scene/backdrop: Solid flat vibrant magenta chroma-key background (#FF00FF), completely clean and empty
+Subject: Modern stylized peashooter plant with glossy big dark eyes, sleek tubular muzzle, vibrant green leaf collar and curved stem
+Style/medium: Modern 2D high-definition stylized vector art, polished digital cartoon game asset
+Composition/framing: Centered full-body hero view, occupying 75% of canvas, perfectly framed with generous margin
+Lighting/mood: Crisp studio lighting, gentle 2.5D bevel edge highlights, soft ambient occlusion
+Color palette: Rich vivid emerald and lime greens, sunny yellow inner muzzle, glossy dark pupils with bright white specular reflections
+Materials/textures: Smooth organic plant surface with subtle subsurface scattering feel, clean vector contours
+Constraints: Centered single character; no ground shadow, no floor plane, no background gradient, no particle noise
+Avoid: pixel art, pixelated, 8-bit, 16-bit, retro sprite, mosaic, dithering, low resolution, aliasing, jagged lines, photo, photorealistic, noise, 3d render artifacts, blurry edges
+`
+
+### 2. 敌方怪物 / Boss 单位（Enemy / Boss Sprite）
+```text
+Use case: modern-2d-game-monster
+Asset type: In-game enemy monster sprite
+Primary request: A menacing but stylized cartoon zombie invader with humorous armored elements
+Scene/backdrop: Solid flat neon green chroma-key background (#00FF00), completely uniform and clean
+Subject: Cartoon zombie warrior with a dented metallic bucket helmet and patchwork ragged suit, expressive dynamic pose
+Style/medium: Modern 2D high-resolution stylized digital cartoon art, clean vector contours
+Composition/framing: Centered three-quarter view, full body from head to toe, ample padding around edges
+Lighting/mood: High-contrast character rim light, smooth gradient shadows, playful sinister mood
+Color palette: Cool desaturated grey-purple skin, weathered brass and steel metal, muted dark brown cloth
+Materials/textures: Smooth stylized surfaces, dented metal highlights, crisp outlines
+Constraints: Isolated single subject; no cast shadows on floor, no background debris
+Avoid: pixel art, pixelated, 8-bit, 16-bit, retro, mosaic, dithered, low resolution, aliasing, photo, photorealistic, noise, 3d render artifacts
+`
+
+### 3. 地图地砖 / 地形块（Isometric / Top-Down Tileset Block）
+```text
+Use case: modern-2d-tileset
+Asset type: Top-down seamless map tile or isometric terrain block
+Primary request: A stylized vibrant grass terrain tile with rich dirt side cross-section
+Scene/backdrop: Neutral solid light grey (#E0E0E0) isolated background
+Subject: Single modular terrain block, lush stylized cartoon grass tufts on top, rich layered earth soil beneath
+Style/medium: Modern 2D stylized cartoon game art, clean vector illustration
+Composition/framing: Centered orthographic or top-down view, precise geometric modular edges for grid alignment
+Lighting/mood: Bright cheerful directional sunlit highlights, soft ground-contact ambient occlusion
+Color palette: Fresh spring greens, warm chocolate brown soil, subtle golden pebble accents
+Materials/textures: Stylized chunky grass clumps, smooth soil texture, polished outlines
+Constraints: Perfectly modular tile, seamless edge compatibility, no perspective distortion outside the specified angle
+Avoid: pixel art, pixelated, 8-bit, 16-bit, retro, mosaic, dithering, photorealistic, grunge noise, blurry
+`
+
+### 4. 技能特效 / 弹道粒子（VFX & Projectile Sprite）
+```text
+Use case: modern-2d-vfx
+Asset type: Skill VFX projectile or impact burst
+Primary request: A blazing plasma energy pea projectile flying horizontally with stylized motion trail
+Scene/backdrop: Pitch black background (#000000) or solid flat chroma-key magenta (#FF00FF)
+Subject: Glowing stylized plasma sphere surrounded by dynamic energy rings and smooth swooshing speed trails
+Style/medium: Modern 2D digital vector VFX, stylized anime/arcade hit effect
+Composition/framing: Centered horizontal flight orientation, clear directionality from left to right
+Lighting/mood: Intense inner core glow (hyper-bright white-cyan), vibrant outer energy aura (neon electric green)
+Color palette: Neon lime green, electric cyan, core pure white
+Materials/textures: Smooth luminous plasma, clean gradient transparency falloff, sharp outer shockwave rings
+Constraints: Crisp stylized shapes, no grainy noise, no dirty dithered alpha
+Avoid: pixel art, pixelated, 8-bit, retro sprite, mosaic, dithering, low resolution, photo smoke, realistic fire, noise
+`

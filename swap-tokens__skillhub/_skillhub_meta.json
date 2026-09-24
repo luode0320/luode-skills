@@ -6,5 +6,6 @@
   "source": "skillhub",
   "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/cab3c5ed-3acd-4936-a59b-5f0c5f5dab1b.png",
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\swap-tokens__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/cab3c5ed-3acd-4936-a59b-5f0c5f5dab1b.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/cab3c5ed-3acd-4936-a59b-5f0c5f5dab1b.png",
+  "installedContentHash": "sha256:d44f6045a0dfaca175e496ef6369415bf62b9e83fe9046a141c8967745dd8b12"
 }

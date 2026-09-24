@@ -2,6 +2,36 @@
 
 > 本文件登记 long-run-loop-rules 历次吸收的裁决记录，来源可回指。格式：日期 | 来源 | 条目摘要 | 裁决 | 落点 | 整理去重（含同域清理位置）。
 
+## 2026-09-24 内部调整：Goal 模式免确认推进与临时产物清理
+
+- **来源**：用户指令（2026-09-24，内部更新通道，无外部原文）
+- **裁决数**：内部诉求拆解 4 条原子条目 → 全部合并（无拒绝、无保留现状）
+  - A1「Goal 模式 = 计划已完成，直接实现」→ 合并
+  - A2「执行分歧按 agent 推荐方案推进，不要求用户确认」→ 合并
+  - A3「分歧无法判定时自行分析得出最推荐方向并默认执行」→ 合并（补最安全兜底口径）
+  - A4「临时生成的文件和脚本执行后删除，不污染项目目录」→ 合并（落为引用既有 Owner，不新建规则）
+- **落点（单一 skill：long-run-loop-rules 为 Goal 模式 Owner）**：
+  - 新增 `SKILL.md`「Goal 模式免确认推进（分歧按推荐方案执行）」章节（计划视为已完成 / 分歧自行裁决 / 推荐方向判定顺序 / 最安全兜底 / 红线 / 临时产物清理 / 边界与退出）+ description 补口径
+  - 新增 `references/safety-mechanisms.md`「Goal 模式免确认推进」章节（只写与安全熔断的衔接，规则本体引用 SKILL.md，避免双权威）
+  - 联动 `autonomous-execution-rules`（SKILL.md description + 必须暂停节点补例外；`continuation-and-pause.md` 新小节 + 暂停项收缩）
+  - 联动仓库级 `AGENTS.md` / `CLAUDE.md`（新增同主题章节，双文件同哈希）
+- **主要裁决理由**：
+  - 合并 A1-A3：Goal 模式语义在本地已由 `long-run-loop-rules`（Goal 生命周期）与 `autonomous-execution-rules`（执行许可/暂停边界）共同承载，本次是给「Goal 激活态」补免确认推进语义，属既有 Owner 内部更新，不新增 skill 目录。
+  - 合并 A4 但不新定义：临时产物清理已有唯一 Owner `runtime-process-cleanup-rules`（零豁免原则 + 三层清理对象 + 收口回读），本 skill 只写引用，避免与既有清理规则形成双权威。
+  - 保留既有红线未放开：提交授权、`local` 连接、凭据、跨项目写入、安全熔断均保持原 Owner 口径。
+- **整理去重（同域扫描结论）**：
+  - 扫描范围：long-run-loop-rules（自身）+ autonomous-execution-rules + runtime-process-cleanup-rules + git-collaboration-rules + skill-hit-check-rules（延迟 gate 注册表）+ AGENTS.md/CLAUDE.md
+  - 发现并收敛 1 处本次引入的重复风险：免确认推进口径同时在 `SKILL.md` 与 `safety-mechanisms.md` 展开 → 收敛为单一权威（SKILL.md 详述，safety-mechanisms.md 只留与安全熔断的衔接并引用）
+  - 发现并修正 1 处本次引入的编号漂移：新章节插入后 `safety-mechanisms.md` 中「独立验证」交叉引用编号与章节号不一致 → 还原为「6. 独立验证」
+  - 发现并修正 1 处本次引入的结构错位：新章节一度被放入「智能检测」子节 → 移出为独立顶层章节，保持原编号语义
+  - 与 `runtime-process-cleanup-rules` / `git-collaboration-rules` 无重复无层叠（引用式衔接，职责层级不同）
+  - 结论：PASS
+- **环境依赖**：N/A（规则纯文本，无环境变量/宿主配置/hook/依赖/路径引用）
+- **自检能力**：N/A（无环境依赖项）
+- **净增体积**：待收口统计
+- **删除源**：N/A（内部更新通道，无外部安装源）
+- **评分**：内部更新通道无吸收前基线，按 `skill-absorption-rules` 用 `quick_validate.py` 结构校验替代棘轮；校验结果见收口说明
+
 ## 2026-08-23 吸收：loop-engineering（skillhub）
 
 - **来源**：`loop-engineering`（skillhub 市场安装源，本地目录 `~/.workbuddy/skills/loop-engineering__skillhub/`，SKILL.md + references/{patterns,config-examples,anti-patterns,integration}.md 全部读原文）

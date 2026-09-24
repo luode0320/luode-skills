@@ -200,7 +200,7 @@ def write_json(path: Path, data: dict, force: bool) -> None:
     if path.exists() and not force:
         raise FileExistsError(f"{path} already exists. Use --force to overwrite.")
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="\n") as handle:
+    with path.open("w") as handle:
         json.dump(data, handle, indent=2)
         handle.write("\n")
 
@@ -209,7 +209,7 @@ def create_stub_file(path: Path, payload: dict, force: bool) -> None:
     if path.exists() and not force:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="\n") as handle:
+    with path.open("w") as handle:
         json.dump(payload, handle, indent=2)
         handle.write("\n")
 

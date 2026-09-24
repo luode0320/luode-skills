@@ -55,56 +55,136 @@ MIME_MAP = {
 # === 配置管理 ===
 
 class Config:
-    """三级优先级读取 API Key 和 Base URL：CLI > 环境变量 > 配置文件。"""
+    """多级优先级读取 API Key、Base URL 与 Model 配置，支持单 Key 与多 Key 并发轮询。"""
 
     def __init__(self, api_key=None, base_url=None, verbose=False):
+        # 1. 基础字段初始化
         self.verbose = verbose
-        self.api_key = self._resolve_api_key(api_key)
+        self.api_keys = self._resolve_api_keys(api_key)
+        self.api_key = self.api_keys[0] if self.api_keys else None
+        self._key_index = 0
         self.base_url = self._resolve_base_url(base_url)
 
-    def _resolve_api_key(self, cli_key):
+    def get_next_key(self):
+        """轮询获取下一个有效 API Key。
+
+        [参数]
+        无
+
+        [返回]
+        str: 轮询获取的 API Key
+
+        最近修改时间: 2026-09-24 16:15:00 支持多 Key 密钥池轮询
+        """
+        if not self.api_keys:
+            raise SystemExit("未找到有效的生图 API Key。")
+        key = self.api_keys[self._key_index % len(self.api_keys)]
+        self._key_index = (self._key_index + 1) % len(self.api_keys)
+        return key
+
+    def _resolve_api_keys(self, cli_key):
+        """解析所有可用 API Key 列表。
+
+        [参数]
+        cli_key: Optional[str] 命令行传入的 Key
+
+        [返回]
+        list: API Key 字符串列表
+
+        最近修改时间: 2026-09-24 16:15:00 新增多 Key 密钥池解析
+        """
+        keys = []
+        # 1. 命令行参数优先
         if cli_key:
-            return cli_key
-        env_key = os.environ.get("AI_HIVE_API_KEY")
-        if env_key:
-            return env_key
+            return [cli_key]
+
+        # 2. 用户全局配置 ~/.imagegen/config.json 优先
         file_config = self._read_config_file()
+        if file_config.get("api_keys") and isinstance(file_config["api_keys"], list):
+            for k in file_config["api_keys"]:
+                cleaned = str(k).strip()
+                if cleaned and cleaned not in keys:
+                    keys.append(cleaned)
         if file_config.get("api_key"):
-            return file_config["api_key"]
+            cleaned = str(file_config["api_key"]).strip()
+            if cleaned and cleaned not in keys:
+                keys.append(cleaned)
+
+        # 3. 环境变量补充
+        for env_var in [
+            "IMAGEGEN_API_KEYS",
+            "PROJECT_IMAGE_OPENAI_API_KEYS",
+        ]:
+            val = os.environ.get(env_var)
+            if val:
+                for k in val.split(","):
+                    cleaned = k.strip()
+                    if cleaned and cleaned not in keys:
+                        keys.append(cleaned)
+
+        for env_var in [
+            "IMAGEGEN_API_KEY",
+            "PROJECT_IMAGE_OPENAI_API_KEY",
+            "PROJECT_IMAGE_API_KEY",
+            "OPENAI_IMAGE_API_KEY",
+            "AI_HIVE_API_KEY",
+        ]:
+            val = os.environ.get(env_var)
+            if val and val not in keys:
+                keys.append(val)
+
+        if keys:
+            return keys
+
         raise SystemExit(
-            "未找到 API Key。\n\n"
-            "一键初始化（推荐）：\n"
-            f"  python3 {sys.argv[0]} init --skill-name <skill-name>\n\n"
-            "或按以下步骤手动获取：\n"
-            f"  1. 访问 {API_KEY_HELP_URL}\n"
-            "  2. 若未登录，会自动跳转到登录页，使用手机号 + 短信验证码登录\n"
-            "  3. 登录后回到聊天页，点击左下角账户菜单（昵称旁下拉箭头，菜单向上展开）\n"
-            "  4. 在下拉菜单中点击「API 接入」选项\n"
-            "  5. 在「API Key 名称」输入框填写名称（例如：生产服务），点击「新建 API Key」\n"
-            "  6. 在新建好的 API Key 卡片上点击「复制」按钮（格式：sk-api-*）\n\n"
-            "配置方式（三选一）：\n"
-            "  · 命令行参数：--api-key sk-api-xxxxx\n"
-            "  · 环境变量：  export AI_HIVE_API_KEY=sk-api-xxxxx\n"
-            f"  · 配置文件：  {CONFIG_FILE_PATH}"
+            "未找到生图 API Key。\n"
+            "请通过环境变量 PROJECT_IMAGE_OPENAI_API_KEY / IMAGEGEN_API_KEY 或 ~/.imagegen/config.json 进行配置。"
         )
 
     def _resolve_base_url(self, cli_url):
+        """解析端点 Base URL。
+
+        [参数]
+        cli_url: Optional[str] 命令行传入的 Base URL
+
+        [返回]
+        str: 规整后的 Base URL
+
+        最近修改时间: 2026-09-24 16:15:00 优先读取配置文件端点
+        """
+        # 1. 命令行显式传入
         if cli_url:
             return cli_url.rstrip("/")
-        env_url = os.environ.get("AI_HIVE_BASE_URL")
-        if env_url:
-            return env_url.rstrip("/")
+        # 2. 专用环境变量
+        if os.environ.get("IMAGEGEN_BASE_URL"):
+            return os.environ["IMAGEGEN_BASE_URL"].rstrip("/")
+        # 3. 用户全局配置
         file_config = self._read_config_file()
         if file_config.get("base_url"):
             return file_config["base_url"].rstrip("/")
+        # 4. 环境变量兜底
+        for env_var in [
+            "PROJECT_IMAGE_BASE_URL",
+            "OPENAI_IMAGE_BASE_URL",
+            "AI_HIVE_BASE_URL",
+        ]:
+            val = os.environ.get(env_var)
+            if val:
+                return val.rstrip("/")
         return DEFAULT_BASE_URL
 
     @staticmethod
     def _read_config_file():
+        imagegen_config = Path.home() / ".imagegen" / "config.json"
+        if imagegen_config.exists():
+            try:
+                with open(imagegen_config, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
         try:
             with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            # 防御性收紧权限：避免多用户系统下 API Key 被其他账号读取
             try:
                 current_mode = os.stat(CONFIG_FILE_PATH).st_mode & 0o777
                 if current_mode & 0o077:
@@ -464,7 +544,96 @@ def cmd_chat(client, args):
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
+def _is_openai_endpoint(base_url):
+    return "/v1" in base_url or not base_url.rstrip("/").endswith("/api")
+
+def _generate_image_openai(client, args):
+    """通过 OpenAI 兼容接口生成图片，支持多 Key 轮换与高品质模型解析。
+
+    [参数]
+    client: AiHiveClient 客户端实例
+    args: argparse.Namespace 命令行参数
+
+    [返回]
+    list: 生成图片本地保存路径列表
+
+    最近修改时间: 2026-09-24 16:20:00 支持多 Key 轮换与优先 gpt-image-2.5-sunburst
+    """
+    import base64
+    url = f"{client.config.base_url.rstrip('/')}/images/generations"
+    # 1. 确定生图模型优先级
+    cfg = Config._read_config_file()
+    if args.model and args.model not in ("public_model_gpt_image_2", "gpt-image-2"):
+        model = args.model
+    else:
+        model = (
+            os.getenv("IMAGEGEN_MODEL")
+            or cfg.get("model")
+            or (cfg.get("model_priority")[0] if cfg.get("model_priority") else None)
+            or os.getenv("PROJECT_IMAGE_MODEL")
+            or "gpt-image-2.5-sunburst"
+        )
+    # 2. 组装请求体载荷
+    body = {
+        "model": model,
+        "prompt": args.prompt,
+        "n": args.batch,
+        "size": "1024x1024"
+    }
+    print(f"正在通过 OpenAI 兼容接口生成图片 (endpoint: {url}, 模型: {model})...")
+
+    # 3. 发起请求并支持多 Key 轮换重试
+    resp = None
+    last_err = None
+    keys_to_try = client.config.api_keys if client.config.api_keys else [client.config.api_key]
+    for key_idx, current_key in enumerate(keys_to_try):
+        headers = {
+            "Authorization": f"Bearer {current_key}",
+            "Content-Type": "application/json"
+        }
+        try:
+            resp = requests.post(url, headers=headers, json=body, timeout=120)
+            if resp.status_code == 200:
+                break
+            if resp.status_code == 429 and key_idx < len(keys_to_try) - 1:
+                print(f"当前 API Key 遭遇限流 (429)，正在尝试切换下一个 Key...", file=sys.stderr)
+                continue
+            last_err = f"生图请求失败 ({resp.status_code}): {resp.text}"
+        except requests.exceptions.RequestException as e:
+            last_err = f"网络请求异常: {e}"
+            if key_idx < len(keys_to_try) - 1:
+                continue
+
+    if not resp or resp.status_code != 200:
+        raise SystemExit(last_err or "所有 API Key 均请求失败")
+
+    # 4. 解析结果并保存落盘
+    data = resp.json()
+    items = data.get("data", [])
+    if not items:
+        raise SystemExit(f"生图返回数据为空: {data}")
+    out_dir = Path(args.output_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    ts = int(time.time())
+    for idx, item in enumerate(items):
+        file_name = f"image_{ts}_{idx+1}.png"
+        file_path = out_dir / file_name
+        if "b64_json" in item:
+            img_data = base64.b64decode(item["b64_json"])
+            file_path.write_bytes(img_data)
+            print(f"生图完成，已保存: {file_path}")
+            results.append(str(file_path))
+        elif "url" in item:
+            r_img = requests.get(item["url"], timeout=60)
+            file_path.write_bytes(r_img.content)
+            print(f"生图完成，已保存: {file_path}")
+            results.append(str(file_path))
+    return results
+
 def cmd_image(client, args):
+    if _is_openai_endpoint(client.config.base_url):
+        return _generate_image_openai(client, args)
     model_entry = client.find_model(args.model, "IMAGE")
     pricing = client.get_pricing_snapshot(model_entry, args.mode)
 
@@ -773,7 +942,7 @@ def main():
 
 
 # === Skill 固定配置（由构建器生成，imagegen 吸收 gpt-image-2 通道后归属改为 imagegen） ===
-SKILL_CONFIG = json.loads('{"example": "高级商业摄影风格的产品主视觉，主体清晰，材质真实，留出标题空间", "keywords": "文生图、图生图、图片编辑、参考图生成、电商图、广告图、详情页、带货、种草", "model": "public_model_gpt_image_2", "name": "imagegen", "rule": "optional", "search": "imagegen AI 图片生成与编辑的 CLI 通道，基于 AI Hive OpenAPI GPT Image 2 模型", "title": "imagegen AI 图片生成与编辑（GPT Image 2 通道）"}')
+SKILL_CONFIG = json.loads('{"example": "高级商业摄影风格的产品主视觉，主体清晰，材质真实，留出标题空间", "keywords": "文生图、图生图、图片编辑、参考图生成、电商图、广告图、详情页、带货、种草", "model": "gpt-image-2.5-sunburst", "name": "imagegen", "rule": "optional", "search": "imagegen AI 图片生成与编辑的 CLI 通道，默认最高画质模型 gpt-image-2.5-sunburst", "title": "imagegen AI 图片生成与编辑（多模型/多Key并发通道）"}')
 
 def _validate_image_inputs(args):
     count = len(args.image or [])

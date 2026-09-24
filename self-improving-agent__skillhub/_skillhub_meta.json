@@ -9,5 +9,6 @@
     "requires_api_key": "false"
   },
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\self-improving-agent__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/81015f94-5620-494e-bbd6-ac3268e7ccd3.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/81015f94-5620-494e-bbd6-ac3268e7ccd3.png",
+  "installedContentHash": "sha256:7c62867f16f268b8c7f3f3349b90654856e8fd1c880bcb0b629c412b2eeb8b9a"
 }

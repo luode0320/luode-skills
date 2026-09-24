@@ -183,3 +183,34 @@ Avoid: <negative constraints>
 更多共享原则看：
 
 - `references/sample-prompts.md`
+
+
+## 现代 2D 高清微立体游戏资产规范（默认非像素生图铁律）
+
+本规范沉淀自游戏素材生产实战经验与用户实测验收，专门应对 2D 游戏资产生成中容易意外退化为低清、粗糙或像素风格的问题：
+
+### 1. 风格定位与特征公式
+- **权威风格定位**：**现代 2D 高清微立体手绘矢量卡通风格（Modern 2D High-Definition Stylized Vector/Cartoon Art）**。
+- **画面特质**：
+  - 极具工业质感的高精度平滑连续轮廓线（polished smooth continuous outlines, clean vector edges）。
+  - 细腻柔和的体积光影与微立体倒角遮蔽（gentle volumetric 2.5D bevel shading, soft ambient occlusion）。
+  - 鲜明饱满的渐变色彩层次（vibrant rich gradient tones），彻底杜绝脏色与死黑。
+  - 晶莹灵动的局部高光与反光（glossy highlights, vibrant eye reflection）。
+
+### 2. 默认非像素机制与负向词库（Default Anti-Pixel Rule）
+- **默认全局生效**：凡是处理 2D 游戏资产（角色、怪物、英雄、NPC、Boss、地图地砖、场景组件、技能特效、道具、UI 图标、Sprite 精灵图）的生图或改图请求，**全链路默认强制装配黄金反像素负向词库**与现代高清手绘矢量风格，无须用户反复强调。
+- **豁免条件（仅显式指定像素时放行）**：只有当用户在 Prompt 或参数中**显式要求“像素风 / pixel art / 8-bit / 16-bit / 点阵 / 复古像素”**，或指定 `--allow-pixel` 时，系统才豁免该反像素过滤规则。
+- **黄金反像素负向词库清单**：
+```text
+Avoid: pixel art, pixelated, 8-bit, 16-bit, retro sprite, mosaic, dithering, low resolution, aliasing, jagged lines, photo, photorealistic, noise, 3d render artifacts, blurry edges, compression artifacts, dirty textures, sketch lines
+```
+
+### 3. 抠图与色度键规范（Chroma-Key Background）
+- 生成单体游戏素材（角色、怪物、塔、道具）时，主体必须完整居中，四边留白，背景强制指定纯平色度键背景（Solid Flat Chroma-Key Background）。
+- **背景色选取铁律**：
+  - 绿色/蓝绿色系主体（如植物、毒液、森林角色）：强制指定纯洋红 `#FF00FF`。
+  - 暖色/红黄色系主体（如火炎、机甲、熔岩角色）：强制指定纯荧光绿 `#00FF00`。
+  - 严禁产生渐变背景、投影、反光地面或半透明粒子与背景混合，确保下游 `remove_chroma_key.py` 能一键 100% 纯净去底。
+
+### 4. 运行环境与网络鲁棒性
+- 在 Windows 宿主环境下，调用外部中转或第三方 API 若遇到网络连接重置（`ConnectionResetError(10054)`）或 SSL 握手超时，优先在 WSL（Windows Subsystem for Linux）环境下运行生图命令，保证网络链路畅通与高效响应。

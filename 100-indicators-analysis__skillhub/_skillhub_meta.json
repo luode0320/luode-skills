@@ -14,5 +14,6 @@
   "description_en": "基于100个热门TradingView Pine Script指标转换的Python技术分析工具集，提供专业的技术指标计算、分析和可视化功能",
   "installs": 853,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\100-indicators-analysis__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7f79eb60-b8d8-4d8e-9b79-6ace0de1ff17.png",
+  "installedContentHash": "sha256:a815d64fbe46f3c25c16d3c18bf77963ac19dfeea4f6bf8ce9e32e48100e641a"
 }

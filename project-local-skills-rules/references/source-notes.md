@@ -1,5 +1,28 @@
 # 来源记录
 
+## 2026-09-20 更新：project-ellipal-admin-vue-tab-page-rules（内部更新通道，骨架去页头卡）
+
+- **来源**：用户看着页面截图指出——「这个头部的展示对于 tab 多功能切换已经完全不需要了，多余了，删除他，把 tab 的切换移动到这个头部的位置，设计一个新的 tab 切换的样式」。内部更新通道，无外部源。
+- **推翻的旧结论**：原骨架「页头 `a-card`（`a-list-item-meta` 标题块）+ 内容 `a-card` 包 `a-tabs`」与原样式条款「`type="rounded"` 是既定样式，不要换成 `line` / `card`」，两条都已作废。
+- **核心新增**：多功能 tab 页的页签名本身就是功能索引，再挂「XX管控 + 一句话把四个页签念一遍」的标题卡纯属占一屏高度；页签条顶到卡片最上方兼任页面头部，但要担得起头部的视觉重量必须换 `type="line" size="large"` + `.page-head-tabs`（nav 分隔线 / 16px 字号 / 3px 圆角 ink 三条 `:deep()` 缺一不可，arco 把这三层样式分挂在三个类上）——rounded 的胶囊选中态在没有页头卡托底时压不住。
+- **落点**：SKILL.md 骨架段、约定一样式条款、约定三代码示例、「进入后先做什么」第 1 步，共 4 处同步改写。
+- **规则文件声明**：`AGENTS.md` / `CLAUDE.md` 的「## 多功能 tab 页优先规则」各加一条骨架条款（两份 md5 一致 `7de543291a4996b540b078fcd1b038dd`）。
+- **验证**：`PYTHONUTF8=1 quick_validate.py` → `Skill is valid!`；实现侧浏览器实测四页签可切、复用组件出数、零 console error、`npm run build-test` 退出码 0。
+- **字典刷新**：不适用——同下。
+
+## 2026-09-20 新建：project-ellipal-admin-vue-tab-page-rules（通道 B 主动点名，多功能 tab 页）
+
+- **来源**：用户主动点名——「我们币对管理做的不错，就是一个页面通过 tab 切换多个功能的，我们希望吸收到项目 skill，我们后续有其他功能也可以使用，做成多功能 tab 切换」。无外部源。
+- **证据**：同会话真实落地的 `go-admin-vue3/src/views/exchange/pair-control/index.vue`（四页签：临时下架 / 永久下架内联，服务商链币映射 / 热门列表复用组件）；`embedded` prop 实现在 `views/backend/exchangeProviderChainMap/index.vue:268-274` 与 `views/backend/exchangeCoinsOrdered/index.vue`；`lazy-load` 边界结论来自浏览器 `read_network_requests` 实测（进页面只发 3 条内联 pane 的请求，两条组件式 pane 的 getPage 在切页签后才发）。
+- **落点**：`ellipal_admin/skills/project-ellipal-admin-vue-tab-page-rules/SKILL.md`（单文件，暂无 references——五条约定的代码片段都在 20 行内，不够拆 recipe）。
+- **分层判定**：五条约定均依赖本仓库事实（arco 2.57、`.container` + 双 card 骨架、`section-tip-icon` 类名、`DEFAULT_PAGE_SIZE` 既有约定、菜单 API 权限人工勾选），换项目不成立 → 项目级，不抽用户级通用层。
+- **核心新增（此前无处记载）**：`lazy-load` 只延迟组件式 pane 的挂载，内联 pane 的数据加载写在页面 `onMounted` 里完全不受它管——加了 `lazy-load` 就以为全部懒加载是错的。
+- **同域冗余扫描**：范围 = 项目根 `skills/` 全部 5 个 skill。与 `project-ellipal-admin-vue-table-page-rules`（表格列宽 / 拖拽 / 分页器）、`project-ellipal-admin-form-help-tooltip-rules`（字段级 tooltip）边界互斥，已在两侧「权责边界」互引；`DEFAULT_PAGE_SIZE` 只在本 skill 提一句并指回表格 skill 约定三，不重复定义 → **PASS**。
+- **规则文件声明**：`AGENTS.md` / `CLAUDE.md` 同步新增「## 多功能 tab 页优先规则」章节（两份 md5 一致）。
+- **验证**：`PYTHONUTF8=1 quick_validate.py` → `Skill is valid!`；SKILL.md 内 6 条相对引用路径逐一 `test -e` 全部可达；文件 UTF-8。
+- **字典刷新**：不适用——同下（`ROOT` 固定 `~/.claude/skills`，不扫描项目根 `skills/`）。
+- **关联记忆**：`browser-pane-hidden-breaks-css-transition`、`vite-dev-needs-mode-dev-flag`、`vue-admin-ui-verify-without-login`。
+
 ## 2026-09-02 更新：project-ellipal-admin-vue-table-page-rules（内部更新通道，补列宽拖拽）
 
 - **来源**：用户主动点名——「把这个支持表头拖宽的也吸收到项目的 skill 中，之前已经吸收了表头拖动了」。内部更新通道，无外部源。

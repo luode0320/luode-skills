@@ -14,5 +14,6 @@
   "description_en": "Android build system and deployment patterns",
   "installs": 3655,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\android__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png",
+  "installedContentHash": "sha256:f8af62180c2c5df8e52d482cda694fa6f22e852b863ce67a508e3b6350691c95"
 }

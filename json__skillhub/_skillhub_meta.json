@@ -14,5 +14,6 @@
   "description_en": "Work with JSON data structures, APIs, and serialization effectively.",
   "installs": 3435,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\json__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/2d8152d9-7618-454e-9d87-2487f1b4457f.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/2d8152d9-7618-454e-9d87-2487f1b4457f.png",
+  "installedContentHash": "sha256:a028b06b95f9d02661676e0ad4cbdff46d79ef832d059cbaa946f540d86e30dd"
 }

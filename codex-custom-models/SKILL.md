@@ -29,6 +29,7 @@ description: 为 Codex Desktop（含 Windows CLI）维护 luode.vip 中转的自
   - slug / display_name 用中转模型 id（与 `/v1/models` 一致）。
   - `context_window` / `max_context_window`：第三方按用户 models.json 的 `maxInputTokens`（通常 262144）；GPT 系（luna/sol/terra/astra）可用官方条目基底 + 用户要求的窗口（如 400000，见环境事实）。
   - `default_reasoning_level` = 用户 models.json `reasoning.defaultEffort`（当前 high）；`supported_reasoning_levels` 与用户 `supportedEfforts` 集合对齐（low/medium/high/xhigh/max）。
+  - **第三方模型工具模式**：第三方模型必须设置 `tool_mode = null`、`use_responses_lite = false`、`multi_agent_version = null`。切勿继承 GPT-5.6 的 `tool_mode = "code_mode_only"`（第三方模型返回标准 `function_call`，若开 code_mode 会被报 `Fatal error: tool exec invoked with incompatible payload` 导致所有工具调用 aborted，见坑#11）。
   - 能力标记（verbosity/websocket/reasoning summary/apply_patch 等）**以官方 gpt-5.6-luna 条目为基底**——它是 luode.vip 全链路实测兼容的配置；不要凭空捏造字段。
   - `visibility = "list"`（出现在 picker）、`supported_in_api = true`、`priority` 决定排序。
   - 4 个 GPT slug（gpt-6-astra / gpt-5.6-sol / gpt-5.6-terra / gpt-5.6-luna）官方条目可直接复用（从现 catalog 或官方 models.json 抽取）。
@@ -83,6 +84,8 @@ wsl.exe -e bash -lc "export CODEX_HOME=/mnt/c/Users/luode/.codex; export OPENAI_
 8. 曾尝试 `C:\mnt\c` junction→`C:\` 让 Windows CLI 也能解析 `/mnt/c`，但 `C:\mnt\c` 是桌面 App 在用的插件镜像目录，**不可动**，已弃用该路线。
 9. **Windows 用户环境变量不自动进 WSL**（仅 WSLENV 白名单变量随 `wsl.exe` 传入；App 注入引擎的白名单只有 CODEX_* / SKY_* / NODE_REPL_* 等）——任何"给 Windows setx 了变量但 WSL 引擎说缺失"的现象都是这个原因。
 10. App 切换引擎模式后可能出现一次性引导 **"完成 Windows 设置 / setup_failed"**——这是 **Elevated sandbox 提权安装**（引擎调 `~/.codex/bin/<hash>/codex-windows-sandbox-setup.exe`，需 UAC 点"是"；该 exe 是 base64 payload 的 helper，**不能裸跑**）。重试多次仍 failed 的官方降级路径：config.toml 追加 `[windows]` 表 + `sandbox = "unelevated"`（RestrictedToken 受限令牌模式，**无需提权**；等价于引导页"继续受限访问"的持久化；键名拼写 kebab-case，出自源码 `WindowsSandboxModeToml`）。设置后引导不再要求提权。要完整 elevated 沙箱则需在引导页点"重试"并确认 UAC"是"。
+11. **第三方模型禁止使用 `tool_mode = "code_mode_only"`**（2026-09-21 验证）：官方 GPT-5/6 模型原生支持 Code Mode 的 raw JS `custom_tool_call` 协议；而第三方中转模型（DeepSeek、GLM、Kimi 等）返回的是标准 OpenAI `function_call`（如 `{"name": "exec", "arguments": "{\"input\": ...}"}`）。若将第三方模型设为 `code_mode_only`，Codex 桌面版内核在路由工具时会校验失败，报错 `Fatal error: tool exec invoked with incompatible payload` 并将命令执行全部立刻中止（aborted），表现为「工具通道整体不可用」。第三方模型必须配置 `tool_mode = null`、`use_responses_lite = false`、`multi_agent_version = null`，让 Codex 暴露标准的 `exec_command`、`apply_patch` 工具，走标准 `function_call` 通道。
+12. **Codex 桌面版更新后 hash 路径变更**：App 更新后会在 `AppData/Local/OpenAI/Codex/` 生成新的哈希目录（如 `bin/<new_hash>/codex.exe`、`runtimes/cua_node/<new_hash>/`），若 `config.toml` 中硬编码了旧的 `notify` 或 CLI 路径，会导致组件执行失败。
 
 ## 环境事实（本机专属，改路径只动这段）
 
@@ -95,3 +98,8 @@ wsl.exe -e bash -lc "export CODEX_HOME=/mnt/c/Users/luode/.codex; export OPENAI_
 - catalog：`~/.codex/model-catalog.json`。
 - 桌面引擎：`~/.codex/bin/wsl/<hash>/codex`（Linux 二进制，hash 随版本变化）。
 - 官方模型目录（基底来源，可选联网）：`codex-rs/models-manager/models.json` in github.com/openai/codex。
+
+## 相关参考（References）
+
+- `references/troubleshooting-tool-channel.md`：工具通道异常（`aborted` / `incompatible payload` / 路径哈希失效）的完整诊断与彻底根治指南。
+- `references/source-notes.md`：技能内部调整与执行 Gap 回补历史记录。

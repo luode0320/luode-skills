@@ -14,5 +14,6 @@
   "description_en": "Build, test, and ship iOS apps with Swift, Xcode, and App Store best practices.",
   "installs": 3357,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\ios__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png",
+  "installedContentHash": "sha256:9aa27e2e78c1620af47148d5f47acaa288b4a0d43a0aa587ada13bbe3f80cd06"
 }

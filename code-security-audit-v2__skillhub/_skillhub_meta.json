@@ -14,5 +14,6 @@
   "description_en": "Professional AI code security audit tool supporting 12 programming languages, 50+ vulnerability types, OWASP Top 10 / CWE / CVE standards alignment, with actionable fix suggestions and complete audit reports",
   "installs": 430,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\code-security-audit-v2__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/0c9b068f-f22e-44e2-96fe-d2b6f5b43b07.png",
+  "installedContentHash": "sha256:c88b6ea34906566a3304abe524626446bd8dc1bdb7418969d0c9f1ce6dd1de16"
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "回测结果 → TradingView 看板"
+  short_description: "把回测/模拟交易结果导出为 TradingView 风格交互看板（蜡烛图+买卖标记+净值/回撤）"
+  default_prompt: "把这次回测结果用 TradingView 看板展示出来"

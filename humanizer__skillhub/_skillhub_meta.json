@@ -9,5 +9,6 @@
     "requires_api_key": "false"
   },
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\humanizer__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/34a07e4e-fec8-4ce0-aaf8-a83e46546c2d.png",
+  "installedContentHash": "sha256:942b587db6911fd50f92854dea0ee183044919b2fc777cf3afe639898d4573e0"
 }

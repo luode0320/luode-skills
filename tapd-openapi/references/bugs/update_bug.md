@@ -38,7 +38,7 @@ POST
 | baseline_close | 否 | string | 关闭基线 |
 | current_owner | 否 | string | 处理人 |
 | cc | 否 | string | 抄送人 |
-| reporter | 否 | string | 创建人 |
+| reporter | 否 | string | 创建人（**注意：TAPD 服务端对已创建实体的创建人执行只读保护，传入会被静默忽略无法修改；若创建时有误需废弃重开**） |
 | current_user | 否 | string | 变更人 |
 | participator | 否 | string | 参与人 |
 | te | 否 | string | 测试人员 |

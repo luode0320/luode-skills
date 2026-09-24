@@ -9,5 +9,6 @@
     "requires_api_key": "false"
   },
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\file-organize__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7920727c-4e7d-496a-9223-d9c6673e9e53.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/7920727c-4e7d-496a-9223-d9c6673e9e53.png",
+  "installedContentHash": "sha256:5e2eede5a1a8730770d89e90d269698c6eb925834f649db90c4f0d99691d0399"
 }

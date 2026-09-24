@@ -14,5 +14,6 @@
   "description_en": "Implement secure webhook receivers and senders with proper verification and reliability.",
   "installs": 4825,
   "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\webhook__skillhub\\_icon.png",
-  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png"
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/64ea6fd6-ebe7-418c-af4f-2cafff71f2ec.png",
+  "installedContentHash": "sha256:4b97257447dc6f45dec00e79c924a85cae7500cff0ad74a687db2ba54b0e6878"
 }

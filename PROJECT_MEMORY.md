@@ -9,6 +9,25 @@
 
 # 项目长期记忆
 
+## Goal 模式免确认推进与临时产物清理（2026-09-24 固化）
+
+- 稳定决策：**Goal 模式 = 计划已完成，只要结果**——用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清。
+- 稳定决策：**执行分歧按 agent 推荐方案推进，不要求用户确认**——出现多方案、路径冲突、口径不一致、约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认；推荐方向判定顺序为「满足目标与验收条件 > 最小可逆 > 有真实证据 > 守住红线」；无法判定优劣时选最小可逆、最保守、可回滚方案继续，并把分歧与选择写入落盘任务计划文档。
+- 稳定决策：**不因免确认放开红线**——系统安全限制与权限审批、高风险或不可逆操作、`local` 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交 / 推送仍需当前轮显式授权）、跨项目写入红线与 `WRT-*` 授权边界、个人文件安全与删除保护全部不变；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。
+- 稳定决策：**防自我授权边界**——agent 为补建任务投影、异常修复或超时探测而自动 `create_goal` 产生的 Goal **不构成**用户开启的 Goal 模式，仍不自动取得任何实现授权；免确认推进必须建立在用户显式开启或确认的 Goal 之上（兼容 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」）。
+- 稳定决策：**临时文件与脚本执行后必须清理**——执行过程中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务，使用后立即清理，禁止污染项目目录或长期滞留在宿主任务列表；未清理视为任务未完成，收口前按 `runtime-process-cleanup-rules` 的三层清理对象真实回读验证。
+- 来源：用户指令（2026-09-24）+ `long-run-loop-rules`（`SKILL.md`、`references/safety-mechanisms.md`）+ `autonomous-execution-rules`（`SKILL.md`、`references/continuation-and-pause.md`）+ `runtime-process-cleanup-rules` + `AGENTS.md` / `CLAUDE.md`。
+- 更新时间：2026-09-24。
+
+## 配置文件项禁止多行过程注释与复杂逻辑专门文档规范（2026-09-18 固化）
+
+- 稳定决策：**配置文件项极简目的注释（强制铁律）**——YAML、TOML、JSON 等各类配置文件是环境运行参数与控制开关的直接载体，其受众为开发、运维与交付人员，关注核心是“该配置控制什么行为、取值含义是什么”。配置项上方注释**严格默认单行就近，只写目的与控制边界说明**。
+- 稳定决策：**严禁将配置文件当做事故复盘或推演草稿纸**——绝对禁止在配置项上方堆砌内部运行机制细节、状态机分步推演（如“先写待确认、10分钟后复核再升级”）、历史事故渊源（如“某日事故的修复要件”）以及新旧行为对比/关停状态对比等多行过程注释。
+- 稳定决策：**复杂逻辑归位功能专门文档记录（强制）**——如果有复杂的业务逻辑、状态流转、多阶段异步任务、速率防护或开关联动机制，**必须在 `doc/` 下建立功能专门的文档记录**（如 `doc/1-架构/<递增序号>-业务链路-<业务名称>.md` 或 `doc/2-需求/` 规格文档），严禁试图在代码或配置文件中用长篇多行注释硬解释机制。代码与配置只留单行目的说明，复杂机制与推演过程全量归位到功能专门文档中。
+- 稳定决策：**过程信息分层归位**——事故背景、推演过程与历史版本行为差异一律写入专门功能文档、需求/Bug 文档或 Git 提交说明，配置文件内一行不留，绝不设折中形态。
+- 来源：用户指令（2026-09-18，配置文件注释与复杂逻辑专门文档记录要求）+ `comment-rules`（统一硬约束、`comment-placement.md`、`comment-granularity.md`、`comment-examples.md`）+ `architecture-doc-rules` + `code-style-consistency-rules` 反例库 `STYLE-CASE-CFG-001` + `PROJECT_STYLE.md`。
+- 更新时间：2026-09-18。
+
 ## TAPD 全流程自动化行为与测试人员流转规则（2026-09-16 固化）
 
 - 稳定决策：**Story / Bug / Task 分类自动化处理工作流（2026-09-16 固化）**：
@@ -18,15 +37,23 @@
 - 稳定决策：**TAPD 全流程自动化行为约束（强制）**：
   1. **分析完成自动评论（五要素）**：会话确认完成任务/需求/bug 分析时，必须自动在 TAPD 添加分析评论，严格包含：分析结论、是否可以开始执行、是否缺失材料、是否缺少前置条件、是否需要人工补充缺失信息。
   2. **开始执行追加评论**：分析结论为可直接执行、已添加“可以开始做”评论且会话实际开始执行后，必须及时追加评论：“`agent开始代码实现`”。
-  3. **代码完成即提交本地 Git（强制铁律）**：Agent 自行完成的代码实现，**严禁暂存在项目的未提交更改中，完成自测验证后必须立即自动提交到本地 Git 仓库（执行 git commit）**，杜绝改动散落；**红线边界**：绝对禁止自动 push 到远端仓库，向远端同步必须由用户发起或显式授权。
+  3. **代码完成即提交本地 Git（强制铁律）**：Agent 自行完成的代码实现，**严禁暂存在项目的未提交更改中，完成自测验证后必须立即自动提交到本地 Git 仓库（执行 git commit）**；**提交前缀必须指明 Agent 任务身份（强制格式：`<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]`，例如 `fix: [agent-兑换] 修复SWAPKIT报价解析异常 [TAPD#1162459836001003690]`）**，杜绝改动散落并清晰留痕；**红线边界**：绝对禁止自动 push 到远端仓库，向远端同步必须由用户发起或显式授权。
   4. **代码实现完成总结评论**：代码实现完成并提交本地后，自动添加一条评论说明实现已完成，并按分节骨架总结本次实现内容、验证结果与本地 commit hash。
   5. **收口流转与测试人员指派**：实现完成评论发布后，必须将条目状态流转至「待版本验证」，并将处理人变更为测试人员；每跳流转与处理人变更必须回读核验生效。
+- 稳定决策：**TAPD 创建实体真实创建人身份规范（防 tapd_my_token 占位符，2026-09-17 固化）**：
+  1. **显式传参**：通过 OpenAPI 创建缺陷（Bug）、需求（Story）或任务（Task）时，**必须显式传入创建人字段**（Bug 为 `reporter`，Story/Task 为 `creator`），绝对禁止漏传或留空。
+  2. **唯一真源**：创建人必须是当前 Token 绑定的真实员工身份（优先调用 `GET /users/info` 动态获取 `name`/`nick`，如“罗德”；或读取本机用户真源），**绝对禁止随便取名**（严禁随意填写 `admin`、`agent`、`workbuddy`、`bot` 或虚构姓名）。
+  3. **审计只读机制**：若漏传创建人，TAPD 服务端将强制默认回退为凭据名 `tapd_my_token`；且创建后该字段在服务端具备严格只读保护，`update_*` 接口会被静默忽略无法事后修改；一旦误创只能关闭作废并在新单重开。
+- 稳定决策：**TAPD 三大核心操作意图与路由分流规则（2026-09-17 固化）**：
+  1. **单任务分析（"看一下这个任务 / 看看任务"）**：仅做深度技术与代码可行性调研，不直接开工写代码；必须在 TAPD 上发表标准五要素分析结论评论，保持在分析就绪等待状态。
+  2. **任务描述完善（"完善这个任务 / 完善任务"）**：明确说明该任务/需求描述不清楚、背景或信息缺失，需结合代码库现状、关联模型和接口，补充完善需求内容与规格说明（更新 description 或发布完善规格评论）。
+  3. **批量扫描清任务流水线（"扫描tapd [xx], 清任务 / 开始做tapd[xx]任务 / 开始做tapd任务"）**：扫描指定项目或当前迭代的需求、任务、Bug，严格按统一优先级排序（缺陷 > 任务，严重度/优先级高 > 低），逐个串行推进状态机：先分析评论是否可做；若可做立即开工走全套流程（追加开工评论 → 编码自测 → 代码完成即本地commit → 总结评论 → 流转待版本验证并指派测试人员杨莹/李红/韩忠宝），闭环一个再做下一个；若不可做则记录缺口并推进下一条。
 - 稳定决策：**测试人员名单持久化配置与记忆**：
   - 测试人员名单落盘配置文件：`<skills>/tapd-task-executor/config/qa-team.json`；
   - 持久化测试人员名单：**杨莹、李红、韩忠宝**；
   - 指派策略：原指定测试优先，未指定时按杨莹、李红、韩忠宝轮询或业务模块负责划分指派；开发完成后禁止处理人留置为开发自身或留空。
-- 来源：用户指令（2026-09-16）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`）+ `tapd-openapi` + `tapd-addcomment`。
-- 更新时间：2026-09-16。
+- 来源：用户指令（2026-09-16、2026-09-17）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`、`references/story-bug-task-workflow.md`）+ `tapd-openapi` + `tapd-addcomment` + 知识库《TAPD创建实体创建人身份规范》。
+- 更新时间：2026-09-17。
 
 ## 待裁定事项建议、选项与默认最安全兜底闭环规则（2026-09-16 固化）
 
@@ -592,14 +619,21 @@ entities:
       - agent开始代码实现
       - Story叶子需求拆解
       - Bug测试提交保护
-    definition: "TAPD 任务全流程自动化规则：1. Story/Bug/Task 分类处理：Story 仅处理叶子需求（父级保持原样），处于规划/实现中且名下无未完成子 Task 时自动拆解为可执行子 Task（标题明确、具体方案、指派当前开发者、填写预估工时）；Bug 由测试人员提交不改原描述，直接分析成因并评论记录排查结果、方案与进度；独立 Task 直接承接进入开发。2. 全流程自动化行为约束：分析完成自动添加五要素评论；开始执行追加评论「agent开始代码实现」；代码完成自测后严禁暂存更改，必须立即自动提交至本地 Git 仓库（git commit，严禁自动 push 远端）；实现完成自动添加总结评论（含 commit hash）；收口流转至「待版本验证」并将处理人变更为持久化测试人员名单（杨莹、李红、韩忠宝）。"
-    scope: "TAPD 任务分析、代码执行、评论回写、状态流转与测试人员指派"
+      - TAPD创建人真实身份规范
+      - 防tapd_my_token占位符
+      - TAPD三大核心操作意图
+      - 看一下这个任务
+      - 完善这个任务
+      - 批量扫描清任务
+      - Agent提交前缀规范
+    definition: "TAPD 任务全流程自动化规则：1. Story/Bug/Task 分类处理：Story 仅处理叶子需求（父级保持原样），处于规划/实现中且名下无未完成子 Task 时自动拆解为可执行子 Task（标题明确、具体方案、指派当前开发者、填写预估工时）；Bug 由测试人员提交不改原描述，直接分析成因并评论记录排查结果、方案与进度；独立 Task 直接承接进入开发。2. 全流程自动化行为约束：分析完成自动添加五要素评论；开始执行追加评论「agent开始代码实现」；代码完成自测后严禁暂存更改，必须立即自动提交至本地 Git 仓库（git commit，严禁自动 push 远端），提交前缀必须指明为 Agent 任务提交（格式：<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]）；实现完成自动添加总结评论（含 commit hash）；收口流转至「待版本验证」并将处理人变更为持久化测试人员名单（杨莹、李红、韩忠宝）。3. 创建人真实身份与防占位符规范（2026-09-17 固化）：通过 OpenAPI 创建实体必须显式传入创建人（Bug 为 reporter，Story/Task 为 creator），必须动态获取真实员工姓名（如罗德），严禁随便取名，严禁漏传导致服务端默认落库为凭据占位符 tapd_my_token；实体的创建人具备服务端只读保护机制，创建后 update 接口无法修改，必须在创建时一次性注入正确。4. 三大核心操作意图与路由分流（2026-09-17 固化）：①「看一下这个任务/看看任务」仅深度分析并输出五要素分析结论评论，不擅自开工；②「完善这个任务/完善任务」用于描述不清楚场景，结合代码库与业务调研补充完善需求内容与规格说明；③「扫描tapd [xx], 清任务/开始做tapd任务」按统一优先级排序逐个分析推进，只要可做立即开工走全套流程并收口流转，闭环一个再推进下一个。"
+    scope: "TAPD 任务分析、需求完善、批量清任务、代码执行、本地Commit前缀规范、评论回写、状态流转、实体创建人约束与测试人员指派"
     status: "active"
     evidence_ids:
       - evidence.tapd-automation-lifecycle-and-qa-assignment
     context_ids:
       - context.tapd-task-executor
-    updated_at: 2026-09-16
+    updated_at: 2026-09-17
     usage_count: 0
     usage_days: 0
     last_used_at: null
@@ -639,6 +673,27 @@ entities:
     context_ids:
       - context.knowledge-flow
     updated_at: 2026-08-12
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - entity_id: rule.config-comment-purpose-only
+    name: "配置文件项极简目的注释与复杂逻辑专门文档规范"
+    type: "代码注释规则"
+    aliases:
+      - 配置文件注释规范
+      - 配置项不写过程注释
+      - 复杂逻辑留专门功能文档
+      - STYLE-CASE-CFG-001
+    definition: "YAML/TOML/JSON 等各类配置文件项上方注释严格遵循只写目的不写过程，默认单行说明该配置项的作用与控制边界。严禁在配置文件或代码中堆砌运行机制细节、状态机分步推演、事故历史渊源（如某日事故修复要件）以及新旧行为对比等多行过程注释。如果有复杂业务逻辑、状态机流转或多任务防护机制，必须在 doc/ 下建立功能专门的文档记录（如 doc/1-架构/ 或 doc/2-需求/ 文档），过程信息与事故复盘写进专门文档或提交说明，配置文件与代码里一行不留。"
+    scope: "YAML、TOML、JSON 各类配置文件项声明、注释维护与复杂业务逻辑文档归位"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.comment-rules
+      - evidence.dialog.config-comment-purpose-only
+    context_ids:
+      - context.code-generation-style
+    updated_at: 2026-09-18
     usage_count: 0
     usage_days: 0
     last_used_at: null
@@ -1627,6 +1682,31 @@ entities:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
+  - entity_id: rule.goal-mode-no-confirm-and-temp-cleanup
+    name: "Goal 模式免确认推进与临时产物清理"
+    type: "执行授权规则"
+    aliases:
+      - Goal模式免确认
+      - goal模式不再确认
+      - 分歧按推荐方案执行
+      - 计划视为已完成
+      - 分歧自行裁决
+      - 临时文件执行后删除
+      - 不污染项目目录
+      - 防Goal自我授权
+    definition: "Goal 模式（用户当前轮显式 `/goal` 开启，或用户已显式确认的 Goal 处于 active）即视为计划阶段已完成、用户只要结果：agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清；执行中出现多方案、路径冲突、口径不一致或约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认。推荐方向判定顺序：① 满足目标与验收条件；② 最小可逆；③ 有真实证据支撑；④ 守住安全与合规红线。证据不足时选最小可逆、最保守、可回滚方案继续推进，并把分歧、依据与选择写入落盘任务计划文档。**防自我授权边界（强制）**：agent 为补建任务投影、异常修复或超时探测而自动 create_goal 产生的 Goal 不构成用户开启的 Goal 模式，仍不自动取得任何实现授权。**不因免确认放开**：系统安全限制与权限审批、高风险或不可逆操作、local 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交/推送仍需当前轮显式授权）、跨项目写入红线与 WRT-* 授权边界、个人文件安全与删除保护；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。**临时产物清理**：执行中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务须在使用后立即清理，禁止污染项目目录或长期滞留宿主任务列表，未清理视为任务未完成，收口前按 runtime-process-cleanup-rules 三层清理对象真实回读验证。落点：long-run-loop-rules/SKILL.md（Goal 模式 Owner）、long-run-loop-rules/references/safety-mechanisms.md（安全熔断衔接）、autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md（执行许可与暂停边界）、AGENTS.md / CLAUDE.md 仓库级章节。"
+    scope: "Goal 模式执行授权、方案分歧裁决、暂停边界收缩、防自我授权、临时产物清理、仓库级规则自举"
+    status: "active"
+    evidence_ids:
+      - evidence.rule.goal-mode-no-confirm-and-temp-cleanup
+    context_ids:
+      - context.execution-authorization
+      - context.long-run-loop
+    updated_at: 2026-09-24
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-09-24
+    absorbed_to: null
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -1696,6 +1776,11 @@ evidence:
     source: "reasoning-summary-structure-rules/SKILL.md、references/summary-structure-template.md、references/conditional-sections-rules.md、references/hook-integration.md、autonomous-execution-rules/SKILL.md"
     path: "reasoning-summary-structure-rules/references/hook-integration.md"
     note: "2026-08-21 新增总结异步任务分流 + 宿主任务列表桥接：后台异步任务必选 `## 🔄 后台异步任务` 小节（结果与结论之后、后续内容之前），任务标识/类型/轮询节奏/完成信号/回流渠道/等待语义/宿主任务列表映射七字段；启动时必须 TaskCreate 登记宿主任务列表（描述三段式：做什么+任务标识+何时查看），启动/等待/回收三阶段 TaskUpdate 推进，禁止裸 run_in_background 当唯一进度可见手段（执行期契约在 autonomous-execution-rules）；该小节是「同步已完成 + 异步在跑」收口信号，非未完成、非阻断、不触发后续。WorkBuddy hooks 增强触发：UserPromptSubmit additionalContext 软提醒 + Stop exit code 2 硬校验；配置路径 ~/.workbuddy/settings.json 或项目 .workbuddy/settings.json；hook 支持需真实任务实测。"
+  - evidence_id: evidence.rule.goal-mode-no-confirm-and-temp-cleanup
+    type: "skill"
+    source: "用户指令（2026-09-24）+ long-run-loop-rules/SKILL.md 与 references/safety-mechanisms.md + autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md + runtime-process-cleanup-rules/SKILL.md + AGENTS.md / CLAUDE.md"
+    path: "long-run-loop-rules/SKILL.md"
+    note: "2026-09-24 固化 Goal 模式免确认推进：Goal 模式激活即视为计划已完成，执行分歧由 agent 自行裁决并按推荐方向推进、不要求用户确认；证据含 6 处落点（AGENTS.md / CLAUDE.md 双文件同哈希、long-run-loop-rules 两处、autonomous-execution-rules 两处）、quick_validate 双 PASS、字典重跑 65/8/120、知识库笔记《Goal模式免确认推进与临时产物清理-20260924》。关键边界：agent 自动补建的 Goal 不构成免确认授权（兼容 task-plan-rehydration-rules 既有口径）。"
   - evidence_id: evidence.dialog.swag-upstream-openapi
     type: "dialog"
     source: "2026-07-14 需求实施计划与离线验证"
@@ -2015,6 +2100,16 @@ evidence:
     type: "dialog"
     source: "本轮用户确认的会话交接触发词"
     note: "冻结开新会话继续、新会话中继续、新会话继续、会话太长、归档旧会话、迁移任务、接续任务、提取会话压缩信息和唤起另一个会话。"
+  - evidence_id: evidence.skill.comment-rules
+    type: "skill"
+    source: "comment-rules/SKILL.md 及 references"
+    path: "comment-rules/SKILL.md"
+    note: "代码与配置文件注释统一硬约束：只写目的不写过程，说明性注释默认单行且禁止论证式块注释与多行过程推演堆砌。"
+  - evidence_id: evidence.dialog.config-comment-purpose-only
+    type: "dialog"
+    source: "用户代码习惯与偏好反馈（2026-09-18）"
+    path: "code-style-consistency-rules/references/user-style-feedback-library.md"
+    note: "用户明确否定在 tempDelistConfig 等配置项上方堆砌 5 行运行机制推演、状态机流转与事故修复要件的写法，确立单行极简目的注释标准。"
 contexts:
   - context_id: context.test-asset-governance
     type: "repository-convention"
@@ -2084,6 +2179,14 @@ contexts:
     type: "task-scope"
     name: "最终总结结果区"
     note: "适用于结果区问题、方法、结果/验证状态的 3 句核心契约，以及复杂、受限或有关键边界时的 4–5 句受控扩展"
+  - context_id: context.execution-authorization
+    type: "task-scope"
+    name: "执行授权与暂停边界"
+    note: "适用于执行许可 confirmed/unknown/revoked 判定、开工计划边界、Goal 模式免确认推进与必须暂停节点的收缩"
+  - context_id: context.long-run-loop
+    type: "task-scope"
+    name: "Goal 生命周期与长任务循环"
+    note: "适用于 Goal 触发、完成标记、循环控制器、安全熔断，以及 Goal 模式下的分歧裁决与临时产物清理"
 lifecycle:
   active:
     - "rule.shared-static-owner-routing"
@@ -2114,6 +2217,7 @@ lifecycle:
     - "rule.plan-mode-decision-wait-loop"
     - "rule.reasoning-summary-detail"
     - "rule.workbuddy-market-skill-absorption"
+    - "rule.goal-mode-no-confirm-and-temp-cleanup"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -2155,6 +2259,16 @@ retrieval_hints:
       - "rule.task-plan-rehydration"
     简单任务十分钟升级:
       - "rule.task-plan-rehydration"
+    goal 模式:
+      - "rule.goal-mode-no-confirm-and-temp-cleanup"
+    不要求确认:
+      - "rule.goal-mode-no-confirm-and-temp-cleanup"
+    按推荐方案执行:
+      - "rule.goal-mode-no-confirm-and-temp-cleanup"
+    临时文件清理:
+      - "rule.goal-mode-no-confirm-and-temp-cleanup"
+    不污染项目目录:
+      - "rule.goal-mode-no-confirm-and-temp-cleanup"
     首次持久化立即刷新:
       - "rule.task-plan-rehydration"
     ensure-start:

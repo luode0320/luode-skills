@@ -1,5 +1,82 @@
 # 项目当前状态
 
+## 2026-09-24 Goal 模式免确认推进与临时产物清理规则落地（内部更新通道）
+
+- 来源对象：用户指令（2026-09-24）——“只要我们开启 goal 模式，说明我们计划已经完成，只要实现就好了，如果执行过程有分歧，一律按照 agent 推荐的方案推进执行，不要求用户确认；出现分歧 agent 自行分析得出最推荐的执行方向，默认按照推荐的方向执行，无需用户确认。临时生成的文件和脚本记得执行后删除，不要污染项目目录。”
+- 当前状态：**全部落地闭环**。
+  - ① Goal 模式 Owner 承载：`long-run-loop-rules/SKILL.md` 新增「Goal 模式免确认推进（分歧按推荐方案执行）」章节 + description 补口径；`references/safety-mechanisms.md` 新增同主题章节（只写与安全熔断的衔接，规则本体引用 SKILL.md，避免双权威）。
+  - ② 执行许可 Owner 联动：`autonomous-execution-rules/SKILL.md` description 放开 + 「必须暂停确认的关键节点」补 Goal 模式例外；`references/continuation-and-pause.md` 新增「Goal 模式免确认推进」小节 + 必须暂停项收缩。
+  - ③ 仓库级规则：`AGENTS.md` / `CLAUDE.md` 新增「Goal 模式免确认推进与临时产物清理（最高优先级，强制）」章节，双文件 SHA256 一致。
+  - ④ 关键边界（防自我授权，来自影响面对账发现的真实冲突）：用户显式 `/goal` 开启或用户已显式确认的 Goal 才免确认；agent 为补建投影 / 异常修复自动 `create_goal` 产生的 Goal 不构成授权，兼容 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」。
+  - ⑤ 临时产物清理不新立规则：复用唯一 Owner `runtime-process-cleanup-rules`（零豁免 + 三层清理对象 + 收口回读）。
+- 验证与交接：`quick_validate.py` 验证 `long-run-loop-rules`、`autonomous-execution-rules` 均 `Skill is valid!`；字典重跑 exit 0（65/8/120）；`AGENTS.md` / `CLAUDE.md` 同哈希、纯 LF；知识库沉淀《Goal模式免确认推进与临时产物清理-20260924》并回读一致（`knowledge_index.py check` 的 48 项违规全部为存量历史笔记，本轮新笔记合规）；改动停在已改动未提交状态（当前无 Git 提交授权）。
+
+## 2026-09-18 ponytail 懒资深开发模式（七级阶梯与原生替代）外部吸收落地
+
+- 来源对象：外部 Skill `ponytail`（v4.9.0，GitHub DietrichGebert/ponytail）。
+- 当前状态：**全部落地闭环并完成安装源清理**。
+  - ① 单一资产聚焦：收敛至 `code-quality-rules`，不新增同类 skill 目录。
+  - ② 核心 Reference 建设：
+    - 新建 `code-quality-rules/references/minimal-solution-ladder.md`：收录七级极简解法阶梯（YAGNI → 代码库已有 → 标准库 → 平台原生 → 已装依赖 → 一行直写 → 最小实现）、有意折中技术债注释规范（`# tradeoff: <天花板>, <升级触发条件>`）、过度设计专项审查五标签（`delete:` / `stdlib:` / `native:` / `yagni:` / `shrink:`）。
+    - 新建 `code-quality-rules/references/platform-native-substitutes.md`：收录 HTML5 原生表单与控件、现代 CSS 布局与样式、现代 JS/Web API 替代第三方依赖清单，强化 Go/Python 后端标准库优先思维。
+  - ③ 存量整理与去重：更新 `minimal-change-general.md`，将原有零散“简单优先”与七级阶梯收敛对齐；更新 `SKILL.md` 统一硬约束、主线 1 与 references 读取规则。
+  - ④ 登记与源清理：更新 `workbuddy-absorption-map.md` 与 `source-notes.md`，同域冗余扫描 PASS；物理清理外部安装源 `ponytail` 目录；运行 `generate_dictionary.py` 刷新 `字典.md` 与数据索引。
+- 验证与交接：`quick_validate.py` 验证 `code-quality-rules` PASS；27 处引用链全部有效；改动保持在已改动未提交状态（当前无 Git 提交授权）。
+
+## 2026-09-18 配置文件项禁止多行过程注释与复杂逻辑专门文档规范吸收落地
+
+- 来源对象：用户指令：“这次某次改动的配置, 加了很多过程注释, 这是我们不喜欢的习惯, 他应该这样: ... 就可以了, 这个规则需要吸收到我们代码习惯的skill规则中。”、“小思考：如果有复杂的逻辑, 应该要留有功能专门的文档记录。”
+- 当前状态：**全部落地闭环**。
+  - ① 全局反例库固化：`code-style-consistency-rules/references/user-style-feedback-library.md` 新增 active 条目 `STYLE-CASE-CFG-001`，收录用户提供的 5 行推演反例与单行目的正例，明确复杂逻辑归位专门文档；
+  - ② 核心注释与架构 Skill 强化：
+    - `comment-rules/SKILL.md`：统一硬约束及驳回标准补充「配置文件与代码同等严格」与「复杂逻辑必须留有专门功能文档记录」两条硬铁律；
+    - `references/comment-placement.md`：增加第 11 条配置项注释放置原则；
+    - `references/comment-granularity.md`：明确配置项注释只说目的不写事故历史，复杂机制必须归位到 `doc/` 专门文档；
+    - `references/comment-examples.md`：增设「配置文件注释正反例」专节；
+    - `architecture-doc-rules/SKILL.md`：补充承接代码与配置中复杂业务逻辑的专门功能文档记录职责与触发信号；
+  - ③ 项目风格记忆与长期记忆同步：`PROJECT_STYLE.md` 增加「配置文件项极简目的注释」与「复杂逻辑建立功能专门文档记录」两个风格样例并同步锚点区；`PROJECT_MEMORY.md` 固化长期决策并新增机器索引实体 `rule.config-comment-purpose-only`；
+  - ④ 知识库知识流沉淀：新建 `20-Knowledge/code-style/配置文件项注释规范-单行目的说明不写过程与事故推演.md` 并双向关联，完善复杂逻辑文档归位机制。
+- 验证与交接：`check_memory_anchors.py` PASS（50 实体、34 风格锚点）；`quick_validate.py` 验证 `comment-rules`、`architecture-doc-rules` 与 `code-style-consistency-rules` 均有效；改动停留在已改动未提交状态。
+
+## 2026-09-17 TAPD 任务 Git 提交 Agent 前缀规范落地
+
+- 来源对象：用户指令：“我们希望处理tapd的任务提交的git, 提交前缀必须要指明这是agent完成的任务提交的, 比如: fix: [agent-xxx] ????”
+- 当前状态：**全部落地闭环**。
+  - ① 规范格式统一：确立 Agent 自动化处理 TAPD 任务的本地提交信息标准格式为 `<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]`（例如 `fix: [agent-兑换] 修复SWAPKIT报价解析异常 [TAPD#1162459836001003690]`、`feat: [agent-Onramper] v2接口适配与用户IP透传支持 [TAPD#1162459836001003250]`）；
+  - ② 技能文件同步：`tapd-task-executor/SKILL.md`（§3.B.4 与 §6.2）及 `references/story-bug-task-workflow.md`（Bug、Task 及全自动流水线提交动作）全面对齐；
+  - ③ 长期记忆与知识库固化：`PROJECT_MEMORY.md` 稳定决策与机器索引区同步实体约束；`20-Knowledge/AI协作/TAPD三大核心操作意图与自动化清任务流转规范.md` 同步补充该铁律。
+- 验证与交接：`quick_validate.py` 验证通过；`git diff --check` PASS；改动停留在已改动未提交状态。
+
+## 2026-09-17 TAPD 三大核心操作意图与自动化清任务流转规则升级落地
+
+- 来源对象：用户指令要求更新 TAPD skill 规则：
+  1. “看一下这个任务/看看任务”：说明开始分析这个任务，给出分析结论评论；
+  2. “完善这个任务/完善任务”：说明任务描述不清楚，需补充完善说明需求内容；
+  3. “扫描tapd [xx], 清任务/开始做tapd[xx]任务/开始做tapd任务”：说明开始扫描某个项目或当前迭代的所有项目需求/任务/bug，按任务优先级从高到低逐个分析，若可做立刻开工走全套流程并完成任务。
+- 当前状态：**全部落地闭环**。
+  - ① 核心执行技能更新：`tapd-task-executor/SKILL.md`（frontmatter description 与正文新增「三大核心操作意图与路由规范」专节，明确分析、完善、批量清任务三种状态机与行为边界）；
+  - ② API 路由技能同步：`tapd-openapi/SKILL.md`（「委派语义识别与路由」专节精准映射三大意图）；
+  - ③ 工作流契约更新：`tapd-task-executor/references/story-bug-task-workflow.md`（新增 §4「三大核心操作意图与执行状态机规范」，明确完善任务结构化模板与清任务串行推进闭环流水线）；
+  - ④ 知识库沉淀：新建 `20-Knowledge/AI协作/TAPD三大核心操作意图与自动化清任务流转规范.md`；
+  - ⑤ 项目长期记忆固化：`PROJECT_MEMORY.md` 人类区固化“TAPD 三大核心操作意图与路由分流规则”，机器索引区同步扩充 `rule.tapd-automation-lifecycle-and-qa-assignment` 实体别名与定义。
+- 验证与交接：`quick_validate.py` 验证 `tapd-task-executor` 与 `tapd-openapi` 均为 valid；`git diff --check` PASS；改动停留在已改动未提交状态（无当轮 Git 提交授权）。
+
+## 2026-09-17 TAPD 实体创建人真实身份规范与防 tapd_my_token 占位符经验吸收闭环
+
+- 来源对象：用户指令：“吸收一下创建这个tapd的bug的经验, 但是要注意一个点, 创建人现在是 "tapd_my_token" , 要改成我自己, 不能随便取名字。”
+- 当前状态：**全部落地闭环并完成旧单清理**。
+  - ① 线上缺陷修复与正规化重建：
+    - 实证发现 TAPD 缺陷创建后 `reporter` 字段在服务端具备严格只读保护，`update_bug` 接口无法修改已创建单的创建人；
+    - 动态从 `GET /users/info` 获取当前用户真实身份（`罗德`），重新调用 `POST /bugs` 创建规范 Bug `1162459836001003690`（`reporter: "罗德"`, `current_owner: "罗德;"`），并补齐标准五要素分析评论；
+    - 将原缺陷 `1162459836001003686` 状态变更为 `closed`（`resolution=duplicated`）并追加重定向作废评论，保持线上看板与审计干净。
+  - ② 知识库沉淀：新建 `20-Knowledge/AI协作/TAPD创建实体创建人身份规范.md`（记录凭据缺省值陷阱、审计只读约束、唯一真源与调用范式）。
+  - ③ Skill 规范加固：
+    - `tapd-openapi/SKILL.md` 新增第 11 条关键规则；
+    - `tapd-openapi/references/bugs/add_bug.md` 与 `update_bug.md` 对齐 `reporter` 必填与只读说明；
+    - `tapd-task-executor/references/story-bug-task-workflow.md` 补齐子任务与代建 Bug 必须显式指定真实自然人创建人铁律。
+  - ④ 长期记忆同步：`PROJECT_MEMORY.md` 人类区固化“TAPD 创建实体真实创建人身份规范”，机器索引区同步扩充 `rule.tapd-automation-lifecycle-and-qa-assignment` 实体。
+- 验证与交接：`quick_validate.py` 验证通过；改动停留在已改动未提交状态（当前无 Git 提交授权）。
+
 ## 2026-09-16 agent 自行完成代码实现即自动提交本地 Git 规则落地与本地 Commit 收口
 
 - 来源对象：用户指令明确要求：“agent自行完成的代码实现, 不要暂存在项目的更改中, 完成就提交到git本地。”
@@ -104,45 +181,15 @@
   - ⑦ 登记：`references/source-notes.md` 追加 2026-09-13 来源记录，`workbuddy-absorption-map.md` 追加续6裁决与同域去重；`PROJECT_MEMORY.md` 固化稳定决策。
 - 验证与交接：`quick_validate.py` 验证 `Skill is valid!`；Windows 与 WorkBuddy 运行时技能目录（通过 NTFS junction 链接）完全同步生效；同域冗余扫描 PASS；改动停在已改动未提交状态（无 Git 提交授权）。
 
-## 2026-09-12 新增「交付残留自查」收口前横切环节（内部更新通道）
+## 2026-09-12 交付残留自查 + 行尾归一 + 既有测试红项清零（已归档摘要）
 
-- 来源对象：用户提出「需求 / Bug / 计划任务执行完成后再次复查仍能查出该任务残留的新问题」，要求诊断现有流程薄弱环节、评估增设收口前自动自查是否有效，并明确其维度 / 时机 / 标准；用户裁决「落成共享 reference」且「6 维全部为必须项」。
-- 当前状态：全部落地。新建 `skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md`（6 维：需求覆盖对账 / 影响面与消费方对账 / 残留物清扫 / 文档与引用一致性 / 口径一致性 / 验证有效性反审；三档触发；三态处置「已修复 / 显式遗留 / `BLK-*`」；防退化三约束）；该 skill `SKILL.md` 承载、「进入后先做什么」新增 `2.1`、默认执行流程第 2 步、阻断级与驳回标准；`code-change-finalization-gate-rules/SKILL.md` 消费维度 2 / 3 / 6；`skill-hit-check-rules/references/deferred-gate-registry.md` 登记为强制 gate（收口前 + 中段改码）。
-- 诊断结论（六处结构性薄弱环节，均有本仓库实证）：① 收口链为消费型 / 信任型，只防「漏执行」；② 触发靠首条 `闸门预告` 预测后正向对账，缺从真实变更集反推的第二机制；③ `6-review` 被限定只查风格，而仓库已不再自动触发业务审查与最终验收，导致需求覆盖在收口链上无责任方；④ 无「变更集 → 影响面 / 消费方」横切扫描；⑤ `SUMMARY-GATE-PMW-002` 只查计划内显式登记项；⑥ 缺「整体重读」，等于把独立复查外包给用户。
-- 形态裁决：**不做独立 gate skill**——仓库已有 5 个收口 gate，新增同构 gate 会造成层叠且无法改变「自我声明式 PASS」的失效模式；落为被既有 gate 消费的横切 reference，符合「单一权威 + 消费不复制」架构。
-- 验证：`quick_validate.py` 双 PASS；引用链 8 处全可达；新 reference CR=0 / LF=101（纯 LF）；同域冗余扫描 PASS（1 处措辞近似已在同闭环收敛为引用）；独立 8 维评分 60.3 → 64.0（+3.7，棘轮保留）；补建该 skill 原缺的 `source-notes.md` 与 `workbuddy-absorption-map.md`。
-- 执行踩坑：**并行对同一文件发多个 Edit 会发生 lost update**（工具返回 `Successfully edited` 但内容未落盘，另有 1 次 `EBUSY`）→ 同一文件多次修改必须串行，批量修改后必须回读磁盘而非相信工具返回值。
-- 诚实局限：本环节**不能消灭残留，只能把「用户复查发现」前移为「agent 收口发现」**；不承诺「以后没有残留」。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 须知：`PROJECT_CURRENT.md` 逼近 51,200 上限，已把最旧 2026-08-23 条目压缩为 5 行摘要；`PROJECT_HISTORY.md` 满 20 条，已裁剪最旧 2026-08-22「吸收调试」条。
-
-## 2026-09-12 行尾归一 + 编码规则加固 + 既有测试红项清零（内部更新通道）
-
-- 来源对象：用户对上一轮登记的三项待办回复「都修复」——① 加固编码规则技能；② 行尾债务；③ 既有测试失败。
-- 当前状态：**三项全部落地，全量测试 33 个文件 / 468.9 秒 / failures = 0**（起始 32 文件、10 失败）。细节与逐项根因见 `doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md`。
-- ① 行尾：根因是 **8 处 Python 写入点缺 `newline`**（`.system/skill-creator/scripts/{generate_openai_yaml,init_skill}.py`、`.system/plugin-creator/scripts/{create_basic_plugin,update_plugin_cachebuster}.py`），Windows 文本模式把 `\n` 翻成 `\r\n`，每次生成都把 `agents/openai.yaml` 写回 CRLF——即 `asset_eol_health_test` 所述「修掉后又回归」的机制。已全部补齐并**真实重跑生成器验证产物 CR=0**。工作副本范围内（排除 `doc/`、`.git`、缓存、`.workbuddy`、二进制）归一为 LF，终态 **整文件 CRLF=0 / 混合=0**。
-- ② 编码规则加固：`windows-encoding-rules/SKILL.md` 新增「换行判定与写入（实证陷阱）」——判定必须走字节级判据，**禁用 `grep -c $'\r'`**（本环境退化为匹配所有行，对 LF 与 CRLF 文件给出同一数值）；Python 写入必须显式 `newline="\n"`；两者均入通过/驳回标准。字典已重刷（65/8/113）。
-- ③ 测试红项：10 个文件逐个定性后修复（非放水）。主要根因：**时间炸弹**夹具（硬编码日期越过 7 天保留窗，伪造成隔离逻辑缺陷）；登记表 `template_count` 与列表不符（唯一一致解 21）；夹具引用已删文档；`bootstrap_agents.sh` 把 `/c/...` 喂给原生 Python 被解析成 `\c\...`（新增 `to_native_path()`，**6 处调用点一并修**）；治理扫描未排除工具运行时目录 `.workbuddy`；端到端测试依赖本机钩子部署（改为优先已部署、缺失回退仓库版本化源码，**未擅自部署**）；精确计数断言改下限；`imagegen/SKILL.md` 补回按其自身事实的凭据口径。
-- ④ 历史资产对账（用户裁决「对账现状」）：`doc/5-tests/` 历史资产在 `3dae6219 fix: 删除旧数据` 中被整体清除（该提交共删 746 文件，其中 571 个在该目录；基线期望的 85 个可执行资产现为 0）。按裁决**不恢复**：基线更新为当前实际；仍被引用的 Plan Mode 等待循环状态机测试从 `e20effc8` 迁入 `test/implementation-planning-rules/plan_mode_wait_loop_test.py`（修正写死的 `parents[4]`→`parents[2]`），夹具同迁。
-- ⑤ 知识库主题合规：`20-Knowledge/测试与验证/` 违反 `knowledge-layout.md`「不得自行新造主题」（09-10 日报已诊断），按主题定义并入 `研发流程/` 并撤销目录；09-10 日报 4 处 wikilink 同步新路径并加注后迁（不追溯改写当日分类）。`build` → 178 篇，`check` → **dead_link_count = 0**。
-- ⑥ 新增仓库级规则「夹具与守卫参照物稳健性」（用户裁决）：根因是本轮 10 个红项里 5 个的参照物都是**外部事实的快照**。唯一事实源 `test-program-rules/references/fixture-and-guard-robustness.md`（时间 / 路径 / 结构 / 范围 / 基线五类硬约束 + 判据 + 反例 + 复核口径）；`AGENTS.md` 与 `CLAUDE.md` 同步加入仓库级最小约束摘要章节「夹具与守卫参照物稳健性（强制）」；`test-program-rules/SKILL.md` 补触发信号、references 读取规则与通过/驳回标准；来源映射已登记（**覆盖率断言在登记前真实拦下该文件并给出可执行信息**，为 09-11 断言的实活验证）；流水线 `STYLE-09` 已将其纳入检查落点。
-- 验证证据：全量 33/33；`asset_eol_health_test` 4/4；`asset_location_test` 12/12；`validate_engineering_docs_test` 60/60；`task_plan_projection_test` 75/75；`supervisor_state_test` 17/17；`static_owner_router_test` 20/20；`scan_test_pollution.py --diff-only` → **POLLUTION: PASS**；6-review 文档 `--profile style_regression` → **valid=true / status=PASS / errors=[]**。
-- 未提交：本轮无 Git 授权，改动停在已改动未提交状态。
-- 遗留（既有，仅登记）：知识库 `check` 仍 42 项违规（39 篇缺 frontmatter、3 篇缺必填字段、2 项接替关系），属 09-10 日报已记录存量；`doc/5-tests/` 571 个历史文件按裁决不恢复。
-- 须用户留意：**4 个文件因 HEAD 本身为 CRLF 而形成真实行尾变更**（`database-schema-rules/SKILL.md`、`database-query-rules/SKILL.md`、`code-snippet-location-rules/SKILL.md`、`code-snippet-location-rules/references/source-priority.md`）；其余 CRLF-only 差异经 `git hash-object --path` 验证归一后 == HEAD、提交不产生差异。如需保留其历史 CRLF 可单独回退。
+- 交付残留自查：新建 `skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md`（6 维横切自查，收口前 + 中段改码）；形态裁决不做独立 gate skill，登记进延迟 gate 注册表。附带发现「同文件并行多 Edit 会 lost update」。
+- 行尾与测试：8 处 Python 写入点补 `newline`、工作副本归一 LF、`windows-encoding-rules` 增换行字节级判据；10 个既有红项定性修复后全量 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则（`test-program-rules/references/fixture-and-guard-robustness.md` + 双规则文件章节）。
+- 逐项根因与证据见 `doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md`。
 
 ## 2026-09-11 代码质量九维治理：四项规则缺口补齐与 6-review 编排（已归档摘要）
 
 - 来源与状态：4 项内容缺口（函数签名、定义位置、结构体角色分层、纯转换函数落点与公共工具索引）及 6-review 九步流水线全部落地闭环，测试全量 PASS，已固化进长期记忆与字典。
-
-
-## 2026-08-28 tapd-env-bootstrap SKILL.md 路径去用户名化（已归档摘要）
-
-- 来源与状态：已落地，将凭据路径硬编码改为动态 `~/.tapd/env.sh` 与 `$env:USERPROFILE` 形式。
-
-## 2026-08-27 根级 cachetask 缓存重建任务目录加入目录树（已归档摘要）
-
-- 来源与状态：已全量落地收口，将 `cachetask/` 作为三类根级任务入口之一加入 `package-structure-rules` 与 Catalog，已沉淀知识库与长期记忆。
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 

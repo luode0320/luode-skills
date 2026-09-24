@@ -50,7 +50,7 @@ def main() -> None:
     cachebuster = sanitize_cachebuster(args.cachebuster or default_cachebuster())
     next_version = with_cachebuster(version, cachebuster)
     manifest["version"] = next_version
-    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     print(f"Updated plugin version: {version} -> {next_version}")
 

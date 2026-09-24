@@ -7,5 +7,6 @@
   "labels": {
     "requires_api_key": "false"
   },
-  "iconDownloadFailedAt": 1789459363626
+  "iconDownloadFailedAt": 1789906339718,
+  "installedContentHash": "sha256:823462e8976b0c8ae9defc116d13dd889ad939bd7ba5b016572bcbc53fae79b7"
 }

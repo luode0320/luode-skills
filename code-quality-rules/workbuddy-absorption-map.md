@@ -98,3 +98,34 @@
   - 引用链 PASS：`SKILL.md` → `references/definition-placement-rules.md` 存在。
   - 字典重跑 exit 0。
   - `quick_validate` 因本机缺 `pyyaml` 未能运行（既有环境基线，非本轮引入）。
+
+## 2026-09-18：外部吸收——ponytail（马尾辫 · 懒资深开发模式）
+
+- **来源**：外部吸收通道，`ponytail`（v4.9.0，GitHub DietrichGebert/ponytail，本地安装源位于 `~/.workbuddy/skills/ponytail/`）。
+- **吸收诉求**：吸收其按「屋里最懒的资深开发」的七级阶梯（The Seven-Step Minimal Ladder）、过度设计审查五标签与平台原生替代清单。
+- **拆解原子条目数**：9 条（4 条合并、3 条保留本地、2 条拒绝）。
+
+| # | 外部精华（原子条目） | 本地现状对照 | 裁决 | agent 通用性 | 环境依赖 | 落点 / 理由 | 整理去重建议 |
+|---|---|---|---|---|---|---|---|
+| 1 | **七级极简解法阶梯（The Ladder）**：YAGNI → 代码库已有 → 标准库 → 平台原生 → 已装依赖 → 一行内联 → 最小实现；在第一个站得住的台阶停下。 | `minimal-change-general.md` 有“简单优先”，缺少结构化、强制递进的七级拦截决策链 | 合并 | 通用 | N/A | `code-quality-rules/references/minimal-solution-ladder.md`（新建） | 整理 `minimal-change-general.md`，将零散描述收敛指向本权威阶梯 |
+| 2 | **平台原生替代方案目录（platform-native）**：系统化整理 HTML5 控件、现代 CSS 与现代 Web API 替代第三方 npm 依赖清单 | 仅零散建议，缺乏跨栈、体系化的平台原生能力速查清单 | 合并 | 通用 | N/A | `code-quality-rules/references/platform-native-substitutes.md`（新建） | 作为阶梯第 4 台阶权威速查支撑，编码前查证 |
+| 3 | **修 Bug 汇聚处修一次（修根因而非症状）**：动手前 grep 改动函数调用方，在所有调用方汇聚处修一次 | `bug-root-cause-rules` 与 `bug-fix-proposal-rules` 已有更严格调用链分析与反打补丁规则 | 保留本地 | 通用 | N/A | 本地规则体系更健全、断言流程更严密 | N/A |
+| 4 | **有意简化的技术债标注（`tradeoff:` 注释）**：对确有天花板的折中注明上限与升级触发条件，防止“以后再说”沦为“永远不做” | `comment-rules` 禁止废话注释，但缺少“对有意识做出的折中必须注明重构阈值”的契约 | 合并 | 通用 | N/A | 去除特定品牌前缀，抽象为标准 `# tradeoff: <天花板>, <升级触发条件>` 并入 `minimal-solution-ladder.md` | 联动 `comment-rules` 确立折中注释格式合法性 |
+| 5 | **代码在前、极简解释输出**：代码在前，最多 3 行短句说明跳过了什么；删除未经要求的散文说明 | 本地已有严格的 `reasoning-summary-structure-rules`（T0/T1/T2 档位与决策三反铁律） | 保留本地 | 通用 | N/A | 本地交付总结更具可审计性与可验证性，不退化为外部 3 行散文 | N/A |
+| 6 | **不能偷懒的安全底线**：绝不因偷懒砍掉输入校验、错误处理、安全防护、可访问性与用户明确需求 | 本地 `error-handling-rules` 与门禁体系已全面涵盖且为硬阻断项 | 保留本地 | 通用 | N/A | 本地红线比单纯声明更具约束力 | N/A |
+| 7 | **过度设计审查五标签**：`delete:`、`stdlib:`、`native:`、`yagni:`、`shrink:` 五标签专项审查 diff 中的冗余抽象 | 本地代码审查侧重改动范围与行数，缺少针对“多余抽象、冗余引包”的精简标签 | 合并 | 通用 | N/A | 并入 `minimal-solution-ladder.md` 过度设计专项审查小节 | 补充进审查维度，不新增独立 gate |
+| 8 | **三档强度控制（lite / full / ultra）**：通过会话指令动态切换懒惰强度 | 本地基于确定性工程契约执行，需求边界由 `requirement-boundary-rules` 在接入期澄清 | 拒绝 | 通用 | N/A | 交互形态不兼容，本地以自动化确定性规则优先 | N/A |
+| 9 | **上游 Hook 与专属机制形态**：上游 SessionStart 钩子、flag 标记文件、状态栏显示等 | 纯指令形态无 hook，且本地严禁工具专属机制绑定 | 拒绝 | 通用 | N/A | 形态分离原则：宿主机制不迁移 | N/A |
+
+- **落盘改动**：
+  - 新增 `code-quality-rules/references/minimal-solution-ladder.md`
+  - 新增 `code-quality-rules/references/platform-native-substitutes.md`
+  - 修改 `code-quality-rules/references/minimal-change-general.md`（整理去重，合并重叠描述）
+  - 修改 `code-quality-rules/SKILL.md`（统一硬约束、主线 1 与 references 读取规则）
+- **整理去重**：`minimal-change-general.md` 中原有的散落抽象原则与七级阶梯收敛对齐，明确权威指向，消除双份同义表述；未产生多余的孤立文件。
+- **同域扫描结论**：扫描范围 = 编码质量与代码生成域（code-quality-rules 自身 / code-generation-style-rules / code-style-consistency-rules / comment-rules / naming-rules）。发现 0 处重复段落、0 处门控层叠、0 处散落产物；**PASS**。
+- **净增体积**：新建两份 reference，整理更新 2 处，净增体积可控且高内聚。
+- **棘轮验证**：
+  - 引用链全可达：`SKILL.md` 与 `minimal-change-general.md` 引用均已落盘。
+  - UTF-8 编码与 LF 格式正常。
+- **源删除**：吸收闭环确认后，删除本地安装源 `C:\Users\luode\.workbuddy\skills\ponytail\`。

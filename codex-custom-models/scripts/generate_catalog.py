@@ -60,6 +60,12 @@ def pick_base_template(slug, existing, official, builtin_luna):
         hit = next((m for m in official if m["slug"] == slug), None)
         if hit:
             return hit
+    # For new third-party slugs, prefer existing verified models like glm-5.3 or gpt-5.6-luna
+    if existing is not None:
+        for fallback_slug in ("glm-5.3", "gpt-5.6-luna"):
+            hit = next((m for m in existing.get("models", []) if m["slug"] == fallback_slug), None)
+            if hit:
+                return hit
     return builtin_luna  # minimal fallback
 
 
@@ -125,8 +131,16 @@ def main():
     gpt_ctx = 400000        # GPT-family declared window (relay supports large ctx)
     third_ctx = 262144      # third-party window == user list maxInputTokens
 
+    effort_desc = {
+        "low": "Fast responses with lighter reasoning",
+        "medium": "Balances speed and reasoning depth for everyday tasks",
+        "high": "Greater reasoning depth for complex problems",
+        "xhigh": "Extra high reasoning depth for complex problems",
+        "max": "Maximum reasoning depth for the hardest problems",
+    }
+
     catalog, builtin = [], builtin_luna_template()
-    for entry in src:
+    for i, entry in enumerate(src):
         slug = entry.get("id") or entry.get("name")
         if not slug:
             continue
@@ -136,16 +150,39 @@ def main():
         m["slug"] = slug
         m["display_name"] = slug
         m["description"] = "luode.vip relay · OpenAI-compatible"
-        m["context_window"] = gpt_ctx if is_gpt else third_ctx
-        m["max_context_window"] = m["context_window"]
+        
+        ctx = entry.get("maxInputTokens") or (gpt_ctx if is_gpt else third_ctx)
+        m["context_window"] = ctx
+        m["max_context_window"] = ctx
         m["auto_compact_token_limit"] = None
+        
         m["default_reasoning_level"] = entry.get("reasoning", {}).get(
             "defaultEffort", "high")
+        
+        supported_efforts = entry.get("reasoning", {}).get("supportedEfforts")
+        if supported_efforts:
+            m["supported_reasoning_levels"] = [
+                {"effort": e, "description": effort_desc.get(e, f"{e} reasoning depth")}
+                for e in supported_efforts
+            ]
+            
         if not is_gpt:
             # neutral identity for non-OpenAI models
             m.pop("model_messages", None)
             m["base_instructions"] = NEUTRAL_INSTRUCTIONS
-        m["priority"] = entry.get("priority", 20)
+            # Third-party relay models produce standard OpenAI function_calls.
+            # Setting tool_mode="code_mode_only" forces Codex into raw JS custom_tool_call mode,
+            # which fatal-errors with "Fatal error: tool exec invoked with incompatible payload".
+            # Setting tool_mode=None allows standard function call tools (exec_command, apply_patch, etc.).
+            m["tool_mode"] = None
+            m["use_responses_lite"] = False
+            m["multi_agent_version"] = None
+            m["include_skills_usage_instructions"] = True
+            m["include_apps_usage_instructions"] = True
+            m["include_plugin_usage_instructions"] = True
+            m["node_repl_auto_review_required"] = False
+            m["node_repl_disabled"] = False
+        m["priority"] = entry.get("priority", 20 + i * 5)
         catalog.append(m)
         print(f"[..] {slug:<24} ctx={m['context_window']:<7} "
               f"default_effort={m['default_reasoning_level']}")
