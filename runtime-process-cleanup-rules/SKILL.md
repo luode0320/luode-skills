@@ -1,6 +1,6 @@
 ---
 name: runtime-process-cleanup-rules
-description: 当任务（测试、联调、冒烟、验证、调试）启动过任何进程、后台任务或临时服务，需要在收口时把它们清理干净时触发。也用于诊断"进程已杀死但任务列表仍显示运行中""端口已释放但宿主说任务还在跑""规则写了清理却总是没执行"这一类反复出现的收尾遗漏问题。核心内容：零豁免原则（豁免只能由用户当轮显式授予，执行者无权自行判定"这是正常开发实例"）、三层清理对象（后台任务 / 服务进程 / 临时文件）、TaskStop 与 taskkill 的关键区别（只 taskkill 会留下任务 shell 残留）、收口前三项回读验证，以及"为什么含模糊豁免条件的规则注定失效"这一可迁移的规则设计心智模型。
+description: 当任务（测试、联调、冒烟、验证、调试）启动过任何进程、后台任务或临时服务，需要在收口时把它们清理干净时触发。也用于诊断"进程已杀死但任务列表仍显示运行中""端口已释放但宿主说任务还在跑""规则写了清理却总是没执行""磁盘100%卡死或WSL跨系统进程残留"这一类收尾遗漏与挂死问题。核心内容：零豁免原则、四层清理对象（后台任务 / 服务进程 / 虚拟机与挂起子系统 / 临时文件）、TaskStop 与 taskkill 区别、WSL DrvFS 死锁机理与 wsl --shutdown 彻底清理、收口前四项回读验证（含物理磁盘 I/O 负荷回读），以及严禁在 WSL 内跨系统全盘递归扫描的源头防护。
 agent_created: true
 ---
 
@@ -55,7 +55,7 @@ agent_created: true
 | 临时测试脚本、临时报告 | ✅ 必须清理 | 本轮产生 |
 | 用户在自己终端启动的服务 | ❌ 不清理 | 非本轮启动（且需用户确认） |
 
-## 四、三层清理对象（缺一不可）
+## 四、四层清理对象（缺一不可）
 
 ### 第 1 层：后台任务 —— 必须用 `TaskStop`
 
@@ -83,7 +83,28 @@ netstat -ano | grep LISTENING | grep ":<port>"
 taskkill -f -pid <PID>
 ```
 
-### 第 3 层：浏览器与临时文件
+### 第 3 层：WSL / 虚拟化子系统与挂起进程（防跨虚拟机残留与 DrvFS 死锁）
+
+**这是最隐蔽、破坏性最大的一层。**
+
+关键事实：
+1. **杀宿主代理 ≠ 杀内部进程**：在 Windows 宿主仅用 `taskkill` 或 `Stop-Process` 杀掉 `bash.exe`、`wsl.exe`、`wslhost.exe`，只是斩断了 Windows 侧的客户端管道，**Linux 虚拟机（`vmmem`）内部派生的后台进程（如死循环脚本、递归检索、编译器）依然在独立存活狂跑**。
+2. **跨系统扫描死锁风暴**：在 WSL 内部通过 `/mnt/c`、`/mnt/d` 挂载点对 Windows 宿主盘执行大范围递归扫描（如 `grep -r /mnt/c`、`find`、全盘索引）会在 9P/DrvFS 文件桥上产生海量小文件元数据请求，并被 Windows Defender（`MsMpEng.exe`）实时拦截扫描，造成 I/O 放大风暴（磁盘活动时间持续 100%），并导致后续所有 `wsl.exe` 命令在 9P 队列中全部超时死锁。
+
+**源头禁令（强制）**：
+- 严禁在 WSL 内部对 Windows 挂载盘（`/mnt/c` 等）执行大范围无限制递归搜索；检索 Windows 文件必须在宿主使用原生工具（PowerShell、ripgrep、Everything）。
+
+**正确清理手段**：
+```powershell
+# 优先在 WSL 内部定位并杀死具体进程
+wsl.exe -d <发行版> -e kill -9 <pid>
+
+# 兜底重置：当 DrvFS 管道已死锁、wsl.exe 命令无响应或进程无法退出时，必须执行虚拟机级彻底重置
+wsl.exe --shutdown
+```
+`wsl.exe --shutdown` 会干净释放全部 Windows 文件锁句柄并回写 VHDX 脏页，将物理磁盘活动时间从 100% 彻底释放回待机水平。
+
+### 第 4 层：浏览器与临时文件
 
 ```bash
 playwright-cli kill-all
@@ -105,7 +126,7 @@ rm -rf .playwright-cli/
 - 给出「已测试通过」「已交付」的结论
 - 进入总结阶段
 
-## 六、收口前必须三项回读验证
+## 六、收口前必须四项回读验证
 
 必须以**真实工具输出**为准，禁止凭记忆或推断断言"已经清理了"。
 
@@ -114,6 +135,7 @@ rm -rf .playwright-cli/
 | 端口回读 | `netstat -ano \| grep -E ":<port>"` | 无 LISTENING 行 |
 | 进程回读 | `tasklist \| grep -iE "<进程名>"` | 无残留 |
 | 后台任务回读 | 查看宿主任务列表 | 无本轮任务处于运行中 |
+| 磁盘 I/O 负荷回读 | `Get-Counter '\PhysicalDisk(_total)\% Disk Time', '\PhysicalDisk(_total)\Disk Read Bytes/sec'` | `% Disk Time < 10%` 且读取吞吐回落至待机水平（< 5MB/s） |
 
 任一项未通过 → 判定未完成，继续清理，**不得进入总结**。
 
@@ -137,6 +159,7 @@ rm -rf .playwright-cli/
 已清理：
 - 后台任务：TaskStop <id>（或：本轮无后台任务）
 - 服务进程：<port> 无 LISTENING（netstat 实测）
+- 虚拟机/子系统：无挂起僵尸进程 / 磁盘 I/O 已恢复待机（实测 % Disk Time < 5%）
 - 浏览器/临时文件：已清理
 ```
 

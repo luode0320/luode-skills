@@ -239,3 +239,14 @@
 - **环境依赖登记**：N/A（纯规则文本）。
 - **验证**：`quick_validate.py` `Skill is valid!`（结构校验替代棘轮基线，内部更新通道无 8 维评分基线）；`path-map.yaml` YAML 解析通过；UTF-8 校验通过；改 `description` + 新增 `##` 级标题，已重跑 `skill-dictionary/generate_dictionary.py` 刷新 `data.js` 与 `字典.md`。
 - **源清理**：N/A（内部更新通道）。
+## 2026-09-26 · 内部调整：runtime-process-cleanup-rules 补齐「虚拟化子系统与 DrvFS 死锁治理」
+
+- **调整诉求**：吸收 2026-09-26 磁盘 100% I/O 挂死排查与治理实战经验：跨虚拟机进程无法仅靠 Windows taskkill 终结、DrvFS 9P 跨系统死锁机理、`wsl --shutdown` 终极重置、物理磁盘实时计数器回读验证，以及严禁在 WSL 内跨系统全盘递归扫描的源头防护。
+- **通道**：内部更新通道。
+- **裁决摘要**：5 条原子诉求全部「合并」——本地原规则仅覆盖宿主 TaskStop、taskkill 端口服务与临时文件三层，对 WSL/Hyper-V 虚拟化子系统完全空白；回读验证缺少物理磁盘 I/O 负荷维度。将清理对象由三层扩展为四层，并将回读验证由三项扩展为四项（增加物理磁盘活动时间 < 10% 判定）。
+- **落点**：`runtime-process-cleanup-rules/SKILL.md`（frontmatter description 扩展；第四节新增「第 3 层：WSL / 虚拟化子系统与挂起进程」；第六节收口回读新增「磁盘 I/O 负荷回读」；第八节话术模板同步更新）。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-09-26 内部更新条目）。
+- **同域扫描**：范围运维/清理域（runtime-process-cleanup / windows-c-drive-cleanup / wsl-host-agent / agent-runtime-recovery），发现 0 处冗余，PASS（详见裁决表）。
+- **环境依赖登记**：N/A（纯规则文本与系统原生命令）。
+- **验证**：UTF-8 校验通过；frontmatter description 长度 302 字符 < 1024 校验通过；四层清理对象与物理磁盘 I/O 回读断言一致。
+- **源清理**：N/A（内部更新通道）。

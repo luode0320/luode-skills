@@ -639,3 +639,25 @@
 - **净增体积**：`test-strategy-rules` +约 1.3KB（7 处补丁，含条件重写与示例替换）；`functional-validation-rules` +约 0.2KB；`browser-session-automation-rules` +约 0.3KB；合计约 +1.8KB。
 - **棘轮验证**：3 个 SKILL.md UTF-8 与 frontmatter 解析 PASS（`description` 999 / 583 / 565 字符，均 <1024）；三条件口径关键字回读（被前端调用的接口改动 ×3、不触发条件三条件合取 ×1、接口调用面检索 ×1、后端改动轮尤其成立 ×1、与页面前端级的联动 ×1、不构成有效豁免理由 ×1）；全仓旧口径扫描清零；`description` 变更触发字典产物同轮刷新。
 - **源清理**：N/A（内部更新通道，无外部安装源）。
+## 2026-09-26：内部更新——运行时进程清理增加虚拟化子系统与 DrvFS 死锁治理
+
+- **来源**：内部调整：`runtime-process-cleanup-rules`，调整诉求 = 「吸收 2026-09-26 磁盘 100% I/O 挂死排查与治理实战经验：跨虚拟机进程无法仅靠 Windows taskkill 终结、DrvFS 9P 跨系统死锁机理、`wsl --shutdown` 终极重置、物理磁盘实时计数器回读验证，以及严禁在 WSL 内跨系统全盘递归扫描的源头防护」。
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：5 条（C1 杀宿主代理≠杀内部进程 / C2 DrvFS 跨系统死锁与 Defender 伴生放大 / C3 源头全盘递归扫描禁令 / C4 虚拟机级重置 `wsl --shutdown` / C5 收口第四项物理磁盘 I/O 回读验证）。
+
+| # | 内部调整诉求 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|---|
+| 1 | 虚拟机内部死循环/挂起进程在杀掉宿主代理后依然存活 | 原规则仅覆盖宿主 TaskStop、taskkill 端口服务与临时文件三层，对 WSL/Hyper-V 子系统完全空白 | 合并 | 新增「第 3 层：WSL / 虚拟化子系统与挂起进程」，揭示杀 Windows 代理不杀 Linux 内部进程事实 |
+| 2 | WSL 跨系统扫描打满 DrvFS 9P 桥接并触发 Defender 放大 | 无跨系统 I/O 挂死机理说明 | 合并 | 补充 9P 协议小文件元数据请求打满与 Defender 实时拦截放大致物理磁盘 100% 卡死分析 |
+| 3 | 缺少源头防护，反复触发跨系统全盘扫描 | 无跨盘扫描限制 | 合并 | 新增源头禁令（强制）：严禁在 WSL 内部通过 `/mnt/c` 等挂载点执行大范围无限制递归搜索 |
+| 4 | 进程卡死后 `kill` 命令无法响应时的终极重置手段 | 原规则只有 taskkill 与 TaskStop，对虚拟机死锁无解 | 合并 | 确立 `wsl.exe --shutdown` 作为 DrvFS 阻塞与进程挂起时的 VM 级彻底清理与文件锁释放手段 |
+| 5 | 回读验证缺少磁盘物理 I/O 负荷维度 | 原规则仅含端口、进程名、任务列表三项回读，对隐形跨虚拟机 I/O 无法感知 | 合并 | 升级为四项回读，追加「磁盘 I/O 负荷回读」（`Get-Counter '\PhysicalDisk(_total)\% Disk Time'` < 10%） |
+
+- **落盘改动**：
+  - `runtime-process-cleanup-rules/SKILL.md`：frontmatter description 扩展（302 字符 <1024）；「三层清理对象」升级为「四层清理对象」，插入第 3 层 WSL/虚拟化子系统治理（含杀宿主≠杀内部、DrvFS 死锁机理、源头禁令、`wsl --shutdown` 兜底清理）；「收口前必须三项回读验证」升级为「四项回读验证」，追加磁盘 I/O 负荷回读；收口模板增加子系统项。
+- **整理去重**：本轮为**对象层级补全与回读闭环**，未新增独立 skill 目录，未引入多套术语；将虚拟机子系统作为独立资源层级纳入统一清理模型；严格遵循单一可编辑资产原则。
+- **同域扫描结论**：范围 = 运维/清理域（runtime-process-cleanup / windows-c-drive-cleanup / wsl-host-agent / agent-runtime-recovery）。发现 = 0 处新增重复段落、0 处门控层叠、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本与标准 PowerShell/WSL 原生命令，无额外环境变量/依赖配置）。
+- **净增体积**：`runtime-process-cleanup-rules/SKILL.md` +约 1.2KB（由 2.9KB 增至 4.1KB）。
+- **棘轮验证**：SKILL.md UTF-8 与 frontmatter 解析 PASS；关键断言回读一致（四层清理对象 / WSL / 虚拟化子系统 / DrvFS / wsl.exe --shutdown / 磁盘 I/O 负荷回读）；description 长度 302 < 1024 PASS。
+- **源清理**：N/A（内部更新通道，无外部安装源）。
