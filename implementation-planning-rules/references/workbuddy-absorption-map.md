@@ -119,8 +119,8 @@
 
 | # | 外部精华 | 本地现状 | 裁决 | 落点 / 理由 |
 |---|---------|---------|------|------------|
-| 1 | 适用场景三件套：目标写成可衡量结果 / 拆月→周→日 / 标今日第一步 | 本地无自有目标拆解规则；long-run-loop-rules 只做执行循环 | 合并 | `implementation-planning-rules/references/goal-breakdown-seed.md`（新建，工程域入口）|
-| 2 | 倒推法：澄清目标与 deadline → 拆 3 层动作 → 最小可行步 | 本地无同义规则 | 合并 | 方法本体单一权威在 `long-run-loop-rules/references/goal-breakdown-before-loop.md`；seed 引用式接入 |
+| 1 | 适用场景三件套：目标写成可衡量结果 / 拆月→周→日 / 标今日第一步 | 本地无自有目标拆解规则；goal-loop-rules 只做执行循环 | 合并 | `implementation-planning-rules/references/goal-breakdown-seed.md`（新建，工程域入口）|
+| 2 | 倒推法：澄清目标与 deadline → 拆 3 层动作 → 最小可行步 | 本地无同义规则 | 合并 | 方法本体单一权威在 `goal-loop-rules/references/goal-breakdown-before-loop.md`；seed 引用式接入 |
 | 3 | 首个最小可行步（默认 10 分钟内可启动） | 本地无 | 合并 | seed.md「最小步下沉」节：首个任务必须短时可启动 |
 | 4 | 示例：转行做开发 → 季度学基础/月做项目/周刷题 + 今日选入门课 | 本地无 | 合并 | seed.md 示例节（改写为本地口径）|
 | 5 | 源文件排版缺陷（逐字换行乱码、`示例: None` 占位） | 本地 skill 规范禁止乱码与空占位 | 拒绝 | 缺陷形态不吸收 |
@@ -130,7 +130,7 @@
   - 修改 `SKILL.md`：自动触发信号补 1 条（模糊大目标计划型问题 → 轻量拆解入口）、references 读取规则补 1 条。
   - `references/source-notes.md` 追加来源记录。
 - **整理去重**：方法步骤在 seed.md 与 before-loop.md 高度重复 → 收敛为「单一权威（before-loop）+ 引用式（seed）」，seed 已重写不重复定义步骤。
-- **同域扫描结论**：范围 = implementation-planning-rules / long-run-loop-rules / requirement-splitting-rules / requirement-intake-rules / goal__skillhub / autonomous-execution-rules。关键词（倒推法/最小可行步/周→日/10 分钟可启动/拆解目标/大目标太小步）扫描：除本次两处新落盘文件外 0 命中；无门控层叠（long-run-loop 侧触发词已限定"目标模糊需先拆解再执行"）；无散落产物；引用链可达（seed → before-loop 跨 skill 相对路径正确）。**PASS**。
+- **同域扫描结论**：范围 = implementation-planning-rules / goal-loop-rules / requirement-splitting-rules / requirement-intake-rules / goal__skillhub / autonomous-execution-rules。关键词（倒推法/最小可行步/周→日/10 分钟可启动/拆解目标/大目标太小步）扫描：除本次两处新落盘文件外 0 命中；无门控层叠（goal-loop 侧触发词已限定"目标模糊需先拆解再执行"）；无散落产物；引用链可达（seed → before-loop 跨 skill 相对路径正确）。**PASS**。
 - **环境依赖**：N/A（规则纯文本，无环境变量/宿主配置/hook/依赖/路径引用）。
 - **自检能力**：N/A（无环境依赖项）。
 - **净增体积**：+约 1.4KB（seed.md）+ 约 0.3KB（SKILL.md 两行 + source-notes 一段）；引用式接入，不构成膨胀。

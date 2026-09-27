@@ -1097,3 +1097,4 @@ claude-mem(记忆) :
 2026-09-01 22:47:00 docs: [项目本地skill] 登记ellipal表格页规则创建记录
 2026-09-13 16:35:42 feat: [接口规范与规则治理] 固化Apifox中文展示规范与项目规则资产同步
 2026-09-14 00:54:00 feat: [代码分解与规则同步] 补齐目录树与代码拆分规则及技能字典资产同步
+2026-09-27 01:30:00 feat: [goal-loop-rules合并] goal__skillhub与long-run-loop-rules合并为goal-loop-rules并同步引用链

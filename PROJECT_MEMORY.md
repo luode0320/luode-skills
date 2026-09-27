@@ -17,6 +17,7 @@
 - 稳定决策：**防自我授权边界**——agent 为补建任务投影、异常修复或超时探测而自动 `create_goal` 产生的 Goal **不构成**用户开启的 Goal 模式，仍不自动取得任何实现授权；免确认推进必须建立在用户显式开启或确认的 Goal 之上（兼容 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」）。
 - 稳定决策：**临时文件与脚本执行后必须清理**——执行过程中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务，使用后立即清理，禁止污染项目目录或长期滞留在宿主任务列表；未清理视为任务未完成，收口前按 `runtime-process-cleanup-rules` 的三层清理对象真实回读验证。
 - 来源：用户指令（2026-09-24）+ `long-run-loop-rules`（`SKILL.md`、`references/safety-mechanisms.md`）+ `autonomous-execution-rules`（`SKILL.md`、`references/continuation-and-pause.md`）+ `runtime-process-cleanup-rules` + `AGENTS.md` / `CLAUDE.md`。
+- 2026-09-27 更新：Goal 模式 Owner 已从 `long-run-loop-rules` 合并至 `goal-loop-rules`（与 `goal__skillhub` 目标方法论合并），旧目录已删除；本条来源路径按新 Owner 理解，原始落盘历史见 `PROJECT_HISTORY.md`。
 - 更新时间：2026-09-24。
 
 ## 配置文件项禁止多行过程注释与复杂逻辑专门文档规范（2026-09-18 固化）
@@ -1694,7 +1695,7 @@ entities:
       - 临时文件执行后删除
       - 不污染项目目录
       - 防Goal自我授权
-    definition: "Goal 模式（用户当前轮显式 `/goal` 开启，或用户已显式确认的 Goal 处于 active）即视为计划阶段已完成、用户只要结果：agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清；执行中出现多方案、路径冲突、口径不一致或约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认。推荐方向判定顺序：① 满足目标与验收条件；② 最小可逆；③ 有真实证据支撑；④ 守住安全与合规红线。证据不足时选最小可逆、最保守、可回滚方案继续推进，并把分歧、依据与选择写入落盘任务计划文档。**防自我授权边界（强制）**：agent 为补建任务投影、异常修复或超时探测而自动 create_goal 产生的 Goal 不构成用户开启的 Goal 模式，仍不自动取得任何实现授权。**不因免确认放开**：系统安全限制与权限审批、高风险或不可逆操作、local 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交/推送仍需当前轮显式授权）、跨项目写入红线与 WRT-* 授权边界、个人文件安全与删除保护；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。**临时产物清理**：执行中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务须在使用后立即清理，禁止污染项目目录或长期滞留宿主任务列表，未清理视为任务未完成，收口前按 runtime-process-cleanup-rules 三层清理对象真实回读验证。落点：long-run-loop-rules/SKILL.md（Goal 模式 Owner）、long-run-loop-rules/references/safety-mechanisms.md（安全熔断衔接）、autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md（执行许可与暂停边界）、AGENTS.md / CLAUDE.md 仓库级章节。"
+    definition: "Goal 模式（用户当前轮显式 `/goal` 开启，或用户已显式确认的 Goal 处于 active）即视为计划阶段已完成、用户只要结果：agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清；执行中出现多方案、路径冲突、口径不一致或约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认。推荐方向判定顺序：① 满足目标与验收条件；② 最小可逆；③ 有真实证据支撑；④ 守住安全与合规红线。证据不足时选最小可逆、最保守、可回滚方案继续推进，并把分歧、依据与选择写入落盘任务计划文档。**防自我授权边界（强制）**：agent 为补建任务投影、异常修复或超时探测而自动 create_goal 产生的 Goal 不构成用户开启的 Goal 模式，仍不自动取得任何实现授权。**不因免确认放开**：系统安全限制与权限审批、高风险或不可逆操作、local 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交/推送仍需当前轮显式授权）、跨项目写入红线与 WRT-* 授权边界、个人文件安全与删除保护；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。**临时产物清理**：执行中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务须在使用后立即清理，禁止污染项目目录或长期滞留宿主任务列表，未清理视为任务未完成，收口前按 runtime-process-cleanup-rules 三层清理对象真实回读验证。落点（2026-09-27 更新）：goal-loop-rules/SKILL.md（Goal 模式 Owner，由 goal__skillhub 与 long-run-loop-rules 合并）、goal-loop-rules/references/safety-mechanisms.md（安全熔断衔接）、autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md（执行许可与暂停边界）、AGENTS.md / CLAUDE.md 仓库级章节。"
     scope: "Goal 模式执行授权、方案分歧裁决、暂停边界收缩、防自我授权、临时产物清理、仓库级规则自举"
     status: "active"
     evidence_ids:
@@ -1778,9 +1779,9 @@ evidence:
     note: "2026-08-21 新增总结异步任务分流 + 宿主任务列表桥接：后台异步任务必选 `## 🔄 后台异步任务` 小节（结果与结论之后、后续内容之前），任务标识/类型/轮询节奏/完成信号/回流渠道/等待语义/宿主任务列表映射七字段；启动时必须 TaskCreate 登记宿主任务列表（描述三段式：做什么+任务标识+何时查看），启动/等待/回收三阶段 TaskUpdate 推进，禁止裸 run_in_background 当唯一进度可见手段（执行期契约在 autonomous-execution-rules）；该小节是「同步已完成 + 异步在跑」收口信号，非未完成、非阻断、不触发后续。WorkBuddy hooks 增强触发：UserPromptSubmit additionalContext 软提醒 + Stop exit code 2 硬校验；配置路径 ~/.workbuddy/settings.json 或项目 .workbuddy/settings.json；hook 支持需真实任务实测。"
   - evidence_id: evidence.rule.goal-mode-no-confirm-and-temp-cleanup
     type: "skill"
-    source: "用户指令（2026-09-24）+ long-run-loop-rules/SKILL.md 与 references/safety-mechanisms.md + autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md + runtime-process-cleanup-rules/SKILL.md + AGENTS.md / CLAUDE.md"
-    path: "long-run-loop-rules/SKILL.md"
-    note: "2026-09-24 固化 Goal 模式免确认推进：Goal 模式激活即视为计划已完成，执行分歧由 agent 自行裁决并按推荐方向推进、不要求用户确认；证据含 6 处落点（AGENTS.md / CLAUDE.md 双文件同哈希、long-run-loop-rules 两处、autonomous-execution-rules 两处）、quick_validate 双 PASS、字典重跑 65/8/120、知识库笔记《Goal模式免确认推进与临时产物清理-20260924》。关键边界：agent 自动补建的 Goal 不构成免确认授权（兼容 task-plan-rehydration-rules 既有口径）。"
+    source: "用户指令（2026-09-24）+ goal-loop-rules/SKILL.md 与 references/safety-mechanisms.md（2026-09-27 合并自 long-run-loop-rules 与 goal__skillhub）+ autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md + runtime-process-cleanup-rules/SKILL.md + AGENTS.md / CLAUDE.md"
+    path: "goal-loop-rules/SKILL.md"
+    note: "2026-09-24 固化 Goal 模式免确认推进；2026-09-27 Goal 模式 Owner 从 long-run-loop-rules 合并至 goal-loop-rules（与 goal__skillhub 目标方法论合并），旧目录保留为合并前快照。关键边界：agent 自动补建的 Goal 不构成免确认授权（兼容 task-plan-rehydration-rules 既有口径）。"
   - evidence_id: evidence.dialog.swag-upstream-openapi
     type: "dialog"
     source: "2026-07-14 需求实施计划与离线验证"
@@ -2185,7 +2186,7 @@ contexts:
     note: "适用于执行许可 confirmed/unknown/revoked 判定、开工计划边界、Goal 模式免确认推进与必须暂停节点的收缩"
   - context_id: context.long-run-loop
     type: "task-scope"
-    name: "Goal 生命周期与长任务循环"
+    name: "Goal 生命周期与长任务循环（2026-09-27 起归 goal-loop-rules）"
     note: "适用于 Goal 触发、完成标记、循环控制器、安全熔断，以及 Goal 模式下的分歧裁决与临时产物清理"
 lifecycle:
   active:

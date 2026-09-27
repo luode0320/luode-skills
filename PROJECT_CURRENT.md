@@ -1,5 +1,16 @@
 # 项目当前状态
 
+## 2026-09-27 Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）
+
+- 来源对象：用户本轮提出"goal 和 loop 的 skill 好像有多个，可以合并为一个吗"并完成三项决策（合并基座 = goal__skillhub 内容 + long-run-loop-rules 工程循环；合并后目录名 = goal-loop-rules；本轮只改仓库不动用户级目录）。
+- 当前状态：**实施中**。
+  - ① TASK-001 合并目录：`goal-loop-rules/` 已创建，SKILL.md 编写完成（目标方法论 + 工程循环控制分域路由），12 个文件从旧目录迁移（6 references + 3 scripts + script.sh + workbuddy-absorption-map.md + _skillhub_meta.json），`quick_validate.py` 返回 `Skill is valid!`。
+  - ② TASK-002 引用链同步：AGENTS.md / CLAUDE.md 第 347 行、deferred-gate-registry.md 第 34 行、goal-breakdown-seed.md（3 处）、source-notes.md（1 处）、workbuddy-absorption-map.md（3 处）已更新。
+  - ③ TASK-003 旧目录删除 + 空目录清理：已完成（用户指令确认删除合并前快照，仓库内 goal__skillhub__merged_archived 与 long-run-loop-rules__merged_archived 已 git rm + rmdir 清理）。
+  - ④ TASK-004 字典刷新：已完成（implemented 65 / planned_missing 8 / seed_total 119）。
+- 关键假设：`goal__skillhub/scripts/script.sh` 在 Codex 环境下 bash 可能不可用，SKILL.md 已注明降级路径。
+- 验证与交接：TASK-001 真实测试通过；TASK-002 / TASK-003 / TASK-004 已完成；改动停在已改动未提交状态。
+
 ## 2026-09-24 Goal 模式免确认推进与临时产物清理规则落地（内部更新通道）
 
 - 来源对象：用户指令（2026-09-24）——“只要我们开启 goal 模式，说明我们计划已经完成，只要实现就好了，如果执行过程有分歧，一律按照 agent 推荐的方案推进执行，不要求用户确认；出现分歧 agent 自行分析得出最推荐的执行方向，默认按照推荐的方向执行，无需用户确认。临时生成的文件和脚本记得执行后删除，不要污染项目目录。”
