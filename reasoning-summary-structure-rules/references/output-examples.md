@@ -131,8 +131,8 @@ flowchart LR
 
 | 文件 | 改动 |
 |---|---|
-| `bug-intake-rules/references/discovery-and-gap.md` | 承接 Bug 主动侦察条件路由与迁移资源 |
-| `编码skill.md` | Bug 域表格登记一行 |
+| [discovery-and-gap.md](file:///D:/谷歌云盘/luode-skills/bug-intake-rules/references/discovery-and-gap.md) | 承接 Bug 主动侦察条件路由与迁移资源 |
+| [编码skill.md](file:///D:/谷歌云盘/luode-skills/reasoning-summary-structure-rules/编码skill.md) | Bug 域表格登记一行 |
 
 ## 📚 知识引用
 
@@ -308,7 +308,7 @@ flowchart LR
 
 | 文件 | 改动 |
 |---|---|
-| `README.md` | 修正标题拼写错误 |
+| [README.md](file:///README.md) | 修正标题拼写错误 |
 ```
 
 合格原因：单文件、单点修改判 T0 极简档，不输出图形化总览，也省略执行证据、问题、方案与结果等主节；结论行写清结果、对象与验证状态，仍保留 `---` 和 `# 📋 本轮总结` 容器。
@@ -327,7 +327,7 @@ flowchart LR
 
 | 文件 | 改动 |
 |---|---|
-| `F:\gpt-free-register\项目.md` | 新增项目分析与使用说明。 |
+| [项目.md](file:///F:/gpt-free-register/项目.md) | 新增项目分析与使用说明。 |
 ```
 
 合格原因：保存文档属 T0 单点任务，省略图形化总览与执行证据、问题、方案、结果等主节；结论行写清结果、对象与验证状态，没有退化为普通确认句。
@@ -579,8 +579,8 @@ flowchart LR
 
 | 文件 | 改动 |
 |---|---|
-| `retry.go` | 3 处硬编码间隔改为读配置 |
-| `config.yaml` | 新增 `retry_interval` 配置项 |
+| [retry.go](file:///retry.go) | 3 处硬编码间隔改为读配置 |
+| [config.yaml](file:///config.yaml) | 新增 `retry_interval` 配置项 |
 ```
 
 合格原因：多步任务判 T1；主节 3 个（结论/执行证据/方案与结果）+ 改动点；无三行对照表、无图形化总览；验证结果并入执行证据与方案与结果，同一事实未跨节复述。

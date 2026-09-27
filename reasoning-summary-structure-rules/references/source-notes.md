@@ -1,6 +1,16 @@
 # 来源记录
 
-> 本文件记录 `reasoning-summary-structure-rules` 的所有调整来源，包括外部吸收与内部更新。
+## 2026-09-26：内部更新（文件路径可点击链接规则）
+
+- **来源类型**：内部调整（用户规则沉淀）
+- **调整诉求**：总结中指明的文件必须加上可点击的链接，鼠标悬浮可查看详细路径
+- **吸收精华**：Markdown 可点击链接格式 `[文件名](file:///完整路径)`，替代行内代码反引号包裹路径
+- **落点文件**：`SKILL.md`、`references/summary-structure-template.md`、`references/output-examples.md`
+- **裁决表**：`references/workbuddy-absorption-map.md`
+- **拒绝条目**：无（单一规则条目，无冲突）
+- **同域冗余扫描**：PASS（检查了 delivery-summary-rules、work-report-summary-rules、write 等，无交叉冗余）
+- **环境依赖**：无（纯 Markdown 语法规则）
+- **净增体积**：+13 行
 
 ## 2026-09-16：待裁定事项建议、选项与默认最安全兜底闭环（内部更新）
 

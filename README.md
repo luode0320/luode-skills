@@ -1099,3 +1099,4 @@ claude-mem(记忆) :
 2026-09-14 00:54:00 feat: [代码分解与规则同步] 补齐目录树与代码拆分规则及技能字典资产同步
 2026-09-27 01:30:00 feat: [goal-loop-rules合并] goal__skillhub与long-run-loop-rules合并为goal-loop-rules并同步引用链
 2026-09-27 15:25:24 feat: [runtime-process-cleanup四层清理] 补齐WSL DrvFS死锁机理与磁盘I/O回读
+2026-09-27 15:26:24 chore: [skillhub元数据同步] 图标下载时间戳与总结输出链接规范
