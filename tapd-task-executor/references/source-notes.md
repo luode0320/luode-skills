@@ -250,3 +250,16 @@
 | 2 | 项目记忆与知识库同步 | 长期记忆未记录该提交前缀 | 固化到稳定决策与知识库文档 | `PROJECT_MEMORY.md` + `TAPD三大核心操作意图与自动化清任务流转规范.md` |
 
 净增减：细化 1 项提交信息格式标准，无冗余。
+
+## 2026-09-29 内部调整（第十批）：建单默认挂当前迭代、任务先登记工时才能完成
+
+来源：用户在 EllipalFinance-go 会话中两条明确要求，均已在 30399328「研发内部需求」实测。
+
+| # | 精华 | 来源 / 证据 | 裁决 | 落点 |
+|---|---|---|---|---|
+| 1 | 新建需求 / 任务默认挂当前迭代，不留 `iteration_id=0` | 用户：「创建的任务的迭代一般都默认选择当前迭代」；需求 1130399328001003448 及 4 个子任务事后补传 `iteration_id` 均生效 | 合并 | `story-bug-task-workflow.md` §3（唯一定义）+ `cli-field-pitfalls.md` §十（取当前迭代）+ SKILL.md §6 第 6 点引用 |
+| 2 | 任务流转 done 前必须先登记工时 | 用户：「必须要填写花费工时后，才能流程为成功」；实测任务 3449 / 3450 无工时时 `status=done` 返回成功但回读 progressing，`timesheet add` 后同一请求立即生效 | 合并 | `cli-field-pitfalls.md` §九（唯一定义）+ SKILL.md §6 第 5 点引用 |
+
+**冗余扫描（tapd-task-executor / tapd-cli / tapd-openapi / tapd-addcomment / tapd-env-bootstrap）**：发现 0 处重复——tapd-openapi 只有 `iteration_id` 的 API 字段说明，没有"默认挂哪个迭代"或"done 前置条件"的规则承载。
+
+**被否决的替代**：把"当前迭代"写成固定 id 常量——否决，迭代按月滚动，且同一项目同时存在 6 个 open 迭代，只能按日期落点实时选。

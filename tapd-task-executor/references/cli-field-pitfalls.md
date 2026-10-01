@@ -146,6 +146,24 @@ tapd-cli story update workspaceid=<id> id=<19位id> status=resolved current_user
 
 返回体里会带更新后的完整 Story 对象，**核对 `status` 与 `modified` 字段确认真的改了**，不要只看 `status:1`（那是 API 调用成功标志，不是业务状态）。
 
+### 任务改 done 前必须先登记工时——否则静默不生效
+
+任务（task）流转到 `done` 的前置条件是**该任务已有花费工时记录**。没登记工时就 `task update status=done`，接口照样返回 `status:1`，回显里甚至写着 `done`，但回读仍是 `progressing`。补 `current_user`、`progress=100` 都没用（2026-09-29 在 30399328 实测，任务 1130399328001003449）。
+
+固定顺序：
+
+```bash
+# 1. 先查后写工时（规则同 §八），entity_type=task
+tapd-cli timesheet list workspaceid=<id> entity_type=task entity_id=<任务id>
+tapd-cli timesheet add  workspaceid=<id> entity_type=task entity_id=<任务id> \
+  timespent=<小时> owner=<中文名> spentdate=YYYY-MM-DD memo=<说明>
+# 2. 再改状态
+tapd-cli task update workspaceid=<id> id=<任务id> status=done
+# 3. 回读 task list id=<任务id> 核对 status=done，不以 update 回显为准
+```
+
+`open → progressing` 不需要工时，只有到 `done` 这一跳要。
+
 ### 缺陷不能直接置 resolved——工作流要求逐跳走，且中间跳有必填字段
 
 需求可以一步 `status=resolved`，**缺陷不行**。缺陷受项目工作流约束，`new` 通常没有直达 `resolved` 的边，硬传会失败或静默不生效。
@@ -182,3 +200,15 @@ r = tc.request("GET", "bugs", params={"workspace_id": ws, "id": bug_id,
 **工作流是项目级配置，各项目不同**，上表只是一个实例，不能当通用常量套用——每次都读 `all_transitions`。
 
 **终态止于 `resolved`**：`verified` / `closed` 代表测试已验证通过，属测试角色判定，自动化流程不越权置上。
+
+## 十、取当前迭代（建单默认挂上）
+
+新建需求 / 任务默认挂当前迭代（规则见 `story-bug-task-workflow.md` §3）。当前迭代 = 状态 `open` 且 `startdate ≤ 今天 ≤ enddate` 的那一个：
+
+```bash
+tapd-cli iteration list workspaceid=<id> status=open fields=id,name,startdate,enddate limit=20
+```
+
+- 同一项目会同时有多个 `open` 迭代（30399328 里 2025-Q4 到 2026-9月 共 6 个都还开着），**不能取第一个**，必须按日期落点选。
+- 按日期落不到任何迭代，或落到多个时，不要猜：先不挂迭代建单，并在交付时向用户说明。
+- 建完回读 `iteration_id`；漏挂的单可以事后 `story update` / `task update` 补传 `iteration_id`，两者都实测生效。

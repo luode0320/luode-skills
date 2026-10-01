@@ -30,12 +30,14 @@
 - **处理人指派**：将处理人 / 开发人员（`developer` / `current_owner`）明确指派为**当前开发者**（当前登录用户，如“罗德”）；
 - **合理预估工时**：根据任务复杂度填写合理的预估工时（`effort` / `estimate`），单位为小时，以 0.5 小时为最小粒度（常见小任务 1~2h，中等任务 2~4h）；
 - **显式指定创建人（防占位符）**：必须显式传入 `creator` 为当前登录开发者姓名（如“罗德”），绝对禁止漏传或随便取名，避免被 TAPD 默认写入凭据名 `tapd_my_token`。
+- **默认挂当前迭代**：新建的需求和子 Task 一律传 `iteration_id=<当前迭代id>`，不留 `0`（用户 2026-09-29 要求）。`0` 的单不进迭代看板，用户找不到。子 Task 跟随所属需求的迭代；需求本身没有迭代时，按当天日期取当前迭代，查法见 `cli-field-pitfalls.md` §十。只有用户明确指定其他迭代或要求不挂迭代时才例外。
 
 ```bash
-# 创建子 Task 示例命令（必须带上 creator）
+# 创建子 Task 示例命令（必须带上 creator 与 iteration_id）
 tapd-cli task add workspaceid=<id> story_id=<叶子需求ID> \
   name="<任务标题>" description="<实现方案与改动点>" \
-  current_owner="<当前开发者>" creator="<当前开发者>" effort=<预估小时>
+  current_owner="<当前开发者>" creator="<当前开发者>" effort=<预估小时> \
+  iteration_id=<当前迭代id>
 ```
 
 ---
