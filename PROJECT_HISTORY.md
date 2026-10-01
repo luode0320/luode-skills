@@ -38,7 +38,7 @@
 version: 1
 anchors:
   - title: "本项目「提交即推送」固化进规则 md 并推送远端（用户固化）"
-    usage_count: 1
+    usage_count: 2
     usage_days: 1
     last_used_at: 2026-10-01
     absorbed_to: null

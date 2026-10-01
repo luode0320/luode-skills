@@ -10,7 +10,7 @@
   - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
 - 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
 - 后续修正（同轮）：自举脚本原把该默认值写进通用正文 `BODY_NO_AUTO_COMMIT`，会扩散到任意项目；已拆出 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` + `resolve_no_auto_commit_body` 按仓库标识条件注入，并补守卫测试。另修复存量阻断：`static-owner-source-map.json` 漏登记 `code-quality-rules` 两文档致 6-review 路由失败关闭，补登记后路由退出码恢复 `0`、契约测试 20/20 OK。回归记录见 `doc/6-review/2026-10-01_175553_提交即推送规则固化与自举条件注入_6-review.md`。
-- 计数回写：先引用 `PROJECT_MEMORY.md` 实体 `rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」各 +1；收口时又窄读本事件用于补写同批修正，该锚点 0→1。两步均先经 `usage_ledger_validate.py` 校验 `ok=true`。
+- 计数回写：本轮实际引用 `PROJECT_MEMORY.md` 实体 `rule.repo-commit-implies-push`、`rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「本项目「提交即推送」固化进规则 md 并推送远端（用户固化）」「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」，逐条先经 `usage_ledger_validate.py` 校验 `ok=true` 后回写计数。
 - 交付残留自查：收口前按 6 维执行并落盘本轮 6-review 记录；发现受管章节索引表未登记条件追加变量（已修复随本轮提交）、宿主根目录临时脚本已清理，其余维度无残留。
 - 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
 
