@@ -1,5 +1,15 @@
 # 项目当前状态
 
+## 2026-10-01 TAPD 建单挂迭代与工时前置经验入库 + 本轮变更本地提交（吸收经验）
+
+- 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把第十批内部调整（TAPD 建单默认挂当前迭代、任务先登记工时才能完成）吸收进项目长期记忆，并按 git 协作规则把仓库全部未提交改动提交到本地。
+- 当前状态：**已落地闭环（本地提交，未推送）**。
+  - ① 业务提交 4 笔：`verify-brainstorm-rules` 新建与字典/吸收登记、TAPD 建单挂迭代与工时前置、命中检查漏触发防护两条、SPOT 种子入库；工作树已清空。
+  - ② 经验吸收入库：`PROJECT_MEMORY.md` 人类区补「新建需求 / 任务默认挂当前迭代」「任务流转完成前必须先登记工时」两条稳定决策并刷新更新时间；机器索引区实体 `rule.tapd-automation-lifecycle-and-qa-assignment` 补定义第 5 节、别名与 `scope`，`updated_at` 刷新为 2026-09-29。
+  - ③ 记忆结构修复：`PROJECT_HISTORY.md` 计数锚点区补齐「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」缺锚点、移除无对应条目的孤儿锚点；`check_memory_anchors.py` 由 `ok=false` 恢复 `ok=true`。
+- 关键边界：本轮仅授权 `git commit`，**未授权 `git push`**，远端同步留给用户显式指令；知识库笔记同步写入 `D:\谷歌云盘\知识库\`（非本仓库，不在提交范围）。
+- 验证与交接：`check_memory_anchors.py` 返回 `ok=true`（锚点 20/20、实体 51）；`git status --porcelain` 为空；改动已本地提交。
+
 ## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
 
 - 来源对象：用户指令——“我们需要一个验证发散的独立 skill，当用户提出验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下等描述的时候触发；我们写代码的规则是最小改动、不要发散思维，但代码完成后需要发散一下、头脑风暴一下，找出更多的安全、性能、逻辑、边界的问题”。经三轮决策确认：命名 `verify-brainstorm-rules`、发散边界“允许外扩到关联模块”、产出“只读清单 + 落盘报告”。
@@ -191,18 +201,9 @@
   - ④ 规则 md 同步与工程化校准：运行 `bootstrap_agents.sh` 统一自举，全量同步受管章节并双平台对齐；将 5 项代码分解规则升格固化进 `AGENTS.md` 与 `CLAUDE.md`，确立「非必要不突破」原则与三大正当特例（数据表、状态机主干、纯入口编排函数），划定坏味道防掩盖红线；修复 `PROJECT_HISTORY.md` 计数锚点漂移（C1~C5 全量 PASS）。
 - 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；`check_memory_anchors.py` 验证 PASS；工作日志写入 `.workbuddy/memory/2026-09-14.md`。
 
-## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（内部更新通道）
+## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（已归档摘要）
 
-- 来源对象：用户明确提出将规范固化到 Apifox skill 中（附带客户端截图红框证据：左侧接口树 `auth`、`registry`、`tasks`、`policies`、`audit`、`tenants` 等纯英文文件夹及 `GET Health` 英文接口名，团队不熟悉英文的成员读不懂）。核心规范：**接口的 API 路径保持原有英文路径不变，但所有用于展示和阅读的内容必须统一使用简体中文**（包括接口显示名称、文件夹名称、接口说明文档，以及请求参数和响应字段的注释描述），生成或更新接口定义时严格按此规范执行。
-- 当前状态：**全部落地落盘**。
-  - ① `apifox-cli__skillhub/SKILL.md`：核心共享规则新增「接口展示与阅读中文规范（强制铁律）」小节，模块按需加载路由表同步补充中文规范关键词；
-  - ② `modules/api-design.md`：新增「接口展示与阅读中文规范（强制铁律）」专节（机器调用走英文 vs 人类阅读全中文对照表 + 典型红框反面案例剖析），更新创建接口标准流程、不可违反规则，并将硬动作 A1 强化为包含中文规范与字段说明完整性即时审计（伪代码增加中文正则校验）；
-  - ③ `modules/api-folder-organization.md`：核心原则与业务模块识别法明确文件夹必须命名为业务简体中文，禁止英文目录，提供英文反例（`auth`、`tasks` 等）与中文规范（`认证授权`、`任务管理` 等）对照表，并在不可违反规则与审计命令集强化中文检查；
-  - ④ `modules/api-sync-to-apifox.md`：步骤 6 契约校验增加接口中文名与说明核验，步骤 6.2 强化 folder 必须为中文业务目录，不可违反规则补充第 11、12 条；
-  - ⑤ `modules/import-export.md`：Step 5 增加 tags、folder、summary、description 简体中文校验；
-  - ⑥ `modules/project-onboarding-checklist.md`：节点 1 硬动作 A1 与 A11 同步强化中文展示规范与审计要求；
-  - ⑦ 登记：`references/source-notes.md` 追加 2026-09-13 来源记录，`workbuddy-absorption-map.md` 追加续6裁决与同域去重；`PROJECT_MEMORY.md` 固化稳定决策。
-- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`；Windows 与 WorkBuddy 运行时技能目录（通过 NTFS junction 链接）完全同步生效；同域冗余扫描 PASS；改动停在已改动未提交状态（无 Git 提交授权）。
+- 结论：接口 API 路径保持英文不变，所有展示与阅读面（接口名、文件夹名、说明文档、字段描述）统一简体中文。落点 `apifox-cli__skillhub`（SKILL.md 中文规范铁律 + `modules/` 六个模块同步：api-design / api-folder-organization / api-sync-to-apifox / import-export / project-onboarding-checklist）+ 登记（source-notes / workbuddy-absorption-map）+ `PROJECT_MEMORY.md` 稳定决策。验证：`quick_validate.py` PASS、同域冗余扫描 PASS。
 
 ## 2026-09-12 交付残留自查 + 行尾归一 + 既有测试红项清零（已归档摘要）
 

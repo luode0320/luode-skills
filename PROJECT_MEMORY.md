@@ -65,8 +65,10 @@
   - 测试人员名单落盘配置文件：`<skills>/tapd-task-executor/config/qa-team.json`；
   - 持久化测试人员名单：**杨莹、李红、韩忠宝**；
   - 指派策略：原指定测试优先，未指定时按杨莹、李红、韩忠宝轮询或业务模块负责划分指派；开发完成后禁止处理人留置为开发自身或留空。
-- 来源：用户指令（2026-09-16、2026-09-17）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`、`references/story-bug-task-workflow.md`）+ `tapd-openapi` + `tapd-addcomment` + 知识库《TAPD创建实体创建人身份规范》。
-- 更新时间：2026-09-17。
+- 稳定决策：**新建需求 / 任务默认挂当前迭代（2026-09-29 固化）**：新建的 Story 与子 Task 一律显式传 `iteration_id=<当前迭代id>`，不留 `0`——`iteration_id=0` 的单不进迭代看板，多 workspace 场景下用户默认只看主项目，只给 id 会导致用户根本找不到。子 Task 跟随所属需求的迭代；需求本身没有迭代时，按当天日期取当前迭代。只有用户明确指定其他迭代或要求不挂迭代时才例外。禁止把"当前迭代"写成固定 id 常量（迭代按月滚动、同项目并存多个 open 迭代，只能按日期实时选）。
+- 稳定决策：**任务流转完成前必须先登记工时（2026-09-29 固化）**：Task 没有工时记录时 `status=done` 返回成功但回读仍是 `progressing`（静默不生效）。因此 task 的状态机顺序固定为「登记工时 → 改 done → 回读核对」，不得省略回读验证。
+- 来源：用户指令（2026-09-16、2026-09-17、2026-09-29）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`、`references/story-bug-task-workflow.md`、`references/cli-field-pitfalls.md` §九 / §十、`references/source-notes.md` 第十批）+ `tapd-openapi` + `tapd-addcomment` + 知识库《TAPD创建实体创建人身份规范》。
+- 更新时间：2026-09-29。
 
 ## 待裁定事项建议、选项与默认最安全兜底闭环规则（2026-09-16 固化）
 
@@ -639,14 +641,16 @@ entities:
       - 完善这个任务
       - 批量扫描清任务
       - Agent提交前缀规范
-    definition: "TAPD 任务全流程自动化规则：1. Story/Bug/Task 分类处理：Story 仅处理叶子需求（父级保持原样），处于规划/实现中且名下无未完成子 Task 时自动拆解为可执行子 Task（标题明确、具体方案、指派当前开发者、填写预估工时）；Bug 由测试人员提交不改原描述，直接分析成因并评论记录排查结果、方案与进度；独立 Task 直接承接进入开发。2. 全流程自动化行为约束：分析完成自动添加五要素评论；开始执行追加评论「agent开始代码实现」；代码完成自测后严禁暂存更改，必须立即自动提交至本地 Git 仓库（git commit，严禁自动 push 远端），提交前缀必须指明为 Agent 任务提交（格式：<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]）；实现完成自动添加总结评论（含 commit hash）；收口流转至「待版本验证」并将处理人变更为持久化测试人员名单（杨莹、李红、韩忠宝）。3. 创建人真实身份与防占位符规范（2026-09-17 固化）：通过 OpenAPI 创建实体必须显式传入创建人（Bug 为 reporter，Story/Task 为 creator），必须动态获取真实员工姓名（如罗德），严禁随便取名，严禁漏传导致服务端默认落库为凭据占位符 tapd_my_token；实体的创建人具备服务端只读保护机制，创建后 update 接口无法修改，必须在创建时一次性注入正确。4. 三大核心操作意图与路由分流（2026-09-17 固化）：①「看一下这个任务/看看任务」仅深度分析并输出五要素分析结论评论，不擅自开工；②「完善这个任务/完善任务」用于描述不清楚场景，结合代码库与业务调研补充完善需求内容与规格说明；③「扫描tapd [xx], 清任务/开始做tapd任务」按统一优先级排序逐个分析推进，只要可做立即开工走全套流程并收口流转，闭环一个再推进下一个。"
-    scope: "TAPD 任务分析、需求完善、批量清任务、代码执行、本地Commit前缀规范、评论回写、状态流转、实体创建人约束与测试人员指派"
+      - 当前迭代
+      - 工时前置
+    definition: "TAPD 任务全流程自动化规则：1. Story/Bug/Task 分类处理：Story 仅处理叶子需求（父级保持原样），处于规划/实现中且名下无未完成子 Task 时自动拆解为可执行子 Task（标题明确、具体方案、指派当前开发者、填写预估工时）；Bug 由测试人员提交不改原描述，直接分析成因并评论记录排查结果、方案与进度；独立 Task 直接承接进入开发。2. 全流程自动化行为约束：分析完成自动添加五要素评论；开始执行追加评论「agent开始代码实现」；代码完成自测后严禁暂存更改，必须立即自动提交至本地 Git 仓库（git commit，严禁自动 push 远端），提交前缀必须指明为 Agent 任务提交（格式：<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]）；实现完成自动添加总结评论（含 commit hash）；收口流转至「待版本验证」并将处理人变更为持久化测试人员名单（杨莹、李红、韩忠宝）。3. 创建人真实身份与防占位符规范（2026-09-17 固化）：通过 OpenAPI 创建实体必须显式传入创建人（Bug 为 reporter，Story/Task 为 creator），必须动态获取真实员工姓名（如罗德），严禁随便取名，严禁漏传导致服务端默认落库为凭据占位符 tapd_my_token；实体的创建人具备服务端只读保护机制，创建后 update 接口无法修改，必须在创建时一次性注入正确。4. 三大核心操作意图与路由分流（2026-09-17 固化）：①「看一下这个任务/看看任务」仅深度分析并输出五要素分析结论评论，不擅自开工；②「完善这个任务/完善任务」用于描述不清楚场景，结合代码库与业务调研补充完善需求内容与规格说明；③「扫描tapd [xx], 清任务/开始做tapd任务」按统一优先级排序逐个分析推进，只要可做立即开工走全套流程并收口流转，闭环一个再推进下一个。5. 建单挂迭代与工时前置（2026-09-29 固化）：新建 Story 与子 Task 一律传 iteration_id=<当前迭代id>，不留 0（0 不进迭代看板、用户找不到；子 Task 跟随需求迭代，需求无迭代时按当天日期取当前迭代；禁止写固定 id 常量）；Task 流转 done 前必须先登记工时，否则 status=done 返回成功但回读仍 progressing，固定顺序为「登记工时 → 改 done → 回读核对」。"
+    scope: "TAPD 任务分析、需求完善、批量清任务、代码执行、建单挂当前迭代、工时前置、本地Commit前缀规范、评论回写、状态流转、实体创建人约束与测试人员指派"
     status: "active"
     evidence_ids:
       - evidence.tapd-automation-lifecycle-and-qa-assignment
     context_ids:
       - context.tapd-task-executor
-    updated_at: 2026-09-17
+    updated_at: 2026-09-29
     usage_count: 0
     usage_days: 0
     last_used_at: null

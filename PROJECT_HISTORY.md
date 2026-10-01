@@ -122,7 +122,7 @@ anchors:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
-  - title: "「项目根 `skills/` 加载声明」补进 bootstrap 受管章节 + 规则 md"
+  - title: "Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）"
     usage_count: 0
     usage_days: 0
     last_used_at: null
