@@ -1,0 +1,19 @@
+{
+  "slug": "spot",
+  "name": "Spot",
+  "version": "0.1.0",
+  "installedAt": 1790748139063,
+  "source": "skillhub",
+  "namespace": "clawhub_awessh",
+  "canonicalName": "@clawhub_awessh/spot",
+  "iconSource": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/a4e49550-e527-4406-b761-c4f2e607b757.png",
+  "labels": {
+    "requires_api_key": "true"
+  },
+  "description_zh": "Binance现货请求使用Binance API，身份验证需要API密钥和密钥，支持测试网和主网。",
+  "description_en": "Binance Spot request using the Binance API. Authentication requires API key and secret key. Supports testnet and mainnet.",
+  "installs": 1225,
+  "installedContentHash": "sha256:771225bb446875c6c5cdf53411967d34642c22a99b41e8ee9d485eebc214ce43",
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\spot__skillhub\\_icon.png",
+  "iconDownloadedFrom": "https://cloudcache.tencent-cloud.com/qcloud/ui/static/other_external_resource/a4e49550-e527-4406-b761-c4f2e607b757.png"
+}
