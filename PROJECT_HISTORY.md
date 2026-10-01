@@ -123,9 +123,9 @@ anchors:
     last_used_at: null
     absorbed_to: null
   - title: "Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-01
     absorbed_to: null
   - title: "bootstrap schema 变更强制检查固化进 `project-rule-file-bootstrap-rules/SKILL.md`"
     usage_count: 0
