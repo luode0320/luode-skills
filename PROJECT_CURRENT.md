@@ -9,6 +9,7 @@
   - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
   - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
 - 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
+- 计数回写：本轮实际引用 `PROJECT_MEMORY.md` 实体 `rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」，经 `usage_ledger_validate.py` 校验 `ok=true` 后各 +1。
 - 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
 
 ## 2026-10-01 TAPD 建单挂迭代与工时前置经验入库 + 本轮变更本地提交（吸收经验）

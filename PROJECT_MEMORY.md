@@ -1496,9 +1496,9 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-08-01
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-01
     absorbed_to: null
   - entity_id: rule.repo-commit-implies-push
     name: "本项目提交即推送规则"
