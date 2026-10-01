@@ -4,6 +4,7 @@
 
 ## 事件
 
+- 2026-10-01：**本项目「提交即推送」固化进规则 md 并推送远端（用户固化）**。用户指令「推送, 这个项目提交并推送做为项目规则写进规则md」：先把上一轮 6 笔本地提交推送到 `origin/main`（`35cc3cf2..d0f6395b`，同步后 `rev-list --left-right --count origin/main...HEAD` = `0 0`），再把「本仓库默认提交即推送」固化为仓库级规则。落盘三处同文（`AGENTS.md` / `CLAUDE.md` 「严禁自动提交 Git」章节 + 唯一正文源 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT` heredoc），口径为「提交意图默认含推送」「只放宽推送授权粒度，pre/post gate 与按业务目标拆分提交继续逐笔执行」「负向边界（只提交不推送）绝对优先」「不扩散到未显式声明的其他仓库」；授权侧同步 `git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节；项目记忆同步 `PROJECT_MEMORY.md` 人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。知识库沉淀追加到《仓库级默认授权覆盖全局当轮授权》新增「粒度细化：可以只放宽单个动作」小节（三态判定=补充：本仓库实例只是该机制的单动作粒度变体，不与原结论矛盾、原文无废止内容）。验证：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致且纯 LF；自举幂等复跑三文件内容零漂移；`check_memory_anchors.py` `ok=true`（实体 52）；`knowledge_index.py check` 本轮笔记自身合规（存量 64 条历史违规不在本轮范围，已登记为遗留项）。本轮改动按新口径提交并推送。
 - 2026-09-27：**Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）**。用户提出 goal/loop 相关 skill 有多个并要求合并，经三项决策确认：合并基座 = `goal__skillhub` 内容 + `long-run-loop-rules` 工程循环全部内容；合并后目录名 = `goal-loop-rules`；本轮只改仓库不动用户级 skill 安装目录。落盘 12 文件：新建 `goal-loop-rules/SKILL.md`（目标方法论 + 工程循环控制分域路由，description 合并两域触发条件），从 `long-run-loop-rules` 迁移 6 个 references + 3 个 scripts + workbuddy-absorption-map.md + _skillhub_meta.json（slug 改为 goal-loop-rules），从 `goal__skillhub` 迁移 script.sh。引用链同步 6 处：AGENTS.md / CLAUDE.md 第 347 行（Goal 模式 Owner）、deferred-gate-registry.md 第 34 行、goal-breakdown-seed.md 3 处、source-notes.md 1 处、workbuddy-absorption-map.md 3 处。PROJECT_MEMORY 机器索引区更新实体 `rule.goal-mode-no-confirm-and-temp-cleanup` 的 definition / evidence / context 路径。后续计划：旧目录重命名为合并前快照、空 `ralph-loop-rules` 目录清理、字典刷新。改动停在已改动未提交状态。
 - 2026-09-24：**Goal 模式免确认推进与临时产物清理规则落地（内部更新通道）**。用户指令：开启 goal 模式即说明计划已完成、只要实现，执行分歧一律按 agent 推荐方案推进不要求用户确认，临时生成的文件和脚本执行后删除不污染项目目录。落盘 6 处：`long-run-loop-rules/SKILL.md` 新增「Goal 模式免确认推进（分歧按推荐方案执行）」章节（计划视为已完成 / 分歧自行裁决 / 推荐方向判定顺序 / 最安全兜底 / 红线 / 临时产物清理 / 边界与退出）+ description 补口径；`long-run-loop-rules/references/safety-mechanisms.md` 新增同主题章节（只写安全熔断衔接，规则本体引用 SKILL.md，避免双权威）；`autonomous-execution-rules/SKILL.md` description 放开 + 必须暂停节点补 Goal 模式例外；`autonomous-execution-rules/references/continuation-and-pause.md` 新小节 + 必须暂停项收缩；`AGENTS.md` / `CLAUDE.md` 新增仓库级章节（双文件 SHA256 一致）。**关键边界发现（影响面对账抓到真实冲突）**：初稿写成「Goal 激活即视为 confirmed」会与 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」冲突，构成 agent 自动补建 Goal 的自我授权漏洞 → 收敛为「仅用户显式 `/goal` 开启或用户已显式确认的 Goal」才免确认，并在 6 处落点统一加「不适用对象（防自我授权）」。**临时产物清理不新立规则**：复用唯一 Owner `runtime-process-cleanup-rules`（零豁免 + 三层清理对象 + 收口回读），只写引用防双权威。验证：`quick_validate.py` 双 `Skill is valid!`；字典重跑 exit 0（65/8/120）；双规则文件纯 LF 同哈希；知识库沉淀《Goal模式免确认推进与临时产物清理-20260924》回读一致。记忆维护：`PROJECT_CURRENT.md` 逼近上限，压缩最旧两条 2026-09-12 条目为一条摘要。改动停在已改动未提交状态。
 
@@ -31,12 +32,16 @@
 - 2026-08-26：**低分 skill 优化第七轮：shell__skillhub（31.0 → 69.0/75，实测全通过）**。短板实锤：SKILL.md 111 行纯命令链接壳（9 入口全裸相对路径 `scripts/script.sh <cmd>`），脚本 587 行 8 大模块内容充实被埋没——"内容有、路由无"结构性缺陷再现；frontmatter 6 违规键（author/category/homepage/source/tags/version）校验器实测确认。断链真因：脚本本体实测可执行（10 命令 exit 0），"断链"= 裸相对路径脱离 skill 根失效 + 知识全锁脚本无内联承载。市场结论：6 组关键词（shell/bash/scripting/脚本/linux/terminal/command line）0 个 shell 候选，授权安装验证无对象；同域 `bash__skillhub`（79 行陷阱速查）定位"速查 vs 手册"互补，拒绝合并留档体系审计。落盘：SKILL.md 重构为 4 步工作流（识别场景→查速查→调脚本→分阶段验收）+ 8 大陷阱内联速查（引用/三件套/子壳/数组/参数展开/信号/退出码/工具，全"问题-修复"对）+ script.sh 加 `SCRIPT_DIR` 自定位（+1 行）+ 双调用方式（cd 相对 / 任意 cwd 绝对）+ frontmatter 合规化 + 环境自检（bash 缺失 4 级降级链）+ 交叉引用 bash/linux/powershell + 版本 1.1.0。复评：独立子代理 `7|4|2|2|5|2|5 → 9|9|9|9|10|9|9`（+38.0）；维度 8 实测全通过（10 命令 exit 0 / 子壳陷阱 count=0→2 / `${#arr[@]}`=2 / `${var:-default}`=DEFAULT / 双调用方式均通）。闭环修复 3 处（SCRIPT_DIR 自定位、检查点分写前/写后、bash 缺失降级链），quick_validate 复验 valid。同域冗余扫描 4 项 PASS。知识库沉淀回读一致（223 链接 0 死链）。改动停在已改动未提交状态。
 - 2026-08-25：**打通日志使用链路（REQ-LOG-20260825-001，用户确认落盘推进）**。新建 `log-analysis-rules` 作为读日志侧唯一权威（SKILL.md + 5 references：log-file-location / log-level-switching / request-id-traceback / log-fetch-and-filter / debug-window-discipline）；联动四处：`logging-trace-rules` 补可反查稳定标识字段（request-id/trace-id/订单号，纯本地用业务键）、`bug-root-cause-rules` 与 `bug-intake-rules` 查日志取证显式指向读侧、apifox `testing-pitfalls.md` 四层诊断补第 5 步服务端取证（request-id 反查 + 证据回贴测试主文档 + ENV_LOG_BLOCKED 阻断归因）、`test-program-rules` 写接口过程日志从自查项升级为默认放行项（计划冻结可升级硬判）。落盘：需求 `doc/2-需求/2026-08-25_REQ-LOG-20260825-001_日志链路打通.md`（valid:true）+ 实施总览 + 6-review（STYLE: PASS）；字典重跑 seed 92；知识库沉淀 1 篇并更新 INDEX.md；PROJECT_MEMORY 补稳定决策。验证：quick_validate PASS、三份工程文档机器校验 valid:true、语义 grep 全部命中（写侧 4 处 / bug 域 2 处 / 取证 7 处 / 升级 3 处）、全量 400 测试失败 14/错误 13 与改动前基线一致（缺 Go 等既有环境项，无新回归）、knowledge_index 0 死链。改动停在已改动未提交状态。
 - 2026-08-23：**实施「任务投影跨宿主适配」修复（BUG-TASK-PROJECTION-HOST-001，用户 /goal 授权并行）**。将任务投影从 Codex 专属硬闸门改造为跨宿主分级适配：① 脚本层 task_plan_projection.py 新增 _resolve_workbuddy_session_id 与三级会话回退链（显式 --session-id > CODEX_THREAD_ID > WorkBuddy 元数据，任意来源冲突/全缺失失败关闭），ensure-start 合成上下文缺 trigger 默认补 start（synthesize 保持严格必填）；② 规则层 task-plan-rehydration-rules SKILL.md 与契约文档跨宿主化（Codex/WorkBuddy/无任务 UI 宿主三档通道 + 互斥不双写），UI_SYNC_BLOCKED 改分级语义——持久化失败/会话冲突/状态不明硬阻断，仅 UI 通道不可用降级继续；③ 上层联动 6 文件（skill-hit-check / autonomous-execution x2 / context-compression / session-handoff / platform-capability-matrix）同步分级语义，PROJECT_MEMORY 三处稳定决策与定义/scope 更新。执行：3 worker 并行（write set 互斥），首次因网关 502 失败，探测恢复后重试成功。验证：单元测试 73/73 OK、quick_validate PASS、实施总览与周期01 文档校验 valid:true、语义 Grep 无绝对化残留、6-review STYLE: PASS。落盘：Bug 主文档 + 实施总览 + 实施周期01 + 测试主文档 + 6-review 记录。改动停在已改动未提交状态。
-- 2026-08-22：**bootstrap schema 变更强制检查固化进 `project-rule-file-bootstrap-rules/SKILL.md`**。承接上轮「usage_tracking 三处同步断点」教训（新建路径 `create_project_memory_file` 内嵌模板 / 补齐路径幂等补丁 / 规则文件受管章节 heredoc，端到端真实自举才抓到），用户确认把教训补为规则强制项。SKILL.md 新增「## Schema 变更强制检查（强制）」章节：模板三路联动（新建 + 补齐 + 受管章节及模板索引，缺一即阻断，漏改新建路径是最高频断点）、真实自举兜底（临时项目跑 `bootstrap_agents.sh --repo $TMP --target default` 验证新建与幂等两路径 + `grep -c` 不重复，`bash -n` 不算兜底）、仓库模板回写四件套模板、缺项阻断；「统一执行步骤」追加第 9 条强制引用。验证：quick_validate PASS、UTF-8 OK、frontmatter 完整。改动停在已改动未提交状态。
 ## 计数锚点区
 
 ```yaml
 version: 1
 anchors:
+  - title: "本项目「提交即推送」固化进规则 md 并推送远端（用户固化）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: "新增「交付残留自查」收口前横切环节（内部更新通道）"
     usage_count: 0
     usage_days: 0
@@ -126,11 +131,6 @@ anchors:
     usage_count: 1
     usage_days: 1
     last_used_at: 2026-10-01
-    absorbed_to: null
-  - title: "bootstrap schema 变更强制检查固化进 `project-rule-file-bootstrap-rules/SKILL.md`"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
     absorbed_to: null
   - title: "Goal 模式免确认推进与临时产物清理规则落地（内部更新通道）"
     usage_count: 1

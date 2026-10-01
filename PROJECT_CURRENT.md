@@ -1,5 +1,16 @@
 # 项目当前状态
 
+## 2026-10-01 推送远端 + 本项目「提交即推送」写进规则 md（用户固化）
+
+- 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
+- 当前状态：**已落地闭环并推送远端**。
+  - ① 推送：`git push origin main` 成功，`35cc3cf2..d0f6395b`（6 笔）；`git rev-list --left-right --count origin/main...HEAD` = `0 0`。
+  - ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目（luode-skills）默认提交即推送」，并同步唯一正文源 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT`（三处同文）；要点为「提交意图默认含推送」「只放宽推送授权粒度，gate 与按业务拆分提交继续生效」「负向边界（只提交不推送）绝对优先」「不扩散到其他仓库」。
+  - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
+  - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
+- 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
+- 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
+
 ## 2026-10-01 TAPD 建单挂迭代与工时前置经验入库 + 本轮变更本地提交（吸收经验）
 
 - 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把第十批内部调整（TAPD 建单默认挂当前迭代、任务先登记工时才能完成）吸收进项目长期记忆，并按 git 协作规则把仓库全部未提交改动提交到本地。
@@ -188,18 +199,9 @@
 
 ## 2026-09-14 补充代码分解规则（目录树 skill 与代码拆分 skill）
 
-- 来源对象：用户明确要求为『目录树 skill』和『代码拆分 skill』补充 5 项代码分解规则：
-  1. 单个代码文件超过 200 行时，拆分为多个 diamond 文件并存放在同级目录；
-  2. 一个同级目录只能包含一种业务逻辑，若拆解后仍归为两种及以上业务，即使很小也必须拆分到不同目录；
-  3. 一个目录只做一件事，逻辑过多则拆分为多个同级文件存放；
-  4. 单个代码块或函数不得超过 80 行，超出则拆分为多个函数；
-  5. 函数参数和返回值均不得超过 2 个，否则改用结构体传参或返回。
-- 当前状态：**全部落地落盘**。
-  - ① 『目录树 skill』（`package-structure-rules`）：SKILL.md 核心边界新增第 12 条代码分解与目录内聚规则，通过标准同步；`structure-general.md` 新增代码分解与目录内聚规则（强制）专节；`project-layout-v2.md` 补齐扩展约束第 7 条；description 同步更新。
-  - ② 『代码拆分 skill』（`code-quality-rules`）：SKILL.md 统一硬约束、可读性主线 2、自动触发信号、进入后先做什么、通过/驳回标准全量同步 5 项规则，全面替换原 500 行粗拆分阈值；`readability-general.md` 总则更新 5 项分解规则；`function-structure-rules.md` 补齐 80 行函数上限、200 行 diamond 文件拆分与参数/返回值 ≤ 2 规则；`function-signature-rules.md` 重构数量控制为硬性上限（参数与返回值 ≤ 2），补齐参数与返回值结构体设计及正反例；`readability-examples.md` 补充正反例。
-  - ③ 字典与索引：重跑 `generate_dictionary.py`，同步刷新 `字典.md` 与 `skill-dictionary/data.js`。
-  - ④ 规则 md 同步与工程化校准：运行 `bootstrap_agents.sh` 统一自举，全量同步受管章节并双平台对齐；将 5 项代码分解规则升格固化进 `AGENTS.md` 与 `CLAUDE.md`，确立「非必要不突破」原则与三大正当特例（数据表、状态机主干、纯入口编排函数），划定坏味道防掩盖红线；修复 `PROJECT_HISTORY.md` 计数锚点漂移（C1~C5 全量 PASS）。
-- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；`check_memory_anchors.py` 验证 PASS；工作日志写入 `.workbuddy/memory/2026-09-14.md`。
+- 来源对象：用户明确要求为『目录树 skill』与『代码拆分 skill』补充 5 项代码分解规则（单文件 ≤ 200 行拆 diamond 文件；同目录单一业务逻辑；一目录一事；函数 ≤ 80 行；参数与返回值 ≤ 2 个用结构体替代）。
+- 当前状态：**全部落地落盘**。① `package-structure-rules`（SKILL.md 核心边界第 12 条、`structure-general.md` 专节、`project-layout-v2.md` 第 7 条）；② `code-quality-rules`（统一硬约束与 5 项规则全量替换原 500 行阈值，`readability-general.md` / `function-structure-rules.md` / `function-signature-rules.md` / `readability-examples.md` 同步）；③ 重跑 `generate_dictionary.py` 刷新 `字典.md` 与 `skill-dictionary/data.js`；④ 经 `bootstrap_agents.sh` 升格固化进 `AGENTS.md` / `CLAUDE.md`，确立「非必要不突破」与三大正当特例（数据表、状态机主干、纯入口编排函数），并修复 `PROJECT_HISTORY.md` 计数锚点漂移（C1~C5 PASS）。
+- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；`check_memory_anchors.py` PASS；工作日志写入 `.workbuddy/memory/2026-09-14.md`。
 
 ## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（已归档摘要）
 
@@ -207,9 +209,7 @@
 
 ## 2026-09-12 交付残留自查 + 行尾归一 + 既有测试红项清零（已归档摘要）
 
-- 交付残留自查：新建 `skill-execution-compliance-gate-rules/references/delivery-residue-self-check.md`（6 维横切自查，收口前 + 中段改码）；形态裁决不做独立 gate skill，登记进延迟 gate 注册表。附带发现「同文件并行多 Edit 会 lost update」。
-- 行尾与测试：8 处 Python 写入点补 `newline`、工作副本归一 LF、`windows-encoding-rules` 增换行字节级判据；10 个既有红项定性修复后全量 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则（`test-program-rules/references/fixture-and-guard-robustness.md` + 双规则文件章节）。
-- 逐项根因与证据见 `doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md`。
+- 结论：新建交付残留自查 6 维横切 reference（收口前 + 中段改码，登记进延迟 gate 注册表，形态裁决不做独立 gate skill）；8 处 Python 写入点补 newline、工作副本归一 LF、windows-encoding-rules 增换行字节级判据；10 个既有红项修复后全量 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则。详细根因与证据见 doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md。
 
 ## 2026-09-11 代码质量九维治理：四项规则缺口补齐与 6-review 编排（已归档摘要）
 

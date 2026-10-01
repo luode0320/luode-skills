@@ -26,6 +26,7 @@ description: 【强制触发】凡当前这轮用户消息出现 Git 协作动�
 - `status/diff/log` 等只读意图只授权对应盘点范围。
 - `commit/push/pull/rebase/merge` 等写历史或同步动作必须由当前轮明确意图授权。
 - 当前轮未授权时必须停止；知识库判断、历史指令、已进入 Git 流程或上一轮提交均不构成授权。
+- 例外：项目级规则文件显式固化「提交即推送」的项目（如本仓库 `luode-skills`），提交意图默认同时授权推送；以该项目规则文件与其 `references/current-turn-authorization.md` 的项目级例外节为准。
 
 细则见 `references/current-turn-authorization.md`。
 

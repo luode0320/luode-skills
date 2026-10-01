@@ -105,6 +105,15 @@
 - 来源：用户决策（2026-09-10，AskUserQuestion 三项确认）+ `AGENTS.md` / `CLAUDE.md`「跨项目写入红线」+ `implementation-planning-rules/references/sibling-project-discovery.md`。
 - 更新时间：2026-09-10。
 
+## 本项目 Git 提交即推送规则（2026-10-01 固化）
+
+- 稳定决策：**本仓库（luode-skills）默认「提交即推送」**——用户在本项目提出提交意图（`提交git`、`提交代码`、`commit一下` 等）时，默认把「本地提交 + 推送 `origin` 对应分支」作为同一笔授权闭环执行，不再对推送单独二次确认。
+- 稳定决策：**例外只放宽推送授权粒度**——提交前置门禁（pre/post gate、按业务目标拆分提交）继续逐笔执行，不因「提交即推送」降低验收标准。
+- 稳定决策：**负向边界绝对优先**——用户当轮显式写出「只提交，不要推送」「不要推送」等限制时，严格停在本地提交并等待后续指令，不得按默认闭环继续推送。
+- 稳定决策：**不扩散到其他项目**——其他仓库未显式声明「提交即推送」时仍按逐动作授权，不得把本例外套用到别的仓库。
+- 来源：用户指令（2026-10-01「推送, 这个项目提交并推送做为项目规则写进规则md」）+ `AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节 + `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT` + `git-collaboration-rules/references/current-turn-authorization.md` 项目级例外节。
+- 更新时间：2026-10-01。
+
 ## 记忆文件超长主动整理规则
 
 - 稳定决策：`PROJECT_CURRENT.md` 的 UTF-8 字节数上限为 51,200；`PROJECT_HISTORY.md` 只保留最近 20 条事件。当任务执行中发现这两个文件超长（CURRENT 接近 51KB / HISTORY 超过 20 条），AI 应主动裁剪过期旧记录，无需等待用户指令。
@@ -1491,6 +1500,27 @@ entities:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
+  - entity_id: rule.repo-commit-implies-push
+    name: "本项目提交即推送规则"
+    type: "流程规则"
+    aliases:
+      - 提交即推送
+      - 提交并推送
+      - 本项目默认推送
+      - 提交授权闭环
+    definition: "本仓库（luode-skills）默认「提交即推送」：用户在本项目提出提交意图（提交git / 提交代码 / commit一下 等）时，默认把「本地提交 + 推送 origin 对应分支」作为同一笔授权闭环执行，不对推送单独二次确认；例外只放宽推送授权粒度，pre/post gate 与按业务目标拆分提交继续逐笔执行；用户当轮显式写出「只提交，不要推送」「不要推送」等负向边界时负向边界绝对优先，严格停在本地提交等待后续指令；本例外不扩散到其他未显式声明的仓库。落点：AGENTS.md / CLAUDE.md「严禁自动提交 Git」章节 + project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh 的 BODY_NO_AUTO_COMMIT + git-collaboration-rules/references/current-turn-authorization.md 项目级例外节。"
+    scope: "本仓库 Git 提交与推送授权粒度、规则文件受管章节与授权契约同步"
+    status: "active"
+    evidence_ids:
+      - evidence.dialog.repo-commit-implies-push
+      - evidence.skill.git-collaboration
+    context_ids:
+      - context.git-collaboration
+    updated_at: 2026-10-01
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
     type: "统计口径"
@@ -2038,6 +2068,10 @@ evidence:
     type: "dialog"
     source: "对话确认"
     note: "用户要求 Git 提交保留审查验收步骤，但不自动生成审查或验收文档"
+  - evidence_id: evidence.dialog.repo-commit-implies-push
+    type: "dialog"
+    source: "对话确认（2026-10-01）"
+    note: "用户指令「推送, 这个项目提交并推送做为项目规则写进规则md」：确认本仓库 luode-skills 默认提交即推送，并把该口径写进 AGENTS.md / CLAUDE.md 与 git-collaboration-rules 授权契约的项目级例外节"
   - evidence_id: evidence.test.skill-size-report-20260717
     type: "test"
     source: "TASK-SPLIT-01-01 真实统计与验收"
