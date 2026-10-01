@@ -9,7 +9,7 @@
 | 3 | 注意 | `BODY_NOTICE` |
 | 4 | Skill 强制自动触发规则（最高优先级） | `BODY_SKILL_AUTO` |
 | 5 | 严禁脑补工具调用与结果（最高优先级，强制） | `BODY_NO_HALLUCINATE` |
-| 6 | 严禁自动提交 Git（最高优先级，强制） | `BODY_NO_AUTO_COMMIT` |
+| 6 | 严禁自动提交 Git（最高优先级，强制） | `BODY_NO_AUTO_COMMIT` + 条件追加 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` |
 | 7 | Skill 命中强制规则 | `BODY_SKILL_HIT` |
 | 8 | 代码生成风格入口规则 | `BODY_CODE_GENERATION_STYLE` |
 | 9 | Karpathy 风格硬闸门 | `BODY_KARPATHY_HARD_GATES` |

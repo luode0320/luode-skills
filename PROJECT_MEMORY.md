@@ -1508,7 +1508,7 @@ entities:
       - 提交并推送
       - 本项目默认推送
       - 提交授权闭环
-    definition: "本仓库（luode-skills）默认「提交即推送」：用户在本项目提出提交意图（提交git / 提交代码 / commit一下 等）时，默认把「本地提交 + 推送 origin 对应分支」作为同一笔授权闭环执行，不对推送单独二次确认；例外只放宽推送授权粒度，pre/post gate 与按业务目标拆分提交继续逐笔执行；用户当轮显式写出「只提交，不要推送」「不要推送」等负向边界时负向边界绝对优先，严格停在本地提交等待后续指令；本例外不扩散到其他未显式声明的仓库。落点：AGENTS.md / CLAUDE.md「严禁自动提交 Git」章节 + project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh 的 BODY_NO_AUTO_COMMIT + git-collaboration-rules/references/current-turn-authorization.md 项目级例外节。"
+    definition: "本仓库（luode-skills）默认「提交即推送」：用户在本项目提出提交意图（提交git / 提交代码 / commit一下 等）时，默认把「本地提交 + 推送 origin 对应分支」作为同一笔授权闭环执行，不对推送单独二次确认；例外只放宽推送授权粒度，pre/post gate 与按业务目标拆分提交继续逐笔执行；用户当轮显式写出「只提交，不要推送」「不要推送」等负向边界时负向边界绝对优先，严格停在本地提交等待后续指令；本例外不扩散到其他未显式声明的仓库。落点：AGENTS.md / CLAUDE.md「严禁自动提交 Git」章节 + project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh 的 BODY_NO_AUTO_COMMIT 与条件追加变量 BODY_NO_AUTO_COMMIT_PROJECT_EXTRA（由 resolve_no_auto_commit_body 按仓库 slug 注入） + git-collaboration-rules/references/current-turn-authorization.md 项目级例外节。"
     scope: "本仓库 Git 提交与推送授权粒度、规则文件受管章节与授权契约同步"
     status: "active"
     evidence_ids:

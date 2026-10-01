@@ -3,14 +3,15 @@
 ## 2026-10-01 推送远端 + 本项目「提交即推送」写进规则 md（用户固化）
 
 - 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
-- 当前状态：**已落地闭环并推送远端**。
-  - ① 推送：`git push origin main` 成功，`35cc3cf2..d0f6395b`（6 笔）；`git rev-list --left-right --count origin/main...HEAD` = `0 0`。
-- ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目默认提交即推送」，同步正文源 `bootstrap_agents.sh`；要点：提交意图默认含推送、gate 与按业务拆分提交继续生效、负向边界绝对优先、不扩散到其他仓库。
+- 当前状态：**已落地闭环并推送远端（本轮共 4 笔）**。
+  - ① 推送：先推上一轮 6 笔（`35cc3cf2..d0f6395b`），本轮再推修复笔 `76975c58`、计数回写笔 `1d3ab946` 与残留自查笔；末笔推送后 `git rev-list --left-right --count origin/main...HEAD` = `0 0`。
+  - ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目默认提交即推送」，同步正文源 `bootstrap_agents.sh`；要点：提交意图默认含推送、gate 与按业务拆分提交继续生效、负向边界绝对优先、不扩散到其他仓库。
   - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
   - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
 - 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
 - 后续修正（同轮）：自举脚本原把该默认值写进通用正文 `BODY_NO_AUTO_COMMIT`，会扩散到任意项目；已拆出 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` + `resolve_no_auto_commit_body` 按仓库标识条件注入，并补守卫测试。另修复存量阻断：`static-owner-source-map.json` 漏登记 `code-quality-rules` 两文档致 6-review 路由失败关闭，补登记后路由退出码恢复 `0`、契约测试 20/20 OK。回归记录见 `doc/6-review/2026-10-01_175553_提交即推送规则固化与自举条件注入_6-review.md`。
-- 计数回写：本轮实际引用 `PROJECT_MEMORY.md` 实体 `rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」，经 `usage_ledger_validate.py` 校验 `ok=true` 后各 +1。
+- 计数回写：先引用 `PROJECT_MEMORY.md` 实体 `rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」各 +1；收口时又窄读本事件用于补写同批修正，该锚点 0→1。两步均先经 `usage_ledger_validate.py` 校验 `ok=true`。
+- 交付残留自查：收口前按 6 维执行并落盘本轮 6-review 记录；发现受管章节索引表未登记条件追加变量（已修复随本轮提交）、宿主根目录临时脚本已清理，其余维度无残留。
 - 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
 
 ## 2026-10-01 TAPD 建单挂迭代与工时前置经验入库 + 本轮变更本地提交（吸收经验）
@@ -207,11 +208,11 @@
 
 ## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（已归档摘要）
 
-- 结论：接口 API 路径保持英文不变，所有展示与阅读面（接口名、文件夹名、说明文档、字段描述）统一简体中文。落点 `apifox-cli__skillhub`（SKILL.md 中文规范铁律 + `modules/` 六个模块同步：api-design / api-folder-organization / api-sync-to-apifox / import-export / project-onboarding-checklist）+ 登记（source-notes / workbuddy-absorption-map）+ `PROJECT_MEMORY.md` 稳定决策。验证：`quick_validate.py` PASS、同域冗余扫描 PASS。
+- 结论：接口 API 路径保持英文，所有展示与阅读面统一简体中文。落点 `apifox-cli__skillhub`（SKILL.md 铁律 + `modules/` 六个模块）、吸收登记与 `PROJECT_MEMORY.md` 稳定决策。验证：`quick_validate.py` PASS、同域冗余扫描 PASS。
 
 ## 2026-09-12 交付残留自查 + 行尾归一 + 既有测试红项清零（已归档摘要）
 
-- 结论：新建交付残留自查 6 维横切 reference（收口前 + 中段改码，登记进延迟 gate 注册表，形态裁决不做独立 gate skill）；8 处 Python 写入点补 newline、工作副本归一 LF、windows-encoding-rules 增换行字节级判据；10 个既有红项修复后全量 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则。详细根因与证据见 doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md。
+- 结论：新建交付残留自查 6 维横切 reference（登记进延迟 gate 注册表）；8 处 Python 写入点补 newline、工作副本归一 LF、windows-encoding-rules 增换行判据；10 个既有红项修复后 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则。根因与证据见 doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md。
 
 ## 2026-09-11 代码质量九维治理：四项规则缺口补齐与 6-review 编排（已归档摘要）
 
