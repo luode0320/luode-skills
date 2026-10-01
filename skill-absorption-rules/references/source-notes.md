@@ -2,6 +2,23 @@
 
 > 归属 owner：`skill-absorption-rules`。追加每次吸收的来源与落点，可回指原始仓库 / 市场 / 版本。
 
+## 2026-09-29：外部吸收 + 新建独立 skill——enhance-verify-mode → verify-brainstorm-rules
+
+- **来源名称**：验证模式（`enhance-verify-mode`），slug `enhance-verify-mode`，canonicalName `@clawhub_jobzhao15/enhance-verify-mode`，version 1.0.0，source skillhub，installs 517。
+- **获取方式**：skillhub 安装源（用户级 `~/.workbuddy/skills/enhance-verify-mode__skillhub/`，含 `SKILL.md`、`_meta.json`、`_skillhub_meta.json`、`_icon.png`）；按外部吸收通道「本地安装源吸收模式」直接读取原文，未 WebFetch / WebSearch。
+- **来源描述**：Claude Code Verification Agent 风格的通用验证模板——四步流程（确定验证目标 / 静态检查 / 动态验证 / 输出验证报告）+ 检查清单（逻辑正确性、边界条件、测试结果、构建状态、安全检查）+ 报告结构。与本地测试域的落点规范、测试隔离红线、收敛验证分工完全未对接。
+- **裁决**：外部吸收通道；用户明确要求建立「编码完成后发散式验证」的独立能力，而本地测试域三套验证（`functional-validation-rules` / `bug-validation-rules` / `test-regression-rules`）均为收敛取向、无承接者 → 走「新增独立 skill」出口，落点 `verify-brainstorm-rules`。
+- **原始文件**：`SKILL.md`（70 行，4 个小节）。
+- **吸收落点**：
+  - `verify-brainstorm-rules/SKILL.md`（新建）：定位（编码收敛的对立面）、6 条铁律（只读发散 / 有界外扩 / 清单产物 / 先收敛后发散 / 裁决在用户 / 维度矩阵）、自动触发信号（含"验证功能 / 验证这个功能 / 验证刚刚改动的代码 / 验证一下 / 再检查一遍 / 检查一下"）、执行流程、权责边界、暂停条件、通过驳回标准、归档要求、references 读取规则。
+  - `verify-brainstorm-rules/references/divergence-dimension-matrix.md`（新建）：12 维发散矩阵 + 每维追问清单 + 典型信号。
+  - `verify-brainstorm-rules/references/scope-and-boundary.md`（新建）：发散起点、外扩一层判定（调用关系 / 数据流）、正反例、15 条噪音上限、停止条件、边界速查表。
+  - `verify-brainstorm-rules/references/finding-report-template.md`（新建）：问题清单模板、落盘位置与同一轮复用策略、填写硬要求。
+  - `verify-brainstorm-rules/references/skill-coordination.md`（新建）：与相邻 skill 的分工表、转交判据、常见误判。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-09-29 enhance-verify-mode 条目）。
+- **环境依赖登记**：N/A（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **源清理**：**保留**本地安装源 `enhance-verify-mode__skillhub`，未自动删除（删除用户级目录文件需用户显式确认）；建议用户在技能管理中按需卸载。
+
 ## 2026-08-26：内部调整——测试进程生命周期强制收口
 
 - **来源名称**：无外部源（内部更新通道）；调整诉求 = "测试任务结束后必须强制关闭测试启动的进程，禁止遗留后台；用户需要时自行启动"。

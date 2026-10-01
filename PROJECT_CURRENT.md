@@ -1,5 +1,17 @@
 # 项目当前状态
 
+## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
+
+- 来源对象：用户指令——“我们需要一个验证发散的独立 skill，当用户提出验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下等描述的时候触发；我们写代码的规则是最小改动、不要发散思维，但代码完成后需要发散一下、头脑风暴一下，找出更多的安全、性能、逻辑、边界的问题”。经三轮决策确认：命名 `verify-brainstorm-rules`、发散边界“允许外扩到关联模块”、产出“只读清单 + 落盘报告”。
+- 当前状态：**已落地闭环**。
+  - ① 新建 `verify-brainstorm-rules/`：`SKILL.md`（6 条铁律：只读发散 / 有界外扩 / 清单产物 / 先收敛后发散 / 裁决在用户 / 维度矩阵）+ 4 个 references（`divergence-dimension-matrix.md` 13 维矩阵 / `scope-and-boundary.md` 范围与外扩边界 / `finding-report-template.md` 问题清单模板 / `skill-coordination.md` 相邻 skill 分工）+ `_skillhub_meta.json`。
+  - ② 主规划同步：`编码skill.md` 测试域新增表格行与“第 8 类职责：验证发散”，同步“测试域默认分流规则”与“测试域内部顺序”，共 4 处。
+  - ③ 吸收登记：`skill-absorption-rules` 的 `workbuddy-absorption-map.md` 追加 enhance-verify-mode 裁决（4 条原子条目：3 合并 + 1 拒绝），`references/source-notes.md` 追加来源记录。
+  - ④ 字典刷新：`implemented 66 / planned_missing 8 / seed_total 120`（种子 +1 为今日安装的 `enhance-verify-mode__skillhub`，非本次新建引入；新 skill 已正确归入测试域 8.9）。
+  - ⑤ **2026-09-29 续（用户补充要求）**：发散维度由 12 维扩为 **13 维**，新增「代码格式与风格」；同时明确风格**判据权威仍归 `code-style-consistency-rules`**，本 skill 只做偏离发现、默认 P2（仅构建/CI/工具链失败才升 P1）、不发起全仓统一格式化。同步 `SKILL.md`、`divergence-dimension-matrix.md`、`finding-report-template.md`、`skill-coordination.md`、`scope-and-boundary.md` 与 `编码skill.md`。
+- 关键边界：发散只发生在“发现问题”一步；本 skill 只读、绝不顺手改码；修复一律回流 `code-quality-rules` 的最小改动收敛；裁决权始终在用户手上。
+- 验证与交接：`quick_validate.py` 返回 `Skill is valid!`（exit 0）；字典刷新 exit 0；改动停在已改动未提交状态（无当轮 Git 授权）。本地安装源 `enhance-verify-mode__skillhub` **保留未删**，待用户确认后在技能管理中卸载。
+
 ## 2026-09-27 Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）
 
 - 来源对象：用户本轮提出"goal 和 loop 的 skill 好像有多个，可以合并为一个吗"并完成三项决策（合并基座 = goal__skillhub 内容 + long-run-loop-rules 工程循环；合并后目录名 = goal-loop-rules；本轮只改仓库不动用户级目录）。

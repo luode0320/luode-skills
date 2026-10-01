@@ -534,10 +534,11 @@ Bug 域采用两条互补路径：
 | `test-regression-rules`       | 当 Bug 修复、原有功能迭代、公共模块修改后，准备执行测试时自动触发。 | 明确回归测试的范围、用例选取、验证要点，针对改动点关联的功能、上下游链路做全覆盖验证，防止修复旧 Bug 引入新问题，保障功能兼容性。 |
 | `project-interface-baseline-rules` | 当需要建立、刷新或核对项目接口事实基线时自动触发。 | 负责接口路由扫描、双索引一致性、依赖图和参数来源生命周期管理，不持有测试执行实现。 |
 | `apifox`（接口测试执行链路） | 当需要做上线前项目级接口测试、接口级功能验证/回归/Bug 验证、生成/补全测试用例、接口新增/更新同步 apifox、在 apifox 中真实跑通并完善接口信息时自动触发。 | 统一承接接口级测试执行：AI 团队项目定位（`ai-team-project.md`）、接口同步（`api-sync-to-apifox.md`）、范围选择（`test-selection-policy.md`）、用例生成（`test-case-generation.md`）、数据构造与判定（`test-data-and-judgement.md`）、陷阱规避（`testing-pitfalls.md`）；本地接口测试服务侧配置统一走 `config/yaml/config.apifox.yaml`（无则从 `config.local.yaml` 复制生成，MySQL 库名约定 apifox 由开发人员手动配置、与 local 相同即阻断等专用库；被测服务 environment 白名单仅 local 与 apifox，**有 apifox 配置默认用 apifox、无则 local、禁其他环境**；apifox 以 local 库数据为基准（apifox 库无数据且 local 有 → 优先从 local 单向灌入；双无 → apifox 自造测试数据）；**临时库特权：项目已有 apifox 配置时，模型测试宽权限场景允许自建 `tmp` 前缀临时库，测完必删，正常库禁删**）；**apifox 测试专用项目直接在 `main` 分支操作（接口文档操作/测试/补用例），不新开 AI 分支 / api 分支、无合并环节**；执行通道见 `test-strategy-rules` 的《接口测试执行通道（强制）》，原 `project-interface-release-execution-rules` 已并入。 |
+| `verify-brainstorm-rules`    | 当用户提出"验证功能""验证这个功能""验证刚刚改动的代码""验证一下""再检查一遍""检查一下"，或编码完成、收敛验证通过后需要主动挖掘潜在隐患时自动触发。 | 编码完成后"发散式对抗验证"的唯一 Owner：只读发散、多维度头脑风暴、产出 P0/P1/P2 问题清单并落盘，不修改任何代码；裁决权在用户，确认修复后回流 `code-quality-rules` 的最小改动收敛。 |
 
 ### 测试域内部边界判定
 
-测试域内部继续细分为七类职责：
+测试域内部继续细分为八类职责：
 
 1. 测试策略
 
@@ -591,6 +592,15 @@ Bug 域采用两条互补路径：
 - 对新增接口、删除接口和接口信息漂移先更新基线，再按 `test-selection-policy.md` 筛选必测接口，用 apifox 生成用例并真实跑通，输出门禁结论
 - 结果作为实施计划完成条件和真实测试证据的一部分
 
+8. 验证发散
+
+- 由 `verify-brainstorm-rules` 负责
+- 聚焦“代码已经写完，还有哪些没被发现的隐患”，覆盖安全、性能、逻辑正确性、边界与空值、并发与竞态、异常与错误处理、数据精度、资源与生命周期、兼容性、可观测性、配置与依赖、业务与用户视角、代码格式与风格 13 个维度
+- 代码格式与风格维度只做偏离发现（默认 P2），风格判据权威与 `6-review` 回归判定仍归 `code-style-consistency-rules`，不重新定义风格规则、不发起全仓统一格式化
+- 允许沿调用关系与数据流外扩一层，受单轮噪音上限约束；外扩发现与改动点自身问题分开标注
+- 只读发散、产出问题清单，不修改任何代码；裁决权始终在用户手上，确认修复后回流 `code-quality-rules` 的最小改动收敛
+- 不替代功能验证、回归验证和上线门禁的收敛判据；顺序上先收敛后发散
+
 ### 测试域默认分流规则
 
 - 讨论“测什么、覆盖哪些场景、优先级怎么排”时，进入 `test-strategy-rules`
@@ -599,6 +609,7 @@ Bug 域采用两条互补路径：
 - 讨论“当前需求是否实现正确”时，进入 `functional-validation-rules`
 - 讨论“上下游系统是否打通、环境是否一致、链路是否闭环”时，先进入 `test-strategy-rules` 重新拆分验证路径，必要时升级到总控层协调
 - 讨论“旧功能有没有被这次改动带坏、回归范围怎么定、回归用例怎么选”时，进入 `test-regression-rules`
+- 讨论“代码已经写完，还想发散看看安全、性能、逻辑、边界还有什么坑”或用户要求“再检查一遍”时，进入 `verify-brainstorm-rules`
 - 讨论“上线前全项目接口要不要放行、核心接口是否全量过门禁、接口基线是否需要冷启动或增量更新”时，进入 `project-interface-baseline-rules`（基线冷启动/增量更新）与 apifox 测试链路（放行/门禁判定，`apifox-cli__skillhub/modules/test-selection-policy.md`）
 
 ### 测试域内部顺序
@@ -609,6 +620,7 @@ Bug 域采用两条互补路径：
 - 然后执行 `functional-validation-rules`；其中接口类验证按 `test-strategy-rules` 的《接口测试执行通道（强制）》在 apifox 中真实执行并落地用例
 - 涉及跨系统或跨环境时，回到 `test-strategy-rules` 重新确认验证路径与证据收集方式
 - 再执行 `test-regression-rules`，确认改动没有破坏原有能力，并完成回归范围验证；接口类回归在 apifox 中执行（复用 apifox 测试套件）
+- 收敛验证通过后，如需要主动挖隐患（用户提出“再检查一遍”“验证一下”等），执行 `verify-brainstorm-rules` 做 13 维发散并产出问题清单（只读、不修改代码）
 - 准备上线或需要统一放行结论时，最后先执行 `project-interface-baseline-rules` 扫描并更新接口基线，再走 apifox 测试链路完成项目级接口门禁（`test-selection-policy.md` 选范围 → `test-case-generation.md` 生成用例 → `test-data-and-judgement.md` 构造与判定 → 真实 run 通过）
 
 ## 十二、交付域

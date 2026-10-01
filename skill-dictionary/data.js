@@ -1,15 +1,15 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-09-27 15:13:38",
+  "generated_at": "2026-10-01 16:47:05",
   "repo_root": "D:\\谷歌云盘\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
   "summary": {
-    "planned_total": 73,
-    "implemented_total": 65,
+    "planned_total": 74,
+    "implemented_total": 66,
     "planned_missing": 8,
     "seed_total": 119,
     "doc_total": 12,
-    "references_total": 872,
+    "references_total": 876,
     "agents_total": 78
   },
   "downloaded_seeds": {
@@ -2865,10 +2865,10 @@ window.SKILL_DICTIONARY = {
       "label": "测试域",
       "description": "策略、资源、功能验证、浏览器联动与回归",
       "order": 8,
-      "implemented_count": 8,
+      "implemented_count": 9,
       "planned_count": 0,
       "seed_count": 0,
-      "total_count": 8,
+      "total_count": 9,
       "items": [
         {
           "id": "test-strategy-rules",
@@ -3245,6 +3245,53 @@ window.SKILL_DICTIONARY = {
             "apifox-cli__skillhub/references/case-getactivityexposure-gap-backfill.md",
             "apifox-cli__skillhub/references/project-test-md-template.md",
             "apifox-cli__skillhub/references/source-notes.md"
+          ],
+          "agents": [],
+          "has_license": false,
+          "focus_points": [
+            "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+            "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+            "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+          ]
+        },
+        {
+          "id": "verify-brainstorm-rules",
+          "name": "verify-brainstorm-rules",
+          "title": "验证发散规则（verify-brainstorm-rules）",
+          "status": "implemented",
+          "status_label": "已实现",
+          "domain_id": "test",
+          "domain_label": "测试域",
+          "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+          "domain_order": 8,
+          "item_order": 9,
+          "auto_trigger": "当用户提出\"验证功能\"\"验证这个功能\"\"验证刚刚改动的代码\"\"验证一下\"\"再检查一遍\"\"再检查一下改动\"\"检查一下\"\"复查一下\"（追问轮同样触发，不因上一轮已做收敛验证而豁免），或编码完成、收敛验证通过后需要主动挖掘潜在隐患时触发。这是编码完成后\"发散式对抗验证\"的唯一 Owner：以只读方式对当前改动及其关联模块做 13 维头脑风暴（安全、性能、逻辑、边界、并发、异常、精度、资源、兼容、可观测性、配置、业务视角、代码格式与风格），产出结构化问题清单（P0/P1/P2 + 触发路径 + 修复建议）并落盘留痕，不修改任何代码；代码格式与风格的判据权威仍归 code-style-consistency-rules，本 skill 只做偏离发现；发散允许沿调用关系与数据流外扩一层，但受噪音上限与严重度收敛约束；裁决权始终在用户手上，确认后的修复回流 code-quality-rules 的最小改动收敛，真问题转 bug-intake-rules。不要用它代替 functional-validation-rules（改动是否做对）、bug-validation-rules（Bug 修复闭环）、test-regression-rules（旧功能是否被带坏）或 test-strategy-rules（测试策略与资产治理）。",
+          "core_responsibility": "编码完成后\"发散式对抗验证\"的唯一 Owner：只读发散、多维度头脑风暴、产出 P0/P1/P2 问题清单并落盘，不修改任何代码；裁决权在用户，确认修复后回流 `code-quality-rules` 的最小改动收敛。",
+          "skill_path": "verify-brainstorm-rules/SKILL.md",
+          "directory_path": "verify-brainstorm-rules",
+          "directory": "verify-brainstorm-rules",
+          "sections": [
+            "定位：编码收敛的对立面，但只在\"发现问题\"这一步发散",
+            "铁律 1：只读发散，绝不顺手改码",
+            "铁律 2：发散有界，外扩受噪音上限约束",
+            "铁律 3：产物是问题清单，不是修改方案说明书",
+            "铁律 4：先收敛验证，再发散挖掘",
+            "铁律 5：裁决权在用户手上",
+            "铁律 6：维度必须走矩阵，防止随机发散漏项",
+            "自动触发信号",
+            "进入后先做什么",
+            "默认执行流程",
+            "权责边界与不负责事项",
+            "需要暂停并确认的条件",
+            "执行通过 / 驳回标准",
+            "执行结果归档要求",
+            "references 读取规则"
+          ],
+          "references": [
+            "verify-brainstorm-rules/references/divergence-dimension-matrix.md",
+            "verify-brainstorm-rules/references/finding-report-template.md",
+            "verify-brainstorm-rules/references/scope-and-boundary.md",
+            "verify-brainstorm-rules/references/skill-coordination.md"
           ],
           "agents": [],
           "has_license": false,
@@ -11265,6 +11312,53 @@ window.SKILL_DICTIONARY = {
         "apifox-cli__skillhub/references/case-getactivityexposure-gap-backfill.md",
         "apifox-cli__skillhub/references/project-test-md-template.md",
         "apifox-cli__skillhub/references/source-notes.md"
+      ],
+      "agents": [],
+      "has_license": false,
+      "focus_points": [
+        "优先检查 description 是否具体到触发信号，而不是只写抽象用途。",
+        "检查 references 是否足以承接复杂场景，避免 SKILL.md 过厚或过空。",
+        "重点看测试策略、资源、功能验证、联调、回归是否已经拆开。"
+      ]
+    },
+    {
+      "id": "verify-brainstorm-rules",
+      "name": "verify-brainstorm-rules",
+      "title": "验证发散规则（verify-brainstorm-rules）",
+      "status": "implemented",
+      "status_label": "已实现",
+      "domain_id": "test",
+      "domain_label": "测试域",
+      "domain_description": "策略、资源、功能验证、浏览器联动与回归",
+      "domain_order": 8,
+      "item_order": 9,
+      "auto_trigger": "当用户提出\"验证功能\"\"验证这个功能\"\"验证刚刚改动的代码\"\"验证一下\"\"再检查一遍\"\"再检查一下改动\"\"检查一下\"\"复查一下\"（追问轮同样触发，不因上一轮已做收敛验证而豁免），或编码完成、收敛验证通过后需要主动挖掘潜在隐患时触发。这是编码完成后\"发散式对抗验证\"的唯一 Owner：以只读方式对当前改动及其关联模块做 13 维头脑风暴（安全、性能、逻辑、边界、并发、异常、精度、资源、兼容、可观测性、配置、业务视角、代码格式与风格），产出结构化问题清单（P0/P1/P2 + 触发路径 + 修复建议）并落盘留痕，不修改任何代码；代码格式与风格的判据权威仍归 code-style-consistency-rules，本 skill 只做偏离发现；发散允许沿调用关系与数据流外扩一层，但受噪音上限与严重度收敛约束；裁决权始终在用户手上，确认后的修复回流 code-quality-rules 的最小改动收敛，真问题转 bug-intake-rules。不要用它代替 functional-validation-rules（改动是否做对）、bug-validation-rules（Bug 修复闭环）、test-regression-rules（旧功能是否被带坏）或 test-strategy-rules（测试策略与资产治理）。",
+      "core_responsibility": "编码完成后\"发散式对抗验证\"的唯一 Owner：只读发散、多维度头脑风暴、产出 P0/P1/P2 问题清单并落盘，不修改任何代码；裁决权在用户，确认修复后回流 `code-quality-rules` 的最小改动收敛。",
+      "skill_path": "verify-brainstorm-rules/SKILL.md",
+      "directory_path": "verify-brainstorm-rules",
+      "directory": "verify-brainstorm-rules",
+      "sections": [
+        "定位：编码收敛的对立面，但只在\"发现问题\"这一步发散",
+        "铁律 1：只读发散，绝不顺手改码",
+        "铁律 2：发散有界，外扩受噪音上限约束",
+        "铁律 3：产物是问题清单，不是修改方案说明书",
+        "铁律 4：先收敛验证，再发散挖掘",
+        "铁律 5：裁决权在用户手上",
+        "铁律 6：维度必须走矩阵，防止随机发散漏项",
+        "自动触发信号",
+        "进入后先做什么",
+        "默认执行流程",
+        "权责边界与不负责事项",
+        "需要暂停并确认的条件",
+        "执行通过 / 驳回标准",
+        "执行结果归档要求",
+        "references 读取规则"
+      ],
+      "references": [
+        "verify-brainstorm-rules/references/divergence-dimension-matrix.md",
+        "verify-brainstorm-rules/references/finding-report-template.md",
+        "verify-brainstorm-rules/references/scope-and-boundary.md",
+        "verify-brainstorm-rules/references/skill-coordination.md"
       ],
       "agents": [],
       "has_license": false,

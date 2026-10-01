@@ -661,3 +661,57 @@
 - **净增体积**：`runtime-process-cleanup-rules/SKILL.md` +约 1.2KB（由 2.9KB 增至 4.1KB）。
 - **棘轮验证**：SKILL.md UTF-8 与 frontmatter 解析 PASS；关键断言回读一致（四层清理对象 / WSL / 虚拟化子系统 / DrvFS / wsl.exe --shutdown / 磁盘 I/O 负荷回读）；description 长度 302 < 1024 PASS。
 - **源清理**：N/A（内部更新通道，无外部安装源）。
+
+## 2026-09-29：外部吸收——验证模式（enhance-verify-mode）→ 新建 verify-brainstorm-rules
+
+- **来源**：skillhub `enhance-verify-mode`（canonicalName `@clawhub_jobzhao15/enhance-verify-mode`，v1.0.0，installs 517），本地安装源 `~/.workbuddy/skills/enhance-verify-mode__skillhub/`。
+- **形态**：外部吸收通道（本地安装源吸收模式：读取原文 → 裁决 → 落盘 → 源清理待确认）+ 落点形态为「新增独立 skill 目录」。
+- **吸收目标**：新建 `verify-brainstorm-rules`（编码完成后"发散式对抗验证"唯一 Owner）。
+- **拆解原子条目数**：4 条。
+
+| # | 外部精华 | 本地现状 | 裁决 | agent 通用性 | 落点 / 理由 |
+|---|---------|---------|------|-------------|------------|
+| 1 | 四步验证流程（确定目标 → 静态检查 → 动态验证 → 输出报告） | 测试域已有 functional / bug / regression 三套流程，但均为"改动是否正确"的收敛取向，无"编码后主动发散挖隐患"流程 | 合并（改形态） | 通用 | `verify-brainstorm-rules/SKILL.md` 执行流程改写为：建立事实基线 → 逐维度发散 → 外扩一层 → 去重收敛 → 落盘 → 交接 |
+| 2 | 检查清单（逻辑正确性 / 边界条件 / 测试结果 / 构建状态 / 安全检查） | 本地无跨维度发散清单；安全维度已有 `code-security-audit` 专项审计 | 合并（扩展为 12 维） | 通用 | `references/divergence-dimension-matrix.md`：由 5 项扩展为 12 维（安全 / 性能 / 逻辑 / 边界 / 并发 / 异常 / 精度 / 资源 / 兼容 / 可观测 / 配置 / 业务视角）并配每维追问清单与典型信号 |
+| 3 | 验证报告结构（验证对象 / 检查清单 / 发现问题 / 结论） | 本地已有 `doc/5-tests/` 测试主文档与 `artifact-storage-rules` 落点规范，外部模板未对接任何落点或同一轮复用策略 | 合并（按本地落点重写） | 通用 | `references/finding-report-template.md`：改用 `path-map.yaml` 的 `test_doc` 命名与"优先复用同一轮测试主文档"策略，问题条目改为 P0/P1/P2 + 触发路径 + 建议方向 |
+| 4 | 豁免条款"改动很小且显而易见正确 → 不要使用此技能" | 与本地口径冲突：本地要求发散必须留下维度级结论与依据，不得因"看起来简单"整体跳过 | 拒绝 | — | 与本地红线冲突（跳过即无留痕、无维度覆盖证据），拒绝该豁免；改由"维度无问题也必须写依据"承接 |
+
+- **落盘改动**：
+  - `verify-brainstorm-rules/SKILL.md`（新建）：6 条铁律——只读发散绝不顺手改码 / 有界外扩受噪音上限约束 / 产物是问题清单不是修改 / 先收敛验证再发散挖掘 / 裁决权在用户 / 维度必须走矩阵；`description` 内置用户口径触发词（验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下）。
+  - `verify-brainstorm-rules/references/divergence-dimension-matrix.md`（新建）：12 维矩阵 + 追问清单 + 典型信号 + 计数规则。
+  - `verify-brainstorm-rules/references/scope-and-boundary.md`（新建）：发散起点三要素、外扩一层（调用关系 / 数据流）合法路径与正反例、15 条噪音上限与截断顺序、停止条件、边界速查表。
+  - `verify-brainstorm-rules/references/finding-report-template.md`（新建）：文档结构模板、填写硬要求、精简示例。
+  - `verify-brainstorm-rules/references/skill-coordination.md`（新建）：职责图谱、分工表、转交判据、常见误判。
+  - `verify-brainstorm-rules/_skillhub_meta.json`（新建）：与仓库既有 skill 对齐的元数据（`source: user-self-built`）。
+- **整理去重**：不复制外部整套工作流与目录形态，只吸收原子规则；外部 5 项检查清单统一收敛进 `divergence-dimension-matrix.md` 单一权威，SKILL.md 只列 12 个维度名不重复展开；落点规则不重复定义，统一引用 `artifact-storage-rules` 的 path-map 与 update-policy；与相邻 skill 的边界收敛进 `skill-coordination.md` 单一权威，SKILL.md 只留一行指针；未改动任何既有 skill 文件（纯新增，零回归面）。
+- **同域扫描结论**：范围 = 测试域（test-strategy / functional-validation / bug-validation / test-regression / project-interface-baseline）、编码基线域（code-quality / code-style-consistency）、安全域（code-security-audit）、交付域（artifact-storage / artifact-delivery-gate）。发现 = 0 处重复段落（12 维矩阵为广度发现、安全审计为专项定级，差异已在 `skill-coordination.md` 声明；本 skill 明确声明"先收敛后发散"的前置顺序，不与三个收敛验证 skill 争判据）、0 处门控层叠（触发词与 functional-validation 的"验证功能"存在语义邻近，已在分工表与 SKILL.md 首段双重划界）、0 处散落产物；清理 0 处；**PASS**（实测证据：对 test-strategy / functional-validation / bug-validation / test-regression / code-quality / code-style-consistency / artifact-delivery-gate 共 7 个同域 skill 的全文做长度 ≥24 字符的逐字片段比对 = **0 处命中**；关键概念「只读发散 / 噪音上限 / 外扩一层 / 裁决权 / 12 个维度 / 发散式对抗验证」在同域文本中均出现 **0 次**，语义为本 skill 独有，无重复段落、无门控层叠）。
+- **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
+- **净增体积**：`verify-brainstorm-rules` 新增目录合计 31,575B（≈30.8KB：`SKILL.md` 12,636B + 4 个 references 合计 18,836B + meta 103B）；既有文件为登记与规划追加（`编码skill.md` 测试域 4 处、`workbuddy-absorption-map.md` 与 `source-notes.md` 各追加 1 节、`PROJECT_CURRENT.md` 与 `PROJECT_MEMORY.md` 各追加 1 节；`字典.md` 与 `skill-dictionary/data.js` 由脚本刷新）；未删改任何既有 skill 内容，体系净增 ≈ +31KB 量级（纯新增能力）。
+- **棘轮验证**：`quick_validate.py` 返回 `Skill is valid!`（exit 0）；frontmatter `name` 与目录名一致且为 hyphen-case（`verify-brainstorm-rules`）；`description` 415 字符（<1024）且无尖括号；6 个用户口径触发词（验证功能 / 验证这个功能 / 验证刚刚改动的代码 / 验证一下 / 再检查一遍 / 检查一下）在 `description` 中全部命中；8 条跨目录引用链（`artifact-storage-rules` ×2、`artifact-delivery-gate-rules` ×1、`test-strategy-rules` ×1、自身 references ×4）全部可达、无断链；全部文件 UTF-8 无乱码。
+- **源清理**：保留本地安装源 `enhance-verify-mode__skillhub`，未自动删除——删除用户级目录文件需用户显式确认；已提示用户可在技能管理中卸载。
+
+### 2026-09-29 续：需求变更——发散维度扩为 13 维（新增代码格式与风格）
+
+- **来源**：用户当轮补充要求——“发散不仅仅包括安全等问题，还包括代码格式、代码风格的发散检查”。
+- **形态**：内部更新通道（需求变更，无外部源可删）；承接同一轮 `verify-brainstorm-rules` 新建任务的口径变更。
+- **变更内容**：
+
+| # | 变更诉求 | 原口径 | 裁决 | 落点 / 理由 |
+|---|---------|-------|------|------------|
+| 1 | 代码格式与风格纳入发散 | 原铁律 3 明确“禁止把代码风格意见包装成缺陷（风格问题归 `code-style-consistency-rules`）”，转交判据表写“不写入问题清单” | 合并（口径反转 + 边界重划） | 新增第 13 维「代码格式与风格」；原“禁止”改为“按发现处理、不按判据处理” |
+| 2 | 风格判据不能出现两套标准 | 新维度若无边界，会与 `code-style-consistency-rules`（`6-review` 风格回归 gate）形成双权威 | 合并（单一权威 + 引用） | 判据权威与 `STYLE: PASS / FIX_REQUIRED` 判定仍归 `code-style-consistency-rules`；本 skill 只做偏离发现，默认 P2、不做全仓统一格式化 |
+| 3 | 与最小改动原则协同 | 风格类问题若被允许顺手全仓格式化，会直接击穿 `code-quality-rules` 的“阻断顺手重构” | 合并 | 维度矩阵与常见误判表各增一条边界：“不做全仓风格巡检与统一格式化”，只覆盖本轮改动及其外扩一层 |
+
+- **落盘改动**：
+  - `verify-brainstorm-rules/SKILL.md`（7 处）：`description` 补 13 维与判据归属；铁律 3 风格条款重写（默认 P2、仅构建/CI 失败升 P1）；铁律 6 维度列表 12→13；执行流程第 2 步；归档要求“13 维覆盖结论”；通过标准“13 个维度”；references 读取规则；权责边界拆分为两条（不持有风格判据权威）。
+  - `verify-brainstorm-rules/references/divergence-dimension-matrix.md`（3 处）：标题与使用规则 12→13；新增「13. 代码格式与风格」维度（8 条追问、典型信号、严重度约定、判据归属声明、边界提醒）。
+  - `verify-brainstorm-rules/references/finding-report-template.md`（1 处）：维度覆盖表 12→13，第 13 行标注判据归属。
+  - `verify-brainstorm-rules/references/skill-coordination.md`（3 处）：分工表风格行由“不进清单”改为“可列 P2、判据归它”；转交判据表同步；常见误判新增 2 条（不做全仓格式化、风格不按 P1 报）。
+  - `verify-brainstorm-rules/references/scope-and-boundary.md`（1 处）：停止条件 12→13。
+  - `编码skill.md`（2 处）：测试域第 8 类职责维度列表 12→13 并补判据归属条；内部顺序“13 维发散”。
+- **整理去重**：本轮为**口径反转 + 边界重划**，未新增维度以外的并行条款——风格判据统一指向 `code-style-consistency-rules` 单一权威，本 skill 不留风格规则正文；未新增 skill 目录；未改动 `code-style-consistency-rules` 本体（保持其 `6-review` gate 职责不变）。
+- **同域扫描结论**：范围 = 代码风格回归域（`code-style-consistency-rules`）、编码基线域（`code-quality-rules`、`comment-rules`）、测试域（`functional-validation-rules` 等）。发现 = 0 处重复段落（新增维度只写“发现清单”，未复制任何风格判据正文）、0 处门控层叠（本 skill 不阻断风格、`code-style-consistency-rules` 才是风格 gate，职责互补不嵌套）、0 处散落产物；清理 0 处；**PASS**。
+- **环境依赖登记**：N/A + 理由（纯规则文本）。
+- **净增体积**：`SKILL.md` +约 0.9KB；`divergence-dimension-matrix.md` +约 1.3KB；其余 3 个 references 与 `编码skill.md` 合计 +约 0.5KB；本轮净增 ≈ +2.7KB（维度扩展与边界声明，无冗余复制）。
+- **棘轮验证**：`quick_validate.py` 重跑 PASS；全目录关键字回读「12 维 / 12 个维度」清零；13 维列表在 `SKILL.md` 与维度矩阵两处一致；风格判据归属声明在 `SKILL.md`、维度矩阵、分工表三处一致；字典按正文变更重跑。
+- **源清理**：N/A（内部更新通道）。
