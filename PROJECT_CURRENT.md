@@ -3,8 +3,8 @@
 ## 2026-10-01 推送远端 + 本项目「提交即推送」写进规则 md（用户固化）
 
 - 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
-- 当前状态：**已落地闭环并推送远端**。本轮按新口径「提交即推送」逐笔推送，每次推送后 `git rev-list --left-right --count origin/main...HEAD` 均回到 `0 0`；末笔为「残留自查与落点同步」。
-  - ① 推送：先推上一轮 6 笔（`35cc3cf2..d0f6395b`），再按新口径逐笔推本轮各笔（规则固化、计数回写、条件注入修复、残留自查与落点同步），`origin/main` 已与本地位点一致。
+- 当前状态：**已落地闭环并推送远端**。本轮按新口径「提交即推送」逐笔推送，每次推送后 `git rev-list --left-right --count origin/main...HEAD` 均回到 `0 0`。
+  - ① 推送：先推上一轮 6 笔（`35cc3cf2..d0f6395b`），再按新口径逐笔推本轮全部各笔；收口时 `origin/main` 与本地提交位点一致，工作树干净。
   - ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目默认提交即推送」，同步正文源 `bootstrap_agents.sh`；要点：提交意图默认含推送、gate 与按业务拆分提交继续生效、负向边界绝对优先、不扩散到其他仓库。
   - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
   - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
