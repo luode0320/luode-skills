@@ -38,9 +38,9 @@
 version: 1
 anchors:
   - title: "本项目「提交即推送」固化进规则 md 并推送远端（用户固化）"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-01
     absorbed_to: null
   - title: "新增「交付残留自查」收口前横切环节（内部更新通道）"
     usage_count: 0
