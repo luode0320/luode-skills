@@ -54,5 +54,47 @@ class BootstrapAgentsTests(unittest.TestCase):
             self.assertNotIn("禁止将真实 API key、token、密码、私钥、连接串原值或其他敏感配置写入代码、文档、日志、输出或 Git 提交", agents)
 
 
+    def test_commit_implies_push_extra_is_scoped_to_owner_repo(self) -> None:
+        """验证「提交即推送」项目专属补充不会被通用自举扩散到其他仓库。
+
+        [参数] 无
+        [返回] 无；断言失败时由 unittest 抛出异常。
+        最近修改时间：2026-10-01 17:52:00；覆盖受管通用章节混入单仓库授权默认值的回归。
+        """
+
+        # 1. 归属仓库命中 slug 时必须注入项目专属补充。
+        extra = "本项目（luode-skills）默认「提交即推送」"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "luode-skills"
+            root.mkdir()
+            subprocess.run(
+                [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
+                capture_output=True,
+                check=True,
+                cwd=ROOT,
+                text=True,
+                encoding="utf-8",
+                env=os.environ.copy(),
+            )
+            self.assertIn(extra, (root / "AGENTS.md").read_text(encoding="utf-8"))
+
+        # 2. 其他仓库必须保持通用正文，不得继承该默认授权。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "some-other-project"
+            root.mkdir()
+            subprocess.run(
+                [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
+                capture_output=True,
+                check=True,
+                cwd=ROOT,
+                text=True,
+                encoding="utf-8",
+                env=os.environ.copy(),
+            )
+            agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertNotIn(extra, agents)
+            self.assertIn("严禁自动提交 Git", agents)
+
+
 if __name__ == "__main__":
     unittest.main()

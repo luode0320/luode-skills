@@ -5,10 +5,11 @@
 - 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
 - 当前状态：**已落地闭环并推送远端**。
   - ① 推送：`git push origin main` 成功，`35cc3cf2..d0f6395b`（6 笔）；`git rev-list --left-right --count origin/main...HEAD` = `0 0`。
-  - ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目（luode-skills）默认提交即推送」，并同步唯一正文源 `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT`（三处同文）；要点为「提交意图默认含推送」「只放宽推送授权粒度，gate 与按业务拆分提交继续生效」「负向边界（只提交不推送）绝对优先」「不扩散到其他仓库」。
+- ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目默认提交即推送」，同步正文源 `bootstrap_agents.sh`；要点：提交意图默认含推送、gate 与按业务拆分提交继续生效、负向边界绝对优先、不扩散到其他仓库。
   - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
   - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
 - 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
+- 后续修正（同轮）：自举脚本原把该默认值写进通用正文 `BODY_NO_AUTO_COMMIT`，会扩散到任意项目；已拆出 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` + `resolve_no_auto_commit_body` 按仓库标识条件注入，并补守卫测试。另修复存量阻断：`static-owner-source-map.json` 漏登记 `code-quality-rules` 两文档致 6-review 路由失败关闭，补登记后路由退出码恢复 `0`、契约测试 20/20 OK。回归记录见 `doc/6-review/2026-10-01_175553_提交即推送规则固化与自举条件注入_6-review.md`。
 - 计数回写：本轮实际引用 `PROJECT_MEMORY.md` 实体 `rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」，经 `usage_ledger_validate.py` 校验 `ok=true` 后各 +1。
 - 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
 

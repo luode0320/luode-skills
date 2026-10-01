@@ -256,8 +256,16 @@ BODY_NO_AUTO_COMMIT=$(cat <<'EOF'
 - 只读盘点命令（`git status`、`git diff`、`git log`）不受限制；写入历史的动作严格受限。
 - 本条与全局技能 `git-collaboration-rules` 的「1.-2」一致，为项目级重申，确保重启会话 / 无全局上下文时本规则仍在项目内生效。
 - 若当前轮 Git 协作伴随可复用事实、决策、流程、定义、偏好、来源或调试经验，先按 `knowledge-flow` 做沉淀判断，再继续 Git 协作收口；沉淀判断不得覆盖当前轮提交授权边界。
-- **本项目（luode-skills）默认「提交即推送」（2026-10-01 用户固化）**：在本项目提出提交意图（`提交git`、`提交代码`、`commit一下` 等）时，默认把「本地提交 + 推送 origin 对应分支」作为**同一笔授权闭环**执行，不再对推送单独二次确认；推送前仍需 pre/post gate 通过。用户当轮显式写出「只提交，不要推送」「不要推送」等负向边界时，负向边界绝对优先，严格停在本地提交等待后续指令。
 - 违反本条视为最高级别流程违规。
+EOF
+)
+
+# BODY_NO_AUTO_COMMIT_PROJECT_EXTRA
+# 项目专属补充：仅在仓库 slug 命中时插入「严禁自动提交 Git」章节。
+# 「提交即推送」只是单个仓库的授权默认值，若写进上面的通用正文，
+# 通用自举会把该默认值扩散到其他项目；其他仓库必须保持逐动作授权。
+BODY_NO_AUTO_COMMIT_PROJECT_EXTRA=$(cat <<'EOF'
+- **本项目（luode-skills）默认「提交即推送」（2026-10-01 用户固化）**：在本项目提出提交意图（`提交git`、`提交代码`、`commit一下` 等）时，默认把「本地提交 + 推送 origin 对应分支」作为**同一笔授权闭环**执行，不再对推送单独二次确认；推送前仍需 pre/post gate 通过。用户当轮显式写出「只提交，不要推送」「不要推送」等负向边界时，负向边界绝对优先，严格停在本地提交等待后续指令。
 EOF
 )
 
@@ -998,6 +1006,25 @@ if "usage_tracking:" in block:
 PY
 }
 
+# resolve_no_auto_commit_body
+# [参数] 无（读取全局 REPO_DIR）
+# [返回] 「严禁自动提交 Git」受管章节正文；仅当仓库 slug 为 luode-skills 时追加项目专属补充
+# 最近修改时间: 2026-10-01 17:47:00 拆出项目专属补充：该章节是通用受管正文，直接写入单个仓库的
+# 「提交即推送」默认值会在其他项目自举时被一并刷入，与「不扩散到其他仓库」的声明自相矛盾
+resolve_no_auto_commit_body() {
+  local body="$BODY_NO_AUTO_COMMIT"
+  if [[ "$(basename "$REPO_DIR")" != "luode-skills" ]]; then
+    printf '%s\n' "$body"
+    return 0
+  fi
+  while IFS= read -r line; do
+    if [[ "$line" == "- 违反本条视为最高级别流程违规。" ]]; then
+      printf '%s\n' "$BODY_NO_AUTO_COMMIT_PROJECT_EXTRA"
+    fi
+    printf '%s\n' "$line"
+  done <<< "$body"
+}
+
 # sync_agents_file
 # [参数] file: 需要同步受管章节的 AGENTS.md / CLAUDE.md 文件路径
 # [返回] 无
@@ -1014,7 +1041,7 @@ sync_agents_file() {
   sync_section "$file" "注意" "$BODY_NOTICE"
   sync_section "$file" "Skill 强制自动触发规则（最高优先级）" "$BODY_SKILL_AUTO"
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
-  sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$BODY_NO_AUTO_COMMIT"
+  sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$(resolve_no_auto_commit_body)"
   sync_section "$file" "跨项目写入红线（最高优先级，强制）" "$BODY_NO_CROSS_PROJECT_WRITE"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
   sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"

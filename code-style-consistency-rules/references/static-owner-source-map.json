@@ -108,6 +108,8 @@
             "code-quality-rules/references/minimal-change-boundaries.md",
             "code-quality-rules/references/minimal-change-examples.md",
             "code-quality-rules/references/minimal-change-general.md",
+            "code-quality-rules/references/minimal-solution-ladder.md",
+            "code-quality-rules/references/platform-native-substitutes.md",
             "code-quality-rules/references/code-removal-discipline.md"
           ],
           "source_globs": [],
