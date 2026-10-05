@@ -1,5 +1,17 @@
 # 项目当前状态
 
+## 2026-10-05 反打补丁规则落地与经验吸收入库 + 截图双技能接入与规范提交推送
+
+- 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把 2026-10-05 内部更新（严禁为少改代码打补丁破坏架构、主流程正向补齐遗漏流程）吸收进项目长期记忆，并按 git 协作规则将仓库全部未提交改动拆分提交并推送到远端。
+- 当前状态：**已落地闭环并推送远端**。
+  - ① 经验吸收入库：确立严禁为少改代码打补丁破坏架构铁律，在 `PROJECT_MEMORY.md` 沉淀人类区章节与机器实体 `rule.no-patchwork-architecture-discipline`，在 `PROJECT_STYLE.md` 补齐反例与正例（STYLE-CASE-ALL-004）及计数锚点，在 `D:\谷歌云盘\知识库\` 沉淀《严禁为少改代码而打补丁破坏架构与主流程正向补齐规范.md》；
+  - ② 截图双技能入库：入库 `window-scoped-capture`（窗口级 PrintWindow 截屏与 PostMessage 受控交互）与 `app-internal-screenshot-rules`（自渲染应用内部像素提取），并在长期记忆沉淀双轨机制（机器实体 `rule.window-and-app-internal-capture-discipline`）；
+  - ③ 系统标记同步与清理：同步 `.codex-system-skills.marker` 哈希，移除官方已下线组件 `plugin-creator`；
+  - ④ 字典刷新：运行 `generate_dictionary.py`，更新 `data.js` 与 `字典.md`（implemented 66 / planned_missing 8 / seed 122）；
+  - ⑤ Git 协作闭环：按业务目标拆分 4 笔规范提交，逐笔通过 pre-commit 与 post-commit gate，并在收口时推送到 `origin/main`；工作树完全清空。
+- 关键边界：本仓库默认「提交即推送」（2026-10-01 固化），全流程遵守 pre/post gate 与业务拆分提交原则。
+- 验证与交接：`check_memory_anchors.py` ok=true（实体 54、风格锚点 35、历史锚点 20）；`quick_validate.py` 对各 skill 校验全 PASS；字典重跑 exit 0；`git status --short` 清空；`origin/main` 同步一致。
+
 ## 2026-10-01 推送远端 + 本项目「提交即推送」写进规则 md（用户固化）
 
 - 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
@@ -199,24 +211,6 @@
   - ④ `references/conditional-sections-rules.md`：明确决策任务天然豁免图形化总览与工程执行流水账，无文件改动时省略改动点。
   - ⑤ `字典.md`：刷新 1.18 `reasoning-summary-structure-rules` 核心职责描述。
 - 验证与交接：文件更新完成并读回校验通过；工作日志记录至 `.workbuddy/memory/2026-09-15.md`；当轮无 Git 提交授权，停留在已改动未提交状态。
-
-## 2026-09-14 补充代码分解规则（目录树 skill 与代码拆分 skill）
-
-- 来源对象：用户明确要求为『目录树 skill』与『代码拆分 skill』补充 5 项代码分解规则（单文件 ≤ 200 行拆 diamond 文件；同目录单一业务逻辑；一目录一事；函数 ≤ 80 行；参数与返回值 ≤ 2 个用结构体替代）。
-- 当前状态：**全部落地落盘**。① `package-structure-rules`（SKILL.md 核心边界第 12 条、`structure-general.md` 专节、`project-layout-v2.md` 第 7 条）；② `code-quality-rules`（统一硬约束与 5 项规则全量替换原 500 行阈值，`readability-general.md` / `function-structure-rules.md` / `function-signature-rules.md` / `readability-examples.md` 同步）；③ 重跑 `generate_dictionary.py` 刷新 `字典.md` 与 `skill-dictionary/data.js`；④ 经 `bootstrap_agents.sh` 升格固化进 `AGENTS.md` / `CLAUDE.md`，确立「非必要不突破」与三大正当特例（数据表、状态机主干、纯入口编排函数），并修复 `PROJECT_HISTORY.md` 计数锚点漂移（C1~C5 PASS）。
-- 验证与交接：`test/package-structure-rules` 45 个单元测试全部通过（45/45 OK）；`check_memory_anchors.py` PASS；工作日志写入 `.workbuddy/memory/2026-09-14.md`。
-
-## 2026-09-13 Apifox 接口展示与阅读简体中文统一规范固化（已归档摘要）
-
-- 结论：接口 API 路径保持英文，所有展示与阅读面统一简体中文。落点 `apifox-cli__skillhub`（SKILL.md 铁律 + `modules/` 六个模块）、吸收登记与 `PROJECT_MEMORY.md` 稳定决策。验证：`quick_validate.py` PASS、同域冗余扫描 PASS。
-
-## 2026-09-12 交付残留自查 + 行尾归一 + 既有测试红项清零（已归档摘要）
-
-- 结论：新建交付残留自查 6 维横切 reference（登记进延迟 gate 注册表）；8 处 Python 写入点补 newline、工作副本归一 LF、windows-encoding-rules 增换行判据；10 个既有红项修复后 33 文件 failures = 0；新增仓库级「夹具与守卫参照物稳健性」规则。根因与证据见 doc/6-review/2026-09-12_103431_行尾归一与既有测试失败修复_6-review.md。
-
-## 2026-09-11 代码质量九维治理：四项规则缺口补齐与 6-review 编排（已归档摘要）
-
-- 来源与状态：4 项内容缺口（函数签名、定义位置、结构体角色分层、纯转换函数落点与公共工具索引）及 6-review 九步流水线全部落地闭环，测试全量 PASS，已固化进长期记忆与字典。
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 

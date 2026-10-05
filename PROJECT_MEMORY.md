@@ -114,6 +114,22 @@
 - 来源：用户指令（2026-10-01「推送, 这个项目提交并推送做为项目规则写进规则md」）+ `AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节 + `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT` + `git-collaboration-rules/references/current-turn-authorization.md` 项目级例外节。
 - 更新时间：2026-10-01。
 
+
+## 反打补丁与架构优先原则（2026-10-05 固化）
+
+- 稳定决策：**核心红线：严禁为少改代码打补丁破坏架构**——改动、改 Bug、改需求严禁用打补丁的方式实现；明显的为了不改动太多 / 控制 diff 行数 / 避开动旧逻辑而选择打补丁（如在外围堆砌特判 flag、搞新老双轨分流兼容、套壳胶水绕道、下游 try-catch 吞异常或坏数据兜底）是绝对不可取的，会严重破坏代码可读性与既有架构设计。
+- 稳定决策：**正向准则：流程遗漏直接在主流程补齐**——排查发现是主流程确实遗漏了必要步骤（如缺少状态转移分支、缺少必要前置校验、未处理边界返回值），允许且应当直接在原主干流程中补齐，保持业务流水线单一自洽。
+- 稳定决策：**架构与可读性优先**——系统架构与代码可读性永远高于局部 diff 最小化；遇到新旧规则冲突，宁可正向演进模型统一承接，绝不搞双轨历史包袱。
+- 来源：用户指令（2026-10-05）+ `code-quality-rules/references/no-patchwork-architecture-discipline.md` 与 `SKILL.md` + `code-generation-style-rules` + `bug-fix-proposal-rules` + `implementation-planning-rules` + `code-style-consistency-rules/references/user-style-feedback-library.md`（STYLE-CASE-ALL-004）。
+- 更新时间：2026-10-05。
+
+## 窗口与应用截图取证双轨机制（2026-10-05 固化）
+
+- 稳定决策：**自身可控渲染应用优先走应用内自渲染（app-internal-screenshot-rules）**——对 Godot、自研游戏、浏览器 CDP、Electron 等可控渲染应用，通过自身渲染通道（视口纹理 `get_image()`、CDP `Page.captureScreenshot`、Electron `capturePage()`）抓取，天然只含目标应用且不串味、不依赖前台、不出现黑屏或陈旧帧。
+- 稳定决策：**系统级第三方窗口走定向截屏与受控交互（window-scoped-capture）**——对普通操作系统窗口，使用 `PrintWindow`（`PW_CLIENTONLY`）锁定客户区截屏，使用 `PostMessage` 投递后台按键与比例坐标点击，避免全屏截图串味、不抢前台焦点、不动系统真实鼠标。
+- 来源：新增技能 `app-internal-screenshot-rules/SKILL.md` 与 `window-scoped-capture/SKILL.md`。
+- 更新时间：2026-10-05。
+
 ## 记忆文件超长主动整理规则
 
 - 稳定决策：`PROJECT_CURRENT.md` 的 UTF-8 字节数上限为 51,200；`PROJECT_HISTORY.md` 只保留最近 20 条事件。当任务执行中发现这两个文件超长（CURRENT 接近 51KB / HISTORY 超过 20 条），AI 应主动裁剪过期旧记录，无需等待用户指令。
@@ -1754,6 +1770,49 @@ entities:
     usage_days: 1
     last_used_at: 2026-09-24
     absorbed_to: null
+  - entity_id: rule.no-patchwork-architecture-discipline
+    name: "反打补丁与架构优先原则"
+    type: "代码质量规则"
+    aliases:
+      - 反打补丁
+      - 严禁打补丁
+      - 架构与可读性优先
+      - 流程遗漏主流程补齐
+      - 严禁双轨分流兼容
+      - 严禁外围堆flag
+    definition: "改动、改 Bug、改需求严禁用打补丁的方式实现。打补丁会严重破坏代码可读性与系统架构设计。严禁为了“不改动太多 / 控制 diff / 避免修改已有调用”而在外围堆砌特判 flag、搞新老双轨分流兼容、套壳胶水绕道、下游吞异常或对脏数据兜底以绕过主流程与架构设计；正常的流程遗漏（缺失状态流转、未处理边界返回值、缺少必要前置校验）必须直接在原主流程中补齐，保持主干自洽。系统架构与代码可读性绝对高于局部 diff 最小化。落点：code-quality-rules/references/no-patchwork-architecture-discipline.md 与 SKILL.md、code-generation-style-rules/SKILL.md、bug-fix-proposal-rules/SKILL.md、implementation-planning-rules/SKILL.md、code-style-consistency-rules 反例库 STYLE-CASE-ALL-004。"
+    scope: "代码编写、Bug 修复方案、实施规划、代码质量审查与风格契约"
+    status: "active"
+    evidence_ids:
+      - evidence.doc.no-patchwork-architecture-discipline
+    context_ids:
+      - context.code-quality
+    updated_at: 2026-10-05
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - entity_id: rule.window-and-app-internal-capture-discipline
+    name: "窗口定向与应用自渲染截图双轨机制"
+    type: "工具与环境规则"
+    aliases:
+      - 窗口级截图
+      - 应用内自渲染截图
+      - 避免全屏截图串味
+      - PostMessage受控交互
+    definition: "针对桌面与 GUI 自动化验证，确立截图取证双轨机制：① 自身可控渲染应用（Godot/游戏/CDP/Electron）优先使用 app-internal-screenshot-rules，直接从视口纹理或引擎截屏 API 提取像素，天然不串味、不抢前台、无陈旧帧；② 操作系统级第三方窗口使用 window-scoped-capture，通过 PrintWindow 锁定目标窗口客户区画面，并通过 PostMessage 投递比例坐标与按键交互，绝不使用全屏截屏（CopyFromScreen）与全局鼠标事件（mouse_event），严禁抢夺用户前台焦点。落点：app-internal-screenshot-rules/SKILL.md 与 window-scoped-capture/SKILL.md。"
+    scope: "GUI 自动化测试、桌面与游戏客户端截图取证、窗口交互驱动"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.window-scoped-capture
+      - evidence.skill.app-internal-screenshot-rules
+    context_ids:
+      - context.testing-and-verification
+    updated_at: 2026-10-05
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -1793,6 +1852,21 @@ relations:
       - evidence.skill.task-plan-rehydration
     status: "active"
 evidence:
+  - evidence_id: evidence.doc.no-patchwork-architecture-discipline
+    type: "skill"
+    source: "code-quality-rules/references/no-patchwork-architecture-discipline.md 与 SKILL.md"
+    path: "code-quality-rules/references/no-patchwork-architecture-discipline.md"
+    note: "2026-10-05 内部更新确立严禁为少改代码而打补丁破坏架构铁律与主流程正向补齐准则"
+  - evidence_id: evidence.skill.window-scoped-capture
+    type: "skill"
+    source: "window-scoped-capture/SKILL.md"
+    path: "window-scoped-capture/SKILL.md"
+    note: "2026-10-02 新增窗口级截图与 PostMessage 受控交互技能"
+  - evidence_id: evidence.skill.app-internal-screenshot-rules
+    type: "skill"
+    source: "app-internal-screenshot-rules/SKILL.md"
+    path: "app-internal-screenshot-rules/SKILL.md"
+    note: "2026-10-03 新增应用自渲染通道截图技能"
   - evidence_id: evidence.root-test-code-and-evidence-layout
     type: "test"
     source: "根 test 目录统一实施与真实测试"

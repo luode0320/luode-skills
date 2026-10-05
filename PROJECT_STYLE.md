@@ -419,6 +419,31 @@
 - 2026-09-18：新增配置文件项极简目的注释风格，明确 YAML/TOML/JSON 等各类配置文件项上方注释只保留单行目的与控制边界说明，严禁堆砌机制细节、状态机推演、事故要件与新旧行为比对等过程注释。
 - 2026-09-18：新增复杂逻辑建立功能专门文档记录风格，明确复杂逻辑、状态机流转与多任务联动机制必须归位到 `doc/` 功能专门文档中，严禁在代码或配置中堆砌多行注释硬解释。
 
+### 严禁为少改代码而打补丁搞双轨兼容
+
+- **适用场景**：代码改动 / Bug 修复 / 需求变更 / 架构演进
+- **反例（禁止这样写，为了少改旧逻辑在外围堆 flag 特判与双轨分流）**：
+  ```go
+  // 面对策略参数变更或平仓规则调整，为了“不动旧订单逻辑”，在订单表加 isLegacy，
+  // 在状态机到处搞 if-else 双轨分流，严重摧毁代码可读性与架构一致性
+  func (s *GridEngine) OnTick(ctx context.Context, order *Order) error {
+      if order.IsLegacyStrategy {
+          return s.handleLegacyOrderTick(ctx, order) // 双轨历史包袱
+      }
+      return s.handleNewStrategyTick(ctx, order)
+  }
+  ```
+- **正例（应该这样写，主流程统一模型，流程遗漏在主流程直接补齐）**：
+  ```go
+  // 统一数据与规则模型，业务引擎始终保持单一、干净、自洽的主流水线。
+  // 历史数据通过版本迁移脚本升级，或在数据接入层归一化；流程遗漏直接在主状态机补齐。
+  func (s *GridEngine) OnTick(ctx context.Context, order *Order) error {
+      // 单一主干状态流转，清晰自然
+      return s.evaluateGridState(ctx, order)
+  }
+  ```
+- **说明**：改动、改 Bug、改需求严禁用打补丁的方式实现；明显的为了不改动太多而选择打补丁（如堆 flag 特判、搞新旧双轨分流、套壳胶水绕道、下游吞异常兜底）是绝对不可取的，会严重破坏代码可读性与系统架构；正常的流程遗漏（如缺失的状态转移、未处理的边界返回值、缺少必要前置校验）必须直接在原主流程中补齐，保持主干自洽。
+
 ## 计数锚点区
 
 > 本区由 `memory-usage-tracking-rules` 收口闸门维护：仅"实际引用"条目时 +1（用于决策/输出/代码），会话启动全文读取不计；同会话同条目只 +1；`usage_days` 当天首次引用时 +1。锚点 key 与人类阅读区 `### 标题` 一致，条目新增/删除/改名时同步维护本区。
@@ -426,6 +451,11 @@
 ```yaml
 version: 1
 anchors:
+  - title: "严禁为少改代码而打补丁搞双轨兼容"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: 中文优先表达
     usage_count: 0
     usage_days: 0
