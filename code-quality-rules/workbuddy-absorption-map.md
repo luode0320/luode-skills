@@ -129,3 +129,34 @@
   - 引用链全可达：`SKILL.md` 与 `minimal-change-general.md` 引用均已落盘。
   - UTF-8 编码与 LF 格式正常。
 - **源删除**：吸收闭环确认后，删除本地安装源 `C:\Users\luode\.workbuddy\skills\ponytail\`。
+
+## 2026-10-05：内部更新——严禁为少改代码而打补丁破坏架构（反补丁与架构优先）
+
+- **来源**：内部调整：`code-quality-rules`，调整诉求 = "改动、改bug、改需求不能用打补丁的方式实现，这样会破坏代码的可读性，一些遗漏的流程可以直接补，但是明显是为了不改动太多，而选择打补丁来实现是不可取的，这个会导致代码设计、架构的破坏，不能这样实现。这个规则要吸收到我们的用户级skill中。"
+- **形态**：内部更新通道（无外部源可删）。
+- **拆解原子条目数**：4 条（全量合并）。
+
+| # | 内部诉求（原子条目） | 本地现状对照 | 裁决 | agent 通用性 | 环境依赖 | 落点 / 理由 | 整理去重建议 |
+|---|---|---|---|---|---|---|---|
+| 1 | **核心红线：严禁为少改代码打补丁破坏架构**：改动/改bug/改需求绝不能为了少改代码而打补丁（禁止外围堆 flag 特判、双轨分流、套壳胶水绕道、下游吞异常兜底） | `minimal-change-general.md` 强调最小改动，但易被误解为"改动行数少就行"，导致外围打补丁破坏架构 | 合并 | 通用 | N/A | `code-quality-rules/references/no-patchwork-architecture-discipline.md`（新建主权威定义） | 联动 `minimal-change-general.md` 明确最小改动不是打补丁的遮羞布 |
+| 2 | **正向准则：流程遗漏直接在主流程补齐**：排查发现主流程缺失状态流转/前置校验/边界处理时，直接在主流程中补齐，保持主干自洽透明 | 既有文档未明确区分"流程补齐"与"打补丁"的边界 | 合并 | 通用 | N/A | 并入 `no-patchwork-architecture-discipline.md`，并在 `minimal-change-examples.md` 补正例 4 | 明确与打补丁的本质区别，消除正向修复顾虑 |
+| 3 | **架构与设计优先原则**：宁可重构主干统一模型，也绝不在核心引擎搞双轨历史包袱；可读性是生命线 | 既有规则缺少架构优先于局部 diff 的硬闸门 | 合并 | 通用 | N/A | 并入 `no-patchwork-architecture-discipline.md` 与 `code-quality-rules/SKILL.md` 统一硬约束 | 确立系统架构与代码可读性绝对高于 diff 最小化 |
+| 4 | **全链路联防（契约、Bug、规划与反例库）**：写码前契约、Bug 修复方案、实施规划均禁止妥协补丁，入库全局反例 | 各下游 skill 在方案与契约层缺乏针对打补丁的显式拒收条款 | 合并 | 通用 | N/A | `code-generation-style-rules/SKILL.md`、`bug-fix-proposal-rules/SKILL.md`、`implementation-planning-rules/SKILL.md`、`user-style-feedback-library.md`（STYLE-CASE-ALL-004） | 单一权威在 `code-quality-rules`，下游引用对齐不重复展开 |
+
+- **落盘改动**：
+  - 新增 `code-quality-rules/references/no-patchwork-architecture-discipline.md`
+  - 修改 `code-quality-rules/SKILL.md`（frontmatter description、统一硬约束、主线 1 核心约束、references 读取规则）
+  - 修改 `code-quality-rules/references/minimal-change-general.md`（排除改动补充、默认原则第 7 条）
+  - 修改 `code-quality-rules/references/minimal-change-examples.md`（正例 4 与反例 5）
+  - 修改 `code-generation-style-rules/SKILL.md`（禁用写法与驳回标准）与 `references/style-contract-template.md`
+  - 修改 `bug-fix-proposal-rules/SKILL.md`（根因修复小节补充核心红线与正向准则）
+  - 修改 `implementation-planning-rules/SKILL.md`（方案设计架构优先与反打补丁规划）
+  - 修改 `code-style-consistency-rules/references/user-style-feedback-library.md`（追加 STYLE-CASE-ALL-004）
+  - 修改 `code-quality-rules/references/source-notes.md` 与本表
+- **整理去重**：主定义唯一定位于 `no-patchwork-architecture-discipline.md`，其他 skill（code-generation-style / bug-fix-proposal / implementation-planning）均以短句引用权威，不复制大段说明；`minimal-change-general.md` 澄清最小改动内涵，消除了因追求少改代码而诱发打补丁的认知冲突。
+- **同域扫描结论**：扫描范围 = 编码质量、代码生成、Bug 提议、实施规划与风格规则域。发现 0 处重复冗余段落、0 处门控层叠、0 处散落产物；**PASS**。
+- **净增体积**：新建 1 份核心 reference（约 3.8KB），多处高内聚短句补充与反例库扩充，整体结构精炼无臃肿。
+- **棘轮验证**：
+  - 全部落盘文件 UTF-8 编码与换行正常。
+  - 引用链全可达：各 skill 均正确引用 `no-patchwork-architecture-discipline.md`。
+  - `quick_validate.py` 针对受影响的 4 个 skill 校验全部通过。

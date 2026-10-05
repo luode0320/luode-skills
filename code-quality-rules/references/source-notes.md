@@ -62,3 +62,20 @@
   - 入口引用：`code-quality-rules/SKILL.md`（统一硬约束 + 主线 1 核心约束 + references 读取规则）
 - **裁决依据**：见 `code-quality-rules/workbuddy-absorption-map.md` 2026-09-18 段落。
 - **外部源删除**：已删除本地安装源 `C:\Users\luode\.workbuddy\skills\ponytail\`。
+
+## 2026-10-05：内部更新——严禁为少改代码而打补丁破坏架构
+
+- **调整类型**：内部更新通道。
+- **调整诉求**：改动、改 bug、改需求不能用打补丁的方式实现，这会破坏代码可读性与系统架构；遗漏的流程可以直接在主流程补齐，但明显是为了不改动太多而选择打补丁是绝对不可取的，必须吸收到用户级 skill 中作为顶层红线。
+- **触发场景**：实盘策略同步回测规则方案中，agent 为了“控制改动范围”试图设计数据表加标记、状态机搞新老双轨分流的妥协补丁，被用户严厉纠正并指示建立系统级红线。
+- **落点**：
+  - 主定义：`code-quality-rules/references/no-patchwork-architecture-discipline.md`（新建）
+  - 核心准则：`code-quality-rules/SKILL.md`（统一硬约束红线、主线 1 核心约束、references 读取规则、frontmatter 描述）
+  - 规则落地与示例：`code-quality-rules/references/minimal-change-general.md`（排除改动与默认原则）、`minimal-change-examples.md`（正例 4 与反例 5）
+  - 编码风格契约：`code-generation-style-rules/SKILL.md`（禁用写法与驳回标准）、`references/style-contract-template.md`
+  - Bug 修复提议：`bug-fix-proposal-rules/SKILL.md`（根因修复与正向补齐）
+  - 实施规划方案：`implementation-planning-rules/SKILL.md`（方案设计架构优先，禁打补丁规划）
+  - 全局反例库：`code-style-consistency-rules/references/user-style-feedback-library.md`（STYLE-CASE-ALL-004）
+- **裁决依据**：见 `code-quality-rules/workbuddy-absorption-map.md` 2026-10-05 段落。
+- **未落盘内容**：无。
+- **外部源**：无（内部更新通道）。

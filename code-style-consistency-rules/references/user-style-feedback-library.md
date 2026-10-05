@@ -308,6 +308,39 @@
 - 确认时间: 2026-09-18
 - 出现次数: 1
 
+### STYLE-CASE-ALL-004：严禁为少改代码而打补丁破坏架构（禁止外围堆flag/双轨兼容）
+- id: STYLE-CASE-ALL-004
+- status: active
+- 语言/技术栈: 通用（Go / Python / JS-TS 等各语言业务代码与状态机）
+- 适用范围: 代码改动 / Bug 修复 / 需求变更 / 架构演进
+- 去重键: 通用|代码质量|严禁为少改代码打补丁破坏架构堆flag双轨兼容
+- 来源: 用户文字反馈（2026-10-05）
+- 反例（禁止这样写，为了少改旧逻辑在外围堆 flag 特判与双轨分流）:
+  ```go
+  // 面对策略参数变更或平仓规则调整，为了“不动旧订单逻辑”，在订单表加 isLegacy，
+  // 在状态机到处搞 if-else 双轨分流，严重摧毁代码可读性与架构一致性
+  func (s *GridEngine) OnTick(ctx context.Context, order *Order) error {
+      if order.IsLegacyStrategy {
+          return s.handleLegacyOrderTick(ctx, order) // 双轨历史包袱
+      }
+      return s.handleNewStrategyTick(ctx, order)
+  }
+  ```
+- 正例（应该这样写，主流程统一模型，流程遗漏在主流程直接补齐）:
+  ```go
+  // 统一数据与规则模型，业务引擎始终保持单一、干净、自洽的主流水线。
+  // 历史数据通过版本迁移脚本升级，或在数据接入层归一化；流程遗漏直接在主状态机补齐。
+  func (s *GridEngine) OnTick(ctx context.Context, order *Order) error {
+      // 单一主干状态流转，清晰自然
+      return s.evaluateGridState(ctx, order)
+  }
+  ```
+- 规则一句话: 改动、改 Bug、改需求严禁用打补丁的方式实现；明显的为了不改动太多而选择打补丁（如堆 flag 特判、搞新旧双轨分流、套壳胶水绕道、下游吞异常兜底）是绝对不可取的，会严重破坏代码可读性与系统架构；正常的流程遗漏（如缺失的状态转移、未处理的边界返回值、缺少必要前置校验）必须直接在原主流程中补齐，保持主干自洽。
+- 规则权威: `code-quality-rules` 统一硬约束 + `no-patchwork-architecture-discipline.md` + `code-generation-style-rules` + `bug-fix-proposal-rules` + `implementation-planning-rules`。
+- 首次记录: 2026-10-05
+- 确认时间: 2026-10-05
+- 出现次数: 1
+
 ## 变更记录
 
 - 2026-07-13：建立全局用户风格反例库，写入库结构示例条目 STYLE-CASE-GO-001。
@@ -323,3 +356,4 @@
 - 2026-09-12：STYLE-CASE-GO-003 同去重键二次复发（用户贴出 var 块内 rows/err/repo 声明与初始化混排并判"这种定义风格是禁止"），出现次数 1→2、确认时间更新为 2026-09-12；正例补充带初始化的逐行 var 写法（`var repo = repository.NewExchangeCoinsOrderedRepo()`），规则一句话同步覆盖"带初始化赋值的局部声明同样逐行单独声明"，新增"复发提示"注明 var 与变量名分隔以 gofmt 输出为准（单空格），用户示例中的 tab / 双空格对齐不作规则要求。规则条文无需改动：`SKILL.md`「Go 局部变量声明风格约定」与 `go-coding-rules.md` 既有 bullet 已完整覆盖。
 - 2026-09-12：经用户确认新增 active 条目 STYLE-CASE-GO-006（模型字段上方禁止多行机制/决策块注释；字段语义进 `comment:` tag，运行机制、来源区分决策、未来计划等过程信息一律删除，写进模块文档或提交说明）。去重判定为新增而非复发：GO-005 管"行尾重抄 tag"、ALL-003 前提是"组内已形成行尾短注释风格"，均不覆盖"裸行组上方挂块注释"形态。规则权威在 `comment-rules` 硬约束与 `comment-placement.md` 第 5/8/10 条（同日第 10 条同步微调），本库只承载正反例。
 - 2026-09-18：经用户文字反馈确认新增 active 条目 STYLE-CASE-CFG-001（配置文件项上方禁止多行过程机制与事故历史注释；只保留单行目的与控制边界说明，运行机制细节、事故由来、状态机推演与关停行为对比等过程信息一律删除，写进 `doc/` 或提交说明）。规则权威在 `comment-rules` 统一硬约束（配置文件同等严格，只写目的不写过程）+ `comment-placement.md` 第 11 条 + `comment-granularity.md`。
+- 2026-10-05：经用户文字反馈确认新增 active 条目 STYLE-CASE-ALL-004（严禁为少改代码而打补丁破坏架构；禁止外围堆 flag 特判、新老双轨分流、套壳胶水绕道、下游吞异常兜底；正向流程遗漏在原主流程直接补齐，主干业务保持统一模型与高可读性）。
