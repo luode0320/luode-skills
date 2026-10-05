@@ -1,0 +1,4 @@
+interface:
+  display_name: "窗口级截图与受控交互"
+  short_description: "只截目标窗口、只向该窗口投递点击/按键，不串味、不抢前台"
+  default_prompt: "用 $window-scoped-capture 给目标窗口做截图和窗口内点击/按键取证，不要用全屏截图或全局鼠标注入。"
