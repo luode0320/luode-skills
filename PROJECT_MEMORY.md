@@ -130,6 +130,15 @@
 - 来源：新增技能 `app-internal-screenshot-rules/SKILL.md` 与 `window-scoped-capture/SKILL.md`。
 - 更新时间：2026-10-05。
 
+## 生图生成后符合度自检与不符合即重做（2026-10-05 固化）
+
+- 稳定决策：**生图出图不等于任务完成**——每次生成或编辑后，必须对照用户原始提示词与本轮约束逐条给出 `符合 / 不符合 / 无法判定` 的验收结论，不能以"已生成"代替"已达标"。
+- 稳定决策：**验收清单至少覆盖十个维度**——主体与数量、风格与媒介、构图与取景、颜色与配色、尺寸与比例、画面内文字、禁止项、透明底与色度键、参考图角色、输入图不可变项。
+- 稳定决策：**不符合即重做**——任一验收项为"不符合"时不得交付，须按不符合项定向修改（已符合项保持不变并在新 prompt 中复述关键约束防漂移），重新生成新图；同一资产多轮优化按 `v1`、`v2`、`v3` 递增命名，禁止覆盖旧版本，多问题时一次只改一个重点。
+- 稳定决策：**连续 3 轮不达标即停止自动重试**——改为向用户报告差距、已尝试的修改与候选方向，交回用户决策。
+- 来源：用户指令（2026-10-05）+ `imagegen/SKILL.md` 核心规则与工作流第 5/6/7 步 + `imagegen/references/prompting.md`「生成后符合度自检」节。
+- 更新时间：2026-10-05。
+
 ## 记忆文件超长主动整理规则
 
 - 稳定决策：`PROJECT_CURRENT.md` 的 UTF-8 字节数上限为 51,200；`PROJECT_HISTORY.md` 只保留最近 20 条事件。当任务执行中发现这两个文件超长（CURRENT 接近 51KB / HISTORY 超过 20 条），AI 应主动裁剪过期旧记录，无需等待用户指令。
@@ -904,6 +913,27 @@ entities:
     context_ids:
       - context.imagegen-maintenance
     updated_at: 2026-07-12
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-05
+    absorbed_to: null
+  - entity_id: rule.imagegen-post-generation-compliance-check
+    name: "生图生成后符合度自检与不符合即重做"
+    type: "Skill 维护规则"
+    aliases:
+      - 生成后符合度自检
+      - 出图不等于完成
+      - 不符合即重新生成
+      - imagegen 自检铁律
+    definition: "生图不是生成完就算完成：每次生成或编辑后必须对照用户原始提示词与本轮约束逐条给出 符合 / 不符合 / 无法判定 的验收结论（覆盖主体与数量、风格与媒介、构图与取景、颜色与配色、尺寸与比例、画面内文字、禁止项、透明底与色度键、参考图角色、输入图不可变项）；任一不符合项即不得交付，须按不符合项定向修改并重新生成新图（版本递增、不覆盖旧版），直到全部符合才允许交付与汇报；连续 3 轮不达标时停止自动重试并交回用户。内置工具与 CLI fallback 两条通道均适用。"
+    scope: "imagegen 生图/改图的生成后验收、定向重做、版本递增与交付前自检证据"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.imagegen-post-generation-compliance-check
+      - evidence.skill.imagegen
+    context_ids:
+      - context.imagegen-maintenance
+    updated_at: 2026-10-05
     usage_count: 0
     usage_days: 0
     last_used_at: null
@@ -1926,6 +1956,11 @@ evidence:
     type: "dialog"
     source: "用户需求与本轮验证"
     note: "用户要求持续记录生图错误示例和解决方案，本轮以本地 dry-run/check 验证首批案例"
+  - evidence_id: evidence.skill.imagegen-post-generation-compliance-check
+    type: "skill"
+    source: "imagegen/SKILL.md"
+    path: "imagegen/SKILL.md"
+    note: "imagegen 生成后符合度自检铁律、不符合即重做与版本递增规则的规则来源"
   - evidence_id: evidence.skill.execution-failure-learning
     type: "skill"
     source: "execution-failure-learning-rules/SKILL.md"
@@ -2318,6 +2353,7 @@ lifecycle:
     - "rule.swag-upstream-openapi"
     - "rule.task-blocker-closure"
     - "rule.imagegen-error-case-evolution"
+    - "rule.imagegen-post-generation-compliance-check"
     - "rule.execution-failure-learning"
     - "rule.authenticated-url-routing"
     - "term.doc-top-level-mixed-naming"
@@ -2460,6 +2496,14 @@ retrieval_hints:
       - "rule.imagegen-error-case-evolution"
     生图失败经验回写:
       - "rule.imagegen-error-case-evolution"
+    生成后符合度自检:
+      - "rule.imagegen-post-generation-compliance-check"
+    出图不等于完成:
+      - "rule.imagegen-post-generation-compliance-check"
+    不符合即重新生成:
+      - "rule.imagegen-post-generation-compliance-check"
+    imagegen 自检铁律:
+      - "rule.imagegen-post-generation-compliance-check"
     windows-powershell-environment-rules:
       - "rule.windows-powershell-environment"
     PowerShell 7 默认入口:

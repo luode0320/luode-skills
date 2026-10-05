@@ -1,5 +1,13 @@
 # 项目当前状态
 
+## 2026-10-05 imagegen 生图「生成后符合度自检」规则落地（内部更新通道）
+
+- 来源对象：用户指令「生图skill要注意检查, 不是生成就算完成了, 要生成后检查是否符合提示词要求, 如果不符合要继续重新修改生成新图」。
+- 当前状态：**规则与登记已落地闭环；改动停在已改动未提交状态**。
+- 改动落点：`imagegen/SKILL.md` 核心规则新增【生成后符合度自检铁律】，工作流第 5/6/7 步重写为「自检硬闸门 → 不符合即重做 → 汇报附自检结论」；`imagegen/references/prompting.md` 新增「生成后符合度自检」节（10 维逐条验收清单 + 判定处置）；`imagegen/CHANGELOG.md` 升 2.2.0；`imagegen/workbuddy-absorption-map.md` 与 `imagegen/references/source-notes.md` 补裁决与来源登记。
+- 关键边界：内置工具与 CLI fallback 两条出图通道都适用；不符合即重新生成新图并递增版本号、不覆盖旧图；连续 3 轮仍不达标时停止自动重试并交回用户；仅约束流程行为，不改脚本逻辑。
+- 验证与交接：`quick_validate.py imagegen` = `Skill is valid!`；同域冗余扫描仅命中原单句、无兄弟 skill 重复定义；字典重跑仅时间戳漂移已回滚；`check_memory_anchors.py` ok=true。
+
 ## 2026-10-05 反打补丁规则落地与经验吸收入库 + 截图双技能接入与规范提交推送
 
 - 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把 2026-10-05 内部更新（严禁为少改代码打补丁破坏架构、主流程正向补齐遗漏流程）吸收进项目长期记忆，并按 git 协作规则将仓库全部未提交改动拆分提交并推送到远端。
@@ -194,23 +202,15 @@
 
 ## 2026-09-15 project-memory-rules 补充历史条目裁剪强力脱敏提示
 
-- 来源对象：用户指出在其他会话中遇到 Agent 面对 `PROJECT_HISTORY.md` 95 条超限时因顾虑「不可逆删除」而未自动裁剪、停下向用户请示的问题，要求在 `project-memory-rules` 中补充强力脱敏提示（“历史条目已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示”）。
-- 当前状态：**全部落地**。
-  - ① `project-memory-rules/SKILL.md`：在「写入规则」第 4 点补充加粗强力脱敏提示，并在「历史事件保留窗口」中明确旧事件删除已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示。
-  - ② `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh`：在受管模板 `BODY_PROJECT_CONTEXT` 的 `PROJECT_HISTORY.md` 规范行同步追加脱敏与强制自主裁剪要求，确保多项目自举时生效。
-  - ③ `AGENTS.md` 与 `CLAUDE.md`：根规则文件同步更新，所有新会话第一轮直接加载该硬约束。
-- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`（exit 0）；`git diff --check` 空白与格式检查 PASS；所有涉及文件 LF 编码归一化；改动停在已改动未提交状态。
+- 来源对象：用户指出 Agent 面对 `PROJECT_HISTORY.md` 超限时因顾虑「不可逆删除」而未自动裁剪、停下向用户请示，要求在 `project-memory-rules` 补充强力脱敏提示（历史条目已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示）。
+- 当前状态：**全部落地**（`project-memory-rules/SKILL.md` 写入规则第 4 点 + 历史保留窗口；`bootstrap_agents.sh` 受管模板 `BODY_PROJECT_CONTEXT`；`AGENTS.md` / `CLAUDE.md` 同步）。
+- 验证与交接：`quick_validate.py` `Skill is valid!`（exit 0）；`git diff --check` PASS；改动停在已改动未提交状态。
 
 ## 2026-09-15 优化「输出总结」Skill 规则（三段式极简结构与决策收敛）
 
-- 来源对象：用户提出总结越长越说不清，存在铺垫多、论证重复、重点淹没的问题。参考手机维度 4 列拆成员案例（`phoneTop30ModelsJson` 月累计口径是否拆表），要求重写总结规则：简单建议走极简断言，复杂建议走强制三段式结构（待判断决策点 / 作用与跨成员影响 / 明确建议与倾向），坚决去除核实过程流水账与冗余论证。
-- 当前状态：**已全部落地落盘**。
-  - ① `reasoning-summary-structure-rules/SKILL.md`：重塑档位与任务性质分流，确立工程执行任务与决策研判任务边界；针对字段判断与架构选型任务强制规定极简断言与三段式极简结构；写入反铺垫、反探查流水账（严禁倾倒核实代码/SQL排查过程）、反重复论证三反铁律作为硬闸自检项。
-  - ② `references/summary-structure-template.md`：新增简单建议模板（≤ 3 行极简断言）与复杂建议模板（三段式结构，含明确倾向与 A/B 方案选项），并明确不合格写法。
-  - ③ `references/output-examples.md`：引入两个正例（简单场景二选一 / 拆表三段式范式）与典型反面案例剖析（长铺垫、过程流水账、反复论证、重点淹没）。
-  - ④ `references/conditional-sections-rules.md`：明确决策任务天然豁免图形化总览与工程执行流水账，无文件改动时省略改动点。
-  - ⑤ `字典.md`：刷新 1.18 `reasoning-summary-structure-rules` 核心职责描述。
-- 验证与交接：文件更新完成并读回校验通过；工作日志记录至 `.workbuddy/memory/2026-09-15.md`；当轮无 Git 提交授权，停留在已改动未提交状态。
+- 来源对象：用户提出总结越长越说不清（铺垫多、论证重复、重点淹没），要求重写总结规则：简单建议走极简断言，复杂建议走强制三段式（决策点 / 跨成员影响 / 明确建议与倾向），去除核实流水账与冗余论证。
+- 当前状态：**已全部落地落盘**（`reasoning-summary-structure-rules/SKILL.md` 档位与任务性质分流 + 三反铁律；`references/summary-structure-template.md` 简单/复杂模板；`references/output-examples.md` 正反例；`references/conditional-sections-rules.md` 决策任务豁免；`字典.md` 刷新）。
+- 验证与交接：文件更新并读回通过；工作日志记至 `.workbuddy/memory/2026-09-15.md`；当轮无 Git 提交授权，停在已改动未提交状态。
 
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 

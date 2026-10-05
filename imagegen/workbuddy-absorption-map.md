@@ -6,6 +6,7 @@
 | 2026-09-05 | 同上 | CLI 参数速查表 | 无对应表 | 合并 | 通用 | SKILL.md 参数表 + references/cli.md | cli.md 承接 image-api.md 职责 |
 | 2026-09-05 | 同上 | 提示词结构/图片文字/参考图角色/电商场景 | prompting.md/sample-prompts.md 已覆盖且更强 | 保留本地 | — | 不吸收 | prompting.md/sample-prompts.md 清 CODEX_HOME 路径痕迹 |
 | 2026-09-05 | 同上 | 产品化文档形态（FAQ/子命令大全） | 形态非规则精华 | 拒绝（形态） | — | 不吸收 | 仅借鉴 FAQ 写法入 cli.md |
+| 2026-10-05 | 内部更新（用户指令） | 生成后符合度自检铁律：出图不等于完成，逐条比对用户提示词与约束，出现"不符合"必须定向修改并重新生成新图 | 原有仅一句"出图后检查：主体、风格、构图、文本准确性、约束是否满足"，无判定结论、无重做闭环 | 合并 | 通用 | `SKILL.md` 核心规则新增铁律 + 工作流第 5/6/7 步重写；`references/prompting.md` 新增「生成后符合度自检」节（逐条清单 + 判定与处置） | 规则正文与操作细则分层，未新增同域重复定义 |
 
 **同域冗余扫描（2026-09-05）**：扫描范围 imagegen + 图片生成同域（.system/imagegen 官方快照、buddy-image-processing、2D 素材设计/生产 skill）。发现：SKILL.md 内 `<skill-dir>` 路径写法与 prompting/sample-prompts 统一一致；gpt-image-2 独立目录删除后无散落产物；引用链可达。清理 0 处残留冗余。结论 PASS。
 
