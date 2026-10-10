@@ -9,7 +9,7 @@
 | 3 | 注意 | `BODY_NOTICE` |
 | 4 | Skill 强制自动触发规则（最高优先级） | `BODY_SKILL_AUTO` |
 | 5 | 严禁脑补工具调用与结果（最高优先级，强制） | `BODY_NO_HALLUCINATE` |
-| 6 | 严禁自动提交 Git（最高优先级，强制） | `BODY_NO_AUTO_COMMIT` + 条件追加 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` |
+| 6 | 严禁自动提交 Git（最高优先级，强制） | `BODY_NO_AUTO_COMMIT` |
 | 7 | Skill 命中强制规则 | `BODY_SKILL_HIT` |
 | 8 | 代码生成风格入口规则 | `BODY_CODE_GENERATION_STYLE` |
 | 9 | Karpathy 风格硬闸门 | `BODY_KARPATHY_HARD_GATES` |
@@ -31,3 +31,5 @@
 | 25 | 图像生成配置（仅 Godot 项目） | `GODOT_IMAGEGEN_SECTION` |
 
 另有两份非受管章节但同属规则文件组的静态内容：`GITATTRIBUTES_CONTENT`（两种换行符变体）、`EDITORCONFIG_CONTENT`（两种换行符变体），只在 `.gitattributes` / `.editorconfig` 缺失时首次写入，不走 `sync_section` 增量同步。
+
+子目录规则文件可声明跳过受管章节同步：在文件中单独写一行 `<!-- bootstrap-agents:skip-managed-sections -->`（脚本变量 `SKIP_MANAGED_SECTIONS_MARKER`，由 `has_skip_marker` 判定，允许首尾空白与 CRLF 行尾）。含该标记的子目录 `AGENTS.md` / `CLAUDE.md` 不写入上表任何章节，脚本逐文件打印跳过原因；标记按文件生效，根目录规则文件忽略该标记，始终按上表同步。

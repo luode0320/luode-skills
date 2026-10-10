@@ -21,6 +21,7 @@ BASH = next(
     ),
     shutil.which("bash") or "bash",
 )
+SKIP_MANAGED_SECTIONS_MARKER = "<!-- bootstrap-agents:skip-managed-sections -->"
 
 
 def git_bash_path(path: Path) -> str:
@@ -53,47 +54,62 @@ class BootstrapAgentsTests(unittest.TestCase):
             self.assertIn("过程性输出中回显", agents)
             self.assertNotIn("禁止将真实 API key、token、密码、私钥、连接串原值或其他敏感配置写入代码、文档、日志、输出或 Git 提交", agents)
 
+    def test_subdirectory_skip_marker_keeps_isolated_rules_untouched(self) -> None:
+        """子目录规则文件含跳过标记时逐文件打印跳过原因且字节不变，无标记子目录与根目录照常同步，重跑幂等。
 
-    def test_commit_implies_push_extra_is_scoped_to_owner_repo(self) -> None:
-        """验证「提交即推送」项目专属补充不会被通用自举扩散到其他仓库。
-
-        [参数] 无
-        [返回] 无；断言失败时由 unittest 抛出异常。
-        最近修改时间：2026-10-01 17:52:00；覆盖受管通用章节混入单仓库授权默认值的回归。
+        判据防止跳过标记失效后精简规则文件被补全成根规则副本、跳过时静默无输出，以及根目录误认标记而停止同步。
+        副作用：只在临时目录内运行自举脚本，用例结束后目录自动删除。
+        最近修改时间: 2026-10-08 11:19:43 新增, 覆盖子目录跳过标记的跳过提示、字节不变与幂等
         """
-
-        # 1. 归属仓库命中 slug 时必须注入项目专属补充。
-        extra = "本项目（luode-skills）默认「提交即推送」"
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory) / "luode-skills"
-            root.mkdir()
-            subprocess.run(
-                [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
-                capture_output=True,
-                check=True,
-                cwd=ROOT,
-                text=True,
-                encoding="utf-8",
-                env=os.environ.copy(),
-            )
-            self.assertIn(extra, (root / "AGENTS.md").read_text(encoding="utf-8"))
+            root = Path(directory)
+            # 1. 构造带标记的根目录文件、带标记的隔离子目录文件（LF 与带首尾空白的 CRLF 各一份）和无标记的普通子目录文件
+            (root / "isolated").mkdir()
+            (root / "plain").mkdir()
+            (root / "AGENTS.md").write_bytes(f"# 根规则\n{SKIP_MANAGED_SECTIONS_MARKER}\n".encode("utf-8"))
+            (root / "plain" / "AGENTS.md").write_bytes("# 普通子目录规则\n".encode("utf-8"))
+            skipped = {
+                root / "isolated" / "AGENTS.md": f"# 隔离规则\n{SKIP_MANAGED_SECTIONS_MARKER}\n\n## 本文件的定位\n".encode("utf-8"),
+                root / "isolated" / "CLAUDE.md": f"# 隔离规则\r\n  {SKIP_MANAGED_SECTIONS_MARKER}\t\r\n\r\n## 本文件的定位\r\n".encode("utf-8"),
+            }
+            for path, content in skipped.items():
+                path.write_bytes(content)
 
-        # 2. 其他仓库必须保持通用正文，不得继承该默认授权。
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory) / "some-other-project"
-            root.mkdir()
-            subprocess.run(
-                [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
-                capture_output=True,
-                check=True,
-                cwd=ROOT,
-                text=True,
-                encoding="utf-8",
-                env=os.environ.copy(),
-            )
-            agents = (root / "AGENTS.md").read_text(encoding="utf-8")
-            self.assertNotIn(extra, agents)
-            self.assertIn("严禁自动提交 Git", agents)
+            # 2. 连续运行两次自举脚本
+            runs = []
+            for _ in range(2):
+                # 2.1 运行一次自举脚本
+                result = subprocess.run(
+                    [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
+                    capture_output=True,
+                    check=False,
+                    cwd=ROOT,
+                    text=True,
+                    encoding="utf-8",
+                    env=os.environ.copy(),
+                )
+                # 2.2 记录本次运行后全部文件的字节快照
+                runs.append((result, {path: path.read_bytes() for path in root.rglob("*") if path.is_file()}))
+
+            # 3. 每次运行都只对两份隔离文件逐个打印跳过原因，且两次快照一致
+            for result, _ in runs:
+                self.assertEqual(0, result.returncode, result.stderr)
+                skip_lines = [line for line in result.stdout.splitlines() if line.startswith("[INFO] 已跳过: ")]
+                self.assertEqual(len(skipped), len(skip_lines), result.stdout)
+                for path in skipped:
+                    self.assertTrue(any(f"/isolated/{path.name}（" in line for line in skip_lines), result.stdout)
+            self.assertEqual(runs[0][1], runs[1][1])
+
+            # 4. 隔离文件字节不变；普通子目录与根目录同步出相同的受管章节，根目录两份规则文件一致
+            for path, content in skipped.items():
+                self.assertEqual(content, path.read_bytes())
+            headings = {
+                path: [line for line in path.read_text(encoding="utf-8").splitlines() if line.startswith("## ")]
+                for path in (root / "AGENTS.md", root / "plain" / "AGENTS.md")
+            }
+            self.assertTrue(headings[root / "AGENTS.md"])
+            self.assertEqual(headings[root / "AGENTS.md"], headings[root / "plain" / "AGENTS.md"])
+            self.assertEqual((root / "AGENTS.md").read_bytes(), (root / "CLAUDE.md").read_bytes())
 
 
 if __name__ == "__main__":
