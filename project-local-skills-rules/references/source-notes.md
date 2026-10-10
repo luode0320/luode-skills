@@ -1,5 +1,41 @@
 # 来源记录
 
+## 2026-09-30 新建：project-ellipal-admin-vue-list-page-style-rules（通道 B 主动点名，列表页新视觉）
+
+- **来源**：用户主动点名——「将这个会话处理的页面风格, 总结吸收为项目skill、前端组件, 一些特殊的处理规则也吸收到项目skill, 后续我们将逐步改造其他的页面为这个风格的的样式」。无外部源。
+- **证据**：
+  - 同会话真实落地的试点页 `go-admin-vue3/src/views/backend/coinsBrowserUrlDict/index.vue`；
+  - 公共件 `src/components/list-page/`（HelpTip / ListPageHeader / ListPageFilter / ListPageEmpty / ListPageLink）、`src/utils/useListPage.js`、`src/style/list-page.scss`；
+  - 视觉数值逐条经用户确认：https 可点、分页胶囊、帮助按钮统一橙色组件、表格字号两次调大定在 14 / 15px、表头 11px 圆角；
+  - arco 结论来自读源码：`es/input/input.js` 的 `handleClear` 先 `emitChange` 再 `emit('clear')`；`es/trigger/trigger.js:627` 的 `contentClass` 落点；`es/table/table-tr.js` 的空行类名是 `arco-table-tr-empty`。
+- **落点**：`ellipal_admin/skills/project-ellipal-admin-vue-list-page-style-rules/`，含：
+  - `SKILL.md`：八条约定 + 逐页改造步骤；
+  - `references/verify-recipe.md`：服务、免登录、选择器、环境坑、11 条断言、查询触发计数脚本、构建、收口清理；
+  - `scripts/make_verify_token.py`：生成 / 清理 `.local` 免登录注入文件，secret 只从 local 配置解析、不回显；
+  - `agents/openai.yaml`。
+  - 未用 `init_skill.py`：Windows Python 写 UNC 路径有截断风险，改用 Write 工具按同一骨架创建。
+- **分层判定**：全部约定都依赖本仓库事实（arco 2.57、`cardStyle` 与 `.container` 骨架、`--lp-*` token、公共件路径、试点页、local 配置路径），换项目不成立，判为项目级。其中「同一 tick 连发合成事件读到旧 prop」可迁移，已作为执行失败案例沉淀到知识库 `browser-session-automation-rules` owner 下（candidate），不另抽用户级 skill。
+- **核心新增（此前无处记载）**：
+  - teleport 浮层拿不到 `.list-page` 下的 token 和样式：`modal-class` 落在 `.arco-modal` 元素本身，必须写复合选择器；`contentClass` 落在 `.arco-trigger-content`。
+  - 查询框同时绑 `@change` 与 `@clear`，一次清空会查两次。
+  - Pane 隐藏时 `el.focus()` 不派发事件，要合成 `focusin` 才能打开 HelpTip。
+  - 空状态行也是 `tr.arco-table-tr`，漏排除 `arco-table-tr-empty` 会把空表数成 1 行。
+- **关联 skill 补注**：
+  - `project-ellipal-admin-vue-table-page-rules`：约定三补 useListPage 页面不再自定义常量；约定五对比表补 `@change` + `@clear` 一行；验证坑补「回车同理」并指向知识库案例和计数脚本。
+  - `project-ellipal-admin-form-help-tooltip-rules`：约定三、约定六标注新视觉页面改用 HelpTip，灰色 `.section-tip-icon` 只留旧页面。
+  - `project-ellipal-admin-vue-tab-page-rules`：约定五改用 HelpTip，并注明 tab 页新视觉未定稿。
+- **同域冗余扫描**：范围 = 项目根 `skills/` 全部 8 个 skill。新 skill 只管视觉骨架、token、公共件、浮层接入和样式归属；列宽拖拽、分页常量、列顺序归 table-page，文案落点归 form-help-tooltip，tab 骨架归 tab-page，三处都只放指针、不重复定义。`section-tip-icon` 残留（form-help-tooltip 7 处、tab-page 6 处）都是旧视觉写法，已标注适用范围。form-validation、new-menu、route-interface-mapping、coins-tag-task 四个 skill 关键词零命中。结论 **PASS**。
+- **规则文件声明**：
+  - 根 `AGENTS.md` / `CLAUDE.md` 新增「## 列表页新视觉优先规则」，同步修正帮助提示、tab 页两条里的问号写法；两份 md5 一致 `9a92edc6bc2e22c1744b258d25db025c`。
+  - `go-admin-vue3/AGENTS.md` / `CLAUDE.md` 在「隔离模式下仍然成立的前端约定」补一条自包含的新视觉说明；两份 md5 一致 `781f8102e2fabe590a65d299780bc8c4`。
+- **验证**：
+  - `PYTHONUTF8=1 quick_validate.py` 对新 skill 和三个关联 skill 都返回 `Skill is valid!`；description 932 字符。
+  - SKILL.md 与 verify-recipe 的 12 条相对链接逐一 `test -e` 全部可达；四个新文件均为 UTF-8、LF。
+  - 验证配方在试点页逐条实测通过：骨架、橙色帮助图标、表头 / 数据行字号与圆角、https 链接、分页与真实点击下拉、查询触发计数、空状态、两个弹窗、暗色、控制台零 error。
+  - 构建 `npx vite build --mode dev --outDir /tmp/lp_build_check` 退出码 0。
+- **字典刷新**：不适用——同下（`ROOT` 固定 `~/.claude/skills`，不扫描项目根 `skills/`）。
+- **关联记忆**：`vue-admin-ui-verify-without-login`、`vite-dev-needs-mode-dev-flag`、`browser-pane-hidden-breaks-css-transition`、`arco-popover-defaults-to-hover`、`localstorage-token-must-be-json-stringified`、`browser-pane-coordinate-frame-clipping`。
+
 ## 2026-09-20 更新：project-ellipal-admin-vue-tab-page-rules（内部更新通道，骨架去页头卡）
 
 - **来源**：用户看着页面截图指出——「这个头部的展示对于 tab 多功能切换已经完全不需要了，多余了，删除他，把 tab 的切换移动到这个头部的位置，设计一个新的 tab 切换的样式」。内部更新通道，无外部源。

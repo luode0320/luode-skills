@@ -1,49 +1,5 @@
 # 项目当前状态
 
-## 2026-10-05 imagegen 生图「生成后符合度自检」规则落地（内部更新通道）
-
-- 来源对象：用户指令「生图skill要注意检查, 不是生成就算完成了, 要生成后检查是否符合提示词要求, 如果不符合要继续重新修改生成新图」。
-- 当前状态：**规则与登记已落地闭环；改动停在已改动未提交状态**。
-- 改动落点：`imagegen/SKILL.md` 核心规则新增【生成后符合度自检铁律】，工作流第 5/6/7 步重写为「自检硬闸门 → 不符合即重做 → 汇报附自检结论」；`imagegen/references/prompting.md` 新增「生成后符合度自检」节（10 维逐条验收清单 + 判定处置）；`imagegen/CHANGELOG.md` 升 2.2.0；`imagegen/workbuddy-absorption-map.md` 与 `imagegen/references/source-notes.md` 补裁决与来源登记。
-- 关键边界：内置工具与 CLI fallback 两条出图通道都适用；不符合即重新生成新图并递增版本号、不覆盖旧图；连续 3 轮仍不达标时停止自动重试并交回用户；仅约束流程行为，不改脚本逻辑。
-- 验证与交接：`quick_validate.py imagegen` = `Skill is valid!`；同域冗余扫描仅命中原单句、无兄弟 skill 重复定义；字典重跑仅时间戳漂移已回滚；`check_memory_anchors.py` ok=true。
-
-## 2026-10-05 反打补丁规则落地与经验吸收入库 + 截图双技能接入与规范提交推送
-
-- 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把 2026-10-05 内部更新（严禁为少改代码打补丁破坏架构、主流程正向补齐遗漏流程）吸收进项目长期记忆，并按 git 协作规则将仓库全部未提交改动拆分提交并推送到远端。
-- 当前状态：**已落地闭环并推送远端**。
-  - ① 经验吸收入库：确立严禁为少改代码打补丁破坏架构铁律，在 `PROJECT_MEMORY.md` 沉淀人类区章节与机器实体 `rule.no-patchwork-architecture-discipline`，在 `PROJECT_STYLE.md` 补齐反例与正例（STYLE-CASE-ALL-004）及计数锚点，在 `D:\谷歌云盘\知识库\` 沉淀《严禁为少改代码而打补丁破坏架构与主流程正向补齐规范.md》；
-  - ② 截图双技能入库：入库 `window-scoped-capture`（窗口级 PrintWindow 截屏与 PostMessage 受控交互）与 `app-internal-screenshot-rules`（自渲染应用内部像素提取），并在长期记忆沉淀双轨机制（机器实体 `rule.window-and-app-internal-capture-discipline`）；
-  - ③ 系统标记同步与清理：同步 `.codex-system-skills.marker` 哈希，移除官方已下线组件 `plugin-creator`；
-  - ④ 字典刷新：运行 `generate_dictionary.py`，更新 `data.js` 与 `字典.md`（implemented 66 / planned_missing 8 / seed 122）；
-  - ⑤ Git 协作闭环：按业务目标拆分 4 笔规范提交，逐笔通过 pre-commit 与 post-commit gate，并在收口时推送到 `origin/main`；工作树完全清空。
-- 关键边界：本仓库默认「提交即推送」（2026-10-01 固化），全流程遵守 pre/post gate 与业务拆分提交原则。
-- 验证与交接：`check_memory_anchors.py` ok=true（实体 54、风格锚点 35、历史锚点 20）；`quick_validate.py` 对各 skill 校验全 PASS；字典重跑 exit 0；`git status --short` 清空；`origin/main` 同步一致。
-
-## 2026-10-01 推送远端 + 本项目「提交即推送」写进规则 md（用户固化）
-
-- 来源对象：用户指令「推送, 这个项目提交并推送做为项目规则写进规则md。」——先把上一轮 6 笔本地提交推送到 `origin/main`，再把「本项目提交并推送」固化为仓库级规则。
-- 当前状态：**已落地闭环并推送远端**。本轮按新口径「提交即推送」逐笔推送，每次推送后 `git rev-list --left-right --count origin/main...HEAD` 均回到 `0 0`。
-  - ① 推送：先推上一轮 6 笔（`35cc3cf2..d0f6395b`），再按新口径逐笔推本轮全部各笔；收口时 `origin/main` 与本地提交位点一致，工作树干净。
-  - ② 规则固化：`AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节各新增 1 条「本项目默认提交即推送」，同步正文源 `bootstrap_agents.sh`；要点：提交意图默认含推送、gate 与按业务拆分提交继续生效、负向边界绝对优先、不扩散到其他仓库。
-  - ③ 授权契约同步：`git-collaboration-rules/SKILL.md` -1.8 与 `references/current-turn-authorization.md` 新增「项目级默认闭环例外（本仓库 luode-skills）」节。
-  - ④ 项目记忆：`PROJECT_MEMORY.md` 新增「本项目 Git 提交即推送规则」人类区章节 + 机器索引实体 `rule.repo-commit-implies-push` + 证据 `evidence.dialog.repo-commit-implies-push`。
-- 关键边界：负向指令（「只提交，不要推送」）仍绝对优先；本例外不适用于其他未显式声明的仓库。
-- 后续修正（同轮）：自举脚本原把该默认值写进通用正文 `BODY_NO_AUTO_COMMIT`，会扩散到任意项目；已拆出 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` + `resolve_no_auto_commit_body` 按仓库标识条件注入，并补守卫测试。另修复存量阻断：`static-owner-source-map.json` 漏登记 `code-quality-rules` 两文档致 6-review 路由失败关闭，补登记后路由退出码恢复 `0`、契约测试 20/20 OK。回归记录见 `doc/6-review/2026-10-01_175553_提交即推送规则固化与自举条件注入_6-review.md`。
-- 计数回写：本轮实际引用 `PROJECT_MEMORY.md` 实体 `rule.repo-commit-implies-push`、`rule.git-commit-review-acceptance-evidence` 与 `PROJECT_HISTORY.md` 事件「本项目「提交即推送」固化进规则 md 并推送远端（用户固化）」「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」，逐条先经 `usage_ledger_validate.py` 校验 `ok=true` 后回写计数。
-- 交付残留自查：收口前按 6 维执行并落盘本轮 6-review 记录；发现受管章节索引表未登记条件追加变量（已修复随本轮提交）、宿主根目录临时脚本已清理，其余维度无残留。
-- 验证与交接：`bash -n bootstrap_agents.sh` PASS；`AGENTS.md` / `CLAUDE.md` SHA256 一致（779F4880...）且纯 LF；自举幂等复跑后内容零漂移（仅存量 CRLF 归一）；`check_memory_anchors.py` ok=true（实体 52）。
-
-## 2026-10-01 TAPD 建单挂迭代与工时前置经验入库 + 本轮变更本地提交（吸收经验）
-
-- 来源对象：用户指令「吸收经验并根据git提交skill的规则, 所有文件提交git」——把第十批内部调整（TAPD 建单默认挂当前迭代、任务先登记工时才能完成）吸收进项目长期记忆，并按 git 协作规则把仓库全部未提交改动提交到本地。
-- 当前状态：**已落地闭环（本地提交，未推送）**。
-  - ① 业务提交 4 笔：`verify-brainstorm-rules` 新建与字典/吸收登记、TAPD 建单挂迭代与工时前置、命中检查漏触发防护两条、SPOT 种子入库；工作树已清空。
-  - ② 经验吸收入库：`PROJECT_MEMORY.md` 人类区补「新建需求 / 任务默认挂当前迭代」「任务流转完成前必须先登记工时」两条稳定决策并刷新更新时间；机器索引区实体 `rule.tapd-automation-lifecycle-and-qa-assignment` 补定义第 5 节、别名与 `scope`，`updated_at` 刷新为 2026-09-29。
-  - ③ 记忆结构修复：`PROJECT_HISTORY.md` 计数锚点区补齐「Goal 与 Loop 双 Skill 合并为 goal-loop-rules」缺锚点、移除无对应条目的孤儿锚点；`check_memory_anchors.py` 由 `ok=false` 恢复 `ok=true`。
-- 关键边界：本轮仅授权 `git commit`，**未授权 `git push`**，远端同步留给用户显式指令；知识库笔记同步写入 `D:\谷歌云盘\知识库\`（非本仓库，不在提交范围）。
-- 验证与交接：`check_memory_anchors.py` 返回 `ok=true`（锚点 20/20、实体 51）；`git status --porcelain` 为空；改动已本地提交。
-
 ## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
 
 - 来源对象：用户指令——“我们需要一个验证发散的独立 skill，当用户提出验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下等描述的时候触发；我们写代码的规则是最小改动、不要发散思维，但代码完成后需要发散一下、头脑风暴一下，找出更多的安全、性能、逻辑、边界的问题”。经三轮决策确认：命名 `verify-brainstorm-rules`、发散边界“允许外扩到关联模块”、产出“只读清单 + 落盘报告”。
@@ -200,18 +156,6 @@
   - ⑦ `PROJECT_MEMORY.md`：固化“待裁定事项建议、选项与默认最安全兜底闭环规则”长期稳定决策并同步机器索引区实体。
 - 验证与交接：`quick_validate.py` 验证 `Skill is valid!`（exit 0）；`git diff --check` 空白与格式检查 PASS；`summary_check_hook_test.py` 全量通过（6/6 OK）；所有涉及文件保持纯 LF；当前无 Git 提交授权，改动停在已改动未提交状态。
 
-## 2026-09-15 project-memory-rules 补充历史条目裁剪强力脱敏提示
-
-- 来源对象：用户指出 Agent 面对 `PROJECT_HISTORY.md` 超限时因顾虑「不可逆删除」而未自动裁剪、停下向用户请示，要求在 `project-memory-rules` 补充强力脱敏提示（历史条目已有 git 提交兜底，滚动裁剪属于预期内自闭环维护，禁止作为阻断项向用户请示）。
-- 当前状态：**全部落地**（`project-memory-rules/SKILL.md` 写入规则第 4 点 + 历史保留窗口；`bootstrap_agents.sh` 受管模板 `BODY_PROJECT_CONTEXT`；`AGENTS.md` / `CLAUDE.md` 同步）。
-- 验证与交接：`quick_validate.py` `Skill is valid!`（exit 0）；`git diff --check` PASS；改动停在已改动未提交状态。
-
-## 2026-09-15 优化「输出总结」Skill 规则（三段式极简结构与决策收敛）
-
-- 来源对象：用户提出总结越长越说不清（铺垫多、论证重复、重点淹没），要求重写总结规则：简单建议走极简断言，复杂建议走强制三段式（决策点 / 跨成员影响 / 明确建议与倾向），去除核实流水账与冗余论证。
-- 当前状态：**已全部落地落盘**（`reasoning-summary-structure-rules/SKILL.md` 档位与任务性质分流 + 三反铁律；`references/summary-structure-template.md` 简单/复杂模板；`references/output-examples.md` 正反例；`references/conditional-sections-rules.md` 决策任务豁免；`字典.md` 刷新）。
-- 验证与交接：文件更新并读回通过；工作日志记至 `.workbuddy/memory/2026-09-15.md`；当轮无 Git 提交授权，停在已改动未提交状态。
-
 <!-- BEGIN RECENT PROJECT SESSIONS -->
 
 ## 最近 5 个同项目会话
@@ -228,7 +172,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-09-12T02:38:28.076861Z",
+  "registry_updated_at": "2026-10-08T03:40:07.160167Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -689,30 +633,35 @@
       ]
     },
     {
-      "projection_id": "SESSION/dff025fe4d9d957a9015b19c8e03b240c872a596505fb706010b25f3adcbce73",
-      "session_id": "ca214e6e-8368-4f88-bad3-37c4a5df2a36",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "fallback",
-      "state": "inactive",
-      "plan_key": "SYNTH-FALLBACK/20260911T091333Z",
-      "source_document": "",
-      "plan_fingerprint": "c3ac163c8326bb6195931dc7e75d8ae18bf006125040d6015ba17f67deb2cadb",
-      "updated_at": "2026-09-12T02:38:28.076660Z",
+      "projection_id": "SESSION/2c84191dccd032ac666a1eda9733fe176c84d35081b659d58c14d65cf8bc8d2f",
+      "session_id": "569c724c-4439-434e-b4d4-3b482c43f0be",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "PLAN/BOOTSTRAP-SUBDIR-SKIP-MARKER",
+      "source_document": "CHAT-MINIMUM-PLAN/BOOTSTRAP-SUBDIR-SKIP-MARKER",
+      "plan_fingerprint": "7ce93a768d25270d0e21926bebe01b33d5355c625e23bfded40bdf86532f3c1a",
+      "updated_at": "2026-10-08T03:38:58Z",
       "steps": [
         {
-          "id": "RECOVERY-01",
-          "step": "[RECOVERY-01] 核对当前任务目标与范围",
+          "id": "SKIP-01",
+          "step": "脚本第 6 步识别子目录跳过标记并逐文件打印原因",
           "status": "completed"
         },
         {
-          "id": "RECOVERY-02",
-          "step": "[RECOVERY-02] 确认中断点与未完成工作",
+          "id": "SKIP-02",
+          "step": "SKILL.md 与受管章节索引写入标记约定",
           "status": "completed"
         },
         {
-          "id": "RECOVERY-03",
-          "step": "[RECOVERY-03] 继续当前任务执行",
+          "id": "SKIP-03",
+          "step": "补回归用例并在临时仿真仓库真实验证与幂等复跑",
           "status": "completed"
+        },
+        {
+          "id": "SKIP-04",
+          "step": "收口：6-review、合规闸门、知识库沉淀与临时目录清理",
+          "status": "in_progress"
         }
       ]
     }
@@ -721,4 +670,4 @@
 ```
 <!-- END TASK PLAN PROJECTION -->
 
-<!-- 注：旧条目 2026-08-11/08-13/08-21/08-26 已裁剪，保留在 PROJECT_HISTORY.md 中。-->
+<!-- 注：旧条目 2026-08-11 至 2026-09-15 已裁剪，保留在 PROJECT_HISTORY.md 中。-->
