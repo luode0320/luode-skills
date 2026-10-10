@@ -21,6 +21,7 @@ from typing import Any
 
 AUDIT_PATH = Path(__file__).with_name("audit_vault_knowledge.py")
 INDEX_NAME = "_index.json"
+SUMMARY_INDEX_NAME = "_index_summary.json"
 SCHEMA_VERSION = 1
 # note-schema.md 要求新笔记必须含完整 frontmatter，但该要求原先无机器校验，实测填充率只有 70%~82%。
 REQUIRED_FIELDS = ("id", "type", "title", "status", "created", "updated")
@@ -105,15 +106,40 @@ def build_index() -> dict[str, Any]:
 
 
 def write_index(index: dict[str, Any]) -> Path:
-    """把索引写入知识库根并回读校验。
+    """把索引写入知识库根并回读校验，同时输出轻量级摘要索引供 Agent 低成本加载。
 
     [参数] index: 待写入的索引对象。
-    [返回] Path: 索引文件路径。
-    最近修改时间: 2026-08-12 新增机器索引脚本。
+    [返回] Path: 全量索引文件路径。
+    最近修改时间: 2026-10-10 新增轻量摘要索引生成。
     """
     target = KB_ROOT / INDEX_NAME
     payload = json.dumps(index, ensure_ascii=False, indent=2)
     target.write_text(payload, encoding="utf-8")
+
+    # 生成轻量级摘要索引：仅保留路径、标题、主题、标签和别名，剔除冗余字段
+    summary_notes = [
+        {
+            "path": n["path"],
+            "title": n["title"],
+            "theme": n["theme"],
+            "tags": n["tags"],
+            "aliases": n["aliases"],
+        }
+        for n in index["notes"]
+    ]
+    summary_payload = json.dumps(
+        {
+            "schema_version": index["schema_version"],
+            "notes_count": index["notes_count"],
+            "latest_mtime": index["latest_mtime"],
+            "notes": summary_notes,
+        },
+        ensure_ascii=False,
+        indent=1,
+    )
+    summary_target = KB_ROOT / SUMMARY_INDEX_NAME
+    summary_target.write_text(summary_payload, encoding="utf-8")
+
     # 写后回读，确保落盘内容与预期一致。
     back = json.loads(target.read_text(encoding="utf-8"))
     if back.get("notes_count") != index["notes_count"]:
@@ -163,21 +189,80 @@ def load_index(auto_rebuild: bool = True) -> dict[str, Any]:
     return index
 
 
-def query_index(index: dict[str, Any], keyword: str) -> list[dict[str, Any]]:
-    """按六类结构化字段加正文匹配关键词，并给出命中原因。
+def infer_recommended_moc(note: dict[str, Any]) -> str:
+    """根据笔记的主题、路径、标题与标签，推导对应的推荐领域 MOC。
+
+    [参数] note: 索引中的单篇笔记字典。
+    [返回] str: 对应的推荐 MOC 路径。
+    最近修改时间: 2026-10-10 新增，用于阶梯式召回导航。
+    """
+    path = note.get("path", "")
+    theme = note.get("theme", "")
+    if theme == "工程实践":
+        lower_path = path.lower()
+        title = note.get("title", "").lower()
+        tags = " ".join(str(t).lower() for t in note.get("tags", []))
+        topics = " ".join(str(t).lower() for t in note.get("topics", []))
+        sign = f"{lower_path} {title} {tags} {topics}"
+        if any(w in sign for w in ("plugin", "插件", "registry", "trae", "workbuddy", "solo", "换号")):
+            return "30-MOCs/工程实践/插件体系与扩展架构.md"
+        if any(w in sign for w in ("oauth", "授权", "安全", "loopback", "回环", "sms", "短信", "接码", "token", "凭据", "端口")):
+            return "30-MOCs/工程实践/网络安全与认证授权.md"
+        if any(w in sign for w in ("web3", "moonpay", "swap", "crypto", "exchange", "兑换", "汇率", "交易", "chart", "网格")):
+            return "30-MOCs/工程实践/Web3与金融交易实践.md"
+        if any(w in sign for w in ("mongo", "mysql", "redis", "数据库", "表", "索引", "sql", "哨兵", "副本集")):
+            return "30-MOCs/工程实践/数据库与存储工程.md"
+        if any(w in sign for w in ("godot", "游戏", "pck", "渲染", "font", "msdf", "ui", "关卡", "视口")):
+            return "30-MOCs/工程实践/Godot与客户端工程.md"
+        return "30-MOCs/工程实践/架构模式与后端治理.md"
+    elif theme == "AI协作":
+        return "30-MOCs/AI协作与Agent工程-MOC.md"
+    elif theme in ("代码规则", "code-style"):
+        return "30-MOCs/代码规则与工程规范-MOC.md"
+    elif theme == "研发流程":
+        return "30-MOCs/研发流程与Skill治理-MOC.md"
+    elif theme == "开发环境":
+        return "30-MOCs/开发环境与跨宿主工程-MOC.md"
+    elif theme == "项目":
+        lower_path = path.lower()
+        if "crossverse" in lower_path:
+            return "30-MOCs/CrossVerse-Arena项目地图.md"
+        if "ellipal" in lower_path:
+            return "30-MOCs/EllipalFinance-go 项目地图.md"
+        return "30-MOCs/项目知识地图.md"
+    elif theme == "50-Sources":
+        return "30-MOCs/会话日志与日常沉淀-MOC.md"
+    return "INDEX.md"
+
+
+def query_index(
+    index: dict[str, Any],
+    keyword: str,
+    theme_filter: str = "",
+    tag_filter: str = "",
+) -> list[dict[str, Any]]:
+    """按六类结构化字段加正文匹配关键词，支持主题/标签过滤，并附带推荐 MOC。
 
     结构化字段只覆盖 frontmatter，实测会漏掉「正文讲了但标签没写」的笔记，
     因此始终附带一次正文扫描并合并结果，保证查询结果是结构化命中与全文命中的超集。
 
-    [参数] index: 索引对象；keyword: 查询关键词，大小写不敏感。
+    [参数] index: 索引对象；keyword: 查询关键词；theme_filter: 可选主题过滤；tag_filter: 可选标签过滤。
     [返回] list[dict[str, Any]]: 命中笔记列表，按命中字段数降序。
-    最近修改时间: 2026-08-12 补正文兜底，修复纯 frontmatter 索引的召回损失。
+    最近修改时间: 2026-10-10 增加 recommended_moc 字段与主题/标签过滤。
     """
     needle = keyword.strip().lower()
     if not needle:
         return []
     results = []
+    theme_needle = theme_filter.strip().lower()
+    tag_needle = tag_filter.strip().lower()
+
     for note in index["notes"]:
+        if theme_needle and theme_needle not in note["theme"].lower():
+            continue
+        if tag_needle and not any(tag_needle in str(t).lower() for t in note["tags"]):
+            continue
+
         reasons = []
         if needle in note["title"].lower():
             reasons.append("title")
@@ -208,6 +293,7 @@ def query_index(index: dict[str, Any], keyword: str) -> list[dict[str, Any]]:
                     "matched": reasons,
                     "partial": note["partial"],
                     "superseded_by": note["superseded_by"],
+                    "recommended_moc": infer_recommended_moc(note),
                 }
             )
     # 结构化命中比纯正文命中更相关：先按非 body 命中数降序，再按总命中数，最后按路径稳定排序。
@@ -222,7 +308,7 @@ def query_index(index: dict[str, Any], keyword: str) -> list[dict[str, Any]]:
 
 
 def check_frontmatter() -> dict[str, Any]:
-    """校验活动区笔记的 frontmatter 必填字段与状态枚举合规性。
+    """校验活动区笔记的 frontmatter 必填字段、状态枚举及目录白名单合规性。
 
     `note-schema.md` 要求新笔记含完整 frontmatter，但该要求原先只是文字约定、
     漏填不报错，实测导致约三成笔记不合规、状态枚举还漂移出未声明值。
@@ -231,15 +317,17 @@ def check_frontmatter() -> dict[str, Any]:
     归档区豁免只覆盖「有没有头部」与「必填字段齐不齐」——不为历史残留补字段；
     但状态值合法性对全库生效：归档退场本身要写 `status: archived`，整体豁免会让
     归档区变成枚举盲区，实测该区曾长期存在未声明的 `test-fixture` 而零告警。
+    同时，增加目录白名单校验：除归档区外，所有活动笔记的主题不能为 unknown。
 
     [参数] 无。
-    [返回] dict[str, Any]: 含三类不合规清单与统计的报告。
-    最近修改时间: 2026-08-12 归档豁免收窄，状态值合法性改为对全库生效。
+    [返回] dict[str, Any]: 含四类不合规清单与统计的报告。
+    最近修改时间: 2026-10-10 增加目录白名单校验（unknown 主题阻断）。
     """
     allowed_status = set(DECLARED_STATUS) | set(CASE_STATUS)
     missing_frontmatter: list[str] = []
     missing_fields: list[dict[str, Any]] = []
     bad_status: list[dict[str, str]] = []
+    unknown_theme_violations: list[dict[str, str]] = []
     checked = 0
     exempt = 0
 
@@ -252,6 +340,13 @@ def check_frontmatter() -> dict[str, Any]:
             exempt += 1
         else:
             checked += 1
+            # 目录白名单校验：活动区笔记的主题不得为 unknown（散落文件或未登记目录）
+            theme = note_theme(rel)
+            if theme == "unknown":
+                unknown_theme_violations.append(
+                    {"path": rel, "theme": theme, "reason": "未在声明主题清单或契约目录中，或者是20-Knowledge根下散落文件"}
+                )
+
         # 与巡检口径一致：utf-8-sig 容忍 BOM，避免带 BOM 的笔记被误判为无 frontmatter。
         text = filepath.read_text(encoding="utf-8-sig")
         if not text.startswith("---"):
@@ -268,7 +363,12 @@ def check_frontmatter() -> dict[str, Any]:
         if status and status not in allowed_status:
             bad_status.append({"path": rel, "status": status})
 
-    total_bad = len(missing_frontmatter) + len(missing_fields) + len(bad_status)
+    total_bad = (
+        len(missing_frontmatter)
+        + len(missing_fields)
+        + len(bad_status)
+        + len(unknown_theme_violations)
+    )
     return {
         "ok": total_bad == 0,
         "checked_notes": checked,
@@ -277,6 +377,7 @@ def check_frontmatter() -> dict[str, Any]:
         "missing_frontmatter": missing_frontmatter,
         "missing_required_fields": missing_fields,
         "status_out_of_enum": bad_status,
+        "unknown_theme_violations": unknown_theme_violations,
         "allowed_status": sorted(allowed_status),
     }
 
@@ -479,6 +580,8 @@ def parse_args() -> argparse.Namespace:
     sub.add_parser("build", help="扫描全库并重建 _index.json")
     query = sub.add_parser("query", help="按关键词检索索引，索引过期时自动重建")
     query.add_argument("--keyword", required=True, help="查询关键词，匹配标题/别名/标签/topics/主题/路径")
+    query.add_argument("--theme", default="", help="按主题过滤，如 工程实践、AI协作")
+    query.add_argument("--tag", default="", help="按标签过滤")
     query.add_argument("--limit", type=int, default=0, help="限制返回条数，0 表示不限制")
     sub.add_parser("stats", help="输出索引覆盖与主题分布统计")
     sub.add_parser("check", help="校验 frontmatter 必填字段、状态枚举、接替关系双向性与双链有效性")
@@ -528,12 +631,24 @@ def main() -> int:
 
     if args.command == "query":
         index = load_index()
-        hits = query_index(index, args.keyword)
+        hits = query_index(
+            index,
+            args.keyword,
+            theme_filter=args.theme,
+            tag_filter=args.tag,
+        )
         if args.limit > 0:
             hits = hits[: args.limit]
         print(
             json.dumps(
-                {"ok": True, "keyword": args.keyword, "hit_count": len(hits), "hits": hits},
+                {
+                    "ok": True,
+                    "keyword": args.keyword,
+                    "theme_filter": args.theme,
+                    "tag_filter": args.tag,
+                    "hit_count": len(hits),
+                    "hits": hits,
+                },
                 ensure_ascii=False,
                 indent=2,
             )

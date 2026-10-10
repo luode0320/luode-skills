@@ -227,6 +227,21 @@ class IndexBuildAndQueryTest(unittest.TestCase):
         index = INDEX.build_index()
         self.assertEqual(INDEX.query_index(index, "   "), [])
 
+    def test_summary_index_is_created(self) -> None:
+        """写索引时必须同步输出 _index_summary.json 且包含结构化精简字段。
+
+        [参数] 无。
+        [返回] None：断言失败时抛出 AssertionError。
+        最近修改时间: 2026-10-10 新增轻量摘要索引测试。
+        """
+        index = INDEX.build_index()
+        INDEX.write_index(index)
+        summary_path = INDEX.KB_ROOT / INDEX.SUMMARY_INDEX_NAME
+        self.assertTrue(summary_path.exists())
+        data = json.loads(summary_path.read_text(encoding="utf-8"))
+        self.assertEqual(data["notes_count"], index["notes_count"])
+        self.assertIn("tags", data["notes"][0])
+
 
 class FrontmatterCheckTest(unittest.TestCase):
     """契约校验组：note-schema 的必填字段与状态枚举必须可机器校验。"""
@@ -306,6 +321,19 @@ class FrontmatterCheckTest(unittest.TestCase):
         entry = report["missing_required_fields"][0]
         self.assertIn("id", entry["missing"])
         self.assertIn("created", entry["missing"])
+
+    def test_unknown_theme_is_reported(self) -> None:
+        """未在声明主题目录中（如散落文件或非法目录）必须作为违规被 check 拦截。
+
+        [参数] 无。
+        [返回] None：断言失败时抛出 AssertionError。
+        最近修改时间: 2026-10-10 新增目录白名单校验断言。
+        """
+        self.write("20-Knowledge/projects/野目录笔记.md", self.full_note("野目录笔记"))
+        report = INDEX.check_frontmatter()
+        self.assertFalse(report["ok"])
+        self.assertGreaterEqual(len(report["unknown_theme_violations"]), 1)
+        self.assertEqual(report["unknown_theme_violations"][0]["path"], "20-Knowledge/projects/野目录笔记.md")
 
     def test_missing_frontmatter_is_reported(self) -> None:
         """完全没有头部的笔记必须被报出。

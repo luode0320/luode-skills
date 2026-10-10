@@ -339,17 +339,26 @@ def build_report(notes: list[NoteFacts], orphan_paths: list[str]) -> dict[str, A
     ]
     unreadable = [{"path": n.path, "error": n.read_error} for n in notes if n.read_error]
     scanned = {n.path for n in notes}
+    scoped_orphans = [
+        {"path": p, "in_scanned_scope": p in scanned}
+        for p in orphan_paths
+        if not p.startswith(EXECUTION_CASE_PREFIX)
+    ]
+    orphan_ratio = round(len(scoped_orphans) / max(1, len(notes)), 4)
+    sync_conflicts = [
+        fp.relative_to(KB_ROOT).as_posix()
+        for fp in sorted(KB_ROOT.rglob("* (1).*"))
+        if not fp.name.startswith(".")
+    ]
     return {
         "schema_version": 1,
         "scanned_notes": len(notes),
+        "orphan_ratio": orphan_ratio,
+        "sync_conflicts": sync_conflicts,
         "candidates": {
             "conflict_groups": group_conflict_candidates(notes),
             "non_active_status": inactive,
-            "orphans": [
-                {"path": p, "in_scanned_scope": p in scanned}
-                for p in orphan_paths
-                if not p.startswith(EXECUTION_CASE_PREFIX)
-            ],
+            "orphans": scoped_orphans,
             "superseded_without_pointer": dangling,
         },
         "unreadable_notes": unreadable,
@@ -406,8 +415,9 @@ def main() -> int:
     candidates = report["candidates"]
     print(f"扫描笔记数: {report['scanned_notes']}")
     print(f"冲突候选组: {len(candidates['conflict_groups'])}")
+    print(f"网盘同步冲突副本: {len(report['sync_conflicts'])}")
     print(f"非当前有效状态: {len(candidates['non_active_status'])}")
-    print(f"孤儿笔记: {len(candidates['orphans'])}")
+    print(f"孤儿笔记: {len(candidates['orphans'])} (孤岛率: {report['orphan_ratio'] * 100:.1f}%)")
     print(f"标了已取代但缺接替者: {len(candidates['superseded_without_pointer'])}")
     print(f"不可读笔记: {len(report['unreadable_notes'])}")
     print(report["disposition_hint"])
