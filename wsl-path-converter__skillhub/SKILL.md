@@ -40,6 +40,17 @@ metadata:
 3. **执行命令**：`wslpath -u '<路径>'`（或 `-w`/`-m`），含空格路径务必加引号。
 4. **验证输出**：核对转换结果是否仍指向原位置——WSL 路径应可 `ls`/`test -e` 通过，Windows 路径应 `test -f` 或在资源管理器中可达；失败则查下表。
 
+### Windows 宿主输出 WSL 文件链接
+
+当 agent 运行在 Windows、而文件位于 WSL（例如 `/home/...`）时，给用户输出可点击的文件链接，应先用 `wslpath -w '<绝对 WSL 路径>'` 获取 Windows UNC 路径，并把该 UNC 路径作为链接目标，例如 `\\wsl.localhost\Ubuntu-24.04\home\user\project\file.go`。不要把 `/home/...` 直接作为 Windows 宿主里的链接目标。
+
+```bash
+wslpath -w /home/user/project/file.go
+# 期望形态：\\wsl.localhost\<发行版名>\home\user\project\file.go
+```
+
+发行版名以转换结果为准，不要手工猜测或替换；如果结果不是可访问的 UNC 路径，先检查发行版名称和目标路径。agent 与用户都在 WSL 内时可继续使用 Linux 绝对路径；目标文件在 Windows 挂载盘（如 `/mnt/c/...`）时，按 `wslpath -w` 返回的盘符路径输出。
+
 ## 四、失败回退表（实测证据 2026-08-25）
 
 | 症状 | 根因 | 处理 |

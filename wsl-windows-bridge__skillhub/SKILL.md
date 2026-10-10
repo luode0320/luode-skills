@@ -61,6 +61,8 @@ file -i "$DIR/note.md"       # 应为 charset=utf-8
 md5sum "$DIR/note.md"; wc -c "$DIR/note.md"
 ```
 
+第 3 步写法适用于 agent 在 WSL 内。**agent 在 Windows 宿主经 Bash 工具执行时，成对反斜杠在进 shell 前就被减半，quoted heredoc 挡不住**：原样写正文直接用文件写入工具落盘；内联脚本用 `chr(92)` 构造反斜杠、路径写正斜杠，细则见 [references/windows-host-side-workflow.md](references/windows-host-side-workflow.md) 配方 5。
+
 同一盘符可能同时挂载在多个挂载点（`/mnt/d` 与 `~/d/<user>` 等），它们指向同一份文件；
 统一只用 `/mnt/<drive>` 这一个规范形态参与路径拼接，避免同一文件在证据里出现两种绝对路径。
 
@@ -165,7 +167,7 @@ win-path --to-wsl D:\app
 
 ## Windows 宿主侧工作流（agent 在 Windows、项目在 WSL）
 
-bridge 默认方向是「WSL 内 agent 调 Windows」；**反向拓扑**（agent 跑在 Windows 宿主、项目源码在 WSL 时的编译/启动/调试）见 [references/windows-host-side-workflow.md](references/windows-host-side-workflow.md)：Temp 副本编译（`go.mod RLock: Incorrect function`）、18080 端口、验证码 dev 放行、登录断言 HTTP 恒 200、Bash 调 PowerShell 拦截、Windows Python `/tmp` 路径坑。
+bridge 默认方向是「WSL 内 agent 调 Windows」；**反向拓扑**（agent 跑在 Windows 宿主、项目源码在 WSL 时的编译/启动/调试）见 [references/windows-host-side-workflow.md](references/windows-host-side-workflow.md)：Temp 副本编译（`go.mod RLock: Incorrect function`）、18080 端口、验证码 dev 放行、登录断言 HTTP 恒 200、Bash 调 PowerShell 拦截、Windows Python `/tmp` 路径坑、Bash 工具成对反斜杠减半（与项目位置无关）。
 
 ### Quantitative Trading Example (QMT/xtquant)
 

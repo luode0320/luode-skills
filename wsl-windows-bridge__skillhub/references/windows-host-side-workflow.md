@@ -1,7 +1,7 @@
 # Windows 宿主侧工作流（agent 在 Windows、项目在 WSL）
 
 > 本 skill 的默认方向是「WSL 内 agent 调 Windows」（win-python / win-ps / win-copy / win-path 等 wrapper）。
-> 本文是**反向拓扑**补充：agent（WorkBuddy）运行在 **Windows 宿主**、项目源码在 **WSL**（如 `/home/luode/code/ellipal_admin`）时的编译、启动、调试工作流。2026-08-26 在 go-admin 接入 Apifox 测试全程实测。
+> 本文是**反向拓扑**补充：agent（WorkBuddy）运行在 **Windows 宿主**、项目源码在 **WSL**（如 `/home/luode/code/ellipal_admin`）时的编译、启动、调试工作流。2026-08-26 在 go-admin 接入 Apifox 测试全程实测。配方 5 不受此限：只要 agent 在 Windows 宿主经 Bash 工具执行就适用，与项目在哪无关。
 
 ## 触发信号
 
@@ -9,6 +9,7 @@
 - 本地起服务后 Windows 侧连不上端口（典型：128xx 段）。
 - 从 Git Bash 调 PowerShell 被安全策略拦截。
 - Windows Python 报找不到脚本/路径（典型：把 `/tmp/...` 当成 `c:\tmp\...`）。
+- Bash 工具里的内联脚本：匹配反斜杠的正则静默漏检或报正则语法错误，或 Python 报 `SyntaxError: unterminated string literal`（3.9 及以下为 `EOL while scanning string literal`），见配方 5。
 
 ## 核心原则（双路线）
 
@@ -44,6 +45,16 @@
 - 从 Bash 调 PowerShell 被安全策略拦截（`powershell -Command ...`）→ 改用独立 PowerShell 入口/工具执行（Stop-Process 等 Windows 专用操作）。
 - Windows Python 不认 Git Bash 的 `/tmp` 绝对路径（会解析成 `c:\tmp\...`）→ 传 `C:/Users/...` 风格路径。
 - apifox CLI 遥测弹窗与禁用（`APIFOX_CLI_TELEMETRY=0`）：**权威源为 `apifox-cli` skill**（含兼容变量与残留进程清理），本文不重复。
+
+### 5. Bash 工具会把成对反斜杠减半（与项目在哪无关）
+
+- 现象：agent 在 Windows 宿主经 Bash 工具（Git Bash）执行时，命令文本里每两个连续反斜杠在进入 shell 前就被折成一个，单引号和 `<<'EOF'` 都挡不住；单个反斜杠、经文件写入工具（如 Write / Edit）落盘的内容不受影响。匹配「反斜杠或正斜杠」的字符类 `[\\/]` 折成 `[\/]`，只剩正斜杠：文本里有正斜杠时照常命中、退出码为 0，反斜杠路径静默漏检，只有反斜杠时零命中（rg 退出码 1）；写成 `[/\\]` 则折成 `[/\]`，rg 报正则解析错误（退出码 2），Python 抛 `re.error`。Python 里表示一个反斜杠的字面量 `'\\'` 变成未闭合字符串，报 `SyntaxError`。
+- 做法：命令文本里不写两个连续反斜杠，按用途选：
+  - 原样写正文，或必须保留字面反斜杠的脚本：用文件写入工具写成文件（脚本写完再执行），不经命令文本。
+  - 内联 Python：用 `chr(92)` 构造反斜杠，匹配路径前先 `.replace(chr(92), '/')`。
+  - 路径：传给 Windows 程序（Python、PowerShell 等）写 `C:/Users/...`；`/d/...` 只作 Git Bash 命令的参数，Windows 程序会把它解析成当前盘根下的 `\d\...`（同配方 4 的 `/tmp`）；确需反斜杠形式时用 `cygpath -w` 在运行时生成。
+  - 不要改写成四个反斜杠去凑数，换一种执行方式就会错；扫描类结论要带一个已知命中项作对照组。
+- 范围：已在 Claude Code 桌面版 + Git Bash 实测，其他宿主未验证。文件写入工具和 `chr(92)` 不依赖宿主；`cygpath` 只在 Git Bash / MSYS2 / Cygwin 里有，WSL 内对应 `wslpath -w`。本 skill 其他小节（如「免桥直读要点」第 3 步、陷阱清单）推荐的 quoted heredoc，对 Windows 宿主经 Bash 工具执行的命令不成立。案例：知识库 `20-Knowledge/execution-failure-cases/wsl-windows-bridge/20260930-204809-exec-case-bash-tool-halves-double-backslash.md`。
 
 ## 边界与交叉引用
 
