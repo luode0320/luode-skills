@@ -1125,3 +1125,4 @@ claude-mem(记忆) :
 2026-10-10 10:05:00 feat: [知识库索引增强] knowledge-flow 新增轻量摘要索引与 MOC 分层导航
 2026-10-10 10:08:00 fix: [WSL宿主写法] 补Bash反斜杠减半陷阱与Windows宿主输出WSL文件链接
 2026-10-10 10:11:00 chore: [执行失败学习] 明确owner取frontmatter名称与历史owner案例承接
+2026-10-10 10:14:00 feat: [视频总结技能] 新增 video-summary 全网视频提取与深度总结 skill
