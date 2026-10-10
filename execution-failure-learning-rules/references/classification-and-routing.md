@@ -1,6 +1,6 @@
 # 分类与路由
 
-本文件只定义“如何找到 owner”和“执行前检查什么”，不保存具体错误正文。具体案例由 owner skill 的 `references/*casebook*.md` 保存。
+本文件只定义“如何找到 owner”和“执行前检查什么”，不保存具体错误正文。具体案例写入知识库 `20-Knowledge/execution-failure-cases/<owner>/`（见 [lifecycle-and-gates.md](lifecycle-and-gates.md)），owner skill 的 `references/*casebook*.md` 只作种子与回归基线。
 
 MCP/插件相关动作必须先区分 provisioning（安装、注册、启用、首次可用性检查）与 runtime（已配置组件在任务执行期间的超时、断开、失活或宿主异常）。前者仍由安装类 skill 负责；后者统一由 `agent-runtime-recovery-rules` 负责恢复能力协商、重载/重启和任务续接。没有真实 adapter 能力时不得猜测平台命令。
 
@@ -59,6 +59,8 @@ Windows PowerShell 的 `CommandNotFoundException`、`command-not-found`、`not r
 3. 如果两个 owner 都合理，标记 `conflicted` 并暂停自动复用，交给 `skill-absorption-rules` 或人工裁决。
 4. owner 没有 casebook 时，输出结构化 candidate 交接并触发 `skill-absorption-rules`；不得在无归属目录下临时新建全局 casebook。
 5. provisioning 与 runtime 证据不得合并成一个案例；同一组件从“未安装”到“已配置后断连”必须分别记录在安装类 casebook 与运行期 owner casebook。
+6. owner 一律取 owner skill 的 frontmatter `name`，不取仓库目录名：如 `wsl-windows-bridge`（目录是 `wsl-windows-bridge__skillhub`）。`owner_skill`、`case_key` 首段与知识库 `<owner>/` 目录名必须是同一个值，混用会让去重键对不上、同一失败被重复建案。目录名与 `name` 不一致时按 `^name:` 反查 `SKILL.md`，不要靠去掉 `__skillhub` 后缀推导（如 `py__skillhub` 的 `name` 是 `python`）。
+7. 路由表注明“原 X 已删除”的，X 是历史 owner：其旧案例原地保留、只追加，不移动、不改名、不复制，由该行 owner 承接；该行另写明拆分承接的（如编码规则由 `windows-encoding-rules` 承接），按旧案例内容归对应 owner。去重与检索同时查承接 owner 和历史 owner 的目录。比对历史目录时，去重键的 `owner_skill` 段视同承接 owner；旧案例 `category` 不在上文分类表内（如 `command`）时不比对该段，其余字段照常比对。命中旧案例时只更新出现次数、验证时间和来源，并在 `## 状态事件` 追加一条注明承接 owner 的事件，其他正文不动，这是 [case-template.md](case-template.md)「不能修改其他 skill 的案例正文」的唯一例外。新案例只写承接 owner 的目录。
 
 ## 最小预检清单
 

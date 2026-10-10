@@ -2,7 +2,7 @@
 
 ## Canonical candidate 模板
 
-以下字段是案例笔记的 canonical frontmatter；字段值必须脱敏。没有值时写 `unknown`，不要用猜测填充。动态 candidate/active 必须写入知识库，静态 owner casebook 只保留同结构的种子和回归基线。
+以下字段是案例笔记的 canonical frontmatter；字段值必须脱敏。没有值时写 `unknown`，不要用猜测填充。动态 candidate/active 必须写入知识库，静态 owner casebook 只保留同结构的种子和回归基线。`owner_skill`、`case_key` 首段和 `note_path` 里的 `<owner>` 取同一个值，即 owner skill 的 frontmatter `name`，不取仓库目录名，见 [classification-and-routing.md](classification-and-routing.md)「唯一 owner 规则」第 6 条。
 
 ```yaml
 id: <owner>-<short-slug>-<stable-id>
