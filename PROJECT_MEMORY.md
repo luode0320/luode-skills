@@ -123,6 +123,22 @@
 - 来源：用户指令（2026-10-05）+ `code-quality-rules/references/no-patchwork-architecture-discipline.md` 与 `SKILL.md` + `code-generation-style-rules` + `bug-fix-proposal-rules` + `implementation-planning-rules` + `code-style-consistency-rules/references/user-style-feedback-library.md`（STYLE-CASE-ALL-004）。
 - 更新时间：2026-10-05。
 
+## 服务器改动前备份与可还原（2026-10-11 固化）
+
+- 稳定决策：**无还原点，不改动**——凡会改变服务器状态的写操作（文件/目录增删改移与权限、配置文件、服务 start/stop/restart、软件包、数据库 DDL/DML、Docker、防火墙、cron/用户/环境变量、任何 `sudo` 写入），执行前必须先建立并验证通过可验证的还原点（存在、非空、可读）；只读白名单命令免还原点。落点：`ssh-server-ops-rules/SKILL.md`「改动前备份与可还原（强制，最高优先级）」+ `references/backup-and-rollback.md` + `scripts/backup_before_change.sh`。
+- 稳定决策：**失败或效果不符预期即主动回滚**——不等待用户开口；回滚属「恢复到改动前状态」的降险动作默认放行，但若会覆盖改动期间产生的新改动须先确认；L1 硬禁止命令不因「回滚」名义放行；回滚也失败则停止叠加、保留现场并给出手动恢复指引。
+- 稳定决策：**三阶段流程与还原点契约**——改动前（侦察现状 → 声明 `→ 目标:` → 建还原点 → 验证非空 → 生成 `manifest.md`+`rollback.sh` → 回报用户）→ 改动中（原子操作、分步校验退出码、不叠加不可逆步骤、不删历史还原点）→ 改动后（立即验证，失败即回滚）。还原点 ID `RP-<alias>-<UTC>`，远端落点 `~/.agent-backups/<TS>/`（权限 700），默认保留 ≥24h。用户当轮显式豁免须声明「本次无还原点」且仅当轮生效；备份内容可能含密钥/业务数据，禁止流入 Git 或聊天记录。
+- 来源：用户指令（2026-10-11）——「操作服务器的改动，一定要注意备份和可还原操作……如果 agent 操作服务器失败了，或者没有达到想要的效果，要支持回到之前的状态」+ `ssh-server-ops-rules/SKILL.md` 与 `references/backup-and-rollback.md`、`scripts/backup_before_change.sh`。
+- 更新时间：2026-10-11。
+
+## 配置持久化写入安全与故障定位（2026-10-11 固化）
+
+- 稳定决策：**禁止对生产配置做「读出 → 二次序列化 → 写回」**——该模式会把换行转义为字面 `\n`，使整篇配置塌缩成单行；对 YAML 尤其致命，塌缩后若首字符为 `#` 整行成注释 → 解析为空配置 → 关键项（端口/密钥/开关）丢失。写操作一律走应用提供的配置写入 API。
+- 稳定决策：**必须直写存储时用「无转义歧义」方式 + 哈希回读校验**——首选 hex 编码写入（如 `UPDATE ... SET content = CONVERT(UNHEX('<hex>') USING utf8mb4)`），写完立即用 md5/真实换行数回读比对，不一致即回滚；不确定格式契约时先读出一份当前正常内容作对照基准。
+- 稳定决策：**配置类故障先定位写入源再修**——定性判据为「端口漂移 + 关键路由 404（401/403=正常）+ 内容塌缩成单行」三条同时成立；写入源用「容器/系统事件日志 + 时间窗内被改文件 + md5 指纹比对 + 时间线交叉验证」定位，修完须确保不被再次写坏。生产写操作（改库、重启服务）属需确认级。
+- 来源：新增技能 `config-persistence-safety-rules/SKILL.md`；同类实践经验见知识库笔记《配置持久化写入安全与二次序列化损坏》与《cli-proxy-api 宿主配置存储形态》。
+- 更新时间：2026-10-11。
+
 ## 窗口与应用截图取证双轨机制（2026-10-05 固化）
 
 - 稳定决策：**自身可控渲染应用优先走应用内自渲染（app-internal-screenshot-rules）**——对 Godot、自研游戏、浏览器 CDP、Electron 等可控渲染应用，通过自身渲染通道（视口纹理 `get_image()`、CDP `Page.captureScreenshot`、Electron `capturePage()`）抓取，天然只含目标应用且不串味、不依赖前台、不出现黑屏或陈旧帧。
@@ -1843,6 +1859,50 @@ entities:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
+  - entity_id: rule.server-write-backup-and-rollback
+    name: "服务器改动前备份与可还原（无还原点不改动）"
+    type: "运维安全规则"
+    aliases:
+      - 无还原点不改动
+      - 改动前备份
+      - 还原点
+      - 服务器回滚
+      - 失败即回滚
+      - RP还原点
+    definition: "凡会改变服务器状态的写操作（文件/目录增删改移与权限、配置文件、服务 start/stop/restart/enable/disable、软件包安装卸载升级、数据库 DDL/批量 DML/导入导出、Docker 容器镜像卷网络、防火墙与 sysctl、cron/用户/环境变量、任何 sudo 写入），执行前必须先建立并验证通过可验证的还原点（存在、非空、可读），无还原点不得动手；只读白名单命令（ls/cat/df/du/free/ps/systemctl status/journalctl/docker ps/inspect/logs 等）免还原点。三阶段：改动前（侦察现状 → 声明目标 → 建还原点 → 验证非空 → 生成 manifest.md+rollback.sh → 回报用户）→ 改动中（原子操作、分步校验退出码、不叠加不可逆步骤、不删历史还原点）→ 改动后（立即验证，失败或效果不符预期即主动回滚，不等用户开口）。还原点 ID RP-<alias>-<UTC>，远端落点 ~/.agent-backups/<TS>/（权限 700），默认保留 ≥24h。回滚属降险动作默认放行，但若会覆盖期间新改动须先确认；L1 硬禁止命令不因回滚名义放行；回滚也失败则停止叠加、保留现场并给出手动恢复指引。用户当轮显式豁免须声明「本次无还原点」且仅当轮生效；备份含密钥/业务数据，禁止流入 Git 或聊天记录。落点：ssh-server-ops-rules/SKILL.md 与 references/backup-and-rollback.md、scripts/backup_before_change.sh。"
+    scope: "SSH 服务器写操作、配置变更、服务与包管理、数据库变更、容器与网络操作的前置备份与失败回滚"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.ssh-backup-and-rollback
+    context_ids:
+      - context.ssh-server-ops
+    updated_at: 2026-10-11
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - entity_id: rule.config-persistence-write-safety
+    name: "配置持久化写入安全与二次序列化损坏"
+    type: "配置与运维规则"
+    aliases:
+      - 配置持久化
+      - 二次序列化损坏
+      - 配置塌缩成单行
+      - 配置解析为空
+      - 写入源追溯
+      - hex安全写回
+    definition: "把配置写入持久化存储（数据库配置表、配置文件、配置中心）时：① 禁止「读出 → 二次序列化（json.dumps/JSON.stringify/模板渲染）→ 写回」，该模式把换行转义为字面 \\n 使整篇配置塌缩成单行，YAML 塌缩后若首字符为 # 整行成注释 → 解析为空配置 → 关键项（端口/密钥/开关）丢失；写操作一律走应用提供的配置写入 API。② 必须直写存储时用无转义歧义方式（hex：UPDATE ... CONVERT(UNHEX('<hex>') USING utf8mb4)）并写后 md5/真实换行数回读校验，不一致即回滚；不确定格式契约时先读出一份当前正常内容作对照基准。③ 配置类故障定性判据为「端口漂移 + 关键路由 404（401/403 表示路由在、正常）+ 内容塌缩成单行」三条同时成立。④ 先定位写入源再修：容器/系统事件日志 + 故障时段新改文件 + md5 指纹比对 + 时间线交叉验证。⑤ 关键项显式固定避免静默回退默认/随机值；禁止多会话并行改同一份生产配置；生产写操作属需确认级。落点：config-persistence-safety-rules/SKILL.md。"
+    scope: "配置写入持久化存储、配置类故障（不生效/解析为空/关键项丢失/格式异常）的定性定位与安全恢复"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.config-persistence-safety
+    context_ids:
+      - context.config-persistence-safety
+    updated_at: 2026-10-11
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
 relations:
   - relation_id: rel.root-test-code-and-evidence-layout.owned-by.artifact-storage
     type: "owned_by"
@@ -1897,6 +1957,16 @@ evidence:
     source: "app-internal-screenshot-rules/SKILL.md"
     path: "app-internal-screenshot-rules/SKILL.md"
     note: "2026-10-03 新增应用自渲染通道截图技能"
+  - evidence_id: evidence.skill.ssh-backup-and-rollback
+    type: "skill"
+    source: "ssh-server-ops-rules/SKILL.md 与 references/backup-and-rollback.md、scripts/backup_before_change.sh"
+    path: "ssh-server-ops-rules/references/backup-and-rollback.md"
+    note: "2026-10-11 用户指令新增「改动前备份与可还原」强制规则：无还原点不改动、失败即主动回滚、三阶段流程、12 类对象备份策略矩阵与一键回滚脚本。"
+  - evidence_id: evidence.skill.config-persistence-safety
+    type: "skill"
+    source: "config-persistence-safety-rules/SKILL.md"
+    path: "config-persistence-safety-rules/SKILL.md"
+    note: "2026-10-11 新增配置持久化写入安全与配置故障定位技能：二次序列化损坏机理、症状三判据、写入源追溯、hex 安全写回与带回滚恢复。"
   - evidence_id: evidence.root-test-code-and-evidence-layout
     type: "test"
     source: "根 test 目录统一实施与真实测试"
@@ -2347,6 +2417,14 @@ contexts:
     type: "task-scope"
     name: "Goal 生命周期与长任务循环（2026-09-27 起归 goal-loop-rules）"
     note: "适用于 Goal 触发、完成标记、循环控制器、安全熔断，以及 Goal 模式下的分歧裁决与临时产物清理"
+  - context_id: context.ssh-server-ops
+    type: "task-scope"
+    name: "SSH 服务器运维与写前备份回滚"
+    note: "适用于服务器连接、命令执行、写操作前置还原点、失败或效果不符时主动回滚"
+  - context_id: context.config-persistence-safety
+    type: "task-scope"
+    name: "配置持久化写入安全与故障定位"
+    note: "适用于配置写入持久化存储、配置类故障（不生效/解析为空/关键项丢失/格式异常）的定性定位与安全恢复"
 lifecycle:
   active:
     - "rule.shared-static-owner-routing"
@@ -2379,6 +2457,8 @@ lifecycle:
     - "rule.reasoning-summary-detail"
     - "rule.workbuddy-market-skill-absorption"
     - "rule.goal-mode-no-confirm-and-temp-cleanup"
+    - "rule.server-write-backup-and-rollback"
+    - "rule.config-persistence-write-safety"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -2418,6 +2498,20 @@ retrieval_hints:
       - "rule.task-plan-rehydration"
     update_plan 重建:
       - "rule.task-plan-rehydration"
+    无还原点不改动:
+      - "rule.server-write-backup-and-rollback"
+    改动前备份:
+      - "rule.server-write-backup-and-rollback"
+    服务器回滚:
+      - "rule.server-write-backup-and-rollback"
+    失败即回滚:
+      - "rule.server-write-backup-and-rollback"
+    配置二次序列化损坏:
+      - "rule.config-persistence-write-safety"
+    配置塌缩成单行:
+      - "rule.config-persistence-write-safety"
+    配置解析为空:
+      - "rule.config-persistence-write-safety"
     简单任务十分钟升级:
       - "rule.task-plan-rehydration"
     goal 模式:

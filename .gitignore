@@ -5,3 +5,4 @@ thread-title-rules/mcp/node_modules/
 .workbuddy/*
 .disable*
 node_modules/
+.workbuddy-ai/*

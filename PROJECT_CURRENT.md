@@ -1,5 +1,26 @@
 # 项目当前状态
 
+## 2026-10-11 新增 config-persistence-safety-rules 并吸收两处经验入库（用户指令）
+
+- 来源对象：用户指令——“吸收经验并根据git提交skill的规则, 所有文件提交git”。本轮工作区含两处待吸收成果：① `ssh-server-ops-rules` 新增「改动前备份与可还原」强制规则（上一轮成果，已入 CURRENT/HISTORY）；② 全新技能 `config-persistence-safety-rules`（配置持久化写入安全与配置故障定位，尚未入记忆/字典/知识库）。
+- 当前状态：**已落地闭环**。
+  - ① 新增技能 `config-persistence-safety-rules/SKILL.md`（118 行，通用层）：核心风险「配置二次序列化损坏」（读出 → JSON 序列化 → 写回 → 换行变字面 `\n` → 整篇塌缩单行 → YAML 解析为空 → 端口漂移 + 路由 404）；症状三判据、写入源追溯手法（事件日志 + 时间窗文件 + md5 指纹 + 时间线交叉验证）、hex 编码安全写回与 md5 回读、六条红线与权责边界。
+  - ② 记忆沉淀：`PROJECT_MEMORY.md` 人类区新增两节稳定规则（「服务器改动前备份与可还原」「配置持久化写入安全与故障定位」）+ 机器索引区新增两个实体（`rule.server-write-backup-and-rollback`、`rule.config-persistence-write-safety`）与对应 evidence / context / lifecycle / retrieval_hints 登记。
+  - ③ 知识库沉淀：新增《服务器改动前备份与可还原规程》《配置持久化写入安全与二次序列化损坏》两篇笔记（`20-Knowledge/工程实践/`），并挂载到对应二级 MOC（网络安全与认证授权 / 数据库与存储工程）；与 `ssh-server-ops.md` 建立双向关联（三态判定=补充，互补不重叠）。
+  - ④ 字典刷新：重跑 `skill-dictionary/generate_dictionary.py`，`data.js` 与 `字典.md` 已收录 `config-persistence-safety-rules`（implemented 66 / planned_missing 8 / seed 124）。
+- 关键设计：新技能定为「通用层」，不含任何具体项目的路径、容器名与拓扑（项目实例由 `cli-proxy-api 宿主配置存储形态` 等笔记承接）；两处经验均为「失败可恢复」类运维安全规则。
+- 验证与交接：`quick_validate.py` 双 `Skill is valid!`（exit 0）；`bash -n backup_before_change.sh` exit 0；`knowledge_index.py check` 本轮两篇笔记合规（存量 2 处历史违规不在本轮范围）；`audit_vault_knowledge.py` 本轮笔记三态判定后不再进候选组；`check_memory_anchors.py` `ok=true`（实体 57）；字典刷新 exit 0；`.workbuddy-ai/` 按用户裁决加入 `.gitignore` 不提交；改动按业务目标拆分提交并推送。
+
+## 2026-10-11 ssh-server-ops-rules 新增「改动前备份与可还原」强制规则（用户指令）
+
+- 来源对象：用户指令——“操作服务器的改动，一定要注意备份和可还原操作，因为操作服务器总会有意外发生，如果 agent 操作服务器失败了，或者没有达到想要的效果，要支持回到之前的状态，也就是可还原到 agent 修改之前的状态。”
+- 当前状态：**已落地闭环**。
+  - ① `SKILL.md`：新增一级章节「改动前备份与可还原（强制，最高优先级）」，核心口径 **无还原点，不改动**——适用范围表（写操作必建还原点 / 只读白名单免还原点）+ 例外（用户当轮显式豁免须声明「本次无还原点」，仅当轮生效）、三阶段强制流程（改动前建还原点并验证非空 → 改动中保持可回滚 → 改动后验证、失败即主动回滚）、回滚授权边界（回滚默认放行；会覆盖期间新改动须先确认；L1 命令不因「回滚」名义放行）、还原点落点（`RP-<alias>-<UTC>` / `~/.agent-backups/<TS>/`）；能力清单置顶新增「🛟 备份与回滚」行；`description` 补强制约束与触发词。
+  - ② 新建 `references/backup-and-rollback.md`：12 类对象备份策略矩阵（文件 / 目录 / systemd / 软件包 / MySQL / PostgreSQL / Redis / Docker 容器与卷 / 防火墙 / cron / 用户权限）、三阶段流程、回滚操作规程（触发条件 / 步骤 / 回滚失败处置）、保留清理与安全边界。
+  - ③ 新建 `scripts/backup_before_change.sh`：本地运行经 SSH 在远端建还原点（文件 `cp -a`、目录 `tar czf`、不存在记 MISSING），生成含 sha256 的 `manifest.md` 与逆序一键 `rollback.sh`。
+- 关键设计：还原点是「改动前状态」的唯一凭据；回滚属降险动作默认放行，但不得覆盖期间产生的新改动；备份内容可能含密钥与业务数据，禁止流入 Git 或聊天记录。
+- 验证与交接：`bash -n` 主脚本与提取的远端脚本双通过；本地临时 HOME 模拟跑测（改文件 / 删目录 / 新增路径三类对象）备份成功、`manifest.md` 与 `rollback.sh` 生成正确，模拟破坏后执行回滚三项断言全 PASS；双路径 md5 一致（C 盘 skill 目录为 D 盘 junction 链接）；`check_memory_anchors.py` `ok=true`（history 20/20）；改动停在已改动未提交状态。
+
 ## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
 
 - 来源对象：用户指令——“我们需要一个验证发散的独立 skill，当用户提出验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下等描述的时候触发；我们写代码的规则是最小改动、不要发散思维，但代码完成后需要发散一下、头脑风暴一下，找出更多的安全、性能、逻辑、边界的问题”。经三轮决策确认：命名 `verify-brainstorm-rules`、发散边界“允许外扩到关联模块”、产出“只读清单 + 落盘报告”。

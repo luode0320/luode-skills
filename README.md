@@ -1128,3 +1128,4 @@ claude-mem(记忆) :
 2026-10-10 10:14:00 feat: [视频总结技能] 新增 video-summary 全网视频提取与深度总结 skill
 2026-10-10 10:17:00 chore: [项目文档同步] 刷新技能字典并同步项目设计与当前状态文档
 2026-10-11 22:51:22 feat: [热备回滚规则] ssh-server-ops-rules 新增改动前备份与可还原
+2026-10-11 22:53:00 feat: [配置持久化安全] 新增 config-persistence-safety-rules 并吸收经验入库
