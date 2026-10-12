@@ -212,7 +212,10 @@
 ## Codex Desktop 任务投影断点恢复规则
 
 - 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 v4 registry schema、计划指纹、敏感字段拒绝、51,200 字节闸门、同目录排他锁、原子写入、失活和 `update_plan` payload。
-- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影只保存当前周期最多 20 个任务的 ID、悬浮文案和 `pending/in_progress/completed` 状态。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影固定为不含 Goal 原文的三步，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
+- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影移除 20 项小数量上限，保留 51,200 字节总限，长清单支持滚动查看。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影以至少十步细化步骤为通用基线，旧三步 Goal 读取时自动兼容映射，任务专属细项按已确认工作项继续拆细，不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
+- 稳定决策：原生步骤悬浮清单可见是用户明确验收条件，但 UI 同步缺失或失败只进入 `UI_SYNC_BLOCKED` 降级继续，绝对不阻断领域任务执行，不得用其它面板冒充原生显示证据。
+- 稳定决策：Desktop 重启后继续时重新检查本回合工具注册和当前会话投影，工具已注册且投影校验通过时立即同步；若先前仅因 UI 同步失败留下 `blocked` 状态，不把该 UI 状态当成领域阻断，遵循用户本轮继续意图推进。
+- 稳定决策：初始步骤投影时序在最少规则命中和定位当前会话后、领域侦察前持久化并立即同步暂定启动清单；步骤具备动作、对象和可辨认结果，编号只作辅助索引。
 - 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
 - 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
 - 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续：保留 projection + 继续领域执行 + 下一检查点重试 UI，不得声称 UI 已恢复。`inactive` 不创建悬浮任务列表。
@@ -222,10 +225,10 @@
 - 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
 - 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或知识库。
 - 稳定决策：超时升级只在工具返回、阶段进度或回合结束前等可执行检查点运行，不承诺后台第 601 秒自动唤醒；计时起止与暂停秒数不进入 projection schema 或项目长期状态，计时上下文丢失后重新计时而不是推算。
-- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 固定三步。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将三步写为 `inactive`，失活后禁止重放。
+- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 细化步骤。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将步骤写为 `inactive`，失活后禁止重放。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
-- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/3-实施/2026-07-26_150000_CodexDesktop任务悬浮窗断点恢复_实施周期07_首次持久化即悬浮窗同步.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
-- 更新时间：2026-07-26。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`task-plan-rehydration-rules/references/case-task-plan-rehydration-rules-absorption.md`、`task-plan-rehydration-rules/references/source-notes.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/3-实施/2026-07-26_150000_CodexDesktop任务悬浮窗断点恢复_实施周期07_首次持久化即悬浮窗同步.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 更新时间：2026-10-12。
 
 
 ## 会话交接与新任务接续规则
@@ -1682,7 +1685,7 @@ entities:
       - ensure-timeout
       - ensure-start
       - UI_SYNC_BLOCKED
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续并下一检查点重试 UI，不得声称 UI 已恢复。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退、WorkBuddy 宿主元数据再回退，任意来源冲突或全缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门；计时不持久化，也不承诺后台唤醒。"
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；步骤数量不设小上限（51,200字节总限），Goal 默认至少十步细化基线并支持旧版迁移；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用时进入 UI_SYNC_BLOCKED 降级继续，绝对不阻断领域任务执行，不得声称 UI 已恢复。Desktop 重启后重新核验工具与当前会话投影并立即同步，仅因 UI 故障留下 blocked 的 Goal 不阻断用户明确继续。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退、WorkBuddy 宿主元数据再回退，任意来源冲突或全缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门。"
     scope: "跨宿主（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）默认执行回合、首次任务可见性、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
     status: "active"
     evidence_ids:

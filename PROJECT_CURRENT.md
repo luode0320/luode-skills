@@ -1,5 +1,25 @@
 # 项目当前状态
 
+## 2026-10-12 任务计划投影恢复与多模式细步骤展示规则落地、TAPD子任务排期与知识库测试闭环（用户指令）
+
+- 来源对象：用户指令——“吸收经验并根据git提交skill的规则, 所有文件提交git。并推送”。本轮工作区包含三处待吸收经验与测试产物：
+  ① `task-plan-rehydration-rules` 吸收三项关键规则：
+     - Codex Desktop 重启后恢复同会话清单：重启后重新核验工具注册与当前会话投影；工具可用且校验通过时立即同步；先前仅因 UI 故障标为 blocked 的 Goal 不把显示状态当作领域阻断；
+     - Goal、普通会话与 Plan Mode 默认展示细粒度步骤：三种模式都默认展示细步骤，长清单支持滚动查看，移除 20 项小上限（保留 51,200 字节上限）；Goal 以至少十步作为细化基线，支持旧三步 Goal 读取迁移；
+     - 初始步骤投影时序与可读文案：在最少规则命中和定位当前会话后、领域侦察前持久化并同步暂定启动清单；步骤编号不替代详细中文说明；
+     - 原生步骤悬浮清单可见是明确验收条件，但 UI 同步缺失或失败只进入 `UI_SYNC_BLOCKED` 降级继续，绝对不阻断领域任务执行。
+     - 对应 6-review 风格回归（`doc/6-review/`）、复盘案例与吸收记录完备落盘。
+  ② `tapd-task-executor` 吸收排期规则：
+     - Story 子 Task 根据个人每日可用开发时间、日历占用与 TAPD 同迭代任务负载，自动估算预计开始与截止日期；显式处理未排期任务不确定性并做 CLI 回读校验。
+  ③ `knowledge-flow` 门禁与检索综合测试套件落盘：
+     - 根 `test/knowledge-flow/` 补齐 4 项自动化测试（目录白名单门禁、Frontmatter 规范、双向接替闭环、死链防呆、端到端生命周期与检索评测），全量运行通过。
+- 当前状态：**已落地闭环**。
+  - ① 经验沉淀：`task-plan-rehydration-rules` 与 `tapd-task-executor` 的 `workbuddy-absorption-map.md`、`source-notes.md`、`case-task-plan-rehydration-rules-absorption.md` 建立完毕；
+  - ② 审查归档：`doc/6-review/` 索引 README 与 3 份 review 记录落盘；
+  - ③ 记忆同步：`PROJECT_MEMORY.md` 稳定决策与机器索引区同步刷新；`PROJECT_HISTORY.md` 追加事件并裁剪维持 20 条，锚点配对通过；
+  - ④ 字典刷新：`skill-dictionary/generate_dictionary.py` 刷新 `data.js` 与 `字典.md`（收录新增 references）；
+  - ⑤ Git 协作闭环：按业务目标拆分提交并推送远端。
+
 ## 2026-10-11 新增 config-persistence-safety-rules 并吸收两处经验入库（用户指令）
 
 - 来源对象：用户指令——“吸收经验并根据git提交skill的规则, 所有文件提交git”。本轮工作区含两处待吸收成果：① `ssh-server-ops-rules` 新增「改动前备份与可还原」强制规则（上一轮成果，已入 CURRENT/HISTORY）；② 全新技能 `config-persistence-safety-rules`（配置持久化写入安全与配置故障定位，尚未入记忆/字典/知识库）。

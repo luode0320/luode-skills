@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-10-11 22:47:14",
+  "generated_at": "2026-10-12 23:58:06",
   "repo_root": "D:\\谷歌云盘\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 8,
     "seed_total": 124,
     "doc_total": 12,
-    "references_total": 881,
+    "references_total": 883,
     "agents_total": 80
   },
   "downloaded_seeds": {
@@ -7105,6 +7105,8 @@ window.SKILL_DICTIONARY = {
             "执行入口"
           ],
           "references": [
+            "task-plan-rehydration-rules/references/case-task-plan-rehydration-rules-absorption.md",
+            "task-plan-rehydration-rules/references/source-notes.md",
             "task-plan-rehydration-rules/references/task-plan-projection-contract.md"
           ],
           "agents": [
@@ -15327,6 +15329,8 @@ window.SKILL_DICTIONARY = {
         "执行入口"
       ],
       "references": [
+        "task-plan-rehydration-rules/references/case-task-plan-rehydration-rules-absorption.md",
+        "task-plan-rehydration-rules/references/source-notes.md",
         "task-plan-rehydration-rules/references/task-plan-projection-contract.md"
       ],
       "agents": [
