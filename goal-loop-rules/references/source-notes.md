@@ -2,6 +2,13 @@
 
 > 本文件登记 long-run-loop-rules 各次调整的来源与落点，保证可追溯。
 
+## 2026-10-13 内部调整：Goal 计划文档缺项自修复并持续执行
+
+- **来源**：用户裁决（2026-10-13）——Goal 执行过程中发现计划文档不完善，应主动完善并持续执行 Goal，不要因计划文档问题阻断停止。
+- **通道**：Goal Owner 规则补充；Goal 已确认目标级许可，计划文档缺陷属于执行期可修复事项。
+- **落点**：`SKILL.md` 增加缺项自修复规则；`references/safety-mechanisms.md` 补 Owner 引用；同步 `autonomous-execution-rules/SKILL.md`、`references/execution-authorization-and-plan-boundary.md`、`references/continuation-and-pause.md` 及 agent 默认提示。
+- **边界**：仅用户显式开启或确认且仍 active 的 Goal 适用；普通模式和 Plan Mode 的正式计划门禁不变。计划缺项本身不生成 `BLK-*`；强制审批、高风险、不可逆、越界、用户撤销或无法安全推进的动作仍按真实阻断契约处理。
+
 ## 2026-09-24 内部调整：Goal 模式免确认推进与临时产物清理
 
 - **来源**：用户指令（2026-09-24）——“只要我们开启 goal 模式，说明我们计划已经完成，只要实现就好了；如果执行过程有分歧，一律按照 agent 推荐的方案推进执行，不要求用户确认；临时生成的文件和脚本记得执行后删除，不要污染项目目录。”
