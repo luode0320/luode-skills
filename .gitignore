@@ -6,3 +6,5 @@ thread-title-rules/mcp/node_modules/
 .disable*
 node_modules/
 .workbuddy-ai/*
+$inputPath
+Python/

@@ -48,7 +48,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 ## 触发信号
 
 - 自动触发：多步骤任务尚未闭环，且存在原执行计划内、完成原始目标所必需、当前可安全执行的下一步。
-- 不触发或立即停止：用户明确结束、原始目标已完成、仅剩可选优化、执行许可不足、计划边界缺失、上下文压缩后编码许可未确认，或已进入关键/高风险节点。
+- 不触发或立即停止：用户明确结束、原始目标已完成、仅剩可选优化、执行许可不足、上下文压缩后编码许可未确认，或已进入关键/高风险节点。普通模式遇到计划边界缺失时先停在计划阶段；用户显式开启或确认且仍 active 的 Goal 遇到计划文档缺项，按 Goal 专属自修复流程补齐后继续，不把该文档缺项单独作为暂停理由。
 - 自动触发不依赖用户再次说“继续”，也不得把“可继续优化”升级成新目标。
 
 触发与排除样例见 `references/continuation-and-pause.md` 和 `references/termination-loop-prevention.md`。
@@ -56,11 +56,11 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 ## 默认执行策略
 
 1. 先确认有效计划、完成定义、停止条件、最大推进边界和验证点。
-2. 获得 `confirmed` 后，按当前计划连续推进，不在普通步骤重复询问；无论任务大小，首次领域动作前都先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection，持久化成功后的下一动作必须立即调用 `update_plan`；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域动作，单纯 UI 同步不可用（磁盘投影已成功且归属明确）时保留磁盘投影并继续领域执行，下一检查点重试 UI。
+2. 获得 `confirmed` 后，按当前计划连续推进，不在普通步骤重复询问；无论任务大小，首次领域动作前都先由 `task-plan-rehydration-rules` 为当前 `session_id` 持久化 `active` 或 `blocked` projection，持久化成功后的下一动作必须立即调用 `update_plan`；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域动作，单纯 UI 同步不可用（磁盘投影已成功且归属明确）时保留磁盘投影并继续领域执行，下一检查点重试 UI。用户明确把当前会话原生步骤悬浮清单实际可见列为完成条件时，该要求只影响 UI 验收，不阻止领域执行；未实际显示前不得报告 UI 验收通过或目标完成。
 3. 每个最小任务必须独立满足实施计划完成条件，并完成“实现 -> 真实测试 -> 6-review”，不得批量实现后统一验证；任务开始前先创建或更新该任务的独立 md 任务计划文档并落盘 `in_progress`（铁律 3），状态迁移、决策、偏差与验证证据先落盘任务计划文档，再原子更新当前 session projection，再立即刷新悬浮任务列表；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断，单纯 UI 刷新失败进入 `UI_SYNC_BLOCKED` 降级继续：保留磁盘 projection + 继续领域执行，下一检查点重试 UI，不得声称 UI 已刷新。
 4. 当前周期未收口不得跳到后续周期；当前周期收口且仍有计划内必需周期时自动继续。当前投影全部完成后先写为 `inactive`，后续回合不得重放。
 5. 中间进度只说明已完成与正在推进的必需动作，不交还非关键执行权；`update_plan` 成功后才可声称 UI 已刷新；不可用或失败但磁盘投影已成功且归属明确时进入 `UI_SYNC_BLOCKED` 降级继续，如实说明磁盘 projection 已保存并继续领域执行，下一检查点优先重试 UI，不得声称 UI 已恢复。
-5.1 十分钟只作缺失 projection 的异常修复闸门：任务已真实执行但当前 session 仍无活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后严格超过 600 秒时，先把资格交给 `task-plan-rehydration-rules` 的只读 `probe-timeout`，随后补建当前 session projection 并立即调用 `update_plan`；不得把 600 秒作为正常任务首次显示悬浮窗的入口。仅 `goal_check_required` 时由当前主 Agent 先 `get_goal`，复用明确匹配的活动 Goal，或在无活动 Goal 时使用脱敏摘要调用一次 `create_goal`；不匹配、不可用、失败或结果不明确时禁止重复创建并降级原 `ensure-timeout` 普通投影。任何 projection 成功持久化后才能调用 `update_plan`。
+5.1 十分钟只作步骤未显示的异常补救闸门：任务已真实执行、扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后严格超过 600 秒，且当前会话尚未确认原生步骤清单同步成功时，在首个可执行检查点立即调用 `task-plan-rehydration-rules` 的只读 `probe-timeout`。若无活动 projection，则按原流程补建；若返回 `already_active` 但 UI 未同步，则用 `ensure-timeout` 读取唯一活动投影的现有 payload 并立即重试 `update_plan`，不得创建 Goal 或覆盖任务。不得把 600 秒作为正常任务首次显示悬浮窗的入口。工具调用运行中无法后台唤醒；其返回后的首个检查点不得延迟补救。仅 `goal_check_required` 时由当前主 Agent 先 `get_goal`，复用明确匹配的活动 Goal，或在无活动 Goal 时使用脱敏摘要调用一次 `create_goal`；不匹配、不可用、失败或结果不明确时禁止重复创建并降级原 `ensure-timeout` 普通投影。任何 projection 成功持久化后才能调用 `update_plan`。
 6. 遇到关键节点、高风险、越界、冲突或授权不足时立即暂停。
 7. 真实 `blocked/manual_handoff` 先收口运行时状态，再交接结构化事实。
 8. 原始目标完成后只允许三类合法后续；无合法后续时直接结束。
@@ -70,7 +70,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 
 ## Goal 生命周期交接
 
-- `create_goal` 成功只表示 Goal 运行时已创建；用户已对“严格超过 600 秒且资格探测通过后自动创建一次 Goal”给出 standing authorization，但该授权只覆盖当前主 Agent 的 Goal 生命周期调用，不授予新的编码、文件写入、外部副作用或 Git 权限。创建后把事件交给 `task-plan-rehydration-rules` 创建安全三步投影，且不因此自动取得任何实现授权。
+- `create_goal` 成功只表示 Goal 运行时已创建；用户已对“严格超过 600 秒且资格探测通过后自动创建一次 Goal”给出 standing authorization，但该授权只覆盖当前主 Agent 的 Goal 生命周期调用，不授予新的编码、文件写入、外部副作用或 Git 权限。创建后把事件交给 `task-plan-rehydration-rules` 创建细化默认步骤投影，且不因此自动取得任何实现授权。
 - `get_goal` 证明活动 Goal 仍存在时，可交给投影 Owner 恢复已有活动 Goal 悬浮列表；恢复 UI 前仍需核验中断点，且不得自动重放未知幂等写操作。若创建时已保留活动正式计划，Owner 返回 `preserved_formal` 且不重写、不刷新，正式计划仍走自身恢复路径。
 - `update_goal` 进入 `blocked` 时，交给投影 Owner 持久化无进行中步骤的观察列表；不得把 blocked payload 解释为可以继续执行。`update_goal` 进入 `complete` 时，交给 Owner 失活 Goal 安全投影，随后真实收口 Goal；若结果为 `preserved_formal`，不得失活、改写或刷新独立的正式计划。
 - Plan Mode、无活动 Goal、来源不匹配、损坏投影或工具失败时退出 Goal 投影路径；投影和 `update_plan` 从不改变本 Skill 的授权状态。
@@ -93,7 +93,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 
 逐项处理见 `references/continuation-and-pause.md`、`references/blocker-handoff.md` 与 `references/termination-loop-prevention.md`。
 
-**Goal 模式例外（强制）**：用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，上述暂停项整体收缩——执行许可视为 `confirmed`、执行计划视为已冻结，方案分歧、口径冲突、路径选择一律由 agent 自行裁决并按推荐方向直接推进，不暂停、不抛选择题、不等待确认；无法判定优劣时按最小可逆的最安全兜底继续，并把分歧与选择写入落盘任务计划文档。仍不得突破的红线：系统安全限制与权限审批、高风险或不可逆操作、`local` 连接调试红线、凭据不回显、Git 写历史红线、跨项目写入红线与 `WRT-*` 授权边界、个人文件删除保护。agent 为补建任务投影或异常修复自动 `create_goal` 产生的 Goal 不属于用户开启的 Goal 模式，不自动取得实现授权。完整口径见 `references/continuation-and-pause.md`「Goal 模式免确认推进」。
+**Goal 模式例外（强制）**：用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，上述暂停项整体收缩——执行许可视为 `confirmed`、执行计划视为已冻结，普通方案分歧由 agent 自行裁决；执行中发现计划文档缺项、失效或未落盘时，先依据 Goal 和当前项目证据主动修复并落盘，再继续 Goal，不因该文档问题暂停或标记阻断；目标范围内满足 Goal Owner 低风险判据的单项必需授权默认通过，不重复征求用户同意。系统、平台或工具明确要求的审批、高风险或不可逆操作、超出目标范围且需要扩权的动作、`local` 连接调试红线、凭据不回显、Git 写历史红线、跨项目写入红线与 `WRT-*` 授权边界及个人文件安全与删除保护仍不得自动通过。agent 为补建任务投影或异常修复自动 `create_goal` 产生的 Goal 不属于用户开启的 Goal 模式，不自动取得实现授权。计划文档自修复见 `references/continuation-and-pause.md` 与 `../goal-loop-rules/SKILL.md`；完整许可判据亦见以上文件。
 
 ## 关键节点提问格式（强制）
 
@@ -104,7 +104,7 @@ description: 当多步骤任务尚未闭环且存在原执行计划内可直接�
 - `git-collaboration-rules`：独占当前轮 Git 授权、提交和推送边界。
 - `skill-execution-compliance-gate-rules` / `code-change-finalization-gate-rules`：独占执行合规与代码最终收口；自主执行不得跳过。
 - `context-compression-rules`：提供压缩恢复事实；恢复偏移由任务计划文档状态字段确定；编码许可仍按本 Skill 的授权契约复核。
-- `task-plan-rehydration-rules`：独占任务投影持久化、校验、失活、Goal 安全三步和 `update_plan` payload；UI 重建不恢复本 Skill 的执行许可；投影是任务计划文档的紧凑投影，不是事实源。
+- `task-plan-rehydration-rules`：独占任务投影持久化、校验、失活、Goal 细化默认步骤和 `update_plan` payload；Goal、普通会话和 Plan Mode 默认展示细粒度步骤，但 UI 故障不暂停领域任务；UI 重建不恢复本 Skill 的执行许可；投影是任务计划文档的紧凑投影，不是事实源。
 - `artifact-storage-rules`：任务计划文档与执行证据的落点、命名唯一真相源。
 - 需求、Bug、实施、测试、审查、验收 Skill：保留领域决策和阶段门禁，本 Skill 只控制推进节奏。
 - `reasoning-summary-structure-rules`：唯一负责面向用户渲染阻断与最终状态；本 Skill 只交接结构化事实。

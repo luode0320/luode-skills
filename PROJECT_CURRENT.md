@@ -1,45 +1,28 @@
 # 项目当前状态
 
-## 2026-10-12 任务计划投影恢复与多模式细步骤展示规则落地、TAPD子任务排期与知识库测试闭环（用户指令）
+## 2026-10-13 Goal 计划文档自修复与低风险授权规则补充
 
-- 来源对象：用户指令——“吸收经验并根据git提交skill的规则, 所有文件提交git。并推送”。本轮工作区包含三处待吸收经验与测试产物：
-  ① `task-plan-rehydration-rules` 吸收三项关键规则：
-     - Codex Desktop 重启后恢复同会话清单：重启后重新核验工具注册与当前会话投影；工具可用且校验通过时立即同步；先前仅因 UI 故障标为 blocked 的 Goal 不把显示状态当作领域阻断；
-     - Goal、普通会话与 Plan Mode 默认展示细粒度步骤：三种模式都默认展示细步骤，长清单支持滚动查看，移除 20 项小上限（保留 51,200 字节上限）；Goal 以至少十步作为细化基线，支持旧三步 Goal 读取迁移；
-     - 初始步骤投影时序与可读文案：在最少规则命中和定位当前会话后、领域侦察前持久化并同步暂定启动清单；步骤编号不替代详细中文说明；
-     - 原生步骤悬浮清单可见是明确验收条件，但 UI 同步缺失或失败只进入 `UI_SYNC_BLOCKED` 降级继续，绝对不阻断领域任务执行。
-     - 对应 6-review 风格回归（`doc/6-review/`）、复盘案例与吸收记录完备落盘。
-  ② `tapd-task-executor` 吸收排期规则：
-     - Story 子 Task 根据个人每日可用开发时间、日历占用与 TAPD 同迭代任务负载，自动估算预计开始与截止日期；显式处理未排期任务不确定性并做 CLI 回读校验。
-  ③ `knowledge-flow` 门禁与检索综合测试套件落盘：
-     - 根 `test/knowledge-flow/` 补齐 4 项自动化测试（目录白名单门禁、Frontmatter 规范、双向接替闭环、死链防呆、端到端生命周期与检索评测），全量运行通过。
-- 当前状态：**已落地闭环**。
-  - ① 经验沉淀：`task-plan-rehydration-rules` 与 `tapd-task-executor` 的 `workbuddy-absorption-map.md`、`source-notes.md`、`case-task-plan-rehydration-rules-absorption.md` 建立完毕；
-  - ② 审查归档：`doc/6-review/` 索引 README 与 3 份 review 记录落盘；
-  - ③ 记忆同步：`PROJECT_MEMORY.md` 稳定决策与机器索引区同步刷新；`PROJECT_HISTORY.md` 追加事件并裁剪维持 20 条，锚点配对通过；
-  - ④ 字典刷新：`skill-dictionary/generate_dictionary.py` 刷新 `data.js` 与 `字典.md`（收录新增 references）；
-  - ⑤ Git 协作闭环：按业务目标拆分提交并推送远端。
+- 任务目标: 明确用户确认的 Goal 可对范围内普通低风险必需授权默认放行；计划文档缺项需主动补齐后继续 Goal，同时保留强制审批与高危操作红线。
+- 用户裁决: 低风险默认放行仅限目标内、局部、可逆、无实质外部副作用且不受系统/平台/工具强制审批的单项动作；高风险、不可逆、越界扩权和强制审批仍须停下。
+- 2026-10-13 补充裁决: Goal 执行中计划文档缺项由 agent 主动修复并落盘后继续；文档问题本身不阻断 Goal，真实审批/高危/越界等红线仍只暂停受影响动作。
+- 当前阶段: 已完成规则、自主执行边界、仓库规则、项目记忆与知识库同步，并完成技能校验、索引检查和只读规则审计。
+- 验证: UTF-8 quick_validate 两个技能 PASS；知识库 310 篇/803 链接无死链；项目记忆锚点与使用台账 PASS；6 维残留自查：诉求全覆盖、消费方已同步、无本轮临时物、引用无断链、术语一致、静态校验未冒充功能测试。git status 因 unable to read tree 不可用，未宣称 diff 校验通过。
+- 完成定义: Owner 规则与引用口径一致；Skill 校验、知识索引及记忆锚点通过；改动保持未提交。
+- 停止条件: 不替用户批准强制审批，不改变真实 `BLK-*` 恢复契约或既有 Git、跨项目、local 与个人文件红线。
+- 最大推进边界: 仅修改 Goal 授权与计划文档自修复相关规则及本项目记忆/知识记录，不清理或覆盖其他未提交工作。
 
-## 2026-10-11 新增 config-persistence-safety-rules 并吸收两处经验入库（用户指令）
+## 2026-10-12 多模式详细任务步骤默认展示规则
 
-- 来源对象：用户指令——“吸收经验并根据git提交skill的规则, 所有文件提交git”。本轮工作区含两处待吸收成果：① `ssh-server-ops-rules` 新增「改动前备份与可还原」强制规则（上一轮成果，已入 CURRENT/HISTORY）；② 全新技能 `config-persistence-safety-rules`（配置持久化写入安全与配置故障定位，尚未入记忆/字典/知识库）。
-- 当前状态：**已落地闭环**。
-  - ① 新增技能 `config-persistence-safety-rules/SKILL.md`（118 行，通用层）：核心风险「配置二次序列化损坏」（读出 → JSON 序列化 → 写回 → 换行变字面 `\n` → 整篇塌缩单行 → YAML 解析为空 → 端口漂移 + 路由 404）；症状三判据、写入源追溯手法（事件日志 + 时间窗文件 + md5 指纹 + 时间线交叉验证）、hex 编码安全写回与 md5 回读、六条红线与权责边界。
-  - ② 记忆沉淀：`PROJECT_MEMORY.md` 人类区新增两节稳定规则（「服务器改动前备份与可还原」「配置持久化写入安全与故障定位」）+ 机器索引区新增两个实体（`rule.server-write-backup-and-rollback`、`rule.config-persistence-write-safety`）与对应 evidence / context / lifecycle / retrieval_hints 登记。
-  - ③ 知识库沉淀：新增《服务器改动前备份与可还原规程》《配置持久化写入安全与二次序列化损坏》两篇笔记（`20-Knowledge/工程实践/`），并挂载到对应二级 MOC（网络安全与认证授权 / 数据库与存储工程）；与 `ssh-server-ops.md` 建立双向关联（三态判定=补充，互补不重叠）。
-  - ④ 字典刷新：重跑 `skill-dictionary/generate_dictionary.py`，`data.js` 与 `字典.md` 已收录 `config-persistence-safety-rules`（implemented 66 / planned_missing 8 / seed 124）。
-- 关键设计：新技能定为「通用层」，不含任何具体项目的路径、容器名与拓扑（项目实例由 `cli-proxy-api 宿主配置存储形态` 等笔记承接）；两处经验均为「失败可恢复」类运维安全规则。
-- 验证与交接：`quick_validate.py` 双 `Skill is valid!`（exit 0）；`bash -n backup_before_change.sh` exit 0；`knowledge_index.py check` 本轮两篇笔记合规（存量 2 处历史违规不在本轮范围）；`audit_vault_knowledge.py` 本轮笔记三态判定后不再进候选组；`check_memory_anchors.py` `ok=true`（实体 57）；字典刷新 exit 0；`.workbuddy-ai/` 按用户裁决加入 `.gitignore` 不提交；改动按业务目标拆分提交并推送。
-
-## 2026-10-11 ssh-server-ops-rules 新增「改动前备份与可还原」强制规则（用户指令）
-
-- 来源对象：用户指令——“操作服务器的改动，一定要注意备份和可还原操作，因为操作服务器总会有意外发生，如果 agent 操作服务器失败了，或者没有达到想要的效果，要支持回到之前的状态，也就是可还原到 agent 修改之前的状态。”
-- 当前状态：**已落地闭环**。
-  - ① `SKILL.md`：新增一级章节「改动前备份与可还原（强制，最高优先级）」，核心口径 **无还原点，不改动**——适用范围表（写操作必建还原点 / 只读白名单免还原点）+ 例外（用户当轮显式豁免须声明「本次无还原点」，仅当轮生效）、三阶段强制流程（改动前建还原点并验证非空 → 改动中保持可回滚 → 改动后验证、失败即主动回滚）、回滚授权边界（回滚默认放行；会覆盖期间新改动须先确认；L1 命令不因「回滚」名义放行）、还原点落点（`RP-<alias>-<UTC>` / `~/.agent-backups/<TS>/`）；能力清单置顶新增「🛟 备份与回滚」行；`description` 补强制约束与触发词。
-  - ② 新建 `references/backup-and-rollback.md`：12 类对象备份策略矩阵（文件 / 目录 / systemd / 软件包 / MySQL / PostgreSQL / Redis / Docker 容器与卷 / 防火墙 / cron / 用户权限）、三阶段流程、回滚操作规程（触发条件 / 步骤 / 回滚失败处置）、保留清理与安全边界。
-  - ③ 新建 `scripts/backup_before_change.sh`：本地运行经 SSH 在远端建还原点（文件 `cp -a`、目录 `tar czf`、不存在记 MISSING），生成含 sha256 的 `manifest.md` 与逆序一键 `rollback.sh`。
-- 关键设计：还原点是「改动前状态」的唯一凭据；回滚属降险动作默认放行，但不得覆盖期间产生的新改动；备份内容可能含密钥与业务数据，禁止流入 Git 或聊天记录。
-- 验证与交接：`bash -n` 主脚本与提取的远端脚本双通过；本地临时 HOME 模拟跑测（改文件 / 删目录 / 新增路径三类对象）备份成功、`manifest.md` 与 `rollback.sh` 生成正确，模拟破坏后执行回滚三项断言全 PASS；双路径 md5 一致（C 盘 skill 目录为 D 盘 junction 链接）；`check_memory_anchors.py` `ok=true`（history 20/20）；改动停在已改动未提交状态。
+- 任务目标: 将细粒度、多步骤清单确立为 Goal、普通会话和 Plan 模式的默认体验，并保证 UI 不可用时领域任务照常执行。
+- 用户裁决: 步骤应尽量细化、允许长列表滚动；不接受仅“开始、执行、完成”的三步占位。显示故障不暂停任务。
+- 当前阶段: 已完成多模式细步骤默认规则、旧 Goal 三步迁移、相关规则同步、82 项回归、六个 Skill 校验、6-review 与文档 profile 校验；当前会话原生浮层只确认 update_plan 调用成功，视觉呈现未获截图证据。
+- 本轮补充: 已将入口规则改为在最少规则确认及必要 registry 定位后，先持久化并尝试同步可读暂定步骤，再进入领域侦察；每步写明动作、对象和结果，编号只作辅助；同会话多计划需显式 plan_key 并只同步当前 payload。投影脚本已有对应写入能力，本轮未改脚本。UI 同步失败继续领域任务。
+- 2026-10-13 补充：超过 600 秒仍未确认步骤显示时，缺投影则补建；已有投影但 UI 未同步则取回当前 payload 重试。显示失败不暂停任务；仅在首个可执行检查点触发，工具运行中不能后台唤醒。
+- 本轮验证: `skill-hit-check-rules` 与 `task-plan-rehydration-rules` 的 `quick_validate.py` 均通过；技能字典刷新成功；`git diff --check` 通过；知识库索引检查 309 笔记无违规、797 个链接无死链；本轮投影 13 步已全部完成并失活。未取得 Codex Desktop 原生浮层截图，故不宣称视觉显示验收通过。
+- 当前计划: 1) 核对官方宿主资料、用户目标与现行投影约束；2) 确立 Goal、普通会话和 Plan Mode 默认展示细步骤；3) 明确 UI 工具缺失或同步失败不阻断领域执行；4) 扩展 Goal 十步基线并支持任务专属细项；5) 将旧三步 Goal 安全迁移并保留状态；6) 更新投影校验、指纹和兼容契约；7) 同步跨 Skill、仓库规则与宿主提示；8) 更新 Skill 吸收记录、项目记忆和知识笔记；9) 运行 82 项投影回归及六个 Skill 结构校验；10) 完成 6-review 与工程文档机器校验；11) 核对知识索引、记忆锚点和数字口径；12) 完成差异、临时产物与原生 UI 证据收口。
+- 验收: Goal、普通会话与 Plan Mode 均规定默认展示细粒度步骤；不设任意小的步骤数量上限，保留单步 256 字符和 registry 总体 51,200 UTF-8 字节硬限；Goal 默认至少十步并支持按任务扩展；旧三步 Goal 可兼容迁移；仅 UI 失败可降级继续；验证输出与规则一致。
+- 停止条件: 若无法在不泄露 Goal 原文的前提下生成 Goal 清单，保留通用但可执行的细化默认项并明确能力边界；若 native UI 工具缺失或调用失败，不阻断任务，记录 UI 未验证后继续。
+- 收口状态: 当前会话投影已失活；改动保持未提交。桌面浮窗宽度和原生像素呈现不由本仓库控制，本轮没有实际屏幕证据。
 
 ## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
 
@@ -181,23 +164,8 @@
 
 ## 2026-09-16 reasoning-summary-structure-rules 待裁定事项建议、选项与安全兜底闭环更新
 
-- 来源对象：用户指出在总结结论中出现“需你裁定的事”时仅列出待裁定事项而没有给出建议与选项选择属于半成品输出；用户进一步明确要求：引入「如果不做裁定，默认推进的最安全兜底方案」，彻底消除未选选项或回复“继续”时的系统停滞死锁或盲目冒进风险。
-- 当前状态：**全部落地落盘**。
-  - ① `reasoning-summary-structure-rules/SKILL.md`：
-    - Frontmatter description 补充四要素闭环约束（裁定点与影响 + 推荐建议倾向 + 选项选择 + 默认最安全兜底方案）并控制在 740 字符（通过 `quick_validate.py` 1024 字符限制）；
-    - 「Skill 作用与适用场景」新增待裁定事项四要素闭环说明；
-    - 「待裁定事项处理铁律」升级为四要素闭环（1. 裁定点与影响；2. 明确建议与理由，加粗倾向；3. 选项选择，清晰 A/B 方案；4. 默认最安全兜底方案：说明未做裁定/回复继续时的默认安全推进路径与防限流/防击穿/防破坏依据）；
-    - 「输出要求」第 7 项（当前解决结果、结论）与 T1 标准档同步补齐默认安全兜底方案要求；
-    - 「发送前强制自检」与「执行通过/驳回标准」将未给建议、未给选项或未声明默认安全兜底的总结列为硬闸驳回项。
-  - ② `references/summary-structure-template.md`：在 T2 完整档模板与结构要求中补充待裁定事项四要素标准格式（含 `- **默认安全兜底**：若直接回复“继续”或未显式选择，默认按【选项 X】推进...`）。
-  - ③ `references/conditional-sections-rules.md`：在「0. 档位判定与对照表降级规则」中同步四要素判定规则。
-  - ④ `references/output-examples.md`：正反例全面更新，反例增加缺少默认安全兜底的驳回原因，正例给出包含默认安全兜底的范式。
-  - ⑤ 来源登记：`references/source-notes.md` 与 `references/workbuddy-absorption-map.md` 同步登记。
-  - ⑥ `字典.md`：同步刷新 1.18 `reasoning-summary-structure-rules` 核心职责描述。
-  - ⑦ `PROJECT_MEMORY.md`：固化“待裁定事项建议、选项与默认最安全兜底闭环规则”长期稳定决策并同步机器索引区实体。
-- 验证与交接：`quick_validate.py` 验证 `Skill is valid!`（exit 0）；`git diff --check` 空白与格式检查 PASS；`summary_check_hook_test.py` 全量通过（6/6 OK）；所有涉及文件保持纯 LF；当前无 Git 提交授权，改动停在已改动未提交状态。
-
-<!-- BEGIN RECENT PROJECT SESSIONS -->
+- 当前状态：已完成。统一待裁定事项的影响说明、建议与选项、未裁定时的安全默认路径；落点含该 Skill、示例、记忆与字典。
+- 详细来源、变更和验证见 `PROJECT_HISTORY.md` 同标题事件；活动规则以 `reasoning-summary-structure-rules` 为准。
 
 ## 最近 5 个同项目会话
 
@@ -213,7 +181,7 @@
 {
   "version": 4,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-08T03:40:07.160167Z",
+  "registry_updated_at": "2026-10-13T05:41:06.184040Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -703,6 +671,190 @@
           "id": "SKIP-04",
           "step": "收口：6-review、合规闸门、知识库沉淀与临时目录清理",
           "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/14ae4ca08a5c704e4ab08956d25f2ac0636c786613e7843874ef5ed17635db1d",
+      "session_id": "01a12eac-6a20-7992-a19a-9a77e4446acc",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "2026-10-12-DETAILED-STEPS-ALL-MODES",
+      "source_document": "PROJECT_CURRENT.md",
+      "plan_fingerprint": "2cc39698f557addb4ae0127366377b7cc8d8b6b8a0207841496d9f13c72005e2",
+      "updated_at": "2026-10-12T10:30:30.741432Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "[TASK-01] 核对官方宿主资料、用户目标与现行投影约束",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "[TASK-02] 确立 Goal、普通会话和 Plan Mode 默认展示细步骤",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-03",
+          "step": "[TASK-03] 明确 UI 工具缺失或同步失败不阻断领域执行",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-04",
+          "step": "[TASK-04] 扩展 Goal 十步基线并支持任务专属细项",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-05",
+          "step": "[TASK-05] 将旧三步 Goal 安全迁移并保留状态",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-06",
+          "step": "[TASK-06] 更新投影校验、指纹和兼容契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-07",
+          "step": "[TASK-07] 同步跨 Skill、仓库规则与宿主提示",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-08",
+          "step": "[TASK-08] 更新 Skill 吸收记录、项目记忆和知识笔记",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-09",
+          "step": "[TASK-09] 运行 82 项投影回归及 Skill 结构校验",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-10",
+          "step": "[TASK-10] 完成 6-review 与工程文档机器校验",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-11",
+          "step": "[TASK-11] 核对知识索引、记忆锚点和数字口径",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-12",
+          "step": "[TASK-12] 完成差异、临时产物与原生 UI 证据收口",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/a94296b288abe7fa6ef931b7ffc0d371a9e5f868061e178d2b069f3e6501fbfa",
+      "session_id": "01a12eac-6a20-7992-a19a-9a77e4446acc",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "2026-10-12-PROJECTION-ENTRY-READABLE-STEPS",
+      "source_document": "PROJECT_CURRENT.md",
+      "plan_fingerprint": "d900db13d2faa8624bd3bcb62498ab105e61109d4b9cbbdce3409005c5e02a3f",
+      "updated_at": "2026-10-12T10:51:46.735181Z",
+      "steps": [
+        {
+          "id": "TASK-ENTRY-01",
+          "step": "[TASK-ENTRY-01] 对照用户截图确认编号说明、步骤细度和展示模式",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-02",
+          "step": "[TASK-ENTRY-02] 确认 Goal、普通会话与 Plan 模式都要默认显示清楚步骤",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-03",
+          "step": "[TASK-ENTRY-03] 对比纯内部编号示例与可读动作说明示例",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-04",
+          "step": "[TASK-ENTRY-04] 追踪入口 Skill、投影脚本和宿主清单的职责",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-05",
+          "step": "[TASK-ENTRY-05] 明确确认任务后先建投影再做领域侦察",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-06",
+          "step": "[TASK-ENTRY-06] 规定每步写清动作、对象和可辨认结果，编号只作辅助",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-07",
+          "step": "[TASK-ENTRY-07] 明确同会话来源匹配与多计划按 plan_key 选择",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-08",
+          "step": "[TASK-ENTRY-08] 保证 UI 工具缺失或同步失败时任务继续执行",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-09",
+          "step": "[TASK-ENTRY-09] 更新入口 Skill 与任务投影 Owner 规则，不改投影脚本",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-10",
+          "step": "[TASK-ENTRY-10] 同步吸收表、来源记录、知识库和技能字典",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-11",
+          "step": "[TASK-ENTRY-11] 完成 Skill 校验、知识库检查和独立规则审计",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-12",
+          "step": "[TASK-ENTRY-12] 记录宿主窗口宽度与实际 UI 显示的验证边界",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-ENTRY-13",
+          "step": "[TASK-ENTRY-13] 完成差异复核并关闭当前会话投影",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/ca79132d96fb4cc70bf10a0aa35b6b47458ef22dd615b7417fdcf3b3d99c5d41",
+      "session_id": "01a12f8e-2011-7e33-a52f-f238568dcd02",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SESSION/goal-rule-update-continuation",
+      "source_document": "PROJECT_CURRENT.md",
+      "plan_fingerprint": "1500b202d8b73c7f0d62891ba4dc9c01c528101f4046266cf7df9f7fa58d68b8",
+      "updated_at": "2026-10-13T05:41:06.184040Z",
+      "steps": [
+        {
+          "id": "RESTORE-01",
+          "step": "核验本会话 Goal 规则更新的目标、现有完成记录和恢复边界",
+          "status": "completed"
+        },
+        {
+          "id": "RESTORE-02",
+          "step": "收集当前会话及项目文档的只读证据，确认是否还有原目标必需工作",
+          "status": "completed"
+        },
+        {
+          "id": "RESTORE-03",
+          "step": "按证据补齐尚未完成的 Goal 规则更新或必要收口",
+          "status": "completed"
+        },
+        {
+          "id": "RESTORE-04",
+          "step": "校验本会话恢复步骤已安全收口并报告结果",
+          "status": "completed"
         }
       ]
     }

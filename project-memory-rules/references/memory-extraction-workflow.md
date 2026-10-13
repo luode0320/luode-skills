@@ -41,4 +41,4 @@
 - 当前状态、待办、阻断和下一执行点只能进入 `PROJECT_CURRENT.md`。
 - 稳定规则、关键决策和长期事实进入 `PROJECT_MEMORY.md`，并按机器索引区规则合并。
 - 重要历史事件进入 `PROJECT_HISTORY.md`，只追加；不得用历史流水污染当前状态或稳定记忆。
-- `PROJECT_CURRENT.md` 超过 51,200 字节时阻断写入并先压缩，禁止静默截断。
+- 会话投影候选全文超过 51,200 字节时，按 `project-memory-rules/SKILL.md` 的 `PROJECT_CURRENT 超限压缩`流程处理；本流程只提醒入口，不重复定义压缩细则。其它写入超限时不得擅自改写托管区或丢弃唯一信息。

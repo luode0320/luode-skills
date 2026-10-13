@@ -126,21 +126,29 @@ class TaskPlanProjectionTests(unittest.TestCase):
 
     def _goal_sample(
         self,
-        statuses: tuple[str, ...] = ("in_progress", "pending", "pending"),
+        statuses: tuple[str, ...] | None = None,
         *,
         state: str = "active",
         synthesis_mode: str = "goal_default",
     ) -> dict[str, object]:
         """构造不含 Goal 原文的合法 version:3 Goal 投影。
 
-        [参数] statuses: 固定安全三步状态；state: Goal 投影状态；synthesis_mode: Goal 合成模式。
+        [参数] statuses: 可选 Goal 步骤状态；state: Goal 投影状态；synthesis_mode: Goal 合成模式。
         [返回] dict：符合 Goal v3 身份和指纹约束的测试投影。
-        最近修改时间：2026-07-25 00:00:00；改动原因：覆盖 Goal 安全三步、阻断和完成迁移。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖 Goal 细化步骤与状态迁移。
         """
-        # 1. 仅从生产常量组装测试样本，防止测试意外允许自定义 Goal 文案。
+        # 1. 仅从生产常量组装测试样本；兼容旧测试传入的前三项状态。
+        normalized_statuses = list(statuses or ("in_progress", *("pending" for _ in projection.GOAL_DEFAULT_STEPS[1:])))
+        if len(normalized_statuses) < len(projection.GOAL_DEFAULT_STEPS):
+            if state == "inactive" and all(status == "completed" for status in normalized_statuses):
+                normalized_statuses = ["completed"] * len(projection.GOAL_DEFAULT_STEPS)
+            else:
+                normalized_statuses.extend(["pending"] * (len(projection.GOAL_DEFAULT_STEPS) - len(normalized_statuses)))
+        if len(normalized_statuses) != len(projection.GOAL_DEFAULT_STEPS):
+            raise ValueError("Goal test status count must match GOAL_DEFAULT_STEPS")
         steps = [
             {"id": item[0], "step": item[1], "status": status}
-            for item, status in zip(projection.GOAL_DEFAULT_STEPS, statuses, strict=True)
+            for item, status in zip(projection.GOAL_DEFAULT_STEPS, normalized_statuses, strict=True)
         ]
         return {
             "version": 3,
@@ -258,6 +266,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self,
         *,
         trigger: str = "continue",
+        task_summary: str | None = None,
         current_step_hint: str | None = "TASK-SYN-02",
         completed_step_hints: list[str] | None = None,
         candidate_source_documents: list[str] | None = None,
@@ -265,14 +274,15 @@ class TaskPlanProjectionTests(unittest.TestCase):
     ) -> dict[str, object]:
         """构造 synthesize 输入上下文。
 
-        [参数] trigger: 合成触发类型；current_step_hint: 当前步骤；completed_step_hints: 已完成步骤；candidate_source_documents: 候选来源；conflicts: 兼容保留参数。
+        [参数] trigger: 合成触发类型；task_summary: 可选的当前任务说明；current_step_hint: 当前步骤；completed_step_hints: 已完成步骤；candidate_source_documents: 候选来源；conflicts: 兼容保留参数。
         [返回] dict：可供 continue 或 timeout 路径使用的证据上下文。
-        最近修改时间：2026-07-25 00:00:00；改动原因：复用既有样本覆盖超时升级入口。
+        最近修改时间：2026-10-13；改动说明：为恢复摘要测试构造可选任务说明。
         """
         # 1. 保持原有证据结构，只允许测试按场景替换触发类型和步骤提示。
         return {
             "trigger": trigger,
             "current_message": "继续",
+            "task_summary": task_summary,
             "project_current_summary": {
                 "goal": "恢复无投影任务",
                 "current_scope": "补建悬浮任务列表",
@@ -345,7 +355,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             second = path.read_text(encoding="utf-8")
             self.assertEqual(second.count(projection.BEGIN_MARKER), 1)
             self.assertIn("用户正文。", second)
-            self.assertIn('"version": 4', second)
+            self.assertIn(f'"version": {projection.REGISTRY_VERSION}', second)
 
     def test_marker_damage_is_rejected(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖半标记、重复和逆序。"""
@@ -400,16 +410,19 @@ class TaskPlanProjectionTests(unittest.TestCase):
             projection.validate_projection(multiple)
 
     def test_step_count_text_and_duplicate_id_limits(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-23；改动原因：覆盖步骤数量和文本边界。"""
-        # 1. 分别覆盖步骤总数和单条文案长度上限。
-        too_many = self._sample(tuple("pending" for _ in range(21)))
-        with self.assertRaises(projection.ProjectionContractError):
-            projection.validate_projection(too_many)
+        """验证长步骤列表可校验，并拒绝重复 ID 与超长文案。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖步骤列表数量与单步文案边界。
+        """
+        # 1. 二十一步计划必须可用；数量由托管区总字节闸门约束，不设任意小上限。
+        many_steps = self._sample(tuple(["pending"] * 20 + ["in_progress"]))
+        validated = projection.validate_projection(many_steps)
+        self.assertEqual(len(validated["steps"]), 21)
+        # 2. 单条文案仍限制 256 字符，避免单一步骤撑大投影。
         too_long = self._sample(("pending",))
         too_long["steps"][0]["step"] = "中" * 257
         with self.assertRaises(projection.ProjectionContractError):
             projection.validate_projection(too_long)
-        # 2. 任务 ID 重复时拒绝，避免恢复后无法区分步骤。
+        # 3. 任务 ID 重复时拒绝，避免恢复后无法区分步骤。
         duplicate = self._sample(("pending", "in_progress"))
         duplicate["steps"][1]["id"] = duplicate["steps"][0]["id"]
         with self.assertRaises(projection.ProjectionContractError):
@@ -502,11 +515,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             projection.validate_projection(fallback)
 
     def test_goal_version_three_contract_rejects_original_goal_content(self) -> None:
-        """验证 Goal 投影拒绝原文、标识与自定义步骤。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：防止 Goal 原文或运行时身份被持久化到悬浮窗投影。
+        """验证 Goal 投影拒绝原文与运行时标识并保留安全任务步骤。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖 Goal v3 内容隔离契约。
         """
         # 1. 基线样本必须可通过 v3 Goal 契约，随后逐项注入被禁止的敏感字段。
         valid = self._goal_sample()
@@ -516,13 +526,75 @@ class TaskPlanProjectionTests(unittest.TestCase):
             candidate[field] = "不得保存的原文"
             with self.subTest(field=field), self.assertRaises(projection.ProjectionContractError):
                 projection.validate_projection(candidate)
-        # 2. 即使重新计算指纹，也不得通过自定义步骤文案绕过固定安全列表。
+        # 2. Goal 步骤允许经过脱敏的任务专属文案，不允许伪造 ID 顺序。
         altered_steps = [dict(step) for step in valid["steps"]]
-        altered_steps[0]["step"] = "[GOAL-01] 泄漏 Goal 原文"
+        altered_steps[0]["step"] = "[GOAL-01] 核对当前任务的具体验收项"
         valid["steps"] = altered_steps
         valid["plan_fingerprint"] = projection.compute_plan_fingerprint(altered_steps)
+        self.assertEqual(projection.validate_projection(valid)["steps"][0]["step"], altered_steps[0]["step"])
+
+    def test_goal_accepts_detailed_custom_steps_without_a_small_count_limit(self) -> None:
+        """验证 Goal 可接受超过默认十步的细化任务清单。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        goal = self._goal_sample()
+        goal["steps"] = [
+            {"id": f"GOAL-{index:02d}", "step": f"[GOAL-{index:02d}] 核对第 {index} 项任务证据", "status": "pending"}
+            for index in range(1, 23)
+        ]
+        goal["steps"][0]["status"] = "in_progress"
+        goal["plan_fingerprint"] = projection.compute_plan_fingerprint(goal["steps"])
+        validated = projection.validate_projection(goal)
+        self.assertEqual(len(validated["steps"]), 22)
+
+        too_short = dict(goal)
+        too_short["steps"] = [dict(step) for step in goal["steps"][:9]]
+        too_short["plan_fingerprint"] = projection.compute_plan_fingerprint(too_short["steps"])
+        with self.assertRaisesRegex(projection.ProjectionContractError, "at least 10 detailed items"):
+            projection.validate_projection(too_short)
+
+        goal["steps"][10]["id"] = "GOAL-24"
+        goal["steps"][10]["step"] = "[GOAL-24] 错序项目"
+        goal["plan_fingerprint"] = projection.compute_plan_fingerprint(goal["steps"])
         with self.assertRaises(projection.ProjectionContractError):
-            projection.validate_projection(valid)
+            projection.validate_projection(goal)
+
+    def test_legacy_three_step_goal_is_upgraded_to_detailed_default_steps(self) -> None:
+        """验证旧版三步 Goal 读取时升级为细化默认步骤。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        legacy = self._goal_sample()
+        legacy["steps"] = [
+            {"id": item[0], "step": item[1], "status": status}
+            for item, status in zip(
+                projection.LEGACY_GOAL_DEFAULT_STEPS,
+                ("completed", "in_progress", "pending"),
+                strict=True,
+            )
+        ]
+        legacy["plan_fingerprint"] = projection.compute_plan_fingerprint(legacy["steps"])
+        migrated = projection.validate_projection(legacy)
+        self.assertEqual(len(migrated["steps"]), len(projection.GOAL_DEFAULT_STEPS))
+        self.assertEqual(migrated["steps"][0]["status"], "completed")
+        self.assertEqual(migrated["steps"][4]["status"], "in_progress")
+        self.assertEqual(migrated["steps"][8]["status"], "pending")
+        self.assertEqual(
+            migrated["plan_fingerprint"], projection.compute_plan_fingerprint(migrated["steps"])
+        )
+        # 注册表读取也必须保留旧项并返回迁移后的步骤，不能将其隔离为坏项。
+        entry = projection._projection_entry_from_projection(legacy, self.TEST_SESSION_ID)
+        entry["steps"] = [dict(step) for step in legacy["steps"]]
+        entry["plan_fingerprint"] = legacy["plan_fingerprint"]
+        registry = projection.validate_registry(
+            {
+                "version": projection.REGISTRY_VERSION,
+                "registry_schema": projection.REGISTRY_SCHEMA,
+                "registry_updated_at": "2026-07-25T00:00:00Z",
+                "projections": [entry],
+                "quarantined_projections": [],
+            }
+        )
+        self.assertEqual(len(registry["projections"][0]["steps"]), len(projection.GOAL_DEFAULT_STEPS))
 
     def test_goal_blocked_and_inactive_state_rules(self) -> None:
         """验证阻断 Goal 只观察，完成 Goal 不可重放。
@@ -545,19 +617,18 @@ class TaskPlanProjectionTests(unittest.TestCase):
             projection.build_update_plan_payload(inactive)
 
     def test_goal_events_create_restore_block_complete_and_preserve_formal(self) -> None:
-        """验证 Goal 生命周期、正式计划保护和 fallback 替换边界。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-26 00:00:00；改动原因：锁定 Goal 完成收口 payload 与正式计划保护。
+        """验证 Goal 生命周期与正式计划保护边界。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖 Goal 完成收口和多计划保护。
         """
-        # 1. 新建、恢复、阻断和完成必须只迁移固定安全三步，并以 inactive 终止重放。
+        # 1. 新建、恢复、阻断和完成必须迁移完整细化默认清单，并以 inactive 终止重放。
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             path = self._write_current(root)
             created = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             self.assertEqual(created["action"], "created")
             self.assertEqual(created["projection"]["version"], 3)
+            self.assertEqual(len(created["projection"]["steps"]), len(projection.GOAL_DEFAULT_STEPS))
+            self.assertGreater(len(created["projection"]["steps"]), 3)
             self.assertEqual(created["projection"]["steps"][0]["status"], "in_progress")
             before_restore = path.read_bytes()
             restored = projection.handle_goal_event(path, "restore", session_id=self.TEST_SESSION_ID)
@@ -579,26 +650,27 @@ class TaskPlanProjectionTests(unittest.TestCase):
             preserved = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
             self.assertEqual(preserved["action"], "preserved_formal")
             self.assertEqual(path.read_bytes(), formal_before)
-            # 3. 正式计划不关联 Goal 默认三步，后续 Goal 事件必须无副作用地保持真实实施任务。
+            # 3. 正式计划不关联 Goal 默认清单，后续 Goal 事件必须无副作用地保持真实实施任务。
             for event in ("restore", "blocked", "complete"):
                 preserved_after_event = projection.handle_goal_event(path, event, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(preserved_after_event["action"], "preserved_formal")
                 self.assertIsNone(preserved_after_event["payload"])
                 self.assertEqual(path.read_bytes(), formal_before)
-            # 4. synthesized fallback 仅是恢复兜底，创建 Goal 时必须替换为 Goal 安全三步。
+            # 4. synthesized fallback 仅是恢复兜底，创建 Goal 时必须替换为细化 Goal 安全清单。
             fallback = self._sample_v2(("in_progress", "pending", "pending"), synthesis_mode="fallback")
-            projection.upsert_projection(path, fallback, session_id=self.TEST_SESSION_ID)
-            created_from_fallback = projection.handle_goal_event(path, "create", session_id=self.TEST_SESSION_ID)
+            fallback_session = "fallback-only-session"
+            projection.upsert_projection(path, fallback, session_id=fallback_session)
+            created_from_fallback = projection.handle_goal_event(path, "create", session_id=fallback_session)
             self.assertEqual(created_from_fallback["action"], "created")
             self.assertEqual(created_from_fallback["projection"]["projection_origin"], "goal")
-            self.assertEqual([item["id"] for item in created_from_fallback["projection"]["steps"]], ["GOAL-01", "GOAL-02", "GOAL-03"])
+            self.assertEqual(
+                [item["id"] for item in created_from_fallback["projection"]["steps"]],
+                [item[0] for item in projection.GOAL_DEFAULT_STEPS],
+            )
 
     def test_goal_projection_is_replaced_by_formal_write(self) -> None:
-        """验证正式最小任务写入会替换活动 Goal 安全三步。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-26 00:00:00；改动原因：固定正式计划写入与 session 精确读取的兼容路径。
+        """验证正式任务写入会替换活动 Goal 默认步骤。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖正式计划与会话精确读取兼容。
         """
         # 1. 先建立活动 Goal 投影，再通过常规 write 写入正式最小任务。
         with tempfile.TemporaryDirectory() as directory:
@@ -609,6 +681,27 @@ class TaskPlanProjectionTests(unittest.TestCase):
             replaced = projection.load_projection(path, session_id=self.TEST_SESSION_ID)
             self.assertEqual(replaced["projection_origin"], "persisted")
             self.assertEqual(replaced["steps"][0]["id"], "TASK-RTP-01")
+
+    def test_goal_events_do_not_select_first_of_multiple_formal_plans(self) -> None:
+        """验证多份正式计划并存时 Goal 事件不会默认选第一份。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            first = self._sample()
+            first["plan_key"] = "REQ-FIRST/CYCLE-01"
+            second = self._sample()
+            second["plan_key"] = "REQ-SECOND/CYCLE-01"
+            projection.upsert_projection(path, first, session_id=self.TEST_SESSION_ID)
+            projection.upsert_projection(path, second, session_id=self.TEST_SESSION_ID)
+            before = path.read_bytes()
+
+            for event in ("create", "restore", "blocked", "complete"):
+                result = projection.handle_goal_event(path, event, session_id=self.TEST_SESSION_ID)
+                self.assertEqual(result["action"], "preserved_formal")
+                self.assertIsNone(result["projection"])
+                self.assertIsNone(result["payload"])
+                self.assertEqual(path.read_bytes(), before)
 
     def test_goal_cli_and_invalid_event_preserve_original_file(self) -> None:
         """验证 Goal CLI 生命周期及失败时的原文件保护。
@@ -707,7 +800,9 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["projection"]["steps"][1]["status"], "in_progress")
 
     def test_synthesize_projection_falls_back_when_source_is_ambiguous(self) -> None:
-        """[参数] 无；[返回] None；最近修改时间：2026-07-26 00:00:00；改动原因：保持 session 绑定下的多来源安全 fallback。"""
+        """验证来源不唯一时安全合成 fallback 投影。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖多来源歧义下的会话绑定边界。
+        """
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             current_path = self._write_current(root)
@@ -720,7 +815,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["projection"]["synthesis_mode"], "fallback")
             self.assertEqual(
                 [step["id"] for step in result["projection"]["steps"]],
-                ["RECOVERY-01", "RECOVERY-02", "RECOVERY-03"],
+                [item[0] for item in projection.SAFE_FALLBACK_STEPS],
             )
             self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION_SYNTH_FALLBACK)
 
@@ -798,7 +893,9 @@ class TaskPlanProjectionTests(unittest.TestCase):
                     self.assertEqual(set(current_path.parent.iterdir()), directory_before)
 
     def test_probe_timeout_subtracts_pause_and_preserves_existing_states(self) -> None:
-        """验证暂停扣除、活动投影和阻断 Goal 均不会进入 Goal 检查。"""
+        """验证暂停扣除且保留活动投影与阻断 Goal。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖超时只读检查的状态边界。
+        """
         with tempfile.TemporaryDirectory() as directory:
             current_path = self._write_current(Path(directory))
             before = current_path.read_bytes()
@@ -830,7 +927,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 observed_at="2026-07-25T00:10:01Z",
                 session_id=self.TEST_SESSION_ID,
             )
-            self.assertEqual(blocked_result["action"], "blocked_goal_preserved")
+            self.assertEqual(blocked_result["action"], "already_active")
             self.assertEqual(current_path.read_bytes(), blocked_bytes)
             self.assertNotEqual(before, active_bytes)
 
@@ -995,11 +1092,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(escalated["effective_elapsed_seconds"], 601)
 
     def test_ensure_timeout_uses_fallback_when_exact_evidence_is_ambiguous(self) -> None:
-        """验证超时升级沿用固定三步 fallback。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：来源无法唯一确认时禁止猜测正式任务。
+        """验证超时升级在来源歧义时使用安全 fallback。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖不猜测正式任务来源的边界。
         """
         # 1. 多来源证据必须走 fallback，且持久化结果与返回 payload 一致。
         with tempfile.TemporaryDirectory() as directory:
@@ -1017,7 +1111,10 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["mode"], "fallback")
             persisted = projection.load_projection(current_path, session_id=self.TEST_SESSION_ID)
             self.assertEqual(persisted["synthesis_mode"], "fallback")
-            self.assertEqual([step["id"] for step in persisted["steps"]], ["RECOVERY-01", "RECOVERY-02", "RECOVERY-03"])
+            self.assertEqual(
+                [step["id"] for step in persisted["steps"]],
+                [item[0] for item in projection.SAFE_FALLBACK_STEPS],
+            )
 
     def test_ensure_timeout_keeps_existing_active_session_projection_unchanged(self) -> None:
         """验证当前会话已有活动投影时不重复写入。
@@ -1041,13 +1138,12 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["action"], "already_active")
             self.assertEqual(current_path.read_bytes(), before)
             self.assertEqual(result["payload"]["explanation"], projection.EXPLANATION)
+            self.assertEqual(result["projection"]["plan_key"], self._sample()["plan_key"])
+            self.assertEqual(result["payload"]["plan"][0]["step"], self._sample()["steps"][0]["step"])
 
     def test_ensure_timeout_preserves_blocked_goal_and_replaces_inactive_projection(self) -> None:
-        """验证 blocked Goal 受保护而 inactive 投影可被超时升级替换。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：区分暂停观察状态与可安全替换的历史终态。
+        """验证超时升级保留 blocked Goal 并替换可复用的 inactive 投影。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖暂停态与历史终态的区别。
         """
         # 1. blocked Goal 必须原字节保留，并返回只观察用途的 payload。
         with tempfile.TemporaryDirectory() as directory:
@@ -1082,7 +1178,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(replaced["action"], "escalated")
             self.assertEqual(replaced["mode"], "fallback")
             self.assertEqual(
-                projection.load_projection(current_path, session_id=self.TEST_SESSION_ID)["state"],
+                projection.load_projection(
+                    current_path,
+                    session_id=self.TEST_SESSION_ID,
+                    plan_key=replaced["projection"]["plan_key"],
+                )["state"],
                 "active",
             )
 
@@ -1435,7 +1535,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             projection.upsert_projection(path, entry_a_updated, session_id=session_a)
 
             registry = projection.load_registry(path)
-            self.assertEqual(registry["version"], 4)
+            self.assertEqual(registry["version"], projection.REGISTRY_VERSION)
             self.assertEqual(
                 {item["session_id"] for item in registry["projections"]},
                 {session_a, session_b},
@@ -1603,7 +1703,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 )
                 self.assertEqual(migration.returncode, 0, migration.stderr)
                 migrated = projection.load_registry(path)
-                self.assertEqual(migrated["version"], 4)
+                self.assertEqual(migrated["version"], projection.REGISTRY_VERSION)
                 self.assertEqual(len(migrated["projections"]), 1)
                 self.assertEqual(migrated["projections"][0]["session_id"], "legacy-session")
                 self.assertEqual(
@@ -1646,9 +1746,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 registry = projection.load_registry(path, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(registry["projections"][0]["state"], "inactive")
 
-    def test_registry_rejects_duplicate_session_id(self) -> None:
-        """验证每个会话最多保存一个当前投影。"""
-        # 1. 构造同一会话的两个不同计划，确认注册表拒绝重复归属。
+    def test_registry_allows_multiple_plan_ids_per_session(self) -> None:
+        """验证 registry 允许同一会话保存不同 plan_key。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        # 1. 构造同一会话的两个不同计划，注册表都应保留。
         session_id = "duplicate-session"
         first = self._sample_v4_entry(session_id)
         second_projection = self._sample_v4_projection(session_id)
@@ -1666,24 +1768,158 @@ class TaskPlanProjectionTests(unittest.TestCase):
             "steps": second_projection["steps"],
         }
         registry = {
-            "version": 4,
+            "version": projection.REGISTRY_VERSION,
             "registry_schema": "task_plan_projection_registry",
             "registry_updated_at": "2026-07-25T00:00:00Z",
             "projections": [first, second],
+            "quarantined_projections": [],
         }
         self.assertNotEqual(first["projection_id"], second["projection_id"])
-        with self.assertRaises(projection.ProjectionContractError):
+        validated = projection.validate_registry(registry)
+        self.assertEqual(len(validated["projections"]), 2)
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            projection.upsert_projection(path, self._sample(), session_id=session_id)
+            projection.upsert_projection(path, second_projection, session_id=session_id)
+            with self.assertRaisesRegex(projection.ProjectionContractError, "plan_key or projection_id"):
+                projection.load_projection(path, session_id=session_id)
+            self.assertEqual(
+                projection.load_projection(path, session_id=session_id, plan_key=second_projection["plan_key"])["plan_key"],
+                second_projection["plan_key"],
+            )
+        # 2. 同一个 projection_id 仍是注册表级重复项，必须拒绝。
+        registry["projections"].append(dict(first))
+        with self.assertRaisesRegex(projection.ProjectionContractError, "duplicate projection_id"):
             projection.validate_registry(registry)
+
+    def test_ensure_start_adds_another_plan_without_replacing_existing_session_plan(self) -> None:
+        """验证新增计划不会覆盖同会话已有正式任务。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            existing = self._sample()
+            existing["plan_key"] = "REQ-OLD/CYCLE-01"
+            projection.upsert_projection(path, existing, session_id=self.TEST_SESSION_ID)
+            new_plan = self._sample()
+            new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
+            started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(started["action"], "created")
+            self.assertEqual(started["projection"]["plan_key"], new_plan["plan_key"])
+            self.assertEqual(
+                projection.load_projection(path, session_id=self.TEST_SESSION_ID, plan_key=existing["plan_key"])["plan_key"],
+                existing["plan_key"],
+            )
+            self.assertEqual(len(projection.load_registry(path)["projections"]), 2)
+
+    def test_ensure_start_isolates_corrupt_entry_and_preserves_same_session_plan(self) -> None:
+        """验证新增计划隔离损坏条目并保留同会话有效计划。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            existing = self._sample_v4_entry(self.TEST_SESSION_ID)
+            corrupt = dict(self._sample_v4_entry("corrupt-session"))
+            corrupt["plan_fingerprint"] = "0" * 64
+            registry = {
+                "version": 4,
+                "registry_schema": "task_plan_projection_registry",
+                "registry_updated_at": "2026-10-12T00:00:00Z",
+                "projections": [corrupt, existing],
+            }
+            block = "\n".join(
+                (
+                    projection.BEGIN_MARKER,
+                    "```json",
+                    json.dumps(registry, ensure_ascii=False, indent=2),
+                    "```",
+                    projection.END_MARKER,
+                )
+            )
+            path.write_text("# 项目当前状态\n\n用户正文。\n" + block + "\n", encoding="utf-8", newline="")
+
+            new_plan = self._sample()
+            new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
+            started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
+
+            self.assertEqual(started["action"], "created")
+            saved = projection.load_registry(path)["projections"]
+            saved_identity = {(entry["session_id"], entry["plan_key"]) for entry in saved}
+            self.assertIn((self.TEST_SESSION_ID, existing["plan_key"]), saved_identity)
+            self.assertIn((self.TEST_SESSION_ID, new_plan["plan_key"]), saved_identity)
+            self.assertNotIn(("corrupt-session", corrupt["plan_key"]), saved_identity)
+
+    def test_ensure_start_migrates_legacy_projection_id_without_dropping_plan(self) -> None:
+        """验证旧投影 ID 迁移不会丢弃同会话其它计划。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            existing = self._sample_v4_entry(self.TEST_SESSION_ID)
+            existing_projection = projection._projection_from_entry(existing)
+            existing["projection_id"] = projection._compute_legacy_projection_id(
+                self.TEST_SESSION_ID, existing_projection
+            )
+            registry = {
+                "version": 4,
+                "registry_schema": "task_plan_projection_registry",
+                "registry_updated_at": "2026-10-12T00:00:00Z",
+                "projections": [existing],
+            }
+            block = "\n".join(
+                (
+                    projection.BEGIN_MARKER,
+                    "```json",
+                    json.dumps(registry, ensure_ascii=False, indent=2),
+                    "```",
+                    projection.END_MARKER,
+                )
+            )
+            path.write_text("# 项目当前状态\n\n用户正文。\n" + block + "\n", encoding="utf-8", newline="")
+
+            new_plan = self._sample()
+            new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
+            started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
+
+            self.assertEqual(started["action"], "created")
+            saved = projection.load_registry(path)["projections"]
+            saved_identity = {(entry["session_id"], entry["plan_key"]) for entry in saved}
+            self.assertIn((self.TEST_SESSION_ID, existing["plan_key"]), saved_identity)
+            self.assertIn((self.TEST_SESSION_ID, new_plan["plan_key"]), saved_identity)
+
+    def test_deactivate_requires_plan_selector_for_ambiguous_session(self) -> None:
+        """验证同会话计划歧义时失活操作必须提供选择器。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+        """
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            first = self._sample()
+            second = self._sample()
+            second["plan_key"] = "REQ-SECOND/CYCLE-01"
+            projection.upsert_projection(path, first, session_id=self.TEST_SESSION_ID)
+            projection.upsert_projection(path, second, session_id=self.TEST_SESSION_ID)
+            with self.assertRaisesRegex(projection.ProjectionContractError, "plan_key or projection_id"):
+                projection.deactivate_projection(path, session_id=self.TEST_SESSION_ID)
+            result = projection.deactivate_projection(
+                path, session_id=self.TEST_SESSION_ID, plan_key=second["plan_key"]
+            )
+            self.assertEqual(result["plan_key"], second["plan_key"])
+            self.assertEqual(result["state"], "inactive")
+            self.assertEqual(
+                projection.load_projection(path, session_id=self.TEST_SESSION_ID, plan_key=first["plan_key"])["state"],
+                "active",
+            )
 
     def test_session_id_is_allowed_only_in_controlled_field(self) -> None:
         """验证原始 session_id 可保存，其它敏感字段仍被递归拒绝。"""
         # 1. 受控 session_id 可通过校验，其它敏感字段必须拒绝。
         entry = self._sample_v4_entry("raw-thread-id")
         registry = {
-            "version": 4,
+            "version": projection.REGISTRY_VERSION,
             "registry_schema": "task_plan_projection_registry",
             "registry_updated_at": "2026-07-25T00:00:00Z",
             "projections": [entry],
+            "quarantined_projections": [],
         }
         self.assertEqual(projection.validate_registry(registry)["projections"][0]["session_id"], "raw-thread-id")
         for field in ("thread_id", "prompt", "response", "token", "api_key", "password", "secret", "private_key"):
@@ -1972,6 +2208,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(result["action"], "created")
             self.assertEqual(result["mode"], "fallback")
             self.assertEqual(result["payload"]["plan"][0]["status"], "in_progress")
+            self.assertIn("尚未识别具体任务", result["payload"]["plan"][0]["step"])
 
             input_path = root / "projection.json"
             input_path.write_text(json.dumps(self._sample(), ensure_ascii=False), encoding="utf-8")
@@ -1987,6 +2224,54 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(write.returncode, 0, write.stderr)
             write_output = json.loads(write.stdout)
             self.assertTrue(write_output["payload"]["plan"])
+
+    def test_fallback_steps_name_the_confirmed_task_in_projection_and_payload(self) -> None:
+        """验证恢复兜底步骤使用已确认的任务摘要而非泛化占位说明。
+
+        [参数] 无。
+        [返回] None：断言具体任务名进入每条恢复步骤及 UI payload。
+        最近修改时间：2026-10-13；改动原因：避免恢复悬浮列表无法辨认正在恢复的任务。
+        """
+        # 1. 令精确来源不足以成立，但提供脱敏任务摘要供安全 fallback 使用。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            context = self._synthesis_context(
+                trigger="start",
+                task_summary="任务投影恢复清单按当前任务定制",
+                current_step_hint=None,
+                candidate_source_documents=[],
+            )
+
+            result = projection.ensure_start_projection(path, context, session_id=self.TEST_SESSION_ID)
+
+        # 2. 投影和同步 payload 都必须保留当前任务主题，且不能退回固定通用标题。
+        self.assertEqual(result["mode"], "fallback")
+        task_steps = [item["step"] for item in result["projection"]["steps"]]
+        payload_steps = [item["step"] for item in result["payload"]["plan"]]
+        self.assertTrue(all("任务投影恢复清单按当前任务定制" in step for step in task_steps))
+        self.assertEqual(payload_steps, task_steps)
+        self.assertNotIn("尚未识别具体任务", task_steps[0])
+
+    def test_task_summary_rejects_values_over_display_limit_without_writing(self) -> None:
+        """验证超长任务摘要不会进入投影或改写项目状态。
+
+        [参数] 无。
+        [返回] None：断言超出展示上限时失败且文件字节不变。
+        最近修改时间：2026-10-13；改动说明：锁定任务摘要长度边界。
+        """
+        # 1. 超过 96 字符的摘要不可用于投影，失败时必须保持 PROJECT_CURRENT 原样。
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_current(Path(directory))
+            before = path.read_bytes()
+            context = self._synthesis_context(
+                trigger="start",
+                task_summary="任务" * 49,
+                current_step_hint=None,
+                candidate_source_documents=[],
+            )
+            with self.assertRaisesRegex(projection.ProjectionContractError, "task_summary"):
+                projection.ensure_start_projection(path, context, session_id=self.TEST_SESSION_ID)
+            self.assertEqual(path.read_bytes(), before)
 
     def test_deactivate_and_goal_complete_return_one_time_completion_payload(self) -> None:
         """验证失活与 Goal 完成均返回全完成收口 payload，失活后不可重放。
@@ -2063,11 +2348,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertIn(token, autonomous_document)
 
     def test_contract_document_mentions_version_three_goal_and_synthesize(self) -> None:
-        """验证契约文档锁定 v3 Goal 与补建 CLI。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-25 00:00:00；改动原因：防止 Goal 生命周期命令或 Plan Mode 安全边界从文档契约中丢失。
+        """验证投影契约文档包含 Goal v3 与合成 CLI 规则。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖 Goal 生命周期和 Plan Mode 边界。
         """
         # 1. v3 字段、固定 Goal 身份和四个 CLI 事件必须在公开契约中可追溯。
         contract_document = (ROOT / "references" / "task-plan-projection-contract.md").read_text(encoding="utf-8")
@@ -2076,10 +2358,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self.assertIn("SYNTH-FALLBACK/", contract_document)
         self.assertIn("GOAL/ACTIVE", contract_document)
         self.assertIn("goal_default", contract_document)
-        self.assertIn("fallback 只是恢复兜底，替换为 Goal 固定安全三步", contract_document)
+        self.assertIn("fallback 只是恢复兜底，替换为 Goal 细化默认清单", contract_document)
         for event in ("create", "restore", "blocked", "complete"):
             self.assertIn(f"goal --project-current PROJECT_CURRENT.md --event {event}", contract_document)
-        self.assertIn("Plan Mode 不读取、写入或刷新投影", contract_document)
+        self.assertIn("Plan Mode 不读写执行期 registry", contract_document)
+        self.assertIn("原生计划流程展示细化步骤", contract_document)
         self.assertIn("synthesize --project-current PROJECT_CURRENT.md --input synthesis_context.json", contract_document)
         self.assertIn("ensure-start", contract_document)
         self.assertIn("CODEX_THREAD_ID", contract_document)
@@ -2114,6 +2397,13 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self.assertIn("只允许再调用一次 `get_goal`", documents["owner"])
         self.assertIn("禁止无变化重试 `create_goal`", documents["owner"])
         self.assertIn("子 Agent 不得调用", documents["owner"])
+        self.assertIn("原生步骤清单尚未确认同步成功", documents["owner"])
+        self.assertIn("already_active", documents["contract"])
+        self.assertIn("不创建 Goal、不替换投影", documents["contract"])
+        self.assertIn("多条活动 projection", documents["contract"])
+        self.assertIn("--plan-key <plan-key>", documents["contract"])
+        self.assertIn("UI 同步失败/用户明确反馈未显示", documents["owner"])
+        self.assertIn("首个可执行检查点", documents["autonomous"])
 
     def test_platform_rules_and_bootstrap_keep_continue_route(self) -> None:
         """[参数] 无；[返回] None；最近修改时间：2026-07-24；改动原因：防止受管平台规则遗漏恢复路由。"""
@@ -2130,12 +2420,9 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertIn("任意“继续”或恢复意图", document)
             self.assertIn("update_plan", document)
 
-    def test_plan_mode_does_not_rehydrate_task_list(self) -> None:
-        """验证 Plan Mode 不读取投影或重建任务悬浮窗。
-
-        [参数] 无。
-        [返回] None。
-        最近修改时间：2026-07-24 02:08:25；改动原因：覆盖规划阶段与执行阶段的任务悬浮窗边界。
+    def test_plan_mode_displays_steps_without_execution_projection(self) -> None:
+        """验证 Plan Mode 显示步骤且不创建执行期投影。
+        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
         """
         # 1. 读取恢复 Owner、总控路由和平台规则的全部受影响入口。
         rehydration_skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
@@ -2148,11 +2435,12 @@ class TaskPlanProjectionTests(unittest.TestCase):
             (REPOSITORY_ROOT / "AGENTS.md").read_text(encoding="utf-8"),
             (REPOSITORY_ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
         )
-        # 2. Plan Mode 必须明确禁止读取投影、调用 update_plan 与创建悬浮窗。
+        # 2. Plan Mode 不写执行期 registry，但必须通过原生计划流程展示步骤。
         for document in documents:
             self.assertIn("Plan Mode", document)
-            self.assertIn("不读取", document)
-            self.assertIn("update_plan", document)
+        self.assertIn("不读取、写入或恢复执行期 registry", rehydration_skill)
+        self.assertIn("原生计划流程展示细化步骤", rehydration_skill)
+        self.assertIn("若 `update_plan` 在当前会话可用则可同步显示", rehydration_skill)
         # 3. 实施规划规则仍保留用户选择流程，不能因恢复规则放宽。
         planning_coverage = (
             REPOSITORY_ROOT / "implementation-planning-rules" / "references" / "plan-question-coverage.md"
@@ -2199,9 +2487,14 @@ class TaskPlanProjectionTests(unittest.TestCase):
             newline="",
         )
 
-        # 2. 严格读取应报错（坏项导致整体失败），验证这是隔离降级的触发前提。
-        with self.assertRaises(projection.ProjectionContractError):
-            projection.extract_registry(path.read_text(encoding="utf-8"), session_id="new-session")
+        # 2. v5 读取 v4 registry 时按条目转换：坏项进入隔离区，好项保留，读取不整体报错。
+        tolerant = projection.extract_registry(path.read_text(encoding="utf-8"), session_id="new-session")
+        self.assertEqual(
+            {entry["session_id"] for entry in tolerant["projections"]},
+            {"good-session"},
+        )
+        quarantined = {item["affected_session_id"] for item in tolerant["quarantined_projections"]}
+        self.assertIn("corrupt-session", quarantined)
 
         # 3. 写入新会话投影，不应因坏项而失败，坏项被隔离、好项保留、新项写入。
         new_proj = self._sample_v4_projection("new-session")

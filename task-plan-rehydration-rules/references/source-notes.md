@@ -77,3 +77,41 @@
 - 环境依赖：N/A，本次不增环境变量、配置、依赖或脚本；复用 `ensure-start` 及当前宿主任务列表通道。
 - 同域去重：入口先投影由 `skill-hit-check-rules` 路由，具体步骤字段、恢复和 UI 降级由本 Skill 唯一承接；不复制正式 L1 文档结构、投影 schema 或 UI 宽度实现。
 - 验证：两份 Skill 的 `quick_validate.py` 已通过；规则改动后的字典刷新、同域审查与最终校验待本轮收口完成。
+
+### 2026-10-13 同项目多会话投影身份冲突
+
+- 来源：内部规则调整；用户反馈同一项目的多个会话出现 `projection_id` 与会话/计划身份不匹配，并要求排查并修复投影计划 Skill 规则。
+- 本地证据：`scripts/task_plan_projection.py` 的 `compute_projection_id` 使用 `session_id`、`plan_key`、`source_document`、`projection_origin` 生成 canonical ID；`_compute_legacy_projection_id` 另将 `synthesis_mode` 纳入哈希，`validate_projection_entry` 明确接受两种算法之一精确匹配。当前只读复算的 registry 共 15 条，其中 12 条匹配 legacy、3 条匹配 canonical；当前 `validate_registry` 接受完整 registry。不得据 canonical-only 复算把 legacy 条目标记为损坏。
+- 并发证据：投影脚本和 `project-memory-rules/scripts/sync_recent_project_sessions.py` 使用同一 `.PROJECT_CURRENT.md.lock`，持锁后重读最新文件；一般当前正文写入此前没有统一写清这一约束。原子替换不替代锁内读改写。
+- 规则缺口：投影契约曾把旧 `session:<session-id>:<plan-key-hash>` 仅写为推荐形式，没有冻结 canonical/legacy 算法；`skill-hit-check-rules` 与 Owner Skill 的无匹配恢复顺序互相冲突；没有明确 registry 任一条损坏时的整体完整性边界。
+- 裁决：在 Owner Skill 与持久化契约中冻结 canonical/legacy 校验与身份安全边界，明确共享文件锁、逐会话选择和整体失败关闭；统一入口为“完整 registry 校验成功后，当前会话专属暂定投影并同步 -> 只读来源侦察 -> 由主代理确认 exact/fallback”。任一 registry 结构或身份损坏都在临时写入与委派前停止 UI 恢复。同步 `skill-hit-check-rules`、`project-memory-rules` 与根规则摘要，不修改或修复 `PROJECT_CURRENT.md`。
+- 整理去重：唯一 Owner 承载 projection ID 与 registry 完整性细节；入口 Skill 和根规则只保留恢复顺序摘要；项目记忆 Skill 只负责普通正文且引用 Owner 锁协议。无新增工具、环境变量或依赖。
+- 验证：`task_plan_projection_test.py` 84/84 通过；`task-plan-rehydration-rules` 与 `project-memory-rules` 的 `quick_validate.py` 均通过；定向 `git diff --check` 退出码为 0。改动文件 UTF-8 无 BOM、LF 且无尾随空白。全库知识索引检查统计 310 篇笔记、805 条链接，发现 2 条死链均来自既有 `20-Knowledge/工程实践/ssh-server-ops.md`，与本轮追加笔记无关；未修改该范围外笔记。`git diff --name-only` 可读取，但 `git status --short` 因缺失 Git tree 对象 `5bab5d4b62aa16e0865e93c0d61d56c4661596d2` 失败，故不能确认完整工作区变更集。未改 `PROJECT_CURRENT.md`；无当前桌面悬浮窗视觉证据，不据此声称 UI 验收。
+
+### 2026-10-13 恢复步骤显示具体任务说明
+
+- 来源：用户指出新会话投影仍显示 `[RECOVERY-01..08]` 通用恢复流程，单看清单无法知道实际任务；要求任务简要说明贴近当前任务。
+- 本地证据：`scripts/task_plan_projection.py` 的 `SAFE_FALLBACK_STEPS` 固定列出 8 条通用步骤；`_build_fallback_projection()` 不接收上下文；`synthesize_projection()` 在无法生成 exact 时直接选固定模板。`ensure_start_projection()` 支持直接传入投影对象，因此新任务无需经过恢复合成路径。
+- 裁决：新任务应由入口按当前用户请求直接构造任务专属投影；恢复时只要可从当前请求、已确认项目目标或来源文档辨认任务，就必须传入脱敏 `task_summary` 并使每条 fallback 文案包含任务主题；仅缺少安全可信来源时才明确标注“尚未识别具体任务”，而不是把通用清单装作任务说明。
+- 隐私边界：`task_summary` 限 1–96 字符，必须提炼自已确认的当前任务；不得存储原始 prompt、Goal 原文、凭据或业务数据。
+- 变更：更新入口规则、Owner Skill、投影契约、fallback 生成逻辑和单元测试。`task_plan_projection_test.py` 84/84 通过；两份 Skill 快速校验通过。字节上限阻止本轮将临时原生计划持久化到 `PROJECT_CURRENT.md`，原生 `update_plan` 已成功接收任务专属清单。
+
+### 2026-10-13 v4 注册表坏项隔离与保留
+
+- 来源：用户要求重新设计任务投影；随后明确继续实施。
+- 发现：v4 读取对单条身份损坏采用整表失败；写入降级路径则跳过坏项，并把坏项内容输出到 stderr，造成无关会话受阻、坏数据丢失及敏感内容外泄风险。
+- 裁决：v5 增加 `quarantined_projections`，只对 v4 registry 做内存兼容转换；顶层结构仍严格校验。损坏条目保留原始 JSON、原因码、来源版本与索引，并提取可验证的 `affected_session_id`。重复 projection ID 或重复计划身份时整组隔离，不按顺序选一条；同一会话可有多个不同计划，不能按 session_id 单字段去重。
+- 冲突边界：其它会话及身份明确不同的计划可继续；同一会话中隔离身份与目标计划可能重合或无法排除时，该计划恢复与改写失败关闭。v5 活动条目或隔离记录自身损坏、顶层结构损坏仍整体失败。读取只做内存转换，显式 `migrate` 或正常成功写入后才持久化 v5；不修改项目现存 `PROJECT_CURRENT.md`。
+- 变更范围：Owner Skill、registry 脚本、持久化契约；待补同域测试并执行 Skill 合规校验。未运行测试，当前只记录为实现中，不能据此声称行为通过。
+- 安全复核：发现无法提取 `session_id` 的隔离条目曾被当作与所有会话无关；现改为身份不明时全局失败关闭，只有明确绑定其它会话的隔离项才允许当前会话继续。另对坏项原文递归拒绝凭据、prompt、token 等敏感字段，避免隔离迁移将敏感内容带入 v5。同步更新 Owner 与契约说明。
+- 入口同步：`skill-hit-check-rules` 已按 v5 Owner 规则更新恢复路由。项目根 `AGENTS.md` 仍有 v4 整表失败关闭摘要；其更新要通过项目规则自举流程，本轮因 Git 无法核定完整工作区变更范围而未触发全仓规则同步，故在该项目策略下 v5 隔离恢复仍不可用。
+- UI 投影：本会话已有有效 `SKILL-OP-COLUMN` 来源投影，与本次投影 registry 改造不同源；保留现有投影且未调用 `update_plan`，避免覆盖错投。当前原生 UI 清单未同步验收。
+
+### 2026-10-13 投影容量超限不得阻断领域任务
+
+- 来源：用户指出 `PROJECT_CURRENT.md` 当前约 50,082 字节，追加本会话投影将超过 51,200 字节；明确要求主动压缩历史信息，容量问题不能阻断任务。
+- 本地现状：投影脚本按最终全文 UTF-8 字节数拒绝超限候选并保护原文件；Owner 将投影持久化失败统一列为领域硬阻断，`project-memory-rules` 也写有“超限必须阻断并压缩”，没有自动压缩后重试及容量失败继续执行的闭环。
+- 裁决：仅确认失败原因是全文字节上限后，先由 `project-memory-rules` 在共享锁内压缩普通正文中最旧已完成历史，完整保留 v5 registry（含隔离项）、最近会话快照、当前/活动/阻断/未验证状态、用户决策、授权和交接点；由 Owner 重读并重试，允许最多两轮。两轮后仍超限时不写 projection、不改原文件，但继续领域任务；UI 可独立同步且必须标明未持久化。
+- 整理去重：Owner 定义容量错误的触发与重试；项目记忆 Skill 唯一维护正文压缩策略；入口 Skill 只负责容量错误路由。保留 51,200 字节硬上限，禁止截断、压缩步骤数或触碰托管区。
+- 验证：两个受影响 Skill 的 `quick_validate.py` 均通过；独立只读审阅完成超限可压缩、无安全空间/锁失败、非容量错误三种规则场景走查，覆盖判断正确但不代表脚本运行测试通过。投影回归套件运行 84 项，7 项失败、3 项错误，包含面向旧 v4 的断言与临时锁超时，本轮规则修改不涉及脚本或测试，未修改该测试套件。知识索引修复失效 SSH 备份笔记引用后复查 310 篇笔记、803 条链接、违规数 0、死链 0；UTF-8/LF/无尾随空白检查通过，`git diff --check` 退出码 0。工作区另有多处既有改动，`git status --short` 因缺失 tree 对象失败；本次未写入 `PROJECT_CURRENT.md`。
+- 验证：待本轮 Skill 校验、投影回归测试、知识索引和 6-review 收口后补记。

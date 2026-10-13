@@ -25,12 +25,15 @@
 
 - 稳定决策：**Goal 模式 = 计划已完成，只要结果**——用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清。
 - 稳定决策：**执行分歧按 agent 推荐方案推进，不要求用户确认**——出现多方案、路径冲突、口径不一致、约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认；推荐方向判定顺序为「满足目标与验收条件 > 最小可逆 > 有真实证据 > 守住红线」；无法判定优劣时选最小可逆、最保守、可回滚方案继续，并把分歧与选择写入落盘任务计划文档。
-- 稳定决策：**不因免确认放开红线**——系统安全限制与权限审批、高风险或不可逆操作、`local` 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交 / 推送仍需当前轮显式授权）、跨项目写入红线与 `WRT-*` 授权边界、个人文件安全与删除保护全部不变；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。
+- 稳定决策：**不因免确认放开红线**——系统、平台或工具明确要求的权限审批、高风险或不可逆操作、超出已确认范围且需要扩权的动作、`local` 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交 / 推送仍需当前轮显式授权）、跨项目写入红线与 `WRT-*` 授权边界、个人文件安全与删除保护及实质外部副作用均不放开；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。
+- 稳定决策（2026-10-12 补充）：用户显式开启或确认的 Goal 中，目标/计划范围内必需、范围狭窄且限于当前项目工作区（不含兄弟项目与个人文件）、可逆易恢复、无实质外部副作用/额外费用/破坏性数据变更/敏感信息暴露/安全边界变化、且无更高优先级强制审批要求的单项低风险授权可默认通过任务层许可。默认只覆盖该项最小动作，不扩大目标或未来授权；无法确认全部条件时按需审批；低风险默认许可不产生等待用户授权的 `BLK-*`。
+- 稳定决策（2026-10-13 补充）：已显式开启或确认且仍 active 的 Goal 执行中，计划文档缺项、过期、冲突或未落盘时，由 agent 依据 Goal、现有计划、项目规则和仓库证据先修复同一文档、记录依据与假设并落盘，然后持续执行；文档问题本身不暂停 Goal 或创建 `BLK-*`。真实权限、安全红线只暂停受影响动作，安全独立步骤继续。
+- 已沉淀为 skill: `goal-loop-rules`。
 - 稳定决策：**防自我授权边界**——agent 为补建任务投影、异常修复或超时探测而自动 `create_goal` 产生的 Goal **不构成**用户开启的 Goal 模式，仍不自动取得任何实现授权；免确认推进必须建立在用户显式开启或确认的 Goal 之上（兼容 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」）。
 - 稳定决策：**临时文件与脚本执行后必须清理**——执行过程中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务，使用后立即清理，禁止污染项目目录或长期滞留在宿主任务列表；未清理视为任务未完成，收口前按 `runtime-process-cleanup-rules` 的三层清理对象真实回读验证。
-- 来源：用户指令（2026-09-24）+ `long-run-loop-rules`（`SKILL.md`、`references/safety-mechanisms.md`）+ `autonomous-execution-rules`（`SKILL.md`、`references/continuation-and-pause.md`）+ `runtime-process-cleanup-rules` + `AGENTS.md` / `CLAUDE.md`。
+- 来源：用户指令（2026-09-24 与 2026-10-12）+ `goal-loop-rules`（`SKILL.md`、`references/safety-mechanisms.md`）+ `autonomous-execution-rules`（`SKILL.md`、`references/continuation-and-pause.md`、`references/execution-authorization-and-plan-boundary.md`）+ `runtime-process-cleanup-rules` + `AGENTS.md` / `CLAUDE.md`。
 - 2026-09-27 更新：Goal 模式 Owner 已从 `long-run-loop-rules` 合并至 `goal-loop-rules`（与 `goal__skillhub` 目标方法论合并），旧目录已删除；本条来源路径按新 Owner 理解，原始落盘历史见 `PROJECT_HISTORY.md`。
-- 更新时间：2026-09-24。
+- 更新时间：2026-10-12。
 
 ## 配置文件项禁止多行过程注释与复杂逻辑专门文档规范（2026-09-18 固化）
 
@@ -123,27 +126,17 @@
 - 来源：用户指令（2026-10-05）+ `code-quality-rules/references/no-patchwork-architecture-discipline.md` 与 `SKILL.md` + `code-generation-style-rules` + `bug-fix-proposal-rules` + `implementation-planning-rules` + `code-style-consistency-rules/references/user-style-feedback-library.md`（STYLE-CASE-ALL-004）。
 - 更新时间：2026-10-05。
 
-## 服务器改动前备份与可还原（2026-10-11 固化）
-
-- 稳定决策：**无还原点，不改动**——凡会改变服务器状态的写操作（文件/目录增删改移与权限、配置文件、服务 start/stop/restart、软件包、数据库 DDL/DML、Docker、防火墙、cron/用户/环境变量、任何 `sudo` 写入），执行前必须先建立并验证通过可验证的还原点（存在、非空、可读）；只读白名单命令免还原点。落点：`ssh-server-ops-rules/SKILL.md`「改动前备份与可还原（强制，最高优先级）」+ `references/backup-and-rollback.md` + `scripts/backup_before_change.sh`。
-- 稳定决策：**失败或效果不符预期即主动回滚**——不等待用户开口；回滚属「恢复到改动前状态」的降险动作默认放行，但若会覆盖改动期间产生的新改动须先确认；L1 硬禁止命令不因「回滚」名义放行；回滚也失败则停止叠加、保留现场并给出手动恢复指引。
-- 稳定决策：**三阶段流程与还原点契约**——改动前（侦察现状 → 声明 `→ 目标:` → 建还原点 → 验证非空 → 生成 `manifest.md`+`rollback.sh` → 回报用户）→ 改动中（原子操作、分步校验退出码、不叠加不可逆步骤、不删历史还原点）→ 改动后（立即验证，失败即回滚）。还原点 ID `RP-<alias>-<UTC>`，远端落点 `~/.agent-backups/<TS>/`（权限 700），默认保留 ≥24h。用户当轮显式豁免须声明「本次无还原点」且仅当轮生效；备份内容可能含密钥/业务数据，禁止流入 Git 或聊天记录。
-- 来源：用户指令（2026-10-11）——「操作服务器的改动，一定要注意备份和可还原操作……如果 agent 操作服务器失败了，或者没有达到想要的效果，要支持回到之前的状态」+ `ssh-server-ops-rules/SKILL.md` 与 `references/backup-and-rollback.md`、`scripts/backup_before_change.sh`。
-- 更新时间：2026-10-11。
-
-## 配置持久化写入安全与故障定位（2026-10-11 固化）
-
-- 稳定决策：**禁止对生产配置做「读出 → 二次序列化 → 写回」**——该模式会把换行转义为字面 `\n`，使整篇配置塌缩成单行；对 YAML 尤其致命，塌缩后若首字符为 `#` 整行成注释 → 解析为空配置 → 关键项（端口/密钥/开关）丢失。写操作一律走应用提供的配置写入 API。
-- 稳定决策：**必须直写存储时用「无转义歧义」方式 + 哈希回读校验**——首选 hex 编码写入（如 `UPDATE ... SET content = CONVERT(UNHEX('<hex>') USING utf8mb4)`），写完立即用 md5/真实换行数回读比对，不一致即回滚；不确定格式契约时先读出一份当前正常内容作对照基准。
-- 稳定决策：**配置类故障先定位写入源再修**——定性判据为「端口漂移 + 关键路由 404（401/403=正常）+ 内容塌缩成单行」三条同时成立；写入源用「容器/系统事件日志 + 时间窗内被改文件 + md5 指纹比对 + 时间线交叉验证」定位，修完须确保不被再次写坏。生产写操作（改库、重启服务）属需确认级。
-- 来源：新增技能 `config-persistence-safety-rules/SKILL.md`；同类实践经验见知识库笔记《配置持久化写入安全与二次序列化损坏》与《cli-proxy-api 宿主配置存储形态》。
-- 更新时间：2026-10-11。
-
 ## 窗口与应用截图取证双轨机制（2026-10-05 固化）
 
 - 稳定决策：**自身可控渲染应用优先走应用内自渲染（app-internal-screenshot-rules）**——对 Godot、自研游戏、浏览器 CDP、Electron 等可控渲染应用，通过自身渲染通道（视口纹理 `get_image()`、CDP `Page.captureScreenshot`、Electron `capturePage()`）抓取，天然只含目标应用且不串味、不依赖前台、不出现黑屏或陈旧帧。
 - 稳定决策：**系统级第三方窗口走定向截屏与受控交互（window-scoped-capture）**——对普通操作系统窗口，使用 `PrintWindow`（`PW_CLIENTONLY`）锁定客户区截屏，使用 `PostMessage` 投递后台按键与比例坐标点击，避免全屏截图串味、不抢前台焦点、不动系统真实鼠标。
 - 来源：新增技能 `app-internal-screenshot-rules/SKILL.md` 与 `window-scoped-capture/SKILL.md`。
+
+## 本地项目浏览器调试优先使用 Agent 内置浏览器（2026-10-13 固化）
+
+- 稳定决策：需要在浏览器中调试本地项目页面时，优先使用当前 agent 宿主提供的内置浏览器通道；统一矩阵以 `Chrome DevTools MCP` 作为标准调试能力映射，只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户真实标签页、登录态、Cookie 或扩展时仍使用 `Chrome Plugin`；HAR/性能/trace 和 Cloud 场景按各自专属路由承接。
+- 来源：用户指令（2026-10-13）+ `mcp-installation-rules/references/tool-priority.md`。
+- 更新时间：2026-10-13。
 - 更新时间：2026-10-05。
 
 ## 生图生成后符合度自检与不符合即重做（2026-10-05 固化）
@@ -212,22 +205,20 @@
 ## Codex Desktop 任务投影断点恢复规则
 
 - 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 v4 registry schema、计划指纹、敏感字段拒绝、51,200 字节闸门、同目录排他锁、原子写入、失活和 `update_plan` payload。
-- 稳定决策：正式实施周期文档仍是真实计划源；常规任务投影移除 20 项小数量上限，保留 51,200 字节总限，长清单支持滚动查看。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 投影以至少十步细化步骤为通用基线，旧三步 Goal 读取时自动兼容映射，任务专属细项按已确认工作项继续拆细，不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
-- 稳定决策：原生步骤悬浮清单可见是用户明确验收条件，但 UI 同步缺失或失败只进入 `UI_SYNC_BLOCKED` 降级继续，绝对不阻断领域任务执行，不得用其它面板冒充原生显示证据。
-- 稳定决策：Desktop 重启后继续时重新检查本回合工具注册和当前会话投影，工具已注册且投影校验通过时立即同步；若先前仅因 UI 同步失败留下 `blocked` 状态，不把该 UI 状态当成领域阻断，遵循用户本轮继续意图推进。
-- 稳定决策：初始步骤投影时序在最少规则命中和定位当前会话后、领域侦察前持久化并立即同步暂定启动清单；步骤具备动作、对象和可辨认结果，编号只作辅助索引。
+- 稳定决策：正式实施周期文档仍是真实计划源；Goal、普通会话和 Plan Mode 默认展示足够细、可独立执行与验证的步骤，不压成“开始、执行、完成”，不制造无意义微步骤；长清单可滚动查看。任务投影只保存任务 ID、悬浮文案和 `pending/in_progress/completed` 状态，不设任意小数量上限，托管区整体 UTF-8 大小仍限制为 51,200 字节。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 默认细化清单为不含 Goal 原文的十项安全流程，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
 - 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
-- 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
+- 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Goal 与普通执行模式优先同步细粒度任务投影，Plan Mode 默认以原生计划流程展示细化步骤，当前会话提供 `update_plan` 时允许同步；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
 - 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续：保留 projection + 继续领域执行 + 下一检查点重试 UI，不得声称 UI 已恢复。`inactive` 不创建悬浮任务列表。
 - 稳定决策：任务投影会话解析固定为显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退、WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `X-WorkBuddy-Session-Id` 唯一值或 `WORKBUDDY_SESSION_ID`）再回退；任意来源不一致、非法或全部缺失时失败关闭。`ensure-start` 和带 payload 的 `write` 是首次持久化入口，返回结果必须绑定当前 session 并携带可直接调用的 `update_plan` payload。
-- 稳定决策：十分钟只作缺失 projection 的异常修复闸门。任务已真实执行但当前会话缺少活动或阻断 projection，且扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 后主动执行时间严格大于 600 秒时，才先调用只读 `probe-timeout`，随后补建并立即同步；不再把十分钟作为正常任务首次显示悬浮窗的入口。
+- 稳定决策：十分钟是未显示步骤的异常补救闸门。主动执行时间扣除暂停后严格大于 600 秒且当前会话尚未确认原生步骤同步成功时，在首个可执行检查点先调用只读 `probe-timeout`；无活动投影则补建，已有投影但 UI 未同步则取回唯一 payload 并重试 `update_plan`，不创建 Goal、不覆盖投影；UI 失败继续任务，不将十分钟作为正常首次显示入口。
 - 稳定决策：`probe-timeout` 不创建锁文件、临时文件、projection 或 payload；`goal_check_required` 后只允许主 Agent 按 `get_goal -> 复用明确匹配 Goal 或 create_goal 一次 -> goal --event create -> update_plan` 执行，子 Agent 不得调用 Goal 或主悬浮窗工具。
 - 稳定决策：活动 Goal 不匹配、工具不可用、创建失败或结果不明确时禁止重复创建，使用原 `ensure-timeout` 生成普通 `exact/fallback` 投影；创建结果不明确只允许一次 `get_goal` 复核，Goal 已成功但投影失败也不得再创建。
 - 稳定决策：Goal 摘要来源为已确认实施计划摘要、当前确认目标或固定兜底文案，必须是单行中文、最多 80 个 Unicode 字符并脱敏，只传给 `create_goal`，不得写入项目文件、测试 fixture、工程文档、项目记忆或知识库。
 - 稳定决策：超时升级只在工具返回、阶段进度或回合结束前等可执行检查点运行，不承诺后台第 601 秒自动唤醒；计时起止与暂停秒数不进入 projection schema 或项目长期状态，计时上下文丢失后重新计时而不是推算。
-- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 细化步骤。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将步骤写为 `inactive`，失活后禁止重放。
+- 稳定决策：Goal 创建优先保护活动 `persisted` 或 `synthesized/exact` 正式计划；`synthesized/fallback` 只是恢复兜底，必须让位于 Goal 细化默认清单。Goal blocked 清除进行中步骤但保留观察列表；Goal complete 先返回一次性全完成 `update_plan` payload，再将全部步骤写为 `inactive`，失活后禁止重放。
 - 稳定决策：UI 重建不恢复执行授权，也不等同于 `agent-runtime-recovery-rules` 的 L5 checkpoint/resume；完成投影写为 `inactive`，工具不可用时保留磁盘状态但不得声称悬浮窗已恢复。
-- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`task-plan-rehydration-rules/references/case-task-plan-rehydration-rules-absorption.md`、`task-plan-rehydration-rules/references/source-notes.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/3-实施/2026-07-26_150000_CodexDesktop任务悬浮窗断点恢复_实施周期07_首次持久化即悬浮窗同步.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 来源：`task-plan-rehydration-rules/SKILL.md`、`task-plan-rehydration-rules/references/task-plan-projection-contract.md`、`doc/2-需求/2026-07-23_012302_CodexDesktop任务悬浮窗断点恢复.md`、`doc/3-实施/2026-07-25_163230_CodexDesktop任务悬浮窗断点恢复_实施周期05_超时自动升级.md`、`doc/3-实施/2026-07-25_203000_CodexDesktop任务悬浮窗断点恢复_实施周期06_Goal自动升级.md`、`doc/3-实施/2026-07-26_150000_CodexDesktop任务悬浮窗断点恢复_实施周期07_首次持久化即悬浮窗同步.md`、`doc/2-需求/2026-07-25_000001_Goal模式任务悬浮窗进度可视化.md`。
+- 吸收状态：已沉淀至通用 Owner `task-plan-rehydration-rules`；未创建重复的项目专属 Skill。
 - 更新时间：2026-10-12。
 
 
@@ -1038,6 +1029,25 @@ entities:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
+  - entity_id: rule.local-project-browser-debug-route
+    name: "本地项目浏览器调试优先使用 Agent 内置浏览器"
+    type: "浏览器路由规则"
+    aliases:
+      - 本地项目调试
+      - agent 内置浏览器优先
+      - Chrome DevTools MCP 本地调试
+    definition: "本地项目需要浏览器页面调试时，优先使用当前 agent 宿主提供的内置浏览器通道，统一矩阵以 Chrome DevTools MCP 作为标准调试能力映射；只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户已有标签页、真实登录态、Cookie 或扩展时选择 Chrome Plugin。基础自动化、高级观测和 Browser Use Cloud 仍按统一工具路由矩阵分流。"
+    scope: "本地项目的 DOM、样式、控制台、Network、Performance、Coverage 与运行时调试"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.local-project-browser-debug-route
+    context_ids:
+      - context.local-project-browser-debug
+    updated_at: 2026-10-13
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.reasoning-summary-detail
     name: "结果与结论适中详细度契约"
     type: "最终总结输出规则"
@@ -1681,12 +1691,12 @@ entities:
       - 悬浮任务列表恢复
       - task-plan-rehydration-rules
       - PROJECT_CURRENT 任务投影
-      - 缺失投影十分钟异常修复
+      - 未显示步骤的十分钟异常补救
       - ensure-timeout
       - ensure-start
       - UI_SYNC_BLOCKED
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；步骤数量不设小上限（51,200字节总限），Goal 默认至少十步细化基线并支持旧版迁移；默认执行取得 confirmed 后，任何任务首次领域动作前必须为当前 session 持久化 active/blocked projection，持久化后的下一动作立即调用 update_plan。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用时进入 UI_SYNC_BLOCKED 降级继续，绝对不阻断领域任务执行，不得声称 UI 已恢复。Desktop 重启后重新核验工具与当前会话投影并立即同步，仅因 UI 故障留下 blocked 的 Goal 不阻断用户明确继续。会话解析按显式 --session-id 优先、CODEX_THREAD_ID 回退、WorkBuddy 宿主元数据再回退，任意来源冲突或全缺失失败关闭。十分钟只作为缺失 projection 的异常修复闸门。"
-    scope: "跨宿主（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）默认执行回合、首次任务可见性、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；Goal、普通会话和 Plan Mode 默认展示细粒度、可独立执行与验证的步骤，不压成开始/执行/完成；长清单允许滚动查看，步骤数不设任意小上限，托管区总 UTF-8 大小限制为 51,200 字节。Plan Mode 使用原生计划流程，若当前会话提供 update_plan 可同步；Goal 默认使用细化安全流程，正式任务计划优先。显示工具缺失、失败或界面无法确认均不暂停领域任务；投影持久化失败、会话归属冲突/不确定或执行状态不明仍按安全规则阻断。默认执行取得 confirmed 后，任何任务首次领域动作前持久化 projection，成功后立即调用 update_plan。会话解析按显式 --session-id、CODEX_THREAD_ID、WorkBuddy 宿主元数据顺序解析并拒绝冲突；十分钟用于未显示步骤异常补救：活动执行时间严格超过 600 秒且原生清单未确认同步时，首个可执行检查点调用 probe-timeout；缺投影则补建，已有投影但 UI 未同步则读取唯一现有 payload 并重试 update_plan，不创建 Goal、不覆盖投影；工具运行中无后台唤醒能力。"
+    scope: "跨宿主（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）Goal、普通会话、Plan Mode 默认步骤展示，默认执行回合、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
     status: "active"
     evidence_ids:
       - evidence.skill.task-plan-rehydration
@@ -1695,11 +1705,11 @@ entities:
       - evidence.doc.task-plan-first-persist-cycle
     context_ids:
       - context.task-plan-rehydration
-    usage_count: 1
-    usage_days: 1
-    last_used_at: 2026-08-23
-    absorbed_to: null
-    updated_at: 2026-07-25
+    usage_count: 3
+    usage_days: 2
+    last_used_at: 2026-10-12
+    absorbed_to: task-plan-rehydration-rules
+    updated_at: 2026-10-12
   - entity_id: rule.session-handoff
     name: "会话交接与新任务接续"
     type: "会话迁移规则"
@@ -1806,19 +1816,23 @@ entities:
       - 临时文件执行后删除
       - 不污染项目目录
       - 防Goal自我授权
-    definition: "Goal 模式（用户当前轮显式 `/goal` 开启，或用户已显式确认的 Goal 处于 active）即视为计划阶段已完成、用户只要结果：agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清；执行中出现多方案、路径冲突、口径不一致或约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认。推荐方向判定顺序：① 满足目标与验收条件；② 最小可逆；③ 有真实证据支撑；④ 守住安全与合规红线。证据不足时选最小可逆、最保守、可回滚方案继续推进，并把分歧、依据与选择写入落盘任务计划文档。**防自我授权边界（强制）**：agent 为补建任务投影、异常修复或超时探测而自动 create_goal 产生的 Goal 不构成用户开启的 Goal 模式，仍不自动取得任何实现授权。**不因免确认放开**：系统安全限制与权限审批、高风险或不可逆操作、local 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交/推送仍需当前轮显式授权）、跨项目写入红线与 WRT-* 授权边界、个人文件安全与删除保护；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。**临时产物清理**：执行中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务须在使用后立即清理，禁止污染项目目录或长期滞留宿主任务列表，未清理视为任务未完成，收口前按 runtime-process-cleanup-rules 三层清理对象真实回读验证。落点（2026-09-27 更新）：goal-loop-rules/SKILL.md（Goal 模式 Owner，由 goal__skillhub 与 long-run-loop-rules 合并）、goal-loop-rules/references/safety-mechanisms.md（安全熔断衔接）、autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md（执行许可与暂停边界）、AGENTS.md / CLAUDE.md 仓库级章节。"
-    scope: "Goal 模式执行授权、方案分歧裁决、暂停边界收缩、防自我授权、临时产物清理、仓库级规则自举"
+      - 低风险授权默认通过
+      - Goal普通授权自动通过
+      - Goal计划文档自动补齐
+      - Goal计划缺项不阻断
+    definition: "Goal 模式（用户当前轮显式 `/goal` 开启，或用户已显式确认的 Goal 处于 active）即视为计划阶段已完成、用户只要结果：agent 直接进入实现，不再重复征求计划确认、方案确认或需求澄清；执行中出现多方案、路径冲突、口径不一致或约束互相牵制时，agent 自行完成对比分析并直接按最推荐方向执行，不抛选择题、不暂停、不等待确认。推荐方向判定顺序：① 满足目标与验收条件；② 最小可逆；③ 有真实证据支撑；④ 守住安全与合规红线。证据不足时选最小可逆、最保守、可回滚方案继续推进，并把分歧、依据与选择写入落盘任务计划文档。**防自我授权边界（强制）**：agent 为补建任务投影、异常修复或超时探测而自动 create_goal 产生的 Goal 不构成用户开启的 Goal 模式，仍不自动取得任何实现授权。**计划文档自修复（2026-10-13）**：用户显式开启或确认且仍 active 的 Goal 执行中，计划文档缺项、过期、冲突或未落盘属于可修复事项；依据目标、现有计划、项目规则与仓库证据修复同一文档，记录依据/假设并落盘后继续，不因文档问题暂停 Goal 或创建 BLK。强制审批、高风险、越界、不可逆、用户撤销等真实阻断仍生效。**低风险默认授权（2026-10-12 补充）**：用户显式开启或确认的 Goal 中，只有同时满足目标/计划范围内必需、范围狭窄且限于当前项目工作区（不含兄弟项目与个人文件）、可逆易恢复、无实质外部副作用/额外费用/破坏性数据变更/敏感信息暴露/安全边界变化、且无更高优先级强制审批要求的单项动作，才可默认通过任务层授权；仅覆盖该项最小动作，不扩展目标或未来权限，判定不明不按低风险处理，低风险默认许可不产生授权等待 BLK。**不因免确认放开**：系统、平台或工具明确要求的权限审批、高风险或不可逆操作、超出已确认范围且需要扩权的动作、local 本地连接调试测试红线、凭据不回显、Git 写历史红线（提交/推送仍需当前轮显式授权）、跨项目写入红线与 WRT-* 授权边界、个人文件安全与删除保护；成本预警、速率限制、死循环检测、迭代上限等安全熔断继续保留。**临时产物清理**：执行中为推进任务临时生成的脚本、临时文件、临时目录、临时服务与后台任务须在使用后立即清理，禁止污染项目目录或长期滞留宿主任务列表，未清理视为任务未完成，收口前按 runtime-process-cleanup-rules 三层清理对象真实回读验证。落点（2026-09-27 更新）：goal-loop-rules/SKILL.md（Goal 模式 Owner，由 goal__skillhub 与 long-run-loop-rules 合并）、goal-loop-rules/references/safety-mechanisms.md（安全熔断衔接）、autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md（执行许可与暂停边界）、AGENTS.md / CLAUDE.md 仓库级章节。"
+    scope: "Goal 模式执行授权、方案分歧裁决、暂停边界收缩、防自我授权、计划文档自修复、临时产物清理、仓库级规则自举"
     status: "active"
     evidence_ids:
       - evidence.rule.goal-mode-no-confirm-and-temp-cleanup
     context_ids:
       - context.execution-authorization
       - context.long-run-loop
-    updated_at: 2026-09-24
-    usage_count: 1
-    usage_days: 1
-    last_used_at: 2026-09-24
-    absorbed_to: null
+    updated_at: 2026-10-13
+    usage_count: 3
+    usage_days: 3
+    last_used_at: 2026-10-13
+    absorbed_to: goal-loop-rules
   - entity_id: rule.no-patchwork-architecture-discipline
     name: "反打补丁与架构优先原则"
     type: "代码质量规则"
@@ -1858,50 +1872,6 @@ entities:
     context_ids:
       - context.testing-and-verification
     updated_at: 2026-10-05
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - entity_id: rule.server-write-backup-and-rollback
-    name: "服务器改动前备份与可还原（无还原点不改动）"
-    type: "运维安全规则"
-    aliases:
-      - 无还原点不改动
-      - 改动前备份
-      - 还原点
-      - 服务器回滚
-      - 失败即回滚
-      - RP还原点
-    definition: "凡会改变服务器状态的写操作（文件/目录增删改移与权限、配置文件、服务 start/stop/restart/enable/disable、软件包安装卸载升级、数据库 DDL/批量 DML/导入导出、Docker 容器镜像卷网络、防火墙与 sysctl、cron/用户/环境变量、任何 sudo 写入），执行前必须先建立并验证通过可验证的还原点（存在、非空、可读），无还原点不得动手；只读白名单命令（ls/cat/df/du/free/ps/systemctl status/journalctl/docker ps/inspect/logs 等）免还原点。三阶段：改动前（侦察现状 → 声明目标 → 建还原点 → 验证非空 → 生成 manifest.md+rollback.sh → 回报用户）→ 改动中（原子操作、分步校验退出码、不叠加不可逆步骤、不删历史还原点）→ 改动后（立即验证，失败或效果不符预期即主动回滚，不等用户开口）。还原点 ID RP-<alias>-<UTC>，远端落点 ~/.agent-backups/<TS>/（权限 700），默认保留 ≥24h。回滚属降险动作默认放行，但若会覆盖期间新改动须先确认；L1 硬禁止命令不因回滚名义放行；回滚也失败则停止叠加、保留现场并给出手动恢复指引。用户当轮显式豁免须声明「本次无还原点」且仅当轮生效；备份含密钥/业务数据，禁止流入 Git 或聊天记录。落点：ssh-server-ops-rules/SKILL.md 与 references/backup-and-rollback.md、scripts/backup_before_change.sh。"
-    scope: "SSH 服务器写操作、配置变更、服务与包管理、数据库变更、容器与网络操作的前置备份与失败回滚"
-    status: "active"
-    evidence_ids:
-      - evidence.skill.ssh-backup-and-rollback
-    context_ids:
-      - context.ssh-server-ops
-    updated_at: 2026-10-11
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - entity_id: rule.config-persistence-write-safety
-    name: "配置持久化写入安全与二次序列化损坏"
-    type: "配置与运维规则"
-    aliases:
-      - 配置持久化
-      - 二次序列化损坏
-      - 配置塌缩成单行
-      - 配置解析为空
-      - 写入源追溯
-      - hex安全写回
-    definition: "把配置写入持久化存储（数据库配置表、配置文件、配置中心）时：① 禁止「读出 → 二次序列化（json.dumps/JSON.stringify/模板渲染）→ 写回」，该模式把换行转义为字面 \\n 使整篇配置塌缩成单行，YAML 塌缩后若首字符为 # 整行成注释 → 解析为空配置 → 关键项（端口/密钥/开关）丢失；写操作一律走应用提供的配置写入 API。② 必须直写存储时用无转义歧义方式（hex：UPDATE ... CONVERT(UNHEX('<hex>') USING utf8mb4)）并写后 md5/真实换行数回读校验，不一致即回滚；不确定格式契约时先读出一份当前正常内容作对照基准。③ 配置类故障定性判据为「端口漂移 + 关键路由 404（401/403 表示路由在、正常）+ 内容塌缩成单行」三条同时成立。④ 先定位写入源再修：容器/系统事件日志 + 故障时段新改文件 + md5 指纹比对 + 时间线交叉验证。⑤ 关键项显式固定避免静默回退默认/随机值；禁止多会话并行改同一份生产配置；生产写操作属需确认级。落点：config-persistence-safety-rules/SKILL.md。"
-    scope: "配置写入持久化存储、配置类故障（不生效/解析为空/关键项丢失/格式异常）的定性定位与安全恢复"
-    status: "active"
-    evidence_ids:
-      - evidence.skill.config-persistence-safety
-    context_ids:
-      - context.config-persistence-safety
-    updated_at: 2026-10-11
     usage_count: 0
     usage_days: 0
     last_used_at: null
@@ -1960,16 +1930,6 @@ evidence:
     source: "app-internal-screenshot-rules/SKILL.md"
     path: "app-internal-screenshot-rules/SKILL.md"
     note: "2026-10-03 新增应用自渲染通道截图技能"
-  - evidence_id: evidence.skill.ssh-backup-and-rollback
-    type: "skill"
-    source: "ssh-server-ops-rules/SKILL.md 与 references/backup-and-rollback.md、scripts/backup_before_change.sh"
-    path: "ssh-server-ops-rules/references/backup-and-rollback.md"
-    note: "2026-10-11 用户指令新增「改动前备份与可还原」强制规则：无还原点不改动、失败即主动回滚、三阶段流程、12 类对象备份策略矩阵与一键回滚脚本。"
-  - evidence_id: evidence.skill.config-persistence-safety
-    type: "skill"
-    source: "config-persistence-safety-rules/SKILL.md"
-    path: "config-persistence-safety-rules/SKILL.md"
-    note: "2026-10-11 新增配置持久化写入安全与配置故障定位技能：二次序列化损坏机理、症状三判据、写入源追溯、hex 安全写回与带回滚恢复。"
   - evidence_id: evidence.root-test-code-and-evidence-layout
     type: "test"
     source: "根 test 目录统一实施与真实测试"
@@ -2002,9 +1962,9 @@ evidence:
     note: "2026-08-21 新增总结异步任务分流 + 宿主任务列表桥接：后台异步任务必选 `## 🔄 后台异步任务` 小节（结果与结论之后、后续内容之前），任务标识/类型/轮询节奏/完成信号/回流渠道/等待语义/宿主任务列表映射七字段；启动时必须 TaskCreate 登记宿主任务列表（描述三段式：做什么+任务标识+何时查看），启动/等待/回收三阶段 TaskUpdate 推进，禁止裸 run_in_background 当唯一进度可见手段（执行期契约在 autonomous-execution-rules）；该小节是「同步已完成 + 异步在跑」收口信号，非未完成、非阻断、不触发后续。WorkBuddy hooks 增强触发：UserPromptSubmit additionalContext 软提醒 + Stop exit code 2 硬校验；配置路径 ~/.workbuddy/settings.json 或项目 .workbuddy/settings.json；hook 支持需真实任务实测。"
   - evidence_id: evidence.rule.goal-mode-no-confirm-and-temp-cleanup
     type: "skill"
-    source: "用户指令（2026-09-24）+ goal-loop-rules/SKILL.md 与 references/safety-mechanisms.md（2026-09-27 合并自 long-run-loop-rules 与 goal__skillhub）+ autonomous-execution-rules/SKILL.md 与 references/continuation-and-pause.md + runtime-process-cleanup-rules/SKILL.md + AGENTS.md / CLAUDE.md"
+    source: "用户指令（2026-09-24、2026-10-12）+ goal-loop-rules/SKILL.md 与 references/safety-mechanisms.md（2026-09-27 合并自 long-run-loop-rules 与 goal__skillhub）+ autonomous-execution-rules/SKILL.md、references/continuation-and-pause.md 与 references/execution-authorization-and-plan-boundary.md + runtime-process-cleanup-rules/SKILL.md + AGENTS.md / CLAUDE.md"
     path: "goal-loop-rules/SKILL.md"
-    note: "2026-09-24 固化 Goal 模式免确认推进；2026-09-27 Goal 模式 Owner 从 long-run-loop-rules 合并至 goal-loop-rules（与 goal__skillhub 目标方法论合并），旧目录保留为合并前快照。关键边界：agent 自动补建的 Goal 不构成免确认授权（兼容 task-plan-rehydration-rules 既有口径）。"
+    note: "2026-09-24 固化 Goal 模式免确认推进，2026-09-27 Owner 合并至 goal-loop-rules。2026-10-12 补充：用户确认的 Goal 范围内低风险必需授权按局部、可逆、无实质外部副作用且无强制审批判据默认通过；默认不扩权或创建 BLK 等待。2026-10-13 补充：active 用户 Goal 的计划文档缺项先自主修复并落盘后继续，文档问题本身不阻断 Goal；系统强制审批、高危不可逆、Git、跨项目 WRT、local、凭据与个人文件红线不变。agent 自动补建 Goal 不构成免确认授权。"
   - evidence_id: evidence.dialog.swag-upstream-openapi
     type: "dialog"
     source: "2026-07-14 需求实施计划与离线验证"
@@ -2054,6 +2014,11 @@ evidence:
     source: "browser-use-cloud-rules/SKILL.md"
     path: "browser-use-cloud-rules/SKILL.md"
     note: "Browser Use Cloud 专属路由、费用预检和 session 收口来源"
+  - evidence_id: evidence.skill.local-project-browser-debug-route
+    type: "skill"
+    source: "mcp-installation-rules/references/tool-priority.md"
+    path: "mcp-installation-rules/references/tool-priority.md"
+    note: "本地项目页面调试优先当前 agent 宿主内置浏览器，Chrome DevTools MCP 为标准映射"
   - evidence_id: evidence.accept.browser-use-cloud-20260726
     type: "acceptance"
     source: "REQ-BU-20260726-001 最终验收"
@@ -2364,6 +2329,10 @@ contexts:
     type: "task-scope"
     name: "URL 分析与在线文档读取"
     note: "适用于需要读取、分析或截图已登录页面的场景"
+  - context_id: context.local-project-browser-debug
+    type: "task-scope"
+    name: "本地项目浏览器调试"
+    note: "适用于通过本地项目页面进行 DOM、样式、控制台、Network 或运行时调试的场景"
   - context_id: context.doc-directory-naming
     type: "repository-convention"
     name: "文档目录命名"
@@ -2420,14 +2389,6 @@ contexts:
     type: "task-scope"
     name: "Goal 生命周期与长任务循环（2026-09-27 起归 goal-loop-rules）"
     note: "适用于 Goal 触发、完成标记、循环控制器、安全熔断，以及 Goal 模式下的分歧裁决与临时产物清理"
-  - context_id: context.ssh-server-ops
-    type: "task-scope"
-    name: "SSH 服务器运维与写前备份回滚"
-    note: "适用于服务器连接、命令执行、写操作前置还原点、失败或效果不符时主动回滚"
-  - context_id: context.config-persistence-safety
-    type: "task-scope"
-    name: "配置持久化写入安全与故障定位"
-    note: "适用于配置写入持久化存储、配置类故障（不生效/解析为空/关键项丢失/格式异常）的定性定位与安全恢复"
 lifecycle:
   active:
     - "rule.shared-static-owner-routing"
@@ -2460,8 +2421,6 @@ lifecycle:
     - "rule.reasoning-summary-detail"
     - "rule.workbuddy-market-skill-absorption"
     - "rule.goal-mode-no-confirm-and-temp-cleanup"
-    - "rule.server-write-backup-and-rollback"
-    - "rule.config-persistence-write-safety"
     - "rel.old-directory-cleanup.depends-on.doc-top-level-mixed-naming"
   deprecated: []
   stale: []
@@ -2501,20 +2460,6 @@ retrieval_hints:
       - "rule.task-plan-rehydration"
     update_plan 重建:
       - "rule.task-plan-rehydration"
-    无还原点不改动:
-      - "rule.server-write-backup-and-rollback"
-    改动前备份:
-      - "rule.server-write-backup-and-rollback"
-    服务器回滚:
-      - "rule.server-write-backup-and-rollback"
-    失败即回滚:
-      - "rule.server-write-backup-and-rollback"
-    配置二次序列化损坏:
-      - "rule.config-persistence-write-safety"
-    配置塌缩成单行:
-      - "rule.config-persistence-write-safety"
-    配置解析为空:
-      - "rule.config-persistence-write-safety"
     简单任务十分钟升级:
       - "rule.task-plan-rehydration"
     goal 模式:
