@@ -152,6 +152,19 @@ Rename-Item "<X:\src>.bak" "<X:\src>"        # 恢复原真实目录（若保留
 | `New-Item -ItemType Junction` 报 `Could not find item <目标>` | **Target 目录不存在**（junction 不会自动创建目标） | 先 `New-Item -ItemType Directory` 建目录，或先把数据 robocopy 到云盘再建链 |
 | 改名成功但建链失败 → 源没了、目标也没有（中间状态） | 流程顺序错误：数据没先在云盘就位就切换了 | 数据没丢，在 `.bak` 里：先建云盘目录 + robocopy，校验后再建 junction，确认后删 `.bak`；带数据源自适应的脚本可直接续跑 |
 
+## 云盘同步 Git 仓库的 `.git` 损坏（高风险，强制体检）
+
+把活跃 Git 仓库放在云盘同步目录下时，云盘客户端的**冲突副本机制**会改动 `.git` 内部文件，产生两类症状，成因都是**文件名被云盘改名**而非内容损坏：
+
+| 症状 | 判据 | 处理 |
+| --- | --- | --- |
+| 文件在磁盘和 HEAD 都存在，却显示成片「已暂存删除」 | `git ls-files \| wc -l` 比 `git ls-tree -r --name-only HEAD \| wc -l` 少 N 条，N = staged 删除数（`.git/index` 被回写为旧版本） | 备份 `.git/index` 后 `git read-tree HEAD && git add -A` 重建索引 |
+| `git fsck` 报几十行 `bad sha1 file: .../xxx (1)`，`git ls-tree -r HEAD` 失败 | 文件名尾部 ` (1)` 是云盘冲突副本后缀，git 按名解析 SHA 失败；**对象内容通常完好** | 不要删除；按内容重算哈希原位归位（去掉 ` (1)`），同名则去重；再 `git fsck` 验证 |
+
+- **三条纪律**：① `bad sha1` ≠ 对象损坏，先看文件名是否有 ` (1)`；② 不要用删除「清理」报错对象，可达对象一删就毁 HEAD；③ 修复前先 `cp -a .git .git.bak`，每步用 `git fsck` + `ls-tree -r HEAD` + `archive -o /dev/null` 三件套验证。
+- 预防：不要把活跃 Git 仓库直接放云盘；若必须，至少把 `.git` 排除同步，并定期 `git fsck --no-progress` 体检。
+- 详细判据、可复制脚本与恢复顺序见知识库笔记 `20-Knowledge/开发环境/谷歌云盘同步git索引与对象损坏.md`。
+
 ## 边界与不负责事项
 
 - junction 是本地重定向，不提供跨机实时双向同步；多机共享需各机装谷歌云盘客户端并各自建 junction 指向本地同步目录。

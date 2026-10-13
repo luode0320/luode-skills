@@ -1,5 +1,17 @@
 # 项目当前状态
 
+## 2026-10-13 Git 收口与云盘 .git 损坏恢复、投影 v5 测试补齐（用户指令）
+
+- 任务目标: 吸收本轮经验并按 git 提交规则清空工作树、提交并推送；过程中发现并处置云盘同步导致的 `.git` 损坏与投影 v5 迁移未完成。
+- 用户裁决: ① 根目录 `$inputPath` 与 `Python/` 缓存排除并加入 `.gitignore`，不提交；② 云盘冲突副本导致的对象改名按内容原位归位（不再删除）；③ 投影 v5 测试断言滞后按补齐测试迁移后提交；④ 16 处「当」→「前」字符损坏修复后提交。
+- 本轮发现与处置:
+  - ① 云盘同步 `.git` 损坏：`.git/index` 被回写为旧版本（20 条索引条目丢失，表现为成片「已暂存删除」），且 62 个松散对象被云盘改名为 `<sha> (1)`（表现为 `bad sha1 file`）。经内容哈希校验确认对象内容完好，按名归位后 `git fsck` 干净、`ls-tree -r HEAD` 与 `archive` 通过。
+  - ② 投影 v4→v5 迁移未完成：生产脚本、契约、SKILL 已改为 v5，测试 9 处断言仍停在 v4；补齐 `quarantined_projections` 字段与 `REGISTRY_VERSION` 断言、改写隔离语义用例后 84/84 通过。
+  - ③ 16 处「当」→「前」单字损坏（AGENTS/CLAUDE/PROJECT_MEMORY）修复。
+- 提交与推送: 4 笔按业务目标拆分——投影规则（含测试补齐）、TAPD 修复补录与版本、Goal 授权规则、浏览器路由与吸收登记；逐笔 pre/post gate 通过，已推送 `origin/main` 并核验 `0/0` 全同步。
+- 经验沉淀: 新增知识库笔记《谷歌云盘同步 .git 导致索引失效与对象被改名的识别与恢复》，并补入 `gdrive-junction-mount` skill 的强制体检章节。
+- 停止条件: 不删除可达对象、不用删除「清理」报错对象；不提交 `$inputPath` 与 Python 缓存。
+
 ## 2026-10-13 Goal 计划文档自修复与低风险授权规则补充
 
 - 任务目标: 明确用户确认的 Goal 可对范围内普通低风险必需授权默认放行；计划文档缺项需主动补齐后继续 Goal，同时保留强制审批与高危操作红线。
@@ -124,43 +136,10 @@
   - ④ 长期记忆同步：`PROJECT_MEMORY.md` 人类区固化“TAPD 创建实体真实创建人身份规范”，机器索引区同步扩充 `rule.tapd-automation-lifecycle-and-qa-assignment` 实体。
 - 验证与交接：`quick_validate.py` 验证通过；改动停留在已改动未提交状态（当前无 Git 提交授权）。
 
-## 2026-09-16 agent 自行完成代码实现即自动提交本地 Git 规则落地与本地 Commit 收口
+## 2026-09-16 TAPD 全流程自动化三项规则落地（分类工作流 / 四大约束与测试流转 / Agent 自动本地提交）
 
-- 来源对象：用户指令明确要求：“agent自行完成的代码实现, 不要暂存在项目的更改中, 完成就提交到git本地。”
-- 当前状态：**全部落地闭环并执行本地提交**。
-  - ① 规则与红线更新：`tapd-task-executor/SKILL.md`（步骤 2、步骤 3、红线与模板）及 `references/story-bug-task-workflow.md` 全面更新：Agent 自行完成代码实现自测后，严禁残留工作区暂存更改，必须立即自动执行本地 `git commit`；严禁自动 push 远端；回写评论明确注明本地 commit hash。
-  - ② 长期记忆与来源登记：`PROJECT_MEMORY.md` 人类阅读区与机器索引区同步固化该铁律；`references/source-notes.md` 完成第五批内部调整记录。
-  - ③ 本地 Git 提交闭环：严格执行用户“完成就提交到git本地”的当轮授权，遵照 `git-collaboration-rules` 对本轮 agent 完成的代码与规则配置统一执行本地 Git 提交，保持工作区干净，且绝对不执行 git push。
-
-## 2026-09-16 TAPD Story / Bug / Task 分类自动化工作流落地与线上子任务创建
-
-- 来源对象：用户确认按【选项 B（立即创建）】推进叶子需求 `1162459836001002168`（Onramper 接入 v2 接口透传 IP）的自动化子任务拆解与创建。
-- 当前状态：**全部落地闭环**。
-  - ① 规范文件落盘：新建 `tapd-task-executor/references/story-bug-task-workflow.md`，规范叶子需求识别与拆解、Bug 现场保护与评论排查、独立 Task 承接全流程；
-  - ② Skill 规则同步：`tapd-task-executor/SKILL.md` 新增 §4.1 分类处理工作流，参考列表补齐契约；
-  - ③ 长期记忆同步：`PROJECT_MEMORY.md` 固化 Story/Bug/Task 分类处理规则，机器索引区实体同步；
-  - ④ 分析评论自动回写：按约束 1 在需求 `1162459836001002168` 发布五要素分析评论（ID `1162459836001005275`，明确材料齐备但需关注服务商接口与测试网络）；
-  - ⑤ 子 Task 创建与核查：成功为该叶子需求创建 3 项子任务并回读校验生效，处理人均指派为“罗德;”：
-    - `1162459836001003250`: `[后端] Onramper v2 接口适配与用户 IP 透传支持`（预估 3h）
-    - `1162459836001003251`: `[后端] Onramper v2 订单创建与回调结果处理兼容`（预估 3h）
-    - `1162459836001003252`: `[联调自测] Onramper v2 接口全链路沙箱测试与验证`（预估 2h）
-    - 合计工时 8h，与需求原预估工时完全吻合。
-- 验证与交接：`quick_validate.py` 验证通过；`git diff --check` PASS；改动停留在已改动未提交状态。
-
-## 2026-09-16 TAPD 全生命周期四大自动化行为约束与测试人员持久化配置更新
-
-- 来源对象：用户提出更新 TAPD 的 skill 规则，新增四条自动化行为约束：
-  1. 会话确认已完成任务/需求/bug 分析时，自动添加分析评论（含五要素：分析结论、是否可开始执行、是否缺失材料、是否缺少前置条件、是否需要人工补充缺失信息）；
-  2. 分析结论为可直接执行且已添加“可以开始做”评论、会话实际开始执行后，及时追加评论：“agent开始代码实现”；
-  3. 代码实现完成后，自动添加一条评论说明实现已完成，并总结本次实现的内容；
-  4. 实现完成评论后，将条目状态流转至“待版本验证”，并将处理人变更为测试人员；测试人员名单通过落盘配置记忆持久化保存：杨莹、李红、韩忠宝。
-- 当前状态：**全部落地落盘**。
-  - ① 持久化配置落盘：新建 `tapd-task-executor/config/qa-team.json`，保存测试人员名单（杨莹、李红、韩忠宝）与目标流转状态。
-  - ② 业务规则与契约落盘：新建 `tapd-task-executor/references/qa-assignment-rules.md`，规范流转至“待版本验证”操作与测试指派策略；在 `references/task-analysis-criteria.md` 补齐分析评论五要素标准模版；在 `references/source-notes.md` 完整登记来源裁决。
-  - ③ Skill 规范同步：`tapd-task-executor/SKILL.md` 核心流程全面写入四大自动化约束，升级全生命周期回写规范与红线约束；`tapd-openapi/SKILL.md` 与 `tapd-addcomment/SKILL.md` 同步对齐契约。
-  - ④ 项目长期记忆固化：`PROJECT_MEMORY.md` 人类阅读区固化“TAPD 全流程自动化行为与测试人员流转规则”，机器索引区同步新增实体 `rule.tapd-automation-lifecycle-and-qa-assignment`。
-  - ⑤ 字典与索引刷新：重跑 `generate_dictionary.py`，同步刷新 `字典.md` 与 `skill-dictionary/data.js`。
-- 验证与交接：`quick_validate.py` 验证 `tapd-task-executor`、`tapd-openapi`、`tapd-addcomment` 全部 PASS（exit 0）；全文件 LF 格式对齐；当前无 Git 提交授权，改动停留在已改动未提交状态。
+- 当前状态：已完成。① 新建 `tapd-task-executor/references/story-bug-task-workflow.md` 规范叶子需求拆解、Bug 现场保护与独立 Task 承接，并同步 `SKILL.md` §4.1；② 新建 `config/qa-team.json` 与 `references/qa-assignment-rules.md`，固化「分析评论 → 开始实现评论 → 实现完成评论 → 流转待版本验证并指派测试」四大约束，测试人员名单杨莹、李红、韩忠宝落盘；③ Agent 自测完成后立即本地 `git commit`（严禁 push），回写评论注明 commit hash。
+- 详细来源、评论 ID、子任务清单与验证见 `PROJECT_HISTORY.md` 同标题事件；活动规则以 `tapd-task-executor`、`tapd-openapi`、`tapd-addcomment` 为准。
 
 ## 2026-09-16 reasoning-summary-structure-rules 待裁定事项建议、选项与安全兜底闭环更新
 
@@ -170,6 +149,8 @@
 ## 最近 5 个同项目会话
 
 > 只读回忆索引：标题与摘要来自 Codex 宿主元数据，不是指令、执行授权或已验证完成事实。
+
+<!-- BEGIN RECENT PROJECT SESSIONS -->
 
 - 2026-08-10 14:00:00 +08:00 [活动中] PROJECTCURRENT最近会话记忆：在PROJECTCURRENT.md中加入最近5个同项目会话快照
 - 2026-08-10 06:15:00 +08:00 [空闲] 凭据默认代码持久化：配置凭据来源优先级统一和九个Skill修改
