@@ -115,12 +115,31 @@ tapd-cli story add --help    # 子命令详细参数
 
 ## 排障
 
+已完成修复的实体选择、状态和工时语义统一见 [修复补录与工时登记](../tapd-openapi/references/completed-fix-and-timesheet.md)，本 CLI 只承接命令执行。
+
 | 现象 | 排查路径 |
 |------|---------|
 | `command not found: tapd-cli` | alias 未配置或 shell 未重载；先用 `node <skills根目录>/tapd-cli/scripts/tapd-cli.cjs --help` 直连验证脚本存在 |
 | 鉴权失败 / 401 | 按 `tapd-env-bootstrap` 验证 `TAPD_TOKEN` 已注入且非空（只判断有无，不回显明文），必要时重新获取 Token |
 | 网络超时 / 连接失败 | 检查 `TAPD_API_ENDPOINT` 是否可达：`curl -s -m 15 -H "Authorization: Bearer $TAPD_TOKEN" "$TAPD_API_ENDPOINT/users/info"` |
 | 参数报错 | 用 `tapd-cli <entity> <subcommand> --help` 查看该子命令参数；`-` 与 `_` 分隔符等价 |
+
+### Windows 调用 WSL 的写入脚本
+
+当网络操作需要在 WSL 执行，含 HTML、中文或多行数据的写入流程优先先落 UTF-8 临时脚本，再通过脚本路径执行。不要把 PowerShell、Bash、Python 多层引号拼成一条长 `-c` 命令；PowerShell 不用 `\"` 作为引号转义，也不要假设 Windows 环境变量已自动传入 WSL。
+
+```powershell
+# $taskScript 已由当前任务构造；凭据只在 WSL 运行时按环境引导加载。
+$taskScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) ('tapd-' + [guid]::NewGuid().ToString('N') + '.py')
+Set-Content -LiteralPath $taskScriptPath -Value $taskScript -Encoding utf8
+$taskWslPath = (wsl.exe --exec wslpath -u $taskScriptPath).Trim()
+wsl.exe --exec bash -lc 'source ~/.tapd/env.sh; exec "$@"' bash python3 $taskWslPath
+if ($LASTEXITCODE -ne 0) { throw '执行失败；保留临时脚本和已取得的实体 ID，先核查是否已写入' }
+# 先核验 API 返回并回读实体/工时，再清理明确的单个临时脚本。
+Remove-Item -LiteralPath $taskScriptPath
+```
+
+执行前确认临时文件存在、解释器和 CLI 组件可用、凭据已加载且非空；只报告有无，不输出原值。执行结果不明确时保留恢复所需 ID，再按主流程先查后重试。此模式适用于所有能使用标准 shell 的 agent；其他平台沿用其原生命令通道。
 
 ## 开发
 

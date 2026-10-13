@@ -16,6 +16,7 @@ allowed-tools: Bash,Read,Glob,Grep
 
 链接解析到 story/bug/task 实体后，先判断用户当前意图类型，精准路由：
 
+- **修复补录**（“新增一个 bug，记录这次修复”“补录任务并填写工时”）→ 按 [修复补录与工时登记](references/completed-fix-and-timesheet.md) 创建或补充记录；已有修复事实只记录和核验，不重新进入任务执行流水线。
 - **纯信息查询**（仅问具体字段、状态、进度、负责人等，如"这条需求什么状态""负责人是谁"）→ 停留在本 skill，只读展示，不升级为执行。
 - **分析意图（"看一下这个任务 / 看看任务"）** → 联动 `tapd-task-executor` 走单任务分析工作流：聚焦于代码与业务调研，在 TAPD 上发布标准五要素【分析结论评论】，不擅自开工代码实现。
 - **完善意图（"完善这个任务 / 完善任务"）** → 联动 `tapd-task-executor` 走任务完善工作流：说明任务描述不清楚，根据代码库与业务现状补充完善需求内容与规格说明（更新 description 或发布完善评论）。
@@ -103,7 +104,7 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
 7. **请求标记**：TAPD 请求在 URL 追加 `?s=mcp`（已有 query 用 `&s=mcp`），Header 加 `Via: mcp`，与本地 Bearer 认证兼容
 8. **认证二选一**：默认 `Authorization: Bearer $TAPD_TOKEN`；无 Token 时才用 Basic（`TAPD_API_USER` + `TAPD_API_PASSWORD` 的 base64），详见 `references/id-conversion.md`
 9. **自定义字段前置**：使用 `custom_field_*` 前必须先调对应实体的 `custom_fields_settings` 获取配置；任务状态仅 open/progressing/done，需求状态走工作流接口
-10. **全生命周期自动化行为约束（与 tapd-task-executor 契约对齐）**：
+10. **受委派执行任务的生命周期约束（与 tapd-task-executor 契约对齐；修复补录按上方专用路由）**：
    - **分析完成**：确认完成任务/需求/bug 分析时，必须自动添加一条分析评论（必含：分析结论、是否可开始执行、是否缺失材料、是否缺少前置条件、是否需要人工补充缺失信息）；
    - **开始执行**：分析结论为可直接执行且已添加“可以开始做”评论、实际进入代码实现后，及时追加评论：`agent开始代码实现`；
    - **实现完成**：代码实现完成后，自动添加一条评论说明实现已完成，并总结本次实现内容；
@@ -112,6 +113,7 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
    - 通过 OpenAPI 创建缺陷（`POST /bugs`）、需求（`POST /stories`）或任务（`POST /tasks`）时，**必须显式传入创建人字段**（Bug 为 `reporter`，Story/Task 为 `creator`）；
    - 创建人必须是当前 Token 绑定的真实员工姓名（优先调用 `GET /users/info` 动态解析 `data.name`/`data.nick`，例如 `罗德`；或读取本机用户真源），**绝对禁止随便取名字**（严禁随意填写 `admin`、`agent`、`workbuddy`、`bot` 或虚拟姓名）；
    - **审计只读机制**：若未显式传该字段，TAPD 服务端将强制默认填充为凭据名 `tapd_my_token`；且创建后该字段在 TAPD 服务端属于**只读审计属性**，`update_*` 接口会被静默忽略无法事后修改。一旦误创建，必须作废重开。
+12. **Bug 版本默认取本次项目的当前迭代（每次实时查询）**：创建或补录 Bug，或用户要求填写其当前版本时，先按 [Bug 版本与当前迭代](references/bug-version-and-current-iteration.md) 查询本次 `workspace_id` 的迭代和版本候选值，再填 `iteration_id` 与 `version_report`；不得写死版本、复用上次结果或跨项目套用。合入、验证和关闭版本只按对应事实填写；多个当前迭代无法唯一确定时询问用户，不机械选最高版本或最大 ID。
 
 ## 输出规范（列表结果必须逐条列）
 
@@ -125,7 +127,7 @@ curl -s -X POST -H "Authorization: Bearer $TAPD_TOKEN" \
 
 ## 失败处理
 
-接口最多 **2 次**（原始 + 1 次降级），禁止反复重试：
+读取接口最多 **2 次**（原始 + 1 次降级），禁止反复重试。创建、状态更新或工时登记若返回超时或未知结果，先按 [修复补录与工时登记](references/completed-fix-and-timesheet.md) 回读确认，不套用读取降级流程盲目重发写请求。
 
 1. GET 失败 → 探测：`curl -s -H "Authorization: Bearer $TAPD_TOKEN" $TAPD_API_ENDPOINT/users/info`
 2. 探测也失败 → Token 无效，告知用户
@@ -161,11 +163,11 @@ cat ./references/comments/addcomment.md
 
 | 方法 | 路径 | 功能 | 文档 |
 |------|------|------|------|
-| GET | `/bugs` | 查询缺陷列表 | `bugs/listbugs.md` |
-| GET | `/bugs/count` | 统计缺陷数量 | `bugs/countbugs.md` |
-| POST | `/bugs` | 创建缺陷 | `bugs/addbug.md` |
-| POST | `/bugs` | 更新缺陷（需传 id） | `bugs/updatebug.md` |
-| GET | `/bugs/get_fields_info` | 获取字段及候选值 | `bugs/getbugfieldsinfo.md` |
+| GET | `/bugs` | 查询缺陷列表 | `bugs/get_bugs.md` |
+| GET | `/bugs/count` | 统计缺陷数量 | `bugs/get_bugs_count.md` |
+| POST | `/bugs` | 创建缺陷 | `bugs/add_bug.md` |
+| POST | `/bugs` | 更新缺陷（需传 id） | `bugs/update_bug.md` |
+| GET | `/bugs/get_fields_info` | 获取字段及候选值 | `bugs/get_bug_fields_info.md` |
 
 ### 三、tasks（任务）
 
