@@ -733,3 +733,34 @@
 - **净增体积**：`hit-checklist.md` +2 行（约 +0.2KB）。
 - **棘轮验证**：UTF-8 校验 PASS；两条新增与 `verify-brainstorm-rules` 的追问轮口径一致，无冲突。
 - **源清理**：N/A（内部更新通道）。
+
+
+## 2026-10-13：内部调整——十分钟未显示步骤时重试当前会话投影
+
+- **来源**：用户反馈任务处理超过十分钟仍未显示任务步骤，并明确要求超时后应出现步骤。
+- **形态**：内部更新通道（执行中暴露的投影/UI 同步流程缺口）。
+- **原子条目**：① 十分钟补救同时覆盖缺少活动 projection 与已有 projection 但 UI 未确认同步；② `already_active` 只代表磁盘投影存在，未同步时通过 `ensure-timeout` 取唯一当前 payload 并重试 `update_plan`；③ 在严格超过 600 秒后的首个可执行检查点立刻处理，UI 失败继续领域任务，工具运行中无法后台唤醒。
+- **本地现状**：旧规则的 Owner、契约、自主执行入口只将“无活动 projection”送入 `probe-timeout`；活动 projection 直接跳过 UI 重试，无法覆盖截图反馈。
+- **裁决**：合并，扩充现有唯一 Owner，不新增 Skill 或脚本状态。
+- **落点**：`task-plan-rehydration-rules/SKILL.md`、`references/task-plan-projection-contract.md`、`agents/openai.yaml`；同步 `autonomous-execution-rules`、`skill-hit-check-rules`、仓库入口规则和项目记忆。
+- **整理去重**：更新现有十分钟异常修复条款，未新增第二套计时器；超过阈值判断仍由 Owner 唯一维护，UI 同步失败仍归 `UI_SYNC_BLOCKED` 降级路径。
+- **同域扫描结论**：范围 = `task-plan-rehydration-rules`、`autonomous-execution-rules`、`skill-hit-check-rules`；修正 Owner/下游入口中“仅缺失投影”的旧说法，统一 active-but-unsynced 重试语义；无散落文件；PASS。
+- **环境依赖登记**：N/A（纯规则文本，复用已存在工具）。
+- **净增体积**：N/A + 原因：仓库当前 Git 工作树盘点失败（`git status --short` 返回 `fatal: unable to read tree`），无法读取可靠基线计算净字节差；证据：通过实际文件读取确认本条记录与目标规则均已落盘，未用估算值冒充 diff。
+- **验证**：任务投影定向测试 84 项通过；Owner、自主执行、命中检查、吸收规则与知识流 Skill 的 `quick_validate.py` 均 PASS；知识索引检查 PASS。独立规则走查评分 81.3/100，三类超时场景通过；尚无当前 Codex Desktop 原生 UI 的实机显示证据。
+- **源清理**：N/A（内部更新通道）。
+
+## 2026-10-13：内部调整——本地项目调试优先使用 Agent 内置浏览器
+
+- **来源**：用户指令——“如果我们是本地的项目调试，agent工具本身内置浏览器，优先使用内置的浏览器进行调试”。
+- **形态**：内部更新通道（用户明确提出的路由规则补充，无外部源可删）。
+- **原子条目**：① 本地项目需要浏览器调试时默认使用 agent 内置浏览器；② 需要真实用户标签页、登录态、Cookie 或扩展时仍走 `Chrome Plugin`；③ 基础自动化、高级观测与 Cloud 专属能力继续按统一矩阵分流。
+- **本地现状**：统一矩阵已把独立 profile 的 DOM / 样式 / 控制台 / Network / Performance / Coverage 与运行时调试指向 `Chrome DevTools MCP`，但没有明确称为“本地项目调试”并标明 agent 内置浏览器优先；`test-strategy-rules` 只规定页面点击测试场景。
+- **裁决**：合并到既有唯一浏览器路由矩阵，不新增 Skill 或平行优先级；本地项目调试优先当前 agent 宿主提供的内置浏览器通道，矩阵以 `Chrome DevTools MCP` 作为标准调试能力映射；只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础自动化。用户真实标签页、登录态、Cookie 或扩展仍走 `Chrome Plugin`。只读复核时进一步明确宿主能力边界，避免把不同 agent 的内置浏览器都误称为同一个 MCP。
+- **落点**：`mcp-installation-rules/references/tool-priority.md` 的“浏览器路由矩阵”中独立 profile 的 DOM / 页面行为与 Network / Performance / 运行时调试两行。
+- **整理去重**：只扩充矩阵现有场景表述；`test-strategy-rules` 的页面点击测试优先级继续引用本矩阵，不新增第二套矩阵或改写用户真实 Chrome 的认证边界。
+- **同域扫描结论**：范围 = `mcp-installation-rules/references/tool-priority.md`、`test-strategy-rules/SKILL.md`、`browser-session-automation-rules/SKILL.md`、`browser-advanced-testing-rules/SKILL.md`、`browser-use-cloud-rules/SKILL.md`；规则只在统一矩阵定义，其他 Skill 分别承接页面点击、本地自动化、高级观测和 Cloud 专属能力。只读子代理复核通过：当前宿主内置通道优先、基础自动化条件回退、DevTools 专属能力阻断及真实用户 Chrome 边界均无实质冲突；矩阵内基础点击场景存在条件重叠但兼容。PASS。
+- **环境依赖登记**：N/A（纯规则文本，无新增运行时依赖、配置或路径）。
+- **净增体积**：Git 树读取失败，无法取得可靠 diff 基线；以写入后真实读取到的目标内容核验，不估算净增字节。
+- **棘轮验证**：无目标 Skill 的既有 8 维评分基线；以目标 Skill 结构校验、矩阵引用核对、UTF-8 回读与只读同域审计替代。
+- **源清理**：N/A（内部更新通道）。

@@ -279,3 +279,24 @@
 - **环境依赖登记**：N/A + 理由（纯规则文本，无环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用）。
 - **验证**：文件 UTF-8 无乱码；两条新增规则与 `verify-brainstorm-rules/SKILL.md` 的"追问轮不豁免"口径一致，无冲突。
 - **源清理**：N/A（内部更新通道）。
+
+
+## 2026-10-13 · 内部调整：task-plan-rehydration-rules 十分钟 UI 重同步
+
+- **调整诉求**：用户要求主动执行超过 10 分钟仍未显示步骤时显示任务清单。
+- **发现缺口**：十分钟入口只处理无活动 projection；已有磁盘投影但 `update_plan` 未同步时返回 `already_active` 后没有刷新路径。
+- **裁决**：补充既有恢复 Owner：到期首个可执行检查点立即检查；缺 projection 按原流程补建，active-but-unsynced 通过 `ensure-timeout` 重取唯一 payload 并重试 UI；显示故障仍不阻断任务。
+- **落点**：`task-plan-rehydration-rules/SKILL.md`、`references/task-plan-projection-contract.md`、`autonomous-execution-rules`、`skill-hit-check-rules`、项目规则与记忆。
+
+## 2026-10-13 · 内部调整：本地项目调试优先使用 Agent 内置浏览器
+
+- **来源名称**：用户当轮指令；无外部来源。
+- **调整诉求**：本地项目需要浏览器调试时，优先使用 agent 工具本身内置的浏览器。
+- **裁决摘要**：本地项目调试优先当前 agent 宿主提供的内置浏览器通道，统一矩阵以 `Chrome DevTools MCP` 作为标准调试能力映射；宿主未提供时，仅当任务不依赖 DevTools 专属能力才条件回退到基础自动化。真实用户标签页、登录态、Cookie 或扩展继续走 `Chrome Plugin`。
+- **落点**：`mcp-installation-rules/references/tool-priority.md`。
+- **裁决表**：`workbuddy-absorption-map.md`（2026-10-13 内部调整条目）。
+- **知识库**：检索到页面点击测试路由的既有背景；根据 `knowledge-flow` 对纯项目内部机制变更的排除规则，本轮不另建知识库笔记。
+- **同域扫描**：范围 = 统一浏览器矩阵、页面/UI 测试执行通道、本地自动化、高级观测与 Cloud 路由；PASS，详见裁决表。
+- **环境依赖登记**：N/A（纯规则文本）。
+- **验证**：`quick_validate.py` 对 `mcp-installation-rules`、`skill-absorption-rules`、`skill-execution-compliance-gate-rules` 均返回 `Skill is valid!`；`check_memory_anchors.py --project-root . --json` 返回 `ok=true`（56 个实体、20 个历史锚点）；目标矩阵 UTF-8 解码通过（6863 字节），CRLF=0，两条本地项目调试行和两个标准映射标记计数均为 2；只读子代理规则审计 PASS。Git 状态读取失败（`fatal: unable to read tree`），未取得 diff 校验结果。
+- **源清理**：N/A（内部更新通道）。

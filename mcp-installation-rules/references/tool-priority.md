@@ -16,11 +16,13 @@
 
 按任务条件选择，不按工具名做无条件替换：
 
+本地项目调试优先使用当前 agent 宿主提供的内置浏览器通道。本矩阵的标准调试能力映射为 `Chrome DevTools MCP`；只有当前宿主未提供该通道、且任务不依赖 DevTools 专属能力时，才按条件使用 `browser-session-automation-rules`。只有依赖用户真实标签页、登录态、Cookie 或扩展时才使用 `Chrome Plugin`。
+
 | 任务信号 | 首选工具 | 条件后备 / 处理 |
 | --- | --- | --- |
 | 已有标签、登录态、Cookie、扩展、用户真实 profile | `Chrome Plugin` | Chrome Plugin 不可用时阻断并要求修复连接 |
-| 独立 profile 的 DOM、样式、控制台、页面行为验证 | `Chrome DevTools MCP` | 不依赖 DevTools 专属能力时可使用 `browser-session-automation-rules`；否则阻断 |
-| 独立 profile 的 Network、Performance、Coverage 或运行时调试 | `Chrome DevTools MCP` | 无等价能力时阻断，不以基础自动化结果冒充 DevTools 验证 |
+| 本地项目调试：独立 profile 的 DOM、样式、控制台、页面行为验证 | 当前 agent 宿主提供的内置浏览器通道（本矩阵标准映射：`Chrome DevTools MCP`） | 当前宿主未提供该通道时，只有不依赖 DevTools 专属能力才可使用 `browser-session-automation-rules`；否则阻断 |
+| 本地项目调试：独立 profile 的 Network、Performance、Coverage 或运行时调试 | 当前 agent 宿主提供的内置 DevTools 通道（本矩阵标准映射：`Chrome DevTools MCP`） | 无等价能力时阻断，不以基础自动化结果冒充 DevTools 验证 |
 | 隔离 profile、具名 session、认证登录、表单交互、批量执行 | `browser-session-automation-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | HAR / route、视觉 diff、录制 / trace、代理、多引擎、多 session 观测面板 | `browser-advanced-testing-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | 不依赖真实 profile 的基础打开、点击、填写或一次性截图 | `Chrome DevTools MCP`（可用时） | Chrome DevTools MCP 不可用时可条件后备 `browser-session-automation-rules`；仍需满足 local 与安全约束 |
