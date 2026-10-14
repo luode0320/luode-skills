@@ -74,7 +74,7 @@ class PlanOutputContractTests(unittest.TestCase):
         self.assertIn("reasoning-summary-structure-rules", case["hit_skills"])
         self.assertIn("# 📋 本轮总结", "\n".join(case["visible_messages"]))
 
-    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-07-26 18:00:00，锁定四份规则源的边界声明。
+    # [参数] self：测试实例；[返回] 无；最近修改时间：2026-10-14 12:00:00，锁定四份规则源的边界声明。
     def test_static_owner_boundaries_are_present(self) -> None:
         summary = (REPO_ROOT / "reasoning-summary-structure-rules" / "SKILL.md").read_text(encoding="utf-8")
         planning = (REPO_ROOT / "implementation-planning-rules" / "SKILL.md").read_text(encoding="utf-8")
@@ -84,7 +84,7 @@ class PlanOutputContractTests(unittest.TestCase):
         self.assertIn("Plan Mode 负向退出", summary)
         self.assertIn("唯一计划 Owner", planning)
         self.assertIn("命中列表不得包含 `reasoning-summary-structure-rules`", hit_check)
-        self.assertIn("`Plan Mode` 不持久化活动 projection", compression)
+        self.assertIn("`Plan Mode` 不持久化执行期活动 projection", compression)
 
     # [参数] self：测试实例；[返回] 无；最近修改时间：2026-08-09 02:00:00，验证正例包含完整零决策字段。
     def test_plan_ready_detailed_fields(self) -> None:

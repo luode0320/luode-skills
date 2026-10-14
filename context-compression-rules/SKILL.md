@@ -52,7 +52,7 @@ description: 基于“上下文压缩是有损的、必然丢失细节”这一�
 2. 读 `references/context-recovery-contract.md` 执行共享恢复顺序和近期事实判定。
 3. 读 `references/compression-playbook.md` 生成保留、折叠和剔除结果。
 4. 读 `references/boundary-rules.md` 确认与近期预热、历史回忆和主域的边界。
-5. 读取当前状态后按 `task-plan-rehydration-rules` 输出 `task_projection` 恢复状态；进行中步骤只恢复 UI，不直接继续未知写操作。`Plan Mode` 不写入活动 projection，也不调用 `update_plan`；十分钟仅用于发现缺失 projection 后的只读异常修复，不作为正常任务首次显示悬浮窗的入口。
+5. 读取当前状态后按 `task-plan-rehydration-rules` 输出 `task_projection` 恢复状态；进行中步骤只恢复 UI，不直接继续未知写操作。`Plan Mode` 不写入执行期 registry projection；默认通过原生计划流程展示细化步骤，若当前会话有 `update_plan` 可同步显示；十分钟仅用于发现缺失 projection 后的只读异常修复，不作为正常任务首次显示悬浮窗的入口。
    - `Plan Mode` 压缩恢复期间禁止生成总结型 `final_answer`、`# 📋 本轮总结` 或其它用户可见总结；恢复后继续由 `implementation-planning-rules` 生成原计划。
 6. 仅当 `recent_context_state=missing` 时调用 `recent-context-bootstrap-rules`；否则记录未调用原因。
 7. 输出当前目标、已确认事实、约束、关键路径、待确认项、下一动作、编码许可、规则重载状态、任务投影和近期事实路由状态。
@@ -64,7 +64,7 @@ description: 基于“上下文压缩是有损的、必然丢失细节”这一�
 - 不代替 `history-recall-rules` 的明确历史回溯，也不输出长期时间线。
 - 不把压缩摘要、旧记忆或近期材料伪装成当前已确认事实。
 - 不因压缩而删除仍影响决策的用户习惯、安全、授权、停止、回滚和范围边界。
-- `Plan Mode` 不持久化活动 projection、不调用 `update_plan`；默认执行恢复只允许同步当前 session，禁止跨 session 读取、刷新或覆盖。
+- `Plan Mode` 不持久化执行期活动 projection，但默认展示细化计划步骤；若当前会话提供 `update_plan`，允许同步 Plan Mode 的步骤显示；默认执行恢复只允许同步当前 session，禁止跨 session 读取、刷新或覆盖。
 - 不得在规则未恢复或编码许可不是 `confirmed` 时继续编码。
 - 用户明确停止、终止或不要继续时，恢复动作只允许形成最小收口，不得重启原任务。
 
