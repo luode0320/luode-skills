@@ -298,5 +298,18 @@
 - **知识库**：检索到页面点击测试路由的既有背景；根据 `knowledge-flow` 对纯项目内部机制变更的排除规则，本轮不另建知识库笔记。
 - **同域扫描**：范围 = 统一浏览器矩阵、页面/UI 测试执行通道、本地自动化、高级观测与 Cloud 路由；PASS，详见裁决表。
 - **环境依赖登记**：N/A（纯规则文本）。
-- **验证**：`quick_validate.py` 对 `mcp-installation-rules`、`skill-absorption-rules`、`skill-execution-compliance-gate-rules` 均返回 `Skill is valid!`；`check_memory_anchors.py --project-root . --json` 返回 `ok=true`（56 个实体、20 个历史锚点）；目标矩阵 UTF-8 解码通过（6863 字节），CRLF=0，两条本地项目调试行和两个标准映射标记计数均为 2；只读子代理规则审计 PASS。Git 状态读取失败（`fatal: unable to read tree`），未取得 diff 校验结果。
+- **验证**：`quick_validate.py` 对 `mcp-installation-rules`、`skill-absorption-rules`、`skill-execution-compliance-gate-rules` 均返回 `Skill is valid!`；`check_memory_anchors.py --project-root . --json` 返回 `ok=true`（56 个实体、20 个历史锚点）；目标矩阵 UTF-8 解码通过（6863 字节），CRLF=0；只读同域规则审计 PASS。Git 树读取失败，未取得 diff 校验结果。
 - **源清理**：N/A（内部更新通道）。
+
+## 2026-10-14 · 内部 gap 回补：C 盘删除权限与策略拒绝
+
+- **来源名称**：用户本轮反馈“还是失败，继续修复 skill 的规则”；此前 C 盘清理规则在无审批入口时只要求停止，未提供用户侧解锁条件。
+- **调整诉求**：明确区分路径写入范围不足与危险命令审批拒绝；无正式审批入口时说明如何由用户配置可审批的新任务，且禁止 agent 自行换通道或扩大权限。
+- **裁决**：内部 gap 回补；合并至 `windows-c-drive-cleanup` 与通用 WSL shell 转译规则，不创建新的审批 Skill。
+- **外部源**：N/A（用户实际执行反馈；本条记录内部规则差距）。
+
+### 后续回合复核（2026-10-14）
+
+- 新证据：用户在后续轮次明确要求重试同一精确目标；当前工具调用执行了不带 -Force 的精确 Remove-Item -LiteralPath ... -ErrorAction Stop，退出码为 0；只读回读确认目标不存在。Get-PSDrive 前后可用空间观测增加 209,268,736 字节；该值是空间读数差，不等同于文件逻辑长度。此前拒绝的具体原因仍未确认。
+- 修正规则缺口：明确原因未知时也适用后续新请求的重新评估；再次被拒后，只有影响该精确目标/动作的可核验配置变化或正式审批入口，加上后续轮次新的明确授权，才允许再评估一次；不得把一次成功泛化为未来会话必然获准。
+- 验证边界：本条记录的是当前环境一次成功及读回结果，不证明其他会话或不同工具配置拥有相同权限。

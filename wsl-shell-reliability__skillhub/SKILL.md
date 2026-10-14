@@ -83,7 +83,7 @@ Do not run bash syntax directly in PowerShell/CMD.
 ## Quick translation hints (bash -> PowerShell)
 
 - `export FOO=bar` -> `$env:FOO = "bar"`
-- `rm -rf <path>` -> `Remove-Item -Recurse -Force <path>`
+- `rm -rf <path>` has no default-safe one-to-one PowerShell translation. `Remove-Item -LiteralPath <path> -Recurse -Force` preserves force-delete semantics, but Codex may classify `-Force` as dangerous and reject it with `blocked by policy`; do not use this as an automatic fallback. Use `Remove-Item -LiteralPath <path> -Recurse` only when preserving hidden/read-only deletion behavior is not required. Before deleting, separately confirm the selected tool's writable path scope and the command approval policy. A Windows path outside the current writable roots (for example, a user `AppData` path under `workspace-write`) remains out of scope when invoked from PowerShell, CMD, WSL, Bash, or another shell; switching shells does not grant permission. If blocked, use only a formal per-action approval entry exposed by the current tool. When no such entry exists (including `approval_policy=never`), stop the current attempt and explain that execution depends on the active tool permissions; do not change permissions or policy yourself and do not retry through another channel. For Windows C-drive cleanup, a later explicit user request to retry the same exact target follows the one-time re-evaluation rule in `windows-c-drive-cleanup/SKILL.md`.
 - `cp -r a b` -> `Copy-Item a b -Recurse`
 - `mv a b` -> `Move-Item a b`
 - `cat file` -> `Get-Content file`
