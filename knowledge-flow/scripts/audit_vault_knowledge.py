@@ -47,6 +47,10 @@ EXECUTION_CASE_PREFIX = "20-Knowledge/execution-failure-cases/"
 # 归组时要求的最小共享标签数。原先共享 1 个标签即归组，实测 30 对候选里几乎全是误报
 # （把「Go 编码规范」和「ellipal_stat cron 任务」归为一组），因此提高到 2 并叠加同主题条件。
 MIN_SHARED_TAGS = 2
+# 标签重叠比例下限：共享标签数 / 较小一方的标签总数。宽泛标签（如 godot、oauth、wsl）
+# 会让同主题笔记天然共享 2 个标签，但占各自标签总数比例很低，属于正常同域补充而非冲突，
+# 因此在绝对数之外叠加比例条件。
+MIN_TAG_OVERLAP_RATIO = 0.5
 # 导航笔记类型：同家族分册天生同主题同标签，参与冲突归组只会制造误报。
 MOC_TYPE = "moc"
 # 落点规则声明的固定主题。定义放在本模块，供索引脚本单向复用，避免两处各推一套主题口径。
@@ -59,6 +63,9 @@ DECLARED_THEMES = (
     "数据清洗",
     "开发环境",
 )
+# 不参与归组计算的主题级宽标签：这些标签只表达「属于哪个目录主题」，同目录笔记人手一份，
+# 对「是否同一主题重复写入」没有区分度，计入只会推高重叠比例制造误报。覆盖主题清单。
+WIDE_TAGS_EXCLUDED = frozenset(DECLARED_THEMES)
 # 契约固定落点：被其它 skill 硬编码引用，不参与主题中文化，也不算违规目录。
 CONTRACT_DIRS = (
     "execution-failure-cases",
@@ -272,11 +279,20 @@ def group_conflict_candidates(notes: Iterable[NoteFacts]) -> list[dict[str, Any]
             # 互相写入 related 即视为已裁决为补充，不再作为候选重复报出。
             if links_to(note, other) and links_to(other, note):
                 continue
-            shared = (set(note.topics) | set(note.tags)) & (set(other.topics) | set(other.tags))
+            # 同类型聚合笔记（如不同日期的日报）共享标签是天然形态，按日补充互不取代，
+            # 互相归组只会制造纯噪音，跳过；但与不同类型笔记仍可正常归组。
+            if note.note_type == other.note_type and note.note_type == "source":
+                continue
+            note_tags = (set(note.topics) | set(note.tags)) - WIDE_TAGS_EXCLUDED
+            other_tags = (set(other.topics) | set(other.tags)) - WIDE_TAGS_EXCLUDED
+            shared = note_tags & other_tags
+            # 标签重叠比例按较小一方计算，避免标签多的一方稀释比例。
+            overlap_ratio = len(shared) / max(1, min(len(note_tags), len(other_tags)))
             similarity = title_similarity(note.title, other.title)
             same_theme = note_theme(note.path) == note_theme(other.path)
-            if (same_theme and len(shared) >= MIN_SHARED_TAGS) or similarity >= TITLE_SIMILARITY_THRESHOLD:
+            if (same_theme and len(shared) >= MIN_SHARED_TAGS and overlap_ratio >= MIN_TAG_OVERLAP_RATIO) or similarity >= TITLE_SIMILARITY_THRESHOLD:
                 members.append(other)
+                group_shared = sorted(shared)
         if len(members) < 2:
             continue
         for member in members:
@@ -284,6 +300,7 @@ def group_conflict_candidates(notes: Iterable[NoteFacts]) -> list[dict[str, Any]
         grouped.append(
             {
                 "reason": "同主题且标签高度重叠，或标题高度相似，且均为当前有效，需判定是补充、矛盾未裁决还是取代",
+                "shared_tags": group_shared,
                 "members": [
                     {"path": m.path, "title": m.title, "status": m.status, "is_orphan": m.is_orphan}
                     for m in members

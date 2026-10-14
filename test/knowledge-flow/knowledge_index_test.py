@@ -228,11 +228,11 @@ class IndexBuildAndQueryTest(unittest.TestCase):
         self.assertEqual(INDEX.query_index(index, "   "), [])
 
     def test_summary_index_is_created(self) -> None:
-        """写索引时必须同步输出 _index_summary.json 且包含结构化精简字段。
+        """写索引时必须同步输出 _index_summary.json 且按主题归组。
 
         [参数] 无。
         [返回] None：断言失败时抛出 AssertionError。
-        最近修改时间: 2026-10-10 新增轻量摘要索引测试。
+        最近修改时间: 2026-10-14 摘要索引升级 schema v2 主题归组结构。
         """
         index = INDEX.build_index()
         INDEX.write_index(index)
@@ -240,7 +240,8 @@ class IndexBuildAndQueryTest(unittest.TestCase):
         self.assertTrue(summary_path.exists())
         data = json.loads(summary_path.read_text(encoding="utf-8"))
         self.assertEqual(data["notes_count"], index["notes_count"])
-        self.assertIn("tags", data["notes"][0])
+        self.assertEqual(data["schema_version"], INDEX.SUMMARY_SCHEMA_VERSION)
+        self.assertIn("themes", data)
 
 
 class FrontmatterCheckTest(unittest.TestCase):

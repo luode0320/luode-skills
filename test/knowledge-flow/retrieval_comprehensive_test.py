@@ -91,7 +91,7 @@ class RetrievalComprehensiveTest(unittest.TestCase):
     # ==========================================
 
     def test_summary_index_structure_and_fields(self) -> None:
-        """测试 _index_summary.json 的轻量结构与核心字段精简性。"""
+        """测试 _index_summary.json 的 v2 主题归组结构与字段精简性。"""
         self.write_note(
             "20-Knowledge/工程实践/插件架构实录.md",
             title="插件架构实录",
@@ -106,18 +106,17 @@ class RetrievalComprehensiveTest(unittest.TestCase):
         summary = json.loads(summary_file.read_text(encoding="utf-8"))
 
         self.assertEqual(summary["notes_count"], 1)
-        self.assertIn("notes", summary)
-        note = summary["notes"][0]
-        # 必须保留的字段
-        self.assertIn("path", note)
-        self.assertIn("title", note)
-        self.assertIn("theme", note)
-        self.assertIn("tags", note)
-        self.assertIn("aliases", note)
+        # v2 摘要索引按主题归组，只保留 path/title 短键，服务 L1 领域大类导航。
+        self.assertIn("themes", summary)
+        theme_notes = summary["themes"]["工程实践"]
+        self.assertEqual(len(theme_notes), 1)
+        note = theme_notes[0]
+        self.assertEqual(note["p"], "20-Knowledge/工程实践/插件架构实录.md")
+        self.assertEqual(note["t"], "插件架构实录")
         # 必须精简排除的字段（以降低上下文 Token）
         self.assertNotIn("mtime", note)
-        self.assertNotIn("superseded_by", note)
-        self.assertNotIn("partial", note)
+        self.assertNotIn("tags", note)
+        self.assertNotIn("aliases", note)
 
     # ==========================================
     # 2. L2 领域 MOC 推荐路由算法测试 (infer_recommended_moc)

@@ -141,7 +141,9 @@ class EndToEndLifecycleSandboxTest(unittest.TestCase):
         summary_path = self.sandbox / INDEX.SUMMARY_INDEX_NAME
         self.assertTrue(summary_path.exists())
         summary_data = json.loads(summary_path.read_text(encoding="utf-8"))
-        summary_titles = [n["title"] for n in summary_data["notes"]]
+        summary_titles = [
+            item["t"] for notes in summary_data["themes"].values() for item in notes
+        ]
         self.assertIn("eBPF高性能网络排障组件实践", summary_titles)
 
         # 验证 L2 推荐 MOC 与 L3 原子召回

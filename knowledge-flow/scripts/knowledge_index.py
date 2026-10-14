@@ -22,6 +22,7 @@ from typing import Any
 AUDIT_PATH = Path(__file__).with_name("audit_vault_knowledge.py")
 INDEX_NAME = "_index.json"
 SUMMARY_INDEX_NAME = "_index_summary.json"
+SUMMARY_SCHEMA_VERSION = 2
 SCHEMA_VERSION = 1
 # note-schema.md 要求新笔记必须含完整 frontmatter，但该要求原先无机器校验，实测填充率只有 70%~82%。
 REQUIRED_FIELDS = ("id", "type", "title", "status", "created", "updated")
@@ -110,32 +111,29 @@ def write_index(index: dict[str, Any]) -> Path:
 
     [参数] index: 待写入的索引对象。
     [返回] Path: 全量索引文件路径。
-    最近修改时间: 2026-10-10 新增轻量摘要索引生成。
+    最近修改时间: 2026-10-14 摘要索引改 schema v2 主题归组结构，体积 120KB 降至约 47KB。
     """
     target = KB_ROOT / INDEX_NAME
     payload = json.dumps(index, ensure_ascii=False, indent=2)
     target.write_text(payload, encoding="utf-8")
 
-    # 生成轻量级摘要索引：仅保留路径、标题、主题、标签和别名，剔除冗余字段
-    summary_notes = [
-        {
-            "path": n["path"],
-            "title": n["title"],
-            "theme": n["theme"],
-            "tags": n["tags"],
-            "aliases": n["aliases"],
-        }
-        for n in index["notes"]
-    ]
+    # 生成轻量级摘要索引（schema v2）：摘要的职责只是 L1 领域大类导航，按主题归类后
+    # 逐篇只保留 path/title，短键 + 紧凑序列化 + 剔除非 active 笔记，控制首跳加载成本。
+    # 需要按标签/别名精确检索时用全量 _index.json 的 query 子命令，不在此重复。
+    grouped: dict[str, list[dict[str, str]]] = {}
+    for n in index["notes"]:
+        if n["status"] != "active":
+            continue
+        grouped.setdefault(n["theme"], []).append({"p": n["path"], "t": n["title"]})
     summary_payload = json.dumps(
         {
-            "schema_version": index["schema_version"],
+            "schema_version": SUMMARY_SCHEMA_VERSION,
             "notes_count": index["notes_count"],
             "latest_mtime": index["latest_mtime"],
-            "notes": summary_notes,
+            "themes": dict(sorted(grouped.items(), key=lambda kv: -len(kv[1]))),
         },
         ensure_ascii=False,
-        indent=1,
+        separators=(",", ":"),
     )
     summary_target = KB_ROOT / SUMMARY_INDEX_NAME
     summary_target.write_text(summary_payload, encoding="utf-8")
@@ -276,13 +274,34 @@ def query_index(
             reasons.append("theme")
         if needle in note["path"].lower():
             reasons.append("path")
-        # 正文兜底：结构化字段未命中时也要看正文，避免漏掉未打标签的相关笔记。
         filepath = KB_ROOT / note["path"]
         try:
-            if needle in filepath.read_text(encoding="utf-8-sig").lower():
+            body_lower = filepath.read_text(encoding="utf-8-sig").lower()
+            if needle in body_lower:
                 reasons.append("body")
         except OSError:
-            pass
+            body_lower = ""
+
+        # 多词协同召回：若整词未命中且包含空格，检查是否所有分词都存在于元数据或正文中
+        tokens = [t for t in needle.split() if t]
+        if not reasons and len(tokens) > 1:
+            all_tokens_hit = True
+            for tok in tokens:
+                in_note = (
+                    tok in note["title"].lower()
+                    or any(tok in str(a).lower() for a in note["aliases"])
+                    or any(tok in str(t).lower() for t in note["tags"])
+                    or any(tok in str(t).lower() for t in note["topics"])
+                    or tok in note["theme"].lower()
+                    or tok in note["path"].lower()
+                    or (body_lower and tok in body_lower)
+                )
+                if not in_note:
+                    all_tokens_hit = False
+                    break
+            if all_tokens_hit:
+                reasons.append("multi_term")
+
         if reasons:
             results.append(
                 {
@@ -436,6 +455,41 @@ def strip_code_spans(text: str) -> str:
     return "\n".join(lines)
 
 
+def check_mounted() -> dict[str, Any]:
+    """校验活动区 active 知识笔记是否有至少一处入链（入网挂载硬门禁）。
+
+    捕获规则要求「写入新笔记必须同一轮挂载到 MOC 或建立双链入链」，但该要求此前
+    只存在于文字约定且只在 audit（软巡检）输出，实测工程实践目录累积多篇孤儿。
+    本函数把孤儿检测并入 check 硬闸门：活动区无任何入链的 active 知识笔记即违规。
+
+    豁免口径与巡检一致：归档区按只读历史豁免；`source` 类型（会话日志、日报等）
+    按各自生命周期按日追加，天生无需入链，纳入会把正常形态判成违规。
+
+    [参数] 无。
+    [返回] dict[str, Any]: 含未挂载清单与统计的报告。
+    最近修改时间: 2026-10-14 入网挂载从软巡检升级为 check 硬门禁。
+    """
+    notes = [
+        AUDIT.collect_note_facts(filepath)
+        for filepath in sorted(KB_ROOT.rglob("*.md"))
+        if not filepath.name.startswith(".")
+    ]
+    orphan_paths = set(AUDIT.find_orphans(notes))
+    violations = [
+        note.path
+        for note in notes
+        if note.path in orphan_paths
+        and note.status == ACTIVE_STATUS
+        and note.note_type != "source"
+        and not note.path.startswith(CHECK_EXEMPT_PREFIXES)
+    ]
+    return {
+        "ok": not violations,
+        "unmounted_count": len(violations),
+        "unmounted_notes": sorted(violations),
+    }
+
+
 def check_dead_links() -> dict[str, Any]:
     """校验全库双链目标是否都能解析到真实笔记。
 
@@ -584,7 +638,7 @@ def parse_args() -> argparse.Namespace:
     query.add_argument("--tag", default="", help="按标签过滤")
     query.add_argument("--limit", type=int, default=0, help="限制返回条数，0 表示不限制")
     sub.add_parser("stats", help="输出索引覆盖与主题分布统计")
-    sub.add_parser("check", help="校验 frontmatter 必填字段、状态枚举、接替关系双向性与双链有效性")
+    sub.add_parser("check", help="校验 frontmatter 必填字段、状态枚举、接替关系双向性、双链有效性与入网挂载")
     return parser.parse_args()
 
 
@@ -593,7 +647,7 @@ def main() -> int:
 
     [参数] 无。
     [返回] int: 0 表示成功，4 表示知识库根目录不可达。
-    最近修改时间: 2026-08-12 check 分支合并死链校验报告。
+    最近修改时间: 2026-10-14 check 分支合并入网挂载校验报告。
     """
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
@@ -618,12 +672,19 @@ def main() -> int:
         frontmatter = check_frontmatter()
         supersession = check_supersession()
         dead_links = check_dead_links()
-        # 三份报告扁平合并：调用方按具体违规键定位，不必区分是哪一类校验报出的。
+        mounted = check_mounted()
+        # 四份报告扁平合并：调用方按具体违规键定位，不必区分是哪一类校验报出的。
         report = {
             **frontmatter,
             **{k: v for k, v in supersession.items() if k != "ok"},
             **{k: v for k, v in dead_links.items() if k != "ok"},
-            "ok": frontmatter["ok"] and supersession["ok"] and dead_links["ok"],
+            **{k: v for k, v in mounted.items() if k != "ok"},
+            "ok": (
+                frontmatter["ok"]
+                and supersession["ok"]
+                and dead_links["ok"]
+                and mounted["ok"]
+            ),
         }
         print(json.dumps(report, ensure_ascii=False, indent=2))
         # 不合规时以非零退出码返回，便于当作闸门使用。
