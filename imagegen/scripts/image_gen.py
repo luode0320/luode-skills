@@ -44,6 +44,8 @@ GPT_IMAGE_2_MAX_RATIO = 3.0
 
 MAX_IMAGE_BYTES = 50 * 1024 * 1024
 MAX_BATCH_JOBS = 500
+# 图片下载超时（秒）：接口可能只返回 url 而不内联 b64，缺超时会让下载无限挂起。
+IMAGE_DOWNLOAD_TIMEOUT = 60
 
 DEFAULT_ANTI_PIXEL_NEGATIVE = (
     "pixel art, pixelated, 8-bit, 16-bit, retro sprite, mosaic, dithering, "
@@ -576,6 +578,33 @@ def _downscale_image_bytes(
         return out.getvalue()
 
 
+def _extract_images_b64(result: Any) -> List[Optional[str]]:
+    """把接口返回项统一抽取成 base64 图片列表。
+
+    兼容两种返回形态：优先取内联 `b64_json`，缺失时回退下载 `url` 并转 base64。
+    两者都没有的项保留 `None` 占位，让下游按下标一一对应输出文件。
+
+    [参数] result: 图像接口返回对象，需含 `data` 列表。
+    [返回] List[Optional[str]]: 与返回项等长的 base64 列表，无法取得时为 None。
+    最近修改时间: 2026-10-14 新增 url 回退下载，并补下载超时避免无限挂起。
+    """
+    import urllib.request
+
+    imgs: List[Optional[str]] = []
+    for item in result.data:
+        b64 = getattr(item, "b64_json", None)
+        if b64:
+            imgs.append(b64)
+            continue
+        url = getattr(item, "url", None)
+        if url:
+            with urllib.request.urlopen(url, timeout=IMAGE_DOWNLOAD_TIMEOUT) as resp:
+                imgs.append(base64.b64encode(resp.read()).decode("ascii"))
+            continue
+        imgs.append(None)
+    return imgs
+
+
 def _decode_write_and_downscale(
     images: List[str],
     outputs: List[Path],
@@ -936,7 +965,7 @@ async def _run_generate_batch(args: argparse.Namespace) -> int:
                 )
                 elapsed = time.time() - started
                 print(f"{job_label} completed in {elapsed:.1f}s", file=sys.stderr)
-            images = [item.b64_json for item in result.data]
+            images = _extract_images_b64(result)
             _decode_write_and_downscale(
                 images,
                 outputs,
@@ -1036,7 +1065,7 @@ def _generate(args: argparse.Namespace) -> None:
     elapsed = time.time() - started
     print(f"生图成功，耗时 {elapsed:.1f} 秒。", file=sys.stderr)
 
-    images = [item.b64_json for item in result.data]
+    images = _extract_images_b64(result)
     _decode_write_and_downscale(
         images,
         output_paths,
@@ -1131,7 +1160,7 @@ def _edit(args: argparse.Namespace) -> None:
 
     elapsed = time.time() - started
     print(f"Edit completed in {elapsed:.1f}s.", file=sys.stderr)
-    images = [item.b64_json for item in result.data]
+    images = _extract_images_b64(result)
     _decode_write_and_downscale(
         images,
         output_paths,
