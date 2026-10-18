@@ -179,6 +179,36 @@ class ScanTestPollutionTests(unittest.TestCase):
         reasons = [item.reason for item in result.blocking()]
         self.assertTrue(any("P4" in reason for reason in reasons), reasons)
 
+    def test_runtime_test_branch_is_exemptable(self) -> None:
+        """P4 仅测试可达分支与符号类结论共用豁免通道：登记后降级且不再阻断。
+
+        复刻真实场景：仓库冻结的第三方源码自带测试分支，不能修改，只能登记豁免。
+        """
+        branch_line = "    if env == \"test\" {"
+        allowlist = f"service/gate.go::{branch_line}  # 冻结的第三方源码自带测试分支\n"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            build_project(root, with_prod_caller=True, allowlist=allowlist)
+            (root / "service" / "gate.go").write_text(
+                "package service\n"
+                "\n"
+                "func Gate(env string) bool {\n"
+                f"{branch_line}\n"
+                "        return true\n"
+                "    }\n"
+                "    return false\n"
+                "}\n",
+                encoding="utf-8",
+            )
+            result = self.scanner.scan(root)
+
+        # 1. 豁免生效：该分支不再出现在阻断结论里。
+        self.assertEqual(result.blocking(), [], [vars(item) for item in result.findings])
+        # 2. 仍在报告中列出为 EXEMPTED，便于 6-review 复核理由是否成立。
+        exempted = [item for item in result.findings if item.verdict == "EXEMPTED"]
+        self.assertEqual(len(exempted), 1, [vars(item) for item in result.findings])
+        self.assertIn("P4", exempted[0].reason)
+
     def test_diff_only_covers_untracked_new_directory(self) -> None:
         """--diff-only 必须展开未跟踪新目录，否则新增生产文件会被漏扫。"""
         git = shutil.which("git")

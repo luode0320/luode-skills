@@ -349,6 +349,7 @@ def scan(root: Path, diff_only: bool = False) -> ScanResult:
     result = ScanResult()
     records: list[dict[str, object]] = []
     spans: dict[str, dict[str, tuple[int, int]]] = {}
+    branch_findings: list[Finding] = []
 
     # 1. 先提取全部生产符号定义，引用统计合并成单次 rg 调用。
     definitions: list[tuple[str, str, int]] = []
@@ -360,7 +361,7 @@ def scan(root: Path, diff_only: bool = False) -> ScanResult:
             continue
 
         result.scanned_files += 1
-        result.findings.extend(scan_test_branches(path, relative))
+        branch_findings.extend(scan_test_branches(path, relative))
 
         content = path.read_text(encoding="utf-8", errors="replace").splitlines()
         symbols = extract_symbols(path, relative)
@@ -440,6 +441,14 @@ def scan(root: Path, diff_only: bool = False) -> ScanResult:
                 mock_refs=len(record["mock_refs"]),
             )
         )
+
+    # 6. 仅测试可达分支（P4）与符号类结论共用同一豁免通道：
+    #    P4 的 symbol 取的是代码行文本，登记时须按同一截断口径书写键。
+    for finding in branch_findings:
+        if (finding.path, finding.symbol) in allowlist:
+            finding.verdict = VERDICT_EXEMPTED
+            finding.reason = f"已登记豁免（原判定 {finding.reason}）"
+        result.findings.append(finding)
 
     return result
 
