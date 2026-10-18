@@ -134,9 +134,10 @@
 
 ## 本地项目浏览器调试优先使用 Agent 内置浏览器（2026-10-13 固化）
 
-- 稳定决策：需要在浏览器中调试本地项目页面时，优先使用当前 agent 宿主提供的内置浏览器通道；统一矩阵以 `Chrome DevTools MCP` 作为标准调试能力映射，只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户真实标签页、登录态、Cookie 或扩展时仍使用 `Chrome Plugin`；HAR/性能/trace 和 Cloud 场景按各自专属路由承接。
-- 来源：用户指令（2026-10-13）+ `mcp-installation-rules/references/tool-priority.md`。
-- 更新时间：2026-10-13。
+- 稳定决策：需要在浏览器中调试本地项目页面时，优先使用当前 agent 宿主提供的内置浏览器通道；统一矩阵以 `Chrome DevTools MCP` 作为标准调试能力映射，只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户真实 profile 中**已有**的标签页、登录态、Cookie 或扩展时仍使用 `Chrome Plugin`；HAR/性能/trace 和 Cloud 场景按各自专属路由承接。
+- 稳定决策：**「页面需要登录」本身不构成回退 Chrome Plugin 的理由（2026-10-15 固化）**——回退判据是「必须复用用户真实 Chrome profile 里已经存在的认证态」，不是「页面需要登录」。本地调试系统（`localhost` / `127.0.0.1` 等 local 环境）的登录凭据由调试侧提供，属于可自行注入的授权，应由内置浏览器通道自行完成登录；只有真实账号会话、SSO、企业内部系统、第三方托管文档等难以自行获取的授权态才回退 Chrome Plugin。
+- 来源：用户指令（2026-10-13、2026-10-15）+ `mcp-installation-rules/references/tool-priority.md`。
+- 更新时间：2026-10-15。
 - 更新时间：2026-10-05。
 
 ## 生图生成后符合度自检与不符合即重做（2026-10-05 固化）
@@ -147,6 +148,19 @@
 - 稳定决策：**连续 3 轮不达标即停止自动重试**——改为向用户报告差距、已尝试的修改与候选方向，交回用户决策。
 - 来源：用户指令（2026-10-05）+ `imagegen/SKILL.md` 核心规则与工作流第 5/6/7 步 + `imagegen/references/prompting.md`「生成后符合度自检」节。
 - 更新时间：2026-10-05。
+
+## 可行性假设与浏览器登录判据（2026-10-19 固化）
+
+- 稳定决策：**「读代码推断成立」不等于已验证**——正式计划放行前必须把「不成立就要改路线」的方向级假设登记为 `FEAS-*` 并给出探针级别；落点存在性、依赖可用性、配置与接口契约属 L1 只读，运行时行为、真实返回、超时并发与端到端链路必须用 L2 隔离真实探针，只有只读证据时不得宣称已验证。方向级假设未验证时降级为受限计划并登记 `GAP-*`，任务级未验证假设写进对应任务的执行期第一动作。
+- 稳定决策：**L2 探针是正式验证手段而非越界**——它必须守住 local 环境、临时资源、临时代码、可回滚、无外部副作用、执行后清理并回读；探针只取证，不把 spike 转成交付物。
+- 稳定决策：**「页面需要登录」不是回退 Chrome Plugin 的理由**——回退判据是「必须复用用户真实 profile 中已经存在的认证态」；本地调试系统（`localhost` / `127.0.0.1` / local 配置声明的调试域名）的凭据由调试侧提供、可自行注入，应继续用内置浏览器通道完成登录。真实账号会话、SSO、企业内部系统、第三方托管文档才回退真实 profile。该口径必须同时覆盖认证 URL 路由、MCP 工具优先级矩阵、会话自动化、功能验证与测试策略，任一文档口径不一致即视为规则漂移。
+- 稳定决策：**多张不同图默认并发，内置通道不能当并发用**——内置生图同轮并列调用实测仍排队串行，数量 ≥ 2 且内容不同时走 CLI `generate-batch`（默认 5 路、上限 25、单 job 失败不中断、需要可复现顺序才用 `--concurrency 1`）；单 Key 下并发同样有效，只是共享同一条限流额度。
+- 稳定决策：**媒体产物必须展示而非只给路径**——本轮真实产出图片或视频时，回复必须包含可渲染媒体本体（宿主原生媒体工具 > `data:` URI > 宿主本地资源协议），禁止只用 `file:///`、盘符路径或普通链接冒充已展示；落盘与展示是两项独立交付。
+- 稳定决策：**豁免通道必须对同类结论一视同仁**——符号类结论与「仅测试可达分支（P4）」共用同一豁免键格式 `<相对路径>::<符号名>`，P4 的键照抄扫描报告打印的代码文本；只给一类结论开豁免会让冻结的第三方源码长期报红。
+- 稳定决策：**单条坏投影只隔离自身**——registry 按条目容错，单条损坏或身份重复只退出该计划的 UI 恢复，其余会话照常恢复；只有托管标记、JSON 或隔离记录整体损坏才退出全部 UI 恢复，且这类退出不取消与损坏计划无关的领域工作授权。
+- 稳定决策：**Windows 清理的度量必须按结构解析而非文本匹配**——robocopy 摘要按行序号取字节数（中文系统按「字节:」文本匹配会全盘误报 0GB）；stderr 红字不等于失败，判成功看 `Removed N files`；整目录删 Temp 会连带删掉 CLI 自身输出文件，必须逐项循环；临时 `.ps1` 一律纯 ASCII。仓库 `.gitattributes` 对 `*.bat` / `*.cmd` 强制 CRLF（cmd.exe 按字节偏移解析）。
+- 来源：用户指令（2026-10-19）+ `implementation-planning-rules/references/plan-feasibility-probe.md`、`mcp-installation-rules/references/tool-priority.md`、`imagegen/SKILL.md`、`reasoning-summary-structure-rules/SKILL.md`、`test-strategy-rules/references/production-test-pollution.md`、`task-plan-rehydration-rules/SKILL.md`、`windows-c-drive-cleanup/SKILL.md`。
+- 更新时间：2026-10-19。
 
 ## 记忆文件超长主动整理规则
 
@@ -1036,17 +1050,17 @@ entities:
       - 本地项目调试
       - agent 内置浏览器优先
       - Chrome DevTools MCP 本地调试
-    definition: "本地项目需要浏览器页面调试时，优先使用当前 agent 宿主提供的内置浏览器通道，统一矩阵以 Chrome DevTools MCP 作为标准调试能力映射；只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户已有标签页、真实登录态、Cookie 或扩展时选择 Chrome Plugin。基础自动化、高级观测和 Browser Use Cloud 仍按统一工具路由矩阵分流。"
+    definition: "本地项目需要浏览器页面调试时，优先使用当前 agent 宿主提供的内置浏览器通道，统一矩阵以 Chrome DevTools MCP 作为标准调试能力映射；只有宿主未提供该通道且任务不依赖 DevTools 专属能力时才条件回退到基础浏览器自动化。依赖用户真实 profile 中已有的标签页、真实登录态、Cookie 或扩展时选择 Chrome Plugin；「页面需要登录」本身不构成回退理由，本地调试系统（localhost/127.0.0.1）的凭据由调试侧提供、可自行注入。基础自动化、高级观测和 Browser Use Cloud 仍按统一工具路由矩阵分流。"
     scope: "本地项目的 DOM、样式、控制台、Network、Performance、Coverage 与运行时调试"
     status: "active"
     evidence_ids:
       - evidence.skill.local-project-browser-debug-route
     context_ids:
       - context.local-project-browser-debug
-    updated_at: 2026-10-13
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    updated_at: 2026-10-15
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-15
     absorbed_to: null
   - entity_id: rule.reasoning-summary-detail
     name: "结果与结论适中详细度契约"

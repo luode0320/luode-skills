@@ -1,150 +1,28 @@
 # 项目当前状态
 
-## 2026-10-13 Git 收口与云盘 .git 损坏恢复、投影 v5 测试补齐（用户指令）
+## 2026-10-19 规则吸收与全量提交收口（已收口）
 
-- 任务目标: 吸收本轮经验并按 git 提交规则清空工作树、提交并推送；过程中发现并处置云盘同步导致的 `.git` 损坏与投影 v5 迁移未完成。
-- 用户裁决: ① 根目录 `$inputPath` 与 `Python/` 缓存排除并加入 `.gitignore`，不提交；② 云盘冲突副本导致的对象改名按内容原位归位（不再删除）；③ 投影 v5 测试断言滞后按补齐测试迁移后提交；④ 16 处「当」→「前」字符损坏修复后提交。
-- 本轮发现与处置:
-  - ① 云盘同步 `.git` 损坏：`.git/index` 被回写为旧版本（20 条索引条目丢失，表现为成片「已暂存删除」），且 62 个松散对象被云盘改名为 `<sha> (1)`（表现为 `bad sha1 file`）。经内容哈希校验确认对象内容完好，按名归位后 `git fsck` 干净、`ls-tree -r HEAD` 与 `archive` 通过。
-  - ② 投影 v4→v5 迁移未完成：生产脚本、契约、SKILL 已改为 v5，测试 9 处断言仍停在 v4；补齐 `quarantined_projections` 字段与 `REGISTRY_VERSION` 断言、改写隔离语义用例后 84/84 通过。
-  - ③ 16 处「当」→「前」单字损坏（AGENTS/CLAUDE/PROJECT_MEMORY）修复。
-- 提交与推送: 4 笔按业务目标拆分——投影规则（含测试补齐）、TAPD 修复补录与版本、Goal 授权规则、浏览器路由与吸收登记；逐笔 pre/post gate 通过，已推送 `origin/main` 并核验 `0/0` 全同步。
-- 经验沉淀: 新增知识库笔记《谷歌云盘同步 .git 导致索引失效与对象被改名的识别与恢复》，并补入 `gdrive-junction-mount` skill 的强制体检章节。
-- 停止条件: 不删除可达对象、不用删除「清理」报错对象；不提交 `$inputPath` 与 Python 缓存。
+- 结论: 工作树 110 项改动按业务目标拆成 9 笔提交并推送，全部落盘完成；本轮同时把 8 类新经验吸收进 `PROJECT_MEMORY.md` 稳定规则节。
+- 提交分组: 组件库与示例守卫体系（355 文件 / 152 组件 / 运行守卫 / Arco 真相源 / 需求-Bug-测试-6review 与截图证据）、生图并发与媒体内联展示、计划可行性探针 `FEAS-*`、浏览器路由登录判据、测试污染 P4 豁免通道、任务投影单条容错、C 盘清理实测坑、扩展种子（豆包视频 / rea）、规则入口与残留自查维度校验。
+- 关键决策: ① 组件库与它的守卫脚本、Arco 真相源、文档证据属同一业务目标，合并为一笔，不按 docs/test 二次拆分；② 根 `.npm-cache` 是 npm 日志残留，删除而非提交；子目录 `.gitignore` 已覆盖 `node_modules`/`dist`/`.npm-cache`，不在根重复登记；③ 字典生成器写 `generated_at`，确定性校验需先剥离时间戳；④ `git diff --cached --check` 对行尾空格与 EOF 空行是阻断项，必须在提交前修净。
+- 验证: `task_plan_projection_test.py` 87 项 OK；`scan_test_pollution_test.py` 正负用例通过；`scan_test_pollution.py --diff-only` → `POLLUTION: PASS`；Python 三个脚本 `py_compile` 0 错误；9 笔提交 pre/post gate 全部 PASS。
+- 状态: 已提交并推送，工作树已清空。
 
-## 2026-10-13 Goal 计划文档自修复与低风险授权规则补充
+## 2026-10-19 imagegen 并发生图默认化（已收口）
 
-- 任务目标: 明确用户确认的 Goal 可对范围内普通低风险必需授权默认放行；计划文档缺项需主动补齐后继续 Goal，同时保留强制审批与高危操作红线。
-- 用户裁决: 低风险默认放行仅限目标内、局部、可逆、无实质外部副作用且不受系统/平台/工具强制审批的单项动作；高风险、不可逆、越界扩权和强制审批仍须停下。
-- 2026-10-13 补充裁决: Goal 执行中计划文档缺项由 agent 主动修复并落盘后继续；文档问题本身不阻断 Goal，真实审批/高危/越界等红线仍只暂停受影响动作。
-- 当前阶段: 已完成规则、自主执行边界、仓库规则、项目记忆与知识库同步，并完成技能校验、索引检查和只读规则审计。
-- 验证: UTF-8 quick_validate 两个技能 PASS；知识库 310 篇/803 链接无死链；项目记忆锚点与使用台账 PASS；6 维残留自查：诉求全覆盖、消费方已同步、无本轮临时物、引用无断链、术语一致、静态校验未冒充功能测试。git status 因 unable to read tree 不可用，未宣称 diff 校验通过。
-- 完成定义: Owner 规则与引用口径一致；Skill 校验、知识索引及记忆锚点通过；改动保持未提交。
-- 停止条件: 不替用户批准强制审批，不改变真实 `BLK-*` 恢复契约或既有 Git、跨项目、local 与个人文件红线。
-- 最大推进边界: 仅修改 Goal 授权与计划文档自修复相关规则及本项目记忆/知识记录，不清理或覆盖其他未提交工作。
+- 结论: 多张不同图默认走 CLI `generate-batch` 并发；内置通道同轮并列调用实测仍排队串行，不能当并发用。
+- 实测（单 Key，api.luode.vip）: 3 张串行 78.3s → 并发 3 路 33.1s（约 2.4×）；5 张并发 5 路 36.5s；均无 429，11 张产物尺寸一致且 sha256 互不相同。
+- 改动: `imagegen/SKILL.md` 判定思路 #2/#3、工作流 4.1、新增「并发批量通道」章节、多 Key 并发池补默认并发/失败隔离/串行开关；`skill-dictionary` 重生成；知识库新增 `imagegen并发生图默认化与内置通道串行实测` 并挂 MOC；`PROJECT_CURRENT` 压缩旧已完成条目以容纳投影。
+- 证据: `quick_validate.py imagegen` → Skill is valid!；`knowledge_index.py check` → 368 笔记、0 违规、0 死链、0 未挂载。
+- 状态: 已提交。
 
-## 2026-10-12 多模式详细任务步骤默认展示规则
+## 2026-10-16 至 2026-10-18 组件库三期收口（合并摘要）
 
-- 任务目标: 将细粒度、多步骤清单确立为 Goal、普通会话和 Plan 模式的默认体验，并保证 UI 不可用时领域任务照常执行。
-- 用户裁决: 步骤应尽量细化、允许长列表滚动；不接受仅“开始、执行、完成”的三步占位。显示故障不暂停任务。
-- 当前阶段: 已完成多模式细步骤默认规则、旧 Goal 三步迁移、相关规则同步、82 项回归、六个 Skill 校验、6-review 与文档 profile 校验；当前会话原生浮层只确认 update_plan 调用成功，视觉呈现未获截图证据。
-- 本轮补充: 已将入口规则改为在最少规则确认及必要 registry 定位后，先持久化并尝试同步可读暂定步骤，再进入领域侦察；每步写明动作、对象和结果，编号只作辅助；同会话多计划需显式 plan_key 并只同步当前 payload。投影脚本已有对应写入能力，本轮未改脚本。UI 同步失败继续领域任务。
-- 2026-10-13 补充：超过 600 秒仍未确认步骤显示时，缺投影则补建；已有投影但 UI 未同步则取回当前 payload 重试。显示失败不暂停任务；仅在首个可执行检查点触发，工具运行中不能后台唤醒。
-- 本轮验证: `skill-hit-check-rules` 与 `task-plan-rehydration-rules` 的 `quick_validate.py` 均通过；技能字典刷新成功；`git diff --check` 通过；知识库索引检查 309 笔记无违规、797 个链接无死链；本轮投影 13 步已全部完成并失活。未取得 Codex Desktop 原生浮层截图，故不宣称视觉显示验收通过。
-- 当前计划: 1) 核对官方宿主资料、用户目标与现行投影约束；2) 确立 Goal、普通会话和 Plan Mode 默认展示细步骤；3) 明确 UI 工具缺失或同步失败不阻断领域执行；4) 扩展 Goal 十步基线并支持任务专属细项；5) 将旧三步 Goal 安全迁移并保留状态；6) 更新投影校验、指纹和兼容契约；7) 同步跨 Skill、仓库规则与宿主提示；8) 更新 Skill 吸收记录、项目记忆和知识笔记；9) 运行 82 项投影回归及六个 Skill 结构校验；10) 完成 6-review 与工程文档机器校验；11) 核对知识索引、记忆锚点和数字口径；12) 完成差异、临时产物与原生 UI 证据收口。
-- 验收: Goal、普通会话与 Plan Mode 均规定默认展示细粒度步骤；不设任意小的步骤数量上限，保留单步 256 字符和 registry 总体 51,200 UTF-8 字节硬限；Goal 默认至少十步并支持按任务扩展；旧三步 Goal 可兼容迁移；仅 UI 失败可降级继续；验证输出与规则一致。
-- 停止条件: 若无法在不泄露 Goal 原文的前提下生成 Goal 清单，保留通用但可执行的细化默认项并明确能力边界；若 native UI 工具缺失或调用失败，不阻断任务，记录 UI 未验证后继续。
-- 收口状态: 当前会话投影已失活；改动保持未提交。桌面浮窗宽度和原生像素呈现不由本仓库控制，本轮没有实际屏幕证据。
-
-## 2026-09-29 新增 verify-brainstorm-rules（编码后验证发散独立 skill）
-
-- 来源对象：用户指令——“我们需要一个验证发散的独立 skill，当用户提出验证功能、验证这个功能、验证刚刚改动的代码、验证一下、再检查一遍、检查一下等描述的时候触发；我们写代码的规则是最小改动、不要发散思维，但代码完成后需要发散一下、头脑风暴一下，找出更多的安全、性能、逻辑、边界的问题”。经三轮决策确认：命名 `verify-brainstorm-rules`、发散边界“允许外扩到关联模块”、产出“只读清单 + 落盘报告”。
-- 当前状态：**已落地闭环**。
-  - ① 新建 `verify-brainstorm-rules/`：`SKILL.md`（6 条铁律：只读发散 / 有界外扩 / 清单产物 / 先收敛后发散 / 裁决在用户 / 维度矩阵）+ 4 个 references（`divergence-dimension-matrix.md` 13 维矩阵 / `scope-and-boundary.md` 范围与外扩边界 / `finding-report-template.md` 问题清单模板 / `skill-coordination.md` 相邻 skill 分工）+ `_skillhub_meta.json`。
-  - ② 主规划同步：`编码skill.md` 测试域新增表格行与“第 8 类职责：验证发散”，同步“测试域默认分流规则”与“测试域内部顺序”，共 4 处。
-  - ③ 吸收登记：`skill-absorption-rules` 的 `workbuddy-absorption-map.md` 追加 enhance-verify-mode 裁决（4 条原子条目：3 合并 + 1 拒绝），`references/source-notes.md` 追加来源记录。
-  - ④ 字典刷新：`implemented 66 / planned_missing 8 / seed_total 120`（种子 +1 为今日安装的 `enhance-verify-mode__skillhub`，非本次新建引入；新 skill 已正确归入测试域 8.9）。
-  - ⑤ **2026-09-29 续（用户补充要求）**：发散维度由 12 维扩为 **13 维**，新增「代码格式与风格」；同时明确风格**判据权威仍归 `code-style-consistency-rules`**，本 skill 只做偏离发现、默认 P2（仅构建/CI/工具链失败才升 P1）、不发起全仓统一格式化。同步 `SKILL.md`、`divergence-dimension-matrix.md`、`finding-report-template.md`、`skill-coordination.md`、`scope-and-boundary.md` 与 `编码skill.md`。
-- 关键边界：发散只发生在“发现问题”一步；本 skill 只读、绝不顺手改码；修复一律回流 `code-quality-rules` 的最小改动收敛；裁决权始终在用户手上。
-- 验证与交接：`quick_validate.py` 返回 `Skill is valid!`（exit 0）；字典刷新 exit 0；改动停在已改动未提交状态（无当轮 Git 授权）。本地安装源 `enhance-verify-mode__skillhub` **保留未删**，待用户确认后在技能管理中卸载。
-
-## 2026-09-27 Goal 与 Loop 双 Skill 合并为 goal-loop-rules（用户计划实施）
-
-- 来源对象：用户本轮提出"goal 和 loop 的 skill 好像有多个，可以合并为一个吗"并完成三项决策（合并基座 = goal__skillhub 内容 + long-run-loop-rules 工程循环；合并后目录名 = goal-loop-rules；本轮只改仓库不动用户级目录）。
-- 当前状态：**实施中**。
-  - ① TASK-001 合并目录：`goal-loop-rules/` 已创建，SKILL.md 编写完成（目标方法论 + 工程循环控制分域路由），12 个文件从旧目录迁移（6 references + 3 scripts + script.sh + workbuddy-absorption-map.md + _skillhub_meta.json），`quick_validate.py` 返回 `Skill is valid!`。
-  - ② TASK-002 引用链同步：AGENTS.md / CLAUDE.md 第 347 行、deferred-gate-registry.md 第 34 行、goal-breakdown-seed.md（3 处）、source-notes.md（1 处）、workbuddy-absorption-map.md（3 处）已更新。
-  - ③ TASK-003 旧目录删除 + 空目录清理：已完成（用户指令确认删除合并前快照，仓库内 goal__skillhub__merged_archived 与 long-run-loop-rules__merged_archived 已 git rm + rmdir 清理）。
-  - ④ TASK-004 字典刷新：已完成（implemented 65 / planned_missing 8 / seed_total 119）。
-- 关键假设：`goal__skillhub/scripts/script.sh` 在 Codex 环境下 bash 可能不可用，SKILL.md 已注明降级路径。
-- 验证与交接：TASK-001 真实测试通过；TASK-002 / TASK-003 / TASK-004 已完成；改动停在已改动未提交状态。
-
-## 2026-09-24 Goal 模式免确认推进与临时产物清理规则落地（内部更新通道）
-
-- 来源对象：用户指令（2026-09-24）——“只要我们开启 goal 模式，说明我们计划已经完成，只要实现就好了，如果执行过程有分歧，一律按照 agent 推荐的方案推进执行，不要求用户确认；出现分歧 agent 自行分析得出最推荐的执行方向，默认按照推荐的方向执行，无需用户确认。临时生成的文件和脚本记得执行后删除，不要污染项目目录。”
-- 当前状态：**全部落地闭环**。
-  - ① Goal 模式 Owner 承载：`long-run-loop-rules/SKILL.md` 新增「Goal 模式免确认推进（分歧按推荐方案执行）」章节 + description 补口径；`references/safety-mechanisms.md` 新增同主题章节（只写与安全熔断的衔接，规则本体引用 SKILL.md，避免双权威）。
-  - ② 执行许可 Owner 联动：`autonomous-execution-rules/SKILL.md` description 放开 + 「必须暂停确认的关键节点」补 Goal 模式例外；`references/continuation-and-pause.md` 新增「Goal 模式免确认推进」小节 + 必须暂停项收缩。
-  - ③ 仓库级规则：`AGENTS.md` / `CLAUDE.md` 新增「Goal 模式免确认推进与临时产物清理（最高优先级，强制）」章节，双文件 SHA256 一致。
-  - ④ 关键边界（防自我授权，来自影响面对账发现的真实冲突）：用户显式 `/goal` 开启或用户已显式确认的 Goal 才免确认；agent 为补建投影 / 异常修复自动 `create_goal` 产生的 Goal 不构成授权，兼容 `task-plan-rehydration-rules` 既有口径「投影与 Goal 重建不恢复执行许可」。
-  - ⑤ 临时产物清理不新立规则：复用唯一 Owner `runtime-process-cleanup-rules`（零豁免 + 三层清理对象 + 收口回读）。
-- 验证与交接：`quick_validate.py` 验证 `long-run-loop-rules`、`autonomous-execution-rules` 均 `Skill is valid!`；字典重跑 exit 0（65/8/120）；`AGENTS.md` / `CLAUDE.md` 同哈希、纯 LF；知识库沉淀《Goal模式免确认推进与临时产物清理-20260924》并回读一致（`knowledge_index.py check` 的 48 项违规全部为存量历史笔记，本轮新笔记合规）；改动停在已改动未提交状态（当前无 Git 提交授权）。
-
-## 2026-09-18 ponytail 懒资深开发模式（七级阶梯与原生替代）外部吸收落地
-
-- 来源对象：外部 Skill `ponytail`（v4.9.0，GitHub DietrichGebert/ponytail）。
-- 当前状态：**全部落地闭环并完成安装源清理**。
-  - ① 单一资产聚焦：收敛至 `code-quality-rules`，不新增同类 skill 目录。
-  - ② 核心 Reference 建设：
-    - 新建 `code-quality-rules/references/minimal-solution-ladder.md`：收录七级极简解法阶梯（YAGNI → 代码库已有 → 标准库 → 平台原生 → 已装依赖 → 一行直写 → 最小实现）、有意折中技术债注释规范（`# tradeoff: <天花板>, <升级触发条件>`）、过度设计专项审查五标签（`delete:` / `stdlib:` / `native:` / `yagni:` / `shrink:`）。
-    - 新建 `code-quality-rules/references/platform-native-substitutes.md`：收录 HTML5 原生表单与控件、现代 CSS 布局与样式、现代 JS/Web API 替代第三方依赖清单，强化 Go/Python 后端标准库优先思维。
-  - ③ 存量整理与去重：更新 `minimal-change-general.md`，将原有零散“简单优先”与七级阶梯收敛对齐；更新 `SKILL.md` 统一硬约束、主线 1 与 references 读取规则。
-  - ④ 登记与源清理：更新 `workbuddy-absorption-map.md` 与 `source-notes.md`，同域冗余扫描 PASS；物理清理外部安装源 `ponytail` 目录；运行 `generate_dictionary.py` 刷新 `字典.md` 与数据索引。
-- 验证与交接：`quick_validate.py` 验证 `code-quality-rules` PASS；27 处引用链全部有效；改动保持在已改动未提交状态（当前无 Git 提交授权）。
-
-## 2026-09-18 配置文件项禁止多行过程注释与复杂逻辑专门文档规范吸收落地
-
-- 来源对象：用户指令：“这次某次改动的配置, 加了很多过程注释, 这是我们不喜欢的习惯, 他应该这样: ... 就可以了, 这个规则需要吸收到我们代码习惯的skill规则中。”、“小思考：如果有复杂的逻辑, 应该要留有功能专门的文档记录。”
-- 当前状态：**全部落地闭环**。
-  - ① 全局反例库固化：`code-style-consistency-rules/references/user-style-feedback-library.md` 新增 active 条目 `STYLE-CASE-CFG-001`，收录用户提供的 5 行推演反例与单行目的正例，明确复杂逻辑归位专门文档；
-  - ② 核心注释与架构 Skill 强化：
-    - `comment-rules/SKILL.md`：统一硬约束及驳回标准补充「配置文件与代码同等严格」与「复杂逻辑必须留有专门功能文档记录」两条硬铁律；
-    - `references/comment-placement.md`：增加第 11 条配置项注释放置原则；
-    - `references/comment-granularity.md`：明确配置项注释只说目的不写事故历史，复杂机制必须归位到 `doc/` 专门文档；
-    - `references/comment-examples.md`：增设「配置文件注释正反例」专节；
-    - `architecture-doc-rules/SKILL.md`：补充承接代码与配置中复杂业务逻辑的专门功能文档记录职责与触发信号；
-  - ③ 项目风格记忆与长期记忆同步：`PROJECT_STYLE.md` 增加「配置文件项极简目的注释」与「复杂逻辑建立功能专门文档记录」两个风格样例并同步锚点区；`PROJECT_MEMORY.md` 固化长期决策并新增机器索引实体 `rule.config-comment-purpose-only`；
-  - ④ 知识库知识流沉淀：新建 `20-Knowledge/code-style/配置文件项注释规范-单行目的说明不写过程与事故推演.md` 并双向关联，完善复杂逻辑文档归位机制。
-- 验证与交接：`check_memory_anchors.py` PASS（50 实体、34 风格锚点）；`quick_validate.py` 验证 `comment-rules`、`architecture-doc-rules` 与 `code-style-consistency-rules` 均有效；改动停留在已改动未提交状态。
-
-## 2026-09-17 TAPD 任务 Git 提交 Agent 前缀规范落地
-
-- 来源对象：用户指令：“我们希望处理tapd的任务提交的git, 提交前缀必须要指明这是agent完成的任务提交的, 比如: fix: [agent-xxx] ????”
-- 当前状态：**全部落地闭环**。
-  - ① 规范格式统一：确立 Agent 自动化处理 TAPD 任务的本地提交信息标准格式为 `<type>: [agent-<模块/功能>] <改动说明> [TAPD#<ID>]`（例如 `fix: [agent-兑换] 修复SWAPKIT报价解析异常 [TAPD#1162459836001003690]`、`feat: [agent-Onramper] v2接口适配与用户IP透传支持 [TAPD#1162459836001003250]`）；
-  - ② 技能文件同步：`tapd-task-executor/SKILL.md`（§3.B.4 与 §6.2）及 `references/story-bug-task-workflow.md`（Bug、Task 及全自动流水线提交动作）全面对齐；
-  - ③ 长期记忆与知识库固化：`PROJECT_MEMORY.md` 稳定决策与机器索引区同步实体约束；`20-Knowledge/AI协作/TAPD三大核心操作意图与自动化清任务流转规范.md` 同步补充该铁律。
-- 验证与交接：`quick_validate.py` 验证通过；`git diff --check` PASS；改动停留在已改动未提交状态。
-
-## 2026-09-17 TAPD 三大核心操作意图与自动化清任务流转规则升级落地
-
-- 来源对象：用户指令要求更新 TAPD skill 规则：
-  1. “看一下这个任务/看看任务”：说明开始分析这个任务，给出分析结论评论；
-  2. “完善这个任务/完善任务”：说明任务描述不清楚，需补充完善说明需求内容；
-  3. “扫描tapd [xx], 清任务/开始做tapd[xx]任务/开始做tapd任务”：说明开始扫描某个项目或当前迭代的所有项目需求/任务/bug，按任务优先级从高到低逐个分析，若可做立刻开工走全套流程并完成任务。
-- 当前状态：**全部落地闭环**。
-  - ① 核心执行技能更新：`tapd-task-executor/SKILL.md`（frontmatter description 与正文新增「三大核心操作意图与路由规范」专节，明确分析、完善、批量清任务三种状态机与行为边界）；
-  - ② API 路由技能同步：`tapd-openapi/SKILL.md`（「委派语义识别与路由」专节精准映射三大意图）；
-  - ③ 工作流契约更新：`tapd-task-executor/references/story-bug-task-workflow.md`（新增 §4「三大核心操作意图与执行状态机规范」，明确完善任务结构化模板与清任务串行推进闭环流水线）；
-  - ④ 知识库沉淀：新建 `20-Knowledge/AI协作/TAPD三大核心操作意图与自动化清任务流转规范.md`；
-  - ⑤ 项目长期记忆固化：`PROJECT_MEMORY.md` 人类区固化“TAPD 三大核心操作意图与路由分流规则”，机器索引区同步扩充 `rule.tapd-automation-lifecycle-and-qa-assignment` 实体别名与定义。
-- 验证与交接：`quick_validate.py` 验证 `tapd-task-executor` 与 `tapd-openapi` 均为 valid；`git diff --check` PASS；改动停留在已改动未提交状态（无当轮 Git 提交授权）。
-
-## 2026-09-17 TAPD 实体创建人真实身份规范与防 tapd_my_token 占位符经验吸收闭环
-
-- 来源对象：用户指令：“吸收一下创建这个tapd的bug的经验, 但是要注意一个点, 创建人现在是 "tapd_my_token" , 要改成我自己, 不能随便取名字。”
-- 当前状态：**全部落地闭环并完成旧单清理**。
-  - ① 线上缺陷修复与正规化重建：
-    - 实证发现 TAPD 缺陷创建后 `reporter` 字段在服务端具备严格只读保护，`update_bug` 接口无法修改已创建单的创建人；
-    - 动态从 `GET /users/info` 获取当前用户真实身份（`罗德`），重新调用 `POST /bugs` 创建规范 Bug `1162459836001003690`（`reporter: "罗德"`, `current_owner: "罗德;"`），并补齐标准五要素分析评论；
-    - 将原缺陷 `1162459836001003686` 状态变更为 `closed`（`resolution=duplicated`）并追加重定向作废评论，保持线上看板与审计干净。
-  - ② 知识库沉淀：新建 `20-Knowledge/AI协作/TAPD创建实体创建人身份规范.md`（记录凭据缺省值陷阱、审计只读约束、唯一真源与调用范式）。
-  - ③ Skill 规范加固：
-    - `tapd-openapi/SKILL.md` 新增第 11 条关键规则；
-    - `tapd-openapi/references/bugs/add_bug.md` 与 `update_bug.md` 对齐 `reporter` 必填与只读说明；
-    - `tapd-task-executor/references/story-bug-task-workflow.md` 补齐子任务与代建 Bug 必须显式指定真实自然人创建人铁律。
-  - ④ 长期记忆同步：`PROJECT_MEMORY.md` 人类区固化“TAPD 创建实体真实创建人身份规范”，机器索引区同步扩充 `rule.tapd-automation-lifecycle-and-qa-assignment` 实体。
-- 验证与交接：`quick_validate.py` 验证通过；改动停留在已改动未提交状态（当前无 Git 提交授权）。
-
-## 2026-09-16 TAPD 全流程自动化三项规则落地（分类工作流 / 四大约束与测试流转 / Agent 自动本地提交）
-
-- 当前状态：已完成。① 新建 `tapd-task-executor/references/story-bug-task-workflow.md` 规范叶子需求拆解、Bug 现场保护与独立 Task 承接，并同步 `SKILL.md` §4.1；② 新建 `config/qa-team.json` 与 `references/qa-assignment-rules.md`，固化「分析评论 → 开始实现评论 → 实现完成评论 → 流转待版本验证并指派测试」四大约束，测试人员名单杨莹、李红、韩忠宝落盘；③ Agent 自测完成后立即本地 `git commit`（严禁 push），回写评论注明 commit hash。
-- 详细来源、评论 ID、子任务清单与验证见 `PROJECT_HISTORY.md` 同标题事件；活动规则以 `tapd-task-executor`、`tapd-openapi`、`tapd-addcomment` 为准。
-
-## 2026-09-16 reasoning-summary-structure-rules 待裁定事项建议、选项与安全兜底闭环更新
-
-- 当前状态：已完成。统一待裁定事项的影响说明、建议与选项、未裁定时的安全默认路径；落点含该 Skill、示例、记忆与字典。
-- 详细来源、变更和验证见 `PROJECT_HISTORY.md` 同标题事件；活动规则以 `reasoning-summary-structure-rules` 为准。
+- 示例全量遍历: 101 页 749 卡逐组件排查，修 11 处真实缺陷；系统性根因是示例层只按样本已有键回写 `update:*`、不消费组件其余声明事件（341 条可点事件无人接收）。新增 `build_demo_events.mjs` 从 `defineEmits` 派生事件表，`check_demo_health.py`（九判据双主题）与 `check_demo_event_wiring.py`（vnode 子树对账）均带阳性对照。口径: 弹层走 Teleport，接线判定必须遍历 vnode 而非 DOM；事件名按 camelize 归一；GSAP 空目标属上游冻结面缺陷，只登记不改。
+- 文字清晰度: 噪点层需建层叠上下文才能压到正文之下（只降 `z-index` 无效）；`@font-face` 用 `local()` 解锁可变字重轴；非整数字号 9.13%→0.46%，派生块由 `build_font_overrides.py --check` 守卫。
+- 示例可用性: 逐格提示（`component-guides.ts` + `check_demo_guides.py`）、出卡修复（`BackTop` 按视口 `fixed` 飘出 + `TabPane`/`Divider` 撑高 + `DemoFrame` 外框 + `check_demo_visibility.py`）、文字贴边（`MenuNode` 缺 `padding-right`，判据用文本字形矩形、阈值 4px + `check_content_padding.py`）。
+- 更早: Panel 的 `.panel-body` 死样式由 `overrides.css` 补 20px；`启动组件库.bat` 必须纯 ASCII；HelpTip 组件数 151→152；边角内弧 28 = 38 − 10；10 父分类 / 101 子分组三列大卡；柔影被 `overflow: clip` 切块由 `check_shadow_clipping.mjs` 守卫；Arco 品类 101 covered / 30 merged / gap 0。
+- 状态: 全部已收口，文档见 `doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 对应日期条目。
 
 ## 最近 5 个同项目会话
 
@@ -160,9 +38,9 @@
 <!-- BEGIN TASK PLAN PROJECTION -->
 ```json
 {
-  "version": 4,
+  "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-13T05:41:06.184040Z",
+  "registry_updated_at": "2026-10-18T16:21:03.727437Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -838,8 +716,535 @@
           "status": "completed"
         }
       ]
+    },
+    {
+      "projection_id": "SESSION/d8906877ce09579ac5f934922bbccee4fbc083459c2e7637bfc0b4962f9f19ba",
+      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SESSION/WINDOWS-CRASH-CLEANUP-20261014",
+      "source_document": "PROJECT_CURRENT.md",
+      "plan_fingerprint": "a6efdcbf5383db94d555b48ac859178468651ed92585c659e82ee94da422f872",
+      "updated_at": "2026-10-14T03:46:37.418406Z",
+      "steps": [
+        {
+          "id": "CLEANUP-01",
+          "step": "核对 wsl-crashes 目录现状与可写范围",
+          "status": "completed"
+        },
+        {
+          "id": "CLEANUP-02",
+          "step": "确认清理对象仅限已确认的目录内文件",
+          "status": "completed"
+        },
+        {
+          "id": "CLEANUP-03",
+          "step": "执行精确删除并处理可观测的拒绝",
+          "status": "completed"
+        },
+        {
+          "id": "CLEANUP-04",
+          "step": "回读目录状态与可读取的 C 盘空间信息",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/325708c6c81d652e3aef7cb100c81cc3e7690c378a02fbb52169b0a7d7de1d73",
+      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SESSION/TRAE-INSTALLER-CLEANUP-20261014",
+      "source_document": "PROJECT_CURRENT.md",
+      "plan_fingerprint": "2d00745aea42a07594ee9667bc6b4a9083436db6fc93bc638bc95e51ab0a64b7",
+      "updated_at": "2026-10-14T04:15:29.529712Z",
+      "steps": [
+        {
+          "id": "TRAE-01",
+          "step": "只读核对指定 TRAE 安装包现状、属性和 C 盘空间",
+          "status": "completed"
+        },
+        {
+          "id": "TRAE-02",
+          "step": "对指定安装包执行一次不带 -Force 的精确删除；若被拒绝则停止",
+          "status": "completed"
+        },
+        {
+          "id": "TRAE-03",
+          "step": "回读确认文件是否存在及 C 盘可用空间变化",
+          "status": "completed"
+        },
+        {
+          "id": "TRAE-04",
+          "step": "修正策略拒绝后用户明确重新授权时的清理 Skill 边界",
+          "status": "completed"
+        },
+        {
+          "id": "TRAE-05",
+          "step": "登记吸收记录、验证规则并完成审计与状态收口",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/efe1e5328d41eb9419e907714a7ebe9b13b7122d0033757afbdbbf1229f57fde",
+      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SESSION/WRT-20261014-KB-CLEANUP-001",
+      "source_document": "USER-APPROVED-PLAN/WRT-20261014-KB-CLEANUP-001",
+      "plan_fingerprint": "b3a0adfdb6881ab1087af466adcf6a122acd58526c88e442e3523cac7566efa3",
+      "updated_at": "2026-10-14T04:41:07.298231Z",
+      "steps": [
+        {
+          "id": "WRT-KB-01",
+          "step": "[WRT-KB-01] 按授权定位并备份目标知识笔记原始字节",
+          "status": "completed"
+        },
+        {
+          "id": "WRT-KB-02",
+          "step": "[WRT-KB-02] 最小修订后续重评与再次拦截的权限边界",
+          "status": "completed"
+        },
+        {
+          "id": "WRT-KB-03",
+          "step": "[WRT-KB-03] UTF-8 回读并运行知识索引检查与局部审计",
+          "status": "completed"
+        },
+        {
+          "id": "WRT-KB-04",
+          "step": "[WRT-KB-04] 校验失败时只恢复目标原文并完成收口",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/42677e6fe75a4485d7f01bc080fbedf8d6ed50b41e13bffbe8b756f0f62f940e",
+      "session_id": "47f3713d-01db-48aa-94c7-46ef7cfd324c",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "exact",
+      "state": "inactive",
+      "plan_key": "SYNTH-EXACT/IMPORT-DOUBAO-CREATIVE-VIDEO",
+      "source_document": "README.md",
+      "plan_fingerprint": "f337db484592b22ce42f4b4be63470b11a67cece24e5fa78208979e19fbcbbed",
+      "updated_at": "2026-10-15T09:26:49.419271Z",
+      "steps": [
+        {
+          "id": "TASK-DCV-01",
+          "step": "[TASK-DCV-01] 确认用户级 skill 目录与外部 skill 引入命名约定",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-DCV-02",
+          "step": "[TASK-DCV-02] 复制 doubao-creative-video 全部文件到仓库根目录",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-DCV-03",
+          "step": "[TASK-DCV-03] 校验复制结果的文件数、字节数与 UTF-8 编码完整",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-DCV-04",
+          "step": "[TASK-DCV-04] 检查与既有 skill 的触发冲突并确定优先级",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-DCV-05",
+          "step": "[TASK-DCV-05] 刷新 skill 字典 data.js 与 字典.md",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-DCV-06",
+          "step": "[TASK-DCV-06] 执行 skill 资产合规收口检查并输出结论",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/b917b5ad4526c9121344b11bf8b51698d4703e942ec4b0f65e8753f6d6829ea1",
+      "session_id": "dc19480f-1d2a-41aa-b0df-2c3a7080f4f2",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SHOWCASE/SIDEBAR-NAV-001",
+      "source_document": "frontend-design/component-library/showcase/Showcase.vue",
+      "plan_fingerprint": "907d3796469af68167509b4fbc502f9670650c5baa851259aff8db1a0b84e6b1",
+      "updated_at": "2026-10-15T17:36:10.635054Z",
+      "steps": [
+        {
+          "id": "SS-01",
+          "step": "[SS-01] 侦察 Showcase.vue 分组结构与 DemoCell 渲染链，定侧边栏接入点与锚点方案",
+          "status": "completed"
+        },
+        {
+          "id": "SS-02",
+          "step": "[SS-02] 新增本地侧边栏组件，按分组生成锚点项并复用珍珠玻璃令牌样式",
+          "status": "completed"
+        },
+        {
+          "id": "SS-03",
+          "step": "[SS-03] 接入核对页为左侧栏 + 内容区布局，点击锚点滚动到分组并高亮当前分组",
+          "status": "completed"
+        },
+        {
+          "id": "SS-04",
+          "step": "[SS-04] 浏览器验证分组跳转、高亮跟随、亮暗主题侧边栏样式与 147 组件仍全挂载",
+          "status": "completed"
+        },
+        {
+          "id": "SS-05",
+          "step": "[SS-05] 回归组件守卫并同步 LOCAL-GUIDE 说明，清理临时产物",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/de27c90e59b60ce045d893d8ab47113c2cb8d61e65d491f923fd4771833f4a11",
+      "session_id": "dc19480f-1d2a-41aa-b0df-2c3a7080f4f2",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SHOWCASE/NAV-THUMB-FIX-001",
+      "source_document": "frontend-design/component-library/showcase/use-anchor-nav.ts",
+      "plan_fingerprint": "67518e1b247b71ecef68e48cdbd6ccc1e14702923bb665066e1e3b7473c1ffc2",
+      "updated_at": "2026-10-15T18:05:29.021588Z",
+      "steps": [
+        {
+          "id": "AN-01",
+          "step": "[AN-01] 复现并定位滑块延迟与首次震荡根因：平滑滚动中 pick 回写 activeKey 覆盖点击目标",
+          "status": "completed"
+        },
+        {
+          "id": "AN-02",
+          "step": "[AN-02] 修复锚点导航：编程滚动期间锁定目标高亮，滚动稳定后解锁再交回滚动跟随",
+          "status": "completed"
+        },
+        {
+          "id": "AN-03",
+          "step": "[AN-03] 浏览器验证单次点击直达目标、无中间震荡，快速连点与滚轮跟随仍正确",
+          "status": "completed"
+        },
+        {
+          "id": "AN-04",
+          "step": "[AN-04] 回归组件守卫与类型构建并收口清理",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/b6b9c59c8154277718e96dc28e242f5fe3042f6d1441ac612b70638d7096d73e",
+      "session_id": "11a0691d-1a60-440f-babc-a6a351a48abd",
+      "projection_origin": "goal",
+      "synthesis_mode": "goal_default",
+      "state": "active",
+      "plan_key": "GOAL/ACTIVE",
+      "source_document": "",
+      "plan_fingerprint": "af50a130466bf79087b5bf7d6600327ead19de08a15fe0d3e7ba1c499e54de15",
+      "updated_at": "2026-10-16T09:04:12.366185Z",
+      "steps": [
+        {
+          "id": "GOAL-01",
+          "step": "[GOAL-01] 梳理已确认目标与完成标准",
+          "status": "in_progress"
+        },
+        {
+          "id": "GOAL-02",
+          "step": "[GOAL-02] 确认范围、约束和明确不做事项",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-03",
+          "step": "[GOAL-03] 检查现有上下文、文件和事实来源",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-04",
+          "step": "[GOAL-04] 拆出具体工作项并确认依赖顺序",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-05",
+          "step": "[GOAL-05] 执行当前最小可验证工作项",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-06",
+          "step": "[GOAL-06] 对照完成标准验证本阶段结果",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-07",
+          "step": "[GOAL-07] 检查边界、异常和回归风险",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-08",
+          "step": "[GOAL-08] 更新细化步骤状态和完成证据",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-09",
+          "step": "[GOAL-09] 完成剩余必要工作并复核验收项",
+          "status": "pending"
+        },
+        {
+          "id": "GOAL-10",
+          "step": "[GOAL-10] 清理临时产物并完成最终收口",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/62cfe95631f27178fd15548616583344277751cf1b848175aaf5f41b3f2d3ec9",
+      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "GOAL/PEARL-CORNER-TRANSPARENT-EDGE",
+      "source_document": "doc/4-bugs/2026-10-17_114500_组件边角透明边缘.md",
+      "plan_fingerprint": "a1d3eb1f7c07cf5f828fce7bc1384b7f30bda8c6d29957840dd2429dc2a218c6",
+      "updated_at": "2026-10-17T12:31:24.810690Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "复现并定位截图里 AppShell 左上角透明边角的根因",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "建立可重复的组件边角缺陷扫描守卫",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-03",
+          "step": "全量扫描 151 个组件的所有示例格并归集同类边角缺陷",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-04",
+          "step": "修复截图中 AppShell 的边角问题",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-05",
+          "step": "修复全量扫描出的其余同类边角问题",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-06",
+          "step": "复跑守卫与真实浏览器全量实测确认无回归",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-07",
+          "step": "执行 6-review 风格回归并落盘文档",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/f1087bcf0839039612a9e6907364fae0eed8549ad705765bb79ca0989a8d40b7",
+      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-HELP-TIP-001",
+      "source_document": "doc/2-需求/2026-10-17_133000_图标式气泡帮助组件.md",
+      "plan_fingerprint": "f95d4d556203d35aa4c5c4fa6f03cefb804c9e74c014340ef93a4f28fabe1881",
+      "updated_at": "2026-10-17T14:40:00Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "侦察组件库现有 Tooltip、HoverCard、Popconfirm 与图标类组件，确认图标式帮助是否缺失",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "确定 HelpTip 组件的落点目录、分类归属与 props/emits 契约",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-03",
+          "step": "落盘图标式气泡帮助组件的需求主文档",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-04",
+          "step": "实现图标按钮加悬停气泡说明的 HelpTip 组件",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-05",
+          "step": "补齐示例变体并同步分类真相源与目录索引",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-06",
+          "step": "跑分类、示例、覆盖率、冻结与污染守卫",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-07",
+          "step": "跑 vue-tsc 类型检查、单测与构建",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-08",
+          "step": "真实浏览器实测图标悬停气泡与键盘可访问性",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-09",
+          "step": "执行 6-review 风格回归并落盘记录",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-10",
+          "step": "更新项目记忆、知识库判断与清理临时产物",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/2795253a25b73753d421794cc8a1cb61fedf4ef843e54ae43c53c4b9d055b9a8",
+      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "REQ-PEARL-LAUNCH-BAT-001",
+      "source_document": "frontend-design/component-library/package.json",
+      "plan_fingerprint": "dca48b8330371a9a0e997320fb9361fbcfcbd03c845667558a6dea211117f6bd",
+      "updated_at": "2026-10-17T15:00:00Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "[TASK-01] 侦察组件库启动链路与仓库脚本约定，确定 bat 落点、命名与内容",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "[TASK-02] 新增组件库一键启动 bat 脚本并处理依赖缺失与错误停留",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-03",
+          "step": "[TASK-03] 在 LOCAL-GUIDE 补启动说明与纯 ASCII 约束（README 属冻结面不改）",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-04",
+          "step": "[TASK-04] 真实运行 bat 验证：服务可访问、关闭后端口释放",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-05",
+          "step": "[TASK-05] 执行 6-review 风格回归并落盘记录",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/30bc64e7630f323cd33fdca80992a985a97ac9d4733d096390c9307bbfd99493",
+      "session_id": "76113f53-a6d8-4916-ac36-87ad0378a3fd",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "GOAL/GALLERY-FULL-SWEEP-20261018",
+      "source_document": "doc/4-bugs/2026-10-18_组件示例全量遍历排查.md",
+      "plan_fingerprint": "baf357acd728c8cd00d4dae8aef3c697e081c7197edbdd5795be10d1ce8b8b9b",
+      "updated_at": "2026-10-18T11:57:38.591091Z",
+      "steps": [
+        {
+          "id": "SWEEP-01",
+          "step": "跑齐既有守卫建立基线，确认已知缺陷面已覆盖，避免重复劳动",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-02",
+          "step": "建全量遍历通道：101 个示例页逐页采集控制台错误、挂载异常、溢出与裁切",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-03",
+          "step": "逐组件核对示例行为：交互控件点击/悬停/聚焦是否真的响应",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-04",
+          "step": "归集发现项，区分真 Bug 与预期行为，按影响面排序",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-05",
+          "step": "在冻结面约束内修复真 Bug（overrides.css / extend / gallery 层）",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-06",
+          "step": "每项修复配真实浏览器复现前后对照与守卫回归",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-07",
+          "step": "把可复发判据沉成新守卫并登记进 SKILL.md 与 LOCAL-GUIDE.md",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-08",
+          "step": "落盘 Bug 主文档与 6-review，跑类型检查、单测与构建",
+          "status": "completed"
+        },
+        {
+          "id": "SWEEP-09",
+          "step": "更新项目记忆并清理临时脚本、探针与后台服务",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/fba2b7d8488a92beea96e6d7ef7d4072e5f4708088d2237bc453c6cb83fb7503",
+      "session_id": "25bdf94c-2655-4a88-94f2-d15f4ad7b8cf",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "inactive",
+      "plan_key": "SKILL-IMAGEGEN-CONCURRENCY",
+      "source_document": "imagegen/SKILL.md",
+      "plan_fingerprint": "03b6081c19665bc56fd52ee12c481b4b6b6062c9fb32a48ba6e0ee687f846e69",
+      "updated_at": "2026-10-18T16:21:03.727098Z",
+      "steps": [
+        {
+          "id": "TASK-CONC-01",
+          "step": "[TASK-CONC-01] 核对 imagegen 批量并发生图实现与 CLI 参数语义",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CONC-02",
+          "step": "[TASK-CONC-02] 用 3 个不同 prompt 实测并发生图与串行基线对比耗时和产物",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CONC-03",
+          "step": "[TASK-CONC-03] 记录单 Key 下的限流表现与失败重试行为",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CONC-04",
+          "step": "[TASK-CONC-04] 按实测结论更新 imagegen 技能规则为默认可并发多图",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-CONC-05",
+          "step": "[TASK-CONC-05] 复核规则文案、展示产物并清理临时文件",
+          "status": "completed"
+        }
+      ]
     }
-  ]
+  ],
+  "quarantined_projections": []
 }
 ```
 <!-- END TASK PLAN PROJECTION -->
