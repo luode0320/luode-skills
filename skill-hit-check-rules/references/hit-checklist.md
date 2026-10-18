@@ -56,6 +56,12 @@
 - 提供外部 skill 的 URL / GitHub / 市场页面 / SKILL.md 原文时，先由 `skill-absorption-rules` 抓取并拆解；本入口不复制其裁决步骤。
 - 与 `skill-absorption-rules`（内部 gap 演进）、`skill-audit-rules`（多 skill 职责审计）按职责边界联动；外部种子场景由 `skill-absorption-rules` 总承接。
 
+## 逆向工程场景补充
+
+- 只要当前用户请求或上下文意图涉及：无源码应用逆向、二进制逆向、反编译、脱壳、代码抽取、ASAR 拆包、Electron 应用解构、APK/IPA 包体分析、WebAssembly/WASM 检查、Go/Rust 二进制编译器信息与依赖抽取、.NET/PE 程序集元数据审查、数据包 PCAP/HAR 协议逆向或功能实现原理逆向等，**必须自动联动命中 `rea`**，不得等用户额外点名输入 `/rea`。
+- 命中后优先执行 `rea --version` 检查环境；若本地尚未安装或命令未找到，必须立即输出官方 Release 页面 [https://github.com/morluto/rea/releases](https://github.com/morluto/rea/releases) 与安装命令 `npm install -g rea-agents`，阻断未安装状态并引导安装，严禁凭空脑补逆向结论。
+- 对拥有完整源码的常规仓库分析、重构和实现，使用常规代码检索工具，不触发 `rea`。
+
 ## 判定原则
 
 - 以触发条件为准，不以“任务简单”“已经知道怎么做”或“用户没点名”为由跳过。
