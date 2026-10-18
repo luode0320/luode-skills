@@ -1,0 +1,7449 @@
+{
+  "total": 152,
+  "counts": {
+    "root": 2,
+    "business": 20,
+    "charts": 6,
+    "extend": 83,
+    "layout": 6,
+    "ui": 27,
+    "workspace": 8
+  },
+  "categoryCounts": {
+    "general": 11,
+    "shell": 6,
+    "business": 20,
+    "charts": 6,
+    "navigation": 16,
+    "feedback": 12,
+    "inputs": 33,
+    "display": 32,
+    "layout": 8,
+    "workspace": 8
+  },
+  "components": [
+    {
+      "name": "Icon",
+      "group": "root",
+      "category": "general",
+      "path": "src/components/Icon.vue",
+      "import": "@/components/Icon.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "18"
+        },
+        {
+          "name": "stroke",
+          "type": "number",
+          "optional": true,
+          "default": "1.6"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<Icon name=\"文本\" />",
+      "used_by": [
+        "src/components/business/AskDock.vue",
+        "src/components/business/BoardView.vue",
+        "src/components/business/DeptTree.vue",
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/GeneratorPipeline.vue",
+        "src/components/business/InsightPanel.vue",
+        "src/components/business/MenuStarMap.vue",
+        "src/components/business/PermissionMatrix.vue",
+        "src/components/business/PermissionTrace.vue",
+        "src/components/business/PermissionTree.vue",
+        "src/components/charts/RelationGraph.vue",
+        "src/components/extend/Alert.vue",
+        "src/components/extend/AutoComplete.vue",
+        "src/components/extend/BackTop.vue",
+        "src/components/extend/Breadcrumb.vue",
+        "src/components/extend/Calendar.vue",
+        "src/components/extend/Carousel.vue",
+        "src/components/extend/Cascader.vue",
+        "src/components/extend/CascaderPanel.vue",
+        "src/components/extend/CollapseItem.vue",
+        "src/components/extend/ColorPicker.vue",
+        "src/components/extend/DatePicker.vue",
+        "src/components/extend/Dropdown.vue",
+        "src/components/extend/DropdownButton.vue",
+        "src/components/extend/DropdownSubmenu.vue",
+        "src/components/extend/Image.vue",
+        "src/components/extend/ImagePreview.vue",
+        "src/components/extend/ImagePreviewGroup.vue",
+        "src/components/extend/InputNumber.vue",
+        "src/components/extend/InputPassword.vue",
+        "src/components/extend/InputSearch.vue",
+        "src/components/extend/InputTag.vue",
+        "src/components/extend/Mention.vue",
+        "src/components/extend/Menu.vue",
+        "src/components/extend/MenuNode.vue",
+        "src/components/extend/MonthPicker.vue",
+        "src/components/extend/Notification.vue",
+        "src/components/extend/OverflowList.vue",
+        "src/components/extend/Popconfirm.vue",
+        "src/components/extend/QuarterPicker.vue",
+        "src/components/extend/RangePicker.vue",
+        "src/components/extend/Result.vue",
+        "src/components/extend/Steps.vue",
+        "src/components/extend/Tabs.vue",
+        "src/components/extend/TimePicker.vue",
+        "src/components/extend/Transfer.vue",
+        "src/components/extend/TreeNode.vue",
+        "src/components/extend/TreeSelect.vue",
+        "src/components/extend/Typography.vue",
+        "src/components/extend/Upload.vue",
+        "src/components/extend/WeekPicker.vue",
+        "src/components/extend/YearPicker.vue",
+        "src/components/layout/CommandPalette.vue",
+        "src/components/layout/Sidebar.vue",
+        "src/components/layout/Topbar.vue",
+        "src/components/ui/Button.vue",
+        "src/components/ui/Checkbox.vue",
+        "src/components/ui/ConfirmHost.vue",
+        "src/components/ui/DataTable.vue",
+        "src/components/ui/EmptyState.vue",
+        "src/components/ui/IconButton.vue",
+        "src/components/ui/Pagination.vue",
+        "src/components/ui/Select.vue",
+        "src/components/ui/TextInput.vue",
+        "src/components/workspace/ShortcutGrid.vue",
+        "src/views/Dashboard.vue",
+        "src/views/Login.vue",
+        "src/views/monitor/LoginLog.vue",
+        "src/views/system/Configs.vue",
+        "src/views/system/Dict.vue",
+        "src/views/system/Menus.vue",
+        "src/views/system/Roles.vue",
+        "src/views/tool/Generator.vue"
+      ],
+      "fingerprint": "7a39f4be9d6b2417"
+    },
+    {
+      "name": "NeuralNet",
+      "group": "root",
+      "category": "shell",
+      "path": "src/components/NeuralNet.vue",
+      "import": "@/components/NeuralNet.vue",
+      "description": "神经网络画布：能力模块节点缓慢呼吸，脉冲沿连线往返（导 Conduct）。",
+      "props": [
+        {
+          "name": "burstKey",
+          "type": "number | string",
+          "optional": true,
+          "default": "0"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<NeuralNet />",
+      "used_by": [
+        "src/views/Login.vue"
+      ],
+      "fingerprint": "d288cce4b3de9878"
+    },
+    {
+      "name": "AskDock",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/AskDock.vue",
+      "import": "@/components/business/AskDock.vue",
+      "description": "问答坞：输入问题或点预设，问题逐字打出（蓄 Charge）→ 答案卡级联浮现（结 Crystallize）。",
+      "props": [
+        {
+          "name": "group",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'问问系统…例如「谁能删除用户」'"
+        },
+        {
+          "name": "compact",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "chip",
+          "payload": "AnswerChip"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<AskDock />",
+      "used_by": [
+        "src/components/business/PermissionTrace.vue"
+      ],
+      "fingerprint": "10d045d293e41694"
+    },
+    {
+      "name": "BoardView",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/BoardView.vue",
+      "import": "@/components/business/BoardView.vue",
+      "description": "看板分列：按状态 / 部门 / 角色等分列展示卡片，列头着分类色。",
+      "props": [
+        {
+          "name": "columns",
+          "type": "BoardColumn<T>[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "itemKey",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "draggable",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "onMove",
+          "type": "(payload: { item: T; from: BoardColumn<T>; to: BoardColumn<T> }) => Promise<boolean>",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "optional": true,
+          "default": "'暂无'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "card"
+      ],
+      "types": [
+        "BoardColumn"
+      ],
+      "usage": "<BoardView :columns=\"[]\" itemKey=\"文本\" />",
+      "used_by": [],
+      "fingerprint": "e344752b713f9d92"
+    },
+    {
+      "name": "DeptSelect",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/DeptSelect.vue",
+      "import": "@/components/business/DeptSelect.vue",
+      "description": "部门下拉：按组织层级缩进，可搜索。exclude 用于编辑部门时排除自身及下级。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "data",
+          "type": "Dept[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择部门'"
+        },
+        {
+          "name": "rootLabel",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "excludeIds",
+          "type": "number[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number | null"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<DeptSelect :modelValue=\"0\" />",
+      "used_by": [],
+      "fingerprint": "d4d7e332e71ce4a0"
+    },
+    {
+      "name": "DeptTree",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/DeptTree.vue",
+      "import": "@/components/business/DeptTree.vue",
+      "description": "部门树：左栏筛选用。选中节点即 emit 部门 ID，再点一次取消。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number | null",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "data",
+          "type": "Dept[]",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number | null"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<DeptTree :modelValue=\"0\" />",
+      "used_by": [],
+      "fingerprint": "73409d3a5232da88"
+    },
+    {
+      "name": "DictSelect",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/DictSelect.vue",
+      "import": "@/components/business/DictSelect.vue",
+      "description": "字典下拉：选项来自「字典管理」中的字典数据，值统一为字符串。",
+      "props": [
+        {
+          "name": "type",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "modelValue",
+          "type": "string | number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择'"
+        },
+        {
+          "name": "allLabel",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<DictSelect type=\"文本\" modelValue=\"文本\" />",
+      "used_by": [],
+      "fingerprint": "026ed4964dd331f5"
+    },
+    {
+      "name": "DictSwatchbook",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/DictSwatchbook.vue",
+      "import": "@/components/business/DictSwatchbook.vue",
+      "description": "字典样本册：每个字典类型一张卡，直接渲染真实标签样式与色调分布条。",
+      "props": [
+        {
+          "name": "types",
+          "type": "DictTypeRow[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "create-item",
+          "payload": "DictTypeRow"
+        },
+        {
+          "name": "edit-item",
+          "payload": "DictTypeRow"
+        },
+        {
+          "name": "edit-type",
+          "payload": "DictTypeRow"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "DictTypeRow",
+        "DictItem"
+      ],
+      "usage": "<DictSwatchbook :types=\"[]\" />",
+      "used_by": [
+        "src/views/system/Dict.vue"
+      ],
+      "fingerprint": "ee2a0dc263d37299"
+    },
+    {
+      "name": "DictTag",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/DictTag.vue",
+      "import": "@/components/business/DictTag.vue",
+      "description": "字典值展示：按字典数据的标签文本与样式渲染，找不到时原样显示。",
+      "props": [
+        {
+          "name": "type",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "value",
+          "type": "string | number | null | undefined",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<DictTag type=\"文本\" value=\"文本\" />",
+      "used_by": [],
+      "fingerprint": "63570fa26c2cc5c7"
+    },
+    {
+      "name": "FormDialog",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/FormDialog.vue",
+      "import": "@/components/business/FormDialog.vue",
+      "description": "表单弹窗：两列网格 + 取消 / 保存。页面只写字段与校验。",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "sub",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": "620"
+        },
+        {
+          "name": "saving",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "submitText",
+          "type": "string",
+          "optional": true,
+          "default": "'保存'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        },
+        {
+          "name": "submit",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default",
+        "extra"
+      ],
+      "types": [],
+      "usage": "<FormDialog open title=\"文本\">内容</FormDialog>",
+      "used_by": [
+        "src/components/layout/PasswordDialog.vue"
+      ],
+      "fingerprint": "482601f7a75d7228"
+    },
+    {
+      "name": "GeneratorPipeline",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/GeneratorPipeline.vue",
+      "import": "@/components/business/GeneratorPipeline.vue",
+      "description": "代码生成流水线：① 表信息 → ② 字段映射 → ③ 代码预览，一个弹窗走完。",
+      "props": [
+        {
+          "name": "table",
+          "type": "GenTable | null",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "step",
+          "type": "1 | 2 | 3",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        },
+        {
+          "name": "saved",
+          "payload": "—"
+        },
+        {
+          "name": "generate",
+          "payload": "GenTable"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "GenTable"
+      ],
+      "usage": "<GeneratorPipeline table=\"文本\" />",
+      "used_by": [
+        "src/views/tool/Generator.vue"
+      ],
+      "fingerprint": "9076732a5ddd45bd"
+    },
+    {
+      "name": "InsightPanel",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/InsightPanel.vue",
+      "import": "@/components/business/InsightPanel.vue",
+      "description": "分析栏：关系图 / 画布的右侧详情。头部分类 → 标题与状态 → 主读数 + 迷你柱 →",
+      "props": [
+        {
+          "name": "contentKey",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "kindIcon",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "cat",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "metric",
+          "type": "{ label: string; value: number | null; unit?: string; bars?: number[] }",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "tiles",
+          "type": "InsightTile[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "insights",
+          "type": "InsightCard[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "groups",
+          "type": "InsightGroup[]",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        },
+        {
+          "name": "chip",
+          "payload": "InsightChip"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "InsightTile",
+        "InsightCard",
+        "InsightChip",
+        "InsightGroup"
+      ],
+      "usage": "<InsightPanel contentKey=\"文本\" kind=\"文本\" title=\"文本\">内容</InsightPanel>",
+      "used_by": [],
+      "fingerprint": "d307dfa5c2d66b8e"
+    },
+    {
+      "name": "ListPage",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/ListPage.vue",
+      "import": "@/components/business/ListPage.vue",
+      "description": "统一列表页：页面头 → 查询区 → 表格面板（刷新 / 导出 / 批量条）→ 分页。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "list",
+          "type": "ListPageState",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "columns",
+          "type": "Column[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "tableTitle",
+          "type": "string",
+          "optional": true,
+          "default": "'数据列表'"
+        },
+        {
+          "name": "selectable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "rowKey",
+          "type": "string",
+          "optional": true,
+          "default": "'id'"
+        },
+        {
+          "name": "minWidth",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "altView",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "spec",
+        "actions",
+        "before",
+        "alt",
+        "side",
+        "search",
+        "tools",
+        "name",
+        "batch",
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<ListPage title=\"文本\" list=\"文本\" :columns=\"[]\">内容</ListPage>",
+      "used_by": [],
+      "fingerprint": "03a270ec7d1e3533"
+    },
+    {
+      "name": "MenuStarMap",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/MenuStarMap.vue",
+      "import": "@/components/business/MenuStarMap.vue",
+      "description": "导航星系（图谱舞台，三层下钻）：",
+      "props": [
+        {
+          "name": "tree",
+          "type": "Menu[]",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "edit",
+          "payload": "Menu"
+        },
+        {
+          "name": "create",
+          "payload": "Menu"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<MenuStarMap :tree=\"[]\" />",
+      "used_by": [
+        "src/views/system/Menus.vue"
+      ],
+      "fingerprint": "308b6adebc620222"
+    },
+    {
+      "name": "OrgCanvas",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/OrgCanvas.vue",
+      "import": "@/components/business/OrgCanvas.vue",
+      "description": "组织架构画布：整齐树布局铺满内容区，四角留给页面放浮动玻璃面板（#tl / #tr / #bl / #br）。",
+      "props": [
+        {
+          "name": "tree",
+          "type": "Dept[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "selectedId",
+          "type": "number | null",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "Dept"
+        }
+      ],
+      "slots": [
+        "tl",
+        "tr",
+        "bl",
+        "br"
+      ],
+      "types": [],
+      "usage": "<OrgCanvas :tree=\"[]\" :selectedId=\"0\" />",
+      "used_by": [
+        "src/views/system/Depts.vue"
+      ],
+      "fingerprint": "0b1ef223f9d7e6a9"
+    },
+    {
+      "name": "PermissionButton",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/PermissionButton.vue",
+      "import": "@/components/business/PermissionButton.vue",
+      "description": "权限按钮：没有权限码时不渲染（而不是禁用），与后端 @RequiresPermission 使用同一套编码。",
+      "props": [
+        {
+          "name": "perm",
+          "type": "string | string[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'ghost' | 'text' | 'danger'",
+          "optional": true,
+          "default": "'secondary'"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "iconOnly",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "danger",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "'md' | 'sm'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<PermissionButton variant=\"primary\" size=\"md\">内容</PermissionButton>",
+      "used_by": [
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/MenuStarMap.vue",
+        "src/components/business/PostLadder.vue"
+      ],
+      "fingerprint": "9c4eb2bdc994e89e"
+    },
+    {
+      "name": "PermissionMatrix",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/PermissionMatrix.vue",
+      "import": "@/components/business/PermissionMatrix.vue",
+      "description": "权限矩阵：行 = 菜单树（目录可折叠），列 = 角色。",
+      "props": [
+        {
+          "name": "menus",
+          "type": "Menu[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "roles",
+          "type": "MatrixRole[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "grants",
+          "type": "Record<number, number[]>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "editable",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "saving",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "save",
+          "payload": "Array<{ roleId: number; menuIds: number[] }>"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "MatrixRole"
+      ],
+      "usage": "<PermissionMatrix :menus=\"[]\" :roles=\"[]\" :grants=\"[]\" editable />",
+      "used_by": [],
+      "fingerprint": "292b3be86bc6ba26"
+    },
+    {
+      "name": "PermissionTrace",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/PermissionTrace.vue",
+      "import": "@/components/business/PermissionTrace.vue",
+      "description": "权限溯源（图谱舞台，三层下钻）：",
+      "props": [
+        {
+          "name": "focus",
+          "type": "unknown",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<PermissionTrace />",
+      "used_by": [
+        "src/views/system/Roles.vue"
+      ],
+      "fingerprint": "c1906da54a1b5f10"
+    },
+    {
+      "name": "PermissionTree",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/PermissionTree.vue",
+      "import": "@/components/business/PermissionTree.vue",
+      "description": "菜单权限树：目录 / 菜单为树节点（勾选含全部下级），按钮权限渲染为节点下方的标签。",
+      "props": [
+        {
+          "name": "menus",
+          "type": "Menu[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "modelValue",
+          "type": "number[]",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number[]"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<PermissionTree :menus=\"[]\" :modelValue=\"0\" />",
+      "used_by": [],
+      "fingerprint": "0abab6c936fcc06b"
+    },
+    {
+      "name": "PostLadder",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/PostLadder.vue",
+      "import": "@/components/business/PostLadder.vue",
+      "description": "岗位阶梯（图谱舞台）：岗位按 sort 沿对角线自左下向右上等距铺满舞台，",
+      "props": [
+        {
+          "name": "posts",
+          "type": "LadderPost[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [
+        {
+          "name": "edit",
+          "payload": "LadderPost"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "LadderPost"
+      ],
+      "usage": "<PostLadder :posts=\"[]\" />",
+      "used_by": [
+        "src/views/system/Posts.vue"
+      ],
+      "fingerprint": "2cdbf336021ac3be"
+    },
+    {
+      "name": "SearchForm",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/SearchForm.vue",
+      "import": "@/components/business/SearchForm.vue",
+      "description": "查询区：字段放默认插槽，回车即查询。查询 / 重置按钮统一在右侧。",
+      "props": [
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "search",
+          "payload": "—"
+        },
+        {
+          "name": "reset",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<SearchForm>内容</SearchForm>",
+      "used_by": [
+        "src/components/business/ListPage.vue"
+      ],
+      "fingerprint": "e731f19e96d7447c"
+    },
+    {
+      "name": "UserSelect",
+      "group": "business",
+      "category": "business",
+      "path": "src/components/business/UserSelect.vue",
+      "import": "@/components/business/UserSelect.vue",
+      "description": "用户下拉：可搜索。valueKey 决定绑定的是用户 ID 还是昵称（部门负责人按昵称存储）。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "valueKey",
+          "type": "'id' | 'nickname'",
+          "optional": true,
+          "default": "'id'"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择用户'"
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string | number | null"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<UserSelect modelValue=\"文本\" valueKey=\"id\" />",
+      "used_by": [],
+      "fingerprint": "1dd9ea3ff512ee3a"
+    },
+    {
+      "name": "BarChart",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/BarChart.vue",
+      "import": "@/components/charts/BarChart.vue",
+      "description": "柱状图：柱子从基线生长（结 Crystallize），highlight 柱用斜线填充表示「当前」。",
+      "props": [
+        {
+          "name": "values",
+          "type": "number[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "labels",
+          "type": "string[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "failed",
+          "type": "number[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "highlight",
+          "type": "number | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "optional": true,
+          "default": "168"
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<BarChart :values=\"0\" :labels=\"[]\" />",
+      "used_by": [
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "e2fb302cc01eb042"
+    },
+    {
+      "name": "HeatGrid",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/HeatGrid.vue",
+      "import": "@/components/charts/HeatGrid.vue",
+      "description": "星期 × 小时热力格：格子按分位分 5 级（青柠由浅到深），失败占比高的格子叠斜线（--hatch）。",
+      "props": [
+        {
+          "name": "cells",
+          "type": "HeatCell[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<HeatGrid :cells=\"[]\" />",
+      "used_by": [
+        "src/views/monitor/LoginLog.vue"
+      ],
+      "fingerprint": "f4419f863b732675"
+    },
+    {
+      "name": "RelationGraph",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/RelationGraph.vue",
+      "import": "@/components/charts/RelationGraph.vue",
+      "description": "关系图：节点与连线由页面按当前层级算好目标坐标，本组件负责「活起来」——",
+      "props": [
+        {
+          "name": "nodes",
+          "type": "GraphNode[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "links",
+          "type": "GraphLink[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "activeId",
+          "type": "string | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "highlight",
+          "type": "string[] | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "variant",
+          "type": "'light' | 'stage'",
+          "optional": true,
+          "default": "'light'"
+        },
+        {
+          "name": "network",
+          "type": "NetworkData | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "networkFocus",
+          "type": "number | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "networkAlpha",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        },
+        {
+          "name": "orbits",
+          "type": "Array<{ rx: number; ry: number }>",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "burstKey",
+          "type": "number | string",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": "'关系图'"
+        },
+        {
+          "name": "pannable",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "size",
+          "type": "unknown",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "GraphNode"
+        },
+        {
+          "name": "back",
+          "payload": "—"
+        },
+        {
+          "name": "hover",
+          "payload": "string | null"
+        }
+      ],
+      "slots": [
+        "tl",
+        "tr",
+        "bl",
+        "br",
+        "default"
+      ],
+      "types": [
+        "GraphNode",
+        "GraphLink"
+      ],
+      "usage": "<RelationGraph :nodes=\"[]\" :links=\"[]\" variant=\"light\">内容</RelationGraph>",
+      "used_by": [],
+      "fingerprint": "2e82b6af4cfee8b4"
+    },
+    {
+      "name": "Swimlane",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/Swimlane.vue",
+      "import": "@/components/charts/Swimlane.vue",
+      "description": "时间轴泳道：泳道 × 时间轴。默认聚焦到 [首条 −1h, 现在 +1h]（至少 6 小时），可切回全天。",
+      "props": [
+        {
+          "name": "lanes",
+          "type": "SwimlaneLane[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "nowSec",
+          "type": "number | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "compact",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "maxLanes",
+          "type": "number",
+          "optional": true,
+          "default": "8"
+        },
+        {
+          "name": "slowMs",
+          "type": "number",
+          "optional": true,
+          "default": "1000"
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "{ lane: SwimlaneLane; block: TimelineBlock }"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "SwimlaneLane"
+      ],
+      "usage": "<Swimlane :lanes=\"[]\" />",
+      "used_by": [
+        "src/views/Dashboard.vue",
+        "src/views/monitor/OperLog.vue"
+      ],
+      "fingerprint": "2c903192ba002be6"
+    },
+    {
+      "name": "TickRing",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/TickRing.vue",
+      "import": "@/components/charts/TickRing.vue",
+      "description": "刻度环：60 根径向刻度按顺时针逐根点亮（导 Conduct），",
+      "props": [
+        {
+          "name": "value",
+          "type": "number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "display",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "default": "'%'"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "168"
+        },
+        {
+          "name": "ticks",
+          "type": "number",
+          "optional": true,
+          "default": "60"
+        },
+        {
+          "name": "decimals",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<TickRing :value=\"0\" />",
+      "used_by": [
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "4209f15be686e16f"
+    },
+    {
+      "name": "TrendChart",
+      "group": "charts",
+      "category": "charts",
+      "path": "src/components/charts/TrendChart.vue",
+      "import": "@/components/charts/TrendChart.vue",
+      "description": "纯 SVG 趋势图：按容器真实宽度计算路径，线宽不被拉伸。",
+      "props": [
+        {
+          "name": "values",
+          "type": "number[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "labels",
+          "type": "string[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "secondary",
+          "type": "number[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "secondaryLabel",
+          "type": "string",
+          "optional": true,
+          "default": "'失败'"
+        },
+        {
+          "name": "primaryLabel",
+          "type": "string",
+          "optional": true,
+          "default": "'数值'"
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "optional": true,
+          "default": "220"
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "band",
+          "type": "[number, number] | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "dots",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "tone",
+          "type": "'blue' | 'ink'",
+          "optional": true,
+          "default": "'blue'"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<TrendChart :values=\"0\" :labels=\"[]\" tone=\"blue\" />",
+      "used_by": [
+        "src/views/Dashboard.vue",
+        "src/views/monitor/LoginLog.vue",
+        "src/views/monitor/OperLog.vue"
+      ],
+      "fingerprint": "4591ca6b9544c75b"
+    },
+    {
+      "name": "Affix",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Affix.vue",
+      "import": "@/components/extend/Affix.vue",
+      "description": "固钉：让内容在滚动容器内吸附在顶部或底部，滚出后仍保持可见。",
+      "props": [
+        {
+          "name": "offsetTop",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "offsetBottom",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Affix>内容</Affix>",
+      "used_by": [],
+      "fingerprint": "05cc21175f634bf5"
+    },
+    {
+      "name": "Alert",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Alert.vue",
+      "import": "@/components/extend/Alert.vue",
+      "description": "提示条：页内静态提示，四型语义色 + 可关闭。",
+      "props": [
+        {
+          "name": "type",
+          "type": "'info' | 'success' | 'warning' | 'error'",
+          "optional": true,
+          "default": "'info'"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "closable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "showIcon",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "banner",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Alert type=\"info\">内容</Alert>",
+      "used_by": [],
+      "fingerprint": "a55c4496ad865367"
+    },
+    {
+      "name": "Anchor",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Anchor.vue",
+      "import": "@/components/extend/Anchor.vue",
+      "description": "锚点导航：列出页内小节，点击平滑滚动，滚动时按可见性高亮当前小节。",
+      "props": [
+        {
+          "name": "items",
+          "type": "AnchorItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "offsetTop",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "AnchorItem"
+      ],
+      "usage": "<Anchor :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "eb9bf85020766330"
+    },
+    {
+      "name": "AutoComplete",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/AutoComplete.vue",
+      "import": "@/components/extend/AutoComplete.vue",
+      "description": "自动补全：输入框敲字时在下方浮出匹配候选，上下键切换、回车落定。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "AutoCompleteOption[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "filter",
+          "type": "(input: string, option: AutoCompleteOption) => boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        },
+        {
+          "name": "select",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "AutoCompleteOption"
+      ],
+      "usage": "<AutoComplete :options=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "d36a052ce0be339f"
+    },
+    {
+      "name": "AvatarGroup",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/AvatarGroup.vue",
+      "import": "@/components/extend/AvatarGroup.vue",
+      "description": "头像组：多个头像叠压成一摞，超出 max 的部分收成末尾的 +N。",
+      "props": [
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "32"
+        },
+        {
+          "name": "total",
+          "type": "number",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<AvatarGroup />",
+      "used_by": [],
+      "fingerprint": "1d6f8721f4131e70"
+    },
+    {
+      "name": "BackTop",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/BackTop.vue",
+      "import": "@/components/extend/BackTop.vue",
+      "description": "回到顶部：滚动超过阈值后浮出圆形按钮，点击平滑回顶。",
+      "props": [
+        {
+          "name": "target",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "container",
+          "type": "HTMLElement | null",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "visibilityHeight",
+          "type": "number",
+          "optional": true,
+          "default": "400"
+        },
+        {
+          "name": "right",
+          "type": "number",
+          "optional": true,
+          "default": "28"
+        },
+        {
+          "name": "bottom",
+          "type": "number",
+          "optional": true,
+          "default": "28"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<BackTop />",
+      "used_by": [],
+      "fingerprint": "f14f3b28a41e330a"
+    },
+    {
+      "name": "Badge",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/Badge.vue",
+      "import": "@/components/extend/Badge.vue",
+      "description": "徽标：挂在任意元素右上角的数字 / 圆点角标，数字超过 max 显示为 max+。",
+      "props": [
+        {
+          "name": "value",
+          "type": "string | number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "dot",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": "99"
+        },
+        {
+          "name": "tone",
+          "type": "'danger' | 'info' | 'ok' | 'neutral'",
+          "optional": true,
+          "default": "'danger'"
+        },
+        {
+          "name": "showZero",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "offset",
+          "type": "[number, number]",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Badge tone=\"danger\">内容</Badge>",
+      "used_by": [],
+      "fingerprint": "baab002ea25d374c"
+    },
+    {
+      "name": "Breadcrumb",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Breadcrumb.vue",
+      "import": "@/components/extend/Breadcrumb.vue",
+      "description": "面包屑：展示层级路径，末项是当前页，前面的项只有给了 to 才可点。",
+      "props": [
+        {
+          "name": "items",
+          "type": "CrumbItem[]",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "CrumbItem"
+      ],
+      "usage": "<Breadcrumb :items=\"[]\" />",
+      "used_by": [
+        "src/views/gallery/Gallery.vue"
+      ],
+      "fingerprint": "c4c8418a93a1ad29"
+    },
+    {
+      "name": "ButtonGroup",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/ButtonGroup.vue",
+      "import": "@/components/extend/ButtonGroup.vue",
+      "description": "按钮组：把若干个按钮拼成一条，相邻处只留一道描边、首尾各留一次圆角。",
+      "props": [
+        {
+          "name": "size",
+          "type": "'md' | 'sm'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<ButtonGroup size=\"md\" direction=\"horizontal\">内容</ButtonGroup>",
+      "used_by": [],
+      "fingerprint": "a9f06bed80310392"
+    },
+    {
+      "name": "Calendar",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Calendar.vue",
+      "import": "@/components/extend/Calendar.vue",
+      "description": "日历：月 / 年两种粒度，月网格含上下月补白，今天与选中高亮。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "mode",
+          "type": "'month' | 'year'",
+          "optional": true,
+          "default": "'month'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Calendar mode=\"month\">内容</Calendar>",
+      "used_by": [],
+      "fingerprint": "9357813ef63fb2a3"
+    },
+    {
+      "name": "Card",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Card.vue",
+      "import": "@/components/extend/Card.vue",
+      "description": "通用卡片：header / body / footer 三区，外加可选的顶部封面。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "hoverable",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "cover",
+        "extra",
+        "default",
+        "footer",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Card>内容</Card>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "a339606421f116f8"
+    },
+    {
+      "name": "CardGrid",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/CardGrid.vue",
+      "import": "@/components/extend/CardGrid.vue",
+      "description": "卡片网格：把若干张卡按固定列数排布，列宽等分、间距统一。",
+      "props": [
+        {
+          "name": "columns",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        },
+        {
+          "name": "gutter",
+          "type": "number",
+          "optional": true,
+          "default": "16"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<CardGrid>内容</CardGrid>",
+      "used_by": [],
+      "fingerprint": "36fde26fe0725fc9"
+    },
+    {
+      "name": "CardMeta",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/CardMeta.vue",
+      "import": "@/components/extend/CardMeta.vue",
+      "description": "卡片元信息区：头像 + 标题 + 描述的一行横排，供 Card 主体或列表项复用。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "avatar",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "avatar",
+        "title",
+        "description",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<CardMeta />",
+      "used_by": [],
+      "fingerprint": "f109a955fa0bcaa6"
+    },
+    {
+      "name": "Carousel",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Carousel.vue",
+      "import": "@/components/extend/Carousel.vue",
+      "description": "走马灯：CSS transform 位移切换，支持自动播放、循环、指示点与箭头。",
+      "props": [
+        {
+          "name": "autoplay",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "interval",
+          "type": "number",
+          "optional": true,
+          "default": "3000"
+        },
+        {
+          "name": "loop",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "indicatorPosition",
+          "type": "'inside' | 'outside' | 'none'",
+          "optional": true,
+          "default": "'inside'"
+        },
+        {
+          "name": "showArrow",
+          "type": "'always' | 'hover' | 'never'",
+          "optional": true,
+          "default": "'hover'"
+        },
+        {
+          "name": "current",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:current",
+          "payload": "number"
+        },
+        {
+          "name": "change",
+          "payload": "number"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Carousel indicatorPosition=\"inside\" showArrow=\"always\">内容</Carousel>",
+      "used_by": [],
+      "fingerprint": "24bba827fabb8f5e"
+    },
+    {
+      "name": "Cascader",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Cascader.vue",
+      "import": "@/components/extend/Cascader.vue",
+      "description": "级联选择：按层级逐列展开，每点一层同步回写路径，选到叶子即落定。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "Array<string | number>",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "CascaderOption[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "Array<string | number>"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "CascaderOption"
+      ],
+      "usage": "<Cascader :options=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "bb2824e15548453b"
+    },
+    {
+      "name": "CascaderPanel",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/CascaderPanel.vue",
+      "import": "@/components/extend/CascaderPanel.vue",
+      "description": "级联选择面板：Cascader 里被下拉触发器包住的那部分，抽出来后可独立嵌进页面",
+      "props": [
+        {
+          "name": "options",
+          "type": "CascaderPanelOption[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "modelValue",
+          "type": "Array<string | number>",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "columnWidth",
+          "type": "number",
+          "optional": true,
+          "default": "152"
+        },
+        {
+          "name": "maxHeight",
+          "type": "number",
+          "optional": true,
+          "default": "300"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "Array<string | number>"
+        },
+        {
+          "name": "change",
+          "payload": "Array<string | number>"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "CascaderPanelOption"
+      ],
+      "usage": "<CascaderPanel :options=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "aef572754e24e7bf"
+    },
+    {
+      "name": "CheckboxGroup",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/CheckboxGroup.vue",
+      "import": "@/components/extend/CheckboxGroup.vue",
+      "description": "复选组的对外契约：子项靠 checkboxGroupKey 注入上下文，与组件的 setup 逻辑无关，",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "CheckboxValue[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "options",
+          "type": "CheckboxOption[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "checkAll",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "CheckboxValue[]"
+        },
+        {
+          "name": "change",
+          "payload": "CheckboxValue[]"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "CheckboxValue",
+        "CheckboxOption",
+        "CheckboxGroupContext"
+      ],
+      "usage": "<CheckboxGroup :options=\"[]\" direction=\"horizontal\">内容</CheckboxGroup>",
+      "used_by": [],
+      "fingerprint": "f0444e7944a5b49b"
+    },
+    {
+      "name": "Collapse",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Collapse.vue",
+      "import": "@/components/extend/Collapse.vue",
+      "description": "折叠面板：以 modelValue 数组承载展开项，accordion 下互斥展开。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "accordion",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "expandIconPosition",
+          "type": "'left' | 'right'",
+          "optional": true,
+          "default": "'left'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string[]"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Collapse expandIconPosition=\"left\">内容</Collapse>",
+      "used_by": [],
+      "fingerprint": "69a659943ef4a10d"
+    },
+    {
+      "name": "CollapseItem",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/CollapseItem.vue",
+      "import": "@/components/extend/CollapseItem.vue",
+      "description": "折叠子项：标题行 + 内容区，展开态、图标位置全部从父级 Collapse inject 读取。",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "title",
+        "extra",
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<CollapseItem name=\"文本\">内容</CollapseItem>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "d9e1ccc77ee34e3d"
+    },
+    {
+      "name": "ColorPicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/ColorPicker.vue",
+      "import": "@/components/extend/ColorPicker.vue",
+      "description": "取色器：色块按钮点开面板，预设色板、原生取色盘与十六进制输入三路同源。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "presets",
+          "type": "string[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "showText",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<ColorPicker />",
+      "used_by": [],
+      "fingerprint": "2e16af7613adb024"
+    },
+    {
+      "name": "Comment",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Comment.vue",
+      "import": "@/components/extend/Comment.vue",
+      "description": "评论：头像 + 作者 + 时间 + 正文，底部动作条可点或走 actions 插槽。",
+      "props": [
+        {
+          "name": "author",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "avatar",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "datetime",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "actions",
+          "type": "string[]",
+          "optional": true,
+          "default": "() => []"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default",
+        "actions",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Comment>内容</Comment>",
+      "used_by": [],
+      "fingerprint": "b482be112f57c991"
+    },
+    {
+      "name": "Countdown",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Countdown.vue",
+      "import": "@/components/extend/Countdown.vue",
+      "description": "倒计时：按目标时间戳或剩余秒数逐秒倒数，按格式串渲染，走到零时派发 finish。",
+      "props": [
+        {
+          "name": "target",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "remaining",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "default": "'HH:mm:ss'"
+        },
+        {
+          "name": "autostart",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [
+        {
+          "name": "finish",
+          "payload": "—"
+        },
+        {
+          "name": "change",
+          "payload": "number"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Countdown />",
+      "used_by": [],
+      "fingerprint": "7db28593416c071c"
+    },
+    {
+      "name": "DataList",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/DataList.vue",
+      "import": "@/components/extend/DataList.vue",
+      "description": "数据列表：一份 data 数组 + item 插槽渲染每行，支持分割线、加载骨架与空态。",
+      "props": [
+        {
+          "name": "data",
+          "type": "Array<Record<string, any>>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "split",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "item",
+        "empty"
+      ],
+      "types": [],
+      "usage": "<DataList :data=\"[]\" size=\"sm\" />",
+      "used_by": [],
+      "fingerprint": "fb20d789f94cf61d"
+    },
+    {
+      "name": "DatePicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/DatePicker.vue",
+      "import": "@/components/extend/DatePicker.vue",
+      "description": "日期选择：用原生 Date 自绘月历网格，支持上下月切换、选日、今天与选中高亮。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择日期'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "default": "'YYYY-MM-DD'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<DatePicker />",
+      "used_by": [],
+      "fingerprint": "f869f8c759aef2bf"
+    },
+    {
+      "name": "Descriptions",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Descriptions.vue",
+      "import": "@/components/extend/Descriptions.vue",
+      "description": "定义列表（Descriptions）：详情页/订单页常见的「一组字段标签—值」只读卡片，",
+      "props": [
+        {
+          "name": "data",
+          "type": "DescriptionItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "column",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "layout",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "extra",
+        "(动态透传)"
+      ],
+      "types": [
+        "DescriptionItem"
+      ],
+      "usage": "<Descriptions :data=\"[]\" layout=\"horizontal\" />",
+      "used_by": [],
+      "fingerprint": "b285d4a17b758d3f"
+    },
+    {
+      "name": "Divider",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/Divider.vue",
+      "import": "@/components/extend/Divider.vue",
+      "description": "分割线：横向分隔段落、纵向分隔并排区块，可带文字居中或靠左靠右。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "orientation",
+          "type": "'left' | 'right' | 'center'",
+          "optional": true,
+          "default": "'center'"
+        },
+        {
+          "name": "dashed",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "margin",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Divider direction=\"horizontal\" orientation=\"left\">内容</Divider>",
+      "used_by": [],
+      "fingerprint": "d8fb16ebd39a268a"
+    },
+    {
+      "name": "Dropdown",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Dropdown.vue",
+      "import": "@/components/extend/Dropdown.vue",
+      "description": "下拉菜单：点或悬停触发区后浮出选项列表，选中即派发 key 并关闭。",
+      "props": [
+        {
+          "name": "items",
+          "type": "DropdownItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "trigger",
+          "type": "'click' | 'hover'",
+          "optional": true,
+          "default": "'click'"
+        },
+        {
+          "name": "placement",
+          "type": "'bottom' | 'top'",
+          "optional": true,
+          "default": "'bottom'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "string"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "DropdownItem"
+      ],
+      "usage": "<Dropdown :items=\"[]\" trigger=\"click\" placement=\"bottom\">内容</Dropdown>",
+      "used_by": [],
+      "fingerprint": "05d1bca66e753c43"
+    },
+    {
+      "name": "DropdownButton",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/DropdownButton.vue",
+      "import": "@/components/extend/DropdownButton.vue",
+      "description": "下拉按钮：按钮主体点一下走默认动作，右侧小箭头单独点开菜单，两件事互不干扰。",
+      "props": [
+        {
+          "name": "items",
+          "type": "DropdownButtonItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'primary' | 'secondary' | 'ghost' | 'text' | 'danger'",
+          "optional": true,
+          "default": "'secondary'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "click",
+          "payload": "—"
+        },
+        {
+          "name": "select",
+          "payload": "string"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "DropdownButtonItem"
+      ],
+      "usage": "<DropdownButton :items=\"[]\" type=\"primary\">内容</DropdownButton>",
+      "used_by": [],
+      "fingerprint": "1ff82cedda8f68c3"
+    },
+    {
+      "name": "DropdownSubmenu",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/DropdownSubmenu.vue",
+      "import": "@/components/extend/DropdownSubmenu.vue",
+      "description": "下拉子菜单：把一组二级选项收在一个菜单项后面，指针悬停时在右侧浮出面板。",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "items",
+          "type": "SubMenuItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "SubMenuItem"
+      ],
+      "usage": "<DropdownSubmenu label=\"文本\" :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "2c9e97566a4235d3"
+    },
+    {
+      "name": "Form",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Form.vue",
+      "import": "@/components/extend/Form.vue",
+      "description": "表单容器：把「数据模型 + 校验规则 + 错误态 + 提交」这一套编排收到一处。",
+      "props": [
+        {
+          "name": "model",
+          "type": "Record<string, unknown>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "rules",
+          "type": "Rules<Record<string, unknown>>",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "layout",
+          "type": "'vertical' | 'inline'",
+          "optional": true,
+          "default": "'vertical'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "submit",
+          "payload": "—"
+        },
+        {
+          "name": "invalid",
+          "payload": "FormErrors"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "FormErrors"
+      ],
+      "usage": "<Form model=\"文本\" layout=\"vertical\">内容</Form>",
+      "used_by": [],
+      "fingerprint": "eaba903081bf8be5"
+    },
+    {
+      "name": "GridCol",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/GridCol.vue",
+      "import": "@/components/extend/GridCol.vue",
+      "description": "栅格列：24 栅格制，span 决定占比，offset 前置留白，push / pull 做顺序视觉交换。",
+      "props": [
+        {
+          "name": "span",
+          "type": "number",
+          "optional": true,
+          "default": "24"
+        },
+        {
+          "name": "offset",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "push",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "pull",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "xs",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "sm",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "md",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "lg",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "xl",
+          "type": "number",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<GridCol>内容</GridCol>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "fa4d3dd5bf52763b"
+    },
+    {
+      "name": "GridRow",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/GridRow.vue",
+      "import": "@/components/extend/GridRow.vue",
+      "description": "栅格行：24 栅格制的 flex 轨道容器，横纵两个方向各有一份间距。",
+      "props": [
+        {
+          "name": "gutter",
+          "type": "number | [number, number]",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "justify",
+          "type": "'start' | 'center' | 'end' | 'space-between' | 'space-around'",
+          "optional": true,
+          "default": "'start'"
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end' | 'stretch'",
+          "optional": true,
+          "default": "'stretch'"
+        },
+        {
+          "name": "wrap",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<GridRow justify=\"start\" align=\"start\">内容</GridRow>",
+      "used_by": [],
+      "fingerprint": "3ded0025199a09ac"
+    },
+    {
+      "name": "HelpTip",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/HelpTip.vue",
+      "import": "@/components/extend/HelpTip.vue",
+      "description": "图标式帮助：一个小图标按钮，悬停或键盘聚焦时浮出功能 / 字段 / 业务说明。",
+      "props": [
+        {
+          "name": "content",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "tone",
+          "type": "'info' | 'help'",
+          "optional": true,
+          "default": "'info'"
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "default": "'top'"
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "15"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": "'查看说明'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "delay",
+          "type": "number",
+          "optional": true,
+          "default": "120"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<HelpTip content=\"文本\" tone=\"info\" placement=\"top\" />",
+      "used_by": [
+        "src/views/gallery/DemoCell.vue"
+      ],
+      "fingerprint": "dcdc66b99cd40624"
+    },
+    {
+      "name": "Image",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Image.vue",
+      "import": "@/components/extend/Image.vue",
+      "description": "图片：加载中显示骨架，失败回落 fallback 或占位图标；preview 时点击开全屏遮罩。",
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "width",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "height",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "fit",
+          "type": "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'",
+          "optional": true,
+          "default": "'cover'"
+        },
+        {
+          "name": "preview",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "fallback",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "load",
+          "payload": "—"
+        },
+        {
+          "name": "error",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Image src=\"文本\" fit=\"fill\" />",
+      "used_by": [],
+      "fingerprint": "5505d873167bc6e3"
+    },
+    {
+      "name": "ImagePreview",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/ImagePreview.vue",
+      "import": "@/components/extend/ImagePreview.vue",
+      "description": "图片预览器：全屏遮罩里看单张大图，支持滚轮与按钮缩放、旋转、Esc / 点遮罩关闭。",
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "visible",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "zoomable",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:visible",
+          "payload": "boolean"
+        },
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<ImagePreview src=\"文本\" />",
+      "used_by": [],
+      "fingerprint": "1d3aea7618d17aa7"
+    },
+    {
+      "name": "ImagePreviewGroup",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/ImagePreviewGroup.vue",
+      "import": "@/components/extend/ImagePreviewGroup.vue",
+      "description": "图片预览组：一组图共用一个全屏预览器，底部缩略图导航，左右箭头或方向键切上下张。",
+      "props": [
+        {
+          "name": "images",
+          "type": "PreviewImage[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "visible",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "initialIndex",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:visible",
+          "payload": "boolean"
+        },
+        {
+          "name": "change",
+          "payload": "number"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "PreviewImage"
+      ],
+      "usage": "<ImagePreviewGroup :images=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "f90a0841426f9347"
+    },
+    {
+      "name": "InputGroup",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/InputGroup.vue",
+      "import": "@/components/extend/InputGroup.vue",
+      "description": "输入组：把多个输入框 / 按钮横向或纵向拼成一条，整组读作「一个控件」而不是几个并排控件。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<InputGroup direction=\"horizontal\">内容</InputGroup>",
+      "used_by": [],
+      "fingerprint": "0f25cdf74c069629"
+    },
+    {
+      "name": "InputNumber",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/InputNumber.vue",
+      "import": "@/components/extend/InputNumber.vue",
+      "description": "数字输入：左右步进按钮夹住中间输入框，越界钳制、按 precision 定小数位。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number | null",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        },
+        {
+          "name": "precision",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number | null"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<InputNumber />",
+      "used_by": [],
+      "fingerprint": "010c5bfb257dd118"
+    },
+    {
+      "name": "InputPassword",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/InputPassword.vue",
+      "import": "@/components/extend/InputPassword.vue",
+      "description": "密码输入框：在输入框内自带一个「明文/密文」切换钮，点击即在 password 与 text 间切换。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请输入密码'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "defaultVisible",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<InputPassword />",
+      "used_by": [],
+      "fingerprint": "6179d2a10acee037"
+    },
+    {
+      "name": "InputSearch",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/InputSearch.vue",
+      "import": "@/components/extend/InputSearch.vue",
+      "description": "搜索输入：把「填词 + 触发搜索」收成一个控件，回车与点右侧按钮完全等价。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "allowClear",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        },
+        {
+          "name": "search",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<InputSearch />",
+      "used_by": [
+        "src/views/gallery/Gallery.vue"
+      ],
+      "fingerprint": "24c405fadd293a8f"
+    },
+    {
+      "name": "InputTag",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/InputTag.vue",
+      "import": "@/components/extend/InputTag.vue",
+      "description": "标签输入：回车把当前文本收成标签，退格在空输入时删末尾，标签上的叉逐个移除。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string[]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "allowDuplicate",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string[]"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<InputTag />",
+      "used_by": [],
+      "fingerprint": "827aad5d5fb5ea60"
+    },
+    {
+      "name": "LinkText",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/LinkText.vue",
+      "import": "@/components/extend/LinkText.vue",
+      "description": "链接文字：语义色 + 可选下划线，禁用态降级为纯文本，无 href 时退化为 span。",
+      "props": [
+        {
+          "name": "href",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "target",
+          "type": "'_blank' | '_self'",
+          "optional": true,
+          "default": "'_self'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "underline",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'default' | 'primary' | 'success' | 'warning' | 'danger'",
+          "optional": true,
+          "default": "'primary'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<LinkText target=\"_blank\" type=\"default\">内容</LinkText>",
+      "used_by": [],
+      "fingerprint": "e2006c529f6d87b7"
+    },
+    {
+      "name": "Mention",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Mention.vue",
+      "import": "@/components/extend/Mention.vue",
+      "description": "提及输入：textarea 里敲出 trigger（默认 @）即浮出候选，选中后把触发词替换成候选值。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "MentionOption[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "trigger",
+          "type": "string",
+          "optional": true,
+          "default": "'@'"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "MentionOption"
+      ],
+      "usage": "<Mention :options=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "e31308dfa47c51bd"
+    },
+    {
+      "name": "Menu",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Menu.vue",
+      "import": "@/components/extend/Menu.vue",
+      "description": "菜单：纵向或横向的导航列表，支持子菜单递归展开与折叠态。",
+      "props": [
+        {
+          "name": "items",
+          "type": "MenuItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "mode",
+          "type": "'vertical' | 'horizontal'",
+          "optional": true,
+          "default": "'vertical'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "MenuItem"
+      ],
+      "usage": "<Menu :items=\"[]\" mode=\"vertical\" />",
+      "used_by": [],
+      "fingerprint": "edc3d25709e0df85"
+    },
+    {
+      "name": "MenuNode",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/MenuNode.vue",
+      "import": "@/components/extend/MenuNode.vue",
+      "description": "菜单节点：菜单的递归单元，自身承载子项列表。",
+      "props": [
+        {
+          "name": "item",
+          "type": "MenuNodeItem",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "depth",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "vertical",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "collapsed",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "selected",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<MenuNode item=\"文本\" :depth=\"0\" vertical />",
+      "used_by": [
+        "src/components/extend/Menu.vue"
+      ],
+      "fingerprint": "ef2b8025f265a33d"
+    },
+    {
+      "name": "MonthPicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/MonthPicker.vue",
+      "import": "@/components/extend/MonthPicker.vue",
+      "description": "月份选择：一格一月共 12 格，头部只翻年不翻月，选完立即回写。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择月份'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<MonthPicker />",
+      "used_by": [],
+      "fingerprint": "80be42aee088bd1a"
+    },
+    {
+      "name": "Notification",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Notification.vue",
+      "import": "@/components/extend/Notification.vue",
+      "description": "通知卡片：单条展示型，只负责一条通知的排版与关闭。",
+      "props": [
+        {
+          "name": "type",
+          "type": "'info' | 'success' | 'warning' | 'error'",
+          "optional": true,
+          "default": "'info'"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "closable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "showIcon",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Notification type=\"info\">内容</Notification>",
+      "used_by": [],
+      "fingerprint": "cbd822d7ed07fbea"
+    },
+    {
+      "name": "OverflowList",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/OverflowList.vue",
+      "import": "@/components/extend/OverflowList.vue",
+      "description": "溢出列表：按容器宽度逐项排布，放不下的项收进 +N 下拉，点开可看全部。",
+      "props": [
+        {
+          "name": "items",
+          "type": "Array<{ key: string | number; label: string }>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "maxCount",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "collapseFrom",
+          "type": "'start' | 'end'",
+          "optional": true,
+          "default": "'end'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<OverflowList :items=\"[]\" collapseFrom=\"start\">内容</OverflowList>",
+      "used_by": [],
+      "fingerprint": "2f2a85bd0c8c42b1"
+    },
+    {
+      "name": "Popconfirm",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Popconfirm.vue",
+      "import": "@/components/extend/Popconfirm.vue",
+      "description": "气泡确认：点触发区浮出一个小气泡，确认或取消后收起。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "okText",
+          "type": "string",
+          "optional": true,
+          "default": "'确定'"
+        },
+        {
+          "name": "cancelText",
+          "type": "string",
+          "optional": true,
+          "default": "'取消'"
+        },
+        {
+          "name": "danger",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "default": "'top'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "ok",
+          "payload": "—"
+        },
+        {
+          "name": "confirm",
+          "payload": "—"
+        },
+        {
+          "name": "cancel",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Popconfirm placement=\"top\">内容</Popconfirm>",
+      "used_by": [],
+      "fingerprint": "c8dde80f84234e74"
+    },
+    {
+      "name": "Popover",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Popover.vue",
+      "import": "@/components/extend/Popover.vue",
+      "description": "气泡卡片：比 Tooltip 更重的一块浮层，可放标题、正文与可点内容。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "trigger",
+          "type": "'click' | 'hover'",
+          "optional": true,
+          "default": "'hover'"
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "default": "'top'"
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": "240"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default",
+        "content",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Popover trigger=\"click\" placement=\"top\">内容</Popover>",
+      "used_by": [],
+      "fingerprint": "0a7e33accd982969"
+    },
+    {
+      "name": "Progress",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Progress.vue",
+      "import": "@/components/extend/Progress.vue",
+      "description": "进度条：line 用宽度过渡、circle 用 SVG 描边偏移，两条实现共用一套状态色。",
+      "props": [
+        {
+          "name": "percent",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'line' | 'circle'",
+          "optional": true,
+          "default": "'line'"
+        },
+        {
+          "name": "status",
+          "type": "'normal' | 'success' | 'error' | 'warning'",
+          "optional": true,
+          "default": "'normal'"
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "120"
+        },
+        {
+          "name": "showText",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "strokeWidth",
+          "type": "number",
+          "optional": true,
+          "default": "8"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<Progress :percent=\"0\" type=\"line\" status=\"normal\" />",
+      "used_by": [],
+      "fingerprint": "9834b1f3f91e3d71"
+    },
+    {
+      "name": "QuarterPicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/QuarterPicker.vue",
+      "import": "@/components/extend/QuarterPicker.vue",
+      "description": "季度选择：一格一季共 4 格，头部只翻年。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择季度'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<QuarterPicker />",
+      "used_by": [],
+      "fingerprint": "0658507db6c18e3a"
+    },
+    {
+      "name": "Radio",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Radio.vue",
+      "import": "@/components/extend/Radio.vue",
+      "description": "单选框：优先读最近 RadioGroup 的上下文，独立使用时退回自身 props。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "RadioValue",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "value",
+          "type": "RadioValue",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "RadioValue"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Radio value=\"文本\">内容</Radio>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts",
+        "src/views/gallery/demo-variants.curated-inputs.ts"
+      ],
+      "fingerprint": "47e66f79fc7023ac"
+    },
+    {
+      "name": "RadioGroup",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/RadioGroup.vue",
+      "import": "@/components/extend/RadioGroup.vue",
+      "description": "单选组的对外契约：Radio 依赖 radioGroupKey 注入上下文，独立于组件的 setup 逻辑，",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "RadioValue",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "RadioValue"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "RadioValue",
+        "RadioGroupContext"
+      ],
+      "usage": "<RadioGroup modelValue=\"文本\" direction=\"horizontal\">内容</RadioGroup>",
+      "used_by": [],
+      "fingerprint": "835b077494ad8ef5"
+    },
+    {
+      "name": "RangePicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/RangePicker.vue",
+      "import": "@/components/extend/RangePicker.vue",
+      "description": "日期区间选择：单个月历网格里两步连选，先点开始再点结束。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "[string, string]",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择日期区间'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "default": "'YYYY-MM-DD'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "[string, string]"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<RangePicker />",
+      "used_by": [],
+      "fingerprint": "16fde4033119980d"
+    },
+    {
+      "name": "Rate",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Rate.vue",
+      "import": "@/components/extend/Rate.vue",
+      "description": "评分：五角星按整数或半星打分，hover 预览、点击定值、再点同一值得可清空。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "count",
+          "type": "number",
+          "optional": true,
+          "default": "5"
+        },
+        {
+          "name": "allowHalf",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "allowClear",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Rate />",
+      "used_by": [],
+      "fingerprint": "3c595cdde92f5c49"
+    },
+    {
+      "name": "ResizeBox",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/ResizeBox.vue",
+      "import": "@/components/extend/ResizeBox.vue",
+      "description": "伸缩框：拖动右下角把手把内容压成指定宽高，宽高直接落到容器尺寸上。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "minWidth",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "maxWidth",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "minHeight",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "maxHeight",
+          "type": "number",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "resize",
+          "payload": "{ width: number; height: number }"
+        }
+      ],
+      "slots": [
+        "default",
+        "resize"
+      ],
+      "types": [],
+      "usage": "<ResizeBox direction=\"horizontal\">内容</ResizeBox>",
+      "used_by": [],
+      "fingerprint": "a3668a2f59d365af"
+    },
+    {
+      "name": "Result",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Result.vue",
+      "import": "@/components/extend/Result.vue",
+      "description": "结果页：一次操作或一个错误码的终态陈述。",
+      "props": [
+        {
+          "name": "status",
+          "type": "'success' | 'error' | 'warning' | 'info' | '404' | '403' | '500'",
+          "optional": true,
+          "default": "'info'"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "subTitle",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default",
+        "extra",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Result status=\"success\">内容</Result>",
+      "used_by": [],
+      "fingerprint": "bdfd77ac1d4e15c0"
+    },
+    {
+      "name": "Skeleton",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Skeleton.vue",
+      "import": "@/components/extend/Skeleton.vue",
+      "description": "骨架屏：loading 为 true 时按 type / rows 渲染占位块，否则渲染 default 插槽。",
+      "props": [
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "animation",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        },
+        {
+          "name": "type",
+          "type": "'text' | 'image' | 'circle' | 'rect'",
+          "optional": true,
+          "default": "'text'"
+        },
+        {
+          "name": "width",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "height",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Skeleton type=\"text\">内容</Skeleton>",
+      "used_by": [
+        "src/components/extend/Card.vue"
+      ],
+      "fingerprint": "aa1a212f7f8e91ce"
+    },
+    {
+      "name": "Slider",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Slider.vue",
+      "import": "@/components/extend/Slider.vue",
+      "description": "滑块：原生 <input type=\"range\"> 作无障碍底座，视觉轨道与滑块叠在其上。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "number | [number, number]",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": "100"
+        },
+        {
+          "name": "step",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "showTicks",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "range",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number | [number, number]"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Slider />",
+      "used_by": [],
+      "fingerprint": "8451ac3f31903409"
+    },
+    {
+      "name": "Space",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/Space.vue",
+      "import": "@/components/extend/Space.vue",
+      "description": "间距：给一组子项之间垫出统一距离，方向与对齐由一行 flex 决定。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg' | number",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "align",
+          "type": "'start' | 'center' | 'end' | 'baseline'",
+          "optional": true,
+          "default": "'center'"
+        },
+        {
+          "name": "wrap",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "split",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Space direction=\"horizontal\" size=\"sm\" align=\"start\">内容</Space>",
+      "used_by": [],
+      "fingerprint": "dbe718a92a44a2a8"
+    },
+    {
+      "name": "Spin",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Spin.vue",
+      "import": "@/components/extend/Spin.vue",
+      "description": "加载中：只渲染一个转圈，或用 wrapper 在内容上叠一层遮罩。",
+      "props": [
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "size",
+          "type": "'sm' | 'md' | 'lg'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "tip",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "wrapper",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Spin size=\"sm\">内容</Spin>",
+      "used_by": [],
+      "fingerprint": "a6ef904eec4f226d"
+    },
+    {
+      "name": "SplitPane",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/SplitPane.vue",
+      "import": "@/components/extend/SplitPane.vue",
+      "description": "分栏：一块区域按可拖动的分隔条切成两半，横向出左右、纵向出上下。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "modelValue",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "number"
+        },
+        {
+          "name": "resize",
+          "payload": "number"
+        }
+      ],
+      "slots": [
+        "isHorizontal ? 'left' : 'top'",
+        "isHorizontal ? 'right' : 'bottom'"
+      ],
+      "types": [],
+      "usage": "<SplitPane direction=\"horizontal\" />",
+      "used_by": [],
+      "fingerprint": "ede5f4c377a3e3be"
+    },
+    {
+      "name": "Steps",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Steps.vue",
+      "import": "@/components/extend/Steps.vue",
+      "description": "步骤条：横向或纵向的工序进度，已完成打勾、当前高亮、未开始置灰。",
+      "props": [
+        {
+          "name": "current",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "items",
+          "type": "StepItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "direction",
+          "type": "'horizontal' | 'vertical'",
+          "optional": true,
+          "default": "'horizontal'"
+        },
+        {
+          "name": "clickable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "change",
+          "payload": "number"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "StepItem"
+      ],
+      "usage": "<Steps :current=\"0\" :items=\"[]\" direction=\"horizontal\" />",
+      "used_by": [],
+      "fingerprint": "b60b4d8224f847eb"
+    },
+    {
+      "name": "StyledScrollbar",
+      "group": "extend",
+      "category": "layout",
+      "path": "src/components/extend/StyledScrollbar.vue",
+      "import": "@/components/extend/StyledScrollbar.vue",
+      "description": "自定义滚动条：滚动容器保持原生 overflow / 键盘 / 触控板行为，只额外画一条浮动滑块压在上面。",
+      "props": [
+        {
+          "name": "direction",
+          "type": "'vertical' | 'horizontal' | 'both'",
+          "optional": true,
+          "default": "'vertical'"
+        },
+        {
+          "name": "maxHeight",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "maxWidth",
+          "type": "number | string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "always",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<StyledScrollbar direction=\"vertical\">内容</StyledScrollbar>",
+      "used_by": [],
+      "fingerprint": "1c4a63fe6e2e4374"
+    },
+    {
+      "name": "TabPane",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/TabPane.vue",
+      "import": "@/components/extend/TabPane.vue",
+      "description": "标签面板：Tabs 内容区的单页容器，active 为真才显示，切换只切可见性不销毁内容。",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<TabPane>内容</TabPane>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "c123e78abb1cc6c6"
+    },
+    {
+      "name": "Tabs",
+      "group": "extend",
+      "category": "navigation",
+      "path": "src/components/extend/Tabs.vue",
+      "import": "@/components/extend/Tabs.vue",
+      "description": "标签页：横向切换一组视图，line 型用滑动下划线、card 型用底色切换。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "items",
+          "type": "TabItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'line' | 'card'",
+          "optional": true,
+          "default": "'line'"
+        },
+        {
+          "name": "closable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        },
+        {
+          "name": "close",
+          "payload": "string"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [
+        "TabItem"
+      ],
+      "usage": "<Tabs modelValue=\"文本\" :items=\"[]\" type=\"line\">内容</Tabs>",
+      "used_by": [],
+      "fingerprint": "20366e7c4403ec00"
+    },
+    {
+      "name": "Textarea",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Textarea.vue",
+      "import": "@/components/extend/Textarea.vue",
+      "description": "多行文本域：在 TextInput 的 multiline 之外补两项真实能力——自动高度与字数统计。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        },
+        {
+          "name": "autoSize",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "maxRows",
+          "type": "number",
+          "optional": true,
+          "default": "8"
+        },
+        {
+          "name": "maxlength",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "showCount",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Textarea />",
+      "used_by": [],
+      "fingerprint": "ab56a0e6518d748a"
+    },
+    {
+      "name": "TimePicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/TimePicker.vue",
+      "import": "@/components/extend/TimePicker.vue",
+      "description": "时间选择：触发区 + 下拉面板，面板里时 / 分两列滚动选择，底部提供「此刻」快捷。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'选择时间'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "optional": true,
+          "default": "'HH:mm:ss'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<TimePicker />",
+      "used_by": [],
+      "fingerprint": "9c0361364689e52f"
+    },
+    {
+      "name": "Timeline",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Timeline.vue",
+      "import": "@/components/extend/Timeline.vue",
+      "description": "时间轴：由 items 数据派生节点，左侧 / 右侧 / 交替三种排布，可反向。",
+      "props": [
+        {
+          "name": "items",
+          "type": "TimelineEntry[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "mode",
+          "type": "'left' | 'right' | 'alternate'",
+          "optional": true,
+          "default": "'left'"
+        },
+        {
+          "name": "reverse",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "TimelineEntry"
+      ],
+      "usage": "<Timeline :items=\"[]\" mode=\"left\" />",
+      "used_by": [],
+      "fingerprint": "c221bcb4f87a7a64"
+    },
+    {
+      "name": "TimelineItem",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/TimelineItem.vue",
+      "import": "@/components/extend/TimelineItem.vue",
+      "description": "时间轴节点：圆点 + 竖线 + 时间 / 标题 / 内容，可单独使用也可被 Timeline 批量渲染。",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "time",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "dot",
+          "type": "string",
+          "optional": true,
+          "default": "'default'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "dot",
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<TimelineItem>内容</TimelineItem>",
+      "used_by": [
+        "src/components/extend/Timeline.vue"
+      ],
+      "fingerprint": "72bae5f27444ea68"
+    },
+    {
+      "name": "Tooltip",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Tooltip.vue",
+      "import": "@/components/extend/Tooltip.vue",
+      "description": "提示气泡：hover / focus 时在目标旁浮出说明，位置自动避让视口边缘。",
+      "props": [
+        {
+          "name": "content",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "optional": true,
+          "default": "'top'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "delay",
+          "type": "number",
+          "optional": true,
+          "default": "120"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Tooltip placement=\"top\">内容</Tooltip>",
+      "used_by": [],
+      "fingerprint": "9622c5a602e46333"
+    },
+    {
+      "name": "Transfer",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Transfer.vue",
+      "import": "@/components/extend/Transfer.vue",
+      "description": "穿梭框：左「待选」右「已选」两栏，中间箭头把勾选项推过去。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "Array<string | number>",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "data",
+          "type": "TransferItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "titles",
+          "type": "[string, string]",
+          "optional": true,
+          "default": "() => ['待选', '已选']"
+        },
+        {
+          "name": "searchable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "Array<string | number>"
+        },
+        {
+          "name": "change",
+          "payload": "any[]"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "TransferItem"
+      ],
+      "usage": "<Transfer :data=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "e9b220660b43adb2"
+    },
+    {
+      "name": "Tree",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Tree.vue",
+      "import": "@/components/extend/Tree.vue",
+      "description": "通用递归树：只认 key/label/children 这套通用结构，不绑定任何业务数据模型，",
+      "props": [
+        {
+          "name": "data",
+          "type": "TreeNode[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "modelValue",
+          "type": "TreeKey[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "checkable",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "selectable",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "defaultExpandAll",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "showLine",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "filterText",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "TreeKey[]"
+        },
+        {
+          "name": "select",
+          "payload": "TreeKey"
+        },
+        {
+          "name": "check",
+          "payload": "TreeKey[]"
+        },
+        {
+          "name": "expand",
+          "payload": "TreeKey[]"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "TreeNode",
+        "TreeKey",
+        "TreeCheckState",
+        "TreeContext"
+      ],
+      "usage": "<Tree :data=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "972b87772a679208"
+    },
+    {
+      "name": "TreeNode",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/TreeNode.vue",
+      "import": "@/components/extend/TreeNode.vue",
+      "description": "树的递归单元：一行 = 展开箭头 + 可选复选框 + 图标 + 标签，下方按需渲染子级。",
+      "props": [
+        {
+          "name": "node",
+          "type": "TreeNode",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "depth",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "parentKey",
+          "type": "TreeKey | null",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<TreeNode node=\"文本\" :depth=\"0\" parentKey=\"文本\" />",
+      "used_by": [
+        "src/components/extend/Tree.vue"
+      ],
+      "fingerprint": "3522de6985bfb7eb"
+    },
+    {
+      "name": "TreeSelect",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/TreeSelect.vue",
+      "import": "@/components/extend/TreeSelect.vue",
+      "description": "树选择：触发区点开一个下拉树面板，支持层级缩进、展开折叠、单选与多选。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | number | Array<string | number> | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "data",
+          "type": "TreeNode[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "TreeSelectValue"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "TreeNode",
+        "TreeSelectValue"
+      ],
+      "usage": "<TreeSelect :data=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "fc34583df7ff8ce8"
+    },
+    {
+      "name": "Trigger",
+      "group": "extend",
+      "category": "feedback",
+      "path": "src/components/extend/Trigger.vue",
+      "import": "@/components/extend/Trigger.vue",
+      "description": "触发器：通用「定位 + 显隐」底层原语，Dropdown / Popover 这类浮层都由它派生。",
+      "props": [
+        {
+          "name": "trigger",
+          "type": "Array<'click' | 'hover' | 'focus' | 'contextmenu'>",
+          "optional": true,
+          "default": "() => ['hover']"
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right' | 'bottom-start' | 'bottom-end'",
+          "optional": true,
+          "default": "'bottom'"
+        },
+        {
+          "name": "popupVisible",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "popupClass",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:popupVisible",
+          "payload": "boolean"
+        }
+      ],
+      "slots": [
+        "default",
+        "content"
+      ],
+      "types": [],
+      "usage": "<Trigger placement=\"top\">内容</Trigger>",
+      "used_by": [],
+      "fingerprint": "760539f423947282"
+    },
+    {
+      "name": "Typography",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/Typography.vue",
+      "import": "@/components/extend/Typography.vue",
+      "description": "排版：按 type / heading 决定语义标签，叠加加粗、高亮、下划线、删除线、行内代码、省略、复制等修饰。",
+      "props": [
+        {
+          "name": "type",
+          "type": "'title' | 'text' | 'paragraph'",
+          "optional": true,
+          "default": "'text'"
+        },
+        {
+          "name": "heading",
+          "type": "1 | 2 | 3 | 4 | 5",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "ellipsis",
+          "type": "boolean | number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "bold",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "mark",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "underline",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "delete",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "code",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "copyable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "copy",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Typography type=\"title\">内容</Typography>",
+      "used_by": [],
+      "fingerprint": "ae0cd4d00d6c71cf"
+    },
+    {
+      "name": "Upload",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/Upload.vue",
+      "import": "@/components/extend/Upload.vue",
+      "description": "上传：只做前端文件选择与列表管理，不做真实网络上传。",
+      "props": [
+        {
+          "name": "fileList",
+          "type": "UploadFile[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "accept",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "drag",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "autoUpload",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [
+        {
+          "name": "change",
+          "payload": "UploadFile[]"
+        },
+        {
+          "name": "remove",
+          "payload": "UploadFile"
+        },
+        {
+          "name": "progress",
+          "payload": "UploadFile"
+        },
+        {
+          "name": "success",
+          "payload": "UploadFile"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "UploadFile"
+      ],
+      "usage": "<Upload />",
+      "used_by": [],
+      "fingerprint": "631634a333531cd7"
+    },
+    {
+      "name": "VerificationCode",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/VerificationCode.vue",
+      "import": "@/components/extend/VerificationCode.vue",
+      "description": "验证码输入：定长数字格，逐格输入自动跳格，退格回跳，支持整串粘贴。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "length",
+          "type": "number",
+          "optional": true,
+          "default": "6"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "numeric",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "autofocus",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        },
+        {
+          "name": "complete",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<VerificationCode />",
+      "used_by": [],
+      "fingerprint": "c884da62acc64fd6"
+    },
+    {
+      "name": "Watermark",
+      "group": "extend",
+      "category": "display",
+      "path": "src/components/extend/Watermark.vue",
+      "import": "@/components/extend/Watermark.vue",
+      "description": "水印：用 canvas 把文字 / 图片绘成 dataURL，作为背景图平铺在内容之上。",
+      "props": [
+        {
+          "name": "content",
+          "type": "string | string[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "image",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "rotate",
+          "type": "number",
+          "optional": true,
+          "default": "-22"
+        },
+        {
+          "name": "gap",
+          "type": "[number, number]",
+          "optional": true,
+          "default": "() => [100, 100]"
+        },
+        {
+          "name": "font",
+          "type": "{ fontSize?: number; color?: string }",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "zIndex",
+          "type": "number",
+          "optional": true,
+          "default": "9"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Watermark>内容</Watermark>",
+      "used_by": [],
+      "fingerprint": "d52cf5af3c414423"
+    },
+    {
+      "name": "WeekPicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/WeekPicker.vue",
+      "import": "@/components/extend/WeekPicker.vue",
+      "description": "周选择：列出 ISO 周（周一开头，第 1 周含当年首个周四），每行显示周序号与起止日期。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择周'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<WeekPicker />",
+      "used_by": [],
+      "fingerprint": "696c97464314eb98"
+    },
+    {
+      "name": "YearPicker",
+      "group": "extend",
+      "category": "inputs",
+      "path": "src/components/extend/YearPicker.vue",
+      "import": "@/components/extend/YearPicker.vue",
+      "description": "年份选择：一页 12 年（十年跨度加前后各一年的缓冲），头部显示跨度并整页翻。",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择年份'"
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<YearPicker />",
+      "used_by": [],
+      "fingerprint": "87bdf17ef99c2fdd"
+    },
+    {
+      "name": "AppShell",
+      "group": "layout",
+      "category": "shell",
+      "path": "src/components/layout/AppShell.vue",
+      "import": "@/components/layout/AppShell.vue",
+      "description": "",
+      "props": [],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<AppShell />",
+      "used_by": [
+        "src/router/index.ts"
+      ],
+      "fingerprint": "c66d6774f1cd506b"
+    },
+    {
+      "name": "AppearanceDialog",
+      "group": "layout",
+      "category": "shell",
+      "path": "src/components/layout/AppearanceDialog.vue",
+      "import": "@/components/layout/AppearanceDialog.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<AppearanceDialog open />",
+      "used_by": [
+        "src/components/layout/AppShell.vue"
+      ],
+      "fingerprint": "15eb3fa7a31cb3b7"
+    },
+    {
+      "name": "CommandPalette",
+      "group": "layout",
+      "category": "navigation",
+      "path": "src/components/layout/CommandPalette.vue",
+      "import": "@/components/layout/CommandPalette.vue",
+      "description": "命令面板：最近访问 / 页面 / 用户 / 快捷动作 四组结果，",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        },
+        {
+          "name": "action",
+          "payload": "'appearance' | 'password' | 'logout'"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<CommandPalette open />",
+      "used_by": [
+        "src/components/layout/AppShell.vue"
+      ],
+      "fingerprint": "5037dc52f4a15ff4"
+    },
+    {
+      "name": "PasswordDialog",
+      "group": "layout",
+      "category": "shell",
+      "path": "src/components/layout/PasswordDialog.vue",
+      "import": "@/components/layout/PasswordDialog.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<PasswordDialog open />",
+      "used_by": [
+        "src/components/layout/AppShell.vue"
+      ],
+      "fingerprint": "15eb3fa7a31cb3b7"
+    },
+    {
+      "name": "Sidebar",
+      "group": "layout",
+      "category": "shell",
+      "path": "src/components/layout/Sidebar.vue",
+      "import": "@/components/layout/Sidebar.vue",
+      "description": "",
+      "props": [],
+      "emits": [
+        {
+          "name": "navigate",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Sidebar />",
+      "used_by": [
+        "src/components/layout/AppShell.vue"
+      ],
+      "fingerprint": "090d8c0758c0bc54"
+    },
+    {
+      "name": "Topbar",
+      "group": "layout",
+      "category": "shell",
+      "path": "src/components/layout/Topbar.vue",
+      "import": "@/components/layout/Topbar.vue",
+      "description": "",
+      "props": [],
+      "emits": [
+        {
+          "name": "toggle-rail",
+          "payload": "—"
+        },
+        {
+          "name": "command",
+          "payload": "—"
+        },
+        {
+          "name": "appearance",
+          "payload": "—"
+        },
+        {
+          "name": "password",
+          "payload": "—"
+        },
+        {
+          "name": "logout",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Topbar />",
+      "used_by": [
+        "src/components/layout/AppShell.vue"
+      ],
+      "fingerprint": "de2fee4e7336e2fd"
+    },
+    {
+      "name": "Avatar",
+      "group": "ui",
+      "category": "general",
+      "path": "src/components/ui/Avatar.vue",
+      "import": "@/components/ui/Avatar.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "32"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<Avatar />",
+      "used_by": [
+        "src/components/extend/CardMeta.vue",
+        "src/components/extend/Comment.vue",
+        "src/components/layout/CommandPalette.vue",
+        "src/components/layout/Topbar.vue",
+        "src/components/workspace/ActivityList.vue",
+        "src/views/Dashboard.vue",
+        "src/views/gallery/demo-slots.ts",
+        "src/views/gallery/demo-variants.curated-general.ts"
+      ],
+      "fingerprint": "64fba84ef4b941bc"
+    },
+    {
+      "name": "Button",
+      "group": "ui",
+      "category": "general",
+      "path": "src/components/ui/Button.vue",
+      "import": "@/components/ui/Button.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'ghost' | 'text' | 'danger'",
+          "optional": true,
+          "default": "'secondary'"
+        },
+        {
+          "name": "size",
+          "type": "'md' | 'sm'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "danger",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "block",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'button' | 'submit'",
+          "optional": true,
+          "default": "'button'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Button variant=\"primary\" size=\"md\" type=\"button\">内容</Button>",
+      "used_by": [
+        "src/components/business/FormDialog.vue",
+        "src/components/business/GeneratorPipeline.vue",
+        "src/components/business/ListPage.vue",
+        "src/components/business/PermissionButton.vue",
+        "src/components/business/PermissionMatrix.vue",
+        "src/components/business/SearchForm.vue",
+        "src/components/extend/DropdownButton.vue",
+        "src/components/extend/Popconfirm.vue",
+        "src/components/layout/AppearanceDialog.vue",
+        "src/components/ui/ConfirmHost.vue",
+        "src/views/gallery/Gallery.vue",
+        "src/views/Login.vue",
+        "src/views/NotFound.vue",
+        "src/views/gallery/demo-slots.ts",
+        "src/views/gallery/demo-variants.curated-general.ts"
+      ],
+      "fingerprint": "f85c1d9b3ea1cc7d"
+    },
+    {
+      "name": "Checkbox",
+      "group": "ui",
+      "category": "inputs",
+      "path": "src/components/ui/Checkbox.vue",
+      "import": "@/components/ui/Checkbox.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "indeterminate",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "boolean"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Checkbox modelValue>内容</Checkbox>",
+      "used_by": [
+        "src/components/business/PermissionTree.vue",
+        "src/components/extend/CheckboxGroup.vue",
+        "src/components/extend/Transfer.vue",
+        "src/components/extend/TreeNode.vue",
+        "src/components/ui/DataTable.vue",
+        "src/views/Login.vue"
+      ],
+      "fingerprint": "770eaabe3c80cacb"
+    },
+    {
+      "name": "ConfirmHost",
+      "group": "ui",
+      "category": "feedback",
+      "path": "src/components/ui/ConfirmHost.vue",
+      "import": "@/components/ui/ConfirmHost.vue",
+      "description": "",
+      "props": [],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<ConfirmHost />",
+      "used_by": [
+        "src/App.vue"
+      ],
+      "fingerprint": "c66d6774f1cd506b"
+    },
+    {
+      "name": "DataTable",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/DataTable.vue",
+      "import": "@/components/ui/DataTable.vue",
+      "description": "树形表格：按 children 展开，首列带缩进与展开按钮",
+      "props": [
+        {
+          "name": "columns",
+          "type": "Column[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "data",
+          "type": "Row[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "rowKey",
+          "type": "string",
+          "optional": true,
+          "default": "'id'"
+        },
+        {
+          "name": "selectable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "selected",
+          "type": "(string | number)[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "optional": true,
+          "default": "'暂无数据'"
+        },
+        {
+          "name": "tree",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "expandDepth",
+          "type": "number",
+          "optional": true,
+          "default": "1"
+        },
+        {
+          "name": "minWidth",
+          "type": "number",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:selected",
+          "payload": "(string | number)[]"
+        },
+        {
+          "name": "row-click",
+          "payload": "Row"
+        }
+      ],
+      "slots": [
+        "`cell-${col.key}`",
+        "(动态透传)"
+      ],
+      "types": [
+        "Column"
+      ],
+      "usage": "<DataTable :columns=\"[]\" :data=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "6cca3dcd4474d971"
+    },
+    {
+      "name": "DeltaPill",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/DeltaPill.vue",
+      "import": "@/components/ui/DeltaPill.vue",
+      "description": "环比胶囊：上升青柠、下降红、持平中性；上一周期为 0（fresh）时显示「新增」中性态，不给出误导的百分比",
+      "props": [
+        {
+          "name": "value",
+          "type": "number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "up",
+          "type": "boolean | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "fresh",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        },
+        {
+          "name": "suffix",
+          "type": "string",
+          "optional": true,
+          "default": "'%'"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<DeltaPill :value=\"0\" />",
+      "used_by": [
+        "src/views/Dashboard.vue",
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "bcebacbea0d7cb0a"
+    },
+    {
+      "name": "Drawer",
+      "group": "ui",
+      "category": "feedback",
+      "path": "src/components/ui/Drawer.vue",
+      "import": "@/components/ui/Drawer.vue",
+      "description": "共享元素来处：传入选择器（如 'tr'），打开时从最近一次被点的该元素生长成抽屉",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "sub",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": "520"
+        },
+        {
+          "name": "originFrom",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default",
+        "footer",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Drawer open>内容</Drawer>",
+      "used_by": [],
+      "fingerprint": "1d379cb359d06f19"
+    },
+    {
+      "name": "EmptyState",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/EmptyState.vue",
+      "import": "@/components/ui/EmptyState.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": "'暂无数据'"
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "optional": true,
+          "default": "'search'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<EmptyState>内容</EmptyState>",
+      "used_by": [
+        "src/components/business/PostLadder.vue",
+        "src/components/extend/DataList.vue",
+        "src/components/extend/Transfer.vue",
+        "src/components/ui/DataTable.vue",
+        "src/views/Dashboard.vue",
+        "src/views/gallery/Gallery.vue",
+        "src/views/NoAccess.vue",
+        "src/views/NotFound.vue"
+      ],
+      "fingerprint": "d3c0543f52fb93de"
+    },
+    {
+      "name": "Field",
+      "group": "ui",
+      "category": "inputs",
+      "path": "src/components/ui/Field.vue",
+      "import": "@/components/ui/Field.vue",
+      "description": "表单字段。默认根节点是 <label>，点标题即可聚焦输入；",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "hint",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "wide",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "span",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "group",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Field>内容</Field>",
+      "used_by": [
+        "src/components/business/GeneratorPipeline.vue",
+        "src/components/layout/PasswordDialog.vue",
+        "src/views/Login.vue",
+        "src/views/gallery/demo-slots.ts"
+      ],
+      "fingerprint": "155e448e2d0ecc69"
+    },
+    {
+      "name": "HoverCard",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/HoverCard.vue",
+      "import": "@/components/ui/HoverCard.vue",
+      "description": "悬停名片：指针停留 300ms 或键盘聚焦时出现的轻玻璃预览卡。",
+      "props": [
+        {
+          "name": "delay",
+          "type": "number",
+          "optional": true,
+          "default": "300"
+        },
+        {
+          "name": "placement",
+          "type": "'bottom' | 'top'",
+          "optional": true,
+          "default": "'bottom'"
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": "260"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default",
+        "card"
+      ],
+      "types": [],
+      "usage": "<HoverCard placement=\"bottom\">内容</HoverCard>",
+      "used_by": [],
+      "fingerprint": "f8bde9c09fb72212"
+    },
+    {
+      "name": "IconButton",
+      "group": "ui",
+      "category": "general",
+      "path": "src/components/ui/IconButton.vue",
+      "import": "@/components/ui/IconButton.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": true,
+          "default": "17"
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "danger",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "small",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<IconButton name=\"文本\" label=\"文本\" />",
+      "used_by": [
+        "src/components/business/AskDock.vue",
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/InsightPanel.vue",
+        "src/components/business/ListPage.vue",
+        "src/components/business/MenuStarMap.vue",
+        "src/components/business/OrgCanvas.vue",
+        "src/components/business/PermissionButton.vue",
+        "src/components/business/PermissionTrace.vue",
+        "src/components/extend/Alert.vue",
+        "src/components/extend/Notification.vue",
+        "src/components/layout/Topbar.vue",
+        "src/components/ui/Drawer.vue",
+        "src/components/ui/Modal.vue"
+      ],
+      "fingerprint": "b028b595f307bd07"
+    },
+    {
+      "name": "Metric",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/Metric.vue",
+      "import": "@/components/ui/Metric.vue",
+      "description": "显示级读数：等宽大数字 + 上标单位。size 对应 --fs-display-xl / l / m 三档",
+      "props": [
+        {
+          "name": "value",
+          "type": "number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "decimals",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "size",
+          "type": "'xl' | 'l' | 'm' | 's'",
+          "optional": true,
+          "default": "'m'"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Metric :value=\"0\" size=\"xl\">内容</Metric>",
+      "used_by": [
+        "src/components/business/InsightPanel.vue",
+        "src/components/workspace/ReadoutStrip.vue",
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "021a523dfbe1f5f2"
+    },
+    {
+      "name": "Modal",
+      "group": "ui",
+      "category": "feedback",
+      "path": "src/components/ui/Modal.vue",
+      "import": "@/components/ui/Modal.vue",
+      "description": "点击遮罩是否关闭（表单弹窗默认不关，避免误触丢失输入）",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "sub",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "width",
+          "type": "number",
+          "optional": true,
+          "default": "560"
+        },
+        {
+          "name": "closeOnOverlay",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "close",
+          "payload": "—"
+        }
+      ],
+      "slots": [
+        "default",
+        "footer",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Modal open>内容</Modal>",
+      "used_by": [
+        "src/components/business/FormDialog.vue",
+        "src/components/business/GeneratorPipeline.vue",
+        "src/components/layout/AppearanceDialog.vue",
+        "src/components/ui/ConfirmHost.vue"
+      ],
+      "fingerprint": "e2433e76924cf55e"
+    },
+    {
+      "name": "Odometer",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/Odometer.vue",
+      "import": "@/components/ui/Odometer.vue",
+      "description": "逐位滚动读数（结 Crystallize）：每一位是一条 0–9 的竖带，只有变化的位会滚。",
+      "props": [
+        {
+          "name": "value",
+          "type": "number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "decimals",
+          "type": "number",
+          "optional": true,
+          "default": "0"
+        },
+        {
+          "name": "group",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<Odometer :value=\"0\" />",
+      "used_by": [
+        "src/components/charts/TickRing.vue",
+        "src/components/ui/Metric.vue"
+      ],
+      "fingerprint": "ec2c535a84e88fe5"
+    },
+    {
+      "name": "PageHeader",
+      "group": "ui",
+      "category": "navigation",
+      "path": "src/components/ui/PageHeader.vue",
+      "import": "@/components/ui/PageHeader.vue",
+      "description": "页面头：大标题 + 说明；右侧放规格铭牌（#spec）与主操作（默认插槽）。位置信息由顶栏面包屑承担，不再放英文眉标",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "desc",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "spec",
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<PageHeader title=\"文本\">内容</PageHeader>",
+      "used_by": [
+        "src/components/business/ListPage.vue",
+        "src/views/gallery/Gallery.vue"
+      ],
+      "fingerprint": "99fcfa9fe0e41782"
+    },
+    {
+      "name": "Pagination",
+      "group": "ui",
+      "category": "navigation",
+      "path": "src/components/ui/Pagination.vue",
+      "import": "@/components/ui/Pagination.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "total",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "pageSize",
+          "type": "number",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "sizes",
+          "type": "number[]",
+          "optional": true,
+          "default": "() => [10, 20, 50, 100]"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:page",
+          "payload": "number"
+        },
+        {
+          "name": "update:pageSize",
+          "payload": "number"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Pagination :total=\"0\" :page=\"0\" :pageSize=\"0\" />",
+      "used_by": [
+        "src/components/business/ListPage.vue"
+      ],
+      "fingerprint": "eac41eb43e0329d0"
+    },
+    {
+      "name": "Panel",
+      "group": "ui",
+      "category": "layout",
+      "path": "src/components/ui/Panel.vue",
+      "import": "@/components/ui/Panel.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "meta",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "head",
+        "tools",
+        "default",
+        "(动态透传)"
+      ],
+      "types": [],
+      "usage": "<Panel>内容</Panel>",
+      "used_by": [
+        "src/components/business/ListPage.vue"
+      ],
+      "fingerprint": "6580e42d80a6e4cb"
+    },
+    {
+      "name": "Ruler",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/Ruler.vue",
+      "import": "@/components/ui/Ruler.vue",
+      "description": "刻度尺：细刻度 + 主刻度标签，marker 为 0–1 的当前位置（一根亮刻度）",
+      "props": [
+        {
+          "name": "labels",
+          "type": "string[]",
+          "optional": true,
+          "default": "() => []"
+        },
+        {
+          "name": "marker",
+          "type": "number | null",
+          "optional": true,
+          "default": "null"
+        },
+        {
+          "name": "markerLabel",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "minor",
+          "type": "number",
+          "optional": true,
+          "default": "4"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<Ruler />",
+      "used_by": [
+        "src/components/charts/Swimlane.vue"
+      ],
+      "fingerprint": "7d8744f15fc79db0"
+    },
+    {
+      "name": "SectionLabel",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/SectionLabel.vue",
+      "import": "@/components/ui/SectionLabel.vue",
+      "description": "区块标题：横带分层与仪器化面板的中文小标题（不再使用英文眉标与编号）",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "as",
+          "type": "'h2' | 'h3'",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<SectionLabel as=\"h2\" />",
+      "used_by": [
+        "src/components/workspace/Band.vue",
+        "src/components/workspace/BentoCard.vue",
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "23624c2d78b1f24f"
+    },
+    {
+      "name": "Segmented",
+      "group": "ui",
+      "category": "navigation",
+      "path": "src/components/ui/Segmented.vue",
+      "import": "@/components/ui/Segmented.vue",
+      "description": "容器或任一选项尺寸变化都重新对位：拉伸布局里网页字体加载完成只改选项宽度，不改容器宽度",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "T",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "Array<{ label: string; value: T }>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "T"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<Segmented modelValue=\"文本\" :options=\"[]\" />",
+      "used_by": [
+        "src/components/layout/AppearanceDialog.vue",
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "37f39a950435f681"
+    },
+    {
+      "name": "Select",
+      "group": "ui",
+      "category": "inputs",
+      "path": "src/components/ui/Select.vue",
+      "import": "@/components/ui/Select.vue",
+      "description": "树形选项的缩进层级",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | number | null | undefined",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "Array<SelectOption | string | number>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": "'请选择'"
+        },
+        {
+          "name": "filterable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "optional": true,
+          "default": "'无匹配项'"
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "Value"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "SelectOption"
+      ],
+      "usage": "<Select modelValue=\"文本\" :options=\"[]\" />",
+      "used_by": [
+        "src/components/business/DeptSelect.vue",
+        "src/components/business/DictSelect.vue",
+        "src/components/business/UserSelect.vue",
+        "src/components/ui/Pagination.vue"
+      ],
+      "fingerprint": "c9899811d1c0830e"
+    },
+    {
+      "name": "SpecPlate",
+      "group": "ui",
+      "category": "display",
+      "path": "src/components/ui/SpecPlate.vue",
+      "import": "@/components/ui/SpecPlate.vue",
+      "description": "规格铭牌：深色玻璃小板，等宽键值行。只读读数，不带可点的样子",
+      "props": [
+        {
+          "name": "rows",
+          "type": "Array<{ label: string; value: string | number | null | undefined; tone?: 'lime' | 'red' }>",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<SpecPlate :rows=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "21f609c63deabeeb"
+    },
+    {
+      "name": "StatusTag",
+      "group": "ui",
+      "category": "general",
+      "path": "src/components/ui/StatusTag.vue",
+      "import": "@/components/ui/StatusTag.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "status",
+          "type": "number | boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "on",
+          "type": "string",
+          "optional": true,
+          "default": "'正常'"
+        },
+        {
+          "name": "off",
+          "type": "string",
+          "optional": true,
+          "default": "'停用'"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<StatusTag :status=\"0\" />",
+      "used_by": [
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/PostLadder.vue"
+      ],
+      "fingerprint": "b63a8afe5e594ccb"
+    },
+    {
+      "name": "Switch",
+      "group": "ui",
+      "category": "inputs",
+      "path": "src/components/ui/Switch.vue",
+      "import": "@/components/ui/Switch.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "boolean",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "boolean"
+        }
+      ],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Switch modelValue>内容</Switch>",
+      "used_by": [
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/GeneratorPipeline.vue"
+      ],
+      "fingerprint": "182e4e498861138d"
+    },
+    {
+      "name": "Tag",
+      "group": "ui",
+      "category": "general",
+      "path": "src/components/ui/Tag.vue",
+      "import": "@/components/ui/Tag.vue",
+      "description": "语义色只有四种；字典里的历史色值就近归档",
+      "props": [
+        {
+          "name": "tone",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "dot",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<Tag>内容</Tag>",
+      "used_by": [
+        "src/components/business/DictSwatchbook.vue",
+        "src/components/business/DictTag.vue",
+        "src/components/ui/StatusTag.vue",
+        "src/components/workspace/ActivityList.vue",
+        "src/views/Dashboard.vue"
+      ],
+      "fingerprint": "67e103f3aacd3ff7"
+    },
+    {
+      "name": "TextInput",
+      "group": "ui",
+      "category": "inputs",
+      "path": "src/components/ui/TextInput.vue",
+      "import": "@/components/ui/TextInput.vue",
+      "description": "",
+      "props": [
+        {
+          "name": "modelValue",
+          "type": "string | number | null",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "'text' | 'password' | 'number' | 'email' | 'tel'",
+          "optional": true,
+          "default": "'text'"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "clearable",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "multiline",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        },
+        {
+          "name": "maxlength",
+          "type": "number",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "autocomplete",
+          "type": "string",
+          "optional": true,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "update:modelValue",
+          "payload": "string | number | null"
+        },
+        {
+          "name": "enter",
+          "payload": "—"
+        }
+      ],
+      "slots": [],
+      "types": [],
+      "usage": "<TextInput type=\"text\" />",
+      "used_by": [
+        "src/components/business/DeptTree.vue",
+        "src/components/business/GeneratorPipeline.vue",
+        "src/components/layout/PasswordDialog.vue",
+        "src/views/Login.vue",
+        "src/views/gallery/demo-slots.ts",
+        "src/views/gallery/demo-variants.curated-inputs.ts"
+      ],
+      "fingerprint": "bb8c63b9fbc10ace"
+    },
+    {
+      "name": "ToastHost",
+      "group": "ui",
+      "category": "feedback",
+      "path": "src/components/ui/ToastHost.vue",
+      "import": "@/components/ui/ToastHost.vue",
+      "description": "提示牌堆：最新一条在最前，较早的缩小叠在后面；悬停展开成列表并暂停计时。",
+      "props": [],
+      "emits": [],
+      "slots": [],
+      "types": [],
+      "usage": "<ToastHost />",
+      "used_by": [
+        "src/App.vue"
+      ],
+      "fingerprint": "c66d6774f1cd506b"
+    },
+    {
+      "name": "ActivityList",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/ActivityList.vue",
+      "import": "@/components/workspace/ActivityList.vue",
+      "description": "动态列表：头像 + 主文 + 时间 + 右侧标记，用于「最近登录」这类流水。",
+      "props": [
+        {
+          "name": "items",
+          "type": "ActivityItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "avatarSize",
+          "type": "number",
+          "optional": true,
+          "default": "30"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "ActivityItem"
+      ],
+      "usage": "<ActivityList :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "945a9d663a73a32c"
+    },
+    {
+      "name": "Band",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/Band.vue",
+      "import": "@/components/workspace/Band.vue",
+      "description": "横带分层容器：监控页与详情页的整块分区（Stacked Bands）。",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "reveal",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "tools",
+        "default"
+      ],
+      "types": [],
+      "usage": "<Band>内容</Band>",
+      "used_by": [],
+      "fingerprint": "aaf60f9d4e544a37"
+    },
+    {
+      "name": "BentoCard",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/BentoCard.vue",
+      "import": "@/components/workspace/BentoCard.vue",
+      "description": "工作台卡片：主次布局的基本单元。span 决定栅格占位（复用 pages.css 的 bento-* 变体），",
+      "props": [
+        {
+          "name": "span",
+          "type": "'hero' | 'side' | 'third' | 'wide' | 'narrow' | 'half' | 'full'",
+          "optional": true,
+          "default": "'third'"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "meta",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "glow",
+          "type": "boolean",
+          "optional": true,
+          "default": "false"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "tools",
+        "default"
+      ],
+      "types": [],
+      "usage": "<BentoCard span=\"hero\">内容</BentoCard>",
+      "used_by": [
+        "src/views/gallery/demo-slots.ts",
+        "src/views/gallery/demo-variants.curated-shell.ts"
+      ],
+      "fingerprint": "9a8733581df18a1e"
+    },
+    {
+      "name": "BentoGrid",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/BentoGrid.vue",
+      "import": "@/components/workspace/BentoGrid.vue",
+      "description": "工作台网格：12 列自适应栅格容器，卡片按 BentoCard 的 span 语义落位。",
+      "props": [],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<BentoGrid>内容</BentoGrid>",
+      "used_by": [],
+      "fingerprint": "6622c35d5b6cce8f"
+    },
+    {
+      "name": "KeyValueReadout",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/KeyValueReadout.vue",
+      "import": "@/components/workspace/KeyValueReadout.vue",
+      "description": "键值读数组：主卡与刻度环旁的「峰值 / 均值 / 范围」小表。",
+      "props": [
+        {
+          "name": "rows",
+          "type": "ReadoutRow[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "columns",
+          "type": "number",
+          "optional": true,
+          "default": "3"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "ReadoutRow"
+      ],
+      "usage": "<KeyValueReadout :rows=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "b64b99e4eba759a0"
+    },
+    {
+      "name": "ReadoutStrip",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/ReadoutStrip.vue",
+      "import": "@/components/workspace/ReadoutStrip.vue",
+      "description": "读数条：一排并列的 Metric，带分隔线；用于概览统计。",
+      "props": [
+        {
+          "name": "items",
+          "type": "ReadoutItem[]",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "ReadoutItem"
+      ],
+      "usage": "<ReadoutStrip :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "2161319c9e9fe6f2"
+    },
+    {
+      "name": "ShareList",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/ShareList.vue",
+      "import": "@/components/workspace/ShareList.vue",
+      "description": "占比条列表：横向条形 + 数值，用于「数据权限分布」这类按数量排序的构成展示。",
+      "props": [
+        {
+          "name": "items",
+          "type": "ShareItem[]",
+          "optional": false,
+          "default": null
+        },
+        {
+          "name": "unit",
+          "type": "string",
+          "optional": true,
+          "default": "''"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "ShareItem"
+      ],
+      "usage": "<ShareList :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "ed6e4cf70661f8e4"
+    },
+    {
+      "name": "ShortcutGrid",
+      "group": "workspace",
+      "category": "workspace",
+      "path": "src/components/workspace/ShortcutGrid.vue",
+      "import": "@/components/workspace/ShortcutGrid.vue",
+      "description": "快捷入口宫格：图标 + 标题 + 分组副标题，点击上抛 key 与路径。",
+      "props": [
+        {
+          "name": "items",
+          "type": "ShortcutItem[]",
+          "optional": false,
+          "default": null
+        }
+      ],
+      "emits": [
+        {
+          "name": "select",
+          "payload": "ShortcutItem"
+        }
+      ],
+      "slots": [],
+      "types": [
+        "ShortcutItem"
+      ],
+      "usage": "<ShortcutGrid :items=\"[]\" />",
+      "used_by": [],
+      "fingerprint": "babb0b062b823f65"
+    }
+  ]
+}

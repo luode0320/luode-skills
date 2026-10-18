@@ -1,0 +1,623 @@
+{
+  "source": "npm:@arco-design/web-vue@2.58.0 package es/ directory listing",
+  "collected_at": "2026-10-15",
+  "infra_dirs_excluded": [
+    "_components",
+    "_hooks",
+    "_utils",
+    "_virtual",
+    "icon-component",
+    "locale",
+    "style"
+  ],
+  "note": "categories 覆盖 Arco 全部对外组件品类；covered 表示组件库已有等价实现（ours 中的文件必须真实存在），gap 表示尚未提供、需在本地扩展层补齐。status 由 scripts/check_arco_parity.py 三重校验：标 gap 但已实现会报 STALE_GAP，标 covered 但文件缺失会报 DANGLING，本清单与 references/arco-categories.json（真实 Arco 包品类）对账不上会报 PHANTOM_CATEGORY（虚构）/ MISSING_CATEGORY（漏登），任一非空即 PARITY: FAIL。",
+  "categories": [
+    {
+      "arco": "affix",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Affix"
+      ]
+    },
+    {
+      "arco": "alert",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Alert"
+      ]
+    },
+    {
+      "arco": "anchor",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Anchor"
+      ]
+    },
+    {
+      "arco": "auto-complete",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "AutoComplete"
+      ]
+    },
+    {
+      "arco": "avatar",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Avatar"
+      ]
+    },
+    {
+      "arco": "back-top",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "BackTop"
+      ]
+    },
+    {
+      "arco": "badge",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Badge"
+      ]
+    },
+    {
+      "arco": "breadcrumb",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Breadcrumb"
+      ]
+    },
+    {
+      "arco": "button",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Button",
+        "IconButton"
+      ]
+    },
+    {
+      "arco": "calendar",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Calendar"
+      ]
+    },
+    {
+      "arco": "card",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Panel",
+        "BentoCard"
+      ]
+    },
+    {
+      "arco": "carousel",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Carousel"
+      ]
+    },
+    {
+      "arco": "cascader",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Cascader"
+      ]
+    },
+    {
+      "arco": "checkbox",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Checkbox"
+      ]
+    },
+    {
+      "arco": "collapse",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Collapse"
+      ]
+    },
+    {
+      "arco": "color-picker",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "ColorPicker"
+      ]
+    },
+    {
+      "arco": "comment",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Comment"
+      ]
+    },
+    {
+      "arco": "config-provider",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "composables/appearance.ts"
+      ]
+    },
+    {
+      "arco": "date-picker",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "DatePicker"
+      ]
+    },
+    {
+      "arco": "descriptions",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "KeyValueReadout",
+        "SpecPlate"
+      ]
+    },
+    {
+      "arco": "divider",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "Divider"
+      ]
+    },
+    {
+      "arco": "drawer",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Drawer"
+      ]
+    },
+    {
+      "arco": "dropdown",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Dropdown"
+      ]
+    },
+    {
+      "arco": "empty",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "EmptyState"
+      ]
+    },
+    {
+      "arco": "form",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Field",
+        "SearchForm",
+        "FormDialog"
+      ]
+    },
+    {
+      "arco": "grid",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "GridRow",
+        "GridCol"
+      ]
+    },
+    {
+      "arco": "icon",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Icon"
+      ]
+    },
+    {
+      "arco": "image",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Image"
+      ]
+    },
+    {
+      "arco": "input",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "TextInput"
+      ]
+    },
+    {
+      "arco": "input-number",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "InputNumber"
+      ]
+    },
+    {
+      "arco": "input-tag",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "InputTag"
+      ]
+    },
+    {
+      "arco": "layout",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "AppShell",
+        "Sidebar",
+        "Topbar"
+      ]
+    },
+    {
+      "arco": "link",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "LinkText"
+      ]
+    },
+    {
+      "arco": "list",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "DataList"
+      ]
+    },
+    {
+      "arco": "mention",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Mention"
+      ]
+    },
+    {
+      "arco": "menu",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Menu"
+      ]
+    },
+    {
+      "arco": "message",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "ToastHost"
+      ]
+    },
+    {
+      "arco": "modal",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Modal"
+      ]
+    },
+    {
+      "arco": "notification",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Notification"
+      ]
+    },
+    {
+      "arco": "overflow-list",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "OverflowList"
+      ]
+    },
+    {
+      "arco": "page-header",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "PageHeader"
+      ]
+    },
+    {
+      "arco": "pagination",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Pagination"
+      ]
+    },
+    {
+      "arco": "popconfirm",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Popconfirm"
+      ]
+    },
+    {
+      "arco": "popover",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Popover"
+      ]
+    },
+    {
+      "arco": "progress",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Progress"
+      ]
+    },
+    {
+      "arco": "radio",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Radio",
+        "RadioGroup"
+      ]
+    },
+    {
+      "arco": "rate",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Rate"
+      ]
+    },
+    {
+      "arco": "resize-box",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "ResizeBox"
+      ]
+    },
+    {
+      "arco": "result",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Result"
+      ]
+    },
+    {
+      "arco": "scrollbar",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "StyledScrollbar"
+      ]
+    },
+    {
+      "arco": "select",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Select"
+      ]
+    },
+    {
+      "arco": "skeleton",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Skeleton"
+      ]
+    },
+    {
+      "arco": "slider",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Slider"
+      ]
+    },
+    {
+      "arco": "space",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "Space"
+      ]
+    },
+    {
+      "arco": "spin",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Spin"
+      ]
+    },
+    {
+      "arco": "split",
+      "group": "layout",
+      "status": "covered",
+      "ours": [
+        "SplitPane"
+      ]
+    },
+    {
+      "arco": "statistic",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Metric",
+        "Odometer",
+        "DeltaPill"
+      ]
+    },
+    {
+      "arco": "steps",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Steps"
+      ]
+    },
+    {
+      "arco": "switch",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Switch"
+      ]
+    },
+    {
+      "arco": "table",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "DataTable"
+      ]
+    },
+    {
+      "arco": "tabs",
+      "group": "navigation",
+      "status": "covered",
+      "ours": [
+        "Tabs",
+        "TabPane"
+      ]
+    },
+    {
+      "arco": "tag",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Tag",
+        "StatusTag",
+        "DictTag"
+      ]
+    },
+    {
+      "arco": "textarea",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "TextInput"
+      ]
+    },
+    {
+      "arco": "time-picker",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "TimePicker"
+      ]
+    },
+    {
+      "arco": "timeline",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Timeline"
+      ]
+    },
+    {
+      "arco": "tooltip",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Tooltip"
+      ]
+    },
+    {
+      "arco": "transfer",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Transfer"
+      ]
+    },
+    {
+      "arco": "tree",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "PermissionTree",
+        "DeptTree"
+      ]
+    },
+    {
+      "arco": "tree-select",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "TreeSelect"
+      ]
+    },
+    {
+      "arco": "trigger",
+      "group": "feedback",
+      "status": "covered",
+      "ours": [
+        "Trigger"
+      ]
+    },
+    {
+      "arco": "typography",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Typography"
+      ]
+    },
+    {
+      "arco": "upload",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "Upload"
+      ]
+    },
+    {
+      "arco": "verification-code",
+      "group": "inputs",
+      "status": "covered",
+      "ours": [
+        "VerificationCode"
+      ]
+    },
+    {
+      "arco": "watermark",
+      "group": "display",
+      "status": "covered",
+      "ours": [
+        "Watermark"
+      ]
+    }
+  ]
+}

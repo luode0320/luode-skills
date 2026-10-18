@@ -1,0 +1,19 @@
+# 生产代码测试污染豁免登记
+# 格式：<相对路径>::<符号名>  # <理由>
+#
+# 说明：frontend-design/component-library/ 下的上游文件受「字节级还原守卫」冻结
+# （基线 references/component-library-baseline.json，上游 commit 577079e9），
+# 任何修改都会让 FIDELITY 守卫失败，因此这些上游自带的测试语义代码只能登记豁免，
+# 不能迁移到根 test/，也不能改写。
+
+# 上游自带的浏览器回归脚本：本身即测试脚本，位于上游 scripts/ 目录，非组件库运行时生产代码。
+frontend-design/component-library/scripts/session-regression.py::password = os.environ.get("SCAFFOLD_TEST_PASSWORD", "admin12  # 上游自带浏览器回归脚本，字节冻结；该分支只在其自身 __main__ 回归流程中可达
+
+# 上游动效模块的导出函数：上游保留的页面级动效入口，本仓库页面未调用。
+frontend-design/component-library/src/composables/motion.ts::revealPage  # 上游导出函数，字节冻结；本仓库不改上游 API 面，故不删除
+
+# 任务投影脚本的存量兼容导出：2026-07-24 引入，早于本轮 v5 容错改动，全仓生产零引用、仅被既有单测覆盖。
+# 本轮只改按条隔离逻辑，未新增这些符号；删除会破坏现有测试且越出本轮范围，转独立清理评估。
+task-plan-rehydration-rules/scripts/task_plan_projection.py::extract_projection  # 存量旧单投影兼容导出，非本轮引入；仅既有测试引用
+task-plan-rehydration-rules/scripts/task_plan_projection.py::render_projection_block  # 存量旧单投影渲染兼容导出，非本轮引入；仅既有测试引用
+task-plan-rehydration-rules/scripts/task_plan_projection.py::deactivate_projection  # 存量公共失活包装，CLI 实走 _deactivate_projection_with_payload；非本轮引入；仅既有测试引用

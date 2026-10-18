@@ -1,0 +1,19 @@
+# 珍珠玻璃组件库：上游冻结面必须逐字节可核验，行尾符固定为 LF。
+# 上游 scaffold-master 全部文本 blob 均为 LF；此前按 Windows 默认写出 CRLF，
+# 导致「字节级还原」实际只在归一换行后成立。此处固化策略，防止再次漂移。
+* text=auto eol=lf
+
+# 本目录的 Windows 启动脚本是唯一例外：cmd.exe 解析 .bat 依赖 CRLF，
+# 纯 LF 会让行尾被当成命令内容。该文件不在上游冻结面内，不影响字节级还原。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 上游二进制资产不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

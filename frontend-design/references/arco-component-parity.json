@@ -1,0 +1,987 @@
+{
+  "source": "npm:@arco-design/web-vue@2.58.0 es/index.js",
+  "reference": "references/arco-components.json",
+  "collected_at": "2026-10-15",
+  "note": "组件粒度对齐清单：把 Arco 全部 131 个对外导出逐条映射到本地实现。kind 三态——covered 有独立等价组件（ours 必须真实存在）、merged 由已有组件以配置/插槽覆盖（无需新文件，note 写明用哪个组件怎么覆盖）、gap 真实缺口（必须补齐后转 covered）。守卫 scripts/check_arco_component_parity.py 逐条校验，任何 gap 未清零或 covered 文件缺失即 FAIL。",
+  "kinds": {
+    "covered": "有独立等价组件",
+    "merged": "由已有组件以配置或插槽覆盖",
+    "gap": "真实缺口，待补齐"
+  },
+  "components": [
+    {
+      "arco": "Affix",
+      "kind": "covered",
+      "ours": [
+        "Affix"
+      ]
+    },
+    {
+      "arco": "Alert",
+      "kind": "covered",
+      "ours": [
+        "Alert"
+      ]
+    },
+    {
+      "arco": "Anchor",
+      "kind": "covered",
+      "ours": [
+        "Anchor"
+      ]
+    },
+    {
+      "arco": "AnchorLink",
+      "kind": "merged",
+      "ours": [
+        "Anchor"
+      ],
+      "note": "锚点项由 Anchor 的 items 配置驱动，无需独立子组件"
+    },
+    {
+      "arco": "AutoComplete",
+      "kind": "covered",
+      "ours": [
+        "AutoComplete"
+      ]
+    },
+    {
+      "arco": "Avatar",
+      "kind": "covered",
+      "ours": [
+        "Avatar"
+      ]
+    },
+    {
+      "arco": "AvatarGroup",
+      "kind": "covered",
+      "ours": [
+        "AvatarGroup"
+      ]
+    },
+    {
+      "arco": "BackTop",
+      "kind": "covered",
+      "ours": [
+        "BackTop"
+      ]
+    },
+    {
+      "arco": "Badge",
+      "kind": "covered",
+      "ours": [
+        "Badge"
+      ]
+    },
+    {
+      "arco": "Breadcrumb",
+      "kind": "covered",
+      "ours": [
+        "Breadcrumb"
+      ]
+    },
+    {
+      "arco": "BreadcrumbItem",
+      "kind": "merged",
+      "ours": [
+        "Breadcrumb"
+      ],
+      "note": "面包屑项由 Breadcrumb 的 items 配置驱动"
+    },
+    {
+      "arco": "Button",
+      "kind": "covered",
+      "ours": [
+        "Button"
+      ]
+    },
+    {
+      "arco": "ButtonGroup",
+      "kind": "covered",
+      "ours": [
+        "ButtonGroup"
+      ]
+    },
+    {
+      "arco": "Calendar",
+      "kind": "covered",
+      "ours": [
+        "Calendar"
+      ]
+    },
+    {
+      "arco": "Card",
+      "kind": "covered",
+      "ours": [
+        "Card"
+      ]
+    },
+    {
+      "arco": "CardGrid",
+      "kind": "covered",
+      "ours": [
+        "CardGrid"
+      ]
+    },
+    {
+      "arco": "CardMeta",
+      "kind": "covered",
+      "ours": [
+        "CardMeta"
+      ]
+    },
+    {
+      "arco": "Carousel",
+      "kind": "covered",
+      "ours": [
+        "Carousel"
+      ]
+    },
+    {
+      "arco": "CarouselItem",
+      "kind": "merged",
+      "ours": [
+        "Carousel"
+      ],
+      "note": "轮播项由 Carousel 的默认插槽子节点驱动"
+    },
+    {
+      "arco": "Cascader",
+      "kind": "covered",
+      "ours": [
+        "Cascader"
+      ]
+    },
+    {
+      "arco": "CascaderPanel",
+      "kind": "covered",
+      "ours": [
+        "CascaderPanel"
+      ]
+    },
+    {
+      "arco": "Checkbox",
+      "kind": "covered",
+      "ours": [
+        "Checkbox"
+      ]
+    },
+    {
+      "arco": "CheckboxGroup",
+      "kind": "covered",
+      "ours": [
+        "CheckboxGroup"
+      ]
+    },
+    {
+      "arco": "Col",
+      "kind": "covered",
+      "ours": [
+        "GridCol"
+      ],
+      "note": "命名差异：本地为 GridCol"
+    },
+    {
+      "arco": "Collapse",
+      "kind": "covered",
+      "ours": [
+        "Collapse"
+      ]
+    },
+    {
+      "arco": "CollapseItem",
+      "kind": "covered",
+      "ours": [
+        "CollapseItem"
+      ]
+    },
+    {
+      "arco": "ColorPicker",
+      "kind": "covered",
+      "ours": [
+        "ColorPicker"
+      ]
+    },
+    {
+      "arco": "Comment",
+      "kind": "covered",
+      "ours": [
+        "Comment"
+      ]
+    },
+    {
+      "arco": "ConfigProvider",
+      "kind": "merged",
+      "ours": [
+        "composables/appearance.ts"
+      ],
+      "note": "全局配置由七层 CSS 令牌 + appearance composable 承担（主题/密度），零依赖体系不另建 Provider 组件"
+    },
+    {
+      "arco": "Countdown",
+      "kind": "covered",
+      "ours": [
+        "Countdown"
+      ]
+    },
+    {
+      "arco": "DatePicker",
+      "kind": "covered",
+      "ours": [
+        "DatePicker"
+      ]
+    },
+    {
+      "arco": "Descriptions",
+      "kind": "covered",
+      "ours": [
+        "Descriptions"
+      ],
+      "note": "详情定义列表卡片由独立 Descriptions 组件承担（带边框/多列/跨列/标题带额外操作，形态区别于无框横排的 KeyValueReadout 与深色单列的 SpecPlate）"
+    },
+    {
+      "arco": "DescriptionsItem",
+      "kind": "merged",
+      "ours": [
+        "Descriptions"
+      ],
+      "note": "描述项由 Descriptions 的 data[].{label,value,span} 配置驱动，与父组件同属一个真相源"
+    },
+    {
+      "arco": "Dgroup",
+      "kind": "merged",
+      "ours": [
+        "Dropdown"
+      ],
+      "note": "下拉分组由 Dropdown 的 items[].divided 分隔线表达"
+    },
+    {
+      "arco": "Divider",
+      "kind": "covered",
+      "ours": [
+        "Divider"
+      ]
+    },
+    {
+      "arco": "Doption",
+      "kind": "merged",
+      "ours": [
+        "Dropdown"
+      ],
+      "note": "下拉项由 Dropdown 的 items 配置驱动"
+    },
+    {
+      "arco": "Drawer",
+      "kind": "covered",
+      "ours": [
+        "Drawer"
+      ]
+    },
+    {
+      "arco": "Dropdown",
+      "kind": "covered",
+      "ours": [
+        "Dropdown"
+      ]
+    },
+    {
+      "arco": "DropdownButton",
+      "kind": "covered",
+      "ours": [
+        "DropdownButton"
+      ]
+    },
+    {
+      "arco": "Dsubmenu",
+      "kind": "covered",
+      "ours": [
+        "DropdownSubmenu"
+      ]
+    },
+    {
+      "arco": "Empty",
+      "kind": "covered",
+      "ours": [
+        "EmptyState"
+      ],
+      "note": "命名差异：本地为 EmptyState"
+    },
+    {
+      "arco": "Form",
+      "kind": "covered",
+      "ours": [
+        "Form",
+        "Field",
+        "SearchForm",
+        "FormDialog"
+      ],
+      "note": "Form 收口「模型+规则+错误态+提交」的重复编排并复用 utils/validate，不另建 rules 引擎；单字段仍由 Field 承担，SearchForm/FormDialog 是场景化封装"
+    },
+    {
+      "arco": "FormItem",
+      "kind": "merged",
+      "ours": [
+        "Field"
+      ],
+      "note": "表单项即 Field"
+    },
+    {
+      "arco": "Grid",
+      "kind": "covered",
+      "ours": [
+        "GridRow",
+        "GridCol"
+      ],
+      "note": "命名差异：本地拆为 GridRow/GridCol"
+    },
+    {
+      "arco": "GridItem",
+      "kind": "merged",
+      "ours": [
+        "GridCol"
+      ],
+      "note": "栅格子项即 GridCol"
+    },
+    {
+      "arco": "Icon",
+      "kind": "covered",
+      "ours": [
+        "Icon"
+      ]
+    },
+    {
+      "arco": "Image",
+      "kind": "covered",
+      "ours": [
+        "Image"
+      ]
+    },
+    {
+      "arco": "ImagePreview",
+      "kind": "covered",
+      "ours": [
+        "ImagePreview"
+      ]
+    },
+    {
+      "arco": "ImagePreviewAction",
+      "kind": "merged",
+      "ours": [
+        "ImagePreview"
+      ],
+      "note": "预览动作按钮是 ImagePreview 的内部单元，由预览器自带工具栏承担，不单独对外"
+    },
+    {
+      "arco": "ImagePreviewGroup",
+      "kind": "covered",
+      "ours": [
+        "ImagePreviewGroup"
+      ]
+    },
+    {
+      "arco": "Input",
+      "kind": "covered",
+      "ours": [
+        "TextInput"
+      ],
+      "note": "命名差异：本地为 TextInput"
+    },
+    {
+      "arco": "InputGroup",
+      "kind": "covered",
+      "ours": [
+        "InputGroup"
+      ]
+    },
+    {
+      "arco": "InputNumber",
+      "kind": "covered",
+      "ours": [
+        "InputNumber"
+      ]
+    },
+    {
+      "arco": "InputPassword",
+      "kind": "covered",
+      "ours": [
+        "InputPassword"
+      ],
+      "note": "密码框由独立 InputPassword 组件承担（自带明文/密文切换态，TextInput 的静态 type=password 不具备该交互）"
+    },
+    {
+      "arco": "InputSearch",
+      "kind": "covered",
+      "ours": [
+        "InputSearch"
+      ]
+    },
+    {
+      "arco": "InputTag",
+      "kind": "covered",
+      "ours": [
+        "InputTag"
+      ]
+    },
+    {
+      "arco": "Layout",
+      "kind": "covered",
+      "ours": [
+        "AppShell"
+      ],
+      "note": "命名差异：本地为 AppShell（外壳网格）"
+    },
+    {
+      "arco": "LayoutContent",
+      "kind": "merged",
+      "ours": [
+        "AppShell"
+      ],
+      "note": "内容区由 AppShell 的默认插槽承担"
+    },
+    {
+      "arco": "LayoutFooter",
+      "kind": "merged",
+      "ours": [
+        "AppShell"
+      ],
+      "note": "页脚由 AppShell 的 footer 插槽承担"
+    },
+    {
+      "arco": "LayoutHeader",
+      "kind": "covered",
+      "ours": [
+        "Topbar"
+      ],
+      "note": "命名差异：本地为 Topbar"
+    },
+    {
+      "arco": "LayoutSider",
+      "kind": "covered",
+      "ours": [
+        "Sidebar"
+      ],
+      "note": "命名差异：本地为 Sidebar"
+    },
+    {
+      "arco": "Link",
+      "kind": "covered",
+      "ours": [
+        "LinkText"
+      ],
+      "note": "命名差异：本地为 LinkText"
+    },
+    {
+      "arco": "List",
+      "kind": "covered",
+      "ours": [
+        "DataList"
+      ],
+      "note": "命名差异：本地为 DataList"
+    },
+    {
+      "arco": "ListItem",
+      "kind": "merged",
+      "ours": [
+        "DataList"
+      ],
+      "note": "列表项由 DataList 的 item 插槽驱动"
+    },
+    {
+      "arco": "ListItemMeta",
+      "kind": "merged",
+      "ours": [
+        "DataList"
+      ],
+      "note": "列表项元信息由 item 插槽内的标记表达"
+    },
+    {
+      "arco": "Mention",
+      "kind": "covered",
+      "ours": [
+        "Mention"
+      ]
+    },
+    {
+      "arco": "Menu",
+      "kind": "covered",
+      "ours": [
+        "Menu"
+      ]
+    },
+    {
+      "arco": "MenuItem",
+      "kind": "covered",
+      "ours": [
+        "MenuNode"
+      ],
+      "note": "命名差异：本地为 MenuNode（递归节点）"
+    },
+    {
+      "arco": "MenuItemGroup",
+      "kind": "merged",
+      "ours": [
+        "Menu"
+      ],
+      "note": "菜单分组由 Menu 的 items 层级表达"
+    },
+    {
+      "arco": "Message",
+      "kind": "covered",
+      "ours": [
+        "ToastHost"
+      ],
+      "note": "命名差异：本地为 ToastHost（全局消息宿主）"
+    },
+    {
+      "arco": "Modal",
+      "kind": "covered",
+      "ours": [
+        "Modal"
+      ]
+    },
+    {
+      "arco": "MonthPicker",
+      "kind": "covered",
+      "ours": [
+        "MonthPicker"
+      ]
+    },
+    {
+      "arco": "Notification",
+      "kind": "covered",
+      "ours": [
+        "Notification"
+      ]
+    },
+    {
+      "arco": "Optgroup",
+      "kind": "merged",
+      "ours": [
+        "Select"
+      ],
+      "note": "选项分组由 Select 的 options[].depth 与 disabled 表达"
+    },
+    {
+      "arco": "Option",
+      "kind": "merged",
+      "ours": [
+        "Select"
+      ],
+      "note": "选项由 Select 的 options 配置驱动"
+    },
+    {
+      "arco": "OverflowList",
+      "kind": "covered",
+      "ours": [
+        "OverflowList"
+      ]
+    },
+    {
+      "arco": "PageHeader",
+      "kind": "covered",
+      "ours": [
+        "PageHeader"
+      ]
+    },
+    {
+      "arco": "Pagination",
+      "kind": "covered",
+      "ours": [
+        "Pagination"
+      ]
+    },
+    {
+      "arco": "Popconfirm",
+      "kind": "covered",
+      "ours": [
+        "Popconfirm"
+      ]
+    },
+    {
+      "arco": "Popover",
+      "kind": "covered",
+      "ours": [
+        "Popover"
+      ]
+    },
+    {
+      "arco": "Progress",
+      "kind": "covered",
+      "ours": [
+        "Progress"
+      ]
+    },
+    {
+      "arco": "QuarterPicker",
+      "kind": "covered",
+      "ours": [
+        "QuarterPicker"
+      ]
+    },
+    {
+      "arco": "Radio",
+      "kind": "covered",
+      "ours": [
+        "Radio"
+      ]
+    },
+    {
+      "arco": "RadioGroup",
+      "kind": "covered",
+      "ours": [
+        "RadioGroup"
+      ]
+    },
+    {
+      "arco": "RangePicker",
+      "kind": "covered",
+      "ours": [
+        "RangePicker"
+      ]
+    },
+    {
+      "arco": "Rate",
+      "kind": "covered",
+      "ours": [
+        "Rate"
+      ]
+    },
+    {
+      "arco": "ResizeBox",
+      "kind": "covered",
+      "ours": [
+        "ResizeBox"
+      ]
+    },
+    {
+      "arco": "Result",
+      "kind": "covered",
+      "ours": [
+        "Result"
+      ]
+    },
+    {
+      "arco": "Row",
+      "kind": "covered",
+      "ours": [
+        "GridRow"
+      ],
+      "note": "命名差异：本地为 GridRow"
+    },
+    {
+      "arco": "Scrollbar",
+      "kind": "covered",
+      "ours": [
+        "StyledScrollbar"
+      ],
+      "note": "命名差异：本地为 StyledScrollbar"
+    },
+    {
+      "arco": "Select",
+      "kind": "covered",
+      "ours": [
+        "Select"
+      ]
+    },
+    {
+      "arco": "Skeleton",
+      "kind": "covered",
+      "ours": [
+        "Skeleton"
+      ]
+    },
+    {
+      "arco": "SkeletonLine",
+      "kind": "merged",
+      "ours": [
+        "Skeleton"
+      ],
+      "note": "骨架行由 Skeleton 的 rows 与 type 驱动"
+    },
+    {
+      "arco": "SkeletonShape",
+      "kind": "merged",
+      "ours": [
+        "Skeleton"
+      ],
+      "note": "骨架形状由 Skeleton 的 type（circle/rect/image）驱动"
+    },
+    {
+      "arco": "Slider",
+      "kind": "covered",
+      "ours": [
+        "Slider"
+      ]
+    },
+    {
+      "arco": "Space",
+      "kind": "covered",
+      "ours": [
+        "Space"
+      ]
+    },
+    {
+      "arco": "Spin",
+      "kind": "covered",
+      "ours": [
+        "Spin"
+      ]
+    },
+    {
+      "arco": "Split",
+      "kind": "covered",
+      "ours": [
+        "SplitPane"
+      ],
+      "note": "命名差异：本地为 SplitPane"
+    },
+    {
+      "arco": "Statistic",
+      "kind": "covered",
+      "ours": [
+        "Metric",
+        "Odometer"
+      ],
+      "note": "命名差异：本地为 Metric/Odometer"
+    },
+    {
+      "arco": "Step",
+      "kind": "merged",
+      "ours": [
+        "Steps"
+      ],
+      "note": "步骤项由 Steps 的 items 配置驱动"
+    },
+    {
+      "arco": "Steps",
+      "kind": "covered",
+      "ours": [
+        "Steps"
+      ]
+    },
+    {
+      "arco": "SubMenu",
+      "kind": "merged",
+      "ours": [
+        "Menu"
+      ],
+      "note": "子菜单由 Menu 的 items 层级递归表达"
+    },
+    {
+      "arco": "Switch",
+      "kind": "covered",
+      "ours": [
+        "Switch"
+      ]
+    },
+    {
+      "arco": "Table",
+      "kind": "covered",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "命名差异：本地为 DataTable"
+    },
+    {
+      "arco": "TableColumn",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "列由 DataTable 的 columns 配置驱动，不另建列组件"
+    },
+    {
+      "arco": "TabPane",
+      "kind": "covered",
+      "ours": [
+        "TabPane"
+      ]
+    },
+    {
+      "arco": "Tabs",
+      "kind": "covered",
+      "ours": [
+        "Tabs"
+      ]
+    },
+    {
+      "arco": "Tag",
+      "kind": "covered",
+      "ours": [
+        "Tag",
+        "StatusTag",
+        "DictTag"
+      ]
+    },
+    {
+      "arco": "Tbody",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "表体由 DataTable 内部渲染，不对外暴露 HTML 节点组件"
+    },
+    {
+      "arco": "Td",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "单元格由 DataTable 的 columns 渲染"
+    },
+    {
+      "arco": "Textarea",
+      "kind": "covered",
+      "ours": [
+        "Textarea"
+      ],
+      "note": "独立 Textarea 组件补上 TextInput multiline 没有的自动高度（夹到 rows~maxRows）与字数统计；TextInput 属上游冻结层不能加这两个开关"
+    },
+    {
+      "arco": "Th",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "表头由 DataTable 的 columns 渲染"
+    },
+    {
+      "arco": "Thead",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "表头区由 DataTable 内部渲染"
+    },
+    {
+      "arco": "Timeline",
+      "kind": "covered",
+      "ours": [
+        "Timeline"
+      ]
+    },
+    {
+      "arco": "TimelineItem",
+      "kind": "covered",
+      "ours": [
+        "TimelineItem"
+      ]
+    },
+    {
+      "arco": "TimePicker",
+      "kind": "covered",
+      "ours": [
+        "TimePicker"
+      ]
+    },
+    {
+      "arco": "Tooltip",
+      "kind": "covered",
+      "ours": [
+        "Tooltip"
+      ]
+    },
+    {
+      "arco": "Tr",
+      "kind": "merged",
+      "ours": [
+        "DataTable"
+      ],
+      "note": "表格行由 DataTable 的 data 渲染"
+    },
+    {
+      "arco": "Transfer",
+      "kind": "covered",
+      "ours": [
+        "Transfer"
+      ]
+    },
+    {
+      "arco": "Tree",
+      "kind": "covered",
+      "ours": [
+        "Tree"
+      ]
+    },
+    {
+      "arco": "TreeSelect",
+      "kind": "covered",
+      "ours": [
+        "TreeSelect"
+      ]
+    },
+    {
+      "arco": "Trigger",
+      "kind": "covered",
+      "ours": [
+        "Trigger"
+      ]
+    },
+    {
+      "arco": "Typography",
+      "kind": "covered",
+      "ours": [
+        "Typography"
+      ]
+    },
+    {
+      "arco": "TypographyParagraph",
+      "kind": "merged",
+      "ours": [
+        "Typography"
+      ],
+      "note": "段落由 Typography 的 type='paragraph' 驱动"
+    },
+    {
+      "arco": "TypographyText",
+      "kind": "merged",
+      "ours": [
+        "Typography"
+      ],
+      "note": "文本由 Typography 的 type='text' 驱动"
+    },
+    {
+      "arco": "TypographyTitle",
+      "kind": "merged",
+      "ours": [
+        "Typography"
+      ],
+      "note": "标题由 Typography 的 type='title' + heading 驱动"
+    },
+    {
+      "arco": "Upload",
+      "kind": "covered",
+      "ours": [
+        "Upload"
+      ]
+    },
+    {
+      "arco": "VerificationCode",
+      "kind": "covered",
+      "ours": [
+        "VerificationCode"
+      ]
+    },
+    {
+      "arco": "Watermark",
+      "kind": "covered",
+      "ours": [
+        "Watermark"
+      ]
+    },
+    {
+      "arco": "WeekPicker",
+      "kind": "covered",
+      "ours": [
+        "WeekPicker"
+      ]
+    },
+    {
+      "arco": "YearPicker",
+      "kind": "covered",
+      "ours": [
+        "YearPicker"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+/* 本地样式覆盖层：只用于修正上游冻结层里的绘制缺陷，不新增组件、不改变设计语言。
+   上游 src/styles/*.css 逐字节冻结，任何外壳级修复必须落在这一层，
+   由 main.ts 的声明式缝隙行引入，保证缝隙之外仍与上游逐字节相等。
+   最近修改时间：2026-10-18 14:20:00；改动原因：噪点层原以 fixed + z-index 200
+   压在正文之上，逐像素扰动文字边缘，改为沉到内容之下。 */
+
+:root {
+  /* 外壳外阴影的实际延展量：上延 24-70/2=11px、侧延 70/2=35px、下延 24+70/2=59px。
+     留白必须逐项大于延展量，否则阴影被舞台裁切边界切成方形暗块。 */
+  --stage-pad-top: 14px;
+  --stage-pad-x: 36px;
+  --stage-pad-bottom: 62px;
+  /* 登录画布用同一条阴影（0 24px 70px），留白取同一组延展上限。 */
+  --login-pad-top: 14px;
+  --login-pad-x: 36px;
+  --login-pad-bottom: 62px;
+}
+
+/* 只在有深色外框的宽度生效：≤820px 上游把外框改成贴边全屏（border 0 / radius 0），
+   那时既没有浮起造型也没有圆角，不需要留白，保持上游行为不动。 */
+@media (min-width: 821px) {
+  .stage {
+    padding: var(--stage-pad-top) var(--stage-pad-x) var(--stage-pad-bottom);
+  }
+
+  /* 上游按 8px 上下留白写死了高度，留白改变后必须同步，否则外框比可用高度高出一截。 */
+  .app-frame {
+    height: calc(100dvh - var(--stage-pad-top) - var(--stage-pad-bottom));
+  }
+}
+
+/* 登录页同一类缺陷：.login 也是 overflow: clip 且只留 14px，
+   左侧画布 .login-canvas 带同量级外阴影，会在左边与底边被切成暗块。
+   ≤960px 上游隐藏画布并把 padding 归零，所以只在更宽视口下修正。 */
+@media (min-width: 961px) {
+  .login {
+    padding: var(--login-pad-top) var(--login-pad-x) var(--login-pad-bottom);
+  }
+
+  /* 画布高度跟随留白收缩，否则撑出留白把页面顶出滚动条。 */
+  .login-canvas {
+    min-height: calc(100dvh - var(--login-pad-top) - var(--login-pad-bottom));
+  }
+}
+
+/* 外框内层的直角子元素会盖住圆角处的深色描边：导航轨 .rail 带 .m-rail 半透明玻璃底，
+   从内边距左上角开始铺满，自身没有圆角，于是 38px 外弧在左上/左下露出直角浅色块
+   （实测 y=304–307 四行深色描边完全缺失）。内弧 = 外弧 38px − 描边 10px = 28px，
+   给 rail 补同值圆角后弧线连续（实测该四行恢复为 397/396/395/395）。
+   只在有深色外框的宽度生效：≤820px 上游把外框改成贴边全屏（border 0 / radius 0），
+   此时内弧为 0，补圆角反而会切掉本应贴边的导航轨。 */
+@media (min-width: 821px) {
+  .app-frame > .rail {
+    border-top-left-radius: 28px;
+    border-bottom-left-radius: 28px;
+  }
+}
+
+/* 上游 Panel 把默认插槽直接挂在 section 下，没有内容区包裹层：
+   模板里不存在 .panel-body，而 components.css 只定义了 `.panel-body { padding: 0 20px 20px }`，
+   于是插槽里的文字左右与底部都贴到面板边框（实测 pads l=0 r=0 b=0，只有标题区自带 14px 上边距）。
+   覆盖层不能改模板，改为对「除 header 之外的直接子元素」补同一组 20px 内边距，
+   与 .panel-head 的左右 20px 对齐；上边距仍由标题区负责，无标题时由下面的 :first-child 规则补。 */
+.panel > :not(.panel-head) {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* 无标题面板没有 header 撑出上边距，首个子元素需要自己让开 20px */
+.panel > :not(.panel-head):first-child {
+  margin-top: 20px;
+}
+
+/* 末个子元素让开底部 20px；用 margin 而非 padding 是为了不改变子元素自身的盒模型 */
+.panel > :not(.panel-head):last-child {
+  margin-bottom: 20px;
+}
+
+/* 噪点层沉到内容之下：上游把它写成 fixed + z-index 200，盖在所有正文之上，
+   噪声逐像素扰动字形边缘（实测开/关噪点层，正文区 100% 像素有差异，最大 8 灰阶）。
+   只降 z-index 无效——0 与 auto 同层，仍按 DOM 顺序画在内容之后；
+   必须给 #app 建层叠上下文，-1 才会画到 #app 背景之上、普通流内容之下。
+   .stage 的实色背景要让开，否则整块盖住噪点；留白区的颗粒由 #app 背景透出。 */
+#app {
+  position: relative;
+  z-index: 0;
+}
+
+.stage {
+  background: transparent;
+}
+
+.grain-layer {
+  z-index: -1;
+}
+
+/* 可变字重轴：上游字体栈把 macOS 专属的 SF Pro / 苹方排在最前，Windows 上全部空转，
+   实际命中由系统偶然安装决定；实测 165 处字重声明里 96 处是非标准档位，
+   直接系统匹配时 400/500/560/620/700 只渲染出 3 种字形（500=560、620=700），
+   中间档位被静默吸附，设计层次落空。
+   local() 复用系统已装的可变字体并声明 100-900 连续轴后，五档产生五种字形。
+   不打包字体文件：17MB 的系统字体不适合进产物，local() 命中失败时按平台栈降级。 */
+@font-face {
+  font-family: "PearlSans";
+  src: local("Noto Sans SC"), local("NotoSansSC-VF"), local("NotoSansSC");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: "PearlSans", "PingFang SC", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* BEGIN GENERATED: fractional font-size overrides */
+/* 上游冻结样式里的非整数字号会让字形落在半像素栅格上；
+   本段由 scripts/build_font_overrides.py 从冻结源自动派生，请勿手改。
+   映射：10.5→11 / 11.5→12 / 12.5→13 / 13.5→14 / 14.5→15（px）。 */
+.alert-kind,
+.bar-readout,
+.dial-date,
+.hc-rows dt,
+.insight-group h4 b,
+.insight-kind,
+.ladder-card dd small,
+.ladder-card-rank,
+.login-foot,
+.mono-time,
+.org-count,
+.pipe-dir,
+.pipe-map-head span,
+.preview-dir,
+.rg-badge,
+.rg-sub,
+.ucard-time {
+  font-size: 11px;
+}
+.alert-meta,
+.ask-presets button,
+.cap-desc,
+.cmd-ask-hint,
+.cmd-foot,
+.code-chip,
+.eyebrow,
+.field-error,
+.field-hint,
+.hc-sub,
+.heat-day,
+.insight-metric-label,
+.insight-subtitle,
+.is-compact .swim-name,
+.nav-preview-item.is-sub,
+.nav-preview-title,
+.org-meta,
+.pipe-readouts dt,
+.quick-sub,
+.readout-label,
+.rg-tools button,
+.rg.is-stage .rg-node.is-hub .rg-sub,
+.settings-nav-note,
+.settings-was,
+.stage-chip,
+.swatch-def,
+.swim-more,
+.ucard-sub {
+  font-size: 12px;
+}
+.activity-main,
+.ask-results-head span,
+.board-menu .menu-item,
+.btn-sm,
+.cap-title,
+.cmd-trigger,
+.crumbs,
+.heat-readout,
+.hovercard,
+.insight-card h4,
+.insight-status,
+.login-error,
+.mx-role-name,
+.mx-row.is-btn .mx-name,
+.org-card-rows,
+.org-members li,
+.pg-btn,
+.pill-btn,
+.preview-name,
+.rg-label,
+.segmented button,
+.settings-readonly,
+.share-list li,
+.side-label,
+.swim-name,
+.trace-crumbs,
+.user-chip .user-name {
+  font-size: 13px;
+}
+.board-col-title,
+.cmd-label,
+.confirm-text,
+.pref-title,
+.rg-node.is-hub .rg-label,
+.rg.is-stage .rg-node.is-hub .rg-label,
+.rg.is-stage .rg-node.is-slab .rg-label,
+.scope-name,
+.ucard-name {
+  font-size: 14px;
+}
+.login-lead {
+  font-size: 15px;
+}
+/* END GENERATED: fractional font-size overrides */

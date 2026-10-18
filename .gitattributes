@@ -5,6 +5,10 @@
 *.sh text eol=lf
 *.bash text eol=lf
 
+# Windows 批处理强制 CRLF：cmd.exe 对纯 LF 的 .bat 解析异常，行尾会被当成命令的一部分
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 # YAML/工作流配置强制 LF
 *.yml text eol=lf
 *.yaml text eol=lf

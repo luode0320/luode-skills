@@ -1,0 +1,6 @@
+# 生产代码测试污染豁免登记
+# 格式：<相对路径>::<符号名>  # <理由>
+# 口径：以下两条命中均落在上游 scaffold-master 字节冻结基线（references/component-library-baseline.json 的 139 个文件）内，
+# 由 scripts/verify_fidelity.py 逐字节守卫，改动即 FIDELITY: FAIL；不是本轮引入，也不属于本地扩展层。
+
+scripts/session-regression.py::password = os.environ.get("SCAFFOLD_TEST_PASSWORD", "admin12  # 上游冻结的本地登录回归脚本，取环境变量密码并带本地种子库默认值，非测试专用分支

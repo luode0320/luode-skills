@@ -1,0 +1,23 @@
+{
+  "upstream_commit": "577079e9a347555fadddd3865fc0bbcdb00d9fb4",
+  "upstream_file_count": 137,
+  "stats": {
+    "identical": 0,
+    "eol": 134,
+    "content": 1,
+    "missing": 0,
+    "restored": 135
+  },
+  "skipped_overrides": [
+    "package-lock.json",
+    "vite.config.ts"
+  ],
+  "content_drift_not_restored": [
+    "README.md up=2888B local=2776B"
+  ],
+  "restored_count": 135,
+  "local_guide_preserved": [
+    "LOCAL-GUIDE.md"
+  ],
+  "dry_run": false
+}
