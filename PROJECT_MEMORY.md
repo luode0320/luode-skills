@@ -1606,9 +1606,9 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-10-01
-    usage_count: 1
-    usage_days: 1
-    last_used_at: 2026-10-01
+    usage_count: 2
+    usage_days: 2
+    last_used_at: 2026-10-19
     absorbed_to: null
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
