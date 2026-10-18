@@ -24,7 +24,7 @@ except ImportError:
 
 # === 常量 ===
 
-DEFAULT_BASE_URL = "https://ai-hive.iclip.cn/api"
+DEFAULT_BASE_URL = "https://api.luode.vip/v1"
 API_KEY_HELP_URL = "https://ai-hive.iclip.cn/chat"
 CONFIG_FILE_PATH = os.path.expanduser("~/.ai-hive/config.json")
 DEFAULT_OUTPUT_DIR = os.path.expanduser("~/Downloads/AiHive")

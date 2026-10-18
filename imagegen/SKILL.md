@@ -31,7 +31,7 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 本 skill 只有两条真实出图路径，其余（程序绘制、脚本拼图、SVG/HTML/CSS/canvas 合成、占位图）一律不算出图：
 
 1. **内置模式（默认优先）**：使用当前宿主提供的内置位图生成工具（不同宿主名称不同，如 WorkBuddy 的 ImageGen、Codex 的 `image_gen`）。零配置，普通生图、改图、简单透明底需求直接用它。
-2. **CLI fallback 模式**：使用捆绑的 `scripts/imagegen.py` 或 `scripts/image_gen.py`。支持 OpenAI 兼容接口（如 `https://laaai.cc/v1` 等中转平台）与 AI Hive OpenAPI 接口。默认使用 `gpt-image-2.5-sunburst`，支持多 Key 轮换与限流故障切换。当内置工具不可用或用户显式要求参数/并发控制时走本路径。
+2. **CLI fallback 模式**：使用捆绑的 `scripts/imagegen.py` 或 `scripts/image_gen.py`。支持 OpenAI 兼容接口（如 `https://api.luode.vip/v1` 等中转平台）与 AI Hive OpenAPI 接口。默认使用 `gpt-image-2.5-sunburst`，支持多 Key 轮换与限流故障切换。当内置工具不可用、需要一次并发生成多张不同图、或需要参数控制时走本路径。
 
 判定优先级：内置可用 → 用内置；内置不可用 → 验证 CLI fallback 后出图；两条都不可用 → 明确标记 blocked（尚未生成最终图片），不伪造。
 
@@ -50,7 +50,7 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 - **配置文件结构 (`~/.imagegen/config.json`)**：
   ```json
   {
-    "base_url": "https://laaai.cc/v1",
+    "base_url": "https://api.luode.vip/v1",
     "model": "gpt-image-2.5-sunburst",
     "model_priority": ["gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-2"],
     "api_key": "sk-primary...",
@@ -62,8 +62,11 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
   }
   ```
 - **并发与限流应对**：
-  - **Round-Robin 负载均衡**：批量生成或并发请求按 Key 队列轮询派发，突破单个 Key 的 QPS/并发上限。
-  - **429 自动降级与切换（Rate-Limit Failover）**：当某个 Key 遇到限流（HTTP 429）或配额不足时，捕获异常后自动切换至密钥池中的下一个可用 Key 并执行指数退避重试，无须中断生成任务。
+  - **默认并发批量**：`scripts/image_gen.py generate-batch` 使用 asyncio + Semaphore 真并发，默认 5 路、上限 25 路；多张不同 prompt 一次性提交，不再逐张串行等待。本机单 Key 实测：3 张串行 78.3s → 并发 3 路 33.1s（约 2.4×）；5 张并发 5 路 36.5s，全程无 429。
+  - **Round-Robin 负载均衡**：并发请求按 Key 队列轮询派发，多 Key 时突破单个 Key 的 QPS/并发上限；单 Key 场景下并发仍有效，只是共享同一条限流额度。
+  - **429 自动降级与切换（Rate-Limit Failover）**：当某个 Key 遇到限流（HTTP 429）或配额不足时，捕获异常后自动切换至密钥池中的下一个可用 Key 并执行指数退避重试，无须中断生成任务；单 Key 时同 Key 退避重试，`--max-attempts` 默认 3。
+  - **失败隔离**：单个 job 失败不会中断其它 job；只有显式加 `--fail-fast` 才在首个失败时中止全部。
+  - **串行开关**：`--concurrency 1` 恢复串行；仅在持续限流、配额冲突或需要可复现顺序时使用。
 
 ## 核心规则
 
@@ -84,8 +87,12 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 ## 判定思路
 
 1. **意图**：`generate`（无图或图仅作风格/构图参考）vs `edit`（保留原图主体、修改局部）。本地文件走内置 edit 时先把它读进上下文；需要文件路径控制、mask 等 CLI 专属参数时走 CLI。
-2. **数量**：单资产多次调用即可；只有明确走 CLI 且需要大量不同 prompt 时才批量；`--batch` 只适合同一 prompt 的多个变体。
-3. **批量策略**：内置路径一个资产/一种变体对应一次调用；CLI 路径的 `--batch N` 用于同一 prompt 出 N 张变体，不是多个不同资产。
+2. **数量**：默认并发。需要多张**不同**图时，走 CLI 的 `generate-batch` 一次提交，默认 `--concurrency 5`（已于本机单 Key 实测 5 路并发稳定、无 429）；内置通道实测并列调用仍会排队串行，因此多图不走内置。`--batch N` 仍然只表示同一 prompt 出 N 张变体，与"多个不同 prompt 并发"是两件事。
+3. **批量策略**：
+   - **多张不同内容（默认并发）**：写一份 JSONL（每行一个 `{"prompt": "...", "out": "name.png"}`），用 `generate-batch --input jobs.jsonl --out-dir <dir>` 一次跑完；默认并发 5，上限 25。
+   - **同一 prompt 多张变体**：用 `--n N`（生成接口的 `n` 参数）或 AI Hive 通道的 `--batch N`。
+   - **内置通道**：内置工具没有批量 API；实测同一轮并列发起 3 次内置生图仍是依次执行（完成时间戳间隔约 11s），不构成真并发。多张不同图且数量 ≥ 2 时，默认切 CLI `generate-batch`。
+   - **降级为串行**：`--concurrency 1`。仅在并发出现持续 429、配额冲突或显式要求可复现顺序时使用。
 
 ## 工作流
 
@@ -93,9 +100,15 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 2. 判定 `generate` / `edit`，明确每张输入图角色：`reference image`（风格/构图参考）、`edit target`（修改目标）、`supporting input`（辅助输入）。
 3. 判定结果用途：预览图（对话展示即可）还是项目正式资产（必须落盘）。
 4. 一次性收集输入：prompt、文字要求、约束、禁止项、输入图；用户 prompt 很具体时只做结构化整理不乱加创意，比较泛时只补能明显提升质量的必要细节。
+4.1 **多图并发预判（数量 ≥ 2 且内容不同时）**：先把每张图拆成独立 job（主体 + 该图独有约束 + 输出文件名），一次性写入 JSONL 并走 `generate-batch`；不要为了"安全"退回逐张串行，也不要指望内置通道并列调用来并发。只有单张需求或明确要求串行时才逐次调用。
 5. **出图后符合度自检（硬闸门，不得跳过）**：把用户提示词与本轮约束拆成可逐条打勾的验收清单，至少覆盖主体与数量、风格/媒介、构图与取景、颜色与配色、尺寸与比例、画面内文字是否逐字准确、禁止项（`Avoid:` 负向词）是否守住、透明底或色度键要求、参考图角色是否被正确遵守；逐项给出 `符合 / 不符合 / 无法判定`，并把清单作为交付证据随结论一起给出。详细清单与判定口径见 `references/prompting.md`。
 6. **不符合即重做（不得以"已生成"代替"已达标"）**：任一验收项为 `不符合` 时不得交付，须按不符合项做**定向修改**（已符合项保持不变，并在新 prompt 中复述关键约束防漂移），重新生成新图；同一资产多轮优化按 `v1`、`v2`、`v3` 递增命名，禁止覆盖旧版本，多问题时一次只改一个重点。连续 3 轮仍不达标 → 停止重试，向用户报告差距、已尝试修改与候选方向。
-7. 最终汇报：最终保存路径、最终 prompt 集、生图路径（内置 / CLI fallback）、使用的模型，以及本轮符合度自检结论。
+7. **交付必须先展示再给路径（硬闸门）**：生图成功后，用户可见的交付必须让图片本身出现在回复中，路径只作为补充信息。
+   - 宿主支持图片渲染时（Qoder Desktop、ChatGPT、Claude 等聊天界面），必须把图片以可渲染形式嵌入最终回复，而不是只写"已保存到 `<路径>`"。
+   - 嵌入写法优先级：宿主原生媒体交付工具（如 `present_files`）> `data:` URI 内联（`![alt](data:image/jpeg;base64,...)`）> 宿主已注册的本地资源协议。**禁止**直接使用 `file:///`、`/D:/` 或盘符绝对路径：主流 Electron 聊天渲染层的 CSP 通常为 `img-src 'self' data: blob: https: http:`，不含 `file:`，这类写法会被静默拦截成破图或原文。
+   - 大图必须先压缩成缩略图再内联（建议宽度 ≤ 800px、JPEG quality 60-75），避免撑爆上下文；原图仍完整落盘，回复里同时给出原图路径供下载。
+   - 纯 CLI / 无渲染能力的宿主，明确写"当前环境不支持内联渲染"并给出路径，不得伪造已展示。
+8. 最终汇报：展示结果（是否已内联渲染 + 使用的嵌入方式）、最终保存路径、最终 prompt 集、生图路径（内置 / CLI fallback）、使用的模型，以及本轮符合度自检结论。
 
 ## 透明底规则
 
@@ -127,6 +140,7 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 - 保存优先级：用户指定路径 > 项目 `images/<YYYYMMDDHHMMSS>/` > 仅预览（留在默认位置即可）。
 - 不要把项目实际依赖的图片只留在宿主默认目录。
 - 同一张图多轮优化默认递增版本号（`hero-v1.png`、`hero-v2.png`…）；从无版本起步的第一版直接用 `v1`；用户明确要替换时才覆盖。
+- **落盘与展示是两个独立交付项**：落盘保证资产可复用，展示保证用户当场看得见；两者都要做，不得用其中一个替代另一个。
 
 ## CLI fallback 通道（AI Hive GPT Image 2）
 
@@ -134,7 +148,47 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 
 **能力**：图片生成与编辑，固定模型 `public_model_gpt_image_2`；支持文生图、参考图生成（`--image`）、批量（`--batch`）、模型参数透传（`--param key=value`）。
 
-**子命令速查**：
+## 并发批量通道（OpenAI 兼容端点，默认多图路径）
+
+入口 `scripts/image_gen.py`，子命令 `generate-batch`。多张**不同**图默认走这里。
+
+**JSONL 输入**（每行一个 job，可省略 `fields`）：
+
+```jsonl
+{"prompt": "红色陶瓷马克杯，纯白背景", "out": "mug.png"}
+{"prompt": "黄色橡皮鸭，纯白背景", "out": "duck.png"}
+```
+
+**命令**：
+
+```bash
+python3 "$SKILL_PATH/scripts/image_gen.py" generate-batch \
+  --input jobs.jsonl --out-dir images/20261019120000 \
+  --concurrency 5 --max-attempts 3 \
+  --size 1024x1024 --quality medium --output-format png
+```
+
+**关键参数**：
+
+| 参数 | 默认 | 说明 |
+|---|---|---|
+| `--concurrency` | 5 | 并发上限 1–25；`1` 即串行基线 |
+| `--max-attempts` | 3 | 单 job 限流/瞬态错误的最大尝试次数，失败自动切 Key + 指数退避 |
+| `--fail-fast` | 关闭 | 默认单 job 失败不影响其它 job；开启后首个失败即中止全部 |
+| `--out-dir` | 必填 | 批量模式强制要求，产物按 `序号-slug.png` 命名 |
+| `--size` / `--quality` / `--output-format` | `auto` / `medium` / `png` | 作用于全部 job，也可在单行 job 内覆盖 |
+
+**已验证事实（2026-10-19，本机单 Key，`api.luode.vip`）**：
+
+| 场景 | 结果 |
+|---|---|
+| 3 张串行（`--concurrency 1`） | 29.2s + 23.8s + 25.3s = 78.3s |
+| 3 张并发（`--concurrency 3`） | 33.1s，无 429 |
+| 5 张并发（`--concurrency 5`） | 36.5s，无 429 |
+
+单 Key 下并发同样有效，只是共享同一条限流额度；配多 Key 时 `ApiKeyPool` 轮询进一步分摊。串行只作为限流兜底，不再是默认。
+
+**子命令速查（AI Hive 通道）**：
 
 | 子命令 | 功能 | 关键参数 |
 |---|---|---|

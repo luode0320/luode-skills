@@ -1,5 +1,5 @@
 {
-  "base_url": "https://laaai.cc/v1",
+  "base_url": "https://api.luode.vip/v1",
   "model": "gpt-image-2.5-sunburst",
   "models": [
     "gpt-image-2.5-sunburst",
