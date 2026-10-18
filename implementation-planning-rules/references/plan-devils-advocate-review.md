@@ -35,5 +35,6 @@
 ## 与现有规则的边界
 
 - 结构自审、字段矩阵、占位词检查：以 `plan-review-checklist.md` 与 `plan-output-gate.md` 为准，本文件不改变其必填项。
+- 假设是否真实成立：本文件只负责识别"哪些假设值得怀疑"，把无证据假设落到 `FEAS-*`；成立与否由 `plan-feasibility-probe.md` 用探针证据裁决，本文件不自行判定"已有证据"。
 - Plan Mode 决策提问与未决协议：以 `plan-question-coverage.md` 为准，本文件不新增提问渠道、不改变 `WAITING_DECISION` 语义。
 - 只读规划模式：本文件仍属规划阶段，禁止边批判边写实现代码。
