@@ -18,7 +18,7 @@ description: 当用户要求分析项目、检查是否需要安装 MCP、决定
 - 覆盖 Codex 本地配置缺口：若项目级 `./codex/config.toml` 或 `./.codex/config.toml` 缺少目标 MCP 配置，默认补齐而不是只停留在口头建议。以上 `./codex/config.toml` / `./.codex/config.toml` 特指 Codex CLI 的项目级 MCP 配置文件；Claude Code 的项目级 MCP 配置机制另见下方"平台判定与 Claude Code MCP 配置分支"，两者不通用，不得混用同一份配置文件语义。
 - 为后续浏览器控制和 Godot 编辑器控制建立清晰的优先级，避免同类工具抢主导权。
 - 仅负责 provisioning：安装、注册、配置补齐和首次可用性检查。已配置 MCP 在任务执行期间发生的 timeout、EOF、断开、失活或宿主异常，统一转给 `agent-runtime-recovery-rules`，不在本 skill 内猜测 reload/restart 命令。
-- 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；`browser-session-automation-rules` 仅在矩阵命中隔离 profile / session 自动化能力时使用，或作为不依赖用户 profile 的条件后备；`browser-advanced-testing-rules` 仅在矩阵命中 HAR / 视觉 diff / trace / 代理 / 多引擎等高级验证能力时使用；`browser-use-cloud-rules` 仅接收 Cloud 专属需求，并在任何收费动作前提醒 `BROWSER_USE_API_KEY`、检查 Billing 和硬费用上限、取得当次确认。
+- 浏览器路由唯一以 `references/tool-priority.md` 为准：Chrome Plugin（用户真实 profile 中**已有**的登录态、标签、Cookie、扩展）与 Chrome DevTools MCP（独立调试 / 验证）是不同能力；**「页面需要登录」本身不构成回退 Chrome Plugin 的理由**，本地调试系统（`localhost` / `127.0.0.1`）的凭据由调试侧提供、可自行注入，仍走内置浏览器通道；`browser-session-automation-rules` 仅在矩阵命中隔离 profile / session 自动化能力时使用，或作为不依赖用户 profile 的条件后备；`browser-advanced-testing-rules` 仅在矩阵命中 HAR / 视觉 diff / trace / 代理 / 多引擎等高级验证能力时使用；`browser-use-cloud-rules` 仅接收 Cloud 专属需求，并在任何收费动作前提醒 `BROWSER_USE_API_KEY`、检查 Billing 和硬费用上限、取得当次确认。
 
 ## 自动触发信号
 
@@ -46,7 +46,7 @@ description: 当用户要求分析项目、检查是否需要安装 MCP、决定
    - 若用户使用了“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”等叫法，先统一解释为官方当前名称 `Chrome DevTools MCP`
    - 结论写为“需要安装 Chrome DevTools MCP”
    - 检查项目级 `./codex/config.toml` 与 `./.codex/config.toml`；若目标配置不存在，则默认补齐对应 MCP 配置
-   - 后续浏览器工具选择按 `references/tool-priority.md` 的矩阵执行：用户已有标签、登录态、Cookie 或扩展由 Chrome Plugin 接管；独立页面调试与验证优先 Chrome DevTools MCP；隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`；HAR / route、视觉 diff、录制 / trace、代理或多引擎需求使用 `browser-advanced-testing-rules`；云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等 Cloud 专属需求使用 `browser-use-cloud-rules`
+   - 后续浏览器工具选择按 `references/tool-priority.md` 的矩阵执行：用户真实 profile 中**已有**的标签、登录态、Cookie 或扩展由 Chrome Plugin 接管；独立页面调试与验证优先 Chrome DevTools MCP；**本地调试系统（`localhost` / `127.0.0.1`）的登录凭据可自行注入，不因「需要登录」回退 Chrome Plugin**；隔离 profile / session 等核心自动化需求使用 `browser-session-automation-rules`；HAR / route、视觉 diff、录制 / trace、代理或多引擎需求使用 `browser-advanced-testing-rules`；云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等 Cloud 专属需求使用 `browser-use-cloud-rules`
    - 若仅需不依赖用户 profile 的基础自动化，且 Chrome DevTools MCP 不可用，可按矩阵条件后备到 `browser-session-automation-rules`；不满足能力或安全边界时明确阻断
 3. 若命中 Godot 标记：
    - 结论写为“需要安装 Godot AI MCP”
@@ -97,7 +97,7 @@ Claude Code 结论模板（待确认阶段使用，新增）：
 ## 默认优先级
 
 - 浏览器控制：按 `references/tool-priority.md` 条件路由：
-  - `Chrome Plugin`：依赖用户已有标签、登录态、Cookie、扩展或真实 profile
+  - `Chrome Plugin`：依赖用户真实 profile 中**已有**的标签、登录态、Cookie、扩展或真实 profile（「页面需要登录」不构成理由，见 `references/tool-priority.md`）
   - `Chrome DevTools MCP`：独立 profile 的 DOM、控制台、Network、Performance 与页面行为验证
   - `browser-session-automation-rules`：隔离 profile、具名 session、认证登录、表单交互、批量执行；在不依赖用户 profile 的基础自动化中可作为条件后备
   - `browser-advanced-testing-rules`：HAR / route、视觉 diff、录制 / trace、代理、多引擎、多 session 观测面板
@@ -120,7 +120,7 @@ MCP 安装、配置、注册或首次连接失败时，先触发 `execution-fail
 
 - 不代替 `project-design-doc-rules` 做整项目总览同步。
 - 不代替 `godot-project-bootstrap-rules` 做 Godot 项目的规则文件（`AGENTS.md` / `CLAUDE.md`）模板补齐、图像配置模板补齐或环境就绪收口；本 skill 只负责 MCP 判定与项目级 Codex 配置补齐。
-- 不代替 `browser-session-automation-rules`、`browser-advanced-testing-rules` 或 `browser-use-cloud-rules` 做实际浏览器自动化执行；浏览器工具按 `references/tool-priority.md` 的能力矩阵选择，不能用 Chrome DevTools MCP 绕过用户真实 profile，也不能用本地自动化或 Browser Use Cloud 替代需要 Chrome Plugin 登录态的任务。
+- 不代替 `browser-session-automation-rules`、`browser-advanced-testing-rules` 或 `browser-use-cloud-rules` 做实际浏览器自动化执行；浏览器工具按 `references/tool-priority.md` 的能力矩阵选择，不能用 Chrome DevTools MCP 绕过用户真实 profile，也不能用本地自动化或 Browser Use Cloud 替代需要 Chrome Plugin 中**已有真实 profile 登录态**的任务（本地调试系统凭据可自行注入，不属此类）。
 - 不代替 `find-skills` 做开放生态技能搜索；这里只判断当前项目应安装什么 MCP。
 - 不代替具体的前端 skill 或 Godot 项目实现规则。
 - 本 skill 的 Claude Code MCP 配置分支目前仅完成判定与提示义务，具体命令细节以实际核实结果为准，不作为最终结论。

@@ -15,7 +15,7 @@
 |---|---|---|
 | 已有专用 API、Connector 或 CLI | 专用语义接口 | 不使用 |
 | 公开网页只读检索 | `web` 或 HTTP 来源 | 不使用 |
-| 用户真实标签页、Cookie、扩展、登录态 | Chrome Plugin | 禁止替代 |
+| 用户真实 profile 中**已有**的标签页、Cookie、扩展、登录态 | Chrome Plugin | 禁止替代 |
 | 普通打开、点击、填写、本地页面交互 | 应用内 Browser | 通常不使用 |
 | DOM、Console、Network、Performance | Chrome DevTools MCP | 不使用 |
 | 隔离 profile、表单、批量确定性操作 | `browser-session-automation-rules` | 不使用 |

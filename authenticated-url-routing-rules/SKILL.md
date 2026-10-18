@@ -15,11 +15,12 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 0. 例外让路：URL 属于 `tapd.cn` 域名（如 `https://www.tapd.cn/tapd_fe/...`）时，优先让位给 `tapd-openapi` skill 走 TAPD OpenAPI 读取实体数据（含其环境预检与 Token 未配置阻断）；仅当 API 无法覆盖（需要页面截图、富文本渲染确认、人工登录操作）或 TAPD env 阻断后用户仍要求直接看页面时，才回到本 skill 的浏览器路由。
 1. 只要用户消息中包含 URL 或明显的网页链接，就先触发本 skill。
-2. 优先加载并执行 `chrome:control-chrome`，通过 Chrome Plugin 接管用户已登录的真实 Chrome profile。
-3. 若用户说明“我已经在浏览器打开 / 已登录 / 默认浏览器能看 / 你看这个链接”，仍按第 2 步执行，不再询问是否需要复用登录态。
-4. Chrome Plugin 可用时，不优先使用 `web`、隔离 Playwright、无登录态浏览器或普通 HTTP 抓取。
-5. 如果用户明确说“这是公开网页，用 web 搜索 / 网页抓取即可”，才允许优先走 `web`。
-6. Browser Use Cloud 不是 Chrome Plugin、应用内 Browser、Chrome DevTools MCP 或本地自动化的故障后备；只有统一矩阵命中 Cloud 专属需求，或用户明确点名 Cloud，才转交 `browser-use-cloud-rules`。
+2. 先做一次前置分流：URL 指向本地调试系统（`localhost` / `127.0.0.1` / local 配置声明的调试域名）时，不进入 Chrome Plugin 默认路由，直接按「非 profile 页面路由」用内置浏览器通道打开；其登录凭据由调试侧提供，可自行注入。
+3. 其余 URL 优先加载并执行 `chrome:control-chrome`，通过 Chrome Plugin 接管用户已登录的真实 Chrome profile。
+4. 若用户说明“我已经在浏览器打开 / 已登录 / 默认浏览器能看 / 你看这个链接”，仍按上一步执行，不再询问是否需要复用登录态。
+5. Chrome Plugin 可用时，不优先使用 `web`、隔离 Playwright、无登录态浏览器或普通 HTTP 抓取。
+6. 如果用户明确说“这是公开网页，用 web 搜索 / 网页抓取即可”，才允许优先走 `web`。
+7. Browser Use Cloud 不是 Chrome Plugin、应用内 Browser、Chrome DevTools MCP 或本地自动化的故障后备；只有统一矩阵命中 Cloud 专属需求，或用户明确点名 Cloud，才转交 `browser-use-cloud-rules`。
 
 ## 非 profile 页面路由
 
@@ -31,6 +32,8 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 4. 所选通道不可用时，记录阻断并说明恢复条件；不得把 Browser Use Cloud 当作不等价回退
 
 依赖真实 Chrome profile 的页面不进入以上回退；应请求用户修复 Chrome 连接、扩展或授权。
+
+**本地调试系统不适用 Chrome Plugin 默认路由（强制）**：URL 指向本地调试系统（`localhost` / `127.0.0.1` / local 配置声明的调试域名）时，「需要登录」不构成回退 Chrome Plugin 的理由。本地调试系统的登录凭据由调试侧提供、属于可自行注入的授权，应直接用内置浏览器通道（`Chrome DevTools MCP` 或 `browser-session-automation-rules`）打开并完成登录。只有真实账号会话、SSO、企业内部系统、第三方托管文档等**难以自行获取的授权态**，才走 Chrome Plugin 接管真实 profile。
 
 不得把登录页、权限页、验证码页或 403 / 无权限页面替换成搜索结果、公开缓存、第三方转载或其他站点来绕过鉴权。
 

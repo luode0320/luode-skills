@@ -419,7 +419,7 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 
 ### 触发规则补充（强制）
 - 当**本轮改动命中** `test-strategy-rules`《页面/UI 级测试执行通道（强制）》触发判定的任一条——前端改动面、**被前端调用的接口改动（前端代码零改动同样触发）**、影响前端可见行为的其他后端变更——且任务进入“测试/验证/联调”阶段时，必须完成真实 local 浏览器联调与页面点击交互验证；判定与证据口径统一按该节。**前端仓库零 diff 不等于豁免**：仅当「纯后端改动 + 不影响前端可见行为 + 不涉及前端调用的接口」三条件同时满足时，才按该节记 `not_applicable` + 依据（须含前端调用面检索结论）。
-- 具体工具按 `mcp-installation-rules` 的统一路由选择；页面点击测试场景**默认优先 agent 内置浏览器通道**（Chrome DevTools MCP，或不依赖用户真实 profile 的基础自动化用本 skill 的 agent-browser），需要复用用户登录态、已有标签页、Cookie 或扩展时**兜底** Chrome Plugin（系统默认浏览器）；HAR/route、视觉 diff、录制/trace、代理或其他引擎场景见 `browser-advanced-testing-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
+- 具体工具按 `mcp-installation-rules` 的统一路由选择；页面点击测试场景**默认优先 agent 内置浏览器通道**（Chrome DevTools MCP，或不依赖用户真实 profile 的基础自动化用本 skill 的 agent-browser），需要复用用户真实 profile 中**已有**的登录态、已有标签页、Cookie 或扩展时**兜底** Chrome Plugin（系统默认浏览器）；**本地调试系统（`localhost` / `127.0.0.1`）的登录凭据由调试侧提供、可自行注入，不因「页面需要登录」回退 Chrome Plugin**；HAR/route、视觉 diff、录制/trace、代理或其他引擎场景见 `browser-advanced-testing-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
 - 所选浏览器通道不可用且没有满足安全边界的替代通道时，记录本地联调阻断，不强行切换工具。
 - 若系统需要登录授权而当前上下文缺失有效授权信息，必须先向用户获取登录账户或 token，再继续联调。
 - 若准备开始前后端联调，允许主动关闭用户已启动的前端与后端进程，并按当前任务重新启动前后端服务后再调试。

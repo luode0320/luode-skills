@@ -6,23 +6,26 @@
 
 | 工具 | 能力定位 | 适用条件 | 不适用 / 不可用处理 |
 | --- | --- | --- | --- |
-| `Chrome Plugin` | 连接用户当前 Chrome，复用真实标签、登录态、Cookie、扩展和 profile | 任务依赖用户已经打开的页面、已有认证状态、浏览器扩展或真实 profile | 连接失败时要求修复 Chrome 连接；不得改用独立 profile 工具绕过用户认证边界 |
+| `Chrome Plugin` | 连接用户当前 Chrome，复用真实标签、登录态、Cookie、扩展和 profile | 任务依赖用户已经打开的页面、**用户真实 profile 中已有**的认证状态、浏览器扩展或真实 profile | 连接失败时要求修复 Chrome 连接；不得改用独立 profile 工具绕过用户认证边界 |
 | `Chrome DevTools MCP` | 独立浏览器调试与验证：DOM、样式、控制台、Network、Performance、Coverage、运行时状态 | 不依赖用户真实 profile 的本地页面调试、页面行为验证、网络或性能诊断 | 未安装或未接通时，只有在任务不依赖 DevTools 专属能力且不需要真实 profile 时，才按下方条件后备；否则阻断 |
-| `browser-session-automation-rules` | 隔离 profile / 具名 session 的核心浏览器自动化：打开、快照、交互、认证、等待、截图、批量执行 | 任务需要隔离 profile、具名 session、认证登录、表单交互、数据提取，或独立 profile 的基础自动化在 Chrome DevTools MCP 不可用时 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的真实 profile / 登录态 |
-| `browser-advanced-testing-rules` | 浏览器高级验证与观测：HAR / 网络记录、视觉 diff、trace / profiling、代理、多 session 观测面板 | 任务明确需要网络 HAR、视觉 / 页面 diff、性能 profiling、录制 trace、代理配置或多 session dashboard 观测 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的真实 profile / 登录态 |
+| `browser-session-automation-rules` | 隔离 profile / 具名 session 的核心浏览器自动化：打开、快照、交互、认证、等待、截图、批量执行 | 任务需要隔离 profile、具名 session、认证登录、表单交互、数据提取，或独立 profile 的基础自动化在 Chrome DevTools MCP 不可用时 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的用户真实 profile 中**已有**登录态 |
+| `browser-advanced-testing-rules` | 浏览器高级验证与观测：HAR / 网络记录、视觉 diff、trace / profiling、代理、多 session 观测面板 | 任务明确需要网络 HAR、视觉 / 页面 diff、性能 profiling、录制 trace、代理配置或多 session dashboard 观测 | CLI / 能力不可用时明确阻断；不得用于替代需要 Chrome Plugin 的用户真实 profile 中**已有**登录态 |
 | `browser-use-cloud-rules` | Browser Use Cloud 托管自主执行：云端长链、托管并发、地域出口、托管代理、隐身环境和合规验证码处理 | 任务明确需要 Cloud 专属能力，或用户明确点名 Browser Use Cloud 并接受密钥、账单、硬费用上限和逐次确认闸门 | 不作为其它浏览器工具的故障后备；缺 key、账单/余额不明、无硬费用上限或未取得当次确认时默认停止 |
 
 ## 浏览器路由矩阵
 
 按任务条件选择，不按工具名做无条件替换：
 
-本地项目调试优先使用当前 agent 宿主提供的内置浏览器通道。本矩阵的标准调试能力映射为 `Chrome DevTools MCP`；只有当前宿主未提供该通道、且任务不依赖 DevTools 专属能力时，才按条件使用 `browser-session-automation-rules`。只有依赖用户真实标签页、登录态、Cookie 或扩展时才使用 `Chrome Plugin`。
+本地项目调试优先使用当前 agent 宿主提供的内置浏览器通道。本矩阵的标准调试能力映射为 `Chrome DevTools MCP`；只有当前宿主未提供该通道、且任务不依赖 DevTools 专属能力时，才按条件使用 `browser-session-automation-rules`。只有依赖用户真实标签页、**用户真实 Chrome profile 中已有**的登录态、Cookie 或扩展时才使用 `Chrome Plugin`。
+
+**「需要登录」本身不构成回退 Chrome Plugin 的理由（强制）**：回退 Chrome Plugin 的判据是「必须复用用户真实 profile 里已经存在的认证态」，不是「页面需要登录」。本地调试系统（`localhost` / `127.0.0.1` 等 local 环境）的登录凭据由调试侧提供，属于**可自行注入的授权**，应由内置浏览器通道（`Chrome DevTools MCP` 或 `browser-session-automation-rules`）自行完成登录，不得因为页面需要登录就切到用户系统默认浏览器。只有真实账号会话、SSO、企业内部系统、第三方托管文档等**难以自行获取的授权态**才回退 Chrome Plugin。
 
 | 任务信号 | 首选工具 | 条件后备 / 处理 |
 | --- | --- | --- |
-| 已有标签、登录态、Cookie、扩展、用户真实 profile | `Chrome Plugin` | Chrome Plugin 不可用时阻断并要求修复连接 |
+| 已有标签、**用户真实 profile 中已有**的登录态、Cookie、扩展、用户真实 profile | `Chrome Plugin` | Chrome Plugin 不可用时阻断并要求修复连接 |
 | 本地项目调试：独立 profile 的 DOM、样式、控制台、页面行为验证 | 当前 agent 宿主提供的内置浏览器通道（本矩阵标准映射：`Chrome DevTools MCP`） | 当前宿主未提供该通道时，只有不依赖 DevTools 专属能力才可使用 `browser-session-automation-rules`；否则阻断 |
 | 本地项目调试：独立 profile 的 Network、Performance、Coverage 或运行时调试 | 当前 agent 宿主提供的内置 DevTools 通道（本矩阵标准映射：`Chrome DevTools MCP`） | 无等价能力时阻断，不以基础自动化结果冒充 DevTools 验证 |
+| 本地调试系统（`localhost` / `127.0.0.1`）的登录与授权注入 | 当前 agent 宿主提供的内置浏览器通道（用调试侧提供的凭据自行登录） | 不因「页面需要登录」回退 `Chrome Plugin`；凭据缺失时向用户索取调试账号 / token，不索取 cookie、验证码或 localStorage |
 | 隔离 profile、具名 session、认证登录、表单交互、批量执行 | `browser-session-automation-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | HAR / route、视觉 diff、录制 / trace、代理、多引擎、多 session 观测面板 | `browser-advanced-testing-rules` | 不可用时阻断，不自动切换到 Chrome Plugin |
 | 不依赖真实 profile 的基础打开、点击、填写或一次性截图 | `Chrome DevTools MCP`（可用时） | Chrome DevTools MCP 不可用时可条件后备 `browser-session-automation-rules`；仍需满足 local 与安全约束 |
