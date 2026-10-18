@@ -952,15 +952,13 @@ def extract_registry(document: str, *, session_id: str | None = None) -> dict[st
 
     [参数] document: PROJECT_CURRENT.md 全文；session_id: 旧活动投影迁移归属。
     [返回] dict | None：合法 v5 注册表；无托管区时返回 None。
-    最近修改时间：2026-10-13；改动说明：读取 v4 时按条目转换并隔离坏记录。
+    最近修改时间：2026-10-16；改动说明：v5 注册表也按条目容错隔离，单条损坏不再连坐全部会话。
     """
-    # 1. v5 严格读取；v4 转换到 v5 内存结构，旧版 projection 进入兼容路径。
+    # 1. v4/v5 注册表统一按条目容错读取，旧版单投影进入严格兼容路径。
     value = _extract_raw_projection_value(document)
     if value is None:
         return None
-    if isinstance(value, Mapping) and value.get("version") == REGISTRY_VERSION:
-        return validate_registry(value)
-    if isinstance(value, Mapping) and value.get("version") == 4:
+    if isinstance(value, Mapping) and value.get("version") in (4, REGISTRY_VERSION):
         registry, _ = _extract_registry_tolerant(document, session_id=session_id)
         return registry
     legacy = validate_projection(value)
@@ -980,14 +978,15 @@ def _extract_registry_tolerant(
     [返回] tuple：(v5 registry 或 None, 不含原始数据的隔离原因摘要)。
     最近修改时间：2026-10-13；改动说明：隔离记录持久保留，不再跳过坏项。
     """
-    # 1. 读取原始值；非 v4（旧版单投影 / 顶层损坏）不做隔离，回退严格路径。
+    # 1. 读取原始值；非 v4/v5（旧版单投影 / 顶层无法识别）不做隔离，回退严格路径。
     value = _extract_raw_projection_value(document)
     if value is None:
         return None, []
-    if not (isinstance(value, Mapping) and value.get("version") == 4):
+    if not (isinstance(value, Mapping) and value.get("version") in (4, REGISTRY_VERSION)):
         return extract_registry(document, session_id=session_id), []
-    # 2. v4 顶层契约仍严格，顶层损坏不属于可隔离的单条记录错误。
-    if set(value) != REGISTRY_FIELDS_V4:
+    # 2. 顶层契约仍严格，顶层损坏不属于可隔离的单条记录错误。
+    expected_top_fields = REGISTRY_FIELDS if value.get("version") == REGISTRY_VERSION else REGISTRY_FIELDS_V4
+    if set(value) != expected_top_fields:
         raise ProjectionContractError("registry fields mismatch (top-level contract violation)")
     if value.get("registry_schema") != REGISTRY_SCHEMA:
         raise ProjectionContractError("registry_schema is invalid")
@@ -998,15 +997,20 @@ def _extract_registry_tolerant(
             f"projections must be an array of at most {MAX_PROJECTIONS} entries"
         )
     # 3. 先逐项规范化，再按重复身份整组隔离；一个 session 可保留多个不同计划。
+    # v4 无隔离字段，v5 已有隔离记录校验后原样保留，再叠加本轮新隔离项。
+    source_version = value.get("version")
     normalized_by_index: dict[int, dict[str, Any]] = {}
-    quarantine: list[dict[str, Any]] = []
+    quarantine: list[dict[str, Any]] = [
+        _validate_quarantine_entry(item)
+        for item in (value.get("quarantined_projections") or [])
+    ]
     skipped: list[dict[str, Any]] = []
     for index, entry in enumerate(raw_projections):
         try:
             normalized_by_index[index] = validate_projection_entry(entry)
         except ProjectionContractError:
             quarantine.append(_quarantine_entry(
-                entry, reason="invalid_projection", source_index=index, source_version=4
+                entry, reason="invalid_projection", source_index=index, source_version=source_version
             ))
             skipped.append({"index": index, "reason_code": "invalid_projection"})
     # 4. 同一 projection_id 或业务身份的所有候选都隔离，禁止按顺序选择其中一条。
@@ -1025,7 +1029,7 @@ def _extract_registry_tolerant(
         for index in sorted(duplicate_indices):
             raw = raw_projections[index]
             quarantine.append(_quarantine_entry(
-                raw, reason=reason, source_index=index, source_version=4
+                raw, reason=reason, source_index=index, source_version=source_version
             ))
             skipped.append({"index": index, "reason_code": reason})
             normalized_by_index.pop(index, None)

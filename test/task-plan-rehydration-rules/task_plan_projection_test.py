@@ -243,6 +243,27 @@ class TaskPlanProjectionTests(unittest.TestCase):
             ),
         )
 
+    # _write_registry_block 把指定 registry 原样写入托管区，供容错读取用例构造损坏样本。
+    # [参数] root: 临时目录；registry: 待序列化的注册表对象（不做合法性修正，保留损坏字段）。
+    # [返回] Path：创建的文件路径。
+    # 最近修改时间：2026-10-16；改动原因：v5 容错隔离用例需要写入任意损坏程度的 registry。
+    def _write_registry_block(self, root: Path, registry: dict[str, object]) -> Path:
+        """把 registry 原样写入任务投影托管区。"""
+        registry_json = json.dumps(registry, ensure_ascii=False, indent=2)
+        return self._write_current(
+            root,
+            "# 项目当前状态\n\n用户正文。\n"
+            + "\n".join(
+                (
+                    projection.BEGIN_MARKER,
+                    "```json",
+                    registry_json,
+                    "```",
+                    projection.END_MARKER,
+                )
+            ),
+        )
+
     # _run_cli 执行脚本子命令并固定 UTF-8 子进程环境。
     # [参数] arguments: CLI 参数。
     # [返回] CompletedProcess[str]：stdout/stderr 和退出码。
@@ -2504,6 +2525,119 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self.assertIn("new-session", session_ids)
         self.assertIn("good-session", session_ids)
         self.assertNotIn("corrupt-session", session_ids)  # 坏项已被隔离
+
+    def test_v5_tolerant_extract_isolates_corrupt_entry_without_blocking_others(self) -> None:
+        """验证 v5 活动项单条损坏时按条隔离，其它会话读取与新计划写入不被连坐。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-10-16；改动原因：v5 损坏不再整体失败关闭，单计划失败不影响其它会话。
+        """
+        # 1. 构造 v5 registry：好会话 + 指纹损坏会话（保留合法 session_id）+ 全完成 inactive 好项。
+        recent = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat().replace("+00:00", "Z")
+        good = self._sample_v4_entry("v5-good-session", updated_at=recent)
+        corrupt = dict(self._sample_v4_entry("v5-corrupt-session", updated_at=recent))
+        corrupt["plan_fingerprint"] = "0" * 64
+        registry = {
+            "version": projection.REGISTRY_VERSION,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": recent,
+            "projections": [corrupt, good],
+            "quarantined_projections": [],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_registry_block(Path(directory), registry)
+            # 2. 文档级读取按条目容错：坏项进隔离区，好项保留，不整体报错。
+            tolerant = projection.extract_registry(
+                path.read_text(encoding="utf-8"), session_id="v5-new-session"
+            )
+            self.assertEqual(
+                {entry["session_id"] for entry in tolerant["projections"]},
+                {"v5-good-session"},
+            )
+            quarantined = {
+                (item["affected_session_id"], item["reason_code"], item["source_version"])
+                for item in tolerant["quarantined_projections"]
+            }
+            self.assertEqual(quarantined, {("v5-corrupt-session", "invalid_projection", projection.REGISTRY_VERSION)})
+            # 3. 损坏只针对该计划：坏会话自身读取仍失败关闭。
+            with self.assertRaisesRegex(projection.ProjectionContractError, "quarantined"):
+                projection.load_projection(path, session_id="v5-corrupt-session")
+            # 4. 身份明确的新会话 ensure-start 不被连坐，好计划与隔离记录同文件共存。
+            projection.upsert_projection(
+                path, self._sample_v4_projection("v5-new-session"), session_id="v5-new-session"
+            )
+            result = projection.extract_registry(
+                path.read_text(encoding="utf-8"), session_id="v5-new-session"
+            )
+            self.assertEqual(
+                {entry["session_id"] for entry in result["projections"]},
+                {"v5-good-session", "v5-new-session"},
+            )
+            self.assertNotIn(
+                "v5-corrupt-session",
+                {entry["session_id"] for entry in result["projections"]},
+            )
+            self.assertEqual(len(result["quarantined_projections"]), 1)
+
+    def test_v5_tolerant_extract_still_rejects_top_level_damage(self) -> None:
+        """验证 v5 顶层字段或隔离记录损坏仍整体失败关闭，容错只限单条投影。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-10-16；改动原因：容错不放宽 v5 顶层契约与隔离记录校验。
+        """
+        # 1. 顶层缺 quarantined_projections 字段属于契约违规，必须报错而非静默补齐。
+        entry = self._sample_v4_entry("v5-top-session")
+        registry = {
+            "version": projection.REGISTRY_VERSION,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-10-16T00:00:00Z",
+            "projections": [entry],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_registry_block(Path(directory), registry)
+            with self.assertRaisesRegex(projection.ProjectionContractError, "top-level contract violation"):
+                projection.extract_registry(path.read_text(encoding="utf-8"), session_id="v5-top-session")
+        # 2. 隔离记录本身无效时整体失败关闭，不降级忽略。
+        damaged = {
+            "version": projection.REGISTRY_VERSION,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-10-16T00:00:00Z",
+            "projections": [entry],
+            "quarantined_projections": [{"reason_code": "not_a_valid_reason"}],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_registry_block(Path(directory), damaged)
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.extract_registry(path.read_text(encoding="utf-8"), session_id="v5-top-session")
+
+    def test_v5_unknown_session_quarantine_blocks_all_recovery(self) -> None:
+        """验证所属会话无法确认的 v5 损坏项阻止所有会话恢复，防止错投。
+
+        [参数] 无。
+        [返回] None。
+        最近修改时间：2026-10-16；改动原因：锁定身份未知隔离项的全局失败关闭边界。
+        """
+        # 1. 损坏项连 session_id 都非法，隔离后无法证明与任何会话无关。
+        good = self._sample_v4_entry("v5-safe-session")
+        anonymous = dict(self._sample_v4_entry("v5-anon-session"))
+        anonymous["session_id"] = ""
+        anonymous["plan_fingerprint"] = "0" * 64
+        registry = {
+            "version": projection.REGISTRY_VERSION,
+            "registry_schema": "task_plan_projection_registry",
+            "registry_updated_at": "2026-10-16T00:00:00Z",
+            "projections": [anonymous, good],
+            "quarantined_projections": [],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = self._write_registry_block(Path(directory), registry)
+            tolerant = projection.extract_registry(path.read_text(encoding="utf-8"), session_id="v5-safe-session")
+            self.assertIn(None, [item["affected_session_id"] for item in tolerant["quarantined_projections"]])
+            # 2. 即便本会话自身计划完好，身份未知隔离项仍使恢复失败关闭。
+            with self.assertRaisesRegex(projection.ProjectionContractError, "quarantined"):
+                projection.load_projection(path, session_id="v5-safe-session", plan_key=good["plan_key"])
 
     def test_tolerant_extract_rejects_top_level_contract_violation(self) -> None:
         """验证隔离降级仍对顶层契约违规保持严格（不误吞版本/schema 错误）。

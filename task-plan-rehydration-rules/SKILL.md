@@ -128,7 +128,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 当前回合处于 Plan Mode 时，本 Skill 只负责投影与 UI 适配路由：不读取、写入或恢复执行期 registry；默认由 `implementation-planning-rules` 通过原生计划流程展示细化步骤，若 `update_plan` 在当前会话可用则可同步显示。UI 不可用不暂停计划形成。Plan Mode 结束并开始执行后，才进入以下执行期 registry 恢复流程。
 
 1. 在任何领域写操作前读取 `PROJECT_CURRENT.md`。
-2. 若 registry 托管区存在，先对完整托管区及全部 projection 执行严格校验，再使用当前 `session_id` 定位唯一 projection，并校验来源文档、计划指纹、状态约束和文件大小；有效 `active` projection 直接使用 `payload` 重建。任一条目、标记、JSON 结构或身份校验失败时，立即保留整个 `PROJECT_CURRENT.md` 原文并退出 registry UI 恢复；不得继续 `ensure-start`、`synthesize`、委派来源侦察或写入 fallback。完整校验通过但当前会话无匹配时，才进入下一步。无匹配、多匹配、来源不一致或归属不确定时不得读取其它会话 projection。
+2. 若 registry 托管区存在，先按条目容错读取完整托管区，再使用当前 `session_id` 定位唯一 projection，并校验来源文档、计划指纹、状态约束和文件大小；有效 `active` projection 直接使用 `payload` 重建。v4/v5 单条活动投影损坏或身份重复时，转换器把该条原样放入 `quarantined_projections`，其余身份明确的计划继续可读可写；损坏只针对该计划失败关闭，不得读取、复制或刷新该条。托管标记缺失、半边或重复、JSON 无法解析、顶层字段/schema/版本/数组上限违规、隔离记录本身无效，或隔离项所属会话无法确认时，保留整个 `PROJECT_CURRENT.md` 原文并退出 registry UI 恢复；不得继续 `ensure-start`、`synthesize`、委派来源侦察或写入 fallback。完整校验通过但当前会话无匹配时，才进入下一步。无匹配、多匹配、来源不一致或归属不确定时不得读取其它会话 projection。
 3. 仅当 registry 托管区缺失，或完整校验通过且当前 `session_id` 无匹配 projection 时，才可先仅根据当前用户请求构造任务专属、脱敏的暂定步骤；若当前请求也不足以辨认任务，则明确写“尚未识别具体任务”。将该临时清单绑定当前 `session_id`，以唯一临时 `plan_key` 通过 `ensure-start` 持久化，并立即同步当前会话 UI；不得借用同项目其它会话的投影、来源文档或步骤作为本会话投影。完成这一步后，主代理才可派只读子代理收集候选来源文档、完成步骤提示、当前步骤提示和冲突信息。子代理不得决定最终归属、不得写回文件、不得直接调用 `update_plan`。
 4. 主代理把当前会话摘要、`PROJECT_CURRENT` 普通正文、子代理证据和候选来源文档传给 `synthesize`，并绑定当前 `session_id`。唯一来源且存在明确状态提示时生成 `exact` 正式补建；否则生成细化 `fallback` 安全恢复列表。正式来源必须先由主代理核验，不能因为同一项目中另一个会话引用了某份计划就认定当前会话属于该计划。
 5. 正式计划补建必须先写入 L1 事实源，再原子写入 L2 投影和 payload。若已有暂定恢复投影，正式 projection 通过后按明确的 `plan_key` 或 `projection_id` 失活暂定项，再用正式 payload 同步 UI。`inactive`、过期或来源不匹配时不得恢复未知正式步骤；仅在完整 registry 仍通过校验且当前会话身份明确时，才可保留并继续显示已绑定本会话的暂定清单。registry 损坏时不得创建、更新或显示任何恢复清单，不得错投其它会话。
@@ -145,7 +145,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 - 托管区契约、字段白名单和状态规则见 [task-plan-projection-contract.md](references/task-plan-projection-contract.md)。
 - 多会话身份与共享文件并发边界：每条投影只按当前宿主提供的 `session_id` 及该条自身的计划身份选择；同项目、相同 `plan_key`、相同工作目录或最近更新时间都不能证明会话归属。当前 canonical `projection_id` 按 `session_id`、`plan_key`、`source_document`、`projection_origin` 的规范 JSON 计算；历史 ID 若只在加入 `synthesis_mode` 的 legacy 算法下匹配，仍是有效兼容 ID，不能仅因它与 canonical 算法结果不同就报损坏。校验只接受精确匹配的 canonical 或 legacy ID；两者都不匹配时保留原文件并退出该投影的 UI 恢复，禁止自动修复 ID 或从其它会话补拷身份。
 - 所有会改写 `PROJECT_CURRENT.md` 的入口必须共用 `.PROJECT_CURRENT.md.lock`：持锁后重读最新全文，只改自己拥有的区段或当前 `session_id + 计划身份` 对应项，原样保留其他会话/计划投影及非托管正文，再按 UTF-8 大小限制和原子替换规则写回。原子替换本身不提供并发读改写保护；不能取得共享锁或不能在锁内重读时，保持原文件不变并报告写入失败。绝不使用数组顺序、更新时间或“项目内唯一活动项”选择要同步的会话清单。
-- registry 的顶层结构、托管标记、JSON、版本和共享文件边界仍整体严格校验；v4 registry 中单条投影损坏或投影 ID / 业务身份重复时，读取器可将所有冲突候选转换为 v5 `quarantined_projections`，保存原始 JSON 与安全诊断字段，并继续处理身份唯一且不与隔离项冲突的计划。隔离项与当前会话计划可能重叠、隔离记录无法确认所属会话、身份不足以排除冲突，或 v5 活动投影自身损坏时，针对该计划失败关闭；所属会话未知的隔离项会阻止所有会话继续恢复或写入。待隔离原文含凭据、prompt、token 等敏感字段时拒绝转换，保留原文件不变。不得仅凭 `session_id` 去重：同一会话允许并存不同 `plan_key`。除显式 `migrate` 或正常成功写入外，读取不得改写文件；转换失败时保留原文。
+- registry 的顶层结构、托管标记、JSON、版本和共享文件边界仍整体严格校验；v4/v5 registry 中单条投影损坏或投影 ID / 业务身份重复时，读取器可将所有冲突候选转换为 v5 `quarantined_projections`，保存原始 JSON 与安全诊断字段，并继续处理身份唯一且不与隔离项冲突的计划。隔离项与当前会话计划可能重叠、隔离记录无法确认所属会话、身份不足以排除冲突时，针对该计划失败关闭；所属会话未知的隔离项会阻止所有会话继续恢复或写入。待隔离原文含凭据、prompt、token 等敏感字段时拒绝转换，保留原文件不变。不得仅凭 `session_id` 去重：同一会话允许并存不同 `plan_key`。除显式 `migrate` 或正常成功写入外，读取不得改写文件；转换失败时保留原文。
 - 投影不得保存 prompt、响应、凭据、token、线程 ID、业务数据或原始用户输入；原始宿主会话 / 线程标识只允许出现在受控字段 `session_id`，不得出现在其它字段或步骤文案中。
 - 所有 CLI/Python 状态入口按显式 `session_id` 优先、`CODEX_THREAD_ID` 回退、WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `mcpServers.*.headers["X-WorkBuddy-Session-Id"]` 唯一值或 `WORKBUDDY_SESSION_ID` 环境变量）兜底解析；多来源不一致时拒绝，全缺失时失败关闭，禁止猜测 `legacy/default` 或其它会话；解析时禁止打印 `CODEBUDDY_MCP_CONFIG` 全文或 token。
 - 最多一个 `in_progress`；允许因阻断暂时没有 `in_progress`。
@@ -159,6 +159,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 - UI 同步通道不可用：按本节前述 `UI_SYNC_BLOCKED` 规则降级继续；投影持久化失败、会话归属冲突/不确定或执行状态不明按各自安全边界处理。全文字节上限是持久化失败的专用例外：先压缩普通历史正文，压缩两轮后仍超限则保留原文件并继续领域任务，不阻断执行。
 - 超时计时缺失、时间不是 UTC、暂停秒数非法或主动执行时长无法可靠计算：不创建 projection，不得用墙钟猜测补齐。
 - 投影来源、指纹或正式计划无法确认：不重建 UI，不继续未知写操作。
+- 单条投影损坏或进入隔离区：只退出该条所属计划的 UI 恢复与改写，其余身份明确的会话继续；与损坏计划身份不重叠、且已按各自规则取得授权或属默认许可范围的领域工作，照常推进，不得把它升级成整仓任务阻断。顶层契约、标记、JSON 或隔离记录整体损坏时才全局退出 UI 恢复，且该退出仍只限制悬浮任务列表重建，不改变领域执行授权。
 - 原子替换失败：原文件必须保持不变，并按失败原因处理。候选全文仅因超过 51,200 字节被拒绝：先调用 `project-memory-rules` 在共享锁内压缩普通历史正文、验证托管区逐字节不变并重试，最多两轮；仍超限则保留原文件，不持久化该 projection，但继续领域任务，不把容量限制升级为任务阻断。
 - 用户明确结束：只允许把投影失活并完成必要状态收口，不得扩展新任务。
 
