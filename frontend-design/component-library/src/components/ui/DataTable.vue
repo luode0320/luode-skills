@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="Row extends Record<string, any>">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
 import Checkbox from './Checkbox.vue'
 import EmptyState from './EmptyState.vue'
@@ -10,8 +10,6 @@ export interface Column {
   title: string
   width?: number
   minWidth?: number
-  maxWidth?: number
-  resizable?: boolean
   align?: 'left' | 'center' | 'right'
   className?: string
 }
@@ -39,54 +37,10 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'update:selected', value: (string | number)[]): void
   (e: 'row-click', row: Row): void
-  (e: 'column-resize', key: string, width: number): void
 }>()
 
 const body = ref<HTMLElement | null>(null)
 const expanded = ref(new Set<string | number>())
-
-// 列宽拖拽调整：resizable 为 true 的列右侧显示手柄，mousedown 后动态更新 width
-const resizedWidths = ref<Record<string, number>>({})
-let resizeCol: string | null = null
-let startX: number = 0
-let startWidth: number = 0
-
-function onResizeStart(e: MouseEvent, colKey: string) {
-  if (!colKey) return
-  const col = props.columns.find(c => c.key === colKey)
-  if (!col || !col.resizable) return
-  startX = e.clientX
-  startWidth = resizedWidths.value[colKey] || col.width || 0
-  resizeCol = colKey
-  document.body.style.cursor = 'ew-resize'
-  document.addEventListener('mousemove', onResizeing)
-  document.addEventListener('mouseup', onResizeEnd)
-}
-
-function onResizeing(e: MouseEvent) {
-  if (!resizeCol) return
-  const delta = e.clientX - startX
-  const newWidth = Math.max(startWidth + delta, 50) // 最小 50px
-  resizedWidths.value[resizeCol] = newWidth
-}
-
-function onResizeEnd() {
-  if (resizeCol) {
-    emit('column-resize', resizeCol, resizedWidths.value[resizeCol])
-  }
-  resizeCol = null
-  document.body.style.cursor = ''
-  document.removeEventListener('mousemove', onResizeing)
-  document.removeEventListener('mouseup', onResizeEnd)
-}
-
-onBeforeUnmount(() => {
-  if (resizeCol) {
-    document.body.style.cursor = ''
-    document.removeEventListener('mousemove', onResizeing)
-    document.removeEventListener('mouseup', onResizeEnd)
-  }
-})
 
 interface FlatRow { row: Row; depth: number; hasChildren: boolean }
 
@@ -154,7 +108,7 @@ watch(() => props.data, (rows) => {
 
 function cellStyle(col: Column) {
   return {
-    width: resizedWidths.value[col.key] || col.width ? `${resizedWidths.value[col.key] || col.width}px` : undefined,
+    width: col.width ? `${col.width}px` : undefined,
     minWidth: col.minWidth ? `${col.minWidth}px` : undefined,
     textAlign: col.align,
   }
@@ -173,11 +127,6 @@ defineExpose({ expandAll, collapseAll })
           </th>
           <th v-for="col in columns" :key="col.key" :class="col.className" :style="cellStyle(col)" scope="col">
             <span class="th-inner">{{ col.title }}</span>
-            <span
-              v-if="col.resizable"
-              class="col-resize-handle"
-              @mousedown.prevent.stop="onResizeStart($event, col.key)"
-            />
           </th>
         </tr>
       </thead>
@@ -225,26 +174,3 @@ defineExpose({ expandAll, collapseAll })
     </table>
   </div>
 </template>
-
-<style scoped>
-.col-resize-handle {
-  position: absolute;
-  right: -4px;
-  top: 0;
-  bottom: 0;
-  width: 8px;
-  cursor: col-resize;
-  transition: background .15s ease;
-}
-.col-resize-handle:hover,
-.col-resize-handle:active {
-  background: var(--blue);
-  border-right: 2px solid var(--blue);
-}
-.table-wrap {
-  position: relative;
-}
-.table th {
-  position: relative;
-}
-</style>

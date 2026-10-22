@@ -2,22 +2,22 @@
   "upstream_commit": "577079e9a347555fadddd3865fc0bbcdb00d9fb4",
   "upstream_file_count": 137,
   "stats": {
-    "identical": 0,
-    "eol": 134,
-    "content": 1,
+    "identical": 132,
+    "eol": 0,
+    "content": 3,
     "missing": 0,
-    "restored": 135
+    "restored": 3
   },
   "skipped_overrides": [
     "package-lock.json",
     "vite.config.ts"
   ],
   "content_drift_not_restored": [
-    "README.md up=2888B local=2776B"
+    "src/components/ui/DataTable.vue up=6789B local=8893B",
+    "src/composables/auth.ts up=7155B local=7224B",
+    "src/main.ts up=801B local=833B"
   ],
-  "restored_count": 135,
-  "local_guide_preserved": [
-    "LOCAL-GUIDE.md"
-  ],
+  "restored_count": 3,
+  "local_guide_preserved": [],
   "dry_run": false
 }

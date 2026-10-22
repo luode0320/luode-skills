@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: 创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面、前端应用，或进行前端 UI、组件、样式的调整/改进/界面 Bug 修复时优先使用这个 skill。中后台/管理端 design 默认使用珍珠玻璃组件库（152 个 Vue 组件 + 七层令牌样式，字节级还原基线守卫，附组件目录索引；全部组件的用法示例内置在后台路由 /gallery 内，共 749 组可操作示例、平均每个组件 4.93 组，按「父分类 + 子组件分类」两级菜单导航 10 个父分类 / 101 个单一概念子分组，示例页宽屏一行 3 格大卡，品类广度对齐 Arco Design Vue），选组件前先查 references/component-catalog.md。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。触发词：前端设计、页面设计、UI 设计、组件设计、界面样式、前端审美、网页设计、设计风格、组件库、珍珠玻璃、后台管理界面、中后台、管理端、组件目录、组件索引、找组件、组件示例、组件菜单、示例分组、多变体示例、字体加载失败、字体乱码、tofu、@fontsource、字体子集、文字显示不全。
+description: 创建具有鲜明风格、达到生产级质量的高品质前端界面。当用户要求构建 Web 组件、页面或前端应用，或进行前端 UI、组件、样式的调整/改进/界面 Bug 修复时优先使用这个 skill。中后台/管理端 design 默认使用内置珍珠玻璃组件库（152 个 Vue 组件 + 七层令牌样式，来自 scaffold-master，字节级还原基线守卫，附组件目录索引可一键查用；全部组件的用法示例内置在后台路由 /gallery 内，按「父分类 + 子组件分类」两级菜单导航 10 个父分类 / 101 个单一概念子分组，品类广度对齐 Arco Design Vue），选组件前先查 references/component-catalog.md。它会生成有创意、打磨精细的代码，并避免出现千篇一律的 AI 模板化审美。触发词：前端设计、页面设计、UI 设计、组件设计、界面样式、前端审美、网页设计、设计风格、组件库、珍珠玻璃、后台管理界面、中后台、管理端、组件目录、组件索引、找组件、组件示例、字体加载失败、字体乱码、tofu、@fontsource、字体子集、文字显示不全。
 license: Complete terms in LICENSE.txt
 metadata:
   version: "2.2.0"
@@ -15,6 +15,29 @@ metadata:
 本 skill 内置一套完整的**珍珠玻璃组件库**（`component-library/`），来源：[scaffold-master](https://github.com/wbr664393425-lgtm/scaffold-master) `scaffold-vue`，上游冻结 commit `577079e9a347555fadddd3865fc0bbcdb00d9fb4`，MIT License（GSAP 为其自有许可，不在 MIT 内）。
 
 **路由规则**：当用户要求 design 的页面属于**中后台 / 管理端 / 数据面板 / 系统管理类**（列表页、表单、工作台、看板、权限矩阵、日志监控等），**默认走本组件库**，从库中选组件组装页面，不从零手写样式；用户明确要求其它风格或非中后台场景（营销页、着陆页、移动端 H5 等）时，走下方通用审美工作流。
+
+**路由优先级**：用户明确说“design 组件库”时，优先于前面的页面类别路由，直接使用本 skill 内置库；未使用该术语时，才按中后台 / 管理端等场景判断默认组件库。
+
+**术语默认指代**：用户说“design 组件库”“design组件库”“design 的珍珠玻璃组件库”“我们的珍珠玻璃组件库”，或要求“按 design 组件库调整前端”时，默认且直接指本 skill 自带的 `component-library/` 珍珠玻璃组件库；不再把这类说法当作未指定组件库，也不转而猜测其它设计系统。应先查本 skill 的 `references/component-catalog.md`，再从内置组件中选型并按组件库规则实现。只有用户明确指定另一套组件库时，才改用其指定对象。
+
+### 组件库路径与缺失恢复
+
+1. **路径以 skill 根目录为准**：先定位当前实际加载的 `SKILL.md`，其所在目录就是 `frontend-design` 的根目录；`component-library/`、`references/`、`scripts/` 等路径均相对该根目录解析，不相对目标项目的工作目录。目标项目不需要自带 `component-library/`；按组件库调整现有前端时，把组件库当作设计与实现参考，结合目标项目的技术栈适配。
+2. **按明确标记检查资产**：先检查已加载 skill 根目录下的 `component-library/README.md` 与 `references/component-catalog.md`。任一缺失或安装副本明显不完整时，再检查规范源 `D:/谷歌云盘/luode-skills/frontend-design` 的相同文件；不要只在目标项目里搜索 `component-library/`。
+3. **区分 WSL 盘符不可达与资源不存在**：若 WSL 无法读取 `D:` 对应的 `/mnt/d`，或出现挂载 / `fstab` 错误，先按 `wsl-windows-bridge` 检查盘符挂载和可访问路径；空搜索结果、挂载失败或退出码为 0 均不能证明组件库不存在。可读取已安装副本时，先核对其中的目录索引；仍不可读则报告受阻的准确根路径和访问错误。
+4. **缺失结论与用户求助条件**：只有在已加载 skill 根目录和规范源都可访问、且上述标记文件均不存在时，才报告组件库资产缺失。完成这两处检查前，不要求用户提供目录或链接。
+5. **运行命令与分发完整性**：文中的相对命令都从实际包含相应资产的 skill 根目录执行；例如运行组件库要进入该根目录下的 `component-library/`，而不是目标项目中同名目录。常规页面适配只需查目录索引和参考实现，不必启动组件库服务；只有需要直接查看组件库时才运行预览。同步 / 安装本 skill 时，必须一并带上 `component-library/`、`scripts/` 与被引用的 `references/` 资产；排除本地缓存、`node_modules/`、`dist/` 和 `.git/`，不得只分发 `SKILL.md`。
+
+### design+组件库：组件落地与页面重设计同时完成
+
+使用“design 组件库”时，默认进入 **design+ 模式**。完成目标不是把原有按钮、表格、卡片逐个替换成珍珠玻璃组件，而是用组件库的视觉语言重新审视页面结构，让组件选型和页面设计形成一个闭环。
+
+- **先锁定业务边界**：确认页面目的、用户主任务、数据 / API / 权限 / 状态契约；除非用户另有要求，不改查询、接口、权限和业务逻辑。
+- **再做页面设计诊断**：检查信息层级、主次路径、页面骨架、分区组合、内容密度、留白、栅格与响应式断点，以及空态、加载态、错误态、禁用态；明确当前布局的问题和新的设计目标。
+- **组件选型必须服务于布局**：按目录选取组件并重新组织页面主次关系。允许重排分区、合并或拆分视觉区域、调整列数和间距、引入 `workspace/` 版式组件、重做页面级样式，但不能只换组件却保留与珍珠玻璃语言冲突的旧布局、旧间距和旧装饰。
+- **统一设计表达**：页面改造继续遵守组件库的 tokens、材质类、七层样式顺序和动效入口；页面级重设计不能重新散落硬编码颜色、圆角、阴影或另一套组件外观。
+- **默认做一轮页面级重排审视，不为形式强行大改**：如果现有骨架已经服务于主任务，可以保留，但交付时必须说明判断依据；如果信息层级或操作路径明显有问题，应在接入组件的同时完成有边界的布局优化。
+- **交付必须留下设计决策摘要**：至少说明页面目标与视觉方向、调整前后的信息层级 / 布局变化、组件映射、响应式与关键状态处理，以及保持不变的业务边界。若用户明确要求“只换组件”“只修组件问题”或“不要改布局”，按用户边界执行并跳过页面重排。
 
 ### 组件库结构（七层样式 + 六类组件目录）
 
@@ -37,9 +60,8 @@ metadata:
 **选组件前先查 `references/component-catalog.md`**：它由 `scripts/build_component_catalog.mjs` 从组件源码自动生成（含全部组件的引入路径、必填 props、类型字面量、默认值、事件、插槽、导出类型、用法骨架与参考实现位置），是"组件名 → 怎么用"的唯一速查入口；机器可读版本为 `references/component-catalog.json`。
 
 - 查组件：在 `component-catalog.md` 的「速查表」按名称 / 分类 / 物理目录 / 必填 props 定位，再读同文件的「组件契约」取完整 props 与用法骨架。
-- 语义分类：分类真相源在 `component-library/src/data/component-categories.ts`（对齐 Arco 组件菜单，两级结构：10 个父分类 → 101 个单一概念子分组（不使用「A与B」复合命名），声明数据分放 `component-categories.basic.ts` / `.data.ts` / `.extended.ts`，组装文件只做派生索引）。示例页侧栏导航、菜单种子与目录索引的「分类」列都由它驱动；新增/删除组件必须同步对应分域文件，收口前跑 `node frontend-design/scripts/check_component_categories.mjs`（必须 `CATEGORIES: PASS`：每个磁盘组件恰好归入一个子分组一次，无遗漏无幽灵，父分类数不低于 8、子分组不为空、子分组键唯一、图标名均已注册；守卫直接 import 分类模块，不重解析源文件结构）。
-- 人工核对全部组件真实渲染：登录后台后进入「组件库」分组（`/gallery/<父分类键>/<子分组键>`，101 个子分组各一条路由；父分类是不可点的目录节点，面包屑对不可路由层级只渲染文本），逐卡显示组件名、变体标签、仓库内路径与挂载状态；一个组件多组示例，props 与插槽样本由 `src/views/gallery/demo-*.ts` 与 `demo-variants.curated-*.ts` 提供，派生样本由 `scripts/build_demo_variants.mjs` 从组件契约生成。示例卡片内容超出时走限高滚动而不是裁切，窄窗口不丢样式。示例页本身也是后台页面，使用真实壳层与真实路由，不再有独立 html 入口。
-- 示例可用性收口：`node frontend-design/scripts/check_demo_variants.mjs` → 必须 `DEMO_VARIANTS: PASS`（每个组件含基础示例 ≥3 组，单一可覆盖维度的契约组件降档到 1 组并逐个点名；每组示例必须与同组件其它示例有可见差异，只在打开态才可见的差异不得计为重复，须在浏览器点开实测或登记为不可见候选）。
+- 语义分类：分类真相源在 `component-library/src/data/component-categories.ts`（对齐 Arco 组件菜单：通用 / 布局 / 导航 / 数据输入 / 数据展示 / 反馈 / 图表 / 业务组件 / 工作台版式 / 外壳与系统，共 10 类）。示例页侧栏导航与目录索引的「分类」列都由它驱动；新增/删除组件必须同步该表，收口前跑 `node frontend-design/scripts/check_component_categories.mjs`（必须 `CATEGORIES: PASS`：每个磁盘组件恰好归类一次，无遗漏无幽灵，分类数不低于 8；守卫直接 import 分类模块，不重解析源文件结构）。
+- 人工核对全部组件真实渲染：登录后台后进入「组件库」分组（`/gallery/<分类键>`，10 个分类各一条路由），逐卡显示组件名、仓库内路径与挂载状态；必填 props 与插槽样本由 `src/views/gallery/demo-*.ts` 提供。示例页本身也是后台页面，使用真实壳层与真实路由，不再有独立 html 入口。
 - 契约变化后重跑：`node scripts/build_component_catalog.mjs`（生成）/ `--check`（校验索引与磁盘是否同步，签名含分类，分类漂移即 STALE）。
 
 
@@ -64,16 +86,6 @@ metadata:
   - `node frontend-design/scripts/check_component_categories.mjs` → 必须 `CATEGORIES: PASS`（分类真相源 `component-categories.ts` 与磁盘 `.vue` 双向对账：覆盖、唯一、无幽灵、分类数≥8；直接 import 生产模块，不重解析源文件，源文件结构漂移即判失败）
   - `node frontend-design/scripts/build_component_catalog.mjs --check` → 必须 `CATALOG: PASS`（组件契约与目录索引同步，签名含分类，分类漂移即 STALE）
   - `node frontend-design/scripts/check_admin_component_coverage.mjs` → 必须 `ADMIN_COVERAGE: PASS`（后台组件覆盖率：以 `src/views/**` + `src/App.vue` + `src/router/**` 为入口做真实 import/模板引用闭包，152 个组件必须全部可达；只 import 不渲染不计入，防止一行批量导入刷满覆盖率；`import.meta.glob` 按实际匹配集计入，变异自测已验证收窄 glob 会真实掉覆盖率）
-  - `node frontend-design/scripts/check_shadow_clipping.mjs` → 必须 `SHADOW_CLIP: PASS`（投影留白守卫：从源码解析全部非内阴影层的四向延展（`left = blur/2 + spread − ox` 等，`var()` 当场展开），与外壳 `.stage`、示例卡 `.g-cell-body`、登录页 `.login` 三个容器的四向留白逐维比对；留白不足会被 `overflow: clip` 的裁切边切成方形暗块。卡内预算排除 `pages.css`/`layout.css`（页面级与外壳级投影各有承接方）。判据全部由源码推导不写死数字，内置阳性对照：把三个落点（`.stage`、`.g-cell-body`、`.login`）的留白清零后，必须逐落点四向全部报缺（共 12 条），少一条即判守卫自身失效）
-  - `python frontend-design/scripts/check_corner_occlusion.py` → 必须 `CORNER_OCCLUSION: PASS`（边角一致性守卫：先启动本地开发服务，逐页扫描全部菜单页的圆角容器与贴角子元素。判据一「粗描边父级的内弧被直角子元素盖住」——`内弧 = 外弧 − 描边`，子元素该角圆角小于内弧即判遮挡，会让深色描边在角部露出方角缺口；判据二「有背景的圆角父级下，方角子元素外露」——父级自身 `overflow: hidden/clip` 时子元素被裁到圆角内不判。内置两条阳性对照：移除 `.rail` 内弧圆角必须报 `border-occluded`，注入「20px 圆角父级 + 直角有背景子元素」必须报 `corner-mismatch`）
-  - `python frontend-design/scripts/check_help_tip_interaction.py` → 必须 `HELP_TIP: PASS`（图标式气泡帮助交互守卫：先启动本地开发服务，实测悬停浮出、指针移出收起、键盘聚焦、Esc 收起并清除 `aria-describedby`、焦点保持（悬停后聚焦再移开指针，说明必须仍在——用 DOM 真实焦点判断，不用本地标记）、视口四边夹取、长文 260px 宽度上限；浮层沿 `offsetParent` 祖先链检查未被滚动容器裁切）
-  - `python frontend-design/scripts/check_content_padding.py` → 必须 `CONTENT_PADDING: PASS`（内容留白守卫：先启动本地开发服务，逐页扫描全部示例页。候选容器 = 四边有可见边框、带非透明背景，或本身是 `button` / `menuitem` 等交互控件；判据用 Range 取**文本字形矩形**（不是元素盒）与容器边框内沿比对，**左右任一方向 < 4px 即判 FAIL**。三类按语义豁免：无可见边界的纯文字按钮与布局 div（贴自身盒边属流式排版）、圆形容器（字形受弧线约束，如头像）、自身可滚动的容器。表格单元格、泳道、分页按布局语义豁免。路由从 `component-categories` 真相源派生，不手写清单。**必须配阳性对照**：移除 `overrides.css` 中 Panel 的留白规则后应报出 `panel > P` 贴边，移除 `MenuNode.vue` 的 `padding-right` 后应精确报出 1 处 `x-menu-item > .x-menu-label`（`r:0`）——该对照曾因把 `.workspace` 写进排除面而整页失效，排除面必须与被验面严格一致）
-  - `python frontend-design/scripts/check_demo_visibility.py` → 必须 `DEMO_VISIBILITY: PASS`（示例卡可见性守卫：先启动本地开发服务，逐页扫描全部示例页。三条判据——空白卡（内容区可见元素数为 0）、出卡（组件根元素完全落在内容区可视矩形之外，如 `position: fixed` 浮层飘到视口角落）、塌缩（可见宽与高都小于 4px，1px 竖线按线状组件豁免）。定位包装层不参与判定：`absolute/fixed` 且恰好铺满内容区的元素会盖住真正飘出去的浮层。路由从分类真相源派生；内置三项自证——阳性对照（注入视口固定元素必须被出卡判据命中）、示例卡数量下限、空页检测。**必须配阳性对照**：把 `BackTop.vue` 的 `docked` 强制为 `false` 后应精确报出 4 处 `BackTop ... all-outside | BUTTON.x-backtop`；恢复后转 `PASS`）
-  - `python frontend-design/scripts/check_demo_guides.py` → 必须 `DEMO_GUIDES: PASS`（示例文字提示守卫：先启动本地开发服务，逐页扫描全部示例页。四条判据——每张卡头必须有 `.x-help` 触发图标、提示正文必须含「组件说明 + 本格示例」两段、非基础示例不得退回「默认形态」、同一组件内不同变体的提示不得全部相同。说明数据源为 `src/data/component-guides.ts`（152 条，覆盖全部组件；17 个上游冻结文件因源码无头部注释由该文件补齐，不得改冻结文件），本格差异由 `views/gallery/demo-guides.ts` 按该格 props 覆盖项推导。内置示例卡数量下限与空页检测。**必须配阳性对照**：把 `demo-guides.ts` 的差异推导改成恒返回 `BASE_TEXT` 后必须报出大量「非基础示例却写默认形态」；移除 `DemoCell.vue` 的 `<HelpTip>` 后必须报出大量「缺少提示图标」——两者恢复后转 `PASS`）
-  - `python frontend-design/scripts/build_font_overrides.py --check` → 必须 `FONT_OVERRIDES: PASS`（字号整数化派生块同步守卫：从冻结的 `src/styles/*.css` 自动提取全部非整数字号规则的选择器，按 10.5→11 / 11.5→12 / 12.5→13 / 13.5→14 / 14.5→15 映射生成 `overrides.css` 里的受管块，`--check` 只比对不写入。上游升级新增或删除非整数字号规则时，派生块会与冻结源失配并报 FAIL，防止静默漏改。派生块由 `BEGIN/END GENERATED` 标记包裹，禁止手改）
-  - `python frontend-design/scripts/check_demo_health.py` → 必须 `DEMO_HEALTH: PASS`（示例页运行时健康守卫：先启动本地开发服务，逐页扫描全部示例页。九条判据——渲染异常（卡头徽标转 `is-bad`）、框架告警（控制台 error、`[Vue warn]` / `Invalid prop` 类 warning、页面未捕获异常）、坏文本（`NaN` / `undefined` / `Invalid Date` / `[object Object]` / `[object Promise]`）、坏图（`img` 加载完成但 `naturalWidth` 为 0）、零尺寸图标（可见 svg 宽或高 < 2px）、缺可访问名（交互元素既无文本又无 `aria-label` / `title`）、文字裁切（内容超宽且既无省略号也非可滚动容器）、页面横向溢出、低对比文字（文字色与逐层 alpha 合成后的有效背景色对比度 < 1.5，`--theme light` / `--theme dark` 两个主题都要扫，漏改颜色变量会整片命中）。视觉隐藏元素（绝对定位且宽高 ≤1px 或 `clip` 生效）豁免裁切判定；半透明与禁用态元素豁免对比度判定；文字与不透明底之间存在渐变或图片背景时返回 `measurable = false` 不判对比度，因为实际底色取决于色标与图像内容，硬判会把深色盘上的浅字报成缺陷。控制台豁免面集中在 `KNOWN_CONSOLE_ALLOW` 一处定义，每条必须写明根因与解除条件；示例卡数量下限防扫描根不全。`--selftest` 跑阳性对照：注入一张放齐七类违例的坏卡与两条坏控制台消息，逐条断言判据真的会报，并回显注入前后卡数证明扫描根覆盖到被验面。本守卫按 diamond 拆成四个同级文件：`demo_health_env.py`（路由派生、已登录页面装配、页内量测脚本 `PROBE`）、`demo_health_judges.py`（`KNOWN_CONSOLE_ALLOW` 与控制台判据）、`demo_health_selftest.py`（阳性对照注入物与自测流程）、`check_demo_health.py`（入口与全量流程）；改判据只动前三个，改流程只动入口）
-  - `node frontend-design/scripts/build_demo_events.mjs --check` → 必须 `DEMO_EVENTS: PASS`（事件表派生同步守卫：从各组件 `defineEmits` 机械派生「组件 → 声明事件名」表写入 `src/views/gallery/demo-events.generated.ts`，示例层据此把每个声明事件都接上一次可见反馈。`--check` 只比对不写入，组件改了 `emits` 而未重跑生成即报 FAIL。生成物禁止手改）
-  - `python frontend-design/scripts/check_demo_event_wiring.py` → 必须 `EVENT_WIRING: PASS`（示例事件接线守卫：先启动本地开发服务，逐页扫描全部示例页。沿 `__vueParentComponent` 找到卡内与卡名同名的组件实例，读它 vnode 上真实绑定的 `on*` 处理器，与派生事件表对账；组件声明了却没接处理器的事件即判缺口——这类格子上的按钮点了完全没反馈，看起来像坏控件。事件名按 Vue 的 camelize 规则归一（`row-click` 对应 `onRowClick`），直接比原文会把带横线事件全量误报。`update:*` 由样本状态写回负责，不在本判据范围。非手势触发的逐帧/逐秒/指针移动类事件走集中豁免面，且豁免条目必须是事件表里真实存在的事件，防止豁免面腐烂。`--selftest` 跑六条判据阳性对照：未接必报、接上必不报、带横线事件名不误报、`update:*` 不计入、多事件只报漏的那个、豁免面无失效条目。本守卫按 diamond 拆成两个同级文件：`demo_event_wiring_probe.py`（页内量测脚本 `PROBE`、豁免面 `NO_FEEDBACK`、事件名归一与缺口判定、事件表读取）、`check_demo_event_wiring.py`（路由派生、全量流程与裁决）；改判据只动探针层，改流程只动入口）
   - `cd component-library && npm run build` → 必须 vue-tsc 类型检查 + 构建成功
   - `cd component-library && npm run test:unit` → 上游单测必须全绿
 - 上游升级：重新冻结 commit → 运行 `python frontend-design/scripts/verify_fidelity.py --write-baseline` 刷新基线，并同步更新本文件顶部的 commit 号。
@@ -95,25 +107,26 @@ metadata:
 
 - **输入**：候选审美方向列表。
 - **动作**：选一个**大胆且清晰**的方向（极端极简/极繁/复古未来/自然有机/编辑杂志感/粗野主义/装饰艺术等），并说明选它的理由。
+- **design+ 补充**：使用组件库时同步确定页面骨架、信息层级、内容密度和主次操作；组件替换不能代替这一步。
 - **检查点【必确认】**：方向涉及极端风格、大面积留白、非预期布局等激进选择时，先向用户确认审美方向与接受度再进入实现；用户无明确偏好时，给出 2-3 个方向供其选择，不擅自定稿。
 - **输出**：确认后的设计方向一句话陈述（含风格、主色、字体基调）。
 
 ### 第 3 步：实现真实可运行的代码
 
 - **输入**：已确认的设计方向。
-- **动作**：实现 HTML/CSS/JS、React 或 Vue 代码，确保生产级、可用、功能真实成立；按「前端审美指导」打磨字体/颜色/动效/空间/背景细节。
+- **动作**：先落实已确认的页面骨架与信息层级，再实现 HTML/CSS/JS、React 或 Vue 代码，确保生产级、可用、功能真实成立；按「前端审美指导」打磨字体/颜色/动效/空间/背景细节。组件只是实现设计决策，不是设计决策本身。
 - **输出**：可运行代码 + 关键设计决策说明（为什么这个字体/配色/动效）。
 
 ### 第 4 步：自查与打磨
 
 - **输入**：首版实现。
-- **动作**：对照审美立场逐项自查——风格是否统一、细节是否打磨到位、是否落入通用 AI 审美（Inter/Roboto/Arial、白底紫渐变、可预测布局）；复杂度是否与审美愿景匹配。**交互校验**（参考 `references/apple-fluid-design.md` 核心交互校验清单）：按下有无即时反馈、拖拽是否 1:1 跟随、动画是否可打断、是否使用弹簧而非固定时长 transition、手势释放是否移交动量。
+- **动作**：对照审美立场逐项自查——风格是否统一、细节是否打磨到位、信息层级是否清楚、组件替换后是否仍残留与珍珠玻璃冲突的旧布局 / 旧样式、是否落入通用 AI 审美（Inter/Roboto/Arial、白底紫渐变、可预测布局）；复杂度是否与审美愿景匹配。**交互校验**（参考 `references/apple-fluid-design.md` 核心交互校验清单）：按下有无即时反馈、拖拽是否 1:1 跟随、动画是否可打断、是否使用弹簧而非固定时长 transition、手势释放是否移交动量。
 - **输出**：自查清单结果 + 需要微调的细节项。
 
 ### 第 5 步：交付与验收（检查点）
 
 - **输入**：打磨后的实现。
-- **动作**：验证功能可用性（交互/响应式/可访问性），并向用户展示设计决策摘要。
+- **动作**：验证功能可用性（交互/响应式/可访问性），并向用户展示 design+ 设计决策摘要：页面为何这样重排、组件如何支撑主任务、哪些业务边界保持不变。
 - **检查点【必确认】**：交付前向用户确认视觉效果与功能是否符合预期；用户提出修改时回到第 3 步迭代，不擅自扩大改动范围。
 - **输出**：最终交付 + 修改迭代记录。
 
@@ -129,8 +142,8 @@ metadata:
 
 ## 职责边界与引用
 
-- **珍珠玻璃组件库**（中后台默认组件库：152 组件 + 七层令牌样式 + mock 运行时 + 还原度守卫）→ `component-library/`（来源与许可见 `component-library/README.md`；设计规范见 `component-library/DESIGN.md`；守卫脚本在 `scripts/`）
-- **组件目录索引**（152 组件契约与用法速查，按 Arco 语义分类与物理目录双维度导航，选组件的第一入口）→ `references/component-catalog.md` / `references/component-catalog.json`（生成器 `scripts/build_component_catalog.mjs`）
+- **珍珠玻璃组件库**（中后台默认组件库：151 组件 + 七层令牌样式 + mock 运行时 + 还原度守卫）→ `component-library/`（来源与许可见 `component-library/README.md`；设计规范见 `component-library/DESIGN.md`；守卫脚本在 `scripts/`）
+- **组件目录索引**（151 组件契约与用法速查，按 Arco 语义分类与物理目录双维度导航，选组件的第一入口）→ `references/component-catalog.md` / `references/component-catalog.json`（生成器 `scripts/build_component_catalog.mjs`）
 - **组件库示例页**（后台内的组件用法目录，人工核对全部组件真实渲染与挂载状态）→ 后台「组件库」分组，路由 `/gallery/<分类键>`，源码 `component-library/src/views/gallery/`；独立 html 入口已退役，示例统一在真实后台壳层与真实路由内呈现
 - **Apple 流体交互设计**（弹簧物理参数、毛玻璃材质、动效降级、交互校验）→ `references/apple-fluid-design.md`
 - **设计偏好学习**（从历史交互积累用户视觉品味）→ `frontend-ui-visual-rules/references/visual-preference-learning.md`

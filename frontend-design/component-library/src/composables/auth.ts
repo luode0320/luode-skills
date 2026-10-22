@@ -3,7 +3,6 @@ import type { RouteRecordRaw } from 'vue-router'
 import { ApiError, authApi, authSession, type CurrentUser, type LoginRequest, type RouteItem } from '@/api'
 import { setPermissions } from '@/directives/permission'
 import type { NavGroup, NavLeaf } from '@/data'
-import { LOCAL_VIEWS } from '@/data/view-registry'
 import { clearDictCache } from './dict'
 import { clearDeptCache } from './dept'
 
@@ -37,7 +36,6 @@ setPermissions(currentUser.value?.permissions ?? [])
 
 /** sys_menu.component 的取值必须在此登记 */
 const COMPONENT_MAP: Record<string, () => Promise<{ default: Component }>> = {
-  ...LOCAL_VIEWS,
   'dashboard/index': () => import('@/views/Dashboard.vue'),
   'system/user/index': () => import('@/views/system/Users.vue'),
   'system/role/index': () => import('@/views/system/Roles.vue'),

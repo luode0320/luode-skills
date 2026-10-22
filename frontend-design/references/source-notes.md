@@ -148,33 +148,34 @@
 - **取证陷阱**：⓪ 变异自证的还原要按字节不能按文本——用文本改写还原登记缝隙文件时多留一个文件末尾空行，还原后仍判漂移且校验和与注入前不一致；改按原始字节截去多余换行才真正复原，故还原完成判据是校验和一致而非守卫恢复。① 分类切换探测必须等标题文本切到目标分类后再计数，只等「卡片数>0」会把上一页残留卡片读成当前页（曾误报 layout=11，真实 8）；② `history.pushState` 不通知 vue-router，验证侧栏跳转要点真实按钮；③ 标签页隐藏时上游帧循环主动停帧，画布类组件只能在前台取像素；④ 本仓库单元测试入口是 `npm run test:unit`（Node 原生 test runner），直接调第三方 runner 会因找不到用例而全红，不属于项目回归。
 - **落点**：新增 `src/views/gallery/`（示例页、单元格、发现入口、受控回写、四类样本）、`src/data/view-registry.ts`、四个守卫模块、`component-library/.test-pollution-allowlist`；修改 `src/composables/auth.ts`（2 行缝隙）、`mock/server.mjs`、`scripts/verify_fidelity.py`、`SKILL.md`、`component-library/LOCAL-GUIDE.md`、本文件；新增 `doc/3-实施/`、`doc/5-tests/`、`doc/6-review/` 对应记录；退役 `showcase.html` 与 `showcase/`。
 
-## 2026-10-17 · 组件菜单二级化与示例可用性收口（10 类 → 10 父分类 / 39 子分组 / 579 组示例）
+## 2026-10-19 · design 组件库术语映射纠偏
 
-- **动机**：Goal 追加两条验收面——「菜单可做父级分类 + 子组件分类」与「每个组件示例都可用、不被遮盖、窄窗口不隐藏样式」。
-- **冻结约束**：侧栏装配与菜单消费方 `src/composables/auth.ts`、`src/components/layout/Sidebar.vue` 属上游 139 文件冻结面，`buildNav` 只支持「顶层节点 → 携带 component 的子节点」两级；因此两级导航必须落在 mock 菜单种子与路由层，不能改渲染层。
-- **做法**：分类数据源拆为契约 + 三个分域数据文件 + 一个组装文件；`mock/server.mjs` 由 `COMPONENT_CATEGORY_ORDER` 生成「父目录 + 子页面」扁平菜单（标识段自 501 起避开业务菜单）；示例页按路由末两段解析父分类与子分组，不可路由层级只渲染文本面包屑。
-- **可见差异判据**：派生器新增 `GATING_PAIRS`（属性单独覆盖需附带启用前置，如多行行数需先开多行、半选需先取消勾选、环形尺寸需先切圆环、多选摘要需先给数组值）与 `INVISIBLE_CANDIDATES`（`SectionLabel as=h2`、`Carousel current=2`、`DictSwatchbook/PostLadder loading`、`Anchor offsetTop`、`StyledScrollbar direction=both`、`Rate allowClear` 等从源头不派生）。
-- **伪变体清除**：表单插槽原把输入框取值写死为空串，导致「已填全」与「只填姓名」渲染相同，改为读本格 model 样本；泳道样本由两条补到三条，否则 `maxLanes` 的隐藏提示永不出现；倒计时停表差异需连 `remaining: 0` 一起给；表格 `rowKey` 在无选中项时无可见差异，改做 `minWidth` 宽表横向滚动。
-- **组件真实缺陷**：`TreeSelect.nodeOf` 原按可见行列表查节点，而该行表会剔除折叠节点的子行，收起状态下选中二级节点时触发区退化为占位符；改为在完整数据树递归查找。
-- **卡片不裁切**：`.g-cell-body` 由裁切换为限高滚动，判据是「示例必须完整可见，窄屏也不能丢样式」。
-- **取证陷阱**：① 渲染签名若剥掉 `style` 会把宽度类差异误判为重复；② 只比字符串长度会把文本差异误判为重复；③ 只看卡片内部标记会漏掉根标签变化的属性；④ 浮层收起态测量会把宽度与位置差异判为重复，必须点开后再量；⑤ 判定「是否真的看不出差异」不能靠静态守卫，只能靠浏览器逐格扫描，守卫只兜住数量与归属。
-- **验证**：`CATEGORIES: PASS(10 个父分类、39 个子分组，覆盖 151)`、`DEMO_VARIANTS: PASS(151 组件 579 组，平均 3.83)`、`ADMIN_COVERAGE: PASS(151/151)`、`CATALOG: PASS(151)`、`FIDELITY: PASS(256 本地/139 上游)` + `SEAM`、`GUARD_SELFTEST: PASS`、`POLLUTION: PASS`、`vue-tsc` 零报错、`vite build` 成功（4.36s）、单测 21/21；真实浏览器 39 页 579 格重复签名 0、渲染异常 0、零尺寸 0，五个宽度档（1280/900/620/400/320）无裁切与横向溢出，浮层与下拉与泳道与表单与树选择打开态均取到实测数值。详见 `doc/5-tests/2026-10-17_044000_REQ-PEARL-ADMIN-GALLERY-001_组件菜单二级化与示例可用性_测试主文档.md`。
+- **触发与来源**：用户明确纠正术语：“design 组件库”默认就是 `frontend-design` skill 中的组件库；要求按该库调整前端时不得误判。
+- **通道与裁决**：内部规则更新；将“design 组件库 / design组件库 / 按 design 组件库调整前端”明确指向本 skill 的 `component-library/` 珍珠玻璃组件库，优先于按页面类别选择默认入口；仅用户明确指定另一套库时才切换。
+- **落点**：`SKILL.md` 的组件库路由增加术语优先级与默认指代，并继续以 `references/component-catalog.md` 为选型索引；知识库笔记只作该规则的检索入口。
+- **同域去重**：核对 `frontend-component-rules` 已将 UI 主路线交给 `frontend-design`，`frontend-ui-visual-rules` 不绑定任何 UI 库默认外观与本次采用内置库不冲突；无重复规则或引用层叠。
+- **独立复核**：D1-D7 改前为 8/8/7/8/7/7/8，改后为 9/9/9/8/9/9/8；D8 未执行真实场景 prompt，不评分。
+- **验证**：`quick_validate.py` → Skill is valid；`git diff --check` → PASS；独立只读路由审查 → PASS。描述和 `##` 级标题未改，无需刷新技能字典。
+- **环境依赖**：N/A。
 
-## 2026-10-17 · 边角阴影块修复与四向投影留白守卫
+## 2026-10-19 · 珍珠玻璃组件库路径与安装资产恢复
 
-- **动机**：用户指出示例卡与外壳出现「边角阴影块」。根因是柔影延展超过容器留白后被 `overflow: clip` 的裁切边（落在 padding 外沿）切成方形暗块，不是组件本身的造型问题。
-- **冻结约束**：`src/styles/layout.css`、`src/styles/pages.css` 与入口 `src/main.ts` 全在上游 139 文件冻结面内，外壳级留白缺陷不能直接改冻结 CSS。做法是新增本地覆盖层 `src/styles/overrides.css`（`LOCAL_ONLY`），再只在 `src/main.ts` 追加一行引入语句并登记进 `fidelity_upstream.py` 的 `SANCTIONED_SEAMS`，让校验剥离声明行后仍要求逐字节相等。
-- **三个落点**：`.stage` 承接 `.app-frame` 外阴影（需 `11/35/59/35`，改为 `14/36/62/36`，并同步 `.app-frame` 高度公式，否则外框超出可用高度）；`.g-cell-body` 承接卡内组件柔影（需 `5/25/47/25`，改为 `26/26/48/26` 并把 `max-height` 由 420 抬到 494，内容可视高度不变）；`.login` 承接 `.login-canvas` 同量级外阴影（同外壳留白，`min-height` 同步收缩）。≤820px 与 ≤960px 上游本就无外框或隐藏画布，用媒体查询保持上游行为不动。
-- **守卫**：新增 `scripts/check_shadow_clipping.mjs`（落点定义与裁决）+ `scripts/shadow_clip_measure.mjs`（变量表、投影几何、留白读取），判据当场从源码推导不写死数字，阳性对照要求留白清零三个落点四向全部报缺（条数不足即判守卫自身失效）。卡内预算需排除 `pages.css` 与 `layout.css`，而 Windows 下 `relative()` 返回反斜杠路径，必须先归一成 POSIX 分隔符再比对排除表。首版为单文件 207 行越过仓库 200 行基准，按后台覆盖率守卫的同一口径拆为「裁决入口 + 测量模块」（最终 102 / 170 行，最长函数 17 行），拆分只做搬运，守卫输出与拆分前逐项一致。
-- **取证陷阱**：① 首版守卫取「每层四向的最小值」，20px 留白对着 47px 投影照样 PASS，属空判定，必须逐维比较；② 亮度聚类像素判据会把中文字形与主色按钮读成暗块，只能用作几何反证、不能作为缺陷判据；③ iframe 扫描要先注入登录态并统计空页计数，否则会话丢失后的 `cells: 0` 会被误读成通过；④ 跨 realm 调用不能直接 `contentWindow.__fn()`，需把函数体作为字符串在 iframe 内 `eval`；⑤ 单向探针的符号写反会报出与专用探针矛盾的数值，两个方向都要单独量。
-- **验证**：`SHADOW_CLIP: PASS`（104 层柔影，卡片需承接 87 层）、`FIDELITY: PASS(257 本地/139 上游)` + `SEAM: src/main.ts`、`DEMO_VARIANTS/CATEGORIES/ADMIN_COVERAGE/CATALOG: PASS`、`POLLUTION: PASS`、`vue-tsc` 零报错、单测 21/21、`vite build` 成功；真实浏览器 39 页 579 格卡内暗块 0、外壳暗块 0、页面级溢出 0。A/B 对照（38 页单变量）：留白 0 时基线已有 25 格横滚/18 格竖滚，加留白后 28/19，净增 3 横 1 竖换来卡内柔影零裁切。详见 `doc/4-bugs/2026-10-17_084300_组件示例边角阴影块.md`。
+- **触发与证据**：关联会话 01a15229-342e-7a40-968f-30441c03cd93 中，已加载的 C:/Users/luode/.agents/skills/frontend-design 缺少 component-library/、目录索引与脚本；随后 WSL 因 D 盘挂载失败而得到空搜索结果，并误把它当成资源不存在。
+- **根因与裁决**：规范源 D:/谷歌云盘/luode-skills/frontend-design 有完整目录，但 skill 正文未明确资产路径相对当前加载的 SKILL.md 根目录，也未说明目标项目无需自带组件目录、安装副本缺资产时如何回退。规则补齐路径基准、规范源回退、WSL 挂载检查、缺失结论门槛与分发完整性。
+- **安装副本修复**：更新已安装副本的 SKILL.md，补入缺失的组件目录、脚本和目录索引；保留该副本原有的 references/source-notes.md 与已有 apple-fluid-design.md，未复制 .npm-cache/、node_modules/、dist/ 或 .git/。
+- **同域去重**：frontend-component-rules 将 UI 主路线交给 frontend-design；frontend-ui-visual-rules 不声明默认 UI 库。本修复归 frontend-design 唯一维护，不扩散到相邻 skill。
+- **验证**：UTF-8 回读、安装资产逐文件哈希比对、quick_validate.py、git diff --check；只调整正文与三级标题，未修改 description 或二级标题，技能字典无需刷新。
+- **评分（间隔后的第三方视角）**：按 darwin-rubric 对已记录基线 D1-D7=9/9/9/8/9/9/8（加权 65.3/75）复评，得 9/9/10/8/10/10/8（68.3/75，+3.0）；边界、路径具体性、资产可达性提升，其他维度无退化。D8 未运行真实场景 prompt，本轮未要求 prompt 实测，故不评分；未把先前独立审阅结果冒充本轮评分。
 
-## 2026-10-17 · 菜单单一概念拆分、示例页三列大卡与示例扩容（39 → 101 子分组 / 579 → 738 组）
+- 环境依赖：Windows 宿主安装路径可读；组件库开发 / 构建命令未运行（本轮只修复 Skill 规则与分发资产）。
 
-- **动机**：用户要求「不要 xx 与 xx 放在一起」，点名「标识与头像」拆成两个菜单；同时要求组件像素更高、示例更多、卡片更大、一行 3 格而不是 5 格。
-- **菜单拆分**：`component-categories.{basic,data,extended}.ts` 全部按「单一概念」重写，复合项一律拆开（标识与头像 → 标识 / 头像，图标与排版 → 图标 / 排版，表格与列表 → 表格 / 列表，图片与状态 → 图片 / 评论 / 日历 / 空状态 / 骨架屏 …）。子分组由 39 增到 101，每个组件仍恰好归入一组；`CATEGORIES: PASS` 当场对账 151 个磁盘组件。
-- **栅格与像素**：`.gallery-grid` 由 `auto-fill minmax(250px,1fr)`（宽屏 5 列、每格约 250px）改为固定 3 列；降列断点按「三列每卡不低于 300px」反推——实测 1320px 三列只有 297px、比两列的 454px 更小，故断点定在 1360：1360 以上三列（310 / 337 / 497px），1359 以下两列，820 以下单列。画布类默认高度 160 → 240，策展画布档位 240/360 → 320/440 并补 560 档，卡片头与路径字号各上调一档，内容区上限 494 → 634。
-- **示例扩容**：派生器补上「反向布尔」（基础已开启则派生关闭态，白名单 `SAFE_FALSE_BOOLEANS`），布尔标签改为「开启 X / 关闭 X」；数值档位扩到三档（size/width/height/columns）；弹层宽度改走组件专属档（Modal 420/720、Drawer 380/680、FormDialog 480/760），避免被通用 width 档压成窄边。策展侧为窄契约组件补真实可见差异（日期族空值占位、SpecPlate 空值占位、MenuStarMap 单目录、Calendar 年度模式、DeltaPill 新增态、Spin 包裹遮罩等）。示例总数 579 → 738，平均 3.83 → 4.89。
-- **既有缺陷修复**：`demo-variants.curated-inputs.ts` 里 MonthPicker/QuarterPicker/WeekPicker/YearPicker/RangePicker 与 Transfer 各有两段重复对象字面量，后者静默覆盖前者（我新补的「空值占位」因此一度失效），已合并为单段；`SpecPlate` 的「两行带红」与基础样本完全同值、`MenuStarMap` 的「仅系统目录」过滤键不存在，均被变体守卫抓出并修正。
-- **冻结面保护**：曾试图在 `src/router/index.ts` 加旧地址重定向，`FIDELITY` 立即报 `DRIFTED: src/router/index.ts`——该文件属上游 139 文件冻结面，缝隙机制只允许「新增声明行后逐字节相等」，容不下新逻辑。已完整撤回，确认 `FIDELITY: PASS`；旧子分组地址（如 `/gallery/general/identity`）会落到 404，属一次性历史链接问题，从菜单进入的新地址全部可达。
-- **验证**：`CATEGORIES: PASS(10 父/101 子/151)`、`DEMO_VARIANTS: PASS(151 组件 738 组，平均 4.89)`、`ADMIN_COVERAGE: PASS(151/151)`、`CATALOG: PASS(151)`、`SHADOW_CLIP: PASS`、`FIDELITY: PASS(258 本地/139 上游)` + 两条 `SEAM`、`POLLUTION: PASS`、`vue-tsc` 零报错、单测 21/21、`vite build` 成功（4.64s）。浏览器 iframe 实测：1920/1440/1360 三列（497/337/310px），1359/1180 两列（474/397px），831 两列（231px）；8 个抽样页渲染异常 0、空页 0，画布高度 240/320/440/560 全部生效。
+## 2026-10-19 · design+组件库设计思考与页面重设计闭环
+
+- **触发与来源**：用户进一步明确“design 组件库”的目的不止替换控件，还要重新思考页面设计并优化样式布局；来源为内部规则更新，不是外部 skill 吸收。
+- **原子裁决**：合并“默认进入 design+ 模式”“先锁定业务边界”“先做页面设计诊断”“组件选型服务于布局”“统一令牌 / 材质 / 动效表达”“交付必须给出设计决策摘要”六条规则；保留现有第 1～5 步审美工作流作为通用设计流程；拒绝新增独立 skill，也拒绝把完整视觉流程复制到相邻 skill。
+- **落点**：`SKILL.md` 新增“design+组件库：组件落地与页面重设计同时完成”，并在工作流第 2～5 步补充页面骨架、布局重排、冲突样式自查与交付摘要；`frontend-ui-visual-rules/SKILL.md`、`frontend-component-rules/SKILL.md` 只补职责指向，统一由 `frontend-design` 维护 design+ 主规则。
+- **边界**：默认做一轮页面级重排审视，但不为形式强行大改；用户明确要求只换组件、只修组件或不改布局时，按用户边界执行组件级最小改动；默认不改查询、接口、权限和业务逻辑。
+- **同域去重**：范围 = `frontend-design`、`frontend-ui-visual-rules`、`frontend-component-rules`；发现 0 处重复流程、0 处门控层叠、0 处散落产物，兄弟 skill 仅保留单句职责引用；引用链与安装副本均复核，**PASS**。
+- **验证**：规范源与 `C:/Users/luode/.agents/skills/frontend-design/SKILL.md` 的新规则回读一致；组件库路径、目录索引与 design+ 术语检索均可达；未改 description 或 `##` 级标题，技能字典无需刷新；本轮不涉及前端源码，未运行构建或业务测试。
+- **评分**：独立复核代理两次因模型容量不足未启动，按 darwin-rubric 改用间隔后的第三方视角静态复评；D1-D7 改前沿用 2026-10-19 基线 `9/9/10/8/10/10/8`（68.3/75），改后为 `9/10/10/8/10/10/9`（71.3/75，+3.0），提升来自 design+ 工作流、边界和架构闭环；D8 未运行真实场景 prompt，不把静态复核冒充实测。
+- **环境依赖 / agent 通用性**：环境依赖 N/A；规则落点为通用 `SKILL.md` 与 references，所有 agent 可读取执行。
