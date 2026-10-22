@@ -1,6 +1,6 @@
 ---
 name: authenticated-url-routing-rules
-description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile，以复用登录态、扩展、权限和已打开标签页；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP、`browser-session-automation-rules` 或高级验证 Skill；只有任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码等 Cloud 专属能力，或用户明确点名 Browser Use Cloud 时，才让位给 `browser-use-cloud-rules`，且不得跳过密钥、费用和安全闸门。
+description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。TAPD URL 是专用例外：必须先按 `tapd-cli` → `tapd-openapi` 的顺序尝试 CLI 与 API，只有 API 无法满足页面专属需求或用户明确要求直接操作页面时才进入浏览器路由；网页读取失败或浏览器已有登录态不能单独触发浏览器回退。其他页面默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP、`browser-session-automation-rules` 或高级验证 Skill；只有任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码等 Cloud 专属能力，或用户明确点名 Browser Use Cloud 时，才让位给 `browser-use-cloud-rules`，且不得跳过密钥、费用和安全闸门。
 ---
 
 # 认证 URL 路由规则
@@ -9,11 +9,11 @@ description: 当用户提供任意 URL、链接或网页地址，并要求打开
 
 当用户给出 URL 时，先选对浏览器通道，再分析页面内容。
 
-本 skill 只负责 URL 访问通道决策：默认让 agent 复用用户真实 Chrome 登录态，避免内部文档、企业系统、微信文档、飞书、语雀、Notion、Confluence、TAPD、GitHub 私有页面等链接因隔离浏览器或 `web` 抓取而丢失权限。
+本 skill 只负责 URL 访问通道决策：普通内部页面默认让 agent 复用用户真实 Chrome 登录态，避免企业系统、微信文档、飞书、语雀、Notion、Confluence、GitHub 私有页面等链接因隔离浏览器或 `web` 抓取而丢失权限。TAPD 链接由专用 API-first 例外接管，必须先走 `tapd-cli` 与 `tapd-openapi`。
 
 ## 默认路由
 
-0. 例外让路：URL 属于 `tapd.cn` 域名（如 `https://www.tapd.cn/tapd_fe/...`）时，优先让位给 `tapd-openapi` skill 走 TAPD OpenAPI 读取实体数据（含其环境预检与 Token 未配置阻断）；仅当 API 无法覆盖（需要页面截图、富文本渲染确认、人工登录操作）或 TAPD env 阻断后用户仍要求直接看页面时，才回到本 skill 的浏览器路由。
+0. 最高优先级例外：URL 属于 `tapd.cn` 域名（如 `https://www.tapd.cn/tapd_fe/...`）时，先让 `tapd-openapi` 按 `tapd-cli` → 直接 OpenAPI 的顺序处理；仅当 CLI 与 API 都无法满足页面专属需求，或用户明确要求直接操作页面时，才回到本 skill 的浏览器路由。TAPD 凭据缺失或鉴权失败不构成自动打开浏览器的理由；网页抓取失败、浏览器已有登录态或页面已打开也不能跳过 CLI/API。
 1. 只要用户消息中包含 URL 或明显的网页链接，就先触发本 skill。
 2. 先做一次前置分流：URL 指向本地调试系统（`localhost` / `127.0.0.1` / local 配置声明的调试域名）时，不进入 Chrome Plugin 默认路由，直接按「非 profile 页面路由」用内置浏览器通道打开；其登录凭据由调试侧提供，可自行注入。
 3. 其余 URL 优先加载并执行 `chrome:control-chrome`，通过 Chrome Plugin 接管用户已登录的真实 Chrome profile。

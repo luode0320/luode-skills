@@ -1,28 +1,34 @@
 # 项目当前状态
 
-## 2026-10-19 规则吸收与全量提交收口（已收口）
+## 2026-10-22 索引漂移识别与全量提交收口（Git 收口）
 
-- 结论: 工作树 110 项改动按业务目标拆成 9 笔提交并推送，全部落盘完成；本轮同时把 8 类新经验吸收进 `PROJECT_MEMORY.md` 稳定规则节。
-- 提交分组: 组件库与示例守卫体系（355 文件 / 152 组件 / 运行守卫 / Arco 真相源 / 需求-Bug-测试-6review 与截图证据）、生图并发与媒体内联展示、计划可行性探针 `FEAS-*`、浏览器路由登录判据、测试污染 P4 豁免通道、任务投影单条容错、C 盘清理实测坑、扩展种子（豆包视频 / rea）、规则入口与残留自查维度校验。
-- 关键决策: ① 组件库与它的守卫脚本、Arco 真相源、文档证据属同一业务目标，合并为一笔，不按 docs/test 二次拆分；② 根 `.npm-cache` 是 npm 日志残留，删除而非提交；子目录 `.gitignore` 已覆盖 `node_modules`/`dist`/`.npm-cache`，不在根重复登记；③ 字典生成器写 `generated_at`，确定性校验需先剥离时间戳；④ `git diff --cached --check` 对行尾空格与 EOF 空行是阻断项，必须在提交前修净。
-- 验证: `task_plan_projection_test.py` 87 项 OK；`scan_test_pollution_test.py` 正负用例通过；`scan_test_pollution.py --diff-only` → `POLLUTION: PASS`；Python 三个脚本 `py_compile` 0 错误；9 笔提交 pre/post gate 全部 PASS。
-- 状态: 已提交并推送，工作树已清空。
+- 当前状态: 工作树已按业务拆成 8 笔提交并推送 `origin/main`；本轮新增的索引漂移判据已写入 `git-collaboration-rules/references/staged-review-and-evidence.md`「索引漂移前置核对」。
+- 本轮交付: ① 索引被整体回退到 `3a9aa97e`（2026-10-15）的识别与恢复（392 条假删除 → 真实变更 106 项）；② Markdown 文档规则与 PPTX 外部种子；③ 生图配置统一目录；④ TAPD CLI 优先路由；⑤ 任务投影单会话唯一；⑥ design 组件库定位与 design+ 口径；⑦ `.system` 内置 skill 同步；⑧ 规则、记忆、字典与历史收口。
+- 关键决策: ① 批量「已暂存删除」先按三重判据识别索引漂移，禁止直接提交（会静默吞掉期间提交）；② 恢复只用混合 `git reset`，禁止 `checkout`/`restore`/`rm`；③ pptx 外部种子用 `.gitattributes` 的 `pptx/** -whitespace` 保留上游字节；④ 组件数按 `CATEGORIES`/`CATALOG` 守卫实测校正为 152。
+- 验证: git 规则 12 项、任务投影 87 项测试全绿；`POLLUTION: PASS`；每笔提交 pre/post gate 均 PASS；全量 476 项测试中 6 错 2 失败为 HEAD 基线同样存在的存量问题（本机 `~/.workbuddy` Python 软链失效、空 `skills/` 目录遮蔽、CRLF 存量）。
 
-## 2026-10-19 imagegen 并发生图默认化（已收口）
+## 2026-10-16 珍珠玻璃组件库后台化：后台承载全部组件示例（Goal 收口）
 
-- 结论: 多张不同图默认走 CLI `generate-batch` 并发；内置通道同轮并列调用实测仍排队串行，不能当并发用。
-- 实测（单 Key，api.luode.vip）: 3 张串行 78.3s → 并发 3 路 33.1s（约 2.4×）；5 张并发 5 路 36.5s；均无 429，11 张产物尺寸一致且 sha256 互不相同。
-- 改动: `imagegen/SKILL.md` 判定思路 #2/#3、工作流 4.1、新增「并发批量通道」章节、多 Key 并发池补默认并发/失败隔离/串行开关；`skill-dictionary` 重生成；知识库新增 `imagegen并发生图默认化与内置通道串行实测` 并挂 MOC；`PROJECT_CURRENT` 压缩旧已完成条目以容纳投影。
-- 证据: `quick_validate.py imagegen` → Skill is valid!；`knowledge_index.py check` → 368 笔记、0 违规、0 死链、0 未挂载。
-- 状态: 已提交。
+- 当前状态: 151 个组件 **全部在管理后台可达并在后台内提供可操作示例**（覆盖率守卫 151/151），独立 `showcase.html` 入口已可逆退役、示例收敛为单轨。工作树未提交（无当轮 Git 授权）。
+- 本轮交付: 新增 `src/views/gallery/`（示例页 + 单元格 + 磁盘发现入口 + 受控回写 + 四类样本）、`src/data/view-registry.ts`（本地页面登记处）、覆盖率守卫四模块（裁决入口 / 可达图访问器 / 引用边遍历 / 源码解析口径）；`mock/server.mjs` 改为直接 import 分类单一数据源生成 10 条组件库菜单；`src/composables/auth.ts` 开入 2 行声明式登记缝隙。
+- 关键决策: ① 覆盖率不能靠改上游页面提高——139 个上游文件（含业务视图、路由、登记表）逐字节冻结且无冻结文件 import 本地模块，故新增本地后台路由页 + 单一登记缝隙；② 缝隙不按整文件豁免，改为「剥离声明行后必须等于上游字节」，缝隙外改动仍报 DRIFTED；③ 覆盖率判据要求「导入的本地名真被使用」，只 import 不渲染不计入，防批量导入刷满；④ 退役入口用临时目录搬移而非删除（本仓库配置 Git content filters，`git ls-files` 不能当还原兜底）。
+- 行数基准返工: 首版守卫 250/270 行、可达图工厂函数 157 行越基准，已拆为 90/167/107/115 与 151/181 行、最大函数 23 行；示例样本 666 行单文件无损拆为四类；三个样本文件写出为 CRLF 已按组件库 `eol=lf` 策略归一。
+- 验证: `ADMIN_COVERAGE: PASS(151/151)`、`CATEGORIES: PASS(10 类 151)`、`CATALOG: PASS(151)`、`FIDELITY: PASS(244 本地/139 上游)` + `SEAM`、`GUARD_SELFTEST: PASS`、`INVENTORY: PASS`、`COMPONENT_PARITY: PASS`、`PARITY: PASS(74)`、`POLLUTION: PASS`、`vue-tsc` 零报错、`vite build` 成功、单测 21/21；真实浏览器十分类挂载 11/8/16/33/31/12/6/20/8/6=151、空白卡片 0、渲染错误 0，输入回写 / 开关翻转 / 弹层开合 / 提示与确认宿主均真实状态迁移。证据见 `doc/5-tests/2026-10-16_193800_REQ-PEARL-ADMIN-GALLERY-001_组件库后台化_测试主文档.md` 与 `doc/6-review/2026-10-16_202200_珍珠玻璃组件库后台化_6-review.md`。
+- 守卫变异自证: 收窄示例页发现面 → `FAIL(75/151)`；给登记缝隙文件追加未声明行 → `FIDELITY: FAIL drifted=1`；两者还原后恢复 PASS 且文件校验和回到注入前。
+- 已知缺口: `ui/DataTable.vue` 无列排序（上游冻结 + 多页消费，需以需求立项）；上游 `motion.ts` 的 `revealPage` 无引用（冻结层，转评估）；画布类组件视觉只能前台取证（上游隐藏标签页停帧属预期）。
 
-## 2026-10-16 至 2026-10-18 组件库三期收口（合并摘要）
+## 2026-10-16 珍珠玻璃组件库：Arco 语义分类导航 + 补齐 4 个组件 + 核对页可操作化（Goal 收口）
 
-- 示例全量遍历: 101 页 749 卡逐组件排查，修 11 处真实缺陷；系统性根因是示例层只按样本已有键回写 `update:*`、不消费组件其余声明事件（341 条可点事件无人接收）。新增 `build_demo_events.mjs` 从 `defineEmits` 派生事件表，`check_demo_health.py`（九判据双主题）与 `check_demo_event_wiring.py`（vnode 子树对账）均带阳性对照。口径: 弹层走 Teleport，接线判定必须遍历 vnode 而非 DOM；事件名按 camelize 归一；GSAP 空目标属上游冻结面缺陷，只登记不改。
-- 文字清晰度: 噪点层需建层叠上下文才能压到正文之下（只降 `z-index` 无效）；`@font-face` 用 `local()` 解锁可变字重轴；非整数字号 9.13%→0.46%，派生块由 `build_font_overrides.py --check` 守卫。
-- 示例可用性: 逐格提示（`component-guides.ts` + `check_demo_guides.py`）、出卡修复（`BackTop` 按视口 `fixed` 飘出 + `TabPane`/`Divider` 撑高 + `DemoFrame` 外框 + `check_demo_visibility.py`）、文字贴边（`MenuNode` 缺 `padding-right`，判据用文本字形矩形、阈值 4px + `check_content_padding.py`）。
-- 更早: Panel 的 `.panel-body` 死样式由 `overrides.css` 补 20px；`启动组件库.bat` 必须纯 ASCII；HelpTip 组件数 151→152；边角内弧 28 = 38 − 10；10 父分类 / 101 子分组三列大卡；柔影被 `overflow: clip` 切块由 `check_shadow_clipping.mjs` 守卫；Arco 品类 101 covered / 30 merged / gap 0。
-- 状态: 全部已收口，文档见 `doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、`doc/6-review/` 对应日期条目。
+- 当前状态: 组件库 **151 个组件 / extend 82 个**，Arco 组件粒度对齐 **covered:101 merged:30 gap:0**，74 品类全覆盖；核对页 151/151 挂载、0 渲染异常。工作树未提交（无当轮 Git 授权）。
+- 本轮交付: 新增 `src/data/component-categories.ts`（10 类 Arco 语义分类单一数据源，替代 7 个物理目录桶）、`extend/{InputPassword,Descriptions,Form,Textarea}.vue` 四个独立一等组件、`showcase/use-live-props.ts`（受控回写，使核对页组件可真实操作）、`scripts/check_component_categories.mjs`（分类闭合守卫，import 真实模块不手抄）。
+- 关键决策: ① `Textarea` 推翻早前「只是 TextInput multiline 转封装」结论——实测上游无自动高度与字数统计，且 `ui/` 属冻结层不可加开关，故落 extend 层；② `Form` 由 merged 翻转为 covered——9 个真实调用点重复同一段「errors ref + validate + 空判断」编排，用作用域插槽收口而非改冻结的 `ui/Field.vue`；③ 其余 merged（Table 列、Typography、Skeleton、Select 选项等）经逐项代码自证确为配置/插槽驱动，拆分即套壳，维持不动。
+- 验证: `CATEGORIES: PASS(151)`、`CATALOG: PASS(151)`、`COMPONENT_PARITY: PASS`、`PARITY: PASS(74)`、`INVENTORY: PASS`、`FIDELITY: PASS(244 本地/139 上游)`、`GUARD_SELFTEST: PASS`、`POLLUTION: PASS`、单测 21/21、`vue-tsc + vite build` 成功；交互逐项浏览器实测见 `doc/5-tests/2026-10-16_珍珠玻璃Arco分类与核对页可操作化_测试主文档.md`。
+- 已知缺口（P3 登记）: `ui/DataTable.vue` 无列排序（上游冻结 + 9 页消费，需以需求立项评估）；`COMPONENT_PARITY` 的 kind 不校验能力完备性，高价值项断言待下沉为可执行用例。
+
+## 2026-10-15 珍珠玻璃组件库 Arco 对齐（已收口，详情见指针）
+
+- 结论: 品类对齐补齐 57 个（69→126）、组件粒度对齐补齐 21 个（126→147）、核对页 6 类渲染缺陷修复、组件目录索引与工作台版式层落地；上游 `src/` 零手改，全部守卫当时均 PASS。
+- 指针: 来源与决策 `frontend-design/references/source-notes.md`（2026-10-15 四条）；完整事件 `PROJECT_HISTORY.md`（2026-10-15 三条）。本条为压缩后的历史摘要，原详情正文已移除（信息在上述两处完整留存，非唯一事实）。
 
 ## 最近 5 个同项目会话
 
@@ -40,7 +46,7 @@
 {
   "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-18T16:21:03.727437Z",
+  "registry_updated_at": "2026-10-19T08:24:46.240109Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -534,79 +540,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/14ae4ca08a5c704e4ab08956d25f2ac0636c786613e7843874ef5ed17635db1d",
-      "session_id": "01a12eac-6a20-7992-a19a-9a77e4446acc",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "2026-10-12-DETAILED-STEPS-ALL-MODES",
-      "source_document": "PROJECT_CURRENT.md",
-      "plan_fingerprint": "2cc39698f557addb4ae0127366377b7cc8d8b6b8a0207841496d9f13c72005e2",
-      "updated_at": "2026-10-12T10:30:30.741432Z",
-      "steps": [
-        {
-          "id": "TASK-01",
-          "step": "[TASK-01] 核对官方宿主资料、用户目标与现行投影约束",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-02",
-          "step": "[TASK-02] 确立 Goal、普通会话和 Plan Mode 默认展示细步骤",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-03",
-          "step": "[TASK-03] 明确 UI 工具缺失或同步失败不阻断领域执行",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-04",
-          "step": "[TASK-04] 扩展 Goal 十步基线并支持任务专属细项",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-05",
-          "step": "[TASK-05] 将旧三步 Goal 安全迁移并保留状态",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-06",
-          "step": "[TASK-06] 更新投影校验、指纹和兼容契约",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-07",
-          "step": "[TASK-07] 同步跨 Skill、仓库规则与宿主提示",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-08",
-          "step": "[TASK-08] 更新 Skill 吸收记录、项目记忆和知识笔记",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-09",
-          "step": "[TASK-09] 运行 82 项投影回归及 Skill 结构校验",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-10",
-          "step": "[TASK-10] 完成 6-review 与工程文档机器校验",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-11",
-          "step": "[TASK-11] 核对知识索引、记忆锚点和数字口径",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-12",
-          "step": "[TASK-12] 完成差异、临时产物与原生 UI 证据收口",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/a94296b288abe7fa6ef931b7ffc0d371a9e5f868061e178d2b069f3e6501fbfa",
       "session_id": "01a12eac-6a20-7992-a19a-9a77e4446acc",
       "projection_origin": "persisted",
@@ -718,77 +651,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/d8906877ce09579ac5f934922bbccee4fbc083459c2e7637bfc0b4962f9f19ba",
-      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SESSION/WINDOWS-CRASH-CLEANUP-20261014",
-      "source_document": "PROJECT_CURRENT.md",
-      "plan_fingerprint": "a6efdcbf5383db94d555b48ac859178468651ed92585c659e82ee94da422f872",
-      "updated_at": "2026-10-14T03:46:37.418406Z",
-      "steps": [
-        {
-          "id": "CLEANUP-01",
-          "step": "核对 wsl-crashes 目录现状与可写范围",
-          "status": "completed"
-        },
-        {
-          "id": "CLEANUP-02",
-          "step": "确认清理对象仅限已确认的目录内文件",
-          "status": "completed"
-        },
-        {
-          "id": "CLEANUP-03",
-          "step": "执行精确删除并处理可观测的拒绝",
-          "status": "completed"
-        },
-        {
-          "id": "CLEANUP-04",
-          "step": "回读目录状态与可读取的 C 盘空间信息",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/325708c6c81d652e3aef7cb100c81cc3e7690c378a02fbb52169b0a7d7de1d73",
-      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SESSION/TRAE-INSTALLER-CLEANUP-20261014",
-      "source_document": "PROJECT_CURRENT.md",
-      "plan_fingerprint": "2d00745aea42a07594ee9667bc6b4a9083436db6fc93bc638bc95e51ab0a64b7",
-      "updated_at": "2026-10-14T04:15:29.529712Z",
-      "steps": [
-        {
-          "id": "TRAE-01",
-          "step": "只读核对指定 TRAE 安装包现状、属性和 C 盘空间",
-          "status": "completed"
-        },
-        {
-          "id": "TRAE-02",
-          "step": "对指定安装包执行一次不带 -Force 的精确删除；若被拒绝则停止",
-          "status": "completed"
-        },
-        {
-          "id": "TRAE-03",
-          "step": "回读确认文件是否存在及 C 盘可用空间变化",
-          "status": "completed"
-        },
-        {
-          "id": "TRAE-04",
-          "step": "修正策略拒绝后用户明确重新授权时的清理 Skill 边界",
-          "status": "completed"
-        },
-        {
-          "id": "TRAE-05",
-          "step": "登记吸收记录、验证规则并完成审计与状态收口",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/efe1e5328d41eb9419e907714a7ebe9b13b7122d0033757afbdbbf1229f57fde",
       "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
       "projection_origin": "persisted",
@@ -860,44 +722,6 @@
         {
           "id": "TASK-DCV-06",
           "step": "[TASK-DCV-06] 执行 skill 资产合规收口检查并输出结论",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/b917b5ad4526c9121344b11bf8b51698d4703e942ec4b0f65e8753f6d6829ea1",
-      "session_id": "dc19480f-1d2a-41aa-b0df-2c3a7080f4f2",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SHOWCASE/SIDEBAR-NAV-001",
-      "source_document": "frontend-design/component-library/showcase/Showcase.vue",
-      "plan_fingerprint": "907d3796469af68167509b4fbc502f9670650c5baa851259aff8db1a0b84e6b1",
-      "updated_at": "2026-10-15T17:36:10.635054Z",
-      "steps": [
-        {
-          "id": "SS-01",
-          "step": "[SS-01] 侦察 Showcase.vue 分组结构与 DemoCell 渲染链，定侧边栏接入点与锚点方案",
-          "status": "completed"
-        },
-        {
-          "id": "SS-02",
-          "step": "[SS-02] 新增本地侧边栏组件，按分组生成锚点项并复用珍珠玻璃令牌样式",
-          "status": "completed"
-        },
-        {
-          "id": "SS-03",
-          "step": "[SS-03] 接入核对页为左侧栏 + 内容区布局，点击锚点滚动到分组并高亮当前分组",
-          "status": "completed"
-        },
-        {
-          "id": "SS-04",
-          "step": "[SS-04] 浏览器验证分组跳转、高亮跟随、亮暗主题侧边栏样式与 147 组件仍全挂载",
-          "status": "completed"
-        },
-        {
-          "id": "SS-05",
-          "step": "[SS-05] 回归组件守卫并同步 LOCAL-GUIDE 说明，清理临时产物",
           "status": "completed"
         }
       ]
@@ -999,246 +823,72 @@
       ]
     },
     {
-      "projection_id": "SESSION/62cfe95631f27178fd15548616583344277751cf1b848175aaf5f41b3f2d3ec9",
-      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "GOAL/PEARL-CORNER-TRANSPARENT-EDGE",
-      "source_document": "doc/4-bugs/2026-10-17_114500_组件边角透明边缘.md",
-      "plan_fingerprint": "a1d3eb1f7c07cf5f828fce7bc1384b7f30bda8c6d29957840dd2429dc2a218c6",
-      "updated_at": "2026-10-17T12:31:24.810690Z",
+      "projection_id": "SESSION/4244d98e0f4d0b58160b24c1adfabc3cbdb97bf70dd08c0676a7252e5d86db1c",
+      "session_id": "01a152d6-b10f-7430-9b9b-e2fac9e55687",
+      "projection_origin": "synthesized",
+      "synthesis_mode": "fallback",
+      "state": "active",
+      "plan_key": "SYNTH-FALLBACK/20261019T070940780Z-SESSION-UNIQUE",
+      "source_document": "",
+      "plan_fingerprint": "81e570f9175a081317d5f66247b9ae95b4945a9e10362b0c37ed08d198a11f39",
+      "updated_at": "2026-10-19T07:09:40.783Z",
       "steps": [
         {
           "id": "TASK-01",
-          "step": "复现并定位截图里 AppShell 左上角透明边角的根因",
+          "step": "核实链接会话的投影错误、文件超限与命令引用根因",
           "status": "completed"
         },
         {
           "id": "TASK-02",
-          "step": "建立可重复的组件边角缺陷扫描守卫",
+          "step": "改造任务投影写入与读取规则，使每个 session_id 只保留当前任务",
           "status": "completed"
         },
         {
           "id": "TASK-03",
-          "step": "全量扫描 151 个组件的所有示例格并归集同类边角缺陷",
+          "step": "同步 Owner Skill、契约、宿主规则、项目记忆与知识决策",
           "status": "completed"
         },
         {
           "id": "TASK-04",
-          "step": "修复截图中 AppShell 的边角问题",
+          "step": "运行专项回归并记录全量测试结果与验证限制",
           "status": "completed"
         },
         {
           "id": "TASK-05",
-          "step": "修复全量扫描出的其余同类边角问题",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-06",
-          "step": "复跑守卫与真实浏览器全量实测确认无回归",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-07",
-          "step": "执行 6-review 风格回归并落盘文档",
-          "status": "completed"
+          "step": "完成最终 Skill 合规、差异审查并处理收口限制",
+          "status": "in_progress"
         }
       ]
     },
     {
-      "projection_id": "SESSION/f1087bcf0839039612a9e6907364fae0eed8549ad705765bb79ca0989a8d40b7",
-      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
+      "projection_id": "SESSION/44b12ee99b0e0853d33587cc47b6e533431a189e21fc3d980d25decc276219da",
+      "session_id": "01a15230-a27f-7630-b018-ade5a31b6361",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
       "state": "inactive",
-      "plan_key": "REQ-HELP-TIP-001",
-      "source_document": "doc/2-需求/2026-10-17_133000_图标式气泡帮助组件.md",
-      "plan_fingerprint": "f95d4d556203d35aa4c5c4fa6f03cefb804c9e74c014340ef93a4f28fabe1881",
-      "updated_at": "2026-10-17T14:40:00Z",
+      "plan_key": "PEARL-GLASS-LIBRARY-DISCOVERY-20261019",
+      "source_document": "frontend-design/SKILL.md",
+      "plan_fingerprint": "4e58a93bd1305ff54d33e8c29e59a7a2204aa527b168dfc1e7ba516089545ae2",
+      "updated_at": "2026-10-19T08:24:46.240109Z",
       "steps": [
         {
-          "id": "TASK-01",
-          "step": "侦察组件库现有 Tooltip、HoverCard、Popconfirm 与图标类组件，确认图标式帮助是否缺失",
+          "id": "RULE-01",
+          "step": "[RULE-01] 读取用户指向的会话，摘录“目录不存在”的触发语境和目标项目",
           "status": "completed"
         },
         {
-          "id": "TASK-02",
-          "step": "确定 HelpTip 组件的落点目录、分类归属与 props/emits 契约",
+          "id": "RULE-02",
+          "step": "[RULE-02] 核对 frontend-design 的组件目录结构和使用规则，定位目录误判原因",
           "status": "completed"
         },
         {
-          "id": "TASK-03",
-          "step": "落盘图标式气泡帮助组件的需求主文档",
+          "id": "RULE-03",
+          "step": "[RULE-03] 更新权威 skill 中的组件库定位、目录确认和跨项目使用规则",
           "status": "completed"
         },
         {
-          "id": "TASK-04",
-          "step": "实现图标按钮加悬停气泡说明的 HelpTip 组件",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-05",
-          "step": "补齐示例变体并同步分类真相源与目录索引",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-06",
-          "step": "跑分类、示例、覆盖率、冻结与污染守卫",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-07",
-          "step": "跑 vue-tsc 类型检查、单测与构建",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-08",
-          "step": "真实浏览器实测图标悬停气泡与键盘可访问性",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-09",
-          "step": "执行 6-review 风格回归并落盘记录",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-10",
-          "step": "更新项目记忆、知识库判断与清理临时产物",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/2795253a25b73753d421794cc8a1cb61fedf4ef843e54ae43c53c4b9d055b9a8",
-      "session_id": "3ee7e245-3d6a-4fed-b1b3-c065d4f63c54",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "REQ-PEARL-LAUNCH-BAT-001",
-      "source_document": "frontend-design/component-library/package.json",
-      "plan_fingerprint": "dca48b8330371a9a0e997320fb9361fbcfcbd03c845667558a6dea211117f6bd",
-      "updated_at": "2026-10-17T15:00:00Z",
-      "steps": [
-        {
-          "id": "TASK-01",
-          "step": "[TASK-01] 侦察组件库启动链路与仓库脚本约定，确定 bat 落点、命名与内容",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-02",
-          "step": "[TASK-02] 新增组件库一键启动 bat 脚本并处理依赖缺失与错误停留",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-03",
-          "step": "[TASK-03] 在 LOCAL-GUIDE 补启动说明与纯 ASCII 约束（README 属冻结面不改）",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-04",
-          "step": "[TASK-04] 真实运行 bat 验证：服务可访问、关闭后端口释放",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-05",
-          "step": "[TASK-05] 执行 6-review 风格回归并落盘记录",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/30bc64e7630f323cd33fdca80992a985a97ac9d4733d096390c9307bbfd99493",
-      "session_id": "76113f53-a6d8-4916-ac36-87ad0378a3fd",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "GOAL/GALLERY-FULL-SWEEP-20261018",
-      "source_document": "doc/4-bugs/2026-10-18_组件示例全量遍历排查.md",
-      "plan_fingerprint": "baf357acd728c8cd00d4dae8aef3c697e081c7197edbdd5795be10d1ce8b8b9b",
-      "updated_at": "2026-10-18T11:57:38.591091Z",
-      "steps": [
-        {
-          "id": "SWEEP-01",
-          "step": "跑齐既有守卫建立基线，确认已知缺陷面已覆盖，避免重复劳动",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-02",
-          "step": "建全量遍历通道：101 个示例页逐页采集控制台错误、挂载异常、溢出与裁切",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-03",
-          "step": "逐组件核对示例行为：交互控件点击/悬停/聚焦是否真的响应",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-04",
-          "step": "归集发现项，区分真 Bug 与预期行为，按影响面排序",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-05",
-          "step": "在冻结面约束内修复真 Bug（overrides.css / extend / gallery 层）",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-06",
-          "step": "每项修复配真实浏览器复现前后对照与守卫回归",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-07",
-          "step": "把可复发判据沉成新守卫并登记进 SKILL.md 与 LOCAL-GUIDE.md",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-08",
-          "step": "落盘 Bug 主文档与 6-review，跑类型检查、单测与构建",
-          "status": "completed"
-        },
-        {
-          "id": "SWEEP-09",
-          "step": "更新项目记忆并清理临时脚本、探针与后台服务",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/fba2b7d8488a92beea96e6d7ef7d4072e5f4708088d2237bc453c6cb83fb7503",
-      "session_id": "25bdf94c-2655-4a88-94f2-d15f4ad7b8cf",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SKILL-IMAGEGEN-CONCURRENCY",
-      "source_document": "imagegen/SKILL.md",
-      "plan_fingerprint": "03b6081c19665bc56fd52ee12c481b4b6b6062c9fb32a48ba6e0ee687f846e69",
-      "updated_at": "2026-10-18T16:21:03.727098Z",
-      "steps": [
-        {
-          "id": "TASK-CONC-01",
-          "step": "[TASK-CONC-01] 核对 imagegen 批量并发生图实现与 CLI 参数语义",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-CONC-02",
-          "step": "[TASK-CONC-02] 用 3 个不同 prompt 实测并发生图与串行基线对比耗时和产物",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-CONC-03",
-          "step": "[TASK-CONC-03] 记录单 Key 下的限流表现与失败重试行为",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-CONC-04",
-          "step": "[TASK-CONC-04] 按实测结论更新 imagegen 技能规则为默认可并发多图",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-CONC-05",
-          "step": "[TASK-CONC-05] 复核规则文案、展示产物并清理临时文件",
+          "id": "RULE-04",
+          "step": "[RULE-04] 回读改动并完成 Skill 合规与规则关联检查，报告验证证据",
           "status": "completed"
         }
       ]

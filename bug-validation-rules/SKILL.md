@@ -86,3 +86,9 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 - 输出 Bug 验证结论前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先写修复是否有效和是否可放行，命令、样本和证据进入附录。
 - 若验证依赖浏览器、第三方接口或授权环境，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，区分可继续、受限交接和正式放行。
 - 只有关闭必需验证无法继续且无替代验证，或修复问题必须回改时，必须读取 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`；受限交接和普通待补测不适用。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

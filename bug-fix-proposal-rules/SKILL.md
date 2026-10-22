@@ -124,3 +124,9 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 - 若修复方案涉及审查、验收、浏览器或第三方条件，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
 
 - Bug 修复风险分级与确认：`references/fix-risk-grading-and-confirmation.md`
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

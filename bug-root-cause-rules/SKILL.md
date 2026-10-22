@@ -79,3 +79,9 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 - 只有在判断是否该停止静态分析时，再读 `references/when-to-stop-static-analysis.md`。
 - 回写根因记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先解释已知结论和用户影响，调用链、日志、文件位置和证据进入附录。
 - 若根因判断依赖第三方响应或专项环境，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

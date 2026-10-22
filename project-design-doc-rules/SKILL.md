@@ -79,3 +79,9 @@ description: 当用户要求分析整个项目、梳理项目架构/模块/目�
 - 只有在需要生成或重写 `项目设计.md` 时，再读 `references/design-template.md`。
 - 输出 `项目设计.md` 前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先说明项目目标、范围和关键变化，技术栈、目录树和证据进入附录。
 - 涉及项目设计审查或专项验收时，同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

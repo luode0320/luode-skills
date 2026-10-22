@@ -73,6 +73,12 @@
 - 来源：用户指令（2026-09-16、2026-09-17、2026-09-29）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`、`references/story-bug-task-workflow.md`、`references/cli-field-pitfalls.md` §九 / §十、`references/source-notes.md` 第十批）+ `tapd-openapi` + `tapd-addcomment` + 知识库《TAPD创建实体创建人身份规范》。
 - 更新时间：2026-09-29。
 
+## TAPD 工具路由优先级（2026-10-19 固化）
+
+- 稳定决策：TAPD 查询与操作默认先使用 `tapd-cli`，单条查询与批量操作均适用；CLI 不支持或不能满足请求时，回退到 `tapd-openapi` 的直接 API 能力；只有 CLI 与 API 都无法提供页面专属能力时才使用浏览器。网页读取失败、浏览器已登录或标签页已打开，均不能单独作为跳过 CLI/API 的理由；凭据缺失或鉴权失败按 TAPD 环境规则阻断，不得静默绕过。
+- 来源：用户指令（2026-10-19）+ `tapd-cli/SKILL.md`、`tapd-openapi/SKILL.md`、`authenticated-url-routing-rules/SKILL.md`。
+- 更新时间：2026-10-19。
+
 ## 待裁定事项建议、选项与默认最安全兜底闭环规则（2026-09-16 固化）
 
 - 稳定决策：**严禁只抛问题不给建议（强制铁律）**——无论是工程执行任务收口、周期/阶段边界、任务中断点，还是独立结论区，凡总结中列出“需用户裁定的事 / 待决策项 / 阻断决策”，绝对禁止只提问题、只陈述矛盾或当传声筒；Agent 作为具备专业判断力的工作搭档，必须体现主见（带着答案回来，而不是带着问题回来）。
@@ -118,6 +124,21 @@
 - 更新时间：2026-10-01。
 
 
+## 代码项目提交前编译闸门（2026-10-22 固化）
+
+- 稳定决策：**代码项目提交 git 前必须最基本编译通过**——仓库根命中 `go.mod`、`Cargo.toml`、`tsconfig.json`、定义了 `build` 脚本的 `package.json`、`pyproject.toml`、`setup.py` 任一标记即为代码项目，提交前必须真实执行对应编译入口并取得退出码 0。
+- 稳定决策：**工具链缺失与超时一律阻断**——命令不存在、node 无法执行、需要联网取包、超过 `COMPILE_GATE_TIMEOUT`（默认 600 秒）都阻断提交，不得静默判成「非代码项目」跳过；TypeScript 只认本地已安装的 `tsc`，禁止 `npx` 联网拉取 registry 上的同名无关包。
+- 稳定决策：**编译通过不等于功能可用**——编译只算最低门槛，功能、接口、页面验证仍由测试类 skill 负责，不得用「能编译」宣称「已验证可用」。
+- 来源：用户指令（2026-10-22「如果是代码的项目，提交git之前要保证最基本的编译通过才可以提交git」）+ `git-collaboration-rules/SKILL.md` 的「1.0 代码项目最基本编译闸门」+ `git-collaboration-rules/references/baseline-compile-gate.md` + `git-collaboration-rules/scripts/pre_commit_gate.sh` 第 6 步 + `AGENTS.md` / `CLAUDE.md`「代码项目提交前编译闸门」章节。
+- 更新时间：2026-10-22。
+
+## 提交前索引漂移识别（2026-10-22 固化）
+
+- 稳定决策：**批量「已暂存删除」先当索引漂移处理，不当用户删除**——判断三条：`D` 条目路径仍在磁盘、内容与 `HEAD:<path>` 一致或仅差 CRLF/LF、`git write-tree` 等于某个历史提交的树。任一命中即证明索引被整体回退，直接提交会静默吞掉期间所有提交的改动。
+- 稳定决策：**恢复只用混合重置**——`git reset` 只回写索引、不动工作树；禁止对这类条目用 `git checkout`、`git restore` 或 `rm`，否则会把磁盘上完好的文件真的删掉。
+- 来源：2026-10-22 本轮实测（索引树等于 `3a9aa97e`，392 条假删除中 365 条与 HEAD 完全一致，混合重置后真实变更收敛为 106 项）+ `git-collaboration-rules/references/staged-review-and-evidence.md`「索引漂移前置核对」。
+- 更新时间：2026-10-22。
+
 ## 反打补丁与架构优先原则（2026-10-05 固化）
 
 - 稳定决策：**核心红线：严禁为少改代码打补丁破坏架构**——改动、改 Bug、改需求严禁用打补丁的方式实现；明显的为了不改动太多 / 控制 diff 行数 / 避开动旧逻辑而选择打补丁（如在外围堆砌特判 flag、搞新老双轨分流兼容、套壳胶水绕道、下游 try-catch 吞异常或坏数据兜底）是绝对不可取的，会严重破坏代码可读性与既有架构设计。
@@ -149,17 +170,12 @@
 - 来源：用户指令（2026-10-05）+ `imagegen/SKILL.md` 核心规则与工作流第 5/6/7 步 + `imagegen/references/prompting.md`「生成后符合度自检」节。
 - 更新时间：2026-10-05。
 
-## 可行性假设与浏览器登录判据（2026-10-19 固化）
+## 生图配置统一目录（2026-10-19 固化）
 
-- 稳定决策：**「读代码推断成立」不等于已验证**——正式计划放行前必须把「不成立就要改路线」的方向级假设登记为 `FEAS-*` 并给出探针级别；落点存在性、依赖可用性、配置与接口契约属 L1 只读，运行时行为、真实返回、超时并发与端到端链路必须用 L2 隔离真实探针，只有只读证据时不得宣称已验证。方向级假设未验证时降级为受限计划并登记 `GAP-*`，任务级未验证假设写进对应任务的执行期第一动作。
-- 稳定决策：**L2 探针是正式验证手段而非越界**——它必须守住 local 环境、临时资源、临时代码、可回滚、无外部副作用、执行后清理并回读；探针只取证，不把 spike 转成交付物。
-- 稳定决策：**「页面需要登录」不是回退 Chrome Plugin 的理由**——回退判据是「必须复用用户真实 profile 中已经存在的认证态」；本地调试系统（`localhost` / `127.0.0.1` / local 配置声明的调试域名）的凭据由调试侧提供、可自行注入，应继续用内置浏览器通道完成登录。真实账号会话、SSO、企业内部系统、第三方托管文档才回退真实 profile。该口径必须同时覆盖认证 URL 路由、MCP 工具优先级矩阵、会话自动化、功能验证与测试策略，任一文档口径不一致即视为规则漂移。
-- 稳定决策：**多张不同图默认并发，内置通道不能当并发用**——内置生图同轮并列调用实测仍排队串行，数量 ≥ 2 且内容不同时走 CLI `generate-batch`（默认 5 路、上限 25、单 job 失败不中断、需要可复现顺序才用 `--concurrency 1`）；单 Key 下并发同样有效，只是共享同一条限流额度。
-- 稳定决策：**媒体产物必须展示而非只给路径**——本轮真实产出图片或视频时，回复必须包含可渲染媒体本体（宿主原生媒体工具 > `data:` URI > 宿主本地资源协议），禁止只用 `file:///`、盘符路径或普通链接冒充已展示；落盘与展示是两项独立交付。
-- 稳定决策：**豁免通道必须对同类结论一视同仁**——符号类结论与「仅测试可达分支（P4）」共用同一豁免键格式 `<相对路径>::<符号名>`，P4 的键照抄扫描报告打印的代码文本；只给一类结论开豁免会让冻结的第三方源码长期报红。
-- 稳定决策：**单条坏投影只隔离自身**——registry 按条目容错，单条损坏或身份重复只退出该计划的 UI 恢复，其余会话照常恢复；只有托管标记、JSON 或隔离记录整体损坏才退出全部 UI 恢复，且这类退出不取消与损坏计划无关的领域工作授权。
-- 稳定决策：**Windows 清理的度量必须按结构解析而非文本匹配**——robocopy 摘要按行序号取字节数（中文系统按「字节:」文本匹配会全盘误报 0GB）；stderr 红字不等于失败，判成功看 `Removed N files`；整目录删 Temp 会连带删掉 CLI 自身输出文件，必须逐项循环；临时 `.ps1` 一律纯 ASCII。仓库 `.gitattributes` 对 `*.bat` / `*.cmd` 强制 CRLF（cmd.exe 按字节偏移解析）。
-- 来源：用户指令（2026-10-19）+ `implementation-planning-rules/references/plan-feasibility-probe.md`、`mcp-installation-rules/references/tool-priority.md`、`imagegen/SKILL.md`、`reasoning-summary-structure-rules/SKILL.md`、`test-strategy-rules/references/production-test-pollution.md`、`task-plan-rehydration-rules/SKILL.md`、`windows-c-drive-cleanup/SKILL.md`。
+- 稳定决策：**生图配置唯一目录为 `~/.imagegen/`**，主配置固定 `~/.imagegen/config.json`，覆盖 `base_url`、`model`、`model_priority`、`api_key`、`api_keys` 全部字段；不再新增或回退 `~/.ai-hive/` 等其它配置目录。
+- 稳定决策：**两条 CLI 通道共用同一份配置**，`imagegen.py init` 写入时合并保留既有 `api_keys`、`model`、`model_priority`，不得用整文件覆盖冲掉多 Key 池。
+- 稳定决策：仅运行时覆盖可走环境变量（`IMAGEGEN_*`、`AI_HIVE_API_KEY`、`PROJECT_IMAGE_*`）；需要长期保存的配置一律写回统一目录。
+- 来源：用户指令（2026-10-19）+ `imagegen/SKILL.md`「统一配置目录」+ `imagegen/scripts/imagegen.py`。
 - 更新时间：2026-10-19。
 
 ## 记忆文件超长主动整理规则
@@ -219,7 +235,7 @@
 ## Codex Desktop 任务投影断点恢复规则
 
 - 稳定决策：`task-plan-rehydration-rules` 是 `PROJECT_CURRENT.md` 任务投影托管区的唯一 Owner，独占 v4 registry schema、计划指纹、敏感字段拒绝、51,200 字节闸门、同目录排他锁、原子写入、失活和 `update_plan` payload。
-- 稳定决策：正式实施周期文档仍是真实计划源；Goal、普通会话和 Plan Mode 默认展示足够细、可独立执行与验证的步骤，不压成“开始、执行、完成”，不制造无意义微步骤；长清单可滚动查看。任务投影只保存任务 ID、悬浮文案和 `pending/in_progress/completed` 状态，不设任意小数量上限，托管区整体 UTF-8 大小仍限制为 51,200 字节。`PROJECT_CURRENT.md` 托管区使用 v4 `projections[]` 注册表，按受控原始 `session_id` 隔离多个会话；Goal 默认细化清单为不含 Goal 原文的十项安全流程，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
+- 稳定决策：正式实施周期文档仍是真实计划源；Goal、普通会话和 Plan Mode 默认展示足够细、可独立执行与验证的步骤，不压成“开始、执行、完成”，不制造无意义微步骤；长清单可滚动查看。任务投影只保存任务 ID、悬浮文案和 `pending/in_progress/completed` 状态，不设任意小数量上限，托管区整体 UTF-8 大小仍限制为 51,200 字节。`PROJECT_CURRENT.md` 托管区使用 v5 `projections[]` 注册表，可并存多个会话，但每个 `session_id` 仅有一条当前任务投影；同会话新任务按当前请求在 `.PROJECT_CURRENT.md.lock` 内替换旧项并保留其它会话。兼容历史同会话多项时只按唯一最大 `updated_at` 归并，最大时间并列则隔离该会话。Goal 默认细化清单为不含 Goal 原文的十项安全流程，允许 `blocked` 仅观察状态，但不保存 prompt、响应、凭据、Goal ID、业务数据或原始用户输入。
 - 稳定决策：原始宿主会话 / 线程标识只允许保存于投影条目的 `session_id` 字段，其它位置仍拒绝 `thread_id` 等敏感字段；所有会改变投影或 Goal 状态的写入 API 与 CLI 都必须显式提供 `session_id`，不得静默写入伪造的 legacy 会话。
 - 稳定决策：任务状态迁移固定先按 `session_id` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；Goal 与普通执行模式优先同步细粒度任务投影，Plan Mode 默认以原生计划流程展示细化步骤，当前会话提供 `update_plan` 时允许同步；Desktop 重开或上下文恢复后的首次继续回合先按当前会话精确校验活动投影并重建 UI，进行中步骤必须先核验中断点。
 - 稳定决策：默认执行回合取得 `confirmed` 后，任何任务首次领域动作前都必须为当前 `session_id` 持久化 `active` 或 `blocked` projection；持久化成功后的下一动作必须立即调用 `update_plan`，两者之间禁止领域写操作。投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断；仅 UI 同步通道不可用（磁盘投影已成功且归属明确）时降级继续：保留 projection + 继续领域执行 + 下一检查点重试 UI，不得声称 UI 已恢复。`inactive` 不创建悬浮任务列表。
@@ -713,6 +729,25 @@ entities:
     usage_days: 1
     last_used_at: 2026-10-01
     absorbed_to: null
+  - entity_id: rule.tapd-cli-first-tool-routing
+    name: "TAPD CLI 优先与浏览器末级回退"
+    type: "TAPD工具路由规则"
+    aliases:
+      - TAPD CLI优先
+      - TAPD浏览器回退
+      - TAPD工具优先级
+    definition: "所有 TAPD 查询与操作先尝试 tapd-cli；CLI 不支持或不能满足请求时回退到 tapd-openapi 直接 API；只有 CLI 与 API 均无法覆盖页面专属需求时才使用浏览器。网页读取失败、浏览器已有登录态或标签页已打开不构成跳过 CLI/API 的理由；凭据缺失或鉴权失败不得静默绕过。"
+    scope: "TAPD URL、需求/缺陷/任务/评论等查询与操作的 CLI/API/浏览器选择"
+    status: "active"
+    evidence_ids:
+      - evidence.tapd-cli-first-routing
+    context_ids:
+      - context.tapd-tool-routing
+    updated_at: 2026-10-19
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - entity_id: rule.knowledge-iterative-governance
     name: "知识库可迭代更新与分级处置"
     type: "知识库治理规则"
@@ -876,9 +911,9 @@ entities:
     context_ids:
       - context.skill-governance
     updated_at: 2026-07-25
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-19
     absorbed_to: null
   - entity_id: rule.apifox-test-separate-db
     name: "Apifox 测试分离库规则（config.apifox.yaml）"
@@ -958,6 +993,26 @@ entities:
     context_ids:
       - context.imagegen-maintenance
     updated_at: 2026-10-05
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - entity_id: rule.imagegen-unified-config-dir
+    name: "生图配置统一目录"
+    type: "Skill 维护规则"
+    aliases:
+      - 统一生图配置
+      - .imagegen 配置目录
+      - imagegen config.json
+      - imagegen init 写入位置
+    definition: "生图配置唯一目录固定为 ~/.imagegen/，主配置为 ~/.imagegen/config.json，统一承载 base_url、model、model_priority、api_key 与 api_keys；不再使用或回退 ~/.ai-hive/ 等其它目录。imagegen.py 的读取与 init 写入均指向该文件，init 覆盖写入时必须合并保留既有 api_keys、model、model_priority。环境变量与 --api-key 仅作运行时覆盖，长期配置一律写回统一目录。"
+    scope: "imagegen 全部 CLI 通道的配置读取、init 写入与文档口径"
+    status: "active"
+    evidence_ids:
+      - evidence.skill.imagegen
+    context_ids:
+      - context.imagegen-maintenance
+    updated_at: 2026-10-19
     usage_count: 0
     usage_days: 0
     last_used_at: null
@@ -1058,9 +1113,9 @@ entities:
     context_ids:
       - context.local-project-browser-debug
     updated_at: 2026-10-15
-    usage_count: 1
-    usage_days: 1
-    last_used_at: 2026-10-15
+    usage_count: 2
+    usage_days: 2
+    last_used_at: 2026-10-19
     absorbed_to: null
   - entity_id: rule.reasoning-summary-detail
     name: "结果与结论适中详细度契约"
@@ -1119,9 +1174,9 @@ entities:
     context_ids:
       - context.document-handoff
     updated_at: 2026-07-13
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-19
     absorbed_to: null
   - entity_id: term.doc-top-level-mixed-naming
     name: "doc 顶层混合命名"
@@ -1176,9 +1231,9 @@ entities:
     context_ids:
       - context.implementation-flow
     updated_at: 2026-08-01
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-19
     absorbed_to: null
   - entity_id: rule.implementation-sequence-master-plan
     name: "需求与实施计划全量顺序实施方案"
@@ -1606,9 +1661,9 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-10-01
-    usage_count: 2
-    usage_days: 2
-    last_used_at: 2026-10-19
+    usage_count: 1
+    usage_days: 1
+    last_used_at: 2026-10-01
     absorbed_to: null
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
@@ -1709,7 +1764,7 @@ entities:
       - ensure-timeout
       - ensure-start
       - UI_SYNC_BLOCKED
-    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v4 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；Goal、普通会话和 Plan Mode 默认展示细粒度、可独立执行与验证的步骤，不压成开始/执行/完成；长清单允许滚动查看，步骤数不设任意小上限，托管区总 UTF-8 大小限制为 51,200 字节。Plan Mode 使用原生计划流程，若当前会话提供 update_plan 可同步；Goal 默认使用细化安全流程，正式任务计划优先。显示工具缺失、失败或界面无法确认均不暂停领域任务；投影持久化失败、会话归属冲突/不确定或执行状态不明仍按安全规则阻断。默认执行取得 confirmed 后，任何任务首次领域动作前持久化 projection，成功后立即调用 update_plan。会话解析按显式 --session-id、CODEX_THREAD_ID、WorkBuddy 宿主元数据顺序解析并拒绝冲突；十分钟用于未显示步骤异常补救：活动执行时间严格超过 600 秒且原生清单未确认同步时，首个可执行检查点调用 probe-timeout；缺投影则补建，已有投影但 UI 未同步则读取唯一现有 payload 并重试 update_plan，不创建 Goal、不覆盖投影；工具运行中无后台唤醒能力。"
+    definition: "task-plan-rehydration-rules 独占 PROJECT_CURRENT v5 registry 托管区的 schema、指纹、session_id 归属、排他锁、原子写入、失活和 update_plan payload；每个 session_id 仅保存一条当前任务投影，新任务在共享锁内替换同会话旧项并保留其它会话；历史重复项按唯一最大 updated_at 归并，最新时间并列则隔离该会话。Goal、普通会话和 Plan Mode 默认展示细粒度、可独立执行与验证的步骤，不压成开始/执行/完成；长清单允许滚动查看，步骤数不设任意小上限，托管区总 UTF-8 大小限制为 51,200 字节。Plan Mode 使用原生计划流程，若当前会话提供 update_plan 可同步；Goal 默认使用细化安全流程，正式任务计划优先。显示工具缺失、失败或界面无法确认均不暂停领域任务；投影持久化失败、会话归属冲突/不确定或执行状态不明仍按安全规则阻断。默认执行取得 confirmed 后，任何任务首次领域动作前持久化 projection，成功后立即调用 update_plan。会话解析按显式 --session-id、CODEX_THREAD_ID、WorkBuddy 宿主元数据顺序解析并拒绝冲突；十分钟用于未显示步骤异常补救：活动执行时间严格超过 600 秒且原生清单未确认同步时，首个可执行检查点调用 probe-timeout；缺投影则补建，已有投影但 UI 未同步则读取唯一现有 payload 并重试 update_plan，不创建 Goal、不覆盖投影；工具运行中无后台唤醒能力。"
     scope: "跨宿主（Codex Desktop / WorkBuddy Desktop / 无任务 UI 宿主）Goal、普通会话、Plan Mode 默认步骤展示，默认执行回合、Goal 生命周期、上下文恢复、宿主重开后的首次继续回合和缺失投影十分钟异常修复"
     status: "active"
     evidence_ids:
@@ -1929,6 +1984,11 @@ relations:
       - evidence.skill.task-plan-rehydration
     status: "active"
 evidence:
+  - evidence_id: evidence.tapd-cli-first-routing
+    type: "user-instruction"
+    source: "用户指令（2026-10-19）与 TAPD 路由 skill 更新"
+    path: "PROJECT_MEMORY.md#TAPD-工具路由优先级"
+    note: "确立 TAPD 查询和操作先使用 tapd-cli，CLI 不支持时回退直接 OpenAPI，浏览器仅处理 API 无法覆盖的页面专属需求。"
   - evidence_id: evidence.doc.no-patchwork-architecture-discipline
     type: "skill"
     source: "code-quality-rules/references/no-patchwork-architecture-discipline.md 与 SKILL.md"
@@ -2277,7 +2337,7 @@ evidence:
     type: "skill"
     source: "任务投影断点恢复唯一 Owner 与机器契约"
     path: "task-plan-rehydration-rules/SKILL.md"
-    note: "定义 v4 多会话 registry、首次继续按 session_id 精确触发、十分钟超时升级、状态同步顺序、UI 与执行授权边界、失活和工具不可用语义。"
+    note: "定义 v5 多会话 registry 的每会话唯一当前任务、同会话新任务锁内替换、历史重复项归并或隔离、首次继续按 session_id 精确触发、十分钟超时升级、状态同步顺序、UI 与执行授权边界、失活和工具不可用语义。"
   - evidence_id: evidence.doc.task-plan-rehydration-requirement
     type: "doc"
     source: "Codex Desktop 任务悬浮窗断点恢复需求与实施文档"
@@ -2323,6 +2383,10 @@ evidence:
     path: "code-style-consistency-rules/references/user-style-feedback-library.md"
     note: "用户明确否定在 tempDelistConfig 等配置项上方堆砌 5 行运行机制推演、状态机流转与事故修复要件的写法，确立单行极简目的注释标准。"
 contexts:
+  - context_id: context.tapd-tool-routing
+    type: "routing-policy"
+    name: "TAPD CLI、OpenAPI 与浏览器路由"
+    note: "适用于 TAPD URL、需求/缺陷/任务/评论查询与写操作的通道优先级选择。"
   - context_id: context.test-asset-governance
     type: "repository-convention"
     name: "测试资产双根治理"

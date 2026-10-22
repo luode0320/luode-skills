@@ -79,3 +79,9 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 - 只有在 对照复现正反例或处理未复现结论 时，再读 `references/reproduction-examples.md`。
 - 输出 Bug 复现记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文说明能否复现和对用户的影响，步骤、环境、数据和命令进入执行附录。
 - 若复现依赖浏览器、第三方接口或授权环境，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，按门禁记录适用性和替代验证。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

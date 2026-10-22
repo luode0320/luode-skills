@@ -85,3 +85,9 @@ description: 当开发人员提出“请帮我生成交付文档”“发布文�
 - 只有在 对照样例或判断总结是否足够可交接 时，再读 `references/delivery-examples.md`。
 - 输出交付总结前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先说明交付结果、影响和风险，提交范围、命令和证据进入附录。
 - 涉及交付审查或最终验收时，同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，分别记录可继续、受限交接和正式放行。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

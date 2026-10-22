@@ -787,3 +787,29 @@
 - 当前累计净增：两个目标 SKILL.md 相对 HEAD 合计 +4,620 字节，其中首轮 +3,636、后续规则澄清 +984；不含吸收记录与工作树其他文件差异。
 - 独立评分：改前静态维度 1–7 加权 57.3/75，当前 65.5/75（+8.2）；维度 8 为 N/A（未执行 2–3 个真实 prompt），不计算完整总分。
 - 棘轮验证：只以本次真实单次删除和回读作为执行证据；不追加危险模拟测试。未来会话权限不由本次结果或 Skill 更新保证。
+
+## 2026-10-19：内部吸收——PPTX 视觉表达原则 → markdown-document-authoring-rules
+
+- **来源**：本仓库现有 pptx/SKILL.md 与 pptx/references/zh-CN.md；来源类型为内部 skill 吸收，不涉及外部安装源。
+- **吸收目标**：新建公共呈现 Owner markdown-document-authoring-rules，供需求、Bug、计划、架构、测试、交付和工作报告类 Markdown 消费者引用。
+- **拆解与裁决**：
+
+| 来源原则 | 本地现状 | 裁决 | 落点 / 理由 |
+|---|---|---|---|
+| 按内容选择表达方式 | 领域 skill 各自描述结构，缺少统一呈现路由 | 合并 | markdown-document-authoring-rules/SKILL.md 的图形与表格路由 |
+| 内容层级、结论优先、留白、对齐与对比度 | 分散在 PPTX 或领域文档中 | 合并并改写 | 公共 skill 的 Markdown 呈现基线，去除幻灯片尺寸和字号 |
+| 图表自解释、装饰克制、最终视觉验收 | Markdown 文档没有单一 Owner | 合并 | references/markdown-visual-checklist.md 与公共 skill 通过条件 |
+| 固定页面布局、字号、英寸、每页必须有视觉、OOXML/API | 不适用于 Markdown 渲染器 | 拒绝 | 保持在 PPTX skill，不进入公共 Markdown 规则 |
+| PPTX 图表 API 与模板继承 | 不属于文档写作职责 | 拒绝 | 保留在 PPTX skill，避免跨 Owner |
+
+- **落盘改动**：
+  - 新增 markdown-document-authoring-rules/SKILL.md、agents/openai.yaml、_skillhub_meta.json。
+  - 新增 references/pptx-absorbed-principles.md、references/markdown-visual-checklist.md、references/route-contract.md。
+  - 修改 15 个需求、Bug、计划、架构、测试、交付和工作报告消费者，仅加入公共呈现路由指针，不复制领域语义。
+- **整理去重**：N/A + 公共 Owner 为本地原缺口；未复制 PPTX 物理版式，也未在消费者 skill 内重复写呈现规则；领域语义、Mermaid 类型、路径/编码和交付门禁保持各自单一权威。
+- **同域扫描结论**：范围 = markdown-document-authoring-rules、15 个消费者、pptx、implementation-planning-rules/references/visualization-standard.md、artifact-storage-rules、artifact-delivery-gate-rules；发现 0 处重复呈现段落、0 处门控层叠、0 处散落产物；清理 0 处；引用链收敛为“公共 Markdown Owner + 领域语义 Owner + Mermaid/存储/交付专属 Owner”；**PASS**。
+- **环境依赖登记**：N/A + 理由：纯 Markdown、skill 和 reference 文本，不引入环境变量、hook、安装依赖或业务运行时。
+- **净增体积**：新增公共 skill 与 references 约 29 KB；消费者只新增路由指针；N/A + 理由：本次为补齐缺失的公共 Owner，没有删除既有领域能力。
+- **独立审查**：pptx_rules_audit 子任务对可迁移与不可迁移边界完成只读审查，结论与当前公共 skill 一致；PASS。
+- **验证**：公共 skill quick validation PASS；15 个消费者 quick validation 全部 PASS；计划文档 7 个 profile PASS；Mermaid 14 个图块本地解析 PASS；字典刷新退出码 0；交付和 6-review 证据由本轮收口文档记录。
+- **源清理**：N/A + 理由：来源是仓库内现有 PPTX skill，不存在待删除的外部安装源。

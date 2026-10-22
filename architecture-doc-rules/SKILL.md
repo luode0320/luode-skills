@@ -90,3 +90,9 @@ description: 当需要创建、更新、审查或解释 `doc/1-架构/` 下的�
 - 只有在判断旧文档是否复用、拆分，或业务链路应更新还是新增时，再读 `references/update-policy.md`。
 - 输出架构文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先说明系统对业务的作用和变化，目录树、版本和证据进入附录。
 - 涉及架构审查或专项验收时，同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，明确哪些验证适用、哪些不适用。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

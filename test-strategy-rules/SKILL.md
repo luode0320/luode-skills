@@ -377,3 +377,9 @@ python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only
 - 通道判据：只有"测试对象是 HTTP 接口"的维度才进 apifox；UI / 易用性 / 客户端兼容性 / 游戏体验等维度**不得硬写成接口用例充数**。
 - 用例收口前按**四性**（正确性 / 完整性 / 可执行性 / 一致性）判定，任一不通过不得作为覆盖证据；禁止占位符数据、"正常显示"式不可验证预期、孤儿用例。
 - 维度定义、方法要点、按任务类型裁剪表、四性检查项与游戏领域专项，统一见 `references/test-case-design-methods.md`；本文件只保留上述四条硬约束。
+
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。

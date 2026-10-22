@@ -42,6 +42,12 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 - 需求变化、缺口关闭或路线回退必须保留差异、来源、回滚和关闭证据；不得覆盖历史事实后声称已验证。
 - 图片、Mermaid、结构、稳定 ID、`N/A + 原因 + 证据`、追踪字段和普通语言正文规则不得在根文件重复定义，必须执行其唯一 Owner reference。
 
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+
 ## References
 
 - 需求域路由、单一主文档、共享保护语义和下游移交：`references/requirement-domain-shared-contract.md`

@@ -44,6 +44,12 @@ description: 当已确认或已进入实现的需求被补充、修正、插入�
 - 驳回：直接把新增条件塞进实现、把 Bug/gap/boundary 误判为 change、只更新需求不移交受影响实施/验收，或覆盖已完成旧周期。
 - 变更关闭后必须由对应 Owner 重跑文档机器校验和受影响行为测试；证据不全不得恢复原完成状态。
 
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+
 ## References
 
 - 共享路由与保护语义：`../requirement-intake-rules/references/requirement-domain-shared-contract.md`

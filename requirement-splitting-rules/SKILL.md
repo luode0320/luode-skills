@@ -36,6 +36,12 @@ description: 当需求较大、涉及多个模块、接口、页面、步骤、�
 - 驳回：机械按技术层切块、把小需求过度拆碎、多个独立子系统未先顶层拆分、拆分阶段直接定义实施文件/命令，或创建平行拆分文档。
 - 切片变化必须保留来源、差异、受影响验收/计划和回滚条件；恢复时从已落盘的 `SLICE-*` 状态继续。
 
+## 公共 Markdown 呈现路由
+
+- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
+- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
+- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+
 ## References
 
 - 共享路由与保护语义：`../requirement-intake-rules/references/requirement-domain-shared-contract.md`
