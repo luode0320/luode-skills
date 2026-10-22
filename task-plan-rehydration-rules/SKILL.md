@@ -33,7 +33,7 @@ description: 当 Goal、普通会话或 Plan Mode 需要默认展示细粒度且
 - 投影持久化失败、会话归属冲突或执行状态不明时按各自边界处理：禁止破坏原文件、错投或重放未知写操作；但投影写入仅因全文超过 51,200 字节被拒绝时，不得暂停领域任务，必须先转给 `project-memory-rules` 压缩普通历史正文并重试。两轮安全压缩后仍因容量无法持久化时保留原文件、明确标记未落盘并继续领域任务；仅 UI 同步通道不可用（`update_plan` 缺失或调用失败，但磁盘投影已成功且会话归属明确）时按 `UI_SYNC_BLOCKED` 降级继续。
 - 当前实施周期把最小任务委派给子智能体（`spawn_agent` / 多智能体并行 / delegation）执行，主智能体需要维持并持续更新面向用户的主计划投影。
 - `create_goal` 成功后、默认执行回合检测到活动 Goal、`update_goal` 成功进入 `blocked` 或 `complete` 时，需要生成、恢复或迁移 Goal 专属投影。
-- 默认执行回合不允许因任务简单而跳过首次投影；若扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 暂停后的主动执行时间严格超过 600 秒，且当前会话原生步骤清单尚未确认同步成功（没有活动 projection，或已有 projection 但 UI 同步失败/用户明确反馈未显示），必须在首个可执行检查点进入十分钟异常探测：无活动 projection 时按 Goal 优先路径补建；已有唯一活动 projection 时取回原 payload 并重试 UI，同一会话多条活动 projection 时按下方消歧规则处理。UI 显示失败不得暂停领域任务。
+- 默认执行回合不允许因任务简单而跳过首次投影；若扣除 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 暂停后的主动执行时间严格超过 600 秒，且当前会话原生步骤清单尚未确认同步成功（没有活动 projection，或已有 projection 但 UI 同步失败/用户明确反馈未显示），必须在首个可执行检查点进入十分钟异常探测：无活动 projection 时按 Goal 优先路径补建；已有本会话唯一活动 projection 时取回原 payload 并重试 UI。历史重复条目若无法按唯一最新 `updated_at` 归并，当前会话进入隔离并停止该会话的 UI 恢复。UI 显示失败不得暂停领域任务。
 
 ### 原生清单可见性的验收规则
 
@@ -70,7 +70,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 ## 保存和状态迁移流程
 
 1. 从正式计划提取所有适用的最小可执行、可验证任务，只保留任务 ID、用户可见步骤文案和三态状态；不设置小数量上限，不删减来缩短滚动列表。Goal 清单、普通会话投影和 Plan Mode 原生计划中的每条步骤，都必须让不了解内部编号的用户单独阅读也能说出“要做什么、处理什么对象、要得到或确认什么结果”；优先使用具体中文动词 + 当前任务对象 + 可辨认的结果/检查点。`TASK-001`、`GOAL-02` 等编号只作辅助索引，不能代替任务含义；必须保留编号时，将清楚的动作说明放在编号之后。缩写或内部术语首次出现时要有上下文解释，避免把多个无法理解的编号串成句子。唯一硬限制为整个 `PROJECT_CURRENT.md` 不超过 51,200 UTF-8 字节；超限时不得截断或改成三步占位，按容量恢复规则处理。
-2. 非 Plan Mode 的实质任务在取得 `confirmed` 后，先按当前模式校验是否已有同一 `session_id` 的有效投影。为定位或安全更新 registry，只允许最小读取 `PROJECT_CURRENT.md`；不得读取其它项目文档/源码或执行侦察。只有当该投影能由当前回合证据确认属于同一已确认任务来源对象时，才可复用并立即同步；同一会话内的新任务、来源不匹配、多个候选或归属不确定都不得复用旧投影，也不得覆盖其它任务/会话记录。新任务必须根据当前用户请求直接构造任务专属暂定投影，明确写出当前任务对象、要完成的动作和可核验结果，并在 `ensure-start` 输入中明确唯一 `plan_key`；不得把固定 `RECOVERY-*` 流程清单当作新任务说明。`ensure-start` 已支持直接接收投影对象；新任务不得为方便而走会丢失任务对象的通用恢复合成路径。脚本返回后只同步该当前任务的 payload，不得按更新时间或数组顺序选计划，不得失活其它任务的 registry 记录，也不得声称一个原生清单同时展示了多个计划。若脚本因歧义拒绝写入，按投影安全规则处理，不猜测或覆盖。暂定启动投影不是正式 L2 计划，不替代正式 L1；它必须早于领域侦察、其他项目文档/源码读取、CodeGraph 查询、命令执行、委派和修改。持久化成功后下一动作立即调用当前宿主任务列表工具。取得上下文后，先落正式 L1 计划，再将暂定投影细化/替换为正式 L2 投影；明确选中并失活暂定投影，避免同一会话留下多个活动列表。不得以“计划还不够精确”为由延后初始显示。
+2. 非 Plan Mode 的实质任务在取得 `confirmed` 后，先按当前模式校验是否已有同一 `session_id` 的有效投影。为定位或安全更新 registry，只允许最小读取 `PROJECT_CURRENT.md`；不得读取其它项目文档/源码或执行侦察。只有当该投影能由当前回合证据确认属于同一已确认任务来源对象时，才可复用并立即同步；若当前用户请求开启了新任务或来源对象改变，则当前请求就是该会话最新任务，必须通过 `ensure-start` 在共享锁内替换本会话旧投影，不能沿用旧任务步骤。任何时刻一个 `session_id` 只能有一条投影；替换不得影响其它会话的投影或隔离记录。新任务必须根据当前用户请求直接构造任务专属暂定投影，明确写出当前任务对象、要完成的动作和可核验结果，并在 `ensure-start` 输入中明确唯一 `plan_key`；不得把固定 `RECOVERY-*` 流程清单当作新任务说明。`ensure-start` 已支持直接接收投影对象；新任务不得为方便而走会丢失任务对象的通用恢复合成路径。脚本返回后只同步该当前任务的 payload，不得按更新时间或数组顺序选择会话；不得失活其它会话记录，也不得声称一个原生清单同时展示多个任务。若脚本因损坏或身份歧义拒绝写入，按投影安全规则处理，不猜测或覆盖。暂定启动投影不是正式 L2 计划，不替代正式 L1；它必须早于领域侦察、其他项目文档/源码读取、CodeGraph 查询、命令执行、委派和修改。持久化成功后下一动作立即调用当前宿主任务列表工具。取得上下文后，先落正式 L1 计划，再将暂定投影细化为正式 L2 投影；该写入直接替换本会话暂定投影，不保留同会话旧任务。不得以“计划还不够精确”为由延后初始显示。
 3. 确认命令成功后，必须把同一结果中的 `payload` 作为下一动作调用当前宿主任务列表工具（Codex 为 `update_plan`）；中间不得执行其它领域写操作。宿主工具缺失或同步失败时，如实记录 UI 未同步并继续原任务；不得因显示故障暂停执行，也不得声称悬浮列表已显示。
 4. UI 同步成功后才能说明悬浮任务列表已刷新；同步失败时按本节前述 `UI_SYNC_BLOCKED` 规则处理。
 5. 当前会话的当前周期全部完成后调用 `deactivate`；成功落盘后可使用一次性完成收口 payload 刷新 UI，随后该会话的失活投影不得再次生成活动 payload，也不得影响其它会话投影。
@@ -90,7 +90,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 2. Agent 只在当前执行上下文维护开始时间和累计暂停秒数。等待用户、真实 `blocked` 与 `manual_handoff` 期间暂停累计；这些计时事实不写入 projection、步骤文案、`PROJECT_CURRENT.md` 普通正文或其它长期状态。
 3. 每次工具返回后、阶段进度更新前和准备结束当前回合前检查一次。任务已完成、当前处于 Plan Mode、执行许可不是 `confirmed` 或计时上下文丢失时，不调用超时探测、不创建 Goal、不刷新 UI；计时丢失后从下一次真实执行动作重新计时，禁止根据墙钟或历史消息猜测。首次观察到主动执行时间已严格超过 600 秒且当前会话的原生步骤清单尚未确认同步成功时，必须把补救作为该检查点的首项立即执行，不得等到下一个阶段或回合结束。
 4. 主动执行时间 `observed_at - started_at - paused_seconds` 严格大于 600 秒才有资格升级；恰好 600 秒和不足 600 秒均不升级。时间必须是 UTC ISO-8601，暂停秒数必须非负且不得超过总墙钟时长。
-5. 到期检查点先调用带当前 `session_id` 的只读 `probe-timeout`。`not_due` 不做任何动作；`goal_check_required` 才进入宿主 Goal 编排；`blocked_goal_preserved` 保持阻断观察状态，不恢复执行。`already_active` 只证明磁盘有活动投影，不等于 UI 已显示：若当前同步状态为 `UI_SYNC_BLOCKED` 或用户明确反馈未显示，立即调用 `ensure-timeout` 取回同一会话唯一活动投影的现有 payload，并由主 Agent 重试 `update_plan`；这条重同步路径不得创建 Goal 或改写/替换现有任务。多个活动计划、会话归属不明、投影损坏或读写错误时禁止猜测和错投。`ensure-timeout` 仅在当前会话恰有一条活动 projection 时返回其 payload；若当前会话有多条活动 projection 且本回合已凭正式计划或首次同步返回值确认目标身份，可用只读 `payload --project-current PROJECT_CURRENT.md --session-id <session-id> --plan-key <plan-key>`（或 `--projection-id <projection-id>`）读取并同步该条；身份未确认或选择结果不唯一时不得刷新 UI，继续领域任务并说明未能安全判定要显示哪条。
+5. 到期检查点先调用带当前 `session_id` 的只读 `probe-timeout`。`not_due` 不做任何动作；`goal_check_required` 才进入宿主 Goal 编排；`blocked_goal_preserved` 保持阻断观察状态，不恢复执行。`already_active` 只证明磁盘有活动投影，不等于 UI 已显示：若当前同步状态为 `UI_SYNC_BLOCKED` 或用户明确反馈未显示，立即调用 `ensure-timeout` 取回同一会话唯一活动投影的现有 payload，并由主 Agent 重试 `update_plan`；这条重同步路径不得创建 Goal 或改写现有任务。损坏、同会话重复项无法唯一归并、会话归属不明或读写错误时禁止猜测和错投。`ensure-timeout` 只在当前会话有且仅有一条合法活动 projection 时返回它的现有 payload；选择器只能校验唯一当前投影的身份，不能从同一会话的多个任务中选择。未能安全判定时不得刷新 UI，继续领域任务并说明 UI 尚未同步。
 6. `goal_check_required` 后只允许当前主会话主 Agent 先调用一次 `get_goal`。子 Agent 不得调用 `get_goal`、`create_goal`、`update_goal` 或主悬浮窗 `update_plan`。
 7. `get_goal` 返回的活动 Goal 与当前已确认任务来源和目标明确匹配时复用，不调用 `create_goal`；没有活动 Goal 时，主 Agent 使用脱敏任务摘要调用一次 `create_goal`；活动 Goal 不匹配或无法可靠确认匹配时，不覆盖、不创建第二个 Goal，直接进入普通投影降级。
 8. `create_goal` 结果不明确时，只允许再调用一次 `get_goal` 确认，禁止无变化重试 `create_goal`。确认存在匹配活动 Goal 后，执行带当前 `session_id` 的 `goal --event create` 原子同步细化安全步骤；脚本成功后才使用 payload 调用 `update_plan`。
@@ -108,11 +108,11 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 
 ## Goal 生命周期投影流程
 
-1. `create_goal` 成功后，只在默认执行回合执行带当前 `session_id` 的 `goal --event create`。若该会话已有活动正式投影，脚本返回 `preserved_formal`，不得覆盖正式最小任务；若存在多条活动正式投影，返回空 projection/payload，不得按注册表顺序选择；否则原子写入不含 Goal 原文的细化安全步骤，且不得影响其它计划或会话投影。
+1. `create_goal` 成功后，只在默认执行回合执行带当前 `session_id` 的 `goal --event create`。若该会话当前唯一投影是活动正式任务，脚本返回 `preserved_formal`，不得覆盖正式最小任务；否则原子写入不含 Goal 原文的细化安全步骤，替换该会话现有的 Goal/fallback 投影，且不得影响其它会话投影。
 2. Desktop 或会话重开后，先通过 `get_goal` 确认仍有活动 Goal；随后执行带同一 `session_id` 的 `goal --event restore`。活动 Goal 安全投影返回可恢复 payload；此前已保留的正式计划返回 `preserved_formal` 且不重写、不刷新，仍由其自身的正式计划恢复路径负责。阻断、失活、来源不匹配、损坏或 Plan Mode 一律明确退出。
 3. `update_goal` 成功进入 `blocked` 时，执行 `goal --event blocked`：若当前是 Goal 安全投影，先持久化“无进行中步骤”的观察投影，再使用返回 payload 调用 `update_plan`；若 `create` 已返回 `preserved_formal`，则返回同名无副作用结果，保持正式计划独立且不得调用 `update_plan`。此 UI 仅观察进度，绝不恢复执行授权。
 4. `update_goal` 成功进入 `complete` 时，执行 `goal --event complete`：Goal 安全投影须先生成一次性全完成收口 payload，再持久化全部默认步骤为完成并失活；失活后不得重放，`preserved_formal` 同样返回无副作用结果，不得失活真实正式计划。
-5. Goal 运行中出现正式实施最小任务时，仍用带当前 `session_id` 的 `write` 写入正式投影；仅移除该会话的 Goal 默认步骤并写入正式计划，其它正式计划及其它会话投影保持不变。投影不得保存 Goal 原文、Goal ID、线程 ID、原始用户输入、prompt、response、业务数据或凭据。
+5. Goal 运行中出现正式实施最小任务时，仍用带当前 `session_id` 的 `write` 写入正式投影；该正式任务替换本会话唯一的 Goal 默认投影，其它会话投影保持不变。投影不得保存 Goal 原文、Goal ID、线程 ID、原始用户输入、prompt、response、业务数据或凭据。
 6. 每个脚本事件成功后才读取返回 payload 并由当前主会话同步 UI；同步失败时按本节前述 `UI_SYNC_BLOCKED` 规则处理。Plan Mode 不调用 Goal CLI；若当前会话提供 `update_plan`，可同步细化计划步骤。
 
 
@@ -128,7 +128,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 当前回合处于 Plan Mode 时，本 Skill 只负责投影与 UI 适配路由：不读取、写入或恢复执行期 registry；默认由 `implementation-planning-rules` 通过原生计划流程展示细化步骤，若 `update_plan` 在当前会话可用则可同步显示。UI 不可用不暂停计划形成。Plan Mode 结束并开始执行后，才进入以下执行期 registry 恢复流程。
 
 1. 在任何领域写操作前读取 `PROJECT_CURRENT.md`。
-2. 若 registry 托管区存在，先按条目容错读取完整托管区，再使用当前 `session_id` 定位唯一 projection，并校验来源文档、计划指纹、状态约束和文件大小；有效 `active` projection 直接使用 `payload` 重建。v4/v5 单条活动投影损坏或身份重复时，转换器把该条原样放入 `quarantined_projections`，其余身份明确的计划继续可读可写；损坏只针对该计划失败关闭，不得读取、复制或刷新该条。托管标记缺失、半边或重复、JSON 无法解析、顶层字段/schema/版本/数组上限违规、隔离记录本身无效，或隔离项所属会话无法确认时，保留整个 `PROJECT_CURRENT.md` 原文并退出 registry UI 恢复；不得继续 `ensure-start`、`synthesize`、委派来源侦察或写入 fallback。完整校验通过但当前会话无匹配时，才进入下一步。无匹配、多匹配、来源不一致或归属不确定时不得读取其它会话 projection。
+2. 若 registry 托管区存在，先按条目容错读取完整托管区，再使用当前 `session_id` 定位唯一 projection，并校验来源文档、计划指纹、状态约束和文件大小；有效 `active` projection 只有在确认仍属于当前任务时才可使用 `payload` 重建。v4/v5 同一会话的历史多任务条目按唯一最大 `updated_at` 归并，较旧项不再进入当前投影；若最大时间并列，则仅隔离该会话并停止其 UI 恢复，不按数组顺序猜测。无法校验的单条投影进入 `quarantined_projections`；合法条目若同会话有多条（包括相同计划身份），按唯一最大 `updated_at` 保留最新一条，最大时间并列则隔离该会话；其它会话身份明确的投影继续可读可写。托管标记缺失、半边或重复、JSON 无法解析、顶层字段/schema/版本/数组上限违规、隔离记录本身无效，或隔离项所属会话无法确认时，保留整个 `PROJECT_CURRENT.md` 原文并退出 registry UI 恢复；不得派发来源侦察或写入 fallback。当前用户明确开启新任务时，`ensure-start` 可在共享锁内替换该会话旧投影并清除已知归属本会话的隔离项；未知归属隔离项仍阻止写入。恢复旧任务时，若当前会话没有合法且身份匹配的唯一投影，才进入下一步；不得读取其它会话 projection。
 3. 仅当 registry 托管区缺失，或完整校验通过且当前 `session_id` 无匹配 projection 时，才可先仅根据当前用户请求构造任务专属、脱敏的暂定步骤；若当前请求也不足以辨认任务，则明确写“尚未识别具体任务”。将该临时清单绑定当前 `session_id`，以唯一临时 `plan_key` 通过 `ensure-start` 持久化，并立即同步当前会话 UI；不得借用同项目其它会话的投影、来源文档或步骤作为本会话投影。完成这一步后，主代理才可派只读子代理收集候选来源文档、完成步骤提示、当前步骤提示和冲突信息。子代理不得决定最终归属、不得写回文件、不得直接调用 `update_plan`。
 4. 主代理把当前会话摘要、`PROJECT_CURRENT` 普通正文、子代理证据和候选来源文档传给 `synthesize`，并绑定当前 `session_id`。唯一来源且存在明确状态提示时生成 `exact` 正式补建；否则生成细化 `fallback` 安全恢复列表。正式来源必须先由主代理核验，不能因为同一项目中另一个会话引用了某份计划就认定当前会话属于该计划。
 5. 正式计划补建必须先写入 L1 事实源，再原子写入 L2 投影和 payload。若已有暂定恢复投影，正式 projection 通过后按明确的 `plan_key` 或 `projection_id` 失活暂定项，再用正式 payload 同步 UI。`inactive`、过期或来源不匹配时不得恢复未知正式步骤；仅在完整 registry 仍通过校验且当前会话身份明确时，才可保留并继续显示已绑定本会话的暂定清单。registry 损坏时不得创建、更新或显示任何恢复清单，不得错投其它会话。
@@ -143,14 +143,14 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 ## 数据与安全约束
 
 - 托管区契约、字段白名单和状态规则见 [task-plan-projection-contract.md](references/task-plan-projection-contract.md)。
-- 多会话身份与共享文件并发边界：每条投影只按当前宿主提供的 `session_id` 及该条自身的计划身份选择；同项目、相同 `plan_key`、相同工作目录或最近更新时间都不能证明会话归属。当前 canonical `projection_id` 按 `session_id`、`plan_key`、`source_document`、`projection_origin` 的规范 JSON 计算；历史 ID 若只在加入 `synthesis_mode` 的 legacy 算法下匹配，仍是有效兼容 ID，不能仅因它与 canonical 算法结果不同就报损坏。校验只接受精确匹配的 canonical 或 legacy ID；两者都不匹配时保留原文件并退出该投影的 UI 恢复，禁止自动修复 ID 或从其它会话补拷身份。
-- 所有会改写 `PROJECT_CURRENT.md` 的入口必须共用 `.PROJECT_CURRENT.md.lock`：持锁后重读最新全文，只改自己拥有的区段或当前 `session_id + 计划身份` 对应项，原样保留其他会话/计划投影及非托管正文，再按 UTF-8 大小限制和原子替换规则写回。原子替换本身不提供并发读改写保护；不能取得共享锁或不能在锁内重读时，保持原文件不变并报告写入失败。绝不使用数组顺序、更新时间或“项目内唯一活动项”选择要同步的会话清单。
-- registry 的顶层结构、托管标记、JSON、版本和共享文件边界仍整体严格校验；v4/v5 registry 中单条投影损坏或投影 ID / 业务身份重复时，读取器可将所有冲突候选转换为 v5 `quarantined_projections`，保存原始 JSON 与安全诊断字段，并继续处理身份唯一且不与隔离项冲突的计划。隔离项与当前会话计划可能重叠、隔离记录无法确认所属会话、身份不足以排除冲突时，针对该计划失败关闭；所属会话未知的隔离项会阻止所有会话继续恢复或写入。待隔离原文含凭据、prompt、token 等敏感字段时拒绝转换，保留原文件不变。不得仅凭 `session_id` 去重：同一会话允许并存不同 `plan_key`。除显式 `migrate` 或正常成功写入外，读取不得改写文件；转换失败时保留原文。
+- 多会话身份与共享文件并发边界：每个 `session_id` 在合法 registry 中必须且只能有一条当前任务投影；同一会话开启新任务时以当前请求为准，在共享锁内替换旧投影。身份仍按当前宿主提供的 `session_id` 及投影自身字段校验；同项目、相同 `plan_key`、相同工作目录或更新时间都不能证明会话归属。当前 canonical `projection_id` 按 `session_id`、`plan_key`、`source_document`、`projection_origin` 的规范 JSON 计算；历史 ID 若只在加入 `synthesis_mode` 的 legacy 算法下匹配，仍是有效兼容 ID，不能仅因它与 canonical 算法结果不同就报损坏。校验只接受精确匹配的 canonical 或 legacy ID；两者都不匹配时保留原文件并退出该投影的 UI 恢复，禁止自动修复 ID 或从其它会话补拷身份。
+- 所有会改写 `PROJECT_CURRENT.md` 的入口必须共用 `.PROJECT_CURRENT.md.lock`：持锁后重读最新全文，只改自己的普通正文区域，或替换当前 `session_id` 唯一投影；生命周期更新只更新该唯一当前投影。原样保留其他会话投影、隔离记录及非托管正文，再按 UTF-8 大小限制和原子替换规则写回。原子替换本身不提供并发读改写保护；不能取得共享锁或不能在锁内重读时，保持原文件不变并报告写入失败。正常写入不得按数组顺序选择投影；`updated_at` 只用于兼容归并旧版重复条目，不用来选择当前会话本轮要同步的任务。
+- registry 的顶层结构、托管标记、JSON、版本和共享文件边界仍整体严格校验；v4/v5 中无法校验的单条投影进入 `quarantined_projections`，保留原始 JSON 与安全诊断字段。合法条目按 `session_id` 归并，同会话无论任务身份是否相同，都只保留唯一最大 `updated_at`；较旧项按已被新任务替代处理，最大时间并列时隔离该会话，禁止按数组顺序猜测。隔离项与当前会话冲突时，该会话失败关闭；所属会话未知的隔离项会阻止所有会话继续恢复或写入。明确代表当前任务的 `ensure-start` 或正式 `write` 可在共享锁内替换本会话旧项并清除已知归属该会话的隔离项，但不能清除未知归属隔离项。待隔离原文含凭据、prompt、token 等敏感字段时拒绝转换，保留原文件不变。除显式 `migrate` 或正常成功写入外，读取不得改写文件；转换失败时保留原文。
 - 投影不得保存 prompt、响应、凭据、token、线程 ID、业务数据或原始用户输入；原始宿主会话 / 线程标识只允许出现在受控字段 `session_id`，不得出现在其它字段或步骤文案中。
 - 所有 CLI/Python 状态入口按显式 `session_id` 优先、`CODEX_THREAD_ID` 回退、WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `mcpServers.*.headers["X-WorkBuddy-Session-Id"]` 唯一值或 `WORKBUDDY_SESSION_ID` 环境变量）兜底解析；多来源不一致时拒绝，全缺失时失败关闭，禁止猜测 `legacy/default` 或其它会话；解析时禁止打印 `CODEBUDDY_MCP_CONFIG` 全文或 token。
 - 最多一个 `in_progress`；允许因阻断暂时没有 `in_progress`。
 - 指纹只根据有序任务 ID 和文案计算，状态与更新时间不参与。
-- 读取兼容 `version: 1/2/3` 单投影与 v4 registry；任何成功写入统一为 `version: 5` registry。`projections[]` 按 `session_id + projection_id` 隔离计划，同一会话可并存多个不同计划身份；单投影读取 / 失活遇到多个候选时必须显式选择 `plan_key` 或 `projection_id`，否则失败关闭。v5 保留 `projection_origin=goal` 与 `synthesis_mode=goal_default|goal_blocked`，Goal 固定 `plan_key=GOAL/ACTIVE`、空 `source_document` 与不含 Goal 原文的细化默认清单；`blocked` 仅允许 Goal 且没有 `in_progress`。v1-v3 单投影只作读取 / migrate 兼容，不能覆盖其它投影。
+- 读取兼容 `version: 1/2/3` 单投影与 v4 registry；任何成功写入统一为 `version: 5` registry。`projections[]` 按 `session_id` 唯一，每会话仅保存当前任务；选择器可用于校验该唯一投影的 `plan_key` 或 `projection_id`，与当前项不匹配时返回无匹配错误。不同会话可使用相同 `plan_key`。v4/v5 历史同会话多项按唯一最大 `updated_at` 归并，最大时间并列则隔离该会话；新任务通过 `ensure-start`、正式 `write` 或受支持的 Goal 生命周期入口在共享锁内替换本会话旧投影。v5 保留 `projection_origin=goal` 与 `synthesis_mode=goal_default|goal_blocked`，Goal 固定 `plan_key=GOAL/ACTIVE`、空 `source_document` 与不含 Goal 原文的细化默认清单；`blocked` 仅允许 Goal 且没有 `in_progress`。v1-v3 单投影只作读取 / migrate 兼容，不能覆盖其它会话投影。
 - 文件必须是严格 UTF-8，最终全文不得超过 51,200 字节。
 - 缺半边标记、重复区块、损坏 JSON、未知字段或敏感字段时必须拒绝，原文件保持不变。
 
@@ -165,7 +165,7 @@ UI 同步通道按宿主分级适配，磁盘投影（`PROJECT_CURRENT.md` regis
 
 ## 通过标准
 
-- 合法 registry 可跨进程稳定读取；多个会话及同一会话的多个计划可并存、交错写入互不覆盖，并按 `session_id + plan_key/projection_id` 生成精确 UI 同步 payload（Codex 宿主为 `update_plan` payload）。
+- 合法 registry 可跨进程稳定读取；不同会话可并存并发写入而互不覆盖，同一会话始终只有一条当前任务投影，新任务在共享锁内替换旧任务，并按 `session_id` 生成精确 UI 同步 payload（Codex 宿主为 `update_plan` payload）。
 - 首次 `ensure-start` 或 `write` 成功后直接返回同一当前会话 payload；主 Agent 下一动作必须同步 UI（Codex 宿主为 `update_plan`），不得先执行其它领域写操作。
 - 状态入口统一按显式 `--session-id` 优先、`CODEX_THREAD_ID` 回退、WorkBuddy 宿主元数据兜底解析；多来源不一致、全缺失或非法时失败关闭且不写文件。
 - 无活动 projection 的未完成任务在主动执行时间严格超过 600 秒后，先由只读 `probe-timeout` 返回 `goal_check_required`，再由主 Agent 优先创建或复用 Goal；只有 Goal 不匹配、不可用、失败或结果不明确时才通过 `ensure-timeout` 原子降级普通投影。未到阈值、已有活动 projection、已有 `blocked` Goal 观察投影和非法计时输入均不产生重复或错误写入。

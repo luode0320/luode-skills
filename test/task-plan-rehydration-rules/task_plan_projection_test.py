@@ -703,9 +703,9 @@ class TaskPlanProjectionTests(unittest.TestCase):
             self.assertEqual(replaced["projection_origin"], "persisted")
             self.assertEqual(replaced["steps"][0]["id"], "TASK-RTP-01")
 
-    def test_goal_events_do_not_select_first_of_multiple_formal_plans(self) -> None:
-        """验证多份正式计划并存时 Goal 事件不会默认选第一份。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_goal_events_preserve_the_current_session_formal_plan(self) -> None:
+        """验证 Goal 事件保留当前会话唯一的最新正式任务。
+        最近修改时间：2026-10-19 15:10:56；改动说明：一个 session_id 只保留当前最新任务投影。
         """
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
@@ -720,8 +720,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
             for event in ("create", "restore", "blocked", "complete"):
                 result = projection.handle_goal_event(path, event, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(result["action"], "preserved_formal")
-                self.assertIsNone(result["projection"])
-                self.assertIsNone(result["payload"])
+                self.assertEqual(result["projection"]["plan_key"], second["plan_key"])
+                self.assertEqual(result["payload"] is not None, event == "create")
                 self.assertEqual(path.read_bytes(), before)
 
     def test_goal_cli_and_invalid_event_preserve_original_file(self) -> None:
@@ -948,7 +948,7 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 observed_at="2026-07-25T00:10:01Z",
                 session_id=self.TEST_SESSION_ID,
             )
-            self.assertEqual(blocked_result["action"], "already_active")
+            self.assertEqual(blocked_result["action"], "blocked_goal_preserved")
             self.assertEqual(current_path.read_bytes(), blocked_bytes)
             self.assertNotEqual(before, active_bytes)
 
@@ -1767,11 +1767,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
                 registry = projection.load_registry(path, session_id=self.TEST_SESSION_ID)
                 self.assertEqual(registry["projections"][0]["state"], "inactive")
 
-    def test_registry_allows_multiple_plan_ids_per_session(self) -> None:
-        """验证 registry 允许同一会话保存不同 plan_key。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_registry_rejects_multiple_plan_ids_per_session(self) -> None:
+        """验证 registry 每个 session_id 只允许一个任务投影。
+        最近修改时间：2026-10-19 15:10:56；改动说明：同会话新任务替换旧任务。
         """
-        # 1. 构造同一会话的两个不同计划，注册表都应保留。
+        # 1. 构造同一会话的两个不同计划，严格校验必须拒绝重复 session_id。
         session_id = "duplicate-session"
         first = self._sample_v4_entry(session_id)
         second_projection = self._sample_v4_projection(session_id)
@@ -1796,26 +1796,29 @@ class TaskPlanProjectionTests(unittest.TestCase):
             "quarantined_projections": [],
         }
         self.assertNotEqual(first["projection_id"], second["projection_id"])
-        validated = projection.validate_registry(registry)
-        self.assertEqual(len(validated["projections"]), 2)
+        with self.assertRaisesRegex(projection.ProjectionContractError, "duplicate session_id"):
+            projection.validate_registry(registry)
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
             projection.upsert_projection(path, self._sample(), session_id=session_id)
             projection.upsert_projection(path, second_projection, session_id=session_id)
-            with self.assertRaisesRegex(projection.ProjectionContractError, "plan_key or projection_id"):
-                projection.load_projection(path, session_id=session_id)
             self.assertEqual(
-                projection.load_projection(path, session_id=session_id, plan_key=second_projection["plan_key"])["plan_key"],
+                projection.load_projection(path, session_id=session_id)["plan_key"],
                 second_projection["plan_key"],
             )
-        # 2. 同一个 projection_id 仍是注册表级重复项，必须拒绝。
-        registry["projections"].append(dict(first))
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.load_projection(path, session_id=session_id, plan_key=first["plan_key"])
+            saved = projection.load_registry(path)["projections"]
+            self.assertEqual(len(saved), 1)
+            self.assertEqual(saved[0]["plan_key"], second_projection["plan_key"])
+        # 2. 同一个 projection_id 仍是注册表级重复项，必须先按该错误拒绝。
+        registry["projections"] = [first, dict(first)]
         with self.assertRaisesRegex(projection.ProjectionContractError, "duplicate projection_id"):
             projection.validate_registry(registry)
 
-    def test_ensure_start_adds_another_plan_without_replacing_existing_session_plan(self) -> None:
-        """验证新增计划不会覆盖同会话已有正式任务。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_ensure_start_replaces_existing_session_plan_with_latest_task(self) -> None:
+        """验证新任务替换同会话旧任务并保留其他会话投影。
+        最近修改时间：2026-10-19 15:10:56；改动说明：一个 session_id 只保留当前最新任务投影。
         """
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
@@ -1825,17 +1828,17 @@ class TaskPlanProjectionTests(unittest.TestCase):
             new_plan = self._sample()
             new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
             started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
-            self.assertEqual(started["action"], "created")
+            self.assertEqual(started["action"], "replaced")
             self.assertEqual(started["projection"]["plan_key"], new_plan["plan_key"])
-            self.assertEqual(
-                projection.load_projection(path, session_id=self.TEST_SESSION_ID, plan_key=existing["plan_key"])["plan_key"],
-                existing["plan_key"],
-            )
-            self.assertEqual(len(projection.load_registry(path)["projections"]), 2)
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.load_projection(path, session_id=self.TEST_SESSION_ID, plan_key=existing["plan_key"])
+            saved = projection.load_registry(path)["projections"]
+            self.assertEqual(len(saved), 1)
+            self.assertEqual(saved[0]["plan_key"], new_plan["plan_key"])
 
-    def test_ensure_start_isolates_corrupt_entry_and_preserves_same_session_plan(self) -> None:
-        """验证新增计划隔离损坏条目并保留同会话有效计划。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_ensure_start_replaces_current_task_and_preserves_other_session_quarantine(self) -> None:
+        """验证新任务替换本会话旧任务并保留其他会话隔离记录。
+        最近修改时间：2026-10-19 15:10:56；改动说明：同会话唯一投影不影响其他会话隔离。
         """
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
@@ -1863,16 +1866,17 @@ class TaskPlanProjectionTests(unittest.TestCase):
             new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
             started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
 
-            self.assertEqual(started["action"], "created")
+            self.assertEqual(started["action"], "replaced")
             saved = projection.load_registry(path)["projections"]
             saved_identity = {(entry["session_id"], entry["plan_key"]) for entry in saved}
-            self.assertIn((self.TEST_SESSION_ID, existing["plan_key"]), saved_identity)
             self.assertIn((self.TEST_SESSION_ID, new_plan["plan_key"]), saved_identity)
             self.assertNotIn(("corrupt-session", corrupt["plan_key"]), saved_identity)
+            self.assertEqual(len(saved), 1)
+            self.assertEqual(len(projection.load_registry(path)["quarantined_projections"]), 1)
 
-    def test_ensure_start_migrates_legacy_projection_id_without_dropping_plan(self) -> None:
-        """验证旧投影 ID 迁移不会丢弃同会话其它计划。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_ensure_start_replaces_legacy_projection_with_latest_task(self) -> None:
+        """验证新任务替换旧版 ID 投影并保留其他会话数据。
+        最近修改时间：2026-10-19 15:10:56；改动说明：当前 session_id 只保留最新任务。
         """
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
@@ -1902,15 +1906,16 @@ class TaskPlanProjectionTests(unittest.TestCase):
             new_plan["plan_key"] = "REQ-NEW/CYCLE-01"
             started = projection.ensure_start_projection(path, new_plan, session_id=self.TEST_SESSION_ID)
 
-            self.assertEqual(started["action"], "created")
+            self.assertEqual(started["action"], "replaced")
             saved = projection.load_registry(path)["projections"]
             saved_identity = {(entry["session_id"], entry["plan_key"]) for entry in saved}
-            self.assertIn((self.TEST_SESSION_ID, existing["plan_key"]), saved_identity)
             self.assertIn((self.TEST_SESSION_ID, new_plan["plan_key"]), saved_identity)
+            self.assertNotIn((self.TEST_SESSION_ID, existing["plan_key"]), saved_identity)
+            self.assertEqual(len(saved), 1)
 
-    def test_deactivate_requires_plan_selector_for_ambiguous_session(self) -> None:
-        """验证同会话计划歧义时失活操作必须提供选择器。
-        最近修改时间：2026-10-12 18:43:49；改动说明：覆盖同会话多计划隔离与选择规则。
+    def test_deactivate_targets_the_only_current_session_projection(self) -> None:
+        """验证失活操作直接作用于当前会话唯一任务，旧选择器不会误命中新任务。
+        最近修改时间：2026-10-19 15:10:56；改动说明：每个 session_id 仅保留最新投影。
         """
         with tempfile.TemporaryDirectory() as directory:
             path = self._write_current(Path(directory))
@@ -1919,17 +1924,11 @@ class TaskPlanProjectionTests(unittest.TestCase):
             second["plan_key"] = "REQ-SECOND/CYCLE-01"
             projection.upsert_projection(path, first, session_id=self.TEST_SESSION_ID)
             projection.upsert_projection(path, second, session_id=self.TEST_SESSION_ID)
-            with self.assertRaisesRegex(projection.ProjectionContractError, "plan_key or projection_id"):
-                projection.deactivate_projection(path, session_id=self.TEST_SESSION_ID)
-            result = projection.deactivate_projection(
-                path, session_id=self.TEST_SESSION_ID, plan_key=second["plan_key"]
-            )
+            with self.assertRaises(projection.ProjectionContractError):
+                projection.deactivate_projection(path, session_id=self.TEST_SESSION_ID, plan_key=first["plan_key"])
+            result = projection.deactivate_projection(path, session_id=self.TEST_SESSION_ID)
             self.assertEqual(result["plan_key"], second["plan_key"])
             self.assertEqual(result["state"], "inactive")
-            self.assertEqual(
-                projection.load_projection(path, session_id=self.TEST_SESSION_ID, plan_key=first["plan_key"])["state"],
-                "active",
-            )
 
     def test_session_id_is_allowed_only_in_controlled_field(self) -> None:
         """验证原始 session_id 可保存，其它敏感字段仍被递归拒绝。"""
@@ -2421,8 +2420,8 @@ class TaskPlanProjectionTests(unittest.TestCase):
         self.assertIn("原生步骤清单尚未确认同步成功", documents["owner"])
         self.assertIn("already_active", documents["contract"])
         self.assertIn("不创建 Goal、不替换投影", documents["contract"])
-        self.assertIn("多条活动 projection", documents["contract"])
-        self.assertIn("--plan-key <plan-key>", documents["contract"])
+        self.assertIn("当前会话有且仅有一条合法活动 projection", documents["contract"])
+        self.assertIn("`--plan-key` 或 `--projection-id` 只能校验当前唯一投影的身份", documents["contract"])
         self.assertIn("UI 同步失败/用户明确反馈未显示", documents["owner"])
         self.assertIn("首个可执行检查点", documents["autonomous"])
 

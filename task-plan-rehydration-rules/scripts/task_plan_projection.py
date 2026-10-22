@@ -62,6 +62,7 @@ QUARANTINE_REASONS = {
     "invalid_projection",
     "duplicate_projection_id",
     "duplicate_projection_identity",
+    "ambiguous_session_projection",
 }
 PROJECTION_ENTRY_FIELDS = (TOP_LEVEL_FIELDS_V3 - {"version"}) | {"projection_id", "session_id"}
 STEP_FIELDS = {"id", "step", "status"}
@@ -664,11 +665,11 @@ def validate_projection_entry(value: Any) -> dict[str, Any]:
 
 
 def validate_registry(value: Any) -> dict[str, Any]:
-    """校验 v5 多计划任务投影注册表及隔离记录。
+    """校验 v5 多会话任务投影注册表及隔离记录。
 
     [参数] value: 待校验的注册表对象。
     [返回] dict：字段顺序稳定且全部条目已规范化的 v5 注册表。
-    最近修改时间：2026-10-13；改动说明：保留损坏条目的原始 JSON 并按计划身份隔离。
+    最近修改时间：2026-10-19 15:10:56；改动说明：确保每个 session_id 只登记一条当前任务。
     """
     # 1. 校验顶层 schema、版本和时间，避免旧单投影被误解释为注册表。
     if not isinstance(value, Mapping) or set(value) != REGISTRY_FIELDS:
@@ -685,10 +686,11 @@ def validate_registry(value: Any) -> dict[str, Any]:
     projections = value.get("projections")
     if not isinstance(projections, list) or len(projections) > MAX_PROJECTIONS:
         raise ProjectionContractError(f"projections must be an array of at most {MAX_PROJECTIONS} entries")
-    # 2. 逐条校验投影，并拒绝重复 ID 或重复业务身份。
+    # 2. 逐条校验投影，并保证 projection_id、业务身份和 session_id 唯一。
     normalized_entries = []
     projection_ids: set[str] = set()
     projection_identities: set[tuple[str, str, str, str]] = set()
+    session_ids: set[str] = set()
     for index, entry in enumerate(projections):
         try:
             normalized = validate_projection_entry(entry)
@@ -699,8 +701,11 @@ def validate_registry(value: Any) -> dict[str, Any]:
         identity = _projection_identity(normalized)
         if identity in projection_identities:
             raise ProjectionContractError("duplicate projection identity")
+        if normalized["session_id"] in session_ids:
+            raise ProjectionContractError("duplicate session_id projection")
         projection_ids.add(normalized["projection_id"])
         projection_identities.add(identity)
+        session_ids.add(normalized["session_id"])
         normalized_entries.append(normalized)
     raw_quarantine = value.get("quarantined_projections")
     if not isinstance(raw_quarantine, list) or len(raw_quarantine) > MAX_QUARANTINED_PROJECTIONS:
@@ -785,92 +790,29 @@ def _quarantine_entry(raw: Any, *, reason: str, source_index: int, source_versio
 def _quarantine_may_match(
     item: Mapping[str, Any],
     session_id: str,
-    *,
-    plan_key: str | None = None,
-    projection_id: str | None = None,
-    source_document: str | None = None,
-    projection_origin: str | None = None,
 ) -> bool:
-    """判断隔离记录是否可能与所选计划冲突；信息不足时失败关闭。"""
+    """判断隔离记录是否可能代表该会话唯一任务投影。
+
+    [参数] item: 已校验的隔离记录；session_id: 当前会话标识。
+    [返回] bool：隔离记录可能属于该会话时返回 True。
+    最近修改时间：2026-10-19 15:10:56；改动说明：同会话隔离项统一阻止当前任务恢复。
+    """
     affected_session_id = item.get("affected_session_id")
-    if affected_session_id is None:
-        # 身份未知时无法证明与任一会话无关，必须对所有会话失败关闭。
-        return True
-    if affected_session_id != session_id:
-        return False
-    raw = item.get("raw_entry")
-    if not isinstance(raw, Mapping):
-        return True
-    if projection_id is not None:
-        raw_id = raw.get("projection_id")
-        if raw_id == projection_id:
-            return True
-        identity_fields = ("plan_key", "source_document", "projection_origin")
-        if not all(isinstance(raw.get(key), str) for key in identity_fields):
-            return True
-        raw_identity = {
-            "session_id": session_id,
-            "plan_key": raw["plan_key"],
-            "source_document": raw["source_document"],
-            "projection_origin": raw["projection_origin"],
-        }
-        canonical_json = json.dumps(
-            raw_identity,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        legacy_identity = {
-            **raw_identity,
-            "synthesis_mode": raw.get("synthesis_mode"),
-        }
-        legacy_json = json.dumps(
-            legacy_identity,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        candidate_ids = {
-            f"SESSION/{hashlib.sha256(canonical_json).hexdigest()}",
-            f"SESSION/{hashlib.sha256(legacy_json).hexdigest()}",
-        }
-        if projection_id in candidate_ids:
-            return True
-        if isinstance(raw_id, str):
-            return False
-        return True
-    for field, expected in (
-        ("plan_key", plan_key),
-        ("source_document", source_document),
-        ("projection_origin", projection_origin),
-    ):
-        actual = raw.get(field)
-        if expected is not None and actual is not None and actual != expected:
-            return False
-    if plan_key is None and projection_id is None:
-        return True
-    return True
+    return affected_session_id is None or affected_session_id == session_id
 
 
 def _assert_quarantine_unambiguous(
     registry: Mapping[str, Any],
     session_id: str,
-    *,
-    plan_key: str | None = None,
-    projection_id: str | None = None,
-    source_document: str | None = None,
-    projection_origin: str | None = None,
 ) -> None:
-    """拒绝恢复或改写可能与隔离记录重叠的计划。"""
+    """拒绝读取或更新存在隔离记录的会话投影。
+
+    [参数] registry: 已校验的 v5 注册表；session_id: 当前会话标识。
+    [返回] None：无匹配隔离记录时返回；存在时抛出契约错误。
+    最近修改时间：2026-10-19 15:10:56；改动说明：按会话隔离状态保护唯一任务投影。
+    """
     for item in registry.get("quarantined_projections", []):
-        if _quarantine_may_match(
-            item,
-            session_id,
-            plan_key=plan_key,
-            projection_id=projection_id,
-            source_document=source_document,
-            projection_origin=projection_origin,
-        ):
+        if _quarantine_may_match(item, session_id):
             raise ProjectionContractError("matching projection is quarantined; recovery is blocked")
 
 
@@ -952,7 +894,7 @@ def extract_registry(document: str, *, session_id: str | None = None) -> dict[st
 
     [参数] document: PROJECT_CURRENT.md 全文；session_id: 旧活动投影迁移归属。
     [返回] dict | None：合法 v5 注册表；无托管区时返回 None。
-    最近修改时间：2026-10-16；改动说明：v5 注册表也按条目容错隔离，单条损坏不再连坐全部会话。
+    最近修改时间：2026-10-19 15:10:56；改动说明：读取时归并同会话历史重复任务。
     """
     # 1. v4/v5 注册表统一按条目容错读取，旧版单投影进入严格兼容路径。
     value = _extract_raw_projection_value(document)
@@ -972,11 +914,11 @@ def extract_registry(document: str, *, session_id: str | None = None) -> dict[st
 def _extract_registry_tolerant(
     document: str, *, session_id: str | None = None
 ) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
-    """转换 v4 registry，将无效或身份重复项原样隔离。
+    """转换 v4/v5 registry，将无效项隔离并归并同会话历史任务。
 
     [参数] document: PROJECT_CURRENT.md 全文；session_id: 旧活动投影兼容归属。
     [返回] tuple：(v5 registry 或 None, 不含原始数据的隔离原因摘要)。
-    最近修改时间：2026-10-13；改动说明：隔离记录持久保留，不再跳过坏项。
+    最近修改时间：2026-10-19 15:10:56；改动说明：保留损坏记录并只选唯一最新任务。
     """
     # 1. 读取原始值；非 v4/v5（旧版单投影 / 顶层无法识别）不做隔离，回退严格路径。
     value = _extract_raw_projection_value(document)
@@ -996,8 +938,7 @@ def _extract_registry_tolerant(
         raise ProjectionContractError(
             f"projections must be an array of at most {MAX_PROJECTIONS} entries"
         )
-    # 3. 先逐项规范化，再按重复身份整组隔离；一个 session 可保留多个不同计划。
-    # v4 无隔离字段，v5 已有隔离记录校验后原样保留，再叠加本轮新隔离项。
+    # 3. 逐项规范化后按会话归并，唯一最新条目作为当前任务。
     source_version = value.get("version")
     normalized_by_index: dict[int, dict[str, Any]] = {}
     quarantine: list[dict[str, Any]] = [
@@ -1013,27 +954,43 @@ def _extract_registry_tolerant(
                 entry, reason="invalid_projection", source_index=index, source_version=source_version
             ))
             skipped.append({"index": index, "reason_code": "invalid_projection"})
-    # 4. 同一 projection_id 或业务身份的所有候选都隔离，禁止按顺序选择其中一条。
-    quarantined_indices: set[int] = set()
-    for field, reason in (
-        ("projection_id", "duplicate_projection_id"),
-        ("identity", "duplicate_projection_identity"),
-    ):
-        groups: dict[Any, list[int]] = {}
-        for index, item in normalized_by_index.items():
-            key = item["projection_id"] if field == "projection_id" else _projection_identity(item)
-            groups.setdefault(key, []).append(index)
-        duplicate_indices = {
-            idx for indexes in groups.values() if len(indexes) > 1 for idx in indexes
-        } - quarantined_indices
-        for index in sorted(duplicate_indices):
-            raw = raw_projections[index]
-            quarantine.append(_quarantine_entry(
-                raw, reason=reason, source_index=index, source_version=source_version
-            ))
-            skipped.append({"index": index, "reason_code": reason})
+    # 4. 同会话条目按 updated_at 归并；最新时间并列时隔离该会话。
+    session_groups: dict[str, list[int]] = {}
+    for index, item in normalized_by_index.items():
+        session_groups.setdefault(item["session_id"], []).append(index)
+    for indexes in session_groups.values():
+        if len(indexes) < 2:
+            continue
+        latest_time = max(
+            _parse_utc_timestamp("updated_at", normalized_by_index[index]["updated_at"])
+            for index in indexes
+        )
+        latest_indexes = [
+            index for index in indexes
+            if _parse_utc_timestamp("updated_at", normalized_by_index[index]["updated_at"]) == latest_time
+        ]
+        if len(latest_indexes) == 1:
+            latest_index = latest_indexes[0]
+            for index in indexes:
+                if index == latest_index:
+                    continue
+                normalized_by_index.pop(index, None)
+                skipped.append({"index": index, "reason_code": "superseded_session_projection"})
+            continue
+
+        for index in indexes:
             normalized_by_index.pop(index, None)
-            quarantined_indices.add(index)
+            if index in latest_indexes:
+                quarantine.append(_quarantine_entry(
+                    raw_projections[index],
+                    reason="ambiguous_session_projection",
+                    source_index=index,
+                    source_version=source_version,
+                ))
+                skipped.append({"index": index, "reason_code": "ambiguous_session_projection"})
+            else:
+                skipped.append({"index": index, "reason_code": "superseded_session_projection"})
+
     normalized_entries = [normalized_by_index[index] for index in sorted(normalized_by_index)]
     registry = {
         "version": REGISTRY_VERSION,
@@ -1075,11 +1032,11 @@ def load_projection(
     expected_fingerprint: str | None = None,
     expected_source_document: str | None = None,
 ) -> dict[str, Any]:
-    """按会话和计划选择器读取任务投影。
+    """读取当前会话唯一任务投影，并校验可选身份选择器。
 
-    [参数] path: PROJECT_CURRENT 路径；session_id: 可选显式会话标识；plan_key / projection_id: 多计划时的精确选择器；expected_fingerprint: 可选预期指纹；expected_source_document: 可选来源。
+    [参数] path: PROJECT_CURRENT 路径；session_id: 可选显式会话标识；plan_key / projection_id: 当前任务身份校验器；expected_fingerprint: 可选预期指纹；expected_source_document: 可选来源。
     [返回] dict：已通过读取和身份校验的投影。
-    最近修改时间：2026-10-12 18:43:49；改动说明：支持显式计划选择器并拒绝歧义读取。
+    最近修改时间：2026-10-19 15:10:56；改动说明：读取单会话当前任务并拒绝旧身份选择器。
     """
     # 1. 严格按 UTF-8 读取，优先报告文件损坏而不进行任何会话猜测。
     target = Path(path)
@@ -1087,7 +1044,7 @@ def load_projection(
         document = target.read_bytes().decode("utf-8", errors="strict")
     except (OSError, UnicodeDecodeError) as error:
         raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
-    # 2. 读取入口随后绑定当前会话；同一会话存在多计划时必须提供身份选择器。
+    # 2. 读取入口随后绑定当前会话；身份选择器只校验唯一的当前任务投影。
     sid = _require_session_id(session_id)
     registry = extract_registry(document, session_id=sid)
     if registry is None:
@@ -1101,11 +1058,9 @@ def load_projection(
     ]
     if plan_key is not None and projection_id is not None:
         raise ProjectionContractError("provide only one projection selector")
-    _assert_quarantine_unambiguous(
-        registry, sid, plan_key=plan_key, projection_id=projection_id
-    )
+    _assert_quarantine_unambiguous(registry, sid)
     if len(matches) != 1:
-        reason = "projection selector did not match exactly one plan" if plan_key or projection_id else "plan_key or projection_id is required when session has multiple projections"
+        reason = "projection selector did not match the current session projection" if plan_key or projection_id else "task projection not found for session_id"
         raise ProjectionContractError(reason)
     return validate_projection(
         _projection_from_entry(matches[0]),
@@ -1139,13 +1094,13 @@ def _find_registry_entry(
     registry: Mapping[str, Any], session_id: str, *, plan_key: str | None = None,
     projection_id: str | None = None,
 ) -> dict[str, Any] | None:
-    """按会话和计划选择器定位唯一投影。
+    """按会话定位唯一当前投影，并可用计划选择器校验身份。
 
     [参数] registry: 合法 v5 注册表；session_id: 当前会话标识。
     [返回] dict | None：唯一匹配条目；无匹配时返回 None。
-    最近修改时间：2026-10-12 18:43:49；改动说明：支持同会话多计划精确消歧。
+    最近修改时间：2026-10-19 15:10:56；改动说明：每个 session_id 只允许一个当前任务投影。
     """
-    # 1. 先按当前 session_id 收窄；多计划时必须使用 plan_key 或 projection_id 精确选择。
+    # 1. 先按当前 session_id 收窄；选择器只用于拒绝指向已被替换任务的旧身份。
     sid = _validate_session_id(session_id)
     if plan_key is not None and projection_id is not None:
         raise ProjectionContractError("provide only one projection selector")
@@ -1155,11 +1110,9 @@ def _find_registry_entry(
         and (plan_key is None or entry["plan_key"] == plan_key)
         and (projection_id is None or entry["projection_id"] == projection_id)
     ]
-    _assert_quarantine_unambiguous(
-        registry, sid, plan_key=plan_key, projection_id=projection_id
-    )
+    _assert_quarantine_unambiguous(registry, sid)
     if len(matches) > 1:
-        raise ProjectionContractError("plan_key or projection_id is required when session has multiple projections")
+        raise ProjectionContractError("registry contains multiple projections for session_id")
     return matches[0] if matches else None
 
 
@@ -1324,48 +1277,43 @@ def _upsert_projection_while_locked(
     registry: Mapping[str, Any],
     projection: Mapping[str, Any],
     session_id: str,
+    *,
+    supersede_session_quarantine: bool = False,
 ) -> dict[str, Any]:
-    """在锁内更新同会话的目标计划投影。
+    """在锁内替换当前会话唯一任务投影。
 
     [参数] target: 目标文件；document: 锁内读取的原文；bounds: 托管区边界；registry: 已校验注册表；projection: 新投影；session_id: 当前会话。
     [返回] dict：成功原子落盘的 v3 投影。
-    最近修改时间：2026-10-12 18:43:49；改动说明：按计划身份更新并保留同会话其它投影。
+    最近修改时间：2026-10-19 15:10:56；改动说明：每个 session_id 只保留最新写入的一个任务投影。
     """
-    # 1. 基于锁内快照只替换同会话、同计划身份条目，其它计划和会话保持原样。
+    # 1. 清除明确归属本会话的隔离项，并保留归属未知的隔离项。
     normalized = _to_version_three_projection(projection)
     entry = _projection_entry_from_projection(normalized, session_id)
-    _assert_quarantine_unambiguous(
-        registry,
-        session_id,
-        plan_key=normalized["plan_key"],
-        projection_id=entry["projection_id"],
-        source_document=normalized["source_document"],
-        projection_origin=normalized["projection_origin"],
-    )
-    updated_registry = dict(registry)
-    updated_registry["projections"] = [dict(item) for item in registry["projections"]]
-    if normalized.get("projection_origin") != "goal":
-        updated_registry["projections"] = [
-            item for item in updated_registry["projections"]
-            if not (item["session_id"] == session_id and item["projection_origin"] == "goal")
+    effective_registry = dict(registry)
+    if supersede_session_quarantine:
+        effective_registry["quarantined_projections"] = [
+            dict(item) for item in registry.get("quarantined_projections", [])
+            if item["affected_session_id"] != session_id
         ]
-    replaced = False
+    _assert_quarantine_unambiguous(effective_registry, session_id)
+    updated_registry = dict(effective_registry)
+    existing_session_entries = [
+        item for item in effective_registry["projections"] if item["session_id"] == session_id
+    ]
     identity_matches = [
-        index for index, current in enumerate(updated_registry["projections"])
-        if current["session_id"] == session_id
-        and current["plan_key"] == normalized["plan_key"]
-        and current["source_document"] == normalized["source_document"]
-        and current["projection_origin"] == normalized["projection_origin"]
+        current for current in existing_session_entries
+        if _projection_identity(current) == _projection_identity(entry)
     ]
     if len(identity_matches) > 1:
-        raise ProjectionContractError("multiple projections match session_id and plan identity")
+        raise ProjectionContractError("multiple projections match session_id")
     if identity_matches:
-        index = identity_matches[0]
-        entry["projection_id"] = updated_registry["projections"][index]["projection_id"]
-        updated_registry["projections"][index] = entry
-        replaced = True
-    if not replaced:
-        updated_registry["projections"].append(entry)
+        # 同一任务延续时保留合法 legacy projection_id；新任务使用新身份生成的 ID。
+        entry["projection_id"] = identity_matches[0]["projection_id"]
+    updated_registry["projections"] = [
+        dict(item) for item in effective_registry["projections"]
+        if item["session_id"] != session_id
+    ]
+    updated_registry["projections"].append(entry)
 
     # 2. 统一清理过期完成投影，再校验完整候选 registry 和文件大小。
     now = datetime.now(timezone.utc)
@@ -1396,7 +1344,7 @@ def upsert_projection(
 
     [参数] path: PROJECT_CURRENT 路径；projection: 待持久化投影；session_id: 会话标识。
     [返回] dict：原子写入后可重读的 v3 投影。
-    最近修改时间：2026-07-25 00:00:00；改动原因：复用持锁 upsert 并保持多会话写入串行化。
+    最近修改时间：2026-10-19 15:10:56；改动说明：锁内写入时替换本会话旧任务并保留其它会话。
     """
     # 1. 在锁内读取并校验最新 registry，避免多个会话基于同一旧快照互相覆盖。
     target = Path(path)
@@ -1410,7 +1358,15 @@ def upsert_projection(
         bounds = _validate_markers(document)
         registry = _load_registry_for_write(document, sid)
         # 2. 调用只允许在持锁状态使用的写入函数，完成校验和原子替换。
-        return _upsert_projection_while_locked(target, document, bounds, registry, projection, sid)
+        return _upsert_projection_while_locked(
+            target,
+            document,
+            bounds,
+            registry,
+            projection,
+            sid,
+            supersede_session_quarantine=True,
+        )
 
 
 def _deactivate_projection_with_payload(
@@ -1459,27 +1415,28 @@ def _deactivate_projection_with_payload(
 
 
 def migrate_projection(path: str | os.PathLike[str], session_id: str | None = None) -> dict[str, Any]:
-    """把现有 v1-v4 投影迁移为 v5 注册表。
+    """把现有 v1-v5 投影迁移并归并为每会话唯一的 v5 注册表。
 
     [参数] path: PROJECT_CURRENT.md 路径；session_id: 旧投影归属的真实会话标识，可回退宿主会话。
     [返回] dict：迁移后或原本已存在的 v5 注册表。
-    最近修改时间：2026-07-26 00:00:00；改动原因：迁移入口支持宿主会话回退并返回可同步 payload。
+    最近修改时间：2026-10-19 15:10:56；改动说明：显式迁移时归并同会话旧任务。
     """
-    # 1. 已是 v5 时只校验返回；v4 在显式 migrate 时转换并原子写回。
+    # 1. v4/v5 注册表在共享锁内重新读取；显式迁移会持久化兼容读取后的每会话唯一结果。
     sid = _require_session_id(session_id)
     target = Path(path)
     document = _read_utf8_text(target, label="UTF-8 PROJECT_CURRENT")
     raw = _extract_raw_projection_value(document)
     if raw is None:
         raise ProjectionContractError("task projection block is missing")
-    if isinstance(raw, Mapping) and raw.get("version") == REGISTRY_VERSION:
-        return validate_registry(raw)
-    if isinstance(raw, Mapping) and raw.get("version") == 4:
+    if isinstance(raw, Mapping) and raw.get("version") in (4, REGISTRY_VERSION):
         with _projection_file_lock(target):
             current_document = _read_utf8_text(target, label="UTF-8 PROJECT_CURRENT")
             current_registry = extract_registry(current_document, session_id=sid)
             if current_registry is None:
                 raise ProjectionContractError("task projection block is missing")
+            current_raw = _extract_raw_projection_value(current_document)
+            if current_raw == current_registry:
+                return current_registry
             bounds = _validate_markers(current_document)
             newline = "\r\n" if "\r\n" in current_document else "\n"
             block = render_registry_block(current_registry, newline)
@@ -1614,7 +1571,7 @@ def handle_goal_event(
 
     [参数] path: PROJECT_CURRENT 路径；event: create、restore、blocked 或 complete；session_id: 会话标识。
     [返回] dict：事件动作、投影和可选 UI payload；complete 返回一次性完成收口 payload。
-    最近修改时间：2026-10-12 18:43:49；改动说明：多计划时拒绝按注册表顺序选择。
+    最近修改时间：2026-10-19 15:10:56；改动说明：Goal 只保护当前会话唯一的正式任务投影。
     """
     # 1. 先限制事件集合并读取既有投影；只有 create 可在无投影时初始化 Goal 默认清单。
     if event not in {"create", "restore", "blocked", "complete"}:
@@ -1632,17 +1589,17 @@ def handle_goal_event(
         else:
             raise
 
-    # 2. 收集当前会话活动正式计划；多条时不能按注册表顺序替用户选择。
+    # 2. 收集当前会话的活动正式任务；合法 registry 每个 session_id 只会有一条投影。
     formal_entries = [
         item for item in registry["projections"]
         if item["session_id"] == sid and item["state"] == "active"
         and (item["projection_origin"] == "persisted"
              or (item["projection_origin"] == "synthesized" and item["synthesis_mode"] == "exact"))
     ]
-    formal_projection = _projection_from_entry(formal_entries[0]) if len(formal_entries) == 1 else None
+    formal_projection = _projection_from_entry(formal_entries[0]) if formal_entries else None
 
     if event == "create":
-        # 3. 活动正式计划保持不变；多条计划时只返回保护结果，不生成有歧义的 UI payload。
+        # 3. 当前活动正式任务保持不变并返回唯一 payload。
         if formal_entries:
             return {
                 "ok": True,
@@ -2077,11 +2034,11 @@ def ensure_start_projection(
     *,
     session_id: str | None = None,
 ) -> dict[str, Any]:
-    """按计划身份原子写入首个或并存任务投影。
+    """原子写入当前会话最新任务，并替换该会话先前的投影。
 
     [参数] path: PROJECT_CURRENT 路径；input_value: 正式投影或 start/continue 补建上下文；session_id: 当前会话。
     [返回] dict：创建、保留或更新动作、投影和可直接调用的 payload。
-    最近修改时间：2026-10-12 18:43:49；改动说明：允许同会话不同计划独立登记。
+    最近修改时间：2026-10-19 15:10:56；改动说明：一个 session_id 只保留当前最新任务投影。
     """
     # 1. 先解析当前会话；没有显式参数时只允许使用宿主 CODEX_THREAD_ID。
     sid = _require_session_id(session_id)
@@ -2094,7 +2051,7 @@ def ensure_start_projection(
             raise ProjectionIOError(f"unable to read UTF-8 PROJECT_CURRENT: {target}") from error
         bounds = _validate_markers(document)
         registry = _load_registry_for_write(document, sid)
-        # 2. 先校验候选计划，再只查询同一 session + plan_key；同会话其它正式计划保留。
+        # 2. 先校验候选计划，再检查本会话唯一投影；不同任务身份视为当前会话的新任务。
         mode: str | None = None
         evidence: dict[str, Any] | None = None
         if _is_projection_input(input_value):
@@ -2111,8 +2068,24 @@ def ensure_start_projection(
             candidate = synthesis_result["projection"]
             mode = synthesis_result["mode"]
             evidence = synthesis_result["evidence"]
-        current_entry = _find_registry_entry(registry, sid, plan_key=candidate["plan_key"])
-        if current_entry is not None and current_entry["state"] in {"active", "blocked"}:
+        current_entries = [entry for entry in registry["projections"] if entry["session_id"] == sid]
+        if len(current_entries) > 1:
+            raise ProjectionContractError("registry contains multiple projections for session_id")
+        current_entry = current_entries[0] if current_entries else None
+        current_session_quarantined = any(
+            item["affected_session_id"] in {None, sid}
+            for item in registry.get("quarantined_projections", [])
+        )
+        same_task = current_entry is not None and all(
+            current_entry[field] == candidate[field]
+            for field in ("plan_key", "source_document", "projection_origin", "plan_fingerprint")
+        )
+        if (
+            current_entry is not None
+            and same_task
+            and not current_session_quarantined
+            and current_entry["state"] in {"active", "blocked"}
+        ):
             current_projection = _projection_from_entry(current_entry)
             action = "already_active" if current_entry["state"] == "active" else "blocked_preserved"
             return {
@@ -2123,13 +2096,19 @@ def ensure_start_projection(
                 "session_id": sid,
             }
 
-        # 3. 新计划独立追加；已有同身份计划按原行为保持活动态不覆盖。
+        # 3. 当前请求代表最新任务；在共享锁内替换本会话所有旧项和已归属隔离项。
         persisted = _upsert_projection_while_locked(
-            target, document, bounds, registry, candidate, sid
+            target,
+            document,
+            bounds,
+            registry,
+            candidate,
+            sid,
+            supersede_session_quarantine=True,
         )
     result = {
         "ok": True,
-        "action": "created",
+        "action": "replaced" if current_entry is not None or current_session_quarantined else "created",
         "projection": persisted,
         "payload": build_update_plan_payload(persisted),
         "session_id": sid,
@@ -2174,7 +2153,7 @@ def probe_timeout_projection(
 
     [参数] path: PROJECT_CURRENT.md 路径；started_at: 首次真实执行时间；observed_at: 当前检查时间；session_id: 当前会话；paused_seconds: 不计时暂停秒数。
     [返回] dict：not_due、already_active、blocked_goal_preserved 或 goal_check_required；payload 固定为空。
-    最近修改时间：2026-10-12 18:43:49；改动说明：按计划身份判断现有投影状态。
+    最近修改时间：2026-10-19 15:10:56；改动说明：隔离的同会话投影阻止超时恢复。
     """
     # 1. 先校验会话和时间；非法输入不得触碰项目状态。
     sid = _require_session_id(session_id)
@@ -2194,6 +2173,7 @@ def probe_timeout_projection(
     if effective_elapsed_seconds <= TIMEOUT_SECONDS:
         action = "not_due"
     else:
+        _assert_quarantine_unambiguous(registry or _new_registry(), sid)
         current_entries = [entry for entry in registry["projections"] if entry["session_id"] == sid] if registry else []
         active_entries = [entry for entry in current_entries if entry["state"] == "active"]
         blocked_goal_entries = [
@@ -2227,11 +2207,11 @@ def ensure_timeout_projection(
     session_id: str | None = None,
     paused_seconds: Any = 0,
 ) -> dict[str, Any]:
-    """按计划身份补建或更新超时任务投影。
+    """按当前会话唯一任务投影补建或更新超时状态。
 
     [参数] path: PROJECT_CURRENT.md 路径；started_at: 首次真实执行时间；observed_at: 本次观测时间；context: 合成证据；session_id: 当前会话；paused_seconds: 不计时的暂停秒数。
     [返回] dict：not_due、already_active、blocked_goal_preserved 或 escalated 动作及可用 payload。
-    最近修改时间：2026-10-12 18:43:49；改动说明：超时升级时保留同会话其它计划。
+    最近修改时间：2026-10-19 15:10:56；改动说明：超时路径校验当前会话隔离状态。
     """
     # 1. 先校验会话、时间和暂停输入；任一非法输入都不得触碰磁盘状态。
     sid = _require_session_id(session_id)
@@ -2263,6 +2243,7 @@ def ensure_timeout_projection(
             }
 
         # 3. 超时后只检查当前会话；活动投影和 blocked Goal 都直接返回且不重复写入。
+        _assert_quarantine_unambiguous(registry or _new_registry(), sid)
         current_entries = [entry for entry in registry["projections"] if entry["session_id"] == sid] if registry else []
         active_entries = [entry for entry in current_entries if entry["state"] == "active"]
         blocked_goal_entries = [

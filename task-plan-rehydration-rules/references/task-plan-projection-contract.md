@@ -2,7 +2,7 @@
 
 ## 托管区边界
 
-`PROJECT_CURRENT.md` 只允许一个任务投影托管区；托管区内部是 v5 registry，可保存多个会话 projection 与可追溯隔离记录。同一会话也可并存多个独立计划；每项必须绑定受控字段 `session_id` 和唯一 `projection_id`，按计划身份更新，不同计划和会话写入不得互相覆盖：
+`PROJECT_CURRENT.md` 只允许一个任务投影托管区；托管区内部是 v5 registry，可保存多个会话 projection 与可追溯隔离记录。每个 `session_id` 只能有一条当前任务投影；同一会话收到新任务时，以当前请求为准，在共享锁内替换旧投影。不同会话仍可并存，且互不覆盖：
 
 ````markdown
 <!-- BEGIN TASK PLAN PROJECTION -->
@@ -49,7 +49,7 @@ v5 registry 顶层字段必须且只能包含：
 | `version` | 接受 `1`、`2`、`3` 单 projection 与 `4` registry | 所有成功写入统一输出 `5` |
 | `registry_schema` | v1-v3 无此字段；v4 已有 | 固定为 `task_plan_projection_registry` |
 | `registry_updated_at` | v1-v3 无此字段；v4 已有 | 带 UTC 时区的 ISO-8601 |
-| `projections` | v1-v3 顶层 projection 在读取时包装为单项数组；v4 按兼容规则读取 | 数组；projection ID 与计划身份唯一，同一会话允许多个不同计划，不同会话可使用相同 `plan_key` |
+| `projections` | v1-v3 顶层 projection 在读取时包装为单项数组；v4 按兼容规则读取 | 数组；每个 `session_id` 唯一且只保留当前任务，不同会话可使用相同 `plan_key` |
 | `quarantined_projections` | v1-v4 无此字段 | 最多 512 项，保留坏项的原始 JSON 与有限诊断字段，仍受全文字节上限约束 |
 
 每个 v5 projection 的字段必须且只能包含：`projection_id`、`session_id`、`projection_origin`、`synthesis_mode`、`state`、`plan_key`、`source_document`、`plan_fingerprint`、`updated_at`、`steps`。`session_id` 非空且原样保存宿主会话 / 线程标识，仅允许出现在该字段。新写入的 canonical `projection_id` 固定为 `SESSION/<sha256>`：将下列对象按 UTF-8、`ensure_ascii=false`、键排序、紧凑分隔符序列化后计算 SHA-256，并加 `SESSION/` 前缀：
@@ -60,9 +60,9 @@ v5 registry 顶层字段必须且只能包含：
 
 `synthesis_mode` 不属于 canonical 身份字段。为读取历史 v4 registry，校验器还接受仅当把同一对象增加 `synthesis_mode` 后计算出的 legacy `SESSION/<sha256>` 与记录完全相等时的旧 ID。canonical 或 legacy 两种算法之一精确匹配即为有效；只与 canonical 结果不同、但与 legacy 结果相等，不是身份损坏。`validate` 和恢复操作不得自动改写 legacy ID；新条目使用 canonical ID，已存在 legacy 条目的常规状态更新可保留其 ID。两种算法都不匹配时，将该条目视为身份损坏：原文件字节保持不变，拒绝针对它的 payload/UI 恢复，不猜测或修复身份。
 
-`plan_fingerprint` 仅校验步骤 ID、顺序和文案，不证明会话或来源文档归属。所有恢复和写入必须同时校验该条的 `session_id`、`projection_id` 与 `plan_key`、`source_document`、`projection_origin` 身份。相同 `plan_key` 可以出现在不同 `session_id` 下；同一会话出现多条候选时，`validate`、`payload`、`deactivate` 等单投影读取或迁移必须显式提供 `--plan-key` 或 `--projection-id`，且选择结果唯一；如 `plan_key` 在同会话内有歧义，必须改用 `--projection-id`。选择器缺失或不唯一时失败关闭，不得按更新时间、数组顺序或活动状态猜测。
+`plan_fingerprint` 仅校验步骤 ID、顺序和文案，不证明会话或来源文档归属。所有恢复和写入必须同时校验该条的 `session_id`、`projection_id` 与 `plan_key`、`source_document`、`projection_origin` 身份。相同 `plan_key` 可以出现在不同 `session_id` 下；合法 registry 中同一个 `session_id` 必须唯一。`--plan-key` 或 `--projection-id` 只能校验当前唯一投影的身份，选择器不匹配时失败关闭，不能借选择器恢复同会话已被新任务替换的旧任务。
 
-v5 活动 `projections[]` 中单条无效时，读取器按条目容错：把所有损坏或身份重复候选放入 `quarantined_projections`，保留原始 JSON、来源版本、原数组索引、原因码和可验证的 `affected_session_id`，其余身份明确的计划继续可读可写；已有隔离记录校验后原样保留。`validate_registry` 作为写入前的最终闸门仍保持严格，候选 registry 任一条目无效时拒绝落盘，原文件字节不变。读取 v4 registry 时，顶层字段、标记、JSON、版本和数组上限仍严格校验；同一会话允许多个不同计划，不能仅按 `session_id` 去重。待隔离原文包含凭据、prompt、token 等敏感字段时，拒绝转换并保持原文件字节不变。读取只在内存转换、不改文件；显式 `migrate` 或后续成功写入才持久化 v5。隔离项与目标会话及所选计划身份可能冲突，或证据不足以排除冲突时，仅阻止该目标计划恢复 / 改写；其它会话和身份明确无关的计划可继续。若隔离记录无法验证所属会话，则证据不足以证明它与任何会话无关，所有会话的恢复 / 改写均失败关闭。托管标记、registry JSON 解析、顶层字段 / schema / 版本 / 数组上限损坏或隔离记录本身无效时整体失败关闭，保持原文件字节不变；整体失败关闭只退出悬浮任务列表重建与投影改写，不取消领域工作自身的执行授权。
+v4/v5 活动 `projections[]` 中无法校验的单条投影，读取器按条目容错放入 `quarantined_projections`，保留原始 JSON、来源版本、原数组索引、原因码和可验证的 `affected_session_id`；其它会话的有效投影继续可读可写。合法投影按 `session_id` 归并，同会话无论任务身份是否相同，都只保留 `updated_at` 唯一最大的一条，较旧项视为已被新任务替代；若最大时间并列，则隔离该会话并阻止其恢复，绝不按数组顺序猜测。`validate_registry` 作为写入前的最终闸门仍保持严格，同一 `session_id` 重复或其它条目无效时拒绝落盘。待隔离原文包含凭据、prompt、token 等敏感字段时，拒绝转换并保持原文件字节不变。读取只在内存转换、不改文件；显式 `migrate` 或后续成功写入才持久化 v5。已知归属当前会话的隔离项会阻止该会话恢复和常规改写；明确代表当前任务的 `ensure-start` 或正式 `write` 可在共享锁内替换本会话旧项并清除已知归属本会话的隔离项。会话归属未知的隔离项会阻止所有会话恢复或写入；托管标记、registry JSON 解析、顶层字段 / schema / 版本 / 数组上限损坏或隔离记录本身无效时整体失败关闭，保持原文件字节不变。整体失败关闭只退出悬浮任务列表重建与投影改写，不取消领域工作自身的执行授权。
 
 旧 v1-v3 projection 读取时必须绑定当前调用解析出的 `session_id` 后包装为 v5 registry；解析优先级固定为显式 `--session-id` > `CODEX_THREAD_ID` > WorkBuddy 宿主元数据（`CODEBUDDY_MCP_CONFIG` 的 `mcpServers.*.headers["X-WorkBuddy-Session-Id"]` 唯一值，或 `WORKBUDDY_SESSION_ID` 环境变量），多来源不一致、均缺失或非法时失败关闭，不得写入、恢复或迁移。任何成功 `write`、`ensure-start`、`deactivate`、Goal 生命周期或 `migrate` 都统一输出 v5。
 
@@ -115,7 +115,7 @@ v5 活动 `projections[]` 中单条无效时，读取器按条目容错：把所
 | Goal 阻断 | `blocked + goal_blocked` | 已完成步骤保留，未完成步骤均为 `pending`，不得有进行中；生成仅观察用途的 payload |
 | Goal 完成 | `inactive + goal_default` | 十步全部完成；返回一次性完成收口 payload，失活后不得再次生成活动 payload |
 | Goal 创建遇到 fallback | 既有 `synthesized/fallback` | fallback 只是恢复兜底，替换为 Goal 细化默认清单 |
-| 正式计划接管 | 既有 `persisted` 或 `synthesized/exact` | `create` 返回 `preserved_formal`；正式计划优先且保持独立，不写入 Goal 标识；若同一会话存在多条活动正式计划，返回空 projection/payload，不按数组顺序选择 |
+| 正式计划接管 | 既有 `persisted` 或 `synthesized/exact` | `create` 返回 `preserved_formal`；当前唯一正式计划优先且保持独立，不写入 Goal 标识；新正式任务通过 `write` 替换当前会话原投影 |
 | 已接管后的 Goal 生命周期 | `preserved_formal` | `restore`、`blocked`、`complete` 都返回无副作用的 `preserved_formal`；不得失活、改写或刷新真实正式计划 |
 
 读取旧版固定三步 Goal 时，将旧 `GOAL-01` 映射到新 `GOAL-01`，旧 `GOAL-02` 映射到新 `GOAL-05`，旧 `GOAL-03` 映射到新 `GOAL-09`，保留可迁移状态并为其它步骤补 `pending`；旧投影若已失活则新版全部置为 `completed`，阻断状态不得残留 `in_progress`。该转换只在内存读取中发生，后续成功写入时统一持久化新版清单。
@@ -124,7 +124,7 @@ v5 活动 `projections[]` 中单条无效时，读取器按条目容错：把所
 
 ## 指纹、大小与原子写入
 
-`PROJECT_CURRENT.md` 是多个会话共享的单一文件。投影更新、最近会话快照更新及普通当前状态更新必须共用锁文件 `.PROJECT_CURRENT.md.lock`；锁路径基于目标文件所在目录和文件名，不得另造每个 Skill 私有的锁名。写入者须先获取锁，再读取最新全文和 registry，只修改本 Skill 拥有的正文区段或精确选中的投影条目，校验其余区段与投影未被覆盖后才写回。锁获取失败、锁内重读失败或源身份不符时必须保持原字节不变。`fsync` 与 `os.replace` 仅保证完整原子替换，不可替代锁内读改写协议；两个会话并发更新时，每个调用须串行重读最新 registry 并合并自己拥有的单条记录。
+`PROJECT_CURRENT.md` 是多个会话共享的单一文件。投影更新、最近会话快照更新及普通当前状态更新必须共用锁文件 `.PROJECT_CURRENT.md.lock`；锁路径基于目标文件所在目录和文件名，不得另造每个 Skill 私有的锁名。写入者须先获取锁，再读取最新全文和 registry，只修改本 Skill 拥有的正文区段或当前 `session_id` 唯一投影，校验其他会话、隔离记录和普通正文未被覆盖后才写回。同会话新任务替换旧投影，不追加第二条；生命周期更新只更新当前唯一投影。锁获取失败、锁内重读失败或源身份不符时必须保持原字节不变。`fsync` 与 `os.replace` 仅保证完整原子替换，不可替代锁内读改写协议；不同会话并发更新时，每个调用须串行重读最新 registry 并合并自己的单条记录。
 
 指纹只包含步骤 ID、顺序和文案，序列化固定使用 UTF-8、`ensure_ascii=false`、键排序和紧凑分隔符，再计算 SHA-256；`state`、`status`、`updated_at`、`plan_key` 和 `source_document` 不参与指纹。
 
@@ -156,7 +156,7 @@ probe-timeout --project-current PROJECT_CURRENT.md --started-at <UTC-ISO-8601> -
 
 - `started_at` 是取得执行许可后第一个真实执行动作的 UTC 时间；`observed_at` 是当前检查点 UTC 时间；`paused_seconds` 是 Plan Mode、等待用户、`blocked` 和 `manual_handoff` 的累计暂停秒数，默认为 `0`。
 - 主动执行秒数固定为 `observed_at - started_at - paused_seconds`。只有严格大于 600 秒才到期；599 秒、600 秒和暂停扣减后不超过 600 秒均返回 `action: not_due`。
-- `probe-timeout` 只读取并校验 UTF-8 registry，不创建锁文件、临时文件、projection 或 payload。当前会话合法 `active` 返回 `already_active`；`blocked` 返回 `blocked_goal_preserved`；当前会话只有 `inactive` 或没有 projection 且到期时返回 `goal_check_required`。其它会话状态不得影响结果。`already_active` 仅代表磁盘状态，不代表 UI 显示成功；若 UI 未确认同步，恰有一条活动 projection 时调用 `ensure-timeout` 读取其现有 payload 后立即重试 `update_plan`，不创建 Goal、不替换投影。若当前会话有多条活动 projection，仅当正式计划或本回合首次同步返回值已明确证明目标身份时，使用只读 `payload --project-current PROJECT_CURRENT.md --session-id <session-id> --plan-key <plan-key>`（或 `--projection-id <projection-id>`）读取该条；身份不明或选择不唯一时禁止猜测、禁止刷新错误任务，继续领域任务并如实说明 UI 尚未同步。
+- `probe-timeout` 只读取并校验 UTF-8 registry，不创建锁文件、临时文件、projection 或 payload。当前会话合法 `active` 返回 `already_active`；`blocked` 返回 `blocked_goal_preserved`；当前会话只有 `inactive` 或没有 projection 且到期时返回 `goal_check_required`。其它会话状态不得影响结果。`already_active` 仅代表磁盘状态，不代表 UI 显示成功；若 UI 未确认同步，当前会话有且仅有一条合法活动 projection 时调用 `ensure-timeout` 读取其现有 payload 后立即重试 `update_plan`，不创建 Goal、不替换投影。历史重复项无法唯一归并、隔离或身份不明时，禁止猜测、禁止刷新错误任务，继续领域任务并如实说明 UI 尚未同步。
 - 非 UTC 时间、结束早于开始、负暂停、暂停大于墙钟时长、损坏 registry 或缺少 `session_id` 均返回非零，且目录和原文件没有副作用。
 
 `goal_check_required` 后的宿主调用顺序固定为：
@@ -185,7 +185,7 @@ goal --project-current PROJECT_CURRENT.md --event complete --session-id <session
 
 | 事件 | 磁盘行为 | action | payload |
 |---|---|---|---|
-| `create` | 无活动正式计划时原子写入细化安全清单；活动正式计划不覆盖 | `created` 或 `preserved_formal` | 活动 Goal；唯一正式计划可返回 projection/payload，多条正式计划时 projection/payload 为 `null` |
+| `create` | 当前唯一投影为活动正式计划时保留；否则原子写入或替换为细化安全清单 | `created` 或 `preserved_formal` | 活动 Goal；当前唯一正式计划可返回 projection/payload |
 | `restore` | Goal 安全投影只读；活动正式计划不改写 | `restored` 或 `preserved_formal` | 仅活动 Goal payload；正式计划为 `null` |
 | `blocked` | Goal 安全投影原子写入阻断状态并清除进行中步骤；正式计划无副作用 | `blocked` 或 `preserved_formal` | 阻断 Goal 观察 payload；正式计划为 `null` |
 | `complete` | Goal 安全投影先生成一次性完成收口 payload，再原子写入全部完成、失活状态；正式计划无副作用 | `completed` 或 `preserved_formal` | 完成收口 payload 或 `preserved_formal` 的 `null` |
