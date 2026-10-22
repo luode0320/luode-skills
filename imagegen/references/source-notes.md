@@ -1,5 +1,15 @@
 # Source notes（来源与调整记录）
 
+## 2026-10-19：统一生图配置目录为 `~/.imagegen/`
+
+- **来源类型**：内部更新（用户指令）
+- **用户诉求**：生图配置统一放在用户目录下的 `.imagegen/`，把该目录作为唯一的生图配置目录。
+- **改动落点**：
+  1. `scripts/imagegen.py`：配置常量改为 `~/.imagegen/config.json`，删除 `~/.ai-hive/config.json` 回退分支；`init` 写入统一配置并合并保留已有字段。
+  2. `SKILL.md`：新增「统一配置目录（唯一写入源）」小节，配置加载优先级、环境自检与凭据口径改为统一目录。
+  3. `references/cli.md`、`references/error-casebook.md`、`CHANGELOG.md`：同步路径口径。
+- **边界**：仅统一配置位置，不改变配置字段结构、模型优先级、多 Key 池与环境变量覆盖语义。
+
 ## 2026-10-05：新增「生成后符合度自检铁律」（内部更新通道）
 
 - **来源类型**：内部更新（用户指令）
@@ -30,5 +40,5 @@
   - `references/prompting.md` / `sample-prompts.md`：清除 Codex 路径与 gpt-image-1.5 痕迹
   - 删除：`codex-network.md`、`local-entrypoints.md`、`image-api.md`、`image_gen.py`、`bootstrap_imagegen_env.py`、`run_imagegen.ps1/.sh`、`agents/openai.yaml`
   - 保留：`remove_chroma_key.py`、`prompting.md`、`sample-prompts.md`、`config.example.json`、LICENSE、assets
-- **环境依赖登记**：AI Hive CLI 需 Python3 + requests、`sk-api-*` API Key（`~/.ai-hive/config.json` 0600 / `AI_HIVE_API_KEY` / `--api-key`）、外网；去底需 Pillow。SKILL.md 已含「环境自检」小节。
+- **环境依赖登记**：AI Hive CLI 需 Python3 + requests、`sk-api-*` API Key（统一配置 `~/.imagegen/config.json` 0600 / `AI_HIVE_API_KEY` / `--api-key`）、外网；去底需 Pillow。SKILL.md 已含「环境自检」小节。
 - **agent 通用性**：产物不再依赖任何单一 agent 宿主（内置出图工具按宿主名称描述）。

@@ -32,8 +32,8 @@
 ### IMG-005（保留，通用）：CLI 无可用通道
 
 - `状态`：`active` · `类型`：`鉴权` · `适用模型`：CLI fallback
-- `错误特征`：调用提示缺少或无效 API Key（401），或找不到 `~/.ai-hive/config.json`。
-- `根因`：CLI fallback 需要有效 `sk-api-*` Key；配置来源依次为 `~/.ai-hive/config.json`、`AI_HIVE_API_KEY` 环境变量、`--api-key`。
+- `错误特征`：调用提示缺少或无效 API Key（401），或找不到统一配置 `~/.imagegen/config.json`。
+- `根因`：CLI fallback 需要有效 `sk-api-*` Key；配置来源依次为统一配置 `~/.imagegen/config.json`、`AI_HIVE_API_KEY` 环境变量、`--api-key`。
 - `解决方案`：运行 `init` 引导配置或设置环境变量/传参；只提示配置位置，不回显或回写 secret；两条真实路径都不可用后明确标记尚未生成最终图片。
 - `验证`：`init` 后跑最简 `generate --no-download` 返回 `taskId`。
 - `来源`：AI Hive 通道鉴权逻辑；2026-09-05 通道切换后沿用。
@@ -52,6 +52,20 @@
 - `状态`：`superseded`（OpenAI `image_gen.py` 通道已于 2026-09-05 删除）
 - 历史内容：gpt-image-2 尺寸约束（16px 倍数/3840 上限/3:1/像素区间）、不支持 `background=transparent`、不支持设置 `input_fidelity`。
 - **不适用于当前 AI Hive 通道**：AI Hive 的分辨率/格式/参数以平台实时 `imageConfig` 为准，禁止照抄上述约束；确需确认时用一次 `--no-download` 任务试探或查平台实时配置。
+
+### IMG-007（保留，通用）：聊天渲染层拦截图片内联
+
+- `状态`：`active` · `类型`：`输出校验` · `适用模型`：任意（与生图模型无关） · `失败阶段`：交付展示
+- `环境/版本`：Qoder CN（Windows，客户端安装目录 `resources/app.asar`，2026-10-19 抓取）
+- `错误特征`：图片已真实生成并成功落盘，但聊天回复里显示为纯文本 `[Image blocked: <alt>]`；文件本身可正常解码。
+- `最小复现输入`：在 Qoder CN 聊天回复中发送 `![老虎](data:image/jpeg;base64,<...>)`。
+- `根因`：宿主聊天 Markdown 净化器把 `data:` 列入了 `blockedProtocols`，img 节点的 `src` 被判定为非法后整体替换成文本节点。与 CSP、图片体积、base64 长度、模型选择、生图通道均无关。
+  - 客户端证据（Qoder CN `resources/app.asar`）：`blockedProtocols = {javascript:, data:, file:, vbscript:}`；净化 schema `protocols.src = ["http","https"]`；拦截文案由 `resolveImageBlockPolicy()` 拼接为 `[Image blocked: ` + alt + `]`。
+- `解决方案`：改用宿主专用可视化通道承载图片（Qoder Desktop 用 `present_visualization` 提交内嵌 base64 的 HTML 片段，片段 < 1 MB），不要继续在聊天 Markdown 里重试 `data:`。`file:///` 与盘符绝对路径同样被拦，不要作为替代。
+- `验证`：同一图片改走 `present_visualization` 后工具返回成功快照（2026-10-19，本机 Qoder CN 实测）。该证据只证明片段通过校验并保存，**不证明客户端已渲染**；渲染是否生效仍需用户侧确认，不得用工具返回值自证展示成功。
+- `适用边界`：按宿主而非按模型判定；换宿主需重新实测，不得把 Qoder CN 的结论外推为所有 Electron 宿主。
+- `替代关系`：无 · `授权`：`imagegen` 维护 · `发生次数`：2（两个独立会话同类现象） · `首次观察`：2026-10-19 · `最后验证`：2026-10-19 · `用户确认`：用户在本轮报告现象并确认修复方向
+- `来源`：Qoder CN 客户端 asar 反查 + 两个独立会话（`e5e216ab…`、`ffa5907c…`）同类现象。
 
 ## AI Hive 通道可预期错误（待真实复现后转正式案例）
 

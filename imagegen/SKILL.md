@@ -39,14 +39,23 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 
 为了让开发机上所有项目（前后端、独立脚本、不同工作区）无需重复配置即可调用这套 API，本 skill 建立了分层解析与容灾机制：
 
-### 1. 配置加载优先级
+### 1. 统一配置目录（唯一写入源）
+
+- **配置目录固定为 `~/.imagegen/`**，Windows 即 `C:\Users\<用户名>\.imagegen\`。所有生图配置只放这里，不再使用 `~/.ai-hive/` 等其它目录。
+- **主配置固定为 `~/.imagegen/config.json`**：`base_url`、`model`、`model_priority`、`api_key`、`api_keys` 等全部字段都写在这一份文件里；多条通道（OpenAI 兼容端点、AI Hive 端点）共用同一份配置，不按通道分文件。
+- **`imagegen.py init` 写入该文件**，并在覆盖前保留已有的 `api_keys`、`model`、`model_priority` 等字段，不会把多 Key 池冲掉。
+- **未配置时**：提示用户自行创建或运行 `init`；agent 不得代填 Key，也不得回显 Key 原值。
+
+### 2. 配置加载优先级
 1. **CLI 运行时入参**（最高优先级）：`--model`、`--api-key`、`--base-url`
 2. **专用环境变量覆盖**：`IMAGEGEN_MODEL`、`IMAGEGEN_BASE_URL`、`IMAGEGEN_API_KEYS`
-3. **用户全局配置文件（核心单一真理源）**：`~/.imagegen/config.json`（跨所有项目通用，优先读取避免 Windows 进程环境变量缓存漂移）
+3. **统一配置文件（核心单一真理源）**：`~/.imagegen/config.json`（跨所有项目通用，优先读取避免 Windows 进程环境变量缓存漂移）
 4. **Windows 用户级注册表环境变量**：`PROJECT_IMAGE_MODEL`、`PROJECT_IMAGE_BASE_URL`、`PROJECT_IMAGE_OPENAI_API_KEY`
 5. **系统默认兜底**：模型 `gpt-image-2.5-sunburst`
 
-### 2. 多 Key 并发密钥池架构（Multi-Key Pool）
+> 仅运行时覆盖可走环境变量；任何需要长期保存的配置一律写回 `~/.imagegen/config.json`。
+
+### 3. 多 Key 并发密钥池架构（Multi-Key Pool）
 - **配置文件结构 (`~/.imagegen/config.json`)**：
   ```json
   {
@@ -105,10 +114,16 @@ description: "用于生成或编辑位图图片，例如插画、照片、纹理
 6. **不符合即重做（不得以"已生成"代替"已达标"）**：任一验收项为 `不符合` 时不得交付，须按不符合项做**定向修改**（已符合项保持不变，并在新 prompt 中复述关键约束防漂移），重新生成新图；同一资产多轮优化按 `v1`、`v2`、`v3` 递增命名，禁止覆盖旧版本，多问题时一次只改一个重点。连续 3 轮仍不达标 → 停止重试，向用户报告差距、已尝试修改与候选方向。
 7. **交付必须先展示再给路径（硬闸门）**：生图成功后，用户可见的交付必须让图片本身出现在回复中，路径只作为补充信息。
    - 宿主支持图片渲染时（Qoder Desktop、ChatGPT、Claude 等聊天界面），必须把图片以可渲染形式嵌入最终回复，而不是只写"已保存到 `<路径>`"。
-   - 嵌入写法优先级：宿主原生媒体交付工具（如 `present_files`）> `data:` URI 内联（`![alt](data:image/jpeg;base64,...)`）> 宿主已注册的本地资源协议。**禁止**直接使用 `file:///`、`/D:/` 或盘符绝对路径：主流 Electron 聊天渲染层的 CSP 通常为 `img-src 'self' data: blob: https: http:`，不含 `file:`，这类写法会被静默拦截成破图或原文。
-   - 大图必须先压缩成缩略图再内联（建议宽度 ≤ 800px、JPEG quality 60-75），避免撑爆上下文；原图仍完整落盘，回复里同时给出原图路径供下载。
-   - 纯 CLI / 无渲染能力的宿主，明确写"当前环境不支持内联渲染"并给出路径，不得伪造已展示。
-8. 最终汇报：展示结果（是否已内联渲染 + 使用的嵌入方式）、最终保存路径、最终 prompt 集、生图路径（内置 / CLI fallback）、使用的模型，以及本轮符合度自检结论。
+   - **嵌入通道按以下优先级逐个尝试，前一档真实成功才停**：
+     1. **宿主专用可视化 / 媒体通道**：Qoder Desktop 用 `present_visualization`（提交内嵌 base64 的 HTML 片段）；其他宿主若有自己的原生媒体工具（如 Doubao 的 `present_files`）优先用它。这条通道与聊天 Markdown 渲染分离，是目前唯一已知能绕开 Qoder CN 净化器的路径。
+     2. **`data:` URI 内联**：`![alt](data:image/jpeg;base64,...)`。**只有在该宿主已实测确认放行时才用**；不能凭"主流 Electron CSP 含 `data:`"臆测可用。
+     3. **宿主已注册的本地资源协议**。
+   - **Qoder CN 实证（2026-10-19，客户端 `resources/app.asar` 确认）**：聊天 Markdown 净化器 `harden()` 的 `blockedProtocols` 固定包含 `data:`、`file:`、`javascript:`、`vbscript:`；净化 schema 的 `src` 白名单只有 `http`、`https`。因此 `data:` 图片会被替换成纯文本 `[Image blocked: <alt>]`，`file:///` 与盘符绝对路径同样不可用。**Qoder CN 上必须走 `present_visualization`，不要用 `data:` 内联。**
+   - **拦截无法靠"换写法"绕过**：这不是 CSP、图片体积或 base64 长度问题，压缩到多小都会被拦。看到 `[Image blocked: ...]` 直接切第 1 档通道，不要反复重试内联。
+   - 大图必须先压缩：`present_visualization` 的 HTML 片段须控制在 1 MB 以内；`data:` 内联建议宽度 ≤ 800px、JPEG quality 60-75。原图始终完整落盘，回复里同时给出原图路径。
+   - **所有通道都失败时**：明确写"当前环境不支持内联渲染"并给出原图绝对路径，不得伪造已展示，也不得把"我已经贴了 base64"当成已渲染。
+   - **"工具返回成功"≠"用户已看见"**：`present_visualization` 返回成功只证明片段通过校验并保存为快照，**不证明客户端真的渲染出来了**。交付时只能说"已提交可视化通道"，不得断言"已展示"；若用户反馈看不到，按通道不可用处理并回退到路径交付，不要重复提交同一片段。
+8. 最终汇报：展示结果（**实际用了哪一档通道**、该通道是否经真实返回确认成功；若走降档必须写明原因）、最终保存路径、最终 prompt 集、生图路径（内置 / CLI fallback）、使用的模型，以及本轮符合度自检结论。
 
 ## 透明底规则
 
@@ -216,11 +231,11 @@ AI Hive CLI 通道环境依赖：
 | 依赖 | 说明 |
 |---|---|
 | Python 3 + `requests` | 脚本唯一运行时依赖；缺 `requests` 时 `pip3 install requests` |
-| API Key | 格式 `sk-api-*`。三种来源：`init` 子命令引导写入 `~/.ai-hive/config.json`（权限 0600）/ `AI_HIVE_API_KEY` 环境变量 / `--api-key` 参数 |
+| API Key | 格式 `sk-api-*`。三种来源：`init` 子命令引导写入统一配置 `~/.imagegen/config.json`（权限 0600）/ `AI_HIVE_API_KEY` 环境变量 / `--api-key` 参数 |
 | 外网 | 需可达 AI Hive API（默认 base URL） |
 | Pillow | 仅透明底去底 `remove_chroma_key.py` 需要 |
 
-凭据口径：`AI_HIVE_API_KEY` 默认来源为 `~/.ai-hive/config.json`（由 `init` 子命令引导写入，权限 0600），`AI_HIVE_API_KEY` 环境变量与 `--api-key` 参数仅作运行时覆盖；agent 不得代填，禁止在过程性输出中回显凭据原值。
+凭据口径：API Key 默认来源为统一配置 `~/.imagegen/config.json`（由 `init` 子命令引导写入，权限 0600），`AI_HIVE_API_KEY`、`IMAGEGEN_API_KEY` 等环境变量与 `--api-key` 参数仅作运行时覆盖；agent 不得代填，禁止在过程性输出中回显凭据原值。
 
 自检三步：① `python3 scripts/imagegen.py init` 配置 Key；② `models` 能力不存在时跑一次带 `--no-download` 的最简 `generate`，返回 `taskId` 即配置成功；③ 去底场景先确认 `import PIL` 可用。换机器/干净环境后按上表逐项恢复。
 

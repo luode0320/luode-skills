@@ -26,7 +26,9 @@ except ImportError:
 
 DEFAULT_BASE_URL = "https://api.luode.vip/v1"
 API_KEY_HELP_URL = "https://ai-hive.iclip.cn/chat"
-CONFIG_FILE_PATH = os.path.expanduser("~/.ai-hive/config.json")
+# 统一生图配置目录，所有通道与 init 共用同一份配置
+CONFIG_DIR_PATH = os.path.expanduser("~/.imagegen")
+CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, "config.json")
 DEFAULT_OUTPUT_DIR = os.path.expanduser("~/Downloads/AiHive")
 DEFAULT_TIMEOUT = 30  # HTTP 请求超时（秒）
 DEFAULT_POLL_INTERVAL = 3  # 轮询间隔（秒）
@@ -175,25 +177,33 @@ class Config:
 
     @staticmethod
     def _read_config_file():
-        imagegen_config = Path.home() / ".imagegen" / "config.json"
-        if imagegen_config.exists():
-            try:
-                with open(imagegen_config, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        try:
-            with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            try:
-                current_mode = os.stat(CONFIG_FILE_PATH).st_mode & 0o777
-                if current_mode & 0o077:
-                    os.chmod(CONFIG_FILE_PATH, 0o600)
-            except OSError:
-                pass
-            return data
-        except (FileNotFoundError, json.JSONDecodeError):
+        """读取统一配置目录下的生图配置。
+
+        [参数]
+        无
+
+        [返回]
+        dict: 配置字典；文件缺失或解析失败时返回空字典
+
+        最近修改时间: 2026-10-19 20:30:00 配置源统一为 ~/.imagegen/config.json
+        """
+        # 1. 只从统一配置目录读取，旧目录不再参与解析
+        config_file = Path(CONFIG_FILE_PATH)
+        if not config_file.exists():
             return {}
+        # 2. 解析失败按未配置处理，交由上层兜底
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return {}
+        # 3. 配置文件含密钥，尽力收紧为仅本人可读写
+        try:
+            if os.stat(config_file).st_mode & 0o077:
+                os.chmod(config_file, 0o600)
+        except OSError:
+            pass
+        return data
 
     def log(self, msg):
         if self.verbose:
@@ -760,20 +770,43 @@ def add_common_args(parser):
 # === CLI 入口 ===
 
 def _try_read_existing_api_key():
-    """安全读取已配置的 API Key，失败返回 None。"""
+    """安全读取统一配置中已存在的 API Key。
+
+    [参数]
+    无
+
+    [返回]
+    Optional[str]: 已配置的 Key；未配置或读取失败时返回 None
+
+    最近修改时间: 2026-10-19 20:30:00 兼容 api_keys 数组，避免误判为未配置
+    """
     env_key = os.environ.get("AI_HIVE_API_KEY")
     if env_key:
         return env_key
     try:
         with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data.get("api_key")
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         return None
+    if data.get("api_key"):
+        return data.get("api_key")
+    api_keys = data.get("api_keys")
+    if isinstance(api_keys, list) and api_keys:
+        return api_keys[0]
+    return None
 
 
 def cmd_init(args):
-    """交互式初始化 API Key 配置。"""
+    """交互式初始化统一生图配置中的 API Key。
+
+    [参数]
+    args: argparse.Namespace 命令行参数（读取 skill_name 用于来源归因）
+
+    [返回]
+    无
+
+    最近修改时间: 2026-10-19 20:30:00 写入统一配置目录并保留既有字段
+    """
     # 1. 检查是否已配置
     existing = _try_read_existing_api_key()
     if existing:
@@ -813,13 +846,15 @@ def cmd_init(args):
             continue
         break
 
-    config_dir = os.path.dirname(CONFIG_FILE_PATH)
-    os.makedirs(config_dir, exist_ok=True)
+    # 合并写入，保留已有的多 Key 池、模型与端点配置
+    os.makedirs(CONFIG_DIR_PATH, exist_ok=True)
+    existing_config = Config._read_config_file()
+    existing_config.update({"api_key": api_key, "base_url": existing_config.get("base_url") or DEFAULT_BASE_URL})
     with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
-        json.dump({"api_key": api_key, "base_url": DEFAULT_BASE_URL}, f, indent=2)
+        json.dump(existing_config, f, indent=2, ensure_ascii=False)
     os.chmod(CONFIG_FILE_PATH, 0o600)
 
-    print(f"\n[ok] 已写入 {CONFIG_FILE_PATH}（权限 0600）")
+    print(f"\n[ok] 已写入 {CONFIG_FILE_PATH}（统一配置目录，权限 0600）")
     print(f"\n验证：python3 {sys.argv[0]} user-info")
 
 
