@@ -253,7 +253,7 @@ def check_sections(
 ) -> None:
     # [参数] text: Markdown 文本；profile: 文档质量 profile；errors: 错误容器；enforce_profile: 是否执行专项章节约束。
     # [返回] None：把缺失或空章节写入 errors。
-    # 最近修改时间：2026-07-13 14:00:00 + 支持历史文档兼容和新文档专项约束分离。
+    # 最近修改时间：2026-10-22 14:40:34 + 支持历史文档用已校验的摘要字段兼容既有标题。
     """检查 profile 章节要求。"""
     # 1. 历史文档未启用专项约束时直接保留旧行为。
     if not enforce_profile:
@@ -262,6 +262,30 @@ def check_sections(
     bodies = section_bodies(text)
     lines = text.splitlines()
     records = {line_index: (level, title) for level, title, line_index in markdown_heading_records(text)}
+    # 2. 校验摘要字段映射并收集内容唯一且非空的摘要字段。
+    summary_aliases = profile.get("section_summary_field_aliases", {})
+    # 非法映射记录配置错误并按无映射继续校验。
+    if "section_summary_field_aliases" in profile and (
+        not isinstance(summary_aliases, dict)
+        or any(
+            not isinstance(field, str)
+            or not isinstance(aliases, list)
+            or not aliases
+            or not all(isinstance(alias, str) for alias in aliases)
+            for field, aliases in summary_aliases.items()
+        )
+    ):
+        errors.append("invalid section_summary_field_aliases profile mapping")
+        summary_aliases = {}
+    available_summary_fields = set()
+    # profile 存在映射字段时读取 H1 摘要值。
+    if summary_aliases:
+        opening = h1_opening(text)
+        for field in summary_aliases:
+            matches = re.findall(rf"(?:^|[；;。])\s*{re.escape(field)}\s*[：:]\s*([^；;。\n]+)", opening)
+            # 记录唯一且非空的摘要字段值。
+            if len(matches) == 1 and matches[0].strip():
+                available_summary_fields.add(field)
 
     def section_has_content(name: str) -> bool:
         for index, line in enumerate(lines):
@@ -281,14 +305,26 @@ def check_sections(
             return False
         return False
 
+    # 3. 检查单项必需章节是否存在且包含内容。
     for section in profile.get("required_sections", []):
         if section not in existing:
             errors.append(f"missing required section: {section}")
         elif not section_has_content(section):
             errors.append(f"required section is empty: {section}")
+    # 4. 检查章节组；仅在组内标题全部缺失时才允许摘要字段回退。
     for alternatives in profile.get("required_any_sections", []):
         names = [str(item) for item in alternatives]
         matched = next((name for name in names if name in existing and section_has_content(name)), None)
+        # 摘要字段回退仅用于对应章节组的所有标题都缺失的情况。
+        if matched is None and not any(name in existing for name in names):
+            matched = next(
+                (
+                    field
+                    for field, aliases in summary_aliases.items()
+                    if field in available_summary_fields and any(alias in names for alias in aliases)
+                ),
+                None,
+            )
         if matched is None:
             errors.append(f"missing one of required sections: {names}")
 

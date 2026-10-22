@@ -120,6 +120,10 @@ profiles:
     required_any_sections:
       - [文档信息, 结论, 验收结论, 验证结论, 审查结论]
       - [完成标准, 怎样算完成, 通过标准, 验收结论, 验证结论]
+    # 为旧 Bug 文档的结论与完成标准标题提供摘要字段兼容。
+    section_summary_field_aliases:
+      结论: [结论]
+      完成标准: [完成标准]
     id_prefixes: []
     diagrams: {}
     min_tables: 0

@@ -1057,6 +1057,55 @@ review_acceptance_gates:
                     # 2. 每个 profile 都必须接受符合自身契约的分层样例。
                     self.assertTrue(result["valid"], result["errors"])
 
+    # 验证 Bug profile 摘要字段兼容只命中对应章节组且保留失败边界。
+    # [参数] self: 测试上下文。
+    # [返回] None：断言精确摘要字段映射和失败边界。
+    # 最近修改时间：2026-10-22 14:34:54 增加 Bug profile 摘要字段兼容回归。
+    def test_bug_summary_fields_satisfy_only_exact_legacy_sections(self) -> None:
+        """精确摘要字段只兼容指定章节组，不绕过标题或空章节校验。"""
+        profile = self.payload["profiles"]["bug"]
+        # 1. 两个摘要字段都有效且必需标题均缺失时应兼容通过。
+        text = "# 问题\n结论：已修复；完成标准：验证通过。\n\n## 证据\n已有真实证据。\n"
+        errors: list[str] = []
+        validator.check_sections(text, profile, errors)
+        self.assertEqual(errors, [])
+
+        # 2. 已存在但为空的必需标题仍应失败，不能触发摘要回退。
+        text = "# 问题\n结论：已修复；完成标准：验证通过。\n\n## 结论\n\n## 证据\n已有真实证据。\n"
+        errors = []
+        validator.check_sections(text, profile, errors)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("missing one of required sections", errors[0])
+
+        # 3. 缺少任一对应摘要字段时仍应失败。
+        text = "# 问题\n结论：已修复。\n\n## 证据\n已有真实证据。\n"
+        errors = []
+        validator.check_sections(text, profile, errors)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("missing one of required sections", errors[0])
+
+        # 4. 未配置映射时保留原有必需标题行为。
+        profile_without_aliases = {
+            key: value for key, value in profile.items() if key != "section_summary_field_aliases"
+        }
+        errors = []
+        validator.check_sections(
+            "# 问题\n结论：已修复；完成标准：验证通过。\n\n## 证据\n已有真实证据。\n",
+            profile_without_aliases,
+            errors,
+        )
+        self.assertEqual(len(errors), 2)
+
+        # 5. 映射格式损坏时失败关闭并报告配置错误。
+        profile_with_invalid_aliases = {**profile, "section_summary_field_aliases": "结论"}
+        errors = []
+        validator.check_sections(
+            "# 问题\n结论：已修复；完成标准：验证通过。\n",
+            profile_with_invalid_aliases,
+            errors,
+        )
+        self.assertIn("invalid section_summary_field_aliases profile mapping", errors)
+        self.assertEqual(len(errors), 3)
 
 if __name__ == "__main__":
     unittest.main()
