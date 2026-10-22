@@ -1,6 +1,6 @@
 ---
 name: git-collaboration-rules
-description: 【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。每次 `git commit` 前必须以当前 staged 改动为准完成基础代码核查：格式、注释、安全性、并发安全性、系统崩溃风险和边界条件；不得以最近审查文档替代或阻断该核查。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。同一业务目标的改动合并为一笔提交：代码实现、运行配置、可执行测试、流程文档和项目状态同步文件随所属业务一起提交，不再按 `docs`、`test`、实现提交域二次拆分，互不相关的业务仍拆成多笔。测试与文件落点约束（Go 测试须在根 `test/`、`doc/5-tests/**` 只放说明与证据）与提交边界无关，继续生效。
+description: 【强制触发】凡当前这轮用户消息出现 Git 协作动作即触发（显式关键词 + 隐式语义），包括“提交git/帮我提交/commit一下/推送代码/看下状态/看下改动”等；新会话第一条也必须触发。触发后必须与 skill-hit-check-rules 联动命中。默认执行“最小可执行闭环”：短清单 + 阻断脚本 + 统一证据模板。每次 `git commit` 前必须以当前 staged 改动为准完成基础代码核查：格式、注释、安全性、并发安全性、系统崩溃风险和边界条件；不得以最近审查文档替代或阻断该核查。代码项目提交前必须保证最基本编译通过：仓库根命中 `go.mod`、`Cargo.toml`、`tsconfig.json`、带 `build` 脚本的 `package.json`、`pyproject.toml` 或 `setup.py` 时，必须真实跑通对应编译入口；编译失败、超时或工具链缺失一律阻断提交，编译通过也不等于功能已验证可用。用户明确请求“提交git”时，目标是清空当前全部未提交改动（staged、unstaged、untracked），允许按业务拆分多次提交，不要求一次提交完成，但必须循环到 `git status --short` 为空（除阻断项外）。同一业务目标的改动合并为一笔提交：代码实现、运行配置、可执行测试、流程文档和项目状态同步文件随所属业务一起提交，不再按 `docs`、`test`、实现提交域二次拆分，互不相关的业务仍拆成多笔。测试与文件落点约束（Go 测试须在根 `test/`、`doc/5-tests/**` 只放说明与证据）与提交边界无关，继续生效。
 ---
 
 # Git 协作规则（最小闭环版）
@@ -56,15 +56,22 @@ description: 【强制触发】凡当前这轮用户消息出现 Git 协作动�
 
 ## 1. 执行短清单（强制按顺序）
 
-1. 盘点工作树、staged、unstaged、untracked 与当前分支。
+1. 盘点工作树、staged、unstaged、untracked 与当前分支；出现批量“已暂存删除但文件仍在”时，先按 `references/staged-review-and-evidence.md` 的「索引漂移前置核对」恢复索引并重新盘点。
 2. 按 `references/commit-scope-and-clean-tree.md` 冻结业务提交范围和清空目标。
 3. 每次提交前按 `references/staged-review-and-evidence.md` 对当前 staged 改动完成基础代码核查与基础验收。
-4. 写入 README 提交日志并设定合规标题。
-5. 按 `references/pre-post-gates.md` 执行 pre gate。
-6. 执行 `git commit`，正文使用真实换行，禁止字面量 `\n`。
-7. 按 `references/pre-post-gates.md` 执行 post gate，失败时修正当前提交。
-8. 用户目标为“提交git”时按业务目标循环，直到 `git status --short` 为空或出现明确阻断。
-9. 按证据模板列出本轮所有 commit、核查范围、验证结果、放行文件和阻断项。
+4. 代码项目按 `references/baseline-compile-gate.md` 跑通最基本编译，未通过不得进入 commit。
+5. 写入 README 提交日志并设定合规标题。
+6. 按 `references/pre-post-gates.md` 执行 pre gate。
+7. 执行 `git commit`，正文使用真实换行，禁止字面量 `\n`。
+8. 按 `references/pre-post-gates.md` 执行 post gate，失败时修正当前提交。
+9. 用户目标为“提交git”时按业务目标循环，直到 `git status --short` 为空或出现明确阻断。
+10. 按证据模板列出本轮所有 commit、核查范围、编译结果、验证结果、放行文件和阻断项。
+
+## 1.0 代码项目最基本编译闸门（新增，强制）
+
+- 判定为代码项目时，提交前必须真实执行对应编译入口并取得退出码 0；任一入口失败、超时或所需工具链缺失，一律阻断本次提交。
+- 编译通过只证明“能编译”，不得据此宣称功能已验证可用；功能、接口和页面验证仍由测试类 skill 负责。
+- 判定口径、按语言选择入口、超时、跳过与等价回退细则见 `references/baseline-compile-gate.md`。
 
 ## 1.1 脚本查找与缺失回退（强制）
 
@@ -76,10 +83,11 @@ description: 【强制触发】凡当前这轮用户消息出现 Git 协作动�
 - 用户未放行却准备纳入非代理改动。
 - 标题、README 日志、测试落点或服务层落点不合规。
 - staged 基础核查发现 P0/P1、格式、注释、安全、并发、崩溃、边界或验证阻断。
+- 代码项目最基本编译未通过：入口返回非 0、超时，或所需工具链缺失导致无法验证编译。
 - pre/post gate 或等价回退未完整通过。
 - 最新 commit 正文含字面量 `\n`。
 
-详细机械条件见 `references/pre-post-gates.md`，人工核查条件见 `references/staged-review-and-evidence.md`。
+详细机械条件见 `references/pre-post-gates.md`，编译闸门口径见 `references/baseline-compile-gate.md`，人工核查条件见 `references/staged-review-and-evidence.md`。
 
 ## 3. 统一证据输出（强制）
 
@@ -90,9 +98,10 @@ description: 【强制触发】凡当前这轮用户消息出现 Git 协作动�
 - 当前轮授权与实际 Git 动作一致。
 - 每个 commit 只覆盖一个业务目标；同一业务目标的代码实现、可执行测试、流程文档和项目状态同步合并为同一笔提交，不再按提交域二次拆分。
 - 每次提交的 staged 基础核查和基础验收通过或有明确不适用依据。
+- 代码项目在提交前取得最基本编译通过的真实证据；非代码项目有明确的跳过依据。
 - pre/post gate 均通过；脚本缺失时等价回退完整通过并标注。
 - “提交git”场景最终工作树为空，除非存在已明确报告的阻断项。
-- 最终证据列出全部 commit、用户放行文件、验证结果和阻断项；不因提交动作自动生成审查或验收文档。
+- 最终证据列出全部 commit、用户放行文件、编译结果、验证结果和阻断项；不因提交动作自动生成审查或验收文档。
 
 ## 5. 执行文件
 
@@ -101,5 +110,6 @@ description: 【强制触发】凡当前这轮用户消息出现 Git 协作动�
 - `templates/evidence-template.md`
 - `references/current-turn-authorization.md`
 - `references/commit-scope-and-clean-tree.md`
+- `references/baseline-compile-gate.md`
 - `references/pre-post-gates.md`
 - `references/staged-review-and-evidence.md`

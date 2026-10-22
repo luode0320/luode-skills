@@ -18,6 +18,10 @@ def test_directories() -> list[Path]:
 
 def load_test_file(path: Path) -> None:
     """显式加载单个测试文件，不要求镜像目录可导入。"""
+    # 1) 把测试文件所在目录加入导入路径，使同目录 fixture 模块可被正常导入。
+    directory = str(path.parent)
+    if directory not in sys.path:
+        sys.path.insert(0, directory)
     spec = importlib.util.spec_from_file_location(path.stem, path)
     if spec is None or spec.loader is None:
         raise ImportError(f"unable to load test module: {path}")
