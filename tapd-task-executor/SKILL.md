@@ -98,24 +98,22 @@ TAPD 任务的目的是 agent 全自动调度执行，减少人工中间确认�
 - 优先取环境变量 `TAPD_USER_NAME` 或 `CURRENT_USER_NICK`；
 - 否则调用 `tapd-cli user info` 取当前登录用户 nick。
 
-### 3. 拉取我的任务 + bug
+### 3. 拉取我的任务 + bug（CLI 优先）
 
 遍历 `TAPD_WORKSPACE_IDS`（逗号分隔），对每个 workspace_id 执行：
 
-- **优先** `tapd-openapi/scripts/tapd_client_stdlib.py mine`（一条命令同时拉我名下的需求+缺陷，含当前迭代定位、状态过滤、优先级排序、父需求树）：
-  ```bash
-  python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py mine --workspace-id <id> --iteration current --status active
-  # 只看缺陷加 --bugs；只看需求加 --storys；状态 all 不过滤
-  ```
-  mine 输出为表格（含 19 位 id、状态、优先级、owner、标题、详情链接），直接解析为候选清单。
-- **兜底**（mine 不可用或需精确字段时）——**按人筛选的字段两个实体不一样，用错会静默返回全项目数据**：
-
+- **先用 `tapd-cli`** 按实体查询并筛选，两个实体的负责人字段不同，用错会静默返回全项目数据：
   ```bash
   tapd-cli bug   list workspaceid=<id> current_owner=<用户> status="<>closed" limit=50
   tapd-cli story list workspaceid=<id> developer=<用户> limit=200
   ```
-
-  story 用 `current_owner` 不报错但过滤失效；`task` 实体通常为空，找活默认查 story + bug。详见 `references/cli-field-pitfalls.md`。
+  story 使用 `current_owner` 不报错但过滤失效；`task` 实体通常为空，找活默认查 story + bug。详见 `references/cli-field-pitfalls.md`。
+- **直接 API 补位**：只有 CLI 无法满足当前迭代定位、活动状态过滤、父需求树或请求所需字段时，才用 `tapd-openapi/scripts/tapd_client_stdlib.py mine` 补齐缺失数据：
+  ```bash
+  python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py mine --workspace-id <id> --iteration current --status active
+  # 只看缺陷加 --bugs；只看需求加 --storys；状态 all 不过滤
+  ```
+  mine 输出为表格（含 19 位 id、状态、优先级、owner、标题、详情链接），只用于补齐 CLI 未覆盖的数据。
 
 汇总候选清单：id、标题、描述、优先级/严重度、状态、链接（`$TAPD_SITE_URL/tapd_fe/<workspace_id>/<story|bug>/detail/<entity_id>`）。
 

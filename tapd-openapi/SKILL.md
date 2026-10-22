@@ -1,6 +1,6 @@
 ---
 name: tapd-openapi
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD OpenAPI 调用。用于需求、缺陷、任务、评论、测试用例、迭代、评论、Wiki、工时、附件、用户等 TAPD 平台操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接（需求 / 缺陷 / 任务 / 迭代 / Wiki 等实体页），自动触发本 skill 并按需联动 `tapd-addcomment`、`tapd-cli`；执行任何 TAPD 动作前必须先做环境预检，`TAPD_TOKEN` 未配置时阻断 TAPD 任务并提示用户按 `tapd-env-bootstrap` 的本机真源配置或注入环境变量。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 操作路由与 OpenAPI 直接调用 skill。用于需求、缺陷、任务、评论、测试用例、迭代、Wiki、工时、附件、用户等 TAPD 操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接，先按 CLI 优先规则使用 `tapd-cli`；仅当 CLI 不支持或不能满足请求时才由本 skill 使用直接 OpenAPI 能力，API 也无法覆盖页面专属需求时才联动 `authenticated-url-routing-rules`。写评论等专用流程可联动 `tapd-addcomment`，但不得因此跳过 CLI 优先级。执行任何 TAPD 动作前必须遵守本 skill 的环境预检；`TAPD_TOKEN` 未配置时按本机真源规则阻断 API 操作。
 allowed-tools: Bash,Read,Glob,Grep
 ---
 
@@ -8,9 +8,10 @@ allowed-tools: Bash,Read,Glob,Grep
 
 ## 触发规则（tapd.cn 链接自动触发）
 
-- 用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动命中本 skill，不需要用户额外说“用 TAPD skill”；写评论场景联动 `tapd-addcomment`，终端批量脚本场景联动 `tapd-cli`。
-- 从链接解析定位信息：`{TAPD_SITE_URL}/tapd_fe/{workspace_id}/{module}/detail/{id}`（story→需求、bug→缺陷、task→任务、iteration→迭代），优先走 OpenAPI 查询实体数据，而不是用浏览器打开页面。
-- 仅当 API 无法覆盖需求（如需要页面截图、富文本渲染确认、人工登录操作）时，才回退到浏览器链路（`authenticated-url-routing-rules`）。
+- 用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动命中本 skill，不需要用户额外说“用 TAPD skill”；本 skill 负责串起 TAPD CLI、直接 OpenAPI 和浏览器的回退顺序。
+- 从链接解析定位信息：`{TAPD_SITE_URL}/tapd_fe/{workspace_id}/{module}/detail/{id}`（story→需求、bug→缺陷、task→任务、iteration→迭代），先检查并使用 `tapd-cli`，单条查询和批量操作都适用。
+- 只有 CLI 明确不支持所需实体、字段或操作，或无法提供请求所需数据时，才由本 skill 使用直接 OpenAPI 能力；不得仅因网页读取失败、浏览器已登录或标签页已打开而转浏览器。
+- 只有 CLI 与直接 API 均无法覆盖页面专属需求（如截图、富文本实际渲染、必须人工完成的页面操作）时，才回退至 `authenticated-url-routing-rules`。缺少 API 凭据或鉴权失败应按环境规则阻断，不得静默以浏览器绕过。
 
 ### 委派语义识别与路由（强制，防止误留在纯查询）
 
