@@ -2,7 +2,7 @@
 
 ## 2026-10-25 前端视觉改动对比 Demo 规则吸收与全量提交收口（Git 收口）
 
-- 当前状态: 规则资产已落盘并纳入本轮提交；工作树改动为单一业务目标（前端视觉对比 demo 闸门），无索引漂移。
+- 当前状态: 规则资产已落盘并已提交推送 `main`（提交 `d8600c2d`）；工作树改动为单一业务目标（前端视觉对比 demo 闸门），无索引漂移。
 - 本轮交付: ① 新增 `frontend-design/references/visual-change-demo.md`（唯一权威细则：触发面与四类免触发面、对比形态 `M1`-`M4`、可判定性硬约束、保真五档样式来源、闸门语义、产物纪律）；② `frontend-design/SKILL.md` 第 2 步追加 1 行视觉改动对比闸门；③ `frontend-ui-visual-rules/SKILL.md` 暂停条件追加 1 行引用；④ `doc/6-review/` 新增 6-review 记录并登记 README 索引；⑤ 刷新 `skill-dictionary/data.js` 与 `字典.md`；⑥ 项目记忆与历史事件同步沉淀。
 - 关键决策: ① 规则补进既有 `frontend-design` 而非新建独立 skill 目录——它已是前端 UI/组件/样式改动的主路径，另两处只留单句引用，避免双权威日后各自漂移；② demo 必须继承项目真实样式（五档来源：真实构建产物 CSS → token 源文件 → 挂项目跑真实组件 → `M3` 截图 → `getComputedStyle` 兜底），手搓近似样式会让「演示通过、落地不符」比不出 demo 更糟；③ before 版是校准基准，before 偏了 after 的判断随之失效；④ 免 demo 仅四类且必须写明依据。
 - 验证: 两个 skill `quick_validate.py` 均 `Skill is valid!` 退出码 0（Windows 下需 `PYTHONUTF8=1`，脚本自身默认 GBK 解码会假失败）；三文件 UTF-8 且乱码替换符 0 命中；`references_total` 928→929 与实际新增 1 个 reference 一致；6-review 六维自查 PASS。仓库根仅 `package.json` 且无 `build` 脚本，编译闸门按规则判 `N/A`。

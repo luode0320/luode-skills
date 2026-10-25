@@ -27,9 +27,21 @@
 
 ## 计数锚点区
 
+> 本区由 `memory-usage-tracking-rules` 收口闸门维护：仅"实际引用"条目时 +1（用于决策/输出/代码）；同会话同条目只 +1；`usage_days` 当天首次引用时 +1。HISTORY 锚点 key 使用事件主题短语（可前缀匹配）；事件被裁剪时锚点随事件一起删除。
+
 ```yaml
 version: 1
 anchors:
+  - title: "前端视觉改动对比 Demo 规则吸收并全量提交收口（Git 收口）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
+  - title: "索引漂移识别与全量提交收口（Git 收口）"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: "规则吸收与全量提交收口（Git 收口）"
     usage_count: 0
     usage_days: 0
@@ -120,14 +132,4 @@ anchors:
     usage_days: 0
     last_used_at: null
     absorbed_to: null
-  - title: "Goal 模式低风险授权默认通过规则补充（用户裁决）"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-
-  - title: "imagegen 生图「生成后符合度自检」规则落地（内部更新通道）"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
+```
