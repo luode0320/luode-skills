@@ -1,5 +1,13 @@
 # 项目当前状态
 
+## 2026-10-25 前端视觉改动对比 Demo 规则吸收与全量提交收口（Git 收口）
+
+- 当前状态: 规则资产已落盘并纳入本轮提交；工作树改动为单一业务目标（前端视觉对比 demo 闸门），无索引漂移。
+- 本轮交付: ① 新增 `frontend-design/references/visual-change-demo.md`（唯一权威细则：触发面与四类免触发面、对比形态 `M1`-`M4`、可判定性硬约束、保真五档样式来源、闸门语义、产物纪律）；② `frontend-design/SKILL.md` 第 2 步追加 1 行视觉改动对比闸门；③ `frontend-ui-visual-rules/SKILL.md` 暂停条件追加 1 行引用；④ `doc/6-review/` 新增 6-review 记录并登记 README 索引；⑤ 刷新 `skill-dictionary/data.js` 与 `字典.md`；⑥ 项目记忆与历史事件同步沉淀。
+- 关键决策: ① 规则补进既有 `frontend-design` 而非新建独立 skill 目录——它已是前端 UI/组件/样式改动的主路径，另两处只留单句引用，避免双权威日后各自漂移；② demo 必须继承项目真实样式（五档来源：真实构建产物 CSS → token 源文件 → 挂项目跑真实组件 → `M3` 截图 → `getComputedStyle` 兜底），手搓近似样式会让「演示通过、落地不符」比不出 demo 更糟；③ before 版是校准基准，before 偏了 after 的判断随之失效；④ 免 demo 仅四类且必须写明依据。
+- 验证: 两个 skill `quick_validate.py` 均 `Skill is valid!` 退出码 0（Windows 下需 `PYTHONUTF8=1`，脚本自身默认 GBK 解码会假失败）；三文件 UTF-8 且乱码替换符 0 命中；`references_total` 928→929 与实际新增 1 个 reference 一致；6-review 六维自查 PASS。仓库根仅 `package.json` 且无 `build` 脚本，编译闸门按规则判 `N/A`。
+- 知识库: 细则已完整沉淀于 `20-Knowledge/AI协作/前端样式改动先出对比demo.md`，项目记忆只留一行结论加指针，避免两处各写一遍导致口径漂移。
+
 ## 2026-10-22 索引漂移识别与全量提交收口（Git 收口）
 
 - 当前状态: 工作树已按业务拆成 8 笔提交并推送 `origin/main`；本轮新增的索引漂移判据已写入 `git-collaboration-rules/references/staged-review-and-evidence.md`「索引漂移前置核对」。
@@ -46,7 +54,7 @@
 {
   "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-19T08:24:46.240109Z",
+  "registry_updated_at": "2026-10-25T10:59:24.587397Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -540,226 +548,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/a94296b288abe7fa6ef931b7ffc0d371a9e5f868061e178d2b069f3e6501fbfa",
-      "session_id": "01a12eac-6a20-7992-a19a-9a77e4446acc",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "2026-10-12-PROJECTION-ENTRY-READABLE-STEPS",
-      "source_document": "PROJECT_CURRENT.md",
-      "plan_fingerprint": "d900db13d2faa8624bd3bcb62498ab105e61109d4b9cbbdce3409005c5e02a3f",
-      "updated_at": "2026-10-12T10:51:46.735181Z",
-      "steps": [
-        {
-          "id": "TASK-ENTRY-01",
-          "step": "[TASK-ENTRY-01] 对照用户截图确认编号说明、步骤细度和展示模式",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-02",
-          "step": "[TASK-ENTRY-02] 确认 Goal、普通会话与 Plan 模式都要默认显示清楚步骤",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-03",
-          "step": "[TASK-ENTRY-03] 对比纯内部编号示例与可读动作说明示例",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-04",
-          "step": "[TASK-ENTRY-04] 追踪入口 Skill、投影脚本和宿主清单的职责",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-05",
-          "step": "[TASK-ENTRY-05] 明确确认任务后先建投影再做领域侦察",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-06",
-          "step": "[TASK-ENTRY-06] 规定每步写清动作、对象和可辨认结果，编号只作辅助",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-07",
-          "step": "[TASK-ENTRY-07] 明确同会话来源匹配与多计划按 plan_key 选择",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-08",
-          "step": "[TASK-ENTRY-08] 保证 UI 工具缺失或同步失败时任务继续执行",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-09",
-          "step": "[TASK-ENTRY-09] 更新入口 Skill 与任务投影 Owner 规则，不改投影脚本",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-10",
-          "step": "[TASK-ENTRY-10] 同步吸收表、来源记录、知识库和技能字典",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-11",
-          "step": "[TASK-ENTRY-11] 完成 Skill 校验、知识库检查和独立规则审计",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-12",
-          "step": "[TASK-ENTRY-12] 记录宿主窗口宽度与实际 UI 显示的验证边界",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-ENTRY-13",
-          "step": "[TASK-ENTRY-13] 完成差异复核并关闭当前会话投影",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/ca79132d96fb4cc70bf10a0aa35b6b47458ef22dd615b7417fdcf3b3d99c5d41",
-      "session_id": "01a12f8e-2011-7e33-a52f-f238568dcd02",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SESSION/goal-rule-update-continuation",
-      "source_document": "PROJECT_CURRENT.md",
-      "plan_fingerprint": "1500b202d8b73c7f0d62891ba4dc9c01c528101f4046266cf7df9f7fa58d68b8",
-      "updated_at": "2026-10-13T05:41:06.184040Z",
-      "steps": [
-        {
-          "id": "RESTORE-01",
-          "step": "核验本会话 Goal 规则更新的目标、现有完成记录和恢复边界",
-          "status": "completed"
-        },
-        {
-          "id": "RESTORE-02",
-          "step": "收集当前会话及项目文档的只读证据，确认是否还有原目标必需工作",
-          "status": "completed"
-        },
-        {
-          "id": "RESTORE-03",
-          "step": "按证据补齐尚未完成的 Goal 规则更新或必要收口",
-          "status": "completed"
-        },
-        {
-          "id": "RESTORE-04",
-          "step": "校验本会话恢复步骤已安全收口并报告结果",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/efe1e5328d41eb9419e907714a7ebe9b13b7122d0033757afbdbbf1229f57fde",
-      "session_id": "01a13862-e7ff-79a0-8c38-97ce57065413",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SESSION/WRT-20261014-KB-CLEANUP-001",
-      "source_document": "USER-APPROVED-PLAN/WRT-20261014-KB-CLEANUP-001",
-      "plan_fingerprint": "b3a0adfdb6881ab1087af466adcf6a122acd58526c88e442e3523cac7566efa3",
-      "updated_at": "2026-10-14T04:41:07.298231Z",
-      "steps": [
-        {
-          "id": "WRT-KB-01",
-          "step": "[WRT-KB-01] 按授权定位并备份目标知识笔记原始字节",
-          "status": "completed"
-        },
-        {
-          "id": "WRT-KB-02",
-          "step": "[WRT-KB-02] 最小修订后续重评与再次拦截的权限边界",
-          "status": "completed"
-        },
-        {
-          "id": "WRT-KB-03",
-          "step": "[WRT-KB-03] UTF-8 回读并运行知识索引检查与局部审计",
-          "status": "completed"
-        },
-        {
-          "id": "WRT-KB-04",
-          "step": "[WRT-KB-04] 校验失败时只恢复目标原文并完成收口",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/42677e6fe75a4485d7f01bc080fbedf8d6ed50b41e13bffbe8b756f0f62f940e",
-      "session_id": "47f3713d-01db-48aa-94c7-46ef7cfd324c",
-      "projection_origin": "synthesized",
-      "synthesis_mode": "exact",
-      "state": "inactive",
-      "plan_key": "SYNTH-EXACT/IMPORT-DOUBAO-CREATIVE-VIDEO",
-      "source_document": "README.md",
-      "plan_fingerprint": "f337db484592b22ce42f4b4be63470b11a67cece24e5fa78208979e19fbcbbed",
-      "updated_at": "2026-10-15T09:26:49.419271Z",
-      "steps": [
-        {
-          "id": "TASK-DCV-01",
-          "step": "[TASK-DCV-01] 确认用户级 skill 目录与外部 skill 引入命名约定",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-DCV-02",
-          "step": "[TASK-DCV-02] 复制 doubao-creative-video 全部文件到仓库根目录",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-DCV-03",
-          "step": "[TASK-DCV-03] 校验复制结果的文件数、字节数与 UTF-8 编码完整",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-DCV-04",
-          "step": "[TASK-DCV-04] 检查与既有 skill 的触发冲突并确定优先级",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-DCV-05",
-          "step": "[TASK-DCV-05] 刷新 skill 字典 data.js 与 字典.md",
-          "status": "completed"
-        },
-        {
-          "id": "TASK-DCV-06",
-          "step": "[TASK-DCV-06] 执行 skill 资产合规收口检查并输出结论",
-          "status": "completed"
-        }
-      ]
-    },
-    {
-      "projection_id": "SESSION/de27c90e59b60ce045d893d8ab47113c2cb8d61e65d491f923fd4771833f4a11",
-      "session_id": "dc19480f-1d2a-41aa-b0df-2c3a7080f4f2",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "SHOWCASE/NAV-THUMB-FIX-001",
-      "source_document": "frontend-design/component-library/showcase/use-anchor-nav.ts",
-      "plan_fingerprint": "67518e1b247b71ecef68e48cdbd6ccc1e14702923bb665066e1e3b7473c1ffc2",
-      "updated_at": "2026-10-15T18:05:29.021588Z",
-      "steps": [
-        {
-          "id": "AN-01",
-          "step": "[AN-01] 复现并定位滑块延迟与首次震荡根因：平滑滚动中 pick 回写 activeKey 覆盖点击目标",
-          "status": "completed"
-        },
-        {
-          "id": "AN-02",
-          "step": "[AN-02] 修复锚点导航：编程滚动期间锁定目标高亮，滚动稳定后解锁再交回滚动跟随",
-          "status": "completed"
-        },
-        {
-          "id": "AN-03",
-          "step": "[AN-03] 浏览器验证单次点击直达目标、无中间震荡，快速连点与滚轮跟随仍正确",
-          "status": "completed"
-        },
-        {
-          "id": "AN-04",
-          "step": "[AN-04] 回归组件守卫与类型构建并收口清理",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/b6b9c59c8154277718e96dc28e242f5fe3042f6d1441ac612b70638d7096d73e",
       "session_id": "11a0691d-1a60-440f-babc-a6a351a48abd",
       "projection_origin": "goal",
@@ -890,6 +678,64 @@
           "id": "RULE-04",
           "step": "[RULE-04] 回读改动并完成 Skill 合规与规则关联检查，报告验证证据",
           "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/39852bbdccbfcd8f269e77f47258571150f34d27c45de0ae1614b36df494a598",
+      "session_id": "54815839-a36a-49f2-8af1-62c4651f41c3",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "GIT-COMMIT/2026-10-25",
+      "source_document": "doc/6-review/2026-10-25_前端视觉改动对比Demo规则_6-review.md",
+      "plan_fingerprint": "3f16289aa436b530668790ca632b7de09ee5c6ee821e0585ee3b5c6889984a5d",
+      "updated_at": "2026-10-25T11:10:00Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "[TASK-01] 盘点工作树改动并冻结本轮提交范围",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "[TASK-02] 核对前端视觉对比 demo 规则与知识库笔记是否已完整落盘",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-03",
+          "step": "[TASK-03] 吸收经验：把本轮可复用结论写入项目记忆与历史事件",
+          "status": "in_progress"
+        },
+        {
+          "id": "TASK-04",
+          "step": "[TASK-04] 刷新技能字典与 README 改动日志，保证索引与日志一致",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-05",
+          "step": "[TASK-05] 暂存全部文件并完成 staged 基础代码核查与基础验收",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-06",
+          "step": "[TASK-06] 运行 pre gate（标题格式、README 日志、空白、编译闸门）取得 PASS",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-07",
+          "step": "[TASK-07] 创建提交并运行 post gate 校验提交正文无字面量换行",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-08",
+          "step": "[TASK-08] 推送到 origin/main 并核对工作树为空",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-09",
+          "step": "[TASK-09] 输出提交证据清单并完成运行时状态收口",
+          "status": "pending"
         }
       ]
     }

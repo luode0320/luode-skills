@@ -1,5 +1,5 @@
 window.SKILL_DICTIONARY = {
-  "generated_at": "2026-10-22 23:10:50",
+  "generated_at": "2026-10-25 19:02:04",
   "repo_root": "D:\\谷歌云盘\\luode-skills",
   "plan_doc": "编码skill.md",
   "plan_doc_name": "编码skill.md",
@@ -9,7 +9,7 @@ window.SKILL_DICTIONARY = {
     "planned_missing": 8,
     "seed_total": 128,
     "doc_total": 12,
-    "references_total": 928,
+    "references_total": 929,
     "agents_total": 81
   },
   "downloaded_seeds": {
@@ -2738,7 +2738,8 @@ window.SKILL_DICTIONARY = {
             "frontend-design/references/component-catalog.md",
             "frontend-design/references/component-library-baseline.json",
             "frontend-design/references/redrop-report.json",
-            "frontend-design/references/source-notes.md"
+            "frontend-design/references/source-notes.md",
+            "frontend-design/references/visual-change-demo.md"
           ],
           "agents": [],
           "has_license": false,
@@ -11149,7 +11150,8 @@ window.SKILL_DICTIONARY = {
         "frontend-design/references/component-catalog.md",
         "frontend-design/references/component-library-baseline.json",
         "frontend-design/references/redrop-report.json",
-        "frontend-design/references/source-notes.md"
+        "frontend-design/references/source-notes.md",
+        "frontend-design/references/visual-change-demo.md"
       ],
       "agents": [],
       "has_license": false,
@@ -17057,7 +17059,7 @@ window.SKILL_DICTIONARY = {
       "id": "doc:PROJECT_HISTORY",
       "name": "PROJECT_HISTORY",
       "file_name": "PROJECT_HISTORY.md",
-      "title": "项目历史",
+      "title": "项目历史事件",
       "kind": "其他文档",
       "path": "PROJECT_HISTORY.md",
       "is_plan_doc": false

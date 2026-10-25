@@ -179,3 +179,14 @@
 - **验证**：规范源与 `C:/Users/luode/.agents/skills/frontend-design/SKILL.md` 的新规则回读一致；组件库路径、目录索引与 design+ 术语检索均可达；未改 description 或 `##` 级标题，技能字典无需刷新；本轮不涉及前端源码，未运行构建或业务测试。
 - **评分**：独立复核代理两次因模型容量不足未启动，按 darwin-rubric 改用间隔后的第三方视角静态复评；D1-D7 改前沿用 2026-10-19 基线 `9/9/10/8/10/10/8`（68.3/75），改后为 `9/10/10/8/10/10/9`（71.3/75，+3.0），提升来自 design+ 工作流、边界和架构闭环；D8 未运行真实场景 prompt，不把静态复核冒充实测。
 - **环境依赖 / agent 通用性**：环境依赖 N/A；规则落点为通用 `SKILL.md` 与 references，所有 agent 可读取执行。
+
+## 2026-10-25 · 视觉改动对比 Demo 规则（内部规则更新）
+
+- **触发与来源**：用户指出前端改样式、改组件、调 CSS 时，只用文字描述"要改成什么样"用户难以判断，需要给出 HTML demo 对比新旧后再继续。来源为内部经验更新，不是外部 skill 吸收。
+- **原子裁决**：合并 6 条规则（触发面与免触发面、对比形态四级 M1-M4、可判定性硬约束、保真约束、闸门语义、产物纪律）；拒绝新建独立 skill 目录（已有 `frontend-design` 承接）；拒绝把六段细则复制到 `frontend-ui-visual-rules`（避免双权威）。
+- **落点**：新增 `references/visual-change-demo.md`（唯一权威）；`SKILL.md` 第 2 步检查点追加"视觉改动对比闸门"1 条；`frontend-ui-visual-rules/SKILL.md`「需要暂停并确认的条件」追加 1 行引用。
+- **边界**：与 `design-review:visual-regression-review`（宿主插件，改动后回归）不重叠；与 `frontend-component-rules`（组件工程边界）不重叠。用户已给出无歧义目标值、纯内部重构、看不见的改动可免 demo，但须写明依据。
+- **同域去重**：范围 = `frontend-design`、`frontend-ui-visual-rules`、`frontend-component-rules`；发现 0 处重复段落（六段细则仅存于权威文件）、0 处门控层叠（两处入口均为单句引用）、0 处散落产物；引用链双向可达，**PASS**。
+- **验证**：`quick_validate.py` 两个 skill 均 `Skill is valid!`（需 `PYTHONUTF8=1`，脚本自身默认 GBK 解码）；新文件 UTF-8 无乱码；`generate_dictionary.py` 刷新后 `references_total` 928→929；未改 `description`，但因新增 reference 文件，字典引用清单需同步故一并刷新。
+- **环境依赖 / agent 通用性**：环境依赖 N/A（纯 Markdown 规则，渲染通道按宿主能力三级降级，不绑定单一 agent）；落点为通用 `SKILL.md` 与 references，所有 agent 可读取执行。
+- **2026-10-25 追加增强**：用户补充要求 demo 必须继承原项目样式（不能与真实项目外观偏离太远）。原保真约束扩写为：样式来源五档优先级（真实构建产物 CSS → token 源文件 → 项目内真实组件 → `M3` 真实页面截图 → `getComputedStyle` 兜底）+ 复用真实 class 与 DOM + 四条禁止 + before 版须与真实页面并排校准 + 字体资源 404 检查；`SKILL.md` 闸门条同步补一句指引。
