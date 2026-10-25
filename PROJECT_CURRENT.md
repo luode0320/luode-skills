@@ -54,7 +54,7 @@
 {
   "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-25T10:59:24.587397Z",
+  "registry_updated_at": "2026-10-25T11:11:59.295424Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -686,11 +686,11 @@
       "session_id": "54815839-a36a-49f2-8af1-62c4651f41c3",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
-      "state": "active",
+      "state": "inactive",
       "plan_key": "GIT-COMMIT/2026-10-25",
       "source_document": "doc/6-review/2026-10-25_前端视觉改动对比Demo规则_6-review.md",
       "plan_fingerprint": "3f16289aa436b530668790ca632b7de09ee5c6ee821e0585ee3b5c6889984a5d",
-      "updated_at": "2026-10-25T11:10:00Z",
+      "updated_at": "2026-10-25T11:11:59.295193Z",
       "steps": [
         {
           "id": "TASK-01",
@@ -705,37 +705,37 @@
         {
           "id": "TASK-03",
           "step": "[TASK-03] 吸收经验：把本轮可复用结论写入项目记忆与历史事件",
-          "status": "in_progress"
+          "status": "completed"
         },
         {
           "id": "TASK-04",
           "step": "[TASK-04] 刷新技能字典与 README 改动日志，保证索引与日志一致",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-05",
           "step": "[TASK-05] 暂存全部文件并完成 staged 基础代码核查与基础验收",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-06",
           "step": "[TASK-06] 运行 pre gate（标题格式、README 日志、空白、编译闸门）取得 PASS",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-07",
           "step": "[TASK-07] 创建提交并运行 post gate 校验提交正文无字面量换行",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-08",
           "step": "[TASK-08] 推送到 origin/main 并核对工作树为空",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-09",
           "step": "[TASK-09] 输出提交证据清单并完成运行时状态收口",
-          "status": "pending"
+          "status": "completed"
         }
       ]
     }
