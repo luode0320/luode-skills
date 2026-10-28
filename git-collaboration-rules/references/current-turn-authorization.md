@@ -15,6 +15,7 @@
 - 该例外只覆盖「推送」这一动作的授权粒度，不放开提交前置门禁：pre/post gate 仍需逐笔通过，提交粒度仍按业务目标拆分。
 - 负向边界绝对优先：用户当轮显式写出「只提交，不要推送」「不要推送」等限制时，严格停在本地提交并等待后续指令。
 - 其他项目不适用本例外；未显式声明「提交即推送」的项目仍按上面的「当前轮隔离」逐动作授权，不得把本例外扩散到别的仓库。
+- 该例外的落点不只 `AGENTS.md`：`project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `resolve_no_auto_commit_body()` 负责按 `basename "$REPO_DIR"` 判定归属仓库，仅在命中 `luode-skills` 时才追加 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA`。改这段正文或注入条件时必须同源同测，`grep` 只能证明文本存在、不能证明注入范围正确；对应回归是 `test/project-rule-file-bootstrap-rules/bootstrap_agents_test.py` 的归属/非归属双仓库断言。
 
 ### 非代理改动保护
 

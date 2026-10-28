@@ -7,6 +7,7 @@
 - 关键决策: ① 判定用仓库 slug 而非路径前缀——`basename` 对临时目录与真实仓库给出一致结果，回归测试可直接在 `TemporaryDirectory` 内覆盖两种仓库名；② 正文常量与注入逻辑必须同源同测，只改正文不补归属判定会让授权边界静默失效，而 `grep -c` 只能证明文本在、不能证明注入条件正确；③ 子目录规则文件走同一解析函数，保持「同一规则全仓一份权威正文」；④ 历史提交 `76975c58` 是这类「能力被回归掉」的唯一可靠线索，规则漂移排查先 `git log -S` 定位。
 - 验证: `bash -n` 语法检查 PASS；`bootstrap_agents_test.py -v` 3 项全通过（55.177s）；`scan_test_pollution.py --diff-only` 输出 `POLLUTION: PASS`；`check_memory_anchors.py` 全绿（memory 58 实体、style 35/35、history 20/20）；`knowledge_index.py check` 全库 419 篇、死链 0、未挂载 0；`validate_engineering_docs.py --profile style_regression` PASS；`check_punctuation.py` ok；字典重跑 `implemented_total 66 / planned_missing 8 / seed_total 128`。仓库根 `package.json` 无 `build` 脚本，编译闸门按规则判 `N/A`。
 - 知识库: 新增 `20-Knowledge/AI协作/默认值验证必须隔离配置优先级与进程缓存.md` 并挂载到 AI 协作 MOC；本轮另修复 11 篇存量笔记的 frontmatter、4 处死链与 5 处未挂载，全库合规检查从 12 处违规收敛为 0。巡检 `_index (1).json` 为 Google Drive 生成的 2026-10-19 陈旧索引副本（343 条 vs 现行 425 条），登记为同步冲突但不删除。
+- 记忆计数: `rule.repo-commit-implies-push` 本轮实际引用升至 `usage_count 3 / usage_days 3`，达到吸收阈值；查重确认已被 `git-collaboration-rules` 完整覆盖（`SKILL.md` 行 29 + `references/current-turn-authorization.md` 项目级例外节），按「已覆盖则更新不新建」补入自举脚本归属注入的防漂移说明，并把 `absorbed_to` 写为 `git-collaboration-rules` 冻结计数，未新建重复 skill。
 
 ## 2026-10-27 imagegen 模型清单收敛为唯一 gpt-image-2（Git 收口）
 

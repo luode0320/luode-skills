@@ -121,7 +121,8 @@
 - 稳定决策：**负向边界绝对优先**——用户当轮显式写出「只提交，不要推送」「不要推送」等限制时，严格停在本地提交并等待后续指令，不得按默认闭环继续推送。
 - 稳定决策：**不扩散到其他项目**——其他仓库未显式声明「提交即推送」时仍按逐动作授权，不得把本例外套用到别的仓库。
 - 来源：用户指令（2026-10-01「推送, 这个项目提交并推送做为项目规则写进规则md」）+ `AGENTS.md` / `CLAUDE.md`「严禁自动提交 Git」章节 + `project-rule-file-bootstrap-rules/scripts/bootstrap_agents.sh` 的 `BODY_NO_AUTO_COMMIT` + `git-collaboration-rules/references/current-turn-authorization.md` 项目级例外节。
-- 更新时间：2026-10-01。
+- 沉淀状态：已沉淀，通用规则由 `git-collaboration-rules` 承接（`references/current-turn-authorization.md` 项目级例外节 + `SKILL.md` 行 29）；本条目不再重复吸收，后续引用走该 skill。
+- 更新时间：2026-10-29。
 
 
 ## 代码项目提交前编译闸门（2026-10-22 固化）
@@ -1670,10 +1671,10 @@ entities:
     context_ids:
       - context.git-collaboration
     updated_at: 2026-10-01
-    usage_count: 2
-    usage_days: 2
-    last_used_at: 2026-10-25
-    absorbed_to: null
+    usage_count: 3
+    usage_days: 3
+    last_used_at: 2026-10-29
+    absorbed_to: "git-collaboration-rules"
   - entity_id: fact.skill-size-baseline-20260717
     name: "Skill 体积治理统计基线"
     type: "统计口径"
