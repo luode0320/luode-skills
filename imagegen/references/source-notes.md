@@ -1,5 +1,21 @@
 # Source notes（来源与调整记录）
 
+## 2026-10-27：模型清单收敛为唯一 `gpt-image-2`
+
+- **来源类型**：内部更新（用户指令）
+- **用户诉求**：生图 skill 的模型限制在 `gpt-image-2`，删除 `gpt-image-2.5-flare`、`gpt-image-2.5-sunburst`。
+- **改动落点**：
+  1. `SKILL.md`：description 由「优先 gpt-image-2.5-sunburst」改为「唯一模型 gpt-image-2」；开篇说明、模型梯队章节由三档改为唯一模型 + 禁止事项、CLI fallback 描述、配置加载兜底、示例配置、核心规则选型条同步。
+  2. `references/config.example.json`：`model`、`models`、`model_priority` 三处收敛为 `gpt-image-2`。
+  3. `scripts/image_gen.py`：`DEFAULT_MODEL` 改为 `gpt-image-2`；`_resolve_default_model` 文档串与函数注释同步。
+  4. `scripts/imagegen.py`：模型解析兜底与 `SKILL_CONFIG` 的 `model` / `search` 改为 `gpt-image-2`；函数注释同步。
+  5. `CHANGELOG.md`：新增 2.5.0 条目并提示已存在的 `~/.imagegen/config.json` 需同步。
+- **边界**：`--model` 参数层按用户明确选择保持宽松（只改默认值，不加白名单）；AI Hive 通道固定 `public_model_gpt_image_2` 不受影响；`CHANGELOG.md` 2.1.0 与 `references/source-notes.md` 历史条目按只读保留。
+- **仓外同步**：用户级 `~/.imagegen/config.json`（三处模型字段）与用户级环境变量 `IMAGEGEN_MODEL`、`PROJECT_IMAGE_MODEL` 经用户确认后改为 `gpt-image-2`；配置文件改前备份为 `config.json.bak.20261027`。
+- **同域冗余扫描**：`grep -rn "sunburst\|flare"` 全仓仅 `SKILL.md:20` 禁止条款保留历史模型名；`.system/imagegen` 官方快照不含被删模型。
+- **环境依赖**：沿用既有 Python3 + requests、`~/.imagegen/config.json`、外网；本轮未新增依赖。
+- **agent 通用性**：通用，未引入任何宿主绑定。
+
 ## 2026-10-19：统一生图配置目录为 `~/.imagegen/`
 
 - **来源类型**：内部更新（用户指令）

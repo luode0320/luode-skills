@@ -22,7 +22,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from io import BytesIO
 
-DEFAULT_MODEL = "gpt-image-2.5-sunburst"
+DEFAULT_MODEL = "gpt-image-2"
 DEFAULT_SIZE = "auto"
 DEFAULT_QUALITY = "medium"
 DEFAULT_OUTPUT_FORMAT = "png"
@@ -163,7 +163,7 @@ def _resolve_image_api_keys() -> List[str]:
 
 
 def _resolve_default_model() -> str:
-    """按优先级链解析生图模型（sunburst > flare > 2）。
+    """按优先级链解析生图模型（固定 gpt-image-2）。
 
     [参数]
     无
@@ -171,7 +171,7 @@ def _resolve_default_model() -> str:
     [返回]
     str: 目标生图模型标识
 
-    最近修改时间: 2026-09-24 16:05:00 优先读取配置文件中的默认模型
+    最近修改时间: 2026-10-27 10:30:00 模型清单收敛为唯一 gpt-image-2
     """
     # 1. 显式专用环境变量覆盖
     env_override = os.getenv("IMAGEGEN_MODEL")

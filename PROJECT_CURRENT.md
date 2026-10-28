@@ -1,5 +1,13 @@
 # 项目当前状态
 
+## 2026-10-27 imagegen 模型清单收敛为唯一 gpt-image-2（Git 收口）
+
+- 当前状态: 仓库内 8 个文件已改（6 个 skill 资产 + 2 个字典产物）并新增 1 份 6-review 记录，已随本轮第一笔提交收口；本机 `~/.imagegen/config.json` 与两个用户级环境变量已按用户确认同步为 `gpt-image-2`。
+- 本轮交付: ① `imagegen/SKILL.md` 的 description、模型章节、CLI 描述、配置兜底、核心规则统一为唯一 `gpt-image-2`；② `references/config.example.json` 三处模型字段收敛；③ `scripts/image_gen.py` 的 `DEFAULT_MODEL` 与函数注释；④ `scripts/imagegen.py` 的解析兜底与 `SKILL_CONFIG`；⑤ `CHANGELOG.md` 2.5.0；⑥ 吸收登记 `workbuddy-absorption-map.md` 与 `references/source-notes.md`；⑦ `doc/6-review/2026-10-27_imagegen模型收敛gpt-image-2_6-review.md` 并登记 README 索引；⑧ 字典刷新。
+- 关键决策: ① 只改默认值，不加 `--model` 白名单——用户明确选择「只改默认值」，需在文档中写清该边界，避免被误读为参数层已锁死；② 历史文件（`CHANGELOG.md` 2.1.0、`source-notes.md` 旧条目、`workbuddy-absorption-map.md` 旧行）按只读保留，历史记录描述的是当时事实；③ `SKILL.md` 保留一条禁止条款列出两个历史模型名，用于阻断回退，属有意保留；④ `.system/imagegen` 官方快照不含被删模型，无需同步。
+- 验证: 两脚本 `py_compile` 通过；示例配置 JSON 解析正常；隔离 HOME + 清除环境变量后 `_resolve_default_model()` 返回 `gpt-image-2`，新进程复验一致；`quick_validate.py` 返回 `Skill is valid!`；`POLLUTION: PASS`；5 个改动文件 UTF-8 无乱码、LF、无尾随空白；字典旧模型计数 0；6-review 六维自查 PASS。真实出图未执行（会消耗额度且用户未要求产出图片），已显式降级为静态验证。
+- 已知遗留: `image_gen.py:39` `GPT_IMAGE_2_MODEL` 与 `image_gen.py:521` `_decode_and_write` 全仓无引用，属本轮之前的存量死代码，按最小改动原则未处置，登记为后续技术债候选。
+
 ## 2026-10-25 前端视觉改动对比 Demo 规则吸收与全量提交收口（Git 收口）
 
 - 当前状态: 规则资产已落盘并已提交推送 `main`（提交 `d8600c2d`）；工作树改动为单一业务目标（前端视觉对比 demo 闸门），无索引漂移。
@@ -54,7 +62,7 @@
 {
   "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-25T11:11:59.295424Z",
+  "registry_updated_at": "2026-10-28T18:07:10.695449Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -649,39 +657,6 @@
       ]
     },
     {
-      "projection_id": "SESSION/44b12ee99b0e0853d33587cc47b6e533431a189e21fc3d980d25decc276219da",
-      "session_id": "01a15230-a27f-7630-b018-ade5a31b6361",
-      "projection_origin": "persisted",
-      "synthesis_mode": "none",
-      "state": "inactive",
-      "plan_key": "PEARL-GLASS-LIBRARY-DISCOVERY-20261019",
-      "source_document": "frontend-design/SKILL.md",
-      "plan_fingerprint": "4e58a93bd1305ff54d33e8c29e59a7a2204aa527b168dfc1e7ba516089545ae2",
-      "updated_at": "2026-10-19T08:24:46.240109Z",
-      "steps": [
-        {
-          "id": "RULE-01",
-          "step": "[RULE-01] 读取用户指向的会话，摘录“目录不存在”的触发语境和目标项目",
-          "status": "completed"
-        },
-        {
-          "id": "RULE-02",
-          "step": "[RULE-02] 核对 frontend-design 的组件目录结构和使用规则，定位目录误判原因",
-          "status": "completed"
-        },
-        {
-          "id": "RULE-03",
-          "step": "[RULE-03] 更新权威 skill 中的组件库定位、目录确认和跨项目使用规则",
-          "status": "completed"
-        },
-        {
-          "id": "RULE-04",
-          "step": "[RULE-04] 回读改动并完成 Skill 合规与规则关联检查，报告验证证据",
-          "status": "completed"
-        }
-      ]
-    },
-    {
       "projection_id": "SESSION/39852bbdccbfcd8f269e77f47258571150f34d27c45de0ae1614b36df494a598",
       "session_id": "54815839-a36a-49f2-8af1-62c4651f41c3",
       "projection_origin": "persisted",
@@ -736,6 +711,44 @@
           "id": "TASK-09",
           "step": "[TASK-09] 输出提交证据清单并完成运行时状态收口",
           "status": "completed"
+        }
+      ]
+    },
+    {
+      "projection_id": "SESSION/9f6bb24a8caff540a09cbe6e8cfc920fc7801fa2fc9d209fbd42493eb9b5c113",
+      "session_id": "a4831359-4453-4e52-89e7-61d827792292",
+      "projection_origin": "persisted",
+      "synthesis_mode": "none",
+      "state": "active",
+      "plan_key": "GIT-ALL/2026-10-29",
+      "source_document": "CHAT-MINIMUM-PLAN/GIT-ALL-20261029",
+      "plan_fingerprint": "793ea23440af28caad2e76c91c675dda165b645174f9b8ecd506f46edfebb90f",
+      "updated_at": "2026-10-28T18:07:10.682903Z",
+      "steps": [
+        {
+          "id": "TASK-01",
+          "step": "[TASK-01] 盘点全部未提交改动、项目规则与索引状态，冻结按业务目标拆分的提交范围",
+          "status": "completed"
+        },
+        {
+          "id": "TASK-02",
+          "step": "[TASK-02] 复核实际差异并吸收已有可复用经验，避免重复修改已完成的规则",
+          "status": "in_progress"
+        },
+        {
+          "id": "TASK-03",
+          "step": "[TASK-03] 同步必要的技能字典、README 提交日志、项目记忆与知识引用",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-04",
+          "step": "[TASK-04] 逐笔完成 staged 核查、pre/post gate、提交与推送，确认工作树清空",
+          "status": "pending"
+        },
+        {
+          "id": "TASK-05",
+          "step": "[TASK-05] 完成 Skill 合规审计、记忆计数与运行时状态收口，报告全部证据",
+          "status": "pending"
         }
       ]
     }

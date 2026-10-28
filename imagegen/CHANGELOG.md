@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.0（2026-10-27）
+
+- **模型清单收敛**：删除 `gpt-image-2.5-sunburst` 与 `gpt-image-2.5-flare`，本 skill 只支持 `gpt-image-2` 单一模型；模型梯队章节由三档优先级改为唯一模型说明，并新增禁止回退或透传其它模型名的条款。
+- **默认值对齐**：`SKILL.md` 的 description、CLI fallback 描述、配置加载兜底、示例配置、`references/config.example.json`、`scripts/image_gen.py` 的 `DEFAULT_MODEL`、`scripts/imagegen.py` 的模型解析兜底与 `SKILL_CONFIG` 全部改为 `gpt-image-2`。
+- **生效范围提醒**：已存在的 `~/.imagegen/config.json` 若仍写有已删除模型，需把 `model`、`models`、`model_priority` 同步改为 `gpt-image-2`，否则脚本会按配置文件优先读取旧值。
+
 ## 2.4.0（2026-10-19）
 
 - **修正媒体交付通道优先级**：原规则把 `data:` URI 内联列为可用备选，并假设"主流 Electron CSP 包含 `data:`"。实测 Qoder CN 的聊天 Markdown 净化器在协议层就把 `data:`、`file:` 列入黑名单，与 CSP 无关，该假设不成立。

@@ -7,6 +7,9 @@
 | 2026-09-05 | 同上 | 提示词结构/图片文字/参考图角色/电商场景 | prompting.md/sample-prompts.md 已覆盖且更强 | 保留本地 | — | 不吸收 | prompting.md/sample-prompts.md 清 CODEX_HOME 路径痕迹 |
 | 2026-09-05 | 同上 | 产品化文档形态（FAQ/子命令大全） | 形态非规则精华 | 拒绝（形态） | — | 不吸收 | 仅借鉴 FAQ 写法入 cli.md |
 | 2026-10-05 | 内部更新（用户指令） | 生成后符合度自检铁律：出图不等于完成，逐条比对用户提示词与约束，出现"不符合"必须定向修改并重新生成新图 | 原有仅一句"出图后检查：主体、风格、构图、文本准确性、约束是否满足"，无判定结论、无重做闭环 | 合并 | 通用 | `SKILL.md` 核心规则新增铁律 + 工作流第 5/6/7 步重写；`references/prompting.md` 新增「生成后符合度自检」节（逐条清单 + 判定与处置） | 规则正文与操作细则分层，未新增同域重复定义 |
+| 2026-10-27 | 内部更新（用户指令） | 模型清单收敛：只保留 `gpt-image-2`，删除 `gpt-image-2.5-sunburst` / `gpt-image-2.5-flare` | 原为三档模型梯队（sunburst 默认主力 / flare 极速 / 2 兜底），散落在 description、模型章节、配置兜底、示例配置与两个脚本 | 合并（收敛） | 通用 | `SKILL.md` description + 模型章节 + CLI 描述 + 配置兜底 + 核心规则；`references/config.example.json`；`scripts/image_gen.py` 的 `DEFAULT_MODEL` 与函数注释；`scripts/imagegen.py` 的解析兜底与 `SKILL_CONFIG`；`CHANGELOG.md` 2.5.0 | 三档模型说明压为单模型说明，净减 18 行；同域扫描 `.system/imagegen` 官方快照不含被删模型，无需同步；`--model` 参数层按用户决定保持宽松，仅改默认值 |
+
+**同域冗余扫描（2026-10-27）**：扫描 `grep -rn "sunburst\|flare"` 全仓，权威版 `imagegen/` 内仅 `SKILL.md:20` 的禁止条款保留历史模型名（有意保留，用于阻断回退），脚本与配置示例 0 残留。同域 `.system/imagegen`（官方快照）仅使用 `gpt-image-2` 与 `gpt-image-1.5`，不含被删模型，无需同步。结论 PASS。
 
 **同域冗余扫描（2026-09-05）**：扫描范围 imagegen + 图片生成同域（.system/imagegen 官方快照、buddy-image-processing、2D 素材设计/生产 skill）。发现：SKILL.md 内 `<skill-dir>` 路径写法与 prompting/sample-prompts 统一一致；gpt-image-2 独立目录删除后无散落产物；引用链可达。清理 0 处残留冗余。结论 PASS。
 

@@ -567,7 +567,7 @@ def _generate_image_openai(client, args):
     [返回]
     list: 生成图片本地保存路径列表
 
-    最近修改时间: 2026-09-24 16:20:00 支持多 Key 轮换与优先 gpt-image-2.5-sunburst
+    最近修改时间: 2026-10-27 10:30:00 模型清单收敛为唯一 gpt-image-2
     """
     import base64
     url = f"{client.config.base_url.rstrip('/')}/images/generations"
@@ -581,7 +581,7 @@ def _generate_image_openai(client, args):
             or cfg.get("model")
             or (cfg.get("model_priority")[0] if cfg.get("model_priority") else None)
             or os.getenv("PROJECT_IMAGE_MODEL")
-            or "gpt-image-2.5-sunburst"
+            or "gpt-image-2"
         )
     # 2. 组装请求体载荷
     body = {
@@ -977,7 +977,7 @@ def main():
 
 
 # === Skill 固定配置（由构建器生成，imagegen 吸收 gpt-image-2 通道后归属改为 imagegen） ===
-SKILL_CONFIG = json.loads('{"example": "高级商业摄影风格的产品主视觉，主体清晰，材质真实，留出标题空间", "keywords": "文生图、图生图、图片编辑、参考图生成、电商图、广告图、详情页、带货、种草", "model": "gpt-image-2.5-sunburst", "name": "imagegen", "rule": "optional", "search": "imagegen AI 图片生成与编辑的 CLI 通道，默认最高画质模型 gpt-image-2.5-sunburst", "title": "imagegen AI 图片生成与编辑（多模型/多Key并发通道）"}')
+SKILL_CONFIG = json.loads('{"example": "高级商业摄影风格的产品主视觉，主体清晰，材质真实，留出标题空间", "keywords": "文生图、图生图、图片编辑、参考图生成、电商图、广告图、详情页、带货、种草", "model": "gpt-image-2", "name": "imagegen", "rule": "optional", "search": "imagegen AI 图片生成与编辑的 CLI 通道，唯一模型 gpt-image-2", "title": "imagegen AI 图片生成与编辑（多模型/多Key并发通道）"}')
 
 def _validate_image_inputs(args):
     count = len(args.image or [])

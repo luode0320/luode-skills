@@ -3,6 +3,7 @@
 > 本文件追加关键历史事件并只保留最近 20 条（按日期倒序、新事件置顶、追加后自动裁剪）；普通启动默认不读取，只有历史追问、当前状态不足或真实卡点时才窄检索。
 
 ## 事件
+- 2026-10-27：**imagegen 模型清单收敛为唯一 gpt-image-2**。用户要求「生图的 skill，把模型限制在 gpt-image-2，删除 gpt-image-2.5-flare、gpt-image-2.5-sunburst」。本轮只改模型名与默认值，不动通道结构。落点：`SKILL.md` description / 模型章节 / CLI 描述 / 配置兜底 / 核心规则、`references/config.example.json` 三处模型字段、`scripts/image_gen.py` 的 `DEFAULT_MODEL`、`scripts/imagegen.py` 的解析兜底与 `SKILL_CONFIG`、`CHANGELOG.md` 2.5.0。关键教训：① 改 skill 默认值不等于改本机生效值——同名的 `IMAGEGEN_MODEL`、`PROJECT_IMAGE_MODEL` 用户级环境变量优先级高于脚本常量，`~/.imagegen/config.json` 又高于环境变量，验证时若不隔离这三层会误判「改动没生效」；② Windows 用户级环境变量只对新建进程生效，当前 shell 仍读旧值，必须用新进程复验；③ 旧模型名在 `.pyc` 缓存里仍有残留，但 `__pycache__` 未被 Git 跟踪，用 `git ls-files` 确认后不必处理；④ `--model` 参数层按用户明确选择保持宽松（只改默认值，不加白名单），此边界须在文档中写清以免误认为已锁死。验证：两个脚本 `py_compile` 通过；示例配置 JSON 解析正常；清除环境变量后在隔离 HOME 下 `_resolve_default_model()` 返回 `gpt-image-2`，再在新进程复验仍为 `gpt-image-2`；`quick_validate.py` 返回 `Skill is valid!`；`POLLUTION: PASS`；字典旧模型计数 0。仓外同步：`~/.imagegen/config.json` 与两个用户级环境变量已按用户确认改为 `gpt-image-2`，配置改前备份 `config.json.bak.20261027`。
 - 2026-10-25：**前端视觉改动对比 Demo 规则吸收并全量提交收口（Git 收口）**。用户要求「吸收经验并根据 git 提交 skill 的规则，所有文件提交 git」。本轮业务目标单一：把「改样式/改组件/调 CSS 必须先给新旧对比 demo」沉淀为 skill 规则。落点裁决结论是补进既有 skill 而非新建独立目录——`frontend-design` 已是前端 UI/组件/样式改动的主路径，另两处只留单句引用，避免双权威日后各自漂移。新增 `frontend-design/references/visual-change-demo.md` 为唯一权威细则（触发面与四类免触发面、对比形态四级 `M1`-`M4`、可判定性硬约束、保真五档样式来源、闸门语义、产物纪律）；`frontend-design/SKILL.md` 第 2 步追加 1 行闸门条、`frontend-ui-visual-rules/SKILL.md` 暂停条件追加 1 行引用。关键教训：① demo 必须长在项目自己的样式上（`<link>` 真实构建产物 CSS → `@import` token → 挂项目跑真实组件 → `M3` 截图 → `getComputedStyle` 兜底），手搓近似样式会让「演示通过、落地不符」比不出 demo 更糟；② before 版是校准基准，before 偏了 after 的判断随之失效；③ `quick_validate.py` 在 Windows 默认 GBK 解码读 UTF-8 中文 SKILL.md 会假失败，须 `PYTHONUTF8=1` 重跑同一脚本而非改脚本；④ 字典生成器每次写入新时间戳，`data.js` 与 `字典.md` 的 `generated_at` 必然变化，核对计数应比对 `references_total` 等结构字段而非整文件哈希。验证：两个 skill `quick_validate.py` 均 `Skill is valid!` 退出码 0；三文件 UTF-8 且乱码替换符 0 命中；`references_total` 928→929 与实际新增 1 个 reference 一致；6-review 六维自查 PASS。本仓库根仅 `package.json` 且无 `build` 脚本，编译闸门按规则判 `N/A`。
 - 2026-10-22：**索引漂移识别与全量提交收口（Git 收口）**。用户要求「吸收经验并根据 git 提交 skill 的规则，所有文件提交 git」。开工盘点发现索引树等于 2026-10-15 提交 `3a9aa97e`，392 条「已暂存删除」中 365 条与 HEAD 完全一致、其余仅差 CRLF/LF，证实索引被整体回退而非文件删除；用混合 `git reset` 恢复后真实变更从 576 项收敛为 106 项。按业务拆成 8 笔提交：提交索引漂移判据、Markdown 文档规则与 PPTX 种子、生图配置统一、TAPD 路由收敛、任务投影单会话唯一、design 组件库定位、系统 skill 同步、规则记忆与字典收口。关键教训：① 批量假删除必须先查「文件是否还在磁盘 + 内容是否等于 HEAD + write-tree 是否等于历史提交树」，直接提交会吞掉期间的提交；② 恢复只能用混合 reset，`checkout`/`restore`/`rm` 会真的删掉完好文件；③ 外部种子（pptx 的 W3C XSD 与上游脚本）用 `.gitattributes` 的 `-whitespace` 保留原始字节；④ 测试 runner 需把测试文件所在目录加入 `sys.path` 才能导入同目录 fixture；⑤ 文档宣称的组件数必须与守卫实测对齐（本轮 151→152）。验证：git 规则 12 项、任务投影 87 项测试全绿，`POLLUTION: PASS`，每笔提交 pre/post gate 均 PASS；全量 476 项中 6 错 2 失败的存量问题在 HEAD 基线同样存在，本轮新增 2 项失败已归因为既有测试路径缺陷。
 
@@ -23,7 +24,6 @@
 - 2026-10-15：**Arco 组件粒度对齐补齐 21 个组件，组件总数 126 → 147（用户 Goal 收口）**。延续上一条 Goal，把对齐口径从「品类目录」下沉到「组件粒度」——上一条只对平 74 个品类目录，但 Arco 实际对外导出 131 个组件名，只对目录会把 `RangePicker`/`InputSearch`/`CheckboxGroup`/`CardMeta` 这类子组件整体漏掉，属「看着齐全、实则遗漏」。做法：① 从同一份 `npm pack @arco-design/web-vue@2.58.0` 的 `es/index.js` 导出清单派生 `references/arco-components.json`（131 条 = 74 顶层 + 57 子组件）与 `references/arco-component-parity.json`（逐条标 `kind`: covered / merged / gap）；② 新增 `scripts/check_arco_component_parity.py` 五重校验——`COVERAGE_GAP` 未清零 / `STALE_GAP` 标 gap 却已实现 / `DANGLING` 标 covered 但文件缺失 / `PHANTOM_COMPONENT` 登记了 Arco 没有的 / `MISSING_COMPONENT` Arco 有但漏登，前两者用于推进、后三者防止清单自己长歪；③ `src/components/extend/` 新增 21 个文件——日期族 5、浮层预览族 5、输入容器族 5、卡片树族 5，外加递归单元 `TreeNode`（非 Arco 导出，随 `Tree` 落地），extend 层累计 78 个。语义纠错：上轮按「`SubMenu` 缺口」建成的文件实为悬停下拉面板，而 Arco 的 `SubMenu` 是 Menu 的行内子项、已被 `MenuNode.children` 递归覆盖（标 merged 正确），真正缺口是 `Dsubmenu`；核对 `Menu.vue`/`MenuNode.vue` 确认递归存在且全仓无引用后改名 `DropdownSubmenu.vue` 并登记到 `Dsubmenu`，避免一个错名文件同时污染两个语义。核对页适配：`ImagePreview`/`ImagePreviewGroup` 受控键是 `visible` 而非 `open`，`Showcase.vue` 弹层识别与 `bindOf()` 扩展为同时认两种受控键（`visible` 走 `update:visible` 回写）；新增 21 组 demo 样本，含 `TREE_DATA`（`label` 契约，与 `TreeSelect` 的 `title` 契约不同不能互相顶替）。验证：核对页浏览器实测 147/147 全部「已挂载」、0 空白卡片、0 渲染异常（`NeuralNet` canvas / `Mention` textarea / `Skeleton` 骨架三张无文本卡片经 DOM 核查属预期）；`COMPONENT_PARITY: PASS (131 全覆盖; covered:98 merged:33)`、`PARITY: PASS (74)`、`INVENTORY: PASS (123)`、`FIDELITY: PASS (239 本地/139 上游)`、`GUARD_SELFTEST: PASS`、`CATALOG: PASS (147)`、`POLLUTION: PASS`、单测 21/21、`vue-tsc + vite build` 成功。临时产物（`.xverify-*.mjs`、`/tmp/arcoaudit`）已清理；工作树未提交（无当轮 Git 授权）。
 - 2026-10-15：**Arco 品类对齐补齐 57 个组件，组件总数 69 → 126（用户 Goal 主体交付）**。用户 Goal 要求对标 `arco.design/vue` 的组件品类广度、用现有珍珠玻璃样式与 GSAP 动效「继续补充完善，不要遗漏」。做法：① 品类真相源改为可核验数据——`npm pack @arco-design/web-vue@2.58.0` 取 `es/` 目录清单（网页为 SPA，WebFetch 只能拿到分析脚本），落盘 `references/arco-parity.json` 共 74 品类（display 22 / feedback 12 / inputs 22 / layout 8 / navigation 10；初录 75 后剔除误录的 `segmented`——Arco Vue 2.58.0 的 `es/` 与 `es/index.js` 均无该组件，是 Ant Design 的品类）；② 新增 `scripts/check_arco_parity.py` 三重校验守卫（`STALE_GAP` 标 gap 却已实现 / `DANGLING` 标 covered 但文件缺失 / `COVERAGE_GAP` 未清零，另以 `references/arco-categories.json` 真实品类参照对账报 `PHANTOM_CATEGORY` 虚构条目与 `MISSING_CATEGORY` 漏登品类，两个方向均做变异自测），把「不要遗漏」变成机器可判定契约；③ 新增本地扩展层 `src/components/extend/` 共 57 个组件，因上游冻结面含全部七层样式与 `src/main.ts`，extend 一律自带 `<style scoped>` 且只引用 `tokens.css` 令牌、材质复用 `.m-*`、动效复用 `composables/motion.ts`；④ 并行 6 个 background subagent 按不重叠写集实现（display/feedback/inputs/layout/navigation 分组），主 agent 统一收口类型检查与守卫。真实缺陷修复：`Trigger` 动态方法名调用 `addEventListener` 使 TS 重载失配、`Popover` 模板 ref 与 setup 变量重名、`BackTop` 联合类型收窄失败、`Typography` 的 `delete` 保留字不能进模板表达式、`Upload` 局部函数遮蔽同名 prop、`Cascader` 自引用变量缺注解、`MenuNode` 缺必填 props 在核对页崩溃、`CollapseItem` 独立挂载时 `inject` 无兜底告警。验证：核对页浏览器实测 126/126 全部正常渲染、0 渲染异常、0 控制台告警；`PARITY: PASS (74 品类)`、`INVENTORY: PASS (123)`、`FIDELITY: PASS (215/139)`、`GUARD_SELFTEST: PASS`、`CATALOG: PASS (126)`、`POLLUTION: PASS`、单测 21/21、`vue-tsc + vite build` 成功。工作树未提交（无当轮 Git 授权）。
 - 2026-10-15：**珍珠玻璃与仪器化前端组件库吸收进 frontend-design 全闭环完成（用户 Goal）**。用户 Goal 指示将 scaffold-master 前端完整吸收为 frontend-design 默认组件库，原定 3 天（至 2026-10-18），现已提前完成全部三日里程碑：① D1 资产落地：139 个源文件字节级落盘 component-library/（冻结 577079e9），构建 40+ 端点内存级 mock 服务器，建立 SHA256 还原度守卫（verify_fidelity.py）与 61 组件齐全性测试（test_component_inventory.py），升级 SKILL.md 至 2.0.0 设为中后台默认组件库；② D2 视觉与交互实测：浏览器实测 11 个业务及监控页面全量渲染（工作台/用户/角色/菜单星图/部门画布/岗位阶梯/字典样本册/参数面板/操作日志泳道/登录日志7x24热力/代码生成流水线），验证暗黑主题（obsidian/pearl）双向切换、表格密度（comfy 56px/regular 48px/compact 40px）与 820px 移动端抽屉手势，补齐 mock 2 处语义缺口（operName与status/result）；③ D3 完整回归与沉淀：4 项测试全绿（SHA256 还原度 100%、61 组件齐全性、单元测试 21/21、生产构建 223 模块 2.67s 零错误），全量同步至用户全局技能目录 ~/.qoder/skills/frontend-design/ 并跑通守卫，沉淀跨项目知识笔记《珍珠玻璃与仪器化前端组件库架构实践.md》（336 篇），刷新技能字典（66/8/124）。工作树改动就绪，未执行非授权 Git 提交。
-- 2026-10-13：**Goal 计划文档缺项主动修复并持续执行规则落地（用户裁决）**。用户要求 Goal 执行中发现计划文档不完善时主动补齐并持续执行，不因文档问题阻断停止。Goal Owner 新增计划文档缺项自修复流程；autonomous-execution 明确 Goal 特例、通用计划边界的差异和单项安全红线；AGENTS.md / CLAUDE.md、agent 默认提示、项目记忆和既有 Goal 知识笔记同步。计划缺项本身不创建 BLK-*，强制审批、高危、不可逆、越界、用户撤销等真实阻断只限制受影响动作。验证：UTF-8 quick_validate 两技能均 PASS；知识库 310 篇、803 链接、0 死链；项目记忆锚点与 Goal 使用台账校验通过；6 维残留自查记入 PROJECT_CURRENT.md；未运行功能测试。Git status 报 unable to read tree，故本轮无法取得 Git 变更清单或运行 diff check；未执行 Git 写操作。
 
 ## 计数锚点区
 
@@ -32,6 +32,11 @@
 ```yaml
 version: 1
 anchors:
+  - title: "imagegen 模型清单收敛为唯一 gpt-image-2"
+    usage_count: 0
+    usage_days: 0
+    last_used_at: null
+    absorbed_to: null
   - title: "前端视觉改动对比 Demo 规则吸收并全量提交收口（Git 收口）"
     usage_count: 0
     usage_days: 0
@@ -123,11 +128,6 @@ anchors:
     last_used_at: null
     absorbed_to: null
   - title: "珍珠玻璃与仪器化前端组件库吸收进 frontend-design 全闭环完成（用户 Goal）"
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-  - title: "Goal 计划文档缺项主动修复并持续执行规则落地（用户裁决）"
     usage_count: 0
     usage_days: 0
     last_used_at: null
