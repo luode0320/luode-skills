@@ -2,7 +2,7 @@
 
 ## 2026-10-29 自举脚本恢复「提交即推送」归属注入并全量提交收口（Git 收口）
 
-- 当前状态: `bootstrap_agents.sh` 已恢复按仓库 slug 条件注入项目专属 Git 授权正文，四份规则文件的受管章节同步刷新，回归测试 3 项全通过；本轮全部改动按两个业务目标分两笔提交并推送 `origin/main`。
+- 当前状态: `bootstrap_agents.sh` 已恢复按仓库 slug 条件注入项目专属 Git 授权正文，四份规则文件的受管章节同步刷新，回归测试 3 项全通过；本轮全部改动按三个业务目标分三笔提交并推送 `origin/main`（`3129f0b9` 生图模型收敛、`1a282ad9` 自举授权边界恢复、`9d81d7f0` 记忆计数与吸收冻结），工作树已清空。
 - 本轮交付: ① 新增 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` 正文常量与 `resolve_no_auto_commit_body()` 解析函数，按 `basename "$REPO_DIR"` 判定归属仓库后再在收尾条款前插入项目专属授权；② 配套回归测试 `test_commit_implies_push_extra_is_scoped_to_owner_repo`，对归属与非归属仓库双向断言；③ 根 `AGENTS.md` / `CLAUDE.md` 与两个子目录 `AGENTS.md` 的受管章节同步；④ 第一个业务目标（imagegen 模型收敛）另成一笔。
 - 关键决策: ① 判定用仓库 slug 而非路径前缀——`basename` 对临时目录与真实仓库给出一致结果，回归测试可直接在 `TemporaryDirectory` 内覆盖两种仓库名；② 正文常量与注入逻辑必须同源同测，只改正文不补归属判定会让授权边界静默失效，而 `grep -c` 只能证明文本在、不能证明注入条件正确；③ 子目录规则文件走同一解析函数，保持「同一规则全仓一份权威正文」；④ 历史提交 `76975c58` 是这类「能力被回归掉」的唯一可靠线索，规则漂移排查先 `git log -S` 定位。
 - 验证: `bash -n` 语法检查 PASS；`bootstrap_agents_test.py -v` 3 项全通过（55.177s）；`scan_test_pollution.py --diff-only` 输出 `POLLUTION: PASS`；`check_memory_anchors.py` 全绿（memory 58 实体、style 35/35、history 20/20）；`knowledge_index.py check` 全库 419 篇、死链 0、未挂载 0；`validate_engineering_docs.py --profile style_regression` PASS；`check_punctuation.py` ok；字典重跑 `implemented_total 66 / planned_missing 8 / seed_total 128`。仓库根 `package.json` 无 `build` 脚本，编译闸门按规则判 `N/A`。
@@ -71,7 +71,7 @@
 {
   "version": 5,
   "registry_schema": "task_plan_projection_registry",
-  "registry_updated_at": "2026-10-28T18:07:10.695449Z",
+  "registry_updated_at": "2026-10-28T19:05:16.041569Z",
   "projections": [
     {
       "projection_id": "SESSION/e3fee3201c0f1a9b557248ded3b4691524dd6d9775d8ec03515471ee4143db9c",
@@ -728,11 +728,11 @@
       "session_id": "a4831359-4453-4e52-89e7-61d827792292",
       "projection_origin": "persisted",
       "synthesis_mode": "none",
-      "state": "active",
+      "state": "inactive",
       "plan_key": "GIT-ALL/2026-10-29",
       "source_document": "CHAT-MINIMUM-PLAN/GIT-ALL-20261029",
       "plan_fingerprint": "793ea23440af28caad2e76c91c675dda165b645174f9b8ecd506f46edfebb90f",
-      "updated_at": "2026-10-28T18:07:10.682903Z",
+      "updated_at": "2026-10-28T19:05:16.041391Z",
       "steps": [
         {
           "id": "TASK-01",
@@ -742,22 +742,22 @@
         {
           "id": "TASK-02",
           "step": "[TASK-02] 复核实际差异并吸收已有可复用经验，避免重复修改已完成的规则",
-          "status": "in_progress"
+          "status": "completed"
         },
         {
           "id": "TASK-03",
           "step": "[TASK-03] 同步必要的技能字典、README 提交日志、项目记忆与知识引用",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-04",
           "step": "[TASK-04] 逐笔完成 staged 核查、pre/post gate、提交与推送，确认工作树清空",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "TASK-05",
           "step": "[TASK-05] 完成 Skill 合规审计、记忆计数与运行时状态收口，报告全部证据",
-          "status": "pending"
+          "status": "completed"
         }
       ]
     }
