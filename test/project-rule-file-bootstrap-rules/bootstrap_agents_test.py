@@ -54,6 +54,31 @@ class BootstrapAgentsTests(unittest.TestCase):
             self.assertIn("过程性输出中回显", agents)
             self.assertNotIn("禁止将真实 API key、token、密码、私钥、连接串原值或其他敏感配置写入代码、文档、日志、输出或 Git 提交", agents)
 
+    def test_commit_implies_push_extra_is_scoped_to_owner_repo(self) -> None:
+        """验证「提交即推送」只注入归属仓库。
+
+        判据防止通用自举把单仓库授权默认值扩散到其他项目。
+        副作用：只在临时目录内运行自举脚本，用例结束后目录自动删除。
+        最近修改时间：2026-10-29 02:04:56 恢复项目授权归属回归
+        """
+        extra = "本项目（luode-skills）默认「提交即推送」"
+        for repo_name, expected in (("luode-skills", True), ("some-other-project", False)):
+            with self.subTest(repo_name=repo_name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory) / repo_name
+                root.mkdir()
+                subprocess.run(
+                    [BASH, git_bash_path(SCRIPT), "--repo", git_bash_path(root), "--target", "both"],
+                    capture_output=True,
+                    check=True,
+                    cwd=ROOT,
+                    text=True,
+                    encoding="utf-8",
+                    env=os.environ.copy(),
+                )
+                agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+                self.assertEqual(expected, extra in agents)
+                self.assertIn("严禁自动提交 Git", agents)
+
     def test_subdirectory_skip_marker_keeps_isolated_rules_untouched(self) -> None:
         """子目录规则文件含跳过标记时逐文件打印跳过原因且字节不变，无标记子目录与根目录照常同步，重跑幂等。
 

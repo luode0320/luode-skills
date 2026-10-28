@@ -1,5 +1,13 @@
 # 项目当前状态
 
+## 2026-10-29 自举脚本恢复「提交即推送」归属注入并全量提交收口（Git 收口）
+
+- 当前状态: `bootstrap_agents.sh` 已恢复按仓库 slug 条件注入项目专属 Git 授权正文，四份规则文件的受管章节同步刷新，回归测试 3 项全通过；本轮全部改动按两个业务目标分两笔提交并推送 `origin/main`。
+- 本轮交付: ① 新增 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` 正文常量与 `resolve_no_auto_commit_body()` 解析函数，按 `basename "$REPO_DIR"` 判定归属仓库后再在收尾条款前插入项目专属授权；② 配套回归测试 `test_commit_implies_push_extra_is_scoped_to_owner_repo`，对归属与非归属仓库双向断言；③ 根 `AGENTS.md` / `CLAUDE.md` 与两个子目录 `AGENTS.md` 的受管章节同步；④ 第一个业务目标（imagegen 模型收敛）另成一笔。
+- 关键决策: ① 判定用仓库 slug 而非路径前缀——`basename` 对临时目录与真实仓库给出一致结果，回归测试可直接在 `TemporaryDirectory` 内覆盖两种仓库名；② 正文常量与注入逻辑必须同源同测，只改正文不补归属判定会让授权边界静默失效，而 `grep -c` 只能证明文本在、不能证明注入条件正确；③ 子目录规则文件走同一解析函数，保持「同一规则全仓一份权威正文」；④ 历史提交 `76975c58` 是这类「能力被回归掉」的唯一可靠线索，规则漂移排查先 `git log -S` 定位。
+- 验证: `bash -n` 语法检查 PASS；`bootstrap_agents_test.py -v` 3 项全通过（55.177s）；`scan_test_pollution.py --diff-only` 输出 `POLLUTION: PASS`；`check_memory_anchors.py` 全绿（memory 58 实体、style 35/35、history 20/20）；`knowledge_index.py check` 全库 419 篇、死链 0、未挂载 0；`validate_engineering_docs.py --profile style_regression` PASS；`check_punctuation.py` ok；字典重跑 `implemented_total 66 / planned_missing 8 / seed_total 128`。仓库根 `package.json` 无 `build` 脚本，编译闸门按规则判 `N/A`。
+- 知识库: 新增 `20-Knowledge/AI协作/默认值验证必须隔离配置优先级与进程缓存.md` 并挂载到 AI 协作 MOC；本轮另修复 11 篇存量笔记的 frontmatter、4 处死链与 5 处未挂载，全库合规检查从 12 处违规收敛为 0。巡检 `_index (1).json` 为 Google Drive 生成的 2026-10-19 陈旧索引副本（343 条 vs 现行 425 条），登记为同步冲突但不删除。
+
 ## 2026-10-27 imagegen 模型清单收敛为唯一 gpt-image-2（Git 收口）
 
 - 当前状态: 仓库内 8 个文件已改（6 个 skill 资产 + 2 个字典产物）并新增 1 份 6-review 记录，已随本轮第一笔提交收口；本机 `~/.imagegen/config.json` 与两个用户级环境变量已按用户确认同步为 `gpt-image-2`。
