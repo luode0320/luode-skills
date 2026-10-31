@@ -12,6 +12,7 @@ import './styles/components.css'
 import './styles/instruments.css'
 import './styles/layout.css'
 import './styles/pages.css'
+import './styles/overrides.css'
 
 // 外观设置在挂载前写入 data-theme / data-density，避免首屏闪色
 import './composables/appearance'
