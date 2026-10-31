@@ -11,9 +11,3 @@ frontend-design/component-library/scripts/session-regression.py::password = os.e
 
 # 上游动效模块的导出函数：上游保留的页面级动效入口，本仓库页面未调用。
 frontend-design/component-library/src/composables/motion.ts::revealPage  # 上游导出函数，字节冻结；本仓库不改上游 API 面，故不删除
-
-# 任务投影脚本的存量兼容导出：2026-07-24 引入，早于本轮 v5 容错改动，全仓生产零引用、仅被既有单测覆盖。
-# 本轮只改按条隔离逻辑，未新增这些符号；删除会破坏现有测试且越出本轮范围，转独立清理评估。
-task-plan-rehydration-rules/scripts/task_plan_projection.py::extract_projection  # 存量旧单投影兼容导出，非本轮引入；仅既有测试引用
-task-plan-rehydration-rules/scripts/task_plan_projection.py::render_projection_block  # 存量旧单投影渲染兼容导出，非本轮引入；仅既有测试引用
-task-plan-rehydration-rules/scripts/task_plan_projection.py::deactivate_projection  # 存量公共失活包装，CLI 实走 _deactivate_projection_with_payload；非本轮引入；仅既有测试引用

@@ -178,22 +178,16 @@ class TestSync(unittest.TestCase):
         self.assertIn("新标题", content2)
         self.assertNotIn("测试任务", content2)
 
-    def test_preserves_task_projection(self):
-        # 先加入任务投影
-        projection_block = (
-            "<!-- BEGIN TASK PLAN PROJECTION -->\n"
-            "```json\n{\"version\": 4, \"projections\": [{\"session_id\": \"abc\"}]}\n"
-            "```\n"
-            "<!-- END TASK PLAN PROJECTION -->\n"
-        )
+    def test_preserves_unrelated_body(self):
+        body = "## 已完成\n\n- 既有正文不得被快照刷新改写\n"
         self.project_current.write_text(
-            "# 项目当前状态\n\n" + projection_block,
+            "# 项目当前状态\n\n" + body,
             encoding="utf-8",
         )
         sessions = [make_session()]
         sync_recent_sessions(str(self.project_current), "F:/luode-skills", sessions)
         content = self.project_current.read_text(encoding="utf-8")
-        self.assertIn(projection_block, content)
+        self.assertIn(body, content)
 
     def test_filters_other_project(self):
         sessions = [

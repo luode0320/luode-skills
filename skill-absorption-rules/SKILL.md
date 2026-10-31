@@ -1,12 +1,12 @@
 ---
 name: skill-absorption-rules
-description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"吸收某个skill的精华""这个skill能不能吸收到我们skill""借鉴XX skill的思路""把XX skill的精华融进我们的skill"），或主动引入外部种子（市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md、README、指南），或主动要求更新、调整、重构、合并、瘦身我们自己的 skill（如"优化一下这个skill""重构skill的结构""把这两个skill合并""这个skill太臃肿了调整一下""更新skill规则"），或直接点名"优化 XX skill"（XX 为任意 skill 名，如"优化 vue-router-best-practices skill"）触发固定优化流程，或当前已命中的 skill 在执行中暴露出触发不准、规则缺失、边界不清、references 不足、归档约定缺失等 gap 需要小步回补时触发。负责把来源（外部 skill 的原子精华，或自有 skill 的现状与调整诉求，或执行中暴露的 gap）逐条对照本地现状裁决（保留/合并/拒绝）、给出落点与简化建议、对触达的同域 skill 集合做冗余扫描（重复段落/门控层叠/散落产物/引用链）、按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录；它是 skill 体系裁决式调整（外部吸收 + 内部更新 + 执行中 gap 回补）的统一总入口。若来源精华已经在本地更强或重复命中，裁决为保留现状并记录理由，不重复吸收。不要用它代替 skill-audit-rules（多 skill 职责审计）或具体业务实现。
+description: 当用户表达吸收 / 借鉴 / 融合 / 优化外部 skill，引入市场、GitHub、LobeHub、coze、SkillsMP 等来源的 SKILL.md 或 README，或要求优化、重构、合并、瘦身自有 skill，或已命中 skill 在执行中暴露触发不准、规则缺失、边界不清、references 不足、归档约定缺失等 gap 需小步回补时触发。负责把来源逐条对照本地现状裁决（保留 / 合并 / 拒绝），给出落点与简化建议，对同域 skill 集合做冗余扫描（重复段落、门控层叠、散落产物、引用链），按 8 维评分与棘轮机制验证改进是否真实成立，并登记裁决表与来源记录。来源精华本地已更强或重复命中时裁决为保留现状并记录理由。不代替具体业务实现。
 ---
 
 # Skill 调整规则（外部吸收 + 内部更新）
 
 在"用户想把外部 skill 的精华改进我们自己的 skill 体系""用户想主动调整、重构、优化我们自己的 skill"或"当前已命中的 skill 在执行中暴露 gap 需要小步回补"时使用这个 skill。
-如果当前问题是多个 skill 职责重叠、需要审计边界，那是 `skill-audit-rules`；本 skill 负责"来源（外部种子或自有 skill 现状或执行中 gap）-> 裁决 -> 落点 -> 同域去重 -> 验证 -> 登记"的裁决式调整闭环，覆盖外部吸收、内部更新与执行中 gap 回补三通道。
+本 skill 负责"来源（外部种子或自有 skill 现状或执行中 gap）-> 裁决 -> 落点 -> 同域去重 -> 验证 -> 登记"的裁决式调整闭环，覆盖外部吸收、内部更新与执行中 gap 回补三通道。
 
 > **2026-08-20 合并说明**：本 skill 已并入原 `skill-evolution-rules` 的职责（执行中暴露 gap 的小步回补）。原 evolution 的 gap-signals 判断、决策矩阵、改进输出模板与回补后恢复流程已迁入 `references/`（`gap-signals.md`、`evolution-decision-matrix.md`、`improvement-output-template.md`、`resume-workflow.md`），作为第三通道「执行中 gap 回补」的执行细则。原 evolution 目录已删除，相关引用统一指向本 skill。
 
@@ -62,17 +62,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 
 通道判定示例：用户说"这个 skill 太臃肿了，调整一下" → 内部更新通道；用户说"吸收 XX skill 的精华" → 外部吸收通道；用户说"借鉴 XX 的思路优化我们的 skill" → 外部吸收通道（来源是外部种子）；执行中"当前 skill 没有覆盖这个场景，只能临时口头补规则" → 执行中 gap 回补通道。同一轮可能同时含多条通道（如"吸收 XX 精华后顺手优化本地 skill"），按来源分通道逐项裁决。
 
-**与 `skill-audit-rules` 的边界**：`skill-audit-rules` 处理多个 skill 职责重叠审计（只读，不写）；本 skill 三通道都负责实际调整落盘（写）。执行中汇总的 gap 若演变为结构性调整诉求，可回落到内部更新通道走完整裁决流程。
-
-## 自动吸收例外（记忆高频条目通道）
-
-> **2026-08-22 补**：`memory-usage-tracking-rules` 对项目记忆三文件（`PROJECT_MEMORY.md` / `PROJECT_STYLE.md` / `PROJECT_HISTORY.md`）中达到阈值的高频条目执行**自动吸收**为 `project-<slug>-<topic>-rules`，是本 skill「人在回路」原则（第 5 条）与「棘轮验证」的受控例外，仅限此来源，不开放为通用自动吸收。
-
-- **触发源**：仅由 `memory-usage-tracking-rules` 的候选扫描（`scripts/scan_absorption_candidates.py`）命中吸收阈值时进入；阈值本身即量化判据，替代主观评估。
-- **人在回路 → 可回滚自动执行**：不设人工确认闸门，但满足等价兜底——① 执行序列固定（候选识别 → 查重 → `init_skill.py` 生成 SKILL.md → 原条目标记 `absorbed_to` → `quick_validate.py` 结构校验 → 登记 `workbuddy-absorption-map.md` / `source-notes.md` / 当日日志 → 收口）；② git 全程可回滚，吸收后停在已改动未提交状态供用户审计；③ 结构校验失败或查重无法判断归属时**立即转人工**，不得强行收口。
-- **棘轮验证 → 结构校验**：新 skill 无吸收前基线，8 维评分不适用，改用 `quick_validate.py` 结构校验 + 同域冗余扫描（沿用本 skill 第 5 步四项检查）作为替代；校验/扫描不过即回滚。
-- **防重复吸收与防膨胀**：吸收后原条目标记 `absorbed_to` 冻结计数；阈值（≥3 次且跨 ≥2 日期）过滤偶然引用；同域去重沿用「单一权威 + 引用」收敛。
-- 完整执行细则见 `memory-usage-tracking-rules/references/absorption-trigger.md`。
+**边界**：职责重叠的识别在本 skill 的整理去重阶段完成并直接落盘；执行中汇总的 gap 若演变为结构性调整诉求，回落到内部更新通道走完整裁决流程。
 
 ## 进入后先做什么
 
@@ -99,7 +89,7 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 
 ## 权责边界与不负责事项
 
-- 只负责 skill 体系的裁决式调整闭环（外部吸收 + 内部更新 + 执行中 gap 回补），不负责多 skill 职责审计（`skill-audit-rules`）、命中总控（`skill-hit-check-rules`）。
+- 只负责 skill 体系的裁决式调整闭环（外部吸收 + 内部更新 + 执行中 gap 回补），不负责命中判断（`skill-hit-check-rules`）。
 - 不复制外部 skill 的整套工作流、目录结构、`.codebuddy/specs/` 等专属形态；只吸收原子规则。
 - 不把吸收 / 优化结果绑定到单一 agent 工具（Codex / Claude / ZCode / WorkBuddy 等）：产物默认要求通用所有 agent，确需绑定的例外必须在裁决表「agent 通用性」列登记理由（见设计内核第 9 条）。
 - 不因为"发现了新 skill"就默认新增独立 skill 目录；优先补现有 skill 的 reference。
@@ -145,4 +135,4 @@ description: 当用户表达吸收、借鉴、融合、优化外部 skill（如"
 - 用户要求"合并 / 整合多个自有 skill"（技能合并、超级技能、技能组合）时，读 `references/merge-strategies.md`（吸收 / 融合 / 编排三策略 + 触发词双列 + 变更对比模板 + 反合理化表；本地红线：合并产物不新建 skill 目录）。
 - 涉及环境变量 / 宿主配置 / hook / 依赖安装 / 路径引用的吸收或内部更新时，先读 `references/env-dependency-absorption.md`（环境依赖五类识别 / 登记 / 自检附加 / 换机器恢复流程）；需要 WorkBuddy 平台级配置的权威定义时读 `references/workbuddy-env-manifest.md`，或直接运行 `scripts/env-bootstrap-check.py` 检测/补齐。
 - 需要确认文档落点与更新策略时，再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
-- 吸收多轮后需整体防臃肿巡检时，联动 `skill-audit-rules`（职责重叠审计）与 `skill-split-preserve-rules`（体积超标拆分）；本 skill 只负责单轮吸收内的存量整理与同域去重，不代替体系级巡检。执行同域冗余扫描时若同域边界不清或发现疑似体系级职责重叠，按需联动 `skill-audit-rules` 确认边界。
+- 吸收多轮后需整体防臃肿巡检时，联动 `skill-split-preserve-rules`（体积超标拆分）；本 skill 只负责单轮吸收内的存量整理与同域去重，不代替体系级巡检。

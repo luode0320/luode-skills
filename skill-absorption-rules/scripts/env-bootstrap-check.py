@@ -14,13 +14,11 @@ references/workbuddy-env-manifest.md 的权威定义，从仓库 assets 自动�
   python3 env-bootstrap-check.py --home-dir <DIR>   # 覆盖 home 目录（测试/模拟新机器）
   python3 env-bootstrap-check.py --repo-root <DIR>  # 覆盖仓库根（默认脚本上溯两级）
 
-检测项（6 项，权威定义见 references/workbuddy-env-manifest.md）：
+检测项（4 项，权威定义见 references/workbuddy-env-manifest.md）：
   1. settings.json  autoCompactEnabled == true
-  2. settings.json  hooks.Stop 含 summary-check.py 条目
-  3. 环境变量 CODEBUDDY_CODE_MAX_TURNS == 1000
-  4. 环境变量 CODEBUDDY_MAX_RETRIES == 15
-  5. hook 脚本 ~/.workbuddy/hooks/summary-check.py 存在且与资产一致
-  6. hook 脚本 ~/.workbuddy/hooks/ralph-stop.py 存在且与资产一致
+  2. 环境变量 CODEBUDDY_CODE_MAX_TURNS == 1000
+  3. 环境变量 CODEBUDDY_MAX_RETRIES == 15
+  4. hook 脚本 ~/.workbuddy/hooks/ralph-stop.py 存在且与资产一致
 
 安全边界：
   - settings.json 用 merge 写入（只改目标 key，保留其余配置，修改前备份 .bak-<ts>）
@@ -52,8 +50,6 @@ ENV_VARS = {
     "CODEBUDDY_CODE_MAX_TURNS": "1000",
     "CODEBUDDY_MAX_RETRIES": "15",
 }
-HOOK_ASSETS = ["summary-check.py", "ralph-stop.py"]
-SUMMARY_HOOK_TAG = "summary-check-pmw002"
 
 # ---------------------------------------------------------------------------
 # 工具函数
@@ -121,20 +117,6 @@ def check_settings_autocompact(home_dir):
     return ("mismatch", "autoCompactEnabled=%r（目标 true）" % data.get("autoCompactEnabled"))
 
 
-def check_settings_stop_hook(home_dir):
-    path = os.path.join(home_dir, SETTINGS_REL)
-    data = load_json(path)
-    if data is None:
-        return ("missing", "settings.json 不存在或无法解析")
-    stop = (data.get("hooks") or {}).get("Stop") or []
-    for entry in stop:
-        cmds = (entry.get("hooks") or [])
-        for c in cmds:
-            if SUMMARY_HOOK_TAG in c.get("command", "") or "summary-check.py" in c.get("command", ""):
-                return ("ok", "hooks.Stop 含 summary-check 条目")
-    return ("missing", "hooks.Stop 缺 summary-check 条目（现有 %d 条）" % len(stop))
-
-
 def _win_reg_get(name):
     """Windows 下读取 HKCU\\Environment 注册表值；不存在返回 None。"""
     try:
@@ -198,26 +180,6 @@ def fix_settings_autocompact(home_dir):
     return (False, "写入失败")
 
 
-def fix_settings_stop_hook(home_dir):
-    path = os.path.join(home_dir, SETTINGS_REL)
-    data = load_json(path)
-    if data is None:
-        data = {}
-    hooks = data.setdefault("hooks", {})
-    stop = hooks.setdefault("Stop", [])
-    for entry in stop:
-        for c in (entry.get("hooks") or []):
-            if "summary-check.py" in c.get("command", ""):
-                return (True, "已存在，无需追加")
-    backup(path)
-    hook_path = os.path.join(home_dir, HOOKS_DIR_REL, "summary-check.py").replace("\\", "/")
-    stop.append({"hooks": [{"type": "command",
-                            "command": 'python3 "%s" # %s' % (hook_path, SUMMARY_HOOK_TAG)}]})
-    if save_json(path, data):
-        return (True, "已追加 hooks.Stop 条目（现有条目保留）")
-    return (False, "写入失败")
-
-
 def fix_env_var(name, value):
     if sys.platform.startswith("win"):
         try:
@@ -251,15 +213,12 @@ def fix_hook_file(home_dir, name):
 
 CHECKS = [
     ("settings.autoCompactEnabled", check_settings_autocompact, fix_settings_autocompact),
-    ("settings.hooks.Stop.summary-check", check_settings_stop_hook, fix_settings_stop_hook),
     ("env.CODEBUDDY_CODE_MAX_TURNS",
      lambda h: check_env_var("CODEBUDDY_CODE_MAX_TURNS", ENV_VARS["CODEBUDDY_CODE_MAX_TURNS"]),
      lambda h: fix_env_var("CODEBUDDY_CODE_MAX_TURNS", ENV_VARS["CODEBUDDY_CODE_MAX_TURNS"])),
     ("env.CODEBUDDY_MAX_RETRIES",
      lambda h: check_env_var("CODEBUDDY_MAX_RETRIES", ENV_VARS["CODEBUDDY_MAX_RETRIES"]),
      lambda h: fix_env_var("CODEBUDDY_MAX_RETRIES", ENV_VARS["CODEBUDDY_MAX_RETRIES"])),
-    ("hook.summary-check.py", lambda h: check_hook_file(h, "summary-check.py"),
-     lambda h: fix_hook_file(h, "summary-check.py")),
     ("hook.ralph-stop.py", lambda h: check_hook_file(h, "ralph-stop.py"),
      lambda h: fix_hook_file(h, "ralph-stop.py")),
 ]
