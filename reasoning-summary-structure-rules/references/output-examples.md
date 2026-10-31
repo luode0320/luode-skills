@@ -89,8 +89,6 @@
 ---
 # 📋 本轮总结
 
-**命中检查:通过** · skill-compliance-gate:PASS ✅
-
 > 一句话结论：已将 Bug 主动侦察收敛到 `bug-intake-rules` 的 `discovery-and-gap` 条件路由，字典刷新与归域验证通过 ✅。
 
 ## 📊 图形化总览
@@ -107,7 +105,7 @@ flowchart LR
 
 ## 🛠 执行证据
 
-- 命中 skill：`reasoning-summary-structure-rules`、`skill-execution-compliance-gate-rules`
+- 命中 skill：`reasoning-summary-structure-rules`、`code-change-finalization-gate-rules`
 - 关键动作：迁移 route references，刷新字典并核验归域。
 
 ## 🎯 要解决的问题
@@ -157,8 +155,6 @@ flowchart LR
 ```markdown
 ---
 # 📋 本轮总结
-
-**命中检查:通过**
 
 > 一句话结论：已按 T1 统一结构给出本轮结论，主节 3 个且无跨节重复。
 
@@ -263,8 +259,6 @@ flowchart LR
 ---
 # 📋 本轮总结
 
-**命中检查:通过** · Skill合规闸门:PASS ✅
-
 > 一句话结论：已完成规则升级，并通过结构校验与差异检查。
 
 ## 📊 图形化总览
@@ -300,8 +294,6 @@ flowchart LR
 ---
 # 📋 本轮总结
 
-**命中检查:通过**
-
 > 一句话结论：已修正 `README.md` 标题拼写错误并读回确认 ✅。
 
 ## 📦 改动点
@@ -318,8 +310,6 @@ flowchart LR
 ```markdown
 ---
 # 📋 本轮总结
-
-**命中检查:通过** · `reasoning-summary-structure-rules:PASS` ✅
 
 > 一句话结论：已将项目分析保存到 `F:\gpt-free-register\项目.md` 并读回确认 ✅。
 
@@ -418,8 +408,6 @@ flowchart LR
 ---
 # 📋 本轮总结
 
-**命中检查:通过** · `code-change-finalization-gate-rules:PASS` ✅
-
 > 一句话结论：周期二完成，停在此边界，已改动未提交（本轮无提交授权）。
 
 ## 📌 结果与结论
@@ -445,8 +433,6 @@ flowchart LR
 ```markdown
 ---
 # 📋 本轮总结
-
-**命中检查:通过** · `code-change-finalization-gate-rules:PASS` ✅
 
 > 一句话结论：周期二完成，停在此边界，已改动未提交（本轮无提交授权）。
 
@@ -547,8 +533,6 @@ flowchart LR
 ---
 # 📋 本轮总结
 
-**命中检查:通过**
-
 > 一句话结论：`git rebase -i HEAD~3` 可交互改写最近 3 条提交；纯说明任务，无文件改动、无验证动作。
 ```
 
@@ -559,8 +543,6 @@ flowchart LR
 ```markdown
 ---
 # 📋 本轮总结
-
-**命中检查:通过**
 
 > 一句话结论：已将 3 处硬编码重试间隔迁移到配置表，`go test ./...` 14 个用例全部通过 ✅。
 
