@@ -46,12 +46,12 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 这套 Skill 体系不是一个“大而全”的单体规则文件，而是：
 
 - 以很多个小而清晰的独立 Skill 为主
-- 以 `team-development-rules` 作为弱总控协调层
+- 由宿主按 `description` 自动匹配 skill，`skill-hit-check-rules` 只补边界判断
 - 通过“阶段 + 代码位点 + 类型兜底”的方式自动分流
 
 其中：
 
-- `team-development-rules` 负责流程协调、阶段分析、路由分流、冲突裁决和中断管控
+- `implementation-planning-rules` 负责实施计划、阶段拆分与任务边界，`parallel-task-dispatch-rules` 负责并行拆分与子代理生命周期
 - `artifact-storage-rules` 负责统一 `doc/1-架构/`、`doc/2-需求/`、`doc/3-实施/`、`doc/4-bugs/`、`doc/5-tests/`、根 `test/`、活动 `doc/6-review/` 以及历史只读 `doc/6-审查/`、`doc/7-验收/` 的跨域共享入口、命名模板和复用策略；根 `test/` 是唯一活动测试代码根，`doc/4-bugs/` 与 `doc/5-tests/` 每轮只保存一份扁平 md，日志、报告、截图和非可执行证据内联在正文
 - Markdown 图片资产统一进入 `doc/data/images/`；需求、实施、6-review 和通用文档必须按当前 Markdown 位置使用 `/` 分隔相对路径，并登记 `IMG-*`、用途、来源、版本、关联 ID、引用章节、敏感状态和版权状态。真实图片必须经 `imagegen` 生成，交付门禁负责签名、命名、路径、清单和孤儿校验；`doc/data/` 根不提供兼容图片入口
 - 活动文档时间前缀统一使用 `YYYY-MM-DD_HHmmss`；实施、测试和 `6-review` 文档必须在时间后保留来源对象标识，历史审查/验收文档只读保留，避免 `YYYY-MM-DD_主题.md` 或 `时间_阶段_说明.md` 这类不可追溯命名
@@ -71,11 +71,11 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 
 这套体系希望做到的是“改哪类代码，就触发哪类 Skill”。
 
-并且，命中检查与并行分发的可见输出也要求固定化：
+并且，命中判断与并行分发的可见输出要求如下：
 
-- 首条中间进度至少输出 `命中检查`、`命中技能`
-- 若本轮命中 `parallel-task-dispatch-rules`，还必须额外输出 `并行技能`
-- 若最终没有真正启动任何并行 skill，也必须明确写 `并行技能:无`
+- 首条中间进度用一句中文说明本轮命中了哪些 skill 及理由，不产出打卡字段、不阻断执行
+- 若本轮命中 `parallel-task-dispatch-rules`，说明计划线程数与实际启动数
+- 若最终没有真正启动任何并行 skill，也要明确说明串行或本地优先的原因
 - 本仓库默认处于 subagent 完全授权模式，用户已允许 agent 在任务可切分、写集不冲突、风险可控且环境支持时自动启动 subagent / delegation / parallel agent work
 - `parallel-task-dispatch-rules` 统一完成并行分类、授权与能力检查、真实启动、观测、回收和关闭；完全授权模式可满足工具显式授权前提，但系统规则、工具元数据和用户当前轮禁止优先，只输出线程分配或并行技能列表不算真正并行
 
@@ -118,7 +118,6 @@ cmd /c mklink /J "C:\Users\luode\.claude\skills" "F:\luode-skills"
 ├── 编码skill.md
 ├── 字典.md
 ├── skill-dictionary/
-├── team-development-rules/
 ├── requirement-intake-rules/references/initial-discovery-route.md
 ├── requirement-intake-rules/
 ├── bug-intake-rules/
@@ -266,7 +265,6 @@ python skill-dictionary/generate_dictionary.py
 
 | Skill                    | 功能                                                                                                        |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `team-development-rules` | 作为弱触发协调层，负责阶段分析、路由分流、冲突裁决和流程中断管控，不替代数据库、API、错误处理等细节 Skill。 |
 | `artifact-storage-rules` | 统一 `doc/1-架构/` 到活动 `doc/6-review/`，并兼容读取历史 `doc/6-审查/`、`doc/7-验收/`，提供研发产物主入口、命名模板和复用策略。 |
 | `project-design-doc-rules` | 统一根目录 `项目设计.md` 及同类设计文档的弱参考读取、偏移判断、同步更新和缺失补建规则。 |
 | `architecture-doc-rules` | 统一 `doc/1-架构/` 下 `1-总架构.md` 到 `4-主要业务链路.md` 四个有序中文主入口；业务链路从序号 `5` 开始按最大编号加一，支持更新原编号链路或追加新链路，并维护与根目录 `项目设计.md` 的分层关系。 |
@@ -280,15 +278,14 @@ python skill-dictionary/generate_dictionary.py
 | `skill-hit-check-rules` | 作为总控入口的轮次命中检查 skill，负责显式回报命中列表并避免漏触发。 |
 | `parallel-task-dispatch-rules` | 任一 Skill 进入实质执行前统一判断串行、条件并行或可并行，评估上下文重复读取成本，冻结互斥写集，并在系统能力和授权允许时真实启动、观测、回收及关闭子代理；输出计划、启动、完成、关闭数量，失败时真实回退串行。 |
 | `code-snippet-location-rules` | 用户只粘贴代码片段但没有给文件路径时，优先依据用户明示路径、活动编辑器、打开文件、选区和精确片段匹配定位真实目标文件。 |
-| `skill-audit-rules` | 当本轮存在多 skill 组合、并行拆分或规则收口风险时，负责只读审计是否漏触发应有 skill 或漏执行关键规则。 |
-| `skill-compliance-gate-rules` | 在编码、审查、测试或交付收口阶段做一次 skill 执行完整性闸门检查；只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出后续内容。 |
+| `code-change-finalization-gate-rules` | 收口闸门，按本轮改动类型执行 OCR 审查、注释链、测试污染扫描、`6-review` 回归与真实运行验证；缺项即阻断收口。 |
 | `reasoning-summary-structure-rules` | 在最终推理总结或结束输出阶段自动触发，强制检查总结结构字段完整性；默认不输出后续内容，只有原执行计划内未完成必需项、阻断项或用户显式要求建议/backlog 时，才允许输出。 |
 
 ### 2. 记忆域
 
 | Skill                    | 功能                                                       |
 | ------------------------ | ---------------------------------------------------------- |
-| `recent-context-bootstrap-rules` | 新会话开始时压缩最近 3 天项目上下文，为后续主域补前置信息。 |
+| `context-recovery-rules` | 上下文准备与恢复的唯一 owner：规则与记忆自举、压缩恢复、近期预热三个条件路由。 |
 | `history-recall-rules`   | 检索跨会话历史、历史方案、历史修复记录，补回长期上下文。   |
 | `knowledge-flow` | 仓库任务每轮先做 `知识库:<检索/沉淀/不适用/阻断>` 选择性默认判断；只有历史知识依赖或收口沉淀价值成立时，才用标准文件工具检索、捕获或沉淀知识库笔记。 |
 | `project-timeline-rules` | 按项目维度整理历史演进时间线，输出项目阶段变化与决策轨迹。 |
@@ -388,7 +385,6 @@ python skill-dictionary/generate_dictionary.py
 | `"doc"` | 用于读取、创建、编辑 `.docx` 文档并进行版式核验。 |
 | `"pdf"` | 用于读取、创建、审阅 PDF 文档并进行渲染检查。 |
 | `"spreadsheet"` | 用于处理 `.xlsx` / `.csv` / `.tsv` 表格并支持公式与样式工作流。 |
-| `context-compression-rules` | 在会话压缩后重建最小可执行上下文并补齐继续执行所需信息。 |
 | `find-skills` | 用于帮助继续在外部生态中发现、筛选、安装可复用 Skill，适合作为扩展入口。 |
 | `skill-split-preserve-rules` | 用于在不丢失功能前提下拆分臃肿 Skill，并完成承接映射与旧 Skill 下线。 |
 | `work-report-summary-rules` | 用于按项目配置统计本人 Git 提交，并补充各项目未提交改动对应的进行中事项，生成日报/周报/月报/年报。 |
@@ -404,7 +400,7 @@ python skill-dictionary/generate_dictionary.py
 
 一个典型研发任务，建议按下面的节奏理解这套 Skill：
 
-1. 如果是新会话且当前任务明显依赖近期项目动态，先进入 `recent-context-bootstrap-rules` 补最近 3 天前置上下文。
+1. 如果是新会话且当前任务明显依赖近期项目动态，先进入 `context-recovery-rules` 补最近 3 天前置上下文。
 2. 再进入需求或 Bug 链路；需求的 `Gap / Boundary / Splitting / Change` 只按条件插入，完成条件 `AC`、异常边界、停止条件和测试映射统一冻结在实施计划中。
 3. 如果任何必要条件步骤未完成，必须阻断进入实施计划与编码；不再新建独立验收标准文档或后置验收步骤。
 4. 如果是 Bug，转入 Bug 域，而不是混入普通需求流程。
