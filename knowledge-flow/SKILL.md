@@ -21,8 +21,8 @@ description: 将固定根目录的 Google Drive 知识库作为跨项目知识�
 
 项目启动上下文由项目目录父目录的当前平台规则文件，以及项目根目录下的三个文件组成：
 
-1. PROJECT_CURRENT.md：当前目标、范围、状态、待办、阻断、验证和交接点，覆盖式维护，最大 51,200 字节。
-2. PROJECT_MEMORY.md：稳定项目规则、关键决策和少量长期事实；已有机器索引区继续保留，不承载当前状态或历史流水。
+1. PROJECT_CURRENT.md：当前目标、范围、状态、待办、阻断、验证和交接点，覆盖式维护（字节上限见 `project-memory-rules`）。
+2. PROJECT_MEMORY.md：稳定项目规则、关键决策和少量长期事实；不承载当前状态或历史流水。
 3. PROJECT_HISTORY.md：关键历史事件，只追加；普通启动不读，只有历史追问、当前状态不足或真实卡点时窄读。
 
 固定读取顺序是"父目录规则 -> PROJECT_CURRENT.md -> PROJECT_MEMORY.md"，缺失的项目文件先创建最小 UTF-8 模板。

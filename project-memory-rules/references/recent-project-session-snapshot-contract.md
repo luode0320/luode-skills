@@ -41,12 +41,12 @@
 
 ## 锁协议
 
-快照写入必须与任务投影脚本共用锁文件 `.PROJECT_CURRENT.md.lock`：
+快照写入与其它 `PROJECT_CURRENT.md` 写入共用锁文件 `.PROJECT_CURRENT.md.lock`：
 
 1. 最多重试 40 次，每次间隔 50ms。
 2. 持锁后重新读取 `PROJECT_CURRENT.md` 最新全文。
 3. 只替换最近会话托管区（`BEGIN RECENT PROJECT SESSIONS` 到 `END RECENT PROJECT SESSIONS`）。
-4. 任务投影托管区（`BEGIN TASK PLAN PROJECTION` 到 `END TASK PLAN PROJECTION`）逐字节保持不变。
+4. 其余正文与历史托管区逐字节保持不变。
 5. 使用同目录临时文件 + `flush` + `fsync` + `os.replace` 原子替换。
 6. 失败时清理临时文件，原文件保持不变。
 
@@ -54,11 +54,11 @@
 
 默认执行模式的任务收口顺序必须为：
 
-1. 任务投影落盘（`task_plan_projection.py write`）
-2. 立即调用 `update_plan`
+1. 任务计划文档状态字段落盘
+2. 更新宿主任务列表（宿主提供任务工具时）
 3. 最近会话快照刷新（`sync_recent_project_sessions.py`）
 
-快照刷新不得插入投影落盘与 `update_plan` 之间。
+快照刷新不得插入状态落盘与任务列表更新之间。
 
 ## 非 Codex App 宿主
 

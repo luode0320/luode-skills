@@ -14,9 +14,9 @@
 - 默认节奏是“当前周期 -> 当前最小任务实施计划完成条件 -> 当前最小任务实现 -> 当前最小任务真实测试 -> 当前最小任务 `6-review` -> 下一个最小任务 -> 当前周期收口 -> 下一周期”。
 - 当前最小任务未闭环不得进入下一个任务；当前周期未收口不得跳到下一周期。
 - 禁止先完成多个任务的实现，再统一真实测试或统一 `6-review`。
-- 当前最小任务进入 `in_progress`、完成为 `completed` 或下一个任务保持 `pending` 时，先由 `task-plan-rehydration-rules` 原子更新 `PROJECT_CURRENT.md`，再调用 `update_plan`；磁盘写入失败不得刷新 UI，工具失败不得回滚已持久化状态。
-- Desktop 或宿主中断后恢复到 `in_progress` 步骤时，先核验磁盘、测试和外部状态；未知或非幂等写操作不得自动重放。任务投影恢复不改变 `confirmed/unknown/revoked` 执行许可。
-- 默认执行回合取得 `confirmed` 后，无论任务大小，都必须在首次领域动作前为当前 `session_id` 持久化 `active` 或 `blocked` projection，并将持久化成功后的下一动作固定为 `update_plan`；仅投影持久化失败、会话归属冲突/不确定或执行状态不明时硬阻断领域写入，单纯 UI 同步通道不可用（磁盘投影已成功且归属明确）时保留磁盘投影并继续领域执行，下一检查点重试 UI，不得声称 UI 已恢复。当前会话尚未确认原生步骤清单同步成功，且扣除 Plan Mode、等待用户、`blocked` 与 `manual_handoff` 后严格超过 600 秒时，首个可执行检查点立即先调用只读 `probe-timeout`；无活动 projection 时补建，有活动 projection 但 UI 未同步时通过 `ensure-timeout` 取回唯一现有 payload 并重试 `update_plan`；`goal_check_required` 后只允许主 Agent 依次执行 `get_goal`、复用匹配 Goal 或一次 `create_goal`、Goal 安全投影和 `update_plan`。不匹配、不可用、失败或不明确时降级原 `ensure-timeout`，禁止重复创建。恰好 600 秒、任务完成、许可不足或计时丢失均不触发。
+- 当前最小任务进入 `in_progress`、完成为 `completed` 或下一个任务保持 `pending` 时，先落盘任务计划文档状态字段，再更新宿主任务列表（宿主提供任务工具时）。
+- Desktop 或宿主中断后恢复到 `in_progress` 步骤时，先核验磁盘、测试和外部状态；未知或非幂等写操作不得自动重放。任务进度重建不改变 `confirmed/unknown/revoked` 执行许可。
+- 默认执行回合取得 `confirmed` 后，进度展示走宿主任务工具；宿主没有任务工具时只用任务计划文档状态字段，不阻断执行。
 - 可自行消解的不确定项采用最小可逆决策继续；不能自行消解且会改变目标、接口或风险时暂停。
 
 ### 必须暂停

@@ -1,6 +1,6 @@
 # provisioning 子代理委派契约
 
-本文件是 provisioning（MCP / 插件 / 工具的**检测与安装**）子代理委派的唯一事实来源。`mcp-installation-rules`、`plugin-installation-rules`、`thread-title-rules` 只引用本文件，不各自复制策略正文，避免多副本漂移。
+本文件是 provisioning（MCP / 插件 / 工具的**检测与安装**）子代理委派的唯一事实来源。`mcp-installation-rules`、`plugin-installation-rules` 只引用本文件，不各自复制策略正文，避免多副本漂移。
 
 本契约只约束 provisioning 阶段（检测 / 安装 / 注册 / 首次可用性验证）的执行编排；已配置工具在任务运行期的失活、超时、断开等故障不归本文件，统一路由 `agent-runtime-recovery-rules`。
 
@@ -34,7 +34,6 @@
 
 ## 写目标（随 skill 而定）
 
-- `thread-title-rules`（`thread_session`）：写全局 `~/.codex/config.toml`（`CODEX_HOME` 优先）。
 - `mcp-installation-rules`：写项目级 `./codex/config.toml` 或 `./.codex/config.toml`。
 - `plugin-installation-rules`：按插件官方方式（多为平台命令 / 项目级配置），config 写按同一"单写者"不变量处理。
 - 单写者不变量按"每个 config 文件"成立：不同文件可由不同批次处理，同一文件任意时刻只允许一个写入者。
