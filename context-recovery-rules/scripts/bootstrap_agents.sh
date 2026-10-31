@@ -369,6 +369,17 @@ BODY_MINIMAL_LADDER=$(cat <<'EOF'
 EOF
 )
 
+BODY_CODE_DECOMPOSITION=$(cat <<'EOF'
+> 判据与例外细则见 `code-quality-rules`（代码拆分）与 `package-structure-rules`（目录树规范）。本节只锁死阈值。
+
+- **单文件 ≤ 200 行**：超限拆为同级 diamond 文件。例外仅限纯声明式静态数据映射表、枚举字典、协议常量表（`table_*.go`、`registry_*.go`、`data_*.go`）。
+- **函数 ≤ 80 行**：超限拆为职责明确的子函数。例外仅限状态机流转 / 事件派发主干 / 巨型 `switch-case`（分支必须已抽出），以及长流水线入口编排函数（实现细节已全部下沉）。混杂具体计算、SQL/JSON 解析、复杂循环的长函数属坏味道，严禁用 exemption 掩盖。
+- **参数与返回值 ≤ 2 个**：≥ 3 个时改用 `XxxParams` / `XxxOptions` / `XxxResult`。例外仅限框架/三方库固定回调契约与底层极简构造函数。
+- **一个同级目录只含一种业务、只做一件事**；同一业务有多个处理阶段时拆为多个同级文件。
+- 突破基准线必须在代码位点加原因注释（如 `// exemption: 状态机分发主干`），并在 `6-review` 核验正当性；禁止无理由超标。
+EOF
+)
+
 BODY_OUTPUT_FORMAT=$(cat <<'EOF'
 - AI 输出统一使用 markdown，不依赖 HTML 渲染（多数 agent 环境不渲染 HTML，会退化成噪声）。
 - 视觉层级靠 markdown 语义结构（标题、分隔线、表格、引用块），不靠绝对字号；字号由渲染端决定。
@@ -813,6 +824,7 @@ sync_agents_file() {
   sync_section "$file" "本地连接调试测试红线（最高优先级，强制）" "$BODY_LOCAL_ONLY_CONNECTION"
   sync_section "$file" "测试不得污染生产代码红线（最高优先级，强制）" "$BODY_TEST_POLLUTION"
   sync_section "$file" "最小实现优先级阶梯" "$BODY_MINIMAL_LADDER"
+  sync_section "$file" "代码分解与目录内聚规则（强制）" "$BODY_CODE_DECOMPOSITION"
   sync_section "$file" "输出格式规则" "$BODY_OUTPUT_FORMAT"
   sync_section "$file" "Windows / WSL 执行规则" "$BODY_WINDOWS_WSL"
   sync_section "$file" "CodeGraph 与代码检索" "$BODY_CODEGRAPH"

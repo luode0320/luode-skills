@@ -18,7 +18,7 @@ description: 当需要确定测试策略、优先级、覆盖范围和待补测�
 | 名称 | 权威文件 | 一句话 |
 |---|---|---|
 | 测试隔离红线 | `references/test-isolation-redline.md` | 禁止为测试改动生产代码，按引用面判据判定 |
-| 测试进程生命周期 | `references/test-process-lifecycle.md` | 测试收口必关进程，关闭动作要有复查证据 |
+| 测试进程生命周期 | `references/test-process-lifecycle.md` | 测试收口必关进程与临时数据；执行细节见 `runtime-process-cleanup-rules` |
 | 本地环境配置发现与连接 | `references/local-environment-connection.md` | 判定本地环境看配置归属，不看物理地址 |
 | 生产代码测试污染扫描 | `references/production-test-pollution.md` | 五类污染模式与治理四步；扫描脚本硬阻断 |
 
