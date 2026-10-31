@@ -50,7 +50,7 @@
 
 ## 阶段检查点机制（本地适配版）
 
-> 外部 conductor 原版含"等待用户审批后才进入下一阶段"步骤。**本地上不吸收人工审批**：本地为零决策执行模型（强模型冻结决策、执行模型自动闭环），阶段放行按本地既有闸门（`artifact-delivery-gate-rules`、`skill-execution-compliance-gate-rules` 等）执行，不在阶段间引入额外人工等待。若任务本身已标记需要人工确认（如 `WAITING_DECISION` 类状态），仍按对应 Owner 规则处理。
+> 外部 conductor 原版含"等待用户审批后才进入下一阶段"步骤。**本地上不吸收人工审批**：本地为零决策执行模型（强模型冻结决策、执行模型自动闭环），阶段放行按本地既有闸门（`artifact-delivery-gate-rules`、`code-change-finalization-gate-rules` 等）执行，不在阶段间引入额外人工等待。若任务本身已标记需要人工确认（如 `WAITING_DECISION` 类状态），仍按对应 Owner 规则处理。
 
 每个阶段完成时执行检查点协议：
 

@@ -35,7 +35,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 ## 默认执行流程
 
 1. 默认先读 `references/fix-proposal-template.md`，按统一模板组织修复建议。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 3. 如果需要判断风险和影响范围，再读 `references/risk-assessment-checklist.md`。
 4. 如果需要判断何时必须等确认、何时可以直接编码，再读 `references/confirm-before-coding.md`。
 5. 输出主方案、备选方案、风险点、影响范围、验证方式和确认建议。
@@ -110,14 +110,12 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 
 - 将修复建议、影响范围、风险评估、确认结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
 - 当前 Bug 主文档至少写明根因摘要、主方案、备选方案、风险点、验证方式和确认结论；仅当仍存在未完成的修复、验证或确认动作时，补写必要后续动作。
-- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果明确结论是“可直接进入编码”，也要保留该判断依据，并继续沿用同一份 Bug 主文档进入后续修复与验证。
 - 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对主方案、备选方案、风险评估和确认结论是否已经真实写回当前 Bug 主文档；未落盘不得判定修复建议阶段完成。
 
 ## references 读取规则
 
 - 默认先读 `references/fix-proposal-template.md`。
-- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估影响范围和风险时，再读 `references/risk-assessment-checklist.md`。
 - 只有在判断是否必须先确认时，再读 `references/confirm-before-coding.md`。
 - 输出修复建议前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先交代推荐修复、风险和完成结果，技术方案比较和证据进入附录。
@@ -127,6 +125,4 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 
 ## 公共 Markdown 呈现路由
 
-- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
-- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
-- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

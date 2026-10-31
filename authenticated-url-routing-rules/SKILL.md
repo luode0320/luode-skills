@@ -1,6 +1,6 @@
 ---
 name: authenticated-url-routing-rules
-description: 当用户提供任意 URL、链接或网页地址，并要求打开、读取、分析、总结、截图、提取内容、排查页面、查看文档、理解网页、检查资料、访问在线文档或处理已在浏览器登录过的页面时触发。TAPD URL 是专用例外：必须先按 `tapd-cli` → `tapd-openapi` 的顺序尝试 CLI 与 API，只有 API 无法满足页面专属需求或用户明确要求直接操作页面时才进入浏览器路由；网页读取失败或浏览器已有登录态不能单独触发浏览器回退。其他页面默认优先使用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile；依赖用户 profile 的页面在 Chrome Plugin 不可用时必须停在连接/授权阻断，不得用其他浏览器绕过。对明确的公开或 local 页面，才按统一浏览器路由选择 Chrome DevTools MCP、`browser-session-automation-rules` 或高级验证 Skill；只有任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身、合规验证码等 Cloud 专属能力，或用户明确点名 Browser Use Cloud 时，才让位给 `browser-use-cloud-rules`，且不得跳过密钥、费用和安全闸门。
+description: 当用户提供任意 URL 或网页地址，要求打开、读取、分析、总结、截图、提取内容、排查页面或处理已登录页面时触发。TAPD URL 是专用例外：先按 `tapd-cli` → `tapd-openapi` 顺序尝试 CLI 与 API，只有无法满足页面专属需求或用户明确要求直接操作页面时才进入浏览器。其他页面默认优先用 Chrome Plugin 的 `chrome:control-chrome` 接管用户已登录的真实 Chrome profile；依赖用户 profile 而 Chrome Plugin 不可用时必须停在连接 / 授权阻断，不得用其他浏览器绕过。公开或 local 页面按统一浏览器路由选择 Chrome DevTools MCP 或本地自动化 skill；仅 Cloud 专属能力或用户点名时让位 `browser-use-cloud-rules`。
 ---
 
 # 认证 URL 路由规则

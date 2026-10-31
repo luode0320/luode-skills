@@ -131,7 +131,7 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 - 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有本地 HAR/route、视觉 diff、录制/trace、调试代理或其他引擎场景才使用本 skill；隔离 profile、并发 session、批量执行或其他核心自动化场景见 `browser-session-automation-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
 - 所选浏览器通道不可用且没有满足安全边界的替代通道时，记录本地联调阻断，不强行切换工具。
 - 若系统需要登录授权而当前上下文缺失有效授权信息，必须先向用户获取登录账户或 token，再继续联调。
-- 若准备开始前后端联调，允许主动关闭用户已启动的前端与后端进程，并按当前任务重新启动前后端服务后再调试。
+- 联调开场的进程基线收口按 `test-strategy-rules` 的《测试进程生命周期》执行。
 - 项目联调场景下，浏览器打开的前端 URL、后端 API、代理、鉴权回调和依赖服务必须来自 local 本地环境；不得把 `test` / `prod` / `staging` 域名或远端服务当作联调目标。
 
 ### 执行要求补充（强制）

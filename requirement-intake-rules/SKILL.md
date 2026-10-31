@@ -1,6 +1,6 @@
 ---
 name: requirement-intake-rules
-description: 当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是新需求接入唯一自动触发入口和唯一需求主文档 Owner。对一句话 idea、老板式方向、粗略想法，或资料不足但可通过项目、代码、schema、上下游、URL、GitHub、网站、官方资料主动查证的场景，进入 `initial-discovery` 条件路由；对侦察后仍无法补齐、存在多个合理解释，且会影响实现方向的关键缺口进入 `gap-routing`；对已整理资料直接做需求接入。保留“需求信息不全、缺少字段/流程/规则/成功标准/关键前提”等 gap aliases。范围、兼容或旧逻辑归属不清时由 `requirement-boundary-rules` 专项自动触发；需求过大、多模块、多页面、多接口、多角色或多独立子系统时由 `requirement-splitting-rules` 专项自动触发；已确认需求在编码中新增条件、修改默认值、优先级、范围或交付物时由 `requirement-change-rules` 专项自动触发。四个 Owner 均保持自动触发，本 Skill 不吞并专项信号。
+description: 当用户提出新需求、新功能、新页面、新接口、新模块，且任务刚进入研发阶段、尚未进入实现或 Bug 定位时触发；它是新需求接入唯一自动触发入口与唯一需求主文档 Owner。一句话 idea、老板式方向或资料不足但可通过项目、代码、schema、上下游、URL、官方资料查证的场景进入 `initial-discovery` 路由；侦察后仍无法补齐且会影响实现方向的缺口进入 `gap-routing` 路由；已整理资料直接做需求接入。范围与兼容归属不清交 `requirement-boundary-rules`；需求过大或多模块多角色交 `requirement-splitting-rules`；已确认需求被补充或改范围交 `requirement-change-rules`。本 skill 不吞并上述专项信号。
 ---
 
 # 需求接入规则
@@ -44,9 +44,7 @@ description: 当用户提出新需求、新功能、新页面、新接口、新�
 
 ## 公共 Markdown 呈现路由
 
-- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
-- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
-- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。
 
 ## References
 

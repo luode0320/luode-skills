@@ -1,6 +1,6 @@
 ---
 name: code-generation-style-rules
-description: 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮“代码风格契约”；当修改上下文已经形成高度统一的编码风格时，必须优先原样延续局部结构，新增内容只做必要的模板替换，不引入多余代码；当实现已有接口时，必须优先查找并参考项目中已经实现该接口的样例，沿用其结构和表达方式。该 skill 同时约束命名、结构、注释、日志、错误处理、复用、排版和禁用写法；写完后执行风格闸门，并在形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护职责，也不替代 `code-quality-rules`、`code-quality-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。
+description: 当新增、修改、重构任意代码、脚本、测试支撑代码或配置型代码前自动触发。负责在正式写代码前读取 `PROJECT_STYLE.md`、当前文件与同目录样例，把项目长期风格记忆和局部既有写法收敛成本轮「代码风格契约」：已形成高度统一风格时优先原样延续局部结构，只做必要模板替换；实现已有接口时优先参照项目中已实现该接口的样例。约束命名、结构、注释、日志、错误处理、复用、排版与禁用写法；写完后执行风格闸门，形成新的稳定团队偏好时联动 `project-style-rules` 回写 `PROJECT_STYLE.md`。不替代 `project-style-rules` 的记忆维护，也不替代 `code-quality-rules`、`code-style-consistency-rules`、`naming-rules` 或注释类 skill 的专业检查。
 ---
 
 # 代码生成风格规则

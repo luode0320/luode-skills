@@ -1,6 +1,6 @@
 ---
 name: mcp-installation-rules
-description: 当用户要求分析项目、检查是否需要安装 MCP、决定浏览器或 Godot 编辑器由哪个工具接管，或前端验证、浏览器联动、Godot 操控需要先判断 Chrome DevTools MCP、Browser Use Cloud MCP、Godot AI MCP 时触发。对“谷歌浏览器 MCP / Google Chrome MCP / Chrome MCP / Chrome DevTools for agents”统一按 `Chrome DevTools MCP` 处理。负责识别项目标记、给出安装与 Codex 配置补齐结论，并按 `references/tool-priority.md` 路由：真实 Chrome profile 用 Chrome Plugin，独立调试用 Chrome DevTools MCP，隔离自动化用 `browser-session-automation-rules`，HAR/diff/trace/调试代理/多引擎用 `browser-advanced-testing-rules`，仅云端自主长链、托管并发、地域出口、托管代理、隐身或合规验证码等 Cloud 专属需求用 `browser-use-cloud-rules`；Browser Use Cloud 不作故障后备。任何代码仓库默认推荐 CodeGraph 与 codebase-memory-mcp，安装配置以官方仓库为准。用户提出 TAPD MCP、TAPD 技能、TAPD OpenAPI 或 tapd-skills 时，按 TAPD 技能包规则归档直下安装，项目级补环境变量，`TAPD_TOKEN` / `TAPD_WORKSPACE_IDS` 留给用户填写。MCP 检测与安装默认经 `parallel-task-dispatch-rules` 委派：只读检测并行、写 config 串行独占。
+description: 当用户要求分析项目、检查是否需要安装 MCP、决定浏览器或 Godot 编辑器由哪个工具接管，或前端验证、浏览器联动、Godot 操控需要先判断 Chrome DevTools MCP、Browser Use Cloud MCP、Godot AI MCP 时触发。「谷歌浏览器 MCP / Chrome MCP」统一按 `Chrome DevTools MCP` 处理。负责识别项目标记、给出安装与配置补齐结论，并按 `references/tool-priority.md` 路由：真实 Chrome profile 用 Chrome Plugin，独立调试用 Chrome DevTools MCP，隔离自动化、HAR / diff / trace、Cloud 专属需求各归对应 skill，Cloud 不作故障后备。任何代码仓库默认推荐 CodeGraph 与 codebase-memory-mcp，安装以官方仓库为准。
 ---
 
 # MCP 安装判定规则

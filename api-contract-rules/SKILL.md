@@ -1,6 +1,6 @@
 ---
 name: api-contract-rules
-description: 当新增或修改后端 HTTP API 的接口入口（controller/router/路由声明/路径命名/HTTP 方法/超时入口边界）、请求参数（DTO/body 结构/参数校验/请求模型）、响应结构（返回体/响应包装器/分页/错误响应/兼容字段/版本字段/统一响应模型）或 Swagger/OpenAPI 文档（框架接入/注解/调试入口/分组标签/文档暴露路径/环境开关）时触发。负责统一接口契约全链路：入口设计、请求结构、响应格式与文档同步；必须以 package-structure-rules 为基准，不使用 handler 包名；所有接口强制 POST + JSON body；请求与响应解析必须使用明确结构体（DTO），禁止 map/any/RawMessage；成功与错误响应都必须包含状态码、状态、消息、数据四字段；接口文档产物（swag/ YAML 生成）转交 swag-openapi-maintainer-rules；不要用它代替 error-handling-rules 异常分类、业务规则或功能验证。
+description: 当新增或修改后端 HTTP API 的接口入口（controller / router / 路由声明 / 路径命名 / HTTP 方法）、请求参数（DTO / body 结构 / 校验）、响应结构（返回体 / 包装器 / 分页 / 错误响应 / 兼容与版本字段）或 Swagger/OpenAPI 文档（框架接入 / 注解 / 分组标签 / 暴露路径）时触发。负责接口契约全链路：入口设计、请求结构、响应格式与文档同步。以 `package-structure-rules` 为基准，不使用 handler 包名；接口强制 POST + JSON body；请求与响应必须用明确 DTO，禁止 map / any / RawMessage；成功与错误响应均含状态码、状态、消息、数据四字段。`swag/` YAML 生成转交 `swag-openapi-maintainer-rules`。不代替 `error-handling-rules` 的异常分类或功能验证。
 ---
 
 # 接口契约规则（api-contract-rules）

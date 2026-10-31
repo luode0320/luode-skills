@@ -1,16 +1,11 @@
 ---
 name: wsl-host-agent
 description: >-
-  Windows 侧 agent 操作 WSL 项目（agent 在 Windows 宿主、项目源码在 WSL）的
-  编译 / 启动 / 调试完整工作流。当项目通过符号链接（如 C:\Users\luode\WorkBuddy\兑换
-  → \\wsl.localhost\...\EllipalFinance-go）挂载进 Windows 工作区、需要编译、
-  起服务、探活、停服，或遇到 Windows go 报 "Incorrect function"/RLock 失败、
-  wsl.exe chdir 失败、nohup 启动后端口没监听、Git Bash 路径被 MSYS 转换、
-  WSL 输出 NUL 乱码、Windows Python 找不到无扩展名 shim 工具时触发。核心原则：
-  编辑搜索走 Windows 侧符号链接（无锁操作正常），构建与运行必须显式切 WSL 工具链。
-  当用户提到"Windows agent + WSL 项目""符号链接挂载编译""go build 报错
-  Incorrect function""wsl.exe 编译/起服务""WSL 里启动调试""\\wsl.localhost 文件锁"
-  时使用。
+  Windows 侧 agent 操作 WSL 项目（agent 在 Windows 宿主、源码在 WSL）的编译 / 启动 / 调试工作流。
+  项目通过符号链接挂载进 Windows 工作区、需要编译、起服务、探活、停服，或遇到 Windows go 报
+  "Incorrect function"、wsl.exe chdir 失败、nohup 启动后端口没监听、Git Bash 路径被 MSYS 转换、
+  WSL 输出 NUL 乱码时触发。核心原则：编辑搜索走 Windows 侧符号链接，构建与运行显式切 WSL 工具链。
+  当用户提到"Windows agent + WSL 项目""符号链接挂载编译""wsl.exe 编译/起服务"时使用。
 
 ---
 

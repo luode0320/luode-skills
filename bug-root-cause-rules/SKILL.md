@@ -35,7 +35,7 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 ## 默认执行流程
 
 1. 默认先读 `references/static-analysis-path.md`，按静态定位路径逐步收敛。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 3. 在开始多候选假设比较前，先读 `references/symptom-rootcause-map.md` 按五类症状（返回错误 / 数据不对 / 性能退化 / 没反应 / 偶发问题）分类并映射根因方向、按「先外部→配置→数据→代码」顺序缩小范围、按「直接 / 间接 / 系统」三层追问根因；再读 `references/root-cause-catalog.md` 扫一遍常见根因类别候选池（含第三方库 / runtime / 数据损坏边界场景），再读 `references/hypothesis-ranking.md`，按「3-5 个排序假设 + 可证伪预测 + 给用户看」纪律展开；若要判断根因结论是否成立，再读 `references/root-cause-evidence.md`。
 4. 如果需要判断是否已经到达静态定位极限，再读 `references/when-to-stop-static-analysis.md`。
 5. 输出根因结论、证据链或“证据不足需升级运行时诊断”的结论。
@@ -66,7 +66,6 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 
 - 将静态定位路径、关键证据、根因结论或证据不足结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
 - 当前 Bug 主文档至少写明问题现象、分析入口、关键链路、证据点和当前判断；仅当静态定位尚未闭环、需转运行时诊断或需进入修复方案时，补写必要后续动作。
-- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果已确认需要升级到运行时诊断，应明确记录为什么静态定位无法继续收敛，并继续沿用同一份 Bug 主文档。
 - 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对静态定位路径、证据链和根因结论是否已经真实写回当前 Bug 主文档；未落盘不得判定根因定位完成。
 
@@ -74,7 +73,6 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 
 - 默认先读 `references/static-analysis-path.md`。
 - 在生成多候选根因假设前，先按 `references/symptom-rootcause-map.md` 做症状分类与根因方向映射，再扫 `references/root-cause-catalog.md` 的常见根因类别清单，再读 `references/hypothesis-ranking.md` 做排序或可证伪判断。
-- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估根因证据是否成立时，再读 `references/root-cause-evidence.md`。
 - 只有在判断是否该停止静态分析时，再读 `references/when-to-stop-static-analysis.md`。
 - 回写根因记录前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先解释已知结论和用户影响，调用链、日志、文件位置和证据进入附录。
@@ -82,6 +80,4 @@ description: 当开始分析代码、追调用链、看现有日志、查 trace�
 
 ## 公共 Markdown 呈现路由
 
-- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
-- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
-- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

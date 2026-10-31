@@ -1,6 +1,6 @@
 ---
 name: functional-validation-rules
-description: 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求、当前变更和完成条件时触发。负责界定本次功能验证范围、验证步骤、通过驳回标准和结论留痕；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把功能验证结论写回测试主文档，把可执行测试代码、mock、stub、fake、fixture 和 helper 放入根 `test/` 的源码镜像目录，并把详细执行证据放到同一份 `doc/5-tests/` 测试主文档的证据小节；模拟程序与对应测试使用同一源码相对路径，`doc/5-tests/` 仅保存非可执行证据；Go 测试还必须遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码；页面类功能验证还必须按 `test-strategy-rules` 的《页面/UI 级测试执行通道（强制）》完成真实浏览器自动化点击与交互，不得以接口证据或代码审查替代。不要用它代替 test-strategy-rules、test-strategy-rules 的 test-asset-governance 条件路由或 test-regression-rules。
+description: 当需要验证新功能、修改后的功能、接口行为、页面交互、输入输出结果是否满足当前需求与完成条件时触发。负责界定功能验证范围、步骤、通过驳回标准与结论留痕：结论写回测试主文档，可执行测试代码与 mock / stub / fake / fixture 放根 `test/` 源码镜像目录，执行证据内联到 `doc/5-tests/` 同一份测试主文档。必须给出真实运行验证，仅静态检查不得宣称已验证可用。接口类验证走 apifox 真实链路，页面类验证走真实浏览器点击与交互，不得以接口证据或代码审查替代。强制禁止为测试改动生产代码。不代替 `test-strategy-rules` 的策略、`test-asset-governance` 的资产治理或 `test-regression-rules` 的回归验证。
 ---
 
 # 功能验证规则
@@ -101,7 +101,7 @@ description: 当需要验证新功能、修改后的功能、接口行为、页�
 - **仅三条件同时满足才可豁免**：纯后端改动 **且** 不影响前端可见行为 **且** 不涉及前端调用的接口，才记 `not_applicable` + 原因 + 依据（须含前端调用面检索结论），不阻断本地功能验证；**不得仅凭前端仓库零 diff 豁免**。
 - 授权环境或第三方接口不适用时，记录 `not_applicable`、原因和依据；条件不足但已有替代验证时记录 `limited`，允许继续准备，但不能写成正式放行。
 - `browser_integration` 为历史兼容门禁（不得新增阶段或放行分支），新流程是否必须执行点击测试按上一条与《页面/UI 级测试执行通道（强制）》判定，不依赖该历史门禁。
-- 若准备开始前后端联调，允许主动关闭用户已启动的前端与后端进程，并按当前任务重新启动前后端服务后再调试。
+- 联调开场的进程基线收口按 `test-strategy-rules` 的《测试进程生命周期》执行。
 
 ### 执行要求补充（强制）
 

@@ -1,6 +1,6 @@
 ---
 name: test-regression-rules
-description: 当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整、接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论；必须以 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 为基准，把回归结论写回测试主文档，把可执行回归测试、mock、stub、fake、fixture 和 helper 放入根 `test/` 的源码镜像目录，并把详细回归案例、执行证据和补充说明放到同一份 `doc/5-tests/` 测试主文档的证据小节；模拟程序与对应回归测试使用同一源码相对路径，`doc/5-tests/` 仅保存非可执行证据；Go 测试还必须遵循 `test-program-rules` 的《Go 测试编译路径（强制）》；同时强制禁止为了测试目的污染生产代码。不要用它代替 functional-validation-rules、test-strategy-rules 或测试资源管理类规则。
+description: 当 Bug 修复、原有功能迭代、公共模块修改、共享逻辑调整或接口兼容性变化后准备执行测试时触发。负责判定回归范围、选择回归用例、验证兼容性影响并输出回归结论：结论写回测试主文档，可执行回归测试与 mock / stub / fake / fixture 放根 `test/` 源码镜像目录，回归案例与执行证据内联到 `doc/5-tests/` 同一份测试主文档。Go 测试路径服从 `test-program-rules`，强制禁止为测试污染生产代码。不代替 `functional-validation-rules`（改动是否做对）、`test-strategy-rules`（策略与资产治理）或测试资源管理类规则。
 ---
 
 # 回归验证规则

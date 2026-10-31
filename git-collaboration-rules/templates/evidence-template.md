@@ -26,7 +26,3 @@ Skill 执行证据清单：
 - `scripts/post_commit_gate.sh`：<通过/阻断 或 回退 + 摘要>
 - `git log -1 --pretty=%B`：<结果摘要>
 - `git log -1 --pretty=%s`：<结果摘要>
-
-固定校验行（强制）：
-- `命中检查:通过`
-- `Git规则:通过`

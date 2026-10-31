@@ -29,4 +29,4 @@
 - SIMPLE 档的「单文档」不等于放弃验证：仍须有完成条件、验证记录与改动文件清单；`artifact-delivery-gate-rules` 的落盘核验不因档位而豁免。
 - QUICK 档的「跳过重型需求主文档」由 INIT 阶段的口头确认 + 关键点记录替代；需求一旦进入 `implementation-planning-rules`，`AC-*` 仍按既有规则冻结。
 - FULL 档的正式文档结构与编号以 `artifact-storage-rules` 与 `requirement-structure-template.md` 为准，不复制外部 skill 的 `story/` 目录形态。
-- 状态机（INIT → ANALYZING → DESIGNING → IMPLEMENTING → DELIVERED）本地由 `task-plan-rehydration-rules` 的投影机制承载，本文件不引入 `context.json` 专属文件形态。
+- 状态机（INIT → ANALYZING → DESIGNING → IMPLEMENTING → DELIVERED）由 `doc/3-实施/` 的任务计划文档状态字段承载，本文件不引入 `context.json` 专属文件形态。

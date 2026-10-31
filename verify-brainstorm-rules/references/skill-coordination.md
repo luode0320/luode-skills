@@ -32,7 +32,7 @@ flowchart TB
 | 问题录入、根因定位、修复方案 | `bug-intake-rules` → `bug-root-cause-rules` → `bug-fix-proposal-rules` | 本 skill 只负责把问题交出去 |
 | 修复实现的最小改动与可读性 | `code-quality-rules` | 发散发现的问题一旦确认修复，由它收敛 |
 | 命名、格式、注释密度等风格**判据与回归判定** | `code-style-consistency-rules` | 本 skill 可发现风格偏离并列入清单（第 13 维，默认 P2），但判据与 `6-review` 的 `STYLE: PASS / FIX_REQUIRED` 判定归它 |
-| 多个 skill 职责重叠、体系级巡检 | `skill-audit-rules` | 本 skill 不外扩为体系巡检 |
+| 多个 skill 职责重叠、体系级巡检 | 专项重构 | 本 skill 不外扩为体系巡检 |
 | 交付前产物与证据门禁 | `artifact-delivery-gate-rules` | 本 skill 落盘后由其核验 |
 
 ## 3. 转交判据
@@ -44,7 +44,7 @@ flowchart TB
 | 是明确的既有功能缺陷 | `bug-intake-rules` | 在清单中标注"建议转 Bug 域" |
 | 指向需求本身的缺失或矛盾 | 需求域（`requirement-intake-rules`） | 标注"前提缺口"，暂停该方向发散 |
 | 需要专业安全定级或渗透视角 | 安全审计类 skill | 标注"建议安全专项复核" |
-| 属于体系级、跨模块的同类写法 | `skill-audit-rules` 或专项重构 | 标注"超出外扩边界" |
+| 属于体系级、跨模块的同类写法 | 专项重构 | 标注"超出外扩边界" |
 | 风格与格式偏离（命名 / 缩进 / 换行 / 注释颗粒度 / 文件落点） | `code-style-consistency-rules` | 作为 **P2 发现**写入清单，并标注"判据归 `code-style-consistency-rules`"；不重新定义风格规则、不做全仓统一格式化 |
 | 修复需要改动生产代码 | `code-quality-rules`（用户裁决后） | 本 skill 到此为止，不执行修改 |
 
