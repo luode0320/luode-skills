@@ -92,7 +92,7 @@ description: 当多步骤任务尚未闭环且存在原计划内可直接执行�
 
 逐项处理见 `references/continuation-and-pause.md`、`references/blocker-handoff.md` 与 `references/termination-loop-prevention.md`。
 
-**Goal 模式例外（强制）**：用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，上述暂停项整体收缩——执行许可视为 `confirmed`、执行计划视为已冻结，普通方案分歧由 agent 自行裁决；执行中发现计划文档缺项、失效或未落盘时，先依据 Goal 和当前项目证据主动修复并落盘，再继续 Goal，不因该文档问题暂停或标记阻断；目标范围内满足 Goal Owner 低风险判据的单项必需授权默认通过，不重复征求用户同意。系统、平台或工具明确要求的审批、高风险或不可逆操作、超出目标范围且需要扩权的动作、`local` 连接调试红线、凭据不回显、Git 写历史红线、跨项目写入红线与 `WRT-*` 授权边界及个人文件安全与删除保护仍不得自动通过。agent 为补建任务投影或异常修复自动 `create_goal` 产生的 Goal 不属于用户开启的 Goal 模式，不自动取得实现授权。计划文档自修复见 `references/continuation-and-pause.md` 与 `../goal-loop-rules/SKILL.md`；完整许可判据亦见以上文件。
+**Goal 模式例外（强制）**：用户当前轮显式用 `/goal` 开启目标模式，或用户已显式确认的 Goal 处于 `active` 时，上述暂停项整体收缩。免确认推进的完整判据——低风险放行的五项条件、仍不得突破的红线、防自我授权边界、计划文档缺项时的自修复口径——唯一见 `../goal-loop-rules/SKILL.md` 的《Goal 模式免确认推进》一节，本节不重复定义，不得据本节自行推定授权范围。Goal 未激活、处于 Plan Mode，或该 Goal 由 agent 自动 `create_goal` 补建时，本条不适用。
 
 ## 关键节点提问格式（强制）
 
