@@ -65,6 +65,7 @@ description: 当问题需要构造步骤、确定触发条件、判断是否稳�
 ## 执行结果归档要求
 
 - 将复现步骤、环境、输入数据和结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- **追加而不重写**：在现有 Bug 主文档末尾追加 `## 复现` 一节，不改写 intake 阶段已产出的 H1 开场段与既有附录；八字段开场、附录归位按 `references/reproduction-template.md` 与白话文档契约执行。
 - 当前 Bug 主文档至少写明前置条件、操作步骤、结果表现和稳定性判断。
 - 如果本轮复现使用了脚本、模拟数据或验证程序，应按 `artifact-storage-rules` 与 `test-strategy-rules 的 test-asset-governance 条件路由` 放入对应测试主文档；若资产原本散落在错误位置，还需先按 `test-strategy-rules 的 test-asset-governance 条件路由` 收拢，并在当前 Bug 主文档中记录对应测试目录路径。
 - 如果暂未复现，应记录已尝试路径和缺失条件，避免重复试错。

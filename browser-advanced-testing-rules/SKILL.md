@@ -126,20 +126,11 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 
 ## 项目联调规则
 
-### 触发规则补充（强制）
-- 当项目同时存在前端与后端且任务进入“测试/验证/联调”阶段时，必须完成真实 local 浏览器联调；具体工具按 `mcp-installation-rules` 的统一路由选择。
-- 用户已有 Chrome 标签页、登录态、Cookie 或扩展时使用 Chrome Plugin；常规 DOM/控制台调试且 Chrome DevTools MCP 已接通时使用 Chrome DevTools MCP；只有本地 HAR/route、视觉 diff、录制/trace、调试代理或其他引擎场景才使用本 skill；隔离 profile、并发 session、批量执行或其他核心自动化场景见 `browser-session-automation-rules`；Cloud 专属能力见 `browser-use-cloud-rules`。
-- 所选浏览器通道不可用且没有满足安全边界的替代通道时，记录本地联调阻断，不强行切换工具。
-- 若系统需要登录授权而当前上下文缺失有效授权信息，必须先向用户获取登录账户或 token，再继续联调。
-- 联调开场的进程基线收口按 `test-strategy-rules` 的《测试进程生命周期》执行。
-- 项目联调场景下，浏览器打开的前端 URL、后端 API、代理、鉴权回调和依赖服务必须来自 local 本地环境；不得把 `test` / `prod` / `staging` 域名或远端服务当作联调目标。
+本 skill 不拥有本地联调流程。联调何时触发、进程基线收口、local 环境边界、授权注入、进程收口与证据要求，全部由 `test-strategy-rules` 的《页面/UI 级测试执行通道（强制）》与《测试进程生命周期（强制）》定义，本 skill 只消费该结论，不重复定义，也不得据此另立一套流程。
 
-### 执行要求补充（强制）
-1. 联调前先确认服务可访问（前端页面可打开、后端接口可达）。
-2. 使用路由选定的浏览器工具完成至少一次真实用户路径的页面交互验证。
-3. 联调开场应先执行进程基线收口：关闭当前已运行的前端与后端进程，再按本轮调试目标重新启动前后端服务。
-4. 需要授权的场景必须先完成授权注入或登录流程；若遇到注册受限无法自行获取可用会话，必须暂停并向用户索取可用账户、token 或其他可登录方式。
-5. 最终结论必须基于联调证据，不能仅基于代码推断给出“已验证通过”。
-6. 测试完成、前后端浏览器联调完成后，必须关闭本轮为联调启动的前端与后端进程，禁止遗留后台运行进程——测试进程生命周期统一按 `test-strategy-rules`《测试进程生命周期（强制）》执行，本节不重复定义。
-7. 进程收口必须可核验：至少记录一次"关闭动作 + 关闭后状态检查"结论。
-8. 若 local 前端、后端、API 代理或鉴权依赖无法启动，必须记录为本地联调阻断；不得改用 test / prod / staging 页面、接口或账号继续验证。
+### 本 skill 在此流程中的位置（强制）
+
+- 工具选择按 `mcp-installation-rules` 的统一路由；只有本轮需要 HAR/route 记录、视觉 diff、性能 profiling、录制 trace、调试代理、非 Chrome 引擎或多 session 观测面板时，才由本 skill 接管执行。
+- 其余浏览器操作场景交给 `browser-session-automation-rules`；云端长链交给 `browser-use-cloud-rules`。
+- 高级观测产物（HAR、trace、diff 报告、profile）必须与本轮测试证据一并落盘，并在结论中标注其覆盖的页面与操作路径；不得只给观测文件而不给判定。
+- 通道不可用时按 `test-strategy-rules` 的阻断口径记录，不自行发明替代流程。
