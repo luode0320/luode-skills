@@ -45,6 +45,7 @@ description: 当 Windows 环境需要检查或准备 PowerShell 专项入口、W
 
 ## 包源与权限
 
+- 权限边界、状态锁、`-WhatIf` 语义与「必需条件 + 可选限制」的判定口径见 `references/safety-and-validation.md`；本节只列会改变执行结果的操作约束。
 - 包源顺序固定为 `winget`、已存在的 Scoop、已存在的 Chocolatey；系统自带 `curl.exe` 只验证，不作为待安装包。
 - 所有包都使用 `references/tool-manifest.yaml` 中当前包源的精确 ID；Winget、Scoop、Chocolatey 的 ID 彼此独立，某来源没有精确映射时不可退回、搜索或猜测。
 - 当前用户没有管理员权限时，优先使用用户级安装；若包要求提升权限，记录阻断并停止，不自动绕过 UAC。

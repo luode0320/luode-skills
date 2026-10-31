@@ -148,6 +148,8 @@ REA 支持多种输出格式与 Token 控制参数，适合大模型消费与终
 
 ## 五、故障排查与使用建议
 
+完整的安装校验、`rea doctor` 状态判读与输出保护命令见 `references/troubleshooting.md`；以下只列最常触发的三项：
+
 1. **未找到命令 (Command Not Found)**：
    - 优先执行 `npm install -g rea-agents` 安装。
    - 若受限于权限，使用 `npx -y rea-agents@latest <command>` 替代。

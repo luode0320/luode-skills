@@ -12,7 +12,7 @@ description: 收口闸门，最终回复前按本轮改动类型执行检查。�
 代码或测试有改动时逐项执行：
 
 1. **OCR 代码审查**：读 `references/ocr-review/review-workflow.md`，按 `rule-path-map.md` 匹配文件类型并加载 `rule_docs/` 规则做行级审查。Critical 未修复即阻断；High/Medium 在最终回复提示。
-2. **注释链**：消费 `comment-rules` 补齐闸门分区的结论与证据，含位置颗粒度分区的适用性判断。字段、编号、清单细则不在本入口重复定义。
+2. **注释链**：消费 `comment-rules` 补齐闸门分区的结论与证据，含位置颗粒度分区的适用性判断。字段、编号、清单细则不在本入口重复定义。本轮有 Python 改动时执行 `python comment-rules/scripts/check_function_header.py --root . --diff-only`，`HEADER: FAIL` 与注释结论冲突时以脚本实测为准。
 3. **测试落点**：新增测试文件是否全部落在根 `test/` 的镜像路径且命名一致（Python `*_test.py`、Go ASCII 外部黑盒包）；测试证据与结论写入 `doc/5-tests/` 主文档，不放进 `test/`。细则由 `test-program-rules` 与 `test-strategy-rules` 的 test-asset-governance 定义。
 4. **生产代码测试污染**：本轮改动生产代码时执行 `python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only`。FAIL 且未在 `.test-pollution-allowlist` 登记豁免即阻断；判据见 `test-strategy-rules/references/production-test-pollution.md`。
 5. **真实运行验证**：核心接口、页面、导出、查询、提交或任务入口是否真实跑过。只有静态证据时必须显式降级为「仅静态验证」并给出人工验证交接，不得宣称功能可用。改动触达接口可见行为时，按 `test-strategy-rules` 的接口证据要求核验，本地脚本结果不能顶替。
