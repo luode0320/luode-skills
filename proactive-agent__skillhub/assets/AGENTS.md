@@ -399,3 +399,13 @@ Don't wait for permission to improve. If you learned something, write it down no
 - 生产代码重构（依赖注入、接口抽象）只能以**生产价值**立项并走正常需求流程，理由必须独立成立「即使没有测试需求也该做」，且生产行为不变、无仅测试可达入口。以「为了能测」为唯一理由的改动一律驳回。
 - 生产代码改动收口前与 `git commit` 前必须跑 `python test-strategy-rules/scripts/scan_test_pollution.py --root . --diff-only`；`POLLUTION: FAIL` 阻断收口与提交，须先迁移到 `test/` 或登记豁免。
 - 判据细则由 `test-strategy-rules/references/production-test-pollution.md` 唯一定义，其他 skill 只消费结论。违反本条视为最高级别流程违规。
+
+## 代码分解与目录内聚规则（强制）
+
+> 判据与例外细则见 `code-quality-rules`（代码拆分）与 `package-structure-rules`（目录树规范）。本节只锁死阈值。
+
+- **单文件 ≤ 200 行**：超限拆为同级 diamond 文件。例外仅限纯声明式静态数据映射表、枚举字典、协议常量表（`table_*.go`、`registry_*.go`、`data_*.go`）。
+- **函数 ≤ 80 行**：超限拆为职责明确的子函数。例外仅限状态机流转 / 事件派发主干 / 巨型 `switch-case`（分支必须已抽出），以及长流水线入口编排函数（实现细节已全部下沉）。混杂具体计算、SQL/JSON 解析、复杂循环的长函数属坏味道，严禁用 exemption 掩盖。
+- **参数与返回值 ≤ 2 个**：≥ 3 个时改用 `XxxParams` / `XxxOptions` / `XxxResult`。例外仅限框架/三方库固定回调契约与底层极简构造函数。
+- **一个同级目录只含一种业务、只做一件事**；同一业务有多个处理阶段时拆为多个同级文件。
+- 突破基准线必须在代码位点加原因注释（如 `// exemption: 状态机分发主干`），并在 `6-review` 核验正当性；禁止无理由超标。
