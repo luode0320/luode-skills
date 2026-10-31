@@ -1,12 +1,12 @@
 ---
 name: project-design-doc-rules
-description: 当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 recent-context-bootstrap-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / code-style-consistency-rules 的测试前归位判断。
+description: 当用户要求分析整个项目、梳理项目架构/模块/目录/主链路、检查根目录 `项目设计.md` 及同类设计文档是否偏移、同步更新项目设计文档，或在完成全项目分析后为缺失项目补建根目录 `项目设计.md` 时自动触发。负责把根目录项目设计类文档作为弱参考源读取，按“代码与当前文档优先、设计文档低优先级”原则校验偏移，并统一同步到根目录 `项目设计.md`；不要用它代替 context-recovery-rules 的轻量预热、artifact-storage-rules 的路径命名总规则、project-timeline-rules 的长期时间线，或 package-structure-rules / code-style-consistency-rules 的测试前归位判断。
 ---
 
 # 项目设计文档规则
 
 只在“需要读取、判断、同步或补建项目级设计 / 架构 / 大纲文档”这个问题上使用这个 skill。
-如果当前只是决定文档放在哪里、叫什么、是否复用入口文件，请先转交 `artifact-storage-rules`；如果只是新会话快速预热，请转交 `recent-context-bootstrap-rules`。
+如果当前只是决定文档放在哪里、叫什么、是否复用入口文件，请先转交 `artifact-storage-rules`；如果只是新会话快速预热，请转交 `context-recovery-rules`。
 
 ## Skill 作用与适用场景
 
@@ -47,7 +47,7 @@ description: 当用户要求分析整个项目、梳理项目架构/模块/目�
 ## 权责边界与不负责事项
 
 - 只负责项目设计文档的读取、偏移判断、同步和补建，不代替 `artifact-storage-rules` 做路径命名总规则裁定。
-- 不代替 `recent-context-bootstrap-rules` 做新会话最近 3 天轻量预热。
+- 不代替 `context-recovery-rules` 做新会话最近 3 天轻量预热。
 - 不代替 `project-timeline-rules` 输出长期项目演进历史。
 - 不代替 `package-structure-rules`、`code-style-consistency-rules`、`implementation-planning-rules` 去定义代码分层、文件落位或当前实施方案细节。
 - 不允许用过期的项目设计文档反压真实代码、当前有效文档和最近 Git 变更。
@@ -82,6 +82,4 @@ description: 当用户要求分析整个项目、梳理项目架构/模块/目�
 
 ## 公共 Markdown 呈现路由
 
-- 本 Skill 继续负责本领域的语义、流程、字段、验收、测试、停止和回滚边界。
-- 创建、更新或审查 Markdown 文档时，读取 `../markdown-document-authoring-rules/SKILL.md`，由它统一处理正文层次、结论优先、段落与表格密度、Mermaid/图片选择、技术附录分层和渲染后视觉检查。
-- 本 Skill 不复制或改写公共 Markdown 呈现规则；本领域语义由自身负责，公共呈现由 `../markdown-document-authoring-rules/SKILL.md` 负责。
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

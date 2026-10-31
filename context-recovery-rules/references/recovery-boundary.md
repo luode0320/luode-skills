@@ -1,16 +1,16 @@
 # 边界规则
 
-## 与 `recent-context-bootstrap-rules` 的关系
+## 与 `warmup` 路由的关系
 
-- `context-compression-rules` 负责压缩后的规则、项目状态、目标、范围和许可恢复。
-- `recent-context-bootstrap-rules` 负责新会话预热，或在共享契约确认 `recent_context_state=missing` 后补充近 3 天事实。
+- `recovery` 路由负责压缩后的规则、项目状态、目标、范围和许可恢复。
+- `warmup` 路由负责新会话预热，或在共享契约确认 `recent_context_state=missing` 后补充近 3 天事实。
 - 发生压缩不再构成无条件调用近期预热的理由。
 - 状态为 `sufficient` 时不得调用；状态为 `uncertain` 时先核验现有来源；只有 `missing` 才条件调用。
 
-## 与项目 `AGENTS.md` / `project-rule-file-bootstrap-rules` 的关系
+## 与项目 `AGENTS.md` / 自举路由的关系
 
 - 恢复最近上下文不等于恢复仓库级硬规则；压缩后必须重新读取当前平台规则文件。
-- 规则文件缺失或损坏时转交 `project-rule-file-bootstrap-rules`，完成前禁止继续主任务。
+- 规则文件缺失或损坏时转交本 Skill 的 `rule-bootstrap` / `memory-bootstrap` 路由，完成前禁止继续主任务。
 - 重新读取的仓库规则与当前代码事实优先于压缩摘要中的旧口径。
 
 ## 与 `history-recall-rules` 的关系

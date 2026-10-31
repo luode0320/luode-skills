@@ -2,7 +2,7 @@
 
 ## 与 `history-recall-rules` 的边界
 
-- `recent-context-bootstrap-rules` 是新会话的轻量预热，或压缩恢复确认缺少近期事实后的条件补充。
+- `warmup` 路由是新会话的轻量预热，或压缩恢复确认缺少近期事实后的条件补充。
 - `history-recall-rules` 是用户明确要求回忆过去方案、修复或决策时的深度历史回溯。
 - 如果已明确要查“以前怎么做过”，转交 `history-recall-rules`，不扩大近期预热范围。
 

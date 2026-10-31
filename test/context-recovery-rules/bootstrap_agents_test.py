@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "project-rule-file-bootstrap-rules" / "scripts" / "bootstrap_agents.sh"
+SCRIPT = ROOT / "context-recovery-rules" / "scripts" / "bootstrap_agents.sh"
 BASH = next(
     (
         str(candidate)

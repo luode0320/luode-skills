@@ -15,14 +15,14 @@
 
 - 尚未发生上下文压缩。
 - 用户只是在讨论“是否要压缩”，还没真正压缩完成。
-- 当前只是新会话缺少最近项目事实，应直接由 `recent-context-bootstrap-rules` 判断，不冒充压缩恢复。
+- 当前只是新会话缺少最近项目事实，应直接由 `warmup` 路由判断，不冒充压缩恢复。
 
 ## 触发后第一动作
 
 - 先读取 `context-recovery-contract.md`，重新加载当前平台规则文件与项目当前上下文。
 - 完成 `recent_context_state` 三态判定：
   - `sufficient`：不调用近期预热，直接形成恢复包。
-  - `missing`：记录明确缺失项后，条件调用 `recent-context-bootstrap-rules`。
+  - `missing`：记录明确缺失项后，条件进入 `warmup` 路由。
   - `uncertain`：先核验现有来源，不调用近期预热，不继续高风险动作。
 - 恢复并声明编码许可：
   - `confirmed`：存在当前有效授权，可按计划继续。

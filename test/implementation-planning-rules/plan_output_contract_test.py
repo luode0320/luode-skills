@@ -79,7 +79,7 @@ class PlanOutputContractTests(unittest.TestCase):
         summary = (REPO_ROOT / "reasoning-summary-structure-rules" / "SKILL.md").read_text(encoding="utf-8")
         planning = (REPO_ROOT / "implementation-planning-rules" / "SKILL.md").read_text(encoding="utf-8")
         hit_check = (REPO_ROOT / "skill-hit-check-rules" / "SKILL.md").read_text(encoding="utf-8")
-        compression = (REPO_ROOT / "context-compression-rules" / "SKILL.md").read_text(encoding="utf-8")
+        compression = (REPO_ROOT / "context-recovery-rules" / "SKILL.md").read_text(encoding="utf-8")
         # 1. 校验计划 Owner、总结排除、命中总控和压缩恢复边界均已落盘。
         self.assertIn("Plan Mode 负向退出", summary)
         self.assertIn("唯一计划 Owner", planning)

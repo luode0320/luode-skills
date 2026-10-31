@@ -33,10 +33,9 @@ SCAN_TARGETS = (
     "project-style-rules",
     "git-collaboration-rules",
     "session-handoff-rules",
-    "task-plan-rehydration-rules",
-    "continuous-code-quality-supervisor-rules",
     # 自举脚本是 AGENTS.md / CLAUDE.md 的模板源，漏检会导致下次自举写回旧路径写法
-    "project-rule-file-bootstrap-rules",
+    "context-recovery-rules",
+    "continuous-code-quality-supervisor-rules",
 )
 SCAN_SUFFIXES = (".md", ".py", ".yaml", ".sh")
 # 负向示例文件：这些文件必须保留前缀写法作为反例说明，不参与禁止扫描。

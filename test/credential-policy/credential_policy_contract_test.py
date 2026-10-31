@@ -41,7 +41,7 @@ class CredentialPolicyContractTest(unittest.TestCase):
 
     SKILLS = [
         "godot-project-bootstrap-rules",
-        "project-rule-file-bootstrap-rules",
+        "context-recovery-rules",
         "imagegen",
         "mcp-installation-rules",
         "authenticated-url-routing-rules",

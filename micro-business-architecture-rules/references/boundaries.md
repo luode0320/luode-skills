@@ -9,7 +9,7 @@
 | `code-quality-rules` | 结构边界 | 不额外创建 interface、注册或依赖注入层；版本目录边界是用户冻结的跨域隔离边界。 |
 | `artifact-storage-rules` | 文档路径 Owner | 决定需求、测试、审查和验收资产的路径。 |
 | `architecture-doc-rules` | 可选联动 | 可将业务域与版本目录关系摘要回写项目架构文档。 |
-| `project-rule-file-bootstrap-rules` | 初始化衔接 | 先保证规则文件与项目记忆存在；本 Skill 仅幂等写微业务标记。 |
+| `context-recovery-rules` | 初始化衔接 | 先保证规则文件与项目记忆存在；本 Skill 仅幂等写微业务标记。 |
 
 ## 明确不再拥有的规则
 
