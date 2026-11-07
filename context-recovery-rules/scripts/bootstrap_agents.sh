@@ -206,6 +206,7 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 - 来源优先级：当前项目代码 > 最近对话 > 已有文档 > 旧记忆 / 旧风格；冲突时以高优先级为准。
 - 当前状态写 `PROJECT_CURRENT.md`，稳定规则写 `PROJECT_MEMORY.md`，历史事件写 `PROJECT_HISTORY.md`；不得互相替代。
 - 长任务的完整状态写进 `doc/3-实施/` 的计划文档，宿主任务列表（若有）用于展示进度；`PROJECT_CURRENT.md` 只留当前交接点，不承担任务清单职责。
+- `PROJECT_CURRENT.md` 的归档是**自动动作，不需要用户提醒**：日期小节超过 3 个或字节超过 40,000 时，收口前跑 `python context-recovery-rules/scripts/archive_project_current.py --apply`，把已完结小节逐字迁进 `PROJECT_HISTORY.md` 的「交接档案」区（新条目置顶、只保留最近 20 条），当前文档只留最近 3 个交接点与非日期小节。`--check` 是闸门，超限即退出 1，把它当红灯而不是当建议。
 
 ### 项目本地 skill 目录
 
