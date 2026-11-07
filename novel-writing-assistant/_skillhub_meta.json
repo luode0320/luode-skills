@@ -1,0 +1,13 @@
+{
+  "name": "百万字小说稳定写作助手",
+  "installedAt": 1794061982576,
+  "source": "marketplace",
+  "version": "1.7.2",
+  "skillId": "skill_2100066794101239808",
+  "pay_mode": 0,
+  "description_zh": "写百万字小说最怕人设崩、时间线乱。它帮你建一份人物、设定、剧情统一总档案，每写一段自动查矛盾，写到几十万字也不乱套。",
+  "description_en": "Writing a million-word novel? The hardest part is characters drifting and timelines breaking. This assistant keeps one master file of your cast, settings and plot, then scans each chapter for contradictions — so your story stays consistent even at hundreds of thousands of words.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/7d8be33c-f41e-48c9-9ab6-e5304d5ac1ea/c8ba1b1c-d8d0-4af4-8014-5a7123cd6628.png",
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\novel-writing-assistant\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/7d8be33c-f41e-48c9-9ab6-e5304d5ac1ea/c8ba1b1c-d8d0-4af4-8014-5a7123cd6628.png"
+}

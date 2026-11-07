@@ -1,0 +1,21 @@
+name: cn-novel-craft
+version: 2.0.0
+display_name: 中文小说创作与质量管控
+display_name_en: Chinese Novel Craft
+description: "中文长篇小说创作与质量管控一体方法论（合并版 v2.0）。覆盖 设定→大纲→章节spec→正文生成→量化门禁(破折号/ban词/对话标签/钩子)→16维系统审核(含AI味专项)→批量推进→插章重编号 的完整闭环；附 去AI感34模式、叙事结构库、角色声线卡、伏笔登记册、插章重编号Python工作流。面向中文网文/长篇小说写手，提供可机检的硬指标与系统诊断，显著降低AI生成痕迹。"
+category: creative
+author: 普通青年
+tags:
+  - 小说
+  - 网文
+  - 写作
+  - 质量门禁
+  - 去AI感
+  - 审核
+license: MIT
+permissions:
+  - Read
+  - Write
+  - Edit
+  - Bash
+homepage: ""

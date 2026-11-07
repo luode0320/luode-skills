@@ -1,0 +1,13 @@
+{
+  "name": "番茄殿堂作家",
+  "installedAt": 1794062036616,
+  "source": "marketplace",
+  "version": "2.0.0",
+  "skillId": "skill_2098108115146362880",
+  "pay_mode": 0,
+  "description_zh": "番茄小说平台殿堂级网文创作与运营总引擎。从选题立项到百万字连载全链路，含开篇工程、分卷架构、正文撰写、算法对齐、数据回填诊断、书测套餐与零AI味体检，一键产出可直接发布连载的番茄霸榜级作品。",
+  "description_en": "Palace-grade engine for Tomato Novel web fiction. Covers topic selection, title-blurb-tags, opening engineering, volume-and-chapter outlines, serial drafting, algorithm alignment, data diagnosis, book-test packages, limit-flow first aid, short-drama adaptation and AI-flavor removal.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/ac3a66c3-1445-49e5-9585-f1976110f96e/e0ceffa0-94d4-4e2a-bf38-502d239e929f.jpg",
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\tomato-palace-master\\_icon.jpg",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/ac3a66c3-1445-49e5-9585-f1976110f96e/e0ceffa0-94d4-4e2a-bf38-502d239e929f.jpg"
+}

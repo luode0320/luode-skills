@@ -1,0 +1,13 @@
+{
+  "name": "中文小说创作与质量管控",
+  "installedAt": 1794062047606,
+  "source": "marketplace",
+  "version": "2.0.0",
+  "skillId": "skill_2095698074428604416",
+  "pay_mode": 0,
+  "description_zh": "中文长篇小说创作与质量管控一体方法论（合并版 v2.0）。融合 WorkBuddy open-novel-writing 的模块化工程流程 + novel-16d-review 的16维审核框架 + 本地长篇小说批量自动化（long-form novel batch automation）的量化门禁/去AI感/叙事结构/声线卡/钩子工程。覆盖 设定→大纲→章节spec→正文生成→量化门禁→16维审核→批量推进→插章重编号 的完整闭环。",
+  "description_en": "An integrated methodology for writing and quality-controlling Chinese long-form web novels (network fiction). Merges WorkBuddy's modular writing pipeline with a 16-dimension review framework and machine-checkable quality gates (de-AI-ify 34 patterns, narrative structures, character voice cards, hook engineering, ban-word / em-dash / dialogue-tag checks, plus an insert-chapter renumbering workflow). Provides systematic diagnostics to significantly reduce AI-generated traces. For Chinese web-novel and long-fiction writers.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/3585c6dc-c27b-4d72-9219-1cc783c8e0f3/6d6ae5af-9e80-4f68-848a-7145c62f5322.png",
+  "iconLocalPath": "C:\\Users\\luode\\.workbuddy\\skills\\cn-novel-craft\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/3585c6dc-c27b-4d72-9219-1cc783c8e0f3/6d6ae5af-9e80-4f68-848a-7145c62f5322.png"
+}
