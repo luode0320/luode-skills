@@ -9,7 +9,7 @@ description: >-
 description_zh: "创建、读取、编辑 .pptx/.potx 演示文稿：幻灯片、版式、备注与模板。"
 description_en: "Creates, reads, and edits .pptx/.potx decks: slides, layouts, speaker notes, and templates."
 category: document
-version: "1.0.0"
+version: "1.2.0"
 author: "zxh"
 disable-model-invocation: false
 user-invocable: true

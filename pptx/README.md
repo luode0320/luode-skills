@@ -18,7 +18,7 @@ Use for anything touching .pptx/.potx: create decks and pitch decks, read and ex
 
 **Triggers**: 做 PPT、幻灯片、演示文稿、slides、deck、presentation、pptx、pitch deck
 
-- Version: 1.0.0
+- Version: 1.2.0
 - Author: zxh
 - Category: document
-- Based on Anthropic's open-source agent skills (see LICENSE.txt where present).
+- 由 zxh 基于公开方法论整理并做本地化改造。
