@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动效语言对比 · 旧 ease vs 新语态</title>
+<style>
+  /* 令牌取自 component-library/src/styles/tokens.css（浅色主题），保证观感与真实组件一致 */
+  :root {
+    --ink: #101418;
+    --ink-muted: #596368;
+    --ink-soft: #7e888c;
+    --ink-faint: #99a2a5;
+    --blue: #236de9;
+    --blue-solid: #1f66dd;
+    --shade: 46, 58, 62;
+    --line: rgba(46, 58, 62, .085);
+    --line-strong: rgba(46, 58, 62, .11);
+    --surface-solid: #fbfcfc;
+    --canvas: #f6f8f7;
+    --hover-bg: rgba(46, 58, 62, .045);
+    --e1: 0 1px 2px rgba(46, 58, 62, .05), 0 5px 14px rgba(46, 58, 62, .04);
+    --e2: 0 1px 3px rgba(46, 58, 62, .06), 0 12px 30px rgba(46, 58, 62, .055);
+    --edge: inset 0 1px 0 rgba(255, 255, 255, .92);
+    --ease-reveal: cubic-bezier(.16, 1, .3, 1);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 28px 24px 40px;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { margin: 0 0 6px; font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+  .sub { margin: 0 0 20px; font-size: 13px; color: var(--ink-muted); line-height: 1.7; }
+  .sub code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #fff; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--line); }
+
+  .bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 12px 14px;
+    background: var(--surface-solid); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--e1), var(--edge);
+  }
+  button {
+    height: 32px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line-strong);
+    background: #fff; color: var(--ink); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: background .18s var(--ease-reveal);
+  }
+  button:hover { background: var(--hover-bg); }
+  button.primary { background: var(--blue-solid); border-color: transparent; color: #fff; box-shadow: 0 1px 2px rgba(20,66,148,.28), 0 8px 18px rgba(35,109,233,.24); }
+  button.primary:hover { background: #1d61d5; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 9px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; height: 30px; padding: 0 11px; font-weight: 500; }
+  .seg button.on { background: var(--blue-solid); color: #fff; }
+  .hint { margin-left: auto; font-size: 12px; color: var(--ink-faint); }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+
+  .panel {
+    --dur: 180ms;
+    --ease: ease;
+    background: var(--surface-solid);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--e1), var(--edge);
+  }
+  .panel.is-new { --ease: var(--ease-reveal); }
+  .panel-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+  .panel-head b { font-size: 13px; font-weight: 700; }
+  .panel-head span { font-size: 12px; color: var(--ink-soft); font-family: ui-monospace, Consolas, monospace; }
+  .tag-old b { color: var(--ink-muted); }
+  .tag-new b { color: var(--blue); }
+
+  .demo { margin-bottom: 18px; }
+  .demo-name { font-size: 12px; color: var(--ink-soft); margin-bottom: 8px; }
+
+  /* ── 关系图节点 ── */
+  .rg-node {
+    display: inline-flex; align-items: center; gap: 9px;
+    height: 34px; padding: 0 14px 0 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    background: var(--surface-solid);
+    box-shadow: var(--e1), var(--edge);
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .rg-dot {
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--blue) 45%, transparent);
+    background: #fff;
+  }
+  .rg-node b { font-size: 13px; font-weight: 600; }
+  .panel.on .rg-node {
+    border-color: color-mix(in srgb, var(--blue) 55%, transparent);
+    box-shadow: var(--edge), var(--e2);
+  }
+
+  /* ── 权限矩阵行 ── */
+  .mx-row {
+    display: flex; align-items: center;
+    height: 38px; border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+    background: var(--surface-solid);
+  }
+  .mx-label {
+    flex: 1; display: flex; align-items: center; gap: 8px;
+    height: 100%; padding: 0 12px;
+    font-size: 13px; font-weight: 600;
+    background: transparent;
+    transition: background-color var(--dur) var(--ease);
+  }
+  .mx-label em { font-style: normal; font-weight: 400; font-size: 12px; color: var(--ink-faint); margin-left: auto; }
+  .panel.on .mx-label { background: color-mix(in srgb, var(--blue) 5%, var(--surface-solid)); }
+  .mx-cells { display: flex; gap: 6px; padding-right: 12px; }
+  .mx-cell { width: 15px; height: 15px; border-radius: 4px; background: var(--hover-bg); box-shadow: inset 0 0 0 1px var(--line); }
+  .mx-cell.on { background: #82dd2d; box-shadow: none; }
+
+  /* 曲线进度：与卡片用同一 duration + easing，形状即过渡的形状 */
+  .meter { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .track { position: relative; flex: 1; height: 7px; border-radius: 999px; background: var(--hover-bg); overflow: hidden; }
+  .track i {
+    position: absolute; inset: 0; border-radius: inherit;
+    background: var(--blue);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform var(--dur) var(--ease);
+  }
+  .panel.on .track i { transform: scaleX(1); }
+  .pct { width: 46px; text-align: right; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-muted); font-family: ui-monospace, Consolas, monospace; }
+
+  .foot { margin-top: 22px; font-size: 12px; color: var(--ink-faint); line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<h1>动效语言对比 · 旧 <code style="font-family:ui-monospace">ease</code> vs 新语态</h1>
+<p class="sub">
+  两栏的组件、颜色、时长完全相同，<b>只有缓动曲线不同</b>：左栏是浏览器默认 <code>ease</code>，右栏是 <code>--ease-reveal</code>（<code>cubic-bezier(.16, 1, .3, 1)</code>）。
+  点「播放」看两栏同时起步；点「定格 25%」让两边都停在四分之一程——这是两条曲线差距最大的位置。
+</p>
+
+<div class="bar">
+  <button class="primary" id="play">播放对比</button>
+  <button id="freeze">定格 25%</button>
+  <button id="reset">复位</button>
+  <span class="seg" id="speed">
+    <button data-v="1" class="on">1×</button>
+    <button data-v="4">4× 慢放</button>
+    <button data-v="10">10× 慢放</button>
+  </span>
+  <span class="hint" id="hint">时长 180ms</span>
+</div>
+
+<div class="cols">
+  <section class="panel tag-old" data-panel>
+    <div class="panel-head"><b>旧 · 浏览器默认 ease</b><span>ease</span></div>
+
+    <div class="demo">
+      <div class="demo-name">关系图节点 · 悬停高亮</div>
+      <div class="rg-node"><span class="rg-dot"></span><b>用户</b></div>
+      <div class="meter"><span class="track"><i></i></span><span class="pct">0%</span></div>
+    </div>
+
+    <div class="demo" style="margin-bottom:0">
+      <div class="demo-name">权限矩阵行 · 悬停底色</div>
+      <div class="mx-row">
+        <span class="mx-label">系统管理<em>目录</em></span>
+        <span class="mx-cells"><i class="mx-cell on"></i><i class="mx-cell on"></i><i class="mx-cell"></i></span>
+      </div>
+      <div class="meter"><span class="track"><i></i></span><span class="pct">0%</span></div>
+    </div>
+  </section>
+
+  <section class="panel is-new tag-new" data-panel>
+    <div class="panel-head"><b>新 · 语态令牌</b><span>--ease-reveal</span></div>
+
+    <div class="demo">
+      <div class="demo-name">关系图节点 · 悬停高亮</div>
+      <div class="rg-node"><span class="rg-dot"></span><b>用户</b></div>
+      <div class="meter"><span class="track"><i></i></span><span class="pct">0%</span></div>
+    </div>
+
+    <div class="demo" style="margin-bottom:0">
+      <div class="demo-name">权限矩阵行 · 悬停底色</div>
+      <div class="mx-row">
+        <span class="mx-label">系统管理<em>目录</em></span>
+        <span class="mx-cells"><i class="mx-cell on"></i><i class="mx-cell on"></i><i class="mx-cell"></i></span>
+      </div>
+      <div class="meter"><span class="track"><i></i></span><span class="pct">0%</span></div>
+    </div>
+  </section>
+</div>
+
+<p class="foot">
+  进度条与卡片共用同一组 <code>duration</code> 与 <code>easing</code>，所以它的伸缩形状就是过渡的真实形状——这也是唯一能「看见曲线」的办法，颜色差异在小尺寸下太微弱。<br>
+  同一时长下，右栏在半程处已经基本到位，左栏还在爬——这正是 <code>expo.out</code> 与 <code>ease</code> 的区别。
+</p>
+
+<script>
+const BASE = 180;
+let speed = 1;
+const panels = [...document.querySelectorAll('[data-panel]')];
+
+function setSpeed(v) {
+  speed = v;
+  const dur = Math.round(BASE * v);
+  panels.forEach(p => p.style.setProperty('--dur', dur + 'ms'));
+  document.getElementById('hint').textContent = `时长 ${dur}ms${v > 1 ? `（原 ${BASE}ms 放慢 ${v} 倍）` : ''}`;
+}
+
+document.getElementById('speed').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
+  setSpeed(Number(b.dataset.v));
+});
+
+/* 读进度：进度条用 scaleX 驱动，从变换矩阵的 a 分量直接拿到 0~1 */
+function readProgress() {
+  panels.forEach(p => {
+    const bar = p.querySelector('.track i');
+    const m = new DOMMatrixReadOnly(getComputedStyle(bar).transform);
+    const pct = Math.round(Math.max(0, Math.min(1, m.a)) * 100);
+    p.querySelectorAll('.pct').forEach(el => { el.textContent = pct + '%'; });
+  });
+}
+
+let raf = 0, timer = 0;
+function stop() { cancelAnimationFrame(raf); clearTimeout(timer); }
+
+function play() {
+  stop();
+  panels.forEach(p => p.classList.remove('on'));
+  // 强制回流，保证移除后重新加类能触发过渡
+  void document.body.offsetHeight;
+  requestAnimationFrame(() => {
+    panels.forEach(p => p.classList.add('on'));
+    const t0 = performance.now();
+    const tick = () => {
+      readProgress();
+      if (performance.now() - t0 < BASE * speed + 80) raf = requestAnimationFrame(tick);
+    };
+    tick();
+    timer = setTimeout(() => panels.forEach(p => p.classList.remove('on')), BASE * speed + 700);
+  });
+}
+
+/* 定格：把两栏的 CSS 过渡暂停在指定进度。
+   这样得到的是真实插值结果，不是估算——差别可以直接并排看。 */
+function freeze(frac) {
+  stop();
+  panels.forEach(p => p.classList.remove('on'));
+  void document.body.offsetHeight;
+  requestAnimationFrame(() => {
+    panels.forEach(p => p.classList.add('on'));
+    requestAnimationFrame(() => {
+      document.getAnimations().forEach(a => {
+        if (a.constructor.name !== 'CSSTransition') return;
+        const t = a.effect && a.effect.target;
+        if (!t || !t.closest || !t.closest('[data-panel]')) return;
+        const dur = a.effect.getTiming().duration;
+        if (!dur) return;
+        a.pause();
+        a.currentTime = dur * frac;
+      });
+      readProgress();
+    });
+  });
+}
+
+function reset() {
+  stop();
+  panels.forEach(p => p.classList.remove('on'));
+  setTimeout(readProgress, 60);
+}
+
+document.getElementById('play').addEventListener('click', play);
+document.getElementById('freeze').addEventListener('click', () => freeze(0.25));
+document.getElementById('reset').addEventListener('click', reset);
+
+setSpeed(1);
+readProgress();
+</script>
+</body>
+</html>

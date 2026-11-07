@@ -17,6 +17,7 @@ import { COMPONENT_CATEGORY_ORDER } from '../../data/component-categories'
 import { GEN_TABLE } from './demo-business-samples'
 import { demoEntries, liveOf, type DemoEntry } from './entries'
 import { demoGuideOf } from './demo-guides'
+import { specOf, type DemoSpec } from './demo-specs'
 import DemoCell from './DemoCell.vue'
 
 const route = useRoute()
@@ -49,12 +50,16 @@ const crumbs = computed(() => {
 const items = computed(() => {
   const { cat, sub } = current.value
   const kw = keyword.value.trim().toLowerCase()
-  return demoEntries.filter((e) => {
+  const filtered = demoEntries.filter((e) => {
     if (cat && e.category !== cat.key) return false
     if (sub && !sub.components.includes(e.name)) return false
     if (!kw) return true
     return e.name.toLowerCase().includes(kw) || e.rel.toLowerCase().includes(kw) || e.label.toLowerCase().includes(kw)
   })
+  /* 按展示规格稳定排序：同档位的卡片相邻，网格不会被高低差打散成参差；
+     同一组件的多个变体规格一致，排序后仍然连在一起，不破坏变体之间的对照关系。 */
+  const order: Record<DemoSpec, number> = { inline: 0, panel: 1, stage: 2, overlay: 3 }
+  return [...filtered].sort((a, b) => order[specOf(a.name)] - order[specOf(b.name)])
 })
 
 /** 每格弹层是否展开：一律从收起起步——同分类页里多格自动展开会用模态层盖住整页，
@@ -124,7 +129,7 @@ function runAction(action: string) {
 
     <EmptyState v-if="!items.length" title="没有匹配的组件" desc="换个关键词或切换到其他分类" />
     <div v-else class="gallery-grid">
-      <DemoCell v-for="e in items" :key="e.variantKey" :name="e.name" :variant="e.label" :rel="e.rel" :guide="demoGuideOf(e.name, e.label, e.diff)">
+      <DemoCell v-for="e in items" :key="e.variantKey" :name="e.name" :variant="e.label" :rel="e.rel" :spec="specOf(e.name)" :guide="demoGuideOf(e.name, e.label, e.diff)">
         <Button v-if="e.overlay" variant="ghost" size="sm" @click="openState[e.variantKey] = true">预览弹层</Button>
         <Button v-else-if="e.action" variant="ghost" size="sm" @click="runAction(e.action)">触发宿主</Button>
         <div v-if="e.canvas !== null" class="gallery-canvas" :style="{ height: `${e.canvas}px` }">
@@ -155,9 +160,29 @@ function runAction(action: string) {
    比两列的 454px 更小，说明降列必须再往上收；1360px 起三列约 307px 才稳定大于
    中等宽度的两列卡宽，故 1360 以下降两列，820 以下与外壳移动断点对齐降单列。 */
 .gallery { padding: 18px clamp(12px, 2.5vw, 30px) 40px; }
-.gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
-@media (max-width: 1359px) { .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 820px) { .gallery-grid { grid-template-columns: minmax(0, 1fr); } }
+/* 弹层件的卡片里只有一个「预览弹层」按钮，沿用面板件那份四向留白（26/48）
+   会让每张卡空出七成高度，六张卡白白占掉两屏。这里单独收紧到刚好接住
+   按钮的 --e2 柔影（下延约 20px），其余档位仍用 .g-cell-body 的原留白。 */
+.g-cell.is-overlay .g-cell-body { padding: 14px 16px 22px; }
+
+/* 网格以 6 列为基准，让三档规格都能整除、每行不留空位：
+   行内件与弹层件占 2 列（每行 3 张，与原来三列观感一致），
+   面板件占 3 列（每行 2 张，表格各列才完整可见），舞台件占满整行。
+   用 6 列而不是 3 列：3 列下面板件跨 2 列会剩 1 列空位，每行只能放一张。
+   断点仍按「行内件每张不低于 300px」反推，与改造前同一口径。 */
+.gallery-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
+.g-cell.is-inline, .g-cell.is-overlay { grid-column: span 2; }
+.g-cell.is-panel { grid-column: span 3; }
+.g-cell.is-stage { grid-column: span 6; }
+
+@media (max-width: 1359px) {
+  .gallery-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .g-cell.is-panel, .g-cell.is-stage { grid-column: span 4; }
+}
+@media (max-width: 820px) {
+  .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g-cell.is-inline, .g-cell.is-overlay, .g-cell.is-panel, .g-cell.is-stage { grid-column: span 2; }
+}
 /* 画布类组件用 absolute 铺满，必须给定位容器并由 height 内联决定档位；
    最小高度兜住 120px 以下的窄档，避免外壳类示例被压成一条看不清的横带 */
 .gallery-canvas { position: relative; isolation: isolate; width: 100%; min-height: 200px; }

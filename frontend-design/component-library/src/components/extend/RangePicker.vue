@@ -5,7 +5,7 @@
    exemption: 两步连选、区间高亮、定位与事件绑定同属一个交互单元，拆开反而割裂可读性。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -228,7 +228,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else class="x-range-caret" name="chevronDown" :size="15" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="menu"
@@ -265,12 +265,12 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-rangepicker { display: inline-flex; width: 100%; }
 .x-range { width: 100%; cursor: pointer; text-align: left; color: var(--ink); }
-.x-range-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-range-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-range-value.is-placeholder { color: var(--ink-faint); }
 .x-range-caret { color: var(--ink-soft); flex: none; }
 .x-range-menu { position: fixed; z-index: 120; width: 272px; padding: 10px; border-radius: var(--r-md); }
 .x-range-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 8px; }
-.x-range-title { font-size: 13px; font-weight: 620; color: var(--ink); }
+.x-range-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
 .x-range-nav {
   display: inline-flex;
   align-items: center;
@@ -282,11 +282,11 @@ onBeforeUnmount(() => hide())
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-range-nav:hover { background: var(--hover-bg); color: var(--ink); }
 .x-range-week { display: grid; grid-template-columns: repeat(7, 1fr); padding-bottom: 4px; }
-.x-range-week span { text-align: center; font-size: 11px; color: var(--ink-faint); }
+.x-range-week span { text-align: center; font-size: var(--fs-caption); color: var(--ink-faint); }
 .x-range-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 /* 区间底色用方角，端点再单独圆角：连续日期才拼得成一条不断开的带子 */
 .x-range-cell {
@@ -295,10 +295,10 @@ onBeforeUnmount(() => hide())
   border-radius: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-range-cell:hover:not(:disabled) { background: var(--hover-bg); }
 .x-range-cell:disabled { cursor: default; }

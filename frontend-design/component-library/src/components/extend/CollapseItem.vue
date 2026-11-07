@@ -66,7 +66,7 @@ function onHead() {
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fs-body);
   font-weight: 620;
   text-align: left;
   cursor: pointer;
@@ -83,5 +83,5 @@ function onHead() {
 /* 0fr 收起、1fr 展开：只做过渡不做测高的关键 */
 .x-collapse-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--ease-premium) .34s; }
 .x-collapse-item.is-open .x-collapse-body { grid-template-rows: 1fr; }
-.x-collapse-inner { padding: 0 14px 20px; font-size: 13px; color: var(--ink-muted); line-height: 1.6; } /* padding-bottom 从 14px 抬到 20px，避免最后一行被裁切 */
+.x-collapse-inner { padding: 0 14px 20px; font-size: var(--fs-body); color: var(--ink-muted); line-height: 1.6; } /* padding-bottom 从 14px 抬到 20px，避免最后一行被裁切 */
 </style>

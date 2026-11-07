@@ -3,7 +3,7 @@
    对外输出 YYYY-MM-DD 字符串；format 仅用于触发器上的显示文案。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -165,7 +165,7 @@ onBeforeUnmount(() => hide())
     <Icon v-else class="x-date-caret" name="chevronDown" :size="15" />
   </button>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -201,12 +201,12 @@ onBeforeUnmount(() => hide())
 
 <style scoped>
 .x-date { width: 100%; cursor: pointer; text-align: left; color: var(--ink); }
-.x-date-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-date-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-date-value.is-placeholder { color: var(--ink-faint); }
 .x-date-caret { color: var(--ink-soft); flex: none; }
 .x-date-menu { position: fixed; z-index: 120; width: 272px; padding: 10px; border-radius: var(--r-md); }
 .x-date-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 8px; }
-.x-date-title { font-size: 13px; font-weight: 620; color: var(--ink); }
+.x-date-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
 .x-date-nav {
   display: inline-flex;
   align-items: center;
@@ -218,11 +218,11 @@ onBeforeUnmount(() => hide())
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-date-nav:hover { background: var(--hover-bg); color: var(--ink); }
 .x-date-week { display: grid; grid-template-columns: repeat(7, 1fr); padding-bottom: 4px; }
-.x-date-week span { text-align: center; font-size: 11px; color: var(--ink-faint); }
+.x-date-week span { text-align: center; font-size: var(--fs-caption); color: var(--ink-faint); }
 .x-date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .x-date-cell {
   height: 32px;
@@ -230,10 +230,10 @@ onBeforeUnmount(() => hide())
   border-radius: var(--r-xs);
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-date-cell:hover:not(:disabled) { background: var(--hover-bg); }
 .x-date-cell:disabled { cursor: default; }

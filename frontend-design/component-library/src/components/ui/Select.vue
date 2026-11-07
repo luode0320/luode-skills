@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface SelectOption {
@@ -157,7 +157,7 @@ onBeforeUnmount(() => hide())
     <Icon v-else class="select-caret" name="chevronDown" :size="15" />
   </button>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"

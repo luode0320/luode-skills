@@ -57,7 +57,7 @@ const style = computed(() => (props.offset
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  font-size: 11px;
+  font-size: var(--fs-caption);
   font-weight: 640;
   line-height: 1;
   font-variant-numeric: tabular-nums;

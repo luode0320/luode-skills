@@ -3,7 +3,7 @@
    菜单 Teleport 到 body，层级用 floatingLayerFor 跟随所在浮层；点击外部按 pointerdown 捕获关闭。 */
 import { nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface DropdownItem {
@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
     <slot />
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -171,10 +171,10 @@ onBeforeUnmount(() => {
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   text-align: left;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-dropdown-item:hover:not(:disabled) { background: var(--hover-bg); }
 .x-dropdown-item:disabled { color: var(--ink-faint); cursor: not-allowed; }

@@ -14,6 +14,31 @@
   --login-pad-top: 14px;
   --login-pad-x: 36px;
   --login-pad-bottom: 62px;
+
+  /* ── 控件尺寸四档：size 只表示档位，不表示像素 ──────────────────
+     上游只有 --control-h（36）与 --control-h-sm（30）两档，组件无法按档位
+     自适应，只能各自写死尺寸。这里补齐 xs / md / lg，md 直接别名到上游值，
+     保证既有页面不位移；xs 与 lg 是新增档位。
+     几何尺寸（圆形直径、图标边长）不走这组令牌，用组件自己的 diameter /
+     iconSize 像素入参，两者语义不混。 */
+  --control-h-xs: 28px;
+  --control-h-md: var(--control-h);
+  --control-h-lg: 44px;
+
+  --control-px-xs: 10px;
+  --control-px-sm: 12px;
+  --control-px-md: 14px;
+  --control-px-lg: 18px;
+
+  --fs-control-xs: 12px;
+  --fs-control-sm: 13px;
+  --fs-control-md: 14px;
+  --fs-control-lg: 15px;
+
+  --icon-control-xs: 14px;
+  --icon-control-sm: 15px;
+  --icon-control-md: 17px;
+  --icon-control-lg: 20px;
 }
 
 /* 只在有深色外框的宽度生效：≤820px 上游把外框改成贴边全屏（border 0 / radius 0），
@@ -113,100 +138,818 @@
   font-family: var(--font-sans);
 }
 
-/* BEGIN GENERATED: fractional font-size overrides */
-/* 上游冻结样式里的非整数字号会让字形落在半像素栅格上；
-   本段由 scripts/build_font_overrides.py 从冻结源自动派生，请勿手改。
-   映射：10.5→11 / 11.5→12 / 12.5→13 / 13.5→14 / 14.5→15（px）。 */
-.alert-kind,
-.bar-readout,
-.dial-date,
-.hc-rows dt,
-.insight-group h4 b,
-.insight-kind,
-.ladder-card dd small,
-.ladder-card-rank,
-.login-foot,
-.mono-time,
-.org-count,
-.pipe-dir,
-.pipe-map-head span,
-.preview-dir,
-.rg-badge,
+/* 浅色字色：四档拉到 WCAG AA（取白 / 画布 / 阅读面三个内容底的最差值）。
+   --ink-soft 3.40→4.55、--ink-faint 2.44→3.14、--leaf-text 3.05→4.71、--red-text 3.89→4.86。
+   深色主题原本 7 项全部达标，不动。 */
+:root {
+  --ink-soft: #6a7377;
+  --ink-faint: #858e91;
+  --leaf-text: #427d19;
+  --red-text: #c9362d;
+}
+
+/* 小字用法迁移：10–11.5px 的真实文本不能再用 `--ink-faint`——它只到非文本档 3.14。
+   `.faint` 在 35 处 Vue 组件里承载加载提示、空态、时间戳与计数，是文本不是装饰；
+   下面这批是同类的 10–11px 高频点。装饰性使用（标签圆点、排序箭头、省略号、
+   关闭图标、清除按钮）保留原值，它们不承载可读内容。 */
+.faint,
+.ucard-time,
+.ucard-state,
+.mx-type,
+.mx-role-meta,
 .rg-sub,
-.ucard-time {
-  font-size: 11px;
+.swim-count,
+.tick-ring-label,
+.hc-rows dt,
+.org-card-rows dt,
+.tree-row .tree-count,
+.board-empty,
+.ruler-marker-label,
+.bars-labels span,
+.input-shell textarea::placeholder,
+.select-trigger .select-value.is-placeholder {
+  color: var(--ink-soft);
 }
-.alert-meta,
-.ask-presets button,
-.cap-desc,
-.cmd-ask-hint,
-.cmd-foot,
-.code-chip,
-.eyebrow,
-.field-error,
-.field-hint,
-.hc-sub,
-.heat-day,
-.insight-metric-label,
-.insight-subtitle,
-.is-compact .swim-name,
-.nav-preview-item.is-sub,
-.nav-preview-title,
-.org-meta,
-.pipe-readouts dt,
-.quick-sub,
-.readout-label,
-.rg-tools button,
-.rg.is-stage .rg-node.is-hub .rg-sub,
-.settings-nav-note,
-.settings-was,
-.stage-chip,
-.swatch-def,
-.swim-more,
-.ucard-sub {
-  font-size: 12px;
+
+/* 图表轴用 fill 而不是 color，必须单独覆盖 */
+.trend-axis text {
+  fill: var(--ink-soft);
 }
-.activity-main,
-.ask-results-head span,
-.board-menu .menu-item,
-.btn-sm,
-.cap-title,
-.cmd-trigger,
-.crumbs,
-.heat-readout,
-.hovercard,
-.insight-card h4,
-.insight-status,
-.login-error,
-.mx-role-name,
-.mx-row.is-btn .mx-name,
-.org-card-rows,
-.org-members li,
-.pg-btn,
-.pill-btn,
-.preview-name,
-.rg-label,
-.segmented button,
-.settings-readonly,
-.share-list li,
-.side-label,
-.swim-name,
-.trace-crumbs,
-.user-chip .user-name {
-  font-size: 13px;
+
+/* 舞台图谱的核心副标题用了三层选择器，特异性高于上面的 `.rg-sub`，必须同形覆盖 */
+.rg.is-stage .rg-node.is-core .rg-sub {
+  color: var(--ink-soft);
 }
-.board-col-title,
-.cmd-label,
-.confirm-text,
-.pref-title,
-.rg-node.is-hub .rg-label,
-.rg.is-stage .rg-node.is-hub .rg-label,
-.rg.is-stage .rg-node.is-slab .rg-label,
-.scope-name,
-.ucard-name {
-  font-size: 14px;
+
+/* 标签高度跟随字号上调：字号从 caption 档升到 sm 档后，13px 字配 1.5 行高要 19.5px，
+   留在 22px 的胶囊里上下各只剩 1.25px，视觉上贴边。抬到 24px 恢复呼吸，
+   与 Ant Design 等主流实现的「22px 高配 12px 字」保持同一比例。 */
+.tag {
+  height: 24px;
 }
-.login-lead {
-  font-size: 15px;
+
+/* 实心主色改读 `--blue-solid`：`--blue` 是「主色当文字」的取值，压白字时对比度不够
+   （深色主题下 5 套色板实测只有 2.09–3.20）。两个角色对明度的要求方向相反，
+   深底上当文字要够亮、当背景配白字要够暗，一个令牌无法兼顾，故拆成两个。
+   只改真正承载文字的实心件；装饰性小圆点与竖条继续用 `--blue`，它们不承载可读内容。 */
+.btn-primary {
+  background: var(--blue-solid);
 }
-/* END GENERATED: fractional font-size overrides */
+.btn-primary:hover:not(:disabled) {
+  background: var(--blue-solid-hover);
+}
+
+/* 外观设置正文由本地组件 `AppearanceSettings` 接管（主题 / 主色 / 字号 / 密度四区合一），
+   对话框里原有的「主题 + 密度」两行只保留在 DOM 中、不再显示。
+   用 `:has()` 把范围锁死在「正文里确实挂了新面板」的那个弹窗上——
+   若以后别处也用 `.pref-list`，不会被这条规则误伤。 */
+.modal-body:has(> .apx) > .pref-list {
+  display: none;
+}
+
+/* 顶部栏「外观设置」入口重做。
+   上游这个按钮有三个问题：字形是 stroke-only 的 contrast——一个空心圆加一条竖线，
+   在 17px 下既看不出「深浅对比」，也读不出「外观」；没有控件边界，夹在胶囊搜索框
+   和头像之间像一枚掉队的装饰；尺寸 32px，与旁边 34px 的搜索框不齐。
+
+   改动只在这一层完成（图标名写在冻结的 Topbar.vue 里，不能改）：
+   1. 补齐真正的「半实心对比圆」字形——掩码绘制，跟随文字色，深浅主题都成立；
+   2. 给它搜索框同款的胶囊材质与 34px 高度，右上一排读作一组控件。
+   上游 svg 保留在 DOM 里只把描边设为透明：直接 display:none 会让它变成零尺寸图标，
+   而「零尺寸图标」本身就是渲染健康守卫的一条判据。 */
+.topbar .icon-btn[aria-label="外观设置"] {
+  --apx-contrast-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.4' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M12 3.6a8.4 8.4 0 0 1 0 16.8z' fill='black'/%3E%3C/svg%3E");
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--glass-line);
+  border-radius: var(--r-sm);
+  background: var(--pill-bg);
+  box-shadow: var(--e2), var(--edge-strong), var(--pill-inset);
+  backdrop-filter: blur(22px) saturate(1.18);
+  -webkit-backdrop-filter: blur(22px) saturate(1.18);
+}
+
+.topbar .icon-btn[aria-label="外观设置"] .icon {
+  color: transparent;
+}
+
+.topbar .icon-btn[aria-label="外观设置"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 17px;
+  height: 17px;
+  background: currentColor;
+  -webkit-mask: var(--apx-contrast-glyph) no-repeat center / contain;
+  mask: var(--apx-contrast-glyph) no-repeat center / contain;
+}
+
+.topbar .icon-btn[aria-label="外观设置"]:hover:not(:disabled) {
+  background: var(--pill-bg);
+  box-shadow: var(--e2), var(--edge-strong), var(--pill-inset);
+}
+
+/* ── 组件库侧栏：本地折叠导航接管 ──────────────────────────────────────
+   上游 Sidebar.vue 把分类标题渲染成不可点的静态标签，子项全部平铺。100+ 子项
+   全展开等于没有分组。本地 GalleryNav 只在 /gallery 下接管，这里把上游的平铺
+   分组与它的滑动块一起隐藏。
+   用 :has 而不是运行时给父级加类——不给冻结组件的 DOM 留副作用，组件卸载即复原。
+   匹配后代而不是直接子元素：本地导航外面套了一层只做身份判断的 .gn-host；
+   示例卡里的嵌套外壳不会渲染 .gn，所以不会误伤演示用的侧栏。 */
+.rail-nav:has(.gn) > .nav-group,
+.rail-nav:has(.gn) > .nav-thumb {
+  display: none;
+}
+
+/* ── 通用入场形变：列表子项逐条落下 ──────────────────────────────────
+   形变语式里的「展开 Unfold」：内容不是「唰」地出现，而是逐条落位。
+   一处定义覆盖所有列表类组件，新增列表只要把容器选择器加进下面这组即可。
+
+   只对「一条一条进来」的容器生效（表格行、列表项、时间线、动态流、分享榜、
+   描述项、便当格、快捷入口）。卡片、面板这类单件不加——它们不是列表，
+   逐条落下没有语义。 */
+@keyframes morph-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.table tbody tr,
+.x-datalist .x-datalist-row,
+.x-timeline .x-timeline-item,
+.activity-list > .activity,
+.share-list > li,
+.x-desc .x-desc-item,
+.bento-grid > *,
+.quick-link {
+  animation: morph-enter .26s var(--ease-reveal) backwards;
+}
+
+/* 错位：前 8 条各差 26ms，第 8 条之后统一封顶——长列表不该滚出一波浪 */
+.table tbody tr:nth-child(2),
+.x-datalist .x-datalist-row:nth-child(2),
+.x-timeline .x-timeline-item:nth-child(2),
+.activity-list > .activity:nth-child(2),
+.share-list > li:nth-child(2),
+.x-desc .x-desc-item:nth-child(2),
+.bento-grid > *:nth-child(2),
+.quick-link:nth-child(2) { animation-delay: 26ms; }
+
+.table tbody tr:nth-child(3),
+.x-datalist .x-datalist-row:nth-child(3),
+.x-timeline .x-timeline-item:nth-child(3),
+.activity-list > .activity:nth-child(3),
+.share-list > li:nth-child(3),
+.x-desc .x-desc-item:nth-child(3),
+.bento-grid > *:nth-child(3),
+.quick-link:nth-child(3) { animation-delay: 52ms; }
+
+.table tbody tr:nth-child(4),
+.x-datalist .x-datalist-row:nth-child(4),
+.x-timeline .x-timeline-item:nth-child(4),
+.activity-list > .activity:nth-child(4),
+.share-list > li:nth-child(4),
+.x-desc .x-desc-item:nth-child(4),
+.bento-grid > *:nth-child(4),
+.quick-link:nth-child(4) { animation-delay: 78ms; }
+
+.table tbody tr:nth-child(n+5),
+.x-datalist .x-datalist-row:nth-child(n+5),
+.x-timeline .x-timeline-item:nth-child(n+5),
+.activity-list > .activity:nth-child(n+5),
+.share-list > li:nth-child(n+5),
+.x-desc .x-desc-item:nth-child(n+5),
+.bento-grid > *:nth-child(n+5),
+.quick-link:nth-child(n+5) { animation-delay: 104ms; }
+
+/* 单件容器：卡片、面板、规格牌。
+   只做一次轻微上浮，不做错位——它们不是列表，逐条落下没有语义，
+   整页一起「落位」才是它们该有的读法。 */
+.x-card,
+.panel,
+.spec-plate {
+  animation: morph-enter .26s var(--ease-reveal) backwards;
+}
+
+/* ── 通用入场形变二：纯色块落定 ──────────────────────────────────────
+   标签、徽标、涨跌牌这类只有颜色变化的组件，靠「出现时落定」获得形变：
+   从 0.9 弹到 1，0.2s 走 settle 曲线（末尾有一点过冲，读作「贴上去了」）。
+   比 scale 从 0 起更克制——色块本来体量就小，从 0 长出来会像闪。 */
+@keyframes morph-pop {
+  from { opacity: 0; transform: scale(.9); }
+  to { opacity: 1; transform: none; }
+}
+
+.tag,
+.x-badge,
+.delta-pill {
+  animation: morph-pop .2s var(--ease-settle) backwards;
+}
+
+/* ── 通用选中形变：强调条从中间长出来 ────────────────────────────────
+   选中态原来只靠底色变化（那是缓动，不是形变）。这里给出一处几何变化：
+   左侧一条 2.5px 的强调条从中心向两端长出。改的是 scaleY，不动宽高，
+   所以行内文字不会被推走。
+
+   覆盖菜单项、下拉选项、级联选项、树行——四类都是「在一列里选一个」，
+   强调条的位置正好承担「我选的是这一条」。 */
+.x-menu-item,
+.select-option,
+.x-cas-option,
+.tree-row,
+.x-tree-row {
+  position: relative;
+}
+
+.x-menu-item::before,
+.select-option::before,
+.x-cas-option::before,
+.tree-row::before,
+.x-tree-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2.5px;
+  height: 56%;
+  border-radius: 2px;
+  background: var(--blue);
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: center;
+  transition: transform .22s var(--ease-swap);
+  pointer-events: none;
+}
+
+.x-menu-item.is-active::before,
+.select-option.is-active::before,
+.select-option.is-selected::before,
+.x-cas-option.is-active::before,
+.tree-row.is-selected::before,
+.x-tree-row.is-selected::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* ── 动效校准层 ──────────────────────────────────────────────────────────
+   审计结论：全库 236 段 transition 里 **180 段用浏览器默认 ease**（含未声明缓动），
+   56 段用 --ease-premium；而 motion.ts 的 EASE 是专门设计的五条能量曲线。
+   两套动效语言并存，正是「登录那个确认动画比别处高级」的根因——不是形变更花哨，
+   而是它拿到了真曲线，CSS 侧只拿到 ease（起步钝、收尾也钝，没有能量语态）。
+   这里只补令牌与重新定时，不改冻结样式的一个字节。
+   （早期统计写的是 154/11，那个正则要求缓动在行尾，把 `prop easing duration`
+   这种写法整段漏判了；以 180/56 为准。） */
+
+:root {
+  /* 五条曲线与 motion.ts 的 EASE 一一对应，改一边必须同步另一边：
+     reveal=expo.out / glide=power4.out / exit=power2.in /
+     swap=power2.inOut / settle=back.out(1.6) */
+  --ease-reveal: cubic-bezier(.16, 1, .3, 1);
+  --ease-glide: cubic-bezier(.22, 1, .36, 1);
+  --ease-exit: cubic-bezier(.55, .085, .68, .53);
+  --ease-swap: cubic-bezier(.455, .03, .515, .955);
+  --ease-settle: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* 时长按能量语态收口，取代 .12s～.5s 的 12 种散值 */
+  --dur-hover: .18s;
+  --dur-swap: .22s;
+  --dur-reveal: .32s;
+  --dur-exit: .16s;
+}
+
+/* transition 的重定时不在这里手写：下面由 build_motion_overrides.py 从冻结样式
+   机械派生，保持一份来源。手写清单会和派生结果漂移，已移除。
+
+   keyframes 的缓动只挑出 4 段人工判语义 —— 机械派生得靠动画名猜意图，不划算。
+   其余 7 段是 spinner 与倒计时进度，必须保持 linear（匀速改成变速反而更假），
+   2 段已是 --ease-premium，3 段是 animation: none。 */
+.segmented .seg-thumb,
+.nav-thumb {
+  /* fade-in 入场：起手要快、落位要软，走显现曲线 */
+  animation-timing-function: var(--ease-reveal);
+}
+
+.skeleton,
+.rg-node.is-core .rg-body::before {
+  /* 无限循环的呼吸：用对称曲线，起收同速才读得出「呼吸」而不是「闪」 */
+  animation-timing-function: var(--ease-swap);
+}
+
+/* BEGIN GENERATED: motion language overrides */
+/* 由 scripts/build_motion_overrides.py 从冻结样式机械派生，请勿手改。
+   冻结层有 96 段 transition 仍跑在浏览器默认 ease 上；这里按「属性优先、选择器兜底」
+   分派到五条语态曲线。同特异度 + 本文件最后加载 = 生效，冻结样式零改动。
+   linear / 自定义 bezier / --ease-* 不在派生范围内；prefers-reduced-motion 整块排除。 */
+
+.m-glow > .glow-layer { transition-timing-function: var(--ease-reveal); }
+.btn { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.icon-btn { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.input-shell { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.select-trigger .select-caret { transition-timing-function: var(--ease-reveal); }
+.select-option { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.checkbox-box { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.segmented button { transition-timing-function: var(--ease-reveal); }
+.table tbody tr { transition-timing-function: var(--ease-reveal); }
+.pg-btn { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.toast-slot { transition-timing-function: var(--ease-premium), var(--ease-reveal); }
+.toast-close { transition-timing-function: var(--ease-exit), var(--ease-exit); }
+.tree-row { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.perm-chip { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.bar-col { transition-timing-function: var(--ease-reveal); }
+.swim-zoom { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.lane-block { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.org-node { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-premium); }
+.board-col { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.board-card { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.board-menu-btn { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.mx-role { transition-timing-function: var(--ease-reveal); }
+.mx-row { transition-timing-function: var(--ease-reveal); }
+.mx-cell { transition-timing-function: var(--ease-reveal); }
+.mx-mark { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-premium), var(--ease-reveal); }
+.rg-path { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.rg-body { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal), var(--ease-reveal), var(--ease-glide); }
+.rg-node.is-dot .rg-text { transition-timing-function: var(--ease-reveal); }
+.rg-tools button { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.insight-chip { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.ask-presets button { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.heat-hours span { transition-timing-function: var(--ease-reveal); }
+.heat-day { transition-timing-function: var(--ease-reveal); }
+.heat-cell { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.alert-card { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.settings-row { transition-timing-function: var(--ease-reveal); }
+.pipe-step { transition-timing-function: var(--ease-reveal); }
+.swatch-tone { transition-timing-function: var(--ease-reveal), var(--ease-glide); }
+.nav-item { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.nav-item .nav-ico { transition-timing-function: var(--ease-reveal); }
+.topbar::before { transition-timing-function: var(--ease-reveal); }
+.cmd-trigger { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.user-chip { transition-timing-function: var(--ease-reveal); }
+.menu-pop .menu-item { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.dial-tick { transition-timing-function: var(--ease-reveal); }
+.pill-btn { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.quick-link { transition-timing-function: var(--ease-reveal), var(--ease-reveal); }
+.quick-go { transition-timing-function: var(--ease-reveal); }
+.scope-option { transition-timing-function: var(--ease-reveal), var(--ease-reveal), var(--ease-reveal); }
+.cmd-go { transition-timing-function: var(--ease-reveal); }
+.link-btn { transition-timing-function: var(--ease-reveal); }
+.import-row { transition-timing-function: var(--ease-reveal); }
+.preview-file { transition-timing-function: var(--ease-reveal); }
+
+/* ── 补建过渡 ────────────────────────────────────────────────────────
+   下列元素的状态确实在变（:hover / .is-* 声明了可视属性），但冻结层从来没有给它们
+   写过 transition —— 表现是瞬间闪变。这里补上声明；组件若在 scoped 样式里已定义过渡，
+   那条带 [data-v] 属性、优先级更高，本段压不过它，因此不会重复接管。 */
+
+.checkbox .checkbox-box { transition: border-color var(--dur-hover) var(--ease-reveal), background-color var(--dur-hover) var(--ease-reveal), box-shadow var(--dur-hover) var(--ease-reveal); }
+.switch .switch-knob { transition: translate var(--dur-swap) var(--ease-swap); }
+.tree-toggle { transition: background-color var(--dur-hover) var(--ease-reveal), color var(--dur-hover) var(--ease-reveal); }
+.input-shell .input-clear { transition: color var(--dur-hover) var(--ease-reveal); }
+.org-toggle { transition: color var(--dur-hover) var(--ease-reveal), border-color var(--dur-hover) var(--ease-reveal); }
+.input-shell-within { transition: border-color var(--dur-hover) var(--ease-reveal); }
+.table .sort-ico { transition: color var(--dur-hover) var(--ease-reveal); }
+.table th.is-sortable { transition: color var(--dur-hover) var(--ease-reveal); }
+.table tbody tr td.col-actions { transition: background-color var(--dur-hover) var(--ease-reveal); }
+.board-menu .menu-item { transition: background-color var(--dur-hover) var(--ease-reveal); }
+.settings-nav-item { transition: background-color var(--dur-hover) var(--ease-reveal), color var(--dur-hover) var(--ease-reveal); }
+.nav-preview-item { transition: background-color var(--dur-hover) var(--ease-reveal), color var(--dur-hover) var(--ease-reveal); }
+.stage-chip { transition: color var(--dur-hover) var(--ease-reveal); }
+.legend-toggle { transition: background-color var(--dur-hover) var(--ease-reveal), box-shadow var(--dur-hover) var(--ease-reveal); }
+.scope-option .scope-radio { transition: background-color var(--dur-hover) var(--ease-reveal), border-color var(--dur-hover) var(--ease-reveal); }
+.cmd-item .cmd-ico { transition: color var(--dur-hover) var(--ease-reveal); }
+.cmd-item .cmd-go { transition: opacity var(--dur-hover) var(--ease-reveal), color var(--dur-hover) var(--ease-reveal); }
+.quick-link .quick-go { transition: color var(--dur-hover) var(--ease-reveal); }
+.mx-cell .mx-mark { transition: border-color var(--dur-hover) var(--ease-reveal), background-color var(--dur-hover) var(--ease-reveal), box-shadow var(--dur-hover) var(--ease-reveal); }
+.swatch { transition: box-shadow var(--dur-hover) var(--ease-reveal), border-color var(--dur-hover) var(--ease-reveal); }
+.swatch-def { transition: border-color var(--dur-hover) var(--ease-reveal), background-color var(--dur-hover) var(--ease-reveal), color var(--dur-hover) var(--ease-reveal); }
+.trace-crumb { transition: color var(--dur-hover) var(--ease-reveal); }
+.ask-form-within { transition: border-color var(--dur-hover) var(--ease-reveal), box-shadow var(--dur-hover) var(--ease-reveal); }
+.preview-file .preview-name { transition: color var(--dur-hover) var(--ease-reveal); }
+.rg-node .rg-body { transition: border-color var(--dur-hover) var(--ease-reveal), box-shadow var(--dur-hover) var(--ease-reveal); }
+.mx-row .mx-label { transition: background-color var(--dur-hover) var(--ease-reveal); }
+/* END GENERATED: motion language overrides */
+
+/* BEGIN GENERATED: type scale overrides */
+/* 字号标度：上游冻结样式在 10–15px 区间有 21 种散值，这里归并为 5 档令牌；
+   相邻 0.5px 档位合并（视觉本就无法分辨），整体上移一档，下限兜到 12px。
+   16px 以上不进标度。本段由 scripts/build_font_overrides.py 自动派生，请勿手改。 */
+:root,
+[data-font-scale="regular"] {
+  --fs-caption: 12px;
+  --fs-sm: 13px;
+  --fs-body: 14px;
+  --fs-lg: 15px;
+  --fs-title: 16px;
+}
+
+/* compact 档：打在任意容器上即对该子树生效 */
+[data-font-scale="compact"] {
+  --fs-caption: 12px;
+  --fs-sm: 12px;
+  --fs-body: 13px;
+  --fs-lg: 14px;
+  --fs-title: 15px;
+}
+
+/* large 档：打在任意容器上即对该子树生效 */
+[data-font-scale="large"] {
+  --fs-caption: 13px;
+  --fs-sm: 14px;
+  --fs-body: 15px;
+  --fs-lg: 16px;
+  --fs-title: 17px;
+}
+
+/* caption */
+.alert-kind { font-size: var(--fs-caption); }
+.ask-results-head small { font-size: var(--fs-caption); }
+.bar-readout { font-size: var(--fs-caption); }
+.bars-labels span { font-size: var(--fs-caption); }
+.bento-meta { font-size: var(--fs-caption); }
+.board-col-count { font-size: var(--fs-caption); }
+.brand-sub { font-size: var(--fs-caption); }
+.delta-pill { font-size: var(--fs-caption); }
+.dial-date { font-size: var(--fs-caption); }
+.field-error { font-size: var(--fs-caption); }
+.field-hint { font-size: var(--fs-caption); }
+.hc-rows dt { font-size: var(--fs-caption); }
+.heat-hours span { font-size: var(--fs-caption); }
+.heat-legend { font-size: var(--fs-caption); }
+.hero-readouts dt, .ring-readouts dt { font-size: var(--fs-caption); }
+.insight-chip small { font-size: var(--fs-caption); }
+.insight-group h4 b { font-size: var(--fs-caption); }
+.insight-kind { font-size: var(--fs-caption); }
+.insight-tiles dt { font-size: var(--fs-caption); }
+.insight-tiles small { font-size: var(--fs-caption); }
+.kbd { font-size: var(--fs-caption); }
+.kv-label { font-size: var(--fs-caption); }
+.ladder-card dd small { font-size: var(--fs-caption); }
+.ladder-card dt { font-size: var(--fs-caption); }
+.ladder-card-rank { font-size: var(--fs-caption); }
+.lane-block-count { font-size: var(--fs-caption); }
+.login-foot { font-size: var(--fs-caption); }
+.mono-time { font-size: var(--fs-caption); }
+.mx-role-meta { font-size: var(--fs-caption); }
+.mx-type { font-size: var(--fs-caption); }
+.nav-group-title { font-size: var(--fs-caption); }
+.org-count { font-size: var(--fs-caption); }
+.org-toggle { font-size: var(--fs-caption); }
+.pipe-dir { font-size: var(--fs-caption); }
+.pipe-map-head span { font-size: var(--fs-caption); }
+.pipe-step-n { font-size: var(--fs-caption); }
+.plate-sub { font-size: var(--fs-caption); }
+.preview-dir { font-size: var(--fs-caption); }
+.rg-badge { font-size: var(--fs-caption); }
+.rg-rank { font-size: var(--fs-caption); }
+.rg-sub { font-size: var(--fs-caption); }
+.rg.is-stage .rg-node.is-slab .rg-count::after { font-size: var(--fs-caption); }
+.ruler-labels span { font-size: var(--fs-caption); }
+.ruler-marker-label { font-size: var(--fs-caption); }
+.settings-nav-item b { font-size: var(--fs-caption); }
+.spec-plate { font-size: var(--fs-caption); }
+.spec-title { font-size: var(--fs-caption); }
+.swatch-count small { font-size: var(--fs-caption); }
+.swim-count { font-size: var(--fs-caption); }
+.swim-zoom { font-size: var(--fs-caption); }
+.tick-ring-label { font-size: var(--fs-caption); }
+.trace-legend dt { font-size: var(--fs-caption); }
+.tree-row .tree-count { font-size: var(--fs-caption); }
+.trend-axis text { font-size: var(--fs-caption); }
+.trend-stem-label { font-size: var(--fs-caption); }
+.ucard-state { font-size: var(--fs-caption); }
+.ucard-time { font-size: var(--fs-caption); }
+.user-chip .user-role { font-size: var(--fs-caption); }
+
+/* sm */
+.alert-figure span { font-size: var(--fs-sm); }
+.alert-meta { font-size: var(--fs-sm); }
+.ask-card p { font-size: var(--fs-sm); }
+.ask-presets button { font-size: var(--fs-sm); }
+.board-empty { font-size: var(--fs-sm); }
+.cap-desc { font-size: var(--fs-sm); }
+.cell-sub { font-size: var(--fs-sm); }
+.cmd-ask-hint { font-size: var(--fs-sm); }
+.cmd-foot { font-size: var(--fs-sm); }
+.cmd-sub { font-size: var(--fs-sm); }
+.code-block { font-size: var(--fs-sm); }
+.code-chip { font-size: var(--fs-sm); }
+.eyebrow { font-size: var(--fs-sm); }
+.field-label { font-size: var(--fs-sm); }
+.hc-sub { font-size: var(--fs-sm); }
+.heat-day { font-size: var(--fs-sm); }
+.hero-delta { font-size: var(--fs-sm); }
+.insight-card p { font-size: var(--fs-sm); }
+.insight-chip { font-size: var(--fs-sm); }
+.insight-group h4 { font-size: var(--fs-sm); }
+.insight-metric-label { font-size: var(--fs-sm); }
+.insight-subtitle { font-size: var(--fs-sm); }
+.is-compact .swim-name { font-size: var(--fs-sm); }
+.metric-label { font-size: var(--fs-sm); }
+.modal-sub { font-size: var(--fs-sm); }
+.mono { font-size: var(--fs-sm); }
+.nav-preview-item { font-size: var(--fs-sm); }
+.nav-preview-item.is-sub { font-size: var(--fs-sm); }
+.nav-preview-title { font-size: var(--fs-sm); }
+.org-meta { font-size: var(--fs-sm); }
+.page-date { font-size: var(--fs-sm); }
+.pager-info { font-size: var(--fs-sm); }
+.panel-head .panel-meta { font-size: var(--fs-sm); }
+.perm-chip { font-size: var(--fs-sm); }
+.pipe-note { font-size: var(--fs-sm); }
+.pipe-readouts dt { font-size: var(--fs-sm); }
+.pref-desc { font-size: var(--fs-sm); }
+.preview-head { font-size: var(--fs-sm); }
+.quick-sub { font-size: var(--fs-sm); }
+.readout-label { font-size: var(--fs-sm); }
+.rg-tools button { font-size: var(--fs-sm); }
+.rg.is-stage .rg-node.is-hub .rg-sub { font-size: var(--fs-sm); }
+.scope-desc { font-size: var(--fs-sm); }
+.select-empty { font-size: var(--fs-sm); }
+.settings-diff-row { font-size: var(--fs-sm); }
+.settings-nav-note { font-size: var(--fs-sm); }
+.settings-remark { font-size: var(--fs-sm); }
+.settings-was { font-size: var(--fs-sm); }
+.side-foot { font-size: var(--fs-sm); }
+.stage-chip { font-size: var(--fs-sm); }
+.swatch-def { font-size: var(--fs-sm); }
+.swatch-foot { font-size: var(--fs-sm); }
+.swim-more { font-size: var(--fs-sm); }
+.swim-tip { font-size: var(--fs-sm); }
+.table th { font-size: var(--fs-sm); }
+.tag { font-size: var(--fs-sm); }
+.tick-ring-value sup { font-size: var(--fs-sm); }
+.trace-hint { font-size: var(--fs-sm); }
+.trace-legend { font-size: var(--fs-sm); }
+.trend-tip { font-size: var(--fs-sm); }
+.ucard-sub { font-size: var(--fs-sm); }
+
+/* body */
+.activity-main { font-size: var(--fs-body); }
+.alert-calm { font-size: var(--fs-body); }
+.ask-card h4 { font-size: var(--fs-body); }
+.ask-form input { font-size: var(--fs-body); }
+.ask-results-head span { font-size: var(--fs-body); }
+.band-empty { font-size: var(--fs-body); }
+.board-menu .menu-item { font-size: var(--fs-body); }
+.btn { font-size: var(--fs-body); }
+.btn-sm { font-size: var(--fs-body); }
+.cap-title { font-size: var(--fs-body); }
+.checkbox { font-size: var(--fs-body); }
+.cmd-trigger { font-size: var(--fs-body); }
+.crumbs { font-size: var(--fs-body); }
+.empty { font-size: var(--fs-body); }
+.float-bar { font-size: var(--fs-body); }
+.heat-readout { font-size: var(--fs-body); }
+.hovercard { font-size: var(--fs-body); }
+.import-row { font-size: var(--fs-body); }
+.input-shell input, .input-shell textarea { font-size: var(--fs-body); }
+.insight-card h4 { font-size: var(--fs-body); }
+.insight-status { font-size: var(--fs-body); }
+.kv-value { font-size: var(--fs-body); }
+.login-card-sub { font-size: var(--fs-body); }
+.login-error { font-size: var(--fs-body); }
+.login-plate.is-health { font-size: var(--fs-body); }
+.menu-pop .menu-item { font-size: var(--fs-body); }
+.mx-label { font-size: var(--fs-body); }
+.mx-role-name { font-size: var(--fs-body); }
+.mx-row.is-btn .mx-name { font-size: var(--fs-body); }
+.nav-item { font-size: var(--fs-body); }
+.org-card-rows { font-size: var(--fs-body); }
+.org-members li { font-size: var(--fs-body); }
+.page-desc { font-size: var(--fs-body); }
+.pg-btn { font-size: var(--fs-body); }
+.pill-btn { font-size: var(--fs-body); }
+.pipe-step { font-size: var(--fs-body); }
+.preview-name { font-size: var(--fs-body); }
+.quick-title { font-size: var(--fs-body); }
+.readout-value small { font-size: var(--fs-body); }
+.rg-label { font-size: var(--fs-body); }
+.rg-node.is-core .rg-label { font-size: var(--fs-body); }
+.segmented button { font-size: var(--fs-body); }
+.select-option { font-size: var(--fs-body); }
+.select-trigger .select-value { font-size: var(--fs-body); }
+.settings-nav-item { font-size: var(--fs-body); }
+.settings-readonly { font-size: var(--fs-body); }
+.share-list li { font-size: var(--fs-body); }
+.side-label { font-size: var(--fs-body); }
+.swim-name { font-size: var(--fs-body); }
+.switch { font-size: var(--fs-body); }
+.table { font-size: var(--fs-body); }
+.toast { font-size: var(--fs-body); }
+.trace-crumbs { font-size: var(--fs-body); }
+.tree-row { font-size: var(--fs-body); }
+.trend-tip-row b { font-size: var(--fs-body); }
+.user-chip .user-name { font-size: var(--fs-body); }
+body { font-size: var(--fs-body); }
+
+/* lg */
+.board-col-title { font-size: var(--fs-lg); }
+.cmd-label { font-size: var(--fs-lg); }
+.confirm-text { font-size: var(--fs-lg); }
+.hc-name { font-size: var(--fs-lg); }
+.login-submit { font-size: var(--fs-lg); }
+.org-name { font-size: var(--fs-lg); }
+.pref-title { font-size: var(--fs-lg); }
+.rg-node.is-hub .rg-label { font-size: var(--fs-lg); }
+.rg.is-stage .rg-node.is-core .rg-label { font-size: var(--fs-lg); }
+.rg.is-stage .rg-node.is-hub .rg-label { font-size: var(--fs-lg); }
+.rg.is-stage .rg-node.is-slab .rg-label { font-size: var(--fs-lg); }
+.scope-name { font-size: var(--fs-lg); }
+.settings-title { font-size: var(--fs-lg); }
+.ucard-name { font-size: var(--fs-lg); }
+
+/* title */
+.alert-key { font-size: var(--fs-title); }
+.brand-name { font-size: var(--fs-title); }
+.cmd-input input { font-size: var(--fs-title); }
+.hero-readouts dd, .ring-readouts dd { font-size: var(--fs-title); }
+.login-lead { font-size: var(--fs-title); }
+.section-label { font-size: var(--fs-title); }
+.section-mark-title { font-size: var(--fs-title); }
+.swatch-title b { font-size: var(--fs-title); }
+/* END GENERATED: type scale overrides */
+
+/* BEGIN GENERATED: accent palettes */
+/* 主色色板：每套由一个种子色派生 12 个令牌，浅深各一份。
+   来源 references/accent-palettes.json，由 scripts/build_accent_palette.py 生成，请勿手改。
+   加色板 = 在 JSON 加一行后重跑脚本；种子色不达标时脚本会自动修正明度并打印幅度。 */
+
+/* 缺省色板（珍珠蓝）：没有 data-accent 时的取值 */
+:root {
+  --blue: #1f66dd;
+  --blue-hover: #1c5cc7;
+  --blue-solid: #1f66dd;
+  --blue-solid-hover: #1c5ecb;
+  --blue-soft: rgba(31, 102, 221, 0.1);
+  --focus: rgba(31, 102, 221, 0.8);
+  --e-accent: 0 1px 2px rgba(12, 40, 87, 0.28), 0 8px 18px rgba(31, 102, 221, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(12, 40, 87, 0.32), 0 12px 24px rgba(31, 102, 221, 0.3);
+  --graph-accent: 31, 102, 221;
+  --thread-active: rgba(31, 102, 221, 0.62);
+  --pulse-halo: rgba(31, 102, 221, 0.18);
+  --ambient-b: rgba(31, 102, 221, 0.055);
+}
+
+/* 珍珠蓝 · 浅色 */
+[data-accent="blue"] {
+  --blue: #1f66dd;
+  --blue-hover: #1c5cc7;
+  --blue-solid: #1f66dd;
+  --blue-solid-hover: #1c5ecb;
+  --blue-soft: rgba(31, 102, 221, 0.1);
+  --focus: rgba(31, 102, 221, 0.8);
+  --e-accent: 0 1px 2px rgba(12, 40, 87, 0.28), 0 8px 18px rgba(31, 102, 221, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(12, 40, 87, 0.32), 0 12px 24px rgba(31, 102, 221, 0.3);
+  --graph-accent: 31, 102, 221;
+  --thread-active: rgba(31, 102, 221, 0.62);
+  --pulse-halo: rgba(31, 102, 221, 0.18);
+  --ambient-b: rgba(31, 102, 221, 0.055);
+}
+
+/* 珍珠蓝 · 深色（祖先或同元素带 data-theme=dark 均可） */
+:root[data-theme="dark"] [data-accent="blue"],
+[data-theme="dark"][data-accent="blue"] {
+  --blue: #4c8dff;
+  --blue-hover: #609aff;
+  --blue-solid: #1069ff;
+  --blue-solid-hover: #005dfb;
+  --blue-soft: rgba(76, 141, 255, 0.16);
+  --focus: rgba(76, 141, 255, 0.85);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(76, 141, 255, 0.26);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.44), 0 12px 24px rgba(76, 141, 255, 0.34);
+  --graph-accent: 76, 141, 255;
+  --thread-active: rgba(76, 141, 255, 0.72);
+  --pulse-halo: rgba(76, 141, 255, 0.28);
+  --ambient-b: rgba(76, 141, 255, 0.07);
+}
+
+/* 青碧 · 浅色 */
+[data-accent="teal"] {
+  --blue: #0f7a6b;
+  --blue-hover: #0c6357;
+  --blue-solid: #0f7a6b;
+  --blue-solid-hover: #0d685b;
+  --blue-soft: rgba(15, 122, 107, 0.1);
+  --focus: rgba(15, 122, 107, 0.8);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.28), 0 8px 18px rgba(15, 122, 107, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.32), 0 12px 24px rgba(15, 122, 107, 0.3);
+  --graph-accent: 15, 122, 107;
+  --thread-active: rgba(15, 122, 107, 0.62);
+  --pulse-halo: rgba(15, 122, 107, 0.18);
+  --ambient-b: rgba(15, 122, 107, 0.055);
+}
+
+/* 青碧 · 深色（祖先或同元素带 data-theme=dark 均可） */
+:root[data-theme="dark"] [data-accent="teal"],
+[data-theme="dark"][data-accent="teal"] {
+  --blue: #3fbfa8;
+  --blue-hover: #4ec5af;
+  --blue-solid: #2f7f77;
+  --blue-solid-hover: #297069;
+  --blue-soft: rgba(63, 191, 168, 0.16);
+  --focus: rgba(63, 191, 168, 0.85);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(63, 191, 168, 0.26);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.44), 0 12px 24px rgba(63, 191, 168, 0.34);
+  --graph-accent: 63, 191, 168;
+  --thread-active: rgba(63, 191, 168, 0.72);
+  --pulse-halo: rgba(63, 191, 168, 0.28);
+  --ambient-b: rgba(63, 191, 168, 0.07);
+}
+
+/* 丁香紫 · 浅色 */
+[data-accent="violet"] {
+  --blue: #5b45b0;
+  --blue-hover: #523e9e;
+  --blue-solid: #5b45b0;
+  --blue-solid-hover: #533fa1;
+  --blue-soft: rgba(91, 69, 176, 0.1);
+  --focus: rgba(91, 69, 176, 0.8);
+  --e-accent: 0 1px 2px rgba(34, 26, 66, 0.28), 0 8px 18px rgba(91, 69, 176, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(34, 26, 66, 0.32), 0 12px 24px rgba(91, 69, 176, 0.3);
+  --graph-accent: 91, 69, 176;
+  --thread-active: rgba(91, 69, 176, 0.62);
+  --pulse-halo: rgba(91, 69, 176, 0.18);
+  --ambient-b: rgba(91, 69, 176, 0.055);
+}
+
+/* 丁香紫 · 深色（祖先或同元素带 data-theme=dark 均可） */
+:root[data-theme="dark"] [data-accent="violet"],
+[data-theme="dark"][data-accent="violet"] {
+  --blue: #a48cf0;
+  --blue-hover: #b29ef2;
+  --blue-solid: #745be4;
+  --blue-solid-hover: #6549e1;
+  --blue-soft: rgba(164, 140, 240, 0.16);
+  --focus: rgba(164, 140, 240, 0.85);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(164, 140, 240, 0.26);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.44), 0 12px 24px rgba(164, 140, 240, 0.34);
+  --graph-accent: 164, 140, 240;
+  --thread-active: rgba(164, 140, 240, 0.72);
+  --pulse-halo: rgba(164, 140, 240, 0.28);
+  --ambient-b: rgba(164, 140, 240, 0.07);
+}
+
+/* 苔绿 · 浅色 */
+[data-accent="moss"] {
+  --blue: #3d7a2a;
+  --blue-hover: #346723;
+  --blue-solid: #3d7a2a;
+  --blue-solid-hover: #356b25;
+  --blue-soft: rgba(61, 122, 42, 0.1);
+  --focus: rgba(61, 122, 42, 0.8);
+  --e-accent: 0 1px 2px rgba(4, 8, 3, 0.28), 0 8px 18px rgba(61, 122, 42, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(4, 8, 3, 0.32), 0 12px 24px rgba(61, 122, 42, 0.3);
+  --graph-accent: 61, 122, 42;
+  --thread-active: rgba(61, 122, 42, 0.62);
+  --pulse-halo: rgba(61, 122, 42, 0.18);
+  --ambient-b: rgba(61, 122, 42, 0.055);
+}
+
+/* 苔绿 · 深色（祖先或同元素带 data-theme=dark 均可） */
+:root[data-theme="dark"] [data-accent="moss"],
+[data-theme="dark"][data-accent="moss"] {
+  --blue: #79c65a;
+  --blue-hover: #85cb69;
+  --blue-solid: #468230;
+  --blue-solid-hover: #3e732a;
+  --blue-soft: rgba(121, 198, 90, 0.16);
+  --focus: rgba(121, 198, 90, 0.85);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(121, 198, 90, 0.26);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.44), 0 12px 24px rgba(121, 198, 90, 0.34);
+  --graph-accent: 121, 198, 90;
+  --thread-active: rgba(121, 198, 90, 0.72);
+  --pulse-halo: rgba(121, 198, 90, 0.28);
+  --ambient-b: rgba(121, 198, 90, 0.07);
+}
+
+/* 琥珀 · 浅色 */
+[data-accent="amber"] {
+  --blue: #8a4f0a;
+  --blue-hover: #724108;
+  --blue-solid: #8a4f0a;
+  --blue-solid-hover: #774409;
+  --blue-soft: rgba(138, 79, 10, 0.1);
+  --focus: rgba(138, 79, 10, 0.8);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.28), 0 8px 18px rgba(138, 79, 10, 0.24);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.32), 0 12px 24px rgba(138, 79, 10, 0.3);
+  --graph-accent: 138, 79, 10;
+  --thread-active: rgba(138, 79, 10, 0.62);
+  --pulse-halo: rgba(138, 79, 10, 0.18);
+  --ambient-b: rgba(138, 79, 10, 0.055);
+}
+
+/* 琥珀 · 深色（祖先或同元素带 data-theme=dark 均可） */
+:root[data-theme="dark"] [data-accent="amber"],
+[data-theme="dark"][data-accent="amber"] {
+  --blue: #e0a44a;
+  --blue-hover: #e3ad5b;
+  --blue-solid: #9e6819;
+  --blue-solid-hover: #8c5c16;
+  --blue-soft: rgba(224, 164, 74, 0.16);
+  --focus: rgba(224, 164, 74, 0.85);
+  --e-accent: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(224, 164, 74, 0.26);
+  --e-accent-hover: 0 1px 2px rgba(0, 0, 0, 0.44), 0 12px 24px rgba(224, 164, 74, 0.34);
+  --graph-accent: 224, 164, 74;
+  --thread-active: rgba(224, 164, 74, 0.72);
+  --pulse-halo: rgba(224, 164, 74, 0.28);
+  --ambient-b: rgba(224, 164, 74, 0.07);
+}
+/* END GENERATED: accent palettes */

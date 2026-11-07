@@ -67,7 +67,7 @@ const heading = computed(() => props.title ?? preset.value.title)
 .x-result.is-warn .x-result-ico { color: var(--cat-1-ink); background: var(--cat-1-bg); }
 .x-result.is-neutral .x-result-ico { color: var(--ink-soft); background: var(--groove-bg); }
 .x-result-title { margin-top: 16px; font-size: 18px; font-weight: 680; letter-spacing: -.015em; color: var(--ink); }
-.x-result-sub { margin-top: 6px; max-width: 420px; font-size: 13px; line-height: 1.6; color: var(--ink-muted); }
+.x-result-sub { margin-top: 6px; max-width: 420px; font-size: var(--fs-body); line-height: 1.6; color: var(--ink-muted); }
 .x-result-body { margin-top: 16px; width: 100%; }
 .x-result-extra { margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 </style>

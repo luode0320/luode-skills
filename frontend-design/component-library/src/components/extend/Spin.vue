@@ -3,7 +3,7 @@
    转圈复用全局 .spinner（currentColor 描边），这里只负责尺寸与语义色。 */
 withDefaults(defineProps<{
   loading?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   tip?: string
   /** 包裹内容时遮罩 */
   wrapper?: boolean
@@ -34,9 +34,10 @@ withDefaults(defineProps<{
 /* 独立转圈：横向排布，tip 落在圈右侧 */
 .x-spin { display: inline-flex; align-items: center; gap: 8px; color: var(--blue); }
 .x-spin .x-spin-ring { width: 18px; height: 18px; }
+.x-spin.is-xs .x-spin-ring { width: 12px; height: 12px; border-width: 1.5px; }
 .x-spin.is-sm .x-spin-ring { width: 14px; height: 14px; border-width: 1.5px; }
 .x-spin.is-lg .x-spin-ring { width: 24px; height: 24px; border-width: 2.5px; }
-.x-spin-tip { font-size: 13px; color: var(--ink-muted); }
+.x-spin-tip { font-size: var(--fs-body); color: var(--ink-muted); }
 
 /* 包裹态：内容保留布局，遮罩绝对定位压在内容上。
    最近修改时间：2026-10-18 18:20:00；改动原因：遮罩底色用的是 --overlay（浅色主题下只有

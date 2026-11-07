@@ -64,11 +64,11 @@ withDefaults(defineProps<{
   min-width: 0;
 }
 .x-card-titles { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-.x-card-title { font-size: 14px; font-weight: 650; letter-spacing: -.01em; color: var(--ink); }
-.x-card-subtitle { font-size: 12px; color: var(--ink-soft); }
+.x-card-title { font-size: var(--fs-lg); font-weight: 650; letter-spacing: -.01em; color: var(--ink); }
+.x-card-subtitle { font-size: var(--fs-sm); color: var(--ink-soft); }
 .x-card-extra { flex: none; display: flex; align-items: center; gap: 6px; }
 
-.x-card-body { padding: 13px 18px 16px; min-width: 0; font-size: 13px; color: var(--ink-muted); line-height: 1.62; }
+.x-card-body { padding: 13px 18px 16px; min-width: 0; font-size: var(--fs-body); color: var(--ink-muted); line-height: 1.62; }
 /* 有头或封面时主体顶部已由上方补足间距，这里只留正常内边距 */
 .x-card-head + .x-card-body { padding-top: 10px; }
 
@@ -78,7 +78,7 @@ withDefaults(defineProps<{
   gap: 10px;
   padding: 12px 18px;
   border-top: 1px solid var(--line);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink-soft);
 }
 </style>

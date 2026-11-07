@@ -3,7 +3,7 @@
    maxCount 作为项数上限与宽度二者取小；宽度探测用 ResizeObserver，无现成工具可复用。 */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -115,7 +115,7 @@ const layer = computed(() => floatingLayerFor(host.value))
     </div>
 
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           class="x-overflow-pop m-float"
@@ -153,7 +153,7 @@ const layer = computed(() => floatingLayerFor(host.value))
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--blue);
   cursor: pointer;
 }
@@ -168,7 +168,7 @@ const layer = computed(() => floatingLayerFor(host.value))
   gap: 6px;
   padding: 10px 12px;
   border-radius: var(--r-sm);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--ink);
   box-shadow: var(--e3);
 }

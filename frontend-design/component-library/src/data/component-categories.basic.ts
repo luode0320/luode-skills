@@ -15,7 +15,7 @@ export const BASIC_CATEGORIES: ComponentCategory[] = [
     icon: 'layers',
     desc: '按钮、图标、排版、标签与头像等最基础的原子组件',
     subGroups: [
-      { key: 'button', label: '按钮', icon: 'tool', desc: '主/次/幽灵按钮、图标按钮与按钮组', components: ['Button', 'IconButton', 'ButtonGroup'] },
+      { key: 'button', label: '按钮', icon: 'tool', desc: '主/次/幽灵按钮、图标按钮与按钮组', components: ['Button', 'IconButton', 'ButtonGroup', 'ConfirmButton'] },
       { key: 'link', label: '文字链接', icon: 'arrowRight', desc: '行内文字链接的语义与下划线形态', components: ['LinkText'] },
       { key: 'icon', label: '图标', icon: 'file', desc: '按名取用的图标集', components: ['Icon'] },
       { key: 'typography', label: '排版', icon: 'edit', desc: '标题、正文、辅助文字等排版原子', components: ['Typography'] },

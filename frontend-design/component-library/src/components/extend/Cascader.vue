@@ -3,7 +3,7 @@
    面板随层数横向生长，列宽固定，超出视口宽度时横向滚动。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface CascaderOption {
@@ -88,6 +88,7 @@ async function openMenu() {
   if (props.disabled || open.value) return
   draft.value = [...(props.modelValue ?? [])]
   open.value = true
+  syncFocus()
   place()
   bind()
   await nextTick()
@@ -127,6 +128,112 @@ function clear() {
   trigger.value?.focus()
 }
 
+/* ── 键盘导航 ──────────────────────────────────────────────────
+   焦点始终留在触发器上（combobox 模式），靠 aria-activedescendant
+   把「读到哪一项」告诉读屏，不给每个选项加 tabindex——否则一列
+   十几项会把 Tab 序列撑爆。 */
+const focus = ref<{ depth: number; index: number }>({ depth: 0, index: 0 })
+
+/** [参数] list 列数据 [参数] from 起点 [参数] step 步长 [返回] 跳过后仍可用的下标，无则 -1 */
+function seek(list: CascaderOption[], from: number, step: number) {
+  for (let i = from + step; i >= 0 && i < list.length; i += step) {
+    if (!list[i].disabled) return i
+  }
+  return -1
+}
+
+/** [返回] 当前焦点落在的列、项与选项对象（越界自动夹回合法位置） */
+function focused() {
+  const cols = columns.value
+  const depth = Math.min(focus.value.depth, Math.max(0, cols.length - 1))
+  const col = cols[depth] ?? []
+  const index = Math.min(Math.max(0, focus.value.index), Math.max(0, col.length - 1))
+  return { depth, col, index, option: col[index] as CascaderOption | undefined }
+}
+
+/** [参数] depth 列 [参数] index 项 [返回] 无 */
+function moveTo(depth: number, index: number) {
+  focus.value = { depth, index: Math.max(0, index) }
+}
+
+/** [返回] 无；打开时把焦点落到当前选中项上，而不是永远是第一项 */
+function syncFocus() {
+  const path = props.modelValue ?? []
+  if (!path.length) { moveTo(0, seek(columns.value[0] ?? [], -1, 1) === -1 ? 0 : seek(columns.value[0] ?? [], -1, 1)); return }
+  const depth = Math.min(path.length - 1, Math.max(0, columns.value.length - 1))
+  const at = (columns.value[depth] ?? []).findIndex(o => o.value === path[depth])
+  moveTo(depth, at < 0 ? 0 : at)
+}
+
+/** [参数] event 键盘事件 [返回] 无 */
+function onKey(event: KeyboardEvent) {
+  if (props.disabled) return
+  if (!open.value) {
+    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      openMenu()
+    }
+    return
+  }
+  const { depth, col, index, option } = focused()
+  switch (event.key) {
+    case 'Escape':
+      event.preventDefault()
+      hide(true)
+      return
+    case 'ArrowDown': {
+      const next = seek(col, index, 1)
+      event.preventDefault()
+      if (next !== -1) moveTo(depth, next)
+      return
+    }
+    case 'ArrowUp': {
+      const next = seek(col, index, -1)
+      event.preventDefault()
+      if (next !== -1) moveTo(depth, next)
+      return
+    }
+    case 'Home':
+      event.preventDefault()
+      moveTo(depth, seek(col, -1, 1) === -1 ? index : seek(col, -1, 1))
+      return
+    case 'End':
+      event.preventDefault()
+      moveTo(depth, seek(col, col.length, -1) === -1 ? index : seek(col, col.length, -1))
+      return
+    case 'ArrowLeft': {
+      event.preventDefault()
+      if (depth === 0) return
+      const parent = columns.value[depth - 1] ?? []
+      const at = parent.findIndex(o => o.value === draft.value[depth - 1])
+      moveTo(depth - 1, at < 0 ? 0 : at)
+      return
+    }
+    case 'ArrowRight':
+    case 'Enter':
+    case ' ':
+      event.preventDefault()
+      if (!option || option.disabled) return
+      pick(option, depth)
+      if (option.children?.length) {
+        const nextDepth = depth + 1
+        nextTick(() => {
+          const list = columns.value[nextDepth] ?? []
+          const first = seek(list, -1, 1)
+          moveTo(nextDepth, first === -1 ? 0 : first)
+        })
+      }
+      return
+  }
+}
+
+/** [返回] 当前焦点项的 DOM id，供 aria-activedescendant 引用 */
+const activeDesc = computed(() => {
+  if (!open.value) return undefined
+  const { depth, index } = focused()
+  return `x-cas-opt-${depth}-${index}`
+})
+
 onBeforeUnmount(() => hide())
 </script>
 
@@ -139,6 +246,8 @@ onBeforeUnmount(() => hide())
     role="combobox"
     aria-haspopup="listbox"
     :aria-expanded="open"
+    :aria-activedescendant="activeDesc"
+    @keydown="onKey"
     @click="open ? hide(true) : openMenu()"
   >
     <span :class="['x-cas-value', !labels.length && 'is-placeholder']">{{ labels.length ? labels.join(' / ') : placeholder }}</span>
@@ -152,7 +261,7 @@ onBeforeUnmount(() => hide())
     <Icon v-else class="x-cas-caret" name="chevronDown" :size="15" />
   </button>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -161,12 +270,18 @@ onBeforeUnmount(() => hide())
       >
         <div v-for="(col, depth) in columns" :key="depth" class="x-cas-col" role="listbox">
           <div
-            v-for="o in col"
+            v-for="(o, oi) in col"
+            :id="`x-cas-opt-${depth}-${oi}`"
             :key="o.value"
             role="option"
             :aria-selected="draft[depth] === o.value"
             :aria-disabled="o.disabled || undefined"
-            :class="['x-cas-option', draft[depth] === o.value && 'is-active', o.disabled && 'is-disabled']"
+            :class="[
+              'x-cas-option',
+              draft[depth] === o.value && 'is-active',
+              o.disabled && 'is-disabled',
+              focus.depth === depth && focus.index === oi && 'is-focus',
+            ]"
             @click="pick(o, depth)"
           >
             <span class="x-cas-label">{{ o.label }}</span>
@@ -181,9 +296,9 @@ onBeforeUnmount(() => hide())
 
 <style scoped>
 .x-cas { width: 100%; justify-content: space-between; text-align: left; cursor: pointer; color: var(--ink); }
-.x-cas-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-cas-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-cas-value.is-placeholder { color: var(--ink-faint); }
-.x-cas-caret { color: var(--ink-soft); flex: none; transition: color .2s ease; }
+.x-cas-caret { color: var(--ink-soft); flex: none; transition: color .2s var(--ease-reveal); }
 .x-cas-menu {
   position: fixed;
   z-index: 120;
@@ -203,12 +318,14 @@ onBeforeUnmount(() => hide())
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-cas-label { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .x-cas-option.is-active { background: var(--hover-bg); color: var(--blue); font-weight: 620; }
 .x-cas-option.is-disabled { color: var(--ink-faint); cursor: not-allowed; }
+/* 键盘光标与「已选中」是两件事：选中靠底色+主色，光标靠内描边，叠在一起也分得清 */
+.x-cas-option.is-focus { box-shadow: inset 0 0 0 2px var(--blue); }
 </style>

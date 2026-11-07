@@ -5,7 +5,7 @@
    这样同一张图在多次开关之间不会因为组件自己记状态而出现「上次的缩放没清掉」。 */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayDialogEnter, overlayDialogLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -107,7 +107,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 <template>
   <span ref="anchor" class="x-preview-anchor" aria-hidden="true" />
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'modal')" @leave="(el, done) => overlayLeave(el, done, 'modal')">
+    <Transition :css="false" @enter="overlayDialogEnter" @leave="overlayDialogLeave">
       <div
         v-if="visible"
         ref="mask"
@@ -165,7 +165,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   border-radius: 9999px;
   background: var(--dark-surface);
   color: var(--plate-ink);
-  font-size: 13px;
+  font-size: var(--fs-body);
   letter-spacing: .01em;
 }
 .x-preview-image {
@@ -205,7 +205,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   min-width: 44px;
   color: var(--ink-muted);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
   text-align: center;
 }

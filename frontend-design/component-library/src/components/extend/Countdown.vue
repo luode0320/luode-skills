@@ -127,7 +127,7 @@ defineExpose({ start, stop, reset: start })
 /* 等宽数字：秒数跳动时每一位的宽度不变，整块文本不会左右抖 */
 .x-countdown {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   letter-spacing: .02em;
   color: var(--ink);

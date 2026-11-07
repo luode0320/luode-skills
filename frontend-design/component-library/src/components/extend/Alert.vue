@@ -55,8 +55,8 @@ const iconName = computed(() => ICONS[props.type])
 }
 .x-alert-ico { flex: none; margin-top: 1px; color: var(--blue); }
 .x-alert-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.x-alert-title { font-size: 13px; font-weight: 620; color: var(--ink); }
-.x-alert-desc { font-size: 13px; line-height: 1.6; color: var(--ink-muted); }
+.x-alert-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
+.x-alert-desc { font-size: var(--fs-body); line-height: 1.6; color: var(--ink-muted); }
 /* 关闭键压到首行文字基线附近，避免把整条撑高 */
 .x-alert-close { margin: -3px -4px 0 0; }
 

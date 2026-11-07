@@ -6,6 +6,7 @@ import { navGroups } from '@/composables/auth'
 import { appearance } from '@/composables/appearance'
 import { slideThumb } from '@/composables/motion'
 import { APP } from '@/data'
+import GalleryNav from '@/views/gallery/GalleryNav.vue'
 
 const emit = defineEmits<{ (e: 'navigate'): void }>()
 
@@ -50,6 +51,7 @@ watch(() => [navGroups.value, appearance.railCollapsed], () => nextTick(() => sy
 
     <nav ref="nav" class="rail-nav">
       <span v-show="hasActive" ref="thumb" class="nav-thumb m-pill" aria-hidden="true" />
+      <GalleryNav />
       <div v-for="group in navGroups" :key="group.key" class="nav-group">
         <div v-if="!group.single" class="nav-group-title">{{ group.label }}</div>
         <div class="nav-list">

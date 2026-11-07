@@ -5,7 +5,7 @@ import Icon from '@/components/Icon.vue'
 import IconButton from '@/components/ui/IconButton.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import { currentUser } from '@/composables/auth'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 
 const emit = defineEmits<{
   (e: 'toggle-rail'): void
@@ -101,7 +101,7 @@ onBeforeUnmount(() => closeMenu())
     </button>
 
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div v-if="menuOpen" ref="pop" class="menu-pop m-float" role="menu" :style="{ top: `${pos.top}px`, right: `${pos.right}px` }">
           <div class="menu-head">
             <div style="font-weight: 680">{{ currentUser?.nickname }}</div>

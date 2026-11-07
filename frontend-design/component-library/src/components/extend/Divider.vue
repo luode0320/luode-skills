@@ -69,7 +69,7 @@ const gap = computed(() => {
   background: repeating-linear-gradient(to right, var(--line-strong) 0 4px, transparent 4px 8px);
 }
 .x-divider-text {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--ink-soft);
   white-space: nowrap;
 }

@@ -36,12 +36,12 @@ defineProps<{ items: CrumbItem[] }>()
 </template>
 
 <style scoped>
-.x-crumb { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.x-crumb { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: var(--fs-body); }
 .x-crumb-sep { display: inline-flex; align-items: center; color: var(--ink-faint); }
 .x-crumb-link,
 .x-crumb-text,
 .x-crumb-now { display: inline-flex; align-items: center; gap: 5px; }
-.x-crumb-link { color: var(--ink-muted); text-decoration: none; transition: color .2s ease; }
+.x-crumb-link { color: var(--ink-muted); text-decoration: none; transition: color .2s var(--ease-reveal); }
 .x-crumb-link:hover { color: var(--blue); }
 .x-crumb-text { color: var(--ink-soft); }
 /* 当前页不给链接语义，用正文色与字重强调，避免误点回跳 */

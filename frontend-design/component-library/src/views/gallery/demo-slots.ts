@@ -22,6 +22,7 @@ import { phone, required } from '../../utils/validate'
 export function demoSlots(name: string): Record<string, (props?: Record<string, unknown>) => VNodeChild> {
   switch (name) {
     case 'Button': return { default: () => '保存' }
+    case 'ConfirmButton': return { default: () => '确认提交' }
     case 'Tag': return { default: () => '启用' }
     case 'Field': return { default: () => h(TextInput, { modelValue: '罗德', placeholder: '请输入负责人' }) }
     /* 作用域插槽样本：从插槽参数取 errors 与 submit，演示「点提交→必填未过→错误态落在字段下方」。
@@ -116,9 +117,18 @@ export function demoSlots(name: string): Record<string, (props?: Record<string, 
     case 'Watermark': return { default: () => h('div', { style: 'padding:18px;min-height:80px' }, '被水印覆盖的内容区') }
     case 'Divider': return { default: () => '分割文字' }
     case 'GridRow': return {
+      /* 栅格槽位用库内的 .m-groove 材质 + 圆角 + 字号令牌。
+         原来只有 `background: var(--blue-soft)` + padding：没有圆角、没有描边、
+         没有材质，在一屏玻璃/面板里看着像调试占位块。示例本身也应该是设计语言的一部分。 */
       default: () => [
-        h(GridCol, { span: 12 }, () => h('div', { style: 'padding:8px;background:var(--blue-soft)' }, '半宽列')),
-        h(GridCol, { span: 12 }, () => h('div', { style: 'padding:8px;background:var(--lime-soft)' }, '半宽列')),
+        h(GridCol, { span: 12 }, () => h('div', {
+          class: 'm-groove',
+          style: 'padding:10px 12px;border-radius:var(--r-sm);font-size:var(--fs-sm);color:var(--ink-muted);text-align:center',
+        }, '半宽列')),
+        h(GridCol, { span: 12 }, () => h('div', {
+          class: 'm-groove',
+          style: 'padding:10px 12px;border-radius:var(--r-sm);font-size:var(--fs-sm);color:var(--ink-muted);text-align:center',
+        }, '半宽列')),
       ],
     }
     case 'GridCol': return { default: () => h('div', {}, '栅格列内容') }

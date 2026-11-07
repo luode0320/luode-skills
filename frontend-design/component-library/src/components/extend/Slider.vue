@@ -149,7 +149,7 @@ function onRangeInput(event: Event, which: 'low' | 'high') {
   height: 100%;
   border-radius: 999px;
   background: var(--blue);
-  transition: left .12s ease, width .12s ease;
+  transition: left .12s var(--ease-glide), width .12s var(--ease-glide);
 }
 .x-slider-tick {
   position: absolute;
@@ -210,7 +210,7 @@ function onRangeInput(event: Event, which: 'low' | 'high') {
   border: 2px solid var(--blue);
   background: var(--surface-solid);
   box-shadow: var(--e1);
-  transition: left .12s ease;
+  transition: left .12s var(--ease-glide);
 }
-.x-slider-value { flex: none; min-width: 44px; text-align: right; font-size: 12px; font-weight: 620; color: var(--ink-muted); }
+.x-slider-value { flex: none; min-width: 44px; text-align: right; font-size: var(--fs-sm); font-weight: 620; color: var(--ink-muted); }
 </style>

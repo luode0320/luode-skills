@@ -62,8 +62,8 @@ const iconName = computed(() => ICONS[props.type])
 }
 .x-notify-ico { flex: none; margin-top: 1px; color: var(--blue); }
 .x-notify-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.x-notify-title { font-size: 13px; font-weight: 640; color: var(--ink); }
-.x-notify-msg { font-size: 13px; line-height: 1.6; color: var(--ink-muted); }
+.x-notify-title { font-size: var(--fs-body); font-weight: 640; color: var(--ink); }
+.x-notify-msg { font-size: var(--fs-body); line-height: 1.6; color: var(--ink-muted); }
 .x-notify-close { margin: -2px -3px 0 0; }
 
 .x-notify.is-success .x-notify-bar { background: var(--lime); }

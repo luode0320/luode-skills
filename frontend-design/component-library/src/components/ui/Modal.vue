@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import IconButton from './IconButton.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayDialogEnter, overlayDialogLeave } from '@/composables/morph'
 import { createFocusTrap } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -51,7 +51,7 @@ function onOverlay(event: MouseEvent) {
 
 <template>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'modal')" @leave="(el, done) => overlayLeave(el, done, 'modal')">
+    <Transition :css="false" @enter="overlayDialogEnter" @leave="overlayDialogLeave">
       <div v-if="open" class="overlay" @mousedown="onOverlay">
         <div
           ref="panel"

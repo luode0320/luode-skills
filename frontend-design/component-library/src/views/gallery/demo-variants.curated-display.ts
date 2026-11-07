@@ -70,6 +70,12 @@ export const CURATED_DISPLAY: Record<string, VariantShape[]> = {
   ],
   /* 反馈类：Spin 的 wrapper 会把内容包进遮罩层，与裸转圈是两种形态；
      Modal / Drawer 的宽度档位由派生器按弹层专属档给出，这里补遮罩关闭与标题差异 */
+  Progress: [
+    /* 形变演示：只有「percent 到 100 且 status=success」才会收拢成圆并描出对勾。
+       单给 status 不给 percent 不会变形，这是刻意的——62% 打对勾语义说不通 */
+    { label: '走完落定', props: { percent: 100, status: 'success' } },
+    { label: '失败态', props: { percent: 62, status: 'error' } },
+  ],
   Spin: [
     { label: '大号带文案', props: { size: 'lg', tip: '正在加载明细' } },
     { label: '包裹遮罩', props: { wrapper: true, tip: '提交中' }, slots: { default: () => h('p', {}, '被遮罩的内容') } },

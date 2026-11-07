@@ -3,7 +3,7 @@
    按钮走浮层材质 m-float，进出场沿用 pop 语态，与下拉、气泡同一手感。 */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 
 const props = withDefaults(defineProps<{
   /** 滚动容器选择器，缺省为 window */
@@ -102,7 +102,7 @@ watch(() => [props.target, props.container], bind)
 
 <template>
   <div ref="root" class="x-backtop-anchor">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <button
         v-if="shown"
         type="button"
@@ -133,7 +133,7 @@ watch(() => [props.target, props.container], bind)
   justify-content: center;
   border-radius: 9999px;
   color: var(--ink-muted);
-  transition: color .2s ease;
+  transition: color .2s var(--ease-reveal);
 }
 .x-backtop:hover { color: var(--blue); }
 </style>

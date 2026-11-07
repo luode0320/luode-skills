@@ -4,11 +4,17 @@
    最近修改时间：2026-10-17 09:28:00；改动原因：修「边角阴影块」——示例内容区原本
    无留白，组件柔影被滚动容器裁切边界切成方形暗块，现按实测延展加四周留白，
    并同步抬高高度上限以保持内容可视高度不变。 */
-import { ref, onErrorCaptured } from 'vue'
+import { computed, ref, onErrorCaptured } from 'vue'
 import HelpTip from '../../components/extend/HelpTip.vue'
+import type { DemoSpec } from './demo-specs'
 
-const props = defineProps<{ name: string; variant?: string; rel?: string; guide?: string }>()
+const props = defineProps<{ name: string; variant?: string; rel?: string; guide?: string; spec?: DemoSpec }>()
 const error = ref('')
+
+/* 规格决定卡片占几列：表格、看板、图谱需要横向空间，占半行或整行才放得下；
+   行内件与弹层件占三分之一行。列数写在 Gallery 的媒体查询里（要随断点变），
+   这里只出类名，组件自身不重复一套断点。 */
+const specClass = computed(() => `is-${props.spec ?? 'inline'}`)
 
 onErrorCaptured((err) => {
   error.value = err.message || String(err)
@@ -17,7 +23,7 @@ onErrorCaptured((err) => {
 </script>
 
 <template>
-  <div class="g-cell">
+  <div :class="['g-cell', specClass]">
     <div class="g-cell-head">
       <span class="g-cell-name">{{ name }}<em v-if="variant" class="g-cell-variant">{{ variant }}</em><HelpTip v-if="guide" :content="guide" tone="help" :label="`查看 ${name} 的说明`" /></span>
       <span class="g-cell-status" :class="error ? 'is-bad' : 'is-ok'">{{ error ? '渲染异常' : '已挂载' }}</span>

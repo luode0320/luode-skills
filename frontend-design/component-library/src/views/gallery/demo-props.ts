@@ -46,7 +46,7 @@ export function demoProps(name: string): Record<string, unknown> {
     case 'Ruler': return { labels: ['00', '06', '12', '18', '24'], marker: 0.62, markerLabel: '14:52' }
     case 'EmptyState': return { title: '暂无数据', desc: '调整筛选条件后重试', icon: 'search' }
     case 'Modal': case 'Drawer': case 'FormDialog': return { open: true, title: '示例弹窗' }
-    /* 这三个弹层自带固定标题、不声明 title，多传会触发「extraneous non-props attributes」警告 */
+    /* 这几个弹层自带固定标题、不声明 title，多传会触发「extraneous non-props attributes」警告 */
     case 'AppearanceDialog': case 'CommandPalette': case 'PasswordDialog': return { open: true }
     case 'DataTable': return { columns: TABLE_COLUMNS, data: TABLE_ROWS, selectable: true, selected: [] }
     case 'Pagination': return { total: 86, page: 1, pageSize: 10 }
@@ -97,6 +97,8 @@ export function demoProps(name: string): Record<string, unknown> {
     /* ── Arco 品类对齐层（extend）：按组件名给最小可渲染样本 ── */
     case 'Badge': return { value: 12, max: 99 }
     case 'Steps': return { current: 1, items: STEP_ITEMS, clickable: true }
+    /* 不传 status = 自驱：点一下自己走完 pending → 落定，示例卡上点得动 */
+    case 'ConfirmButton': return { variant: 'primary' }
     case 'Tooltip': return { content: '这是一段提示说明' }
     case 'HelpTip': return { title: '审批时限', content: '指提交后到审批完成的最长工作日，超时自动提醒审批人。' }
     case 'Alert': return { type: 'info', title: '提示', closable: true }
@@ -143,7 +145,7 @@ export function demoProps(name: string): Record<string, unknown> {
     case 'InputGroup': return { direction: 'horizontal' }
     case 'CheckboxGroup': return { modelValue: ['a'], options: CHECKBOX_OPTIONS, checkAll: true }
     case 'ButtonGroup': return { size: 'md' }
-    case 'AvatarGroup': return { max: 3, size: 32, total: 5 }
+    case 'AvatarGroup': return { max: 3, diameter: 32, total: 5 }
     case 'Card': return { title: '组件卡片', subtitle: '带描边与阅读面', hoverable: true }
     case 'CardMeta': return { title: '罗德', description: '总部 · 超级管理员', avatar: '罗德' }
     case 'CardGrid': return { columns: 2, gutter: 12 }

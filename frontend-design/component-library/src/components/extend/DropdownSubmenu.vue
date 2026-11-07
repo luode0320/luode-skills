@@ -5,7 +5,7 @@
    面板用 Teleport 到 body：宿主菜单本身常带 overflow 裁剪，留在原地会被切掉右半边。 */
 import { nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface SubMenuItem {
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
     <Icon name="chevronRight" :size="14" />
   </div>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="panel"
@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
   transition: background var(--ease-premium) .15s, color var(--ease-premium) .15s;
@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   text-align: left;
   transition: background var(--ease-premium) .15s, color var(--ease-premium) .15s;

@@ -245,7 +245,7 @@ provide('xTree', {
 </template>
 
 <style scoped>
-.x-tree { min-width: 0; font-size: 13px; }
+.x-tree { min-width: 0; font-size: var(--fs-body); }
 .x-tree-list { margin: 0; padding: 0; list-style: none; }
 .x-tree-empty { margin: 0; padding: 20px 10px; text-align: center; color: var(--ink-faint); }
 /* 引导线画在子级容器上，横向位置由行下发的 --x-tree-guide 决定，对齐父级箭头中心 */

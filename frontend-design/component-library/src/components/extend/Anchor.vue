@@ -83,11 +83,11 @@ watch(() => props.items.map(item => item.id).join('\u0000'), observe)
   display: block;
   padding: 6px 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   line-height: 1.4;
   color: var(--ink-muted);
   text-decoration: none;
-  transition: color .2s ease, background .2s ease;
+  transition: color .2s var(--ease-reveal), background .2s var(--ease-reveal);
 }
 .x-anchor-link:hover { color: var(--ink); background: var(--hover-bg); }
 .x-anchor-link.is-active { color: var(--blue); font-weight: 620; background: var(--blue-soft); }

@@ -59,7 +59,7 @@ export const EXTENDED_CATEGORIES: ComponentCategory[] = [
       { key: 'frame', label: '应用外壳', icon: 'sidebar', desc: '整机外壳', components: ['AppShell'] },
       { key: 'sidebar', label: '侧栏', icon: 'menu', desc: '导航轨与菜单树', components: ['Sidebar'] },
       { key: 'topbar', label: '顶栏', icon: 'board', desc: '页面顶栏与操作区', components: ['Topbar'] },
-      { key: 'system', label: '系统对话框', icon: 'gear', desc: '外观设置与口令修改', components: ['AppearanceDialog', 'PasswordDialog'] },
+      { key: 'system', label: '系统对话框', icon: 'gear', desc: '外观设置与口令修改', components: ['AppearanceDialog', 'AppearanceSettings', 'PasswordDialog'] },
       { key: 'neural', label: '神经网络视图', icon: 'activity', desc: '授权关系神经网画布', components: ['NeuralNet'] },
     ],
   },

@@ -6,7 +6,8 @@ import Avatar from '@/components/ui/Avatar.vue'
 import { systemApi, type UserRow } from '@/api'
 import { navGroups, pathOf } from '@/composables/auth'
 import { appearance } from '@/composables/appearance'
-import { overlayEnter, overlayLeave, revealCascade, slideThumb, typeOut } from '@/composables/motion'
+import { revealCascade, slideThumb, typeOut } from '@/composables/motion'
+import { overlayDialogEnter, overlayDialogLeave } from '@/composables/morph'
 import { createFocusTrap } from '@/composables/focus'
 import { ask, presetQuestions, type AnswerCard, type AnswerChip } from '@/composables/ask'
 import { hasPermission } from '@/directives/permission'
@@ -197,7 +198,7 @@ function onKey(event: KeyboardEvent) {
 
 <template>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'modal')" @leave="(el, done) => overlayLeave(el, done, 'modal')">
+    <Transition :css="false" @enter="overlayDialogEnter" @leave="overlayDialogLeave">
       <div v-if="open" class="overlay cmd-overlay" @mousedown.self="emit('close')">
         <div ref="panel" class="modal cmd-panel m-float" role="dialog" aria-modal="true" aria-label="命令面板" @keydown="onKey">
           <div class="cmd-input">

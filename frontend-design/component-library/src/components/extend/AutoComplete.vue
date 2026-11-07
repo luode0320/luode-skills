@@ -3,7 +3,7 @@
    默认按 label 子串过滤，调用方可用 filter 换成任意匹配策略。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface AutoCompleteOption {
@@ -174,7 +174,7 @@ onBeforeUnmount(() => hide())
     ><Icon name="x" :size="14" /></span>
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -223,13 +223,13 @@ onBeforeUnmount(() => hide())
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-ac-label { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .x-ac-option.is-active { background: var(--hover-bg); }
 .x-ac-option.is-selected { color: var(--blue); font-weight: 620; }
-.x-ac-empty { padding: 14px 10px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+.x-ac-empty { padding: 14px 10px; font-size: var(--fs-sm); color: var(--ink-soft); text-align: center; }
 </style>
