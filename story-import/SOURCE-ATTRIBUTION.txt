@@ -1,3 +1,0 @@
-Upstream repository: https://github.com/zenstory-ai/oh-story-claudecode
-Original skill name: story-import
-This marketplace edition contains newly written standalone instructions and no external runtime dependency.
