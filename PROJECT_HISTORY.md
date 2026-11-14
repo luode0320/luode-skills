@@ -29,6 +29,190 @@
 
 > 由 `context-recovery-rules/scripts/archive_project_current.py` 自动迁入，新条目置顶、只保留最近 20 条。当前交接点仍以 `PROJECT_CURRENT.md` 为准。
 
+### 2026-10-31 浮层入场改为「优化版缩放」：用户实测推翻规范推断（同日第二十七笔，未提交）
+
+- 当前状态: 内容面板入场回到**从锚点缩放**，并修掉上游 `modal` 分支的三个缺陷。全守卫 PASS。
+- 用户反馈: 「A 缩放是最好的，丝滑，还可以更好吗？」——**推翻了上一笔的判断**。
+- 判断反转（必须记住的教训）:
+  - 上一笔我按 Material 规范（对话框 `scale 0.86` / 菜单 fade + slide）把下拉改成位移，理由是缩放会让文字重栅格化、背景模糊跟着缩放。
+  - 但实测观感相反：**缩放有「从触发器长出来」的来源感，位移只是「滑进来」，缺来源**。
+  - 结论：规范是通用参考，**实际观感优先**。技术缺陷应该被修掉，而不是用换语法来回避。
+- 三项修复（`morph.ts` 自己实现，参数可控）:
+  1. **长尾**：`expo.out` 46ms 就到 0.944、之后 150ms 只再走 0.05。换 `glide`（`power4.out`），时长 380 → **280ms**。
+  2. **文字重栅格化**：入场挂 `will-change: transform, opacity` 提升合成层，`onComplete` 立即 `clearProps` 清理（实测 310ms 后回到 `auto`）。
+  3. **原点不准**：上游按面板几何算 `transformOrigin`，轴心可能落在中部像「从肚子鼓起来」。固定为**顶边中心**（面板在视口上半则底边）。
+- 实测: scale `0.914 → 0.955 → 0.98 → 0.992 → 1`，**209ms 到位**（原版 262ms 才到 0.995）。
+- 对比工具: `frontend-design/references/overlay-motion-compare.html` 已改为三栏——A 原版缩放 / **A+ 优化缩放（现在）** / B 位移对照，带真实 `backdrop-filter` 材质。
+- 顺带记录一个被证伪的假设: 之前怀疑「掉帧 / 背景模糊重算」导致卡顿，实测 rAF 稳定 16.7ms、零超 20ms 帧，**主线程没压力**；首帧宽度也单调递增无跳变。观感问题来自曲线与栅格化。
+- 验证: `vue-tsc rc=0`；`OVERLAY_MOTION: PASS`；`FIDELITY: PASS`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中。
+- 交接点: 无阻断。若还需更「贴手」，可试 A+ 的时长再压到 0.24s，或 scale 收到 0.9。
+
+### 2026-10-31 浮层入场改位移：定位「不丝滑」的真因（同日第二十六笔，未提交）
+
+- 当前状态: 内容面板入场从「锚点缩放」改为「位移 12px + 淡入」；小气泡仍走 `pop`。全守卫 PASS。
+- 用户反馈: 「弹出窗口还是不够丝滑，有一叠卡顿感，为什么？」
+- 排查（三个假设逐个证伪/证实）:
+  1. **掉帧？否**。实测 rAF 平均 16.7ms、最大 16.8ms、超 20ms 帧 **0**；关掉 `backdrop-filter` 后数据相同。
+  2. **首帧跳变？否**。逐帧记录面板宽度单调递增 `221.9 → 256.6`，无「先大后小」。
+  3. **真因：语法用错 + 材质冲突**。`.m-float` 带 `backdrop-filter: blur(28px)`，对它做 `scale` 会让浏览器每帧按新尺寸重采样背景并重算高斯模糊——**透过面板看到的卡片也在缩放**；同时面板内文字被重新栅格化，动画中发虚。叠加 `expo` 曲线长尾（262ms 时 scale 仍停在 0.995），观感就是「一叠卡顿」。
+- 规范依据: Material 把对话框（从中心升起）用 `scale 0.86`，**菜单用 fade + slide**。下拉紧贴触发器，属于后者。上一笔把 dialog 的语法套到了 menu 上。
+- 修复: `overlayMenuEnter` 自己实现位移入场（`y 12 → 0` + 淡入，0.26s `--ease-reveal`），**完全不缩放**；方向按面板落在视口上半/下半决定；退场只淡出 0.14s。小气泡仍调上游 `pop`。
+- 实测新入场: scale **恒为 1**；`y 7.9 → 3.3 → 1.3 → 0.4 → 0.1 → 0`；opacity `0.35 → 0.73 → 0.89 → 0.96 → 1`；**216ms 完全落定**（此前 262ms 还停在 0.995）。
+- 对比 demo: `frontend-design/references/overlay-motion-compare.html` —— 三栏并排（A 缩放 / B 位移 12px / C 位移 8px 更快），**带真实 `backdrop-filter` 材质**，否则看不出差别。已实测可运行、零报错。
+- 验证: `vue-tsc rc=0`；`OVERLAY_MOTION: PASS`；`FIDELITY: PASS`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中；`A11Y_WIRING` / `KEYBOARD_VERIFY` PASS。
+- 交接点: 无阻断。若用户觉得 12px 仍偏弱，C 方案（8px + 0.20s）已在 demo 里备好。
+
+### 2026-10-31 浮层入场全量统一 + 经验沉淀（同日第二十五笔，未提交）
+
+- 当前状态: 22 个浮层全部接入统一入口，按「面板内有无可操作项」自动分派形态；新增 `OVERLAY_MOTION` 守卫；规则沉淀进 `PROJECT_MEMORY.md`。全守卫 PASS。
+- 用户要求: 「都统一，吸收为项目经验」。
+- 统一做法（关键设计决定）:
+  - **不是把所有浮层都改成同一个参数**——Tooltip 这类几十像素的纯文字提示从 0.86 放大会像「弹」。
+  - 改成**统一规则、分层表现**：`overlayMenuEnter` 按面板里有没有可操作项（`button` / `[role=menuitem]` / `[role=option]` / `[role=treeitem]` / `input` 等）分派，有则 `modal`（14% 形变），纯文字则 `pop`（轻量淡入）。
+  - 判据用「可操作性」而非宽度：下拉菜单可能只有 160px、确认气泡反而更宽，按尺寸分会判反。
+- 接入范围: 全库 22 个浮层，包括此前的 `BackTop` `HelpTip` `Popconfirm` `Tooltip` `Trigger` 与冻结层的 `Select` `HoverCard` `Topbar`。全库已无裸 `overlayEnter(..., 'pop')` 调用。
+- 实测分派: Dropdown/Cascader/DatePicker/Select 起始 `0.86`；Popconfirm 起始 `0.86`（有确认按钮）；Tooltip 起始 `0.986`（纯文字）。**判据正确**。
+- 冻结面: `Select` `HoverCard` `Topbar` 三个文件登记进 `LOCAL_MANAGED`，校验打印 4 条 `OVERRIDE`（含 package-lock）。
+- 新增守卫: `scripts/check_overlay_motion.py`（`OVERLAY_MOTION`）——组件里直写 `overlayEnter(..., 'pop')` 即 FAIL，防止绕过统一入口。双向验证通过，已接入 `_sweep.sh` 第 41 项。
+- 经验沉淀（写进 `PROJECT_MEMORY.md` 新章节「组件库动效：形变语言与浮层入场规则」）:
+  1. 缓动与形变是两件事，不要互相冒充。
+  2. 形变起点必须是「无」而非「小」（0.6→1 只是弹一下，0→1 才是长出来）。
+  3. 入场力度按体量分档（列表错位 / 单件上浮 / 色块 0.9 起 / 小气泡淡入）。
+  4. 展开必须双向，一端有动效一端瞬删比都没有更僵硬。
+  5. `animation-fill-mode` 用 `backwards` 不用 `both`（后者会压掉 hover 位移且不报错）。
+  6. 浮层形态按可操作性分派，不按类型、不按尺寸。
+  7. 冻结面破例要登记、写明代价与回退；非必须不扩清单。
+- 验证: `vue-tsc rc=0`；`OVERLAY_MOTION: PASS`；`FIDELITY: PASS (274 local)`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中；`A11Y_WIRING: PASS`。
+- 交接点: 无阻断。`LOCAL_MANAGED` 现有 3 个 `src` 文件，是本次的代价，后续非必须不再扩。
+
+### 2026-10-31 Select 解冻：登记为本地受管例外（同日第二十四笔，未提交）
+
+- 当前状态: `Select` 入场改为锚点展开，文件登记进 `LOCAL_MANAGED`；冻结面 PASS 且例外被显式打印。双主题健康、无障碍、键盘全 PASS。
+- 用户授权: 「允许」（针对上一笔提出的「要统一得先解冻 `ui/Select.vue`」）。
+- 改动: `ui/Select.vue` 两处——Transition 的 `@enter`/`@leave` 换成 `overlayMenuEnter`/`overlayMenuLeave`，import 来源换成 `@/composables/morph`。
+- 实测: scale `0.86 → 0.92 → 0.965 → 0.991 → 1`，**14% 幅度**，与 Dropdown / Cascader / DatePicker 一致。
+- 冻结面处理（关键）:
+  - 直接改会让 `verify_fidelity.py` 报 `DRIFTED: src/components/ui/Select.vue` → `FIDELITY: FAIL`（已实测确认守卫有效）。
+  - 登记进 `fidelity_upstream.py` 的 `LOCAL_MANAGED` 后转为 `OVERRIDE: src/components/ui/Select.vue (local-managed, declared)`，`FIDELITY: PASS`。
+  - **代价写在代码注释里**：该文件从此不再与上游比对，上游修 bug 或改交互本地不会告警；回退方式是删掉那行并恢复原 Transition 属性。非必须不要再往清单加 `src` 文件。
+- 仍受限: `Topbar`（`layout/`）、`HoverCard`（`ui/`）保持 `pop`；`Trigger` 是通用基件保持原样。这三个使用频率低，暂不破例。
+- 验证: `vue-tsc rc=0`；`FIDELITY: PASS (274 local)`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中；`A11Y_WIRING: PASS`；`KEYBOARD_VERIFY: PASS`。
+- 交接点: 无阻断。浮层入场现覆盖 17 个组件，小气泡类刻意保留轻量形态。
+
+### 2026-10-31 浮层入场统一：25 个弹出层从「几乎无动画」改为锚点展开（同日第二十三笔，未提交）
+
+- 当前状态: 16 个菜单类浮层改走 `modal` 入场形态；4 个小气泡按设计保留 `pop`；3 个冻结组件受限于上游无法改。双主题健康、示例可见性、冻结面全 PASS。
+- 用户要求: 「检查其他会弹出子层级的组件，是否也有同样问题，一起修复」。
+- 排查结论:
+  - **30 个组件用 `overlayEnter`**（有入场），只有 4 个裸 `v-if`：`MenuNode`（上一笔已修）、`Notification` / `Tree` / `Upload`（不是浮层）。
+  - 但 **25 个走 `pop` 分支**，参数是 `y -6 + scale 0.98`。实测下拉 scale 只从 **0.986 → 1**，**幅度 1.4%**，肉眼等同于无动画，只剩淡入。**这就是「僵硬」的真因，与菜单同源。**
+- 修复: `morph.ts` 增 `overlayMenuEnter` / `overlayMenuLeave`（语义包装，内部走 `'modal'` 分支——从锚点 `scale .86` 展开，退场 `.94`）。组件只改 `@enter` / `@leave` 与 import。
+- 实测（真实指针点击）:
+  | 组件 | scale 曲线 | 幅度 |
+  |---|---|---|
+  | Dropdown | `0.86 → 0.884 → 0.944 → 0.984 → 1` | 14% |
+  | Cascader | `0.87 → 0.93 → 0.966 → 0.991 → 1` | 13% |
+  | DatePicker | `0.86 → 0.908 → 0.965 → 0.99 → 1` | 14% |
+- 改动范围（16 个，全在 `extend/` 可写层）: Dropdown / DropdownButton / DropdownSubmenu / Cascader / ColorPicker / DatePicker / MonthPicker / QuarterPicker / RangePicker / WeekPicker / YearPicker / TimePicker / AutoComplete / Mention / TreeSelect / OverflowList，外加内容气泡 Popover。
+- 刻意保留: `Tooltip` `HelpTip` `Popconfirm` `BackTop` 走 `pop`——小气泡缩放会显得「弹」，不能一刀切。
+- 无法改: `Select`（`ui/`）、`Topbar`（`layout/`）、`HoverCard`（`ui/`）在冻结面；`Trigger` 是通用基件，保持原样。
+- 关键认知: **`motion.ts` 逐字节冻结，缝隙只允许追加精确行**，改不了 `pop` 分支的 `0.98`。所以只能在调用侧换形态——这也是为什么加了语义包装而不是直接写 `'modal'`（第三个参数描述入场形态，不代表组件是弹窗）。
+- 验证: `vue-tsc rc=0`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中；`DEMO_VISIBILITY` PASS；`FIDELITY: PASS (274 local)`。
+- 交接点: 无阻断。`Select` 若要一并改，需先解冻 `ui/Select.vue` 或与上游同步该改动。
+
+### 2026-10-31 菜单展开收起改为双向高度形变（同日第二十二笔，未提交）
+
+- 当前状态: `MenuNode` 子菜单从「只有展开有动效」改为**双向高度形变**；箭头状态改绑 `subOpen`。双主题健康、无障碍接线、键盘验证全 PASS。
+- 用户指出: 截图中「监控中心」的展开收起「太僵硬，一点动画效果都没有」。
+- 根因: 上一轮做的是「子项逐条落下」，但那只覆盖**展开**；收起仍是 `v-if` 直接卸载，元素瞬间消失。一端有动效一端没有，反而比全都没有更显突兀。
+- 修复:
+  1. `<Transition :css="false" @enter="onSubEnter" @leave="onSubLeave">` 包住 `<ul v-if="subOpen">`。
+  2. `@enter`：`height: 0 → auto` + `opacity 0 → 1`，0.24s `--ease-swap`。
+  3. `@leave`：`height → 0` + `opacity → 0`，0.18s `--ease-exit`，`onComplete: done`。
+  4. `.x-menu-sub` 加 `overflow: hidden` 裁切；撤掉原来的 `menu-unfold` 逐行落下（与高度形变叠加会乱）。
+  5. 箭头 `:class="{ 'is-open': subOpen }"`（原绑 `expanded`，浮层态下永远不转）。
+- 实测:
+  - 内联展开：高度 `0 → 7 → 34 → 71 → 72px`，opacity `0 → 1`；收起 `72 → 68 → 53 → 0`。
+  - 浮层展开：高度 `14 → 67 → 86`，opacity `0.17 → 0.78 → 1`。
+  - 箭头：收起 `transform: none` → 展开 `matrix(-1,0,0,-1)`（180°）→ 收起还原。
+- 差点踩的坑: `onEnter` / `onLeave` **在 MenuNode 里已被悬停逻辑占用**（`@pointerenter` / `@pointerleave`），直接用同名会把悬停展开覆盖掉。TypeScript 的 `Duplicate function implementation` 拦下了这次覆盖，改名为 `onSubEnter` / `onSubLeave`。
+- 验证: `vue-tsc rc=0`；`A11Y_WIRING: PASS`；`KEYBOARD_VERIFY: PASS`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中。
+- 交接点: 无阻断。
+
+### 2026-10-31 示例层视觉一致性：栅格占位块成材 + 新增守卫（同日第二十一笔，未提交）
+
+- 当前状态: `GridRow` 示例的两个裸色块改为库内槽材质；新增 `DEMO_STYLE` 守卫并入批跑（第 52 项）。双主题健康、内容留白全 PASS。
+- 用户指出: 截图显示 `GridRow` 示例里两个「半宽列」是**纯色矩形**，与整屏玻璃/面板语言明显不一致。
+- 根因: 示例层直接拼内联样式 —— `style: 'padding:8px;background:var(--blue-soft)'`，**没有圆角、没有描边、没有材质、字号也没走令牌**，所以看着像调试占位块。而且 `--blue-soft` / `--lime-soft` 是语义色（accent / success），在栅格示例里没有任何语义，纯装饰性上色。
+- 修复: 改用库内 `.m-groove` 材质（`border 1px + groove 底 + 内阴影`）+ `border-radius: var(--r-sm)` + `font-size: var(--fs-sm)` + 居中。实测 `radius 12px / border 1px / fs 13px / text-align center`，8 个 GridRow 示例一次修复。
+- 全量排查: 运行时扫 101 页示例卡的内联视觉样式，命中 29 种，**除 GridRow 外全部合理** —— 头像是按名字派生色（内容色）、取色器色块是内容、时间线节点用 `var(--red)` 令牌、图标用 `var(--ink-soft)`。**没有第二处裸色块。**
+- 新增守卫: `scripts/check_demo_style.py`（`DEMO_STYLE`）。判据：示例层内联 style 里出现 `background` 但缺 `border-radius` / `border` / 材质类 → 失败。已做双向验证（当前 PASS；旧写法能被命中）。已接入 `_sweep.sh`。
+- 规则沉淀: `LOCAL-GUIDE` 新增「示例内容本身也要成材」一节，含正反例与边界（示例图片 SVG 色值、取色器色值属内容，不算违规）。
+- 副产物: 期间发现 dev server 已挂（`curl` 返回 000），重启后守卫恢复；浏览器类守卫依赖它存活，挂掉时表现为导航超时而不是判据失败。
+- 验证: `DEMO_HEALTH` 双主题 101 页 763 卡零命中；`CONTENT_PADDING` PASS（763 卡无文本贴边）；`DEMO_STYLE` PASS。
+- 交接点: 无阻断。
+
+### 2026-10-31 全组件复检：修掉一个静默功能回归（同日第二十笔，未提交）
+
+- 当前状态: 31 项守卫全 PASS；发现并修复一处**由我自己上一笔引入的回归**——卡片悬停上浮失效。工作树未提交。
+- 复检目标: 用户「再次遍历检查一下所有组件」。重点是查上一轮批量加动画带来的副作用，而不是重跑一遍守卫。
+- 发现的真问题: **`animation-fill-mode: both` 会永久占用属性**。入场动画末帧是 `transform: none`，而 CSS 动画在层叠里优先于普通声明 → `.x-card:hover { transform: translateY(-2px) }` 被压掉，悬停上浮直接失效。页面上只表现为「不浮了」，不报错、守卫也抓不到。
+- 修复: 5 处入场动画的 `both` → `backwards`（只在开始前补首帧，结束即释放）。复测：静止 `none`、悬停 `matrix(1,0,0,1,0,-2)`，上浮恢复；`animationName` 仍为 `morph-enter`，入场未被削弱。
+- 同源排查: 逐个检查被加动画的 10 个类（`.x-card` `.panel` `.spec-plate` `.tag` `.x-badge` `.delta-pill` `.quick-link` `.bento-grid` `.share-list` `.activity`）是否还有 hover/active 位移 —— **只有卡片一处**，其余无位移，未受影响。
+- 验证: 全量批跑 **31 项零失败**（含 `MOTION_OVERRIDES: PASS (53 重定时 + 26 补建)`、`DEMO_HEALTH` 双主题 101 页 763 卡零命中、`FIDELITY: PASS`、`vue-tsc rc=0`）。
+- 教训（已写进计划与记忆）: 给元素加完入场动画后，**必须复测它原有的 hover/active 位移还在不在**（悬停前后 `getComputedStyle(el).transform` 是否变化）。只看「动画播得对」会漏掉这类静默回归。
+- 交接点: 无阻断。
+
+### 2026-10-31 形变通用语式三：单件容器 + 纯色块（同日第十九笔，未提交）
+
+- 当前状态: 补齐最后两类。双主题健康、动效语言全 PASS。
+- 新增两条:
+  1. **单件容器上浮**（`.x-card` `.panel` `.spec-plate`）：6px 上浮 + 淡入，**不做错位**——它们不是列表，整页一起落位才是正确读法。实测 `opacity 0.89→0.96→1`。
+  2. **纯色块落定**（`.tag` `.x-badge` `.delta-pill`）：出现时 `scale .9 → 1`，0.2s `--ease-settle`，末尾轻微过冲读作「贴上去了」。**不从 0 起**——色块体量小，从 0 长出来像闪。实测 `scale 0.98→1.01→1`。
+- 至此形变覆盖（去重）: 7 个专门实现 + 12 个列表入场 + 5 类选中行 + 3 类单件容器 + 3 类纯色块 + 26 个浮层自带 ≈ **35 个组件**。
+- 验证: `DEMO_HEALTH` 双主题 101 页 763 卡零命中；`MOTION_LANGUAGE: PASS`。
+- 交接点: 无阻断。形变语言到此覆盖了「列表 / 单件 / 色块 / 选中 / 完成 / 浮层」六类场景，剩余未覆盖的是纯装饰性组件（Divider / Space / Grid 等，本身没有状态）。
+
+### 2026-10-31 形变通用语式二：选中强调条（同日第十八笔，未提交）
+
+- 当前状态: 新增「选中强调条从中心长出」（`scaleY 0→1`，0.22s `--ease-swap`），覆盖 5 类选中行。双主题健康、动效语言全 PASS。
+- 覆盖: `.x-menu-item` `.select-option` `.x-cas-option` `.tree-row` `.x-tree-row` → 菜单 / 下拉 / 级联 / 业务树 / 组件树。
+- 实测: 菜单切换选中项时强调条 `scaleY 0 → 0.19 → 0.7 → 1`；树行 `.x-tree-row.is-selected` 实测 2.5px 蓝条、`translateY(-50%)` + `scaleY 1`。
+- 踩坑（重要）: **`.tree-row` 与 `.x-tree-row` 是两套类名**——前者属冻结的 DeptTree / PermissionTree，后者属可写的 TreeNode / TreeSelect。只写一个会漏掉一半，第一版就是这样漏的。
+- 纠正上一笔的判断: 浮层类**本来就带入场形变**，不是「改不了」。`overlayEnter` 里 drawer 用共享元素 ghost 从被点的行长成抽屉、modal 从触发点 `scale .86→1`、pop 是 `y -6 + scale .98`（克制但存在）。冻结的是参数微调，不是能力缺失。
+- 验证: `DEMO_HEALTH` 双主题 101 页 763 卡零命中；`MOTION_LANGUAGE: PASS`。
+- 交接点: 无阻断。形变现覆盖约 25 个组件（7 个专门实现 + 12 个列表入场 + 5 类选中行 + 浮层自带）。
+
+### 2026-10-31 形变通用语式：列表入场（同日第十七笔，未提交）
+
+- 当前状态: 用户反馈「希望更多组件有形变」。逐组件改只有 7 个，改成**一条通用语式覆盖一批**：`overrides.css` 新增 `morph-enter` 关键帧 + 8 组列表容器选择器。形变覆盖从 7 个组件扩到约 20 个。
+- 做法:
+  - `@keyframes morph-enter`：`opacity 0→1` + `translateY(6px)→0`，0.26s `--ease-reveal`。
+  - 容器选择器：`.table tbody tr`、`.x-datalist .x-datalist-row`、`.x-timeline .x-timeline-item`、`.activity-list > .activity`、`.share-list > li`、`.x-desc .x-desc-item`、`.bento-grid > *`、`.quick-link`。
+  - 错位：前 8 条各差 26ms，第 8 条起封顶 104ms（长列表不该滚出一波浪）。
+- 覆盖组件: `DataTable` `ListPage` `PermissionMatrix` `GeneratorPipeline` `DataList` `Timeline` `TimelineItem` `ActivityList` `ShareList` `Descriptions` `BentoGrid` `ShortcutGrid`。
+- 边界: 只对「一条一条进来」的容器生效。卡片、面板这类单件**不加**——不是列表，逐条落下没有语义；加了会变成「整页都在动」。
+- 验证: 实测表格行起点 opacity 0.93 / 0.86 / 0.72（延迟不同，逐条落下成立）；`DEMO_HEALTH` 双主题 101 页 763 卡零命中。
+- 交接点: 无阻断。要再扩只有两条路：①给冻结的 `overlayEnter` 开缝隙（26 个浮层组件的入场）；②给组件新增选中标记元素（8 个选中类）。
+
+### 2026-10-31 形变全量扫描 + 收口（同日第十六笔，未提交）
+
+- 当前状态: 154 个组件全部扫过并分类；本轮新增 `MenuNode` 子菜单展开。形变覆盖 **7 个组件**（含此前 6 个）。双主题健康、动效语言、冻结面全 PASS。
+- 扫描结论（154 个组件）:
+  | 分类 | 数量 |
+  |---|---|
+  | 已有形变 | 12 |
+  | 有形式变但受现实限制 | 43 |
+  | **状态只换色（无形变机会）** | **99** |
+- 43 个「有形式变但没做」的四类原因（已写进计划文档）:
+  1. **浮层入场编排在冻结的 `motion.ts`**（26 个）：Dropdown / Popover / Tooltip / Popconfirm / HelpTip / AutoComplete / Cascader / 日期时间族 / Mention / TreeSelect / OverflowList + 冻结的 CommandPalette / Drawer / HoverCard / Modal / Select。要做必须先给 `overlayEnter` 开缝隙或本地重写。
+  2. **选中态没有「标记元素」，只有行高亮**（8 个）：Anchor / Calendar / ImagePreviewGroup / StyledScrollbar / TickRing / Sidebar 等。要做得先新增标记元素，属重新设计。
+  3. **图标挂载即存在 / 无收拢载体**（5 个）：Alert / Notification / Result / LinkText / GeneratorPipeline。加入场动效会让一屏提示条同时晃。
+  4. **增删宿主冻结或只是换图**（4 个）：Image / ImagePreview / ImagePreviewGroup / Topbar，以及 Upload（进度条 `v-if` 卸载）。
+- 本轮新增: `MenuNode` 子菜单展开 24ms 错位（实测 `opacity 0 → 0.86 → 0.98 → 1`），与 `Tree` 同一套语式。
+- 验证: `vue-tsc rc=0`；`DEMO_HEALTH` 双主题 101 页 763 卡零命中；`MOTION_LANGUAGE: PASS`；`FIDELITY: PASS (274 local)`。
+- 交接点: 无阻断。形变已到自然边界——再做要么改冻结的 `motion.ts`（浮层入场），要么给组件新增标记元素（重新设计），二者都不属于「补动效」。
+
 ### 2026-10-31 形变升级全部执行完成（同日第十五笔，未提交）
 
 - 当前状态: 计划里的四个批次已按序执行完毕，**6 个组件落地形变**，4 处按理由跳过。双主题健康、动效语言、冻结面、示例契约全 PASS。工作树未提交。
@@ -193,223 +377,3 @@
   - 慢放只覆盖 6 个可见色变场景。`树行`因颜色变化过小、`表格行`/`输入壳`/`分段控件`因该页无悬停入口未纳入——**未被测到不等于没升级**，它们同样吃第 2 批的覆盖块，只是缺少可量化样本。
   - 映射表本身未经审美复核：数据只能证明「起手更快」，证明不了「这个快得恰到好处」。
 - 交接点: 无阻断。下一步候选：①按审美判断微调映射表（例如退场是否再快一档）；②把时长收敛成独立批次（目前 12 种散值只做了令牌定义）。
-
-### 2026-10-31 动效语言升级：180 段默认 ease 全部收敛（同日第七笔，未提交）
-
-- 当前状态: 计划里的 4 个批次全部落地；批跑 **31 项零失败**；`vue-tsc rc=0`；可写层与冻结层的默认 `ease` 清零。工作树未提交。
-- 本轮目标: 用户先要「动效语言升级计划」，随后「按照计划执行」——把浏览器默认 `ease` 统一到登录页那套曲线。
-- 执行结果:
-  | 批次 | 范围 | 结果 |
-  |---|---|---|
-  | 1 | 可写层 `extend` + `workspace` | 29 文件 / 84 段改写为令牌，残留 **0** |
-  | 2 | 冻结层 `src/styles/*.css` | 生成器派生 **53 条规则 / 96 段**，`MOTION_OVERRIDES: PASS` |
-  | 3 | keyframes 14 段 | 仅 **4 段**需改（2 入场→`reveal`、2 呼吸→`swap`），7 段 spinner/倒计时保持 `linear` |
-  | 4 | 守卫 | `MOTION_LANGUAGE: PASS`，已入 `_sweep.sh` |
-- 新增件:
-  1. `scripts/motion_language.py`：共享判定（拆段 / 属性优先分派 / 退场 ×0.8）。生成器与守卫共用，避免「生成按一套、校验按另一套」。
-  2. `scripts/build_motion_overrides.py`：从冻结样式机械派生覆盖块，含 `--check` 与 `--selftest`（断言多属性分派、`@media` 复刻、`linear`/`premium` 排除、`reduced-motion` 排除、`keyframes` 排除）。
-  3. `scripts/check_motion_language.py`：三条判据——可写层零默认 `ease`、冻结层默认 `ease` 必须被覆盖块接住、动画必须有具名曲线或覆盖。
-  4. `scripts/_apply_motion_language.py`：批次 1 的一次性改写工具（带 dry-run，保留原有 `property <easing> <duration>` 笔法与换行符）。
-- 执行中发现并修正的三处偏差（都写进了计划文档）:
-  1. **统计高估**：第一版正则要求缓动在行尾，把既有 `property <easing> <duration>` 写法整段漏判，得出「225 段默认 ease / 11 段 premium」。用括号感知的拆分器重算是 **180 / 56**。
-  2. **漏了一个样式文件**：`layout.css` 有 9 段过渡，最初没登记。现已改成「目录里出现未登记的 `.css` 直接 FAIL」，防再漏。
-  3. **删除手写重定时清单**：`overrides.css` 原本手写 12 个选择器的重定时，与生成块重复。现在只留生成块一份来源；其中给 `.segmented button` / `.x-tabs-tab` 手写的 `swap` 按「属性优先」改判 `reveal`——真正的交接是滑动的 `.x-tabs-thumb`（`glide`）。
-- 验证:
-  - 计算值实测：`.btn` / `.icon-btn` / `.checkbox-box` / `.switch-track` / `.x-date-cell` 均为 `cubic-bezier(0.16, 1, 0.3, 1)`；`.skeleton` 的 `pulse` 为 `cubic-bezier(0.455, 0.03, 0.515, 0.955)`。
-  - 批跑 31 项全 PASS：静态 19 + 渲染 12，含 `MOTION_OVERRIDES(53)` / `MOTION_LANGUAGE` / `DEMO_HEALTH` 双主题 762 卡 / `CRYSTALLIZE_VERIFY` / `KEYBOARD_VERIFY`。
-- 已知遗留:
-  - **手感本身没有机器验收**。守卫只证明「没有默认 ease」，证明不了「这条曲线选得对」。计划里的慢放抽查（6 个代表组件）仍未做，下一步应当人工过一遍。
-  - 时长仍是 12 种散值，只做了令牌定义、未做收敛，退场 ×0.8 目前也只作用于批次 1 的改写。
-  - `PROJECT_CURRENT.md` 已 4.3 万字节 / 15 个小节，接近 51,200 上限，历史小节该迁往 `PROJECT_HISTORY.md` 了。
-- 交接点: 无阻断。下一步候选：①按计划第 6 节做慢放抽查并据此微调映射表；②把时长收敛成独立批次。
-
-### 2026-10-31 动效审计 + 确认落定动效沉淀（同日第六笔，未提交）
-
-- 当前状态: 组件数 153 → 154（新增 `ConfirmButton`），示例 750 → 762；`overrides.css` 新增「动效校准层」；落定动效抽成 `crystallize.ts` + `ConfirmButton.vue`。工作树未提交。
-- 本轮目标: 用户带登录页两张截图——「再次检查每个组件的细腻程度、动画的流畅度，看看有没有需要优化的」+「把这个风格延续到其他组件的组件中」。
-- 动效审计（量化，不是感觉）:
-  1. **两套动效语言并存**。216 段 `transition` 里 **154 段用浏览器默认 `ease`**，只有 11 段用了 `--ease-premium`；而 `motion.ts` 的 `EASE` 是专门设计的五条曲线（expo/power4/power2/back）。默认 `ease` 起步钝、收尾也钝，没有能量语态。**登录那个动画之所以高级，不是形变更花哨，而是它拿到了真曲线**——这是本轮最重要的结论。
-  2. 时长没有令牌，12 种散值（.12s～.5s）；同一语义的 hover 在不同组件上是 .15s / .2s / .25s。
-  3. `transition: all` **0 处**（这点很干净，无需处理）。
-  4. GSAP 侧布局属性动画只有 **4 处 / 约 94 处**：`Login.vue` 与 `crystallize.ts` 的宽度收拢（同源）、`motion.ts` 的 FLIP ghost（width/height 是共用元素转场的必要手段）。其余全是 transform/opacity，合成器友好。
-  5. `base.css` 有全局 `*` 的 reduced-motion 兜底（`animation-duration: .01ms !important`），13 个组件额外遵守 `motionSkipped()`。降级链完整。
-- 本轮交付:
-  1. `overrides.css`「动效校准层」：五条 `--ease-*`（与 `EASE` 一一对应，取标准 cubic-bezier 近似）+ 四档 `--dur-*`；对用户会碰到的原语（btn / icon-btn / tag / nav-item / menu-item / input-shell / card / x-tabs-tab / segmented / perm-chip / user-chip / cmd-trigger）重新定时。进度条、跑马灯、骨架屏这类 **linear 语义**的排除在外。
-  2. `src/composables/crystallize.ts`（新增）：`playCrystallize()` 把登录页三拍抽成可复用件——收拢 0.42s `swap` → 描环 0.5s `reveal`（提前 0.08s 交接）→ 画勾 0.32s `settle`（再压 0.22s 起笔，笔顺感就靠这个错位）→ 回弹 1 → 1.06 → 1。`motionSkipped()` 时直接给终态。
-  3. `src/components/extend/ConfirmButton.vue`（新增）：`variant`/`size` 与 `Button` 同名同值，换用只改标签名。**受控**（传 `status`）与**自驱**（不传则点一下自己走完 pending→落定→复位）两种模式。
-  4. 登记链：分类 `general>button`、组件说明、基础样本、slot 文案 + catalog → variants → events 三连。
-  5. `scripts/_verify_crystallize.py`（新增）：逐帧采集宽度、两笔 `stroke-dashoffset`、回弹缩放，已并入 `_sweep.sh`。
-  6. `LOCAL-GUIDE` 新增「动效（能量语态与确认落定）」整章；`references/component-checklist.md` 补动效检查项与两条已知坑。
-- 关键决策:
-  - **不新建曲线体系**，只把 CSS 侧拉回 `motion.ts` 已有的五条语态。新增令牌与 `EASE` 一一对应，`cubic-bezier` 取 GSAP 曲线的标准近似（`power2.in` = `.55,.085,.68,.53`，`power2.inOut` = `.455,.03,.515,.955`——我第一版写错了，靠复核 easings 标准值改回）。
-  - **形变改内层圆而不是按钮宽度**：按钮盒子不动，内层 `.cx-orb` 从满宽收到 36px 正圆，布局不位移，工具栏里也能用。
-  - **环与勾取圆的 88%**：按登录页 46px 圆 0.87 的比例换算到 36px 按钮高度，环会贴住蓝底边只剩 1.3px；88% 留出约 2.4px 呼吸，且比例不随尺寸漂移。
-  - **自驱复位必须等动画真正结束**：固定 1800ms 会在慢帧机器上把最后那下回弹剪掉，而回弹正是确认感的来源。改成 `playCrystallize()` 的 Promise resolve 后再排 900ms。
-- 守卫抓到的两个真缺陷（本轮修复）:
-  1. `DEMO_HEALTH` 浅色 FAIL `lowContrast`：error 态把 `--red-text` 直接压在主色实底上，**红字铺蓝 1.01:1**。改为 `--red-soft` 底 + `--red-text` 字（与 `.btn-text.is-danger` 同一套语言）。
-  2. `DEMO_HEALTH` 暗色 FAIL `noName`：落定后按钮里只剩图形，`aria-label` 挂在内层圆上，读屏读不到按钮名。改为挂到按钮本体。
-- 验证（真实逐帧，不是看终态）:
-  - `CRYSTALLIZE_VERIFY: PASS`——宽度 258 → 36 有 8 档以上中间值（是渐变不是跳变）、圆环 19 档 126→0、对勾 11 档 24→0 且**晚于圆环 284ms 起笔**、回弹 51 帧、收拢后宽高比 1.00、动画结束两笔 dashoffset 均归零、自驱能复位回可点击态。
-  - `DEMO_HEALTH` 浅色 + 暗色各 101 页 762 卡零命中。
-  - 全量批跑 **28 项零失败**（静态 16 + 渲染 12）；`vue-tsc rc=0`。
-- 已知遗留:
-  - 落定圆只有 36px（跟随按钮高度）。若某处需要更饱满的确认徽标，得让按钮高度长到 44px 并同步动画高度，目前没做。
-  - `ConfirmButton` 的 `block` 默认 `true`：窄按钮上看不出「收拢」，需要形变的场景必须给足宽度。
-  - 上一笔的 4 处硬编码蓝仍在。
-- 交接点: 无阻断。下一步候选：①把 `crystallize.ts` 用到非按钮场景（结果页出现、行内保存）；②`--dur-*` 令牌目前只在 `overrides.css` 里定义，组件自身 scoped 样式仍写裸时长，可逐步迁。
-
-### 2026-10-31 两个审计件转正为守卫 + 新增组件检查清单（同日第五笔，未提交）
-
-- 当前状态: 守卫家族 22 → 24，批跑条目 26 → 27（新增 `CONTRACTS` / `A11Y_WIRING` 各带 `--selftest`，渲染段补入 `verify_keyboard`）；**静态 16 项 + 渲染 11 项全 PASS**，`vue-tsc rc=0`。工作树未提交。
-- 本轮目标: 用户「都做」——① 把三种键盘模式抽成新增组件时的检查清单；② 两个审计件补阳性对照后转正为守卫。
-- 本轮交付:
-  1. `scripts/check_component_contracts.py`（由 `_audit_contracts.py` 改写）：`audit_source(label, raw)` 纯函数供真扫描与自证共用；`--selftest` 断言「死 prop / 只在默认值出现的 prop / 死 emit」三类必报、正常组件零误报。
-  2. `scripts/check_a11y_wiring.py`（由 `_audit_wiring.py` 改写）：同结构；`--selftest` 断言两类缺口各报 1 项、七类豁免零上抛。新增 `class_tokens()` 归一 `:class="[...]"` 写法。
-  3. 删除 `scripts/_audit_contracts.py`、`scripts/_audit_wiring.py`（被取代）。
-  4. `references/component-checklist.md`（新增）：形态选型表（combobox / roving tabindex / 列表项 / 纯展示）→ 契约 → 样式 → 示例 → 无障碍 → 收口命令 → 已知的坑。规则正文仍归 `LOCAL-GUIDE`，清单只给操作序列。
-  5. `LOCAL-GUIDE`：守卫清单补两条；「交互无障碍」节把审计件改成守卫名并加清单入口。
-- 关键决策:
-  - **审计件转守卫必须改退出码**：审计件是「只报不拦」恒 `rc=0`，放进批跑等于永远绿。两个守卫改为「有命中即 `rc=1`」。
-  - **自证用合成样本，不注入真实组件**。仓库既有守卫多用「改真实文件再还原」，那是为了顺带验证文件发现链路；本守卫已有「扫到 <100 个组件即 FAIL」兜底，合成样本足以证明判据，且失败时不会留下半改的源码。
-  - `a11y_wiring` 的 class 归一：`:class="['input-shell', ...]"` 直接按空格切会切出 `['input-shell',` 这种带符号 token，豁免表匹配不上就全量误报；显式剥离 `[ ] ' ,` 后才正确。
-- 验证:
-  - 静态 16 项全 PASS：`FIDELITY` / `GUARD_SELFTEST` / `INVENTORY(123/14/8)` / `CONTRACTS_SELFTEST` / `CONTRACTS(153)` / `CATEGORIES` / `PARITY(74)` / `COMPONENT_PARITY(131)` / `CATALOG(153)` / `DEMO_VARIANTS(750)` / `DEMO_EVENTS(122)` / `A11Y_WIRING_SELFTEST` / `A11Y_WIRING(153)` / `FONT_OVERRIDES(198,5)` / `ACCENT_PALETTES(5×2)` / `CONTRAST(14+10)` / `ADMIN_COVERAGE(153/153)`。
-  - 渲染 11 项全 PASS：`SHADOW_CLIP` / `KEYBOARD_VERIFY` / `CORNER_OCCLUSION(112 页)` / `CONTENT_PADDING(750 卡)` / `DEMO_VISIBILITY(101 页 750 卡)` / `DEMO_GUIDES(101 页 750 卡)` / `EVENT_WIRING(341 条已接)` / `DEMO_HEALTH` 浅色与暗色各 101 页 750 卡零命中 / `HELP_TIP`。
-- 踩坑（已写进 `_sweep.sh` 注释）:
-  - **渲染类守卫不能与其它 Playwright 任务并发**。并发时 CPU 抢占导致 `wait_for_selector(".g-cell")` 30s 超时，报出假的「空页」失败；本次 `EVENT_WIRING` 与 `DEMO_HEALTH(light)` 就是这么假挂的，单独复跑即 PASS。
-  - 批跑脚本运行中不能编辑：bash 按字节偏移读脚本，改行数会让它从半截继续执行。
-- 交接点: 无阻断。下一步候选：①把 `KEYBOARD_VERIFY` 扩展到全部三种键盘模式（目前只覆盖 Steps 与 Cascader，roving tabindex 尚无浏览器实测）；②`component-checklist.md` 里的收口命令若与批跑条目再次分叉，考虑让清单直接引用 `_sweep.sh` 的分组。
-
-### 2026-10-31 组件与示例全量遍历：死契约 / 接线 / 键盘可达性（同日第四笔，未提交）
-
-- 当前状态: 22 个守卫全 PASS（上一笔遗留的 `CATALOG: STALE` 已查清并转绿），`vue-tsc rc=0`；组件侧修 3 处、审计工具新增 3 个。工作树未提交。
-- 本轮目标: 用户「继续遍历检查所有组件和组件示例，修复，优化」。做法是把「遍历」变成可复跑的检查，而不是靠肉眼挨个看。
-- 遍历手段:
-  1. `scripts/_sweep.sh` 一次跑完 22 个守卫，输出每条 rc / 耗时 / 末行结论。
-  2. `scripts/_audit_contracts.py`（新增）：死契约（声明了从不使用的 props / emits）。
-  3. `scripts/_audit_wiring.py`（新增）：未声明就派发的事件 + 绑了 `@click` 却键盘到不了的元素。
-  4. `scripts/_verify_keyboard.py`（新增）：浏览器里实测键盘操作，而不是只看代码里有没有 `keydown`。
-- 遍历结果（153 个组件 / 750 张示例卡）:
-  - 死契约 **0**（619 props、124 emits 全部在用）；未声明事件 **0**；图标按钮缺可读名 **0**（唯一命中是 `Button.vue` 自身，文字来自插槽，正常）。
-  - 硬编码色只有 `ColorPicker` 与 `AppearanceSettings` 两处，均属必要：前者色板本身就是十六进制，后者是主题缩略图，**必须**脱离当前主题取色，否则深色下三张卡糊成黑白两团。
-  - 可点击无键盘 **34 → 0**。其中真实缺口 2 个，其余是登记在案的豁免（combobox / tree 选项、微型动作、遮罩、触发器包装层）。
-- 本轮修复:
-  1. `extend/Steps.vue`：可点步骤此前只有 `@click`，键盘完全到不了。补 `tabindex`（仅在 `clickable && i <= current` 时给）与 Enter/Space 激活，并加 `:focus-visible` 焦点环（实测 `2px solid`）。**不换成 `role="button"`**——换了等于 `<ol>` 不再有列表项，`aria-current="step"` 也失去上下文。
-  2. `extend/Cascader.vue`：菜单能开但里面一步都走不动。按 combobox 模式补完整键位——焦点留在触发器、`aria-activedescendant` 指向当前项、上下移动跳过 `disabled`、左右进退列、`Home/End` 到首末、Esc 收起并还焦点；`aria-activedescendant` 的 id 只在菜单打开时存在，同页多实例不会撞。焦点态用内描边（`.is-focus`）与选中态（底色 + 主色）分开，两者叠加仍分得清。
-  3. `extend/Trigger.vue`：`disabled` 此前只拦开合，读屏读不出禁用。补 `aria-disabled` / `data-disabled`，并加 watch——运行中置为禁用会立即收起已打开的浮层，否则浮层挂着一个失效的触发区只能靠点外部关闭。外观不接管，留给调用方按 `[data-disabled]` 处理。
-- 关键发现:
-  - **`CATALOG: STALE` 不是漂移**。备份后重新生成并逐组件比对指纹，差异只有 `AppearanceSettings` 的 `props`——即上一笔加的 `sections` 没重跑生成。确认后重建，`CATALOG: PASS (153)`。
-  - **审计工具本身最容易漏报**：死契约扫描若不去掉 `withDefaults` 的默认值对象，只在默认值里回过一次名的 prop 会被算成「已使用」；接线扫描若没遮蔽 `defineEmits` 声明块，每个事件都会把自己数成一次使用。两处都补了遮蔽，并用阳性对照验证（样本 3 项全中、正常样本 0 命中）。
-- 验证:
-  - `_verify_keyboard: PASS`——Steps 12 个步骤里 8 个可聚焦、Enter 把当前步从「部门审批」切到「提交申请」；Cascader Enter 开菜单 → `aria-activedescendant=x-cas-opt-1-0` → ArrowDown 到 `-1-1` → ArrowLeft 退回层级 0 → ArrowRight 进入层级 1 → Esc 关闭且焦点回到触发器。
-  - `DEMO_HEALTH` 浅色 + 暗色各扫 101 页 750 卡，九类判据零命中；`CONTENT_PADDING` / `DEMO_VISIBILITY` / `DEMO_GUIDES` / `EVENT_WIRING` / `CORNER_OCCLUSION` / `HELP_TIP` 全 PASS。
-  - 静态 12 项全 PASS：`FIDELITY(270 local)` / `INVENTORY(8 层)` / `CATEGORIES(153)` / `PARITY(74)` / `COMPONENT_PARITY(131)` / `CATALOG(153)` / `DEMO_VARIANTS(750)` / `DEMO_EVENTS(122)` / `FONT_OVERRIDES(198,5)` / `ACCENT_PALETTES(5×2)` / `CONTRAST(14+10)` / `ADMIN_COVERAGE(153/153)`。
-- 已知遗留:
-  - `.input-clear`、`x-tag-x`、`x-tabs-close`、`x-tree-arrow` 这类微型动作不占 Tab 位（与 Arco 一致），已在 `LOCAL-GUIDE` 写成明确豁免；要改就 11 个组件一起改。
-  - `Dropdown` / `Popover` / `Popconfirm` / `Trigger` 的触发器包装层没有 `role`，可访问元素由插槽内容提供；若要给整个组件补 `aria-haspopup`，得先约定「插槽里必须是可聚焦元素」。
-  - 上一笔的 4 处硬编码蓝（`instruments.css`、`pages.css`、`components.css`）仍未处理。
-- 交接点: 无阻断。下一步候选：①把 `LOCAL-GUIDE` 的无障碍三模式抽成新增组件时的检查清单模板；②`_audit_contracts.py` / `_audit_wiring.py` 目前是审计件（`_` 前缀、不进 `_sweep.sh`），若想常态化，需先补阳性对照再转正为守卫。
-
-### 2026-10-31 外观设置重做：字号入口可见化 + 主题控件改版 + 顶部栏入口重绘（同日第三笔，未提交）
-
-- 当前状态: 面板重做已落盘，17 个守卫全 PASS，生产构建 rc=0（4.66s）；**工作树 87 个文件未提交**（含更早遗留的 16 个组件档位扩展改动，非本笔产物）。dev server 已停，5173 已释放。
-- 本轮目标: 用户带截图反馈两点 —— ①「没看到可以切换和调整字体的」；②「切换主题的这个按钮也很难看，需要重新设计」。截图 1 圈的是顶部栏 `contrast` 入口按钮，截图 2 圈的是「外观设置」里的主题分段控件。
-- 根因（都不是审美问题）:
-  1. 字号面板 `AppearanceExtPanel` 是独立弹窗，只在 gallery 里可达；真实入口「外观设置」（`AppearanceDialog`）里只有主题与密度。**入口分裂**才是「找不到字号」的原因。
-  2. 主题控件是三个纯文字分段项，460px 弹窗里塞不下 `浅色/深色/跟随系统`，只能换行左对齐，且看不出选中后长什么样。
-  3. 顶部栏按钮用的是 stroke-only 的 `contrast` 字形：空心圆 + 一条竖线，17px 下读不出「深浅对比」，又没有控件边界，夹在胶囊搜索框和头像之间像装饰件。
-- 本轮交付:
-  1. `src/components/workspace/AppearanceSettings.vue`（新增）：外观设置**正文**，主题 / 主色 / 字号 / 表格密度四区合一。主题改为三张带缩略图的预览卡（半填充选中环 + 角标），主色为 5 个色点（挂 `data-accent` 自取色，深浅自动跟随），字号行带实时示例与 px 数值。
-  2. `src/components/layout/AppearanceDialog.vue`：冻结文件，仅追加 2 行缝隙（`import` + `<AppearanceSettings />`），已登记 `SANCTIONED_SEAMS`；原 `.pref-list` 由 `overrides.css` 的 `.modal-body:has(> .apx) > .pref-list{display:none}` 隐藏。
-  3. `overrides.css`：新增顶部栏入口按钮重绘——掩码补画半实心对比圆（跟随文字色），套用搜索框同款胶囊材质与 34px 高。上游 `<svg>` 保留在 DOM、只把描边设透明（`display:none` 会触发「零尺寸图标」判据）。
-  4. `build_font_overrides.py`：紧凑档 `caption` 11px → 12px，三档统一守住「辅助字号 ≥12px」。重新生成 198 条覆盖。
-  5. `AppearanceExtPanel.vue` 下线（重复入口），登记点同步：`workspace/index.ts`、分类 data、`demo-props`、`component-guides`，三份生成物按序重跑。
-- 关键决策:
-  - **正文与外壳分离**：冻结的对话框只保留外壳（标题 / 完成按钮 / 关闭），正文整块归本地组件。这样既不改上游一个字节，也不再出现「两个外观弹窗」。
-  - **不做任意色相**：主色仍是 5 套预置、由守卫矩阵证明达标；自定义入口保留 `data-accent="custom"` + 同元素注入。
-  - **紧凑档不再压最小字号**：12px 是验收条件本身，紧凑档的收紧只体现在 body（13px）。
-- 验证（真实交互 + 渲染守卫）:
-  - e2e：进页 `accent=blue` → 点「青碧」`dataset.accent=teal` → 点「宽松」按钮实测 `font-size: 15px`、示例行显示 `15 / 13px` → 刷新后 `dark/teal/large` 全部保持，控制台零错误。
-  - `DEMO_HEALTH: PASS`（浅色 + 暗色两个主题各扫 101 页 748 卡，九类判据零命中）；`DEMO_VISIBILITY` / `DEMO_GUIDES` / `EVENT_WIRING` / `CONTENT_PADDING` / `ADMIN_COVERAGE(153/153)` 全 PASS。
-  - `FIDELITY: PASS (270 local)`，`SEAM: AppearanceDialog.vue (+2 行)`；`INVENTORY(8 层)` / `CATEGORIES(153)` / `CATALOG` / `DEMO_EVENTS` / `PARITY(74)` / `FONT_OVERRIDES(198,5)` / `ACCENT_PALETTES(5×2)` / `CONTRAST(14 字色 + 10 色板)` 全 PASS。
-- 已知遗留:
-  - 对话框标题与「完成」按钮仍是上游形态，未品牌化；要合并成一体需上游升级或多开缝隙深度侵入，不建议。
-  - 用户下拉菜单里的「外观设置」项仍用 `contrast` 小图标（菜单项，视觉权重低，未改）。
-  - 主题卡方向键切换（同日后续已补：主题卡与主色点均接 `onRadioKey`，roving tabindex + 方向键带焦点，本条遗留已关闭）。
-  - 上一笔的 4 处硬编码蓝（`instruments.css` 矩阵悬停、`pages.css` 登录渐变、`components.css` 复选框投影）仍在，换非蓝色板时会露出旧蓝。
-- 交接点: 无阻断。下一步候选：①把 `AppearanceSettings` 抽成业务系统可直接引用的公开出口（连同 `appearance-ext` 一起写进 README）；②补主题卡方向键与 `aria-activedescendant`；③处理上述 4 处硬编码蓝。
-
-### 2026-10-31 珍珠玻璃组件库：UI 评审 + 字号标度 + 主色色板 + 字色 AA（未提交）
-
-- 当前状态: 五项改造全部落盘、14 个守卫全 PASS、生产构建 rc=0；**工作树 86 个文件未提交**（其中 16 个是更早遗留的组件档位扩展改动，非本轮产物）。本条即本轮交接点。
-- 本轮目标（用户诉求演进）: ①评审珍珠玻璃并给可落地优化；②13px「好看但不实用、只能当美术品」→ 基准提到 14px 且字号可单点调整；③组件库要有通用的「字体调节 + 主题色切换」，使用方系统可覆盖，色板可随时新增。
-- 本轮交付:
-  1. `frontend-design/scripts/check_contrast.py`（新增）：字色令牌 + 主色色板双矩阵判定，含 `--selftest` 双向阳性对照。
-  2. `build_font_overrides.py` 重写：由「非整数字号整数化」升级为「字号标度化」，10–15px 的 21 种散值归并为 5 档（caption 12 / sm 13 / body 14 / lg 15 / title 16），生成 198 条覆盖；支持 `data-font-scale` 三档（compact 12–15 / regular 12–16 / large 13–17，三档 caption 均不低于 12px），每档显式整数不用 `calc`。
-  3. `build_accent_palette.py` + `references/accent-palettes.json`（新增）：一个种子色派生 12 令牌 × 5 套 × 2 主题，种子色不达标时沿 HSL 明度自动修正；同时产出 `src/data/accent-palettes.generated.ts` 供前端渲染色板。
-  4. `src/utils/controlSize.ts` + 单测（新增）：档位 → 四变量映射，只出 `var()` 引用不写像素数字。
-  5. `src/composables/appearance-ext.ts` + `src/components/workspace/AppearanceExtPanel.vue`（新增）：主色与字号两个维度的引擎与面板，`ADMIN_COVERAGE` 153/153 可达。
-  6. `overrides.css`：字色四档整改、`.faint` 等 16 处小字用法迁移、`.btn-primary` 改读 `--blue-solid`、标签高度 22→24。
-  7. `extend/` 110 处 scoped 字号并入标度（55 个文件）。
-- 关键决策:
-  - **冻结面比预期大**：`appearance.ts` / `AppearanceDialog.vue` / `AppShell.vue` 全属上游逐字节冻结，`LOCAL_MANAGED` 只收 `vite.config.ts` 与锁文件。外观扩展因此走「新增文件 + gallery 磁盘发现」，首屏防闪烁走 `index.html` seam（+3 行，已在 `fidelity_upstream.py` 的 `SANCTIONED_SEAMS` 登记，剥离后与上游逐字节相等）。
-  - **主色拆 text / solid**：深底上当文字要 L≥0.206、当背景配白字要 L≤0.183，两区间不重叠；不拆时深色主题 5 套色板的按钮白字只有 2.09–3.20。
-  - **扩展维度用独立存储键** `scaffold.appearance.ext`：上游 `appearance.ts` 用整对象回写 `scaffold.appearance`，共用键会被主题/密度切换冲掉。
-  - **`--ink-faint` 退出文本档**：四档灰若全达 AA 会挤在 4.5–6 失去层次，改为「非文本档 3.14 + 文本只留 ink/muted/soft 三档」。
-  - **字号基准 14 与解除 `BOUND-05`** 已作为 `DEC-04` 记录在 `doc/2-需求/2026-10-31_REQ-FONT-SCALE-001_字号标度与基准上调.md`，未改写旧需求正文。
-- 验证: FIDELITY(270 local / 3 seam) · INVENTORY · CATEGORIES(153) · PARITY(74) · CATALOG(153) · DEMO_EVENTS · FONT_OVERRIDES(198, 5 组) · ACCENT_PALETTES(5×2) · CONTRAST(14 字色 + 10 色板) · ADMIN_COVERAGE(153/153) · DEMO_GUIDES(748 卡) · DEMO_VISIBILITY(748) · DEMO_HEALTH(九类零命中) · EVENT_WIRING(342 条) 全部 PASS；`npm run build` rc=0。真实交互实测：点青碧 → `data-accent=teal`、点宽松 → `.btn` 15px、刷新后两者保持；`/system/users` 两档字号下表格 `scrollWidth == clientWidth == 1040` 无溢出，手机号单元格宽 = 内容宽 = 117 未裁切。
-- 已知遗留:
-  - `extend/` 之外仍有 6 处 scoped 字号（`layout/` 2、`business/` 3、`ui/` 1），属冻结文件不可改。
-  - 冻结样式里 4 处硬编码蓝色 rgba（`components.css` 复选框投影、`instruments.css` 矩阵悬停 ×2、`pages.css` 登录渐变）未跟随主色，换非蓝色板时这 4 处仍偏蓝。
-  - 主题与密度绑死 `:root`，只能全局切换；主色与字号用不绑 root 的选择器，可局部嵌套。
-- 交接点: 无阻断，可直接继续。下一步候选：①给那 4 处硬编码蓝补覆盖；②若要求明暗也支持局部嵌套，需把整套深色变量复制到覆盖层（多一份真相，需权衡）；③提交前按业务目标把 86 个文件拆成多笔。
-
-### 2026-10-31 Skill 体系中等重构：流程链 16 环压到 5 环、元规则全部删除（未提交）
-
-- 当前状态: 全部改动已在工作树落盘，**未提交**（无当轮 Git 授权）。`AGENTS.md` 62,059 → 29,931 字节，活跃 description 62,318 → 35,425 字符，活跃 SKILL.md 28,329 → 15,518 行；六条安全红线逐条保留并新增机器守卫。
-- 本轮交付: ① 删除 10 个 skill 目录（`skill-audit-rules`、`team-development-rules`、`memory-usage-tracking-rules`、`task-plan-rehydration-rules`、`thread-title-rules`（含 `mcp/` 3400+ 文件）、`code-context-resync-rules`、`context-compression-rules`、`recent-context-bootstrap-rules`、`project-rule-file-bootstrap-rules`、`skill-execution-compliance-gate-rules`）；② 合并 3 组：合规收口组并入 `code-change-finalization-gate-rules`、上下文组并入新 `context-recovery-rules`、`project-memory-rules` 瘦身至 50 行；③ `skill-hit-check-rules` 115 → 29 行，`deferred-gate-registry.md` 17 → 18 行时机表；④ `test-strategy-rules` 385 → 83 行 + 8 个新 reference，`reasoning-summary-structure-rules` 382 → 104 行 + 4 个新 reference；⑤ 14 个领域 skill 的 Markdown 路由块三行并一行；⑥ 36 个活跃 skill 的 description 压缩；⑦ 删 `summary-check` Stop hook 与 `usage_count`/`absorbed_to`/v5 registry 机制；⑧ 新增 `test/skill-hit-check-rules/meta_rule_purge_test.py`（7 项断言）；⑨ 新增 `doc/5-tests/2026-10-31_skill体系中重构_链路走查与规模验证_测试主文档.md`。
-- 关键决策: ① 元规则「全部删除」而非降级——打卡字段存在一天，AI 就会为它花掉注意力，降级方案必然回流；② 六条安全红线不做任何压缩改写，`保留（红线）` 锚点原文逐字保留，因为删规则时把红线一起带走比流程链过长严重得多；③ RED-2 从手写章节补成 `BODY_TEST_POLLUTION` 受管章节——它此前只存在于 `AGENTS.md` 手写部分，重新自举会让整节被覆盖消失，与 2026-10-29「提交即推送」静默丢失属同一类缺口；④ 新增守卫同时断言「`AGENTS.md` 里有」与「自举脚本里有」，只校验前者无法发现下次自举会冲掉红线；⑤ `__skillhub` 第三方种子不在改造范围，故规模口径以自建活跃 skill 为准。
-- 验证: `meta_rule_purge_test.py` 7/7 PASS；`bootstrap_agents_test.py` 3/3 PASS（54.806s）；`cmp AGENTS.md CLAUDE.md` rc=0（均 29,931 字节）；`scan_test_pollution.py --diff-only` 输出 `POLLUTION: PASS`；`generate_dictionary.py --check` rc=0；连续两次自举字节不变（幂等）；测试主文档 `--profile test` 校验 PASS。
-- 已知遗留: 全库 SKILL.md 26,357 行超 24,000 判据口径，差额全部来自 60 个第三方种子（10,839 行）；全量 Python 测试 3 个存量失败（空 `skills/` 目录遮蔽、`.system` 部分 `openai.yaml` 的 CRLF、gitignore 目录内的 `test_*.py`）在 HEAD 基线上同样存在。
-
-### 2026-10-29 自举脚本恢复「提交即推送」归属注入并全量提交收口（Git 收口）
-
-- 当前状态: `bootstrap_agents.sh` 已恢复按仓库 slug 条件注入项目专属 Git 授权正文，四份规则文件的受管章节同步刷新，回归测试 3 项全通过；本轮全部改动按三个业务目标分三笔提交并推送 `origin/main`（`3129f0b9` 生图模型收敛、`1a282ad9` 自举授权边界恢复、`9d81d7f0` 记忆计数与吸收冻结），工作树已清空。
-- 本轮交付: ① 新增 `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA` 正文常量与 `resolve_no_auto_commit_body()` 解析函数，按 `basename "$REPO_DIR"` 判定归属仓库后再在收尾条款前插入项目专属授权；② 配套回归测试 `test_commit_implies_push_extra_is_scoped_to_owner_repo`，对归属与非归属仓库双向断言；③ 根 `AGENTS.md` / `CLAUDE.md` 与两个子目录 `AGENTS.md` 的受管章节同步；④ 第一个业务目标（imagegen 模型收敛）另成一笔。
-- 关键决策: ① 判定用仓库 slug 而非路径前缀——`basename` 对临时目录与真实仓库给出一致结果，回归测试可直接在 `TemporaryDirectory` 内覆盖两种仓库名；② 正文常量与注入逻辑必须同源同测，只改正文不补归属判定会让授权边界静默失效，而 `grep -c` 只能证明文本在、不能证明注入条件正确；③ 子目录规则文件走同一解析函数，保持「同一规则全仓一份权威正文」；④ 历史提交 `76975c58` 是这类「能力被回归掉」的唯一可靠线索，规则漂移排查先 `git log -S` 定位。
-- 验证: `bash -n` 语法检查 PASS；`bootstrap_agents_test.py -v` 3 项全通过（55.177s）；`scan_test_pollution.py --diff-only` 输出 `POLLUTION: PASS`；`check_memory_anchors.py` 全绿（memory 58 实体、style 35/35、history 20/20）；`knowledge_index.py check` 全库 419 篇、死链 0、未挂载 0；`validate_engineering_docs.py --profile style_regression` PASS；`check_punctuation.py` ok；字典重跑 `implemented_total 66 / planned_missing 8 / seed_total 128`。仓库根 `package.json` 无 `build` 脚本，编译闸门按规则判 `N/A`。
-- 知识库: 新增 `20-Knowledge/AI协作/默认值验证必须隔离配置优先级与进程缓存.md` 并挂载到 AI 协作 MOC；本轮另修复 11 篇存量笔记的 frontmatter、4 处死链与 5 处未挂载，全库合规检查从 12 处违规收敛为 0。巡检 `_index (1).json` 为 Google Drive 生成的 2026-10-19 陈旧索引副本（343 条 vs 现行 425 条），登记为同步冲突但不删除。
-- 记忆计数: `rule.repo-commit-implies-push` 本轮实际引用升至 `usage_count 3 / usage_days 3`，达到吸收阈值；查重确认已被 `git-collaboration-rules` 完整覆盖（`SKILL.md` 行 29 + `references/current-turn-authorization.md` 项目级例外节），按「已覆盖则更新不新建」补入自举脚本归属注入的防漂移说明，并把 `absorbed_to` 写为 `git-collaboration-rules` 冻结计数，未新建重复 skill。
-
-### 2026-10-27 imagegen 模型清单收敛为唯一 gpt-image-2（Git 收口）
-
-- 当前状态: 仓库内 8 个文件已改（6 个 skill 资产 + 2 个字典产物）并新增 1 份 6-review 记录，已随本轮第一笔提交收口；本机 `~/.imagegen/config.json` 与两个用户级环境变量已按用户确认同步为 `gpt-image-2`。
-- 本轮交付: ① `imagegen/SKILL.md` 的 description、模型章节、CLI 描述、配置兜底、核心规则统一为唯一 `gpt-image-2`；② `references/config.example.json` 三处模型字段收敛；③ `scripts/image_gen.py` 的 `DEFAULT_MODEL` 与函数注释；④ `scripts/imagegen.py` 的解析兜底与 `SKILL_CONFIG`；⑤ `CHANGELOG.md` 2.5.0；⑥ 吸收登记 `workbuddy-absorption-map.md` 与 `references/source-notes.md`；⑦ `doc/6-review/2026-10-27_imagegen模型收敛gpt-image-2_6-review.md` 并登记 README 索引；⑧ 字典刷新。
-- 关键决策: ① 只改默认值，不加 `--model` 白名单——用户明确选择「只改默认值」，需在文档中写清该边界，避免被误读为参数层已锁死；② 历史文件（`CHANGELOG.md` 2.1.0、`source-notes.md` 旧条目、`workbuddy-absorption-map.md` 旧行）按只读保留，历史记录描述的是当时事实；③ `SKILL.md` 保留一条禁止条款列出两个历史模型名，用于阻断回退，属有意保留；④ `.system/imagegen` 官方快照不含被删模型，无需同步。
-- 验证: 两脚本 `py_compile` 通过；示例配置 JSON 解析正常；隔离 HOME + 清除环境变量后 `_resolve_default_model()` 返回 `gpt-image-2`，新进程复验一致；`quick_validate.py` 返回 `Skill is valid!`；`POLLUTION: PASS`；5 个改动文件 UTF-8 无乱码、LF、无尾随空白；字典旧模型计数 0；6-review 六维自查 PASS。真实出图未执行（会消耗额度且用户未要求产出图片），已显式降级为静态验证。
-- 已知遗留: `image_gen.py:39` `GPT_IMAGE_2_MODEL` 与 `image_gen.py:521` `_decode_and_write` 全仓无引用，属本轮之前的存量死代码，按最小改动原则未处置，登记为后续技术债候选。
-
-### 2026-10-25 前端视觉改动对比 Demo 规则吸收与全量提交收口（Git 收口）
-
-- 当前状态: 规则资产已落盘并已提交推送 `main`（提交 `d8600c2d`）；工作树改动为单一业务目标（前端视觉对比 demo 闸门），无索引漂移。
-- 本轮交付: ① 新增 `frontend-design/references/visual-change-demo.md`（唯一权威细则：触发面与四类免触发面、对比形态 `M1`-`M4`、可判定性硬约束、保真五档样式来源、闸门语义、产物纪律）；② `frontend-design/SKILL.md` 第 2 步追加 1 行视觉改动对比闸门；③ `frontend-ui-visual-rules/SKILL.md` 暂停条件追加 1 行引用；④ `doc/6-review/` 新增 6-review 记录并登记 README 索引；⑤ 刷新 `skill-dictionary/data.js` 与 `字典.md`；⑥ 项目记忆与历史事件同步沉淀。
-- 关键决策: ① 规则补进既有 `frontend-design` 而非新建独立 skill 目录——它已是前端 UI/组件/样式改动的主路径，另两处只留单句引用，避免双权威日后各自漂移；② demo 必须继承项目真实样式（五档来源：真实构建产物 CSS → token 源文件 → 挂项目跑真实组件 → `M3` 截图 → `getComputedStyle` 兜底），手搓近似样式会让「演示通过、落地不符」比不出 demo 更糟；③ before 版是校准基准，before 偏了 after 的判断随之失效；④ 免 demo 仅四类且必须写明依据。
-- 验证: 两个 skill `quick_validate.py` 均 `Skill is valid!` 退出码 0（Windows 下需 `PYTHONUTF8=1`，脚本自身默认 GBK 解码会假失败）；三文件 UTF-8 且乱码替换符 0 命中；`references_total` 928→929 与实际新增 1 个 reference 一致；6-review 六维自查 PASS。仓库根仅 `package.json` 且无 `build` 脚本，编译闸门按规则判 `N/A`。
-- 知识库: 细则已完整沉淀于 `20-Knowledge/AI协作/前端样式改动先出对比demo.md`，项目记忆只留一行结论加指针，避免两处各写一遍导致口径漂移。
-
-### 2026-10-22 索引漂移识别与全量提交收口（Git 收口）
-
-- 当前状态: 工作树已按业务拆成 8 笔提交并推送 `origin/main`；本轮新增的索引漂移判据已写入 `git-collaboration-rules/references/staged-review-and-evidence.md`「索引漂移前置核对」。
-- 本轮交付: ① 索引被整体回退到 `3a9aa97e`（2026-10-15）的识别与恢复（392 条假删除 → 真实变更 106 项）；② Markdown 文档规则与 PPTX 外部种子；③ 生图配置统一目录；④ TAPD CLI 优先路由；⑤ 任务投影单会话唯一；⑥ design 组件库定位与 design+ 口径；⑦ `.system` 内置 skill 同步；⑧ 规则、记忆、字典与历史收口。
-- 关键决策: ① 批量「已暂存删除」先按三重判据识别索引漂移，禁止直接提交（会静默吞掉期间提交）；② 恢复只用混合 `git reset`，禁止 `checkout`/`restore`/`rm`；③ pptx 外部种子用 `.gitattributes` 的 `pptx/** -whitespace` 保留上游字节；④ 组件数按 `CATEGORIES`/`CATALOG` 守卫实测校正为 152。
-- 验证: git 规则 12 项、任务投影 87 项测试全绿；`POLLUTION: PASS`；每笔提交 pre/post gate 均 PASS；全量 476 项测试中 6 错 2 失败为 HEAD 基线同样存在的存量问题（本机 `~/.workbuddy` Python 软链失效、空 `skills/` 目录遮蔽、CRLF 存量）。
-
-### 2026-10-16 珍珠玻璃组件库后台化：后台承载全部组件示例（Goal 收口）
-
-- 当前状态: 151 个组件 **全部在管理后台可达并在后台内提供可操作示例**（覆盖率守卫 151/151），独立 `showcase.html` 入口已可逆退役、示例收敛为单轨。工作树未提交（无当轮 Git 授权）。
-- 本轮交付: 新增 `src/views/gallery/`（示例页 + 单元格 + 磁盘发现入口 + 受控回写 + 四类样本）、`src/data/view-registry.ts`（本地页面登记处）、覆盖率守卫四模块（裁决入口 / 可达图访问器 / 引用边遍历 / 源码解析口径）；`mock/server.mjs` 改为直接 import 分类单一数据源生成 10 条组件库菜单；`src/composables/auth.ts` 开入 2 行声明式登记缝隙。
-- 关键决策: ① 覆盖率不能靠改上游页面提高——139 个上游文件（含业务视图、路由、登记表）逐字节冻结且无冻结文件 import 本地模块，故新增本地后台路由页 + 单一登记缝隙；② 缝隙不按整文件豁免，改为「剥离声明行后必须等于上游字节」，缝隙外改动仍报 DRIFTED；③ 覆盖率判据要求「导入的本地名真被使用」，只 import 不渲染不计入，防批量导入刷满；④ 退役入口用临时目录搬移而非删除（本仓库配置 Git content filters，`git ls-files` 不能当还原兜底）。
-- 行数基准返工: 首版守卫 250/270 行、可达图工厂函数 157 行越基准，已拆为 90/167/107/115 与 151/181 行、最大函数 23 行；示例样本 666 行单文件无损拆为四类；三个样本文件写出为 CRLF 已按组件库 `eol=lf` 策略归一。
-- 验证: `ADMIN_COVERAGE: PASS(151/151)`、`CATEGORIES: PASS(10 类 151)`、`CATALOG: PASS(151)`、`FIDELITY: PASS(244 本地/139 上游)` + `SEAM`、`GUARD_SELFTEST: PASS`、`INVENTORY: PASS`、`COMPONENT_PARITY: PASS`、`PARITY: PASS(74)`、`POLLUTION: PASS`、`vue-tsc` 零报错、`vite build` 成功、单测 21/21；真实浏览器十分类挂载 11/8/16/33/31/12/6/20/8/6=151、空白卡片 0、渲染错误 0，输入回写 / 开关翻转 / 弹层开合 / 提示与确认宿主均真实状态迁移。证据见 `doc/5-tests/2026-10-16_193800_REQ-PEARL-ADMIN-GALLERY-001_组件库后台化_测试主文档.md` 与 `doc/6-review/2026-10-16_202200_珍珠玻璃组件库后台化_6-review.md`。
-- 守卫变异自证: 收窄示例页发现面 → `FAIL(75/151)`；给登记缝隙文件追加未声明行 → `FIDELITY: FAIL drifted=1`；两者还原后恢复 PASS 且文件校验和回到注入前。
-- 已知缺口: `ui/DataTable.vue` 无列排序（上游冻结 + 多页消费，需以需求立项）；上游 `motion.ts` 的 `revealPage` 无引用（冻结层，转评估）；画布类组件视觉只能前台取证（上游隐藏标签页停帧属预期）。
