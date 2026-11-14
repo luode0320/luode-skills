@@ -1,0 +1,570 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-07",
+  "description": "模型到前置提示词的唯一路由表。resolve_prompt.py 消费本文件；新增模型只需在此登记，不必改脚本。",
+  "match_order": [
+    "family_id",
+    "alias_exact",
+    "alias_contains",
+    "vendor_prefix",
+    "generic_fallback"
+  ],
+  "generic_family": "generic",
+  "ignored_files": [
+    {
+      "file": "qwen-preferences.md",
+      "reason": "上游空文件（2 字节），无可路由内容；保留快照以维持与上游 1:1 对齐，索引中标记 empty。"
+    }
+  ],
+  "families": [
+    {
+      "id": "generic",
+      "label": "通用（模型无关）",
+      "vendor": "any",
+      "priority": 0,
+      "aliases": [
+        "generic",
+        "unified",
+        "default",
+        "通用",
+        "公共",
+        "任意模型",
+        "any"
+      ],
+      "candidates": [
+        "Unified.md",
+        "hy4-agents.md",
+        "deepseek-4-1.md"
+      ],
+      "note": "兜底链：找不到具体模型时按顺序取第一份存在的文件。三者均为模型无关的工作区策略写法。"
+    },
+    {
+      "id": "claude-opus",
+      "label": "Claude Opus",
+      "vendor": "anthropic",
+      "priority": 50,
+      "aliases": [
+        "opus",
+        "claude opus",
+        "claude-opus",
+        "opus v2",
+        "claude opus 4",
+        "克劳德"
+      ],
+      "candidates": [
+        "opus v2.md",
+        "opus v1.md"
+      ],
+      "note": "v2 为较新版本；v1 保留作对照。"
+    },
+    {
+      "id": "claude-sonnet",
+      "label": "Claude Sonnet",
+      "vendor": "anthropic",
+      "priority": 49,
+      "aliases": [
+        "sonnet",
+        "claude sonnet",
+        "claude-sonnet",
+        "sonnet v2"
+      ],
+      "candidates": [
+        "Sonnet v2.md",
+        "sonnet v1.md"
+      ],
+      "note": "写作工作室（writer's room）框架。"
+    },
+    {
+      "id": "chatgpt-free",
+      "label": "ChatGPT 免费层",
+      "vendor": "openai",
+      "priority": 40,
+      "aliases": [
+        "chatgpt",
+        "gpt",
+        "gpt-4",
+        "openai",
+        "chatgpt free"
+      ],
+      "candidates": [
+        "0x8D-jailbreaks-chatgpt-free-tier.md"
+      ],
+      "note": "与 gemini-chat / grok-fast / kimi-standard 内容完全相同（REGISTER 组），任取其一。"
+    },
+    {
+      "id": "gpt-oss",
+      "label": "GPT-OSS 20B",
+      "vendor": "openai",
+      "priority": 39,
+      "aliases": [
+        "gpt-oss",
+        "gpt oss",
+        "oss 20b",
+        "gpt-oss-20b"
+      ],
+      "candidates": [
+        "gpt-oss-20b.md"
+      ],
+      "note": "Ollama Modelfile（FROM + SYSTEM）。"
+    },
+    {
+      "id": "gemini-3.1-pro",
+      "label": "Gemini 3.1 Pro",
+      "vendor": "google",
+      "priority": 46,
+      "aliases": [
+        "gemini 3.1",
+        "gemini-3.1",
+        "gemini 3.1 pro",
+        "gemini3.1",
+        "gemini pro",
+        "谷歌 gemini"
+      ],
+      "candidates": [
+        "gemini-3.1-pro.md"
+      ],
+      "note": "人格锁定 + [MaHii] 思考标记写法。"
+    },
+    {
+      "id": "gemini-4",
+      "label": "Gemini 4 Argon",
+      "vendor": "google",
+      "priority": 47,
+      "aliases": [
+        "gemini 4",
+        "gemini-4",
+        "gemini4",
+        "argon",
+        "gemini 4 argon",
+        "gemini"
+      ],
+      "candidates": [
+        "Gemini-4-Argon.md",
+        "0x8D-jailbreaks-gemini-chat.md"
+      ],
+      "note": "Operating Policy 写法，模型无关度较高，可跨厂商复用。"
+    },
+    {
+      "id": "grok-build",
+      "label": "Grok Build",
+      "vendor": "xai",
+      "priority": 44,
+      "aliases": [
+        "grok build",
+        "grok-build",
+        "build agent"
+      ],
+      "candidates": [
+        "Grok build.md"
+      ],
+      "note": "Agent 操作指令，面向应用构建场景。"
+    },
+    {
+      "id": "grok-4.7",
+      "label": "Grok 4.7",
+      "vendor": "xai",
+      "priority": 45,
+      "aliases": [
+        "grok 4.7",
+        "grok-4.7",
+        "grok4.7",
+        "grok"
+      ],
+      "candidates": [
+        "grok-4.7.md"
+      ],
+      "note": "App Builder 工作区指南。"
+    },
+    {
+      "id": "grok-fast",
+      "label": "Grok Fast",
+      "vendor": "xai",
+      "priority": 43,
+      "aliases": [
+        "grok fast",
+        "grok-fast",
+        "grok fast v2"
+      ],
+      "candidates": [
+        "0x8D-jailbreaks-grok-fast-v2.md",
+        "0x8D-jailbreaks-grok-fast.md"
+      ],
+      "note": "v2 为 <system> 块写法；grok-fast.md 与 REGISTER 组同内容。"
+    },
+    {
+      "id": "grok-config",
+      "label": "Grok 配置块",
+      "vendor": "xai",
+      "priority": 42,
+      "aliases": [
+        "grok config",
+        "grok cfg",
+        "cfg block"
+      ],
+      "candidates": [
+        "grok-config.txt"
+      ],
+      "note": "<CFG> 优先级与路由配置块，填进 harness 配置位而非对话。"
+    },
+    {
+      "id": "deepseek-v3",
+      "label": "DeepSeek V3",
+      "vendor": "deepseek",
+      "priority": 36,
+      "aliases": [
+        "deepseek v3",
+        "deepseek-v3",
+        "deepseek3",
+        "深度求索 v3"
+      ],
+      "candidates": [
+        "deepseek v3.md"
+      ],
+      "note": "官方系统提示风格。"
+    },
+    {
+      "id": "deepseek-v4",
+      "label": "DeepSeek V4",
+      "vendor": "deepseek",
+      "priority": 37,
+      "aliases": [
+        "deepseek v4",
+        "deepseek-v4",
+        "deepseek4",
+        "深度求索 v4"
+      ],
+      "candidates": [
+        "deepseek v4.md"
+      ],
+      "note": "官方系统提示风格。"
+    },
+    {
+      "id": "deepseek-4.1",
+      "label": "DeepSeek 4.1",
+      "vendor": "deepseek",
+      "priority": 38,
+      "aliases": [
+        "deepseek 4.1",
+        "deepseek-4.1",
+        "deepseek4.1",
+        "deepseek v4.1",
+        "deepseek-v4.1",
+        "ds 4.1",
+        "ds4.1",
+        "ds-v4.1",
+        "深度求索 4.1",
+        "deepseek"
+      ],
+      "candidates": [
+        "deepseek-4-1.md"
+      ],
+      "note": "Assistant Operating Specification 写法，模型无关度高，可作通用备选。"
+    },
+    {
+      "id": "glm-5.2",
+      "label": "GLM 5.2",
+      "vendor": "zhipu",
+      "priority": 52,
+      "aliases": [
+        "glm 5.2",
+        "glm-5.2",
+        "glm5.2",
+        "chatglm 5.2",
+        "智谱 5.2"
+      ],
+      "candidates": [
+        "glm-5.2.md"
+      ],
+      "note": "官方系统提示风格。"
+    },
+    {
+      "id": "glm-zcode-5.2",
+      "label": "GLM ZCode 5.2",
+      "vendor": "zhipu",
+      "priority": 53,
+      "aliases": [
+        "zcode 5.2",
+        "glm zcode 5.2",
+        "glm-zcode-5.2",
+        "zcode5.2"
+      ],
+      "candidates": [
+        "glm-zcode-5.2.md"
+      ],
+      "note": "ZCode harness 系统提示。"
+    },
+    {
+      "id": "glm-zcode-5.3",
+      "label": "GLM ZCode 5.3",
+      "vendor": "zhipu",
+      "priority": 54,
+      "aliases": [
+        "zcode 5.3",
+        "glm zcode 5.3",
+        "glm-zcode-5.3",
+        "zcode5.3",
+        "zcode"
+      ],
+      "candidates": [
+        "glm-zcode-5.3.md",
+        "glm-zcode-5.3-AGENTS.md"
+      ],
+      "note": "同时提供系统提示与 AGENTS.md 落盘版，按载体取用。"
+    },
+    {
+      "id": "glm-5.3-flash",
+      "label": "GLM 5.3 Flash",
+      "vendor": "zhipu",
+      "priority": 55,
+      "aliases": [
+        "glm 5.3",
+        "glm-5.3",
+        "glm5.3",
+        "glm 5.3 flash",
+        "5.3 flash",
+        "glm"
+      ],
+      "candidates": [
+        "glm-5-3-flash.md",
+        "glm5-3opencode.md"
+      ],
+      "note": "Assistant Operating Specification 写法；opencode 版为同族变体。"
+    },
+    {
+      "id": "kimi-k2",
+      "label": "Kimi K2",
+      "vendor": "moonshot",
+      "priority": 32,
+      "aliases": [
+        "kimi k2",
+        "kimi-k2",
+        "kimi2",
+        "moonshot k2",
+        "月之暗面 k2"
+      ],
+      "candidates": [
+        "kimi-k2.md"
+      ],
+      "note": "官方系统提示风格。"
+    },
+    {
+      "id": "kimi-k3",
+      "label": "Kimi K3",
+      "vendor": "moonshot",
+      "priority": 33,
+      "aliases": [
+        "kimi k3",
+        "kimi-k3",
+        "kimik3",
+        "kimi k3.1",
+        "kimik3.1",
+        "kimi",
+        "月之暗面"
+      ],
+      "candidates": [
+        "kimi-k3-agents.md",
+        "kimik3.1.md",
+        "0x8D-jailbreaks-kimi-standard.md"
+      ],
+      "note": "k3-agents 为工作区版，kimik3.1 为 Operating Policy 版，kimi-standard 为 REGISTER 组。"
+    },
+    {
+      "id": "qwen-3.7",
+      "label": "Qwen 3.7",
+      "vendor": "alibaba",
+      "priority": 28,
+      "aliases": [
+        "qwen 3.7",
+        "qwen-3.7",
+        "qwen3.7",
+        "通义千问 3.7"
+      ],
+      "candidates": [
+        "qwen-3.7.md"
+      ],
+      "note": "官方系统提示风格，篇幅最长的一份。"
+    },
+    {
+      "id": "qwen-3.8",
+      "label": "Qwen 3.8",
+      "vendor": "alibaba",
+      "priority": 29,
+      "aliases": [
+        "qwen 3.8",
+        "qwen-3.8",
+        "qwen3.8",
+        "qwen",
+        "通义千问",
+        "千问"
+      ],
+      "candidates": [
+        "qwen-3.8.md"
+      ],
+      "note": "Assistant Operating Specification 写法。"
+    },
+    {
+      "id": "mistral-large-4",
+      "label": "Mistral Large 4",
+      "vendor": "mistral",
+      "priority": 26,
+      "aliases": [
+        "mistral large 4",
+        "mistral-large-4",
+        "mistral 4",
+        "mistral"
+      ],
+      "candidates": [
+        "Mistral-Large-4.md"
+      ],
+      "note": "Agent 系统提示。"
+    },
+    {
+      "id": "gemma4",
+      "label": "Gemma 4",
+      "vendor": "google",
+      "priority": 24,
+      "aliases": [
+        "gemma 4",
+        "gemma4",
+        "gemma-4",
+        "gemma"
+      ],
+      "candidates": [
+        "gemma4.md"
+      ],
+      "note": "Ollama Modelfile（FROM + SYSTEM）。"
+    },
+    {
+      "id": "nemotron-3-ultra",
+      "label": "Nemotron 3 Ultra 550B A55B",
+      "vendor": "nvidia",
+      "priority": 22,
+      "aliases": [
+        "nemotron",
+        "nemotron 3",
+        "nemotron 3 ultra",
+        "nemotron-3-ultra"
+      ],
+      "candidates": [
+        "nemotron-3-ultra.md"
+      ],
+      "note": "Assistant Operating Specification 写法。"
+    },
+    {
+      "id": "step-5",
+      "label": "Step 5 Preview",
+      "vendor": "stepfun",
+      "priority": 20,
+      "aliases": [
+        "step 5",
+        "step-5",
+        "step5",
+        "step 5 preview",
+        "阶跃星辰"
+      ],
+      "candidates": [
+        "Step-5-preview.md"
+      ],
+      "note": "Workspace Operating Profile 写法。"
+    },
+    {
+      "id": "longcat",
+      "label": "LongCat 2.5",
+      "vendor": "longcat",
+      "priority": 18,
+      "aliases": [
+        "longcat",
+        "longcat 2.5",
+        "longcat-agents"
+      ],
+      "candidates": [
+        "longcat-agents.md"
+      ],
+      "note": "Assistant Operating Specification 写法。"
+    },
+    {
+      "id": "mimo",
+      "label": "MiMo V2.6",
+      "vendor": "xiaomi",
+      "priority": 16,
+      "aliases": [
+        "mimo",
+        "mimo 2.6",
+        "mimo v2.6",
+        "mimo-2.6"
+      ],
+      "candidates": [
+        "mimo-2.6-agents.md"
+      ],
+      "note": "Assistant Operating Specification 写法。"
+    },
+    {
+      "id": "muse-spark",
+      "label": "Muse Spark 1.3 / Muse.ai",
+      "vendor": "muse",
+      "priority": 14,
+      "aliases": [
+        "muse",
+        "muse spark",
+        "muse spark 1.3",
+        "musespark",
+        "muse ai",
+        "muse-wonder"
+      ],
+      "candidates": [
+        "Muse spark 1.3.md",
+        "Muse-spark-1-3-v2.md",
+        "muse-ai-AGENTS.md",
+        "Muse-wonder.md"
+      ],
+      "note": "同族四份：部署策略版 / 运行时变体 / AGENTS 版 / wonder 版。"
+    },
+    {
+      "id": "spacebunny",
+      "label": "Space Bunny",
+      "vendor": "opencode",
+      "priority": 12,
+      "aliases": [
+        "space bunny",
+        "spacebunny",
+        "spacebunny-agents"
+      ],
+      "candidates": [
+        "spacebunny-agents.md"
+      ],
+      "note": "Assistant Operating Specification 写法。"
+    },
+    {
+      "id": "bigpickle",
+      "label": "Big Pickle（VANTA）",
+      "vendor": "opencode",
+      "priority": 10,
+      "aliases": [
+        "big pickle",
+        "bigpickle",
+        "vanta",
+        "bigpickle-opencode"
+      ],
+      "candidates": [
+        "0x8D-jailbreaks-BigPickle-opencode.md"
+      ],
+      "note": "VANTA 人格锁 + 显式操作底线。"
+    },
+    {
+      "id": "unified",
+      "label": "统一策略（Unified / Beam）",
+      "vendor": "any",
+      "priority": 5,
+      "aliases": [
+        "unified",
+        "beam",
+        "统一策略"
+      ],
+      "candidates": [
+        "Unified.md",
+        "Beam.md"
+      ],
+      "note": "Unified.md 与 Beam.md 内容一致，优先取 Unified.md。"
+    }
+  ]
+}
