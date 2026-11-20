@@ -1,6 +1,6 @@
 {
   "timezone": "Asia/Shanghai",
-  "report_output_dir": "/home/luode/code",
+  "report_output_dir": "D:/谷歌云盘/code",
   "include_uncommitted_changes": true,
   "uncommitted_max_paths": 5,
   "uncommitted_analysis_excluded_paths": [
@@ -83,47 +83,47 @@
   ],
   "projects": [
     {
-      "path": "/home/luode/code/ellipal_buysell_go",
+      "path": "G:/home/luode/ellipal_buysell_go",
       "name": "买卖币"
     },
     {
-      "path": "/home/luode/code/ellipal_market_activity",
+      "path": "G:/home/luode/ellipal_market_activity",
       "name": "市场活动"
     },
     {
-      "path": "/home/luode/code/ellipal_wallet_pay",
+      "path": "G:/home/luode/ellipal_wallet_pay",
       "name": "冷钱包打款项目"
     },
     {
-      "path": "/home/luode/code/EllipalFinance-go",
+      "path": "G:/home/luode/EllipalFinance-go",
       "name": "兑换"
     },
     {
-      "path": "/home/luode/code/EllipalNodeSync",
+      "path": "G:/home/luode/EllipalNodeSync",
       "name": "go-api服务"
     },
     {
-      "path": "/home/luode/code/ellipal-swap-java",
+      "path": "G:/home/luode/ellipal-swap-java",
       "name": "自有兑换"
     },
     {
-      "path": "/home/luode/code/ellipal_admin",
+      "path": "G:/home/luode/ellipal_admin",
       "name": "管理系统"
     },
     {
-      "path": "/home/luode/code/hedgeswapSignManager",
+      "path": "G:/home/luode/hedgeswapSignManager",
       "name": "冷钱包签名项目"
     },
     {
-      "path": "/home/luode/code/python_tools",
+      "path": "G:/home/luode/python_tools",
       "name": "python脚本项目"
     },
     {
-      "path": "/home/luode/code/ellipal_activity_world_cup",
+      "path": "G:/home/luode/ellipal_activity_world_cup",
       "name": "世界cup活动"
     },
     {
-      "path": "/home/luode/code/ellipal_stat",
+      "path": "G:/home/luode/ellipal_stat",
       "name": "数据统计清洗服务"
     }
   ]
