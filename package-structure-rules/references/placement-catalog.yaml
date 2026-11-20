@@ -1293,7 +1293,7 @@
         ".md"
       ],
       "node_kind": "file",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "AGENTS.md"
     },
     {
@@ -1311,7 +1311,7 @@
       ],
       "node_kind": "file",
       "content_must_match": "AGENTS.md",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "CLAUDE.md"
     },
     {
@@ -1411,7 +1411,7 @@
         ".md"
       ],
       "node_kind": "file",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "AGENTS.md"
     },
     {
@@ -1429,7 +1429,7 @@
       ],
       "node_kind": "file",
       "content_must_match": "AGENTS.md",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "CLAUDE.md"
     },
     {
@@ -1529,7 +1529,7 @@
         ".md"
       ],
       "node_kind": "file",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "AGENTS.md"
     },
     {
@@ -1547,7 +1547,7 @@
       ],
       "node_kind": "file",
       "content_must_match": "AGENTS.md",
-      "owner_skill": "project-rule-file-bootstrap-rules",
+      "owner_skill": "context-recovery-rules",
       "search_entry": "CLAUDE.md"
     },
     {

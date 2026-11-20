@@ -36,7 +36,7 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 ## 默认执行流程
 
 1. 默认先读 `references/validation-checklist.md`，先确认修复验证至少应覆盖哪些内容。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 3. 如需继续展开，再读 `references/validation-boundaries.md`，需要区分修复验证与功能验证 / 回归验证边界。
 4. 需要对照边界或正反例时，再读 `references/validation-template.md`，需要输出统一修复验证结论模板。
 5. 输出修复验证结论、未覆盖说明、关联测试目录和关闭建议。
@@ -69,8 +69,8 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 ## 执行结果归档要求
 
 - 将修复验证结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- **追加而不重写**：在现有 Bug 主文档末尾追加 `## 修复验证` 一节，不改写前序阶段已产出的 H1 开场段与既有附录；八字段开场与附录归位按 `references/validation-template.md` 与白话文档契约执行。
 - 当前 Bug 主文档至少写明验证环境、验证路径、通过项、未通过项、未覆盖说明和关闭建议。
-- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果本轮验证依赖测试脚本、测试数据或测试报告，应继续放在中央约定的测试主文档中，并在当前 Bug 主文档中记录对应测试目录路径。
 - 如果结论为待补测或带风险关闭，必须写明缺口和后续动作。
 - 真实阻断时，Bug 主文档必须包含共享契约的完整“任务阻断收口”，其中解决计划必须包含责任方、完成判据和 Bug 重验入口；`limited`、`not_applicable`、普通待补测和 P2/P3 风险不得创建 `BLK-*`。
@@ -80,9 +80,12 @@ description: 当 Bug 修复后需要验证是否真的修好、是否引入副�
 
 - 默认先读 `references/validation-checklist.md`。
 - 修复验证通过后、关闭 Bug 前，再读 `references/post-mortem.md` 做修复后复盘。
-- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在 判断与相邻测试 skill 的边界 时，再读 `references/validation-boundaries.md`。
 - 只有在 套用验证结论模板或对照样例 时，再读 `references/validation-template.md`。
 - 输出 Bug 验证结论前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先写修复是否有效和是否可放行，命令、样本和证据进入附录。
 - 若验证依赖浏览器、第三方接口或授权环境，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，区分可继续、受限交接和正式放行。
 - 只有关闭必需验证无法继续且无替代验证，或修复问题必须回改时，必须读取 `../artifact-delivery-gate-rules/references/task-blocker-closure-contract.md`；受限交接和普通待补测不适用。
+
+## 公共 Markdown 呈现路由
+
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

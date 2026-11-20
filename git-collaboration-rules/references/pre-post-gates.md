@@ -20,8 +20,13 @@
 - 本次新增或修改的 Go 测试必须位于根 `test/` 下；历史 `doc/5-tests/` 仅作为测试说明 / 证据文档，不作为活动测试代码根。
 - staged 不命中 `internal/service/[^/]+.go`。
 - `git diff --cached --check` 通过。
+- 代码项目最基本编译通过：按 `references/baseline-compile-gate.md` 选择入口并取得退出码 0；失败、超时或工具链缺失退出码为 19。
 
 机械 gate 不替代 staged 基础代码核查与基础验收。
+
+### 编译闸门回退
+
+脚本不可用时，按 `references/baseline-compile-gate.md` 的标记表手工执行对应编译命令，并保留真实命令、退出码与关键输出作为证据；不得以“看起来没问题”或历史构建结果替代当场执行。
 
 ### Post gate
 

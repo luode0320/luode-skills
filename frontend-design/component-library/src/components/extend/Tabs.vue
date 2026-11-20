@@ -163,10 +163,10 @@ watch(() => props.items.map(item => item.label).join('\u0000'), () => nextTick((
   height: var(--control-h);
   padding: 0 13px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink-muted);
   white-space: nowrap;
-  transition: color .2s ease, background .2s ease, box-shadow .2s ease;
+  transition: color .2s var(--ease-reveal), background .2s var(--ease-reveal), box-shadow .2s var(--ease-reveal);
 }
 .x-tabs-tab:hover:not(:disabled) { color: var(--ink); }
 .x-tabs-tab:disabled { color: var(--ink-faint); cursor: not-allowed; }
@@ -188,7 +188,7 @@ watch(() => props.items.map(item => item.label).join('\u0000'), () => nextTick((
   margin-right: -4px;
   border-radius: 9999px;
   color: var(--ink-faint);
-  transition: background .18s ease, color .18s ease;
+  transition: background 0.144s var(--ease-exit), color 0.144s var(--ease-exit);
 }
 .x-tabs-close:hover { background: var(--press-bg); color: var(--ink); }
 .x-tabs-body { min-width: 0; }

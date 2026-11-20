@@ -17,3 +17,12 @@
 - 内部调整：openapi 专用补录流程及状态/工时回读；CLI 只补 Windows/WSL UTF-8 临时脚本调用。身份、凭据和 API 字段仍引用原 Owner，修正 Bug 索引 5 个失效路径，补录与受委派执行分流。
 - 语义澄清：本次实例曾同时填 effort=1 和实际 1 小时；后续仅要求已完成修复工时时只填 timespent，明确要求预估时再写 effort，不照抄双填。
 - 裁决与验证：[吸收裁决表](../workbuddy-absorption-map.md)、[案例与校验](case-tapd-openapi-absorption.md)。
+
+## 2026-10-19 TAPD 操作统一 CLI 优先
+
+- 来源：用户指出 TAPD 任务误走浏览器并要求修正规则，使 CLI 成为默认通道，只有 CLI 无法处理时再回退。
+- 本地现状：`tapd-cli/SKILL.md` 有命令入口；`tapd-openapi/SKILL.md` 曾把单条读取引向 API；`authenticated-url-routing-rules/SKILL.md` 的通用网页默认规则可能覆盖 TAPD；评论与任务执行技能也各自声明通道。
+- 裁决与落点：以 `tapd-openapi/SKILL.md` 作为统一路由权威，顺序为 CLI → 直接 OpenAPI → 浏览器；更新 `tapd-cli`、`tapd-addcomment`、`tapd-task-executor` 及 URL 路由例外保持一致。只有 CLI 与 API 均无法满足页面专属操作，或用户明确要求直接操作页面时才用浏览器。
+- 整理去重：扫描 `tapd-cli`、`tapd-openapi`、`tapd-addcomment`、`tapd-task-executor`、`authenticated-url-routing-rules`；共发现原有通道说明不一致 3 处，统一为 CLI 优先并保留各 skill 的领域专属补充；无新增重复门控、孤立文件或断链。
+- 环境依赖与通用性：无新增环境配置，复用现有 CLI/API 凭据预检，不回显凭据；规则对所有 agent 通用。
+- 验证：5 个受影响 skill 的 `quick_validate.py` 均通过；字典已刷新；未执行 TAPD 真实 API/浏览器操作（本轮仅调整规则资产）。

@@ -3,7 +3,7 @@
    与 Tooltip 同一套定位与 pop 动效；差别是面板接指针事件、可点内部，
    hover 模式下给 120ms 宽限，允许指针从触发区移进卡片而不闪断。 */
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
     <slot />
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="panel"
@@ -144,11 +144,11 @@ onBeforeUnmount(() => {
   position: fixed;
   padding: 12px 14px;
   border-radius: var(--r-sm);
-  font-size: 13px;
+  font-size: var(--fs-body);
   line-height: 1.6;
   color: var(--ink);
 }
-.x-pop-title { font-size: 13px; font-weight: 640; margin-bottom: 4px; }
+.x-pop-title { font-size: var(--fs-body); font-weight: 640; margin-bottom: 4px; }
 .x-pop-text { color: var(--ink-muted); }
 .x-pop-slot:not(:first-child) { margin-top: 6px; }
 </style>

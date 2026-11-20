@@ -1,9 +1,9 @@
 # 珍珠玻璃组件库 · 组件目录索引
 
 > 本文件由 `scripts/build_component_catalog.mjs` 从组件源码自动生成，请勿手改；组件契约变化后重跑生成命令。
-> 共 152 个组件。
-> 物理目录：基础控件 27 · 业务组件 20 · 工作台版式（本地扩展） 8 · Arco 品类对齐（本地扩展） 83 · 自研图表 6 · 外壳布局 6 · 根级组件 2。
-> 语义分类（对齐 Arco 组件菜单）：通用 11 · 布局 8 · 导航 16 · 数据输入 33 · 数据展示 32 · 反馈 12 · 图表 6 · 业务组件 20 · 工作台版式 8 · 外壳与系统 6。
+> 共 154 个组件。
+> 物理目录：基础控件 27 · 业务组件 20 · 工作台版式（本地扩展） 9 · Arco 品类对齐（本地扩展） 84 · 自研图表 6 · 外壳布局 6 · 根级组件 2。
+> 语义分类（对齐 Arco 组件菜单）：通用 12 · 布局 8 · 导航 16 · 数据输入 33 · 数据展示 32 · 反馈 12 · 图表 6 · 业务组件 20 · 工作台版式 8 · 外壳与系统 7。
 
 ## 速查表
 
@@ -57,6 +57,7 @@
 | SearchForm | 业务组件 | 业务组件 | `@/components/business/SearchForm.vue` | — | 查询区：字段放默认插槽，回车即查询。查询 / 重置按钮统一在右侧。 |
 | UserSelect | 业务组件 | 业务组件 | `@/components/business/UserSelect.vue` | modelValue | 用户下拉：可搜索。valueKey 决定绑定的是用户 ID 还是昵称（部门负责人按昵称存储）。 |
 | ActivityList | 工作台版式 | 工作台版式（本地扩展） | `@/components/workspace/ActivityList.vue` | items | 动态列表：头像 + 主文 + 时间 + 右侧标记，用于「最近登录」这类流水。 |
+| AppearanceSettings | 外壳与系统 | 工作台版式（本地扩展） | `@/components/workspace/AppearanceSettings.vue` | — | 外观设置的正文：把四个正交维度放进同一个面板。 |
 | Band | 工作台版式 | 工作台版式（本地扩展） | `@/components/workspace/Band.vue` | — | 横带分层容器：监控页与详情页的整块分区（Stacked Bands）。 |
 | BentoCard | 工作台版式 | 工作台版式（本地扩展） | `@/components/workspace/BentoCard.vue` | — | 工作台卡片：主次布局的基本单元。span 决定栅格占位（复用 pages.css 的 bento-* 变体）， |
 | BentoGrid | 工作台版式 | 工作台版式（本地扩展） | `@/components/workspace/BentoGrid.vue` | — | 工作台网格：12 列自适应栅格容器，卡片按 BentoCard 的 span 语义落位。 |
@@ -85,6 +86,7 @@
 | CollapseItem | 数据展示 | Arco 品类对齐（本地扩展） | `@/components/extend/CollapseItem.vue` | name | 折叠子项：标题行 + 内容区，展开态、图标位置全部从父级 Collapse inject 读取。 |
 | ColorPicker | 数据输入 | Arco 品类对齐（本地扩展） | `@/components/extend/ColorPicker.vue` | — | 取色器：色块按钮点开面板，预设色板、原生取色盘与十六进制输入三路同源。 |
 | Comment | 数据展示 | Arco 品类对齐（本地扩展） | `@/components/extend/Comment.vue` | — | 评论：头像 + 作者 + 时间 + 正文，底部动作条可点或走 actions 插槽。 |
+| ConfirmButton | 通用 | Arco 品类对齐（本地扩展） | `@/components/extend/ConfirmButton.vue` | — | 确认落定按钮：一次操作里走完「提交 → 收拢成圆 → 描环 → 画勾」。 |
 | Countdown | 数据展示 | Arco 品类对齐（本地扩展） | `@/components/extend/Countdown.vue` | — | 倒计时：按目标时间戳或剩余秒数逐秒倒数，按格式串渲染，走到零时派发 finish。 |
 | DataList | 数据展示 | Arco 品类对齐（本地扩展） | `@/components/extend/DataList.vue` | data | 数据列表：一份 data 数组 + item 插槽渲染每行，支持分割线、加载骨架与空态。 |
 | DatePicker | 数据输入 | Arco 品类对齐（本地扩展） | `@/components/extend/DatePicker.vue` | — | 日期选择：用原生 Date 自绘月历网格，支持上下月切换、选日、今天与选中高亮。 |
@@ -538,7 +540,7 @@
 
 **事件**：`update:modelValue`(T)
 
-**参考实现**：`src/components/layout/AppearanceDialog.vue`、`src/views/Dashboard.vue`
+**参考实现**：`src/components/layout/AppearanceDialog.vue`、`src/components/workspace/AppearanceSettings.vue`、`src/views/Dashboard.vue`
 
 
 #### Select
@@ -1070,7 +1072,7 @@
 **事件**：`update:modelValue`(string \| number \| null)
 
 
-### 工作台版式（本地扩展）（8）
+### 工作台版式（本地扩展）（9）
 
 #### ActivityList
 
@@ -1086,6 +1088,23 @@
 | avatarSize | `number` | 否 | 30 |
 
 **导出类型**：`ActivityItem`
+
+
+#### AppearanceSettings
+
+外观设置的正文：把四个正交维度放进同一个面板。
+
+```vue
+<AppearanceSettings />
+```
+
+| prop | 类型 | 必填 | 默认 |
+| --- | --- | --- | --- |
+| sections | `AppearanceSection[]` | 否 | () => ['theme', 'accent', 'fontScale', 'density'] |
+
+**导出类型**：`AppearanceSection`
+
+**参考实现**：`src/components/layout/AppearanceDialog.vue`
 
 
 #### Band
@@ -1199,7 +1218,7 @@
 **导出类型**：`ShortcutItem`
 
 
-### Arco 品类对齐（本地扩展）（83）
+### Arco 品类对齐（本地扩展）（84）
 
 #### Affix
 
@@ -1288,7 +1307,7 @@
 | prop | 类型 | 必填 | 默认 |
 | --- | --- | --- | --- |
 | max | `number` | 否 | — |
-| size | `number` | 否 | 32 |
+| diameter | `number` | 否 | 32 |
 | total | `number` | 否 | — |
 
 
@@ -1351,12 +1370,12 @@
 按钮组：把若干个按钮拼成一条，相邻处只留一道描边、首尾各留一次圆角。
 
 ```vue
-<ButtonGroup size="md" direction="horizontal">内容</ButtonGroup>
+<ButtonGroup size="xs" direction="horizontal">内容</ButtonGroup>
 ```
 
 | prop | 类型 | 必填 | 默认 |
 | --- | --- | --- | --- |
-| size | `'md' \| 'sm'` | 否 | 'md' |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg'` | 否 | 'md' |
 | direction | `'horizontal' \| 'vertical'` | 否 | 'horizontal' |
 
 **插槽**：`default`
@@ -1597,6 +1616,28 @@
 **插槽**：`default`、`actions`、`(动态透传)`
 
 
+#### ConfirmButton
+
+确认落定按钮：一次操作里走完「提交 → 收拢成圆 → 描环 → 画勾」。
+
+```vue
+<ConfirmButton status="idle" variant="primary" size="md" type="button">内容</ConfirmButton>
+```
+
+| prop | 类型 | 必填 | 默认 |
+| --- | --- | --- | --- |
+| status | `'idle' \| 'pending' \| 'success' \| 'error'` | 否 | — |
+| variant | `'primary' \| 'secondary' \| 'ghost' \| 'text' \| 'danger'` | 否 | 'primary' |
+| size | `'md' \| 'sm'` | 否 | 'md' |
+| icon | `string` | 否 | — |
+| disabled | `boolean` | 否 | — |
+| block | `boolean` | 否 | true |
+| type | `'button' \| 'submit'` | 否 | 'button' |
+| successLabel | `string` | 否 | '操作已完成' |
+
+**插槽**：`default`
+
+
 #### Countdown
 
 倒计时：按目标时间戳或剩余秒数逐秒倒数，按格式串渲染，走到零时派发 finish。
@@ -1620,14 +1661,14 @@
 数据列表：一份 data 数组 + item 插槽渲染每行，支持分割线、加载骨架与空态。
 
 ```vue
-<DataList :data="[]" size="sm" />
+<DataList :data="[]" size="xs" />
 ```
 
 | prop | 类型 | 必填 | 默认 |
 | --- | --- | --- | --- |
 | data | `Array<Record<string, any>>` | 是 | — |
 | bordered | `boolean` | 否 | — |
-| size | `'sm' \| 'md' \| 'lg'` | 否 | 'md' |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg'` | 否 | 'md' |
 | split | `boolean` | 否 | true |
 | loading | `boolean` | 否 | — |
 
@@ -1830,7 +1871,7 @@
 | title | `string` | 否 | — |
 | tone | `'info' \| 'help'` | 否 | 'info' |
 | placement | `'top' \| 'bottom' \| 'left' \| 'right'` | 否 | 'top' |
-| size | `number` | 否 | 15 |
+| iconSize | `number` | 否 | 15 |
 | label | `string` | 否 | '查看说明' |
 | disabled | `boolean` | 否 | — |
 | delay | `number` | 否 | 120 |
@@ -2181,7 +2222,7 @@
 | percent | `number` | 是 | — |
 | type | `'line' \| 'circle'` | 否 | 'line' |
 | status | `'normal' \| 'success' \| 'error' \| 'warning'` | 否 | 'normal' |
-| size | `number` | 否 | 120 |
+| diameter | `number` | 否 | 120 |
 | showText | `boolean` | 否 | true |
 | strokeWidth | `number` | 否 | 8 |
 
@@ -2374,13 +2415,14 @@
 间距：给一组子项之间垫出统一距离，方向与对齐由一行 flex 决定。
 
 ```vue
-<Space direction="horizontal" size="sm" align="start">内容</Space>
+<Space direction="horizontal" size="xs" align="start">内容</Space>
 ```
 
 | prop | 类型 | 必填 | 默认 |
 | --- | --- | --- | --- |
 | direction | `'horizontal' \| 'vertical'` | 否 | 'horizontal' |
-| size | `'sm' \| 'md' \| 'lg' \| number` | 否 | 'md' |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg'` | 否 | 'md' |
+| gap | `number` | 否 | — |
 | align | `'start' \| 'center' \| 'end' \| 'baseline'` | 否 | 'center' |
 | wrap | `boolean` | 否 | false |
 | split | `boolean` | 否 | — |
@@ -2393,13 +2435,13 @@
 加载中：只渲染一个转圈，或用 wrapper 在内容上叠一层遮罩。
 
 ```vue
-<Spin size="sm">内容</Spin>
+<Spin size="xs">内容</Spin>
 ```
 
 | prop | 类型 | 必填 | 默认 |
 | --- | --- | --- | --- |
 | loading | `boolean` | 否 | true |
-| size | `'sm' \| 'md' \| 'lg'` | 否 | 'md' |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg'` | 否 | 'md' |
 | tip | `string` | 否 | — |
 | wrapper | `boolean` | 否 | — |
 

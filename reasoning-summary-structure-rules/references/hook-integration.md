@@ -4,7 +4,7 @@
 
 ## 为什么 hook 能提高触发准确率
 
-本 skill 的触发机制是「文本信号 + 闸门预声明」：`skill-hit-check-rules` 在每轮首条把本 skill 预声明为收口 Owner，模型在最终回复前按模板输出。这个机制的薄弱点是「收口前必须自觉想起并套用模板」——如果模型在最终回复时跳过总结容器，规则无法拦截。
+本 skill 的触发机制是「文本信号 + 描述路由」：宿主按 `description` 命中本 skill，模型在最终回复前按模板输出。这个机制的薄弱点是「收口前必须自觉想起并套用模板」——如果模型在最终回复时跳过总结容器，规则无法拦截。
 
 WorkBuddy hooks 提供两个强触发点：
 
@@ -47,7 +47,7 @@ hook 配置在 WorkBuddy 的设置文件 `hooks` 字段：
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CODEBUDDY_PROJECT_DIR/.workbuddy/hooks/summary-check.py\"",
+            "command": "python3 \"$CODEBUDDY_PROJECT_DIR/.workbuddy/hooks/summary-format-check.py\"",
             "timeout": 15
           }
         ]
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
 ```python
 #!/usr/bin/env python3
-"""summary-check.py - Stop 硬校验：缺总结容器或异步任务小节则打回"""
+"""summary-format-check.py - Stop 硬校验：缺总结容器或异步任务小节则打回"""
 import json, os, re, sys
 
 SUMMARY_MARK = "# 📋 本轮总结"
@@ -167,25 +167,6 @@ if __name__ == "__main__":
 - `Stop` 的 exit code 2 会把 stderr 注入下一条消息，Agent 会继续执行。若校验条件永远不满足，可能反复打回。
 - 本脚本只在「缺少总结容器」或「有异步信号但缺异步小节」两种明确缺口时打回；Agent 补写后即可通过，不会无限循环。
 - 如需更强防死循环，可在 `Stop` payload 的 `stop_hook_active` 字段为 true（表示已处于 stop hook 反馈循环）时直接放行一次，避免重复打回。
-
-### 任务状态检查（SUMMARY-GATE-PMW-002，已部署）
-
-除「缺总结容器打回」外，Stop 通道还承载「收口前任务状态检查」：agent 准备停止时若当前会话仍有未完成任务，则打回继续，把「模型自觉检查任务清单」升级为「平台强制」。
-
-- **已部署脚本**：`~/.workbuddy/hooks/summary-check.py`（用户级 `settings.json` 的 `hooks.Stop` 第二条，与 ralph-loop 的 `ralph-stop.py` 并列、互不干扰；ralph 管 loop-state.md 循环，summary-check 管收口前任务状态检查）。
-- **数据源**：`<cwd>/PROJECT_CURRENT.md` 的 v4 投影 registry（`BEGIN TASK PLAN PROJECTION` JSON 区块），按 Stop payload 的 `session_id`（缺失时回退 `WORKBUDDY_SESSION_ID` / `CODEBUDDY_MCP_CONFIG` 的 `X-WorkBuddy-Session-Id`）匹配当前会话 `active` / `blocked` projection。
-- **打回条件**：存在未完成 step（pending / in_progress）且未命中豁免 → stderr 注入剩余任务清单 + exit code 2。
-- **豁免清单**：Plan Mode（`<proposed_plan>` / `Plan Mode` 标记）；用户明确结束（“结束 / 停止 / 到此为止 / 不要继续 / 不要下一步建议 / 不要扩散 / 终止 / 停手”）；已输出「任务阻断收口」或 `BLK-*`；状态文件 `stop_hook_active=true`；打回次数达上限（3 次 / 10 分钟窗口，防死循环）。
-- **现网先例**：`ralph-stop.py` 自 2026-08-22 部署于同一 `hooks.Stop` 通道，当日调用 188 次、exit code 2 打回机制实测有效，证明该通道在 WorkBuddy 桌面版真实触发。
-
-### 投影中断防护（P0-2 + P1-1，2026-08-23 已部署）
-
-针对「平台中断（连续压缩上限 abort）后会话被伪装成完成」的帮凶链路，`summary-check.py` 在原有「未完成 step 打回」之上新增两层硬检测，二者都只对「投影本该存在/应当继续」的场景打回，不影响无投影的正常会话：
-
-- **P0-2 registry 损坏/空检测**：`registry is None` 时做二级判断——若 `PROJECT_CURRENT.md` 仍残留投影托管痕迹（`BEGIN/END TASK PLAN PROJECTION` marker）但 JSON 解析失败或为空，视为「投影丢失/损坏」，输出显式中断点 + exit code 2 打回；完全无托管痕迹才放行（`no_registry`）。
-- **P1-1 平台中断痕迹检测**：即便投影没有未完成 step（疑似被误标 completed），若 transcript 尾部命中宿主 abort 完整原话 `Aborting session for context compaction` / `stopping compact loop`，也输出显式中断点打回，阻断「已完成」式总结。
-
-**核心口径：平台中断 ≠ 完成。** 中断（连续压缩上限 abort / 超时 / 额度 / 非交互退出）发生时，投影必须保持 `in_progress` / `incomplete`，禁止标记 `completed` 或失活 `inactive`；只有真实验证通过后才能走 `complete` 收口。投影写入端（`task-plan-rehydration-rules`）已同步加固：单条损坏投影写入时被隔离，不再阻塞新会话投影落盘（避免 registry 被整体清空导致 hook 失去防护依据）。
 
 ## 实测注意事项（重要）
 

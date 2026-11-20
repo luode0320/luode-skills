@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* 验证码输入：定长数字格，逐格输入自动跳格，退格回跳，支持整串粘贴。
    输入过程用 tabular-nums 保证数字不跳动；完成后自动聚焦到最后一格。 */
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   modelValue?: string
@@ -85,6 +85,17 @@ function onArrow(index: number, step: number) {
   cells.value[next]?.focus()
 }
 
+/* autofocus 之前只声明、从未生效（契约死项）：模板上写原生 autofocus 对 SPA 里
+   动态插入的节点不可靠，统一在挂载后手动聚焦。已有部分输入时聚焦到第一个空格，
+   比固定聚焦首格更贴近「续填」的真实场景。 */
+onMounted(() => {
+  if (!props.autofocus) return
+  const empty = digits.value.findIndex(char => !char)
+  const index = empty === -1 ? props.length - 1 : empty
+  active.value = index
+  nextTick(() => cells.value[index]?.focus())
+})
+
 watch(() => props.modelValue, (value) => {
   if ((value ?? '').length === props.length) active.value = props.length - 1
 })
@@ -137,7 +148,7 @@ defineExpose({ focus: () => cells.value[Math.min(active.value, props.length - 1)
   outline: none;
   transition: border-color var(--ease-premium) .2s, box-shadow var(--ease-premium) .2s, background var(--ease-premium) .2s;
 }
-.x-vcode-cell::placeholder { font-size: 12px; font-weight: 400; color: var(--ink-faint); }
+.x-vcode-cell::placeholder { font-size: var(--fs-sm); font-weight: 400; color: var(--ink-faint); }
 .x-vcode-cell:focus {
   border-color: transparent;
   background: var(--surface-solid);

@@ -1,6 +1,0 @@
-interface:
-  display_name: "会话标题规则"
-  short_description: "通过统一 MCP 工具优先更新当前会话标题，并保留原生工具回退"
-  default_prompt: "Use $thread-title-rules to keep this thread title aligned with the current task throughout the conversation, not only at final summary time. When the user asks a clear question, or when a goal is created/resumed, context is resumed after compression, or a long-running task enters a stable new phase, extract a stable 8-24 character Chinese task topic. Discover and call `rename_current_thread` first with only the `title`; never pass or guess a thread ID, and stop immediately after `RENAMED`. If the first call returns `INVALID_TITLE`, correct the title and retry MCP at most once; if that second call still fails for any reason, skip without native fallback. If the MCP tool is unavailable or the first call fails for another reason, use `set_thread_title` at most once only when it can directly target the current thread. Never use `list_threads`, cwd, timestamps, previews, or title similarity to guess the current thread. Skip vague topics, accurate existing titles, small internal step changes, explicit user opt-out, or unavailable real tools, and report the real path or skip reason."
-policy:
-  allow_implicit_invocation: true

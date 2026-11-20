@@ -112,7 +112,7 @@ function pick(option: CascaderPanelOption, depth: number) {
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
   transition: background var(--ease-premium) .2s, color var(--ease-premium) .2s;

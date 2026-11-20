@@ -2,6 +2,7 @@
 /* 评分：五角星按整数或半星打分，hover 预览、点击定值、再点同一值得可清空。
    星星是自绘 SVG（实心填充走 currentColor），不引图标库，避免描边星在选中态显脏。 */
 import { computed, ref } from 'vue'
+import { pressSettle } from '@/composables/morph'
 
 const props = withDefaults(defineProps<{
   modelValue?: number
@@ -67,6 +68,9 @@ function pick(event: PointerEvent) {
   if (props.readonly || props.disabled) return
   const next = valueOf(event)
   hover.value = null // 立即清除预览态，让 shown 回落到真实绑定值，点击后立即上色
+  /* 被点中的那颗星按一下再落定：星标是「评分落定」的动作，
+     给一次按压比整排一起变色更像真的在按 */
+  pressSettle(event.currentTarget as HTMLElement, 0.86)
   emit('update:modelValue', props.allowClear && next === props.modelValue ? 0 : next)
 }
 
@@ -138,7 +142,7 @@ function onKey(event: KeyboardEvent) {
   height: 24px;
   padding: 0;
   color: var(--ink-faint);
-  transition: color .18s ease, transform .18s ease;
+  transition: color .18s var(--ease-reveal), transform .18s var(--ease-glide);
 }
 .x-rate:not(.is-readonly):not(.is-disabled) .x-star { cursor: pointer; }
 .x-rate:not(.is-readonly):not(.is-disabled) .x-star:hover { transform: scale(1.08); }
@@ -148,5 +152,5 @@ function onKey(event: KeyboardEvent) {
 .x-star-fill { position: absolute; inset: 0; width: 100%; height: 100%; }
 .x-star-fill { color: var(--blue); }
 .x-star-fill.is-half { clip-path: inset(0 50% 0 0); }
-.x-rate-value { margin-left: 6px; font-size: 13px; font-weight: 620; color: var(--ink-muted); }
+.x-rate-value { margin-left: 6px; font-size: var(--fs-body); font-weight: 620; color: var(--ink-muted); }
 </style>

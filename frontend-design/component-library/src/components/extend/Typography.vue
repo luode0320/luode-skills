@@ -101,13 +101,13 @@ const copyLabel = computed(() => {
 <style scoped>
 .x-typo { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
 .x-typo.is-paragraph { display: flex; }
-.x-typo-el { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.62; }
+.x-typo-el { margin: 0; color: var(--ink); font-size: var(--fs-body); line-height: 1.62; }
 .x-typo.is-title .x-typo-el { font-weight: 660; line-height: 1.35; }
 .x-typo.is-title .x-typo-el:is(h1) { font-size: 22px; }
 .x-typo.is-title .x-typo-el:is(h2) { font-size: 19px; }
 .x-typo.is-title .x-typo-el:is(h3) { font-size: 16px; }
-.x-typo.is-title .x-typo-el:is(h4) { font-size: 14px; }
-.x-typo.is-title .x-typo-el:is(h5) { font-size: 13px; }
+.x-typo.is-title .x-typo-el:is(h4) { font-size: var(--fs-lg); }
+.x-typo.is-title .x-typo-el:is(h5) { font-size: var(--fs-body); }
 .x-typo.is-paragraph .x-typo-el { color: var(--ink-muted); }
 .x-typo-el.is-ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .x-typo-el.is-clamp { overflow-wrap: anywhere; }
@@ -121,7 +121,7 @@ const copyLabel = computed(() => {
   background: var(--groove-bg);
   box-shadow: var(--groove-inset);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-sm);
 }
 .x-typo.is-disabled .x-typo-el { color: var(--ink-faint); }
 .x-typo-copy {

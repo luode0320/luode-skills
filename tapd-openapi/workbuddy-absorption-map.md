@@ -18,3 +18,5 @@
 | 5个Bug API文档入口失效 | 短命名与磁盘不一致 | 合并 | 主 SKILL Bug 索引 | 改为真实下划线命名，不建兼容副本 | 文件存在性校验 | 通用 |
 | PowerShell/WSL多层引号失败 | CLI 无安全运行提示 | 合并 | CLI UTF-8临时脚本示例 | CLI仅链接业务流程不复写 | Windows/WSL/Python；无API写入冒烟 | 通用（平台分支） |
 | 固化本次人名、项目和Bug编号 | 用户仅授权经验吸收 | 拒绝 | 仅在来源记录保留案例 | 通用流程动态核对身份和项目 | N/A | 通用 |
+
+| 2026-10-19 TAPD 路由纠偏 | TAPD 查询与操作统一 CLI 优先；CLI 不支持或不能满足时直用 OpenAPI；浏览器仅用于 CLI/API 均无法完成的页面专属操作 | 合并：此前 tapd-openapi 描述把单条读取导向 API，authenticated URL 通用 Chrome 默认也可能覆盖 TAPD | tapd-openapi/SKILL.md 定义权威顺序；tapd-cli、tapd-addcomment、tapd-task-executor 与 authenticated-url-routing-rules 引用一致顺序 | 合并重复路由说明到 OpenAPI 权威；各执行 skill 仅保留领域入口；同域扫描 5 个技能，未发现新增重复门控或孤立产物 | 无新增环境依赖；复用现有 CLI/API 鉴权，不保存凭据 | 通用 |

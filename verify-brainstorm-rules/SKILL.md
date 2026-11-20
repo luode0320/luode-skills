@@ -1,6 +1,6 @@
 ---
 name: verify-brainstorm-rules
-description: 当用户提出"验证功能""验证这个功能""验证刚刚改动的代码""验证一下""再检查一遍""再检查一下改动""检查一下""复查一下"（追问轮同样触发，不因上一轮已做收敛验证而豁免），或编码完成、收敛验证通过后需要主动挖掘潜在隐患时触发。这是编码完成后"发散式对抗验证"的唯一 Owner：以只读方式对当前改动及其关联模块做 13 维头脑风暴（安全、性能、逻辑、边界、并发、异常、精度、资源、兼容、可观测性、配置、业务视角、代码格式与风格），产出结构化问题清单（P0/P1/P2 + 触发路径 + 修复建议）并落盘留痕，不修改任何代码；代码格式与风格的判据权威仍归 code-style-consistency-rules，本 skill 只做偏离发现；发散允许沿调用关系与数据流外扩一层，但受噪音上限与严重度收敛约束；裁决权始终在用户手上，确认后的修复回流 code-quality-rules 的最小改动收敛，真问题转 bug-intake-rules。不要用它代替 functional-validation-rules（改动是否做对）、bug-validation-rules（Bug 修复闭环）、test-regression-rules（旧功能是否被带坏）或 test-strategy-rules（测试策略与资产治理）。
+description: 当用户说「验证功能 / 验证这个功能 / 验证刚刚改动的代码 / 验证一下 / 再检查一遍 / 复查一下 / 检查一下」（追问轮同样触发），或编码完成、收敛验证通过后需要主动挖掘隐患时触发。编码完成后的发散式对抗验证唯一 Owner：只读地对当前改动及关联模块做多维度头脑风暴（安全、性能、逻辑、边界、并发、异常、精度、资源、兼容、可观测性、配置、业务视角），产出结构化问题清单（P0/P1/P2 + 触发路径 + 修复建议）并落盘留痕，不修改任何代码。代码风格判据归 `code-style-consistency-rules`；裁决权在用户，确认后回流 `code-quality-rules`，真问题转 `bug-intake-rules`。不代替 `functional-validation-rules`、`bug-validation-rules` 或 `test-strategy-rules`。
 ---
 
 # 验证发散规则（verify-brainstorm-rules）
@@ -96,7 +96,7 @@ flowchart LR
 - 不负责安全专项深度审计与漏洞定级标准（`code-security-audit-v2` 类安全审计 skill）；本 skill 只做安全维度的广度发现，命中深度需求时转交安全审计。
 - 不负责修复实现，不负责 Bug 主文档维护（`bug-intake-rules`）。
 - 覆盖代码格式与风格的偏离**发现**（第 13 维），但不持有风格判据权威——判据与 `6-review` 的 `STYLE: PASS / FIX_REQUIRED` 判定仍归 `code-style-consistency-rules`；本 skill 不主动发起全仓统一格式化或大面积风格清理。
-- 不把"发散"扩张成全项目巡检；体系级问题应回到 `skill-audit-rules`，架构级问题回到架构文档域。
+- 不把"发散"扩张成全项目巡检；体系级问题走专项重构，架构级问题回到架构文档域。
 
 ## 需要暂停并确认的条件
 

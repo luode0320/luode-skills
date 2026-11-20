@@ -55,7 +55,7 @@ const items = computed(() => props.data.map((item) => ({
 <style scoped>
 .x-desc { min-width: 0; }
 .x-desc-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.x-desc-title { margin: 0; font-size: 14px; font-weight: 650; color: var(--ink); letter-spacing: -.01em; }
+.x-desc-title { margin: 0; font-size: var(--fs-lg); font-weight: 650; color: var(--ink); letter-spacing: -.01em; }
 .x-desc-extra { flex: none; display: flex; align-items: center; gap: 8px; }
 
 /* 栅格主体：列数由内联 style 决定，行间距靠 gap，跨列项用 gridColumn span */
@@ -67,8 +67,8 @@ const items = computed(() => props.data.map((item) => ({
 /* 竖排：标签在上、值在下 */
 .x-desc.is-vertical .x-desc-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
-.x-desc-label { font-size: 13px; color: var(--ink-muted); white-space: nowrap; }
-.x-desc-value { margin: 0; font-size: 13px; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.x-desc-label { font-size: var(--fs-body); color: var(--ink-muted); white-space: nowrap; }
+.x-desc-value { margin: 0; font-size: var(--fs-body); color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
 
 /* 带边框表格态：单元格铺实色、格间留 1px 缝露出容器底色成线，
    这样跨列项的分隔线自动对齐，不需要按「每行几项」假设 nth-child。 */

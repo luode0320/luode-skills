@@ -4,7 +4,7 @@
    按 trigger 列表响应交互、把开合态以 popupVisible 双向同步出去。
    浮层内容与样式完全交给调用方，本组件不自带任何外观。 */
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 type Placement = 'top' | 'bottom' | 'left' | 'right' | 'bottom-start' | 'bottom-end'
@@ -139,6 +139,9 @@ watch(() => props.popupVisible, (value) => { if (inner.value !== value) apply(va
 
 watch(() => props.placement, () => { if (inner.value) nextTick(place) })
 
+/* 运行中被置为禁用时立刻收起：否则浮层会挂着一个已失效的触发区，只能靠点外部关闭 */
+watch(() => props.disabled, (value) => { if (value && inner.value) setVisible(false) })
+
 onBeforeUnmount(() => {
   window.clearTimeout(timer)
   toggleListeners(false)
@@ -150,6 +153,8 @@ onBeforeUnmount(() => {
     ref="anchor"
     class="x-trigger"
     :aria-expanded="inner"
+    :aria-disabled="props.disabled || undefined"
+    :data-disabled="props.disabled || undefined"
     @click="onOpen($event, 'click')"
     @pointerenter="onOpen($event, 'hover')"
     @pointerleave="onLeave"
@@ -160,7 +165,7 @@ onBeforeUnmount(() => {
     <slot />
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="inner"
         ref="popup"
@@ -177,6 +182,9 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .x-trigger { display: inline-flex; }
+/* 禁用只管开合，不接管外观：留 not-allowed 这一层最小提示，
+   触发区里的按钮/图标要变灰仍由调用方按 [data-disabled] 自行处理 */
+.x-trigger[data-disabled] { cursor: not-allowed; }
 /* 只做定位容器，外观（玻璃、边框、内边距）由调用方经 popupClass 或插槽内容给 */
 .x-trigger-popup { position: fixed; }
 </style>

@@ -306,16 +306,10 @@ def sync_recent_sessions(
         markers = _validate_markers(document)
 
         if markers is None:
-            # 无 marker：优先在任务投影 marker 前插入，否则追加到文件末尾
-            proj_idx = document.find("<!-- BEGIN TASK PLAN PROJECTION -->")
-            if proj_idx >= 0:
-                before = document[:proj_idx].rstrip("\n")
-                after = document[proj_idx:]
-                document = before + "\n\n" + section + "\n\n" + after
-            else:
-                if not document.endswith("\n"):
-                    document += "\n"
-                document += section
+            # 无 marker：追加到文件末尾
+            if not document.endswith("\n"):
+                document += "\n"
+            document += section
             action = "created"
         else:
             # 已有 marker：只替换区块

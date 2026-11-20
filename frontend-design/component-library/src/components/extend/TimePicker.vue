@@ -3,7 +3,7 @@
    面板定位与关外逻辑照 Select.vue 的写法：Teleport 到 body + fixed 定位 + overlayEnter pop 语态。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -165,7 +165,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else name="chevronDown" :size="15" class="x-time-caret" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="panel"
@@ -219,7 +219,7 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-timepicker { display: inline-flex; width: 100%; }
 .x-time-trigger { width: 100%; cursor: pointer; justify-content: space-between; text-align: left; color: var(--ink); }
-.x-time-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-time-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-time-value.is-placeholder { color: var(--ink-faint); }
 .x-time-caret { color: var(--ink-soft); flex: none; }
 .x-time-panel { border-radius: var(--r-md); padding: 10px; }
@@ -240,10 +240,10 @@ onBeforeUnmount(() => hide())
   line-height: 30px;
   text-align: center;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink-muted);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-time-opt:hover { background: var(--hover-bg); color: var(--ink); }
 .x-time-opt.is-selected { background: var(--blue); color: var(--plate-ink); font-weight: 620; }

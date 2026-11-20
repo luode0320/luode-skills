@@ -3,7 +3,7 @@
    浮层走 .m-float 材质与 pop 动效；定位按触发区实测尺寸计算，超出视口自动翻面并夹边。
    最近修改时间：2026-10-17 21:54:00；改动原因：补齐图标式气泡帮助，指针与焦点各自独立触发。 */
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -14,8 +14,9 @@ const props = withDefaults(defineProps<{
   /** info 用主蓝色信息圈，help 用中性墨色问号圈 */
   tone?: 'info' | 'help'
   placement?: 'top' | 'bottom' | 'left' | 'right'
-  /** 图标边长，点击区随它放大但保底 24px */
-  size?: number
+  /** 图标边长，点击区随它放大但保底 24px。
+      用 iconSize 而不是 size：size 专指控件档位，图标边长是几何量 */
+  iconSize?: number
   /** 按钮的可读名称，读屏用户听到的就是它 */
   label?: string
   disabled?: boolean
@@ -23,7 +24,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   tone: 'info',
   placement: 'top',
-  size: 15,
+  iconSize: 15,
   label: '查看说明',
   delay: 120,
 })
@@ -42,7 +43,7 @@ const id = `ht-${Math.random().toString(36).slice(2, 8)}`
 let timer: number | undefined
 
 /* 点击区随图标放大但保底 24px：小图标不缩水可点面积，大图标也不会溢出按钮 */
-const hitSize = computed(() => `${Math.max(24, props.size + 9)}px`)
+const hitSize = computed(() => `${Math.max(24, props.iconSize + 9)}px`)
 
 /** [参数] 无 [返回] 无；按触发区与浮层实测尺寸算出贴边位置并夹进视口 */
 function place() {
@@ -136,13 +137,13 @@ onBeforeUnmount(() => { window.clearTimeout(timer); bindReposition(false) })
     @blur="release('focus')"
     @keydown.esc.stop="dismiss"
   >
-    <svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg :width="iconSize" :height="iconSize" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path :d="PATHS[tone]" />
     </svg>
   </button>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         :id="id"
@@ -169,7 +170,7 @@ onBeforeUnmount(() => { window.clearTimeout(timer); bindReposition(false) })
   vertical-align: middle;
   line-height: 0;
   color: var(--ink-muted);
-  transition: color .2s ease, background .2s ease;
+  transition: color .2s var(--ease-reveal), background .2s var(--ease-reveal);
 }
 .x-help.is-info { color: var(--blue); }
 .x-help:hover:not(:disabled) { background: var(--hover-bg); color: var(--ink); }
@@ -181,7 +182,7 @@ onBeforeUnmount(() => { window.clearTimeout(timer); bindReposition(false) })
   max-width: 260px;
   padding: 8px 11px;
   border-radius: var(--r-xs);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--ink);
   box-shadow: var(--e2);

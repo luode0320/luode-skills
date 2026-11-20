@@ -70,8 +70,8 @@ EXPECT_COMPOSABLES = [
     "appearance", "ask", "auth", "confirm", "dept", "dict", "focus", "list",
     "motion", "neural", "permissionGraph", "toast", "view", "viewport",
 ]
-EXPECT_STYLES = ["tokens", "base", "materials", "components", "instruments", "layout", "pages"]
-STYLE_ORDER = ["tokens", "base", "materials", "components", "instruments", "layout", "pages"]
+EXPECT_STYLES = ["tokens", "base", "materials", "components", "instruments", "layout", "pages", "overrides"]
+STYLE_ORDER = ["tokens", "base", "materials", "components", "instruments", "layout", "pages", "overrides"]
 
 failures: list[str] = []
 
@@ -140,13 +140,15 @@ def main() -> int:
     ws_exported = set(re.findall(r"export \{ default as (\w+) \}", ws_index))
     check(not (set(EXPECT_WORKSPACE) - ws_exported), f"workspace/index.ts 缺导出: {sorted(set(EXPECT_WORKSPACE) - ws_exported)}")
 
-    # 3. 七层样式文件齐全且 main.ts 按规范顺序引入。
+    # 3. 八层样式文件齐全且 main.ts 按规范顺序引入。
+    #    前七层属上游冻结面，最后一层 overrides 是本地覆盖层——顺序在此尤其要紧：
+    #    它必须排在 pages 之后，否则压不住上游声明，覆盖会静默失效。
     for name in EXPECT_STYLES:
         check((SRC / "styles" / f"{name}.css").exists(), f"缺少样式层: {name}.css")
     main_ts = (SRC / "main.ts").read_text(encoding="utf-8")
     positions = [main_ts.find(f"./styles/{n}.css") for n in STYLE_ORDER]
-    check(all(p >= 0 for p in positions), "main.ts 未引入全部七层样式")
-    check(positions == sorted(positions), "main.ts 样式引入顺序违反七层规范")
+    check(all(p >= 0 for p in positions), "main.ts 未引入全部八层样式")
+    check(positions == sorted(positions), "main.ts 样式引入顺序违反八层规范（overrides 必须在最后）")
 
     # 4. composables 齐全。
     for name in EXPECT_COMPOSABLES:

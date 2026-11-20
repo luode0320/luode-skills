@@ -27,7 +27,7 @@ description: 仅当当前会话处于 Goal active 且用户当前消息明确表
 - 只负责编排既有代码规则、观察增量变化、记录 finding 和发送通知。
 - 不创建新代码规范，不复制 Owner 正文、路由常量或来源映射，不回写 `PROJECT_STYLE.md`，不创建项目私有 Skill。
 - 不调用阶段审查、最终收口、测试执行、验收、交付、Git、需求、Bug、状态管理或其他元流程 Skill。
-- `code-context-resync-rules` 不是 Owner；每个扫描周期直接重新读取最新 diff。
+- 每个扫描周期直接重新读取最新 diff。
 - `codegraph-analysis-rules` 不是 Owner；复杂影响面由主流程按需单独调用。
 
 ## 状态接口

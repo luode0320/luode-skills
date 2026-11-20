@@ -10,6 +10,8 @@ description: 当新增或修改 React、Vue、前端组件拆分、组件目录�
 
 ## Skill 作用与适用场景
 
+- 当用户要求使用 design 组件库时，页面骨架、信息层级和视觉编排先由 `frontend-design` 的 design+ 模式裁定；本 skill 只在该设计落地后补充组件职责、状态归属、props / events 和复用边界，不把“组件库”误解为只做组件替换。
+
 - 约束组件拆分粒度，防止页面逻辑、状态和渲染细节堆成一个大组件。
 - 明确 props、emits、slots、children、回调和数据流的边界。
 - 判断状态应留在局部、上提到父层，还是进入全局状态。

@@ -3,7 +3,7 @@
    只在光标前最近一个触发符到光标之间没有空白时才算命中，避免误触发。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface MentionOption {
@@ -160,7 +160,7 @@ onBeforeUnmount(() => hide())
       />
     </span>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="menu"
@@ -209,13 +209,13 @@ onBeforeUnmount(() => hide())
   min-height: 32px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
-  transition: background .15s ease;
+  transition: background .15s var(--ease-reveal);
 }
 .x-mention-label { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.x-mention-value { font-size: 11px; }
+.x-mention-value { font-size: var(--fs-caption); }
 .x-mention-option.is-active { background: var(--hover-bg); }
-.x-mention-empty { padding: 14px 10px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+.x-mention-empty { padding: 14px 10px; font-size: var(--fs-sm); color: var(--ink-soft); text-align: center; }
 </style>

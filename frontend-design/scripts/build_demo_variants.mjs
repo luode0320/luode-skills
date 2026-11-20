@@ -70,6 +70,19 @@ const OVERLAY_WIDTH_VARIANTS = {
   FormDialog: [480, 760],
 }
 
+/* 数值 prop 的组件级值域：同一个 prop 名在不同组件里量纲不同，全局档位会越界。
+   TickRing.size 是外环直径（默认 168），走全局 size 档 [16,28,44] 会被缩成 16px 的
+   一小块，卡片里既看不出刻度也看不出占比；IconButton / Icon 的 size 是图标边长
+   （默认 17 / 18），44 会撑破 32px 的按钮外框。两者都必须围绕各自默认值取档。
+   键为组件名，值里按 prop 名给档位；未登记的组件继续走 NUMBER_VARIANTS。 */
+const NUMBER_VARIANTS_BY_COMPONENT = {
+  TickRing: { size: [120, 168, 220] },
+  IconButton: { size: [14, 20, 26] },
+  Icon: { size: [14, 20, 26] },
+  AvatarGroup: { diameter: [24, 32, 40] },
+  Progress: { diameter: [80, 120, 160] },
+}
+
 /**
  * 按顶层竖线切分类型串，忽略尖括号、花括号、方括号与圆括号内部的竖线。
  *
@@ -255,10 +268,17 @@ function derive(comp, base = {}) {
       if (on && SAFE_FALSE_BOOLEANS.has(prop.name)) push(`关闭 ${prop.name}`, { [prop.name]: false }, 'boolean')
       if (!on && SAFE_BOOLEANS.has(prop.name)) push(`开启 ${prop.name}`, { [prop.name]: true }, 'boolean')
     }
-    if (kind === 'number' && Array.isArray(NUMBER_VARIANTS[prop.name]) && NUMBER_VARIANTS[prop.name].length) {
-      /* 弹层宽度优先取该组件的专属档位，避免被通用 width 档压成窄边 */
-      const tiers = (prop.name === 'width' && OVERLAY_WIDTH_VARIANTS[name]) || NUMBER_VARIANTS[prop.name]
-      for (const n of tiers) push(`${prop.name}=${n}`, { [prop.name]: n }, 'number')
+    if (kind === 'number') {
+      /* 取值优先级：组件专属档位 → 弹层宽度专属档 → 全局同名字档。
+         组件专属必须排在最前，否则 TickRing.size 这类「同名不同量纲」的 prop
+         会被全局档位覆盖成越界值。 */
+      const own = NUMBER_VARIANTS_BY_COMPONENT[name]?.[prop.name]
+      const tiers = own
+        || (prop.name === 'width' && OVERLAY_WIDTH_VARIANTS[name])
+        || NUMBER_VARIANTS[prop.name]
+      if (Array.isArray(tiers) && tiers.length) {
+        for (const n of tiers) push(`${prop.name}=${n}`, { [prop.name]: n }, 'number')
+      }
     }
   }
   return out

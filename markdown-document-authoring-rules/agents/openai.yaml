@@ -1,0 +1,4 @@
+interface:
+  display_name: "通用 Markdown 文档写作与呈现规则"
+  short_description: "统一 Markdown 工程文档的结构、图形和视觉验收"
+  default_prompt: "按领域 skill 保留业务语义，使用公共 Markdown 呈现规则组织正文、附录、表格和 Mermaid，并在真实测试后执行 6-review。"

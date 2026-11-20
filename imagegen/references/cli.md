@@ -8,7 +8,7 @@
 - `generate`：从 prompt 生成新图，或带参考图/编辑要求出图（固定模型 `public_model_gpt_image_2`）
 - `task`：查询生成任务状态并下载结果
 - `upload`：上传图片获取 `mediaId`
-- `init`：交互式初始化 API Key（写 `~/.ai-hive/config.json`，权限 0600）
+- `init`：交互式初始化 API Key（写统一配置 `~/.imagegen/config.json`，权限 0600，写入时保留已有 `api_keys` 等字段）
 
 真实 API 调用需要**外网** + 已配置的 AI Hive API Key（`sk-api-*`）。
 

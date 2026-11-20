@@ -1,6 +1,6 @@
 ---
 name: plugin-installation-rules
-description: 当用户要求分析项目、检查是否需要安装某个 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时自动触发。负责通用的"插件检测 → 安装 → 验证 → 使用 → 回退"流程，适用于 Claude Code、Codex 等多种 AI 环境；安装命令与配置一律以官方仓库为准，拒绝沿用第三方博客/公众号转述的旧命名、旧参数或臆造命令。具体插件条目（含 Ponytail）见 references/plugin-catalog.md，未来新增插件只追加条目、不改框架；其中标记为【必装】的插件（当前为 Ponytail）在会话 / 项目准备时默认强制安装与启用。不要用它代替 mcp-installation-rules 的 MCP server 判定，也不代替具体编码 / 测试 / 审查 skill。插件检测与安装默认经 parallel-task-dispatch-rules 委派子代理执行（检测只读并行、写 config 的安装串行独占），细则见 parallel-task-dispatch-rules/references/provisioning-delegation.md。
+description: 当用户要求分析项目、检查是否需要安装 AI 编码插件 / agent 增强插件，或提到具体插件名（如 Ponytail）需要安装、启用、配置时触发。负责通用流程：检测 → 安装 → 验证 → 使用 → 回退，适用于 Claude Code、Codex 等环境；安装命令与配置一律以官方仓库为准，拒绝第三方博客转述的旧命名与臆造参数。插件条目见 `references/plugin-catalog.md`，新增插件只追加条目不改框架；标记【必装】的插件（当前 Ponytail）在会话准备时默认安装启用。不代替 `mcp-installation-rules` 的 MCP server 判定或具体编码 / 测试 / 审查 skill。
 ---
 
 # 插件检测安装使用规则

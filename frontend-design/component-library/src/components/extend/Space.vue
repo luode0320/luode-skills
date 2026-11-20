@@ -1,12 +1,16 @@
 <script setup lang="ts">
 /* 间距：给一组子项之间垫出统一距离，方向与对齐由一行 flex 决定。
    用 gap 而不是逐个包 margin，子项自身不需要知道相邻是谁，追加删减都不错位。
-   split 时在相邻子项之间补一条细线，线由 flex 排布自动落在两子项正中。 */
+   split 时在相邻子项之间补一条细线，线由 flex 排布自动落在两子项正中。
+   size 只表示档位；需要贴合具体设计稿时用 gap 传像素，两者不混在同一个 prop 里
+   （此前 size 同时接受档位与数字，调用方无法判断传 12 是档位还是 12px）。 */
 import { computed, useSlots, Comment, Fragment, type VNode } from 'vue'
 
 const props = withDefaults(defineProps<{
   direction?: 'horizontal' | 'vertical'
-  size?: 'sm' | 'md' | 'lg' | number
+  size?: 'xs' | 'sm' | 'md' | 'lg'
+  /** 精确间距（像素），给了它就覆盖 size 档位 */
+  gap?: number
   align?: 'start' | 'center' | 'end' | 'baseline'
   wrap?: boolean
   split?: boolean
@@ -19,10 +23,10 @@ const props = withDefaults(defineProps<{
 
 const slots = useSlots()
 
-/* 三档语义间距，数值走固定阶梯，与其它组件的疏密口径一致 */
-const sizes: Record<string, number> = { sm: 8, md: 12, lg: 20 }
+/* 四档语义间距，数值走固定阶梯，与其它组件的疏密口径一致 */
+const sizes: Record<string, number> = { xs: 4, sm: 8, md: 12, lg: 20 }
 
-const gapPx = computed(() => (typeof props.size === 'number' ? props.size : sizes[props.size] ?? 12))
+const gapPx = computed(() => props.gap ?? sizes[props.size] ?? 12)
 
 /**
  * [参数] 无

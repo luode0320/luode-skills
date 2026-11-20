@@ -5,7 +5,7 @@
    role=button 却没有可访问名，读屏念不出用途；同时补齐 role=button 应有的空格键激活。 */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayDialogEnter, overlayDialogLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -90,7 +90,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
     </span>
 
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'modal')" @leave="(el, done) => overlayLeave(el, done, 'modal')">
+      <Transition :css="false" @enter="overlayDialogEnter" @leave="overlayDialogLeave">
         <div v-if="previewOpen" class="x-image-mask overlay" :style="{ zIndex: floatingLayerFor(root) }" @click.self="closePreview">
           <img :src="src" :alt="alt" class="x-image-full" />
         </div>

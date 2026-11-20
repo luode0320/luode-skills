@@ -15,7 +15,7 @@ description: 当统一智能体运行期间出现 MCP、插件、浏览器会话
 
 禁止以下动作：猜测进程名或 CLI 参数；没有 capability 声明就重载/重启；用 UI 点击、强杀任意同名进程或删除配置冒充宿主恢复；自动重放未知幂等性的写操作；把工具恢复误报为任务续接；跨 local 配置连接 test、staging、pre、release 或 production 环境。
 
-`task-plan-rehydration-rules` 通过 `PROJECT_CURRENT.md` 和 `update_plan` 重建悬浮任务列表，只属于展示层 rehydration，不是本 Skill 的 L5 checkpoint/resume。它不能把 `restarted`、`manual_handoff` 或未知执行结果提升为 `resumed`，也不能恢复执行授权。
+宿主任务列表重建只属于展示层 rehydration，不是本 Skill 的 L5 checkpoint/resume。它不能把 `restarted`、`manual_handoff` 或未知执行结果提升为 `resumed`，也不能恢复执行授权。
 
 ## 能力等级
 

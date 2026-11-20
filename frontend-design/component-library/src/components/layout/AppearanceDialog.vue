@@ -3,6 +3,7 @@ import Modal from '@/components/ui/Modal.vue'
 import Segmented from '@/components/ui/Segmented.vue'
 import Button from '@/components/ui/Button.vue'
 import { appearance, type Density, type ThemeMode } from '@/composables/appearance'
+import AppearanceSettings from '@/components/workspace/AppearanceSettings.vue'
 
 defineProps<{ open: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -37,6 +38,7 @@ const densities: Array<{ label: string; value: Density }> = [
         <Segmented v-model="appearance.density" :options="densities" label="表格密度" />
       </div>
     </div>
+    <AppearanceSettings />
     <template #footer>
       <Button variant="primary" @click="emit('close')">完成</Button>
     </template>

@@ -14,10 +14,7 @@
    - 创建后按 `architecture-doc-rules` 更新 `doc/1-架构/2-目录树.md`。
 5. **扩展目录不获得引用特权**：业务域之间禁止直接导入对方任何目录（无 `rpc/` 例外）；跨域共享结构仅走根 `common/`（request/response/constant/error/validation）与 `global/` 非业务运行引用。
 6. **Catalog 边界**：`placement_catalog.py query` 只对规范目录返回唯一位置；扩展目录不进入 Catalog、不由 `init` 创建、`check` 也不为其背书。
-7. **代码分解与目录内聚规则（强制）**：
-   - 单个代码文件超过 200 行时，拆分为多个 diamond 文件并存放在同级目录；
-   - 一个同级目录只能包含一种业务逻辑，若拆解后仍归为两种及以上业务，即使很小也必须拆分到不同目录；
-   - 一个目录只做一件事，逻辑过多则拆分为多个同级文件存放。
+7. **代码分解与目录内聚**：阈值与合法例外见 `AGENTS.md` 的「代码分解与目录内聚规则（强制）」，本节不重复数字；本文件只规定拆完之后的落点——同级 diamond 文件留在原业务目录，跨业务则新建独立规范目录。
 
 ## 旧项目渐进采纳
 
@@ -306,7 +303,7 @@
 
 源码根只选择一个：Go 为 `internal/`；Java 为 `src/main/java/<base-package>/`；Node.js 为 `src/`；Python 为 `src/<package>/`。业务域直连源码根，业务相关逻辑在各版本目录 `<v?>` 隔离；域级入口为单文件 `init.<ext>`（`<ext>` 为当前语言扩展名，如 Go 的 `init.go`），全量注册本域各版本路由，`/v1`、`/v2` 前缀区分，多版本并存对外。版本目录挂在 `router/`、`controller/`、`entity/`、`service/` 各自之下（`router/<v?>/`、`controller/<v?>/`、`entity/<v?>/`、`service/<v?>/`），包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用区分版本。
 `crontask/`、`cachetask/`、`async/` 是三类并行的根级任务入口，按触发机制区分：`crontask/` 承载时间驱动（cron 表达式/固定间隔）的周期任务；`cachetask/` 承载缓存过期驱动的异步重建任务（Stale-While-Revalidate 模式：缓存 TTL 到期后先返回旧数据，再异步重建新缓存，典型如 60s 级短 TTL 内存缓存）；`async/` 承载消息/队列驱动的 Worker 与消费者。缓存读写技术适配归 `utils/cache/`（Redis/Mongo 客户端封装），`cachetask/` 只承载缓存过期后的业务重建逻辑入口，不重复实现缓存读写。
-后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `project-rule-file-bootstrap-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
+后端根治理文件必须直接位于项目根，不得放入 `<source-root>/`、`doc/` 或业务域；`AGENTS.md` 与 `CLAUDE.md` 同时存在并保持完全相同正文，目录规则只初始化文件位置，正文分别由 `context-recovery-rules`、`project-memory-rules` 和 `project-style-rules` 维护。
 `main.<ext>` 和 `cmd/<binary>/main.<ext>` 是人工创建的入口 pattern，不由 `init` 创建；`cmd/main.<ext>` 不满足 `<binary>` 目录层级。
 
 独立后端配置统一使用 `config/yaml/`（唯一配置模式；`config/embedded/` 已废弃，strict 下存在即报错，旧项目遗留须经收敛清单登记 `legacy_source_roots` 后继续维护，新配置一律进 `config/yaml/`），按 `config.<env>` 点中缀拆分环境（Go 生态主流，如 `config.local.yaml`）。外部 YAML 使用 `config.prod.yaml`、`config.test.yaml`、`config.local.yaml`（兼容 `.yml`），保持外部配置文件形态、不加 `_yaml` 后缀。Go 项目由 `config/load.go` 通过 `//go:embed yaml/config.*.yaml` 编译期嵌入并读取；非 Go 语言（Java/Node/Python）的 `load.<ext>` 从文件系统读取 `yaml/config.<env>.yaml`。`local`、`test`、`prod` 是标准环境名，环境名可按 `[a-z][a-z0-9_]*` 扩展；只检查已有文件，不要求三种环境齐全。外部 YAML 允许有意持久化 API key、密钥、密码等私密信息，默认不依赖环境变量，但不得向 Agent 输出、日志、README、错误或测试报告泄露，详细安全边界和合法/非法示例见 `configuration-layout.md`。`config/yaml/` 只存放配置数据；`test/` 目录不承载配置数据源，测试所需的运行时配置数据统一使用 `config/` 下的 `test` 环境。`test/config/` 允许作为测试配置加载/解析逻辑的目录，这不属于配置数据源，而是测试代码的一部分。配置加载与结构定义由 `config/` 根下的 `load.<ext>`（配置加载与解析入口）与 `model.<ext>`（配置结构定义）两个源码文件承担；`load.<ext>` 环境识别支持 `-env`、`APP_ENV`、`ENV`，优先级 `-env > APP_ENV > ENV > local`。

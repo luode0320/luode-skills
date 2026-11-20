@@ -12,6 +12,9 @@
       var theme = saved.theme === 'dark' || (saved.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'
       document.documentElement.dataset.theme = theme
       document.documentElement.dataset.density = saved.density || 'regular'
+      var ext = JSON.parse(localStorage.getItem('scaffold.appearance.ext') || '{}')
+      document.documentElement.dataset.accent = ext.accent || 'blue'
+      document.documentElement.dataset.fontScale = ext.fontScale || 'regular'
     } catch (e) {}
   </script>
 </head>

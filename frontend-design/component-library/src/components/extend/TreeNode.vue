@@ -211,4 +211,25 @@ const visibleChildren = computed(() => (props.node.children ?? []).filter(child 
 /* 命中片段只改底色与字重，不换色相，避免与选中态的语义色互相干扰 */
 .x-tree-hit { background: transparent; color: var(--blue); font-weight: 680; }
 .x-tree-children { margin: 0; padding: 0; list-style: none; }
+
+/* 展开形变：子行逐条落下，而不是整块同时出现。
+   收起是 v-if 卸载，没有退场可做——这是刻意的取舍：展开有过程、收起即时，
+   比「收也慢、开也慢」更跟手。错位用 nth-child 而不是传 index，
+   避免为了动效给组件加一个纯样式用的 prop（那会牵动目录与示例契约）。 */
+@keyframes tree-unfold {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: none; }
+}
+.x-tree-children > li {
+  transform-origin: top center;
+  animation: tree-unfold .26s var(--ease-reveal) backwards;
+}
+.x-tree-children > li:nth-child(1) { animation-delay: 0ms; }
+.x-tree-children > li:nth-child(2) { animation-delay: 26ms; }
+.x-tree-children > li:nth-child(3) { animation-delay: 52ms; }
+.x-tree-children > li:nth-child(4) { animation-delay: 78ms; }
+.x-tree-children > li:nth-child(5) { animation-delay: 104ms; }
+.x-tree-children > li:nth-child(6) { animation-delay: 130ms; }
+.x-tree-children > li:nth-child(7) { animation-delay: 156ms; }
+.x-tree-children > li:nth-child(n+8) { animation-delay: 182ms; }
 </style>

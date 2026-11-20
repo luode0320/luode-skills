@@ -200,7 +200,7 @@ function remove(file: UploadFile) {
   background: var(--input-bg);
   box-shadow: var(--edge);
   cursor: pointer;
-  transition: border-color .2s ease, background .2s ease;
+  transition: border-color .2s var(--ease-reveal), background .2s var(--ease-reveal);
 }
 .x-upload-drop:hover,
 .x-upload-drop.is-over { border-color: var(--blue); background: var(--blue-soft); }
@@ -215,8 +215,8 @@ function remove(file: UploadFile) {
   border-radius: var(--r-sm);
   color: var(--ink-faint);
 }
-.x-upload-main { font-size: 13px; font-weight: 620; color: var(--ink); }
-.x-upload-hint { font-size: 12px; color: var(--ink-faint); }
+.x-upload-main { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
+.x-upload-hint { font-size: var(--fs-sm); color: var(--ink-faint); }
 .x-upload-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .x-upload-item {
   position: relative;
@@ -227,8 +227,8 @@ function remove(file: UploadFile) {
   padding: 0 8px 0 12px;
   border-radius: var(--r-sm);
 }
-.x-upload-name { flex: 1; min-width: 0; font-size: 13px; color: var(--ink); }
-.x-upload-size { flex: none; font-size: 12px; color: var(--ink-faint); }
+.x-upload-name { flex: 1; min-width: 0; font-size: var(--fs-body); color: var(--ink); }
+.x-upload-size { flex: none; font-size: var(--fs-sm); color: var(--ink-faint); }
 .x-upload-bar {
   position: absolute;
   left: 12px;
@@ -239,5 +239,5 @@ function remove(file: UploadFile) {
   background: var(--line-strong);
   overflow: hidden;
 }
-.x-upload-fill { display: block; height: 100%; border-radius: 999px; background: var(--blue); transition: width .22s ease; }
+.x-upload-fill { display: block; height: 100%; border-radius: 999px; background: var(--blue); transition: width .22s var(--ease-glide); }
 </style>

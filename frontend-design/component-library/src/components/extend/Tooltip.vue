@@ -2,7 +2,7 @@
 /* 提示气泡：hover / focus 时在目标旁浮出说明，位置自动避让视口边缘。
    动效走 overlayEnter/overlayLeave 的 pop 语态，与 Select 下拉同一手感。 */
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -71,7 +71,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
     <slot />
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="panel"
@@ -90,7 +90,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
   max-width: 260px;
   padding: 7px 10px;
   border-radius: var(--r-xs);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   line-height: 1.5;
   color: var(--ink);
   box-shadow: var(--e2);

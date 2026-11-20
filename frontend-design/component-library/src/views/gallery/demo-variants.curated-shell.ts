@@ -23,6 +23,12 @@ export const CURATED_SHELL: Record<string, VariantShape[]> = {
     { label: '画布 440 高', canvas: 440 },
     { label: '画布 560 高', canvas: 560 },
   ],
+  /* 宿主按需裁剪：两格分别对应「业务自己设置页只放字号 + 主色」和「顶栏菜单只放主题 + 密度」
+     两种真实接法，与基础示例的「四项全显」构成三格，不是凑数的高度差异。 */
+  AppearanceSettings: [
+    { label: '只放字号与主色', props: { sections: ['accent', 'fontScale'] } },
+    { label: '只放主题与密度', props: { sections: ['theme', 'density'] } },
+  ],
   BentoGrid: [
     {
       label: '两列窄卡',

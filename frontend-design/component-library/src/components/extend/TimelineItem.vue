@@ -62,7 +62,7 @@ const dotStyle = computed(() => (props.color ? { background: props.color, border
   box-shadow: 0 0 0 1px var(--line-strong);
 }
 .x-timeline-box { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; padding-top: 1px; }
-.x-timeline-time { font-size: 11px; }
-.x-timeline-label { font-size: 13px; font-weight: 620; color: var(--ink); }
-.x-timeline-content { font-size: 13px; line-height: 1.6; color: var(--ink-muted); overflow-wrap: anywhere; }
+.x-timeline-time { font-size: var(--fs-caption); }
+.x-timeline-label { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
+.x-timeline-content { font-size: var(--fs-body); line-height: 1.6; color: var(--ink-muted); overflow-wrap: anywhere; }
 </style>

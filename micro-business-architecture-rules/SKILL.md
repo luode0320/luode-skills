@@ -1,6 +1,6 @@
 ---
 name: micro-business-architecture-rules
-description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业务代码骨架），或用户提出「微业务 / 伪微服务 / 按业务分目录包 / 业务隔离 / 业务互不关联 / 业务版本化 / 新业务开新包 / 一个项目一个服务的伪微服务」等诉求，或项目已存在微业务标记时自动触发。负责守护单项目单服务中的业务垂直切分、版本化目录隔离和跨业务导入隔离：业务域直连源码根，业务相关逻辑通过 `router/v?/`、`controller/v?/`、`entity/v?/`、`service/v?/` 四类版本化目录完全隔离（包名用 `v?router`、`v?controller`、`v?entity`、`v?service` 别名引用），业务域之间禁止直接导入对方任何目录；提供幂等脚手架、标记与确定性校验，并以 CodeGraph 导入节点作为审查证据。具体目录、引用边界由 `package-structure-rules` 唯一拥有；不要用它代替需求分析、实施规划、分层落点或实际编码。
+description: 当新建项目或新会话首轮检测到新 / 空仓库（缺业务代码骨架），或用户提出「微业务 / 伪微服务 / 按业务分目录包 / 业务隔离 / 业务版本化 / 一个新包一个业务 / 一个项目一个服务的伪微服务」等诉求，或项目已存在微业务标记时触发。守护单项目单服务内的业务垂直切分与版本化目录隔离：业务域直连源码根，业务逻辑通过 `router/v?/`、`controller/v?/`、`entity/v?/`、`service/v?/` 四类版本化目录完全隔离（包名用 `v?router` 等别名引用），业务域之间禁止互相导入；提供幂等脚手架、标记与确定性校验，并以 CodeGraph 导入节点作为审查证据。具体目录与引用边界由 `package-structure-rules` 唯一拥有。
 ---
 
 # 微业务架构规则
@@ -26,7 +26,7 @@ description: 当新建项目 / 新会话首轮检测到新或空仓库（缺业�
 ## 进入后先做什么
 
 1. 明确当前对象是业务项目，不是 `luode-skills` 规则仓库本身。
-2. 新会话首轮先联动 `project-rule-file-bootstrap-rules`，再依 `trigger-and-marker.md` 判断引导或守护模式。
+2. 新会话首轮先联动 `context-recovery-rules`，再依 `trigger-and-marker.md` 判断引导或守护模式。
 3. 需要目录或引用边界时先查询 `package-structure-rules`；本 Skill 不复制其目录 Owner 职责。
 4. 需要隔离检查时读取 `isolation-and-communication.md`，使用 `micro_business.py check` 做确定性门禁，并在审查时用 CodeGraph 导入节点复核证据。
 

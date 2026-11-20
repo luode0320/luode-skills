@@ -3,7 +3,7 @@
    对外统一输出 #rrggbb 小写串，非法输入回滚到当前色。 */
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 /* 默认预设色板：一组常用色，调用方可用 presets 覆盖 */
@@ -120,7 +120,7 @@ onBeforeUnmount(() => hide())
     <Icon class="x-color-caret" name="chevronDown" :size="14" />
   </button>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -177,12 +177,12 @@ onBeforeUnmount(() => hide())
   box-shadow: var(--edge);
   color: var(--ink-muted);
   cursor: pointer;
-  transition: border-color .2s ease;
+  transition: border-color .2s var(--ease-reveal);
 }
 .x-color:hover { border-color: rgba(var(--shade), .18); }
 .x-color.is-disabled { opacity: .6; cursor: not-allowed; background: var(--groove-bg); }
 .x-color-chip { width: 18px; height: 18px; flex: none; border-radius: var(--r-xs); box-shadow: inset 0 0 0 1px var(--line-strong); }
-.x-color-text { font-size: 12px; color: var(--ink); text-transform: uppercase; }
+.x-color-text { font-size: var(--fs-sm); color: var(--ink); text-transform: uppercase; }
 .x-color-caret { color: var(--ink-soft); }
 .x-color-menu { position: fixed; z-index: 120; width: 216px; padding: 10px; border-radius: var(--r-md); }
 .x-color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }

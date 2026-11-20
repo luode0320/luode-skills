@@ -6,7 +6,7 @@
    否则调用方不监听 change 就会把用户翻到的那一页弹回去。 */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayDialogEnter, overlayDialogLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface PreviewImage {
@@ -97,7 +97,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 <template>
   <span ref="anchor" class="x-group-anchor" aria-hidden="true" />
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'modal')" @leave="(el, done) => overlayLeave(el, done, 'modal')">
+    <Transition :css="false" @enter="overlayDialogEnter" @leave="overlayDialogLeave">
       <div
         v-if="visible && current"
         ref="mask"
@@ -206,7 +206,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--ink-muted);
-  font-size: 13px;
+  font-size: var(--fs-body);
 }
 .x-group-thumbs { display: inline-flex; gap: 6px; }
 .x-group-thumb {
@@ -227,7 +227,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 .x-group-counter {
   color: var(--ink-muted);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
 }
 .x-group-close {

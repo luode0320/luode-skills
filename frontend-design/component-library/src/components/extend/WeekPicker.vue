@@ -6,7 +6,7 @@
    exemption: ISO 周归属计算、列表渲染与定位事件同属一个交互单元，拆开反而割裂可读性。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -221,7 +221,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else class="x-week-caret" name="chevronDown" :size="15" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="menu"
@@ -257,12 +257,12 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-weekpicker { display: inline-flex; width: 100%; }
 .x-week { width: 100%; cursor: pointer; text-align: left; color: var(--ink); }
-.x-week-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-week-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-week-value.is-placeholder { color: var(--ink-faint); }
 .x-week-caret { color: var(--ink-soft); flex: none; }
 .x-week-menu { position: fixed; z-index: 120; width: 272px; padding: 10px; border-radius: var(--r-md); }
 .x-week-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 8px; }
-.x-week-title { font-size: 13px; font-weight: 620; color: var(--ink); }
+.x-week-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
 .x-week-nav {
   display: inline-flex;
   align-items: center;
@@ -274,7 +274,7 @@ onBeforeUnmount(() => hide())
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-week-nav:hover { background: var(--hover-bg); color: var(--ink); }
 /* 一年 53 行超过面板高，滚动发生在列表自身，头部翻年按钮固定不动 */
@@ -296,10 +296,10 @@ onBeforeUnmount(() => hide())
   height: 28px;
   padding: 0 8px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink-muted);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-week-row:hover { background: var(--hover-bg); color: var(--ink); }
 .x-week-no { flex: none; width: 34px; font-weight: 620; color: var(--ink); font-variant-numeric: tabular-nums; }

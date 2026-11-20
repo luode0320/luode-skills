@@ -1,6 +1,6 @@
 ---
 name: codegraph-analysis-rules
-description: 当需要分析代码库结构、符号关系、调用链、被调用方、影响面、重构范围或跨文件根因时自动触发。任何仓库都默认先尝试由 CodeGraph 支撑；若未安装 `codegraph`，必须从 `colbymchenry/codegraph` 强制下载并安装；若 `.codegraph/` 未初始化，则先自动初始化再用；若安装或初始化失败、当前环境不支持，则直接回退到 `rg`、`find`、`read` 等本地手段。不要把它代替项目设计、需求澄清、编码实现或测试验证主流程。
+description: 当需要分析代码库结构、符号关系、调用链、被调用方、影响面、重构范围或跨文件根因时自动触发。任何仓库都默认先尝试由 CodeGraph 支撑；已安装则优先用索引查询，未安装时可尝试自行安装，未安装、初始化失败或当前环境不支持时直接回退到 `rg`、`find`、`read` 等本地手段，不阻断任务。不要把它代替项目设计、需求澄清、编码实现或测试验证主流程。
 ---
 
 # CodeGraph 分析规则
@@ -26,9 +26,9 @@ description: 当需要分析代码库结构、符号关系、调用链、被调�
 
 1. 先判断当前服务器 / 电脑是否已经安装 `codegraph` CLI，以及当前仓库是否已经具备 CodeGraph 索引。
    - Windows 环境先检查 `pwsh` 是否存在且主版本至少为 7；CodeGraph 的 Windows 安装命令优先在 `pwsh -NoProfile` 中执行。缺少 PowerShell 7 时，先调用 `windows-powershell-environment-rules` 的审计/安装入口；只有安装/升级被阻断时，才允许使用 `powershell.exe` 5.1 回退。
-2. 若未安装 `codegraph` CLI，必须立即从 `https://github.com/colbymchenry/codegraph` 强制下载并安装，不需要、也不得等待用户确认。
-3. 安装完成后，继续为当前项目执行 CodeGraph 初始化；若 `.codegraph/` 不存在，必须先运行初始化再继续。
-4. 若可用，优先用 CodeGraph 做以下查询：
+2. 已安装时，若 `.codegraph/` 不存在则先为当前项目初始化再查询。
+3. 未安装时可尝试按《安装入口》自行安装；安装耗时过长、被权限或环境阻断、或用户当前轮表示不要装工具时，**直接按不可用处理并回退本地检索，不阻断任务**。
+4. 可用时优先用 CodeGraph 做以下查询：
    - 符号定义
    - callers / callees
    - 影响面 / 依赖面
@@ -40,35 +40,35 @@ description: 当需要分析代码库结构、符号关系、调用链、被调�
 
 **这些兜底命令能用 bash 就不用 PowerShell；必须走 PowerShell 时优先 PowerShell 7，5.1 仅阻断回退。完整判定以 `AGENTS.md` 的「Windows / WSL 执行规则」内联摘要为准。**
 
-1. 项目结构、符号关系、调用链、影响面：CodeGraph 优先
+1. 项目结构、符号关系、调用链、影响面：CodeGraph 可用时优先
 2. 局部文本搜索：`rg` / `find` 兜底
 3. 单文件细节确认：直接 `read`
+
+兜底优先级以 `AGENTS.md` 的「CodeGraph 与代码检索」为唯一权威：未安装或初始化失败时用 `rg`、`find`、`read`，不阻断任务。
 
 跨项目查询的额外约束：
 
 - `.codegraph/` 索引是 per-project 的，查询兄弟项目的符号、调用链或影响面时，必须先切到**目标项目根**再查，不得在当前项目索引里找兄弟项目符号。
 - 目标项目只知道名字、不知道路径时，按 `../implementation-planning-rules/references/sibling-project-discovery.md` 的发现顺序定位。
-- 在兄弟项目执行 `codegraph init` 会生成 `.codegraph/`，属于写入动作：默认禁止；只有在取得「会话级跨项目写入授权」`WRT-*` 且授权范围覆盖该目标项目与"命令执行 / 生成产物"操作类型时才允许，否则一律禁止。本 skill 的“任何仓库都默认强制初始化”仍只适用于当前会话绑定的项目。
+- 在兄弟项目执行 `codegraph init` 会生成 `.codegraph/`，属于写入动作：默认禁止；只有在取得「会话级跨项目写入授权」`WRT-*` 且授权范围覆盖该目标项目与"命令执行 / 生成产物"操作类型时才允许，否则一律禁止。本 skill 的初始化建议只适用于当前会话绑定的项目。
 - 兄弟项目已有 `.codegraph/` 时可直接只读查询；没有时回退到 `rg` / `read` 等只读手段，不假装 CodeGraph 已经参与。
 
-## CodeGraph 初始化规则
+## CodeGraph 初始化与安装
 
-- 任何仓库都默认先确保 CodeGraph 已安装并初始化，不需要用户确认。
-- 若当前服务器 / 电脑未安装 `codegraph` CLI，必须强制下载安装 `colbymchenry/codegraph` 后再初始化项目。
-- 安装入口优先使用官方仓库提供的安装方式：
+- 当前会话绑定的项目：`codegraph` 已安装时，可在项目根执行 `codegraph init` 建立 `.codegraph/` 索引，不需要用户额外确认。
+- 未安装时，安装是**可选前置**而非强制门槛：目标是尽量用上图谱能力，但安装失败不得拖慢或阻断原本的分析任务。
+- 安装入口（优先官方仓库提供的方式）：
   - Windows PowerShell 7+（首选）：`pwsh -NoProfile -Command "& { irm -UseBasicParsing https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex }"`
   - macOS / Linux：`curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh`
   - 已有 npm 环境时也可使用：`npm i -g @colbymchenry/codegraph`
 - Windows PowerShell 5.1 回退下，凡使用 `Invoke-WebRequest`、`Invoke-RestMethod`、`iwr`、`irm` 执行无人值守安装、下载脚本或拉取远端元数据时，必须显式附带 `-UseBasicParsing`，或先设置：
   - `$PSDefaultParameterValues['Invoke-WebRequest:UseBasicParsing']=$true`
   - `$PSDefaultParameterValues['Invoke-RestMethod:UseBasicParsing']=$true`
-- 上述规则属于强制无交互前置条件，目的是避免弹出“是否继续执行 / 使用 IE 引擎解析”的安全确认框；不得把人工点击“是”当作默认流程。
+- 上述规则属于无交互前置条件，目的是避免弹出“是否继续执行 / 使用 IE 引擎解析”的安全确认框；不得把人工点击“是”当作默认流程。
 - 5.1 回退安装命令可用 `powershell.exe -NoProfile -Command "& { irm -UseBasicParsing https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex }"`；该命令只在 `pwsh` 安装/升级被阻断时使用，不得取代 PowerShell 7+ 首选路径。
 - 若只是下载文件而不需要管道执行，Windows 下优先使用 `curl.exe` 落盘，再执行后续步骤，减少 PowerShell Web Cmdlet 的交互提示概率。
-- 安装完成后必须在当前项目根目录执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
-- 初始化是前置准备，不是可选优化。
-- 若下载、安装、初始化失败，权限不足或环境不支持，直接按“不可用”处理并回退本地手段。
-- 只要本 skill 已被触发，不得因为仓库太小、收益不明显或需要安装工具而跳过 CodeGraph 安装 / 初始化尝试。
+- 安装完成后在当前项目根目录执行 `codegraph init`，生成 `.codegraph/` 并建立索引。
+- 若下载、安装、初始化失败，权限不足或环境不支持，直接按“不可用”处理并回退本地手段；不得因安装失败而暂停任务或要求用户先装好工具。
 
 ## 与相邻 skill 的边界
 

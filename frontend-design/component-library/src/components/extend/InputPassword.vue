@@ -96,7 +96,7 @@ defineExpose({ focus: () => el.value?.focus() })
   background: var(--input-bg);
   box-shadow: var(--edge);
   color: var(--ink-soft);
-  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  transition: border-color .2s var(--ease-reveal), box-shadow .2s var(--ease-reveal), background .2s var(--ease-reveal);
 }
 .x-password:hover:not(.is-disabled) { border-color: var(--line-strong); }
 .x-password:focus-within {
@@ -114,7 +114,7 @@ defineExpose({ focus: () => el.value?.focus() })
   border: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--fs-body);
   outline: none;
 }
 .x-password input::placeholder { color: var(--ink-faint); }
@@ -131,7 +131,7 @@ defineExpose({ focus: () => el.value?.focus() })
   border-radius: 0 calc(var(--r-sm) - 1px) calc(var(--r-sm) - 1px) 0;
   color: var(--ink-faint);
   box-shadow: inset 1px 0 0 var(--line);
-  transition: color .2s ease, background .2s ease;
+  transition: color .2s var(--ease-reveal), background .2s var(--ease-reveal);
 }
 .x-password-toggle:hover:not(:disabled) { color: var(--ink); background: var(--hover-bg); }
 .x-password-toggle:disabled { opacity: .45; cursor: not-allowed; }

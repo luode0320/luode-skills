@@ -13,23 +13,16 @@ export interface GeneratedVariant {
 export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
   "Icon": [
     {
-      "label": "size=16",
+      "label": "size=14",
       "props": {
-        "size": 16
+        "size": 14
       },
       "source": "number"
     },
     {
-      "label": "size=28",
+      "label": "size=26",
       "props": {
-        "size": 28
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=44",
-      "props": {
-        "size": 44
+        "size": 26
       },
       "source": "number"
     }
@@ -287,23 +280,16 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
       "source": "number"
     },
     {
-      "label": "size=16",
+      "label": "size=120",
       "props": {
-        "size": 16
+        "size": 120
       },
       "source": "number"
     },
     {
-      "label": "size=28",
+      "label": "size=220",
       "props": {
-        "size": 28
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=44",
-      "props": {
-        "size": 44
+        "size": 220
       },
       "source": "number"
     },
@@ -431,23 +417,16 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
   ],
   "AvatarGroup": [
     {
-      "label": "size=16",
+      "label": "diameter=24",
       "props": {
-        "size": 16
+        "diameter": 24
       },
       "source": "number"
     },
     {
-      "label": "size=28",
+      "label": "diameter=40",
       "props": {
-        "size": 28
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=44",
-      "props": {
-        "size": 44
+        "diameter": 40
       },
       "source": "number"
     },
@@ -500,9 +479,23 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
   "Breadcrumb": [],
   "ButtonGroup": [
     {
+      "label": "size=xs",
+      "props": {
+        "size": "xs"
+      },
+      "source": "enum"
+    },
+    {
       "label": "size=sm",
       "props": {
         "size": "sm"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "size=lg",
+      "props": {
+        "size": "lg"
       },
       "source": "enum"
     },
@@ -697,6 +690,85 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
     }
   ],
   "Comment": [],
+  "ConfirmButton": [
+    {
+      "label": "status=idle",
+      "props": {
+        "status": "idle"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "status=pending",
+      "props": {
+        "status": "pending"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "status=success",
+      "props": {
+        "status": "success"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "status=error",
+      "props": {
+        "status": "error"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "variant=secondary",
+      "props": {
+        "variant": "secondary"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "variant=ghost",
+      "props": {
+        "variant": "ghost"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "variant=text",
+      "props": {
+        "variant": "text"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "variant=danger",
+      "props": {
+        "variant": "danger"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "size=sm",
+      "props": {
+        "size": "sm"
+      },
+      "source": "enum"
+    },
+    {
+      "label": "开启 disabled",
+      "props": {
+        "disabled": true
+      },
+      "source": "boolean"
+    },
+    {
+      "label": "type=submit",
+      "props": {
+        "type": "submit"
+      },
+      "source": "enum"
+    }
+  ],
   "Countdown": [],
   "DataList": [
     {
@@ -705,6 +777,13 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
         "bordered": false
       },
       "source": "boolean"
+    },
+    {
+      "label": "size=xs",
+      "props": {
+        "size": "xs"
+      },
+      "source": "enum"
     },
     {
       "label": "size=sm",
@@ -949,27 +1028,6 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
         "placement": "right"
       },
       "source": "enum"
-    },
-    {
-      "label": "size=16",
-      "props": {
-        "size": 16
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=28",
-      "props": {
-        "size": 28
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=44",
-      "props": {
-        "size": 44
-      },
-      "source": "number"
     },
     {
       "label": "开启 disabled",
@@ -1349,26 +1407,16 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
       "source": "enum"
     },
     {
-      "label": "size=16",
+      "label": "diameter=80",
       "props": {
-        "size": 16,
-        "type": "circle"
+        "diameter": 80
       },
       "source": "number"
     },
     {
-      "label": "size=28",
+      "label": "diameter=160",
       "props": {
-        "size": 28,
-        "type": "circle"
-      },
-      "source": "number"
-    },
-    {
-      "label": "size=44",
-      "props": {
-        "size": 44,
-        "type": "circle"
+        "diameter": 160
       },
       "source": "number"
     },
@@ -1624,6 +1672,13 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
       "source": "enum"
     },
     {
+      "label": "size=xs",
+      "props": {
+        "size": "xs"
+      },
+      "source": "enum"
+    },
+    {
       "label": "size=sm",
       "props": {
         "size": "sm"
@@ -1674,6 +1729,13 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
     }
   ],
   "Spin": [
+    {
+      "label": "size=xs",
+      "props": {
+        "size": "xs"
+      },
+      "source": "enum"
+    },
     {
       "label": "size=sm",
       "props": {
@@ -2252,23 +2314,23 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
   ],
   "IconButton": [
     {
-      "label": "size=16",
+      "label": "size=14",
       "props": {
-        "size": 16
+        "size": 14
       },
       "source": "number"
     },
     {
-      "label": "size=28",
+      "label": "size=20",
       "props": {
-        "size": 28
+        "size": 20
       },
       "source": "number"
     },
     {
-      "label": "size=44",
+      "label": "size=26",
       "props": {
-        "size": 44
+        "size": 26
       },
       "source": "number"
     },
@@ -2504,6 +2566,7 @@ export const GENERATED_VARIANTS: Record<string, GeneratedVariant[]> = {
   ],
   "ToastHost": [],
   "ActivityList": [],
+  "AppearanceSettings": [],
   "Band": [],
   "BentoCard": [
     {
@@ -2673,7 +2736,7 @@ export const DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
     "placeholder": ""
   },
   "AvatarGroup": {
-    "size": 32
+    "diameter": 32
   },
   "BackTop": {
     "visibilityHeight": 400,
@@ -2737,6 +2800,13 @@ export const DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
     "content": "",
     "datetime": ""
   },
+  "ConfirmButton": {
+    "variant": "primary",
+    "size": "md",
+    "block": true,
+    "type": "button",
+    "successLabel": "操作已完成"
+  },
   "Countdown": {
     "format": "HH:mm:ss",
     "autostart": true
@@ -2783,7 +2853,7 @@ export const DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
   "HelpTip": {
     "tone": "info",
     "placement": "top",
-    "size": 15,
+    "iconSize": 15,
     "label": "查看说明",
     "delay": 120
   },
@@ -2852,7 +2922,7 @@ export const DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
   "Progress": {
     "type": "line",
     "status": "normal",
-    "size": 120,
+    "diameter": 120,
     "showText": true,
     "strokeWidth": 8
   },
@@ -3054,6 +3124,7 @@ export const DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
   "ActivityList": {
     "avatarSize": 30
   },
+  "AppearanceSettings": {},
   "Band": {
     "reveal": true
   },

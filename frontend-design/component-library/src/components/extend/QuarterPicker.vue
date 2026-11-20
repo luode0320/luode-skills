@@ -6,7 +6,7 @@
    exemption: 翻年、4 格布局与选后回写同属一个交互单元，拆开反而割裂可读性。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -166,7 +166,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else class="x-quarter-caret" name="chevronDown" :size="15" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="menu"
@@ -201,12 +201,12 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-quarterpicker { display: inline-flex; width: 100%; }
 .x-quarter { width: 100%; cursor: pointer; text-align: left; color: var(--ink); }
-.x-quarter-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-quarter-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-quarter-value.is-placeholder { color: var(--ink-faint); }
 .x-quarter-caret { color: var(--ink-soft); flex: none; }
 .x-quarter-menu { position: fixed; z-index: 120; width: 272px; padding: 10px; border-radius: var(--r-md); }
 .x-quarter-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 8px; }
-.x-quarter-title { font-size: 13px; font-weight: 620; color: var(--ink); }
+.x-quarter-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
 .x-quarter-nav {
   display: inline-flex;
   align-items: center;
@@ -218,7 +218,7 @@ onBeforeUnmount(() => hide())
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-quarter-nav:hover { background: var(--hover-bg); color: var(--ink); }
 .x-quarter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
@@ -235,11 +235,11 @@ onBeforeUnmount(() => hide())
   color: var(--ink);
   text-align: left;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-quarter-cell:hover { background: var(--hover-bg); }
-.x-quarter-no { font-size: 13px; font-weight: 620; font-variant-numeric: tabular-nums; }
-.x-quarter-months { font-size: 11px; color: var(--ink-faint); }
+.x-quarter-no { font-size: var(--fs-body); font-weight: 620; font-variant-numeric: tabular-nums; }
+.x-quarter-months { font-size: var(--fs-caption); color: var(--ink-faint); }
 /* 当季降级到弱色而不是换成蓝系浅色：--blue-soft 是半透明底，当文字色会发虚看不清 */
 .x-quarter-cell.is-current { color: var(--blue); }
 .x-quarter-cell.is-current .x-quarter-months { color: var(--ink-soft); }

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.5.0（2026-10-27）
+
+- **模型清单收敛**：删除 `gpt-image-2.5-sunburst` 与 `gpt-image-2.5-flare`，本 skill 只支持 `gpt-image-2` 单一模型；模型梯队章节由三档优先级改为唯一模型说明，并新增禁止回退或透传其它模型名的条款。
+- **默认值对齐**：`SKILL.md` 的 description、CLI fallback 描述、配置加载兜底、示例配置、`references/config.example.json`、`scripts/image_gen.py` 的 `DEFAULT_MODEL`、`scripts/imagegen.py` 的模型解析兜底与 `SKILL_CONFIG` 全部改为 `gpt-image-2`。
+- **生效范围提醒**：已存在的 `~/.imagegen/config.json` 若仍写有已删除模型，需把 `model`、`models`、`model_priority` 同步改为 `gpt-image-2`，否则脚本会按配置文件优先读取旧值。
+
+## 2.4.0（2026-10-19）
+
+- **修正媒体交付通道优先级**：原规则把 `data:` URI 内联列为可用备选，并假设"主流 Electron CSP 包含 `data:`"。实测 Qoder CN 的聊天 Markdown 净化器在协议层就把 `data:`、`file:` 列入黑名单，与 CSP 无关，该假设不成立。
+- **新增三档降级链**：宿主专用可视化 / 媒体通道（Qoder 用 `present_visualization`）→ 实测放行的 `data:` 内联 → 宿主本地资源协议；前一档真实成功才停。
+- **补充宿主实证与止损规则**：记录 Qoder CN `harden()` 的 `blockedProtocols` 与 `src` 白名单证据；明确看到 `[Image blocked: ...]` 时不得靠缩小图片或换 base64 写法重试，应直接切第一档通道。
+- **区分"提交成功"与"已渲染"**：`present_visualization` 返回成功只代表片段通过校验并保存快照，不代表客户端已渲染；交付话术不得越级断言"已展示"。
+- **新增案例 IMG-007**：`references/error-casebook.md` 记录"图片已生成落盘但聊天渲染被拦截"的根因、脱敏复现输入与验证方式。
+
+## 2.3.0（2026-10-19）
+
+- **统一生图配置目录**：所有生图配置固定存放于 `~/.imagegen/`，主配置为 `~/.imagegen/config.json`；不再使用 `~/.ai-hive/config.json`。
+- **CLI fallback 对齐**：`scripts/imagegen.py` 只从统一配置读取，删除 `~/.ai-hive/` 回退分支；`init` 写入统一配置并保留已有 `api_keys`、`model`、`model_priority` 等字段，避免覆盖多 Key 池。
+- **文档同步**：`SKILL.md`、`references/cli.md`、`references/error-casebook.md` 的配置路径与凭据口径统一改为 `~/.imagegen/config.json`。
+
 ## 2.2.0（2026-10-05）
 
 - **新增「生成后符合度自检铁律」**：明确"出图不等于任务完成"。每次生成或编辑后，必须对照用户原始提示词与本轮约束逐条给出 `符合 / 不符合 / 无法判定` 的验收结论；只要存在任何"不符合"项就不得交付，必须按不符合项定向修改提示词并重新生成新图（版本号递增、不覆盖旧版），直到全部要求符合才允许交付与汇报。

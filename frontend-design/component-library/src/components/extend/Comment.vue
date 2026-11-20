@@ -46,16 +46,16 @@ withDefaults(defineProps<{
 .x-comment-photo { width: 34px; height: 34px; border-radius: 9999px; object-fit: cover; }
 .x-comment-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
 .x-comment-head { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
-.x-comment-author { font-size: 13px; font-weight: 620; color: var(--ink); }
-.x-comment-time { font-size: 11px; }
-.x-comment-body { font-size: 13px; line-height: 1.62; color: var(--ink-muted); overflow-wrap: anywhere; }
+.x-comment-author { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
+.x-comment-time { font-size: var(--fs-caption); }
+.x-comment-body { font-size: var(--fs-body); line-height: 1.62; color: var(--ink-muted); overflow-wrap: anywhere; }
 .x-comment-actions { display: flex; align-items: center; gap: 14px; }
 .x-comment-action {
   padding: 0;
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--ink-soft);
   cursor: pointer;
   transition: color var(--ease-premium) .22s;

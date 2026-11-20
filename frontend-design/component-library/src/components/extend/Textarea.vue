@@ -116,6 +116,6 @@ defineExpose({ focus: () => el.value?.focus() })
 .x-textarea { width: 100%; }
 .x-textarea textarea { resize: vertical; }
 .x-textarea.is-auto textarea { resize: none; }
-.x-textarea-count { align-self: flex-end; font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.x-textarea-count { align-self: flex-end; font-size: var(--fs-sm); color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 .x-textarea-count.is-full { color: var(--red-text); }
 </style>

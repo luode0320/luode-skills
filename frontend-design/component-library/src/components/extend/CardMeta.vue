@@ -38,6 +38,6 @@ withDefaults(defineProps<{
 .x-card-meta { display: flex; align-items: center; gap: 11px; min-width: 0; }
 .x-card-meta-avatar { flex: none; display: flex; }
 .x-card-meta-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-.x-card-meta-title { font-size: 14px; font-weight: 620; color: var(--ink); }
-.x-card-meta-desc { font-size: 12px; color: var(--ink-soft); line-height: 1.55; }
+.x-card-meta-title { font-size: var(--fs-lg); font-weight: 620; color: var(--ink); }
+.x-card-meta-desc { font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.55; }
 </style>

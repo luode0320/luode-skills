@@ -1,6 +1,6 @@
 ---
 name: codex-custom-models
-description: 为 Codex Desktop（含 Windows CLI）维护 luode.vip 中转的自定义模型目录。触发场景：用户说"更新 codex 模型 / 给 codex desktop 加模型 / 模型切换 / 模型清单(models.json)更新了 / 把 luode 模型同步到 codex"。流程：读源清单 D:\谷歌云盘\workbuddy-model\models.json → 生成 Codex catalog（ModelsResponse/ModelInfo schema）→ 写 ~/.codex/model-catalog.json + 云盘镜像 → 校验（TOML 语法 + base_instructions 必填 + 引擎连通测试）→ 提醒重启 Codex Desktop。沉淀了完整机制与坑：model_catalog_json 顶层键、官方目录在 codex-rs/models-manager/models.json、wire_api 仅支持 responses、catalog 条目必须含 base_instructions 或 model_messages.instructions_template、引擎运行模式（runCodexInWindowsSubsystemForLinux 决定 WSL/Windows 原生）决定 model_catalog_json 路径写法（/mnt/c vs C:\，写错即 os error 2/"配置加载未成功"）、provider 认证会被 App 改写为 http_headers 内联 key（此时不需环境变量；若仍 env_key 则 WSL 引擎拿不到 Windows 用户环境变量报 Missing environment variable）。含生成模板脚本 scripts/generate_catalog.py。
+description: 为 Codex Desktop（含 Windows CLI）维护 luode.vip 中转的自定义模型目录。触发：用户说「更新 codex 模型 / 给 codex desktop 加模型 / 模型切换 / 模型清单更新了 / 把 luode 模型同步到 codex」。流程：读源清单 `D:\谷歌云盘\workbuddy-model\models.json` → 生成 catalog → 写 `~/.codex/model-catalog.json` 与云盘镜像 → 校验 TOML、base_instructions 必填与引擎连通 → 提醒重启。关键约束：`model_catalog_json` 是顶层键；`wire_api` 仅支持 responses；条目须含 base_instructions 或 model_messages.instructions_template；引擎运行模式决定路径写法（`/mnt/c` 与 `C:\` 写错即加载失败）。脚本见 `scripts/generate_catalog.py`。
 ---
 
 # Codex Desktop 自定义模型目录（luode.vip 中转）

@@ -1,0 +1,10 @@
+{
+  "$comment": "主色色板定义。加一套色板 = 在这里加一条 + 重跑 build_accent_palette.py，无需手写任何派生值。light/dark 是种子色，脚本会按对比度要求自动微调明度。",
+  "palettes": [
+    { "key": "blue", "label": "珍珠蓝", "light": "#1f66dd", "dark": "#4c8dff" },
+    { "key": "teal", "label": "青碧", "light": "#0f7a6b", "dark": "#3fbfa8" },
+    { "key": "violet", "label": "丁香紫", "light": "#5b45b0", "dark": "#a48cf0" },
+    { "key": "moss", "label": "苔绿", "light": "#3d7a2a", "dark": "#79c65a" },
+    { "key": "amber", "label": "琥珀", "light": "#8a4f0a", "dark": "#e0a44a" }
+  ]
+}

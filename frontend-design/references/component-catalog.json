@@ -1,17 +1,17 @@
 {
-  "total": 152,
+  "total": 154,
   "counts": {
     "root": 2,
     "business": 20,
     "charts": 6,
-    "extend": 83,
+    "extend": 84,
     "layout": 6,
     "ui": 27,
-    "workspace": 8
+    "workspace": 9
   },
   "categoryCounts": {
-    "general": 11,
-    "shell": 6,
+    "general": 12,
+    "shell": 7,
     "business": 20,
     "charts": 6,
     "navigation": 16,
@@ -75,6 +75,7 @@
         "src/components/extend/CascaderPanel.vue",
         "src/components/extend/CollapseItem.vue",
         "src/components/extend/ColorPicker.vue",
+        "src/components/extend/ConfirmButton.vue",
         "src/components/extend/DatePicker.vue",
         "src/components/extend/Dropdown.vue",
         "src/components/extend/DropdownButton.vue",
@@ -118,8 +119,10 @@
         "src/components/ui/Pagination.vue",
         "src/components/ui/Select.vue",
         "src/components/ui/TextInput.vue",
+        "src/components/workspace/AppearanceSettings.vue",
         "src/components/workspace/ShortcutGrid.vue",
         "src/views/Dashboard.vue",
+        "src/views/gallery/GalleryNav.vue",
         "src/views/Login.vue",
         "src/views/monitor/LoginLog.vue",
         "src/views/system/Configs.vue",
@@ -1733,7 +1736,7 @@
           "default": null
         },
         {
-          "name": "size",
+          "name": "diameter",
           "type": "number",
           "optional": true,
           "default": "32"
@@ -1750,7 +1753,7 @@
       "types": [],
       "usage": "<AvatarGroup />",
       "used_by": [],
-      "fingerprint": "1d6f8721f4131e70"
+      "fingerprint": "9ef1089255d3dffe"
     },
     {
       "name": "BackTop",
@@ -1888,7 +1891,7 @@
       "props": [
         {
           "name": "size",
-          "type": "'md' | 'sm'",
+          "type": "'xs' | 'sm' | 'md' | 'lg'",
           "optional": true,
           "default": "'md'"
         },
@@ -1904,9 +1907,9 @@
         "default"
       ],
       "types": [],
-      "usage": "<ButtonGroup size=\"md\" direction=\"horizontal\">内容</ButtonGroup>",
+      "usage": "<ButtonGroup size=\"xs\" direction=\"horizontal\">内容</ButtonGroup>",
       "used_by": [],
-      "fingerprint": "a9f06bed80310392"
+      "fingerprint": "615b132b6df228f8"
     },
     {
       "name": "Calendar",
@@ -2484,6 +2487,72 @@
       "fingerprint": "b482be112f57c991"
     },
     {
+      "name": "ConfirmButton",
+      "group": "extend",
+      "category": "general",
+      "path": "src/components/extend/ConfirmButton.vue",
+      "import": "@/components/extend/ConfirmButton.vue",
+      "description": "确认落定按钮：一次操作里走完「提交 → 收拢成圆 → 描环 → 画勾」。",
+      "props": [
+        {
+          "name": "status",
+          "type": "'idle' | 'pending' | 'success' | 'error'",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'ghost' | 'text' | 'danger'",
+          "optional": true,
+          "default": "'primary'"
+        },
+        {
+          "name": "size",
+          "type": "'md' | 'sm'",
+          "optional": true,
+          "default": "'md'"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "optional": true,
+          "default": null
+        },
+        {
+          "name": "block",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
+        },
+        {
+          "name": "type",
+          "type": "'button' | 'submit'",
+          "optional": true,
+          "default": "'button'"
+        },
+        {
+          "name": "successLabel",
+          "type": "string",
+          "optional": true,
+          "default": "'操作已完成'"
+        }
+      ],
+      "emits": [],
+      "slots": [
+        "default"
+      ],
+      "types": [],
+      "usage": "<ConfirmButton status=\"idle\" variant=\"primary\" size=\"md\" type=\"button\">内容</ConfirmButton>",
+      "used_by": [],
+      "fingerprint": "ab201f1c12c59fc6"
+    },
+    {
       "name": "Countdown",
       "group": "extend",
       "category": "display",
@@ -2554,7 +2623,7 @@
         },
         {
           "name": "size",
-          "type": "'sm' | 'md' | 'lg'",
+          "type": "'xs' | 'sm' | 'md' | 'lg'",
           "optional": true,
           "default": "'md'"
         },
@@ -2577,9 +2646,9 @@
         "empty"
       ],
       "types": [],
-      "usage": "<DataList :data=\"[]\" size=\"sm\" />",
+      "usage": "<DataList :data=\"[]\" size=\"xs\" />",
       "used_by": [],
-      "fingerprint": "fb20d789f94cf61d"
+      "fingerprint": "adc245046e763eba"
     },
     {
       "name": "DatePicker",
@@ -3047,7 +3116,7 @@
           "default": "'top'"
         },
         {
-          "name": "size",
+          "name": "iconSize",
           "type": "number",
           "optional": true,
           "default": "15"
@@ -3078,7 +3147,7 @@
       "used_by": [
         "src/views/gallery/DemoCell.vue"
       ],
-      "fingerprint": "dcdc66b99cd40624"
+      "fingerprint": "f3925b372fca9e6e"
     },
     {
       "name": "Image",
@@ -3960,7 +4029,7 @@
           "default": "'normal'"
         },
         {
-          "name": "size",
+          "name": "diameter",
           "type": "number",
           "optional": true,
           "default": "120"
@@ -3983,7 +4052,7 @@
       "types": [],
       "usage": "<Progress :percent=\"0\" type=\"line\" status=\"normal\" />",
       "used_by": [],
-      "fingerprint": "9834b1f3f91e3d71"
+      "fingerprint": "af6ee106ae2b0e3d"
     },
     {
       "name": "QuarterPicker",
@@ -4471,9 +4540,15 @@
         },
         {
           "name": "size",
-          "type": "'sm' | 'md' | 'lg' | number",
+          "type": "'xs' | 'sm' | 'md' | 'lg'",
           "optional": true,
           "default": "'md'"
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "optional": true,
+          "default": null
         },
         {
           "name": "align",
@@ -4499,9 +4574,9 @@
         "default"
       ],
       "types": [],
-      "usage": "<Space direction=\"horizontal\" size=\"sm\" align=\"start\">内容</Space>",
+      "usage": "<Space direction=\"horizontal\" size=\"xs\" align=\"start\">内容</Space>",
       "used_by": [],
-      "fingerprint": "dbe718a92a44a2a8"
+      "fingerprint": "c5552c2a432fe4fb"
     },
     {
       "name": "Spin",
@@ -4519,7 +4594,7 @@
         },
         {
           "name": "size",
-          "type": "'sm' | 'md' | 'lg'",
+          "type": "'xs' | 'sm' | 'md' | 'lg'",
           "optional": true,
           "default": "'md'"
         },
@@ -4541,9 +4616,9 @@
         "default"
       ],
       "types": [],
-      "usage": "<Spin size=\"sm\">内容</Spin>",
+      "usage": "<Spin size=\"xs\">内容</Spin>",
       "used_by": [],
-      "fingerprint": "a6ef904eec4f226d"
+      "fingerprint": "29512c25a244fe21"
     },
     {
       "name": "SplitPane",
@@ -6862,6 +6937,7 @@
       "usage": "<Segmented modelValue=\"文本\" :options=\"[]\" />",
       "used_by": [
         "src/components/layout/AppearanceDialog.vue",
+        "src/components/workspace/AppearanceSettings.vue",
         "src/views/Dashboard.vue"
       ],
       "fingerprint": "37f39a950435f681"
@@ -7237,6 +7313,32 @@
       "usage": "<ActivityList :items=\"[]\" />",
       "used_by": [],
       "fingerprint": "945a9d663a73a32c"
+    },
+    {
+      "name": "AppearanceSettings",
+      "group": "workspace",
+      "category": "shell",
+      "path": "src/components/workspace/AppearanceSettings.vue",
+      "import": "@/components/workspace/AppearanceSettings.vue",
+      "description": "外观设置的正文：把四个正交维度放进同一个面板。",
+      "props": [
+        {
+          "name": "sections",
+          "type": "AppearanceSection[]",
+          "optional": true,
+          "default": "() => ['theme', 'accent', 'fontScale', 'density']"
+        }
+      ],
+      "emits": [],
+      "slots": [],
+      "types": [
+        "AppearanceSection"
+      ],
+      "usage": "<AppearanceSettings />",
+      "used_by": [
+        "src/components/layout/AppearanceDialog.vue"
+      ],
+      "fingerprint": "20c8cebc4ef83de8"
     },
     {
       "name": "Band",

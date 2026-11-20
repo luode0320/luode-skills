@@ -1,18 +1,5 @@
 interface:
   display_name: "项目记忆规则"
-  short_description: "维护项目四件套与稳定长期记忆"
+  short_description: "维护项目记忆三文件的稳定事实与当前交接点"
   default_prompt: >-
-    使用 $project-memory-rules 维护项目根目录四件套：先读取 `PROJECT_CURRENT.md`，再读取
-    `PROJECT_MEMORY.md`；缺失的 `PROJECT_CURRENT.md`、`PROJECT_MEMORY.md`、`PROJECT_HISTORY.md`
-    由 bootstrap 创建。`PROJECT_CURRENT.md` 覆盖式维护项目概览与活动会话任务摘要且不得超过 51,200 字节，并原样保留
-    `task-plan-rehydration-rules` 的 v4 多会话 registry 托管区，不解析、复制或改写其中字段；
-    `PROJECT_HISTORY.md` 只追加关键事件并默认不读。`PROJECT_MEMORY.md` 只保存稳定规则、关键决策
-    和长期事实，继续保留“人类阅读区 + 底部机器索引区”的兼容结构；不得新增
-    `PROJECT_MEMORY_INDEX.yaml` 等平行记忆根文件。执行时必须完整读取 `PROJECT_MEMORY.md`，
-    检查底部是否已有固定 `## 机器索引区`；若缺失，先补最小骨架。
-    随后基于代码、项目文档和当前对话证据，优先更新机器索引区中的 `entities`、
-    `relations`、`evidence`、`contexts`、`lifecycle`、`retrieval_hints` 与必要的 `extensions`，
-    再同步渲染或回写人类阅读区。若同一事实已存在，优先按 `entity_id + 类型 + 作用域 + 别名 + 来源`
-    定位原实体并更新，不要新增同义冲突条目。遇到证据冲突、口径失效或身份不明时，使用
-    `conflicted`、`stale`、`deprecated`、`retired` 等状态表达，不得直接伪造为启用事实。
-    所有标题、章节名、条目标题和字段名默认使用中文。
+    使用 $project-memory-rules 维护项目根目录的三个记忆文件：`PROJECT_CURRENT.md` 覆盖更新项目概览与会话间可交接的当前状态，UTF-8 不超过 51,200 字节；`PROJECT_MEMORY.md` 保存稳定规则、关键决策和长期事实；`PROJECT_HISTORY.md` 只追加关键历史事件并保留最近 20 条。文件骨架创建归 `context-recovery-rules` 的 bootstrap 路由，本 skill 只负责内容维护。同一事实优先按原条目回写，不新增同义冲突条目；旧口径失效时直接替换为当前权威说法，或标注废弃状态。事实不明确、证据不足或身份无法确定时不得写入。所有标题、章节名、条目标题和字段名默认使用中文。

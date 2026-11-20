@@ -1,6 +1,6 @@
 ---
 name: browser-use-cloud-rules
-description: 凭据默认来源为 `~/.browser-use/.env`（单一权威，junction 指向 Google Drive 同步目录），环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。当项目程序需要操作公网浏览器（https 有域名站点）——通过 Browser Use Cloud REST API 提交/轮询/停止浏览器任务——或浏览器任务明确需要 Browser Use Cloud 的云端自主长链、托管并发、地域出口、托管代理、隐身浏览或服务商提供的合规验证码处理能力，或用户明确点名 Browser Use Cloud 时触发。作为 Browser Use Cloud 执行、安全、费用确认和 session 生命周期的唯一 Owner，负责检查 `BROWSER_USE_API_KEY`、Billing 余额、运行时 MCP 工具 schema 的硬费用上限、逐次 `run_session` / `send_task` 确认、默认无 profile/录制/保活，以及任务结束后的停止与费用回读。普通网页检索、真实 Chrome 登录态、应用内 Browser、DevTools 调试、本地 agent-browser、本地 URL/本地页面交互、HAR/视觉 diff/trace 不使用本 Skill；不得用 Cloud 绕过权限、安全策略或真实浏览器连接失败。
+description: 凭据默认来源 `~/.browser-use/.env`（junction 指向 Google Drive 同步目录），环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。当项目需要操作公网浏览器（通过 Browser Use Cloud REST API 提交 / 轮询 / 停止任务），或任务明确需要云端自主长链、托管并发、地域出口、托管代理、隐身浏览、合规验证码处理，或用户点名 Browser Use Cloud 时触发。作为执行、安全、费用与 session 生命周期的唯一 Owner：检查 API Key、Billing 余额、工具 schema 费用上限、逐次确认、默认无 profile / 录制 / 保活，任务结束停止并回读费用。普通网页检索、真实 Chrome 登录态、本地 agent-browser、本地页面交互、HAR / diff / trace 不使用本 skill；不得用 Cloud 绕过权限或真实浏览器连接失败。
 ---
 
 # Browser Use Cloud 安全路由规则

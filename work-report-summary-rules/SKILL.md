@@ -114,3 +114,7 @@ description: 当用户提出“生成年报/月报/周报/日报”“汇总年�
 - 需要确认未提交工作区事项如何纳入周报时，再读 `references/uncommitted-worktree.md`。
 - 输出工作报告前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先说明工作结果和影响，提交明细、时间口径和证据进入附录。
 - 涉及审查或验收结果汇总时，同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`，不把不适用验证写成阻断。
+
+## 公共 Markdown 呈现路由
+
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

@@ -1,0 +1,4 @@
+interface:
+  display_name: "上下文准备与恢复"
+  short_description: "规则与记忆自举、压缩恢复、近期预热三路由共用一份磁盘事实源纪律"
+  default_prompt: "使用 $context-recovery-rules，先判断命中哪个路由：rule-bootstrap / memory-bootstrap 调用唯一 scripts/bootstrap_agents.sh 幂等补齐 AGENTS.md / CLAUDE.md、.gitattributes、.editorconfig 与项目记忆骨架；recovery 按 references/context-recovery-contract.md 重读规则文件与项目当前状态并恢复编码许可；warmup 只补近 3 天缺失事实。保护非受管内容，不做事实抽取。"

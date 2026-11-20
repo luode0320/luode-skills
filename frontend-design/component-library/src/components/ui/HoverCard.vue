@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref } from 'vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 
 /* 悬停名片：指针停留 300ms 或键盘聚焦时出现的轻玻璃预览卡。
    只放只读信息；离开触发区后留 120ms 宽限，允许指针移进卡片。 */
@@ -63,7 +63,7 @@ onBeforeUnmount(() => window.clearTimeout(timer))
     @keydown="onKey"
   ><slot /></span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         :id="id"

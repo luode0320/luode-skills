@@ -107,7 +107,7 @@ function onKey(event: KeyboardEvent) {
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-num-btn:hover:not(:disabled) { background: var(--hover-bg); color: var(--ink); }
 .x-num-btn:disabled { opacity: .45; cursor: not-allowed; }

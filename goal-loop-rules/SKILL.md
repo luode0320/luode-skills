@@ -257,10 +257,9 @@ Goal 模式一旦激活（用户当前轮显式用 `/goal` 开启，或用户已
 | `autonomous-execution-rules` | L1 内部续跑的承载者；本节的 L2 是独立路径，不冲突 |
 | `parallel-task-dispatch-rules` | 负责 worker 线程的创建、生命周期管理和回收 |
 | `continuous-code-quality-supervisor-rules` | L3 监控模式的可选上游 |
-| `skill-hit-check-rules` | 提供 `deferred-gate-registry.md` 触发登记 |
+| `skill-hit-check-rules` | 每轮命中的唯一轻量入口 |
 | `reasoning-summary-structure-rules` | 负责最终收口时的总结渲染 |
 | `execution-failure-learning-rules` | worker 线程失败时联动恢复 |
-| `task-plan-rehydration-rules` | 负责任务投影持久化 |
 
 ### 配置参数
 

@@ -133,9 +133,9 @@ function pickYear(year: number) {
 <style scoped>
 .x-calendar { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r-md); }
 .x-cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.x-cal-title { font-size: 13px; font-weight: 640; color: var(--ink); }
+.x-cal-title { font-size: var(--fs-body); font-weight: 640; color: var(--ink); }
 .x-cal-week { display: grid; grid-template-columns: repeat(7, 1fr); }
-.x-cal-weekday { text-align: center; font-size: 11px; color: var(--ink-faint); }
+.x-cal-weekday { text-align: center; font-size: var(--fs-caption); color: var(--ink-faint); }
 .x-cal-grid { display: grid; gap: 2px; }
 .x-cal-grid.is-month { grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); }
 .x-cal-grid.is-year { grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -150,7 +150,7 @@ function pickYear(year: number) {
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   cursor: pointer;
   transition: background var(--ease-premium) .24s, color var(--ease-premium) .24s;
 }

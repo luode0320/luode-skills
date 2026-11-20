@@ -35,7 +35,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 ## 默认执行流程
 
 1. 默认先读 `references/fix-proposal-template.md`，按统一模板组织修复建议。
-2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`，确认 Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略。
+2. 再读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 3. 如果需要判断风险和影响范围，再读 `references/risk-assessment-checklist.md`。
 4. 如果需要判断何时必须等确认、何时可以直接编码，再读 `references/confirm-before-coding.md`。
 5. 输出主方案、备选方案、风险点、影响范围、验证方式和确认建议。
@@ -44,7 +44,7 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 
 ## 条件路由：regression-risk
 
-当修复涉及公共方法、共享模块、对外接口、数据库、缓存、兼容性、异常语义、历史能力或验证优先级变化时，必须在修复建议内进入本路由；它替代独立的回归风险入口，不创建第二个生命周期阶段。
+当修复涉及公共方法、共享模块、对外接口、数据库、缓存、兼容性、异常语义、历史能力或验证优先级变化时，必须在修复建议内进入本路由；它替代独立的回归风险入口，不创建第二个生命周期阶段。本路由的定位与阅读顺序见 `references/regression-risk.md`。
 
 1. 先用 `references/risk-assessment-checklist.md` 做轻量筛查，确认是否属于高影响修复。
 2. 阅读 `references/regression-risk/risk-dimensions.md`，识别接口兼容、数据行为、共享逻辑与业务流程风险。
@@ -109,18 +109,21 @@ description: 当问题已定位，需要形成修改建议、风险评估、备�
 ## 执行结果归档要求
 
 - 将修复建议、影响范围、风险评估、确认结论统一记录到 `artifact-storage-rules` 约定的当前 Bug 主文档中。
+- **追加而不重写**：在现有 Bug 主文档末尾追加 `## 修复建议` 一节，不改写前序阶段已产出的 H1 开场段与既有附录；八字段开场与附录归位按 `references/fix-proposal-template.md` 与白话文档契约执行。
 - 当前 Bug 主文档至少写明根因摘要、主方案、备选方案、风险点、验证方式和确认结论；仅当仍存在未完成的修复、验证或确认动作时，补写必要后续动作。
-- Bug 主文档命名和同一 Bug 持续复用同一份主文档的策略统一遵循 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 如果明确结论是“可直接进入编码”，也要保留该判断依据，并继续沿用同一份 Bug 主文档进入后续修复与验证。
 - 进入最终回复前，必须联动 `artifact-delivery-gate-rules`，核对主方案、备选方案、风险评估和确认结论是否已经真实写回当前 Bug 主文档；未落盘不得判定修复建议阶段完成。
 
 ## references 读取规则
 
 - 默认先读 `references/fix-proposal-template.md`。
-- 在定位当前 Bug 主文档或判断是否继续复用同一份主文档时，先读 `../artifact-storage-rules/references/path-map.yaml` 与 `../artifact-storage-rules/references/update-policy.md`。
 - 只有在评估影响范围和风险时，再读 `references/risk-assessment-checklist.md`。
 - 只有在判断是否必须先确认时，再读 `references/confirm-before-coding.md`。
 - 输出修复建议前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先交代推荐修复、风险和完成结果，技术方案比较和证据进入附录。
 - 若修复方案涉及审查、验收、浏览器或第三方条件，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
 
 - Bug 修复风险分级与确认：`references/fix-risk-grading-and-confirmation.md`
+
+## 公共 Markdown 呈现路由
+
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

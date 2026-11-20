@@ -5,7 +5,7 @@
 import { nextTick, onBeforeUnmount, ref } from 'vue'
 import Button from '@/components/ui/Button.vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface DropdownButtonItem {
@@ -134,7 +134,7 @@ onBeforeUnmount(hide)
     </Button>
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="menu"
@@ -188,7 +188,7 @@ onBeforeUnmount(hide)
   min-height: 34px;
   padding: 0 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   text-align: left;
   transition: background var(--ease-premium) .15s, color var(--ease-premium) .15s;

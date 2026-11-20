@@ -7,7 +7,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 const props = withDefaults(defineProps<{
   data: Array<Record<string, any>>
   bordered?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   split?: boolean
   loading?: boolean
 }>(), {
@@ -41,9 +41,10 @@ const rows = computed(() => props.data ?? [])
 <style scoped>
 .x-datalist { display: flex; flex-direction: column; overflow: hidden; border-radius: var(--r-sm); }
 .x-datalist.is-bordered { border: 1px solid var(--line); background: var(--surface); }
-.x-datalist-row { padding: 10px 14px; font-size: 13px; color: var(--ink); }
-.x-datalist.is-sm .x-datalist-row { padding: 7px 12px; font-size: 12px; }
-.x-datalist.is-lg .x-datalist-row { padding: 14px 18px; font-size: 14px; }
+.x-datalist-row { padding: 10px 14px; font-size: var(--fs-body); color: var(--ink); }
+.x-datalist.is-xs .x-datalist-row { padding: 5px 10px; font-size: var(--fs-control-xs); }
+.x-datalist.is-sm .x-datalist-row { padding: 7px 12px; font-size: var(--fs-control-sm); }
+.x-datalist.is-lg .x-datalist-row { padding: 14px 18px; font-size: var(--fs-control-lg); }
 .x-datalist.is-split .x-datalist-row:not(:last-child) { border-bottom: 1px solid var(--line); }
 .x-datalist-row.is-loading { display: flex; align-items: center; }
 .x-datalist-skeleton { height: 14px; width: 62%; border-radius: var(--r-xs); }

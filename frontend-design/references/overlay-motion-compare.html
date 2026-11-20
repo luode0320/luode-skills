@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>浮层入场对比 · 缩放优化</title>
+<style>
+  :root {
+    --ink: #101418; --ink-muted: #596368; --ink-soft: #7e888c; --ink-faint: #99a2a5;
+    --blue: #236de9; --blue-solid: #1f66dd;
+    --shade: 46, 58, 62;
+    --line: rgba(46, 58, 62, .085); --line-strong: rgba(46, 58, 62, .11);
+    --surface-solid: #fbfcfc; --canvas: #f6f8f7; --hover-bg: rgba(46, 58, 62, .045);
+    --glass-line: rgba(255, 255, 255, .88);
+    --e3: 0 2px 6px rgba(46, 58, 62, .07), 0 22px 50px rgba(46, 58, 62, .08);
+    --edge: inset 0 1px 0 rgba(255, 255, 255, .92);
+    --ease-reveal: cubic-bezier(.16, 1, .3, 1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 26px 24px 40px; background: var(--canvas); color: var(--ink);
+    font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  h1 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+  .sub { margin: 0 0 18px; font-size: 13px; color: var(--ink-muted); line-height: 1.75; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #fff; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--line); }
+
+  .bar { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+  button {
+    height: 32px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line-strong);
+    background: #fff; color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  button:hover { background: var(--hover-bg); }
+  button.primary { background: var(--blue-solid); border-color: transparent; color: #fff; }
+  .hint { margin-left: auto; font-size: 12px; color: var(--ink-faint); }
+
+  .stage {
+    position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+
+  .col { position: relative; }
+  .col-head { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .col-desc { font-size: 11px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 10px; min-height: 30px; }
+  .col.a .col-head { color: #b45309; }
+  .col.b .col-head { color: var(--blue); }
+  .col.c .col-head { color: #15803d; }
+
+  /* 真实场景：一张有内容的卡片，浮层要叠在它上面 */
+  .card {
+    position: relative; padding: 14px; border-radius: 14px;
+    background: var(--surface-solid); border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(46,58,62,.05), 0 5px 14px rgba(46,58,62,.04), var(--edge);
+  }
+  .card-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .card-line { font-size: 11px; color: var(--ink-faint); font-family: ui-monospace, Consolas, monospace; margin-bottom: 10px; }
+  .trigger {
+    width: 100%; height: 32px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 10px; border-radius: 10px; border: 1px solid var(--line-strong);
+    background: #fff; font-size: 12px; color: var(--ink-muted);
+  }
+  .trigger span { color: var(--ink-faint); font-size: 10px; }
+
+  /* 与库里 .m-float 完全一致的玻璃材质——缩放的问题只在 backdrop-filter 上才暴露 */
+  .panel {
+    position: absolute; left: 0; right: 0; top: 66px; z-index: 5;
+    padding: 4px; border-radius: 12px;
+    border: 1px solid var(--glass-line);
+    background: rgba(251, 252, 252, .92);
+    box-shadow: var(--e3), var(--edge);
+    backdrop-filter: blur(28px) saturate(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.08);
+    opacity: 0; visibility: hidden;
+  }
+  .panel.open { visibility: visible; }
+  .opt {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 10px; border-radius: 8px; font-size: 12px; color: var(--ink-muted);
+  }
+  .opt.on { background: var(--blue-soft, rgba(35,109,233,.1)); color: var(--ink); font-weight: 600; }
+  .opt em { font-style: normal; color: var(--blue); font-size: 11px; }
+
+  .foot { margin-top: 18px; font-size: 12px; color: var(--ink-faint); line-height: 1.9; }
+  .foot b { color: var(--ink-muted); }
+</style>
+</head>
+<body>
+
+<h1>浮层入场对比 · 缩放优化</h1>
+<p class="sub">
+  三栏的材质、尺寸、内容完全一样，只有入场方式不同。<b>A 与 A+ 都是缩放</b>，差别在原点、时长和曲线；B 是位移对照。<br>
+  建议点「连续播放」，盯住 A 和 A+ 的<b>收尾那一段</b>：A 会拖一小段才停稳，A+ 收得更干脆。
+</p>
+
+<div class="bar">
+  <button class="primary" id="play">连续播放</button>
+  <button id="reset">复位</button>
+  <span class="hint">材质：backdrop-filter blur(28px)，与库里 .m-float 一致</span>
+</div>
+
+<div class="stage">
+  <div class="col a">
+    <div class="col-head">A · 缩放（之前）</div>
+    <div class="col-desc">从锚点 <code>scale .86</code> 展开，0.38s。文字重栅格化 + 背景模糊跟着缩放。</div>
+    <div class="card">
+      <div class="card-title">Select 基础示例</div>
+      <div class="card-line">ui/Select.vue</div>
+      <div class="trigger" data-trigger="a">启用<span>⌄</span></div>
+      <div class="panel" data-panel="a">
+        <div class="opt">全部</div>
+        <div class="opt on">启用<em>✓</em></div>
+        <div class="opt">停用</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col b">
+    <div class="col-head">B · 位移 12px（现在）</div>
+    <div class="col-desc">不缩放，<code>y 12 → 0</code> + 淡入，0.26s。文字全程清晰。</div>
+    <div class="card">
+      <div class="card-title">Select 基础示例</div>
+      <div class="card-line">ui/Select.vue</div>
+      <div class="trigger" data-trigger="b">启用<span>⌄</span></div>
+      <div class="panel" data-panel="b">
+        <div class="opt">全部</div>
+        <div class="opt on">启用<em>✓</em></div>
+        <div class="opt">停用</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col c">
+    <div class="col-head">A+ · 缩放优化（现在）</div>
+    <div class="col-desc">轴心挪到顶边、时长 380→280ms、曲线换 <code>power4.out</code> 收掉长尾，加 <code>will-change</code> 减少文字重栅格化。</div>
+    <div class="card">
+      <div class="card-title">Select 基础示例</div>
+      <div class="card-line">ui/Select.vue</div>
+      <div class="trigger" data-trigger="c">启用<span>⌄</span></div>
+      <div class="panel" data-panel="c">
+        <div class="opt">全部</div>
+        <div class="opt on">启用<em>✓</em></div>
+        <div class="opt">停用</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="foot">
+  <b>怎么判</b>：连续播放时把注意力放在面板<b>里面的文字</b>上。A 栏文字在放大的过程中会发虚、落定瞬间才变清晰；B/C 全程清晰。<br>
+  <b>为什么 A 会卡</b>：带 <code>backdrop-filter</code> 的元素做 <code>scale</code>，浏览器每帧都要按新尺寸重新采样背景并重算 28px 高斯模糊，<b>透过面板看到的卡片也在缩放</b>——这是观感上的「不丝滑」，不是掉帧（实测 rAF 稳定 60fps）。<br>
+  <b>规范依据</b>：Material 把对话框（从中心升起）用 <code>scale 0.86</code>，<b>菜单用 fade + slide</b>。下拉紧贴触发器，属于后者。
+</p>
+
+<script>
+const REVEAL = 'cubic-bezier(.16, 1, .3, 1)'
+const QUART = 'cubic-bezier(.25, 1, .5, 1)'
+const panels = { a: null, b: null, c: null }
+
+/* A：从锚点缩放（复刻旧实现：expo 380ms，轴心按面板中心算） */
+function playA(el) {
+  const r = el.getBoundingClientRect()
+  el.style.transformOrigin = `${r.width * 0.5}px ${r.height * 0.35}px`
+  el.animate(
+    [{ opacity: 0, transform: 'scale(.86)' }, { opacity: 1, transform: 'scale(1)' }],
+    { duration: 380, easing: REVEAL, fill: 'both' }
+  )
+}
+/* B：位移 12px + 淡入（对照：来源感弱） */
+function playB(el) {
+  el.animate(
+    [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }],
+    { duration: 260, easing: REVEAL, fill: 'both' }
+  )
+}
+/* A+：轴心在顶边、280ms、quart.out、will-change */
+function playC(el) {
+  el.style.transformOrigin = '50% 0%'
+  el.style.willChange = 'transform, opacity'
+  const a = el.animate(
+    [{ opacity: 0, transform: 'scale(.88)' }, { opacity: 1, transform: 'scale(1)' }],
+    { duration: 280, easing: QUART, fill: 'both' }
+  )
+  a.finished.then(() => { el.style.willChange = 'auto' }).catch(() => {})
+}
+
+const players = { a: playA, b: playB, c: playC }
+
+function close(kind) {
+  const el = document.querySelector(`[data-panel="${kind}"]`)
+  el.classList.remove('open')
+  el.getAnimations().forEach(a => a.cancel())
+  el.style.opacity = ''
+  el.style.transform = ''
+}
+
+function open(kind) {
+  const el = document.querySelector(`[data-panel="${kind}"]`)
+  el.classList.add('open')
+  players[kind](el)
+}
+
+function reset() {
+  ['a', 'b', 'c'].forEach(close)
+}
+
+document.querySelectorAll('.trigger').forEach(t => {
+  t.addEventListener('click', () => {
+    const kind = t.dataset.trigger
+    const el = document.querySelector(`[data-panel="${kind}"]`)
+    if (el.classList.contains('open')) close(kind)
+    else { close(kind); requestAnimationFrame(() => open(kind)) }
+  })
+})
+
+let timers = []
+document.getElementById('play').addEventListener('click', () => {
+  timers.forEach(clearTimeout); timers = []
+  reset()
+  const seq = [['a', 200], ['b', 200], ['c', 200]]
+  let delay = 260
+  seq.forEach(([k, hold]) => {
+    timers.push(setTimeout(() => open(k), delay))
+    timers.push(setTimeout(() => close(k), delay + 900))
+    delay += 1100
+  })
+})
+
+document.getElementById('reset').addEventListener('click', () => { timers.forEach(clearTimeout); reset() })
+</script>
+</body>
+</html>

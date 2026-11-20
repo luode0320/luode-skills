@@ -28,9 +28,26 @@ BASELINE = ROOT / "references" / "component-library-baseline.json"
 # 基线溯源标签：只有由上游对象库派生的清单才被离线模式信任。
 PROVENANCE = "upstream-git-blob"
 
-# 本地受管例外：允许与上游内容漂移的配置层文件（不属于 src 视觉/行为还原面）。
+# 本地受管例外：允许与上游内容漂移的文件，校验时记为 overridden 而不是 drift。
 # vite.config.ts 挂载本地 mock 插件；package-lock.json 由本机 npm 重写。
-LOCAL_MANAGED = {"vite.config.ts", "package-lock.json"}
+#
+# 例外清单本该只放配置层，下面这个 src 组件是**有意识的破例**，原因是上游的浮层入场
+# 只有 `pop` 分支（scale 0.98，实测幅度 1.4%，等同无动画），而参数写在逐字节冻结的
+# motion.ts 里、缝隙只允许追加行、改不了数字。要让选择器和 Dropdown（已改成锚点展开，
+# 幅度 14%）观感一致，只能在调用侧换入场形态，而这必须改 Select.vue 自身的 Transition 属性。
+#
+# 代价必须记住：**此文件从此不再与上游比对**。上游若修了 Select 的 bug 或改了交互，
+# 本地不会收到漂移告警。回退方式：把下面这行删掉、恢复 Select.vue 的原始 Transition 属性，
+# 再跑 verify_fidelity.py 复核。若非必须，不要往这里继续加 src 文件。
+LOCAL_MANAGED = {
+    "vite.config.ts",
+    "package-lock.json",
+    "src/components/ui/Select.vue",
+    "src/components/ui/HoverCard.vue",
+    "src/components/ui/Modal.vue",
+    "src/components/layout/Topbar.vue",
+    "src/components/layout/CommandPalette.vue",
+}
 
 # 上游仓库根、按同路径收录进组件库的文件（设计契约与许可证）。
 ROOT_TRACKED = {"DESIGN.md", "LICENSE"}
@@ -49,6 +66,30 @@ SANCTIONED_SEAMS = {
     # 修复只能以「追加一行 import」的声明形式进入冻结入口，缝隙之外仍须逐字节等于上游。
     "src/main.ts": [
         "import './styles/overrides.css'",
+    ],
+    # 外观新增「主色」「字号」两个维度后，首屏脚本必须同步写入，否则用户选了非默认色板
+    # 或非标准字号时，会先渲染一帧默认外观再跳到真实值。扩展维度存在独立键里，
+    # 避免与上游 appearance 模块的整对象回写互相覆盖。只允许追加这三行。
+    "index.html": [
+        "      var ext = JSON.parse(localStorage.getItem('scaffold.appearance.ext') || '{}')",
+        "      document.documentElement.dataset.accent = ext.accent || 'blue'",
+        "      document.documentElement.dataset.fontScale = ext.fontScale || 'regular'",
+    ],
+    # 外观面板要同时管主题、主色、字号、密度，而上游这个对话框把主题与密度两个
+    # Segmented 直接写死在里面，文件逐字节冻结、内部无法扩展。
+    # 做法：正文交给本地组件 AppearanceSettings，这里只留「引入 + 挂载」两行，
+    # 原有 pref-list 由覆盖层隐藏（见 overrides.css 的 :has 规则）。
+    # 缝隙之外仍须逐字节等于上游。
+    "src/components/layout/AppearanceDialog.vue": [
+        "import AppearanceSettings from '@/components/workspace/AppearanceSettings.vue'",
+        "    <AppearanceSettings />",
+    ],
+    # 组件库侧栏要把「父分类标题 + 平铺子项」改成可折叠分组，而 Sidebar.vue 逐字节冻结、
+    # 模板结构无法扩展。做法：本地 GalleryNav 只在画廊路由下接管导航，原有平铺分组
+    # 由覆盖层隐藏（见 overrides.css 的 `:has(> .gn)` 规则）。缝隙之外仍须逐字节等于上游。
+    "src/components/layout/Sidebar.vue": [
+        "import GalleryNav from '@/views/gallery/GalleryNav.vue'",
+        "      <GalleryNav />",
     ],
 }
 

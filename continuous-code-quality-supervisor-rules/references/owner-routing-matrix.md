@@ -51,14 +51,14 @@
 
 ### 运行时、分析与元流程
 
-`code-context-resync-rules`、`codegraph-analysis-rules`、`project-local-skills-rules`、`project-style-rules`、`skill-hit-check-rules`、`skill-audit-rules`、`skill-execution-compliance-gate-rules`、`skill-absorption-rules`、`skill-creator`、`skill-installer`、`find-skills`、`autonomous-execution-rules`、`parallel-task-dispatch-rules`、`team-development-rules`、`execution-failure-learning-rules`、`mcp-installation-rules`、`plugin-installation-rules`。
+`codegraph-analysis-rules`、`project-local-skills-rules`、`project-style-rules`、`skill-hit-check-rules`、`code-change-finalization-gate-rules`、`skill-absorption-rules`、`skill-creator`、`skill-installer`、`find-skills`、`autonomous-execution-rules`、`parallel-task-dispatch-rules`、`execution-failure-learning-rules`、`mcp-installation-rules`、`plugin-installation-rules`。
 
 ### 项目分析、文档与专项工程流程
 
-`project-interface-baseline-rules`、`architecture-doc-rules`、`project-design-doc-rules`、`project-timeline-rules`、`project-local-skills-rules`、`project-rule-file-bootstrap-rules`、`godot-project-bootstrap-rules`。`micro-business-architecture-rules` 仅按允许列表中的受控条件作为质量 Owner，不因此放开其它项目流程。
+`project-interface-baseline-rules`、`architecture-doc-rules`、`project-design-doc-rules`、`project-timeline-rules`、`project-local-skills-rules`、`context-recovery-rules`、`godot-project-bootstrap-rules`。`micro-business-architecture-rules` 仅按允许列表中的受控条件作为质量 Owner，不因此放开其它项目流程。
 
 ### 状态、记忆、宿主与环境准备
 
-`task-plan-rehydration-rules`、`knowledge-flow`、`project-memory-rules`、`thread-title-rules`、`context-compression-rules`、`agent-runtime-recovery-rules`、`project-rule-file-bootstrap-rules`、`recent-context-bootstrap-rules`、`history-recall-rules`、`authenticated-url-routing-rules`、`windows-powershell-environment-rules`、`wsl-windows-bridge`。
+`knowledge-flow`、`project-memory-rules`、`context-recovery-rules`、`agent-runtime-recovery-rules`、`history-recall-rules`、`authenticated-url-routing-rules`、`windows-powershell-environment-rules`、`wsl-windows-bridge`。
 
 排除列表中的 Skill 仍可由主流程按其自身触发条件调用；本监督 Skill 永不把它们当作质量 Owner。

@@ -95,3 +95,7 @@ description: 当用户描述报错、异常行为、结果不符、线上问题�
 - 只有在对照好坏描述样例时，再读 `references/intake-examples.md`。
 - 输出 Bug 入口文档前，必须读取 `../artifact-delivery-gate-rules/references/plain-language-document-contract.md`；正文先写现象、影响和期望，环境、日志、复现数据和证据进入附录。
 - 若 Bug 需要审查、验收、浏览器联调或第三方验证，必须同时读取 `../artifact-delivery-gate-rules/references/review-acceptance-gate-contract.md`。
+
+## 公共 Markdown 呈现路由
+
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。

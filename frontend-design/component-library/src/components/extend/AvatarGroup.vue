@@ -10,12 +10,14 @@ import { computed, useSlots, Comment, Fragment, type VNode } from 'vue'
 const props = withDefaults(defineProps<{
   /** 最多展示几个头像，不传则不裁剪 */
   max?: number
-  /** 单个头像直径，px；同时决定 +N 气泡与叠压量，三者同源才不会错位 */
-  size?: number
+  /** 单个头像直径，px；同时决定 +N 气泡与叠压量，三者同源才不会错位。
+      用 diameter 而不是 size：size 在本库专指控件档位（xs/sm/md/lg），
+      直径是几何量，两者混用会让调用方无法判断传 32 是档位还是 32px。 */
+  diameter?: number
   /** 头像总数，用于服务端只返回部分头像时算 +N；不传则按实际子项数算 */
   total?: number
 }>(), {
-  size: 32,
+  diameter: 32,
 })
 
 const slots = useSlots()
@@ -48,15 +50,15 @@ const overflow = computed(() => {
   return remain > 0 ? remain : 0
 })
 
-/* 叠压量与环宽都由 size 推导：写死像素会在换尺寸后与头像直径脱节，露出压边错位 */
-const stack = computed(() => ({ marginLeft: `${-Math.round(props.size * 0.28)}px` }))
+/* 叠压量与环宽都由 diameter 推导：写死像素会在换尺寸后与头像直径脱节，露出压边错位 */
+const stack = computed(() => ({ marginLeft: `${-Math.round(props.diameter * 0.28)}px` }))
 const ring = { boxShadow: '0 0 0 2px var(--surface-solid)' }
 
 /* +N 紧跟前一个头像，两者共用同一份叠压量；前面没有头像时不能负移，否则会向左多缩一截 */
 const moreStyle = computed(() => [
   visible.value.length ? stack.value : undefined,
   ring,
-  { width: `${props.size}px`, height: `${props.size}px`, fontSize: `${Math.round(props.size * 0.36)}px` },
+  { width: `${props.diameter}px`, height: `${props.diameter}px`, fontSize: `${Math.round(props.diameter * 0.36)}px` },
 ])
 </script>
 

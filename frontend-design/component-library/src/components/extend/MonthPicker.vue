@@ -5,7 +5,7 @@
    exemption: 翻年、12 格布局与选后回写同属一个交互单元，拆开反而割裂可读性。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -161,7 +161,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else class="x-month-caret" name="chevronDown" :size="15" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="menu"
@@ -193,12 +193,12 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-monthpicker { display: inline-flex; width: 100%; }
 .x-month { width: 100%; cursor: pointer; text-align: left; color: var(--ink); }
-.x-month-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-month-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-month-value.is-placeholder { color: var(--ink-faint); }
 .x-month-caret { color: var(--ink-soft); flex: none; }
 .x-month-menu { position: fixed; z-index: 120; width: 272px; padding: 10px; border-radius: var(--r-md); }
 .x-month-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 8px; }
-.x-month-title { font-size: 13px; font-weight: 620; color: var(--ink); }
+.x-month-title { font-size: var(--fs-body); font-weight: 620; color: var(--ink); }
 .x-month-nav {
   display: inline-flex;
   align-items: center;
@@ -210,7 +210,7 @@ onBeforeUnmount(() => hide())
   background: transparent;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-month-nav:hover { background: var(--hover-bg); color: var(--ink); }
 .x-month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -220,10 +220,10 @@ onBeforeUnmount(() => hide())
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-month-cell:hover { background: var(--hover-bg); }
 .x-month-cell.is-current { color: var(--blue); font-weight: 640; }

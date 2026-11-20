@@ -6,7 +6,7 @@
    现把数组形态写进公开契约，去掉两处 as any。 */
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 export interface TreeNode {
@@ -207,7 +207,7 @@ onBeforeUnmount(() => hide())
       <Icon v-else name="chevronDown" :size="15" class="x-tree-caret" />
     </button>
     <Teleport to="body">
-      <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+      <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
         <div
           v-if="open"
           ref="panel"
@@ -248,7 +248,7 @@ onBeforeUnmount(() => hide())
 <style scoped>
 .x-treeselect { display: inline-flex; width: 100%; }
 .x-tree-trigger { width: 100%; cursor: pointer; justify-content: space-between; text-align: left; color: var(--ink); }
-.x-tree-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+.x-tree-value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-body); }
 .x-tree-value.is-placeholder { color: var(--ink-faint); }
 .x-tree-caret { color: var(--ink-soft); flex: none; }
 .x-tree-panel {
@@ -265,10 +265,10 @@ onBeforeUnmount(() => hide())
   min-height: 32px;
   padding-right: 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s var(--ease-reveal), color .15s var(--ease-reveal);
 }
 .x-tree-row:hover { background: var(--hover-bg); }
 .x-tree-row.is-selected { background: var(--blue-soft); color: var(--blue); font-weight: 620; }
@@ -276,5 +276,5 @@ onBeforeUnmount(() => hide())
 .x-tree-arrow { display: inline-flex; color: var(--ink-soft); flex: none; }
 .x-tree-arrow.is-blank { width: 13px; }
 .x-tree-title { flex: 1; min-width: 0; }
-.x-tree-empty { margin: 0; padding: 20px 10px; text-align: center; font-size: 13px; color: var(--ink-faint); }
+.x-tree-empty { margin: 0; padding: 20px 10px; text-align: center; font-size: var(--fs-body); color: var(--ink-faint); }
 </style>

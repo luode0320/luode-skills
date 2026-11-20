@@ -36,6 +36,10 @@ description: 当需求边界不清、影响范围不明、兼容性不明确、�
 - 驳回：历史问题与当前需求混做、需求偏差直接误判为 Bug、边界未稳定即进入下游，或只改文字未声明受影响图表和下游结论。
 - 用户明确暂停、停止或不继续时立即停止扩散；恢复时从已落盘的 `BOUND-*` 状态继续。
 
+## 公共 Markdown 呈现路由
+
+- Markdown 呈现统一读 `../markdown-document-authoring-rules/SKILL.md`，本 skill 只负责本领域语义、流程、字段、验收、测试、停止与回滚边界，不复制排版规则。
+
 ## References
 
 - 共享路由与保护语义：`../requirement-intake-rules/references/requirement-domain-shared-contract.md`

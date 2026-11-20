@@ -5,7 +5,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
 import Button from '@/components/ui/Button.vue'
-import { overlayEnter, overlayLeave } from '@/composables/motion'
+import { overlayMenuEnter, overlayMenuLeave } from '@/composables/morph'
 import { floatingLayerFor } from '@/composables/focus'
 
 const props = withDefaults(defineProps<{
@@ -125,7 +125,7 @@ watch(() => props.placement, () => { if (open.value) nextTick(place) })
     <slot />
   </span>
   <Teleport to="body">
-    <Transition :css="false" @enter="(el, done) => overlayEnter(el, done, 'pop')" @leave="(el, done) => overlayLeave(el, done, 'pop')">
+    <Transition :css="false" @enter="overlayMenuEnter" @leave="overlayMenuLeave">
       <div
         v-if="open"
         ref="panel"
@@ -170,8 +170,8 @@ watch(() => props.placement, () => { if (open.value) nextTick(place) })
 }
 .x-pc-ico.is-danger { color: var(--red-text); }
 .x-pc-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.x-pc-title { font-size: 13px; font-weight: 620; }
-.x-pc-msg { font-size: 12px; line-height: 1.6; color: var(--ink-muted); }
+.x-pc-title { font-size: var(--fs-body); font-weight: 620; }
+.x-pc-msg { font-size: var(--fs-sm); line-height: 1.6; color: var(--ink-muted); }
 .x-pc-foot {
   display: flex;
   align-items: center;

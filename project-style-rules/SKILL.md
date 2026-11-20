@@ -1,6 +1,6 @@
 ---
 name: project-style-rules
-description: 从对话和代码中自动提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。用于项目需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；后续写代码时由 `code-generation-style-rules` 读取并应用这份风格记忆，本 skill 只负责维护记忆本身，不作为代码生成风格总控入口。当用户给出“根据 skill 补充更新 md / 根据规则更新 md / 按 skill 更新项目 md / 补充更新 md / 更新项目规则md / 更新规则md / 更新md”等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（该聚合指令下的其余文件分别由 `project-rule-file-bootstrap-rules` 的 `rule-bootstrap`〔规则文件〕与 `memory-bootstrap`〔记忆四件套骨架〕条件路由编排联动）。
+description: 从对话和代码中提取、规范化、合并并增量更新项目代码风格示例，写入根目录 `PROJECT_STYLE.md` 作为唯一风格记忆源。适用于需要长期记住方法、注释、类、结构体、变量、异步、日志、错误处理、接口、工具调用、循环等代码风格样例的场景；写代码时由 `code-generation-style-rules` 读取并应用，本 skill 只维护记忆本身，不作为代码生成总控入口。当用户说「根据 skill 补充更新 md / 按 skill 更新项目 md / 更新规则 md / 更新 md」等聚合指令时，本 skill 负责其中 `PROJECT_STYLE.md` 的检测、缺失则创建、已存在则增量补齐（其余文件由 `context-recovery-rules` 的 `rule-bootstrap` 与 `memory-bootstrap` 路由编排）。
 ---
 
 # 项目风格规则
@@ -75,22 +75,6 @@ description: 从对话和代码中自动提取、规范化、合并并增量更�
 - 同一条目若同时需要“推荐写法”和“禁用写法”，优先在 `示例` 中给推荐片段，在 `说明` 中补禁用边界。
 
 参考 [project-style-template.md](references/project-style-template.md) 获取可直接复制的主文档模板和合并检查清单。
-
-## 使用次数计数锚点区（委托）
-
-`PROJECT_STYLE.md` 底部新增固定标题 `## 计数锚点区`（与 `PROJECT_MEMORY.md` 的"机器索引区"语义区分：本区只承载计数，不含实体/关系/证据全索引），使用 `yaml` fenced block，锚点 key 用条目标题（`### 标题`，稳定可回指）：
-
-```yaml
-version: 1
-anchors:
-  - title: 中文优先表达
-    usage_count: 0
-    usage_days: 0
-    last_used_at: null
-    absorbed_to: null
-```
-
-计数语义、回写时机、防虚报校验与吸收触发统一由 `memory-usage-tracking-rules` 管理；本 skill 只负责在维护条目时**原样保留**计数锚点区（条目标题变更时同步更新锚点 title，条目删除时删除对应锚点），不自行定义计数规则。会话启动全文读取不计入使用次数。
 
 ## 跨项目沉淀判断（可选）
 

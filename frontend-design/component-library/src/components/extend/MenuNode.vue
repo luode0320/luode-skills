@@ -4,6 +4,7 @@
    折叠态或横向模式下子菜单改为浮层浮出，避免把父级列表撑开。 */
 import { computed, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
+import { EASE, gsap, motionSkipped } from '@/composables/motion'
 
 /* 与 Menu.vue 的 MenuItem 保持同一结构：只描述本节点消费的字段，递归由 children 自引用 */
 interface MenuNodeItem {
@@ -49,6 +50,23 @@ function activate() {
   emit('select', props.item.key)
 }
 
+/* 展开形变：子菜单是「被拉开」而不是「瞬间出现」。
+   用高度 0 → auto 的过渡，和 CollapseItem 同一套语式（展开 Unfold）。
+   收起同样走一遍——v-if 直接卸载会让整块凭空消失，这正是「僵硬」的来源。 */
+function onSubEnter(el: Element) {
+  if (motionSkipped()) return
+  gsap.fromTo(
+    el,
+    { height: 0, opacity: 0 },
+    { height: 'auto', opacity: 1, duration: 0.24, ease: EASE.swap, clearProps: 'height', overwrite: true },
+  )
+}
+
+function onSubLeave(el: Element, done: () => void) {
+  if (motionSkipped()) { done(); return }
+  gsap.to(el, { height: 0, opacity: 0, duration: 0.18, ease: EASE.exit, overwrite: true, onComplete: done })
+}
+
 /** [参数] key 子节点派发上来的选中项 [返回] 无；继续向上冒泡 */
 function relay(key: string) {
   emit('select', key)
@@ -86,23 +104,25 @@ function onLeave() {
       <Icon
         v-if="hasChildren && !floating"
         class="x-menu-caret"
-        :class="{ 'is-open': expanded }"
+        :class="{ 'is-open': subOpen }"
         name="chevronDown"
         :size="14"
       />
     </button>
-    <ul v-if="subOpen" :class="['x-menu-sub', floating && 'm-float']" role="menu">
-      <MenuNode
-        v-for="child in item.children"
-        :key="child.key"
-        :item="child"
-        :depth="depth + 1"
-        :vertical="vertical"
-        :collapsed="collapsed"
-        :selected="selected"
-        @select="relay"
-      />
-    </ul>
+    <Transition :css="false" @enter="onSubEnter" @leave="onSubLeave">
+      <ul v-if="subOpen" :class="['x-menu-sub', floating && 'm-float']" role="menu">
+        <MenuNode
+          v-for="child in item.children"
+          :key="child.key"
+          :item="child"
+          :depth="depth + 1"
+          :vertical="vertical"
+          :collapsed="collapsed"
+          :selected="selected"
+          @select="relay"
+        />
+      </ul>
+    </Transition>
   </li>
 </template>
 
@@ -118,10 +138,10 @@ function onLeave() {
      缺右内边距会让文字末尾直接贴到选中底色块的右边缘（实测 padR=0）。 */
   padding-right: 10px;
   border-radius: var(--r-xs);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--ink-muted);
   text-align: left;
-  transition: background .18s ease, color .18s ease;
+  transition: background .18s var(--ease-reveal), color .18s var(--ease-reveal);
 }
 .x-menu-item:hover:not(:disabled) { background: var(--hover-bg); color: var(--ink); }
 .x-menu-item.is-active { background: var(--blue-soft); color: var(--blue); font-weight: 620; }
@@ -129,7 +149,16 @@ function onLeave() {
 .x-menu-label { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .x-menu-caret { color: var(--ink-faint); transition: transform .24s var(--ease-premium); }
 .x-menu-caret.is-open { transform: rotate(180deg); }
-.x-menu-sub { margin: 0; padding: 0; list-style: none; }
+/* 子菜单是「被拉开」的：高度 0 ↔ auto 由 Transition 钩子驱动（见 onEnter / onLeave），
+   这里只负责裁切与原点。早先做的是「子项逐条落下」，但收起仍是 v-if 瞬删，
+   一半有动效一半没有，反而更显僵硬——改为双向高度形变后两端一致。 */
+.x-menu-sub {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  transform-origin: top center;
+}
 /* 浮层子菜单：折叠态贴节点右侧，横向菜单贴节点下方 */
 .x-menu-node.is-floating > .x-menu-sub {
   position: absolute;
