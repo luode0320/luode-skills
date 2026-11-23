@@ -86,6 +86,7 @@ metadata:
   - `node frontend-design/scripts/check_component_categories.mjs` → 必须 `CATEGORIES: PASS`（分类真相源 `component-categories.ts` 与磁盘 `.vue` 双向对账：覆盖、唯一、无幽灵、分类数≥8；直接 import 生产模块，不重解析源文件，源文件结构漂移即判失败）
   - `node frontend-design/scripts/build_component_catalog.mjs --check` → 必须 `CATALOG: PASS`（组件契约与目录索引同步，签名含分类，分类漂移即 STALE）
   - `node frontend-design/scripts/check_admin_component_coverage.mjs` → 必须 `ADMIN_COVERAGE: PASS`（后台组件覆盖率：以 `src/views/**` + `src/App.vue` + `src/router/**` 为入口做真实 import/模板引用闭包，152 个组件必须全部可达；只 import 不渲染不计入，防止一行批量导入刷满覆盖率；`import.meta.glob` 按实际匹配集计入，变异自测已验证收窄 glob 会真实掉覆盖率）
+  - `python frontend-design/scripts/check_form_vocabulary.py` → 必须 `FORM_VOCABULARY: PASS`（覆盖层里那三块本地补齐的表单词汇——成组数字带单位、文件选择、危险区域——必须齐备；词汇不许外溢到七个冻结层；外壳变体的内层 input 不许补 border/背景，否则就是「药丸套药丸」；`.empty` 不许退回虚线灰盒、`.page.is-contained` 不许缺 `margin-inline:auto`。词汇无组件引用，删掉不会有别的测试红，只能靠这道守着；`--selftest` 反向变异四条已验证）
   - `cd component-library && npm run build` → 必须 vue-tsc 类型检查 + 构建成功
   - `cd component-library && npm run test:unit` → 上游单测必须全绿
 - 上游升级：重新冻结 commit → 运行 `python frontend-design/scripts/verify_fidelity.py --write-baseline` 刷新基线，并同步更新本文件顶部的 commit 号。

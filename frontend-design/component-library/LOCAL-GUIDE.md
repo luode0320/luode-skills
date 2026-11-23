@@ -89,6 +89,59 @@ npm run dev        # http://localhost:5173，登录页任意账号密码可进�
 
 示例变体由 `../scripts/build_demo_variants.mjs` 从组件契约派生。同名 prop 在不同组件里量纲不同时，必须在脚本的 `NUMBER_VARIANTS_BY_COMPONENT` 里给出该组件自己的值域，否则会派生出越界示例（曾把 168px 的刻度环缩成 16px、把 44px 图标塞进 32px 按钮）。改完组件 props 后的生成顺序固定为：`build_component_catalog.mjs` → `build_demo_variants.mjs`，顺序颠倒会沿用旧契约。
 
+## 表单词汇：外壳变体与成组控件
+
+`.input-shell` 是输入控件的唯一外壳词汇。边框、背景、焦点环全归外壳一层，内层 `input / textarea` 在冻结层里已经 `border: 0` + `outline: none`（`components.css` 119–131 行），所以**任何新变体只调几何，不要给内层补边框、圆角或阴影**——那会立刻变成两层描边，用户看到的是「药丸套药丸」。
+
+冻结层没有覆盖到的三种真实表单形态，本地补在 `src/styles/overrides.css` 的「表单词汇补齐」段。它们都是新增的可选类，没有既有组件引用，现网渲染零变化：
+
+| 形态 | 类 | 用途 |
+| --- | --- | --- |
+| 成组数字 | `.input-shell.is-unit` + `.shell-affix` | 「最近 30 天」「间隔 3 秒」这类数量带单位。单位包在外壳内，读屏读成一个整体，而不是三段互不相干的文本 |
+| 文件选择 | `.input-shell.is-file` | 原生 `input[type=file]` 自带按钮与内边距，高度超过 36px 外壳会向下溢出压住提示行；外壳改自适应高度，原生按钮用 `::file-selector-button` 重绘成与 `.btn-sm` 同族 |
+| 危险区域 | `.danger-zone` + `.danger-title` / `.danger-desc` | 说明 + 手抄确认 + 破坏性按钮收成一块。确认输入限宽 340px，不跟着面板拉满 |
+
+```html
+<!-- 成组数字：单位在外壳里，for 挂在 label 上，点「最近」也能聚焦 -->
+<label class="input-shell is-unit" for="days">
+  <span class="shell-affix">最近</span>
+  <input id="days" type="number" min="1" max="365" value="30">
+  <span class="shell-affix">天</span>
+</label>
+
+<!-- 文件选择 -->
+<div class="input-shell is-file">
+  <input type="file" multiple accept=".txt,.epub">
+</div>
+
+<!-- 危险区域 -->
+<section class="danger-zone">
+  <div class="danger-title">清空全部阅读记录</div>
+  <div class="danger-desc">这一步不可撤销，输入「清空」确认。</div>
+  <form method="post" action="/reads/clear">
+    <div class="field">
+      <span class="field-label">输入「清空」确认</span>
+      <div class="input-shell"><input name="confirm" autocomplete="off"></div>
+    </div>
+    <button class="btn btn-danger">执行清空</button>
+  </form>
+</section>
+```
+
+**成组控件必须是同一个外壳**，不要用「`.field-label` + 输入框 + `.field-label`」拼三段：那样三段各自按自己的行高排，中文全角标签与数字框的基线对不上，视觉上会挤成一坨，语义上也读不出是一个词组。
+
+## 空态与内容宽度
+
+**空态不画灰盒子**。`.empty`（冻结层 `components.css` 629–648 行）已经是留白式：居中、44px 上下留白、`--ink-soft` 文字，配 `.empty-ico` 的描边图标。不要给它加虚线边框、凹槽底色或内阴影——「虚线 + 灰底」在用户眼里是「这里有内容但没加载出来」，而不是「这里现在没有内容」。这条是反例基线，复盘自一次后台组件返工：那边把空态做成虚线凹槽，截图反馈的第一句就是「像坏了的占位框」。
+
+**内容宽度默认通栏**。`.page`（冻结层 `layout.css` 249–259 行）没有 `max-width`，视口多宽内容就多宽。表格列少、读数卡少的页面在 1900+ 视口下会右侧空出一整条，读起来还要横着扫。需要收就加类：
+
+```html
+<main class="page is-contained">…</main>
+```
+
+宽度取 `--content-max`（`overrides.css` 顶部，默认 1400px）。要调就改这个令牌，别在页面里散写 `max-width`。**收窄只在页面明确要求时生效**——不同应用的表格列数差别很大，组件库不替页面决定。
+
 ## 字号标度
 
 正文字号基准是 **14px**（`body` 与 `.btn` / `.table` / `.input-shell` 一致），最小字号 **12px**。字号只有 5 档，分 3 个整体档位，由 `data-font-scale` 切换：

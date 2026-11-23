@@ -1,8 +1,9 @@
 /* 本地样式覆盖层：只用于修正上游冻结层里的绘制缺陷，不新增组件、不改变设计语言。
    上游 src/styles/*.css 逐字节冻结，任何外壳级修复必须落在这一层，
    由 main.ts 的声明式缝隙行引入，保证缝隙之外仍与上游逐字节相等。
-   最近修改时间：2026-10-18 14:20:00；改动原因：噪点层原以 fixed + z-index 200
-   压在正文之上，逐像素扰动文字边缘，改为沉到内容之下。 */
+   最近修改时间：2026-11-24 00:25:00；改动原因：补齐冻结层缺失的三块表单词汇
+   （成组数字与单位、文件选择、危险区域）与可选的内容宽度上限，全部是新增的
+   可选类，无既有组件引用，现网渲染零变化。 */
 
 :root {
   /* 外壳外阴影的实际延展量：上延 24-70/2=11px、侧延 70/2=35px、下延 24+70/2=59px。
@@ -39,6 +40,11 @@
   --icon-control-sm: 15px;
   --icon-control-md: 17px;
   --icon-control-lg: 20px;
+
+  /* 内容宽度上限：只在页面显式要求时生效（.page.is-contained）。
+     通栏仍是默认——组件库服务的应用列数差别很大，由页面决定收不收，
+     令牌给一个可调的值，避免在每个页面里散写 max-width。 */
+  --content-max: 1400px;
 }
 
 /* 只在有深色外框的宽度生效：≤820px 上游把外框改成贴边全屏（border 0 / radius 0），
@@ -432,6 +438,127 @@
 .rg-node.is-core .rg-body::before {
   /* 无限循环的呼吸：用对称曲线，起收同速才读得出「呼吸」而不是「闪」 */
   animation-timing-function: var(--ease-swap);
+}
+
+/* ── 表单词汇补齐：成组数字、文件选择、危险区域 ─────────────────────────
+   来源是一次后台组件缺陷复盘，那里暴露的四个问题里，组件库本来就答对了三个
+   （单层描边、标签不塌、空态不画灰盒），真正缺的是三块「真实表单必然出现、
+   而冻结层没有词汇」的形态：数量后面带单位、选一个文件、危险操作要手抄确认。
+   缺词汇的代价不是画错，而是每个业务方各写一套：单位靠 span 硬凑、文件框用
+   原生控件裸奔、危险区拿红按钮代替确认。
+   这里的规则全是新增的可选类，冻结层规则一个字节没动，也没有任何既有组件
+   引用它们，所以现网渲染零变化。
+
+   单层描边不变量（改这里的任何一条前先读一遍）：
+   边框、背景、焦点环永远归 .input-shell 一层，内层控件只提供内容与光标。
+   冻结层 119-131 行已经给了 input/textarea 的 border:0 与 outline:none，
+   所以新变体只调几何，不要给内层补边框、圆角或阴影——那会立刻变成两层。 */
+
+/* 成组数字：单位是控件的一部分，不是旁边的另一段文字。
+   单位用 .shell-affix 包在内壳里，读屏读成「最近 30 天」一个整体，
+   而不是「最近」「30」「天」三段互不相干的文本。 */
+.input-shell.is-unit {
+  width: auto;
+  min-width: 128px;
+  gap: 2px;
+}
+
+.input-shell.is-unit > input {
+  flex: 1;
+  text-align: center;
+}
+
+.shell-affix {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* 文件选择：原生 input[type=file] 自带按钮与内边距，高度比 36px 外壳还高，
+   塞进定高外壳会向下溢出，压住下一行的提示文字（后台那次红框就是这个）。
+   外壳因此改为自适应高度，原生按钮用 ::file-selector-button 重绘成
+   与 .btn-sm 同族的样子，鼠标与键盘焦点仍由外壳统一接管。 */
+.input-shell.is-file {
+  height: auto;
+  min-height: var(--control-h);
+  padding: 5px 8px 5px 6px;
+}
+
+.input-shell.is-file > input[type="file"] {
+  height: auto;
+  padding: 0;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.input-shell.is-file > input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-xs);
+  background: var(--surface-solid);
+  box-shadow: var(--edge);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-hover) var(--ease-glide),
+    background var(--dur-hover) var(--ease-glide);
+}
+
+.input-shell.is-file > input[type="file"]::file-selector-button:hover {
+  border-color: rgba(var(--shade), .2);
+}
+
+/* 危险区域：把「说明 + 手抄确认 + 破坏性按钮」收成一块，避免红按钮孤零零
+   挂在面板里（那种排布点下去才发现不可撤销）。确认输入不跟着面板宽度拉满，
+   340px 是「够抄一个词、又不至于让眼睛跑一整屏」的经验上限。 */
+.danger-zone {
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  background: var(--red-soft);
+  box-shadow: inset 0 0 0 1px rgba(255, 90, 80, .22);
+}
+
+.danger-zone .danger-title {
+  font-size: 13px;
+  font-weight: 640;
+  color: var(--red-text);
+}
+
+.danger-zone .danger-desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.danger-zone form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.danger-zone .field {
+  width: 100%;
+  max-width: 340px;
+}
+
+/* 内容宽度上限：面板与表格在 1900+ 视口下跟着窗口一直拉长，读起来要横着扫，
+   右侧还会空出一整条没有内容的地带。默认不加（冻结层 .page 仍是通栏流式），
+   由页面自行决定要不要收：<main class="page is-contained">。
+   宽度值见文件顶部 :root 的 --content-max——不同应用的表格列数差别很大，
+   要调就改那个令牌，别在页面里散写 max-width。 */
+.page.is-contained {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
 }
 
 /* BEGIN GENERATED: motion language overrides */
