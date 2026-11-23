@@ -1,5 +1,16 @@
 # 项目当前状态
 
+## 2026-11-23 TAPD skill 强制 CLI、绝对禁止浏览器（待提交）
+
+- 当前状态: 五个 TAPD skill 与 URL 路由例外已统一为命令行为唯一入口；浏览器 skill 中的 TAPD 周报脚本与自动化参考已删除；改动已通过提交前校验，按用户本轮授权进入提交与推送。
+- 用户指令: 「再次优化tapd的skill规则, 绝对不要使用浏览器, 必须强制使用cli。」
+- 已改文件: `tapd-openapi/SKILL.md`、`tapd-cli/SKILL.md`、`tapd-addcomment/SKILL.md`、`tapd-task-executor/SKILL.md` 及其 references、`authenticated-url-routing-rules/SKILL.md`、`browser-session-automation-rules/SKILL.md`、`PROJECT_MEMORY.md`、skill 字典。
+- 已删除文件: `browser-session-automation-rules/references/tapd-workflow-automation.md`、`browser-session-automation-rules/templates/tapd-weekly-report.sh`（均可从 Git 历史恢复）。
+- 关键裁决: TAPD 全流程只走 `tapd-cli`；直接 API 脚本只是 CLI 实现依赖，不作为用户侧第二通道；CLI 能力缺口或凭据失败如实阻断，不转浏览器。
+- 实测验证: 7 个受影响 skill `quick_validate` 全通过；`git diff --check` 退出码 0；字典已刷新；CLI `user info` 与 `iteration list` 只读调用通过。
+- 已知缺口: `tapd-cli` 没有工作流转换规则查询子命令，`bug update` 也未列出 `de` / `effort` 参数；工作流必填字段无法由 CLI 补齐时报告缺口并停止。状态推进改为读当前状态与字段候选、逐跳更新、每跳回读；未在 WSL 复验 CLI。
+- 交接点: 无业务写操作；提交完成后在最终证据报告 commit hash 与推送结果。
+
 ## 2026-11-14 两套外部 skill 吸收落盘 + 全仓 Git 收口（已提交并推送）
 
 - 当前状态: 两套外部来源完成吸收，四个 skill 资产入仓，5 笔提交全部 pre/post gate PASS，已推 origin/main（本地 0 领先）。

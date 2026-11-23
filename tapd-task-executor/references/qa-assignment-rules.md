@@ -41,9 +41,9 @@ tapd-cli story update workspaceid=<id> id=<19位id> status="待版本验证" cur
 缺陷通常有严格的状态机跳转路径（例如 `in_progress` -> `resolved` / `待版本验证`），不能假设可直接一步跳跃：
 
 ```bash
-# 1) 拉取工作流合法流转路径与必填字段
-python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py \
-  get --endpoint workflows/all_transitions -p workspace_id=<id> -p system=bug
+# 1) 回读当前状态与字段候选（tapd-cli 暂无工作流规则查询子命令；不因此改走网页）
+tapd-cli bug list workspaceid=<id> id=<19位id> fields=id,status,de,te,effort
+tapd-cli bug fields workspaceid=<id>
 
 # 2) 逐跳流转，目标状态匹配「待版本验证」（或对应 resolved 状态）
 # 3) 同步变更处理人为测试人员

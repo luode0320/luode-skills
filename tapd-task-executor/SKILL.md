@@ -108,18 +108,13 @@ TAPD 任务的目的是 agent 全自动调度执行，减少人工中间确认�
   tapd-cli story list workspaceid=<id> developer=<用户> limit=200
   ```
   story 使用 `current_owner` 不报错但过滤失效；`task` 实体通常为空，找活默认查 story + bug。详见 `references/cli-field-pitfalls.md`。
-- **直接 API 补位**：只有 CLI 无法满足当前迭代定位、活动状态过滤、父需求树或请求所需字段时，才用 `tapd-openapi/scripts/tapd_client_stdlib.py mine` 补齐缺失数据：
-  ```bash
-  python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py mine --workspace-id <id> --iteration current --status active
-  # 只看缺陷加 --bugs；只看需求加 --storys；状态 all 不过滤
-  ```
-  mine 输出为表格（含 19 位 id、状态、优先级、owner、标题、详情链接），只用于补齐 CLI 未覆盖的数据。
+- **复杂筛选仍由 CLI 补齐**：当前迭代定位用 `tapd-cli iteration list workspaceid=<id> status=open`，活动状态用 `tapd-cli story list` / `tapd-cli bug list` 的状态与负责人参数组合查询，父需求树按 `parent_id` / `ancestor_id` 分层拉取。CLI 无法直接表达的组合条件，分页拉取后本地筛选，不调用直接 API 脚本补位，也不进入浏览器。
 
 汇总候选清单：id、标题、描述、优先级/严重度、状态、链接（`$TAPD_SITE_URL/tapd_fe/<workspace_id>/<story|bug>/detail/<entity_id>`）。
 
 拉完先抽查几条的 `developer` / `current_owner` 是否真含目标用户名——条数接近项目总量即说明过滤没生效。
 
-**候选清单排序（强制）**：多 workspace 汇总后，按 `references/task-analysis-criteria.md` 第四节「候选清单处理顺序」统一排序，优先级高的排前面；`mine` 命令的单 workspace 内排序只是起点，跨 workspace 汇总后必须重新按同一套标准整体排序一次。该顺序贯穿后续归项目过滤、分析、执行——不是只用于兜底展示，逐条处理时严格按此顺序推进，不按拉取到的原始顺序或创建时间顺序处理。
+**候选清单排序（强制）**：多 workspace 汇总后，按 `references/task-analysis-criteria.md` 第四节「候选清单处理顺序」统一排序，优先级高的排前面；单个 workspace 的 CLI 返回顺序只是起点，跨 workspace 汇总后必须重新按同一套标准整体排序一次。该顺序贯穿后续归项目过滤、分析、执行——不是只用于兜底展示，逐条处理时严格按此顺序推进，不按拉取到的原始顺序或创建时间顺序处理。
 
 ### 4. 归项目过滤（只筛当前会话项目）
 
@@ -166,7 +161,7 @@ TAPD 任务的目的是 agent 全自动调度执行，减少人工中间确认�
 可执行清单非空 → **按第 3 步排定的优先级顺序**逐条闭环，优先级高的先做完整闭环再推进下一条，不并发抢跑、不按创建时间或拉取原始顺序处理：
 
 1. **领取与开始实现**：
-   - 任务更新 `status=progressing`；缺陷按工作流置处理中（先读 `workflows/all_transitions` 拿合法下一跳与必填字段，确实读不到映射时才退回「仅评论说明开始处理」，不凭猜测硬改状态）。
+   - 任务更新 `status=progressing`；缺陷按工作流置处理中（先用 `tapd-cli bug list` / `bug fields` 回读当前状态与字段候选，再按已确认的合法下一跳更新并回读；`tapd-cli` 暂无工作流规则查询子命令，读不到合法映射或必填字段时退回「仅评论说明开始处理」，不凭猜测硬改状态，不转浏览器）。
    - **【强制自动化约束 2】开始执行追加评论**：当分析结论为可直接执行，且已在第 5 步添加包含“可以开始做”的分析评论、会话已实际开始执行该任务/需求/bug 后，**必须及时追加一条评论**（开头 `@` 触发用户本人），内容明确包含：
      ```text
      agent开始代码实现

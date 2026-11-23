@@ -1,6 +1,6 @@
 ---
 name: tapd-cli
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD OpenAPI 命令行工具。将 TAPD 平台的 OpenAPI 封装为 tapd-cli 命令，是 TAPD 查询与操作的首选通道，适用于单条查询、批量操作、终端脚本、自动化管线和 AI Agent 调用。出现 TAPD URL 或操作请求时，先检查本工具是否支持所需操作；仅 CLI 不支持或无法满足所需数据时才转用 `tapd-openapi` 的直接 API 能力，API 也无法覆盖时才按 `authenticated-url-routing-rules` 考虑浏览器。执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并按 `tapd-env-bootstrap` 的本机真源核对环境。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 命令行工具，也是 TAPD 的唯一执行入口。将 TAPD 平台的 OpenAPI 封装为 tapd-cli 命令，适用于单条查询、批量操作、终端脚本、自动化管线和 AI Agent 调用。出现 TAPD URL 或操作请求时一律使用本工具；绝对禁止浏览器、网页读取、页面截图、网页自动化或 GUI 操作，也不因网页失败、登录态或页面已打开而改变通道。执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并按 `tapd-env-bootstrap` 的本机真源核对环境。
 allowed-tools: Bash,Read,Glob,Grep
 ---
 
@@ -10,10 +10,10 @@ TAPD OpenAPI 命令行工具，无需手动拼接 curl，直接用 `tapd-cli <en
 
 ## TAPD 操作默认路由
 
-- 用户要求查询或操作 TAPD 时，先用 `tapd-cli` 检查并执行所需操作；单条查询与批量操作都遵循此优先级。
-- CLI 明确不支持该实体、字段或操作，或无法返回完成请求所需的数据时，才回退到 `tapd-openapi` 的直接 API 能力；不要因为网页读取失败、浏览器已有登录态或页面已打开而跳过 CLI/API。
-- 只有 CLI 与直接 API 都无法满足请求中的页面专属需求（例如页面截图、富文本实际渲染或必须人工完成的页面操作）时，才按 `authenticated-url-routing-rules` 使用浏览器。凭据缺失或鉴权失败按 TAPD 环境规则处理，不得静默改用浏览器绕过。
-- 用户明确要求直接操作 TAPD 页面时，按其明确指令使用浏览器；仍遵守页面安全、登录与授权边界。
+- 用户要求查询或操作 TAPD 时，一律使用 `tapd-cli` 执行；单条查询与批量操作都遵循此约束。
+- **强制 CLI、绝对禁止浏览器（最高优先级）**：TAPD 全流程只能走命令行。禁止任何浏览器、网页读取、页面截图、富文本页面渲染确认、GUI 点击、agent-browser、Chrome Plugin、Chrome DevTools MCP、Playwright、Selenium 与 Browser Use Cloud；即使 CLI 报错、凭据缺失、页面已登录或用户要求打开页面，也不得改用浏览器。
+- CLI 明确不支持该实体、字段或操作时，先用 CLI 的组合查询、通用子命令或已有实体补齐；仍无法完成时说明命令能力缺口并停止，不切换到浏览器，也不把直接 API 当作第二用户通道。
+- 凭据缺失或鉴权失败按 TAPD 环境规则阻断，等待环境恢复后继续使用 CLI；不得静默改用任何浏览器或页面操作绕过。
 
 ## 安装
 
@@ -153,7 +153,7 @@ wsl.exe --exec bash -c 'source "$HOME/.tapd/env.sh" >/dev/null 2>&1 && [ -n "${T
 
 执行前分别确认 CLI bundle 可读、Node.js 可运行、`~/.tapd/env.sh` 可加载且 `TAPD_TOKEN` 非空；只报告凭据有无，不输出原值。使用能传递参数数组的进程调用接口时，`bash -c` 脚本必须是一个独立参数，CLI 命令与每个 `key=value` 必须是后续独立参数；禁止再套 `bash -lc`、`cmd /c`、多层引号或用 `echo` 拼接 runner。这样可以避免登录 shell 提前返回、引号错配和 Windows CRLF 被当成 Bash 参数。
 
-若 `wslpath` 转出的 CLI 路径不存在或无法读取，CLI 通道应明确标记为环境不可达；不要复制凭据，也不要循环重试同一路径。先按 `tapd-env-bootstrap` 核对 WSL 环境，再将**仅 CLI bundle**安装到稳定且当前 agent 可访问的位置，或在 CLI 确实不支持该操作时回退到 `tapd-openapi`。只有直接 API 也不能满足页面专属需求时才考虑浏览器。写入结果超时或不明确时，保留已取得的实体 ID，并先查询确认是否已写入，再决定是否重试。
+若 `wslpath` 转出的 CLI 路径不存在或无法读取，CLI 通道应明确标记为环境不可达；不要复制凭据，也不要循环重试同一路径。先按 `tapd-env-bootstrap` 核对 WSL 环境，再将**仅 CLI bundle**安装到稳定且当前 agent 可访问的位置。该阻断不会放开浏览器通道。写入结果超时或不明确时，保留已取得的实体 ID，并先查询确认是否已写入，再决定是否重试。
 
 如确需执行复杂多行脚本，脚本文件必须使用 UTF-8 无 BOM 和 LF 换行；先检查脚本与解释器可用，再显式 source WSL 凭据真源。脚本只存业务数据和命令，不含凭据值。操作结束后先回读 TAPD 实体与工时，再清理确认属于本轮的单个临时脚本。
 ## 开发

@@ -18,11 +18,18 @@
 - 语义澄清：本次实例曾同时填 effort=1 和实际 1 小时；后续仅要求已完成修复工时时只填 timespent，明确要求预估时再写 effort，不照抄双填。
 - 裁决与验证：[吸收裁决表](../workbuddy-absorption-map.md)、[案例与校验](case-tapd-openapi-absorption.md)。
 
-## 2026-10-19 TAPD 操作统一 CLI 优先
+## 2026-10-19 TAPD 操作统一 CLI 优先（已被 2026-11-23 决定取代）
 
 - 来源：用户指出 TAPD 任务误走浏览器并要求修正规则，使 CLI 成为默认通道，只有 CLI 无法处理时再回退。
-- 本地现状：`tapd-cli/SKILL.md` 有命令入口；`tapd-openapi/SKILL.md` 曾把单条读取引向 API；`authenticated-url-routing-rules/SKILL.md` 的通用网页默认规则可能覆盖 TAPD；评论与任务执行技能也各自声明通道。
-- 裁决与落点：以 `tapd-openapi/SKILL.md` 作为统一路由权威，顺序为 CLI → 直接 OpenAPI → 浏览器；更新 `tapd-cli`、`tapd-addcomment`、`tapd-task-executor` 及 URL 路由例外保持一致。只有 CLI 与 API 均无法满足页面专属操作，或用户明确要求直接操作页面时才用浏览器。
-- 整理去重：扫描 `tapd-cli`、`tapd-openapi`、`tapd-addcomment`、`tapd-task-executor`、`authenticated-url-routing-rules`；共发现原有通道说明不一致 3 处，统一为 CLI 优先并保留各 skill 的领域专属补充；无新增重复门控、孤立文件或断链。
-- 环境依赖与通用性：无新增环境配置，复用现有 CLI/API 凭据预检，不回显凭据；规则对所有 agent 通用。
-- 验证：5 个受影响 skill 的 `quick_validate.py` 均通过；字典已刷新；未执行 TAPD 真实 API/浏览器操作（本轮仅调整规则资产）。
+- 裁决与落点：当时以 CLI → 直接 OpenAPI → 浏览器作为回退顺序；该顺序已被 2026-11-23 用户要求取代，只保留历史来源意义，不再作为现行路由规则。
+- 现行规则以本文件下一条 2026-11-23 记录为准：TAPD 强制使用 `tapd-cli`，绝对禁止浏览器。
+
+## 2026-11-23 TAPD 强制 CLI、绝对禁止浏览器
+
+- 来源：用户明确要求再次优化 TAPD skill 规则，“绝对不要使用浏览器，必须强制使用 cli”。
+- 本地现状：五个 TAPD skill 与 `authenticated-url-routing-rules` 仍保留 CLI → 直接 API → 浏览器三级回退；`browser-session-automation-rules` 还保留 TAPD 页面周报脚本与自动化流程参考。
+- 裁决与落点：以 `tapd-openapi/SKILL.md` 为 TAPD 通道权威，统一改成命令行唯一入口；同步更新 `tapd-cli`、`tapd-addcomment`、`tapd-task-executor`、`authenticated-url-routing-rules`。删除 `browser-session-automation-rules` 的 TAPD 自动化参考与 TAPD 周报模板，从浏览器 skill 中移除 TAPD 入口。
+- 能力边界：`tapd-cli` 没有工作流转换规则查询子命令。规则改为先读当前状态与字段候选，再逐跳更新并回读，不把缺失能力转成浏览器或直接 API 回退；该缺口如实交给用户，不伪造已查询。
+- 整理去重：五个 TAPD skill 的通用“浏览器仅用于页面专属操作”句收敛为同一口径“TAPD 不开放浏览器”；删除任务执行器中的 `tapd_client_stdlib.py mine` 直接 API 补位，改用 `tapd-cli` 分页拉取后本地筛选。
+- 环境依赖与通用性：无新增环境配置，复用 `tapd-env-bootstrap` 的既有 CLI 凭据预检；不绑定单一 agent。
+- 验证：结构校验、字典刷新与残留扫描见本轮收口记录；未对真实 TAPD 实体执行写操作，仅使用 CLI 帮助命令核验能力边界。

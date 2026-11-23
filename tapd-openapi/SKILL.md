@@ -1,6 +1,6 @@
 ---
 name: tapd-openapi
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 操作路由与 OpenAPI 直接调用 skill。用于需求、缺陷、任务、评论、测试用例、迭代、Wiki、工时、附件、用户等 TAPD 操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接，先按 CLI 优先规则使用 `tapd-cli`；仅当 CLI 不支持或不能满足请求时才由本 skill 使用直接 OpenAPI 能力，API 也无法覆盖页面专属需求时才联动 `authenticated-url-routing-rules`。写评论等专用流程可联动 `tapd-addcomment`，但不得因此跳过 CLI 优先级。执行任何 TAPD 动作前必须遵守本 skill 的环境预检；`TAPD_TOKEN` 未配置时按本机真源规则阻断 API 操作。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 操作路由与命令行调用 skill。用于需求、缺陷、任务、评论、测试用例、迭代、Wiki、工时、附件、用户等 TAPD 操作。只要用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 域名链接，一律由 `tapd-cli` 执行；TAPD 全流程强制使用命令行，绝对禁止浏览器、网页、页面截图、网页自动化或 GUI 操作，也不以网页失败、登录态或页面已打开为由改变通道。直接 OpenAPI 仅作为 CLI 内部实现的免依赖能力，不作为用户侧第二通道。写评论等专用流程可联动 `tapd-addcomment`。执行任何 TAPD 动作前必须遵守本 skill 的环境预检；`TAPD_TOKEN` 未配置时按本机真源规则阻断。
 allowed-tools: Bash,Read,Glob,Grep
 ---
 
@@ -8,10 +8,11 @@ allowed-tools: Bash,Read,Glob,Grep
 
 ## 触发规则（tapd.cn 链接自动触发）
 
-- 用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动命中本 skill，不需要用户额外说“用 TAPD skill”；本 skill 负责串起 TAPD CLI、直接 OpenAPI 和浏览器的回退顺序。
+- 用户消息中出现 `https://www.tapd.cn` 或任意 `tapd.cn` 链接时，自动命中本 skill，不需要用户额外说“用 TAPD skill”；本 skill 负责把请求交给 `tapd-cli` 执行。
 - 从链接解析定位信息：`{TAPD_SITE_URL}/tapd_fe/{workspace_id}/{module}/detail/{id}`（story→需求、bug→缺陷、task→任务、iteration→迭代），先检查并使用 `tapd-cli`，单条查询和批量操作都适用。
-- 只有 CLI 明确不支持所需实体、字段或操作，或无法提供请求所需数据时，才由本 skill 使用直接 OpenAPI 能力；不得仅因网页读取失败、浏览器已登录或标签页已打开而转浏览器。
-- 只有 CLI 与直接 API 均无法覆盖页面专属需求（如截图、富文本实际渲染、必须人工完成的页面操作）时，才回退至 `authenticated-url-routing-rules`。缺少 API 凭据或鉴权失败应按环境规则阻断，不得静默以浏览器绕过。
+- CLI 明确不支持所需实体、字段或操作时，先在该 CLI 能力范围内用已有实体组合查询或改用 CLI 的通用子命令补齐；仍无法完成时向用户说明命令能力缺口与所需数据，不进入浏览器。
+- **TAPD 强制 CLI 通道（最高优先级）**：TAPD 的查询、创建、更新、评论、工时、流转、附件、Wiki 与批量操作一律通过 `tapd-cli` 完成。绝对禁止使用任何浏览器、网页读取、页面截图、富文本页面渲染确认、GUI 点击、agent-browser、Chrome Plugin、Chrome DevTools MCP、Playwright、Selenium 或 Browser Use Cloud；即使用户明确要求“打开 TAPD 页面”，也只执行 CLI 能覆盖的数据操作，并说明页面操作不在 TAPD 通道内。
+- 网页读取失败、浏览器已有登录态、页面已打开、CLI 报参数错误、凭据缺失或鉴权失败，都不是切换浏览器的理由。凭据问题按 `tapd-env-bootstrap` 与本文件环境预检处理；CLI/API 通道不可用时如实报告阻断并停止，不伪造结果。
 
 ### 委派语义识别与路由（强制，防止误留在纯查询）
 
@@ -84,7 +85,7 @@ cat ./references/{模块}/{文件名}.md
 
 ## 关键规则
 
-1. **优先 python3**（标准库 + requests）；禁止含 `#` 注释的多行 shell 赋值脚本；`tapd_client_stdlib.py`（纯标准库零依赖）可直接调 `projects/stories/bugs/iterations/releases/get/post` 子命令
+1. **执行入口统一为 `tapd-cli`**；禁止含 `#` 注释的多行 shell 赋值脚本。`tapd_client_stdlib.py`（纯标准库零依赖）只是 CLI 的实现依赖，不作为用户侧调用通道；CLI 不可用时先恢复 CLI 环境，不换脚本、不碰浏览器
 2. **评论必须 HTML**：`description` 用 `<p>内容</p>` 格式，Markdown 不会渲染；GET `/comments` 是查询，POST 是写入，**不可混用**
 3. **写评论带齐参数**（高频操作，直接复制使用）：
 ```bash

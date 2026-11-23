@@ -73,11 +73,13 @@
 - 来源：用户指令（2026-09-16、2026-09-17、2026-09-29）+ `tapd-task-executor`（`SKILL.md`、`config/qa-team.json`、`references/qa-assignment-rules.md`、`references/task-analysis-criteria.md`、`references/story-bug-task-workflow.md`、`references/cli-field-pitfalls.md` §九 / §十、`references/source-notes.md` 第十批）+ `tapd-openapi` + `tapd-addcomment` + 知识库《TAPD创建实体创建人身份规范》。
 - 更新时间：2026-09-29。
 
-## TAPD 工具路由优先级（2026-10-19 固化）
+## TAPD 工具路由优先级（2026-11-23 改为强制 CLI，取代 2026-10-19 三级回退）
 
-- 稳定决策：TAPD 查询与操作默认先使用 `tapd-cli`，单条查询与批量操作均适用；CLI 不支持或不能满足请求时，回退到 `tapd-openapi` 的直接 API 能力；只有 CLI 与 API 都无法提供页面专属能力时才使用浏览器。网页读取失败、浏览器已登录或标签页已打开，均不能单独作为跳过 CLI/API 的理由；凭据缺失或鉴权失败按 TAPD 环境规则阻断，不得静默绕过。
-- 来源：用户指令（2026-10-19）+ `tapd-cli/SKILL.md`、`tapd-openapi/SKILL.md`、`authenticated-url-routing-rules/SKILL.md`。
-- 更新时间：2026-10-19。
+- 稳定决策：TAPD 的查询、创建、更新、评论、工时与流转一律使用 `tapd-cli`，单条查询与批量操作都适用。**绝对禁止任何浏览器、网页读取、页面截图、网页自动化与 GUI 操作**；CLI 能力缺口、凭据缺失、鉴权失败、CLI 参数错误、页面已登录或页面已打开，都不构成切换通道的理由。
+- 稳定决策：直接 OpenAPI 脚本只是 `tapd-cli` 的内部实现能力，不是用户侧第二通道；CLI 无法完成的操作用 CLI 已有能力组合补齐，仍无法完成时如实报告缺口并停止。
+- 稳定决策：TAPD URL 在 `authenticated-url-routing-rules` 中为强制 CLI 例外，任何浏览器分支都不适用；`browser-session-automation-rules` 不承接 TAPD 任务。
+- 来源：用户指令（2026-11-23「再次优化tapd的skill规则, 绝对不要使用浏览器, 必须强制使用cli」）+ 五个 TAPD skill + `authenticated-url-routing-rules/SKILL.md`；2026-10-19 的 CLI → 直接 API → 浏览器顺序已作废。
+- 更新时间：2026-11-23。
 
 ## 待裁定事项建议、选项与默认最安全兜底闭环规则（2026-09-16 固化）
 

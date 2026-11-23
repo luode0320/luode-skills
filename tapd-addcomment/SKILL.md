@@ -1,6 +1,6 @@
 ---
 name: tapd-addcomment
-description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。用户要求评论或回复时，先检查 `tapd-cli comment` 是否支持所需操作；仅 CLI 不支持评论格式或功能时才使用本 skill 的 Python API 脚本，不因评论意图跳过 CLI 优先级。只有 CLI 与 API 都无法满足页面专属需求时才使用浏览器。执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并按 `tapd-env-bootstrap` 的本机真源核对环境。
+description: 凭据默认来源为项目代码/项目配置/普通维护文档，环境变量仅作运行时覆盖；禁止在过程性输出中回显凭据原值。TAPD 写评论工具。在需求、缺陷、任务等业务对象下添加评论，支持 Markdown / HTML / 纯文本自动识别，Markdown 自动转 HTML。支持 @提及、回复评论、富文本格式。用户要求评论或回复时一律使用 `tapd-cli comment`；绝对禁止浏览器、网页评论框、页面截图或 GUI 操作，也不因登录态或页面已打开而改道。执行前遵守 `tapd-openapi` 的环境预检，`TAPD_TOKEN` 未配置时阻断并按 `tapd-env-bootstrap` 的本机真源核对环境。
 allowed-tools: Bash,Read
 ---
 
@@ -10,8 +10,8 @@ allowed-tools: Bash,Read
 
 ## TAPD 评论通道优先级
 
-- 先用 `tapd-cli comment` 完成评论新增或回复；CLI 不支持所需格式、@提及或回复参数时，再使用本 skill 的 Python API 脚本。
-- CLI/API 能完成的评论不得改用浏览器。只有请求需要 API 无法提供的页面专属操作时，才按 `authenticated-url-routing-rules` 回退浏览器；凭据缺失或鉴权失败按 TAPD 环境规则处理，不得静默绕过。
+- 一律用 `tapd-cli comment` 完成评论新增或回复；CLI 不支持所需格式、@提及或回复参数时，先用 CLI 的正文文件传参与 HTML 形式补齐，仍无法完成时说明能力缺口并停止。
+- **绝对禁止浏览器评论（最高优先级）**：不得打开 TAPD 页面、操作网页评论框、截取评论页面或使用任何网页自动化。凭据缺失或鉴权失败按 TAPD 环境规则阻断，不得静默改用浏览器。
 
 ## 环境变量
 
@@ -116,4 +116,4 @@ echo '<p>评论内容</p>' | python3 scripts/add_comment.py --description -
 |------|---------|
 | 脚本报 `ModuleNotFoundError: markdown` | 按上文安装 `markdown` 库，或改用纯文本 / HTML 输入绕过 |
 | 鉴权失败 / 401 | 按 `tapd-env-bootstrap` 验证 `TAPD_TOKEN` 已注入且非空（只判断有无，不回显明文） |
-| 评论未出现 / 内容异常 | 确认 `--entry-type` / `--entry-id` 与目标实体一致；HTML 标签需在支持列表内，Markdown 转换失败时改传 HTML |
+| 评论未出现 / 内容异常 | 确认 `--entry-type` / `--entry-id` 与目标实体一致；HTML 标签需在支持列表内，Markdown 转换失败时改传 HTML；不得改用网页评论框核对或补发 |

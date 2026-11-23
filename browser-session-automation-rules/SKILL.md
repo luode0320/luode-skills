@@ -54,7 +54,6 @@ agent-browser snapshot -i  # 检查结果
 
 完整经验与命令模板见：
 - [references/browser-operation-lessons.md](references/browser-operation-lessons.md)
-- [references/tapd-workflow-automation.md](references/tapd-workflow-automation.md)
 
 ## 命令链式执行
 
@@ -387,7 +386,6 @@ agent-browser eval -b "$(echo -n 'Array.from(document.querySelectorAll("a")).map
 | [references/session-management.md](references/session-management.md) | 并行 session、状态持久化、并发抓取 |
 | [references/screenshot-cleanup.md](references/screenshot-cleanup.md) | 测试截图生命周期、清理时机与保留例外 |
 | [references/authentication.md](references/authentication.md) | 登录流程、OAuth、2FA、状态复用 |
-| [references/tapd-workflow-automation.md](references/tapd-workflow-automation.md) | TAPD 场景自动化流程、暂停点复盘与无交互收敛 |
 | [references/execution-failure-casebook.md](references/execution-failure-casebook.md) | 浏览器/session/snapshot 执行失败案例与恢复标准 |
 
 ## 浏览器引擎选择
@@ -406,14 +404,14 @@ agent-browser --engine lightpanda --executable-path /path/to/lightpanda open exa
 | [templates/form-automation.sh](templates/form-automation.sh) | 带校验的表单填写流程 |
 | [templates/authenticated-session.sh](templates/authenticated-session.sh) | 登录一次，后续复用状态 |
 | [templates/capture-workflow.sh](templates/capture-workflow.sh) | 带截图的内容抓取流程 |
-| [templates/tapd-weekly-report.sh](templates/tapd-weekly-report.sh) | TAPD 我的工作周维度进度统计（含 WAF/登录兜底） |
 
 ```bash
 ./templates/form-automation.sh https://example.com/form
 ./templates/authenticated-session.sh https://app.example.com/login
 ./templates/capture-workflow.sh https://example.com ./output
-./templates/tapd-weekly-report.sh 2026-04-03 ./output
 ```
+
+TAPD 任务不属于本 skill：TAPD 全流程强制使用 `tapd-cli`，绝对禁止用浏览器或本 skill 的 template 访问 TAPD 页面。
 
 ## 项目联调规则
 

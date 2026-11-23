@@ -168,12 +168,14 @@ tapd-cli task update workspaceid=<id> id=<任务id> status=done
 
 需求可以一步 `status=resolved`，**缺陷不行**。缺陷受项目工作流约束，`new` 通常没有直达 `resolved` 的边，硬传会失败或静默不生效。
 
-先拉工作流，筛出从当前状态出发的合法下一跳与必填字段（`Notnull=yes`）：
+先读实体当前状态与字段候选，再按项目已知工作流约束逐跳更新、每跳回读确认。`tapd-cli` 目前没有读取工作流转换规则的子命令，这是已知命令能力缺口；不得为此改走网页，也不得调用直接 API 脚本补位。
 
 ```bash
-python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py \
-  get --endpoint workflows/all_transitions -p workspace_id=<id> -p system=bug
+tapd-cli bug list workspaceid=<id> id=<缺陷id> fields=id,status,de,effort
+tapd-cli bug fields workspaceid=<id>
 ```
+
+字段候选用于确认目标状态键与必填人员字段；转换合法性以实际更新结果和回读为准。
 
 实测 30399328「研发内部需求」的缺陷工作流（2026-09-01，缺陷 1002897）：
 
@@ -183,21 +185,18 @@ python <skills>/tapd-openapi/scripts/tapd_client_stdlib.py \
 | `in_progress` | `in_progress` / `resolved` / `rejected` | 无 |
 | `resolved` | `resolved` / `verified` / `reopened` / `closed` | 到 `verified` 必填 `te`（测试人员）|
 
-所以 `new → resolved` 实际要走两跳：
+所以 `new → resolved` 实际要走两跳。`tapd-cli bug update` 当前帮助未列出 `de` / `effort` 参数，遇到工作流必填人员或估时字段时不能用 CLI 补齐，必须把缺口报告给用户，不伪造已流转：
 
-```
-POST bugs  status=in_progress  de=<中文名>  effort=<小时>
-POST bugs  status=resolved
-```
-
-**每跳后回读实体核对再走下一跳**，缺陷额外核对 `resolved` 时间戳已写入：
-
-```python
-r = tc.request("GET", "bugs", params={"workspace_id": ws, "id": bug_id,
-                                      "fields": "id,status,de,effort,resolved"})
+```bash
+tapd-cli bug update workspaceid=<id> id=<缺陷id> status=in_progress
+tapd-cli bug list   workspaceid=<id> id=<缺陷id> fields=id,status,de,effort
+tapd-cli bug update workspaceid=<id> id=<缺陷id> status=resolved
+tapd-cli bug list   workspaceid=<id> id=<缺陷id> fields=id,status,de,effort,resolved
 ```
 
-**工作流是项目级配置，各项目不同**，上表只是一个实例，不能当通用常量套用——每次都读 `all_transitions`。
+**每跳后回读实体核对再走下一跳**，缺陷额外核对 `resolved` 时间戳已写入。若第一跳因缺 `de` / `effort` 失败，停在当前状态并报告 CLI 能力缺口。
+
+**工作流是项目级配置，各项目不同**，上表只是一个实例，不能当通用常量套用——每次都先回读当前状态与字段候选，再按实际生效结果推进。
 
 **终态止于 `resolved`**：`verified` / `closed` 代表测试已验证通过，属测试角色判定，自动化流程不越权置上。
 

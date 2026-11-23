@@ -19,4 +19,4 @@
 | PowerShell/WSL多层引号失败 | CLI 无安全运行提示 | 合并 | CLI UTF-8临时脚本示例 | CLI仅链接业务流程不复写 | Windows/WSL/Python；无API写入冒烟 | 通用（平台分支） |
 | 固化本次人名、项目和Bug编号 | 用户仅授权经验吸收 | 拒绝 | 仅在来源记录保留案例 | 通用流程动态核对身份和项目 | N/A | 通用 |
 
-| 2026-10-19 TAPD 路由纠偏 | TAPD 查询与操作统一 CLI 优先；CLI 不支持或不能满足时直用 OpenAPI；浏览器仅用于 CLI/API 均无法完成的页面专属操作 | 合并：此前 tapd-openapi 描述把单条读取导向 API，authenticated URL 通用 Chrome 默认也可能覆盖 TAPD | tapd-openapi/SKILL.md 定义权威顺序；tapd-cli、tapd-addcomment、tapd-task-executor 与 authenticated-url-routing-rules 引用一致顺序 | 合并重复路由说明到 OpenAPI 权威；各执行 skill 仅保留领域入口；同域扫描 5 个技能，未发现新增重复门控或孤立产物 | 无新增环境依赖；复用现有 CLI/API 鉴权，不保存凭据 | 通用 |
+| 2026-11-23 内部调整（取代 2026-10-19 回退顺序） | TAPD 全流程强制 CLI，绝对禁止浏览器、网页、截图与 GUI 操作；CLI 能力缺口不转浏览器 | 合并：五个 TAPD skill 原为 CLI → 直接 API → 浏览器三级回退，浏览器 skill 还留有 TAPD 周报入口 | tapd-openapi/SKILL.md 统一为命令行唯一入口；tapd-cli、tapd-addcomment、tapd-task-executor 与 authenticated-url-routing-rules 同步；删除浏览器 skill 的 TAPD 参考与模板 | 同域扫描六个 skill：通用回退句收敛为一处口径，删除任务执行器的另路补位与浏览器 TAPD 模板，无孤立引用 | 无新增环境依赖；复用 tapd-env-bootstrap 的 CLI 凭据预检 | 通用 |

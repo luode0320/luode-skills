@@ -66,11 +66,6 @@ curl -s -H "Authorization: Bearer $TAPD_TOKEN" \
 
 **用途：** 获取项目内的工作项类型（如需求、缺陷、任务下的子类型），配合 `workitem_type_id` 使用。
 
-## 通用调用（使用 tapd_client_stdlib.py）
+## 命令通道说明
 
-```bash
-python3 {baseDir}/scripts/tapd_client_stdlib.py get --endpoint "workflows/all_transitions" -p workspace_id={id} -p system=story
-python3 {baseDir}/scripts/tapd_client_stdlib.py get --endpoint "workflows/status_map" -p workspace_id={id} -p system=bug
-python3 {baseDir}/scripts/tapd_client_stdlib.py get --endpoint "workflows/last_steps" -p workspace_id={id} -p system=story
-python3 {baseDir}/scripts/tapd_client_stdlib.py get --endpoint "workitem_types" -p workspace_id={id}
-```
+`tapd-cli` 当前没有工作流转规则查询子命令，本节只记录接口契约。需要工作流规则时如实报告 CLI 能力缺口，不用脚本替代 CLI，也不改走网页。
