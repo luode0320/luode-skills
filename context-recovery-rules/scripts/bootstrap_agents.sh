@@ -224,6 +224,15 @@ BODY_SKILL_AUTO=$(cat <<'EOF'
 EOF
 )
 
+# 用户级 skill 吸收同步到项目本地 skills/：强调同步+吸收而非完全拷贝，且吸收完成必须保证本地可命中可用
+BODY_USER_SKILL_SYNC=$(cat <<'EOF'
+- 每个项目都要把经常使用的用户级 skill 吸收同步到项目本地 `skills/` 中，以加快本项目对 skill 的命中与使用；典型对象是写代码项目的编码习惯、编码规则、日志规则、注释规则、测试规则等高频用户级 skill。
+- 是「同步 + 吸收」，不是完全拷贝：按本项目实际使用情况筛选高频、确实会命中的用户级 skill，取其触发条件与核心规则，结合本项目约定改写为项目本地可命中的 skill；禁止整目录原样复制、禁止不加筛选地全量搬运。
+- 吸收完成必须确保本地项目可使用这个 skill：产出的本地 skill 必须有可被自动触发的 `description` 和完整 `SKILL.md`，并由项目级规则文件（`AGENTS.md` / `CLAUDE.md`）声明扫描项目根 `skills/` 目录使其可被命中；只登记清单、只写计划，或产出的本地 skill 无法被本项目加载，均不算吸收完成。
+- 吸收、查重、分层判定与生命周期由 `project-local-skills-rules` 统一负责；通用规则仍以用户级 skill 为权威源，项目本地副本只承接本项目差异，用户级规则更新时同步回本地副本。
+EOF
+)
+
 BODY_NO_HALLUCINATE=$(cat <<'EOF'
 - 任何对文件、命令、搜索、网络的读取与执行，必须通过真实工具调用（独立 tool call）完成；严禁在回复正文里编写 `<invoke>` / `<result>` / 伪 function_calls 文本假装调用工具，也禁止凭记忆“想象”文件内容当作已读取结果。
 - 引用任何文件内容、行号、函数名、配置值前，必须来自本轮真实工具返回；未真实读取不得断言具体代码或数据。
@@ -812,6 +821,7 @@ sync_agents_file() {
   sync_section "$file" "适用范围" "$BODY_SCOPE"
   sync_section "$file" "注意" "$BODY_NOTICE"
   sync_section "$file" "Skill 强制自动触发规则（最高优先级）" "$BODY_SKILL_AUTO"
+  sync_section "$file" "用户级 Skill 吸收同步到项目本地 skills/（强制）" "$BODY_USER_SKILL_SYNC"
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$(resolve_no_auto_commit_body)"
   sync_section "$file" "跨项目写入红线（最高优先级，强制）" "$BODY_NO_CROSS_PROJECT_WRITE"

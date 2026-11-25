@@ -1,5 +1,20 @@
 # 项目当前状态
 
+## 2026-11-26 AGENTS.md 生成 skill 升级：新增「用户级 skill 吸收同步到本地 skills/」规则（已改动未提交）
+
+- 当前状态: 新章节已通过 context-recovery-rules 的唯一入口脚本写入根 AGENTS.md / CLAUDE.md，索引与脚本正文同步更新；本轮未授权 commit/push，停在已改动未提交。
+- 用户指令: 「在设定 AGENTS.md 规则的 skill 升级，加新规则到 md 和对应脚本，后续其他项目更新 md 也能新增规则」→「按这个方案执行, 但是要注意强调, 是同步加吸收不是完全拷贝, 吸收完成要确保本地项目可使用这个skill。」
+- 目标 skill 裁决: `context-recovery-rules`（本仓库唯一负责生成/同步 AGENTS.md / CLAUDE.md 受管章节的 skill；受管正文集中在 `context-recovery-rules/scripts/bootstrap_agents.sh` 的 BODY_* heredoc，由 `sync_agents_file` 逐个 `sync_section` 写入；索引 `context-recovery-rules/references/规则文件模板/agents-md-sections-index.md`）。
+- 已改文件（4 个，均 UTF-8）:
+  - `context-recovery-rules/scripts/bootstrap_agents.sh`: 新增 `BODY_USER_SKILL_SYNC`（4 条正文），并在 `sync_agents_file` 的「Skill 强制自动触发规则」之后插入一次 `sync_section`。
+  - `context-recovery-rules/references/规则文件模板/agents-md-sections-index.md`: 索引表新增第 5 行（标题→`BODY_USER_SKILL_SYNC`），原 5–24 行顺延为 6–25。
+  - `AGENTS.md`、`CLAUDE.md`: 由脚本同步写入新章节「用户级 Skill 吸收同步到项目本地 skills/（强制）」。
+- 新规则要点（落实用户「同步+吸收非完全拷贝、必须本地可用」）: 筛选高频确实命中的用户级 skill，取触发条件与核心规则结合本项目约定改写；禁止整目录复制/全量搬运；本地副本必须有可自动触发 description + 完整 SKILL.md + 项目规则文件声明扫描 skills/ 使其可命中；查重分层生命周期归 `project-local-skills-rules`，用户级为权威源、更新时回同步。
+- 验证: `bash -n` exit=0；AGENTS.md 与 CLAUDE.md MD5 相等（70D00A5E18D4E3680DDB8179BEE13DF1）；4 文件 UTF-8 严格解码通过；两规则文件新章节各出现 1 次；git diff 仅新增行、无全文件换行污染（均 CRLF，符合仓库 text=auto）。
+- 已回退的无相关改动: 脚本既有设计会遍历所有子目录 AGENTS.md，误注入两个第三方 vendored 资产 `proactive-agent__skillhub/assets/AGENTS.md`、`vercel-react-best-practices/AGENTS.md`，已 `git checkout --` 回退。该遍历行为是脚本既有设计（非本轮引入），豁免方式是文件内放 `<!-- bootstrap-agents:skip-managed-sections -->` 标记；未改第三方资产以控制 diff。
+- 前轮遗留（非本轮产物）: `.system/.codex-system-skills.marker` 有未提交改动（43386fb7→97863b75）；本地 main 领先 origin/main 1 笔未 push（c2fcfb1a）。
+- 交接点: 无阻断；用户本轮未授权 commit/push，等待提交指令。
+
 ## 2026-11-23 TAPD skill 强制 CLI、绝对禁止浏览器（待提交）
 
 - 当前状态: 五个 TAPD skill 与 URL 路由例外已统一为命令行为唯一入口；浏览器 skill 中的 TAPD 周报脚本与自动化参考已删除；改动已通过提交前校验，按用户本轮授权进入提交与推送。
