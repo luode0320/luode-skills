@@ -1,8 +1,8 @@
 # 项目当前状态
 
-## 2026-11-26 AGENTS.md 生成 skill 升级：新增「用户级 skill 吸收同步到本地 skills/」规则（已改动未提交）
+## 2026-11-26 AGENTS.md 生成 skill 升级：新增「用户级 skill 吸收同步到本地 skills/」规则（已提交并推送）
 
-- 当前状态: 新章节已通过 context-recovery-rules 的唯一入口脚本写入根 AGENTS.md / CLAUDE.md，索引与脚本正文同步更新；本轮未授权 commit/push，停在已改动未提交。
+- 当前状态: 已随业务目标一并提交并推送 origin/main（commit `4e08a135`），工作树干净、本地与远端 0/0 同步；新章节已通过 context-recovery-rules 唯一入口脚本写入根 AGENTS.md / CLAUDE.md，索引与脚本正文同步更新。
 - 用户指令: 「在设定 AGENTS.md 规则的 skill 升级，加新规则到 md 和对应脚本，后续其他项目更新 md 也能新增规则」→「按这个方案执行, 但是要注意强调, 是同步加吸收不是完全拷贝, 吸收完成要确保本地项目可使用这个skill。」
 - 目标 skill 裁决: `context-recovery-rules`（本仓库唯一负责生成/同步 AGENTS.md / CLAUDE.md 受管章节的 skill；受管正文集中在 `context-recovery-rules/scripts/bootstrap_agents.sh` 的 BODY_* heredoc，由 `sync_agents_file` 逐个 `sync_section` 写入；索引 `context-recovery-rules/references/规则文件模板/agents-md-sections-index.md`）。
 - 已改文件（4 个，均 UTF-8）:
@@ -12,8 +12,8 @@
 - 新规则要点（落实用户「同步+吸收非完全拷贝、必须本地可用」）: 筛选高频确实命中的用户级 skill，取触发条件与核心规则结合本项目约定改写；禁止整目录复制/全量搬运；本地副本必须有可自动触发 description + 完整 SKILL.md + 项目规则文件声明扫描 skills/ 使其可命中；查重分层生命周期归 `project-local-skills-rules`，用户级为权威源、更新时回同步。
 - 验证: `bash -n` exit=0；AGENTS.md 与 CLAUDE.md MD5 相等（70D00A5E18D4E3680DDB8179BEE13DF1）；4 文件 UTF-8 严格解码通过；两规则文件新章节各出现 1 次；git diff 仅新增行、无全文件换行污染（均 CRLF，符合仓库 text=auto）。
 - 已回退的无相关改动: 脚本既有设计会遍历所有子目录 AGENTS.md，误注入两个第三方 vendored 资产 `proactive-agent__skillhub/assets/AGENTS.md`、`vercel-react-best-practices/AGENTS.md`，已 `git checkout --` 回退。该遍历行为是脚本既有设计（非本轮引入），豁免方式是文件内放 `<!-- bootstrap-agents:skip-managed-sections -->` 标记；未改第三方资产以控制 diff。
-- 前轮遗留（非本轮产物）: `.system/.codex-system-skills.marker` 有未提交改动（43386fb7→97863b75）；本地 main 领先 origin/main 1 笔未 push（c2fcfb1a）。
-- 交接点: 无阻断；用户本轮未授权 commit/push，等待提交指令。
+- 前轮遗留（非本轮产物，已随本轮收口）: `.system/.codex-system-skills.marker`（43386fb7→97863b75）在用户「所有文件提交」显式放行下已一并提交；本地领先 1 笔 c2fcfb1a 也已随本轮 push 一并同步远端。
+- 交接点: 无阻断，已提交并推送完成。本轮经验已沉淀到知识库 `20-Knowledge/开发环境/Windows下git与PowerShell命令输出解析陷阱.md` 并挂载到 `30-MOCs/开发环境与跨宿主工程-MOC.md`（pwsh 解析 git -z 输出 char[] 假阴性、系统 bash.exe 是 WSL stub 致中文乱码）。
 
 ## 2026-11-23 TAPD skill 强制 CLI、绝对禁止浏览器（待提交）
 
