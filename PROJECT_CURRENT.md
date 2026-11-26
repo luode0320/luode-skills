@@ -1,5 +1,24 @@
 # 项目当前状态
 
+## 2026-11-26 context-recovery-rules 规则升级：新增「用户级 skills 完全授权」与「反打补丁/重构立即提示」（已改动未提交）
+
+- 当前状态: 两条规则已写入脚本与索引，并同步到根 AGENTS.md / CLAUDE.md；bug 域三个 skill 已补「重构立即提示」规则。本轮用户未授权 commit/push，停在「已改动未提交」，工作树保留本轮 8 项改动（含 PROJECT_CURRENT.md）+ 2 项非本轮用户级 skill 更新。
+- 用户指令: 「context-recovery-rules: 在给md加规则: 1. 用户级skills的目是完全授权的, 不会被跨项目红线给拦截, 因为skills是需要及时更新的, 不需要控制权限 2. 改bug、修复问题、补充一些逻辑, 不能以打补丁修复为主要流程, 如果需要重构, 重新设计就要立刻提示用户需要重构了 -> 这个规则还要更新到bug相关的skii规则中。」
+- 目标 skill 裁决: `context-recovery-rules`（唯一负责生成/同步 AGENTS.md / CLAUDE.md 受管章节）；规则 2 同步落点 `bug-fix-proposal-rules` / `bug-intake-rules` / `bug-root-cause-rules`。
+- 物理实体验证: 仓库 skill 与用户级 `C:\Users\luode\.dsh\skills\` 对应目录 fsutil FileId 完全相同（junction/同址），改仓库 skill 即改用户级 skill，无需 WRT 跨项目授权。
+- 本轮已改文件（7 个，均 UTF-8）:
+  - `context-recovery-rules/scripts/bootstrap_agents.sh`: 新增 `BODY_USER_SKILLS_FULL_AUTH`（3 条：用户级 skill 目录完全授权、不受跨项目红线与 WRT-* 约束、豁免仅限 skill 目录本身）与 `BODY_NO_PATCH_REFACTOR_PROMPT`（3 条：禁止打补丁为主流程、需重构/重新设计立即主动提示用户并给方案等确认、提示是即时动作不省略）；`sync_agents_file` 各插入一次 `sync_section`。
+  - `context-recovery-rules/references/规则文件模板/agents-md-sections-index.md`: 索引新增第 9 行与第 17 行，共 27 条受管章节。
+  - `AGENTS.md`、`CLAUDE.md`: 由脚本同步写入两个新章节「用户级 skills 目录完全授权（强制）」「改bug/补逻辑禁止打补丁且需重构立即提示（强制）」。
+  - `bug-fix-proposal-rules/SKILL.md`: 第 85 行强化为「必须立即、主动提示用户需要重构/重新设计，说明原因与影响范围，给方案等确认后再实施，不得等定稿才被动提出，不得因改动小/用户没问省略」。
+  - `bug-intake-rules/SKILL.md`: 「进入后先做什么」新增第 7 条，侦察阶段预判需重构即主动提示并写入 Bug 主文档。
+  - `bug-root-cause-rules/SKILL.md`: 步骤新增第 8 条，根因指向架构缺陷需重构即主动提示，禁止转打补丁/双轨兼容。
+- 验证: 7 文件 UTF-8 严格解码全 OK；AGENTS.md 与 CLAUDE.md MD5 相等（AB7D91FF4B7F464867392B6A5E5A2CB1）；两新章节在两规则文件各出现 1 次；`bash -n` exit=0；`archive_project_current.py --check` PASS（13003 字节 / 5 日期小节）。
+- 已回退: 脚本既有遍历设计误注入两个第三方 vendored 资产 `proactive-agent__skillhub/assets/AGENTS.md`、`vercel-react-best-practices/AGENTS.md`，已 `git checkout --` 回退；`node_modules/cytoscape/AGENTS.md` 被注入但不被 git 跟踪，不进 status。
+- 非本轮改动（甄别后保留原样）: `code-change-finalization-gate-rules/SKILL.md`、`functional-validation-rules/SKILL.md` 被 M（「移动 App 模拟器验收」主题），属用户级 skill 独立更新，与本轮两条规则无关；按新规则 1 属完全授权，本轮不纳入、不回退。收口期间曾出现 `code-generation-style-rules/SKILL (1).md`、`user-style-feedback-library (1).md` 副本漂移及 `user-style-feedback-library.md` 被 D，已被外部同步进程修复（原文件恢复、副本清除），当前 status 不再体现。
+- skill 字典: 本轮未改任何 skill 的 description，未新增/修改 `##` 级标题，按 AGENTS.md 规则无需重跑 `generate_dictionary.py`。
+- 交接点: 无阻断，停在已改动未提交；用户授权提交后按本项目「提交即推送」闭环 commit + push origin/main。
+
 ## 2026-11-26 AGENTS.md 生成 skill 升级：新增「用户级 skill 吸收同步到本地 skills/」规则（已提交并推送）
 
 - 当前状态: 已随业务目标一并提交并推送 origin/main（commit `4e08a135`），工作树干净、本地与远端 0/0 同步；新章节已通过 context-recovery-rules 唯一入口脚本写入根 AGENTS.md / CLAUDE.md，索引与脚本正文同步更新。

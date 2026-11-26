@@ -12,23 +12,25 @@
 | 6 | 严禁脑补工具调用与结果（最高优先级，强制） | `BODY_NO_HALLUCINATE` |
 | 7 | 严禁自动提交 Git（最高优先级，强制） | `BODY_NO_AUTO_COMMIT` + `BODY_NO_AUTO_COMMIT_PROJECT_EXTRA`（仅归属仓库） |
 | 8 | 跨项目写入红线（最高优先级，强制） | `BODY_NO_CROSS_PROJECT_WRITE` |
-| 9 | Skill 命中强制规则 | `BODY_SKILL_HIT` |
-| 10 | 代码生成风格入口规则 | `BODY_CODE_GENERATION_STYLE` |
-| 11 | Karpathy 风格硬闸门 | `BODY_KARPATHY_HARD_GATES` |
-| 12 | 注释任务强制流程 | `BODY_COMMENT_TASK` |
-| 13 | 上下文压缩续做规则 | `BODY_CONTEXT_COMPRESS` |
-| 14 | 文件编码与写入规则 | `BODY_CHINESE_ENC` |
-| 15 | 变更最小化 | `BODY_MIN_CHANGE` |
-| 16 | 本地连接调试测试红线（最高优先级，强制） | `BODY_LOCAL_ONLY_CONNECTION` |
-| 17 | 测试不得污染生产代码红线（最高优先级，强制） | `BODY_TEST_POLLUTION` |
-| 18 | 最小实现优先级阶梯 | `BODY_MINIMAL_LADDER` |
-| 19 | 输出格式规则 | `BODY_OUTPUT_FORMAT` |
-| 20 | Windows / WSL 执行规则 | `BODY_WINDOWS_WSL` |
-| 21 | CodeGraph 与代码检索 | `BODY_CODEGRAPH` |
-| 22 | 插件检测安装规则 | `BODY_PLUGIN` |
-| 23 | 图像生成强制规则 | `BODY_IMAGEGEN` |
-| 24 | Godot 项目工具配置（仅 Godot 项目） | `GODOT_TOOLING_SECTION` |
-| 25 | 图像生成配置（仅 Godot 项目） | `GODOT_IMAGEGEN_SECTION` |
+| 9 | 用户级 skills 目录完全授权（强制） | `BODY_USER_SKILLS_FULL_AUTH` |
+| 10 | Skill 命中强制规则 | `BODY_SKILL_HIT` |
+| 11 | 代码生成风格入口规则 | `BODY_CODE_GENERATION_STYLE` |
+| 12 | Karpathy 风格硬闸门 | `BODY_KARPATHY_HARD_GATES` |
+| 13 | 注释任务强制流程 | `BODY_COMMENT_TASK` |
+| 14 | 上下文压缩续做规则 | `BODY_CONTEXT_COMPRESS` |
+| 15 | 文件编码与写入规则 | `BODY_CHINESE_ENC` |
+| 16 | 变更最小化 | `BODY_MIN_CHANGE` |
+| 17 | 改bug/补逻辑禁止打补丁且需重构立即提示（强制） | `BODY_NO_PATCH_REFACTOR_PROMPT` |
+| 18 | 本地连接调试测试红线（最高优先级，强制） | `BODY_LOCAL_ONLY_CONNECTION` |
+| 19 | 测试不得污染生产代码红线（最高优先级，强制） | `BODY_TEST_POLLUTION` |
+| 20 | 最小实现优先级阶梯 | `BODY_MINIMAL_LADDER` |
+| 21 | 输出格式规则 | `BODY_OUTPUT_FORMAT` |
+| 22 | Windows / WSL 执行规则 | `BODY_WINDOWS_WSL` |
+| 23 | CodeGraph 与代码检索 | `BODY_CODEGRAPH` |
+| 24 | 插件检测安装规则 | `BODY_PLUGIN` |
+| 25 | 图像生成强制规则 | `BODY_IMAGEGEN` |
+| 26 | Godot 项目工具配置（仅 Godot 项目） | `GODOT_TOOLING_SECTION` |
+| 27 | 图像生成配置（仅 Godot 项目） | `GODOT_IMAGEGEN_SECTION` |
 
 非受管但同属规则文件组的静态内容：`GITATTRIBUTES_CONTENT`（两种换行符变体）、`EDITORCONFIG_CONTENT`（两种换行符变体），只在 `.gitattributes` / `.editorconfig` 缺失时首次写入，不走 `sync_section` 增量同步。
 

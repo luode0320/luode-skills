@@ -271,6 +271,14 @@ BODY_NO_CROSS_PROJECT_WRITE=$(cat <<'EOF'
 EOF
 )
 
+# 用户级 skills 目录完全授权：不受跨项目写入红线拦截，skills 需要及时更新，无需逐笔控制权限
+BODY_USER_SKILLS_FULL_AUTH=$(cat <<'EOF'
+- 用户级 skill 目录（如 `~/.dsh/skills/`、`~/.claude/skills/`、`~/.workbuddy/skills/` 及作为用户级权威源的 skill 目录）**完全授权**：可随时读取、修改、新增、删除、同步，不受「跨项目写入红线」与 `WRT-*` 会话级授权约束，也不需要事先申请跨项目写入授权。
+- 理由：skill 是需要及时更新的共享能力资产，更新频率高、影响范围就是 skill 本身，不需要按项目逐笔控制权限；对用户级 skill 目录的写入视为常规操作，直接执行。
+- 本豁免只覆盖用户级 skill 目录本身；对其中引用的其他项目代码、配置、数据的写入仍按「跨项目写入红线」与各独立红线执行，不得借本豁免扩权到 skill 目录之外。
+EOF
+)
+
 BODY_SKILL_HIT=$(cat <<'EOF'
 - 处理本仓库任务时，按 skill `description` 加载适用的 skill；Plan Mode 下计划出口由 `implementation-planning-rules` 独占。
 - 本项目默认允许 subagent 并行：任务可切分、写集不冲突、风险可控且环境支持时直接启动，不必逐个征询。单一根因、需求边界、接口契约、schema 或架构方向等需统一裁决的主路径保持串行。
@@ -335,6 +343,14 @@ EOF
 
 BODY_MIN_CHANGE=$(cat <<'EOF'
 - 注释补充不改变业务逻辑。
+EOF
+)
+
+# 改 bug / 修复问题 / 补逻辑：禁止以打补丁为主要流程，需重构或重新设计时必须立即提示用户
+BODY_NO_PATCH_REFACTOR_PROMPT=$(cat <<'EOF'
+- 改 bug、修复问题、补充逻辑时，**禁止把打补丁式修复当作主要流程**：必须针对根因、从源头消除问题，在主流程直接补齐，不得靠外围特判、双轨分流、try-catch 吞异常、对坏数据兜底等打补丁妥协绕过架构。
+- 一旦判断根因修复需要重构或重新设计（超出当前修复的最小范围），**必须立即、主动提示用户「需要重构 / 重新设计」**，说明原因与影响范围，并给出干净的重构方案等待用户确认；严禁为了「少改代码」「本次先修」而 silently 退回打补丁、叠加兼容层或拖延提示。
+- 提示是即时动作，不因「当前改动很小」「用户没问」而省略；反打补丁判据与落点统一见 `code-quality-rules`，Bug 域修复方案落点见 `bug-fix-proposal-rules`。
 EOF
 )
 
@@ -825,6 +841,7 @@ sync_agents_file() {
   sync_section "$file" "严禁脑补工具调用与结果（最高优先级，强制）" "$BODY_NO_HALLUCINATE"
   sync_section "$file" "严禁自动提交 Git（最高优先级，强制）" "$(resolve_no_auto_commit_body)"
   sync_section "$file" "跨项目写入红线（最高优先级，强制）" "$BODY_NO_CROSS_PROJECT_WRITE"
+  sync_section "$file" "用户级 skills 目录完全授权（强制）" "$BODY_USER_SKILLS_FULL_AUTH"
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
   sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"
   sync_section "$file" "Karpathy 风格硬闸门" "$BODY_KARPATHY_HARD_GATES"
@@ -832,6 +849,7 @@ sync_agents_file() {
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
   sync_section "$file" "文件编码与写入规则" "$BODY_CHINESE_ENC"
   sync_section "$file" "变更最小化" "$BODY_MIN_CHANGE"
+  sync_section "$file" "改bug/补逻辑禁止打补丁且需重构立即提示（强制）" "$BODY_NO_PATCH_REFACTOR_PROMPT"
   sync_section "$file" "本地连接调试测试红线（最高优先级，强制）" "$BODY_LOCAL_ONLY_CONNECTION"
   sync_section "$file" "测试不得污染生产代码红线（最高优先级，强制）" "$BODY_TEST_POLLUTION"
   sync_section "$file" "最小实现优先级阶梯" "$BODY_MINIMAL_LADDER"
