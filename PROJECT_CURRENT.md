@@ -1,9 +1,9 @@
 # 项目当前状态
 
-## 2026-11-26 context-recovery-rules 规则升级：新增「用户级 skills 完全授权」与「反打补丁/重构立即提示」（已改动未提交）
+## 2026-11-26 context-recovery-rules 规则升级：新增「用户级 skills 完全授权」与「反打补丁/重构立即提示」（已提交并推送）
 
-- 当前状态: 两条规则已写入脚本与索引，并同步到根 AGENTS.md / CLAUDE.md；bug 域三个 skill 已补「重构立即提示」规则。本轮用户未授权 commit/push，停在「已改动未提交」，工作树保留本轮 8 项改动（含 PROJECT_CURRENT.md）+ 2 项非本轮用户级 skill 更新。
-- 用户指令: 「context-recovery-rules: 在给md加规则: 1. 用户级skills的目是完全授权的, 不会被跨项目红线给拦截, 因为skills是需要及时更新的, 不需要控制权限 2. 改bug、修复问题、补充一些逻辑, 不能以打补丁修复为主要流程, 如果需要重构, 重新设计就要立刻提示用户需要重构了 -> 这个规则还要更新到bug相关的skii规则中。」
+- 当前状态: 两条规则已写入脚本与索引，并同步到根 AGENTS.md / CLAUDE.md；bug 域三个 skill 已补「重构立即提示」规则。本轮用户「吸收经验并根据git提交skill的规则, 所有文件提交git。」显式授权全部文件，已随业务目标一并提交并推送 origin/main（commit `0cce17c0`），工作树干净、本地与远端 0/0 同步。
+- 用户指令: 「context-recovery-rules: 在给md加规则: 1. 用户级skills的目是完全授权的, 不会被跨项目红线给拦截, 因为skills是需要及时更新的, 不需要控制权限 2. 改bug、修复问题、补充一些逻辑, 不能以打补丁修复为主要流程, 如果需要重构, 重新设计就要立刻提示用户需要重构了 -> 这个规则还要更新到bug相关的skii规则中。」（提交轮 m00465：「吸收经验并根据git提交skill的规则, 所有文件提交git。」）
 - 目标 skill 裁决: `context-recovery-rules`（唯一负责生成/同步 AGENTS.md / CLAUDE.md 受管章节）；规则 2 同步落点 `bug-fix-proposal-rules` / `bug-intake-rules` / `bug-root-cause-rules`。
 - 物理实体验证: 仓库 skill 与用户级 `C:\Users\luode\.dsh\skills\` 对应目录 fsutil FileId 完全相同（junction/同址），改仓库 skill 即改用户级 skill，无需 WRT 跨项目授权。
 - 本轮已改文件（7 个，均 UTF-8）:
@@ -17,7 +17,7 @@
 - 已回退: 脚本既有遍历设计误注入两个第三方 vendored 资产 `proactive-agent__skillhub/assets/AGENTS.md`、`vercel-react-best-practices/AGENTS.md`，已 `git checkout --` 回退；`node_modules/cytoscape/AGENTS.md` 被注入但不被 git 跟踪，不进 status。
 - 非本轮改动（甄别后保留原样）: `code-change-finalization-gate-rules/SKILL.md`、`functional-validation-rules/SKILL.md` 被 M（「移动 App 模拟器验收」主题），属用户级 skill 独立更新，与本轮两条规则无关；按新规则 1 属完全授权，本轮不纳入、不回退。收口期间曾出现 `code-generation-style-rules/SKILL (1).md`、`user-style-feedback-library (1).md` 副本漂移及 `user-style-feedback-library.md` 被 D，已被外部同步进程修复（原文件恢复、副本清除），当前 status 不再体现。
 - skill 字典: 本轮未改任何 skill 的 description，未新增/修改 `##` 级标题，按 AGENTS.md 规则无需重跑 `generate_dictionary.py`。
-- 交接点: 无阻断，停在已改动未提交；用户授权提交后按本项目「提交即推送」闭环 commit + push origin/main。
+- 交接点: 无阻断，已提交并推送完成（commit `0cce17c0`，pre/post gate 均 PASS，push `308d2e1d..0cce17c0 main -> main`，ahead/behind 0/0，工作树清空）。用户放行文件：本轮 7 个规则/文档文件 + 非本轮 2 个用户级 skill 更新（`code-change-finalization-gate-rules/SKILL.md`、`functional-validation-rules/SKILL.md`，按用户「所有文件」显式放行一并提交）。本轮经验已沉淀到知识库 `20-Knowledge/开发环境/用fsutil FileId判断目录同址与跨项目授权边界.md` 并挂载到 `30-MOCs/开发环境与跨宿主工程-MOC.md`（fsutil FileId 比同址 → junction 同物理实体 → 无需 WRT 跨项目授权）；knowledge_index.py check exit=0（checked_notes=558、dead_link=0、unmounted=0）。
 
 ## 2026-11-26 AGENTS.md 生成 skill 升级：新增「用户级 skill 吸收同步到本地 skills/」规则（已提交并推送）
 
