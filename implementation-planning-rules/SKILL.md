@@ -24,6 +24,7 @@ description: 当来源对象（需求或 Bug）的前置条件已收敛，正式
 - 当新项目启动或项目初期同时存在多份需求、实施总览或实施周期时，先建立“需求与实施计划全量顺序实施方案”，统一排列需求 -> 实施总览 -> 实施周期 -> 周期内最小任务的全量执行顺序；每个实施计划内继续保留 `AC-*` 完成条件。
 - “需求与实施计划全量顺序实施方案”是跨需求 / 跨来源对象的总调度表；它不替代单个来源对象的实施总览、实施周期和最小任务文档，只负责把这些文档串成一个可执行的项目级顺序。
 - 实施规划阶段默认采用只读计划模式：禁止写代码、禁止直接改实现、禁止边计划边试做；只允许读仓库、定依赖、列风险、拆任务、写实施文档。
+- **开写前必须过计划完善度闸门（READY 才准写码）**：任何会改变可执行行为的代码任务（新增 / 修改 / 重构 / Bug 修复），在 agent 动手写码前，计划必须先经 `references/plan-readiness-gate.md` 判定为 `READY`；`NEEDS_REFINEMENT` / `BLOCKED` 一律先回到计划补齐，禁止带病开写，也禁止用 agent 自评"计划已经完善"代替机器判定。这条对 Plan Mode 正式计划和 `minimum-plan-grading` 轻量通道同等生效，不因用户没问、改动看似小或时间紧而豁免。
 - **方案设计架构与可读性优先（严禁打补丁式妥协规划）**：在方案设计与任务拆分时，**严禁为了“不想改动太大/控制 diff/避免修改旧逻辑”而设计打补丁式的妥协方案**（如在数据表加临时列、在核心状态机堆砌特判 flag 搞新旧双轨分流兼容、在外围套壳胶水代码绕过主流程）。面对新旧规则冲突，必须以系统架构纯粹性与代码可读性为第一位，规划统一模型或主流程正向演进；若是原有主流程遗漏了逻辑，应当直接规划在主流程中补齐，绝不搞外围修补（详见 `code-quality-rules` 的 `no-patchwork-architecture-discipline.md`）。
 - 明确本轮要改哪些目录、文件、模块和职责边界，避免一边写代码一边临时漂移。
 - 若计划包含新增文件，强制使用目录树（`text` 代码块）列出新增文件，并在树节点后标注用途说明。
@@ -86,6 +87,7 @@ description: 当来源对象（需求或 Bug）的前置条件已收敛，正式
 ## references 读取规则
 
 - 默认先读 `references/plan-entry-checklist.md`。
+- 方案收敛后、正式计划放行或进入写码前，必须读 `references/plan-readiness-gate.md`，并用 `scripts/check_plan_readiness.py <计划文档> [--tier full|lite] [--explain]` 跑出 `READY(0) / NEEDS_REFINEMENT(1) / BLOCKED(2)` 三态；非 READY 不得进入写码。
 - 只要计划涉及 API 接口测试（有 method + path 的 HTTP 接口）或前端页面改动面，必须读 `../test-strategy-rules/SKILL.md` 的「文档阶段测试要求预埋（强制）」节，把本轮适用的层（本地 test/ 单元测试 + 完善 apifox 接口用例 + 前端页面自动化点击测试）按顺序写进真实测试安排章节。
 - 只要计划要交给新会话执行，或计划包含跨项目代码引用，必须先读 `references/cross-session-plan-execution-contract.md`。
 - 只要需要引用其他项目但只知道项目名、不知道项目路径，必须先读 `references/sibling-project-discovery.md` 按发现顺序定位，再回到 `EXT-*` 契约登记。

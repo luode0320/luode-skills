@@ -1,5 +1,23 @@
 # 项目当前状态
 
+## 2026-11-26 计划完善度闸门：md 受管章节 + skill 强化 + 机器校验脚本（已改动未提交）
+
+- 当前状态: 用户 m00571 提出「写不好计划就开写，写完又回老问题，怎么让计划完善了才让 AI 开写、怎么优化 skill 与 context-recovery-rules 的 md」。经三项决策（均选推荐项：md+skill 双管 / 分级两档 / 机器校验脚本）批准实施计划后，已全部改造完成并验证通过，停在「已改动未提交」（本轮无提交授权）。
+- 根因判断: 现有规则字段已很完备，缺的是「可判定的收口闸门 + 强制触发 + 防自评放水」，而不是更多字段。
+- 用户三项决策（均已拍板选推荐项）: ① gate_scope = md + skill 双管；② gate_strictness = 分级两档（重大全量 / 中等简化，都须 READY 才准开写）；③ gate_enforcement = 加机器校验脚本输出 READY / NEEDS_REFINEMENT / BLOCKED 三态。
+- 本轮已改文件（8 个，均 UTF-8）:
+  - `context-recovery-rules/scripts/bootstrap_agents.sh`: 新增 `BODY_PLAN_READINESS_GATE`（4 条：开写前须 READY 且禁自评、两档不豁免轻量通道、统一由 check_plan_readiness.py 判定且 FEAS-* 未验证即 BLOCKED、与反打补丁/重构提示并行），`sync_section` 插在 Karpathy 之后。
+  - `context-recovery-rules/references/规则文件模板/agents-md-sections-index.md`: 新增第 13 行「计划完善度闸门（强制）」→BODY_PLAN_READINESS_GATE，受管章节 27→28，13-28 重编号。
+  - `AGENTS.md`、`CLAUDE.md`: 由脚本同步写入新章节「## 计划完善度闸门（强制）」。
+  - `implementation-planning-rules/SKILL.md`: 入口新增「开写前必须过计划完善度闸门」硬规则 + references 读取规则行（未改 description、未新增 `##` 标题）。
+  - `implementation-planning-rules/references/plan-readiness-gate.md`（新建）: 唯一判据来源——适用范围/两档/lite 五项/full 追加四项/脚本用法/三态处置/回归样例/与 plan-output-gate 等 reference 的边界。
+  - `implementation-planning-rules/scripts/check_plan_readiness.py`（新建，约 150 行，纯标准库只读）: CLI `<plan.md> [--tier full|lite] [--explain]`，auto_tier 自动定档，lite 五项 + full 追加四项，三态退出码 0/1/2。
+- 测试资产（新建，5 个文件）: `implementation-planning-rules/tests/fixtures/` 下 `lite_ready.md`(0)、`full_ready.md`(0)、`missing_ac.md`(1，AC 写「完成即可」)、`undecided.md`(2，含「待确认」)，配套 `docs/requirement-demo.md` 供来源落盘检查。
+- 验证（全通过）: 4 份 fixture 三态与退出码全对（0/0/1/2）；`bash -n` exit=0；AGENTS.md 与 CLAUDE.md MD5 相等=614B0DC787F1B8FB453AD1747E93F1A5；新章节在两规则文件各出现 1 次；7 个改动文件 UTF-8 严格解码全 OK；`archive_project_current.py --check` PASS（17962 字节 / 6 日期小节，PROJECT_CURRENT 更新后 21695 字节 / 7 小节仍 PASS）；`git diff --check` exit=0；`scan_test_pollution.py --root . --diff-only` POLLUTION: PASS（扫描生产文件 1 个，命中 0）；`check_function_header.py --root . --diff-only` HEADER: PASS（PASS=4 / INVALID=0 / MISSING=0，首检 MISSING=4 已补齐 4 个函数头元信息）；`python -B -m py_compile` EXIT=0 且 `__pycache__` 已清理回读确认。
+- 已回退: 脚本既有遍历设计误注入两个第三方 vendored 资产 `proactive-agent__skillhub/assets/AGENTS.md`、`vercel-react-best-practices/AGENTS.md`，已 `git checkout --` 回退；`node_modules/cytoscape/AGENTS.md` 被注入但不被 git 跟踪，不进 status。
+- skill 字典: 未改任何 skill 的 description、未新增/修改 `##` 级标题（`implementation-planning-rules/SKILL.md` 只加了正文列表行），按 AGENTS.md 规则无需重跑 `generate_dictionary.py`。
+- 交接点: 无阻断，工作树 8 项改动未提交；本轮未授权 commit/push，等用户下一步指令。main 与 origin/main 0/0 同步。
+
 ## 2026-11-26 context-recovery-rules 规则升级：新增「用户级 skills 完全授权」与「反打补丁/重构立即提示」（已提交并推送）
 
 - 当前状态: 两条规则已写入脚本与索引，并同步到根 AGENTS.md / CLAUDE.md；bug 域三个 skill 已补「重构立即提示」规则。本轮用户「吸收经验并根据git提交skill的规则, 所有文件提交git。」显式授权全部文件，已随业务目标一并提交并推送 origin/main（commit `0cce17c0`），工作树干净、本地与远端 0/0 同步。

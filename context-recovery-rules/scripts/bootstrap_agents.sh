@@ -314,6 +314,15 @@ BODY_KARPATHY_HARD_GATES=$(cat <<'EOF'
 EOF
 )
 
+# 计划完善度闸门：开写代码前计划必须先被机器判定为 READY，防止不完善计划直接开写
+BODY_PLAN_READINESS_GATE=$(cat <<'EOF'
+- 写代码前必须先让计划通过完善度闸门判定为 `READY`；判定为 `NEEDS_REFINEMENT` 或 `BLOCKED` 时先补计划，禁止直接开写。闸门只认可机器判定的章节 / 字段标记与非占位内容，禁止 agent 用「已完成 / 已完善 / 应该没问题」自评替代。
+- 闸门分两档：重大改动（实施周期≥2 / 最小任务≥3 / 跨≥2 模块 / 含时序或状态迁移）走全量实施文档闸门；中等改动走简化完善度清单（来源落盘 / 边界清楚 / 完成条件可测 / 决策无未决 / 反方批判）。两档都必须 READY 才准开写，非 Plan Mode 的轻量通道不豁免。
+- 机器判定统一由 `implementation-planning-rules/scripts/check_plan_readiness.py` 执行，输出 READY / NEEDS_REFINEMENT / BLOCKED 三态；计划含方向级假设时，FEAS-* 必须标记为「已探针验证」，未验证即 BLOCKED。
+- 本闸门与「反打补丁 / 重构立即提示」并行生效：计划 READY 不等于可以绕过根因或跳过重构提示；判据细则见 `implementation-planning-rules/references/plan-readiness-gate.md`。
+EOF
+)
+
 
 BODY_COMMENT_TASK=$(cat <<'EOF'
 - 触发词：补充注释 / 注意中文编码 / 只补注释 / 注释完善 / 加注释。
@@ -845,6 +854,7 @@ sync_agents_file() {
   sync_section "$file" "Skill 命中强制规则" "$BODY_SKILL_HIT"
   sync_section "$file" "代码生成风格入口规则" "$BODY_CODE_GENERATION_STYLE"
   sync_section "$file" "Karpathy 风格硬闸门" "$BODY_KARPATHY_HARD_GATES"
+  sync_section "$file" "计划完善度闸门（强制）" "$BODY_PLAN_READINESS_GATE"
   sync_section "$file" "注释任务强制流程" "$BODY_COMMENT_TASK"
   sync_section "$file" "上下文压缩续做规则" "$BODY_CONTEXT_COMPRESS"
   sync_section "$file" "文件编码与写入规则" "$BODY_CHINESE_ENC"
